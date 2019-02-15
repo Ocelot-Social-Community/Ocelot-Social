@@ -6,13 +6,15 @@ module.exports = {
   outputDir: process.env.BUILD === 'library'
     ? path.resolve(__dirname, "./dist")
     : path.resolve(__dirname, "./docs"),
+
   css: {
     loaderOptions: {
       sass: {
-        data: `@import "@@/styles/shared.scss";`
+        data: '@import "@@/styles/shared.scss";'
       }
     }
   },
+
   configureWebpack: {
     devServer: {
       historyApiFallback: true
@@ -50,6 +52,7 @@ module.exports = {
       ]
       : []
   },
+
   chainWebpack: config => {
     config.module
       .rule('eslint')
@@ -75,5 +78,8 @@ module.exports = {
           ]
         }
       })
-  }
+  },
+
+  productionSourceMap: false,
+  lintOnSave: false
 }
