@@ -1,8 +1,12 @@
 <template>
   <div>
     <portal to="modal">
-      <div :key="key" class="ds-modal-wrapper">
-        <transition name="ds-transition-fade" appear>
+      <div 
+        :key="key" 
+        class="ds-modal-wrapper">
+        <transition 
+          name="ds-transition-fade" 
+          appear>
           <div
             v-if="isOpen"
             class="ds-modal-backdrop"
@@ -12,7 +16,9 @@
             &nbsp;
           </div>
         </transition>
-        <transition name="ds-transition-modal-appear" appear>
+        <transition 
+          name="ds-transition-modal-appear" 
+          appear>
           <ds-card
             v-if="isOpen"
             class="ds-modal"
@@ -43,8 +49,14 @@
                 :cancelLabel="cancelLabel"
                 :confirmLabel="confirmLabel"
               >
-                <ds-button ghost icon="close" @click.prevent="cancel('cancel')">{{ cancelLabel }}</ds-button>
-                <ds-button primary icon="check" @click.prevent="confirm('confirm')">{{ confirmLabel }}</ds-button>
+                <ds-button 
+                  ghost 
+                  icon="close" 
+                  @click.prevent="cancel('cancel')">{{ cancelLabel }}</ds-button>
+                <ds-button 
+                  primary 
+                  icon="check" 
+                  @click.prevent="confirm('confirm')">{{ confirmLabel }}</ds-button>
               </slot>
             </template>
           </ds-card>

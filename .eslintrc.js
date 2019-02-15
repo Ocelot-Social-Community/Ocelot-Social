@@ -1,12 +1,11 @@
 module.exports = {
   root: true,
   env: {
+    browser: true,
     node: true
   },
   "extends": [
-    'plugin:vue/strongly-recommended',
-    'plugin:prettier/recommended',
-    'eslint:recommended'
+    'plugin:vue/strongly-recommended'
   ],
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
