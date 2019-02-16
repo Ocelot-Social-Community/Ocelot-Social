@@ -5,6 +5,9 @@ node_modules
 .env.local
 .env.*.local
 
+/src/system/tokens/generated
+/src/system/icons/generated
+
 # Log files
 npm-debug.log*
 yarn-debug.log*
