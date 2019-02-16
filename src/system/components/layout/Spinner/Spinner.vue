@@ -10,7 +10,13 @@
       danger && !inverse && `ds-spinner-danger`,
     ]"
   >
-    <circle class="ds-spinner-circle" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+    <circle 
+      class="ds-spinner-circle" 
+      cx="25" 
+      cy="25" 
+      r="20" 
+      fill="none" 
+      stroke-width="5"/>
   </svg>
 </template>
 

@@ -3,7 +3,7 @@
     class="ds-table-head-col"
     :class="[
       align && `ds-table-head-col-${align}`
-    ]">
+  ]">
     <slot>
       {{ label }}
     </slot>

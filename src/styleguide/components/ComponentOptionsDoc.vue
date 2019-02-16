@@ -13,11 +13,18 @@
               {{ row.name | kebabCase }}
             </ds-code>
             <div v-if="row.required">
-              <ds-tag v-if="row.required" color="warning">required</ds-tag>
+              <ds-tag 
+                v-if="row.required" 
+                color="warning">required</ds-tag>
             </div>
-            <ds-space :margin-bottom="null" margin-top="small">
+            <ds-space 
+              :margin-bottom="null" 
+              margin-top="small">
               <div v-if="row.options">
-                <ds-chip size="small" v-for="option in row.options" :key="option">
+                <ds-chip 
+                  size="small" 
+                  v-for="option in row.options" 
+                  :key="option">
                   {{ option }}
                 </ds-chip>
               </div>
@@ -64,7 +71,7 @@
             slot="name"
             slot-scope="{row}"
             inline>
-              {{ row.name }}
+            {{ row.name }}
           </ds-code>
           <ds-text
             color="soft"
@@ -85,7 +92,7 @@
             slot="name"
             slot-scope="{row}"
             inline>
-              @{{ row.name }}
+            @{{ row.name }}
           </ds-code>
           <ds-text
             color="soft"
