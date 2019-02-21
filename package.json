@@ -54,7 +54,7 @@
     "onchange": "~5.2.0",
     "raw-loader": "~1.0.0",
     "sass-loader": "~7.1.0",
-    "theo": "~8.1.1",
+    "theo": "~8.1.2",
     "vue-click-outside": "~1.0.7",
     "vue-docgen-api": "~2.6.12",
     "vue-router": "~3.0.2",
