@@ -5,6 +5,8 @@ cache:
   yarn: true
   directories:
     - node_modules
+services:
+  - yarn
 
 install:
   - RUN yarn install --production=false --frozen-lockfile --non-interactive
