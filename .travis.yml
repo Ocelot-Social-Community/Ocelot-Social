@@ -8,4 +8,4 @@ cache:
 
 install:
   - RUN yarn install --production=false --frozen-lockfile --non-interactive
-  - RUN yarn build
+  - RUN yarn build:lib
