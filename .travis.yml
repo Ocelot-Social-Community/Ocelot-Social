@@ -11,5 +11,5 @@ before_install:
   - export PATH="$HOME/.yarn/bin:$PATH"
 
 install:
-  - RUN yarn install --production=false --frozen-lockfile --non-interactive
-  - RUN yarn build:lib
+  - yarn install --production=false --frozen-lockfile --non-interactive
+  - yarn build:lib
