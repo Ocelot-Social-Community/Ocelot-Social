@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+  - "10"
+cache:
+  yarn: true
+  directories:
+    - node_modules
+
+install:
+  - RUN yarn install --production=false --frozen-lockfile --non-interactive
+  - RUN yarn build
