@@ -1,6 +1,6 @@
 {
-  "name": "vue-cion-design-system",
-  "version": "1.0.0",
+  "name": "@human-connection/styleguide",
+  "version": "0.5.0",
   "private": true,
   "scripts": {
     "serve": "http-server ./docs -o -s",

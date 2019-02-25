@@ -11,3 +11,10 @@ install:
   # - yarn build
   - yarn build:lib
 
+deploy:
+  provider: npm
+  email: $NPM_EMAIL
+  api_key: $NPM_TOKEN
+  on:
+    tags: true
+    branch: master
