@@ -11,6 +11,7 @@
     "build:lib": "yarn theo && cross-env BUILD=library vue-cli-service build --target lib --name system ./src/library.js --no-fix",
     "theo": "theo ./src/system/tokens/tokens.yml --transform web --format map.scss,scss,raw.json,json --dest ./src/system/tokens/generated",
     "theo:onchange": "onchange \"./src/system/tokens/*.yml\" -- npm run theo",
+    "test": "echo 'TODO: FIX & ADD TESTING!'",
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
