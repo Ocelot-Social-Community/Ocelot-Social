@@ -10,3 +10,6 @@ install:
   - yarn install --production=false --frozen-lockfile --non-interactive
   - yarn build
   - yarn build:lib
+
+test:
+  - echo "ADD TESTING!"
