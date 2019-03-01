@@ -10,7 +10,7 @@
       @keydown.tab="closeAndBlur"
       @keydown.self.down.prevent="pointerNext"
       @keydown.self.up.prevent="pointerPrev"
-      @keypress.enter.prevent.stop.self="selectPointerOption"
+      @keypress.enter.prevent.stop="handleEnter"
       @keyup.esc="close">
       <div
         v-if="icon"
@@ -230,8 +230,9 @@ export default {
      */
     filter: {
       type: Function,
-      default: (option) => {
+      default: (option, searchString = '') => {
         const value = option.value || option
+        const searchParts = (typeof searchString === 'string') ? searchString.split(' ') : []
         return searchParts.every(part => {
           if (!part) {
             return true
@@ -260,9 +261,8 @@ export default {
       if (!this.searchString) {
         return this.options
       }
-      const searchParts = this.searchString.split(' ')
 
-      return this.options.filter(this.filter)
+      return this.options.filter((option) => this.filter(option, this.searchString))
     },
     pointerMax() {
       return this.filteredOptions.length - 1
@@ -318,6 +318,17 @@ export default {
         !this.searchString.length
       ) {
         this.deselectOption(this.innerValue.length - 1)
+      }
+    },
+    handleEnter(e) {
+      console.log('Pointer', this.pointer)
+      if (this.pointer) {
+        console.log('SELECT')
+
+        this.selectPointerOption(e)
+      } else {
+        console.log('ENTER')
+        this.$emit('enter', e)
       }
     },
     handleKeyUp() {
