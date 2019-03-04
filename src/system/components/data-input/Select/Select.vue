@@ -10,7 +10,7 @@
       @keydown.tab="closeAndBlur"
       @keydown.self.down.prevent="pointerNext"
       @keydown.self.up.prevent="pointerPrev"
-      @keydown.enter.prevent.stop="handleEnter"
+      @keypress.enter.prevent.stop="handleEnter"
       @keyup.esc="close">
       <div
         v-if="icon"
@@ -61,7 +61,7 @@
             @keydown.delete.stop="deselectLastOption"
             @keydown.down.prevent="handleKeyDown"
             @keydown.up.prevent="handleKeyUp"
-            @keypress.enter.prevent.stop="selectPointerOption"
+            @keypress.enter.prevent.stop="handleEnter"
             @keyup.esc="close">
         </div>
         <div
@@ -97,7 +97,7 @@
           @keydown.delete.stop="deselectLastOption"
           @keydown.down.prevent="handleKeyDown"
           @keydown.up.prevent="handleKeyUp"
-          @keypress.enter.prevent.stop="selectPointerOption"
+          @keypress.enter.prevent.stop="handleEnter"
           @keyup.esc="close">
       </div>
       <div class="ds-select-dropdown">
@@ -231,7 +231,7 @@ export default {
      */
     autoResetSearch: {
       type: Boolean,
-      default: false
+      default: true
     },
     /**
      * Function to filter the results
@@ -290,7 +290,7 @@ export default {
   },
   methods: {
     handleSelect(options) {
-      if (this.pointerMax <= 0) {
+      if (this.pointerMax < 0) {
         return
       }
       this.selectOption(options)
