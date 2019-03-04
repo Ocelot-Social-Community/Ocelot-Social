@@ -10,7 +10,7 @@
       @keydown.tab="closeAndBlur"
       @keydown.self.down.prevent="pointerNext"
       @keydown.self.up.prevent="pointerPrev"
-      @keypress.enter.prevent.stop="handleEnter"
+      @keydown.enter.prevent.stop="handleEnter"
       @keyup.esc="close">
       <div
         v-if="icon"
@@ -226,6 +226,14 @@ export default {
       default: true
     },
     /**
+     * Wheter the search string inside the inputfield should be resetted
+     * when selected
+     */
+    autoResetSearch: {
+      type: Boolean,
+      default: false
+    },
+    /**
      * Function to filter the results
      */
     filter: {
@@ -275,12 +283,20 @@ export default {
           this.pointer = max
         })
       }
+    },
+    searchString(value) {
+      this.setPointer(-1)
     }
   },
   methods: {
     handleSelect(options) {
+      if (this.pointerMax <= 0) {
+        return
+      }
       this.selectOption(options)
-      this.resetSearch()
+      if (this.autoResetSearch || this.multiple) {
+        this.resetSearch()
+      }
       if (this.multiple) {
         this.$refs.search.focus()
         this.handleFocus()
@@ -293,13 +309,20 @@ export default {
     },
     openAndFocus() {
       this.open()
+
+      if (this.autoResetSearch) {
+        this.resetSearch()
+      }
+
       if (!this.focus || this.multiple) {
         this.$refs.search.focus()
         this.handleFocus()
       }
     },
     open() {
-      this.resetSearch()
+      if (this.autoResetSearch || this.multiple) {
+        this.resetSearch()
+      }
       this.isOpen = true
     },
     close() {
@@ -321,13 +344,10 @@ export default {
       }
     },
     handleEnter(e) {
-      console.log('Pointer', this.pointer)
-      if (this.pointer) {
-        console.log('SELECT')
-
+      if (this.pointer >= 0) {
         this.selectPointerOption(e)
       } else {
-        console.log('ENTER')
+        this.setPointer(-1)
         this.$emit('enter', e)
       }
     },
@@ -351,7 +371,7 @@ export default {
       }
     },
     pointerPrev() {
-      if (this.pointer === 0) {
+      if (this.pointer <= 0) {
         this.pointer = this.pointerMax
       } else {
         this.pointer--
@@ -359,7 +379,7 @@ export default {
       this.scrollToHighlighted()
     },
     pointerNext() {
-      if (this.pointer === this.pointerMax) {
+      if (this.pointer >= this.pointerMax) {
         this.pointer = 0
       } else {
         this.pointer++
@@ -368,7 +388,7 @@ export default {
     },
     scrollToHighlighted() {
       clearTimeout(this.hadKeyboardInput)
-      if (!this.$refs.options || !this.$refs.options.children.length) {
+      if (!this.$refs.options || !this.$refs.options.children.length || this.pointerMax <= -1) {
         return
       }
       this.hadKeyboardInput = setTimeout(() => {
