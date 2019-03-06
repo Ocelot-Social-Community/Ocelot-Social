@@ -4,9 +4,12 @@
 
 .ds-select {
   user-select: none;
+  transition: border-bottom 0ms;
+
   .ds-select-is-open & {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+    border-bottom: 0;
   }
 }
 
@@ -127,7 +130,7 @@
   border-bottom-right-radius: $border-radius-base;
   visibility: hidden;
   opacity: 0;
-  transition: all $duration-short $ease-out;
+  transition: all $duration-short $ease-out, border-bottom 0ms;
   max-height: 240px;
   overflow: auto;
 
@@ -139,6 +142,7 @@
 
 .ds-select-dropdown-message {
   padding: $input-padding-vertical $space-x-small;
+  color: $text-color-disabled;
 }
 
 .ds-select-options {
@@ -148,11 +152,11 @@
 .ds-select-option {
   padding: $input-padding-vertical $space-x-small;
   cursor: pointer;
-  transition: all $duration-short $ease-out;
+  transition: all $duration-short $ease-out, border-bottom 0ms;
 
   &.ds-select-option-hover {
-    background-color: $background-color-primary;
-    color: $text-color-primary-inverse;
+    background-color: $background-color-softer;
+    color: $text-color-base;
   }
 }
 

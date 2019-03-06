@@ -14,9 +14,9 @@
     height: $input-height;
 
     color: $text-color-base;
-    background: $background-color-base;
+    background: $background-color-soft;
 
-    border: $input-border-size solid $border-color-base;
+    border: $input-border-size solid $border-color-softer;
     border-radius: $border-radius-base;
     outline: none;
     transition: all $duration-short $ease-out;

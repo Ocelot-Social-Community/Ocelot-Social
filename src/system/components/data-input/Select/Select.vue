@@ -134,10 +134,17 @@
           </li>
         </ul>
       </div>
-      <div
-        v-if="iconRight"
-        class="ds-select-icon-right">
-        <ds-icon :name="iconRight" />
+      <div class="ds-select-icon-right">
+        <ds-spinner
+          v-if="loading"
+          primary
+          size="small"
+          style="position: absolute"
+        />
+        <ds-icon
+          v-if="iconRight"
+          :name="iconRight"
+        />
       </div>
     </div>
   </ds-form-item>
@@ -234,12 +241,19 @@ export default {
       default: true
     },
     /**
+     * Should a loading indicator be shown?
+     */
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    /**
      * Function to filter the results
      */
     filter: {
       type: Function,
-      default: (option, searchString = '') => {
-        const value = option.value || option
+      default: (option, searchString = '', labelProp) => {
+        const value = option[labelProp] || option
         const searchParts = (typeof searchString === 'string') ? searchString.split(' ') : []
         return searchParts.every(part => {
           if (!part) {
@@ -270,7 +284,7 @@ export default {
         return this.options
       }
 
-      return this.options.filter((option) => this.filter(option, this.searchString))
+      return this.options.filter((option) => this.filter(option, this.searchString, this.labelProp))
     },
     pointerMax() {
       return this.filteredOptions.length - 1
