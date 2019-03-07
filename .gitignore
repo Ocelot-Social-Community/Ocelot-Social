@@ -5,6 +5,8 @@ node_modules
 .env.local
 .env.*.local
 
+/dist
+
 /src/system/tokens/generated
 /src/system/icons/generated
 
