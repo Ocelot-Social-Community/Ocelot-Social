@@ -4,7 +4,7 @@ This Design System provides our team with essential components and guidelines to
 
 ### Documentation
 
-If you are searching for more technical information for the UI & API, you can find it in the [HC Documentation](https://docs.human-connection.org).
+If you are searching for more technical information for the UI & API, you can find it in the [HC Documentation](https://docs.human-connection.org/nitro).
 
 ### How to use it
 
