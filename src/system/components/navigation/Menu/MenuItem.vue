@@ -10,7 +10,8 @@
     @mouseover="handleMouseOver"
     @mouseout="handleMouseOut"
     @click.capture="handleClick"
-    v-click-outside="handleClickOutside">
+    v-click-outside="handleClickOutside"
+  >
     <component
       v-if="route"
       class="ds-menu-item-link"
@@ -20,19 +21,22 @@
       v-bind="bindings"
       :exact="isExact"
       :is="linkTag"
-      ref="link">
+      ref="link"
+    >
       <slot>
         {{ name }}
       </slot>
     </component>
     <ul
       class="ds-menu-item-submenu"
-      v-if="hasSubmenu">
+      v-if="hasSubmenu"
+    >
       <ds-menu-item
         v-for="child in route.children"
         :key="child.name"
         :route="child"
-        :parents="[...parents, route]"/>
+        :parents="[...parents, route]"
+      />
     </ul>
   </li>
 </template>

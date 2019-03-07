@@ -5,10 +5,11 @@
     :class="[size && `ds-icon-size-${size}`]"
     class="ds-icon"
   >
-    <component 
-      v-if="svgComponent" 
-      :is="svgComponent" 
-      class="ds-icon-svg" />
+    <component
+      v-if="svgComponent"
+      :is="svgComponent"
+      class="ds-icon-svg"
+    />
   </component>
 </template>
 

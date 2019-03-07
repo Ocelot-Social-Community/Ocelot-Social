@@ -2,15 +2,16 @@
   <component
     :is="tag"
     class="ds-logo"
-    :class="[
-      inverse && `ds-logo-inverse`
-  ]">
+    :class="[inverse && 'ds-logo-inverse']"
+  >
     <svg-logo
       v-if="!inverse"
-      class="ds-logo-svg" />
+      class="ds-logo-svg"
+    />
     <svg-logo-inverse
       v-else
-      class="ds-logo-svg" />
+      class="ds-logo-svg"
+    />
   </component>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-  <component 
+  <component
     :is="tag"
     class="ds-chip"
     :class="[
@@ -14,7 +14,8 @@
       v-if="removable"
       @click="remove"
       class="ds-chip-close"
-      tabindex="-1">
+      tabindex="-1"
+    >
       <ds-icon name="close" />
     </button>
   </component>
