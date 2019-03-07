@@ -11,8 +11,13 @@ install:
   # - yarn build
   - yarn build:lib
 
+before_deploy:
+  - rm -Rf ./node_modules .docs ./preview ./tests *.log*
+  - rm -Rf ./src/system/icons/_all
+  - rm -Rf ./src/system/tokens/_examples
 deploy:
   provider: npm
+  skip_cleanup: true
   email: $NPM_EMAIL
   api_key: $NPM_TOKEN
   on:
