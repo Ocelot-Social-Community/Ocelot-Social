@@ -4,12 +4,11 @@
 
 .ds-select {
   user-select: none;
-  transition: border-bottom 0ms;
 
   .ds-select-is-open & {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    border-bottom-color: transparent;
+    border-bottom: none;
   }
 }
 
