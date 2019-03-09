@@ -2,11 +2,8 @@
 
 Basic modal usage
 
-You will need to add the portal-target to the end of your html body to get the modal working properly
 ```html
-<!-- put the following tag as last element to your html body / layout -->
-<!-- make sure you only include it once! -->
-<portal-target name="modal" style="position: absolute" />
+<ds-modal style="position: absolute" />
 ```
 
 ```
