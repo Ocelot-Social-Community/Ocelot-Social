@@ -1,6 +1,6 @@
 {
   "name": "@human-connection/styleguide",
-  "version": "0.5.12",
+  "version": "0.5.13",
   "private": false,
   "scripts": {
     "serve": "http-server ./docs -o -s",
@@ -18,7 +18,7 @@
     "access": "public"
   },
   "dependencies": {
-    "vue": "~2.6.7"
+    "vue": "^2.6.6"
   },
   "devDependencies": {
     "@babel/core": "~7.2.2",
@@ -63,8 +63,7 @@
     "vue-docgen-api": "~2.6.12",
     "vue-router": "~3.0.2",
     "vue-svg-loader": "~0.12.0",
-    "vue": "~2.6.7",
-    "vue-template-compiler": "~2.6.7",
+    "vue-template-compiler": "^2.6.6",
     "vuep": "git+https://github.com/visualjerk/vuep.git#fix-iframe-firefox",
     "webpack-bundle-analyzer": "~3.0.4",
     "webpack-merge-and-include-globally": "~2.1.14"
