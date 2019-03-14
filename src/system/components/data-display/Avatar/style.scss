@@ -13,7 +13,7 @@
   }
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     width: 100%;
     height: 100%;
@@ -21,6 +21,22 @@
     left: 0px;
     box-shadow: inset 0 0 0 1px rgba($color-neutral-0, .1);
     border-radius: 50%;
+  }
+
+  &.is-online::before {
+    content: "";
+    position: absolute;
+    width: 33%;
+    height: 33%;
+    max-width: 15px;
+    max-height: 15px;
+    min-width: 10px;
+    min-height: 10px;
+    bottom: 0;
+    right: 0;
+    border: 2px solid $background-color-base;
+    border-radius: 100%;
+    background-color: $color-success;
   }
 
   img {

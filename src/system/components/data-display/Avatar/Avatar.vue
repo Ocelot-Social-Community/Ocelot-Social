@@ -1,15 +1,15 @@
 <template>
   <div
     class="ds-avatar"
-    :style="styles">
-    <img
-      v-if="!error"
-      :src="image"
-      @error="onError">
+    :class="[
+      isOnline && 'is-online'
+    ]"
+    :style="styles"
+  >
     <ds-flex
       v-if="!hasImage || error"
       style="height: 100%">
-      <ds-flex-item center>
+      <ds-flex-item centered>
         <template v-if="isAnonymus">
           <ds-icon name="eye-slash" />
         </template>
@@ -18,6 +18,11 @@
         </template>
       </ds-flex-item>
     </ds-flex>
+    <img
+      v-if="image && !error"
+      :src="image"
+      @error="onError"
+    >
   </div>
 </template>
 
@@ -30,7 +35,8 @@ export default {
     backgroundColor: { type: String, default: null },
     name: { type: String, default: 'Anonymus' },
     size: { type: [Number, String], default: '32px' },
-    image: { type: String, default: null }
+    image: { type: String, default: null },
+    isOnline: { type: Boolean, default: false }
   },
   data() {
     return {
