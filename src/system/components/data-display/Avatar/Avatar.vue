@@ -3,7 +3,7 @@
     class="ds-avatar"
     :class="[
       `ds-size-${this.size}`,
-      isOnline && 'is-online'
+      online && 'is-online'
     ]"
     :style="styles"
   >
@@ -50,7 +50,7 @@ export default {
       }
     },
     image: { type: String, default: null },
-    isOnline: { type: Boolean, default: false }
+    online: { type: Boolean, default: false }
   },
   data() {
     return {
