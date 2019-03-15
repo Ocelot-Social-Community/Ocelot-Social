@@ -48,7 +48,6 @@
   &.ds-size-small {
     width: $size-avatar-small;
     height: $size-avatar-small;
-    font-size: 0.8em;
 
     &.is-online::before {
       border-width: 1px;
@@ -63,12 +62,10 @@
   &.ds-size-large {
     width: $size-avatar-large;
     height: $size-avatar-large;
-    font-size: 1.5em;
   }
   &.ds-size-x-large {
     width: $size-avatar-x-large;
     height: $size-avatar-x-large;
-    font-size: 3em;
 
     &.is-online::before {
       height: $space-large;
