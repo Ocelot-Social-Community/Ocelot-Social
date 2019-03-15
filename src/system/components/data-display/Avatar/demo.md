@@ -6,14 +6,17 @@
   image="https://s3.amazonaws.com/uifaces/faces/twitter/lisovsky/128.jpg" />
 ```
 
-## Size
+## Sizes
 
 ```html
-<ds-avatar 
-  name="Hans"
-  image="https://s3.amazonaws.com/uifaces/faces/twitter/lisovsky/128.jpg"
-  size="60px" 
-/>
+<ds-avatar :is-online="true" size="small" name="Hans Peter"></ds-avatar>
+<ds-avatar :is-online="true" size="base" name="Hans Peter"></ds-avatar>
+<ds-avatar :is-online="true" size="large" name="Hans Peter"></ds-avatar>
+<ds-avatar :is-online="true" size="x-large" name="Hans Peter"></ds-avatar>
+<ds-avatar :is-online="true" size="x-large"></ds-avatar>
+<ds-avatar :is-online="true" size="large"></ds-avatar>
+<ds-avatar :is-online="true" size="base"></ds-avatar>
+<ds-avatar :is-online="true" size="small"></ds-avatar>
 ```
 
 ## Broken Image
@@ -25,7 +28,7 @@
 />
 ```
 
-## Anonymous
+## Anonymus
 
 ```html
 <ds-avatar 

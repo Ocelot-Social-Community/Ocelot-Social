@@ -2,6 +2,7 @@
   <div
     class="ds-avatar"
     :class="[
+      `ds-size-${this.size}`,
       isOnline && 'is-online'
     ]"
     :style="styles"
@@ -34,7 +35,17 @@ export default {
   props: {
     backgroundColor: { type: String, default: null },
     name: { type: String, default: 'Anonymus' },
-    size: { type: [Number, String], default: '32px' },
+    /**
+     * The size used for the avatar.
+     * @options small|base|large
+     */
+    size: {
+      type: String,
+      default: 'base',
+      validator: value => {
+        return value.match(/(small|base|large|x-large)/)
+      }
+    },
     image: { type: String, default: null },
     isOnline: { type: Boolean, default: false }
   },

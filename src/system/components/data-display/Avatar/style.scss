@@ -8,10 +8,6 @@
   min-width: 22px;
   text-align: center;
 
-  .ds-flex-item {
-    padding-top: 0.1em;
-  }
-
   &::after {
     content: "";
     position: absolute;
@@ -28,15 +24,12 @@
     position: absolute;
     width: 33%;
     height: 33%;
-    max-width: 15px;
-    max-height: 15px;
-    min-width: 10px;
-    min-height: 10px;
     bottom: 0;
     right: 0;
     border: 2px solid $background-color-base;
     border-radius: 100%;
     background-color: $color-success;
+    z-index: 1;
   }
 
   img {
@@ -49,6 +42,38 @@
   }
 
   .ds-icon {
-    margin-top: -0.2em;
+    margin-top: -0.1em;
+  }
+
+  &.ds-size-small {
+    width: $size-avatar-small;
+    height: $size-avatar-small;
+    font-size: 0.8em;
+
+    &.is-online::before {
+      border-width: 1px;
+    }
+  }
+  &.ds-size-base {
+    border-width: 1px;
+    width: $size-avatar-base;
+    height: $size-avatar-base;
+
+  }
+  &.ds-size-large {
+    width: $size-avatar-large;
+    height: $size-avatar-large;
+    font-size: 1.5em;
+  }
+  &.ds-size-x-large {
+    width: $size-avatar-x-large;
+    height: $size-avatar-x-large;
+    font-size: 3em;
+
+    &.is-online::before {
+      height: $space-large;
+      width: $space-large;
+      border-width: 3px;
+    }
   }
 }

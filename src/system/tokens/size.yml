@@ -15,6 +15,16 @@ props:
     value: "44px"
   - name: size-height-footer
     value: "64px"
+
+  - name: size-avatar-small
+    value: "34px"
+  - name: size-avatar-base
+    value: "44px"
+  - name: size-avatar-large
+    value: "64px"
+  - name: size-avatar-x-large
+    value: "114px"
+
 global:
   type: number
   category: size
