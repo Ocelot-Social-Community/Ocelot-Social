@@ -29,6 +29,9 @@
 
 <script>
 import helpers from './lib/helpers.js'
+import { tokens } from '@@/tokens'
+import camelCase from 'lodash/camelCase'
+import upperFirst from 'lodash/upperFirst'
 
 export default {
   name: 'DsAvatar',
@@ -59,7 +62,7 @@ export default {
       return !this.name || this.name.toLowerCase() === 'anonymus'
     },
     styles() {
-      let size = this.size
+      let size = this.sizeValue
       if (Number.isInteger(Number(size))) {
         size = `${size}px`
       }
@@ -72,6 +75,9 @@ export default {
         fontWeight: 'bold',
         color: this.fontColor
       }
+    },
+    sizeValue() {
+      return tokens[`sizeAvatar${upperFirst(camelCase(this.size))}`]
     },
     hasImage() {
       return Boolean(this.image) && !this.error
