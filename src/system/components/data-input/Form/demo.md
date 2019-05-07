@@ -51,6 +51,8 @@ Use a schema to provide validation for the form inputs. Use scoped slots to get 
   <ds-form
     v-model="formData"
     @submit="handleSubmit"
+    @input="handleInput"
+    @reset="handleReset"
     :schema="formSchema">
     <template slot-scope="{ errors, reset }">
       <ds-input
@@ -123,6 +125,12 @@ Use a schema to provide validation for the form inputs. Use scoped slots to get 
     methods: {
       handleSubmit(data) {
         console.log('Submit form ...', data)
+      },
+      handleInput(data) {
+        console.log('Input form ...', data)
+      },
+      handleReset(data) {
+        console.log('Reset form ...', data)
       }
     }
   }
