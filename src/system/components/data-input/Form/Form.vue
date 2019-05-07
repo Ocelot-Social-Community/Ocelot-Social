@@ -1,12 +1,12 @@
 <template>
-  <form
-    class="ds-form"
-    @submit.prevent="submit"
-    novalidate="true"
+  <form 
+    class="ds-form" 
+    @submit.prevent="submit" 
+    novalidate="true" 
     autocomplete="off">
     <slot 
       :errors="errors" 
-      :reset="reset" />
+      :reset="reset"/>
   </form>
 </template>
 
@@ -62,13 +62,6 @@ export default {
     submit() {
       this.validate(() => {
         /**
-         * Fires after user input.
-         * Receives the current form data.
-         *
-         * @event input
-         */
-        this.$emit('input', this.newData)
-        /**
          * Fires on form submit.
          * Receives the current form data.
          *
@@ -81,9 +74,9 @@ export default {
       const validator = new Schema(this.schema)
       // Prevent validator from printing to console
       // eslint-disable-next-line
-      const warn = console.warn;
+      const warn = console.warn
       // eslint-disable-next-line
-      console.warn = () => {};
+      console.warn = () => {}
       validator.validate(this.newData, errors => {
         if (errors) {
           this.errors = errors.reduce((errorObj, error) => {
@@ -95,7 +88,7 @@ export default {
           this.errors = null
         }
         // eslint-disable-next-line
-        console.warn = warn;
+        console.warn = warn
         this.notify(this.newData, this.errors)
         if (!errors && cb && typeof cb === 'function') {
           cb()
@@ -121,10 +114,25 @@ export default {
     },
     async update(model, value) {
       dotProp.set(this.newData, model, value)
-      this.validate()
+      this.validate(() => {
+        /**
+         * Fires after user input.
+         * Receives the current form data.
+         *
+         * @event input
+         */
+        this.$emit('input', cloneDeep(this.newData))
+      })
     },
     reset() {
-      this.$emit('input', cloneDeep(this.value))
+      /**
+       * Fires after reset() was called.
+       * Receives the current form data.
+       * Reset has to be handled manually.
+       *
+       * @event reset
+       */
+      this.$emit('reset', cloneDeep(this.value))
     }
   },
   created() {
