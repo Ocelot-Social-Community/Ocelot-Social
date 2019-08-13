@@ -17,18 +17,30 @@
 export default {
   name: 'DsGrid',
   props: {
+    /**
+     * The vertical and horizontal gap between grid items
+     */
     gap: {
       type: Number,
       default: 16, // TODO: how to use tokens.small here?
     },
+    /**
+     * The minimum width of each column
+     */
     minColumnWidth: {
       type: Number,
       default: 250,
     },
+    /**
+     * The height of each row (recommended to use the default)
+     */
     rowHeight: {
       type: Number,
       default: 20,
     },
+    /**
+     * The outermost html tag
+     */
     tag: {
       type: String,
       default: 'div',
