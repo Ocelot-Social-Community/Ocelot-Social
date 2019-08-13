@@ -17,7 +17,7 @@
       },
       rowSpan: {
         type: Number,
-        default: 10,
+        default: 4,
       },
       tag: {
         type: String,

@@ -9,6 +9,11 @@
 </template>
 
 <script>
+/**
+ * Used in combination with the grid item component to create masonry layouts.
+ * @version 1.0.0
+ */
+
 export default {
   name: 'DsGrid',
   props: {
@@ -18,7 +23,7 @@ export default {
     },
     minColumnWidth: {
       type: Number,
-      default: 300,
+      default: 250,
     },
     rowHeight: {
       type: Number,
