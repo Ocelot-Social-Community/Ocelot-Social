@@ -31,14 +31,17 @@ export default {
   },
   computed: {
     styles() {
-      return ({
+      return {
         gridTemplateColumns: `repeat(auto-fill, minmax(${this.minColumnWidth}px, 1fr`,
         gridGap: `${this.gap}px`,
         gridAutoRows: `${this.rowHeight}px`,
-      })
+      }
     }
-  }
+  },
 }
 </script>
 
-<style lang="scss" src="./style.scss" />
+<style lang="scss" src="./style.scss">
+</style>
+
+<docs src="./demo.md"></docs>
