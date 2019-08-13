@@ -1,5 +1,6 @@
 .ds-placeholder {
   @include reset;
+  height: 100%;
   padding: $space-base;
   display: flex;
   align-items: center;
