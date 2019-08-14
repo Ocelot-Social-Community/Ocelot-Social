@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import { getSpace } from '@@/utils'
+
 /**
  * Used in combination with the grid item component to create masonry layouts.
  * @version 1.0.0
@@ -21,8 +23,8 @@ export default {
      * The vertical and horizontal gap between grid items
      */
     gap: {
-      type: Number,
-      default: 16, // TODO: how to use tokens.small here?
+      type: String,
+      default: 'small',
     },
     /**
      * The minimum width of each column
@@ -50,7 +52,7 @@ export default {
     styles() {
       return {
         gridTemplateColumns: `repeat(auto-fill, minmax(${this.minColumnWidth}px, 1fr`,
-        gridGap: `${this.gap}px`,
+        gridGap: `${getSpace(this.gap)}px`,
         gridAutoRows: `${this.rowHeight}px`,
       }
     }
