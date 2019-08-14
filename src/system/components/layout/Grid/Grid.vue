@@ -21,10 +21,14 @@ export default {
   props: {
     /**
      * The vertical and horizontal gap between grid items
+     * @options xxx-small|xx-small|x-small|small|base|large|x-large|xx-large|xxx-large
      */
     gap: {
       type: String,
       default: 'small',
+      validator: value => (
+        value.match(/(xxx-small|xx-small|x-small|small|base|large|x-large|xx-large|xxx-large)/)
+      )
     },
     /**
      * The minimum width of each column
