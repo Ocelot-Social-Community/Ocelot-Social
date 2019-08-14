@@ -4,7 +4,7 @@ All columns share the space in the grid evenly and grow and shrink dynamically.
 
 You can set a minimum width beyond which columns will continue to grow until there is enough space to fit another column of minimum width. (Resize the window to see the effect.)
 ```
-<ds-grid min-column-width="200">
+<ds-grid :min-column-width="200">
   <ds-grid-item><ds-placeholder>same</ds-placeholder></ds-grid-item>
   <ds-grid-item><ds-placeholder>same</ds-placeholder></ds-grid-item>
   <ds-grid-item><ds-placeholder>same</ds-placeholder></ds-grid-item>
@@ -30,8 +30,8 @@ Once the grid is defined a grid item can span several columns and/or rows. You c
 ```
 <ds-grid>
   <ds-grid-item column-span="fullWidth"><ds-placeholder>full width</ds-placeholder></ds-grid-item>
-  <ds-grid-item row-span="6" column-span="2"><ds-placeholder>2 columns, 6 rows</ds-placeholder></ds-grid-item>
-  <ds-grid-item row-span="8"><ds-placeholder>8 rows</ds-placeholder></ds-grid-item>
+  <ds-grid-item :row-span="6" :column-span="2"><ds-placeholder>2 columns, 6 rows</ds-placeholder></ds-grid-item>
+  <ds-grid-item :row-span="8"><ds-placeholder>8 rows</ds-placeholder></ds-grid-item>
   <ds-grid-item><ds-placeholder>default (1 column, 4 rows)</ds-placeholder></ds-grid-item>
 </ds-grid>
 ```
@@ -42,19 +42,19 @@ You can set the height of a row – but this is only recommended in combination 
 
 Low row height leads to a more fine-grained item height:
 ```
-<ds-grid row-height="4">
-  <ds-grid-item row-span="10"><ds-placeholder>same</ds-placeholder></ds-grid-item>
-  <ds-grid-item row-span="11"><ds-placeholder>same</ds-placeholder></ds-grid-item>
-  <ds-grid-item row-span="12"><ds-placeholder>same</ds-placeholder></ds-grid-item>
+<ds-grid :row-height="4">
+  <ds-grid-item :row-span="10"><ds-placeholder>same</ds-placeholder></ds-grid-item>
+  <ds-grid-item :row-span="11"><ds-placeholder>same</ds-placeholder></ds-grid-item>
+  <ds-grid-item :row-span="12"><ds-placeholder>same</ds-placeholder></ds-grid-item>
 </ds-grid>
 ```
 
 High row height leads to a rougher item height:
 ```
-<ds-grid row-height="100">
-  <ds-grid-item row-span="1"><ds-placeholder>same</ds-placeholder></ds-grid-item>
-  <ds-grid-item row-span="2"><ds-placeholder>same</ds-placeholder></ds-grid-item>
-  <ds-grid-item row-span="3"><ds-placeholder>same</ds-placeholder></ds-grid-item>
+<ds-grid :row-height="100">
+  <ds-grid-item :row-span="1"><ds-placeholder>same</ds-placeholder></ds-grid-item>
+  <ds-grid-item :row-span="2"><ds-placeholder>same</ds-placeholder></ds-grid-item>
+  <ds-grid-item :row-span="3"><ds-placeholder>same</ds-placeholder></ds-grid-item>
 </ds-grid>
 ```
 
@@ -65,12 +65,14 @@ In a classic masonry layout items usually have the same width but different heig
 Some items may move slightly out of order to make sure existing rows are filled before creating new ones.
 ```
 <ds-grid>
-  <ds-grid-item row-span="4"><ds-placeholder>first</ds-placeholder></ds-grid-item>
-  <ds-grid-item row-span="8"><ds-placeholder>second</ds-placeholder></ds-grid-item>
-  <ds-grid-item row-span="6"><ds-placeholder>third</ds-placeholder></ds-grid-item>
-  <ds-grid-item row-span="6"><ds-placeholder>fourth</ds-placeholder></ds-grid-item>
-  <ds-grid-item row-span="4"><ds-placeholder>fifth</ds-placeholder></ds-grid-item>
-  <ds-grid-item row-span="8"><ds-placeholder>sixth</ds-placeholder></ds-grid-item>
-  <ds-grid-item row-span="4"><ds-placeholder>seventh</ds-placeholder></ds-grid-item>
+  <ds-grid-item :row-span="4"><ds-placeholder>first</ds-placeholder></ds-grid-item>
+  <ds-grid-item :row-span="8"><ds-placeholder>second</ds-placeholder></ds-grid-item>
+  <ds-grid-item :row-span="6"><ds-placeholder>third</ds-placeholder></ds-grid-item>
+  <ds-grid-item :row-span="6"><ds-placeholder>fourth</ds-placeholder></ds-grid-item>
+  <ds-grid-item :row-span="4"><ds-placeholder>fifth</ds-placeholder></ds-grid-item>
+  <ds-grid-item :row-span="8"><ds-placeholder>sixth</ds-placeholder></ds-grid-item>
+  <ds-grid-item :row-span="4"><ds-placeholder>seventh</ds-placeholder></ds-grid-item>
 </ds-grid>
 ```
+
+**Hint:** Make sure to pass `numbers` with a colon (shortcut for `v-bind:`) so they are not interpreted as strings. For a more thorough explanation visit [the Vue.js docs](https://vuejs.org/v2/guide/components-props.html#Passing-a-Number).
