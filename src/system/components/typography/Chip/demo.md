@@ -32,16 +32,9 @@ A chip can be deletable.
       v-for="(tag, index) in tags"
       @remove="removeTag(index)"
       removable
-      :key="tag">
-      {{ tag }}
-    </ds-chip>
-    <ds-chip
-      v-for="(tag, index) in tags"
-      @remove="removeTag(index)"
-      removable
-      color="primary"
-      :key="tag">
-      {{ tag }}
+      :key="index"
+      :color="tag.color">
+      {{ tag.label }}
     </ds-chip>
   </div>
 </template>
@@ -49,7 +42,14 @@ A chip can be deletable.
   export default {
     data() {
       return {
-        tags: ['Dog', 'Cat', 'Duck']
+        tags: [
+        {label: 'Dog'},
+        {label: 'Cat'},
+        {label: 'Duck'},
+        {label: 'Mouse', color: "primary"},
+        {label: 'Bird', color: "primary"},
+        {label: 'Elephant', color: "primary"},
+        ],
       }
     },
     methods: {
