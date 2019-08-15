@@ -1,6 +1,6 @@
 {
   "name": "@human-connection/styleguide",
-  "version": "0.5.17",
+  "version": "0.5.18",
   "private": false,
   "scripts": {
     "serve": "http-server ./docs -o -s",
