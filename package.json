@@ -18,7 +18,7 @@
     "access": "public"
   },
   "dependencies": {
-    "vue": "^2.6.6"
+    "vue": "^2.6.10"
   },
   "devDependencies": {
     "@babel/core": "~7.2.2",
@@ -52,7 +52,7 @@
     "markdown-it-sub": "~1.0.0",
     "markdown-it-sup": "~1.0.0",
     "markdown-it-task-lists": "~2.1.1",
-    "node-sass": "~4.11.0",
+    "node-sass": "^4.12.0",
     "npm-run-all": "~4.1.5",
     "onchange": "~5.2.0",
     "portal-vue": "~1.5.1",
@@ -60,10 +60,10 @@
     "sass-loader": "~7.1.0",
     "theo": "~8.1.2",
     "vue-click-outside": "~1.0.7",
-    "vue-docgen-api": "~2.6.12",
+    "vue-docgen-api": "^3.20.0",
     "vue-router": "~3.0.2",
     "vue-svg-loader": "~0.12.0",
-    "vue-template-compiler": "^2.6.6",
+    "vue-template-compiler": "^2.6.10",
     "vuep": "git+https://github.com/visualjerk/vuep.git#fix-iframe-firefox",
     "webpack-bundle-analyzer": "~3.0.4",
     "webpack-merge-and-include-globally": "~2.1.14"
