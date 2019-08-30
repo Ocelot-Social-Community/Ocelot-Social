@@ -58,7 +58,7 @@
     "onchange": "~6.0.0",
     "portal-vue": "~2.1.6",
     "raw-loader": "~3.1.0",
-    "sass-loader": "~7.2.0",
+    "sass-loader": "~8.0.0",
     "theo": "~8.1.4",
     "vue-click-outside": "~1.0.7",
     "vue-docgen-api": "^3.20.0",
