@@ -55,7 +55,7 @@ export default {
   computed: {
     styles() {
       return {
-        gridTemplateColumns: `repeat(auto-fill, minmax(${this.minColumnWidth}px, 1fr`,
+        gridTemplateColumns: `repeat(auto-fill, minmax(${this.minColumnWidth}px, 1fr))`,
         gridGap: `${getSpace(this.gap)}px`,
         gridAutoRows: `${this.rowHeight}px`,
       }
