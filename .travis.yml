@@ -8,7 +8,7 @@ cache:
 
 install:
   - yarn install --production=false --frozen-lockfile --non-interactive
-  # - yarn build
+  - yarn build
   - yarn build:lib
 
 before_deploy:
@@ -16,10 +16,17 @@ before_deploy:
   - rm -Rf ./src/system/icons/_all
   - rm -Rf ./src/system/tokens/_examples
 deploy:
-  provider: npm
-  skip_cleanup: true
-  email: $NPM_EMAIL
-  api_key: $NPM_TOKEN
-  on:
-    tags: true
-    branch: master
+  - provider: npm
+    skip_cleanup: true
+    email: $NPM_EMAIL
+    api_key: $NPM_TOKEN
+    on:
+      tags: true
+      branch: master
+  - provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+    keep_history: true
+    on:
+      tags: true
+      branch: master
