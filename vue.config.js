@@ -10,7 +10,7 @@ module.exports = {
   css: {
     loaderOptions: {
       sass: {
-        data: '@import "@@/styles/shared.scss";'
+        prependData: '@import "@@/styles/shared.scss";'
       }
     }
   },
