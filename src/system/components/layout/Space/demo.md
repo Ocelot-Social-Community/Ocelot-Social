@@ -14,6 +14,9 @@ By default the top margin is 0 and the bottom margin is `large`.
 
 Margins can be `xxx-small, xx-small, x-small, small, base, large, x-large, xx-large and xxx-large`
 ```
+<ds-space margin-bottom="xxx-small">
+  <ds-placeholder>I have my own space (xxx-small)</ds-placeholder>
+</ds-space>
 <ds-space margin-bottom="xx-small">
   <ds-placeholder>I have my own space (xx-small)</ds-placeholder>
 </ds-space>
