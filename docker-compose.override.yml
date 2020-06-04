@@ -1,15 +1,9 @@
 version: "3.4"
 
 services:
-  mailserver:
-    image: djfarrelly/maildev
-    ports:
-      - 1080:80
-    networks:
-      - hc-network
   webapp:
     build:
-      context: webapp
+      context: backend
       target: build-and-test
     volumes:
       - ./webapp:/nitro-web
@@ -17,6 +11,8 @@ services:
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
       - PUBLIC_REGISTRATION=false
     command: yarn run dev
+    volumes:
+      - webapp_node_modules:/nitro-web/node_modules
   backend:
     build:
       context: backend
@@ -30,6 +26,12 @@ services:
       - SMTP_IGNORE_TLS=true
       - "DEBUG=${DEBUG}"
       - PUBLIC_REGISTRATION=false
+    volumes:
+      - backend_node_modules:/nitro-backend/node_modules
+      - uploads:/nitro-backend/public/uploads
+  neo4j:
+    volumes:
+      - neo4j_data:/data
   maintenance:
     image: humanconnection/maintenance:latest
     build:
@@ -39,6 +41,17 @@ services:
       - hc-network
     ports:
       - 3503:80
+  mailserver:
+    image: djfarrelly/maildev
+    ports:
+      - 1080:80
+    networks:
+      - hc-network
 
 networks:
   hc-network:
+volumes:
+  webapp_node_modules:
+  backend_node_modules:
+  neo4j_data:
+  uploads:
