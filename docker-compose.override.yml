@@ -15,7 +15,7 @@ services:
       - webapp_node_modules:/nitro-web/node_modules
   backend:
     build:
-      context: backend
+      context: webapp
       target: build-and-test
     volumes:
       - ./backend:/nitro-backend
