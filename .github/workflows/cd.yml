@@ -1,0 +1,19 @@
+name: Continuous deployment
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Build and push docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v1.1.0
+        with:
+          path: fyphe_O/neo4j/
