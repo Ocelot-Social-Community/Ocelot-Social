@@ -21,6 +21,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tag: latest
           path: fyphe_O/neo4j/
+          push: true
       - name: Build backend
         uses: docker/build-push-action@v1.1.0
         with:
@@ -29,6 +30,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tag: latest
           path: fyphe_O/backend/
+          push: true
       - name: Build webapp
         uses: docker/build-push-action@v1.1.0
         with:
@@ -36,4 +38,5 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tag: latest
+          push: true
           path: fyphe_O/webapp/
