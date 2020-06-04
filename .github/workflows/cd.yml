@@ -16,18 +16,21 @@ jobs:
       - name: Build neo4j
         uses: docker/build-push-action@v1.1.0
         with:
+          repository: schoolsinmotion/neo4j
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           path: fyphe_O/neo4j/
       - name: Build backend
         uses: docker/build-push-action@v1.1.0
         with:
+          repository: schoolsinmotion/backend
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           path: fyphe_O/backend/
       - name: Build webapp
         uses: docker/build-push-action@v1.1.0
         with:
+          repository: schoolsinmotion/webapp
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           path: fyphe_O/webapp/
