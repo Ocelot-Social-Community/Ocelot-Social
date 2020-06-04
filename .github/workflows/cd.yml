@@ -14,7 +14,7 @@ jobs:
         with:
           submodules: recursive
       - name: Rebrand
-        run: cp webapp/* fyphe_O/webapp/
+        run: cp -r webapp/* fyphe_O/webapp/
       - name: Build neo4j
         uses: docker/build-push-action@v1.1.0
         with:
