@@ -65,8 +65,8 @@ You should see the persistent volumes at the end of the log:
 
 Restic Backups:
   Completed:
-    human-connection/nitro-backend-5b6dd96d6b-q77n6: uploads
-    human-connection/nitro-neo4j-686d768598-z2vhh: neo4j-data
+    human-connection/backend-5b6dd96d6b-q77n6: uploads
+    human-connection/neo4j-686d768598-z2vhh: neo4j-data
 ```
 
 ## Simulate a Disaster

@@ -36,7 +36,7 @@ spec:
             name: configmap
         - secretRef:
             name: human-connection
-        image: humanconnection/nitro-backend:latest
+        image: schoolsinmotion/backend:latest
         imagePullPolicy: Always
         name: backend
         ports:
@@ -46,7 +46,7 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-        - mountPath: /nitro-backend/public/uploads
+        - mountPath: /backend/public/uploads
           name: uploads
       dnsPolicy: ClusterFirst
       restartPolicy: Always

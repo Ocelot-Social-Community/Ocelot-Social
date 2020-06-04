@@ -14,7 +14,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import fetch from 'node-fetch'
 import { ApolloClient } from 'apollo-client'
 import trunc from 'trunc-html'
-const debug = require('debug')('ea:nitro-datasource')
+const debug = require('debug')('ea:datasource')
 
 export default class NitroDataSource {
   constructor(uri) {

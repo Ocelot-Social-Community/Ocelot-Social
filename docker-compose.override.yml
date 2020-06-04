@@ -12,7 +12,7 @@ services:
       context: webapp
       target: build-and-test
     volumes:
-      - ./webapp:/nitro-web
+      - ./webapp:/webapp
     environment:
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
       - PUBLIC_REGISTRATION=false
@@ -22,7 +22,7 @@ services:
       context: backend
       target: build-and-test
     volumes:
-      - ./backend:/nitro-backend
+      - ./backend:/backend
     command: yarn run dev
     environment:
       - SMTP_HOST=mailserver
@@ -31,7 +31,7 @@ services:
       - "DEBUG=${DEBUG}"
       - PUBLIC_REGISTRATION=false
   maintenance:
-    image: humanconnection/maintenance:latest
+    image: schoolsinmotion/maintenance:latest
     build:
       context: webapp
       dockerfile: Dockerfile.maintenance

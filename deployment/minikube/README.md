@@ -18,8 +18,8 @@ minikube dashboard, expose the services you want on your host system.
 For example:
 
 ```text
-$ minikube service nitro-web --namespace=human-connection
+$ minikube service webapp --namespace=human-connection
 # optionally
-$ minikube service nitro-backend --namespace=human-connection
+$ minikube service backend --namespace=human-connection
 ```
 

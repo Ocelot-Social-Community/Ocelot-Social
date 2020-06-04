@@ -37,7 +37,7 @@ spec:
             name: configmap
         - secretRef:
             name: human-connection
-        image: humanconnection/nitro-web:latest
+        image: schoolsinmotion/webapp:latest
         imagePullPolicy: Always
         name: web
         ports:
