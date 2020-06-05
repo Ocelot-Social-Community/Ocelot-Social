@@ -197,7 +197,7 @@
       },
       "signup": {
         "form": {
-          "data-privacy": "He leido y entendido la <a href=\"https://human-connection.org/datenschutz/\" target=\"_blank\"><ds-text bold color=\"primary\" >declaración de protección de datos</ds-text></a>",
+          "data-privacy": "He leido y entendido la declaración de protección de datos.",
           "description": "Para empezar, introduzca su dirección de correo electrónico:",
           "errors": {
             "email-exists": "¡Ya hay una cuenta de usuario con esta dirección de correo electrónico!",
@@ -209,7 +209,7 @@
           "no-political": "No estoy en la red en nombre de un partido o una organización política.",
           "submit": "Crear una cuenta",
           "success": "Se ha enviado un correo electrónico con un enlace de confirmación para el registro a <b>{email}</b>.",
-          "terms-and-condition": "Estoy de acuerdo con los <a href=\"/terms-and-conditions\"><ds-text bold color=\"primary\" >términos de uso</ds-text></a>."
+          "terms-and-condition": "Estoy de acuerdo con los términos de uso."
         },
         "title": "¡Únete a Human Connection!",
         "unavailable": "Desafortunadamente, el registro público de cuentas de usuario en este servidor actualmente no es posible."
@@ -814,7 +814,7 @@
       "description": "Las siguientes condiciones de uso constituyen la base para el uso de nuestra red. Cuando se registre, deberá aceptarlos y le informaremos más adelante de cualquier cambio que se produzca. La Red de Human Connection es operada en Alemania y por lo tanto está sujeta a la ley alemana. El fuero competente es Kirchheim / Teck. Para más detalles, consulte nuestro pie de imprenta: <a href=\"https://human-connection.org/en/imprint\" target=\"_blank\" >https://human-connection.org/en/imprint</a> ",
       "title": "Términos de uso"
     },
-    "termsAndConditionsConfirmed": "He leído y acepto los <a href=\"/terms-and-conditions\" target=\"_blank\">términos de uso</a>.",
+    "termsAndConditionsConfirmed": "He leído y acepto los términos de uso.",
     "termsAndConditionsNewConfirm": "He leído y acepto los nuevos términos de uso.",
     "termsAndConditionsNewConfirmText": "¡Por favor, lea los nuevos términos de uso ahora!",
     "use-and-license": {

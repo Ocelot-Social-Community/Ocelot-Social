@@ -197,7 +197,7 @@
       },
       "signup": {
         "form": {
-          "data-privacy": " I have read and understood the <a href=\"https://human-connection.org/datenschutz/\" target=\"_blank\"><ds-text bold color=\"primary\" >Privacy Statement</ds-text></a> ",
+          "data-privacy": " I have read and understood the Privacy Statement.",
           "description": "To get started, you can register here for free:",
           "errors": {
             "email-exists": "There is already a user account with this e-mail address!",
@@ -209,7 +209,7 @@
           "no-political": "I am not on behalf of a party or political organization in the network.",
           "submit": "Create an account",
           "success": "A mail with a link to complete your registration has been sent to <b>{email}</b>",
-          "terms-and-condition": "I confirm to the <a href=\"/terms-and-conditions\"><ds-text bold color=\"primary\" > Terms and conditions</ds-text></a>."
+          "terms-and-condition": "I confirm to the Terms and conditions."
         },
         "title": "Join Human Connection!",
         "unavailable": "Unfortunately, public registration of user accounts is not available right now on this server."
@@ -817,7 +817,7 @@
       "description": "The following terms of use form the basis for the use of our network. When you register, you must accept them and we will inform you later about any changes that may take place. The Human Connection Network is operated in Germany and is therefore subject to German law. Place of jurisdiction is Kirchheim / Teck. For details see our imprint: <a href=\"https://human-connection.org/imprint\" target=\"_blank\" >https://human-connection.org/imprint</a> ",
       "title": "Terms of Service"
     },
-    "termsAndConditionsConfirmed": "I have read and confirmed the <a href=\"/terms-and-conditions\" target=\"_blank\">Terms and Conditions</a>.",
+    "termsAndConditionsConfirmed": "I have read and confirmed the Terms and Conditions.",
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!",
     "use-and-license": {

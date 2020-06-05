@@ -197,7 +197,7 @@
       },
       "signup": {
         "form": {
-          "data-privacy": "Я прочитал и понял <a href=\"https://human-connection.org/datenschutz/\" target=\"_blank\"><ds-text bold color=\"primary\" >Заявление о конфиденциальности</ds-text></a>",
+          "data-privacy": "Я прочитал и понял Заявление о конфиденциальности",
           "description": "Для начала работы введите свой адрес электронной почты:",
           "errors": {
             "email-exists": "Уже есть учетная запись пользователя с этим адресом электронной почты!",
@@ -209,7 +209,7 @@
           "no-political": "Я не от имени какой-либо партии или политической организации в сети.",
           "submit": "Создать учетную запись",
           "success": "Письмо со ссылкой для завершения регистрации было отправлено на <b> {email} </b>",
-          "terms-and-condition": "Принимаю <a href=\"/terms-and-conditions\"><ds-text bold color=\"primary\" >Условия и положения</ds-text></a>."
+          "terms-and-condition": "Принимаю Условия и положения."
         },
         "title": "Присоединяйся к Human Connection!",
         "unavailable": "К сожалению, публичная регистрация пользователей на этом сервере сейчас недоступна."
@@ -810,7 +810,7 @@
       "description": "Следующие условия использования являются основой для использования нашей сети. При регистрации вы должны принять их, а мы при необходимости сообщим вам об изменениях. Сеть Human Connection работает в Германии и поэтому регулируется немецким законодательством. Место юрисдикции - Kirchheim / Teck. Подробности в выходных данных: <a href=\"https://human-connection.org/en/imprint\" target=\"_blank\" >https://human-connection.org/en/imprint</a>.",
       "title": "Условия обслуживания"
     },
-    "termsAndConditionsConfirmed": "Я прочитал(а) и подтверждаю <a href=\"/terms-and-conditions\" target=\"_blank\">Условия и положения</a>.",
+    "termsAndConditionsConfirmed": "Я прочитал(а) и подтверждаю Условия и положения.",
     "termsAndConditionsNewConfirm": "Я прочитал(а) и согласен(на) с новыми условиями.",
     "termsAndConditionsNewConfirmText": "Пожалуйста, ознакомьтесь с новыми условиями использования!",
     "use-and-license": {

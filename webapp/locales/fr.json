@@ -197,7 +197,7 @@
       },
       "signup": {
         "form": {
-          "data-privacy": "J'ai lu et compris la <a href=\"https://human-connection.org/datenschutz/\" target=\"_blank\"> <ds-text bold color=\"primary\" > Déclaration de confidentialité </ds-text> </a> ",
+          "data-privacy": "J'ai lu et compris la Déclaration de confidentialité.",
           "description": "Pour commencer, entrez votre adresse mail :",
           "errors": {
             "email-exists": "Il existe déjà un compte utilisateur avec cette adresse mail!",
@@ -209,7 +209,7 @@
           "no-political": "Je ne parle pas au nom d'un parti ou d'une organisation politique sur le réseau.",
           "submit": "Créer un compte",
           "success": "Un mail avec un lien pour compléter votre inscription a été envoyé à <b>{email}</b>",
-          "terms-and-condition": "Je confirme les <a href=\"/terms-and-conditions\"> <ds-text bold color=\"primary\" > Conditions générales </ds-text> </a>."
+          "terms-and-condition": "Je confirme les Conditions générales."
         },
         "title": "Rejoignez Human Connection!",
         "unavailable": "Malheureusement, l'enregistrement public des comptes utilisateurs n'est pas encore disponible sur ce serveur."
@@ -778,7 +778,7 @@
       "description": "Les conditions d'utilisation suivantes constituent la base de l'utilisation de notre réseau. Lorsque vous vous inscrivez, vous devez les accepter et nous vous informerons ultérieurement de tout changement qui pourrait survenir. Le réseau Human Connection Network est exploité en Allemagne et est donc soumis au droit allemand. Le tribunal compétent est celui de Kirchheim / Teck. Pour plus de détails, consultez notre site Internet: <a href=\"https://human-connection.org/en/imprint\" target=\"_blank\" >https://human-connection.org/en/imprint</a> ",
       "title": "Conditions d'utilisation"
     },
-    "termsAndConditionsConfirmed": "J'ai lu et accepte les <a href=\"/terms-and-conditions\" target=\"_blank\">conditions générales</a>.",
+    "termsAndConditionsConfirmed": "J'ai lu et accepte les conditions générales.",
     "termsAndConditionsNewConfirm": "J'ai lu et accepté les nouvelles conditions générales.",
     "termsAndConditionsNewConfirmText": "Veuillez lire les nouvelles conditions d'utilisation dès maintenant !",
     "use-and-license": {

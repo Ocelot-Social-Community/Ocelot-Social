@@ -197,7 +197,7 @@
       },
       "signup": {
         "form": {
-          "data-privacy": "Eu li e entendi o <a href=\"https://human-connection.org/datenschutz/\" target=\"_blank\"><ds-text bold color=\"primary\" >Política de Privacidade</ds-text></a> ",
+          "data-privacy": "Eu li e entendi o Política de Privacidade.",
           "description": "Para começar, digite seu endereço de e-mail:",
           "errors": {
             "email-exists": "Já existe uma conta de usuário com este endereço de e-mail!",
@@ -207,7 +207,7 @@
           "minimum-age": "Tenho 18 anos ou mais.",
           "submit": "Criar uma conta",
           "success": "Um e-mail com um link para completar o seu registo foi enviado para <b>{email}</b>",
-          "terms-and-condition": "Eu concordo com os <a href=\"/terms-and-conditions\"><ds-text bold color=\"primary\" > Termos e condições</ds-text></a>."
+          "terms-and-condition": "Eu concordo com os Termos e condições."
         },
         "title": "Junte-se à Human Connection!",
         "unavailable": "Infelizmente, o registo público para usuário não está disponível neste servidor."
@@ -710,7 +710,7 @@
       "description": "As seguintes condições de utilização constituem a base para a utilização da nossa rede. Ao registar-se, deve aceitar os termos de utilização e informaremos mais tarde sobre quaisquer alterações que possam ocorrer. A Human Connection Network é operada na Alemanha e, portanto, está sujeita à lei alemã. O local de jurisdição é Kirchheim / Teck. Para mais detalhes, veja a nossa impressão: <a href=\"https://human-connection.org/imprint\" target=\"_blank\" >https://human-connection.org/imprint</a> ",
       "title": "Termos do Serviço"
     },
-    "termsAndConditionsConfirmed": "Eu li e confirmei os <a href=\"/terms-and-conditions\" target=\"_blank\">Terms and Conditions</a>.",
+    "termsAndConditionsConfirmed": "Eu li e confirmei os Terms and Conditions.",
     "termsAndConditionsNewConfirm": "Eu li e concordo com os novos termos de condições.",
     "termsAndConditionsNewConfirmText": "Por favor, leia os novos termos de uso agora!",
     "use-and-license": {

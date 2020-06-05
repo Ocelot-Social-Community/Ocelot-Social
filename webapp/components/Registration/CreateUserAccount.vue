@@ -69,17 +69,21 @@
             v-model="termsAndConditionsConfirmed"
             :checked="termsAndConditionsConfirmed"
           />
-          <label
-            for="checkbox0"
-            v-html="$t('termsAndConditions.termsAndConditionsConfirmed')"
-          ></label>
+          <label for="checkbox0">
+            {{ $t('termsAndConditions.termsAndConditionsConfirmed') }}
+          <br>
+          <nuxt-link to="/terms-and-conditions">{{ $t('site.termsAndConditions') }}</nuxt-link>
+          </label>
         </ds-text>
         <ds-text>
           <input id="checkbox1" type="checkbox" v-model="dataPrivacy" :checked="dataPrivacy" />
-          <label
-            for="checkbox1"
-            v-html="$t('components.registration.signup.form.data-privacy')"
-          ></label>
+          <label for="checkbox1">
+            {{ $t('components.registration.signup.form.data-privacy') }}
+            <br>
+            <a :href="links.DATA_PRIVACY">
+              {{ $t('site.data-privacy') }}
+            </a>
+          </label>
         </ds-text>
         <ds-text>
           <input id="checkbox2" type="checkbox" v-model="minimumAge" :checked="minimumAge" />
@@ -125,6 +129,7 @@
 </template>
 
 <script>
+import links from '~/constants/links'
 import PasswordStrength from '../Password/Strength'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
@@ -140,6 +145,7 @@ export default {
   data() {
     const passwordForm = PasswordForm({ translate: this.$t })
     return {
+      links,
       supportEmail: emails.SUPPORT,
       formData: {
         name: '',
