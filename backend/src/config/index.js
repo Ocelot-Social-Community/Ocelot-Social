@@ -1,7 +1,12 @@
 import dotenv from 'dotenv'
 if (require.resolve) {
   // are we in a nodejs environment?
-  dotenv.config({ path: require.resolve('../../.env') })
+  try {
+    dotenv.config({ path: require.resolve('../../.env') })
+  } catch (error) {
+    if (error.code !== 'MODULE_NOT_FOUND') throw error
+    console.log('WARN: No `.env` file found in /backend') // eslint-disable-line no-console
+  }
 }
 
 // eslint-disable-next-line no-undef
