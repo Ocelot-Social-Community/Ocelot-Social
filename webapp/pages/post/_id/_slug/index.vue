@@ -100,7 +100,7 @@
           {{ $t('settings.blocked-users.explanation.commenting-disabled') }}
           <br />
           {{ $t('settings.blocked-users.explanation.commenting-explanation') }}
-          <a href="https://support.human-connection.org/kb/" target="_blank">FAQ</a>
+          <a :href="links.FAQ" target="_blank">FAQ</a>
         </ds-placeholder>
       </ds-section>
     </base-card>
@@ -120,6 +120,7 @@ import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostH
 import PostQuery from '~/graphql/PostQuery'
 import HcEmotions from '~/components/Emotions/Emotions'
 import PostMutations from '~/graphql/PostMutations'
+import links from '~/constants/links.js'
 
 export default {
   name: 'PostSlug',
@@ -145,6 +146,7 @@ export default {
   },
   data() {
     return {
+      links,
       post: null,
       ready: false,
       title: 'loading',
