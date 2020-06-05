@@ -3,6 +3,8 @@ import dotenv from 'dotenv'
 
 dotenv.config() // we want to synchronize @nuxt-dotenv and nuxt-env
 
+const manifest = require('./constants/manifest.js')
+
 const pkg = require('./package')
 export const envWhitelist = [
   'NODE_ENV',
@@ -236,14 +238,7 @@ export default {
     config: additionalSentryConfig,
   },
 
-  manifest: {
-    name: 'Human Connection',
-    short_name: 'HC',
-    homepage_url: 'https://human-connection.org/',
-    description: 'The free and open source social network for active citizenship',
-    theme_color: '#17b53f',
-    lang: 'en',
-  },
+  manifest,
 
   /*
    ** Build configuration

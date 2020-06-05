@@ -24,6 +24,7 @@ COPY locales locales
 COPY mixins mixins
 COPY plugins/i18n.js plugins/v-tooltip.js plugins/styleguide.js plugins/
 COPY static static
+COPY constants constants
 COPY nuxt.config.js nuxt.config.js
 
 # this will also ovewrite the existing package.json
