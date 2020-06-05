@@ -1,4 +1,4 @@
-export const SUPPORT_EMAIL = {
-  href: 'mailto:support@human-connection.org',
-  label: 'support@human-connection.org',
+export default {
+  SUPPORT: 'support@human-connection.org',
+  MODERATION: 'moderation@human-connection.org',
 }

@@ -16,7 +16,7 @@
     </ds-text>
     <ds-text align="center">
       {{ $t('components.registration.create-user-account.help') }}
-      <a :href="supportEmail.href">{{ supportEmail.label }}</a>
+      <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
     </ds-text>
     <ds-space centered>
       <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
@@ -128,9 +128,9 @@
 import PasswordStrength from '../Password/Strength'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
-import { SUPPORT_EMAIL } from '~/constants/emails.js'
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { SignupVerificationMutation } from '~/graphql/Registration.js'
+import emails from '~/constants/emails'
 
 export default {
   components: {
@@ -140,7 +140,7 @@ export default {
   data() {
     const passwordForm = PasswordForm({ translate: this.$t })
     return {
-      supportEmail: SUPPORT_EMAIL,
+      supportEmail: emails.SUPPORT,
       formData: {
         name: '',
         about: '',

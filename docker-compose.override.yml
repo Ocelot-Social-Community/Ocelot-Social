@@ -17,7 +17,7 @@ services:
     environment:
       - "APPLICATION_NAME={$APPLICATION_NAME:-'Human Connection'}"
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
-      - PUBLIC_REGISTRATION=false
+      - PUBLIC_REGISTRATION=true
     command: yarn run dev
   backend:
     image: schoolsinmotion/backend:build-and-test
@@ -33,7 +33,7 @@ services:
       - SMTP_PORT=25
       - SMTP_IGNORE_TLS=true
       - "DEBUG=${DEBUG}"
-      - PUBLIC_REGISTRATION=false
+      - PUBLIC_REGISTRATION=true
   maintenance:
     image: schoolsinmotion/maintenance:latest
     build:

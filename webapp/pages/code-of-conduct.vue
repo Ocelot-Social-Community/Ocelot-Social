@@ -25,9 +25,7 @@
 
       <p>
         {{ $t('code-of-conduct.get-help') }}
-        <a class="hc-editor-link-blot" href="moderation@human-connection.org" target="_blank">
-          moderation@human-connection.org
-        </a>
+        <a :href="'mailto:' + moderationEmail">{{ moderationEmail }}</a>
       </p>
       <br />
     </ds-container>
@@ -35,6 +33,7 @@
 </template>
 
 <script>
+import emails from '~/constants/emails.js'
 export default {
   layout: 'basic',
   head() {
@@ -44,6 +43,7 @@ export default {
   },
   data() {
     return {
+      moderationEmail: emails.MODERATION,
       sections: ['preamble', 'purpose'],
       listSections: [
         {

@@ -20,10 +20,7 @@
                 <ds-text>{{ $t('maintenance.explanation') }}</ds-text>
                 <ds-text>
                   {{ $t('maintenance.questions') }}
-                  <a href="mailto:support@human-connection.org" class="email-link">
-                    support@human-connection.org
-                  </a>
-                  .
+                  <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
                 </ds-text>
               </ds-space>
             </ds-flex-item>
@@ -35,12 +32,16 @@
 </template>
 
 <script>
+import emails from '~/constants/emails.js'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 
 export default {
   layout: 'blank',
   components: {
     LocaleSwitch,
+  },
+  data() {
+    return { supportEmail: emails.SUPPORT }
   },
 }
 </script>
