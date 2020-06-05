@@ -33,7 +33,7 @@ storiesOf('Generic/BaseCard', module)
     template: `
       <base-card style="width: 600px;">
         <template #imageColumn>
-          <img class="image" src="/img/sign-up/humanconnection.svg" />
+          <img class="image" alt="Example image" src="/img/custom/welcome.svg" />
         </template>
         <h2 class="title">I am a card heading</h2>
         <p>And I am a paragraph.</p>
@@ -46,7 +46,7 @@ storiesOf('Generic/BaseCard', module)
     template: `
       <base-card style="width: 600px;">
         <template #imageColumn>
-          <img class="image" src="/img/sign-up/humanconnection.svg" />
+          <img class="image" alt="Example image" src="/img/custom/welcome.svg" />
         </template>
         <h2 class="title">I am a card heading</h2>
         <p>And I am a paragraph.</p>

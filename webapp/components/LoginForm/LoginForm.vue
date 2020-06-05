@@ -7,7 +7,7 @@
     <base-card>
       <template #imageColumn>
         <a :href="$t('login.moreInfoURL')" :title="$t('login.moreInfo')" target="_blank">
-          <img class="image" alt="Human Connection" src="/img/sign-up/humanconnection.svg" />
+          <img class="image" alt="Welcome" src="/img/custom/welcome.svg" />
         </a>
       </template>
       <h2 class="title">{{ $t('login.login') }}</h2>

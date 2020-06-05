@@ -8,7 +8,7 @@
         <ds-flex>
           <ds-flex-item :width="{ base: '100%', sm: 1, md: 1 }">
             <ds-space>
-              <img class="login-image" alt="Human Connection" src="/img/sign-up/onourjourney.svg" />
+              <img alt="Under maintenance" src="/img/custom/under-maintenance.svg" />
             </ds-space>
           </ds-flex-item>
           <ds-flex-item :width="{ base: '100%', sm: 1, md: 1 }">
