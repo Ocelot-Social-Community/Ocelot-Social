@@ -36,6 +36,8 @@ const {
   REDIS_DOMAIN,
   REDIS_PORT,
   REDIS_PASSWORD,
+  EMAIL_DEFAULT_SENDER,
+  EMAIL_SUPPORT,
 } = env
 
 export const requiredConfigs = {
@@ -88,6 +90,11 @@ export const s3Configs = {
   S3_CONFIGURED,
 }
 
+export const customConfigs = {
+  EMAIL_DEFAULT_SENDER,
+  EMAIL_SUPPORT,
+}
+
 export default {
   ...requiredConfigs,
   ...smtpConfigs,
@@ -97,4 +104,5 @@ export default {
   ...sentryConfigs,
   ...redisConfigs,
   ...s3Configs,
+  ...customConfigs,
 }

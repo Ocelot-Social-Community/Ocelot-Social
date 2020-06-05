@@ -45,6 +45,8 @@ services:
       - MAPBOX_TOKEN=pk.eyJ1IjoiaHVtYW4tY29ubmVjdGlvbiIsImEiOiJjajl0cnBubGoweTVlM3VwZ2lzNTNud3ZtIn0.KZ8KK9l70omjXbEkkbHGsQ
       - PRIVATE_KEY_PASSPHRASE=a7dsf78sadg87ad87sfagsadg78
       - "DEBUG=${DEBUG}"
+      - EMAIL_SUPPORT=support@human-connection.org
+      - EMAIL_DEFAULT_SENDER=info@human-connection.org
   neo4j:
     image: schoolsinmotion/neo4j:latest
     build:

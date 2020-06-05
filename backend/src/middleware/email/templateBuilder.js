@@ -3,7 +3,7 @@ import CONFIG from '../../config'
 
 import * as templates from './templates'
 
-const from = '"Human Connection" <info@human-connection.org>'
+const from = CONFIG.EMAIL_DEFAULT_SENDER
 const supportUrl = 'https://human-connection.org/en/contact'
 
 export const signupTemplate = ({ email, nonce }) => {
