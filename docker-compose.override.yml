@@ -8,16 +8,19 @@ services:
     networks:
       - hc-network
   webapp:
+    image: schoolsinmotion/webapp:build-and-test
     build:
       context: webapp
       target: build-and-test
     volumes:
       - ./webapp:/webapp
     environment:
+      - "APPLICATION_NAME={$APPLICATION_NAME:-'Human Connection'}"
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
       - PUBLIC_REGISTRATION=false
     command: yarn run dev
   backend:
+    image: schoolsinmotion/backend:build-and-test
     build:
       context: backend
       target: build-and-test
@@ -25,6 +28,7 @@ services:
       - ./backend:/backend
     command: yarn run dev
     environment:
+      - "APPLICATION_NAME={$APPLICATION_NAME:-'Human Connection'}"
       - SMTP_HOST=mailserver
       - SMTP_PORT=25
       - SMTP_IGNORE_TLS=true
