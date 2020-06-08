@@ -13,29 +13,53 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: Rebrand
-        run: cp -r webapp/* fyphe_O/webapp/
-      - name: Build neo4j
+
+      - name: Build neo4j base image
+        uses: docker/build-push-action@v1.1.0
+        with:
+          repository: humanconnection/neo4j
+          tags: latest
+          path: Human-Connection/neo4j/
+          push: false
+      - name: Build backend base image
+        uses: docker/build-push-action@v1.1.0
+        with:
+          repository: humanconnection/backend
+          tags: latest
+          path: Human-Connection/backend/
+          push: false
+      - name: Build webapp base image
+        uses: docker/build-push-action@v1.1.0
+        with:
+          repository: humanconnection/webapp
+          tags: latest
+          path: Human-Connection/webapp/
+          push: false
+
+      - name: Build neo4j customized image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: schoolsinmotion/neo4j
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
-          path: fyphe_O/neo4j/
-      - name: Build backend
+          path: neo4j/
+          push: true
+      - name: Build backend customized image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: schoolsinmotion/backend
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
-          path: fyphe_O/backend/
-      - name: Build webapp
+          path: backend/
+          push: true
+      - name: Build webapp customized image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: schoolsinmotion/webapp
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
-          path: fyphe_O/webapp/
+          path: webapp/
+          push: true

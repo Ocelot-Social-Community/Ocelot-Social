@@ -3,8 +3,6 @@ version: "3.4"
 services:
   webapp:
     image: schoolsinmotion/webapp:latest
-    build:
-      context: webapp
     ports:
       - 3000:3000
       - 3002:3002
@@ -12,8 +10,6 @@ services:
       - hc-network
     depends_on:
       - backend
-    volumes:
-      - webapp_node_modules:/webapp/node_modules
     environment:
       - HOST=0.0.0.0
       - GRAPHQL_URI=http://backend:4000
@@ -22,17 +18,12 @@ services:
     command: yarn run dev
   backend:
     image: schoolsinmotion/backend:latest
-    build:
-      context: backend
     networks:
       - hc-network
     depends_on:
       - neo4j
     ports:
       - 4000:4000
-    volumes:
-      - backend_node_modules:/backend/node_modules
-      - uploads:/backend/public/uploads
     environment:
       - NEO4J_URI=bolt://neo4j:7687
       - GRAPHQL_URI=http://backend:4000
@@ -47,8 +38,6 @@ services:
     command: yarn run dev
   neo4j:
     image: schoolsinmotion/neo4j:latest
-    build:
-      context: neo4j
     networks:
       - hc-network
     environment:
@@ -58,12 +47,5 @@ services:
     ports:
       - 7687:7687
       - 7474:7474
-    volumes:
-      - neo4j_data:/data
 networks:
   hc-network:
-volumes:
-  webapp_node_modules:
-  backend_node_modules:
-  neo4j_data:
-  uploads:
