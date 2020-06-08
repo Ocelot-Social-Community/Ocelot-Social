@@ -71,15 +71,15 @@
           />
           <label for="checkbox0">
             {{ $t('termsAndConditions.termsAndConditionsConfirmed') }}
-          <br>
-          <nuxt-link to="/terms-and-conditions">{{ $t('site.termsAndConditions') }}</nuxt-link>
+            <br />
+            <nuxt-link to="/terms-and-conditions">{{ $t('site.termsAndConditions') }}</nuxt-link>
           </label>
         </ds-text>
         <ds-text>
           <input id="checkbox1" type="checkbox" v-model="dataPrivacy" :checked="dataPrivacy" />
           <label for="checkbox1">
             {{ $t('components.registration.signup.form.data-privacy') }}
-            <br>
+            <br />
             <a :href="links.DATA_PRIVACY">
               {{ $t('site.data-privacy') }}
             </a>
