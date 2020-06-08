@@ -1,1 +1,1 @@
-FROM humanconnection/backend:build-and-test
+FROM schoolsinmotion/backend:bare

@@ -17,22 +17,22 @@ jobs:
       - name: Build neo4j base image
         uses: docker/build-push-action@v1.1.0
         with:
-          repository: humanconnection/neo4j
-          tags: latest
+          repository: schoolsinmotion/neo4j
+          tags: bare
           path: Human-Connection/neo4j/
           push: false
       - name: Build backend base image
         uses: docker/build-push-action@v1.1.0
         with:
-          repository: humanconnection/nitro-backend
-          tags: latest
+          repository: schoolsinmotion/nitro-backend
+          tags: bare
           path: Human-Connection/backend/
           push: false
       - name: Build webapp base image
         uses: docker/build-push-action@v1.1.0
         with:
-          repository: humanconnection/nitro-web
-          tags: latest
+          repository: schoolsinmotion/nitro-web
+          tags: bare
           path: Human-Connection/webapp/
           push: false
 
@@ -44,8 +44,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
           path: neo4j/
-          cache_from: humanconnection/neo4j:latest
-          push: false
+          push: true
       - name: Build backend customized image
         uses: docker/build-push-action@v1.1.0
         with:
@@ -54,8 +53,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
           path: backend/
-          cache_from: humanconnection/backend:build-and-test
-          push: false
+          push: true
       - name: Build webapp customized image
         uses: docker/build-push-action@v1.1.0
         with:
@@ -64,5 +62,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
           path: webapp/
-          cache_from: humanconnection/webapp:build-and-test
-          push: false
+          push: true

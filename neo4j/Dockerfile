@@ -1,1 +1,1 @@
-FROM humanconnection/neo4j:latest
+FROM schoolsinmotion/neo4j:bare
