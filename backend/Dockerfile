@@ -1,1 +1,1 @@
-FROM schoolsinmotion/backend:bare
+FROM schoolsinmotion/backend:build-and-test
