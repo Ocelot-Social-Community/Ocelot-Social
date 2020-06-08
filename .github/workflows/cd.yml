@@ -31,7 +31,7 @@ jobs:
       - name: Build webapp base image
         uses: docker/build-push-action@v1.1.0
         with:
-          repository: humanconnection/webapp
+          repository: humanconnection/nitro-web
           tags: latest
           path: Human-Connection/webapp/
           push: false
