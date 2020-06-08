@@ -44,7 +44,8 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
           path: neo4j/
-          push: true
+          cache_from: humanconnection/neo4j:latest
+          push: false
       - name: Build backend customized image
         uses: docker/build-push-action@v1.1.0
         with:
@@ -53,7 +54,8 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
           path: backend/
-          push: true
+          cache_from: humanconnection/backend:build-and-test
+          push: false
       - name: Build webapp customized image
         uses: docker/build-push-action@v1.1.0
         with:
@@ -62,4 +64,5 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
           path: webapp/
-          push: true
+          cache_from: humanconnection/webapp:build-and-test
+          push: false
