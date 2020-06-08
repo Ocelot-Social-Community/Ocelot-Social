@@ -40,7 +40,7 @@ jobs:
           push: false
 
       - name: Lint backend
-        run: docker run --rm humanconnection/backend:latest yarn run lint
+        run: docker run --rm humanconnection/backend:build-and-test yarn run lint
       - name: Lint webapp
-        run: docker run --rm humanconnection/webapp:latest yarn run lint
+        run: docker run --rm humanconnection/webapp:build-and-test yarn run lint
 
