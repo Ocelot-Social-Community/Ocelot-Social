@@ -24,7 +24,7 @@ jobs:
       - name: Build backend base image
         uses: docker/build-push-action@v1.1.0
         with:
-          repository: humanconnection/backend
+          repository: humanconnection/nitro-backend
           tags: latest
           path: Human-Connection/backend/
           push: false
