@@ -2,13 +2,13 @@
   <div>
     <ds-space>
       <ds-heading tag="h2">{{ $t('site.code-of-conduct') }}</ds-heading>
-      <p>{{ $t('code-of-conduct.subheader') }}</p>
+      <p>{{ $t('code-of-conduct.subheader', metadata) }}</p>
     </ds-space>
 
     <ds-container>
       <div v-for="section in sections" :key="section">
         <strong>{{ $t(`code-of-conduct.${section}.title`) }}</strong>
-        <p>{{ $t(`code-of-conduct.${section}.description`) }}</p>
+        <p>{{ $t(`code-of-conduct.${section}.description`, metadata) }}</p>
       </div>
 
       <br />
@@ -34,6 +34,8 @@
 
 <script>
 import emails from '~/constants/emails.js'
+import metadata from '~/constants/metadata.js'
+
 export default {
   layout: 'basic',
   head() {
@@ -43,6 +45,7 @@ export default {
   },
   data() {
     return {
+      metadata,
       moderationEmail: emails.MODERATION,
       sections: ['preamble', 'purpose'],
       listSections: [

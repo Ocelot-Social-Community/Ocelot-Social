@@ -1,7 +1,6 @@
+import metadata from './metadata.js'
+const { name, short_name, description, theme_color } = metadata
 export default {
-  name: 'Human Connection',
-  short_name: 'HC',
-  description: 'The free and open source social network for active citizenship',
-  theme_color: '#17b53f',
+  name, short_name, description, theme_color,
   lang: 'en',
 }

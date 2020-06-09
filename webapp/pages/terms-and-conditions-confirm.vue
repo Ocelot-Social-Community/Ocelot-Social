@@ -39,16 +39,6 @@ export default {
   data() {
     return {
       checked: false,
-      sections: [
-        'risk',
-        'data-privacy',
-        'work-in-progress',
-        'code-of-conduct',
-        'moderation',
-        'fairness',
-        'questions',
-        'human-connection',
-      ],
     }
   },
   asyncData({ store, redirect }) {

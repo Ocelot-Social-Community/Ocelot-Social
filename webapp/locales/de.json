@@ -102,14 +102,14 @@
     },
     "get-help": "Wenn Du einem inakzeptablen Verhalten ausgesetzt bist, es miterlebst oder andere Bedenken hast, benachrichtige bitte so schnell wie möglich einen Organisator der Gemeinschaft und verlinke oder verweise auf den entsprechenden Inhalt:",
     "preamble": {
-      "description": "Human Connection ist ein gemeinnütziges soziales Wissens- und Aktionsnetzwerk der nächsten Generation. Von Menschen – für Menschen. Open Source, fair und transparent. Für positiven lokalen und globalen Wandel in allen Lebensbereichen. Wir gestalten den öffentlichen Austausch von Wissen, Ideen und Projekten völlig neu. Die Funktionen von Human Connection bringen die Menschen zusammen – offline und online – so dass wir die Welt zu einem besseren Ort machen können.",
+      "description": "{name} ist ein gemeinnütziges soziales Wissens- und Aktionsnetzwerk der nächsten Generation. Von Menschen – für Menschen. Open Source, fair und transparent. Für positiven lokalen und globalen Wandel in allen Lebensbereichen. Wir gestalten den öffentlichen Austausch von Wissen, Ideen und Projekten völlig neu. Die Funktionen von {name} bringen die Menschen zusammen – offline und online – so dass wir die Welt zu einem besseren Ort machen können.",
       "title": "Präambel"
     },
     "purpose": {
-      "description": "Mit diesen Verhaltensregeln regeln wir die wesentlichen Grundsätze für das Verhalten in unserem Sozialen Netzwerk. Dabei ist die Menschenrechtscharta der Vereinten Nationen unsere Orientierung und bildet das Herz unseres Werteverständnisses. Die Verhaltensregeln dienen als Leitsätze für den persönlichen Auftritt und den Umgang untereinander. Wer als Nutzer im Human Connection Netzwerk aktiv ist, Beiträge verfasst, kommentiert oder mit anderen Nutzern, auch außerhalb des Netzwerkes, Kontakt aufnimmt, erkennt diese Verhaltensregeln als verbindlich an.",
+      "description": "Mit diesen Verhaltensregeln regeln wir die wesentlichen Grundsätze für das Verhalten in unserem Sozialen Netzwerk. Dabei ist die Menschenrechtscharta der Vereinten Nationen unsere Orientierung und bildet das Herz unseres Werteverständnisses. Die Verhaltensregeln dienen als Leitsätze für den persönlichen Auftritt und den Umgang untereinander. Wer als Nutzer im {name} Netzwerk aktiv ist, Beiträge verfasst, kommentiert oder mit anderen Nutzern, auch außerhalb des Netzwerkes, Kontakt aufnimmt, erkennt diese Verhaltensregeln als verbindlich an.",
       "title": "Zweck"
     },
-    "subheader": "für das Soziale Netzwerk der Human Connection gGmbH",
+    "subheader": "für das Soziale Netzwerk von {organization}",
     "unacceptable-behaviour": {
       "description": "Die folgenden Verhaltensweisen sind in unserer Community inakzeptabel:",
       "list": {
