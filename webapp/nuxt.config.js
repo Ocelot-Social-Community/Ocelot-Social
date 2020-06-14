@@ -279,6 +279,13 @@ export default {
           },
         ],
       })
+      config.module.rules.push({
+        enforce: 'pre',
+        test: /\.html$/,
+        loader: 'raw-loader',
+        exclude: /(node_modules)/,
+      })
+
       const tagAttributesForTesting = ['data-test', ':data-test', 'v-bind:data-test']
       ctx.loaders.vue.compilerOptions = {
         modules: [

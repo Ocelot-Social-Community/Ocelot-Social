@@ -1,7 +1,7 @@
 export default {
-  name: 'fyphe_O',
-  short_name: 'fyphe',
-  description: 'The Schools in Motion Network',
-  organization: 'Ensible e.V.',
-  theme_color: '#17b53f',
+  APPLICATION_NAME: 'fyphe_O',
+  APPLICATION_SHORT_NAME: 'fyphe',
+  APPLICATION_DESCRIPTION: 'The Schools in Motion Network',
+  ORGANIZATION_NAME: 'Ensible e.V.',
+  ORGANIZATION_JURISDICTION: 'Köln',
 }

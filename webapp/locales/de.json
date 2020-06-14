@@ -102,14 +102,14 @@
     },
     "get-help": "Wenn Du einem inakzeptablen Verhalten ausgesetzt bist, es miterlebst oder andere Bedenken hast, benachrichtige bitte so schnell wie möglich einen Organisator der Gemeinschaft und verlinke oder verweise auf den entsprechenden Inhalt:",
     "preamble": {
-      "description": "{name} ist ein gemeinnütziges soziales Wissens- und Aktionsnetzwerk der nächsten Generation. Von Menschen – für Menschen. Open Source, fair und transparent. Für positiven lokalen und globalen Wandel in allen Lebensbereichen. Wir gestalten den öffentlichen Austausch von Wissen, Ideen und Projekten völlig neu. Die Funktionen von {name} bringen die Menschen zusammen – offline und online – so dass wir die Welt zu einem besseren Ort machen können.",
+      "description": "{APPLICATION_NAME} ist ein gemeinnütziges soziales Wissens- und Aktionsnetzwerk der nächsten Generation. Von Menschen – für Menschen. Open Source, fair und transparent. Für positiven lokalen und globalen Wandel in allen Lebensbereichen. Wir gestalten den öffentlichen Austausch von Wissen, Ideen und Projekten völlig neu. Die Funktionen von {APPLICATION_NAME} bringen die Menschen zusammen – offline und online – so dass wir die Welt zu einem besseren Ort machen können.",
       "title": "Präambel"
     },
     "purpose": {
-      "description": "Mit diesen Verhaltensregeln regeln wir die wesentlichen Grundsätze für das Verhalten in unserem Sozialen Netzwerk. Dabei ist die Menschenrechtscharta der Vereinten Nationen unsere Orientierung und bildet das Herz unseres Werteverständnisses. Die Verhaltensregeln dienen als Leitsätze für den persönlichen Auftritt und den Umgang untereinander. Wer als Nutzer im {name} Netzwerk aktiv ist, Beiträge verfasst, kommentiert oder mit anderen Nutzern, auch außerhalb des Netzwerkes, Kontakt aufnimmt, erkennt diese Verhaltensregeln als verbindlich an.",
+      "description": "Mit diesen Verhaltensregeln regeln wir die wesentlichen Grundsätze für das Verhalten in unserem Sozialen Netzwerk. Dabei ist die Menschenrechtscharta der Vereinten Nationen unsere Orientierung und bildet das Herz unseres Werteverständnisses. Die Verhaltensregeln dienen als Leitsätze für den persönlichen Auftritt und den Umgang untereinander. Wer als Nutzer im {APPLICATION_NAME} Netzwerk aktiv ist, Beiträge verfasst, kommentiert oder mit anderen Nutzern, auch außerhalb des Netzwerkes, Kontakt aufnimmt, erkennt diese Verhaltensregeln als verbindlich an.",
       "title": "Zweck"
     },
-    "subheader": "für das Soziale Netzwerk von {organization}",
+    "subheader": "für das Soziale Netzwerk von {ORGANIZATION_NAME}",
     "unacceptable-behaviour": {
       "description": "Die folgenden Verhaltensweisen sind in unserer Community inakzeptabel:",
       "list": {
@@ -785,7 +785,7 @@
     },
     "agree": "Ich stimme zu!",
     "code-of-conduct": {
-      "description": "Unser Verhaltenskodex dient als Leitfaden für das persönliche Auftreten und den Umgang miteinander. Wer als Nutzer im Human Connection-Netzwerk aktiv ist, Beiträge verfasst, kommentiert oder mit anderen Nutzern, auch außerhalb des Netzwerkes, Kontakt aufnimmt, erkennt diese Verhaltensregeln als verbindlich an. <a href=\"https://alpha.human-connection.org/code-of-conduct\" target=\"_blank\">https://alpha.human-connection.org/code-of-conduct</a>",
+      "description": "Unser Verhaltenskodex dient als Leitfaden für das persönliche Auftreten und den Umgang miteinander. Wer als Nutzer im {APPLICATION_NAME}-Netzwerk aktiv ist, Beiträge verfasst, kommentiert oder mit anderen Nutzern, auch außerhalb des Netzwerkes, Kontakt aufnimmt, erkennt diese Verhaltensregeln als verbindlich an. <a href=\"https://alpha.human-connection.org/code-of-conduct\" target=\"_blank\">https://alpha.human-connection.org/code-of-conduct</a>",
       "title": "Verhaltenscodex"
     },
     "errors-and-feedback": {
@@ -802,7 +802,7 @@
     },
     "newTermsAndConditions": "Neue Nutzungsbedingungen",
     "no-commercial-use": {
-      "description": "Die Nutzung des Human Connection Netzwerkes ist nicht gestattet für kommerzielle Nutzung. Darunter fällt unter anderem das Bewerben von Produkten mit kommerzieller Absicht, das Einstellen von Affiliate-Links (Geschäftspartner-Links), direkter Aufruf zu Spenden oder finanzieller Unterstützung für Zwecke, die steuerlich nicht als gemeinnützig anerkannt sind.",
+      "description": "Die Nutzung des {APPLICATION_NAME} Netzwerkes ist nicht gestattet für kommerzielle Nutzung. Darunter fällt unter anderem das Bewerben von Produkten mit kommerzieller Absicht, das Einstellen von Affiliate-Links (Geschäftspartner-Links), direkter Aufruf zu Spenden oder finanzieller Unterstützung für Zwecke, die steuerlich nicht als gemeinnützig anerkannt sind.",
       "title": "Keine kommerzielle Nutzung"
     },
     "no-parties": {
@@ -814,7 +814,7 @@
       "title": "Datenschutz"
     },
     "terms-of-service": {
-      "description": "Die folgenden Nutzungsbedingungen sind Basis für die Nutzung unseres Netzwerkes. Beim Registrieren musst Du sie anerkennen und wir werden Dich auch später über ggf. stattfindende Änderungen informieren. Das Human Connection Netzwerk wird in Deutschland betrieben und unterliegt daher deutschem Recht. Gerichtsstand ist Kirchheim / Teck. Zu Details schau in unser Impressum: <a href=\"https://human-connection.org/impressum/\" target=\"_blank\" >https://human-connection.org/impressum/</a>",
+      "description": "Die folgenden Nutzungsbedingungen sind Basis für die Nutzung unseres Netzwerkes. Beim Registrieren musst Du sie anerkennen und wir werden Dich auch später über ggf. stattfindende Änderungen informieren. Das {APPLICATION_NAME} Netzwerk wird in Deutschland betrieben und unterliegt daher deutschem Recht. Gerichtsstand ist {ORGANIZATION_JURISDICTION}. Zu Details schau in unser Impressum.",
       "title": "Nutzungsbedingungen"
     },
     "termsAndConditionsConfirmed": "Ich habe die Nutzungsbedingungen durchgelesen und stimme ihnen zu.",
