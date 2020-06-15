@@ -45,7 +45,7 @@ export async function handler(req, res) {
   } catch (error) {
     debug(error)
     return res.status(500).json({
-      error: `Something went terribly wrong. Please contact ${CONFIG.EMAIL_SUPPORT}`,
+      error: `Something went terribly wrong. Please visit ${CONFIG.SUPPORT_URL}`,
     })
   } finally {
     session.close()

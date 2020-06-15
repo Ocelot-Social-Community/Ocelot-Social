@@ -1,4 +1,6 @@
 import dotenv from 'dotenv'
+import links from './links.js'
+
 if (require.resolve) {
   // are we in a nodejs environment?
   try {
@@ -37,7 +39,6 @@ const {
   REDIS_PORT,
   REDIS_PASSWORD,
   EMAIL_DEFAULT_SENDER,
-  EMAIL_SUPPORT,
 } = env
 
 export const requiredConfigs = {
@@ -92,7 +93,7 @@ export const s3Configs = {
 
 export const customConfigs = {
   EMAIL_DEFAULT_SENDER,
-  EMAIL_SUPPORT,
+  SUPPORT_URL: links.SUPPORT,
 }
 
 export default {

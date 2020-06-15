@@ -4,7 +4,8 @@ import CONFIG from '../../config'
 import * as templates from './templates'
 
 const from = CONFIG.EMAIL_DEFAULT_SENDER
-const supportUrl = 'https://human-connection.org/en/contact'
+const supportUrl = CONFIG.SUPPORT_URL
+const welcomeImageUrl = new URL(`/img/custom/welcome.svg`, CONFIG.CLIENT_URI)
 
 export const signupTemplate = ({ email, nonce }) => {
   const subject = 'Willkommen, Bienvenue, Welcome to Human Connection!'
@@ -18,7 +19,7 @@ export const signupTemplate = ({ email, nonce }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, nonce, supportUrl, subject },
+      { actionUrl, nonce, supportUrl, welcomeImageUrl, subject },
       { content: templates.signup },
     ),
   }
@@ -36,7 +37,7 @@ export const emailVerificationTemplate = ({ email, nonce, name }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, name, nonce, supportUrl, subject },
+      { actionUrl, name, nonce, supportUrl, welcomeImageUrl, subject },
       { content: templates.emailVerification },
     ),
   }
@@ -54,7 +55,7 @@ export const resetPasswordTemplate = ({ email, nonce, name }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, name, nonce, supportUrl, subject },
+      { actionUrl, name, nonce, supportUrl, welcomeImageUrl, subject },
       { content: templates.passwordReset },
     ),
   }
@@ -70,7 +71,7 @@ export const wrongAccountTemplate = ({ email }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, supportUrl },
+      { actionUrl, supportUrl, welcomeImageUrl },
       { content: templates.wrongAccount },
     ),
   }
