@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import links from './links.js'
+import metadata from './metadata.js'
 
 if (require.resolve) {
   // are we in a nodejs environment?
@@ -94,6 +95,7 @@ export const s3Configs = {
 export const customConfigs = {
   EMAIL_DEFAULT_SENDER,
   SUPPORT_URL: links.SUPPORT,
+  APPLICATION_NAME: metadata.APPLICATION_NAME,
 }
 
 export default {
