@@ -15,7 +15,6 @@ services:
     volumes:
       - ./webapp:/webapp
     environment:
-      - "APPLICATION_NAME={$APPLICATION_NAME:-'Human Connection'}"
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
       - PUBLIC_REGISTRATION=true
     command: yarn run dev
@@ -28,7 +27,6 @@ services:
       - ./backend:/backend
     command: yarn run dev
     environment:
-      - "APPLICATION_NAME={$APPLICATION_NAME:-'Human Connection'}"
       - SMTP_HOST=mailserver
       - SMTP_PORT=25
       - SMTP_IGNORE_TLS=true
