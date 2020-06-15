@@ -2,15 +2,11 @@ import Vue from 'vue'
 import vuexI18n from 'vuex-i18n/dist/vuex-i18n.umd.js'
 import { isEmpty, find } from 'lodash'
 import locales from '~/locales'
+import htmlTranslations from '~/locales/html/'
 
 const registerTranslation = ({ Vue, locale }) => {
   const translation = require(`~/locales/${locale}.json`)
-  try {
-    const {
-      default: termsAndConditions,
-    } = require(`~/locales/html/${locale}/termsAndConditions.html`)
-    translation.html = { termsAndConditions }
-  } catch (ex) {}
+  translation.html = htmlTranslations[locale]
   Vue.i18n.add(locale, translation)
 }
 

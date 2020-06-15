@@ -80,9 +80,9 @@
           <label for="checkbox1">
             {{ $t('components.registration.signup.form.data-privacy') }}
             <br />
-            <a :href="links.DATA_PRIVACY">
+            <nuxt-link to="/data-privacy">
               {{ $t('site.data-privacy') }}
-            </a>
+            </nuxt-link>
           </label>
         </ds-text>
         <ds-text>

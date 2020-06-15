@@ -81,54 +81,7 @@
     }
   },
   "code-of-conduct": {
-    "consequences": {
-      "description": "Se un membro della comunità manifesta comportamenti inaccettabili, gli operatori, i moderatori e gli amministratori responsabili della rete possono adottare le misure appropriate, inclusi ma non limitati a:",
-      "list": {
-        "0": "Richiesta di cessazione immediata di comportamenti inaccettabili",
-        "1": "Blocco o eliminazione di commenti",
-        "2": "Esclusione temporanea dal rispettivo posto o contributo",
-        "3": "Blocco o eliminazione di contenuti",
-        "4": "Revoca temporanea delle autorizzazioni di scrittura",
-        "5": "Esclusione temporanea dalla rete",
-        "6": "Esclusione definitiva dalla rete",
-        "7": "Violazioni della legge tedesca possono essere segnalate."
-      },
-      "title": "Conseguenze di comportamenti inaccettabilil"
-    },
-    "expected-behaviour": {
-      "description": null,
-      "list": {
-        "0": null,
-        "1": null,
-        "2": null,
-        "3": "Fai attenzione a ciò che ti circonda e ai tuoi compagni partecipanti. Avvisare i leader della comunità se si nota una situazione pericolosa, qualcuno in difficoltà o violazioni del presente Codice di condotta, anche se sembrano insignificanti."
-      },
-      "title": null
-    },
-    "get-help": "Se sei soggetto o testimone di un comportamento inaccettabile, o se hai altre preoccupazioni, ti preghiamo di avvisare al più presto un organizzatore della comunità e di fare riferimento al contenuto corrispondente:",
-    "preamble": {
-      "description": "Human Connection è una rete di conoscenza e azione sociale senza scopo di lucro della prossima generazione. Dalle persone - per le persone. Open Source, equo e trasparente. Per un cambiamento locale e globale positivo in tutte le aree della vita. Ridisegniamo completamente lo scambio pubblico di conoscenze, idee e progetti. Le funzioni di Human Connection riuniscono le persone - offline e online - in modo che possiamo rendere il mondo un posto migliore.",
-      "title": null
-    },
-    "purpose": {
-      "description": "Con questo codice di condotta regoliamo i principi essenziali di comportamento nel nostro social network. La Carta dei diritti umani delle Nazioni Unite è il nostro orientamento e costituisce il cuore della nostra comprensione dei valori. Il codice di condotta funge da principio guida per il nostro aspetto personale e l'interazione reciproca. Chiunque sia attivo come utente nella rete di connessione umana, scrive articoli, commenti o contatta altri utenti, compresi quelli esterni alla rete, riconosce queste regole di condotta come vincolanti.",
-      "title": null
-    },
-    "subheader": null,
-    "unacceptable-behaviour": {
-      "description": null,
-      "list": {
-        "0": "Posti discriminatori, commenti, dichiarazioni o insulti, in particolare quelli relativi a genere, orientamento sessuale, razza, religione, orientamento politico o filosofico o disabilità.",
-        "1": "Pubblicazione o collegamento di materiale chiaramente pornografico.",
-        "2": "Glorificazione o banalizzazione di atti di violenza crudele o disumana.",
-        "3": "La divulgazione di informazioni personali altrui senza il loro consenso o minaccia di (\"doxing\").",
-        "4": "Intimidazione intenzionale, stalking o persecuzione.",
-        "5": "Pubblicità di prodotti e servizi a fini commerciali.",
-        "6": "Comportamento criminale o violazione della legge tedesca.",
-        "7": "Sostenere o incoraggiare tale condotta."
-      },
-      "title": null
-    }
+    "subheader": null
   },
   "comment": {
     "content": {

@@ -2,17 +2,17 @@
   <div id="footer" class="ds-footer">
     <a :href="links.ORGANIZATION" target="_blank" v-html="$t('site.made')"></a>
     <span>-</span>
-    <a :href="links.IMPRINT" target="_blank">
+    <nuxt-link to="/imprint">
       {{ $t('site.imprint') }}
-    </a>
+    </nuxt-link>
     <span>-</span>
     <nuxt-link to="/terms-and-conditions">{{ $t('site.termsAndConditions') }}</nuxt-link>
     <span>-</span>
     <nuxt-link to="/code-of-conduct">{{ $t('site.code-of-conduct') }}</nuxt-link>
     <span>-</span>
-    <a :href="links.DATA_PRIVACY" target="_blank">
+    <nuxt-link to="/data-privacy">
       {{ $t('site.data-privacy') }}
-    </a>
+    </nuxt-link>
     <span>-</span>
     <a :href="links.FAQ" target="_blank">
       {{ $t('site.faq') }}

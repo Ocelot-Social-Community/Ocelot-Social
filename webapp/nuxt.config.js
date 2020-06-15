@@ -58,6 +58,8 @@ export default {
       'terms-and-conditions',
       'code-of-conduct',
       'changelog',
+      'imprint',
+      'data-privacy',
     ],
     // pages to keep alive
     keepAlivePages: ['index'],

@@ -6,34 +6,12 @@
     </ds-space>
 
     <ds-container>
-      <div v-for="section in sections" :key="section">
-        <strong>{{ $t(`code-of-conduct.${section}.title`) }}</strong>
-        <p>{{ $t(`code-of-conduct.${section}.description`, metadata) }}</p>
-      </div>
-
-      <br />
-
-      <div v-for="section in listSections" :key="section.key">
-        <strong>{{ $t(`code-of-conduct.${section.key}.title`) }}</strong>
-        <p>{{ $t(`code-of-conduct.${section.key}.description`) }}</p>
-        <ul>
-          <li v-for="i in section.items" :key="i">
-            {{ $t(`code-of-conduct.${section.key}.list.${i}`) }}
-          </li>
-        </ul>
-      </div>
-
-      <p>
-        {{ $t('code-of-conduct.get-help') }}
-        <a :href="'mailto:' + moderationEmail">{{ moderationEmail }}</a>
-      </p>
-      <br />
+      <div v-html="$t('html.codeOfConduct')" />
     </ds-container>
   </div>
 </template>
 
 <script>
-import emails from '~/constants/emails.js'
 import metadata from '~/constants/metadata.js'
 
 export default {
@@ -46,22 +24,6 @@ export default {
   data() {
     return {
       metadata,
-      moderationEmail: emails.MODERATION,
-      sections: ['preamble', 'purpose'],
-      listSections: [
-        {
-          key: 'expected-behaviour',
-          items: [...Array(4).keys()],
-        },
-        {
-          key: 'unacceptable-behaviour',
-          items: [...Array(8).keys()],
-        },
-        {
-          key: 'consequences',
-          items: [...Array(8).keys()],
-        },
-      ],
     }
   },
 }
