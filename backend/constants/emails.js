@@ -1,4 +1,4 @@
 export default {
-  SUPPORT: 'support@human-connection.org',
-  MODERATION: 'moderation@human-connection.org',
+  SUPPORT: 'support-schools-in-motion@roschaefer.de',
+  MODERATION: 'moderation-schools-in-motion@roschaefer.de',
 }
