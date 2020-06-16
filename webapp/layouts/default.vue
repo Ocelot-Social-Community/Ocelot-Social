@@ -6,7 +6,7 @@
           <ds-flex class="main-navigation-flex">
             <ds-flex-item :width="{ base: '142px' }">
               <nuxt-link :to="{ name: 'index' }" v-scroll-to="'.main-navigation'">
-                <ds-logo />
+                <Logo />
               </nuxt-link>
             </ds-flex-item>
             <ds-flex-item
@@ -74,6 +74,7 @@
 </template>
 
 <script>
+import Logo from '~/components/Logo/Logo'
 import { mapGetters } from 'vuex'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
@@ -86,6 +87,7 @@ import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 
 export default {
   components: {
+    Logo,
     LocaleSwitch,
     SearchField,
     Modal,
