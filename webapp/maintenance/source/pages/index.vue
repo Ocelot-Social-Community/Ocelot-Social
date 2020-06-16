@@ -13,7 +13,7 @@
           </ds-flex-item>
           <ds-flex-item :width="{ base: '100%', sm: 1, md: 1 }">
             <ds-flex-item>
-              <ds-heading tag="h3">{{ $t('maintenance.title') }}</ds-heading>
+              <ds-heading tag="h3">{{ $t('maintenance.title', metadata) }}</ds-heading>
             </ds-flex-item>
             <ds-flex-item>
               <ds-space margin="small">
@@ -33,6 +33,7 @@
 
 <script>
 import emails from '~/constants/emails.js'
+import metadata from '~/constants/metadata.js'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 
 export default {
@@ -41,7 +42,7 @@ export default {
     LocaleSwitch,
   },
   data() {
-    return { supportEmail: emails.SUPPORT }
+    return { metadata, supportEmail: emails.SUPPORT }
   },
 }
 </script>

@@ -164,7 +164,7 @@
           "success": "Un mail avec un lien pour compléter votre inscription a été envoyé à <b>{email}</b>",
           "terms-and-condition": "Je confirme les Conditions générales."
         },
-        "title": "Rejoignez Human Connection!",
+        "title": "Rejoignez {APPLICATION_NAME}!",
         "unavailable": "Malheureusement, l'enregistrement public des comptes utilisateurs n'est pas encore disponible sur ce serveur."
       }
     }
@@ -292,14 +292,13 @@
     "no-results": "Pas de contribution trouvée."
   },
   "login": {
-    "copy": "Si vous avez déjà un compte human-connection, connectez-vous ici.",
     "email": "Votre mail",
     "failure": "Adresse mail ou mot de passe incorrect.",
     "forgotPassword": "Mot de passe oublié?",
     "hello": "Bonjour",
     "login": "Connexion",
     "logout": "Déconnexion",
-    "moreInfo": "Qu'est-ce que Human Connection?",
+    "moreInfo": "Qu'est-ce que {APPLICATION_NAME}?",
     "moreInfoHint": "à la page de présentation",
     "no-account": "Vous n'avez pas de compte?",
     "password": "Votre mot de passe",
@@ -309,7 +308,7 @@
   "maintenance": {
     "explanation": "Pour l'instant, nous faisons de la maintenance programmée, veuillez réessayer plus tard.",
     "questions": "Des questions ou des préoccupations, envoyez un mail à",
-    "title": "Human Connection est en maintenance"
+    "title": "{APPLICATION_NAME} est en maintenance"
   },
   "moderation": {
     "name": "Modération",
@@ -435,7 +434,7 @@
     "invites": {
       "description": "Entrez leur adresse mail pour l'invitation.",
       "emailPlaceholder": "Mail d'invitation",
-      "title": "Invitez quelqu'un à Human Connection!"
+      "title": "Invitez quelqu'un à {APPLICATION_NAME}!"
     },
     "memberSince": "Membre depuis",
     "name": "Mon profil",

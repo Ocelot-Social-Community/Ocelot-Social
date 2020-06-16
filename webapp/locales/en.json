@@ -164,7 +164,7 @@
           "success": "A mail with a link to complete your registration has been sent to <b>{email}</b>",
           "terms-and-condition": "I confirm to the Terms and conditions."
         },
-        "title": "Join Human Connection!",
+        "title": "Join {APPLICATION_NAME}!",
         "unavailable": "Unfortunately, public registration of user accounts is not available right now on this server."
       }
     }
@@ -305,14 +305,13 @@
     "no-results": "No contributions found."
   },
   "login": {
-    "copy": "If you already have a human-connection account, please login.",
     "email": "Your E-mail",
     "failure": "Incorrect email address or password.",
     "forgotPassword": "Forgot Password?",
     "hello": "Hello",
     "login": "Login",
     "logout": "Logout",
-    "moreInfo": "What is Human Connection?",
+    "moreInfo": "What is {APPLICATION_NAME}?",
     "moreInfoHint": "to the presentation page",
     "no-account": "Don't have an account?",
     "password": "Your Password",
@@ -322,7 +321,7 @@
   "maintenance": {
     "explanation": "At the moment we are doing some scheduled maintenance, please try again later.",
     "questions": "Any Questions or concerns, send an e-mail to",
-    "title": "Human Connection is under maintenance"
+    "title": "{APPLICATION_NAME} is under maintenance"
   },
   "moderation": {
     "name": "Moderation",
@@ -449,7 +448,7 @@
     "invites": {
       "description": "Enter their e-mail address for invitation.",
       "emailPlaceholder": "E-mail to invite",
-      "title": "Invite somebody to Human Connection!"
+      "title": "Invite somebody to {APPLICATION_NAME}!"
     },
     "memberSince": "Member since",
     "name": "My Profile",

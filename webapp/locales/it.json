@@ -298,14 +298,13 @@
     "no-results": null
   },
   "login": {
-    "copy": "Se sei gia registrato su Human Connection, accedi qui.",
     "email": "La tua email",
     "failure": null,
     "forgotPassword": null,
     "hello": "Ciao",
     "login": "Accesso",
     "logout": "Logout",
-    "moreInfo": "Che cosa è Human Connection?",
+    "moreInfo": "Che cosa è {APPLICATION_NAME}?",
     "moreInfoHint": null,
     "no-account": null,
     "password": "La tua password",
@@ -651,7 +650,7 @@
     },
     "agree": "Sono d'accordo!",
     "code-of-conduct": {
-      "description": "Il nostro codice di condotta funge da manuale per l'aspetto personale e l'interazione reciproca. Chiunque sia attivo come utente nella rete di Human Connection, scrive articoli, commenti o contatta altri utenti, anche al di fuori della rete, riconosce queste regole di condotta come vincolanti. <a href=\"https://alpha.human-connection.org/code-of-conduct\" target=\"_blank\"> https://alpha.human-connection.org/code-of-conduct </a>",
+      "description": "Il nostro codice di condotta funge da manuale per l'aspetto personale e l'interazione reciproca. Chiunque sia attivo come utente nella rete di {APPLICATION_NAME}, scrive articoli, commenti o contatta altri utenti, anche al di fuori della rete, riconosce queste regole di condotta come vincolanti. <a href=\"https://alpha.human-connection.org/code-of-conduct\" target=\"_blank\"> https://alpha.human-connection.org/code-of-conduct </a>",
       "title": "Codice di condotta"
     },
     "errors-and-feedback": {

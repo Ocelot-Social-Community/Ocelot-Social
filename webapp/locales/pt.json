@@ -102,14 +102,14 @@
     },
     "get-help": "Se você for vítima ou testemunhar um comportamento inaceitável, ou tiver qualquer outra preocupação, por favor notifique um organizador da comunidade o mais rápido possível e inclua o link ou mencione o conteúdo correspondente:",
     "preamble": {
-      "description": "A Human Connection é uma rede de conhecimento e ação social sem fins lucrativos da próxima geração. Feito por pessoas - para pessoas. Open Source, justo e transparente. Para uma mudança local e global positiva em todas as áreas da vida. Redesenhamos completamente a troca pública de conhecimentos, idéias e projetos. As funções da Human Connection reúnem as pessoas - offline e online - para que possamos fazer do mundo um lugar melhor.",
+      "description": "A {APPLICATION_NAME} é uma rede de conhecimento e ação social sem fins lucrativos da próxima geração. Feito por pessoas - para pessoas. Open Source, justo e transparente. Para uma mudança local e global positiva em todas as áreas da vida. Redesenhamos completamente a troca pública de conhecimentos, idéias e projetos. As funções da Human Connection reúnem as pessoas - offline e online - para que possamos fazer do mundo um lugar melhor.",
       "title": "Introdução"
     },
     "purpose": {
-      "description": "Com este código de conduta, regulamentamos os princípios essenciais para o comportamento em nossa rede social. A Carta dos Direitos Humanos das Nações Unidas é a nossa orientação e forma o coração da nossa compreensão dos valores. O código de conduta serve como princípios orientadores para a nossa aparência pessoal e interação uns com os outros. Qualquer pessoa ativa como usuário da Human Connection Network, que escreve artigos, comentários ou  se conecta com outros usuários, incluindo aqueles fora da rede, reconhece estas regras de conduta como obrigatórias.",
+      "description": "Com este código de conduta, regulamentamos os princípios essenciais para o comportamento em nossa rede social. A Carta dos Direitos Humanos das Nações Unidas é a nossa orientação e forma o coração da nossa compreensão dos valores. O código de conduta serve como princípios orientadores para a nossa aparência pessoal e interação uns com os outros. Qualquer pessoa ativa como usuário da {APPLICATION_NAME} Network, que escreve artigos, comentários ou  se conecta com outros usuários, incluindo aqueles fora da rede, reconhece estas regras de conduta como obrigatórias.",
       "title": "Propósito"
     },
-    "subheader": "para a rede social da Human Connection gGmbH",
+    "subheader": "para a rede social da {ORGANIZATION_NAME}",
     "unacceptable-behaviour": {
       "description": "Os seguintes comportamentos são inaceitáveis dentro da nossa comunidade:",
       "list": {
@@ -209,7 +209,7 @@
           "success": "Um e-mail com um link para completar o seu registo foi enviado para <b>{email}</b>",
           "terms-and-condition": "Eu concordo com os Termos e condições."
         },
-        "title": "Junte-se à Human Connection!",
+        "title": "Junte-se à {APPLICATION_NAME}!",
         "unavailable": "Infelizmente, o registo público para usuário não está disponível neste servidor."
       }
     }
@@ -336,14 +336,13 @@
     "no-results": "Nenhuma contribuição encontrada."
   },
   "login": {
-    "copy": "Se você já tem uma conta no Human Connection, entre aqui.",
     "email": "Seu email",
     "failure": "Endereço de e-mail ou senha incorretos.",
     "forgotPassword": "Esqueceu a sua senha?",
     "hello": "Olá",
     "login": "Entrar",
     "logout": "Sair",
-    "moreInfo": "O que é a Human Connection?",
+    "moreInfo": "O que é a {APPLICATION_NAME}?",
     "moreInfoHint": "para a página de apresentação",
     "no-account": "Ainda não tem uma conta?",
     "password": "Sua senha",
@@ -353,7 +352,7 @@
   "maintenance": {
     "explanation": "No momento estamos em manutenção, por favor tente novamente mais tarde.",
     "questions": "Qualquer dúvida, envie um e-mail para",
-    "title": "Human Connection está em manutenção"
+    "title": "{APPLICATION_NAME} está em manutenção"
   },
   "moderation": {
     "name": "Moderação",
@@ -422,7 +421,7 @@
     "invites": {
       "description": "Digite o endereço de e-mail para o convite.",
       "emailPlaceholder": "E-mail para convidar",
-      "title": "Convidar alguém para Human Connection!"
+      "title": "Convidar alguém para {APPLICATION_NAME}!"
     },
     "memberSince": "Membro desde",
     "name": "Meu perfil",

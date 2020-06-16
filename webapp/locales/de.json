@@ -164,7 +164,7 @@
           "success": "Eine E-Mail mit einem Link zum Abschließen Deiner Registrierung wurde an <b>{email}</b> geschickt",
           "terms-and-condition": "Ich stimme den Nutzungsbedingungen zu."
         },
-        "title": "Mach mit bei Human Connection!",
+        "title": "Mach mit bei {APPLICATION_NAME}!",
         "unavailable": "Leider ist die öffentliche Registrierung von Benutzerkonten auf diesem Server derzeit nicht möglich."
       }
     }
@@ -305,14 +305,13 @@
     "no-results": "Keine Beiträge gefunden."
   },
   "login": {
-    "copy": "Falls Du bereits ein Konto bei Human Connection hast, melde Dich bitte hier an.",
     "email": "Deine E-Mail",
     "failure": "Fehlerhafte E-Mail-Adresse oder Passwort.",
     "forgotPassword": "Passwort vergessen?",
     "hello": "Hallo",
     "login": "Anmelden",
     "logout": "Abmelden",
-    "moreInfo": "Was ist Human Connection?",
+    "moreInfo": "Was ist {APPLICATION_NAME}?",
     "moreInfoHint": "zur Präsentationsseite",
     "no-account": "Du hast noch kein Benutzerkonto?",
     "password": "Dein Passwort",
@@ -322,7 +321,7 @@
   "maintenance": {
     "explanation": "Derzeit führen wir einige geplante Wartungsarbeiten durch, bitte versuche es später erneut.",
     "questions": "Bei Fragen oder Problemen erreichst Du uns per E-Mail an",
-    "title": "Human Connection befindet sich in der Wartung"
+    "title": "{APPLICATION_NAME} befindet sich in der Wartung"
   },
   "moderation": {
     "name": "Moderation",
@@ -449,7 +448,7 @@
     "invites": {
       "description": "Zur Einladung die E-Mail-Adresse hier eintragen.",
       "emailPlaceholder": "E-Mail-Adresse für die Einladung",
-      "title": "Lade jemanden zu Human Connection ein!"
+      "title": "Lade jemanden zu {APPLICATION_NAME} ein!"
     },
     "memberSince": "Mitglied seit",
     "name": "Mein Profil",

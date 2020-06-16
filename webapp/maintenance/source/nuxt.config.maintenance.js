@@ -49,4 +49,14 @@ export default {
       })
     },
   },
+  build: {
+    extend(config, ctx) {
+      config.module.rules.push({
+        enforce: 'pre',
+        test: /\.html$/,
+        loader: 'raw-loader',
+        exclude: /(node_modules)/,
+      })
+    }
+  }
 }
