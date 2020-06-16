@@ -1,9 +1,8 @@
 import path from 'path'
 import dotenv from 'dotenv'
+import manifest from './constants/manifest.js'
 
 dotenv.config() // we want to synchronize @nuxt-dotenv and nuxt-env
-
-const manifest = require('./constants/manifest.js')
 
 const pkg = require('./package')
 export const envWhitelist = [
@@ -68,8 +67,8 @@ export default {
    ** Headers of the page
    */
   head: {
-    title: 'Human Connection',
-    titleTemplate: '%s - Human Connection',
+    title: manifest.name,
+    titleTemplate: `%s - ${manifest.name}`,
     meta: [
       {
         charset: 'utf-8',

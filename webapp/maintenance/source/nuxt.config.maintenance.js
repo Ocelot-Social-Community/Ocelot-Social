@@ -8,7 +8,7 @@ export default {
   manifest,
 
   head: {
-    title: 'Human Connection',
+    title: manifest.name,
     meta: [
       {
         charset: 'utf-8',
@@ -20,7 +20,7 @@ export default {
       {
         hid: 'description',
         name: 'description',
-        content: 'Maintenance page for Human Connection',
+        content: `Maintenance page for ${manifest.name}`,
       },
     ],
     link: [
