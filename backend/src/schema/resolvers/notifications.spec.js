@@ -393,4 +393,51 @@ describe('given some notifications', () => {
       })
     })
   })
+  describe('markAllAsRead', () => {
+    const markAllAsReadMutation = gql`
+      mutation {
+        markAllAsRead {
+          from {
+            __typename
+            ... on Post {
+              content
+            }
+            ... on Comment {
+              content
+            }
+          }
+          read
+          createdAt
+        }
+      }
+    `
+    describe('unauthenticated', () => {
+      it('throws authorization error', async () => {
+        const result = await mutate({
+          mutation: markAllAsReadMutation,
+        })
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+      })
+    })
+
+    describe('authenticated', () => {
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+      })
+
+      describe('not being notified at all', () => {
+        beforeEach(async () => {
+          variables = {
+            ...variables,
+          }
+        })
+
+        it('returns undefined', async () => {
+          const response = await mutate({ mutation: markAllAsReadMutation, variables })
+          expect(response.data.markAsRead).toEqual(undefined)
+          expect(response.errors).toBeUndefined()
+        })
+      })
+    })
+  })
 })
