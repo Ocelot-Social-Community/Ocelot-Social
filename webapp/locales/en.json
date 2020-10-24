@@ -456,6 +456,7 @@
       "unread": "Unread"
     },
     "pageLink": "All notifications",
+    "markAllAsRead": "Mark all as read",
     "post": "Post",
     "reason": {
       "commented_on_post": "Commented on your post …",
