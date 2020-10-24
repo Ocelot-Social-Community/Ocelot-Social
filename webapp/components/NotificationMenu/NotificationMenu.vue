@@ -16,11 +16,24 @@
       <div class="notifications-menu-popover">
         <notification-list :notifications="notifications" @markAsRead="markAsRead" />
       </div>
-      <div class="notifications-link-container">
-        <nuxt-link :to="{ name: 'notifications' }">
-          {{ $t('notifications.pageLink') }}
-        </nuxt-link>
-      </div>
+      <ds-flex class="notifications-link-container">
+        <ds-flex-item :width="{ base: '50%' }" centered>
+          <nuxt-link :to="{ name: 'notifications' }">
+            {{ $t('notifications.pageLink') }}
+          </nuxt-link>
+        </ds-flex-item>
+        <ds-flex-item :width="{ base: '50%' }" centered>
+          <ds-button
+            ghost
+            primary
+            :disabled="unreadNotificationsCount === 0"
+            @click="markAllAsRead"
+            data-test="markAllAsRead-button"
+          >
+            {{ $t('notifications.markAllAsRead') }}
+          </ds-button>
+        </ds-flex-item>
+      </ds-flex>
     </template>
   </dropdown>
 </template>
@@ -28,7 +41,12 @@
 <script>
 import { mapGetters } from 'vuex'
 import unionBy from 'lodash/unionBy'
-import { notificationQuery, markAsReadMutation, notificationAdded } from '~/graphql/User'
+import {
+  notificationQuery,
+  markAsReadMutation,
+  notificationAdded,
+  markAllAsReadMutation,
+} from '~/graphql/User'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import Dropdown from '~/components/Dropdown'
 import NotificationList from '../NotificationList/NotificationList'
@@ -60,6 +78,19 @@ export default {
         this.$toast.error(err.message)
       }
     },
+    async markAllAsRead() {
+      if (!this.hasNotifications) {
+        return
+      }
+
+      try {
+        await this.$apollo.mutate({
+          mutation: markAllAsReadMutation(this.$i18n),
+        })
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
   },
   computed: {
     ...mapGetters({
@@ -70,6 +101,9 @@ export default {
         return notification.read ? count : count + 1
       }, 0)
       return result
+    },
+    hasNotifications() {
+      return this.notifications.length
     },
   },
   apollo: {
