@@ -143,6 +143,7 @@ export default shield(
       blockUser: isAuthenticated,
       unblockUser: isAuthenticated,
       markAsRead: isAuthenticated,
+      markAllAsRead: isAuthenticated,
       AddEmailAddress: isAuthenticated,
       VerifyEmailAddress: isAuthenticated,
       pinPost: isAdmin,
