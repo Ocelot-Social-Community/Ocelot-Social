@@ -253,7 +253,7 @@
     "success": "Salvo!",
     "teaserImage": {
       "cropperConfirm": "Confirmar",
-      "supportedFormats": "Insira uma imagem do formato de arquivo JPG, PNG ou GIF"
+      "supportedFormats": "Insira uma imagem do formato JPG, PNG ou GIF"
     },
     "title": "Título"
   },
