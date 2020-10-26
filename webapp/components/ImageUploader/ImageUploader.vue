@@ -21,7 +21,7 @@
         @click.stop="deleteImage"
       />
       <div v-if="!hasImage" class="supported-formats">
-        Insert a picture of file format JPG , PNG or GIF
+        {{ $t('contribution.teaserImage.supportedFormats') }}
       </div>
     </vue-dropzone>
     <div v-show="showCropper" class="crop-overlay">
