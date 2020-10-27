@@ -258,7 +258,8 @@
     "newPost": "Create a new Post",
     "success": "Saved!",
     "teaserImage": {
-      "cropperConfirm": "Confirm"
+      "cropperConfirm": "Confirm",
+      "supportedFormats": "Insert a picture of file format JPG , PNG or GIF"
     },
     "title": "Title"
   },
