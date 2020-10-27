@@ -437,8 +437,8 @@
       "read": "Lire",
       "unread": "Non lu"
     },
-    "pageLink": "Toutes les notifications",
     "markAllAsRead": "Tout marquer comme lu",
+    "pageLink": "Toutes les notifications",
     "post": "Post",
     "reason": {
       "commented_on_post": "Commenté sur votre post…",

@@ -91,6 +91,26 @@
     "moreInfo": "Wat is Human Connection?",
     "password": "Uw Wachtwoord"
   },
+  "notifications": {
+    "comment": "",
+    "content": "",
+    "empty": "",
+    "filterLabel": {
+      "all": "",
+      "read": "",
+      "unread": ""
+    },
+    "markAllAsRead": "Markeer alles als gelezen",
+    "pageLink": "",
+    "post": "",
+    "reason": {
+      "commented_on_post": "",
+      "mentioned_in_comment": "",
+      "mentioned_in_post": ""
+    },
+    "title": "",
+    "user": ""
+  },
   "post": {
     "moreInfo": {
       "name": "Meer info"
@@ -172,25 +192,5 @@
     "taxident": "Identificatienummer voor de belasting over de toegevoegde waarde overeenkomstig § 27 a Wet op de belasting over de toegevoegde waarde (Duitsland).",
     "termsAc": "Gebruiksvoorwaarden",
     "tribunal": "registerrechtbank"
-  },
-  "notifications": {
-    "comment": "",
-    "content": "",
-    "empty": "",
-    "filterLabel": {
-      "all": "",
-      "read": "",
-      "unread": ""
-    },
-    "pageLink": "",
-    "markAllAsRead": "Markeer alles als gelezen",
-    "post": "",
-    "reason": {
-      "commented_on_post": "",
-      "mentioned_in_comment": "",
-      "mentioned_in_post": ""
-    },
-    "title": "",
-    "user": ""
   }
 }
