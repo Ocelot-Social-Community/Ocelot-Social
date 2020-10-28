@@ -31,7 +31,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: configmap
-        image: humanconnection/neo4j:latest
+        image: ocelotsocialnetwork/neo4j:latest
         imagePullPolicy: Always
         name: neo4j
         ports:

@@ -31,7 +31,7 @@ services:
       - "DEBUG=${DEBUG}"
       - PUBLIC_REGISTRATION=false
   maintenance:
-    image: humanconnection/maintenance:latest
+    image: ocelotsocialnetwork/maintenance:latest
     build:
       context: webapp
       dockerfile: Dockerfile.maintenance

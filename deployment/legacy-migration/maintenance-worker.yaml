@@ -7,7 +7,7 @@
   spec:
     containers:
     - name: nitro-maintenance-worker
-      image: humanconnection/maintenance-worker:latest
+      image: ocelotsocialnetwork/maintenance-worker:latest
       imagePullPolicy: Always
       resources:
         requests:
