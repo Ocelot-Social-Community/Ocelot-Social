@@ -13,7 +13,7 @@ maintenanceImage: ocelotsocialnetwork/maintenance
 # neo4jImage is the docker image for the neo4j deployment
 neo4jImage: ocelotsocialnetwork/neo4j
 # webappImage is the docker image for the webapp deployment
-webappImage: ocelotsocialnetwork/nitro-web
+webappImage: ocelotsocialnetwork/develop-webapp
 # image configures pullPolicy related to the docker images
 image:
   # pullPolicy indicates when, if ever, pods pull a new image from docker hub.

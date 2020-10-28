@@ -7,7 +7,7 @@ CMD ["yarn", "run", "start"]
 # Expose the app port
 ARG BUILD_COMMIT
 ENV BUILD_COMMIT=$BUILD_COMMIT
-ARG WORKDIR=/nitro-web
+ARG WORKDIR=/develop-webapp
 RUN mkdir -p $WORKDIR
 WORKDIR $WORKDIR
 
@@ -35,6 +35,6 @@ RUN yarn run generate
 
 
 FROM nginx:alpine
-COPY --from=build ./nitro-web/dist/ /usr/share/nginx/html/
+COPY --from=build ./develop-webapp/dist/ /usr/share/nginx/html/
 RUN rm /etc/nginx/conf.d/default.conf
 COPY maintenance/nginx/custom.conf /etc/nginx/conf.d/

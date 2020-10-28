@@ -4,7 +4,7 @@ services:
   webapp:
     environment:
       - "CI=${CI}"
-    image: ocelotsocialnetwork/nitro-web:build-and-test
+    image: ocelotsocialnetwork/develop-webapp:build-and-test
     build:
       context: webapp
       target: build-and-test

@@ -45,7 +45,7 @@ $ kubectl --namespace=human-connection get deployments
 NAME            READY   UP-TO-DATE   AVAILABLE   AGE
 nitro-backend   1/1     1            1           3d11h
 nitro-neo4j     1/1     1            1           3d11h
-nitro-web       2/2     2            2           73d
+develop-webapp  2/2     2            2           73d
 $ kubectl --namespace=human-connection delete deployment nitro-neo4j
 deployment.extensions "nitro-neo4j" deleted
 $ kubectl --namespace=human-connection delete deployment nitro-backend

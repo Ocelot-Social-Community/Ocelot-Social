@@ -7,7 +7,7 @@ CMD ["yarn", "run", "start"]
 # Expose the app port
 ARG BUILD_COMMIT
 ENV BUILD_COMMIT=$BUILD_COMMIT
-ARG WORKDIR=/nitro-web
+ARG WORKDIR=/develop-webapp
 RUN mkdir -p $WORKDIR
 WORKDIR $WORKDIR
 
@@ -25,7 +25,7 @@ RUN NODE_ENV=production yarn run build
 
 FROM base as production
 RUN yarn install --production=true --frozen-lockfile --non-interactive --no-cache
-COPY --from=build-and-test ./nitro-web/.nuxt ./.nuxt
-COPY --from=build-and-test ./nitro-web/static ./static
+COPY --from=build-and-test ./develop-webapp/.nuxt ./.nuxt
+COPY --from=build-and-test ./develop-webapp/static ./static
 COPY nuxt.config.js .
 COPY locales locales

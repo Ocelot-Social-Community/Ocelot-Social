@@ -12,7 +12,7 @@ services:
       context: webapp
       target: build-and-test
     volumes:
-      - ./webapp:/nitro-web
+      - ./webapp:/develop-webapp
     environment:
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
       - PUBLIC_REGISTRATION=false

@@ -2,7 +2,7 @@ version: "3.4"
 
 services:
   webapp:
-    image: ocelotsocialnetwork/nitro-web:latest
+    image: ocelotsocialnetwork/develop-webapp:latest
     build:
       context: webapp
       target: production
@@ -16,7 +16,7 @@ services:
     depends_on:
       - backend
     volumes:
-      - webapp_node_modules:/nitro-web/node_modules
+      - webapp_node_modules:/develop-webapp/node_modules
     environment:
       - HOST=0.0.0.0
       - GRAPHQL_URI=http://backend:4000

@@ -31,7 +31,7 @@ E.g. in file `deployment/digital-ocean/https/ingress.yaml` change the following:
       paths:
       - path: /
         backend:
-          # serviceName: nitro-web
+          # serviceName: develop-webapp
           serviceName: maintenance
           # servicePort: 3000
           servicePort: 80
