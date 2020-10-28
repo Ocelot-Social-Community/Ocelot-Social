@@ -22,7 +22,7 @@ services:
       context: backend
       target: build-and-test
     volumes:
-      - ./backend:/nitro-backend
+      - ./backend:/develop-backend
     command: yarn run dev
     environment:
       - SMTP_HOST=mailserver

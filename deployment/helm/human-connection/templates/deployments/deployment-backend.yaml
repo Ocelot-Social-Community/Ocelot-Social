@@ -44,7 +44,7 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-          - mountPath: /nitro-backend/public/uploads
+          - mountPath: /develop-backend/public/uploads
             name: uploads
       dnsPolicy: ClusterFirst
       restartPolicy: Always

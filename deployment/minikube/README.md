@@ -20,6 +20,6 @@ For example:
 ```text
 $ minikube service develop-webapp --namespace=human-connection
 # optionally
-$ minikube service nitro-backend --namespace=human-connection
+$ minikube service develop-backend --namespace=human-connection
 ```
 

@@ -22,7 +22,7 @@ services:
       - GRAPHQL_URI=http://backend:4000
       - MAPBOX_TOKEN="pk.eyJ1IjoiaHVtYW4tY29ubmVjdGlvbiIsImEiOiJjajl0cnBubGoweTVlM3VwZ2lzNTNud3ZtIn0.bZ8KK9l70omjXbEkkbHGsQ"
   backend:
-    image: ocelotsocialnetwork/nitro-backend:latest
+    image: ocelotsocialnetwork/develop-backend:latest
     build:
       context: backend
       target: production
@@ -35,8 +35,8 @@ services:
     ports:
       - 4000:4000
     volumes:
-      - backend_node_modules:/nitro-backend/node_modules
-      - uploads:/nitro-backend/public/uploads
+      - backend_node_modules:/develop-backend/node_modules
+      - uploads:/develop-backend/public/uploads
     environment:
       - NEO4J_URI=bolt://neo4j:7687
       - GRAPHQL_URI=http://backend:4000
