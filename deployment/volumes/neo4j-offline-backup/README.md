@@ -29,7 +29,7 @@ database connections left and nobody can access the application.
 Run the following:
 
 ```sh
-kubectl --namespace=human-connection edit deployment nitro-neo4j
+kubectl --namespace=human-connection edit deployment develop-neo4j
 ```
 
 Add the following to `spec.template.spec.containers`:
@@ -61,7 +61,7 @@ exit
 # Download the file from the pod to your computer.
  kubectl cp human-connection/<POD-ID>:/root/neo4j-backup ./neo4j-backup
 ```
-Revert your changes to deployment `nitro-neo4j` which will restart the database.
+Revert your changes to deployment `develop-neo4j` which will restart the database.
 
 ## Restore a Backup in Kubernetes
 
@@ -79,4 +79,4 @@ kubectl --namespace=human-connection exec -it <POD-ID> bash
 neo4j-admin load --from=/root/neo4j-backup --force
 exit
 ```
-Revert your changes to deployment `nitro-neo4j` which will restart the database.
+Revert your changes to deployment `develop-neo4j` which will restart the database.
