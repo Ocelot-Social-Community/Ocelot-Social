@@ -9,7 +9,7 @@ dbMigrations: "yarn prod:migrate up"
 # bakendImage is the docker image for the backend deployment
 backendImage: ocelotsocialnetwork/develop-backend
 # maintenanceImage is the docker image for the maintenance deployment
-maintenanceImage: ocelotsocialnetwork/maintenance
+maintenanceImage: ocelotsocialnetwork/develop-maintenance
 # neo4jImage is the docker image for the neo4j deployment
 neo4jImage: ocelotsocialnetwork/develop-neo4j
 # webappImage is the docker image for the webapp deployment
