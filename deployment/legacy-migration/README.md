@@ -52,18 +52,18 @@ $ kubectl --namespace=human-connection delete deployment develop-backend
 deployment.extensions "develop-backend" deleted
 ```
 
-Deploy one-time maintenance-worker pod:
+Deploy one-time develop-maintenance-worker pod:
 
 ```bash
 # in deployment/legacy-migration/
 $ kubectl apply -f maintenance-worker.yaml
-pod/nitro-maintenance-worker created
+pod/develop-maintenance-worker created
 ```
 
 Import legacy database and uploads:
 
 ```bash
-$ kubectl --namespace=human-connection exec -it nitro-maintenance-worker bash
+$ kubectl --namespace=human-connection exec -it develop-maintenance-worker bash
 $ import_legacy_db
 $ import_legacy_uploads
 $ exit
@@ -72,7 +72,7 @@ $ exit
 Delete the pod when you're done:
 
 ```bash
-$ kubectl --namespace=human-connection delete pod nitro-maintenance-worker
+$ kubectl --namespace=human-connection delete pod develop-maintenance-worker
 ```
 
 Oh, and of course you have to get those deleted deployments back. One way of
