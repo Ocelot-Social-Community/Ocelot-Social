@@ -11,7 +11,7 @@ backendImage: ocelotsocialnetwork/develop-backend
 # maintenanceImage is the docker image for the maintenance deployment
 maintenanceImage: ocelotsocialnetwork/maintenance
 # neo4jImage is the docker image for the neo4j deployment
-neo4jImage: ocelotsocialnetwork/neo4j
+neo4jImage: ocelotsocialnetwork/develop-neo4j
 # webappImage is the docker image for the webapp deployment
 webappImage: ocelotsocialnetwork/develop-webapp
 # image configures pullPolicy related to the docker images

@@ -1,4 +1,4 @@
-FROM ocelotsocialnetwork/neo4j:latest
+FROM ocelotsocialnetwork/develop-neo4j:latest
 
 ENV NODE_ENV=maintenance
 EXPOSE 7687 7474

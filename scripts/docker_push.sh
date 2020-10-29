@@ -10,7 +10,7 @@ tags=($major $major.$minor $major.$minor.$patch)
 # These three docker images have already been built by now:
 # docker build --build-arg BUILD_COMMIT=$BUILD_COMMIT --target production -t ocelotsocialnetwork/develop-backend:latest $ROOT_DIR/backend
 # docker build --build-arg BUILD_COMMIT=$BUILD_COMMIT --target production -t ocelotsocialnetwork/develop-webapp:latest $ROOT_DIR/webapp
-# docker build --build-arg BUILD_COMMIT=$BUILD_COMMIT -t ocelotsocialnetwork/neo4j:latest $ROOT_DIR/neo4j
+# docker build --build-arg BUILD_COMMIT=$BUILD_COMMIT -t ocelotsocialnetwork/develop-neo4j:latest $ROOT_DIR/neo4j
 docker build -t ocelotsocialnetwork/maintenance:latest $ROOT_DIR/webapp/ -f $ROOT_DIR/webapp/Dockerfile.maintenance
 
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
