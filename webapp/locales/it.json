@@ -261,7 +261,8 @@
     "newPost": "",
     "success": "",
     "teaserImage": {
-      "cropperConfirm": "Confermare"
+      "cropperConfirm": "Confermare",
+      "supportedFormats": "Inserisci un'immagine in formato file JPG, PNG o GIF"
     },
     "title": ""
   },

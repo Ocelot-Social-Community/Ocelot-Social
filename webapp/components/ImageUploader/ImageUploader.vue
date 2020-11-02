@@ -20,6 +20,9 @@
         :title="$t('actions.delete')"
         @click.stop="deleteImage"
       />
+      <div v-if="!hasImage" class="supported-formats">
+        {{ $t('contribution.teaserImage.supportedFormats') }}
+      </div>
     </vue-dropzone>
     <div v-show="showCropper" class="crop-overlay">
       <img id="cropping-image" />
@@ -194,6 +197,11 @@ export default {
       top: $space-small;
       right: $space-small;
       z-index: $z-index-surface;
+    }
+
+    > .supported-formats {
+      margin-top: 150px;
+      font-weight: bold;
     }
   }
 }
