@@ -34,6 +34,7 @@ describe('ImageUploader.vue', () => {
         wrapper.vm.onDropzoneError(fileError, message)
         expect(mocks.$toast.error).toHaveBeenCalledWith(fileError.status, message)
       })
+
       it('shows an error toaster when unSupported file is uploaded', () => {
         wrapper.vm.onUnSupportedFormat(fileError.status, unSupportedFileMessage)
         expect(mocks.$toast.error).toHaveBeenCalledWith(fileError.status, unSupportedFileMessage)
