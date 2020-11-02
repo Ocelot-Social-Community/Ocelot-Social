@@ -28,7 +28,7 @@ describe('ImageUploader.vue', () => {
       const message = 'File upload failed'
       const fileError = { status: 'error' }
       const unSupportedFileMessage =
-        'Please upload an image of file format : jpg , jpeg , png or gif'
+        'Please upload an image of file format : JPG , JPEG , PNG or GIF'
 
       it('shows an error toaster when verror is called', () => {
         wrapper.vm.onDropzoneError(fileError, message)

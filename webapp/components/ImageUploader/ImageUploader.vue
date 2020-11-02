@@ -87,7 +87,7 @@ export default {
       if (supportedFormats.indexOf(file.type) < 0) {
         this.onUnSupportedFormat(
           'error',
-          'Please upload an image of file format : jpg , jpeg , png or gif',
+          this.$t('contribution.teaserImage.errors.unSupported-file-format'),
         )
         return
       }
