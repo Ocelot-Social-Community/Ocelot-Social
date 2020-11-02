@@ -54,13 +54,13 @@ $ velero backup create hc-backup --include-namespaces=human-connection
 
 That should backup your persistent volumes, too. When you enter:
 
-```
+```sh
 $ velero backup describe hc-backup --details
 ```
 
 You should see the persistent volumes at the end of the log:
 
-```
+```sh
 ....
 
 Restic Backups:

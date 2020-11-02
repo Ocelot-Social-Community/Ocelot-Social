@@ -4,7 +4,7 @@ ROOT_DIR=$(dirname "$0")/..
 
 VERSION=$(jq -r '.version' $ROOT_DIR/package.json)
 IFS='.' read -r major minor patch <<< $VERSION
-apps=(develop-webapp develop-backend neo4j maintenance)
+apps=(develop-webapp develop-backend develop-neo4j develop-maintenance)
 tags=($major $major.$minor $major.$minor.$patch)
 
 # These three docker images have already been built by now:
