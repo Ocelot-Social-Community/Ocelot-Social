@@ -13,7 +13,7 @@ We prepared sample configuration, so you can simply run:
 
 ```sh
 # in folder deployment/
-$ kubectl apply -f human-connection/maintenance
+$ kubectl apply -f ocelotsocialnetwork/develop-maintenance
 ```
 
 This will fire up a maintenance service.
