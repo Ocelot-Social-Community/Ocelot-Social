@@ -300,6 +300,7 @@ describe('given some notifications', () => {
         }
       }
     `
+
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const result = await mutate({
@@ -393,6 +394,7 @@ describe('given some notifications', () => {
       })
     })
   })
+
   describe('markAllAsRead', () => {
     const markAllAsReadMutation = gql`
       mutation {
@@ -411,6 +413,7 @@ describe('given some notifications', () => {
         }
       }
     `
+
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const result = await mutate({
@@ -432,9 +435,20 @@ describe('given some notifications', () => {
           }
         })
 
-        it('returns undefined', async () => {
+        it('returns all as read', async () => {
           const response = await mutate({ mutation: markAllAsReadMutation, variables })
-          expect(response.data.markAsRead).toEqual(undefined)
+          expect(response.data.markAllAsRead).toEqual([
+            {
+              createdAt: '2019-08-30T19:33:48.651Z',
+              from: { __typename: 'Comment', content: 'You have been mentioned in a comment' },
+              read: true,
+            },
+            {
+              createdAt: '2019-08-31T17:33:48.651Z',
+              from: { __typename: 'Post', content: 'You have been mentioned in a post' },
+              read: true,
+            },
+          ])
           expect(response.errors).toBeUndefined()
         })
       })

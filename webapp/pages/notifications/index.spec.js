@@ -97,6 +97,7 @@ describe('PostIndex', () => {
       it('refreshes the notificaitons', () => {
         expect(mocks.$apollo.queries.notifications.refresh).toHaveBeenCalledTimes(1)
       })
+
       it('click on `mark all as read` button', async () => {
         await markAllAsReadButton.trigger('click')
         expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
