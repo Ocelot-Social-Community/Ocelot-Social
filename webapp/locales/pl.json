@@ -119,7 +119,8 @@
     "newPost": "Utwórz nowy wpis",
     "success": "Zapisano!",
     "teaserImage": {
-      "cropperConfirm": "Potwierdzać"
+      "cropperConfirm": "Potwierdzać",
+      "supportedFormats": "Wstaw zdjęcie w formacie pliku JPG, PNG lub GIF"
     }
   },
   "delete": {

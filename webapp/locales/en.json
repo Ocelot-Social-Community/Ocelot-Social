@@ -258,7 +258,8 @@
     "newPost": "Create a new Post",
     "success": "Saved!",
     "teaserImage": {
-      "cropperConfirm": "Confirm"
+      "cropperConfirm": "Confirm",
+      "supportedFormats": "Insert a picture of file format JPG , PNG or GIF"
     },
     "title": "Title"
   },
@@ -648,6 +649,8 @@
       "success": "Account successfully deleted!"
     },
     "download": {
+      "description": "Click on the button above to download the content of your posts and comments. To download the images of your posts, you have to click on the corresponding link below.",
+      "json": "as JSON",
       "name": "Download Data"
     },
     "email": {
