@@ -69,14 +69,16 @@ after_failure:
 
 before_deploy:
   - go get -u github.com/tcnksm/ghr
-  - ./scripts/setup_kubernetes.sh
+  # stop deployment to kubernetes until we have set it up
+  # - ./scripts/setup_kubernetes.sh
 
 deploy:
   - provider: script
     script: bash scripts/docker_push.sh
     on:
       branch: master
-  - provider: script
-    script: bash scripts/deploy.sh
-    on:
-      branch: master
+  # stop deployment to kubernetes until we have set it up
+  # - provider: script
+  #   script: bash scripts/deploy.sh
+  #   on:
+  #     branch: master

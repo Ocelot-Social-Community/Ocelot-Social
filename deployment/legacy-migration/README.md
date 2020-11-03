@@ -43,27 +43,27 @@ Then temporarily delete backend and database deployments
 ```bash
 $ kubectl --namespace=human-connection get deployments
 NAME            READY   UP-TO-DATE   AVAILABLE   AGE
-nitro-backend   1/1     1            1           3d11h
-nitro-neo4j     1/1     1            1           3d11h
-nitro-web       2/2     2            2           73d
-$ kubectl --namespace=human-connection delete deployment nitro-neo4j
-deployment.extensions "nitro-neo4j" deleted
-$ kubectl --namespace=human-connection delete deployment nitro-backend
-deployment.extensions "nitro-backend" deleted
+develop-backend 1/1     1            1           3d11h
+develop-neo4j   1/1     1            1           3d11h
+develop-webapp  2/2     2            2           73d
+$ kubectl --namespace=human-connection delete deployment develop-neo4j
+deployment.extensions "develop-neo4j" deleted
+$ kubectl --namespace=human-connection delete deployment develop-backend
+deployment.extensions "develop-backend" deleted
 ```
 
-Deploy one-time maintenance-worker pod:
+Deploy one-time develop-maintenance-worker pod:
 
 ```bash
 # in deployment/legacy-migration/
 $ kubectl apply -f maintenance-worker.yaml
-pod/nitro-maintenance-worker created
+pod/develop-maintenance-worker created
 ```
 
 Import legacy database and uploads:
 
 ```bash
-$ kubectl --namespace=human-connection exec -it nitro-maintenance-worker bash
+$ kubectl --namespace=human-connection exec -it develop-maintenance-worker bash
 $ import_legacy_db
 $ import_legacy_uploads
 $ exit
@@ -72,7 +72,7 @@ $ exit
 Delete the pod when you're done:
 
 ```bash
-$ kubectl --namespace=human-connection delete pod nitro-maintenance-worker
+$ kubectl --namespace=human-connection delete pod develop-maintenance-worker
 ```
 
 Oh, and of course you have to get those deleted deployments back. One way of
