@@ -257,7 +257,7 @@
     "success": "Enregistré!",
     "teaserImage": {
       "cropperConfirm": "Confirmer",
-      "supportedFormats": "Insérer une image au format de fichier JPG, PNG ou GIF"
+      "supportedFormats": "Insérer une image au format de fichier JPG, PNG ou GIF!"
     },
     "title": "Titre"
   },

@@ -262,7 +262,7 @@
     "success": "",
     "teaserImage": {
       "cropperConfirm": "Confermare",
-      "supportedFormats": "Inserisci un'immagine in formato file JPG, PNG o GIF"
+      "supportedFormats": "Inserisci un'immagine in formato file JPG, PNG o GIF!"
     },
     "title": ""
   },
