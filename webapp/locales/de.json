@@ -259,10 +259,10 @@
     "success": "Gespeichert!",
     "teaserImage": {
       "cropperConfirm": "Bestätigen",
-      "supportedFormats": "Füge ein Bild im Dateiformat JPG, PNG oder GIF ein",
-      "errors" : {
-        "unSupported-file-format" : "Bitte lade ein Bild in den folgenden Formaten hoch: JPG, JPEG, PNG or GIF!"
-      }
+      "errors": {
+        "unSupported-file-format": "Bitte lade ein Bild in den folgenden Formaten hoch: JPG, JPEG, PNG or GIF!"
+      },
+      "supportedFormats": "Füge ein Bild im Dateiformat JPG, PNG oder GIF ein"
     },
     "title": "Titel"
   },
