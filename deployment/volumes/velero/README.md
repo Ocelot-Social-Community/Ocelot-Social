@@ -54,19 +54,19 @@ $ velero backup create hc-backup --include-namespaces=human-connection
 
 That should backup your persistent volumes, too. When you enter:
 
-```
+```sh
 $ velero backup describe hc-backup --details
 ```
 
 You should see the persistent volumes at the end of the log:
 
-```
+```sh
 ....
 
 Restic Backups:
   Completed:
-    human-connection/nitro-backend-5b6dd96d6b-q77n6: uploads
-    human-connection/nitro-neo4j-686d768598-z2vhh: neo4j-data
+    human-connection/develop-backend-5b6dd96d6b-q77n6: uploads
+    human-connection/develop-neo4j-686d768598-z2vhh: neo4j-data
 ```
 
 ## Simulate a Disaster

@@ -7,13 +7,13 @@ dbInitializion: "yarn prod:migrate init"
 # dbMigrations runs the database migrations in a post-upgrade hook.
 dbMigrations: "yarn prod:migrate up"
 # bakendImage is the docker image for the backend deployment
-backendImage: humanconnection/nitro-backend
+backendImage: ocelotsocialnetwork/develop-backend
 # maintenanceImage is the docker image for the maintenance deployment
-maintenanceImage: humanconnection/maintenance
+maintenanceImage: ocelotsocialnetwork/develop-maintenance
 # neo4jImage is the docker image for the neo4j deployment
-neo4jImage: humanconnection/neo4j
+neo4jImage: ocelotsocialnetwork/develop-neo4j
 # webappImage is the docker image for the webapp deployment
-webappImage: humanconnection/nitro-web
+webappImage: ocelotsocialnetwork/develop-webapp
 # image configures pullPolicy related to the docker images
 image:
   # pullPolicy indicates when, if ever, pods pull a new image from docker hub.
