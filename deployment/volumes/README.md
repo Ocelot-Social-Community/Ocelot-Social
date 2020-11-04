@@ -3,7 +3,7 @@
 At the moment, the application needs two persistent volumes:
 
 * The `/data/` folder where `neo4j` stores its database and
-* the folder `/nitro-backend/public/uploads` where the backend stores uploads.
+* the folder `/develop-backend/public/uploads` where the backend stores uploads.
 
 As a matter of precaution, the persistent volume claims that setup these volumes
 live in a separate folder. You don't want to accidently loose all your data in

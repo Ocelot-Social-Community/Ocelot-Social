@@ -10,9 +10,10 @@ bring the database into maintenance mode for manual database migrations.
 ## Deploy the service
 
 We prepared sample configuration, so you can simply run:
+
 ```sh
 # in folder deployment/
-kubectl apply -f human-connection/maintenance
+$ kubectl apply -f ocelotsocialnetwork/develop-maintenance
 ```
 
 This will fire up a maintenance service.
@@ -23,6 +24,7 @@ Now if you want to have a controlled downtime and you want to bring your
 application into maintenance mode, you can edit your global ingress server.
 
 E.g. in file `deployment/digital-ocean/https/ingress.yaml` change the following:
+
 ```yaml
 ...
 
@@ -31,13 +33,13 @@ E.g. in file `deployment/digital-ocean/https/ingress.yaml` change the following:
       paths:
       - path: /
         backend:
-          # serviceName: nitro-web
-          serviceName: maintenance
+          # serviceName: develop-webapp
+          serviceName: develop-maintenance
           # servicePort: 3000
           servicePort: 80
 ```
 
-Then run ` kubectl apply -f deployment/digital-ocean/https/ingress.yaml`. If you
+Then run `$ kubectl apply -f deployment/digital-ocean/https/ingress.yaml`. If you
 want to deactivate the maintenance server, just undo the edit and apply the
 configuration again.
 
