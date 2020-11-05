@@ -104,14 +104,14 @@ describe('PostIndex', () => {
       })
     })
 
-    describe('markNotificationAsRead', () => {
+    describe('markAllAsRead', () => {
       let expectedParams
       beforeEach(() => {
         wrapper = Wrapper()
-        wrapper.find(NotificationsTable).vm.$emit('markNotificationAsRead', 'notificationSourceId')
+        wrapper.find(NotificationsTable).vm.$emit('markAllAsRead', 'notificationSourceId')
       })
 
-      it('calls markNotificationAsRead mutation', () => {
+      it('calls markAllAsRead mutation', () => {
         expectedParams = {
           mutation: markAsReadMutation(),
           variables: { id: 'notificationSourceId' },
@@ -125,7 +125,7 @@ describe('PostIndex', () => {
           wrapper = Wrapper()
           wrapper
             .find(NotificationsTable)
-            .vm.$emit('markNotificationAsRead', 'notificationSourceId')
+            .vm.$emit('markAllAsRead', 'notificationSourceId')
         })
 
         it('shows an error message if there is an error', () => {
@@ -139,7 +139,7 @@ describe('PostIndex', () => {
       beforeEach(() => {
         wrapper = Wrapper()
         // FIXME Should I remove next line?
-        wrapper.find(NotificationsTable).vm.$emit('markNotificationAsRead', 'notificationSourceId')
+        wrapper.find(NotificationsTable).vm.$emit('markAllAsRead', 'notificationSourceId')
       })
 
       // FIXME: I need to discover why this test isn't working =(
@@ -160,7 +160,7 @@ describe('PostIndex', () => {
           // FIXME Should I remove next line?
           wrapper
             .find(NotificationsTable)
-            .vm.$emit('markNotificationAsRead', 'notificationSourceId')
+            .vm.$emit('markAllAsRead', 'notificationSourceId')
         })
 
         it('shows an error message if there is an error', () => {
