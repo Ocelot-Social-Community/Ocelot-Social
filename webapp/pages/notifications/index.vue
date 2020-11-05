@@ -21,7 +21,6 @@
         <ds-button
           ghost
           primary
-          :disabled="unreadNotificationsCount === 0"
           @click="markAllAsRead"
           data-test="markAllAsRead-button"
         >

@@ -26,7 +26,6 @@
           <ds-button
             ghost
             primary
-            :disabled="unreadNotificationsCount === 0"
             @click="markAllAsRead"
             data-test="markAllAsRead-button"
           >
@@ -74,8 +73,8 @@ export default {
           mutation: markAsReadMutation(this.$i18n),
           variables,
         })
-      } catch (err) {
-        this.$toast.error(err.message)
+      } catch (error) {
+        this.$toast.error(error.message)
       }
     },
     async markAllAsRead() {
