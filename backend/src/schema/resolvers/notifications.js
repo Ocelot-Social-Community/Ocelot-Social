@@ -105,7 +105,7 @@ export default {
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const markAllNotificationAsReadTransactionResponse = await transaction.run(
           ` 
-            MATCH (resource {deleted: false, disabled: false})-[notification:NOTIFIED {read: FALSE}]->(user:User {id:$id})
+            MATCH (resource)-[notification:NOTIFIED {read: FALSE}]->(user:User {id:$id})
             SET notification.read = TRUE
             WITH user, notification, resource,
             [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
