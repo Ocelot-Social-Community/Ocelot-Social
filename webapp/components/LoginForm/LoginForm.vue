@@ -100,5 +100,9 @@ export default {
     margin-top: $space-large;
     margin-bottom: $space-small;
   }
+
+  .input-wrapper {
+    margin-bottom: $space-small;
+  }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-   <div class="input-wrapper">
+   <div class="input-wrapper" :class="[focus]">
       <base-icon class="input-icon" v-if="icon" :name="icon" /> 
       
       <input
@@ -10,6 +10,7 @@
             iconRightSecondary && `input-has-icon-right-secondary`
          ]"
          type="type"
+         :autofocus="autofocus"
          :placeholder="placeholder"
          :name="name ? name : model"
          :disabled="disabled"
@@ -33,6 +34,7 @@
 <script>
 
 import BaseIcon from '../BaseIcon/BaseIcon'
+import inputMixin from '~/mixins/tempMixins-styleguide/input'
 
 export default {
    components: {
@@ -79,7 +81,7 @@ export default {
    },
    methods: {
       handleInput(event) {
-       this.input(event.target.value)
+         this.input(event.target.value)
       },
       input(value) {
          this.innerValue = value
@@ -109,47 +111,56 @@ export default {
       display: flex;
       appearance: none;
       box-sizing: border-box;
-      font-size: $input-font-size-base;
-      line-height: $line-height-base;
-      font-family: $font-family-text;
       width: 100%;
       padding: $input-padding-vertical $space-x-small;
       height: $input-height;
    
       color: $text-color-base;
-      background: $background-color-base;
+      background: $background-color-disabled;
    
-      border: $input-border-size solid $border-color-base;
+      border: $input-border-size solid $border-color-softer;
       border-radius: $border-radius-base;
       outline: none;
       transition: all $duration-short $ease-out;
 
-      
-   } 
+      &:focus-within {
+         background-color: $background-color-base;
+         border: $input-border-size solid $border-color-active;
 
-   .base-input {
-      border: none;
-      width: 76%;
-
-      &::placeholder {
-         color: $text-color-disabled;
+         .input-icon {
+            color: $text-color-base;
+         }
       }
+    
 
-      .input-has-focus &,
-      &:focus {
-         border-color: $border-color-active;
-         background: $background-color-base;
-      }
-
-      .input-is-disabled &,
-      &:disabled {
-         color: $text-color-disabled;
-         opacity: $opacity-disabled;
-         pointer-events: none;
-         cursor: not-allowed;
+      .base-input {
+         border: none;
+         width: 76%;
          background-color: $background-color-disabled;
+         font-size: $input-font-size-base;
+         line-height: $line-height-base;
+         font-family: $font-family-text;
+         padding: $input-padding-vertical $space-x-small;
+      
+         &::placeholder {
+            color: $text-color-disabled;
+         }
+
+         &:focus {
+            background: $background-color-base;
+
+            .input-wrapper {
+               background-color: $background-color-base;
+               border: $input-border-size solid $border-color-active;
+            }
+         }
+
+         /* .input-is-disabled &, */
+      
       }
    }
+
+
 
    .base-input:focus {
       outline-width: 0;
@@ -160,7 +171,7 @@ export default {
       top: 0;
       bottom: 0;
       left: 0;
-      width: 6%;
+      /* width: 10%; */
       align-items: center;
       justify-content: center;
       width: $input-height;
