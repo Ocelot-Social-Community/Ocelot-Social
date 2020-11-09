@@ -1,6 +1,7 @@
 <template>
   <div class="editor">
-    <menu-bar :editor="editor" :toggleLinkInput="toggleLinkInput" />
+    <menu-bar :editor="editor" :toggleLinkInput="toggleLinkInput" :toggleToolbarInfo="toggleToolbarInfo"/>
+    <dropdown v-if="seen"></dropdown>
     <editor-content ref="editor" :editor="editor" class="ds-input editor-content" />
     <context-menu ref="contextMenu" />
     <suggestion-list
@@ -32,6 +33,8 @@ import defaultExtensions from './defaultExtensions.js'
 import EventHandler from './plugins/eventHandler.js'
 import Hashtag from './nodes/Hashtag.js'
 import Mention from './nodes/Mention.js'
+import BaseCard from '../_new/generic/BaseCard/BaseCard.vue'
+import Dropdown from '~/components/Dropdown'
 import MenuBar from './MenuBar'
 import ContextMenu from './ContextMenu'
 import SuggestionList from './SuggestionList'
@@ -46,6 +49,7 @@ export default {
     LinkInput,
     MenuBar,
     SuggestionList,
+    BaseCard
   },
   props: {
     users: { type: Array, default: () => null }, // If 'null', than the Mention extention is not assigned.
@@ -268,6 +272,11 @@ export default {
     clear() {
       this.editor.clearContent(true)
     },
+    toggleToolbarInfo(bool){
+      if(bool === true) {
+        
+      }
+    }
   },
 }
 </script>

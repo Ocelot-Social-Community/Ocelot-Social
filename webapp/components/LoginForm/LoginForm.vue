@@ -20,12 +20,13 @@
           name="email"
           icon="envelope"
         />
-        <ds-input
+        <base-input
           v-model="form.password"
           :disabled="pending"
           :placeholder="$t('login.password')"
           icon="lock"
-          icon-right="question-circle"
+          icon-right="eye"
+          icon-right-secondary="eye"
           name="password"
           type="password"
         />
@@ -49,10 +50,12 @@
 
 <script>
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import BaseInput from '../_new/generic/BaseInput/BaseInput'
 
 export default {
   components: {
     LocaleSwitch,
+    BaseInput
   },
   data() {
     return {
@@ -78,6 +81,9 @@ export default {
         this.$toast.error(this.$t('login.failure'))
       }
     },
+    capsLockDetect () {
+
+    }
   },
 }
 </script>
