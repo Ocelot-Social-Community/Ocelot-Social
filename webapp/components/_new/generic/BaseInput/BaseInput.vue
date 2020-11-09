@@ -9,16 +9,20 @@
             iconRight && `input-has-icon-right`,
             iconRightSecondary && `input-has-icon-right-secondary`
          ]"
-         type="type"
+         :id="id"
+         :name="name ? name : model"
+         :type="type"
          :autofocus="autofocus"
          :placeholder="placeholder"
-         :name="name ? name : model"
+         :tabindex="tabindex"
          :disabled="disabled"
+         :readonly="readonly"
          :value.prop="innerValue"
-         :rows="type === 'textarea' ? rows : null"
-         v-html="type === textarea"
          @input="handleInput"
          @focus="handleFocus"
+         @blur="handleBlur"
+         :rows="type === 'textarea' ? rows : null"
+         v-html="type === 'textarea'"
       />
       <base-icon 
          class="input-icon-right"
@@ -40,6 +44,7 @@ export default {
    components: {
       BaseIcon,
    },
+   mixins: [inputMixin],
    props: {
       type: {
          type: String, 
@@ -50,13 +55,13 @@ export default {
          type: String, 
          default: null
       },
-      icon: {
-         type: String, 
-         default: null
-      },
       autofocus: {
          type: Boolean,
          default: false
+      },
+      icon: {
+         type: String, 
+         default: null
       },
       rows: {
          type: [String, Number],
@@ -77,29 +82,6 @@ export default {
             return 'textarea'
          }
          return 'input'
-      }
-   },
-   methods: {
-      handleInput(event) {
-         this.input(event.target.value)
-      },
-      input(value) {
-         this.innerValue = value
-         if (this.$parentForm) {
-         this.$parentForm.update(this.model, value)
-         } else {
-         /**
-            * Fires after user input.
-            * Receives the value as the only argument.
-            *
-            * @event input
-            */
-         this.$emit('input', value)
-         this.validate(value)
-         }
-      },
-      handleFocus() {
-         this.focus = true
       }
    }
 }
