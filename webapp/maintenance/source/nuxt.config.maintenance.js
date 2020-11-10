@@ -57,6 +57,6 @@ export default {
         loader: 'raw-loader',
         exclude: /(node_modules)/,
       })
-    }
-  }
+    },
+  },
 }

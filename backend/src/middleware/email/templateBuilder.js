@@ -9,7 +9,7 @@ const welcomeImageUrl = new URL(`/img/custom/welcome.svg`, CONFIG.CLIENT_URI)
 const defaultParams = {
   supportUrl: CONFIG.SUPPORT_URL,
   APPLICATION_NAME: CONFIG.APPLICATION_NAME,
-  welcomeImageUrl
+  welcomeImageUrl,
 }
 
 export const signupTemplate = ({ email, nonce }) => {
@@ -76,7 +76,7 @@ export const wrongAccountTemplate = ({ email }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, supportUrl, welcomeImageUrl },
+      { actionUrl, supportUrl: CONFIG.SUPPORT_URL, welcomeImageUrl },
       { content: templates.wrongAccount },
     ),
   }

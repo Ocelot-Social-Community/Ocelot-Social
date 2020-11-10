@@ -1,7 +1,7 @@
 export default {
-  APPLICATION_NAME: 'fyphe_O',
-  APPLICATION_SHORT_NAME: 'fyphe',
-  APPLICATION_DESCRIPTION: 'The Schools in Motion Network',
-  ORGANIZATION_NAME: 'Ensible e.V.',
-  ORGANIZATION_JURISDICTION: 'Köln',
+  APPLICATION_NAME: 'ocelot.social',
+  APPLICATION_SHORT_NAME: 'ocelot',
+  APPLICATION_DESCRIPTION: 'Ocelot Social Network',
+  ORGANIZATION_NAME: 'buusFaktor() e.V.',
+  ORGANIZATION_JURISDICTION: 'Augsburg',
 }

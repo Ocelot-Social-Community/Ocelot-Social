@@ -1,4 +1,4 @@
 export default {
-  SUPPORT: 'support@human-connection.org',
-  MODERATION: 'moderation@human-connection.org',
+  SUPPORT: 'devops@ocelot.social',
+  MODERATION: 'devops@ocelot.social',
 }

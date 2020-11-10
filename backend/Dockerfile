@@ -4,7 +4,7 @@ EXPOSE 4000
 CMD ["yarn", "run", "start"]
 ARG BUILD_COMMIT
 ENV BUILD_COMMIT=$BUILD_COMMIT
-ARG WORKDIR=/backend
+ARG WORKDIR=/develop-backend
 RUN mkdir -p $WORKDIR
 WORKDIR $WORKDIR
 
@@ -21,7 +21,7 @@ RUN NODE_ENV=production yarn run build
 # reduce image size with a multistage build
 FROM base as production
 ENV NODE_ENV=production
-COPY --from=build-and-test /backend/dist ./dist
+COPY --from=build-and-test /develop-backend/dist ./dist
 COPY ./public/img/ ./public/img/
 COPY ./public/providers.json ./public/providers.json
 RUN yarn install --production=true --frozen-lockfile --non-interactive --no-cache

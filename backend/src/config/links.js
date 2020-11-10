@@ -1,6 +1,6 @@
 export default {
-  ORGANIZATION: 'https://human-connection.org/',
-  DONATE: 'https://human-connection.org/spenden/',
-  FAQ: 'https://faq.human-connection.org/',
-  SUPPORT: 'https://human-connection.org/support'
+  ORGANIZATION: 'https://ocelot-social.herokuapp.com/',
+  DONATE: 'https://www.busfaktor.org/donations',
+  FAQ: 'https://ocelot-social.herokuapp.com/',
+  SUPPORT: 'https://ocelot-social.herokuapp.com/',
 }

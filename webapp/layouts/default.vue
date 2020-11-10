@@ -6,7 +6,7 @@
           <ds-flex class="main-navigation-flex">
             <ds-flex-item :width="{ base: '142px' }">
               <nuxt-link :to="{ name: 'index' }" v-scroll-to="'.main-navigation'">
-                <Logo />
+                <logo />
               </nuxt-link>
             </ds-flex-item>
             <ds-flex-item

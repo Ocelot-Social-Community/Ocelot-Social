@@ -8,7 +8,11 @@
       @submit="handleSubmit"
     >
       <h1>
-        {{ invitation ? $t('profile.invites.title', metadata) : $t('components.registration.signup.title', metadata) }}
+        {{
+          invitation
+            ? $t('profile.invites.title', metadata)
+            : $t('components.registration.signup.title', metadata)
+        }}
       </h1>
       <ds-space v-if="token" margin-botton="large">
         <ds-text v-html="$t('registration.signup.form.invitation-code', { code: token })" />

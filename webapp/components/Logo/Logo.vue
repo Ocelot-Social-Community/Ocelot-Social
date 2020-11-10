@@ -1,17 +1,7 @@
 <template>
-  <component
-    :is="tag"
-    class="ds-logo"
-    :class="[inverse && 'ds-logo-inverse']"
-  >
-    <svg-logo
-      v-if="!inverse"
-      class="ds-logo-svg"
-    />
-    <svg-logo-inverse
-      v-else
-      class="ds-logo-svg"
-    />
+  <component :is="tag" class="ds-logo" :class="[inverse && 'ds-logo-inverse']">
+    <svg-logo v-if="!inverse" class="ds-logo-svg" />
+    <svg-logo-inverse v-else class="ds-logo-svg" />
   </component>
 </template>
 
@@ -26,7 +16,7 @@ export default {
   name: 'Logo',
   components: {
     svgLogo,
-    svgLogoInverse
+    svgLogoInverse,
   },
   props: {
     /**
@@ -34,16 +24,16 @@ export default {
      */
     inverse: {
       type: Boolean,
-      default: false
+      default: false,
     },
     /**
      * The html element name used for the logo.
      */
     tag: {
       type: String,
-      default: 'div'
-    }
-  }
+      default: 'div',
+    },
+  },
 }
 </script>
 

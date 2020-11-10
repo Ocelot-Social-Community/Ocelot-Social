@@ -24,6 +24,14 @@
         <div v-if="formData.image" class="blur-toggle">
           <label for="blur-img">{{ $t('contribution.inappropriatePicture') }}</label>
           <input type="checkbox" id="blur-img" v-model="formData.imageBlurred" />
+          <a
+            href="https://support.human-connection.org/kb/faq.php?id=113"
+            target="_blank"
+            class="link"
+          >
+            {{ $t('contribution.inappropriatePictureText') }}
+            <base-icon name="question-circle" />
+          </a>
         </div>
         <ds-input
           model="title"
