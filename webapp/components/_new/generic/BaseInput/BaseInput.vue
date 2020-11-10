@@ -11,7 +11,8 @@
          ]"
          :id="id"
          :name="name ? name : model"
-         :type="type"
+         :type="[showPassword ? 'text' : 'password']"
+         :v-model="type"
          :autofocus="autofocus"
          :placeholder="placeholder"
          :tabindex="tabindex"
@@ -21,35 +22,52 @@
          @input="handleInput"
          @focus="handleFocus"
          @blur="handleBlur"
-         :rows="type === 'textarea' ? rows : null"
-         v-html="type === 'textarea'"
       />
       <base-icon 
          class="input-icon-right"
-         v-if="iconRight" 
+         v-if="[iconRight && capsLock]" 
          :name="iconRight" />
-      <base-icon 
-         class="input-icon-right"
-         v-if="iconRightSecondary" 
-         :name="iconRightSecondary" />
+      <a
+         class="click-wrapper"
+         @click="showPassword = !showPassword"
+      >
+         <base-icon 
+            class="toggle-icon"
+            icon="[showPassword ? iconRightSecondary : eye-slash]"
+            v-if="iconRightSecondary" 
+            :name="iconRightSecondary" 
+         />
+      </a>
    </div>
 </template>
 
 <script>
 
+import BaseButton from '../BaseButton/BaseButton'
 import BaseIcon from '../BaseIcon/BaseIcon'
+import IconButton from '../IconButton/IconButton'
 import inputMixin from '~/mixins/tempMixins-styleguide/input'
 
 export default {
    components: {
       BaseIcon,
+      BaseButton,
+      IconButton
+   },
+   data: function() {
+      return {
+         showPassword: false,
+         capsLock: false
+      }
    },
    mixins: [inputMixin],
    props: {
       type: {
          type: String, 
          default: 'text',
-         // validator - check if there is existing value helper
+         validator: value => {
+            return value.match(/(url|text|password|email|search|textarea)/)
+         }
       },
       placeholder: {
          type: String, 
@@ -63,10 +81,6 @@ export default {
          type: String, 
          default: null
       },
-      rows: {
-         type: [String, Number],
-         default: 1
-      },
       iconRight: {
          type: String, 
          default: null
@@ -76,14 +90,11 @@ export default {
          default: null
       }
    },
-   computed: {
-      tag() {
-         if (this.type === 'textarea') {
-            return 'textarea'
-         }
-         return 'input'
-      }
-   }
+   // computed: {
+   //    togglePassword(event) {
+   //       this.type = this.type === 'password' ? 'text' : 'password'
+   //    }
+   // }
 }
 </script>
 
@@ -117,7 +128,7 @@ export default {
 
       .base-input {
          border: none;
-         width: 76%;
+         width: 60%;
          background-color: $background-color-disabled;
          font-size: $input-font-size-base;
          line-height: $line-height-base;
@@ -136,9 +147,6 @@ export default {
                border: $input-border-size solid $border-color-active;
             }
          }
-
-         /* .input-is-disabled &, */
-      
       }
    }
 
@@ -148,45 +156,36 @@ export default {
       outline-width: 0;
    }
 
-   .input-icon,
-   .input-icon-right {
-      top: 0;
-      bottom: 0;
-      left: 0;
-      /* width: 10%; */
+   .input-icon {
       align-items: center;
       justify-content: center;
       width: $input-height;
       color: $text-color-softer;
       transition: color $duration-short $ease-out;
       pointer-events: none;
-      
-      .input-has-focus & {
-         color: $text-color-base;
-      }
    }
 
-   /* .input-has-icon-right {
-      padding-right: $input-height;
-
-      .input-size-small & {
-         padding-right: $input-height-small;
-      }
-
-      .input-size-large & {
-         padding-right: $input-height-large;
-      }
+   .input-icon-right,
+   .icon-button {
+      align-items: center;
+      justify-content: center;
+      width: $input-height;
+      color: $text-color-softer;
+      transition: color $duration-short $ease-out;
+      pointer-events: none;
+   }
+   .input-icon-right-secondary {
+      pointer-events: all;
    }
 
-   .input-has-icon-right-secondary {
-      padding-right: $input-height;
 
-      .input-size-small & {
-         padding-right: $input-height-small;
-      }
+   .toggle-icon {
+      color: $text-color-disabled;
+      background-color: $background-color-disabled;
+      width: 100%;
+      height: 100%;
+   }
+   
 
-      .input-size-large & {
-         padding-right: $input-height-large;
-      }
-   } */
+   
 </style>

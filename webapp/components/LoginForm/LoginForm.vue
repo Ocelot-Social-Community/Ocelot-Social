@@ -12,7 +12,7 @@
       </template>
       <h2 class="title">{{ $t('login.login') }}</h2>
       <form :disabled="pending" @submit.prevent="onSubmit">
-        <ds-input
+        <base-input
           v-model="form.email"
           :disabled="pending"
           :placeholder="$t('login.email')"
@@ -25,7 +25,7 @@
           :disabled="pending"
           :placeholder="$t('login.password')"
           icon="lock"
-          icon-right="eye"
+          icon-right="lock"
           icon-right-secondary="eye"
           name="password"
           type="password"
