@@ -1,13 +1,14 @@
 <template>
   <div class="donation-info">
     <progress-bar :title="title" :label="label" :goal="goal" :progress="progress" />
-    <a target="_blank" href="https://human-connection.org/spenden/">
+    <a target="_blank" :href="links.DONATE">
       <base-button filled>{{ $t('donations.donate-now') }}</base-button>
     </a>
   </div>
 </template>
 
 <script>
+import links from '~/constants/links.js'
 import { DonationsQuery } from '~/graphql/Donations'
 import ProgressBar from '~/components/ProgressBar/ProgressBar.vue'
 
@@ -17,6 +18,7 @@ export default {
   },
   data() {
     return {
+      links,
       goal: 15000,
       progress: 0,
     }

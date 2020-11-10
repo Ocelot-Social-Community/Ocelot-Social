@@ -44,7 +44,7 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-          - mountPath: /develop-backend/public/uploads
+          - mountPath: /backend/public/uploads
             name: uploads
       dnsPolicy: ClusterFirst
       restartPolicy: Always

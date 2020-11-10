@@ -2,7 +2,7 @@
   <div>
     <ds-space>
       <ds-heading tag="h2">{{ $t('site.code-of-conduct') }}</ds-heading>
-      <p>{{ $t('code-of-conduct.subheader') }}</p>
+      <p>{{ $t('code-of-conduct.subheader', metadata) }}</p>
     </ds-space>
 
     <ds-container>
@@ -39,6 +39,8 @@
 </template>
 
 <script>
+import metadata from '~/constants/metadata.js'
+
 export default {
   layout: 'basic',
   head() {
@@ -48,21 +50,7 @@ export default {
   },
   data() {
     return {
-      sections: ['preamble', 'purpose'],
-      listSections: [
-        {
-          key: 'expected-behaviour',
-          items: [...Array(4).keys()],
-        },
-        {
-          key: 'unacceptable-behaviour',
-          items: [...Array(8).keys()],
-        },
-        {
-          key: 'consequences',
-          items: [...Array(8).keys()],
-        },
-      ],
+      metadata,
     }
   },
 }

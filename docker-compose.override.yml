@@ -2,6 +2,7 @@ version: "3.4"
 
 services:
   webapp:
+    image: schoolsinmotion/webapp:build-and-test
     build:
       context: webapp
       target: build-and-test
@@ -9,11 +10,12 @@ services:
       - ./webapp:/develop-webapp
     environment:
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
-      - PUBLIC_REGISTRATION=false
+      - PUBLIC_REGISTRATION=true
     command: yarn run dev
     volumes:
       - webapp_node_modules:/nitro-web/node_modules
   backend:
+    image: schoolsinmotion/backend:build-and-test
     build:
       context: backend
       target: build-and-test

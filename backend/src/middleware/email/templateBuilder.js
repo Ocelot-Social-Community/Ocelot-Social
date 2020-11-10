@@ -3,11 +3,17 @@ import CONFIG from '../../config'
 
 import * as templates from './templates'
 
-const from = '"Human Connection" <info@human-connection.org>'
-const supportUrl = 'https://human-connection.org/en/contact'
+const from = CONFIG.EMAIL_DEFAULT_SENDER
+const welcomeImageUrl = new URL(`/img/custom/welcome.svg`, CONFIG.CLIENT_URI)
+
+const defaultParams = {
+  supportUrl: CONFIG.SUPPORT_URL,
+  APPLICATION_NAME: CONFIG.APPLICATION_NAME,
+  welcomeImageUrl
+}
 
 export const signupTemplate = ({ email, nonce }) => {
-  const subject = 'Willkommen, Bienvenue, Welcome to Human Connection!'
+  const subject = `Willkommen, Bienvenue, Welcome to ${CONFIG.APPLICATION_NAME}!`
   const actionUrl = new URL('/registration/create-user-account', CONFIG.CLIENT_URI)
   actionUrl.searchParams.set('nonce', nonce)
   actionUrl.searchParams.set('email', email)
@@ -18,7 +24,7 @@ export const signupTemplate = ({ email, nonce }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, nonce, supportUrl, subject },
+      { ...defaultParams, actionUrl, nonce, subject },
       { content: templates.signup },
     ),
   }
@@ -36,7 +42,7 @@ export const emailVerificationTemplate = ({ email, nonce, name }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, name, nonce, supportUrl, subject },
+      { ...defaultParams, actionUrl, name, nonce, subject },
       { content: templates.emailVerification },
     ),
   }
@@ -54,7 +60,7 @@ export const resetPasswordTemplate = ({ email, nonce, name }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, name, nonce, supportUrl, subject },
+      { ...defaultParams, actionUrl, name, nonce, subject },
       { content: templates.passwordReset },
     ),
   }
@@ -70,7 +76,7 @@ export const wrongAccountTemplate = ({ email }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, supportUrl },
+      { actionUrl, supportUrl, welcomeImageUrl },
       { content: templates.wrongAccount },
     ),
   }

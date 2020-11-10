@@ -1,5 +1,6 @@
 import path from 'path'
 import dotenv from 'dotenv'
+import manifest from './constants/manifest.js'
 
 dotenv.config() // we want to synchronize @nuxt-dotenv and nuxt-env
 
@@ -56,6 +57,8 @@ export default {
       'terms-and-conditions',
       'code-of-conduct',
       'changelog',
+      'imprint',
+      'data-privacy',
     ],
     // pages to keep alive
     keepAlivePages: ['index'],
@@ -64,8 +67,8 @@ export default {
    ** Headers of the page
    */
   head: {
-    title: 'Human Connection',
-    titleTemplate: '%s - Human Connection',
+    title: manifest.name,
+    titleTemplate: `%s - ${manifest.name}`,
     meta: [
       {
         charset: 'utf-8',
@@ -236,14 +239,7 @@ export default {
     config: additionalSentryConfig,
   },
 
-  manifest: {
-    name: 'Human Connection',
-    short_name: 'HC',
-    homepage_url: 'https://human-connection.org/',
-    description: 'The free and open source social network for active citizenship',
-    theme_color: '#17b53f',
-    lang: 'en',
-  },
+  manifest,
 
   /*
    ** Build configuration
@@ -284,6 +280,13 @@ export default {
           },
         ],
       })
+      config.module.rules.push({
+        enforce: 'pre',
+        test: /\.html$/,
+        loader: 'raw-loader',
+        exclude: /(node_modules)/,
+      })
+
       const tagAttributesForTesting = ['data-test', ':data-test', 'v-bind:data-test']
       ctx.loaders.vue.compilerOptions = {
         modules: [

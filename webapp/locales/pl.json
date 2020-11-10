@@ -169,15 +169,13 @@
     "title": "Twoja bańka filtrująca"
   },
   "login": {
-    "copy": "Jeśli masz już konto Human Connection, zaloguj się tutaj.",
     "email": "Twój adres e-mail",
     "forgotPassword": "Zapomniałeś hasła?",
     "hello": "Cześć",
     "login": "Logowanie",
     "logout": "Wyloguj się",
-    "moreInfo": "Co to jest Human Connection?",
+    "moreInfo": "Co to jest {APPLICATION_NAME}?",
     "moreInfoHint": "idź po więcej szczegółów",
-    "moreInfoURL": "https://human-connection.org/en/",
     "password": "Twoje hasło"
   },
   "moderation": {
