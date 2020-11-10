@@ -98,5 +98,8 @@ export default {
     margin-top: $space-large;
     margin-bottom: $space-small;
   }
+  .image {
+    width: 100%;
+  }
 }
 </style>

@@ -19,7 +19,7 @@
     </a>
     <span>-</span>
     <a
-      href="https://github.com/Human-Connection/Human-Connection/blob/master/CHANGELOG.md"
+      href="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/CHANGELOG.md"
       target="_blank"
     >
       {{ version }}
