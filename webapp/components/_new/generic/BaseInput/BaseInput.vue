@@ -22,18 +22,23 @@
          @input="handleInput"
          @focus="handleFocus"
          @blur="handleBlur"
+         v-on:keydown.caps-lock="caps = true"
+         v-on:keyup.caps-lock="caps = false"
       />
       <base-icon 
          class="input-icon-right"
-         v-if="[iconRight && capsLock]" 
+         v-show="caps" 
          :name="iconRight" />
       <a
          class="click-wrapper"
-         @click="showPassword = !showPassword"
+         @mousedown="(event) => {
+            showPassword = !showPassword;
+            event.preventDefault();
+            }"
       >
          <base-icon 
             class="toggle-icon"
-            icon="[showPassword ? iconRightSecondary : eye-slash]"
+            :icon="[showPassword ? iconRightSecondary = 'eye-slash' :  iconRightSecondary = 'eye']"
             v-if="iconRightSecondary" 
             :name="iconRightSecondary" 
          />
@@ -57,7 +62,7 @@ export default {
    data: function() {
       return {
          showPassword: false,
-         capsLock: false
+         caps: false
       }
    },
    mixins: [inputMixin],
@@ -90,11 +95,6 @@ export default {
          default: null
       }
    },
-   // computed: {
-   //    togglePassword(event) {
-   //       this.type = this.type === 'password' ? 'text' : 'password'
-   //    }
-   // }
 }
 </script>
 
@@ -123,6 +123,7 @@ export default {
          .input-icon {
             color: $text-color-base;
          }
+
       }
     
 
@@ -146,6 +147,11 @@ export default {
                background-color: $background-color-base;
                border: $input-border-size solid $border-color-active;
             }
+            .toggle-icon,
+            .click-wrapper,
+            .input-icon-right {
+               background-color: $background-color-base;
+            }
          }
       }
    }
@@ -166,7 +172,7 @@ export default {
    }
 
    .input-icon-right,
-   .icon-button {
+   .toggle-icon {
       align-items: center;
       justify-content: center;
       width: $input-height;
@@ -174,17 +180,14 @@ export default {
       transition: color $duration-short $ease-out;
       pointer-events: none;
    }
-   .input-icon-right-secondary {
-      pointer-events: all;
+   
+   .click-wrapper {
+      position: absolute;
+      right: 10px;
    }
 
 
-   .toggle-icon {
-      color: $text-color-disabled;
-      background-color: $background-color-disabled;
-      width: 100%;
-      height: 100%;
-   }
+   
    
 
    

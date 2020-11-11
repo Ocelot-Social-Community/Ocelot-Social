@@ -25,7 +25,7 @@
           :disabled="pending"
           :placeholder="$t('login.password')"
           icon="lock"
-          icon-right="lock"
+          icon-right="arrow-down"
           icon-right-secondary="eye"
           name="password"
           type="password"
@@ -63,6 +63,7 @@ export default {
         email: '',
         password: '',
       },
+      caps: false,
     }
   },
   computed: {
@@ -81,9 +82,6 @@ export default {
         this.$toast.error(this.$t('login.failure'))
       }
     },
-    capsLockDetect () {
-
-    }
   },
 }
 </script>
