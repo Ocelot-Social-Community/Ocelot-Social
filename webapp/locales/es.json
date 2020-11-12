@@ -256,7 +256,8 @@
     "newPost": "Crear una nueva contribución",
     "success": "¡Guardado!",
     "teaserImage": {
-      "cropperConfirm": "Confirmar"
+      "cropperConfirm": "Confirmar",
+      "supportedFormats": "Insertar una imagen de formato de archivo JPG, PNG o GIF"
     },
     "title": "Título"
   },

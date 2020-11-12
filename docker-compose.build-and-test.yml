@@ -4,14 +4,14 @@ services:
   webapp:
     environment:
       - "CI=${CI}"
-    image: humanconnection/nitro-web:build-and-test
+    image: ocelotsocialnetwork/develop-webapp:build-and-test
     build:
       context: webapp
       target: build-and-test
   backend:
     environment:
       - "CI=${CI}"
-    image: humanconnection/nitro-backend:build-and-test
+    image: ocelotsocialnetwork/develop-backend:build-and-test
     build:
       context: backend
       target: build-and-test

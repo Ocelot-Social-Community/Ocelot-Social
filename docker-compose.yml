@@ -2,7 +2,7 @@ version: "3.4"
 
 services:
   webapp:
-    image: humanconnection/nitro-web:latest
+    image: ocelotsocialnetwork/develop-webapp:latest
     build:
       context: webapp
       target: production
@@ -16,13 +16,13 @@ services:
     depends_on:
       - backend
     volumes:
-      - webapp_node_modules:/nitro-web/node_modules
+      - webapp_node_modules:/develop-webapp/node_modules
     environment:
       - HOST=0.0.0.0
       - GRAPHQL_URI=http://backend:4000
       - MAPBOX_TOKEN="pk.eyJ1IjoiaHVtYW4tY29ubmVjdGlvbiIsImEiOiJjajl0cnBubGoweTVlM3VwZ2lzNTNud3ZtIn0.bZ8KK9l70omjXbEkkbHGsQ"
   backend:
-    image: humanconnection/nitro-backend:latest
+    image: ocelotsocialnetwork/develop-backend:latest
     build:
       context: backend
       target: production
@@ -35,8 +35,8 @@ services:
     ports:
       - 4000:4000
     volumes:
-      - backend_node_modules:/nitro-backend/node_modules
-      - uploads:/nitro-backend/public/uploads
+      - backend_node_modules:/develop-backend/node_modules
+      - uploads:/develop-backend/public/uploads
     environment:
       - NEO4J_URI=bolt://neo4j:7687
       - GRAPHQL_URI=http://backend:4000
@@ -46,7 +46,7 @@ services:
       - PRIVATE_KEY_PASSPHRASE=a7dsf78sadg87ad87sfagsadg78
       - "DEBUG=${DEBUG}"
   neo4j:
-    image: humanconnection/neo4j:latest
+    image: ocelotsocialnetwork/develop-neo4j:latest
     build:
       context: neo4j
       args:

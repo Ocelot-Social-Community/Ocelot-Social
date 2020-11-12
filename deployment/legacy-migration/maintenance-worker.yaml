@@ -2,12 +2,12 @@
   kind: Pod
   apiVersion: v1
   metadata:
-    name: nitro-maintenance-worker
+    name: develop-maintenance-worker
     namespace: human-connection
   spec:
     containers:
-    - name: nitro-maintenance-worker
-      image: humanconnection/maintenance-worker:latest
+    - name: develop-maintenance-worker
+      image: ocelotsocialnetwork/develop-maintenance-worker:latest
       imagePullPolicy: Always
       resources:
         requests:

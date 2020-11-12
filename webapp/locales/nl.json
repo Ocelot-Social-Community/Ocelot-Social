@@ -68,7 +68,8 @@
     "delete": "Bijdrage verwijderen",
     "edit": "Bijdrage bewerken",
     "teaserImage": {
-      "cropperConfirm": "Bevestigen"
+      "cropperConfirm": "Bevestigen",
+      "supportedFormats": "Voeg een afbeelding in met het bestandsformaat JPG, PNG of GIF"
     }
   },
   "disable": {
