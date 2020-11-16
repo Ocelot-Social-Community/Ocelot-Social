@@ -63,3 +63,8 @@ services:
       - 7474:7474
 networks:
   hc-network:
+volumes:
+  webapp_node_modules:
+  backend_node_modules:
+  neo4j_data:
+  uploads:
