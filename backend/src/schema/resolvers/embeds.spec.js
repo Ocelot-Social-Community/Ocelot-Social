@@ -18,7 +18,10 @@ const HumanConnectionOrg = fs.readFileSync(
   path.join(__dirname, '../../../snapshots/embeds/HumanConnectionOrg.html'),
   'utf8',
 )
-const pr3934 = fs.readFileSync(path.join(__dirname, '../../../snapshots/embeds/pr3934.html'), 'utf8')
+const pr3934 = fs.readFileSync(
+  path.join(__dirname, '../../../snapshots/embeds/pr3934.html'),
+  'utf8',
+)
 const babyLovesCat = fs.readFileSync(
   path.join(__dirname, '../../../snapshots/embeds/babyLovesCat.html'),
   'utf8',
@@ -163,8 +166,7 @@ describe('Query', () => {
               description: `🍰 Pullrequest
 Have all the information for the brand in separate config files. Set these defaults to ocelot.social`,
               url: 'https://github.com/Ocelot-Social-Community/Ocelot-Social/pull/3934',
-              image:
-                'https://avatars3.githubusercontent.com/u/67983243?s=400&v=4',
+              image: 'https://avatars3.githubusercontent.com/u/67983243?s=400&v=4',
               audio: null,
               video: null,
               lang: 'en',
