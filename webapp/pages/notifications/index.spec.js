@@ -123,9 +123,7 @@ describe('PostIndex', () => {
         beforeEach(() => {
           mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({ message: 'Some error message' })
           wrapper = Wrapper()
-          wrapper
-            .find(NotificationsTable)
-            .vm.$emit('markAllAsRead', 'notificationSourceId')
+          wrapper.find(NotificationsTable).vm.$emit('markAllAsRead', 'notificationSourceId')
         })
 
         it('shows an error message if there is an error', () => {
@@ -158,9 +156,7 @@ describe('PostIndex', () => {
           mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({ message: 'Some error message' })
           wrapper = Wrapper()
           // FIXME Should I remove next line?
-          wrapper
-            .find(NotificationsTable)
-            .vm.$emit('markAllAsRead', 'notificationSourceId')
+          wrapper.find(NotificationsTable).vm.$emit('markAllAsRead', 'notificationSourceId')
         })
 
         it('shows an error message if there is an error', () => {

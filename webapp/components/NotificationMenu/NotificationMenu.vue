@@ -23,12 +23,7 @@
           </nuxt-link>
         </ds-flex-item>
         <ds-flex-item :width="{ base: '50%' }" centered>
-          <ds-button
-            ghost
-            primary
-            @click="markAllAsRead"
-            data-test="markAllAsRead-button"
-          >
+          <ds-button ghost primary @click="markAllAsRead" data-test="markAllAsRead-button">
             {{ $t('notifications.markAllAsRead') }}
           </ds-button>
         </ds-flex-item>

@@ -18,12 +18,7 @@
 
     <ds-flex>
       <ds-flex-item class="notifications-footer" :width="{ base: '90%' }" centered>
-        <ds-button
-          ghost
-          primary
-          @click="markAllAsRead"
-          data-test="markAllAsRead-button"
-        >
+        <ds-button ghost primary @click="markAllAsRead" data-test="markAllAsRead-button">
           {{ $t('notifications.markAllAsRead') }}
         </ds-button>
       </ds-flex-item>
