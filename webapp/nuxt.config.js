@@ -214,7 +214,7 @@ export default {
 
   // Give apollo module options
   apollo: {
-    tokenName: 'human-connection-token', // optional, default: apollo-token
+    tokenName: 'ocelot-social-token', // optional, default: apollo-token
     cookieAttributes: {
       expires: 1, // optional, default: 7 (days)
     },

@@ -645,43 +645,11 @@
     }
   },
   "termsAndConditions": {
-    "addition": {
-      "description": "Https://human-connection. org/eventi/",
-      "title": "Inoltre, teniamo regolarmente eventi in cui puoi anche condividere le tue impressioni e porre domande. Puoi trovare una panoramica attuale qui:"
-    },
     "agree": "Sono d'accordo!",
-    "code-of-conduct": {
-      "description": "Il nostro codice di condotta funge da manuale per l'aspetto personale e l'interazione reciproca. Chiunque sia attivo come utente nella rete di {APPLICATION_NAME}, scrive articoli, commenti o contatta altri utenti, anche al di fuori della rete, riconosce queste regole di condotta come vincolanti. <a href=\"https://alpha.human-connection.org/code-of-conduct\" target=\"_blank\"> https://alpha.human-connection.org/code-of-conduct </a>",
-      "title": "Codice di condotta"
-    },
-    "errors-and-feedback": {
-      "description": "Facciamo ogni sforzo per mantenere la nostra rete e i nostri dati al sicuro e disponibili. Ogni nuova versione del software viene sottoposta a test sia automatizzati che manuali. Tuttavia, possono verificarsi errori imprevisti. Pertanto, siamo grati per tutti i bug segnalati. Siete invitati a segnalare eventuali bug che si scopre inviando un'e-mail al supporto presso support@human-connection.org",
-      "title": "Errori e feedback"
-    },
-    "help-and-questions": {
-      "description": "Per aiuto e domande abbiamo compilato per voi una raccolta completa di domande e risposte alle domande più frequenti (FAQ). Potete trovarli qui: <a href=\"https://support.human-connection.org/kb/\" target=\"_blank\" >https:</a>//support.human-connection.org/kb/ ",
-      "title": "Aiuto e domande"
-    },
-    "moderation": {
-      "description": "Fino a quando le nostre possibilità finanziarie ci permettono di implementare il sistema di moderazione comunitaria, abbiamo moderato con un sistema semplificato e con personale proprio o eventualmente volontario. Formiamo questi moderatori e per questo motivo solo loro prendono le decisioni appropriate. Questi moderatori svolgono il loro lavoro in forma anonima. È possibile segnalare a noi messaggi, commenti e utenti (ad esempio, se forniscono informazioni nel loro profilo o se hanno immagini che violano queste Condizioni d'uso). Se ci segnalate qualcosa, potete darci una ragione e una breve spiegazione. Dopodiché daremo un'occhiata a ciò che hai segnalato e, se necessario, ti sanzioneremo, ad esempio bloccando i contributi, i commenti o gli utenti. Purtroppo, lei e la persona interessata non riceverà alcun feedback da parte nostra in questo momento, ma questo è in fase di pianificazione. Indipendentemente da ciò, ci riserviamo il diritto di imporre sanzioni in linea di principio per motivi che non sono o non sono ancora elencati nel nostro Codice di condotta o nei presenti termini di servizio.",
-      "title": "Moderazione"
-    },
     "newTermsAndConditions": "Nuovi Termini e Condizioni",
-    "privacy-statement": {
-      "description": "La nostra rete è una rete di conoscenza e azione sociale. Per noi è quindi particolarmente importante che il maggior numero possibile di contenuti sia accessibile al pubblico. Nel corso dello sviluppo della nostra rete ci sarà sempre più la possibilità di decidere sulla visibilità dei dati personali. Ti informeremo su queste nuove funzionalità. Altrimenti, dovresti sempre pensare a quali dati personali divulghi su te stesso (o altri). Ciò vale in particolare per il contenuto di post e commenti, poiché questi hanno un carattere ampiamente pubblico. Successivamente ci saranno possibilità di limitare la visibilità del tuo profilo. Parte dei termini di servizio è la nostra informativa sulla privacy, che ti informa sulle singole operazioni di trattamento dei dati nella nostra rete: <a href=\"https://human-connection.org/datenschutz/#netzwerk\" target=\"_blank\"> https://human-connection.org/datenschutz/#netzwerk </a> bzw. <a href=\"https://human-connection.org/datenschutz/\" target=\"_blank\"> https://human-connection.org/datenschutz/ </a> La nostra informativa sulla privacy è adattata alla situazione legale e caratteristiche della nostra rete ed è sempre valido nella versione più recente.",
-      "title": "Informativa sulla Privacy"
-    },
-    "terms-of-service": {
-      "description": "Le seguenti condizioni d'uso costituiscono la base per l'utilizzo della nostra rete. Quando ti registri, devi accettarli e ti informeremo in seguito di eventuali modifiche che potrebbero aver luogo. La rete di connessione umana è gestita in Germania ed è quindi soggetta alla legge tedesca. Il foro competente è Kirchheim / Teck. Per i dettagli, consulta la nostra impronta: <a href=\"https://human-connection.org/imprint\" target=\"_blank\" > https://human-connection.org/imprint </a>",
-      "title": "Termini di servizio"
-    },
     "termsAndConditionsConfirmed": "Ho letto e confermato i Termini e condizioni.",
     "termsAndConditionsNewConfirm": "Ho letto e accetto le nuove condizioni generali di contratto.",
-    "termsAndConditionsNewConfirmText": "Si prega di leggere le nuove condizioni d'uso ora!",
-    "use-and-license": {
-      "description": "Se qualsiasi contenuto pubblicato su di noi è protetto da diritti di proprietà intellettuale, l'utente ci concede una licenza mondiale, non esclusiva, trasferibile e sub-licenziabile, per l'utilizzo di tali contenuti per la pubblicazione nella nostra rete. Questa licenza scade quando si elimina il contenuto o l'intero account. Ricorda che altri potrebbero condividere i tuoi contenuti e noi non possiamo cancellarli.",
-      "title": "Uso e licenza"
-    }
+    "termsAndConditionsNewConfirmText": "Si prega di leggere le nuove condizioni d'uso ora!"
   },
   "user": {
     "avatar": {

@@ -1,7 +1,7 @@
 {
-  "name": "human-connection-backend",
+  "name": "ocelot-social-backend",
   "version": "0.6.3",
-  "description": "GraphQL Backend for Human Connection",
+  "description": "GraphQL Backend for ocelot.social",
   "main": "src/index.js",
   "scripts": {
     "__migrate": "migrate --compiler 'js:@babel/register' --migrations-dir ./src/db/migrations",
@@ -18,7 +18,6 @@
     "db:migrate": "yarn run __migrate --store ./src/db/migrate/store.js",
     "db:migrate:create": "yarn run __migrate --template-file ./src/db/migrate/template.js --date-format 'yyyymmddHHmmss' create"
   },
-  "author": "Human Connection gGmbH",
   "license": "MIT",
   "jest": {
     "verbose": true,

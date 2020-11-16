@@ -102,7 +102,7 @@
     },
     "get-help": "Se você for vítima ou testemunhar um comportamento inaceitável, ou tiver qualquer outra preocupação, por favor notifique um organizador da comunidade o mais rápido possível e inclua o link ou mencione o conteúdo correspondente:",
     "preamble": {
-      "description": "A {APPLICATION_NAME} é uma rede de conhecimento e ação social sem fins lucrativos da próxima geração. Feito por pessoas - para pessoas. Open Source, justo e transparente. Para uma mudança local e global positiva em todas as áreas da vida. Redesenhamos completamente a troca pública de conhecimentos, idéias e projetos. As funções da Human Connection reúnem as pessoas - offline e online - para que possamos fazer do mundo um lugar melhor.",
+      "description": "A {APPLICATION_NAME} é uma rede de conhecimento e ação social sem fins lucrativos da próxima geração. Feito por pessoas - para pessoas. Open Source, justo e transparente. Para uma mudança local e global positiva em todas as áreas da vida. Redesenhamos completamente a troca pública de conhecimentos, idéias e projetos. As funções da {APPLICATION_NAME} reúnem as pessoas - offline e online - para que possamos fazer do mundo um lugar melhor.",
       "title": "Introdução"
     },
     "purpose": {

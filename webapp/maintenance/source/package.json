@@ -1,9 +1,9 @@
 {
-  "name": "@human-connection/maintenance",
+  "name": "@ocelot-social/maintenance",
   "version": "1.0.0",
-  "description": "Maintenance page for Human Connection",
+  "description": "Maintenance page for ocelot.social",
   "main": "index.js",
-  "repository": "https://github.com/Human-Connection/Human-Connection",
+  "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
   "author": "Robert Schäfer",
   "license": "MIT",
   "private": false,
