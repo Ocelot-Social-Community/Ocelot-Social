@@ -18,7 +18,7 @@ const HumanConnectionOrg = fs.readFileSync(
   path.join(__dirname, '../../../snapshots/embeds/HumanConnectionOrg.html'),
   'utf8',
 )
-const pr960 = fs.readFileSync(path.join(__dirname, '../../../snapshots/embeds/pr960.html'), 'utf8')
+const pr3934 = fs.readFileSync(path.join(__dirname, '../../../snapshots/embeds/pr3934.html'), 'utf8')
 const babyLovesCat = fs.readFileSync(
   path.join(__dirname, '../../../snapshots/embeds/babyLovesCat.html'),
   'utf8',
@@ -145,7 +145,7 @@ describe('Query', () => {
     describe('given a Github link', () => {
       beforeEach(() => {
         fetch
-          .mockReturnValueOnce(Promise.resolve(new Response(pr960)))
+          .mockReturnValueOnce(Promise.resolve(new Response(pr3934)))
           .mockReturnValueOnce(Promise.resolve(JSON.stringify({})))
         variables = { url: 'https://github.com/Human-Connection/Human-Connection/pull/960' }
       })
@@ -156,14 +156,15 @@ describe('Query', () => {
             embed: {
               type: 'link',
               title:
-                'Editor embeds merge in nitro embed by mattwr18 · Pull Request #960 · Human-Connection/Human-Connection',
-              author: 'Human-Connection',
+                'feat: [WIP] 🍰 Rebranding And White-Labeling by Mogge · Pull Request #3934 · Ocelot-Social-Community/Ocelot-Social',
+              author: 'Ocelot-Social-Community',
               publisher: 'GitHub',
               date: expect.any(String),
-              description: '🍰 Pullrequest Issues fixes #256',
-              url: 'https://github.com/Human-Connection/Human-Connection/pull/960',
+              description: `🍰 Pullrequest
+Have all the information for the brand in separate config files. Set these defaults to ocelot.social`,
+              url: 'https://github.com/Ocelot-Social-Community/Ocelot-Social/pull/3934',
               image:
-                'https://repository-images.githubusercontent.com/112590397/52c9a000-7e11-11e9-899d-aaa55f3a3d72',
+                'https://avatars3.githubusercontent.com/u/67983243?s=400&v=4',
               audio: null,
               video: null,
               lang: 'en',
