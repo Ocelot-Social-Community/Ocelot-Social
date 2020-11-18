@@ -20,7 +20,7 @@ services:
     environment:
       - HOST=0.0.0.0
       - GRAPHQL_URI=http://backend:4000
-      - MAPBOX_TOKEN="pk.eyJ1IjoiaHVtYW4tY29ubmVjdGlvbiIsImEiOiJjajl0cnBubGoweTVlM3VwZ2lzNTNud3ZtIn0.bZ8KK9l70omjXbEkkbHGsQ"
+      - MAPBOX_TOKEN="pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g"
   backend:
     image: ocelotsocialnetwork/develop-backend:latest
     build:
@@ -42,7 +42,7 @@ services:
       - GRAPHQL_URI=http://backend:4000
       - CLIENT_URI=http://localhost:3000
       - JWT_SECRET=b/&&7b78BF&fv/Vd
-      - MAPBOX_TOKEN=pk.eyJ1IjoiaHVtYW4tY29ubmVjdGlvbiIsImEiOiJjajl0cnBubGoweTVlM3VwZ2lzNTNud3ZtIn0.KZ8KK9l70omjXbEkkbHGsQ
+      - MAPBOX_TOKEN=pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g
       - PRIVATE_KEY_PASSPHRASE=a7dsf78sadg87ad87sfagsadg78
       - "DEBUG=${DEBUG}"
   neo4j:
