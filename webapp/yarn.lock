@@ -1375,11 +1375,6 @@
   dependencies:
     vue "^2.6.10"
 
-"@illinois/react-use-local-storage@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@illinois/react-use-local-storage/-/react-use-local-storage-1.1.0.tgz#127aba1c2843b3edeb4ab1c74a8dd112f4c7ec29"
-  integrity sha512-ohuwk+ogqr3AVNHLUfYwgt4gbdNBi2kNq4gVDbhD2pwpJcX4VbkWJ9Q0fuXkVD4IB1BP6COSgMSPHPKjg9ep7g==
-
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@istanbuljs/load-nyc-config/-/load-nyc-config-1.0.0.tgz#10602de5570baea82f8afbfa2630b24e7a8cfe5b"
@@ -5978,11 +5973,6 @@ commander@~2.19.0:
   version "2.19.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.19.0.tgz#f6198aa84e5b83c46054b94ddedbfed5ee9ff12a"
   integrity sha512-6tvAOO+D6OENvRAh524Dh9jcfKTYDQAqvqezbCW82xj5X0pSrcpxtvRKHLG0yBY6SD7PSDrJaj+0AiOcKVd1Xg==
-
-comment-parser@0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/comment-parser/-/comment-parser-0.7.1.tgz#99607706e369305f89b0268f138fca7e795a60fc"
-  integrity sha512-YLgOoek/4xgO9wDbNi54wwnzpWseqz4ju2qbezDOv6PIf72w8Z7YajwVfEmd6dhnuRrEmo0vCIuG8B6gKz2d8A==
 
 common-tags@^1.5.1, common-tags@^1.8.0:
   version "1.8.0"
@@ -14035,6 +14025,11 @@ react-sizeme@^2.5.2, react-sizeme@^2.6.7:
     shallowequal "^1.1.0"
     throttle-debounce "^2.1.0"
 
+react-storage-hooks@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/react-storage-hooks/-/react-storage-hooks-3.0.3.tgz#c1cbb79398434af0694e9c6f0c687cb87bbe85b4"
+  integrity sha512-kRUk+ZnRx4dIAkNwmwRhTHxMZlVpXAW5a3qmbqr17CH+/ZfhJ9ksxyYjCUufB/BCkKOXIOEka7sp3HvtB1A1Gw==
+
 react-syntax-highlighter@^11.0.2:
   version "11.0.2"
   resolved "https://registry.yarnpkg.com/react-syntax-highlighter/-/react-syntax-highlighter-11.0.2.tgz#4e3f376e752b20d2f54e4c55652fd663149e4029"
@@ -15357,21 +15352,20 @@ storybook-chromatic@^2.2.2:
     tree-kill "^1.1.0"
     uuid "^3.3.2"
 
-storybook-design-token@^0.7.2:
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/storybook-design-token/-/storybook-design-token-0.7.2.tgz#519918e42504e38273dda9dc8271e69b8816cf85"
-  integrity sha512-NvR/bzAGi86K+ghhybCtIpOtNZ1PM3NNAnGRAsyIYecrCcuoWm6Qwp35lNcWF71OqPj4+MW0Tk6i5FHL4AN/tw==
+storybook-design-token@^0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/storybook-design-token/-/storybook-design-token-0.8.1.tgz#55da2f979799711f2d02c2082a36dffca6b57fae"
+  integrity sha512-kcAEW38oHuDfuJ0Zvfgp/HphAZEdZeXiMOdWpoV4bwg2U7MC49T2kf86J+QkTOESL0HkfEkHyziurV9Um5AQAA==
   dependencies:
-    "@illinois/react-use-local-storage" "1.1.0"
     "@storybook/addons" "5.2.8"
     "@storybook/api" "5.2.8"
     "@storybook/components" "5.2.8"
     "@storybook/theming" "5.2.8"
-    comment-parser "0.7.1"
     gonzales-pe "4.2.4"
     javascript-detect-element-resize "^0.5.3"
     mensch "0.3.4"
     raw-loader "3.1.0"
+    react-storage-hooks "^3.0.3"
     react-use-clipboard "0.1.4"
 
 storybook-vue-router@^1.0.7:
