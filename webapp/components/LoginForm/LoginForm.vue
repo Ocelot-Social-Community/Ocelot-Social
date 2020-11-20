@@ -27,6 +27,7 @@
             :placeholder="$t('login.password')"
             icon="lock"
             name="password"
+            class="password-field"
             :type="showPassword ? 'text' : 'password'"
           />
           <a
@@ -38,7 +39,7 @@
           >
             <base-icon 
                 class="toggle-icon"
-                :name="showPassword ? 'eye-slash' :  'eye'"
+                :name="showPassword ? 'eye-slash' : 'eye'"
             />
           </a>
         </div>
@@ -113,12 +114,13 @@ export default {
 }
 
 .password-wrapper {
-  position: relative;
   display: flex;
-  appearance: none;
   width: 100%;
+  align-items: center;
   padding: $input-padding-vertical $space-x-small;
+  padding-left: 0;
   height: $input-height;
+  margin-bottom: 10px;
 
   color: $text-color-base;
   background: $background-color-disabled;
@@ -127,12 +129,32 @@ export default {
   border-radius: $border-radius-base;
   outline: none;
   transition: all $duration-short $ease-out;
+
+  .click-wrapper {
+    padding: 5px;
+    color: $text-color-disabled;
+  }
+
   &:focus-within {
     background-color: $background-color-base;
     border: $input-border-size solid $border-color-active;
+
     .toggle-icon {
       color: $text-color-base;
     }
   }
+  .password-field {
+    position: relative;
+    padding-top: 16px;
+    padding-right: 20px;
+    border: none;
+    border-style: none;
+    appearance: none;
+    margin-left: 0;
+    margin-right: -16px;
+    width: 100%;
+  }
+
 }
+
 </style>
