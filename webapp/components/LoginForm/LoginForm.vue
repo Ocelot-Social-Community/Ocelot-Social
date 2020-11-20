@@ -32,15 +32,14 @@
           />
           <a
             class="click-wrapper"
-            @mousedown="(event) => {
-                showPassword = !showPassword;
-                event.preventDefault();
-            }"
+            @mousedown="
+              (event) => {
+                showPassword = !showPassword
+                event.preventDefault()
+              }
+            "
           >
-            <base-icon 
-                class="toggle-icon"
-                :name="showPassword ? 'eye-slash' : 'eye'"
-            />
+            <base-icon class="toggle-icon" :name="showPassword ? 'eye-slash' : 'eye'" />
           </a>
         </div>
         <nuxt-link to="/password-reset/request">
@@ -68,7 +67,7 @@ import BaseIcon from '../_new/generic/BaseIcon/BaseIcon'
 export default {
   components: {
     LocaleSwitch,
-    BaseIcon
+    BaseIcon,
   },
   data() {
     return {
@@ -76,7 +75,7 @@ export default {
         email: '',
         password: '',
       },
-      showPassword: false
+      showPassword: false,
     }
   },
   computed: {
@@ -154,7 +153,5 @@ export default {
     margin-right: -16px;
     width: 100%;
   }
-
 }
-
 </style>
