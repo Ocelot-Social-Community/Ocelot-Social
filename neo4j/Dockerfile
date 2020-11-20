@@ -1,4 +1,4 @@
-FROM neo4j:3.5.14
+FROM neo4j:4.2.0
 # community edition 👆🏼, because we have no enterprise licence 👇🏼 at the moment
 # FROM neo4j:3.5.14-enterprise
 LABEL Description="Neo4J database of the Social Network Human-Connection.org with preinstalled database constraints and indices" Vendor="Human Connection gGmbH" Version="0.0.1" Maintainer="Human Connection gGmbH (developer@human-connection.org)"
