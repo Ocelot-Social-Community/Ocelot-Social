@@ -30,10 +30,7 @@
             class="password-field"
             :type="showPassword ? 'text' : 'password'"
           />
-          <a
-            class="click-wrapper"
-            @click="toggleShowPassword"
-          >
+          <a class="click-wrapper" @click="toggleShowPassword">
             <base-icon class="toggle-icon" :name="showPassword ? 'eye-slash' : 'eye'" />
           </a>
         </div>
@@ -90,10 +87,9 @@ export default {
       }
     },
     toggleShowPassword(event) {
-      console.log(event);
-      event.preventDefault();
       this.showPassword = !this.showPassword
-    }
+      event.preventDefault()
+    },
   },
 }
 </script>
@@ -140,13 +136,13 @@ export default {
     cursor: pointer;
 
     &:focus-within {
-    background-color: $background-color-base;
-    border: $input-border-size solid $border-color-active;
+      background-color: $background-color-base;
+      border: $input-border-size solid $border-color-active;
 
-    .toggle-icon {
-      color: $text-color-base;
+      .toggle-icon {
+        color: $text-color-base;
+      }
     }
-  }
   }
 
   &:focus-within {
