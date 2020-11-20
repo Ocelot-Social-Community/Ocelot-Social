@@ -20,15 +20,28 @@
           name="email"
           icon="envelope"
         />
-        <ds-input
-          v-model="form.password"
-          :disabled="pending"
-          :placeholder="$t('login.password')"
-          icon="lock"
-          icon-right="question-circle"
-          name="password"
-          type="password"
-        />
+        <div class="password-wrapper">
+          <ds-input
+            v-model="form.password"
+            :disabled="pending"
+            :placeholder="$t('login.password')"
+            icon="lock"
+            name="password"
+            :type="showPassword ? 'text' : 'password'"
+          />
+          <a
+            class="click-wrapper"
+            @mousedown="(event) => {
+                showPassword = !showPassword;
+                event.preventDefault();
+            }"
+          >
+            <base-icon 
+                class="toggle-icon"
+                :name="showPassword ? 'eye-slash' :  'eye'"
+            />
+          </a>
+        </div>
         <nuxt-link to="/password-reset/request">
           {{ $t('login.forgotPassword') }}
         </nuxt-link>
@@ -49,10 +62,12 @@
 
 <script>
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import BaseIcon from '../_new/generic/BaseIcon/BaseIcon'
 
 export default {
   components: {
     LocaleSwitch,
+    BaseIcon
   },
   data() {
     return {
@@ -60,6 +75,7 @@ export default {
         email: '',
         password: '',
       },
+      showPassword: false
     }
   },
   computed: {
@@ -93,6 +109,30 @@ export default {
     width: 100%;
     margin-top: $space-large;
     margin-bottom: $space-small;
+  }
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  appearance: none;
+  width: 100%;
+  padding: $input-padding-vertical $space-x-small;
+  height: $input-height;
+
+  color: $text-color-base;
+  background: $background-color-disabled;
+
+  border: $input-border-size solid $border-color-softer;
+  border-radius: $border-radius-base;
+  outline: none;
+  transition: all $duration-short $ease-out;
+  &:focus-within {
+    background-color: $background-color-base;
+    border: $input-border-size solid $border-color-active;
+    .toggle-icon {
+      color: $text-color-base;
+    }
   }
 }
 </style>
