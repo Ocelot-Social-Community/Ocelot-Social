@@ -38,7 +38,7 @@ describe('LoginForm', () => {
           error: jest.fn(),
         },
       }
-      return mount(LoginForm, { mocks, localVue, propsData, store })
+      return mount(LoginForm, { mocks, localVue, propsData, store, data })
     }
 
     describe('fill in email and password and submit', () => {
@@ -57,5 +57,13 @@ describe('LoginForm', () => {
         })
       })
     })
+    
+    describe('Click event', () => {
+      it('clicking icon shows/hides password and changes icon', () => {   
+        wrapper.find('a.click-wrapper').trigger('click')
+        expect(wrapper.data.showPassword).toEqual(!showPassword)
+      })
+    })
   })
+
 })
