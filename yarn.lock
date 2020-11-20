@@ -3158,8 +3158,9 @@ extsprintf@^1.2.0:
   integrity sha1-4mifjzVvrWLMplo6kcXfX5VRaS8=
 
 faker@Marak/faker.js#master:
-  version "4.1.0"
-  resolved "https://codeload.github.com/Marak/faker.js/tar.gz/3b2fa4aebccee52ae1bafc15d575061fb30c3cf1"
+  version "5.1.0"
+  uid "91dc8a3372426bc691be56153b33e81a16459f49"
+  resolved "https://codeload.github.com/Marak/faker.js/tar.gz/91dc8a3372426bc691be56153b33e81a16459f49"
 
 fast-deep-equal@^2.0.1:
   version "2.0.1"
