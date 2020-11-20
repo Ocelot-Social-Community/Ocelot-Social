@@ -32,12 +32,7 @@
           />
           <a
             class="click-wrapper"
-            @mousedown="
-              (event) => {
-                showPassword = !showPassword
-                event.preventDefault()
-              }
-            "
+            @click="toggleShowPassword"
           >
             <base-icon class="toggle-icon" :name="showPassword ? 'eye-slash' : 'eye'" />
           </a>
@@ -94,6 +89,11 @@ export default {
         this.$toast.error(this.$t('login.failure'))
       }
     },
+    toggleShowPassword(event) {
+      console.log(event);
+      event.preventDefault();
+      this.showPassword = !this.showPassword
+    }
   },
 }
 </script>
@@ -118,6 +118,7 @@ export default {
   align-items: center;
   padding: $input-padding-vertical $space-x-small;
   padding-left: 0;
+  padding-right: 0;
   height: $input-height;
   margin-bottom: 10px;
 
@@ -130,8 +131,22 @@ export default {
   transition: all $duration-short $ease-out;
 
   .click-wrapper {
-    padding: 5px;
+    padding: 8px;
+    margin: 4px;
     color: $text-color-disabled;
+  }
+
+  .click-wrapper:hover {
+    cursor: pointer;
+
+    &:focus-within {
+    background-color: $background-color-base;
+    border: $input-border-size solid $border-color-active;
+
+    .toggle-icon {
+      color: $text-color-base;
+    }
+  }
   }
 
   &:focus-within {
@@ -145,7 +160,7 @@ export default {
   .password-field {
     position: relative;
     padding-top: 16px;
-    padding-right: 20px;
+    padding-right: 16px;
     border: none;
     border-style: none;
     appearance: none;
