@@ -12,7 +12,7 @@
       </template>
       <h2 class="title">{{ $t('login.login') }}</h2>
       <form :disabled="pending" @submit.prevent="onSubmit">
-        <ds-input
+        <base-input
           v-model="form.email"
           :disabled="pending"
           :placeholder="$t('login.email')"
@@ -20,12 +20,13 @@
           name="email"
           icon="envelope"
         />
-        <ds-input
+        <base-input
           v-model="form.password"
           :disabled="pending"
           :placeholder="$t('login.password')"
           icon="lock"
-          icon-right="question-circle"
+          icon-right="arrow-down"
+          icon-right-secondary="eye"
           name="password"
           type="password"
         />
@@ -49,10 +50,12 @@
 
 <script>
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import BaseInput from '../_new/generic/BaseInput/BaseInput'
 
 export default {
   components: {
     LocaleSwitch,
+    BaseInput
   },
   data() {
     return {
@@ -60,6 +63,7 @@ export default {
         email: '',
         password: '',
       },
+      caps: false,
     }
   },
   computed: {
@@ -92,6 +96,10 @@ export default {
     display: block;
     width: 100%;
     margin-top: $space-large;
+    margin-bottom: $space-small;
+  }
+
+  .input-wrapper {
     margin-bottom: $space-small;
   }
 }

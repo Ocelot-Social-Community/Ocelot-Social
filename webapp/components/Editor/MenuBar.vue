@@ -59,6 +59,12 @@
         :onClick="commands.horizontal_rule"
         icon="minus"
       />
+
+      <menu-bar-button
+        icon="question-circle"
+        :onClick="(event) => toggleToolbarInfo(event)"
+      />
+
     </div>
   </editor-menu-bar>
 </template>
@@ -66,15 +72,22 @@
 <script>
 import { EditorMenuBar } from 'tiptap'
 import MenuBarButton from './MenuBarButton'
+import Dropdown from '~/components/Dropdown'
+
 
 export default {
   components: {
     EditorMenuBar,
     MenuBarButton,
+    Dropdown
   },
   props: {
     editor: Object,
     toggleLinkInput: Function,
+    toggleToolbarInfo: Function,
   },
+  methods: {
+    toggle
+  }
 }
 </script>

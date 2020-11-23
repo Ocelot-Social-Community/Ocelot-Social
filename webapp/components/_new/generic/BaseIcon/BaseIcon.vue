@@ -39,6 +39,8 @@ export default {
   display: inline-flex;
   vertical-align: bottom;
 
+  
+
   > .svg {
     height: 1.2em;
     fill: currentColor;
