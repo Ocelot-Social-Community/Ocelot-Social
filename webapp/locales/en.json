@@ -150,7 +150,7 @@
       },
       "signup": {
         "form": {
-          "data-privacy": " I have read and understood the Privacy Statement.",
+          "data-privacy": "I have read and understood the <a href=\"/data-privacy\" target=\"_blank\"><ds-text bold color=\"primary\">Privacy Statement</ds-text></a>.",
           "description": "To get started, you can register here for free:",
           "errors": {
             "email-exists": "There is already a user account with this e-mail address!",
@@ -162,7 +162,7 @@
           "no-political": "I am not on behalf of a party or political organization in the network.",
           "submit": "Create an account",
           "success": "A mail with a link to complete your registration has been sent to <b>{email}</b>",
-          "terms-and-condition": "I confirm to the Terms and conditions."
+          "terms-and-condition": "I confirm to the  <a href=\"/terms-and-conditions\" target=\"_blank\"><ds-text bold color=\"primary\">Terms and conditions</ds-text></a>."
         },
         "title": "Join {APPLICATION_NAME}!",
         "unavailable": "Unfortunately, public registration of user accounts is not available right now on this server."

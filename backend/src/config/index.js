@@ -96,6 +96,7 @@ export const customConfigs = {
   EMAIL_DEFAULT_SENDER,
   SUPPORT_URL: links.SUPPORT,
   APPLICATION_NAME: metadata.APPLICATION_NAME,
+  ORGANIZATION_URL: links.ORGANIZATION,
 }
 
 export default {
