@@ -6657,12 +6657,12 @@ metascraper-lang@^5.11.8:
   dependencies:
     "@metascraper/helpers" "^5.11.8"
 
-metascraper-logo@^5.11.6:
-  version "5.11.6"
-  resolved "https://registry.yarnpkg.com/metascraper-logo/-/metascraper-logo-5.11.6.tgz#c0f08939fd72021d015cc16e0bb43dc41d79dc5f"
-  integrity sha512-H1kumbrf+I4Ogwm7fFhSZDJU8STRMa7kg77/wnmOK+1sirH8d2NOzTrEhDdoRMmpGYiU3XNjfukvZJbqPu2mvg==
+metascraper-logo@^5.14.22:
+  version "5.14.22"
+  resolved "https://registry.yarnpkg.com/metascraper-logo/-/metascraper-logo-5.14.22.tgz#f89bc6ed5d4f6d8b58fcf2d054e2a0253af52268"
+  integrity sha512-QJwOiqRTpJBUgvv8IvBp6s0Fo+A+ifoRNt1l7fFU6Xsv19PbE/Z5RZENm0yEI2B1ic2TRdqGLqyaCdG2u1kkig==
   dependencies:
-    "@metascraper/helpers" "^5.11.6"
+    "@metascraper/helpers" "^5.14.22"
 
 metascraper-publisher@^5.11.8:
   version "5.11.8"
