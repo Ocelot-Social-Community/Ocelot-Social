@@ -9,6 +9,7 @@ const welcomeImageUrl = new URL(`/img/custom/welcome.svg`, CONFIG.CLIENT_URI)
 const defaultParams = {
   supportUrl: CONFIG.SUPPORT_URL,
   APPLICATION_NAME: CONFIG.APPLICATION_NAME,
+  ORGANIZATION_URL: CONFIG.ORGANIZATION_URL,
   welcomeImageUrl,
 }
 
