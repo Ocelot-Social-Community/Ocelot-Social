@@ -20,7 +20,7 @@
           name="email"
           icon="envelope"
         />
-        <div class="password-wrapper" >
+        <div class="password-wrapper">
           <ds-input
             v-model="form.password"
             :disabled="pending"
@@ -33,7 +33,7 @@
           />
           <span class="click-wrapper" @click="toggleShowPassword">
             <span class="icon-wrapper" :data-test="iconName">
-              <base-icon class="toggle-icon"  :name="iconName" />
+              <base-icon class="toggle-icon" :name="iconName" />
             </span>
           </span>
         </div>
@@ -79,7 +79,7 @@ export default {
     },
     iconName() {
       return this.showPassword ? 'eye-slash' : 'eye'
-    }
+    },
   },
   methods: {
     async onSubmit() {
@@ -145,7 +145,6 @@ export default {
 
   .click-wrapper:hover {
     cursor: pointer;
-
 
     &:focus-within {
       background-color: $background-color-base;

@@ -70,9 +70,8 @@ describe('LoginForm', () => {
         await Vue.nextTick()
         await expect(wrapper.find('input[name = "password"]').attributes('type')).toEqual('text')
       })
-
     })
-        
+
     describe('Click on show password icon, icon change', () => {
       const wrapper = Wrapper()
       it('shows eye icon by default', () => {
@@ -86,12 +85,12 @@ describe('LoginForm', () => {
       })
     })
 
-    describe('Focus returns to password input container after show password click', () =>{
+    describe('Focus returns to password input container after show password click', () => {
       const wrapper = Wrapper()
       const componentToGetFocus = wrapper.find('input[name ="password"]')
       it('Focus is on the password field container after click', async () => {
         wrapper.find('span.click-wrapper').trigger('click', {
-          relateTarget: componentToGetFocus
+          relateTarget: componentToGetFocus,
         })
         await Vue.nextTick()
         await expect(wrapper.emitted('focus')).toBeTruthy()
