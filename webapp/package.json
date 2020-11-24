@@ -134,7 +134,7 @@
     "jest": "~25.3.0",
     "mutation-observer": "^1.0.3",
     "node-sass": "~4.13.1",
-    "prettier": "~2.0.4",
+    "prettier": "~2.2.0",
     "sass-loader": "~8.0.2",
     "storybook-design-token": "^0.8.1",
     "storybook-vue-router": "^1.0.7",
