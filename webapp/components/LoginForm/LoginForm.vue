@@ -20,7 +20,7 @@
           name="email"
           icon="envelope"
         />
-        <div class="password-wrapper">
+        <div class="password-wrapper" >
           <ds-input
             v-model="form.password"
             :disabled="pending"
@@ -28,11 +28,14 @@
             icon="lock"
             name="password"
             class="password-field"
+            ref="password"
             :type="showPassword ? 'text' : 'password'"
           />
-          <a class="click-wrapper" @click="toggleShowPassword">
-            <base-icon class="toggle-icon" :name="showPassword ? 'eye-slash' : 'eye'" />
-          </a>
+          <span class="click-wrapper" @click="toggleShowPassword">
+            <span class="icon-wrapper" :data-test="iconName">
+              <base-icon class="toggle-icon"  :name="iconName" />
+            </span>
+          </span>
         </div>
         <nuxt-link to="/password-reset/request">
           {{ $t('login.forgotPassword') }}
@@ -74,6 +77,9 @@ export default {
     pending() {
       return this.$store.getters['auth/pending']
     },
+    iconName() {
+      return this.showPassword ? 'eye-slash' : 'eye'
+    }
   },
   methods: {
     async onSubmit() {
@@ -89,6 +95,10 @@ export default {
     toggleShowPassword(event) {
       this.showPassword = !this.showPassword
       event.preventDefault()
+      this.$nextTick(() => {
+        this.$refs.password.$el.children[1].children[1].focus()
+        this.$emit('focus')
+      })
     },
   },
 }
@@ -126,14 +136,16 @@ export default {
   outline: none;
   transition: all $duration-short $ease-out;
 
-  .click-wrapper {
+  .icon-wrapper {
     padding: 8px;
     margin: 4px;
+    padding-left: 16px;
     color: $text-color-disabled;
   }
 
   .click-wrapper:hover {
     cursor: pointer;
+
 
     &:focus-within {
       background-color: $background-color-base;
@@ -153,10 +165,11 @@ export default {
       color: $text-color-base;
     }
   }
+
   .password-field {
     position: relative;
     padding-top: 16px;
-    padding-right: 16px;
+    padding-right: 8px;
     border: none;
     border-style: none;
     appearance: none;

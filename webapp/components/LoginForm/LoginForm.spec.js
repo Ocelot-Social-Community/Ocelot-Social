@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import LoginForm from './LoginForm.vue'
 import Styleguide from '@human-connection/styleguide'
 import Vuex from 'vuex'
@@ -38,7 +39,7 @@ describe('LoginForm', () => {
           error: jest.fn(),
         },
       }
-      return mount(LoginForm, { mocks, localVue, propsData, store, data })
+      return mount(LoginForm, { mocks, localVue, propsData, store })
     }
 
     describe('fill in email and password and submit', () => {
@@ -57,13 +58,44 @@ describe('LoginForm', () => {
         })
       })
     })
-    
-    describe('Click event', () => {
-      it('clicking icon shows/hides password and changes icon', () => {   
-        wrapper.find('a.click-wrapper').trigger('click')
-        expect(wrapper.data.showPassword).toEqual(!showPassword)
+
+    describe('Click on show password input field type change', () => {
+      const wrapper = Wrapper()
+      it('does not show the password by default', () => {
+        expect(wrapper.find('input[name ="password"]').attributes('type')).toEqual('password')
+      })
+
+      it('shows the password after click on show password', async () => {
+        wrapper.find('span.click-wrapper').trigger('click')
+        await Vue.nextTick()
+        await expect(wrapper.find('input[name = "password"]').attributes('type')).toEqual('text')
+      })
+
+    })
+        
+    describe('Click on show password icon, icon change', () => {
+      const wrapper = Wrapper()
+      it('shows eye icon by default', () => {
+        expect(wrapper.find('span.icon-wrapper').attributes('data-test')).toEqual('eye')
+      })
+
+      it('shows the slash-eye icon after click', async () => {
+        wrapper.find('span.click-wrapper').trigger('click')
+        await Vue.nextTick()
+        await expect(wrapper.find('span.icon-wrapper').attributes('data-test')).toEqual('eye-slash')
+      })
+    })
+
+    describe('Focus returns to password input container after show password click', () =>{
+      const wrapper = Wrapper()
+      const componentToGetFocus = wrapper.find('input[name ="password"]')
+      it('Focus is on the password field container after click', async () => {
+        wrapper.find('span.click-wrapper').trigger('click', {
+          relateTarget: componentToGetFocus
+        })
+        await Vue.nextTick()
+        await expect(wrapper.emitted('focus')).toBeTruthy()
       })
     })
   })
-
 })
