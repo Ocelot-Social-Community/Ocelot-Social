@@ -1,7 +1,7 @@
 export default {
   APPLICATION_NAME: 'ocelot.social',
   APPLICATION_SHORT_NAME: 'ocelot',
-  APPLICATION_DESCRIPTION: 'Ocelot Social Network',
-  ORGANIZATION_NAME: 'busFaktor() e.V.',
-  ORGANIZATION_JURISDICTION: 'Augsburg',
+  APPLICATION_DESCRIPTION: 'ocelot.social Community Network',
+  ORGANIZATION_NAME: 'ocelot.social Community',
+  ORGANIZATION_JURISDICTION: 'City of Angels',
 }
