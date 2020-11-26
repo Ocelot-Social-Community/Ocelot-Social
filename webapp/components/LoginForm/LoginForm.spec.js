@@ -59,7 +59,7 @@ describe('LoginForm', () => {
       })
     })
 
-    describe('Click on show password input field type change', () => {
+    describe('Visibility of password', () => {
       const wrapper = Wrapper()
       it('does not show the password by default', () => {
         expect(wrapper.find('input[name ="password"]').attributes('type')).toEqual('password')
@@ -85,10 +85,10 @@ describe('LoginForm', () => {
       })
     })
 
-    describe('Focus returns to password input container after show password click', () => {
+    describe('Focus on password input container after show-password click', () => {
       const wrapper = Wrapper()
       const componentToGetFocus = wrapper.find('input[name ="password"]')
-      it('Focus is on the password field container after click', async () => {
+      it('Focuses on the password field after click', async () => {
         wrapper.find('span.click-wrapper').trigger('click', {
           relateTarget: componentToGetFocus,
         })

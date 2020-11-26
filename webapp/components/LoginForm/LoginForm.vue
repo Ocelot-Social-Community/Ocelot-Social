@@ -139,7 +139,7 @@ export default {
   .icon-wrapper {
     padding: 8px;
     margin: 4px;
-    padding-left: 16px;
+    padding-left: 20px;
     color: $text-color-disabled;
   }
 
@@ -173,7 +173,7 @@ export default {
     border-style: none;
     appearance: none;
     margin-left: 0;
-    margin-right: -16px;
+    margin-right: -20px;
     width: 100%;
   }
 }
