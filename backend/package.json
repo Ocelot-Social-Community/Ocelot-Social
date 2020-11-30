@@ -83,7 +83,7 @@
     "metascraper-publisher": "^5.11.8",
     "metascraper-soundcloud": "^5.11.8",
     "metascraper-title": "^5.11.8",
-    "metascraper-url": "^5.11.8",
+    "metascraper-url": "^5.14.26",
     "metascraper-video": "^5.11.8",
     "metascraper-youtube": "^5.11.8",
     "migrate": "^1.7.0",
