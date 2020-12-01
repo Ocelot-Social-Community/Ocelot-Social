@@ -137,15 +137,17 @@ export default {
   transition: all $duration-short $ease-out;
 
   .icon-wrapper {
+    margin-right: 2px;
+  }
+
+  .click-wrapper {
     padding: 8px;
-    margin: 4px;
-    padding-left: 20px;
+    align-content: center;
     color: $text-color-disabled;
+    cursor: pointer;
   }
 
   .click-wrapper:hover {
-    cursor: pointer;
-
     &:focus-within {
       background-color: $background-color-base;
       border: $input-border-size solid $border-color-active;
@@ -155,6 +157,7 @@ export default {
       }
     }
   }
+  
 
   &:focus-within {
     background-color: $background-color-base;
@@ -168,12 +171,10 @@ export default {
   .password-field {
     position: relative;
     padding-top: 16px;
-    padding-right: 8px;
     border: none;
     border-style: none;
     appearance: none;
     margin-left: 0;
-    margin-right: -20px;
     width: 100%;
   }
 }
