@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import LoginForm from './LoginForm.vue'
 import Styleguide from '@human-connection/styleguide'
 import Vuex from 'vuex'
@@ -55,6 +56,21 @@ describe('LoginForm', () => {
           email: 'email@example.org',
           password: '1234',
         })
+      })
+    })
+
+    describe('Warning message is visible when caps lock is on', () => {
+      const wrapper = Wrapper()
+
+      it('Caps-lock warning message is hidden on page load', () => {
+        expect(wrapper.find('text.caps-warning').attributes('style')).toEqual('display: none;')
+      })
+
+      it('shows warning when caps-lock is press', async () => {
+        const formWrapper = wrapper.find({ ref: 'form' })
+        formWrapper.trigger('keydown', {key: 'CapsLock'})
+        // await Vue.nextTick()
+        expect(wrapper.vm.caps).toBe(true)
       })
     })
   })

@@ -11,9 +11,11 @@
         </a>
       </template>
       <h2 class="title">{{ $t('login.login') }}</h2>
-      <form :disabled="pending" @submit.prevent="onSubmit" 
-          v-on:keydown.caps-lock="capsLock"
-          v-on:keyup.caps-lock="capsLock">
+      <form 
+          ref="form"
+          :disabled="pending" @submit.prevent="onSubmit" 
+          @keydown.caps-lock="capsLock"
+          @keyup.caps-lock="capsLock">
         <ds-input
           v-model="form.email"
           :disabled="pending"
@@ -106,7 +108,15 @@ export default {
   }
   
   .caps-warning {
+    font-size: 12px;
     color: $text-color-danger;
+    background-color: $background-color-danger-inverse;
+    border: 2px solid $border-color-softer ;
+    border-radius: 5px;
+    padding: 4px 8px;
+    margin-left: 8px;
+    
+
   }
 }
 
