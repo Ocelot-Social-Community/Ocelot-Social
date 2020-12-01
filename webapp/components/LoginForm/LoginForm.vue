@@ -31,7 +31,6 @@
             name="password"
             type="password"
             ref="passwordInput"
-            @focus="capsLock"
           />
         <nuxt-link to="/password-reset/request">
           {{ $t('login.forgotPassword') }}
@@ -72,7 +71,6 @@ export default {
     pending() {
       return this.$store.getters['auth/pending']
     },
-    
   },
   methods: {
     async onSubmit() {
@@ -86,11 +84,9 @@ export default {
       }
     },
     capsLock(e){
-      this.caps = e.getModifierState('CapsLock')
-      console.log(this.caps)
-      // if(document.activeElement.name === 'password') {
-      //   this.caps = !this.caps
-      // }
+      if(document.activeElement.name === 'password') {
+        this.caps = e.getModifierState('CapsLock')
+      }
     }
   },
 }
