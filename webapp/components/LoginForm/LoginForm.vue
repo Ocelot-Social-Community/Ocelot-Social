@@ -157,7 +157,6 @@ export default {
       }
     }
   }
-  
 
   &:focus-within {
     background-color: $background-color-base;
