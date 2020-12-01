@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import LoginForm from './LoginForm.vue'
 import Styleguide from '@human-connection/styleguide'
 import Vuex from 'vuex'
@@ -55,6 +56,44 @@ describe('LoginForm', () => {
           email: 'email@example.org',
           password: '1234',
         })
+      })
+    })
+
+    describe('Visibility of password', () => {
+      const wrapper = Wrapper()
+      it('does not show the password by default', () => {
+        expect(wrapper.find('input[name ="password"]').attributes('type')).toEqual('password')
+      })
+
+      it('shows the password after click on show password', async () => {
+        wrapper.find('span.click-wrapper').trigger('click')
+        await Vue.nextTick()
+        await expect(wrapper.find('input[name = "password"]').attributes('type')).toEqual('text')
+      })
+    })
+
+    describe('Click on show password icon, icon change', () => {
+      const wrapper = Wrapper()
+      it('shows eye icon by default', () => {
+        expect(wrapper.find('span.icon-wrapper').attributes('data-test')).toEqual('eye')
+      })
+
+      it('shows the slash-eye icon after click', async () => {
+        wrapper.find('span.click-wrapper').trigger('click')
+        await Vue.nextTick()
+        await expect(wrapper.find('span.icon-wrapper').attributes('data-test')).toEqual('eye-slash')
+      })
+    })
+
+    describe('Focus on password input container after show-password click', () => {
+      const wrapper = Wrapper()
+      const componentToGetFocus = wrapper.find('input[name ="password"]')
+      it('Focuses on the password field after click', async () => {
+        wrapper.find('span.click-wrapper').trigger('click', {
+          relateTarget: componentToGetFocus,
+        })
+        await Vue.nextTick()
+        await expect(wrapper.emitted('focus')).toBeTruthy()
       })
     })
   })
