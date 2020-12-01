@@ -31,6 +31,7 @@
             name="password"
             type="password"
             ref="passwordInput"
+            @focus="capsLock"
           />
         <nuxt-link to="/password-reset/request">
           {{ $t('login.forgotPassword') }}
@@ -84,10 +85,12 @@ export default {
         this.$toast.error(this.$t('login.failure'))
       }
     },
-    capsLock(){
-      if(document.activeElement.name === 'password') {
-        this.caps = !this.caps
-      }
+    capsLock(e){
+      this.caps = e.getModifierState('CapsLock')
+      console.log(this.caps)
+      // if(document.activeElement.name === 'password') {
+      //   this.caps = !this.caps
+      // }
     }
   },
 }
