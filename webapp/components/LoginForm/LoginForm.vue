@@ -11,7 +11,9 @@
         </a>
       </template>
       <h2 class="title">{{ $t('login.login') }}</h2>
-      <form :disabled="pending" @submit.prevent="onSubmit">
+      <form :disabled="pending" @submit.prevent="onSubmit" 
+          v-on:keydown.caps-lock="capsLock"
+          v-on:keyup.caps-lock="capsLock">
         <ds-input
           v-model="form.email"
           :disabled="pending"
@@ -20,18 +22,20 @@
           name="email"
           icon="envelope"
         />
-        <ds-input
-          v-model="form.password"
-          :disabled="pending"
-          :placeholder="$t('login.password')"
-          icon="lock"
-          icon-right="question-circle"
-          name="password"
-          type="password"
-        />
+          <ds-input
+            v-model="form.password"
+            :disabled="pending"
+            :placeholder="$t('login.password')"
+            icon="lock"
+            icon-right="question-circle"
+            name="password"
+            type="password"
+            ref="passwordInput"
+          />
         <nuxt-link to="/password-reset/request">
           {{ $t('login.forgotPassword') }}
         </nuxt-link>
+        <text class="caps-warning" v-show="caps" >CAPS LOCK ENABLED!</text>
         <base-button :loading="pending" filled name="submit" type="submit" icon="sign-in">
           {{ $t('login.login') }}
         </base-button>
@@ -60,12 +64,14 @@ export default {
         email: '',
         password: '',
       },
+      caps: false,
     }
   },
   computed: {
     pending() {
       return this.$store.getters['auth/pending']
     },
+    
   },
   methods: {
     async onSubmit() {
@@ -78,6 +84,11 @@ export default {
         this.$toast.error(this.$t('login.failure'))
       }
     },
+    capsLock(){
+      if(document.activeElement.name === 'password') {
+        this.caps = !this.caps
+      }
+    }
   },
 }
 </script>
@@ -94,5 +105,10 @@ export default {
     margin-top: $space-large;
     margin-bottom: $space-small;
   }
+  
+  .caps-warning {
+    color: $text-color-danger;
+  }
 }
+
 </style>
