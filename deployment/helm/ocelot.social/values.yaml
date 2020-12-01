@@ -1,5 +1,5 @@
 # domain is the user-facing domain.
-domain: develop.ocelot.social
+domain: develop-docker.ocelot.social
 # commit is the latest github commit deployed.
 commit: 889a7cdd24dda04a139b2b77d626e984d6db6781
 # dbInitialization runs the database initializations in a post-install hook.
@@ -39,7 +39,7 @@ neo4jResourceRequestsMemory: "1G"
 # supportEmail is used for letsencrypt certs.
 supportEmail: "devops@ocelot.social"
 # smtpHost is the host for the mailserver.
-smtpHost: "mailserver.ocelot.social"
+smtpHost: "mail.ocelot.social"
 # smtpPort is the port to be used for the mailserver.
 smtpPort: \"25\"
 # jwtSecret is used to encode/decode a user's JWT for authentication
