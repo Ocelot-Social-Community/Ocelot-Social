@@ -103,7 +103,7 @@
           ></label>
         </ds-text>
         <base-button
-          style="float: right;"
+          style="float: right"
           icon="check"
           type="submit"
           filled
