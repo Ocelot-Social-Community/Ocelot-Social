@@ -20,15 +20,23 @@
           name="email"
           icon="envelope"
         />
-        <ds-input
-          v-model="form.password"
-          :disabled="pending"
-          :placeholder="$t('login.password')"
-          icon="lock"
-          icon-right="question-circle"
-          name="password"
-          type="password"
-        />
+        <div class="password-wrapper">
+          <ds-input
+            v-model="form.password"
+            :disabled="pending"
+            :placeholder="$t('login.password')"
+            icon="lock"
+            name="password"
+            class="password-field"
+            ref="password"
+            :type="showPassword ? 'text' : 'password'"
+          />
+          <span class="click-wrapper" @click="toggleShowPassword">
+            <span class="icon-wrapper" :data-test="iconName">
+              <base-icon class="toggle-icon" :name="iconName" />
+            </span>
+          </span>
+        </div>
         <nuxt-link to="/password-reset/request">
           {{ $t('login.forgotPassword') }}
         </nuxt-link>
@@ -64,11 +72,15 @@ export default {
         email: '',
         password: '',
       },
+      showPassword: false,
     }
   },
   computed: {
     pending() {
       return this.$store.getters['auth/pending']
+    },
+    iconName() {
+      return this.showPassword ? 'eye-slash' : 'eye'
     },
   },
   methods: {
@@ -81,6 +93,14 @@ export default {
       } catch (err) {
         this.$toast.error(this.$t('login.failure'))
       }
+    },
+    toggleShowPassword(event) {
+      this.showPassword = !this.showPassword
+      event.preventDefault()
+      this.$nextTick(() => {
+        this.$refs.password.$el.children[1].children[1].focus()
+        this.$emit('focus')
+      })
     },
   },
 }
@@ -99,6 +119,66 @@ export default {
     margin-bottom: $space-small;
   }
   .image {
+    width: 100%;
+  }
+}
+
+.password-wrapper {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: $input-padding-vertical $space-x-small;
+  padding-left: 0;
+  padding-right: 0;
+  height: $input-height;
+  margin-bottom: 10px;
+
+  color: $text-color-base;
+  background: $background-color-disabled;
+
+  border: $input-border-size solid $border-color-softer;
+  border-radius: $border-radius-base;
+  outline: none;
+  transition: all $duration-short $ease-out;
+
+  .icon-wrapper {
+    margin-right: 2px;
+  }
+
+  .click-wrapper {
+    padding: 8px;
+    align-content: center;
+    color: $text-color-disabled;
+    cursor: pointer;
+  }
+
+  .click-wrapper:hover {
+    &:focus-within {
+      background-color: $background-color-base;
+      border: $input-border-size solid $border-color-active;
+
+      .toggle-icon {
+        color: $text-color-base;
+      }
+    }
+  }
+
+  &:focus-within {
+    background-color: $background-color-base;
+    border: $input-border-size solid $border-color-active;
+
+    .toggle-icon {
+      color: $text-color-base;
+    }
+  }
+
+  .password-field {
+    position: relative;
+    padding-top: 16px;
+    border: none;
+    border-style: none;
+    appearance: none;
+    margin-left: 0;
     width: 100%;
   }
 }
