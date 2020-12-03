@@ -8,7 +8,11 @@
       @submit="handleSubmit"
     >
       <h1>
-        {{ invitation ? $t('profile.invites.title') : $t('components.registration.signup.title') }}
+        {{
+          invitation
+            ? $t('profile.invites.title', metadata)
+            : $t('components.registration.signup.title', metadata)
+        }}
       </h1>
       <ds-space v-if="token" margin-botton="large">
         <ds-text v-html="$t('registration.signup.form.invitation-code', { code: token })" />
@@ -64,6 +68,7 @@
 
 <script>
 import gql from 'graphql-tag'
+import metadata from '~/constants/metadata'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 
 export const SignupMutation = gql`
@@ -91,6 +96,7 @@ export default {
   },
   data() {
     return {
+      metadata,
       formData: {
         email: '',
       },

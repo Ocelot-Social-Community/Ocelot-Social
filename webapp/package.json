@@ -1,13 +1,13 @@
 {
-  "name": "human-connection-webapp",
+  "name": "ocelot-social-webapp",
   "version": "0.6.3",
-  "description": "Human Connection Frontend",
+  "description": "ocelot.social Frontend",
   "authors": [
     "Grzegorz Leoniec (appinteractive)",
     "ulfgebhardt"
   ],
   "license": "MIT",
-  "author": "Human Connection gGmbH",
+  "author": "ocelot.social Community",
   "private": false,
   "scripts": {
     "dev": "nuxt",

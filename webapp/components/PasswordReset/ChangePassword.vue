@@ -49,8 +49,9 @@
           </p>
           <p>
             {{ $t('components.password-reset.change-password.help') }}
-            <br />
-            <a href="mailto:support@human-connection.org">support@human-connection.org</a>
+          </p>
+          <p>
+            <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
           </p>
         </ds-text>
       </template>
@@ -60,6 +61,7 @@
 </template>
 
 <script>
+import emails from '../../constants/emails.js'
 import PasswordStrength from '../Password/Strength'
 import gql from 'graphql-tag'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
@@ -77,6 +79,7 @@ export default {
   data() {
     const passwordForm = PasswordForm({ translate: this.$t })
     return {
+      supportEmail: emails.SUPPORT,
       formData: {
         ...passwordForm.formData,
       },

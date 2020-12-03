@@ -1,13 +1,8 @@
 version: "3.4"
 
 services:
-  mailserver:
-    image: djfarrelly/maildev
-    ports:
-      - 1080:80
-    networks:
-      - hc-network
   webapp:
+    image: schoolsinmotion/webapp:build-and-test
     build:
       context: webapp
       target: build-and-test
@@ -15,9 +10,12 @@ services:
       - ./webapp:/develop-webapp
     environment:
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
-      - PUBLIC_REGISTRATION=false
+      - PUBLIC_REGISTRATION=true
     command: yarn run dev
+    volumes:
+      - webapp_node_modules:/nitro-web/node_modules
   backend:
+    image: schoolsinmotion/backend:build-and-test
     build:
       context: backend
       target: build-and-test
@@ -30,6 +28,12 @@ services:
       - SMTP_IGNORE_TLS=true
       - "DEBUG=${DEBUG}"
       - PUBLIC_REGISTRATION=false
+    volumes:
+      - backend_node_modules:/nitro-backend/node_modules
+      - uploads:/nitro-backend/public/uploads
+  neo4j:
+    volumes:
+      - neo4j_data:/data
   maintenance:
     image: ocelotsocialnetwork/develop-maintenance:latest
     build:
@@ -39,6 +43,17 @@ services:
       - hc-network
     ports:
       - 3503:80
+  mailserver:
+    image: djfarrelly/maildev
+    ports:
+      - 1080:80
+    networks:
+      - hc-network
 
 networks:
   hc-network:
+volumes:
+  webapp_node_modules:
+  backend_node_modules:
+  neo4j_data:
+  uploads:

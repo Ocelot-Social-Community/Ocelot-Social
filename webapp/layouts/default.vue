@@ -1,12 +1,12 @@
 <template>
   <div class="layout-default">
     <div class="main-navigation">
-      <ds-container class="main-navigation-container" style="padding: 10px 10px;">
+      <ds-container class="main-navigation-container" style="padding: 10px 10px">
         <div>
           <ds-flex class="main-navigation-flex">
             <ds-flex-item :width="{ base: '142px' }">
               <nuxt-link :to="{ name: 'index' }" v-scroll-to="'.main-navigation'">
-                <ds-logo />
+                <logo />
               </nuxt-link>
             </ds-flex-item>
             <ds-flex-item
@@ -18,7 +18,7 @@
             <ds-flex-item
               :width="{ base: '45%', sm: '45%', md: '45%', lg: '50%' }"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-              style="flex-shrink: 0; flex-grow: 1;"
+              style="flex-shrink: 0; flex-grow: 1"
               id="nav-search-box"
               v-if="isLoggedIn"
             >
@@ -27,14 +27,14 @@
             <ds-flex-item
               v-if="isLoggedIn"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-              style="flex-grow: 0; flex-basis: auto;"
+              style="flex-grow: 0; flex-basis: auto"
             >
               <client-only>
                 <filter-menu v-show="showFilterMenuDropdown" />
               </client-only>
             </ds-flex-item>
             <ds-flex-item
-              style="background-color: white; flex-basis: auto;"
+              style="background-color: white; flex-basis: auto"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             >
               <div
@@ -43,7 +43,7 @@
                   'desktop-view': !toggleMobileMenu,
                   'hide-mobile-menu': !toggleMobileMenu,
                 }"
-                style="flex-basis: auto;"
+                style="flex-basis: auto"
               >
                 <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
                 <template v-if="isLoggedIn">
@@ -74,6 +74,7 @@
 </template>
 
 <script>
+import Logo from '~/components/Logo/Logo'
 import { mapGetters } from 'vuex'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
@@ -86,6 +87,7 @@ import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 
 export default {
   components: {
+    Logo,
     LocaleSwitch,
     SearchField,
     Modal,
