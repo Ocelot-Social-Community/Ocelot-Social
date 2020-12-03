@@ -9,7 +9,7 @@ just apply our provided configuration files to your cluster.
 Change into the `./deployment` directory and copy our provided templates:
 
 ```bash
-# in folder deployment/human-connection/
+# in folder deployment/ocelot-social/
 $ cp templates/secrets.template.yaml ./secrets.yaml
 $ cp templates/configmap.template.yaml ./configmap.yaml
 ```

@@ -82,6 +82,7 @@ Sprint planning
 * we select and prioritise the issues we will work on in the following two weeks
 
 Sprint retrospective
+
 * bi-weekly on Monday 13:00
 * via this [zoom link](https://zoom.us/j/7743582385)
 * all contributors welcome (most interesting for those who participated in the sprint)
@@ -90,6 +91,7 @@ Sprint retrospective
 ## Philosophy
 
 We practise [collective code ownership](http://www.extremeprogramming.org/rules/collective.html) rather than strong code ownership, which means that:
+
 * developers can make contributions to other people's PRs (after checking in with them)
 * we avoid blocking because someone else isn't working, so we sometimes take over PRs from other developers
 * everyone should always push their code to branches so others can see it
@@ -104,6 +106,7 @@ As a volunteeer you have no commitment except your own self development and your
 ## Open-Source Bounties
 
 There are so many good reasons to contribute to Human Connection
+
 * You learn state-of-the-art technologies
 * You build your portfolio
 * You contribute to a good cause

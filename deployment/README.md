@@ -7,4 +7,4 @@ and set up a kubernetes cluster. Since there are many different options to host 
 We have tested two different kubernetes providers: [Minikube](./minikube/README.md)
 and [Digital Ocean](./digital-ocean/README.md).
 
-Check out the specific documentation for your provider. After that, choose whether you want to go with the recommended deploy option [Helm](./helm/README.md), or use kubernetes to apply the configuration for [Human Connection](./human-connection/README.md).
+Check out the specific documentation for your provider. After that, choose whether you want to go with the recommended deploy option [Helm](./helm/README.md), or use kubernetes to apply the configuration for [Human Connection](./ocelot-social/README.md).
