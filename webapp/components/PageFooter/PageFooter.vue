@@ -1,25 +1,25 @@
 <template>
   <div id="footer" class="ds-footer">
-    <a href="https://human-connection.org" target="_blank" v-html="$t('site.made')"></a>
+    <a :href="links.ORGANIZATION" target="_blank" v-html="$t('site.made')"></a>
     <span>-</span>
-    <a href="https://human-connection.org/impressum/" target="_blank">
+    <nuxt-link to="/imprint">
       {{ $t('site.imprint') }}
-    </a>
+    </nuxt-link>
     <span>-</span>
     <nuxt-link to="/terms-and-conditions">{{ $t('site.termsAndConditions') }}</nuxt-link>
     <span>-</span>
     <nuxt-link to="/code-of-conduct">{{ $t('site.code-of-conduct') }}</nuxt-link>
     <span>-</span>
-    <a href="https://human-connection.org/datenschutz/" target="_blank">
+    <nuxt-link to="/data-privacy">
       {{ $t('site.data-privacy') }}
-    </a>
+    </nuxt-link>
     <span>-</span>
-    <a href="https://faq.human-connection.org/" target="_blank">
+    <a :href="links.FAQ" target="_blank">
       {{ $t('site.faq') }}
     </a>
     <span>-</span>
     <a
-      href="https://github.com/Human-Connection/Human-Connection/blob/master/CHANGELOG.md"
+      href="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/CHANGELOG.md"
       target="_blank"
     >
       {{ version }}
@@ -28,9 +28,10 @@
 </template>
 
 <script>
+import links from '~/constants/links.js'
 export default {
   data() {
-    return { version: `v${process.env.release}` }
+    return { links, version: `v${process.env.release}` }
   },
 }
 </script>

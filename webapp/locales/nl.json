@@ -84,12 +84,11 @@
     "following": "Volgt"
   },
   "login": {
-    "copy": "Als u al een mini-aansluiting account heeft, log dan hier in.",
     "email": "Uw E-mail",
     "hello": "Hallo",
     "login": "Inloggen",
     "logout": "Uitloggen",
-    "moreInfo": "Wat is Human Connection?",
+    "moreInfo": "Wat is {APPLICATION_NAME}?",
     "password": "Uw Wachtwoord"
   },
   "post": {

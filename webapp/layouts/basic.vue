@@ -6,7 +6,7 @@
           <ds-flex-item width="5.5%" />
           <ds-flex-item style="flex-grow: 1" width="20%">
             <a @click="redirectToRoot">
-              <ds-logo />
+              <logo />
             </a>
           </ds-flex-item>
           <ds-flex-item width="20%" style="flex-grow: 0">
@@ -26,12 +26,14 @@
 </template>
 
 <script>
+import Logo from '~/components/Logo/Logo'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import seo from '~/mixins/seo'
 import PageFooter from '~/components/PageFooter/PageFooter'
 
 export default {
   components: {
+    Logo,
     LocaleSwitch,
     PageFooter,
   },

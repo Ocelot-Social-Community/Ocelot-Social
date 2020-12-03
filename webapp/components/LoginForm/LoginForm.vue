@@ -6,8 +6,8 @@
     </blockquote>
     <base-card>
       <template #imageColumn>
-        <a :href="$t('login.moreInfoURL')" :title="$t('login.moreInfo')" target="_blank">
-          <img class="image" alt="Human Connection" src="/img/sign-up/humanconnection.svg" />
+        <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
+          <img class="image" alt="Welcome" src="/img/custom/welcome.svg" />
         </a>
       </template>
       <h2 class="title">{{ $t('login.login') }}</h2>
@@ -57,15 +57,17 @@
 
 <script>
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
-import BaseIcon from '../_new/generic/BaseIcon/BaseIcon'
+import links from '~/constants/links.js'
+import metadata from '~/constants/metadata.js'
 
 export default {
   components: {
     LocaleSwitch,
-    BaseIcon,
   },
   data() {
     return {
+      metadata,
+      links,
       form: {
         email: '',
         password: '',
@@ -115,6 +117,9 @@ export default {
     width: 100%;
     margin-top: $space-large;
     margin-bottom: $space-small;
+  }
+  .image {
+    width: 100%;
   }
 }
 
