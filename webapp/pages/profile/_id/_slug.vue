@@ -112,7 +112,7 @@
               <template>
                 <ds-space v-for="link in socialMediaLinks" :key="link.username" margin="x-small">
                   <a :href="link.url" target="_blank">
-                    <ds-avatar :image="link.favicon" :size="16" />
+                    <img :src="link.favicon" alt="Link:" height="22" width="22" />
                     {{ link.username }}
                   </a>
                 </ds-space>
