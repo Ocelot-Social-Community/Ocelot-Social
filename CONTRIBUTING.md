@@ -6,7 +6,7 @@ Thank you so much for thinking of contributing to the Human Connection project! 
 
 Instructions for how to install all the necessary software and some code guidelines can be found in our [documentation](https://docs.human-connection.org/human-connection/).
 
-To get you started we recommend that you join forces with a regular contributor. Please join [our discord instance](https://human-connection.org/discord) to chat with developers or just get in touch directly on an issue on either [Github](https://github.com/Human-Connection/Human-Connection/issues) or [Zenhub](https://app.zenhub.com/workspaces/human-connection-nitro-5c0154ecc699f60fc92cf11f/boards?repos=152252353):
+To get you started we recommend that you join forces with a regular contributor. Please join [our discord instance](https://human-connection.org/discord) to chat with developers or just get in touch directly on an issue on either [Github](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues) or [Zenhub](https://app.zenhub.com/workspaces/human-connection-nitro-5c0154ecc699f60fc92cf11f/boards?repos=152252353):
 
 ![](https://dl.dropbox.com/s/vbmcihkduy9dhko/Screenshot%202019-01-03%2015.50.11.png?dl=0)
 
@@ -14,7 +14,7 @@ We also have regular pair programming sessions that you are very welcome to join
 
 ## Development Flow
 
-We operate in two week sprints that are planned, estimated and prioritised on [Zenhub](https://app.zenhub.com/workspaces/human-connection-nitro-5c0154ecc699f60fc92cf11f). All issues are also linked to and synced with [Github](https://github.com/Human-Connection/Human-Connection/issues). Look for the `good first issue` label if you're not sure where to start!
+We operate in two week sprints that are planned, estimated and prioritised on [Zenhub](https://app.zenhub.com/workspaces/human-connection-nitro-5c0154ecc699f60fc92cf11f). All issues are also linked to and synced with [Github](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues). Look for the `good first issue` label if you're not sure where to start!
 
 We try to discuss all questions directly related to a feature or bug in the respective issue, in order to preserve it for the future and for other developers. We use discord for real-time communication.
 
@@ -123,7 +123,7 @@ team, learning the workflow, and understanding this contribution guide. You can
 filter issues by 'good first issue', to get an idea where to start. Please join
 our our [community chat](https://human-connection.org/discord), too.
 
-You can filter Github issues with label [bounty](https://github.com/Human-Connection/Human-Connection/issues?q=is%3Aopen+is%3Aissue+label%3Abounty). These issues should have a second label `€<amount>`
+You can filter Github issues with label [bounty](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues?q=is%3Aopen+is%3Aissue+label%3Abounty). These issues should have a second label `€<amount>`
 which indicate their respective financial compensation in Euros.
 
 You can bill us after your pull request got approved and merged into `master`.

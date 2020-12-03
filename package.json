@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Human-Connection/Human-Connection.git"
+    "url": "https://github.com/Ocelot-Social-Community/Ocelot-Social.git"
   },
   "cypress-cucumber-preprocessor": {
     "nonGlobalStepDefinitions": true

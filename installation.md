@@ -1,6 +1,6 @@
 # Installation
 
-The repository can be found on GitHub. [https://github.com/Human-Connection/Human-Connection](https://github.com/Human-Connection/Human-Connection)
+The repository can be found on GitHub. [https://github.com/Ocelot-Social-Community/Ocelot-Social](https://github.com/Ocelot-Social-Community/Ocelot-Social)
 
 We give write permissions to every developer who asks for it. Just text us on
 [Discord](https://discord.gg/6ub73U3).
@@ -13,7 +13,7 @@ Clone the repository, this will create a new folder called `Human-Connection`:
 {% tabs %}
 {% tab title="HTTPS" %}
 ```bash
-$ git clone https://github.com/Human-Connection/Human-Connection.git
+$ git clone https://github.com/Ocelot-Social-Community/Ocelot-Social.git
 ```
 {% endtab %}
 

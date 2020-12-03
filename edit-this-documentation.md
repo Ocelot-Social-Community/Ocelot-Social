@@ -1,6 +1,6 @@
 # Edit this Documentation
 
-Find the [**table of contents** for this documentation on GitHub](https://github.com/Human-Connection/Human-Connection/blob/master/SUMMARY.md) and navigate to the file you need to update.
+Find the [**table of contents** for this documentation on GitHub](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/SUMMARY.md) and navigate to the file you need to update.
 
 Click on the **edit pencil** on the right side directly above the text to edit this file on your fork of Human Connection \(HC\).
 
@@ -8,7 +8,7 @@ You can see a preview of your changes by clicking the **Preview changes** tab as
 
 If you are ready, fill in the **Propose file change** at the end of the webpage.
 
-After that you have to send your change to the HC basis with a pull request. Here make a comment which issue you have fixed. (If you are working on one of our [open issues](https://github.com/Human-Connection/Human-Connection/issues) please include the number.)
+After that you have to send your change to the HC basis with a pull request. Here make a comment which issue you have fixed. (If you are working on one of our [open issues](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues) please include the number.)
 
 ## Markdown your documentation
 
