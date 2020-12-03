@@ -18,4 +18,4 @@
     COMMIT: ""
   metadata:
     name: configmap
-    namespace: human-connection
+    namespace: ocelot-social

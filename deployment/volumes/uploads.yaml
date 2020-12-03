@@ -3,7 +3,7 @@
   apiVersion: v1
   metadata:
     name: uploads-claim
-    namespace: human-connection
+    namespace: ocelot-social
   spec:
     accessModes:
       - ReadWriteOnce

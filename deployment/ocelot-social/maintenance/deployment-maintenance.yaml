@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: maintenance
-  namespace: human-connection
+  namespace: ocelot-social
 spec:
   selector:
     matchLabels:

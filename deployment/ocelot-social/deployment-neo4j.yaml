@@ -5,7 +5,7 @@ metadata:
   labels:
     human-connection.org/selector: deployment-human-connection-neo4j
   name: neo4j
-  namespace: human-connection
+  namespace: ocelot-social
 spec:
   progressDeadlineSeconds: 2147483647
   replicas: 1

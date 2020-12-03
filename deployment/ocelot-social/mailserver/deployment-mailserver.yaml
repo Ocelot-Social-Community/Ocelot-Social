@@ -5,7 +5,7 @@ metadata:
   labels:
     human-connection.org/selector: deployment-human-connection-mailserver
   name: mailserver
-  namespace: human-connection
+  namespace: ocelot-social
 spec:
   minReadySeconds: 15
   progressDeadlineSeconds: 60
@@ -31,7 +31,7 @@ spec:
         - configMapRef:
             name: configmap
         - secretRef:
-            name: human-connection
+            name: ocelot-social
         image: djfarrelly/maildev
         imagePullPolicy: Always
         name: mailserver

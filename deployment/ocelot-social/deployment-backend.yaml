@@ -6,7 +6,7 @@ metadata:
     human-connection.org/commit: COMMIT
     human-connection.org/selector: deployment-human-connection-backend
   name: backend
-  namespace: human-connection
+  namespace: ocelot-social
 spec:
   minReadySeconds: 15
   progressDeadlineSeconds: 60
@@ -35,7 +35,7 @@ spec:
         - configMapRef:
             name: configmap
         - secretRef:
-            name: human-connection
+            name: ocelot-social
         image: ocelotsocialnetwork/develop-backend:latest
         imagePullPolicy: Always
         name: backend

@@ -3,7 +3,7 @@
   kind: Issuer
   metadata:
     name: letsencrypt-staging
-    namespace: human-connection
+    namespace: ocelot-social
   spec:
     acme:
       # The ACME server URL
@@ -20,7 +20,7 @@
    kind: Issuer
    metadata:
      name: letsencrypt-prod
-     namespace: human-connection
+     namespace: ocelot-social
    spec:
      acme:
        # The ACME server URL

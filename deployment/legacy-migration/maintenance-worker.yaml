@@ -3,7 +3,7 @@
   apiVersion: v1
   metadata:
     name: develop-maintenance-worker
-    namespace: human-connection
+    namespace: ocelot-social
   spec:
     containers:
     - name: develop-maintenance-worker

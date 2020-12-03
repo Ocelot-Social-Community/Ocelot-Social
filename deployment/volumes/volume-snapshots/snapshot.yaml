@@ -3,7 +3,7 @@
   kind: VolumeSnapshot
   metadata:
     name: uploads-snapshot
-    namespace: human-connection
+    namespace: ocelot-social
   spec:
     source:
       name: uploads-claim
