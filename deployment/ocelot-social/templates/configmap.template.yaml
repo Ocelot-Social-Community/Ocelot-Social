@@ -2,7 +2,7 @@
   apiVersion: v1
   kind: ConfigMap
   data:
-    SMTP_HOST: "mailserver.human-connection"
+    SMTP_HOST: "mail.ocelot.social"
     SMTP_PORT: "25"
     GRAPHQL_URI: "http://backend.human-connection:4000"
     NEO4J_URI: "bolt://neo4j.human-connection:7687"

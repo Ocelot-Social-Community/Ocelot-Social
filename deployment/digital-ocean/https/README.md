@@ -53,7 +53,7 @@ $ kubectl describe --namespace=human-connection certificate tls
 $ kubectl describe --namespace=human-connection secret tls
 ```
 
-If everything looks good, update the issuer of your ingress. Change the annotation `certmanager.k8s.io/issuer` from `letsencrypt-staging` to `letsencrypt-prod` in your ingress configuration in `ingress.yaml`.
+If everything looks good, update the issuer of your ingress. Change the annotation `certmanager.k8s.io/issuer` from `letsencrypt-develop` to `letsencrypt-production` in your ingress configuration in `ingress.yaml`.
 
 ```bash
 # in folder deployment/digital-ocean/https/

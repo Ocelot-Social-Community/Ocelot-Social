@@ -2,7 +2,7 @@
   apiVersion: certmanager.k8s.io/v1alpha1
   kind: Issuer
   metadata:
-    name: letsencrypt-staging
+    name: letsencrypt-develop
     namespace: ocelot-social
   spec:
     acme:
@@ -12,14 +12,14 @@
       email: user@example.com
       # Name of a secret used to store the ACME account private key
       privateKeySecretRef:
-        name: letsencrypt-staging
+        name: letsencrypt-develop
       # Enable the HTTP-01 challenge provider
       http01: {}
 ---
    apiVersion: certmanager.k8s.io/v1alpha1
    kind: Issuer
    metadata:
-     name: letsencrypt-prod
+     name: letsencrypt-production
      namespace: ocelot-social
    spec:
      acme:
@@ -29,6 +29,6 @@
        email: user@example.com
        # Name of a secret used to store the ACME account private key
        privateKeySecretRef:
-         name: letsencrypt-prod
+         name: letsencrypt-production
        # Enable the HTTP-01 challenge provider
        http01: {}
