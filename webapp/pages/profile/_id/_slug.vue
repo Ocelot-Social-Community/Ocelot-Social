@@ -87,7 +87,7 @@
           </template>
         </base-card>
         <ds-space />
-        <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
+        <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px;">
           {{ $t('profile.network.title') }}
         </ds-heading>
         <follow-list
@@ -104,7 +104,7 @@
           @fetchAllConnections="fetchAllConnections"
         />
         <ds-space v-if="user.socialMedia && user.socialMedia.length" margin="large">
-          <base-card style="position: relative; height: auto">
+          <base-card style="position: relative; height: auto;">
             <ds-space margin="x-small">
               <ds-text tag="h5" color="soft">
                 {{ $t('profile.socialMedia') }} {{ userName | truncate(15) }}?
