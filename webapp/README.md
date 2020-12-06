@@ -98,7 +98,7 @@ You can then visit the Storybook playground on `http://localhost:3002`
 
 ## Styleguide Migration
 
-We are currently in the process of migrating our styleguide components and design tokens from the [Nitro Styleguide](https://github.com/Human-Connection/Nitro-Styleguide) into the main [Human Connection repository](https://github.com/Human-Connection/Human-Connection) and refactoring our components in the process. During this migration, our new components will live in a `_new/` folder to separate them from the old, yet untouched components.
+We are currently in the process of migrating our styleguide components and design tokens from the [Nitro Styleguide](https://github.com/Ocelot-Social-Community/HC-Styleguide-20201003) into the main [ocelot.social repository](https://github.com/Ocelot-Social-Community/Ocelot-Social) and refactoring our components in the process. During this migration, our new components will live in a `_new/` folder to separate them from the old, yet untouched components.
 
 ### Folder Structure
 

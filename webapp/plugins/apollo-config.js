@@ -16,7 +16,7 @@ export default ({ req, nuxtState }) => {
       credentials: 'same-origin',
     },
     credentials: true,
-    tokenName: 'human-connection-token',
+    tokenName: 'ocelot-social-token',
     persisting: false,
     websocketsOnly: false,
     cache: new InMemoryCache({ fragmentMatcher }),

@@ -8,7 +8,7 @@ export default {
   manifest,
 
   head: {
-    title: 'Human Connection',
+    title: manifest.name,
     meta: [
       {
         charset: 'utf-8',
@@ -20,7 +20,7 @@ export default {
       {
         hid: 'description',
         name: 'description',
-        content: 'Maintenance page for Human Connection',
+        content: `Maintenance page for ${manifest.name}`,
       },
     ],
     link: [
@@ -46,6 +46,16 @@ export default {
         name: 'maintenance',
         path: '*',
         component: resolve(__dirname, 'pages/index.vue'),
+      })
+    },
+  },
+  build: {
+    extend(config, ctx) {
+      config.module.rules.push({
+        enforce: 'pre',
+        test: /\.html$/,
+        loader: 'raw-loader',
+        exclude: /(node_modules)/,
       })
     },
   },

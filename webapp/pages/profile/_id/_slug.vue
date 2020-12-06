@@ -5,7 +5,7 @@
       <ds-flex-item :width="{ base: '100%', sm: 2, md: 2, lg: 1 }">
         <base-card
           :class="{ 'disabled-content': user.disabled }"
-          style="position: relative; height: auto; overflow: visible;"
+          style="position: relative; height: auto; overflow: visible"
         >
           <hc-upload v-if="myProfile" :user="user">
             <user-avatar :user="user" class="profile-avatar" size="large"></user-avatar>
@@ -87,7 +87,7 @@
           </template>
         </base-card>
         <ds-space />
-        <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px;">
+        <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
           {{ $t('profile.network.title') }}
         </ds-heading>
         <follow-list

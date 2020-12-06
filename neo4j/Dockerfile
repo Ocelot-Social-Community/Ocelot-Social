@@ -1,7 +1,7 @@
 FROM neo4j:3.5.14
+LABEL Description="Neo4J database of the Social Network ocelot.social with preinstalled database constraints and indices" Vendor="ocelot.social Community" Version="0.0.1" Maintainer="ocelot.social Community (devops@ocelot.social)"
 # community edition 👆🏼, because we have no enterprise licence 👇🏼 at the moment
 # FROM neo4j:3.5.14-enterprise
-LABEL Description="Neo4J database of the Social Network Human-Connection.org with preinstalled database constraints and indices" Vendor="Human Connection gGmbH" Version="0.0.1" Maintainer="Human Connection gGmbH (developer@human-connection.org)"
 
 ARG BUILD_COMMIT
 ENV BUILD_COMMIT=$BUILD_COMMIT

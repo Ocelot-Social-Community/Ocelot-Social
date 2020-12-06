@@ -1,7 +1,15 @@
 import dotenv from 'dotenv'
+import links from './links.js'
+import metadata from './metadata.js'
+
 if (require.resolve) {
   // are we in a nodejs environment?
-  dotenv.config({ path: require.resolve('../../.env') })
+  try {
+    dotenv.config({ path: require.resolve('../../.env') })
+  } catch (error) {
+    if (error.code !== 'MODULE_NOT_FOUND') throw error
+    console.log('WARN: No `.env` file found in /backend') // eslint-disable-line no-console
+  }
 }
 
 // eslint-disable-next-line no-undef
@@ -31,6 +39,7 @@ const {
   REDIS_DOMAIN,
   REDIS_PORT,
   REDIS_PASSWORD,
+  EMAIL_DEFAULT_SENDER,
 } = env
 
 export const requiredConfigs = {
@@ -83,6 +92,13 @@ export const s3Configs = {
   S3_CONFIGURED,
 }
 
+export const customConfigs = {
+  EMAIL_DEFAULT_SENDER,
+  SUPPORT_URL: links.SUPPORT,
+  APPLICATION_NAME: metadata.APPLICATION_NAME,
+  ORGANIZATION_URL: links.ORGANIZATION,
+}
+
 export default {
   ...requiredConfigs,
   ...smtpConfigs,
@@ -92,4 +108,5 @@ export default {
   ...sentryConfigs,
   ...redisConfigs,
   ...s3Configs,
+  ...customConfigs,
 }
