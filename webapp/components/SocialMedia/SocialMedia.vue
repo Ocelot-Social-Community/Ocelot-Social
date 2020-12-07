@@ -1,6 +1,6 @@
 <template>
   <ds-space v-if="user.socialMedia && user.socialMedia.length" margin="large">
-    <base-card style="position: relative; height: auto;">
+    <base-card class="social-media-bc">
       <ds-space margin="x-small">
         <ds-text tag="h5" color="soft">
           {{ $t('profile.socialMedia') }} {{ userName | truncate(15) }}?
@@ -40,3 +40,10 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.social-media-bc {
+  position: relative;
+  height: auto;
+}
+</style>
