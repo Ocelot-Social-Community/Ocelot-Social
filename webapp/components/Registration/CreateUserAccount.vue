@@ -16,7 +16,7 @@
     </ds-text>
     <ds-text align="center">
       {{ $t('components.registration.create-user-account.help') }}
-      <a :href="supportEmail.href">{{ supportEmail.label }}</a>
+      <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
     </ds-text>
     <ds-space centered>
       <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
@@ -69,17 +69,21 @@
             v-model="termsAndConditionsConfirmed"
             :checked="termsAndConditionsConfirmed"
           />
-          <label
-            for="checkbox0"
-            v-html="$t('termsAndConditions.termsAndConditionsConfirmed')"
-          ></label>
+          <label for="checkbox0">
+            {{ $t('termsAndConditions.termsAndConditionsConfirmed') }}
+            <br />
+            <nuxt-link to="/terms-and-conditions">{{ $t('site.termsAndConditions') }}</nuxt-link>
+          </label>
         </ds-text>
         <ds-text>
           <input id="checkbox1" type="checkbox" v-model="dataPrivacy" :checked="dataPrivacy" />
-          <label
-            for="checkbox1"
-            v-html="$t('components.registration.signup.form.data-privacy')"
-          ></label>
+          <label for="checkbox1">
+            {{ $t('components.registration.signup.form.data-privacy') }}
+            <br />
+            <nuxt-link to="/data-privacy">
+              {{ $t('site.data-privacy') }}
+            </nuxt-link>
+          </label>
         </ds-text>
         <ds-text>
           <input id="checkbox2" type="checkbox" v-model="minimumAge" :checked="minimumAge" />
@@ -103,7 +107,7 @@
           ></label>
         </ds-text>
         <base-button
-          style="float: right;"
+          style="float: right"
           icon="check"
           type="submit"
           filled
@@ -125,12 +129,13 @@
 </template>
 
 <script>
+import links from '~/constants/links'
 import PasswordStrength from '../Password/Strength'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
-import { SUPPORT_EMAIL } from '~/constants/emails.js'
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { SignupVerificationMutation } from '~/graphql/Registration.js'
+import emails from '~/constants/emails'
 
 export default {
   components: {
@@ -140,7 +145,8 @@ export default {
   data() {
     const passwordForm = PasswordForm({ translate: this.$t })
     return {
-      supportEmail: SUPPORT_EMAIL,
+      links,
+      supportEmail: emails.SUPPORT,
       formData: {
         name: '',
         about: '',

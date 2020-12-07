@@ -24,11 +24,7 @@
         <div v-if="formData.image" class="blur-toggle">
           <label for="blur-img">{{ $t('contribution.inappropriatePicture') }}</label>
           <input type="checkbox" id="blur-img" v-model="formData.imageBlurred" />
-          <a
-            href="https://support.human-connection.org/kb/faq.php?id=113"
-            target="_blank"
-            class="link"
-          >
+          <a :href="links.FAQ" target="_blank" class="link">
             {{ $t('contribution.inappropriatePictureText') }}
             <base-icon name="question-circle" />
           </a>
@@ -92,6 +88,7 @@ import locales from '~/locales'
 import PostMutations from '~/graphql/PostMutations.js'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import ImageUploader from '~/components/ImageUploader/ImageUploader'
+import links from '~/constants/links.js'
 
 export default {
   components: {
@@ -114,6 +111,7 @@ export default {
     const { sensitive: imageBlurred = false, aspectRatio: imageAspectRatio = null } = image || {}
 
     return {
+      links,
       formData: {
         title: title || '',
         content: content || '',

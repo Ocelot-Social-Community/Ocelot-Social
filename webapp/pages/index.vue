@@ -7,7 +7,7 @@
       <ds-grid-item :row-span="2" column-span="fullWidth" class="top-info-bar">
         <!--<donation-info /> -->
         <div>
-          <a target="_blank" href="https://human-connection.org/spenden/">
+          <a target="_blank" :href="links.DONATE">
             <base-button filled>{{ $t('donations.donate-now') }}</base-button>
           </a>
         </div>
@@ -74,6 +74,7 @@ import { mapGetters, mapMutations } from 'vuex'
 import { filterPosts } from '~/graphql/PostQuery.js'
 import PostMutations from '~/graphql/PostMutations'
 import UpdateQuery from '~/components/utils/UpdateQuery'
+import links from '~/constants/links.js'
 
 export default {
   components: {
@@ -87,6 +88,7 @@ export default {
   data() {
     const { hashtag = null } = this.$route.query
     return {
+      links,
       posts: [],
       hasMore: true,
       // Initialize your apollo data
