@@ -5,7 +5,7 @@
     name: neo4j-data-claim
     namespace: ocelot-social
     labels:
-      app: human-connection
+      app: ocelot-social
   spec:
     dataSource:
       name: neo4j-data-snapshot
