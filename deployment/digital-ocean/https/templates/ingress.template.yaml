@@ -19,7 +19,7 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: web
+              serviceName: develop-maintenance
               servicePort: 3000
   - host: mail.ocelot.social
     http:

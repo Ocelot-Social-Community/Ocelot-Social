@@ -23,12 +23,12 @@ This will fire up a maintenance service.
 Now if you want to have a controlled downtime and you want to bring your
 application into maintenance mode, you can edit your global ingress server.
 
-E.g. in file `deployment/digital-ocean/https/ingress.yaml` change the following:
+E.g. copy file [`deployment/digital-ocean/https/templates/ingress.template.yaml`](../templates/ingress.template.yaml) to new file `deployment/digital-ocean/https/ingress.yaml` and change the following:
 
 ```yaml
 ...
 
-  - host: nitro-staging.human-connection.org
+  - host: develop-k8s.ocelot.social
     http:
       paths:
       - path: /
