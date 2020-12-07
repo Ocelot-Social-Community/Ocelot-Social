@@ -1,7 +1,7 @@
 # Development Mail Server
 
 You can deploy a fake smtp server which captures all send mails and displays
-them in a web interface. The [sample configuration](../templates/configmap.template.yml)
+them in a web interface. The [sample configuration](../templates/configmap.template.yaml)
 is assuming such a dummy server in the `SMTP_HOST` configuration and points to
 a cluster-internal SMTP server.
 
