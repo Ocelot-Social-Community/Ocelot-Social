@@ -1,6 +1,6 @@
-# Kubernetes Configuration for Human Connection
+# Kubernetes Configuration for ocelot.social
 
-Deploying Human Connection with kubernetes is straight forward. All you have to
+Deploying ocelot.social with kubernetes is straight forward. All you have to
 do is to change certain parameters, like domain names and API keys, then you
 just apply our provided configuration files to your cluster.
 
@@ -19,9 +19,9 @@ environment variables in your deployed kubernetes pods.
 
 Probably you want to change this environment variable to your actual domain:
 
-```
+```yaml
 # in configmap.yaml
-CLIENT_URI: "https://nitro-staging.human-connection.org"
+CLIENT_URI: "https://develop-k8s.ocelot.social"
 ```
 
 If you want to edit secrets, you have to `base64` encode them. See [kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/#creating-a-secret-manually).
