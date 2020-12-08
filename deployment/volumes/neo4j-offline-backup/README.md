@@ -29,7 +29,7 @@ database connections left and nobody can access the application.
 Run the following:
 
 ```sh
-$ kubectl --namespace=human-connection edit deployment develop-neo4j
+$ kubectl -n ocelot-social edit deployment develop-neo4j
 ```
 
 Add the following to `spec.template.spec.containers`:
@@ -55,9 +55,9 @@ file and trigger an update of the deployment.
 First stop your Neo4J database, see above. Then:
 
 ```sh
-$ kubectl --namespace=human-connection get pods
+$ kubectl -n ocelot-social get pods
 # Copy the ID of the pod running Neo4J.
-$ kubectl --namespace=human-connection exec -it <POD-ID> bash
+$ kubectl -n ocelot-social exec -it <POD-ID> bash
 # Once you're in the pod, dump the db to a file e.g. `/root/neo4j-backup`.
 > neo4j-admin dump --to=/root/neo4j-backup
 > exit
@@ -72,12 +72,12 @@ Revert your changes to deployment `develop-neo4j` which will restart the databas
 First stop your Neo4J database. Then:
 
 ```sh
-$ kubectl --namespace=human-connection get pods
+$ kubectl -n ocelot-social get pods
 # Copy the ID of the pod running Neo4J.
 # Then upload your local backup to the pod. Note that once the pod gets deleted
 # e.g. if you change the deployment, the backup file is gone with it.
 $ kubectl cp ./neo4j-backup human-connection/<POD-ID>:/root/
-$ kubectl --namespace=human-connection exec -it <POD-ID> bash
+$ kubectl -n ocelot-social exec -it <POD-ID> bash
 # Once you're in the pod restore the backup and overwrite the default database
 # called `graph.db` with `--force`.
 # This will delete all existing data in database `graph.db`!

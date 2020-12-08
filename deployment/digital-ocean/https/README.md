@@ -49,8 +49,8 @@ If the response looks good, configure your domain registrar for the new IP addre
 Now let's get a valid HTTPS certificate. According to the tutorial above, check your tls certificate for staging:
 
 ```bash
-$ kubectl describe --namespace=human-connection certificate tls
-$ kubectl describe --namespace=human-connection secret tls
+$ kubectl describe -n ocelot-social certificate tls
+$ kubectl describe -n ocelot-social secret tls
 ```
 
 If everything looks good, update the issuer of your ingress. Change the annotation `certmanager.k8s.io/issuer` from `letsencrypt-develop` to `letsencrypt-production` in your ingress configuration in `ingress.yaml`.
@@ -63,7 +63,7 @@ $ kubectl apply -f ingress.yaml
 Delete the former secret to force a refresh:
 
 ```text
-$ kubectl  --namespace=human-connection delete secret tls
+$ kubectl  -n ocelot-social delete secret tls
 ```
 
 Now, HTTPS should be configured on your domain. Congrats.
