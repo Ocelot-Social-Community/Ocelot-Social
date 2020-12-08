@@ -41,7 +41,9 @@ spec:
           protocol: TCP
         - containerPort: 7474
           protocol: TCP
-        resources:  # see requirements for Neo4j v3.5.14 https://neo4j.com/docs/operations-manual/3.5/installation/requirements/
+        resources:
+          # see description and add cpu https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+          # see requirements for Neo4j v3.5.14 https://neo4j.com/docs/operations-manual/3.5/installation/requirements/
           limits:
             memory: 2G
           requests:
