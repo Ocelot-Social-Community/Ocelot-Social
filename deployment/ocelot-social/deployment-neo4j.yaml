@@ -31,19 +31,21 @@ spec:
       - envFrom:
         - configMapRef:
             name: configmap
-        image: ocelotsocialnetwork/develop-neo4j:latest
-        imagePullPolicy: Always
+        image: ocelotsocialnetwork/develop-neo4j:latest  # for develop
+        # image: ocelotsocialnetwork/develop-neo4j:0.6.3  # for production or staging
+        imagePullPolicy: Always  # for develop or staging
+        # imagePullPolicy: IfNotPresent  # for production
         name: neo4j
         ports:
         - containerPort: 7687
           protocol: TCP
         - containerPort: 7474
           protocol: TCP
-        resources:
+        resources:  # see requirements for Neo4j v3.5.14 https://neo4j.com/docs/operations-manual/3.5/installation/requirements/
           limits:
             memory: 2G
           requests:
-            memory: 1G
+            memory: 2G
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:

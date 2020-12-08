@@ -54,7 +54,10 @@ easily recovered. Therefore we separated persistent volumes from deployments
 and services. There is a [dedicated section](../volumes/README.md). Create those
 persistent volumes once before you apply the configuration.
 
-## Apply the Configuration
+## Apply The Configuration
+
+Before you apply you should think about the size of the droplet(s) you need.
+For example, the requirements for Neo4j v3.5.14 are [here](https://neo4j.com/docs/operations-manual/3.5/installation/requirements/).
 
 ```bash
 # in folder deployment/

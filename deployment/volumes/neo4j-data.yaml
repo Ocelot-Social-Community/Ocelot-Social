@@ -9,4 +9,4 @@
       - ReadWriteOnce
     resources:
       requests:
-        storage: "5Gi"
+        storage: "10Gi"  # see requirements for Neo4j v3.5.14 https://neo4j.com/docs/operations-manual/3.5/installation/requirements/
