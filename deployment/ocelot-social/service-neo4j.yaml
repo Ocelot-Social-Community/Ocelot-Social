@@ -4,7 +4,7 @@ metadata:
   name: neo4j
   namespace: ocelot-social
   labels:
-    ocelot.social/selector: deployment-human-connection-neo4j
+    ocelot.social/selector: deployment-ocelot-social-neo4j
 spec:
   ports:
   - name: bolt
@@ -14,4 +14,4 @@ spec:
     port: 7474
     targetPort: 7474
   selector:
-    ocelot.social/selector: deployment-human-connection-neo4j
+    ocelot.social/selector: deployment-ocelot-social-neo4j

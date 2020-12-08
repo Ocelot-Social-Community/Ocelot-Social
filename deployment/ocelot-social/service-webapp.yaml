@@ -4,11 +4,11 @@ metadata:
   name: web
   namespace: ocelot-social
   labels:
-    ocelot.social/selector: deployment-human-connection-web
+    ocelot.social/selector: deployment-ocelot-social-webapp
 spec:
   ports:
     - name: web
       port: 3000
       targetPort: 3000
   selector:
-    ocelot.social/selector: deployment-human-connection-web
+    ocelot.social/selector: deployment-ocelot-social-webapp

@@ -4,7 +4,7 @@ metadata:
   name: mailserver
   namespace: ocelot-social
   labels:
-    ocelot.social/selector: deployment-human-connection-mailserver
+    ocelot.social/selector: deployment-ocelot-social-mailserver
 spec:
   ports:
   - name: web
@@ -14,4 +14,4 @@ spec:
     port: 25
     targetPort: 25
   selector:
-    ocelot.social/selector: deployment-human-connection-mailserver
+    ocelot.social/selector: deployment-ocelot-social-mailserver

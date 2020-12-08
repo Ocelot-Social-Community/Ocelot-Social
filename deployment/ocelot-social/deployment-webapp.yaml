@@ -4,7 +4,7 @@ metadata:
   creationTimestamp: null
   labels:
     ocelot.social/commit: COMMIT
-    ocelot.social/selector: deployment-human-connection-web
+    ocelot.social/selector: deployment-ocelot-social-webapp
   name: web
   namespace: ocelot-social
 spec:
@@ -14,7 +14,7 @@ spec:
   revisionHistoryLimit: 2147483647
   selector:
     matchLabels:
-      ocelot.social/selector: deployment-human-connection-web
+      ocelot.social/selector: deployment-ocelot-social-webapp
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -25,7 +25,7 @@ spec:
       creationTimestamp: null
       labels:
         ocelot.social/commit: COMMIT
-        ocelot.social/selector: deployment-human-connection-web
+        ocelot.social/selector: deployment-ocelot-social-webapp
       name: web
     spec:
       containers:

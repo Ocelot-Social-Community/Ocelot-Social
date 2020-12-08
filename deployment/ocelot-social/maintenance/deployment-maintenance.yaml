@@ -6,12 +6,12 @@ metadata:
 spec:
   selector:
     matchLabels:
-      ocelot.social/selector: deployment-human-connection-maintenance
+      ocelot.social/selector: deployment-ocelot-social-maintenance
   template:
     metadata:
       labels:
         ocelot.social/commit: COMMIT
-        ocelot.social/selector: deployment-human-connection-maintenance
+        ocelot.social/selector: deployment-ocelot-social-maintenance
       name: maintenance
     spec:
       containers:
