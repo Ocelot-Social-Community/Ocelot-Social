@@ -36,8 +36,10 @@ spec:
             name: configmap
         - secretRef:
             name: ocelot-social
-        image: ocelotsocialnetwork/develop-backend:latest
-        imagePullPolicy: Always
+        image: ocelotsocialnetwork/develop-backend:latest  # for develop
+        # image: ocelotsocialnetwork/develop-backend:0.6.3  # for production or staging
+        imagePullPolicy: Always  # for develop or staging
+        # imagePullPolicy: IfNotPresent  # for production
         name: backend
         ports:
         - containerPort: 4000
