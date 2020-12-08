@@ -20,7 +20,7 @@ To design your documentation see the syntax description at GitBook:
 
 #### Headlines
 
-```text
+```markdown
 # Main headline
 ## Smaller headlines
 ### Small headlines
@@ -28,7 +28,7 @@ To design your documentation see the syntax description at GitBook:
 
 #### Tabs
 
-```text
+```markdown
 {% tabs %}
 {% tab title="XXX" %}
 XXX
@@ -42,27 +42,27 @@ XXX
 
 #### Commands
 
-```text
-\`\`\`<LANGUAGE> (for text highlighting)
+~~~markdown
+```<LANGUAGE> (for text highlighting)
 XXX
-\`\`\`
 ```
+~~~
 
 #### Links
 
-```text
+```markdown
 [XXX](https://XXX)
 ```
 
 #### Screenshots or other Images
 
-```text
+```markdown
 ![XXX](https://XXX)
 ```
 
 #### Hints for ToDos
 
-```text
+```markdown
 {% hint style="info" %} TODO: XXX {% endhint %}
 ```
 
