@@ -10,7 +10,8 @@ As a start, read the [introduction into Kubernetes](https://www.digitalocean.com
 4. Now check if you can connect to the cluster and if its your newly created one by running: `kubectl get nodes`
 
 The output should look about like this:
-```
+
+```sh
 $ kubectl get nodes
 NAME                  STATUS   ROLES    AGE   VERSION
 nifty-driscoll-uu1w   Ready    <none>   69d   v1.13.2
