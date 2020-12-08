@@ -60,18 +60,18 @@ XXX
 ![XXX](https://XXX)
 ```
 
-#### Hints for ToDos
+#### Hints For ToDos
 
 ```markdown
 {% hint style="info" %} TODO: XXX {% endhint %}
 ```
 
-## Host the screenshots
+## Host The Screenshots
 
-### Host on Human Connection
+### Host On Ocelot-Social \(GitHub\) repository
 
 {% hint style="info" %}
-TODO: How to host on Human Connection \(GitHub\) ...
+TODO: How to host on Ocelot-Social \(GitHub\) repository ...
 {% endhint %}
 
 ### Quick Solution
