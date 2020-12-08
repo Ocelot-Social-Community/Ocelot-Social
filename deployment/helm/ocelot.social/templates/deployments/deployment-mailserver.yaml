@@ -15,11 +15,11 @@ spec:
   progressDeadlineSeconds: 60
   selector:
     matchLabels:
-      human-connection.org/selector: deployment-mailserver
+      ocelot.social/selector: deployment-mailserver
   template:
     metadata:
       labels:
-        human-connection.org/selector: deployment-mailserver
+        ocelot.social/selector: deployment-mailserver
       name: mailserver
     spec:
       containers:

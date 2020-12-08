@@ -16,15 +16,15 @@ spec:
       maxUnavailable: "100%"
   selector:
     matchLabels:
-      human-connection.org/selector: deployment-neo4j
+      ocelot.social/selector: deployment-neo4j
   template:
     metadata:
       name: neo4j
       annotations:
         backup.velero.io/backup-volumes: neo4j-data
       labels:
-        human-connection.org/commit: {{ .Values.commit }}
-        human-connection.org/selector: deployment-neo4j
+        ocelot.social/commit: {{ .Values.commit }}
+        ocelot.social/selector: deployment-neo4j
     spec:
       containers:
       - name: neo4j

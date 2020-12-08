@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    human-connection.org/commit: COMMIT
-    human-connection.org/selector: deployment-human-connection-backend
+    ocelot.social/commit: COMMIT
+    ocelot.social/selector: deployment-human-connection-backend
   name: backend
   namespace: ocelot-social
 spec:
@@ -14,7 +14,7 @@ spec:
   revisionHistoryLimit: 2147483647
   selector:
     matchLabels:
-      human-connection.org/selector: deployment-human-connection-backend
+      ocelot.social/selector: deployment-human-connection-backend
   strategy:
     rollingUpdate:
       maxSurge: 0
@@ -26,8 +26,8 @@ spec:
         backup.velero.io/backup-volumes: uploads
       creationTimestamp: null
       labels:
-        human-connection.org/commit: COMMIT
-        human-connection.org/selector: deployment-human-connection-backend
+        ocelot.social/commit: COMMIT
+        ocelot.social/selector: deployment-human-connection-backend
       name: backend
     spec:
       containers:

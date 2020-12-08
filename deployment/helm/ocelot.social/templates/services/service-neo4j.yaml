@@ -17,4 +17,4 @@ spec:
     port: 7474
     targetPort: 7474
   selector:
-    human-connection.org/selector: deployment-neo4j
+    ocelot.social/selector: deployment-neo4j

@@ -4,11 +4,11 @@ metadata:
   name: web
   namespace: ocelot-social
   labels:
-    human-connection.org/selector: deployment-human-connection-web
+    ocelot.social/selector: deployment-human-connection-web
 spec:
   ports:
     - name: web
       port: 3000
       targetPort: 3000
   selector:
-    human-connection.org/selector: deployment-human-connection-web
+    ocelot.social/selector: deployment-human-connection-web

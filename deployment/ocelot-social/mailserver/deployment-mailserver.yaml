@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    human-connection.org/selector: deployment-human-connection-mailserver
+    ocelot.social/selector: deployment-human-connection-mailserver
   name: mailserver
   namespace: ocelot-social
 spec:
@@ -13,7 +13,7 @@ spec:
   revisionHistoryLimit: 2147483647
   selector:
     matchLabels:
-      human-connection.org/selector: deployment-human-connection-mailserver
+      ocelot.social/selector: deployment-human-connection-mailserver
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -23,7 +23,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        human-connection.org/selector: deployment-human-connection-mailserver
+        ocelot.social/selector: deployment-human-connection-mailserver
       name: mailserver
     spec:
       containers:

@@ -18,5 +18,5 @@ spec:
     port: 25
     targetPort: 25
   selector:
-    human-connection.org/selector: deployment-mailserver
+    ocelot.social/selector: deployment-mailserver
 {{- end}}

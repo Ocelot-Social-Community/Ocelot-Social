@@ -18,15 +18,15 @@ spec:
       maxUnavailable: "100%"
   selector:
     matchLabels:
-      human-connection.org/selector: deployment-backend
+      ocelot.social/selector: deployment-backend
   template:
     metadata:
       name: deployment-backend
       annotations:
         backup.velero.io/backup-volumes: uploads
       labels:
-        human-connection.org/commit: {{ .Values.commit }}
-        human-connection.org/selector: deployment-backend
+        ocelot.social/commit: {{ .Values.commit }}
+        ocelot.social/selector: deployment-backend
     spec:
       containers:
       - name: backend

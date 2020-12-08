@@ -15,4 +15,4 @@ spec:
       protocol: TCP
       targetPort: 3000
   selector:
-    human-connection.org/selector: deployment-webapp
+    ocelot.social/selector: deployment-webapp

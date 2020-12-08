@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    human-connection.org/selector: deployment-human-connection-neo4j
+    ocelot.social/selector: deployment-human-connection-neo4j
   name: neo4j
   namespace: ocelot-social
 spec:
@@ -12,7 +12,7 @@ spec:
   revisionHistoryLimit: 2147483647
   selector:
     matchLabels:
-      human-connection.org/selector: deployment-human-connection-neo4j
+      ocelot.social/selector: deployment-human-connection-neo4j
   strategy:
     rollingUpdate:
       maxSurge: 0
@@ -24,7 +24,7 @@ spec:
         backup.velero.io/backup-volumes: neo4j-data
       creationTimestamp: null
       labels:
-        human-connection.org/selector: deployment-human-connection-neo4j
+        ocelot.social/selector: deployment-human-connection-neo4j
       name: neo4j
     spec:
       containers:

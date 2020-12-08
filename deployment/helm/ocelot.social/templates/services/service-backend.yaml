@@ -14,4 +14,4 @@ spec:
       port: 4000
       targetPort: 4000
   selector:
-    human-connection.org/selector: deployment-backend
+    ocelot.social/selector: deployment-backend

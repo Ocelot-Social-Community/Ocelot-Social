@@ -11,12 +11,12 @@ metadata:
 spec:
   selector:
     matchLabels:
-      human-connection.org/selector: deployment-maintenance
+      ocelot.social/selector: deployment-maintenance
   template:
     metadata:
       labels:
-        human-connection.org/commit: {{ .Values.commit }}
-        human-connection.org/selector: deployment-maintenance
+        ocelot.social/commit: {{ .Values.commit }}
+        ocelot.social/selector: deployment-maintenance
       name: maintenance
     spec:
       containers:
