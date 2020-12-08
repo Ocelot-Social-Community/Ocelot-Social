@@ -24,7 +24,7 @@ data:
   PUBLIC_REGISTRATION: "false"
   REDIS_DOMAIN: ---toBeSet(IP)---
   # REDIS_PASSWORD: see secrets
-  REDIS_PORT: "---toBeSet(Port)---"
+  REDIS_PORT: "6379"
   SENTRY_DSN_WEBAPP: "---toBeSet---"
   SENTRY_DSN_BACKEND: "---toBeSet---"
   SMTP_HOST: "mail.ocelot.social"
