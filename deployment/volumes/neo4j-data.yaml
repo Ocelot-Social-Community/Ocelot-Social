@@ -9,4 +9,4 @@
       - ReadWriteOnce
     resources:
       requests:
-        storage: {{ .Values.neo4jStorage }}
+        storage: "5Gi"
