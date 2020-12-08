@@ -43,15 +43,15 @@ XXX
 #### Commands
 
 ```text
-```LANGUAGE (for text highlighting)
+\`\`\`<LANGUAGE> (for text highlighting)
 XXX
+\`\`\`
 ```
 
-```text
 #### Links
 
 ```text
-[https://XXX](XXX)
+[XXX](https://XXX)
 ```
 
 #### Screenshots or other Images
