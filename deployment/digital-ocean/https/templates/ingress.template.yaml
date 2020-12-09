@@ -9,22 +9,22 @@ metadata:
     certmanager.k8s.io/acme-challenge-type: http01
     nginx.ingress.kubernetes.io/proxy-body-size: 6m
 spec:
-  tls:
-    - hosts:
-        - develop-k8s.ocelot.social
-      secretName: tls
   rules:
-    - host: develop-k8s.ocelot.social
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: develop-maintenance
-              servicePort: 3000
+  - host: develop-k8s.ocelot.social
+    http:
+      paths:
+        - backend:
+            serviceName: develop-webapp
+            servicePort: 3000
+          path: /
   - host: mail.ocelot.social
     http:
       paths:
-      - path: /
-        backend:
+      - backend:
           serviceName: mailserver
           servicePort: 80
+        path: /
+  tls:
+  - hosts:
+      - develop-k8s.ocelot.social
+    secretName: tls
