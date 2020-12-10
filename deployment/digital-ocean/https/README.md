@@ -1,10 +1,24 @@
 # Setup Ingress and HTTPS
 
+{% tabs %}
+{% tab title="Helm 3" %}
+
+Follow [this quick start guide](https://cert-manager.io/docs/installation/kubernetes/) and install certmanager via Helm 3:
+
+## … Via Kubernetes Directly
+
+```bash
+$ kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.1.0/cert-manager.yaml
+```
+
+{% endtab %}
+{% tab title="Helm 2" %}
+
 {% hint style="info" %}
-REMOVED: Tiller is [removed](https://helm.sh/docs/faq/#removal-of-tiller) on Helm 3. We investigate a solution …
+CAUTION: Tiller on Helm 2 is [removed](https://helm.sh/docs/faq/#removal-of-tiller) on Helm 3, because of savety issues. So we recomment Helm 3.
 {% endhint %}
 
-Follow [this quick start guide](https://docs.cert-manager.io/en/latest/tutorials/acme/quick-start/index.html) and install certmanager via helm and tiller:
+Follow [this quick start guide](https://docs.cert-manager.io/en/latest/tutorials/acme/quick-start/index.html) and install certmanager via Helm 2 and tiller:
 [This resource was also helpful](https://docs.cert-manager.io/en/latest/getting-started/install/kubernetes.html#installing-with-helm)
 
 ```bash
@@ -16,6 +30,9 @@ $ helm repo update
 $ kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.11/deploy/manifests/00-crds.yaml
 $ helm install --name cert-manager --namespace cert-manager --version v0.11.0 jetstack/cert-manager
 ```
+
+{% endtab %}
+{% endtabs %}
 
 ## Create Letsencrypt Issuers and Ingress Services
 
