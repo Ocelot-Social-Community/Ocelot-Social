@@ -6,7 +6,7 @@
           {{ $t('profile.socialMedia') }} {{ userName | truncate(15) }}?
         </ds-text>
         <template>
-          <ds-space v-for="link in socialMediaLinks()" :key="link.username" margin="x-small">
+          <ds-space v-for="link in socialMediaLinks()" :key="link.id" margin="x-small">
             <a :href="link.url" target="_blank">
               <img :src="link.favicon" alt="Link:" height="22" width="22" />
               {{ link.username }}
