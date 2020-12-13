@@ -3,7 +3,7 @@
 {% tabs %}
 {% tab title="Helm 3" %}
 
-Follow [this quick start guide](https://cert-manager.io/docs/installation/kubernetes/) and install certmanager via Helm 3:
+Follow [this quick start guide](https://cert-manager.io/next-docs/installation/kubernetes/) and install certmanager via Helm 3:
 
 ## … Via Kubernetes Directly
 
@@ -74,7 +74,7 @@ $ kubectl describe -n ocelot-social certificate tls
 $ kubectl describe -n ocelot-social secret tls
 ```
 
-If everything looks good, update the issuer of your ingress. Change the annotation `certmanager.k8s.io/issuer` from `letsencrypt-testing` (in the cert-manager docs named `letsencrypt-staging`) to `letsencrypt-production` in your ingress configuration in `ingress.yaml`.
+If everything looks good, update the issuer of your ingress. Change the annotation `cert-manager.io/issuer` from `letsencrypt-staging` (for testing without getting a real certificate) to `letsencrypt-prod` (for production) in your ingress configuration in `ingress.yaml`.
 
 ```bash
 # in folder deployment/digital-ocean/https/

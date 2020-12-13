@@ -19,7 +19,7 @@ image:
   # pullPolicy indicates when, if ever, pods pull a new image from docker hub.
   pullPolicy: IfNotPresent
 # letsencryptIssuer is used by cert-manager to set up certificates with the given provider.
-letsencryptIssuer: "letsencrypt-production"
+letsencryptIssuer: "letsencrypt-prod"
 # neo4jConfig changes any default neo4j config/adds it.
 neo4jConfig:
   # acceptLicenseAgreement is used to agree to the license agreement for neo4j's enterprise edition.

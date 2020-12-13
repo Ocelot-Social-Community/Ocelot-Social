@@ -1,9 +1,9 @@
 ---
   # used while installation as first setup for testing purposes, recognize 'server: https://acme-staging-v02…'
-  apiVersion: certmanager.k8s.io/v1alpha1
+  apiVersion: certmanager.k8s.io/v1
   kind: Issuer
   metadata:
-    name: letsencrypt-testing
+    name: letsencrypt-staging
     namespace: ocelot-social
   spec:
     acme:
@@ -13,15 +13,15 @@
       email: user@example.com
       # Name of a secret used to store the ACME account private key
       privateKeySecretRef:
-        name: letsencrypt-testing
+        name: letsencrypt-staging
       # Enable the HTTP-01 challenge provider
       http01: {}
 ---
   # used after installation for production, recognize 'server: https://acme-v02…'
-  apiVersion: certmanager.k8s.io/v1alpha1
+  apiVersion: certmanager.k8s.io/v1
   kind: Issuer
   metadata:
-    name: letsencrypt-production
+    name: letsencrypt-prod
     namespace: ocelot-social
   spec:
     acme:
@@ -31,6 +31,6 @@
       email: user@example.com
       # Name of a secret used to store the ACME account private key
       privateKeySecretRef:
-        name: letsencrypt-production
+        name: letsencrypt-prod
       # Enable the HTTP-01 challenge provider
       http01: {}
