@@ -74,7 +74,7 @@ $ kubectl describe -n ocelot-social certificate tls
 $ kubectl describe -n ocelot-social secret tls
 ```
 
-If everything looks good, update the issuer of your ingress. Change the annotation `certmanager.k8s.io/issuer` from `letsencrypt-develop` to `letsencrypt-production` in your ingress configuration in `ingress.yaml`.
+If everything looks good, update the issuer of your ingress. Change the annotation `certmanager.k8s.io/issuer` from `letsencrypt-testing` (in the cert-manager docs named `letsencrypt-staging`) to `letsencrypt-production` in your ingress configuration in `ingress.yaml`.
 
 ```bash
 # in folder deployment/digital-ocean/https/

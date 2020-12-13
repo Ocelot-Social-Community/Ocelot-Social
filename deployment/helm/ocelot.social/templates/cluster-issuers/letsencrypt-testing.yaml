@@ -1,7 +1,7 @@
 apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-develop
+  name: letsencrypt-testing
   labels:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
@@ -13,7 +13,7 @@ spec:
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     email: {{ .Values.supportEmail }}
     privateKeySecretRef:
-      name: letsencrypt-develop
+      name: letsencrypt-testing
     solvers:
     - http01:
         ingress:
