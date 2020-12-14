@@ -14,7 +14,7 @@ spec:
     http:
       paths:
         - backend:
-            serviceName: develop-webapp
+            serviceName: web
             servicePort: 3000
           path: /
   - host: mail.ocelot.social
@@ -26,5 +26,5 @@ spec:
         path: /
   tls:
   - hosts:
-      - develop-k8s.ocelot.social
+    - develop-k8s.ocelot.social
     secretName: tls
