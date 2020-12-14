@@ -3,7 +3,7 @@
 {% tabs %}
 {% tab title="Helm 3" %}
 
-Follow [this quick start guide](https://cert-manager.io/next-docs/installation/kubernetes/) and install certmanager via Helm 3:
+Follow [this quick start guide](https://cert-manager.io/docs/) and install certmanager via Helm 3:
 
 ## … Via Kubernetes Directly
 
