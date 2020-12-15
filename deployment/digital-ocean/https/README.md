@@ -54,6 +54,10 @@ Once you are done, apply the configuration:
 $ kubectl apply -f .
 ```
 
+{% hint style="info" %}
+CAUTION: It seems that the behaviour of Digital Ocean has changed and the load balancer is not created automatically anymore. And to create a load balancer costs money. A solution without a load balance you can find [here](../no-loadbalancer/README.md). Please correct the following text …
+{% endhint %}
+
 By now, your cluster should have a load balancer assigned with an external IP
 address. On Digital Ocean, this is how it should look like: 
 
@@ -63,6 +67,7 @@ Check the ingress server is working correctly:
 
 ```bash
 $ curl -kivL -H 'Host: <DOMAIN_NAME>' 'https://<IP_ADDRESS>'
+<page data>
 ```
 
 If the response looks good, configure your domain registrar for the new IP address and the domain.
