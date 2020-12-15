@@ -292,3 +292,27 @@ export const currentUserCountQuery = () => gql`
     }
   }
 `
+
+export const userDataQuery = (i18n) => {
+  return gql`
+    ${userFragment}
+    ${postFragment}
+    ${commentFragment}
+    query($id: ID!) {
+      userData(id: $id) {
+        user {
+          ...user
+        }
+        posts {
+          ...post
+          comments {
+            author {
+              slug
+            }
+            ...comment
+          }
+        }
+      }
+    }
+  `
+}
