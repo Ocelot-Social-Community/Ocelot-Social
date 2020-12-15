@@ -1282,10 +1282,10 @@
     url-regex "~4.1.1"
     video-extensions "~1.1.0"
 
-"@metascraper/helpers@^5.11.6", "@metascraper/helpers@^5.11.8", "@metascraper/helpers@^5.14.22", "@metascraper/helpers@^5.14.26":
-  version "5.14.26"
-  resolved "https://registry.yarnpkg.com/@metascraper/helpers/-/helpers-5.14.26.tgz#e6a10bb58d0e8a79ebe6a25696eb60feacd37f73"
-  integrity sha512-puUmJQTW5b3gyymQTWNtJZq8XyM62F3A6UrbIikWrL4jNx1O87Mlc4XyWTYLPxQiWxll9wJubNdZruKtZkELqA==
+"@metascraper/helpers@^5.11.6", "@metascraper/helpers@^5.11.8", "@metascraper/helpers@^5.14.22", "@metascraper/helpers@^5.14.26", "@metascraper/helpers@^5.15.0":
+  version "5.15.0"
+  resolved "https://registry.yarnpkg.com/@metascraper/helpers/-/helpers-5.15.0.tgz#5e01ae2368c792c5e89d8b2f1036bcdda544b315"
+  integrity sha512-X/SqQBo4T+kMfwk6y7lQ0ML3W4ImGpGLQnWXTK1PnMcH7FSvkY6V8VdqUQwGm17Ggf9SfgMoCpUs2m79VHHk3g==
   dependencies:
     audio-extensions "0.0.0"
     chrono-node "2.1.10"
@@ -1303,7 +1303,7 @@
     microsoft-capitalize "~1.0.3"
     mime-types "~2.1.27"
     normalize-url "~5.3.0"
-    smartquotes "~2.3.1"
+    smartquotes "~2.3.2"
     truncate "~2.1.0"
     url-regex-safe "~1.0.2"
     video-extensions "~1.1.0"
@@ -6686,12 +6686,12 @@ metascraper-logo@^5.14.26:
   dependencies:
     "@metascraper/helpers" "^5.14.26"
 
-metascraper-publisher@^5.11.8:
-  version "5.11.8"
-  resolved "https://registry.yarnpkg.com/metascraper-publisher/-/metascraper-publisher-5.11.8.tgz#440923e521adf3f9222d46f3cdfe213ae6d54326"
-  integrity sha512-UsS2K11oMf5zikcwJfesvc7epyaOKhC/XPTs0bL/MS9SAHv/WFm/4XwGe0QwkRGtD2pCsw3D4ivl0V8rgCGXTA==
+metascraper-publisher@^5.15.0:
+  version "5.15.0"
+  resolved "https://registry.yarnpkg.com/metascraper-publisher/-/metascraper-publisher-5.15.0.tgz#a76d8c3ffaaaa141c9f841dfb8d84e6029c2524a"
+  integrity sha512-BWqPVwAOYhE5Hw3ycfxwj1V3bTyvTaakDVU6XWeOpQ9mwffPkrzklGehH8hHPuinq+RJ2hGWu1NS3LTJcPTX9g==
   dependencies:
-    "@metascraper/helpers" "^5.11.8"
+    "@metascraper/helpers" "^5.15.0"
 
 metascraper-soundcloud@^5.11.8:
   version "5.11.8"
@@ -8664,6 +8664,11 @@ smartquotes@~2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/smartquotes/-/smartquotes-2.3.1.tgz#01ebb595d6c7a9e24d90e8cb95c17d0e1af49407"
   integrity sha1-Aeu1ldbHqeJNkOjLlcF9Dhr0lAc=
+
+smartquotes@~2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/smartquotes/-/smartquotes-2.3.2.tgz#fb1630c49ba04e57446e1a97dc10d590072af4a6"
+  integrity sha512-0R6YJ5hLpDH4mZR7N5eZ12oCMLspvGOHL9A9SEm2e3b/CQmQidekW4SWSKEmor/3x6m3NCBBEqLzikcZC9VJNQ==
 
 snapdragon-node@^2.0.1:
   version "2.1.1"
