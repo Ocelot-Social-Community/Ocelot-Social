@@ -13,7 +13,7 @@ We prepared sample configuration, so you can simply run:
 
 ```sh
 # in folder deployment/
-$ kubectl apply -f ocelotsocialnetwork/develop-maintenance
+$ kubectl apply -f ./ocelot-social/maintenance/
 ```
 
 This will fire up a maintenance service.
@@ -33,8 +33,8 @@ E.g. copy file [`deployment/digital-ocean/https/templates/ingress.template.yaml`
       paths:
       - path: /
         backend:
-          # serviceName: develop-webapp
-          serviceName: develop-maintenance
+          # serviceName: web
+          serviceName: maintenance
           # servicePort: 3000
           servicePort: 80
 ```
