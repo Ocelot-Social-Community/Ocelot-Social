@@ -88,7 +88,7 @@
     "migrate": "^1.7.0",
     "mime-types": "^2.1.26",
     "minimatch": "^3.0.4",
-    "mustache": "^4.0.1",
+    "mustache": "^4.1.0",
     "neo4j-driver": "^4.0.2",
     "neo4j-graphql-js": "^2.11.5",
     "neode": "^0.3.7",
