@@ -55,19 +55,39 @@ $ kubectl apply -f .
 ```
 
 {% hint style="info" %}
-CAUTION: It seems that the behaviour of Digital Ocean has changed and the load balancer is not created automatically anymore. And to create a load balancer costs money. A solution without a load balance you can find [here](../no-loadbalancer/README.md). Please correct the following text …
+CAUTION: It seems that the behaviour of Digital Ocean has changed and the load balancer is not created automatically anymore.
+And to create a load balancer costs money. Please refine the following documentation if required.
 {% endhint %}
 
-By now, your cluster should have a load balancer assigned with an external IP
-address. On Digital Ocean, this is how it should look like: 
+{% tabs %}
+{% tab title="Without Load Balancer" %}
+
+A solution without a load balance you can find [here](../no-loadbalancer/README.md).
+
+{% endtab %}
+{% tab title="With Digital Ocean Load Balancer" %}
+
+{% hint style="info" %}
+CAUTION: It seems that the behaviour of Digital Ocean has changed and the load balancer is not created automatically anymore.
+Please refine the following documentation if required.
+{% endhint %}
+
+In earlier days by now, your cluster should have a load balancer assigned with an external IP
+address. On Digital Ocean, this is how it should look like:
 
 ![Screenshot of Digital Ocean dashboard showing external ip address](./ip-address.png)
+
+If the load balancer isn't created automatically you have to create it your self on Digital Ocean under Networks.
+In case you don't need a Digital Ocean load balancer (which costs money by the way) have a look in the tab `Without Load Balancer`.
+
+{% endtab %}
+{% endtabs %}
 
 Check the ingress server is working correctly:
 
 ```bash
 $ curl -kivL -H 'Host: <DOMAIN_NAME>' 'https://<IP_ADDRESS>'
-<page data>
+<page HTML>
 ```
 
 If the response looks good, configure your domain registrar for the new IP address and the domain.
@@ -75,11 +95,11 @@ If the response looks good, configure your domain registrar for the new IP addre
 Now let's get a valid HTTPS certificate. According to the tutorial above, check your tls certificate for staging:
 
 ```bash
-$ kubectl describe -n ocelot-social certificate tls
-$ kubectl describe -n ocelot-social secret tls
+$ kubectl -n ocelot-social describe certificate tls
+$ kubectl -n ocelot-social describe secret tls
 ```
 
-If everything looks good, update the issuer of your ingress. Change the annotation `cert-manager.io/issuer` from `letsencrypt-staging` (for testing without getting a real certificate) to `letsencrypt-prod` (for production) in your ingress configuration in `ingress.yaml`.
+If everything looks good, update the cluster-issuer of your ingress. Change the annotation `cert-manager.io/cluster-issuer` from `letsencrypt-staging` (for testing by getting a dummy certificate – no blocking by letsencrypt, because of to many request cycles) to `letsencrypt-prod` (for production with a real certificate – possible blocking by letsencrypt for several days, because of to many request cycles) in your ingress configuration in `ingress.yaml`.
 
 ```bash
 # in folder deployment/digital-ocean/https/
@@ -88,7 +108,7 @@ $ kubectl apply -f ingress.yaml
 
 Delete the former secret to force a refresh:
 
-```text
+```bash
 $ kubectl  -n ocelot-social delete secret tls
 ```
 
