@@ -19,10 +19,10 @@ Wait a little until your backend is up and running at [http://localhost:4000/](h
 
 For the local installation you need a recent version of
 [node](https://nodejs.org/en/) (&gt;= `v10.12.0`). We are using
-12.19.0 and therefore we recommend to use the same version
+'12.19.0' and therefore we recommend to use the same version
 ([see](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4082)
 some knwon problems with more recent node versions). You can use the
-[node version manager](https://github.com/nvm-sh/nvm) to swutch
+[node version manager](https://github.com/nvm-sh/nvm) to switch
 between different local node versions.
 
 Install node dependencies with [yarn](https://yarnpkg.com/en/):
