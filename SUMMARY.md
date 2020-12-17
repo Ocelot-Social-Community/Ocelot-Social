@@ -22,7 +22,7 @@
   * [Digital Ocean](deployment/digital-ocean/README.md)
     * [Kubernetes Dashboard](deployment/digital-ocean/dashboard/README.md)
     * [HTTPS](deployment/digital-ocean/https/README.md)
-  * [Human Connection](deployment/ocelot-social/README.md)
+  * [ocelot.social](deployment/ocelot-social/README.md)
     * [Error Reporting](deployment/ocelot-social/error-reporting/README.md)
     * [Mailserver](deployment/ocelot-social/mailserver/README.md)
     * [Maintenance](deployment/ocelot-social/maintenance/README.md)
