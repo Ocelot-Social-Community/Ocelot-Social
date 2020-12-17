@@ -17,14 +17,16 @@ spec:
             serviceName: web
             servicePort: 3000
           path: /
-  - host: mail.ocelot.social
-    http:
-      paths:
-      - backend:
-          serviceName: mailserver
-          servicePort: 80
-        path: /
-  tls:
-  - hosts:
-    - develop-k8s.ocelot.social
-    secretName: tls
+  # decommt if you have installed the mailservice
+  # - host: mail.ocelot.social
+  #   http:
+  #     paths:
+  #     - backend:
+  #         serviceName: mailserver
+  #         servicePort: 80
+  #       path: /
+  # decommt to activate SSL via port 443 if you have installed the certificate. probalby via the cert-manager
+  # tls:
+  # - hosts:
+  #   - develop-k8s.ocelot.social
+  #   secretName: tls
