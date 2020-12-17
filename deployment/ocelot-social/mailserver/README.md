@@ -10,8 +10,8 @@ To deploy the SMTP server just uncomment the relevant code in the
 run the following:
 
 ```bash
-# in folder deployment/human-connection
-kubectl apply -f mailserver/
+# in folder deployment/ocelot-social
+$ kubectl apply -f mailserver/
 ```
 
 You might need to refresh the TLS secret to enable HTTPS on the publicly

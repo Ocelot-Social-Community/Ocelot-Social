@@ -9,6 +9,7 @@ data:
   # AWS_SECRET_ACCESS_KEY: see secrets
   CLIENT_URI: "https://develop-k8s.ocelot.social"  # change this to your domain
   COMMIT: ""
+  EMAIL_DEFAULT_SENDER: devops@ocelot.social  # change this to your e-mail
   GRAPHQL_PORT: "4000"
   GRAPHQL_URI: "http://backend.ocelot-social:4000"  # leave this as ocelot-social
   # decomment following line for Neo4j Enterprice version instead of Community version
@@ -29,8 +30,9 @@ data:
   SENTRY_DSN_BACKEND: "---toBeSet---"
   SMTP_HOST: "mail.ocelot.social"  # change this to your domain
   # SMTP_PASSWORD: see secrets
-  SMTP_PORT: "25"
+  SMTP_PORT: "25"  # change this to your port
   # SMTP_USERNAME: see secrets
+  SMTP_IGNORE_TLS: 'true'  # change this to your setting
   WEBSOCKETS_URI: wss://develop-k8s.ocelot.social/api/graphql  # change this to your domain
 metadata:
   name: configmap
