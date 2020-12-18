@@ -3,11 +3,52 @@ import { hashSync } from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 
 const defaultAdmin = {
-  email: "admin@example.org",
+  email: 'admin@example.org',
   password: hashSync('1234', 10),
-  name: "admin",
+  name: 'admin',
   id: uuid(),
-  slug: "admin",
+  slug: 'admin',
+}
+
+const createDefaultAdminUser = async (session) => {
+  const readTxResultPromise = session.readTransaction(async (txc) => {
+    const result = await txc.run(
+      'MATCH (email:EmailAddress)-[:BELONGS_TO]->(user:User) RETURN count(user) AS userCount',
+    )
+    return result.records.map((r) => r.get('userCount'))
+  })
+  let createAdmin = false
+  try {
+    const userCount = parseInt(String(await readTxResultPromise))
+    if (userCount === 0) createAdmin = true
+  } catch (error) {
+    console.log(error) // eslint-disable-line no-console
+  }
+  if (createAdmin) {
+    const createAdminTxResultPromise = session.writeTransaction(async (txc) => {
+      txc.run(
+        `MERGE (e:EmailAddress {
+           email: "${defaultAdmin.email}",
+           createdAt: datetime()
+         })-[:BELONGS_TO]->(u:User {
+           name: "${defaultAdmin.name}",
+           encryptedPassword: "${defaultAdmin.password}",
+           role: "admin",
+           id: "${defaultAdmin.id}",
+           slug: "${defaultAdmin.slug}",
+           createdAt: toString(datetime()),
+           deleted: false,
+           disabled: false
+         })-[:PRIMARY_EMAIL]->(e)`,
+      )
+    })
+    try {
+      await createAdminTxResultPromise
+      console.log('Successfully created default admin user') // eslint-disable-line no-console
+    } catch (error) {
+      console.log(error) // eslint-disable-line no-console
+    }
+  }
 }
 
 class Store {
@@ -15,44 +56,7 @@ class Store {
     const neode = getNeode()
     const { driver } = neode
     const session = driver.session()
-    const readTxResultPromise = session.readTransaction(async (txc) => {
-      const result = await txc.run(
-        'MATCH (email:EmailAddress)-[:BELONGS_TO]->(user:User) RETURN count(user) AS userCount'
-      )
-      return result.records.map((r) => r.get('userCount'))
-    })
-    let createAdmin = false                                                    
-    try {
-      const userCount = parseInt(String(await readTxResultPromise))
-      if (userCount === 0) createAdmin = true
-    } catch (error) {
-      console.log(error) // eslint-disable-line no-console
-    }
-    if (createAdmin) {
-      const createAdminTxResultPromise = session.writeTransaction(async (txc) => {
-        txc.run(
-          `MERGE (e:EmailAddress {
-             email: "${defaultAdmin.email}",
-             createdAt: datetime()
-           })-[:BELONGS_TO]->(u:User {
-             name: "${defaultAdmin.name}",
-             encryptedPassword: "${defaultAdmin.password}",
-             role: "admin",
-             id: "${defaultAdmin.id}",
-             slug: "${defaultAdmin.slug}",
-             createdAt: datetime(),
-             deleted: false,
-             disabled: false
-           })-[:PRIMARY_EMAIL]->(e)`
-        )
-      })
-      try {
-        await createAdminTxResultPromise
-        console.log('Successfully created default admin user') // eslint-disable-line no-console
-      } catch (error) {
-        console.log(error) // eslint-disable-line no-console
-      }
-    }
+    await createDefaultAdminUser(session)
     const writeTxResultPromise = session.writeTransaction(async (txc) => {
       await txc.run('CALL apoc.schema.assert({},{},true)') // drop all indices
       return Promise.all(
