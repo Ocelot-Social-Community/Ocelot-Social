@@ -19,3 +19,17 @@ describe('uniqueSlug', () => {
     expect(uniqueSlug(string, isUnique)).resolves.toEqual('anonymous')
   })
 })
+
+describe('Slug is transliterated correctly', () => {
+  it('Converts umlaut to two letter equivalent', () => {
+    const umlaut = 'ä';
+    const isUnique = jest.fn().mockResolvedValue(true)
+    expect(uniqueSlug(string, isUnique)).resolves.toEqual('ae');
+  })
+
+  it('Removes Spanish enya ', () => {
+    const enya = 'ñ';
+    const isUnique = jest.fn().mockResolvedValue(true)
+    expect(uniqueSlug(string, isUnique)).resolves.toEqual('n');
+  })
+})

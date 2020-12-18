@@ -1,19 +1,9 @@
 import slugify from 'slug'
 
-let locale; 
-
-if(locale === 'de'){
-  locale = 'de'
-} else {
-  locale = ''
-}
-
 export default async function uniqueSlug(string, isUnique) {
   const slug = slugify(string || 'anonymous', {
     lower: true,
-    charmap: slug.charmap,
-    multicharmap: slug.multicharmap,
-    locale: `${locale}`
+    locale: 'de',
   })
   if (await isUnique(slug)) return slug
 
