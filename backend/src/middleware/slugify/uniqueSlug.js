@@ -2,6 +2,7 @@ import slugify from 'slug'
 export default async function uniqueSlug(string, isUnique) {
   const slug = slugify(string || 'anonymous', {
     lower: true,
+    locale: 'de',
   })
   if (await isUnique(slug)) return slug
 
