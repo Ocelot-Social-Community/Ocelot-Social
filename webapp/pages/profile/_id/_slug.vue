@@ -87,7 +87,7 @@
           </template>
         </base-card>
         <ds-space />
-        <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px;">
+        <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
           {{ $t('profile.network.title') }}
         </ds-heading>
         <follow-list
@@ -103,23 +103,7 @@
           type="following"
           @fetchAllConnections="fetchAllConnections"
         />
-        <ds-space v-if="user.socialMedia && user.socialMedia.length" margin="large">
-          <base-card style="position: relative; height: auto;">
-            <ds-space margin="x-small">
-              <ds-text tag="h5" color="soft">
-                {{ $t('profile.socialMedia') }} {{ userName | truncate(15) }}?
-              </ds-text>
-              <template>
-                <ds-space v-for="link in socialMediaLinks" :key="link.username" margin="x-small">
-                  <a :href="link.url" target="_blank">
-                    <img :src="link.favicon" alt="Link:" height="22" width="22" />
-                    {{ link.username }}
-                  </a>
-                </ds-space>
-              </template>
-            </ds-space>
-          </base-card>
-        </ds-space>
+        <social-media :user-name="userName" :user="user" />
       </ds-flex-item>
 
       <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
@@ -243,6 +227,7 @@ import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 import PostMutations from '~/graphql/PostMutations'
 import UpdateQuery from '~/components/utils/UpdateQuery'
+import SocialMedia from '~/components/SocialMedia/SocialMedia'
 
 const tabToFilterMapping = ({ tab, id }) => {
   return {
@@ -254,6 +239,7 @@ const tabToFilterMapping = ({ tab, id }) => {
 
 export default {
   components: {
+    SocialMedia,
     PostTeaser,
     HcFollowButton,
     HcCountTo,
@@ -291,17 +277,6 @@ export default {
     },
     user() {
       return this.User ? this.User[0] : {}
-    },
-    socialMediaLinks() {
-      const { socialMedia = [] } = this.user
-      return socialMedia.map((socialMedia) => {
-        const { url } = socialMedia
-        const matches = url.match(/^(?:https?:\/\/)?(?:[^@\n])?(?:www\.)?([^:/\n?]+)/g)
-        const [domain] = matches || []
-        const favicon = domain ? `${domain}/favicon.ico` : null
-        const username = url.split('/').pop()
-        return { url, username, favicon }
-      })
     },
     userName() {
       const { name } = this.user || {}
