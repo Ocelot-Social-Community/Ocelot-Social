@@ -315,6 +315,7 @@
     "moreInfo": "What is {APPLICATION_NAME}?",
     "moreInfoHint": "to the presentation page",
     "no-account": "Don't have an account?",
+    "no-cookie": "No cookie can be set. You must accept cookies.",
     "password": "Your Password",
     "register": "Sign up",
     "success": "You are logged in!"

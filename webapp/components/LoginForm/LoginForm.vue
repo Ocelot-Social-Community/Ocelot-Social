@@ -91,7 +91,11 @@ export default {
         this.$toast.success(this.$t('login.success'))
         this.$emit('success')
       } catch (err) {
-        this.$toast.error(this.$t('login.failure'))
+        if (err.message === 'Error: no-cookie') {
+          this.$toast.error(this.$t('login.no-cookie'))
+        } else {
+          this.$toast.error(this.$t('login.failure'))
+        }
       }
     },
     toggleShowPassword(event) {
