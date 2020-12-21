@@ -12,9 +12,7 @@ const defaultAdmin = {
 
 const createDefaultAdminUser = async (session) => {
   const readTxResultPromise = session.readTransaction(async (txc) => {
-    const result = await txc.run(
-      'MATCH (user:User) RETURN count(user) AS userCount',
-    )
+    const result = await txc.run('MATCH (user:User) RETURN count(user) AS userCount')
     return result.records.map((r) => r.get('userCount'))
   })
   let createAdmin = false
