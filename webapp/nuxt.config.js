@@ -1,6 +1,7 @@
 import path from 'path'
 import dotenv from 'dotenv'
 import manifest from './constants/manifest.js'
+import metadata from './constants/metadata.js'
 
 dotenv.config() // we want to synchronize @nuxt-dotenv and nuxt-env
 
@@ -214,7 +215,7 @@ export default {
 
   // Give apollo module options
   apollo: {
-    tokenName: 'ocelot-social-token', // optional, default: apollo-token
+    tokenName: metadata.COOKIE_NAME, // optional, default: apollo-token
     cookieAttributes: {
       expires: 1, // optional, default: 7 (days)
     },
