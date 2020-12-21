@@ -26,6 +26,7 @@ RUN NODE_ENV=production yarn run build
 FROM base as production
 RUN yarn install --production=true --frozen-lockfile --non-interactive --no-cache
 COPY --from=build-and-test ./develop-webapp/.nuxt ./.nuxt
+COPY --from=build-and-test ./develop-webapp/constants ./constants
 COPY --from=build-and-test ./develop-webapp/static ./static
 COPY nuxt.config.js .
 COPY locales locales
