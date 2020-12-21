@@ -13,7 +13,7 @@ const defaultAdmin = {
 const createDefaultAdminUser = async (session) => {
   const readTxResultPromise = session.readTransaction(async (txc) => {
     const result = await txc.run(
-      'MATCH (email:EmailAddress)-[:BELONGS_TO]->(user:User) RETURN count(user) AS userCount',
+      'MATCH (user:User) RETURN count(user) AS userCount',
     )
     return result.records.map((r) => r.get('userCount'))
   })
@@ -29,7 +29,7 @@ const createDefaultAdminUser = async (session) => {
       txc.run(
         `MERGE (e:EmailAddress {
            email: "${defaultAdmin.email}",
-           createdAt: datetime()
+           createdAt: toString(datetime())
          })-[:BELONGS_TO]->(u:User {
            name: "${defaultAdmin.name}",
            encryptedPassword: "${defaultAdmin.password}",
