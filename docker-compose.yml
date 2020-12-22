@@ -2,7 +2,7 @@ version: "3.4"
 
 services:
   webapp:
-    image: schoolsinmotion/webapp:latest
+    image: ocelotsocialnetwork/develop-webapp:latest
     ports:
       - 3000:3000
     networks:
@@ -17,7 +17,7 @@ services:
       - PUBLIC_REGISTRATION=true
     command: yarn run dev
   backend:
-    image: schoolsinmotion/backend:latest
+    image: ocelotsocialnetwork/develop-backend:latest
     networks:
       - hc-network
     depends_on:
@@ -40,7 +40,7 @@ services:
       - SMTP_PASSWORD=${SMTP_PASSWORD}
     command: yarn run dev
   neo4j:
-    image: schoolsinmotion/neo4j:latest
+    image: ocelotsocialnetwork/develop-neo4j:latest
     networks:
       - hc-network
     environment:

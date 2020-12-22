@@ -17,7 +17,7 @@ jobs:
       - name: Build neo4j image
         uses: docker/build-push-action@v1.1.0
         with:
-          repository: schoolsinmotion/neo4j
+          repository: ocelotsocialnetwork/develop-neo4j
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
@@ -25,7 +25,7 @@ jobs:
       - name: Build backend base image
         uses: docker/build-push-action@v1.1.0
         with:
-          repository: schoolsinmotion/backend
+          repository: ocelotsocialnetwork/develop-backend
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: build-and-test
@@ -34,7 +34,7 @@ jobs:
       - name: Build webapp base image
         uses: docker/build-push-action@v1.1.0
         with:
-          repository: schoolsinmotion/webapp
+          repository: ocelotsocialnetwork/develop-webapp
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: build-and-test
@@ -44,7 +44,7 @@ jobs:
       - name: Build backend customized image
         uses: docker/build-push-action@v1.1.0
         with:
-          repository: schoolsinmotion/backend
+          repository: ocelotsocialnetwork/develop-backend
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
@@ -52,7 +52,7 @@ jobs:
       - name: Build webapp customized image
         uses: docker/build-push-action@v1.1.0
         with:
-          repository: schoolsinmotion/webapp
+          repository: ocelotsocialnetwork/develop-webapp
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
