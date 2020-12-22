@@ -4,4 +4,5 @@ export default {
   APPLICATION_DESCRIPTION: 'ocelot.social Community Network',
   ORGANIZATION_NAME: 'ocelot.social Community',
   ORGANIZATION_JURISDICTION: 'City of Angels',
+  COOKIE_NAME: 'ocelot-social-token',
 }

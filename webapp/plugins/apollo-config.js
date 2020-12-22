@@ -1,5 +1,6 @@
 import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
 import introspectionQueryResultData from './apollo-config/fragmentTypes.json'
+import metadata from '~/constants/metadata'
 
 const fragmentMatcher = new IntrospectionFragmentMatcher({
   introspectionQueryResultData,
@@ -16,7 +17,7 @@ export default ({ req, nuxtState }) => {
       credentials: 'same-origin',
     },
     credentials: true,
-    tokenName: 'ocelot-social-token',
+    tokenName: metadata.COOKIE_NAME,
     persisting: false,
     websocketsOnly: false,
     cache: new InMemoryCache({ fragmentMatcher }),
