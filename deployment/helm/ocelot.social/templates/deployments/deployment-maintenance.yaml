@@ -5,18 +5,18 @@ metadata:
   labels:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/name: human-connection
+    app.kubernetes.io/name: ocelot-social
     app.kubernetes.io/version: {{ .Chart.AppVersion }}
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
   selector:
     matchLabels:
-      human-connection.org/selector: deployment-maintenance
+      ocelot.social/selector: deployment-maintenance
   template:
     metadata:
       labels:
-        human-connection.org/commit: {{ .Values.commit }}
-        human-connection.org/selector: deployment-maintenance
+        ocelot.social/commit: {{ .Values.commit }}
+        ocelot.social/selector: deployment-maintenance
       name: maintenance
     spec:
       containers:

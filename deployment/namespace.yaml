@@ -1,6 +1,6 @@
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: human-connection
+  name: ocelot-social
   labels:
-    name: human-connection
+    name: ocelot-social

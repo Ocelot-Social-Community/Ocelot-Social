@@ -1,17 +1,17 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: maintenance
-  namespace: human-connection
+  namespace: ocelot-social
 spec:
   selector:
     matchLabels:
-      human-connection.org/selector: deployment-human-connection-maintenance
+      ocelot.social/selector: deployment-ocelot-social-maintenance
   template:
     metadata:
       labels:
-        human-connection.org/commit: COMMIT
-        human-connection.org/selector: deployment-human-connection-maintenance
+        ocelot.social/commit: COMMIT
+        ocelot.social/selector: deployment-ocelot-social-maintenance
       name: maintenance
     spec:
       containers:

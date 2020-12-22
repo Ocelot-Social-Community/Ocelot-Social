@@ -5,7 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/name: human-connection
+    app.kubernetes.io/name: ocelot-social
     app.kubernetes.io/version: {{ .Chart.AppVersion }}
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
@@ -17,4 +17,4 @@ spec:
     port: 7474
     targetPort: 7474
   selector:
-    human-connection.org/selector: deployment-neo4j
+    ocelot.social/selector: deployment-neo4j

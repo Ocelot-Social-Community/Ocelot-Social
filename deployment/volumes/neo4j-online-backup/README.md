@@ -43,12 +43,12 @@ Restoration must be done while the database is not running, see [our docs](https
 After, you have stopped the database, and have the pod running, you can restore the database by running these commands:
 
 ```sh
-$ kubectl --namespace=human-connection get pods
+$ kubectl -n ocelot-social get pods
 # Copy the ID of the pod running Neo4J.
 # Then upload your local backup to the pod. Note that once the pod gets deleted
 # e.g. if you change the deployment, the backup file is gone with it.
 $ kubectl cp ./neo4j-backup/ human-connection/<POD-ID>:/root/
-$ kubectl --namespace=human-connection exec -it <POD-ID> bash
+$ kubectl -n ocelot-social exec -it <POD-ID> bash
 # Once you're in the pod restore the backup and overwrite the default database
 # called `graph.db` with `--force`.
 # This will delete all existing data in database `graph.db`!

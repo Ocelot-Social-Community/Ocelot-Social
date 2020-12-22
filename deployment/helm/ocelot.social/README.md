@@ -13,7 +13,7 @@ Probably you want to change this environment variable to your actual domain:
 
 ```bash
 # in folder /deployment/helm
-CLIENT_URI: "https://develop.human-connection.org"
+CLIENT_URI: "https://develop-k8s.ocelot.social"
 ```
 
 If you want to edit secrets, you have to `base64` encode them. See [kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/#creating-a-secret-manually). You can also use `helm-secrets`, but we have yet to test it.

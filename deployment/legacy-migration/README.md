@@ -11,7 +11,7 @@ Create a configmap with the specific connection data of your legacy server:
 
 ```bash
 $ kubectl create configmap maintenance-worker          \
-  --namespace=human-connection                          \
+  -n ocelot-social                          \
   --from-literal=SSH_USERNAME=someuser                  \
   --from-literal=SSH_HOST=yourhost                      \
   --from-literal=MONGODB_USERNAME=hc-api                \
@@ -25,7 +25,7 @@ Create a secret with your public and private ssh keys. As the [kubernetes docume
 
 ```bash
 $ kubectl create secret generic ssh-keys          \
-  --namespace=human-connection                    \
+  -n ocelot-social                    \
   --from-file=id_rsa=/path/to/.ssh/id_rsa         \
   --from-file=id_rsa.pub=/path/to/.ssh/id_rsa.pub \
   --from-file=known_hosts=/path/to/.ssh/known_hosts
@@ -41,14 +41,14 @@ Bring the application into maintenance mode.
 Then temporarily delete backend and database deployments
 
 ```bash
-$ kubectl --namespace=human-connection get deployments
+$ kubectl -n ocelot-social get deployments
 NAME            READY   UP-TO-DATE   AVAILABLE   AGE
 develop-backend 1/1     1            1           3d11h
 develop-neo4j   1/1     1            1           3d11h
 develop-webapp  2/2     2            2           73d
-$ kubectl --namespace=human-connection delete deployment develop-neo4j
+$ kubectl -n ocelot-social delete deployment develop-neo4j
 deployment.extensions "develop-neo4j" deleted
-$ kubectl --namespace=human-connection delete deployment develop-backend
+$ kubectl -n ocelot-social delete deployment develop-backend
 deployment.extensions "develop-backend" deleted
 ```
 
@@ -63,7 +63,7 @@ pod/develop-maintenance-worker created
 Import legacy database and uploads:
 
 ```bash
-$ kubectl --namespace=human-connection exec -it develop-maintenance-worker bash
+$ kubectl -n ocelot-social exec -it develop-maintenance-worker bash
 $ import_legacy_db
 $ import_legacy_uploads
 $ exit
@@ -72,7 +72,7 @@ $ exit
 Delete the pod when you're done:
 
 ```bash
-$ kubectl --namespace=human-connection delete pod develop-maintenance-worker
+$ kubectl -n ocelot-social delete pod develop-maintenance-worker
 ```
 
 Oh, and of course you have to get those deleted deployments back. One way of

@@ -8,14 +8,15 @@ you from loosing data if you accidently delete the namespace and the persistent
 volumes along with it.
 
 ```sh
-$ kubectl --namespace=human-connection get pv
+$ kubectl -n ocelot-social get pv
 
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                               STORAGECLASS       REASON   AGE
-pvc-bd02a715-66d0-11e9-be52-ba9c337f4551   1Gi        RWO            Delete           Bound    human-connection/neo4j-data-claim   do-block-storage            4m24s
-pvc-bd208086-66d0-11e9-be52-ba9c337f4551   2Gi        RWO            Delete           Bound    human-connection/uploads-claim      do-block-storage            4m12s
+pvc-bd02a715-66d0-11e9-be52-ba9c337f4551   5Gi        RWO            Delete           Bound    ocelot-social/neo4j-data-claim   do-block-storage            4m24s
+pvc-bd208086-66d0-11e9-be52-ba9c337f4551   10Gi       RWO            Delete           Bound    ocelot-social/uploads-claim      do-block-storage            4m12s
 ```
 
 Get the volume id from above, then change `ReclaimPolicy` with:
+
 ```sh
 kubectl patch pv <VOLUME-ID> -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
 

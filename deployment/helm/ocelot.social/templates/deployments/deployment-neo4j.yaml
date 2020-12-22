@@ -5,7 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/name: human-connection
+    app.kubernetes.io/name: ocelot-social
     app.kubernetes.io/version: {{ .Chart.AppVersion }}
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
@@ -16,15 +16,15 @@ spec:
       maxUnavailable: "100%"
   selector:
     matchLabels:
-      human-connection.org/selector: deployment-neo4j
+      ocelot.social/selector: deployment-neo4j
   template:
     metadata:
       name: neo4j
       annotations:
         backup.velero.io/backup-volumes: neo4j-data
       labels:
-        human-connection.org/commit: {{ .Values.commit }}
-        human-connection.org/selector: deployment-neo4j
+        ocelot.social/commit: {{ .Values.commit }}
+        ocelot.social/selector: deployment-neo4j
     spec:
       containers:
       - name: neo4j
