@@ -21,7 +21,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
-          path: Human-Connection/neo4j/
+          path: Ocelot-Social/neo4j/
       - name: Build backend base image
         uses: docker/build-push-action@v1.1.0
         with:
@@ -30,7 +30,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: build-and-test
           target: build-and-test
-          path: Human-Connection/backend/
+          path: Ocelot-Social/backend/
       - name: Build webapp base image
         uses: docker/build-push-action@v1.1.0
         with:
@@ -39,7 +39,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: build-and-test
           target: build-and-test
-          path: Human-Connection/webapp/
+          path: Ocelot-Social/webapp/
 
       - name: Build backend customized image
         uses: docker/build-push-action@v1.1.0
