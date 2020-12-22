@@ -25,6 +25,11 @@ describe('SocialMedia.vue', () => {
     //   expect(Wrapper().contains('.hc-badges')).toBe(true)
     // })
 
+
+    // the description should be as good as possible.
+    // Even someone who cannot code should be able to read the specs,
+    // e.g. a project manager can read the tests to understand
+    // what the component ist doing
     describe('new test', () => {
       beforeEach(() => {
         propsData.userName = 'Jenny Rostock'
@@ -45,9 +50,16 @@ describe('SocialMedia.vue', () => {
       })
     })
 
+    // check the description
     describe('given a badge', () => {
+
+      // a variable for the wrapper
+      let wrapper
+      
       beforeEach(() => {
         propsData.userName = 'Jenny Rostock'
+        // this is too much
+        // three social media links should be enough
         propsData.user = {
           socialMedia: [
             {
@@ -87,8 +99,32 @@ describe('SocialMedia.vue', () => {
             },
           ],
         }
+        // Now assign wrapper
+        wrapper = Wrapper()
       })
 
+      it('shows 7 social media links', () => {
+        // check what the wrapper looks like:
+        console.log(wrapper.html())
+        expect(wrapper.findAll('a')).toHaveLength(7)
+      })
+
+
+      it('renders a social media link', () => {
+        const link = wrapper.findAll('a').at(0)
+        console.log(link.html())
+        expect(link.attributes('href')).toEqual('https://www.instagram.com/nimitbhargava')
+      })
+
+      it('shows the favicon', () => {
+        const favicon = wrapper.findAll('a').at(0).find('img')
+        console.log(favicon.html())
+        expect(favicon.attributes('src')).toEqual('https://www.instagram.com/favicon.ico')
+      })
+
+      // I think this is enough to test the component
+
+      
       // Case 0:
       // Display profile links
       //
