@@ -1,34 +1,70 @@
 ---
-  apiVersion: certmanager.k8s.io/v1alpha1
-  kind: Issuer
-  metadata:
-    name: letsencrypt-staging
-    namespace: human-connection
-  spec:
-    acme:
-      # The ACME server URL
-      server: https://acme-staging-v02.api.letsencrypt.org/directory
-      # Email address used for ACME registration
-      email: user@example.com
-      # Name of a secret used to store the ACME account private key
-      privateKeySecretRef:
-        name: letsencrypt-staging
-      # Enable the HTTP-01 challenge provider
-      http01: {}
+# used while installation as first setup for testing purposes, recognize 'server: https://acme-staging-v02…'
+# !!! replace the e-mail for expiring certificates, see below !!!
+# !!! create the used secret, see below !!!
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+  namespace: ocelot-social
+spec:
+  acme:
+    # You must replace this email address with your own.
+    # Let's Encrypt will use this to contact you about expiring
+    # certificates, and issues related to your account.
+    email: user@example.com
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      # Secret resource that will be used to store the account's private key.
+      name: letsencrypt-staging-issuer-account-key
+    # Add a single challenge solver, HTTP01 using nginx
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
 ---
-   apiVersion: certmanager.k8s.io/v1alpha1
-   kind: Issuer
-   metadata:
-     name: letsencrypt-prod
-     namespace: human-connection
-   spec:
-     acme:
-       # The ACME server URL
-       server: https://acme-v02.api.letsencrypt.org/directory
-       # Email address used for ACME registration
-       email: user@example.com
-       # Name of a secret used to store the ACME account private key
-       privateKeySecretRef:
-         name: letsencrypt-prod
-       # Enable the HTTP-01 challenge provider
-       http01: {}
+# used after installation for production, recognize 'server: https://acme-v02…'
+# !!! replace the e-mail for expiring certificates, see below !!!
+# !!! create the used secret, see below !!!
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+  namespace: ocelot-social
+spec:
+  acme:
+    # You must replace this email address with your own.
+    # Let's Encrypt will use this to contact you about expiring
+    # certificates, and issues related to your account.
+    email: user@example.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      # Secret resource that will be used to store the account's private key.
+      name: letsencrypt-prod-issuer-account-key
+    # Add a single challenge solver, HTTP01 using nginx
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+---
+# fill in your letsencrypt-staging-issuer-account-key
+# generate base 64: $ echo -n '<your data>' | base64
+apiVersion: v1
+data:
+  tls.key: <your base 64 data>
+kind: Secret
+metadata:
+  name: letsencrypt-staging-issuer-account-key
+  namespace: ocelot-social
+type: Opaque
+---
+# fill in your letsencrypt-prod-issuer-account-key
+# generate base 64: $ echo -n '<your data>' | base64
+apiVersion: v1
+data:
+  tls.key: <your base 64 data>
+kind: Secret
+metadata:
+  name: letsencrypt-prod-issuer-account-key
+  namespace: ocelot-social
+type: Opaque

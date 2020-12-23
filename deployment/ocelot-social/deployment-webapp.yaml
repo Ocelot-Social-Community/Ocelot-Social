@@ -3,10 +3,10 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    human-connection.org/commit: COMMIT
-    human-connection.org/selector: deployment-human-connection-web
+    ocelot.social/commit: COMMIT
+    ocelot.social/selector: deployment-ocelot-social-webapp
   name: web
-  namespace: human-connection
+  namespace: ocelot-social
 spec:
   minReadySeconds: 15
   progressDeadlineSeconds: 60
@@ -14,7 +14,7 @@ spec:
   revisionHistoryLimit: 2147483647
   selector:
     matchLabels:
-      human-connection.org/selector: deployment-human-connection-web
+      ocelot.social/selector: deployment-ocelot-social-webapp
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -24,8 +24,8 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        human-connection.org/commit: COMMIT
-        human-connection.org/selector: deployment-human-connection-web
+        ocelot.social/commit: COMMIT
+        ocelot.social/selector: deployment-ocelot-social-webapp
       name: web
     spec:
       containers:
@@ -36,7 +36,7 @@ spec:
         - configMapRef:
             name: configmap
         - secretRef:
-            name: human-connection
+            name: ocelot-social
         image: ocelotsocialnetwork/develop-webapp:latest
         imagePullPolicy: Always
         name: web

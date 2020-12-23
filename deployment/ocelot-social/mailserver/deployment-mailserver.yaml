@@ -3,9 +3,9 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    human-connection.org/selector: deployment-human-connection-mailserver
+    ocelot.social/selector: deployment-ocelot-social-mailserver
   name: mailserver
-  namespace: human-connection
+  namespace: ocelot-social
 spec:
   minReadySeconds: 15
   progressDeadlineSeconds: 60
@@ -13,7 +13,7 @@ spec:
   revisionHistoryLimit: 2147483647
   selector:
     matchLabels:
-      human-connection.org/selector: deployment-human-connection-mailserver
+      ocelot.social/selector: deployment-ocelot-social-mailserver
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -23,7 +23,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        human-connection.org/selector: deployment-human-connection-mailserver
+        ocelot.social/selector: deployment-ocelot-social-mailserver
       name: mailserver
     spec:
       containers:
@@ -31,7 +31,7 @@ spec:
         - configMapRef:
             name: configmap
         - secretRef:
-            name: human-connection
+            name: ocelot-social
         image: djfarrelly/maildev
         imagePullPolicy: Always
         name: mailserver

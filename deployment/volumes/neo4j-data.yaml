@@ -3,10 +3,10 @@
   apiVersion: v1
   metadata:
     name: neo4j-data-claim
-    namespace: human-connection
+    namespace: ocelot-social
   spec:
     accessModes:
       - ReadWriteOnce
     resources:
       requests:
-        storage: {{ .Values.neo4jStorage }}
+        storage: "10Gi"  # see requirements for Neo4j v3.5.14 https://neo4j.com/docs/operations-manual/3.5/installation/requirements/

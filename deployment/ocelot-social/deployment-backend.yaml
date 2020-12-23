@@ -3,10 +3,10 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    human-connection.org/commit: COMMIT
-    human-connection.org/selector: deployment-human-connection-backend
+    ocelot.social/commit: COMMIT
+    ocelot.social/selector: deployment-ocelot-social-backend
   name: backend
-  namespace: human-connection
+  namespace: ocelot-social
 spec:
   minReadySeconds: 15
   progressDeadlineSeconds: 60
@@ -14,7 +14,7 @@ spec:
   revisionHistoryLimit: 2147483647
   selector:
     matchLabels:
-      human-connection.org/selector: deployment-human-connection-backend
+      ocelot.social/selector: deployment-ocelot-social-backend
   strategy:
     rollingUpdate:
       maxSurge: 0
@@ -26,8 +26,8 @@ spec:
         backup.velero.io/backup-volumes: uploads
       creationTimestamp: null
       labels:
-        human-connection.org/commit: COMMIT
-        human-connection.org/selector: deployment-human-connection-backend
+        ocelot.social/commit: COMMIT
+        ocelot.social/selector: deployment-ocelot-social-backend
       name: backend
     spec:
       containers:
@@ -35,9 +35,11 @@ spec:
         - configMapRef:
             name: configmap
         - secretRef:
-            name: human-connection
-        image: ocelotsocialnetwork/develop-backend:latest
-        imagePullPolicy: Always
+            name: ocelot-social
+        image: ocelotsocialnetwork/develop-backend:latest  # for develop
+        # image: ocelotsocialnetwork/develop-backend:0.6.3  # for production or staging
+        imagePullPolicy: Always  # for develop or staging
+        # imagePullPolicy: IfNotPresent  # for production
         name: backend
         ports:
         - containerPort: 4000
