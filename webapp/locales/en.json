@@ -354,6 +354,7 @@
     "no-results": "No contributions found."
   },
   "login": {
+    "capsLock": "Caps Lock Enabled!",
     "copy": "If you already have a human-connection account, please login.",
     "email": "Your E-mail",
     "failure": "Incorrect email address or password.",

@@ -354,6 +354,7 @@
     "no-results": "Keine Beiträge gefunden."
   },
   "login": {
+    "capsLock": "Capslock ist an",
     "copy": "Falls Du bereits ein Konto bei Human Connection hast, melde Dich bitte hier an.",
     "email": "Deine E-Mail",
     "failure": "Fehlerhafte E-Mail-Adresse oder Passwort.",

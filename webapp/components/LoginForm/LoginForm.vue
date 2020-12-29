@@ -11,11 +11,13 @@
         </a>
       </template>
       <h2 class="title">{{ $t('login.login') }}</h2>
-      <form 
-          ref="form"
-          :disabled="pending" @submit.prevent="onSubmit" 
-          @keydown.caps-lock="capsLock"
-          @keyup.caps-lock="capsLock">
+      <form
+        ref="form"
+        :disabled="pending"
+        @submit.prevent="onSubmit"
+        @keydown="capsLock"
+        @keyup="capsLock"
+      >
         <ds-input
           v-model="form.email"
           :disabled="pending"
@@ -24,20 +26,20 @@
           name="email"
           icon="envelope"
         />
-          <ds-input
-            v-model="form.password"
-            :disabled="pending"
-            :placeholder="$t('login.password')"
-            icon="lock"
-            icon-right="question-circle"
-            name="password"
-            type="password"
-            ref="passwordInput"
-          />
+        <ds-input
+          v-model="form.password"
+          :disabled="pending"
+          :placeholder="$t('login.password')"
+          icon="lock"
+          icon-right="question-circle"
+          name="password"
+          type="password"
+          ref="passwordInput"
+        />
         <nuxt-link to="/password-reset/request">
           {{ $t('login.forgotPassword') }}
         </nuxt-link>
-        <text class="caps-warning" v-show="caps" >CAPS LOCK ENABLED!</text>
+        <text class="caps-warning" v-show="caps">{{ $t('login.capsLock') }}</text>
         <base-button :loading="pending" filled name="submit" type="submit" icon="sign-in">
           {{ $t('login.login') }}
         </base-button>
@@ -85,11 +87,11 @@ export default {
         this.$toast.error(this.$t('login.failure'))
       }
     },
-    capsLock(e){
-      if(document.activeElement.name === 'password') {
+    capsLock(e) {
+      if (document.activeElement.name === 'password') {
         this.caps = e.getModifierState('CapsLock')
       }
-    }
+    },
   },
 }
 </script>
@@ -106,18 +108,16 @@ export default {
     margin-top: $space-large;
     margin-bottom: $space-small;
   }
-  
+
   .caps-warning {
     font-size: 12px;
     color: $text-color-danger;
     background-color: $background-color-danger-inverse;
-    border: 2px solid $border-color-softer ;
+    border: 2px solid $border-color-softer;
     border-radius: 5px;
     padding: 4px 8px;
     margin-left: 8px;
-    
-
+    width: fit-content;
   }
 }
-
 </style>

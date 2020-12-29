@@ -63,14 +63,13 @@ describe('LoginForm', () => {
       const wrapper = Wrapper()
 
       it('Caps-lock warning message is hidden on page load', () => {
-        expect(wrapper.find('text.caps-warning').attributes('style')).toEqual('display: none;')
+        expect(wrapper.find('.caps-warning').isVisible()).toBe(false)
       })
 
-      it('shows warning when caps-lock is press', async () => {
-        const formWrapper = wrapper.find({ ref: 'form' })
-        formWrapper.trigger('keydown', {key: 'CapsLock'})
-        // await Vue.nextTick()
-        expect(wrapper.vm.caps).toBe(true)
+      it('shows warning when caps-lock is pressed', async () => {
+        wrapper.setData({ caps: true })
+        await Vue.nextTick()
+        expect(wrapper.find('.caps-warning').isVisible()).toBe(true)
       })
     })
   })
