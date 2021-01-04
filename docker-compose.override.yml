@@ -29,8 +29,8 @@ services:
       - "DEBUG=${DEBUG}"
       - PUBLIC_REGISTRATION=false
     volumes:
-      - backend_node_modules:/nitro-backend/node_modules
-      - uploads:/nitro-backend/public/uploads
+      - backend_node_modules:/develop-backend/node_modules
+      - uploads:/develop-backend/public/uploads
   neo4j:
     volumes:
       - neo4j_data:/data
