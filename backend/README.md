@@ -26,27 +26,32 @@ some known problems with more recent node versions). You can use the
 between different local node versions.
 
 Install node dependencies with [yarn](https://yarnpkg.com/en/):
+
 ```bash
 $ cd backend
 $ yarn install
 ```
 
 Copy Environment Variables:
+
 ```bash
 # in backend/
 $ cp .env.template .env
 ```
+
 Configure the new file according to your needs and your local setup. Make sure
 a [local Neo4J](http://localhost:7474) instance is up and running.
 
 Start the backend for development with:
+
 ```bash
 $ yarn run dev
 ```
 
 or start the backend in production environment with:
+
 ```bash
-yarn run start
+$ yarn run start
 ```
 
 For e-mail delivery, please configure at least `SMTP_HOST` and `SMTP_PORT` in
@@ -65,20 +70,22 @@ backend is running:
 
 {% tabs %}
 {% tab title="Docker" %}
-```bash
-docker-compose exec backend yarn run db:migrate init
-```
-{% endtab %}
 
+```bash
+$ docker-compose exec backend yarn run db:migrate init
+```
+
+{% endtab %}
 {% tab title="Without Docker" %}
+
 ```bash
 # in folder backend/
 # make sure your database is running on http://localhost:7474/browser/
 yarn run db:migrate init
 ```
+
 {% endtab %}
 {% endtabs %}
-
 
 #### Seed Database
 
