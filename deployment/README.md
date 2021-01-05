@@ -43,11 +43,19 @@ backend: $ exit
 ```
 
 {% endtab %}
-{% tab title="Docker-Compose Local" %}
+{% tab title="Docker-Compose Running Local" %}
 
 ```bash
 # exec in backend
 $ docker-compose exec backend yarn run db:migrate init
+```
+
+{% endtab %}
+{% tab title="Running Local" %}
+
+```bash
+# exec in folder backend/
+$ yarn run db:migrate init
 ```
 
 {% endtab %}
