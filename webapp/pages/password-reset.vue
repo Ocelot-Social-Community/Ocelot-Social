@@ -2,7 +2,7 @@
   <ds-container width="small" class="password-reset">
     <base-card>
       <template #imageColumn>
-        <img alt="Reset your password" src="/img/custom/password-reset.svg" class="image" />
+        <img class="image" alt="Reset your password" src="/img/custom/password-reset.svg" />
       </template>
       <nuxt-child />
       <template #topMenu>
