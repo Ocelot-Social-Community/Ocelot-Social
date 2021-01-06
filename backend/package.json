@@ -2,6 +2,10 @@
   "name": "ocelot-social-backend",
   "version": "0.6.3",
   "description": "GraphQL Backend for ocelot.social",
+  "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
+  "author": "ocelot.social Community",
+  "license": "MIT",
+  "private": false,
   "main": "src/index.js",
   "scripts": {
     "__migrate": "migrate --compiler 'js:@babel/register' --migrations-dir ./src/db/migrations",
@@ -18,7 +22,6 @@
     "db:migrate": "yarn run __migrate --store ./src/db/migrate/store.js",
     "db:migrate:create": "yarn run __migrate --template-file ./src/db/migrate/template.js --date-format 'yyyymmddHHmmss' create"
   },
-  "license": "MIT",
   "jest": {
     "verbose": true,
     "collectCoverageFrom": [

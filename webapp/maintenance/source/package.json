@@ -1,12 +1,12 @@
 {
   "name": "@ocelot-social/maintenance",
-  "version": "1.0.0",
+  "version": "0.6.3",
   "description": "Maintenance page for ocelot.social",
-  "main": "index.js",
   "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
-  "author": "Robert Schäfer",
+  "author": "ocelot.social Community",
   "license": "MIT",
   "private": false,
+  "main": "index.js",
   "scripts": {
     "dev": "yarn run nuxt -c nuxt.config.maintenance.js",
     "build": "yarn run nuxt build -c nuxt.config.maintenance.js",
