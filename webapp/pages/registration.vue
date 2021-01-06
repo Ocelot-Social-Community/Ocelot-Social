@@ -1,8 +1,10 @@
 <template>
-  <ds-container width="medium">
+  <ds-container width="small">
     <base-card>
       <template #imageColumn>
-        <img alt="Sign up" src="/img/custom/sign-up.svg" />
+        <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
+          <img class="image" alt="Sign up" src="/img/custom/sign-up.svg" />
+        </a>
       </template>
       <nuxt-child />
       <template #topMenu>
@@ -13,6 +15,8 @@
 </template>
 
 <script>
+import links from '~/constants/links.js'
+import metadata from '~/constants/metadata.js'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 
 export default {
@@ -20,6 +24,12 @@ export default {
     LocaleSwitch,
   },
   layout: 'no-header',
+  data() {
+    return {
+      metadata,
+      links,
+    }
+  },
   asyncData({ store, redirect }) {
     if (store.getters['auth/isLoggedIn']) {
       redirect('/')
@@ -27,3 +37,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.image {
+  width: 100%;
+}
+</style>
