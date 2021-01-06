@@ -1,4 +1,4 @@
-FROM node:12.19.0-alpine3.10 as base
+FROM node:15.5.1-alpine3.10 as base
 LABEL Description="Web Frontend of the Social Network ocelot.social" Vendor="ocelot.social Community" Version="0.0.1" Maintainer="ocelot.social Community (devops@ocelot.social)"
 
 EXPOSE 3000
