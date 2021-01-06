@@ -6,9 +6,9 @@
     </blockquote>
     <base-card>
       <template #imageColumn>
-        <!-- <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank"> -->
+        <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
           <img class="image" alt="Welcome" src="/img/custom/welcome.svg" />
-        <!-- </a> -->
+        </a>
       </template>
       <h2 class="title">{{ $t('login.login') }}</h2>
       <form :disabled="pending" @submit.prevent="onSubmit">
