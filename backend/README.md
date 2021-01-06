@@ -96,11 +96,13 @@ need to seed your database:
 {% tab title="Docker" %}
 
 In another terminal run:
+
 ```bash
 $ docker-compose exec backend yarn run db:seed
 ```
 
 To reset the database run:
+
 ```bash
 $ docker-compose exec backend yarn run db:reset
 # you could also wipe out your neo4j database and delete all volumes with:
@@ -108,18 +110,22 @@ $ docker-compose down -v
 # if container is not running, run this command to set up your database indeces and contstraints
 $ docker-compose exec backend yarn run db:migrate init
 ```
-{% endtab %}
 
+{% endtab %}
 {% tab title="Without Docker" %}
+
 Run:
+
 ```bash
 $ yarn run db:seed
 ```
 
 To reset the database run:
+
 ```bash
 $ yarn run db:reset
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -130,32 +136,40 @@ you have to migrate your data e.g. because your data modeling has changed.
 
 {% tabs %}
 {% tab title="Docker" %}
+
 Generate a data migration file:
+
 ```bash
 $ docker-compose exec backend yarn run db:migrate:create your_data_migration
 # Edit the file in ./src/db/migrations/
 ```
 
 To run the migration:
+
 ```bash
 $ docker-compose exec backend yarn run db:migrate up
 ```
+
 {% endtab %}
 {% tab title="Without Docker" %}
+
 Generate a data migration file:
+
 ```bash
 $ yarn run db:migrate:create your_data_migration
 # Edit the file in ./src/db/migrations/
 ```
 
 To run the migration:
+
 ```bash
 $ yarn run db:migrate up
 ```
+
 {% endtab %}
 {% endtabs %}
 
-# Testing
+## Testing
 
 **Beware**: We have no multiple database setup at the moment. We clean the
 database after each test, running the tests will wipe out all your data!
