@@ -2,6 +2,8 @@
 
 The maintenance mode shows a translatable page that tells the user that we are right back, because we are working on the server.
 
+![Maintenance Mode Screen Shot](../../.gitbook/assets/maintenance-page.png)
+
 ## Running The Maintenance Page Or Service
 
 At the moment the maintenance mode can only be locally tested with Docker-Compose.
