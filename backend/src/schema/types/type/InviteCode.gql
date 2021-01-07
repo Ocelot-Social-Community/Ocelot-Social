@@ -1,0 +1,14 @@
+type InviteCode {
+  code: ID!
+  createdAt: String
+  uses: Int!
+  maxUses: Int!
+  createdBy: User @relation(name: "CREATED", direction: "IN")
+  usedBy: [User] @relation(name: "USED", direction: "IN")
+  active: Boolean!
+}
+
+
+type Mutation {
+  CreateInviteCode(maxUses: Int = 1): InviteCode
+}

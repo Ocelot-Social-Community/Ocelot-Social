@@ -100,6 +100,18 @@ export default {
     target: 'User',
     direction: 'in',
   },
+  createdInvite: {
+    type: 'relationship',
+    relationship: 'CREATED',
+    target: 'InviteCode',
+    direction: 'out',
+  },
+  usedInvite: {
+    type: 'relationship',
+    relationship: 'USED',
+    target: 'InviteCode',
+    direction: 'out',
+  },
   termsAndConditionsAgreedVersion: {
     type: 'string',
     allow: [null],
