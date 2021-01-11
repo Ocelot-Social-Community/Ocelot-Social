@@ -8,6 +8,8 @@
 # install all dependencies
 $ cd webapp/
 $ yarn install
+# or just
+$ yarn
 ```
 
 Copy:
@@ -95,6 +97,10 @@ You can then visit the Storybook playground on `http://localhost:3002`
 
 {% endtab %}
 {% endtabs %}
+
+## Maintenance Mode
+
+For installing and running the maintenance mode see [Maintenance Mode](./maintenance/README.md).
 
 ## Styleguide Migration
 

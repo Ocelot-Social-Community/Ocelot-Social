@@ -37,7 +37,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .ds-logo {
   @include reset;
   display: inline-flex;
@@ -53,7 +53,7 @@ export default {
 .ds-logo-svg {
   width: 130px;
   height: auto;
-  fill: currentColor;
+  fill: #000000;
 }
 </style>
 

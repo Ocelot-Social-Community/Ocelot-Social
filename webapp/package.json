@@ -2,12 +2,9 @@
   "name": "ocelot-social-webapp",
   "version": "0.6.3",
   "description": "ocelot.social Frontend",
-  "authors": [
-    "Grzegorz Leoniec (appinteractive)",
-    "ulfgebhardt"
-  ],
-  "license": "MIT",
+  "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
   "author": "ocelot.social Community",
+  "license": "MIT",
   "private": false,
   "scripts": {
     "dev": "nuxt",
