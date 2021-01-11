@@ -100,15 +100,15 @@ export default {
     target: 'User',
     direction: 'in',
   },
-  createdInvite: {
+  inviteCodes: {
     type: 'relationship',
-    relationship: 'CREATED',
+    relationship: 'GENERATED',
     target: 'InviteCode',
     direction: 'out',
   },
-  usedInvite: {
+  redeemedInviteCode: {
     type: 'relationship',
-    relationship: 'USED',
+    relationship: 'REDEEMED',
     target: 'InviteCode',
     direction: 'out',
   },

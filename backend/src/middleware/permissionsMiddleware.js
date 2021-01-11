@@ -149,7 +149,7 @@ export default shield(
       pinPost: isAdmin,
       unpinPost: isAdmin,
       UpdateDonations: isAdmin,
-      CreateInviteCode: isAuthenticated,
+      GenerateInviteCode: isAuthenticated,
     },
     User: {
       email: or(isMyOwn, isAdmin),

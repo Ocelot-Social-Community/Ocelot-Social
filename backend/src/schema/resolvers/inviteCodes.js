@@ -1,65 +1,60 @@
-import { neo4jgraphql } from 'neo4j-graphql-js'
 import generateInvieCode from './helpers/generateInviteCode'
 import Resolver from './helpers/Resolver'
 
 const uniqueInviteCode = async (session, code) => {
   return session.readTransaction(async (txc) => {
-    const result = await txc.run(
-      `MATCH (ic:InviteCode { id: $code }) RETURN count(ic) AS count`,
-      { code },
-    )
-     return parseInt(String(result.records[0].get('count'))) === 0
+    const result = await txc.run(`MATCH (ic:InviteCode { id: $code }) RETURN count(ic) AS count`, {
+      code,
+    })
+    return parseInt(String(result.records[0].get('count'))) === 0
   })
 }
 
 export default {
   Mutation: {
-    CreateInviteCode: async (_parent, args, context, _resolveInfo) => {
+    GenerateInviteCode: async (_parent, args, context, _resolveInfo) => {
       const {
         user: { id: userId },
       } = context
       const session = context.driver.session()
       let code = generateInvieCode()
       let response
-      while(!await uniqueInviteCode(session, code)) {
+      while (!(await uniqueInviteCode(session, code))) {
         code = generateInvieCode()
       }
       const writeTxResultPromise = session.writeTransaction(async (txc) => {
         const result = await txc.run(
           `MATCH (user:User {id: $userId})
-           MERGE (user)-[:CREATED]->(ic:InviteCode {
-             code: $code,
-             createdAt: toString(datetime()),
-             uses: $uses,
-             maxUses: $maxUses,
-             active: true
-           }) RETURN ic AS inviteCode`,
+           MERGE (user)-[:GENERATED]->(ic:InviteCode { code: $code })
+           ON CREATE SET
+           ic.createdAt = toString(datetime()),
+           ic.expiresAt = $expiresAt
+           RETURN ic AS inviteCode`,
           {
             userId,
             code,
-            maxUses: args.maxUses,
-            uses: 0,
+            expiresAt: args.expiresAt,
           },
         )
         return result.records.map((record) => record.get('inviteCode').properties)
       })
       try {
         const txResult = await writeTxResultPromise
-        console.log(txResult)
         response = txResult[0]
       } finally {
         session.close()
       }
       return response
-    }
+    },
   },
   InviteCode: {
     ...Resolver('InviteCode', {
+      undefinedToNull: ['expiresAt'],
       hasOne: {
-        createdBy: '<-[:CREATED]-(related:User)',
+        generatedBy: '<-[:GENERATED]-(related:User)',
       },
       hasMany: {
-        usedBy: '<-[:USED]-(related:User)',
+        redeemedBy: '<-[:REDEEMED]-(related:User)',
       },
     }),
   },

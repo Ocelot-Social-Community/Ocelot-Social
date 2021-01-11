@@ -56,8 +56,8 @@ type User {
   followedBy: [User]! @relation(name: "FOLLOWS", direction: "IN")
   followedByCount: Int! @cypher(statement: "MATCH (this)<-[:FOLLOWS]-(r:User) RETURN COUNT(DISTINCT r)")
 
-  inviteCodes: [InviteCode] @relation(name: "CREATED", direction: "OUT")
-  usedInviteCode: InviteCode @relation(name: "USED", direction: "OUT")
+  inviteCodes: [InviteCode] @relation(name: "GENERATED", direction: "OUT")
+  redeemedInviteCode: InviteCode @relation(name: "REDEEMED", direction: "OUT")
 
   # Is the currently logged in user following that user?
   followedByCurrentUser: Boolean! @cypher(

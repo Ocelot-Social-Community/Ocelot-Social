@@ -1,14 +1,12 @@
 type InviteCode {
   code: ID!
   createdAt: String
-  uses: Int!
-  maxUses: Int!
-  createdBy: User @relation(name: "CREATED", direction: "IN")
-  usedBy: [User] @relation(name: "USED", direction: "IN")
-  active: Boolean!
+  generatedBy: User @relation(name: "GENERATED", direction: "IN")
+  redeemedBy: [User] @relation(name: "REDEEMED", direction: "IN")
+  expiresAt: String
 }
 
 
 type Mutation {
-  CreateInviteCode(maxUses: Int = 1): InviteCode
+  GenerateInviteCode(expiresAt: String = null): InviteCode
 }
