@@ -34,6 +34,31 @@ export default {
         session.close()
       }
     },
+    isValidInviteCode: async (_parent, args, context, _resolveInfo) => {
+      const { code } = args
+      if (!code) return false
+      const session = context.driver.session()
+      const readTxResultPromise = session.readTransaction(async (txc) => {
+        const result = await txc.run(
+          `MATCH (ic:InviteCode { code: $code })
+           RETURN
+           CASE
+           WHEN ic.expiresAt IS NULL THEN true
+           WHEN datetime(ic.expiresAt) >=  datetime() THEN true
+           ELSE false END AS result`,
+          {
+            code,
+          },
+        )
+        return result.records.map((record) => record.get('result'))
+      })
+      try {
+        const txResult = await readTxResultPromise
+        return !!txResult[0]
+      } finally {
+        session.close()
+      }
+    },
   },
   Mutation: {
     GenerateInviteCode: async (_parent, args, context, _resolveInfo) => {

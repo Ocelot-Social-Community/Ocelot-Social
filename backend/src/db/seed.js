@@ -550,7 +550,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         generatedBy: jennyRostock,
       },
     )
-    
+
     authenticatedUser = await louie.toJson()
     const mention1 =
       'Hey <a class="mention" data-mention-id="u3" href="/profile/u3">@jenny-rostock</a>, what\'s up?'

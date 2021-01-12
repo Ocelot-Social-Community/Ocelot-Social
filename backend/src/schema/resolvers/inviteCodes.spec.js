@@ -30,6 +30,12 @@ const myInviteCodesQuery = gql`
   }
 `
 
+const isValidInviteCodeQuery = gql`
+  query($code: ID) {
+    isValidInviteCode(code: $code)
+  }
+`
+
 beforeAll(async () => {
   await cleanDatabase()
   const { server } = createServer({
@@ -141,7 +147,36 @@ describe('inviteCodes', () => {
       expect(inviteCodes).toHaveLength(2)
     })
 
-    // const expiringInviteCode = inviteCodes.filter((ic) => ic.expiresAt !== null)
-    // const unExpiringInviteCode = inviteCodes.filter((ic) => ic.expiresAt === null)
+    it('does not returns the created invite codes of other users when queried', async () => {
+      await Factory.build('inviteCode')
+      const response = await query({ query: myInviteCodesQuery })
+      inviteCodes = response.data.MyInviteCodes
+      expect(inviteCodes).toHaveLength(2)
+    })
+
+    it('validates an invite code without expiresAt', async () => {
+      const unExpiringInviteCode = inviteCodes.filter((ic) => ic.expiresAt === null)[0].code
+      expect(
+        query({ query: isValidInviteCodeQuery, variables: { code: unExpiringInviteCode } }),
+      ).resolves.toBeTruthy()
+    })
+
+    it('validates an invite code with expiresAt in the future', async () => {
+      const expiringInviteCode = inviteCodes.filter((ic) => ic.expiresAt !== null)[0].code
+      expect(
+        query({ query: isValidInviteCodeQuery, variables: { code: expiringInviteCode } }),
+      ).resolves.toBeTruthy()
+    })
+
+    it.skip('does not validate an invite code which expired in the past', async () => {
+      const lastWeek = new Date()
+      lastWeek.setDate(lastWeek.getDate() - 7)
+      const code = await Factory.build('inviteCode', {
+        expiresAt: lastWeek.toISOString(),
+      })
+      expect(
+        query({ query: isValidInviteCodeQuery, variables: { code: code.code } }),
+      ).resolves.toBeFalsy()
+    })
   })
 })

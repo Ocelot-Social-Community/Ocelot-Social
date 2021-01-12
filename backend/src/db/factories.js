@@ -235,9 +235,7 @@ Factory.define('inviteCode')
       neode.create('InviteCode', buildObject),
       options.generatedBy,
     ])
-    await Promise.all([
-      inviteCode.relateTo(generatedBy, 'generated'),
-    ])
+    await Promise.all([inviteCode.relateTo(generatedBy, 'generated')])
     return inviteCode
   })
 

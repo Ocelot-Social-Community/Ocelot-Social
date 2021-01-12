@@ -107,6 +107,7 @@ export default shield(
       Donations: isAuthenticated,
       userData: isAuthenticated,
       MyInviteCodes: isAuthenticated,
+      isValidInviteCode: allow,
     },
     Mutation: {
       '*': deny,
