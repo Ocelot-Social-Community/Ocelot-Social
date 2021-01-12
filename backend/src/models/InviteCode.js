@@ -1,18 +1,16 @@
 export default {
   code: { type: 'string', primary: true },
   createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
-  uses: { type: 'int', default: () => 0 },
-  maxUses: { type: 'int', default: () => 1 },
-  active: { type: 'boolean', default: () => true },
-  createdBy: {
+  expiresAt: { type: 'string', isoDate: true, default: null },
+  generated: {
     type: 'relationship',
-    relationship: 'CREATED',
+    relationship: 'GENERATED',
     target: 'User',
     direction: 'in',
   },
-  usedBy: {
+  redeemed: {
     type: 'relationship',
-    relationship: 'USED',
+    relationship: 'REDEEMED',
     target: 'User',
     direction: 'in',
   },
