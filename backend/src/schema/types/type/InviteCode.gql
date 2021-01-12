@@ -10,3 +10,7 @@ type InviteCode {
 type Mutation {
   GenerateInviteCode(expiresAt: String = null): InviteCode
 }
+
+type Query {
+  MyInviteCodes: [InviteCode] 
+}

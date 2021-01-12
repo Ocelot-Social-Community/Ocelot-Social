@@ -11,6 +11,30 @@ const uniqueInviteCode = async (session, code) => {
 }
 
 export default {
+  Query: {
+    MyInviteCodes: async (_parent, args, context, _resolveInfo) => {
+      const {
+        user: { id: userId },
+      } = context
+      const session = context.driver.session()
+      const readTxResultPromise = session.readTransaction(async (txc) => {
+        const result = await txc.run(
+          `MATCH (user:User {id: $userId})-[:GENERATED]->(ic:InviteCode)
+           RETURN properties(ic) AS inviteCodes`,
+          {
+            userId,
+          },
+        )
+        return result.records.map((record) => record.get('inviteCodes'))
+      })
+      try {
+        const txResult = await readTxResultPromise
+        return txResult
+      } finally {
+        session.close()
+      }
+    },
+  },
   Mutation: {
     GenerateInviteCode: async (_parent, args, context, _resolveInfo) => {
       const {
@@ -18,7 +42,6 @@ export default {
       } = context
       const session = context.driver.session()
       let code = generateInvieCode()
-      let response
       while (!(await uniqueInviteCode(session, code))) {
         code = generateInvieCode()
       }
@@ -40,15 +63,15 @@ export default {
       })
       try {
         const txResult = await writeTxResultPromise
-        response = txResult[0]
+        return txResult[0]
       } finally {
         session.close()
       }
-      return response
     },
   },
   InviteCode: {
     ...Resolver('InviteCode', {
+      idAttribute: 'code',
       undefinedToNull: ['expiresAt'],
       hasOne: {
         generatedBy: '<-[:GENERATED]-(related:User)',
