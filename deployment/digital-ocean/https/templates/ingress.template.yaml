@@ -17,7 +17,7 @@ spec:
             serviceName: web
             servicePort: 3000
           path: /
-  # decommt if you have installed the mailservice
+  # decomment if you have installed the fake mail service for devs
   # - host: mail.ocelot.social
   #   http:
   #     paths:
@@ -25,7 +25,7 @@ spec:
   #         serviceName: mailserver
   #         servicePort: 80
   #       path: /
-  # decommt to activate SSL via port 443 if you have installed the certificate. probalby via the cert-manager
+  # decomment to activate SSL via port 443 if you have installed the certificate. probalby via the cert-manager
   # tls:
   # - hosts:
   #   - develop-k8s.ocelot.social

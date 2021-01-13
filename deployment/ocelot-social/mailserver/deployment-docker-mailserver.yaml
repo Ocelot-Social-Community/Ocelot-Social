@@ -5,7 +5,7 @@ metadata:
   labels:
     ocelot.social/selector: deployment-ocelot-social-mailserver
   name: mailserver
-  namespace: ocelot-social
+  namespace: docker-mailserver
 spec:
   minReadySeconds: 15
   progressDeadlineSeconds: 60
@@ -29,16 +29,20 @@ spec:
       containers:
       - envFrom:
         - configMapRef:
-            name: configmap
-        - secretRef:
-            name: ocelot-social
-        image: djfarrelly/maildev
+            name: docker-mailserver-configmap
+        # - secretRef:
+        #     name: XXX
+        image: tvial/docker-mailserver:release-v7.2.0
         imagePullPolicy: Always
         name: mailserver
         ports:
-        - containerPort: 80
-          protocol: TCP
         - containerPort: 25
+          protocol: TCP
+        - containerPort: 143
+          protocol: TCP
+        - containerPort: 587
+          protocol: TCP
+        - containerPort: 993
           protocol: TCP
         resources: {}
         terminationMessagePath: /dev/termination-log

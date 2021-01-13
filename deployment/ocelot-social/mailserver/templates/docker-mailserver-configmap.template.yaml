@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+data:
+  # values are taken from: https://github.com/tomav/docker-mailserver#with-relevant-environmental-variables
+  HOSTNAME=mail
+  DOMAINNAME=ocelot.social
+  ENABLE_SPAMASSASSIN=1
+  SPAMASSASSIN_SPAM_TO_INBOX=1
+  ENABLE_CLAMAV=1
+  ENABLE_FAIL2BAN=1
+  ENABLE_POSTGREY=1
+  ENABLE_SASLAUTHD=0
+  ONE_DIR=1
+  DMS_DEBUG=0
+metadata:
+  name: docker-mailserver-configmap
+  namespace: docker-mailserver
