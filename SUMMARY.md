@@ -24,7 +24,7 @@
     * [HTTPS](deployment/digital-ocean/https/README.md)
   * [ocelot.social](deployment/ocelot-social/README.md)
     * [Error Reporting](deployment/ocelot-social/error-reporting/README.md)
-    * [Mailserver](deployment/ocelot-social/mailserver/README.md)
+    * [Mail Server Fake](deployment/ocelot-social/mailserver-fake/README.md)
     * [Maintenance](deployment/ocelot-social/maintenance/README.md)
   * [Volumes](deployment/volumes/README.md)
     * [Neo4J Offline-Backups](deployment/volumes/neo4j-offline-backup/README.md)

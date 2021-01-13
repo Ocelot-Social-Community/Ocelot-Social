@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mailserver
+  namespace: ocelot-social
+  labels:
+    ocelot.social/selector: deployment-ocelot-social-mailserver
+spec:
+  ports:
+  - name: web
+    port: 80
+    targetPort: 80
+  - name: smtp
+    port: 25
+    targetPort: 25
+  selector:
+    ocelot.social/selector: deployment-ocelot-social-mailserver
