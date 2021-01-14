@@ -147,7 +147,7 @@ describe('inviteCodes', () => {
       expect(inviteCodes).toHaveLength(2)
     })
 
-    it('does not returns the created invite codes of other users when queried', async () => {
+    it('does not return the created invite codes of other users when queried', async () => {
       await Factory.build('inviteCode')
       const response = await query({ query: myInviteCodesQuery })
       inviteCodes = response.data.MyInviteCodes
@@ -156,27 +156,36 @@ describe('inviteCodes', () => {
 
     it('validates an invite code without expiresAt', async () => {
       const unExpiringInviteCode = inviteCodes.filter((ic) => ic.expiresAt === null)[0].code
-      expect(
-        query({ query: isValidInviteCodeQuery, variables: { code: unExpiringInviteCode } }),
-      ).resolves.toBeTruthy()
+      const result = await query({
+        query: isValidInviteCodeQuery,
+        variables: { code: unExpiringInviteCode },
+      })
+      expect(result.data.isValidInviteCode).toBeTruthy()
     })
 
     it('validates an invite code with expiresAt in the future', async () => {
       const expiringInviteCode = inviteCodes.filter((ic) => ic.expiresAt !== null)[0].code
-      expect(
-        query({ query: isValidInviteCodeQuery, variables: { code: expiringInviteCode } }),
-      ).resolves.toBeTruthy()
+      const result = await query({
+        query: isValidInviteCodeQuery,
+        variables: { code: expiringInviteCode },
+      })
+      expect(result.data.isValidInviteCode).toBeTruthy()
     })
 
-    it.skip('does not validate an invite code which expired in the past', async () => {
+    it('does not validate an invite code which expired in the past', async () => {
       const lastWeek = new Date()
       lastWeek.setDate(lastWeek.getDate() - 7)
-      const code = await Factory.build('inviteCode', {
+      const inviteCode = await Factory.build('inviteCode', {
         expiresAt: lastWeek.toISOString(),
       })
-      expect(
-        query({ query: isValidInviteCodeQuery, variables: { code: code.code } }),
-      ).resolves.toBeFalsy()
+      const code = inviteCode.get('code')
+      const result = await query({ query: isValidInviteCodeQuery, variables: { code } })
+      expect(result.data.isValidInviteCode).toBeFalsy()
+    })
+
+    it('does not validate an invite code which does not exits', async () => {
+      const result = await query({ query: isValidInviteCodeQuery, variables: { code: 'AAA' } })
+      expect(result.data.isValidInviteCode).toBeFalsy()
     })
   })
 })

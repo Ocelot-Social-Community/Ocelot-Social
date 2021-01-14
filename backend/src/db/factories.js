@@ -206,7 +206,7 @@ const emailDefaults = {
 }
 
 Factory.define('emailAddress')
-  .attr(emailDefaults)
+  .attrs(emailDefaults)
   .after((buildObject, options) => {
     return neode.create('EmailAddress', buildObject)
   })
@@ -218,13 +218,13 @@ Factory.define('unverifiedEmailAddress')
   })
 
 const inviteCodeDefaults = {
-  code: generateInvieCode(),
+  code: () => generateInvieCode(),
   createdAt: () => new Date().toISOString(),
   expiresAt: () => null,
 }
 
 Factory.define('inviteCode')
-  .attr(inviteCodeDefaults)
+  .attrs(inviteCodeDefaults)
   .option('generatedById', null)
   .option('generatedBy', ['generatedById'], (generatedById) => {
     if (generatedById) return neode.find('User', generatedById)
