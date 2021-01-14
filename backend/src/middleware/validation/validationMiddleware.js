@@ -138,8 +138,6 @@ export default {
   Mutation: {
     CreateComment: validateCreateComment,
     UpdateComment: validateUpdateComment,
-    CreatePost: validatePost,
-    UpdatePost: validateUpdatePost,
     UpdateUser: validateUpdateUser,
     fileReport: validateReport,
     review: validateReview,
