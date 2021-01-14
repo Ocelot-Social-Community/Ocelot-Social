@@ -1,41 +1,25 @@
 import path from 'path'
-import dotenv from 'dotenv'
 import manifest from './constants/manifest.js'
 import metadata from './constants/metadata.js'
 
-dotenv.config() // we want to synchronize @nuxt-dotenv and nuxt-env
-
-const pkg = require('./package')
-export const envWhitelist = [
-  'NODE_ENV',
-  'MAPBOX_TOKEN',
-  'PUBLIC_REGISTRATION',
-  'WEBSOCKETS_URI',
-  'GRAPHQL_URI',
-]
-const dev = process.env.NODE_ENV !== 'production'
+const CONFIG = require('./config') // we need to use require since this is only evaluated at compile time.
 
 const styleguidePath = '../styleguide'
-const styleguideStyles = process.env.STYLEGUIDE_DEV
+const styleguideStyles = CONFIG.STYLEGUIDE_DEV
   ? [
       `${styleguidePath}/src/system/styles/main.scss`,
       `${styleguidePath}/src/system/styles/shared.scss`,
     ]
   : '@human-connection/styleguide/dist/shared.scss'
 
-const buildDir = process.env.NUXT_BUILD || '.nuxt'
-
-const additionalSentryConfig = {}
-if (process.env.COMMIT) additionalSentryConfig.release = process.env.COMMIT
-
 export default {
-  buildDir,
+  buildDir: CONFIG.NUXT_BUILD,
   mode: 'universal',
 
-  dev: dev,
-  debug: dev ? 'nuxt:*,app' : null,
+  dev: CONFIG.DEBUG,
+  debug: CONFIG.DEBUG ? 'nuxt:*,app' : null,
 
-  modern: !dev ? 'server' : false,
+  modern: CONFIG.PRODUCTION ? 'server' : false,
 
   pageTransition: {
     name: 'slide-up',
@@ -43,7 +27,7 @@ export default {
   },
 
   env: {
-    release: pkg.version,
+    release: CONFIG.VERSION,
     // pages which do NOT require a login
     publicPages: [
       'login',
@@ -81,7 +65,7 @@ export default {
       {
         hid: 'description',
         name: 'description',
-        content: pkg.description,
+        content: CONFIG.DESCRIPTION,
       },
     ],
     link: [
@@ -120,7 +104,7 @@ export default {
   plugins: [
     { src: '~/plugins/base-components.js', ssr: true },
     {
-      src: `~/plugins/styleguide${process.env.STYLEGUIDE_DEV ? '-dev' : ''}.js`,
+      src: `~/plugins/styleguide${CONFIG.STYLEGUIDE_DEV ? '-dev' : ''}.js`,
       ssr: true,
     },
     { src: '~/plugins/i18n.js', ssr: true },
@@ -143,18 +127,8 @@ export default {
    ** Nuxt.js modules
    */
   modules: [
-    [
-      '@nuxtjs/dotenv',
-      {
-        only: envWhitelist,
-      },
-    ],
-    [
-      'nuxt-env',
-      {
-        keys: envWhitelist,
-      },
-    ],
+    ['@nuxtjs/dotenv', { only: Object.keys(CONFIG) }],
+    ['nuxt-env', { keys: Object.keys(CONFIG) }],
     [
       'vue-scrollto/nuxt',
       {
@@ -175,32 +149,32 @@ export default {
    */
   axios: {
     // See https://github.com/nuxt-community/axios-module#options
-    debug: dev,
+    debug: CONFIG.DEBUG,
     proxy: true,
   },
   proxy: {
     '/.well-known/webfinger': {
-      target: process.env.GRAPHQL_URI || 'http://localhost:4000',
+      target: CONFIG.GRAPHQL_URI,
       toProxy: true, // cloudflare needs that
       headers: {
         Accept: 'application/json',
         'X-UI-Request': true,
-        'X-API-TOKEN': process.env.BACKEND_TOKEN || 'NULL',
+        'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
       },
     },
     '/activitypub': {
       // make this configurable (nuxt-dotenv)
-      target: process.env.GRAPHQL_URI || 'http://localhost:4000',
+      target: CONFIG.GRAPHQL_URI,
       toProxy: true, // cloudflare needs that
       headers: {
         Accept: 'application/json',
         'X-UI-Request': true,
-        'X-API-TOKEN': process.env.BACKEND_TOKEN || 'NULL',
+        'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
       },
     },
     '/api': {
       // make this configurable (nuxt-dotenv)
-      target: process.env.GRAPHQL_URI || 'http://localhost:4000',
+      target: CONFIG.GRAPHQL_URI,
       pathRewrite: {
         '^/api': '',
       },
@@ -208,7 +182,7 @@ export default {
       headers: {
         Accept: 'application/json',
         'X-UI-Request': true,
-        'X-API-TOKEN': process.env.BACKEND_TOKEN || 'NULL',
+        'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
       },
     },
   },
@@ -235,9 +209,9 @@ export default {
   },
 
   sentry: {
-    dsn: process.env.SENTRY_DSN_WEBAPP,
-    publishRelease: !!process.env.COMMIT,
-    config: additionalSentryConfig,
+    dsn: CONFIG.SENTRY_DSN_WEBAPP,
+    publishRelease: !!CONFIG.COMMIT,
+    config: CONFIG.COMMIT ? { release: CONFIG.COMMIT } : {},
   },
 
   manifest,
@@ -250,7 +224,7 @@ export default {
      ** You can extend webpack config here
      */
     extend(config, ctx) {
-      if (process.env.STYLEGUIDE_DEV) {
+      if (CONFIG.STYLEGUIDE_DEV) {
         config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/src/system`)
         config.module.rules.push({
           resourceQuery: /blockType=docs/,
