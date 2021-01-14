@@ -18,7 +18,7 @@ export default {
   layout: 'blank',
   async beforeCreate() {
     await this.$store.dispatch('auth/logout')
-    this.$router.replace('/')
+    this.$router.replace('/login')
   },
 }
 </script>
