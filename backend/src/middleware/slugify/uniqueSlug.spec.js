@@ -31,4 +31,3 @@ describe('uniqueSlug', () => {
     await expect(uniqueSlug(enya, isUnique)).resolves.toEqual('n')
   })
 })
-
