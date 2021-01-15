@@ -149,6 +149,7 @@ export default shield(
       pinPost: isAdmin,
       unpinPost: isAdmin,
       UpdateDonations: isAdmin,
+      switchUserRole: isAdmin,
     },
     User: {
       email: or(isMyOwn, isAdmin),

@@ -244,6 +244,30 @@ export default {
         session.close()
       }
     },
+    switchUserRole: async (object, args, context, resolveInfo) => {
+      const { role, id } = args
+
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const switchUserRoleResponse = await transaction.run(
+          `
+            MATCH (user:User {id: $id})
+            SET user.role = $role
+            SET user.updatedAt = toString(datetime())
+            RETURN user {.*}
+          `,
+          { id, role },
+        )
+        const [user] = switchUserRoleResponse.records.map((record) => record.get('user'))
+        return user
+      })
+      try {
+        const user = await writeTxResultPromise
+        return user
+      } finally {
+        session.close()
+      }
+    },
   },
   User: {
     email: async (parent, params, context, resolveInfo) => {
