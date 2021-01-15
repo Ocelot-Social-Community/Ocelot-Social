@@ -2,7 +2,7 @@ import slugify from 'slug'
 export default async function uniqueSlug(string, isUnique) {
   const slug = slugify(string || 'anonymous', {
     lower: true,
-    locale: 'de',
+    charmap: { Ä: 'AE', ä: 'ae', Ö: 'OE', ö: 'oe', Ü: 'UE', ü: 'ue', ñ: 'n' },
   })
   if (await isUnique(slug)) return slug
 
