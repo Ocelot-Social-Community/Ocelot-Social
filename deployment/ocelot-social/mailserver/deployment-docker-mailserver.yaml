@@ -21,6 +21,8 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+        backup.velero.io/backup-volumes: data
       creationTimestamp: null
       labels:
         ocelot.social/selector: deployment-ocelot-social-mailserver
@@ -47,9 +49,57 @@ spec:
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+        volumeMounts:  # taken from: https://github.com/funkypenguin/helm-docker-mailserver/blob/master/charts/docker-mailserver/templates/deployment.yaml
+        - name: config
+          mountPath: /tmp/docker-mailserver
+        - name: ssl-cert  # !!! is this really needed ???
+          mountPath: /tmp/ssl
+          readOnly: true              
+        - name: data
+          mountPath: /var/mail
+          subPath: mail
+        - name: data
+          mountPath: /var/mail-state
+          subPath: mail-state
+        - name: configmap
+          subPath: dovecot-services.cf
+          mountPath: /etc/dovecot/conf.d/services.cf
+          readOnly: true  
+        - name: configmap
+          subPath: dovecot.cf
+          mountPath: /etc/dovecot/conf.d/zz-custom.cf
+          readOnly: true  
+        - name: configmap
+          subPath: TrustedHosts
+          mountPath: /tmp/docker-mailserver/opendkim/TrustedHosts
+          readOnly: true                        
+        - name: configmap
+          subPath: SigningTable
+          mountPath: /tmp/docker-mailserver/opendkim/SigningTable
+          readOnly: true    
+        - name: configmap
+          subPath: KeyTable
+          mountPath: /tmp/docker-mailserver/opendkim/KeyTable
+          readOnly: true   
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
+      volumes:
+      - name: "data"
+        persistentVolumeClaim:
+          claimName: docker-mailserver-data-claim
+      - name: "config"
+        emptyDir: {}
+      - name: "configmap"
+        configMap:
+          # name: {{ template "dockermailserver.fullname" . }}-configs
+          name: XXX
+      # - name: "opendkim-keys"
+      #   secret:
+      #     secretName: {{ template "dockermailserver.fullname" . }}-secrets
+      - name: "ssl-cert"  # !!! is this really needed ???
+        secret:
+          secretName: tls  # ATTENTION: needs same namespace! see: https://kubernetes.io/docs/concepts/configuration/secret/#restrictions
 status: {}

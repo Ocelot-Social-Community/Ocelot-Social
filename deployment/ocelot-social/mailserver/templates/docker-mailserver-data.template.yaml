@@ -1,0 +1,13 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: docker-mailserver-data-claim
+  namespace: docker-mailserver
+spec:
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  resources:
+    requests:
+      storage: "5Gi"  # just a guess, see Requirements: https://github.com/tomav/docker-mailserver#requirements

@@ -7,11 +7,12 @@ data:
   ENABLE_SPAMASSASSIN=1
   SPAMASSASSIN_SPAM_TO_INBOX=1
   ENABLE_CLAMAV=1
-  ENABLE_FAIL2BAN=1
+  ENABLE_FAIL2BAN=0  # … but disabled, because of deployment
   ENABLE_POSTGREY=1
   ENABLE_SASLAUTHD=0
   ONE_DIR=1
   DMS_DEBUG=0
+  SSL_TYPE=manual  # … but added for our case of using the existing cert
 metadata:
   name: docker-mailserver-configmap
   namespace: docker-mailserver

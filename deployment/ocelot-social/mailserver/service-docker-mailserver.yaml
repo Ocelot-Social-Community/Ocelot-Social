@@ -6,17 +6,17 @@ metadata:
   labels:
     ocelot.social/selector: deployment-ocelot-social-mailserver
 spec:
-  ports:
-  - name: mail-smtp
+  ports:  # names overtaken from here: https://github.com/funkypenguin/helm-docker-mailserver/blob/master/charts/docker-mailserver/values.yaml
+  - name: smtp
     port: 25
     targetPort: 25
-  - name: mail-imap
+  - name: imap
     port: 143
     targetPort: 143
-  - name: mail-smtp-auth
+  - name: submission
     port: 587
     targetPort: 587
-  - name: mail-imap-ssl
+  - name: imaps
     port: 993
     targetPort: 993
   selector:
