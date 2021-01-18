@@ -163,6 +163,15 @@ describe('inviteCodes', () => {
       expect(result.data.isValidInviteCode).toBeTruthy()
     })
 
+    it('validates an invite code in lower case', async () => {
+      const unExpiringInviteCode = inviteCodes.filter((ic) => ic.expiresAt === null)[0].code
+      const result = await query({
+        query: isValidInviteCodeQuery,
+        variables: { code: unExpiringInviteCode.toLowerCase() },
+      })
+      expect(result.data.isValidInviteCode).toBeTruthy()
+    })
+
     it('validates an invite code with expiresAt in the future', async () => {
       const expiringInviteCode = inviteCodes.filter((ic) => ic.expiresAt !== null)[0].code
       const result = await query({

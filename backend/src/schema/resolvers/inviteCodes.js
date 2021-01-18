@@ -40,7 +40,7 @@ export default {
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
         const result = await txc.run(
-          `MATCH (ic:InviteCode { code: $code })
+          `MATCH (ic:InviteCode { code: toUpper($code) })
            RETURN
            CASE
            WHEN ic.expiresAt IS NULL THEN true
