@@ -108,7 +108,9 @@
 
       <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
         <masonry-grid>
-          <ds-grid-item class="profile-top-navigation" :row-span="3" column-span="fullWidth">
+          <!-- TapNavigation -->
+          <new-tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" />
+          <!-- Wolle <ds-grid-item class="profile-top-navigation" :row-span="3" column-span="fullWidth">
             <base-card class="ds-tab-nav">
               <ul class="Tabs">
                 <li class="Tabs__tab pointer" :class="{ active: tabActive === 'post' }">
@@ -150,8 +152,9 @@
                 </li>
               </ul>
             </base-card>
-          </ds-grid-item>
+          </ds-grid-item> -->
 
+          <!-- feed -->
           <ds-grid-item :row-span="2" column-span="fullWidth">
             <ds-space centered>
               <nuxt-link :to="{ name: 'post-create' }">
@@ -181,9 +184,9 @@
               <post-teaser
                 :post="post"
                 :width="{ base: '100%', md: '100%', xl: '50%' }"
-                @removePostFromList="removePostFromList"
-                @pinPost="pinPost"
-                @unpinPost="unpinPost"
+                @removePostFromList="posts = removePostFromList(post, posts)"
+                @pinPost="pinPost(post, refetchPostList)"
+                @unpinPost="unpinPost(post, refetchPostList)"
               />
             </masonry-grid-item>
           </template>
@@ -210,6 +213,7 @@
 
 <script>
 import uniqBy from 'lodash/uniqBy'
+import postListActions from '~/mixins/postListActions'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import HcFollowButton from '~/components/FollowButton.vue'
 import HcCountTo from '~/components/CountTo.vue'
@@ -221,6 +225,7 @@ import HcUpload from '~/components/Upload'
 import UserAvatar from '~/components/_new/generic/UserAvatar/UserAvatar'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
+import NewTabNavigation from '~/components/_new/generic/TabNavigation/NewTabNavigation'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import UserQuery from '~/graphql/User'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
@@ -251,7 +256,9 @@ export default {
     MasonryGrid,
     MasonryGridItem,
     FollowList,
+    NewTabNavigation,
   },
+  mixins: [postListActions],
   transition: {
     name: 'slide-up',
     mode: 'out-in',
@@ -286,17 +293,36 @@ export default {
       const { slug } = this.user || {}
       return slug && `@${slug}`
     },
+    tabOptions() {
+      return [
+        {
+          type: 'post',
+          title: this.$t('common.post', null, this.user.contributionsCount),
+          count: this.user.contributionsCount,
+          disabled: this.user.contributionsCount === 0,
+        },
+        {
+          type: 'comment',
+          title: this.$t('profile.commented'),
+          count: this.user.commentedCount,
+          disabled: this.user.commentedCount === 0,
+        },
+        {
+          type: 'shout',
+          title: this.$t('profile.shouted'),
+          count: this.user.shoutedCount,
+          disabled: this.user.shoutedCount === 0,
+        },
+      ]
+    },
   },
   methods: {
-    removePostFromList(deletedPost) {
-      this.posts = this.posts.filter((post) => {
-        return post.id !== deletedPost.id
-      })
-    },
     handleTab(tab) {
-      this.tabActive = tab
-      this.filter = tabToFilterMapping({ tab, id: this.$route.params.id })
-      this.resetPostList()
+      if (this.tabActive !== tab) {
+        this.tabActive = tab
+        this.filter = tabToFilterMapping({ tab, id: this.$route.params.id })
+        this.resetPostList()
+      }
     },
     uniq(items, field = 'id') {
       return uniqBy(items, field)
@@ -320,6 +346,10 @@ export default {
       this.offset = 0
       this.posts = []
       this.hasMore = true
+    },
+    refetchPostList() {
+      this.resetPostList()
+      this.$apollo.queries.profilePagePosts.refetch()
     },
     async muteUser(user) {
       try {
@@ -360,40 +390,6 @@ export default {
       } finally {
         this.$apollo.queries.User.refetch()
       }
-    },
-    async deleteUser(userdata) {
-      this.$store.commit('modal/SET_OPEN', {
-        name: 'delete',
-        data: {
-          userdata: userdata,
-        },
-      })
-    },
-    pinPost(post) {
-      this.$apollo
-        .mutate({
-          mutation: PostMutations().pinPost,
-          variables: { id: post.id },
-        })
-        .then(() => {
-          this.$toast.success(this.$t('post.menu.pinnedSuccessfully'))
-          this.resetPostList()
-          this.$apollo.queries.profilePagePosts.refetch()
-        })
-        .catch((error) => this.$toast.error(error.message))
-    },
-    unpinPost(post) {
-      this.$apollo
-        .mutate({
-          mutation: PostMutations().unpinPost,
-          variables: { id: post.id },
-        })
-        .then(() => {
-          this.$toast.success(this.$t('post.menu.unpinnedSuccessfully'))
-          this.resetPostList()
-          this.$apollo.queries.profilePagePosts.refetch()
-        })
-        .catch((error) => this.$toast.error(error.message))
     },
     optimisticFollow({ followedByCurrentUser }) {
       /*
@@ -457,33 +453,33 @@ export default {
 </script>
 
 <style lang="scss">
-.pointer {
-  cursor: pointer;
-}
+// Wolle .pointer {
+//   cursor: pointer;
+// }
 
-.Tabs {
-  position: relative;
-  background-color: #fff;
-  height: 100%;
-  display: flex;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+// Wolle .Tabs {
+//   position: relative;
+//   background-color: #fff;
+//   height: 100%;
+//   display: flex;
+//   margin: 0;
+//   padding: 0;
+//   list-style: none;
 
-  &__tab {
-    text-align: center;
-    height: 100%;
-    flex-grow: 1;
+//   &__tab {
+//     text-align: center;
+//     height: 100%;
+//     flex-grow: 1;
 
-    &:hover {
-      border-bottom: 2px solid #c9c6ce;
-    }
+//     &:hover {
+//       border-bottom: 2px solid #c9c6ce;
+//     }
 
-    &.active {
-      border-bottom: 2px solid #17b53f;
-    }
-  }
-}
+//     &.active {
+//       border-bottom: 2px solid #17b53f;
+//     }
+//   }
+// }
 .profile-avatar.user-avatar {
   margin: auto;
   margin-top: -60px;
@@ -495,26 +491,26 @@ export default {
     right: $space-x-small;
   }
 }
-.profile-top-navigation {
-  position: sticky;
-  top: 53px;
-  z-index: 2;
-}
-.ds-tab-nav.base-card {
-  padding: 0;
+// Wolle .profile-top-navigation {
+//   position: sticky;
+//   top: 53px;
+//   z-index: 2;
+// }
+// Wolle .ds-tab-nav.base-card {
+//   padding: 0;
 
-  .ds-tab-nav-item {
-    &.ds-tab-nav-item-active {
-      border-bottom: 3px solid #17b53f;
-      &:first-child {
-        border-bottom-left-radius: $border-radius-x-large;
-      }
-      &:last-child {
-        border-bottom-right-radius: $border-radius-x-large;
-      }
-    }
-  }
-}
+//   .ds-tab-nav-item {
+//     &.ds-tab-nav-item-active {
+//       border-bottom: 3px solid #17b53f;
+//       &:first-child {
+//         border-bottom-left-radius: $border-radius-x-large;
+//       }
+//       &:last-child {
+//         border-bottom-right-radius: $border-radius-x-large;
+//       }
+//     }
+//   }
+// }
 .profile-post-add-button {
   box-shadow: $box-shadow-x-large;
 }
