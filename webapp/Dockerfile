@@ -27,7 +27,7 @@ LABEL org.label-schema.url="https://ocelot.social"
 LABEL org.label-schema.vcs-url="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/backend"
 LABEL org.label-schema.vcs-ref="${BUILD_COMMIT}"
 LABEL org.label-schema.vendor="ocelot.social Community"
-LABEL org.label-schema.version="${VERSION}"
+LABEL org.label-schema.version="${BUILD_VERSION}"
 LABEL org.label-schema.schema-version="1.0"
 LABEL maintainer="devops@ocelot.social"
 
