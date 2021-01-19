@@ -1,9 +1,17 @@
 import LanguageDetect from 'languagedetect'
+import sanitizeHtml from 'sanitize-html'
+
+const removeHtmlTags = (input) => {
+  return sanitizeHtml(input, {
+    allowedTags: [],
+    allowedAttributes: {},
+  })
+}
 
 const setPostLanguage = (text) => {
   const lngDetector = new LanguageDetect()
   lngDetector.setLanguageType('iso2')
-  const result = lngDetector.detect(text, 2)
+  const result = lngDetector.detect(removeHtmlTags(text), 2)
   return result[0][0]
 }
 

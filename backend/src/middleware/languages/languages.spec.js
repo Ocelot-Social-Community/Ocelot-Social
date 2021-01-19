@@ -4,7 +4,6 @@ import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
 
-
 let mutate
 let authenticatedUser
 let variables
@@ -25,11 +24,9 @@ beforeAll(async () => {
   mutate = createTestClient(server).mutate
 })
 
-
 afterAll(async () => {
-  //await cleanDatabase()
+  // await cleanDatabase()
 })
-
 
 const createPostMutation = gql`
   mutation($title: String!, $content: String!, $categoryIds: [ID]) {
@@ -55,16 +52,18 @@ describe('languagesMiddleware', () => {
       icon: 'university',
     })
   })
-  
+
   it('detects German', async () => {
     variables = {
       ...variables,
       content: 'Jeder sollte vor seiner eigenen Tür kehren.',
     }
-    await expect(mutate({
-      mutation: createPostMutation,
-      variables,
-    })).resolves.toMatchObject({
+    await expect(
+      mutate({
+        mutation: createPostMutation,
+        variables,
+      }),
+    ).resolves.toMatchObject({
       data: {
         CreatePost: {
           language: 'de',
@@ -72,16 +71,18 @@ describe('languagesMiddleware', () => {
       },
     })
   })
-  
+
   it('detects English', async () => {
     variables = {
       ...variables,
       content: 'A journey of a thousand miles begins with a single step.',
     }
-    await expect(mutate({
-      mutation: createPostMutation,
-      variables,
-    })).resolves.toMatchObject({
+    await expect(
+      mutate({
+        mutation: createPostMutation,
+        variables,
+      }),
+    ).resolves.toMatchObject({
       data: {
         CreatePost: {
           language: 'en',
@@ -95,15 +96,37 @@ describe('languagesMiddleware', () => {
       ...variables,
       content: 'A caballo regalado, no le mires el diente.',
     }
-    await expect(mutate({
-      mutation: createPostMutation,
-      variables,
-    })).resolves.toMatchObject({
+    await expect(
+      mutate({
+        mutation: createPostMutation,
+        variables,
+      }),
+    ).resolves.toMatchObject({
       data: {
         CreatePost: {
           language: 'es',
         },
       },
     })
-  })  
+  })
+
+  it('detects German in between lots of html tags', async () => {
+    variables = {
+      ...variables,
+      content:
+        '<strong>Jeder</strong> <strike>sollte</strike> <strong>vor</strong> <span>seiner</span> eigenen <blockquote>Tür</blockquote> kehren.',
+    }
+    await expect(
+      mutate({
+        mutation: createPostMutation,
+        variables,
+      }),
+    ).resolves.toMatchObject({
+      data: {
+        CreatePost: {
+          language: 'de',
+        },
+      },
+    })
+  })
 })
