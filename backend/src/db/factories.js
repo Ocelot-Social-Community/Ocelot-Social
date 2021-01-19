@@ -5,7 +5,7 @@ import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
 import { getDriver, getNeode } from './neo4j'
 import CONFIG from '../config/index.js'
-import generateInvieCode from '../schema/resolvers/helpers/generateInviteCode.js'
+import generateInviteCode from '../schema/resolvers/helpers/generateInviteCode.js'
 
 const neode = getNeode()
 
@@ -218,7 +218,7 @@ Factory.define('unverifiedEmailAddress')
   })
 
 const inviteCodeDefaults = {
-  code: () => generateInvieCode(),
+  code: () => generateInviteCode(),
   createdAt: () => new Date().toISOString(),
   expiresAt: () => null,
 }
