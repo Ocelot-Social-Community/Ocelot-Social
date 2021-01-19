@@ -16,7 +16,7 @@ ENV BUILD_COMMIT="0000000"
 ## SET NODE_ENV
 ENV NODE_ENV=production
 ## App Envs
-ENV PORT="3000"
+ENV PORT="4000"
 
 # Labels
 LABEL org.label-schema.build-date="${BUILD_DATE}"
@@ -55,7 +55,7 @@ FROM base as development
 # local filesystem which will need a rebuild anyway
 
 # Define Volume for workdir folder on development
-VOLUME ${DOCKER_WORKDIR}
+# VOLUME ${DOCKER_WORKDIR}
 
 ##################################################################################
 # BUILD (Does contain all files and is therefore bloated) ########################

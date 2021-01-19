@@ -36,12 +36,12 @@ services:
     ports:
       - 4000:4000
     volumes:
-      - ./backend:/develop-backend
-      - backend_node_modules:/develop-backend/node_modules
-      - uploads:/develop-backend/public/uploads
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+      - uploads:/app/public/uploads
     environment:
       - NEO4J_URI=bolt://neo4j:7687
-      - GRAPHQL_URI=http://backend:4000
+      - GRAPHQL_URI=http://localhost:4000
       - CLIENT_URI=http://localhost:3000
       - JWT_SECRET=b/&&7b78BF&fv/Vd
       - MAPBOX_TOKEN=pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g
