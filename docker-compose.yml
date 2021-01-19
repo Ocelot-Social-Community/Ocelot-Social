@@ -76,6 +76,8 @@ services:
     image: ocelotsocialnetwork/neo4j:latest
     build:
       context: ./neo4j
+      # community edition 👆🏼, because we have no enterprise licence 👇🏼 at the moment
+      target: community
     networks:
       - internal-net
     ports:
