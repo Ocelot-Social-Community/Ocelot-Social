@@ -18,7 +18,7 @@ describe('uniqueSlug', () => {
     const isUnique = jest.fn().mockResolvedValue(true)
     expect(uniqueSlug(string, isUnique)).resolves.toEqual('anonymous')
   })
-  
+
   it('Converts umlaut to a two letter equivalent', async () => {
     const umlaut = 'ä'
     const isUnique = jest.fn().mockResolvedValue(true)
