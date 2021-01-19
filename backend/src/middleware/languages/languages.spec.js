@@ -25,13 +25,16 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  // await cleanDatabase()
+  await cleanDatabase()
 })
 
 const createPostMutation = gql`
   mutation($title: String!, $content: String!, $categoryIds: [ID]) {
     CreatePost(title: $title, content: $content, categoryIds: $categoryIds) {
       language
+      languageScore
+      secondaryLanguage
+      secondaryLanguageScore
     }
   }
 `
@@ -58,15 +61,17 @@ describe('languagesMiddleware', () => {
       ...variables,
       content: 'Jeder sollte vor seiner eigenen Tür kehren.',
     }
-    await expect(
-      mutate({
-        mutation: createPostMutation,
-        variables,
-      }),
-    ).resolves.toMatchObject({
+    const response = await mutate({
+      mutation: createPostMutation,
+      variables,
+    })
+    expect(response).toMatchObject({
       data: {
         CreatePost: {
           language: 'de',
+          languageScore: 0.5134188034188034,
+          secondaryLanguage: 'no',
+          secondaryLanguageScore: 0.3655555555555555,
         },
       },
     })
@@ -77,15 +82,17 @@ describe('languagesMiddleware', () => {
       ...variables,
       content: 'A journey of a thousand miles begins with a single step.',
     }
-    await expect(
-      mutate({
-        mutation: createPostMutation,
-        variables,
-      }),
-    ).resolves.toMatchObject({
+    const response = await mutate({
+      mutation: createPostMutation,
+      variables,
+    })
+    expect(response).toMatchObject({
       data: {
         CreatePost: {
           language: 'en',
+          languageScore: 0.3430188679245283,
+          secondaryLanguage: 'da',
+          secondaryLanguageScore: 0.19968553459119498,
         },
       },
     })
@@ -96,15 +103,17 @@ describe('languagesMiddleware', () => {
       ...variables,
       content: 'A caballo regalado, no le mires el diente.',
     }
-    await expect(
-      mutate({
-        mutation: createPostMutation,
-        variables,
-      }),
-    ).resolves.toMatchObject({
+    const response = await mutate({
+      mutation: createPostMutation,
+      variables,
+    })
+    expect(response).toMatchObject({
       data: {
         CreatePost: {
           language: 'es',
+          languageScore: 0.46589743589743593,
+          secondaryLanguage: 'pt',
+          secondaryLanguageScore: 0.3834188034188034,
         },
       },
     })
@@ -116,15 +125,17 @@ describe('languagesMiddleware', () => {
       content:
         '<strong>Jeder</strong> <strike>sollte</strike> <strong>vor</strong> <span>seiner</span> eigenen <blockquote>Tür</blockquote> kehren.',
     }
-    await expect(
-      mutate({
-        mutation: createPostMutation,
-        variables,
-      }),
-    ).resolves.toMatchObject({
+    const response = await mutate({
+      mutation: createPostMutation,
+      variables,
+    })
+    expect(response).toMatchObject({
       data: {
         CreatePost: {
           language: 'de',
+          languageScore: 0.5134188034188034,
+          secondaryLanguage: 'no',
+          secondaryLanguageScore: 0.3655555555555555,
         },
       },
     })
