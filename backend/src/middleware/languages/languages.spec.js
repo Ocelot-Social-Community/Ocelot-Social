@@ -23,15 +23,6 @@ beforeAll(async () => {
     },
   })
   mutate = createTestClient(server).mutate
-  await cleanDatabase()
-  variables = {}
-  const user = await Factory.build('user')
-  authenticatedUser = await user.toJson()
-  await Factory.build('category', {
-    id: 'cat9',
-    name: 'Democracy & Politics',
-    icon: 'university',
-  })
 })
 
 
@@ -54,6 +45,17 @@ describe('languagesMiddleware', () => {
     categoryIds: ['cat9'],
   }
 
+  beforeAll(async () => {
+    await cleanDatabase()
+    const user = await Factory.build('user')
+    authenticatedUser = await user.toJson()
+    await Factory.build('category', {
+      id: 'cat9',
+      name: 'Democracy & Politics',
+      icon: 'university',
+    })
+  })
+  
   it('detects German', async () => {
     variables = {
       ...variables,
@@ -71,4 +73,37 @@ describe('languagesMiddleware', () => {
     })
   })
   
+  it('detects English', async () => {
+    variables = {
+      ...variables,
+      content: 'A journey of a thousand miles begins with a single step.',
+    }
+    await expect(mutate({
+      mutation: createPostMutation,
+      variables,
+    })).resolves.toMatchObject({
+      data: {
+        CreatePost: {
+          language: 'en',
+        },
+      },
+    })
+  })
+
+  it('detects Spanish', async () => {
+    variables = {
+      ...variables,
+      content: 'A caballo regalado, no le mires el diente.',
+    }
+    await expect(mutate({
+      mutation: createPostMutation,
+      variables,
+    })).resolves.toMatchObject({
+      data: {
+        CreatePost: {
+          language: 'es',
+        },
+      },
+    })
+  })  
 })
