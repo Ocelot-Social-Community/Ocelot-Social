@@ -16,22 +16,15 @@ services:
   backend:
     image: ocelotsocialnetwork/develop-backend:development
     build:
-      context: ./backend
       target: development
-    command: yarn run dev
     environment:
-      - SMTP_HOST=mailserver
-      - SMTP_PORT=25
-      - SMTP_IGNORE_TLS=true
-      - "DEBUG=${DEBUG}"
-      - PUBLIC_REGISTRATION=false
+      - NODE_ENV="development"
+      - DEBUG=true
     volumes:
       - ./backend:/app
-      - backend_node_modules:/app/node_modules
-      - uploads:/app/public/uploads
-  neo4j:
-    volumes:
-      - neo4j_data:/data
+  #neo4j:
+  #  volumes:
+  #    - neo4j_data:/data
   maintenance:
     image: ocelotsocialnetwork/develop-maintenance:latest
     build:

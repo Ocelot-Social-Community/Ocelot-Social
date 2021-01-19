@@ -14,8 +14,8 @@ ENV BUILD_VERSION="0.0.0"
 ## We cannot do `$(git rev-parse --short HEAD)` here so we default to 0000000
 ENV BUILD_COMMIT="0000000"
 ## SET NODE_ENV
-ENV NODE_ENV=production
-## App Envs
+ENV NODE_ENV="production"
+## App relevant Envs
 ENV PORT="4000"
 
 # Labels
@@ -31,20 +31,16 @@ LABEL org.label-schema.version="${VERSION}"
 LABEL org.label-schema.schema-version="1.0"
 LABEL maintainer="devops@ocelot.social"
 
+# Install Additional Software
+## install: git
+RUN apk --no-cache add git
+
 # Settings
 EXPOSE ${PORT}
-WORKDIR ${DOCKER_WORKDIR}
 
 ## Make Workdir
 RUN mkdir -p ${DOCKER_WORKDIR}
-## Additional Software
-RUN apk --no-cache add git  
-## Copy package.json, yarn.lock, .env
-COPY package.json yarn.lock ./
-COPY .env.template .env
-
-# Run command
-CMD ["yarn", "run", "start"]
+WORKDIR ${DOCKER_WORKDIR}
 
 ##################################################################################
 # DEVELOPMENT (Connected to the local environment, to reload on demand) ##########
@@ -57,6 +53,12 @@ FROM base as development
 # Define Volume for workdir folder on development
 # VOLUME ${DOCKER_WORKDIR}
 
+# Copy .env template
+# COPY .env.template .env
+
+# Run command
+CMD ["yarn", "run", "dev"]
+
 ##################################################################################
 # BUILD (Does contain all files and is therefore bloated) ########################
 ##################################################################################
@@ -68,6 +70,9 @@ COPY . .
 RUN yarn install --production=false --frozen-lockfile --non-interactive
 # yarn build
 RUN yarn run build
+
+# Copy package.json, yarn.lock
+# COPY package.json yarn.lock ./
 
 ##################################################################################
 # PRODUCTION (Does contain only "binary"- and static-files to reduce image size) #
@@ -82,3 +87,6 @@ COPY ./public/img/ ./public/img/
 COPY ./public/providers.json ./public/providers.json
 # yarn install
 RUN yarn install --production=true --frozen-lockfile --non-interactive --no-cache
+
+# Run command
+CMD ["yarn", "run", "start"]
