@@ -1,32 +1,88 @@
+##################################################################################
+# BASE ###########################################################################
+##################################################################################
 FROM node:12.19.0-alpine3.10 as base
-LABEL Description="Web Frontend of the Social Network ocelot.social" Vendor="ocelot.social Community" Version="0.0.1" Maintainer="ocelot.social Community (devops@ocelot.social)"
 
-EXPOSE 3000
-CMD ["yarn", "run", "start"]
+# ENVs (available in production aswell, can be overwritten by commandline or env file)
+## DOCKER_WORKDIR would be a classical ARG, but that is not multi layer persistent - shame
+ENV DOCKER_WORKDIR="/app"
+## We Cannot do `$(date -u +'%Y-%m-%dT%H:%M:%SZ')` here so we use unix timestamp=0
+ENV BUILD_DATE="1970-01-01T00:00:00.00Z"
+## We cannot do $(yarn run version) here so we default to 0.0.0
+## TODO: Missing Build number - do that once we have a CI which actually generates it
+ENV BUILD_VERSION="0.0.0"
+## We cannot do `$(git rev-parse --short HEAD)` here so we default to 0000000
+ENV BUILD_COMMIT="0000000"
+## SET NODE_ENV
+ENV NODE_ENV="production"
+## App relevant Envs
+ENV PORT="3000"
 
-# Expose the app port
-ARG BUILD_COMMIT
-ENV BUILD_COMMIT=$BUILD_COMMIT
-ARG WORKDIR=/develop-webapp
-RUN mkdir -p $WORKDIR
-WORKDIR $WORKDIR
+# Labels
+LABEL org.label-schema.build-date="${BUILD_DATE}"
+LABEL org.label-schema.name="ocelot.social:backend"
+LABEL org.label-schema.description="Web Frontend of the Social Network Software ocelot.social"
+LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
+LABEL org.label-schema.url="https://ocelot.social"
+LABEL org.label-schema.vcs-url="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/backend"
+LABEL org.label-schema.vcs-ref="${BUILD_COMMIT}"
+LABEL org.label-schema.vendor="ocelot.social Community"
+LABEL org.label-schema.version="${VERSION}"
+LABEL org.label-schema.schema-version="1.0"
+LABEL maintainer="devops@ocelot.social"
 
-# See: https://github.com/nodejs/docker-node/pull/367#issuecomment-430807898
+# Install Additional Software
+## install: git
 RUN apk --no-cache add git
 
-COPY package.json yarn.lock ./
-COPY .env.template .env
+# Settings
+## Expose Container Port
+EXPOSE ${PORT}
 
+## Workdir
+RUN mkdir -p ${DOCKER_WORKDIR}
+WORKDIR ${DOCKER_WORKDIR}
 
-FROM base as build-and-test
-RUN yarn install --production=false --frozen-lockfile --non-interactive
+##################################################################################
+# DEVELOPMENT (Connected to the local environment, to reload on demand) ##########
+##################################################################################
+FROM base as development
+
+# We don't need to copy or build anything since we gonna bind to the
+# local filesystem which will need a rebuild anyway
+
+# Run command
+CMD ["yarn", "run", "dev"]
+
+##################################################################################
+# BUILD (Does contain all files and is therefore bloated) ########################
+##################################################################################
+FROM base as build
+
+# Copy everything
 COPY . .
-RUN NODE_ENV=production yarn run build
+# yarn install
+RUN yarn install --production=false --frozen-lockfile --non-interactive
+# yarn build
+RUN yarn run build
 
+##################################################################################
+# PRODUCTION (Does contain only "binary"- and static-files to reduce image size) #
+##################################################################################
 FROM base as production
+
+# Copy "binary"-files from build image
+COPY --from=build ${DOCKER_WORKDIR}/.nuxt ./.nuxt
+COPY --from=build ${DOCKER_WORKDIR}/nuxt.config.js ./
+# Copy static files
+# TODO - this should be one Folder containign all stuff needed to be copied
+COPY --from=build ${DOCKER_WORKDIR}/constants ./constants
+COPY --from=build ${DOCKER_WORKDIR}/static ./static
+COPY --from=build ${DOCKER_WORKDIR}/locales ./locales
+# yarn install
 RUN yarn install --production=true --frozen-lockfile --non-interactive --no-cache
-COPY --from=build-and-test ./develop-webapp/.nuxt ./.nuxt
-COPY --from=build-and-test ./develop-webapp/constants ./constants
-COPY --from=build-and-test ./develop-webapp/static ./static
-COPY nuxt.config.js .
-COPY locales locales
+
+# Run command
+CMD ["yarn", "run", "start"]
+
+

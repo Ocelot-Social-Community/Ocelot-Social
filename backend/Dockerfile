@@ -36,9 +36,10 @@ LABEL maintainer="devops@ocelot.social"
 RUN apk --no-cache add git
 
 # Settings
+## Expose Container Port
 EXPOSE ${PORT}
 
-## Make Workdir
+## Workdir
 RUN mkdir -p ${DOCKER_WORKDIR}
 WORKDIR ${DOCKER_WORKDIR}
 
@@ -49,12 +50,6 @@ FROM base as development
 
 # We don't need to copy or build anything since we gonna bind to the
 # local filesystem which will need a rebuild anyway
-
-# Define Volume for workdir folder on development
-# VOLUME ${DOCKER_WORKDIR}
-
-# Copy .env template
-# COPY .env.template .env
 
 # Run command
 CMD ["yarn", "run", "dev"]
@@ -71,9 +66,6 @@ RUN yarn install --production=false --frozen-lockfile --non-interactive
 # yarn build
 RUN yarn run build
 
-# Copy package.json, yarn.lock
-# COPY package.json yarn.lock ./
-
 ##################################################################################
 # PRODUCTION (Does contain only "binary"- and static-files to reduce image size) #
 ##################################################################################
@@ -83,8 +75,8 @@ FROM base as production
 COPY --from=build ${DOCKER_WORKDIR}/dist ./dist
 # Copy static files
 # TODO - externalize the uploads so we can copy the whole folder
-COPY ./public/img/ ./public/img/
-COPY ./public/providers.json ./public/providers.json
+COPY --from=build ${DOCKER_WORKDIR}/public/img/ ./public/img/
+COPY --from=build ${DOCKER_WORKDIR}/public/providers.json ./public/providers.json
 # yarn install
 RUN yarn install --production=true --frozen-lockfile --non-interactive --no-cache
 

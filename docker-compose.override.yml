@@ -2,17 +2,20 @@ version: "3.4"
 
 services:
   webapp:
-    image: ocelotsocialnetwork/develop-webapp:build-and-test
+    image: ocelotsocialnetwork/webapp:development
     build:
-      context: webapp
-      target: build-and-test
+      target: development
     environment:
-      - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
-      - PUBLIC_REGISTRATION=true
+      - NODE_ENV="development"
+      # - DEBUG=true
+      # - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
     command: yarn run dev
     volumes:
-      - ./webapp:/develop-webapp
-      - webapp_node_modules:/develop-webapp/node_modules
+      # This makes sure the docker container has its own node modules.
+      # Therefore it is possible to have a different node version on the host machine
+      - webapp_node_modules:/app/node_modules
+      # bind the local folder to the docker to allow live reload
+      - ./webapp:/app
   backend:
     image: ocelotsocialnetwork/develop-backend:development
     build:
@@ -21,17 +24,25 @@ services:
       - NODE_ENV="development"
       - DEBUG=true
     volumes:
+      # This makes sure the docker container has its own node modules.
+      # Therefore it is possible to have a different node version on the host machine
+      - backend_node_modules:/app/node_modules
+      # bind the local folder to the docker to allow live reload
       - ./backend:/app
-  #neo4j:
-  #  volumes:
-  #    - neo4j_data:/data
+  neo4j:
+    ports:
+      # Also expose the playground
+      - 7474:7474
+    networks:
+      # So we can access the playground from our host machine
+      - external-net
   maintenance:
     image: ocelotsocialnetwork/develop-maintenance:latest
     build:
       context: webapp
       dockerfile: Dockerfile.maintenance
     networks:
-      - hc-network
+      - external-net
     ports:
       - 3503:80
   mailserver:
@@ -39,12 +50,7 @@ services:
     ports:
       - 1080:80
     networks:
-      - hc-network
-
-networks:
-  hc-network:
+      - external-net
 volumes:
   webapp_node_modules:
   backend_node_modules:
-  neo4j_data:
-  uploads:
