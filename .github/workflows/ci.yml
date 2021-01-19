@@ -31,12 +31,12 @@ jobs:
       #    target: production
       #    path: backend/
       #    push: false
-      - name: Build backend development image
+      - name: Build backend build image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/backend
-          tags: development
-          target: development
+          tags: build
+          target: build
           path: backend/
           push: false
       # TODO: We want to push this to dockerhub
@@ -48,17 +48,17 @@ jobs:
       #    target: production
       #    path: webapp/
       #    push: false
-      - name: Build webapp development image
+      - name: Build webapp build image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/webapp
-          tags: development
-          target: development
+          tags: build
+          target: build
           path: webapp/
           push: false
 
       - name: Lint backend
-        run: docker run --rm ocelotsocialnetwork/backend:development yarn run lint
+        run: docker run --rm ocelotsocialnetwork/backend:build yarn run lint
       - name: Lint webapp
-        run: docker run --rm ocelotsocialnetwork/webapp:development yarn run lint
+        run: docker run --rm ocelotsocialnetwork/webapp:build yarn run lint
 
