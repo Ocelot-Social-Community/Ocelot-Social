@@ -22,25 +22,43 @@ jobs:
           tags: latest
           path: neo4j/
           push: false
-      - name: Build backend base image
+      # TODO: We want to push this to dockerhub
+      #- name: Build backend production image
+      #  uses: docker/build-push-action@v1.1.0
+      #  with:
+      #    repository: ocelotsocialnetwork/backend
+      #    tags: production
+      #    target: production
+      #    path: backend/
+      #    push: false
+      - name: Build backend development image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/backend
-          tags: build-and-test
-          target: build-and-test
+          tags: development
+          target: development
           path: backend/
           push: false
-      - name: Build webapp base image
+      # TODO: We want to push this to dockerhub
+      #- name: Build webapp production image
+      #  uses: docker/build-push-action@v1.1.0
+      #  with:
+      #    repository: ocelotsocialnetwork/webapp
+      #    tags: production
+      #    target: production
+      #    path: webapp/
+      #    push: false
+      - name: Build webapp development image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/webapp
-          tags: build-and-test
-          target: build-and-test
+          tags: development
+          target: development
           path: webapp/
           push: false
 
       - name: Lint backend
-        run: docker run --rm ocelotsocialnetwork/backend:build-and-test yarn run lint
+        run: docker run --rm ocelotsocialnetwork/backend:development yarn run lint
       - name: Lint webapp
-        run: docker run --rm ocelotsocialnetwork/webapp:build-and-test yarn run lint
+        run: docker run --rm ocelotsocialnetwork/webapp:development yarn run lint
 
