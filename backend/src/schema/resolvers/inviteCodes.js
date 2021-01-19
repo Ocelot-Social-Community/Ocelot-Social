@@ -1,4 +1,4 @@
-import generateInvieCode from './helpers/generateInviteCode'
+import generateInviteCode from './helpers/generateInviteCode'
 import Resolver from './helpers/Resolver'
 
 const uniqueInviteCode = async (session, code) => {
@@ -66,9 +66,9 @@ export default {
         user: { id: userId },
       } = context
       const session = context.driver.session()
-      let code = generateInvieCode()
+      let code = generateInviteCode()
       while (!(await uniqueInviteCode(session, code))) {
-        code = generateInvieCode()
+        code = generateInviteCode()
       }
       const writeTxResultPromise = session.writeTransaction(async (txc) => {
         const result = await txc.run(

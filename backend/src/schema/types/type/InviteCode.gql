@@ -1,6 +1,6 @@
 type InviteCode {
   code: ID!
-  createdAt: String
+  createdAt: String!
   generatedBy: User @relation(name: "GENERATED", direction: "IN")
   redeemedBy: [User] @relation(name: "REDEEMED", direction: "IN")
   expiresAt: String
@@ -13,5 +13,5 @@ type Mutation {
 
 type Query {
   MyInviteCodes: [InviteCode]
-  isValidInviteCode(code: ID): Boolean
+  isValidInviteCode(code: ID!): Boolean
 }
