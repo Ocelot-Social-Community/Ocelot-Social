@@ -54,8 +54,8 @@ jobs:
         run: docker run --rm ocelotsocialnetwork/backend:build yarn run lint
 
       # Unit Tests
-      - name: backend | unit tests
-        run: docker run --env MAPBOX_TOKEN=123ABC --env JWT_SECRET=123ABC --env PRIVATE_KEY_PASSPHRASE=123ABC --rm ocelotsocialnetwork/backend:build yarn run test
+      #- name: backend | unit tests
+      #  run: docker run --env MAPBOX_TOKEN=123ABC --env JWT_SECRET=123ABC --env PRIVATE_KEY_PASSPHRASE=123ABC --rm ocelotsocialnetwork/backend:build yarn run test
 
       ##########################################################################
       # WEBAPP #################################################################
@@ -85,6 +85,6 @@ jobs:
         run: docker run --rm ocelotsocialnetwork/webapp:build yarn run lint
 
       # Unit Tests
-      - name: webapp | unit tests
-        run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
+      #- name: webapp | unit tests
+      #  run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
 
