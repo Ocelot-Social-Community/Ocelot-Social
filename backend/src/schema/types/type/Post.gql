@@ -122,9 +122,6 @@ type Post {
   createdAt: String
   updatedAt: String
   language: String
-  languageScore: Float
-  secondaryLanguage: String
-  secondaryLanguageScore: Float
   pinnedAt: String @cypher(
       statement: "MATCH (this)<-[pinned:PINNED]-(:User) WHERE NOT this.deleted = true AND NOT this.disabled = true RETURN pinned.createdAt"
     )
