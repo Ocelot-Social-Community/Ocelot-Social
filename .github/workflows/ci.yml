@@ -55,9 +55,7 @@ jobs:
 
       # Unit Tests
       - name: backend | unit tests
-        run: docker run --rm ocelotsocialnetwork/backend:build yarn run test
-        env:
-          MAPBOX_TOKEN: "123ABC"
+        run: docker run --env MAPBOX_TOKEN=123ABC --rm ocelotsocialnetwork/backend:build yarn run test
 
       ##########################################################################
       # WEBAPP #################################################################
