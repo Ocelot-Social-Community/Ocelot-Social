@@ -178,32 +178,20 @@ database after each test, running the tests will wipe out all your data!
 {% tabs %}
 {% tab title="Docker" %}
 
-Run the _**jest**_ tests:
+Run the unit tests:
 
 ```bash
-$ docker-compose exec backend yarn run test:jest
-```
-
-Run the _**cucumber**_ features:
-
-```bash
-$ docker-compose exec backend yarn run test:cucumber
+$ docker-compose exec backend yarn run test
 ```
 
 {% endtab %}
 
 {% tab title="Without Docker" %}
 
-Run the _**jest**_ tests:
+Run the unit tests:
 
 ```bash
-$ yarn run test:jest
-```
-
-Run the _**cucumber**_ features:
-
-```bash
-$ yarn run test:cucumber
+$ yarn run test
 ```
 
 {% endtab %}

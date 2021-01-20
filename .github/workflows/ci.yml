@@ -55,7 +55,7 @@ jobs:
 
       # Unit Tests
       - name: backend | unit tests
-        run: docker run --rm ocelotsocialnetwork/backend:build yarn run test:jest
+        run: docker run --rm ocelotsocialnetwork/backend:build yarn run test
 
       ##########################################################################
       # WEBAPP #################################################################
