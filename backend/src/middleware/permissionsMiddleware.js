@@ -106,6 +106,8 @@ export default shield(
       notifications: isAuthenticated,
       Donations: isAuthenticated,
       userData: isAuthenticated,
+      MyInviteCodes: isAuthenticated,
+      isValidInviteCode: allow,
     },
     Mutation: {
       '*': deny,
@@ -149,6 +151,7 @@ export default shield(
       pinPost: isAdmin,
       unpinPost: isAdmin,
       UpdateDonations: isAdmin,
+      GenerateInviteCode: isAuthenticated,
     },
     User: {
       email: or(isMyOwn, isAdmin),
