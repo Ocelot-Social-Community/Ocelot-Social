@@ -31,7 +31,7 @@ const myInviteCodesQuery = gql`
 `
 
 const isValidInviteCodeQuery = gql`
-  query($code: ID) {
+  query($code: ID!) {
     isValidInviteCode(code: $code)
   }
 `
