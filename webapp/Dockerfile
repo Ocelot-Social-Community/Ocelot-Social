@@ -52,7 +52,9 @@ FROM base as development
 # local filesystem which will need a rebuild anyway
 
 # Run command
-CMD ["yarn", "run", "dev"]
+# (for development we need to execute yarn install since the
+#  node_modules are on another volume and need updating)
+CMD /bin/sh -c "yarn install && yarn run dev"
 
 ##################################################################################
 # BUILD (Does contain all files and is therefore bloated) ########################
@@ -83,6 +85,6 @@ COPY --from=build ${DOCKER_WORKDIR}/locales ./locales
 RUN yarn install --production=true --frozen-lockfile --non-interactive --no-cache
 
 # Run command
-CMD ["yarn", "run", "start"]
+CMD /bin/sh -c "yarn run start"
 
 
