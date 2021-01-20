@@ -6,21 +6,18 @@ services:
     build:
       context: webapp
       target: build-and-test
-    volumes:
-      - ./webapp:/develop-webapp
     environment:
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
       - PUBLIC_REGISTRATION=true
     command: yarn run dev
     volumes:
-      - webapp_node_modules:/nitro-web/node_modules
+      - ./webapp:/develop-webapp
+      - webapp_node_modules:/develop-webapp/node_modules
   backend:
     image: ocelotsocialnetwork/develop-backend:build-and-test
     build:
       context: backend
       target: build-and-test
-    volumes:
-      - ./backend:/develop-backend
     command: yarn run dev
     environment:
       - SMTP_HOST=mailserver
@@ -29,6 +26,7 @@ services:
       - "DEBUG=${DEBUG}"
       - PUBLIC_REGISTRATION=false
     volumes:
+      - ./backend:/develop-backend
       - backend_node_modules:/develop-backend/node_modules
       - uploads:/develop-backend/public/uploads
   neo4j:

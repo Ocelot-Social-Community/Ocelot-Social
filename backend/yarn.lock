@@ -8653,12 +8653,10 @@ slug@^0.9.2:
   dependencies:
     unicode ">= 0.3.1"
 
-slug@~2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/slug/-/slug-2.1.1.tgz#08df390d4b4d51bafb41ac0067c0c2dd70734ef2"
-  integrity sha512-yNGhDdS0DR0JyxnPC84qIx/Vd01RHVY4guJeBqBNdBoOLNWnzw5zkWJvxVSmsuUb92bikdnQFnw3PfGY8uZ82g==
-  dependencies:
-    unicode ">= 0.3.1"
+slug@~4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/slug/-/slug-4.0.2.tgz#35a62b4e71582778ac08bb30a1bf439fd0a43ea7"
+  integrity sha512-c5XbWkwxHU13gAdSvBHQgnGy2sxv/REMz0ugcM0SOSBCO/N4wfU0TDBC3pgdOwVGjZwGnLBTRljXzdVYE+KYNw==
 
 smartquotes@~2.3.1:
   version "2.3.1"
