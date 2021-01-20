@@ -55,7 +55,7 @@ jobs:
 
       # Unit Tests
       - name: backend | unit tests
-        run: docker run --rm ocelotsocialnetwork/backend:build yarn run test
+        run: docker run --rm ocelotsocialnetwork/backend:build mv /app/.env.template /app/.env && yarn run test
 
       ##########################################################################
       # WEBAPP #################################################################
