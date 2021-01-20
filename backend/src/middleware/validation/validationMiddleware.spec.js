@@ -30,27 +30,7 @@ const updateCommentMutation = gql`
     }
   }
 `
-const createPostMutation = gql`
-  mutation($id: ID, $title: String!, $content: String!, $language: String, $categoryIds: [ID]) {
-    CreatePost(
-      id: $id
-      title: $title
-      content: $content
-      language: $language
-      categoryIds: $categoryIds
-    ) {
-      id
-    }
-  }
-`
 
-const updatePostMutation = gql`
-  mutation($id: ID!, $title: String!, $content: String!, $categoryIds: [ID]) {
-    UpdatePost(id: $id, title: $title, content: $content, categoryIds: $categoryIds) {
-      id
-    }
-  }
-`
 const reportMutation = gql`
   mutation($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
     fileReport(
@@ -224,104 +204,6 @@ describe('validateCreateComment', () => {
       ).resolves.toMatchObject({
         data: { UpdateComment: null },
         errors: [{ message: 'Comment must be at least 1 character long!' }],
-      })
-    })
-  })
-
-  describe('validatePost', () => {
-    let createPostVariables
-    beforeEach(async () => {
-      createPostVariables = {
-        title: 'I am  a title',
-        content: 'Some content',
-      }
-      authenticatedUser = await commentingUser.toJson()
-    })
-
-    describe('categories', () => {
-      describe('null', () => {
-        it('throws UserInputError', async () => {
-          createPostVariables = { ...createPostVariables, categoryIds: null }
-          await expect(
-            mutate({ mutation: createPostMutation, variables: createPostVariables }),
-          ).resolves.toMatchObject({
-            data: { CreatePost: null },
-            errors: [
-              {
-                message: 'You cannot save a post without at least one category or more than three',
-              },
-            ],
-          })
-        })
-      })
-
-      describe('empty', () => {
-        it('throws UserInputError', async () => {
-          createPostVariables = { ...createPostVariables, categoryIds: [] }
-          await expect(
-            mutate({ mutation: createPostMutation, variables: createPostVariables }),
-          ).resolves.toMatchObject({
-            data: { CreatePost: null },
-            errors: [
-              {
-                message: 'You cannot save a post without at least one category or more than three',
-              },
-            ],
-          })
-        })
-      })
-
-      describe('more than 3 categoryIds', () => {
-        it('throws UserInputError', async () => {
-          createPostVariables = {
-            ...createPostVariables,
-            categoryIds: ['cat9', 'cat27', 'cat15', 'cat4'],
-          }
-          await expect(
-            mutate({ mutation: createPostMutation, variables: createPostVariables }),
-          ).resolves.toMatchObject({
-            data: { CreatePost: null },
-            errors: [
-              {
-                message: 'You cannot save a post without at least one category or more than three',
-              },
-            ],
-          })
-        })
-      })
-    })
-  })
-
-  describe('validateUpdatePost', () => {
-    describe('post created without categories somehow', () => {
-      let owner, updatePostVariables
-      beforeEach(async () => {
-        const postSomehowCreated = await neode.create('Post', {
-          id: 'how-was-this-created',
-        })
-        owner = await neode.create('User', {
-          id: 'author-of-post-without-category',
-          slug: 'hacker',
-        })
-        await postSomehowCreated.relateTo(owner, 'author')
-        authenticatedUser = await owner.toJson()
-        updatePostVariables = {
-          id: 'how-was-this-created',
-          title: 'I am  a title',
-          content: 'Some content',
-          categoryIds: [],
-        }
-      })
-
-      it('requires at least one category for successful update', async () => {
-        await expect(
-          mutate({ mutation: updatePostMutation, variables: updatePostVariables }),
-        ).resolves.toMatchObject({
-          data: { UpdatePost: null },
-          errors: [
-            { message: 'You cannot save a post without at least one category or more than three' },
-          ],
-        })
       })
     })
   })
