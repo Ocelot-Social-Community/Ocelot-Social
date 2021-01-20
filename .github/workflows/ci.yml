@@ -15,13 +15,20 @@ jobs:
           scripts/translations/sort.sh
           scripts/translations/missing-keys.sh
 
-      - name: Build neo4j image
+      ##########################################################################
+      # NEO4J ##################################################################
+      ##########################################################################
+      - name: [Neo4J] Build `community` image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/neo4j
           tags: latest
           path: neo4j/
           push: false
+      
+      ##########################################################################
+      # BACKEND ################################################################
+      ##########################################################################
       # TODO: We want to push this to dockerhub
       #- name: Build backend production image
       #  uses: docker/build-push-action@v1.1.0
@@ -31,7 +38,9 @@ jobs:
       #    target: production
       #    path: backend/
       #    push: false
-      - name: Build backend build image
+
+      # Build Docker Image (build)
+      - name: [backend] Build `build` image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/backend
@@ -39,6 +48,18 @@ jobs:
           target: build
           path: backend/
           push: false
+      
+      # Lint
+      - name: [backend] Lint
+        run: docker run --rm ocelotsocialnetwork/backend:build yarn run lint
+
+      # Unit Tests
+      - name: [backend] unit tests
+        run: docker run --rm ocelotsocialnetwork/backend:build yarn run test:jest
+
+      ##########################################################################
+      # WEBAPP #################################################################
+      ##########################################################################
       # TODO: We want to push this to dockerhub
       #- name: Build webapp production image
       #  uses: docker/build-push-action@v1.1.0
@@ -48,7 +69,9 @@ jobs:
       #    target: production
       #    path: webapp/
       #    push: false
-      - name: Build webapp build image
+
+      # Build Docker Image (build)
+      - name: [webapp] Build `build` image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/webapp
@@ -57,8 +80,11 @@ jobs:
           path: webapp/
           push: false
 
-      - name: Lint backend
-        run: docker run --rm ocelotsocialnetwork/backend:build yarn run lint
-      - name: Lint webapp
+      # Lint
+      - name: [webapp] Lint
         run: docker run --rm ocelotsocialnetwork/webapp:build yarn run lint
+
+      # Unit Tests
+      - name: [webapp] unit tests
+        run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
 
