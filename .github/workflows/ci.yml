@@ -18,7 +18,7 @@ jobs:
       ##########################################################################
       # NEO4J ##################################################################
       ##########################################################################
-      - name: [Neo4J] Build `community` image
+      - name: Neo4J | Build `community` image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/neo4j
@@ -40,7 +40,7 @@ jobs:
       #    push: false
 
       # Build Docker Image (build)
-      - name: [backend] Build `build` image
+      - name: backend | Build `build` image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/backend
@@ -50,11 +50,11 @@ jobs:
           push: false
       
       # Lint
-      - name: [backend] Lint
+      - name: backend | Lint
         run: docker run --rm ocelotsocialnetwork/backend:build yarn run lint
 
       # Unit Tests
-      - name: [backend] unit tests
+      - name: backend | unit tests
         run: docker run --rm ocelotsocialnetwork/backend:build yarn run test:jest
 
       ##########################################################################
@@ -71,7 +71,7 @@ jobs:
       #    push: false
 
       # Build Docker Image (build)
-      - name: [webapp] Build `build` image
+      - name: webapp | Build `build` image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/webapp
@@ -81,10 +81,10 @@ jobs:
           push: false
 
       # Lint
-      - name: [webapp] Lint
+      - name: webapp | Lint
         run: docker run --rm ocelotsocialnetwork/webapp:build yarn run lint
 
       # Unit Tests
-      - name: [webapp] unit tests
+      - name: webapp | unit tests
         run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
 
