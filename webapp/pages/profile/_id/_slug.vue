@@ -109,7 +109,7 @@
       <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
         <masonry-grid>
           <!-- TapNavigation -->
-          <new-tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" />
+          <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" />
 
           <!-- feed -->
           <ds-grid-item :row-span="2" column-span="fullWidth">
@@ -182,7 +182,7 @@ import HcUpload from '~/components/Upload'
 import UserAvatar from '~/components/_new/generic/UserAvatar/UserAvatar'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
-import NewTabNavigation from '~/components/_new/generic/TabNavigation/NewTabNavigation'
+import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import UserQuery from '~/graphql/User'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
@@ -212,7 +212,7 @@ export default {
     MasonryGrid,
     MasonryGridItem,
     FollowList,
-    NewTabNavigation,
+    TabNavigation,
   },
   mixins: [postListActions],
   transition: {

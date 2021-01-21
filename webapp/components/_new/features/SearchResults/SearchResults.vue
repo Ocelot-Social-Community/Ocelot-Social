@@ -13,7 +13,7 @@
         </ds-grid-item>
 
         <!-- tabs -->
-        <new-tab-navigation :tabs="tabOptions" :activeTab="activeTab" @switch-tab="switchTab" />
+        <tab-navigation :tabs="tabOptions" :activeTab="activeTab" @switch-tab="switchTab" />
 
         <!-- search results -->
 
@@ -105,14 +105,14 @@ import HcEmpty from '~/components/Empty/Empty'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem'
 import PostTeaser from '~/components/PostTeaser/PostTeaser'
-import NewTabNavigation from '~/components/_new/generic/TabNavigation/NewTabNavigation'
+import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 
 export default {
   components: {
-    NewTabNavigation,
+    TabNavigation,
     HcEmpty,
     MasonryGrid,
     MasonryGridItem,

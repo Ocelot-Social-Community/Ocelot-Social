@@ -1,7 +1,7 @@
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
 import SearchResults from './SearchResults'
-import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
+import TabNavigation from '~/components/_new/generic/TabNavigation/OldTabNavigation'
 import PostTeaser from '~/components/PostTeaser/PostTeaser'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import helpers from '~/storybook/helpers'
