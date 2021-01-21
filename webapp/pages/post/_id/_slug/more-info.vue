@@ -27,7 +27,9 @@
           <post-teaser
             :post="relatedPost"
             :width="{ base: '100%', lg: 1 }"
-            @removePostFromList="post.relatedContributions = removePostFromList(relatedPost, post.relatedContributions)"
+            @removePostFromList="
+              post.relatedContributions = removePostFromList(relatedPost, post.relatedContributions)
+            "
             @pinPost="pinPost(relatedPost, refetchPostList)"
             @unpinPost="unpinPost(relatedPost, refetchPostList)"
           />

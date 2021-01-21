@@ -105,7 +105,7 @@ describe('SearchResults', () => {
         })
 
         it('has post tab inactive after emitting switch-tab', async () => {
-          wrapper.find('.tab-navigation').vm.$emit('switch-tab', 'User')  // emits direct from tab component to search results
+          wrapper.find('.tab-navigation').vm.$emit('switch-tab', 'User') // emits direct from tab component to search results
           await wrapper.vm.$nextTick()
           await expect(wrapper.find('[data-test="Post-tab"]').classes('--active')).toBe(false)
         })

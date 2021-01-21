@@ -12,7 +12,7 @@ export default {
         .mutate({
           mutation: PostMutations().pinPost,
           variables: {
-            id: post.id
+            id: post.id,
           },
         })
         .then(() => {
@@ -26,7 +26,7 @@ export default {
         .mutate({
           mutation: PostMutations().unpinPost,
           variables: {
-            id: post.id
+            id: post.id,
           },
         })
         .then(() => {
