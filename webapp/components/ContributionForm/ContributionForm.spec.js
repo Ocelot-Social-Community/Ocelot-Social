@@ -1,7 +1,6 @@
 import { config, mount } from '@vue/test-utils'
 import ContributionForm from './ContributionForm.vue'
 
-import Vue from 'vue'
 import Vuex from 'vuex'
 import PostMutations from '~/graphql/PostMutations.js'
 
@@ -17,13 +16,7 @@ config.stubs['nuxt-link'] = '<span><slot /></span>'
 config.stubs['v-popover'] = '<span><slot /></span>'
 
 describe('ContributionForm.vue', () => {
-  let wrapper,
-    postTitleInput,
-    expectedParams,
-    cancelBtn,
-    mocks,
-    propsData,
-    categoryIds
+  let wrapper, postTitleInput, expectedParams, cancelBtn, mocks, propsData
   const postTitle = 'this is a title for a post'
   const postTitleTooShort = 'xx'
   let postTitleTooLong = ''
@@ -50,7 +43,6 @@ describe('ContributionForm.vue', () => {
               slug: 'this-is-a-title-for-a-post',
               content: postContent,
               contentExcerpt: postContent,
-              categoryIds,
             },
           },
         }),
@@ -147,11 +139,9 @@ describe('ContributionForm.vue', () => {
           postTitleInput = wrapper.find('.ds-input')
           postTitleInput.setValue(postTitle)
           await wrapper.vm.updateEditorContent(postContent)
-          await Vue.nextTick()
-          await Vue.nextTick()
         })
 
-        it('creates a post with valid title, content, and at least one category', async () => {
+        it('creates a post with valid title and content', async () => {
           await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
         })
@@ -213,9 +203,6 @@ describe('ContributionForm.vue', () => {
           postTitleInput = wrapper.find('.ds-input')
           postTitleInput.setValue(postTitle)
           await wrapper.vm.updateEditorContent(postContent)
-          categoryIds = ['cat12']
-          await Vue.nextTick()
-          await Vue.nextTick()
         })
 
         it('shows an error toaster when apollo mutation rejects', async () => {
@@ -235,12 +222,6 @@ describe('ContributionForm.vue', () => {
             title: 'dies ist ein Post',
             content: 'auf Deutsch geschrieben',
             image,
-            categories: [
-              {
-                id: 'cat12',
-                name: 'Democracy & Politics',
-              },
-            ],
           },
         }
         wrapper = Wrapper()
@@ -263,7 +244,6 @@ describe('ContributionForm.vue', () => {
                 slug: 'this-is-a-title-for-a-post',
                 content: postContent,
                 contentExcerpt: postContent,
-                categoryIds,
               },
             },
           })
