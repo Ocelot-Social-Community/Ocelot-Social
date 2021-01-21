@@ -317,19 +317,6 @@ describe('CreatePost', () => {
         expected,
       )
     })
-
-    describe('language', () => {
-      beforeEach(() => {
-        variables = { ...variables, language: 'es' }
-      })
-
-      it('allows a user to set the language of the post', async () => {
-        const expected = { data: { CreatePost: { language: 'es' } } }
-        await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
-          expected,
-        )
-      })
-    })
   })
 })
 
