@@ -391,6 +391,14 @@ export default {
         this.$apollo.queries.User.refetch()
       }
     },
+    async deleteUser(userdata) {
+      this.$store.commit('modal/SET_OPEN', {
+        name: 'delete',
+        data: {
+          userdata: userdata,
+        },
+      })
+    },
     optimisticFollow({ followedByCurrentUser }) {
       /*
        * Note: followedByCountStartValue is updated to avoid counting from 0 when follow/unfollow
