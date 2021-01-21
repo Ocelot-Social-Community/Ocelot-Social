@@ -2,7 +2,7 @@ import slugify from 'slug'
 export default async function uniqueSlug(string, isUnique) {
   const slug = slugify(string || 'anonymous', {
     lower: true,
-    charmap: { Ä: 'AE', ä: 'ae', Ö: 'OE', ö: 'oe', Ü: 'UE', ü: 'ue', ñ: 'n' },
+    multicharmap: { Ä: 'AE', ä: 'ae', Ö: 'OE', ö: 'oe', Ü: 'UE', ü: 'ue', ß: 'ss' },
   })
   if (await isUnique(slug)) return slug
 

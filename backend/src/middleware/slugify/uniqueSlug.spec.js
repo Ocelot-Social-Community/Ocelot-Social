@@ -20,14 +20,14 @@ describe('uniqueSlug', () => {
   })
 
   it('Converts umlaut to a two letter equivalent', async () => {
-    const umlaut = 'ä'
+    const umlaut = 'ÄÖÜäöüß'
     const isUnique = jest.fn().mockResolvedValue(true)
-    await expect(uniqueSlug(umlaut, isUnique)).resolves.toEqual('ae')
+    await expect(uniqueSlug(umlaut, isUnique)).resolves.toEqual('aeoeueaeoeuess')
   })
 
-  it('Removes Spanish enya ', async () => {
-    const enya = 'ñ'
+  it('Removes Spanish enya and diacritics', async () => {
+    const diacritics = 'áàéèíìóòúùñçÁÀÉÈÍÌÓÒÚÙÑÇ'
     const isUnique = jest.fn().mockResolvedValue(true)
-    await expect(uniqueSlug(enya, isUnique)).resolves.toEqual('n')
+    await expect(uniqueSlug(diacritics, isUnique)).resolves.toEqual('aaeeiioouuncaaeeiioouunc')
   })
 })
