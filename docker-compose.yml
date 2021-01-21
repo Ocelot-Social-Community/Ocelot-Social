@@ -16,6 +16,7 @@ services:
     depends_on:
       - backend
     volumes:
+      - ./webapp:/develop-webapp
       - webapp_node_modules:/develop-webapp/node_modules
     environment:
       - HOST=0.0.0.0
@@ -35,6 +36,7 @@ services:
     ports:
       - 4000:4000
     volumes:
+      - ./backend:/develop-backend
       - backend_node_modules:/develop-backend/node_modules
       - uploads:/develop-backend/public/uploads
     environment:

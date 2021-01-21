@@ -4,7 +4,6 @@ import ContributionForm from './ContributionForm.vue'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import PostMutations from '~/graphql/PostMutations.js'
-import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 
 import ImageUploader from '~/components/ImageUploader/ImageUploader'
 import MutationObserver from 'mutation-observer'
@@ -17,34 +16,6 @@ config.stubs['client-only'] = '<span><slot /></span>'
 config.stubs['nuxt-link'] = '<span><slot /></span>'
 config.stubs['v-popover'] = '<span><slot /></span>'
 
-const categories = [
-  {
-    id: 'cat3',
-    slug: 'health-wellbeing',
-    icon: 'medkit',
-  },
-  {
-    id: 'cat12',
-    slug: 'it-internet-data-privacy',
-    icon: 'mouse-pointer',
-  },
-  {
-    id: 'cat9',
-    slug: 'democracy-politics',
-    icon: 'university',
-  },
-  {
-    id: 'cat15',
-    slug: 'consumption-sustainability',
-    icon: 'shopping-cart',
-  },
-  {
-    id: 'cat4',
-    slug: 'environment-nature',
-    icon: 'tree',
-  },
-]
-
 describe('ContributionForm.vue', () => {
   let wrapper,
     postTitleInput,
@@ -54,8 +25,7 @@ describe('ContributionForm.vue', () => {
     propsData,
     categoryIds,
     englishLanguage,
-    deutschLanguage,
-    dataPrivacyButton
+    deutschLanguage
   const postTitle = 'this is a title for a post'
   const postTitleTooShort = 'xx'
   let postTitleTooLong = ''
@@ -136,7 +106,6 @@ describe('ContributionForm.vue', () => {
     describe('CreatePost', () => {
       describe('invalid form submission', () => {
         beforeEach(async () => {
-          wrapper.find(CategoriesSelect).setData({ categories })
           postTitleInput = wrapper.find('.ds-input')
           postTitleInput.setValue(postTitle)
           await wrapper.vm.updateEditorContent(postContent)
@@ -144,10 +113,6 @@ describe('ContributionForm.vue', () => {
             .findAll('li')
             .filter((language) => language.text() === 'English')
           englishLanguage.trigger('click')
-          dataPrivacyButton = await wrapper
-            .find(CategoriesSelect)
-            .find('[data-test="category-buttons-cat12"]')
-          dataPrivacyButton.trigger('click')
         })
 
         it('title cannot be empty', async () => {
@@ -173,22 +138,6 @@ describe('ContributionForm.vue', () => {
           await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
         })
-
-        it('has at least one category', async () => {
-          dataPrivacyButton = await wrapper
-            .find(CategoriesSelect)
-            .find('[data-test="category-buttons-cat12"]')
-          dataPrivacyButton.trigger('click')
-          wrapper.find('form').trigger('submit')
-          expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
-        })
-
-        it('has no more than three categories', async () => {
-          wrapper.vm.formData.categoryIds = ['cat4', 'cat9', 'cat15', 'cat27']
-          await Vue.nextTick()
-          wrapper.find('form').trigger('submit')
-          expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
-        })
       })
 
       describe('valid form submission', () => {
@@ -200,23 +149,17 @@ describe('ContributionForm.vue', () => {
               content: postContent,
               language: 'en',
               id: null,
-              categoryIds: ['cat12'],
               image: null,
             },
           }
           postTitleInput = wrapper.find('.ds-input')
           postTitleInput.setValue(postTitle)
           await wrapper.vm.updateEditorContent(postContent)
-          wrapper.find(CategoriesSelect).setData({ categories })
           englishLanguage = wrapper
             .findAll('li')
             .filter((language) => language.text() === 'English')
           englishLanguage.trigger('click')
           await Vue.nextTick()
-          dataPrivacyButton = await wrapper
-            .find(CategoriesSelect)
-            .find('[data-test="category-buttons-cat12"]')
-          dataPrivacyButton.trigger('click')
           await Vue.nextTick()
         })
 
@@ -293,16 +236,11 @@ describe('ContributionForm.vue', () => {
           postTitleInput.setValue(postTitle)
           await wrapper.vm.updateEditorContent(postContent)
           categoryIds = ['cat12']
-          wrapper.find(CategoriesSelect).setData({ categories })
           englishLanguage = wrapper
             .findAll('li')
             .filter((language) => language.text() === 'English')
           englishLanguage.trigger('click')
           await Vue.nextTick()
-          dataPrivacyButton = await wrapper
-            .find(CategoriesSelect)
-            .find('[data-test="category-buttons-cat12"]')
-          dataPrivacyButton.trigger('click')
           await Vue.nextTick()
         })
 
@@ -365,7 +303,6 @@ describe('ContributionForm.vue', () => {
               content: propsData.contribution.content,
               language: propsData.contribution.language,
               id: propsData.contribution.id,
-              categoryIds: ['cat12'],
               image: {
                 sensitive: false,
               },
@@ -376,18 +313,6 @@ describe('ContributionForm.vue', () => {
         it('calls the UpdatePost apollo mutation', async () => {
           expectedParams.variables.content = postContent
           wrapper.vm.updateEditorContent(postContent)
-          await wrapper.find('form').trigger('submit')
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
-        })
-
-        it('supports updating categories', async () => {
-          expectedParams.variables.categoryIds.push('cat3')
-          wrapper.find(CategoriesSelect).setData({ categories })
-          await Vue.nextTick()
-          const healthWellbeingButton = await wrapper
-            .find(CategoriesSelect)
-            .find('[data-test="category-buttons-cat3"]')
-          healthWellbeingButton.trigger('click')
           await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
         })
