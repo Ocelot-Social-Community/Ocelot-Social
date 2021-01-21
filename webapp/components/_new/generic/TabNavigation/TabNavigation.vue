@@ -1,6 +1,5 @@
 <template>
   <ul class="tab-navigation">
-    <!-- Wolle Fix warning for 'switchTab', see below. -->
     <li
       v-for="tab in tabs"
       :key="tab.type"
@@ -15,30 +14,15 @@
       :data-test="tab.type + '-tab'"
       @click="$emit('switch-tab', tab.type)"
     >
-      <!-- Wolle <ds-space :class="lowerCase('Post-tab')" margin="small"> -->
       <ds-space margin="small">
-        <!-- <ds-number :label="tab.title"> -->
-        <!-- Wolle <hc-count-to slot="count" :end-val="tab.count" /> -->
         {{ tab.count }}
-        <!-- </ds-number> -->
-        <!-- <client-only placeholder="Loading...">
-          <ds-number :label="tab.title">
-            Wolle <hc-count-to slot="count" :end-val="tab.count" />
-            {{ tab.count }}
-          </ds-number>
-        </client-only> -->
       </ds-space>
     </li>
   </ul>
 </template>
 
 <script>
-// Wolle import HcCountTo from '~/components/CountTo.vue'
-
 export default {
-  // Wolle components: {
-  //   HcCountTo,
-  // },
   props: {
     tabs: {
       type: Array,

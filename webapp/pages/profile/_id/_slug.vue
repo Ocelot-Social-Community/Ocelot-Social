@@ -110,49 +110,6 @@
         <masonry-grid>
           <!-- TapNavigation -->
           <new-tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" />
-          <!-- Wolle <ds-grid-item class="profile-top-navigation" :row-span="3" column-span="fullWidth">
-            <base-card class="ds-tab-nav">
-              <ul class="Tabs">
-                <li class="Tabs__tab pointer" :class="{ active: tabActive === 'post' }">
-                  <a @click="handleTab('post')">
-                    <ds-space margin="small">
-                      <client-only placeholder="Loading...">
-                        <ds-number :label="$t('common.post', null, user.contributionsCount)">
-                          <hc-count-to slot="count" :end-val="user.contributionsCount" />
-                        </ds-number>
-                      </client-only>
-                    </ds-space>
-                  </a>
-                </li>
-                <li class="Tabs__tab pointer" :class="{ active: tabActive === 'comment' }">
-                  <a @click="handleTab('comment')">
-                    <ds-space margin="small">
-                      <client-only placeholder="Loading...">
-                        <ds-number :label="$t('profile.commented')">
-                          <hc-count-to slot="count" :end-val="user.commentedCount" />
-                        </ds-number>
-                      </client-only>
-                    </ds-space>
-                  </a>
-                </li>
-                <li
-                  class="Tabs__tab pointer"
-                  :class="{ active: tabActive === 'shout' }"
-                  v-if="myProfile || user.showShoutsPublicly"
-                >
-                  <a @click="handleTab('shout')">
-                    <ds-space margin="small">
-                      <client-only placeholder="Loading...">
-                        <ds-number :label="$t('profile.shouted')">
-                          <hc-count-to slot="count" :end-val="user.shoutedCount" />
-                        </ds-number>
-                      </client-only>
-                    </ds-space>
-                  </a>
-                </li>
-              </ul>
-            </base-card>
-          </ds-grid-item> -->
 
           <!-- feed -->
           <ds-grid-item :row-span="2" column-span="fullWidth">
@@ -461,33 +418,6 @@ export default {
 </script>
 
 <style lang="scss">
-// Wolle .pointer {
-//   cursor: pointer;
-// }
-
-// Wolle .Tabs {
-//   position: relative;
-//   background-color: #fff;
-//   height: 100%;
-//   display: flex;
-//   margin: 0;
-//   padding: 0;
-//   list-style: none;
-
-//   &__tab {
-//     text-align: center;
-//     height: 100%;
-//     flex-grow: 1;
-
-//     &:hover {
-//       border-bottom: 2px solid #c9c6ce;
-//     }
-
-//     &.active {
-//       border-bottom: 2px solid #17b53f;
-//     }
-//   }
-// }
 .profile-avatar.user-avatar {
   margin: auto;
   margin-top: -60px;
@@ -499,26 +429,6 @@ export default {
     right: $space-x-small;
   }
 }
-// Wolle .profile-top-navigation {
-//   position: sticky;
-//   top: 53px;
-//   z-index: 2;
-// }
-// Wolle .ds-tab-nav.base-card {
-//   padding: 0;
-
-//   .ds-tab-nav-item {
-//     &.ds-tab-nav-item-active {
-//       border-bottom: 3px solid #17b53f;
-//       &:first-child {
-//         border-bottom-left-radius: $border-radius-x-large;
-//       }
-//       &:last-child {
-//         border-bottom-right-radius: $border-radius-x-large;
-//       }
-//     }
-//   }
-// }
 .profile-post-add-button {
   box-shadow: $box-shadow-x-large;
 }

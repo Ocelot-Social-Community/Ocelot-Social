@@ -34,12 +34,7 @@ describe('SearchResults', () => {
     propsData = {
       pageSize: 12,
     }
-    // Wolle jest.useFakeTimers()
     wrapper = Wrapper()
-  })
-
-  afterEach(() => {
-    // Wolle jest.clearAllMocks()
   })
 
   describe('mount', () => {
@@ -54,8 +49,6 @@ describe('SearchResults', () => {
         })
       })
 
-      // Wolle beforeEach(jest.useFakeTimers)
-
       describe('result contains 25 posts, 8 users and 0 hashtags', () => {
         // we couldn't get it running with "jest.runAllTimers()" and so we used "setTimeout"
         // time is a bit more then 3000 milisec see "webapp/components/CountTo.vue"
@@ -69,7 +62,6 @@ describe('SearchResults', () => {
             userCount: 8,
             activeTab: 'Post',
           })
-          // Wolle await wrapper.vm.$nextTick()
         })
 
         it('shows a total of 33 results', () => {
@@ -79,9 +71,6 @@ describe('SearchResults', () => {
         })
 
         it('shows tab with 25 posts found', () => {
-          // console.log('postTab: ', postTab.html())
-          // console.log('wrapper: ', wrapper)
-          // Wolle jest.runAllTimers()
           setTimeout(() => {
             expect(wrapper.find('[data-test="Post-tab"]').text()).toContain('25')
           }, counterTimeout)

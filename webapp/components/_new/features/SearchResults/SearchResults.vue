@@ -86,19 +86,7 @@
             </ds-space>
           </ds-grid-item>
         </template>
-        <!-- Wolle <template v-else-if="$apollo.loading">
-          <ds-grid-item column-span="fullWidth">
-            <ds-space centered>
-              <ds-spinner size="base"></ds-spinner>
-            </ds-space>
-          </ds-grid-item>
-        </template> -->
-        <!-- Wolle double! -->
-        <!-- Wolle <template v-else>
-          <ds-grid-item column-span="fullWidth">
-            <hc-empty margin="xx-large" icon="file" />
-          </ds-grid-item>
-        </template> -->
+
         <!-- no results -->
         <ds-grid-item v-else :row-span="7" column-span="fullWidth">
           <ds-space centered>
@@ -107,67 +95,6 @@
         </ds-grid-item>
       </masonry-grid>
     </ds-flex-item>
-
-    <!-- Wolle old -->
-    <!-- <tab-navigation :tabs="tabOptions" :activeTab="activeTab" @switch-tab="switchTab" />
-    <section
-      :class="['results', activeTab === 'User' && '--user', !activeResourceCount > 0 && '--empty']"
-    >
-      <hc-empty
-        v-if="!activeResourceCount || searchCount === 0"
-        icon="tasks"
-        :message="$t('search.no-results', { search })"
-      />
-      <template>
-        <pagination-buttons
-          v-if="activeResourceCount > pageSize"
-          :hasNext="hasNext"
-          :showPageCounter="true"
-          :hasPrevious="hasPrevious"
-          :activePage="activePage"
-          :activeResourceCount="activeResourceCount"
-          :key="'Top'"
-          :pageSize="pageSize"
-          @back="previousResults"
-          @next="nextResults"
-        />
-        <masonry-grid v-if="activeTab === 'Post'">
-          <masonry-grid-item v-for="resource in activeResources" :key="resource.key">
-            <post-teaser :post="resource" />
-          </masonry-grid-item>
-        </masonry-grid>
-
-        <ul v-if="activeTab === 'User'" class="user-list">
-          <li v-for="resource in activeResources" :key="resource.key" class="item">
-            <base-card :wideContent="true">
-              <user-teaser :user="resource" />
-            </base-card>
-          </li>
-        </ul>
-
-        <ul v-if="activeTab === 'Hashtag'" class="hashtag-list">
-          <li v-for="resource in activeResources" :key="resource.key" class="item">
-            <base-card :wideContent="true">
-              <hc-hashtag :id="resource.id" />
-            </base-card>
-          </li>
-        </ul>
-
-        <pagination-buttons
-          v-if="activeResourceCount > pageSize"
-          :hasNext="hasNext"
-          :hasPrevious="hasPrevious"
-          :activePage="activePage"
-          :showPageCounter="true"
-          :activeResourceCount="activeResourceCount"
-          :key="'Bottom'"
-          :pageSize="pageSize"
-          :srollTo="'#search-results'"
-          @back="previousResults"
-          @next="nextResults"
-        />
-      </template>
-    </section> -->
   </div>
 </template>
 
@@ -178,7 +105,6 @@ import HcEmpty from '~/components/Empty/Empty'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem'
 import PostTeaser from '~/components/PostTeaser/PostTeaser'
-// Wolle import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import NewTabNavigation from '~/components/_new/generic/TabNavigation/NewTabNavigation'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
@@ -186,7 +112,6 @@ import HcHashtag from '~/components/Hashtag/Hashtag'
 
 export default {
   components: {
-    // Wolle TabNavigation,
     NewTabNavigation,
     HcEmpty,
     MasonryGrid,
@@ -410,10 +335,8 @@ export default {
 </script>
 
 <style lang="scss">
-// Wolle check if still needed 👇🏼
 .search-results {
   > .results {
-    /* display: inline-block;*/
     padding: $space-small;
     background-color: $color-neutral-80;
     border-radius: 0 $border-radius-base $border-radius-base $border-radius-base;
@@ -444,16 +367,8 @@ export default {
   }
 }
 
-// Wolle new
 .grid-total-search-results {
   padding: 0;
   margin: 0;
-  // margin-bottom: $space-x-small;
-
-  // > .base-button {
-  //   display: block;
-  //   width: 100%;
-  //   margin-bottom: $space-x-small;
-  // }
 }
 </style>
