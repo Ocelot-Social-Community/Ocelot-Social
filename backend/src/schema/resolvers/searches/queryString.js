@@ -40,7 +40,10 @@ const matchBeginningOfWords = (str) => {
 
 export function normalizeWhitespace(str) {
   // delete the first character if it is !, @ or #
-  return str.replace(/^([!@#])/, '').replace(/\s+/g, ' ').trim()
+  return str
+    .replace(/^([!@#])/, '')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 export function escapeSpecialCharacters(str) {
