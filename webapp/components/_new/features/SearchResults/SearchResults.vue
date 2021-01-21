@@ -295,9 +295,9 @@ export default {
       this.userPage = 0
       this.hashtagPage = 0
     },
-    switchTab(tab) {
-      if (this.activeTab !== tab) {
-        this.activeTab = tab
+    switchTab(tabType) {
+      if (this.activeTab !== tabType) {
+        this.activeTab = tabType
       }
     },
     previousResults() {

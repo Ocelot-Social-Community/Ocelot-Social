@@ -57,6 +57,10 @@ describe('SearchResults', () => {
       // Wolle beforeEach(jest.useFakeTimers)
 
       describe('result contains 25 posts, 8 users and 0 hashtags', () => {
+        // we couldn't get it running with "jest.runAllTimers()" and so we used "setTimeout"
+        // time is a bit more then 3000 milisec see "webapp/components/CountTo.vue"
+        const counterTimeout = 3000 + 10
+
         beforeEach(async () => {
           wrapper.setData({
             posts: helpers.fakePost(12),
@@ -69,56 +73,68 @@ describe('SearchResults', () => {
         })
 
         it('shows a total of 33 results', () => {
-          expect(wrapper.find('.total-search-results').text()).toContain('33')
+          setTimeout(() => {
+            expect(wrapper.find('.total-search-results').text()).toContain('33')
+          }, counterTimeout)
         })
 
         it('shows tab with 25 posts found', () => {
-          const postTab = wrapper.find('[data-test="Post-tab"]')
           // console.log('postTab: ', postTab.html())
           // console.log('wrapper: ', wrapper)
           // Wolle jest.runAllTimers()
-          expect(postTab.text()).toContain('25')
+          setTimeout(() => {
+            expect(wrapper.find('[data-test="Post-tab"]').text()).toContain('25')
+          }, counterTimeout)
         })
 
         it('shows tab with 8 users found', () => {
-          const userTab = wrapper.find('[data-test="User-tab"]')
-          expect(userTab.text()).toContain('8')
+          setTimeout(() => {
+            expect(wrapper.find('[data-test="User-tab"]').text()).toContain('8')
+          }, counterTimeout)
         })
 
         it('shows tab with 0 hashtags found', () => {
-          expect(wrapper.find('.Hashtag-tab').text()).toContain('0')
+          setTimeout(() => {
+            expect(wrapper.find('[data-test="Hashtag-tab"]').text()).toContain('0')
+          }, counterTimeout)
         })
 
         it('has post tab as active tab', () => {
-          expect(wrapper.find('.Post-tab').classes('--active')).toBe(true)
+          expect(wrapper.find('[data-test="Post-tab"]').classes('--active')).toBe(true)
         })
 
         it('has user tab inactive', () => {
-          expect(wrapper.find('.User-tab').classes('--active')).toBe(false)
+          expect(wrapper.find('[data-test="User-tab"]').classes('--active')).toBe(false)
         })
 
         it('has hashtag tab disabled', () => {
-          expect(wrapper.find('.Hashtag-tab').classes('--disabled')).toBe(true)
+          expect(wrapper.find('[data-test="Hashtag-tab"]').classes('--disabled')).toBe(true)
         })
 
         it('displays 12 (pageSize) posts', () => {
           expect(wrapper.findAll('.post-teaser')).toHaveLength(12)
         })
 
-        it('has post tab inactive after clicking on user tab', async () => {
-          wrapper.find('.User-tab').trigger('click')
+        it('has post tab inactive after emitting switch-tab', async () => {
+          wrapper.find('.tab-navigation').vm.$emit('switch-tab', 'User')  // emits direct from tab component to search results
           await wrapper.vm.$nextTick()
-          await expect(wrapper.find('.Post-tab').classes('--active')).toBe(false)
+          await expect(wrapper.find('[data-test="Post-tab"]').classes('--active')).toBe(false)
+        })
+
+        it('has post tab inactive after clicking on user tab', async () => {
+          wrapper.find('[data-test="User-tab-click"]').trigger('click')
+          await wrapper.vm.$nextTick()
+          await expect(wrapper.find('[data-test="Post-tab"]').classes('--active')).toBe(false)
         })
 
         it('has user tab active after clicking on user tab', async () => {
-          wrapper.find('.User-tab').trigger('click')
+          wrapper.find('[data-test="User-tab-click"]').trigger('click')
           await wrapper.vm.$nextTick()
-          await expect(wrapper.find('.User-tab').classes('--active')).toBe(true)
+          await expect(wrapper.find('[data-test="User-tab"]').classes('--active')).toBe(true)
         })
 
         it('displays 8 users after clicking on user tab', async () => {
-          wrapper.find('.User-tab').trigger('click')
+          wrapper.find('[data-test="User-tab-click"]').trigger('click')
           await wrapper.vm.$nextTick()
           await expect(wrapper.findAll('.user-teaser')).toHaveLength(8)
         })
@@ -128,7 +144,7 @@ describe('SearchResults', () => {
         })
 
         it('shows no pagination buttons for users', async () => {
-          wrapper.find('.User-tab').trigger('click')
+          wrapper.find('[data-test="User-tab-click"]').trigger('click')
           await wrapper.vm.$nextTick()
           await expect(wrapper.find('.pagination-buttons').exists()).toBe(false)
         })

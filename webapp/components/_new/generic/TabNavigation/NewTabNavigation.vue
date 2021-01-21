@@ -19,8 +19,8 @@
       </ds-space>
     </li>
   </ul> -->
-  <!-- Wolle <ds-grid-item class="profile-top-navigation" :row-span="3" column-span="fullWidth"> -->
-  <ds-grid-item class="profile-top-navigation" :row-span="tabs.length" column-span="fullWidth">
+  <!-- Wolle <ds-grid-item class="tab-navigation" :row-span="3" column-span="fullWidth"> -->
+  <ds-grid-item class="tab-navigation" :row-span="tabs.length" column-span="fullWidth">
     <base-card class="ds-tab-nav">
       <ul class="Tabs">
         <li
@@ -32,8 +32,10 @@
             activeTab === tab.type && '--active',
             tab.disabled && '--disabled',
           ]"
+          :data-test="tab.type + '-tab'"
         >
-          <a @click="switchTab(tab)">
+          <!-- Wolle <a :class="[tab.type + '-tab']" @click="switchTab(tab)"> -->
+          <a :data-test="tab.type + '-tab-click'" @click="switchTab(tab)">
             <ds-space margin="small">
               <!-- Wolle translate -->
               <!-- <client-only placeholder="Loading..."> -->
@@ -149,7 +151,7 @@ export default {
     }
   }
 }
-.profile-top-navigation {
+.tab-navigation {
   position: sticky;
   top: 53px;
   z-index: 2;
