@@ -71,21 +71,9 @@ Docker is a software development container tool that combines software and its d
 
 There are [sevaral ways to install Docker CE](https://docs.docker.com/install/) on your computer or server.
 
-{% tabs %}
-{% tab title="Docker Desktop macOS" %}
-Follow these instructions to [install Docker Desktop on macOS](https://docs.docker.com/docker-for-mac/install/).
-{% endtab %}
-
-{% tab title="Docker Desktop Windows" %}
-Follow these instructions to [install Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/install/).
-{% endtab %}
-
-{% tab title="Docker CE" %}
-Follow these instructions to [install Docker CE](https://docs.docker.com/install/).
-
-This is a great option for Linux users.
-{% endtab %}
-{% endtabs %}
+ * [install Docker Desktop on macOS](https://docs.docker.com/docker-for-mac/install/)
+ * [install Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/install/)
+ * [install Docker CE on Linux](https://docs.docker.com/install/)
 
 Check the correct Docker installation by checking the version before proceeding. E.g. we have the following versions:
 
