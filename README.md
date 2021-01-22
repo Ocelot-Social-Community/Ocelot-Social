@@ -107,8 +107,6 @@ Check out the [contribution guideline](./CONTRIBUTING.md), too!
 We give write permissions to every developer who asks for it. Just text us on
 [Discord](https://discord.gg/6ub73U3).
 
-[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/0)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/0)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/1)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/1)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/2)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/2)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/3)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/3)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/4)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/4)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/5)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/5)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/6)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/6)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/7)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/7)
-
 ## Technology Stack
 
 * [VueJS](https://vuejs.org/)
