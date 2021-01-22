@@ -54,6 +54,9 @@ services:
   maintenance:
     image: ocelotsocialnetwork/maintenance:development
 
+  ########################################################
+  # MAILSERVER TO FAKE SMTP ##########################################
+  ########################################################
   mailserver:
     image: djfarrelly/maildev
     ports:
