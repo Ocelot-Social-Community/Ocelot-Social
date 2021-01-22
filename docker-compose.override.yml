@@ -42,7 +42,7 @@ services:
   neo4j:
     image: ocelotsocialnetwork/neo4j:development
     ports:
-      # Also expose the playground
+      # Also expose the neo4j query browser
       - 7474:7474
     networks:
       # So we can access the playground from our host machine
