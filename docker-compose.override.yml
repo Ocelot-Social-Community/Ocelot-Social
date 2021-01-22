@@ -37,7 +37,7 @@ services:
       - ./backend:/app
 
   ########################################################
-  # Neo4J ################################################
+  # NEO4J ################################################
   ########################################################
   neo4j:
     image: ocelotsocialnetwork/neo4j:development
@@ -55,7 +55,7 @@ services:
     image: ocelotsocialnetwork/maintenance:development
 
   ########################################################
-  # MAILSERVER TO FAKE SMTP ##########################################
+  # MAILSERVER TO FAKE SMTP ##############################
   ########################################################
   mailserver:
     image: djfarrelly/maildev
