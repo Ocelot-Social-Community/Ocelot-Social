@@ -96,7 +96,7 @@ For Production
 docker-compose -f docker-compose.yml up
 ```
 
-This will start all required docker containers
+This will start all required Docker containers
 
 ## Developer Chat
 
