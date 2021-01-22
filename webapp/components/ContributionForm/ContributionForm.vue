@@ -50,22 +50,6 @@
           {{ contentLength }}
           <base-icon v-if="errors && errors.content" name="warning" />
         </ds-chip>
-        <categories-select model="categoryIds" :existingCategoryIds="formData.categoryIds" />
-        <ds-chip size="base" :color="errors && errors.categoryIds && 'danger'">
-          {{ formData.categoryIds.length }} / 3
-          <base-icon v-if="errors && errors.categoryIds" name="warning" />
-        </ds-chip>
-        <ds-select
-          model="language"
-          icon="globe"
-          class="select-field"
-          :options="languageOptions"
-          :placeholder="$t('contribution.languageSelectText')"
-          :label="$t('contribution.languageSelectLabel')"
-        />
-        <ds-chip v-if="errors && errors.language" size="base" color="danger">
-          <base-icon name="warning" />
-        </ds-chip>
         <div class="buttons">
           <base-button data-test="cancel-button" :disabled="loading" @click="$router.back()" danger>
             {{ $t('actions.cancel') }}
@@ -81,19 +65,15 @@
 
 <script>
 import gql from 'graphql-tag'
-import orderBy from 'lodash/orderBy'
 import { mapGetters } from 'vuex'
 import HcEditor from '~/components/Editor/Editor'
-import locales from '~/locales'
 import PostMutations from '~/graphql/PostMutations.js'
-import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import ImageUploader from '~/components/ImageUploader/ImageUploader'
 import links from '~/constants/links.js'
 
 export default {
   components: {
     HcEditor,
-    CategoriesSelect,
     ImageUploader,
   },
   props: {
@@ -103,11 +83,7 @@ export default {
     },
   },
   data() {
-    const { title, content, image, language, categories } = this.contribution
-
-    const languageOptions = orderBy(locales, 'name').map((locale) => {
-      return { label: locale.name, value: locale.code }
-    })
+    const { title, content, image } = this.contribution
     const { sensitive: imageBlurred = false, aspectRatio: imageAspectRatio = null } = image || {}
 
     return {
@@ -118,26 +94,12 @@ export default {
         image: image || null,
         imageAspectRatio,
         imageBlurred,
-        language: languageOptions.find((option) => option.value === language) || null,
-        categoryIds: categories ? categories.map((category) => category.id) : [],
       },
       formSchema: {
         title: { required: true, min: 3, max: 100 },
         content: { required: true },
-        categoryIds: {
-          type: 'array',
-          required: true,
-          validator: (_, value = []) => {
-            if (value.length === 0 || value.length > 3) {
-              return [new Error(this.$t('common.validations.categories'))]
-            }
-            return []
-          },
-        },
-        language: { required: true },
         imageBlurred: { required: false },
       },
-      languageOptions,
       loading: false,
       users: [],
       hashtags: [],
@@ -155,7 +117,7 @@ export default {
   methods: {
     submit() {
       let image = null
-      const { title, content, categoryIds } = this.formData
+      const { title, content } = this.formData
       if (this.formData.image) {
         image = {
           sensitive: this.formData.imageBlurred,
@@ -172,9 +134,7 @@ export default {
           variables: {
             title,
             content,
-            categoryIds,
             id: this.contribution.id || null,
-            language: this.formData.language.value,
             image,
           },
         })

@@ -136,7 +136,7 @@ type Post {
       """
     )
   tags: [Tag]! @relation(name: "TAGGED", direction: "OUT")
-  categories: [Category]! @relation(name: "CATEGORIZED", direction: "OUT")
+  categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
   comments: [Comment]! @relation(name: "COMMENTS", direction: "IN")
   commentsCount: Int!

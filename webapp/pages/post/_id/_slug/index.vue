@@ -46,21 +46,6 @@
       <content-viewer class="content hyphenate-text" :content="post.content" />
       <!-- eslint-enable vue/no-v-html -->
       <ds-space margin="xx-large" />
-      <!-- Categories -->
-      <div class="categories">
-        <ds-space margin="xx-small" />
-        <hc-category
-          v-for="category in post.categories"
-          :key="category.id"
-          :icon="category.icon"
-          :name="$t(`contribution.category.name.${category.slug}`)"
-        />
-        <!-- Post language -->
-        <ds-tag v-if="post.language" class="category-tag language">
-          <base-icon name="globe" />
-          {{ post.language.toUpperCase() }}
-        </ds-tag>
-      </div>
       <ds-space margin-bottom="small" />
       <!-- Tags -->
       <div v-if="post.tags && post.tags.length" class="tags">
@@ -110,7 +95,6 @@
 
 <script>
 import ContentViewer from '~/components/Editor/ContentViewer'
-import HcCategory from '~/components/Category'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
@@ -134,7 +118,6 @@ export default {
     mode: 'out-in',
   },
   components: {
-    HcCategory,
     HcHashtag,
     UserTeaser,
     HcShoutButton,

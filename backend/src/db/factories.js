@@ -5,6 +5,7 @@ import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
 import { getDriver, getNeode } from './neo4j'
 import CONFIG from '../config/index.js'
+import generateInviteCode from '../schema/resolvers/helpers/generateInviteCode.js'
 
 const neode = getNeode()
 
@@ -205,7 +206,7 @@ const emailDefaults = {
 }
 
 Factory.define('emailAddress')
-  .attr(emailDefaults)
+  .attrs(emailDefaults)
   .after((buildObject, options) => {
     return neode.create('EmailAddress', buildObject)
   })
@@ -214,6 +215,28 @@ Factory.define('unverifiedEmailAddress')
   .attr(emailDefaults)
   .after((buildObject, options) => {
     return neode.create('UnverifiedEmailAddress', buildObject)
+  })
+
+const inviteCodeDefaults = {
+  code: () => generateInviteCode(),
+  createdAt: () => new Date().toISOString(),
+  expiresAt: () => null,
+}
+
+Factory.define('inviteCode')
+  .attrs(inviteCodeDefaults)
+  .option('generatedById', null)
+  .option('generatedBy', ['generatedById'], (generatedById) => {
+    if (generatedById) return neode.find('User', generatedById)
+    return Factory.build('user')
+  })
+  .after(async (buildObject, options) => {
+    const [inviteCode, generatedBy] = await Promise.all([
+      neode.create('InviteCode', buildObject),
+      options.generatedBy,
+    ])
+    await Promise.all([inviteCode.relateTo(generatedBy, 'generated')])
+    return inviteCode
   })
 
 Factory.define('location')

@@ -76,7 +76,6 @@ export default {
   },
   Mutation: {
     CreatePost: async (_parent, params, context, _resolveInfo) => {
-      const { categoryIds } = params
       const { image: imageInput } = params
       delete params.categoryIds
       delete params.image
@@ -92,13 +91,9 @@ export default {
             WITH post
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
-            WITH post
-            UNWIND $categoryIds AS categoryId
-            MATCH (category:Category {id: categoryId})
-            MERGE (post)-[:CATEGORIZED]->(category)
             RETURN post {.*}
           `,
-          { userId: context.user.id, categoryIds, params },
+          { userId: context.user.id, params },
         )
         const [post] = createPostTransactionResponse.records.map((record) => record.get('post'))
         if (imageInput) {
