@@ -110,10 +110,6 @@ docker-compose -f docker-compose.yml up
 
 This will start all required docker containers
 
-## Documentation
-
-Learn how to set up a local development environment in our [Docs](https://docs.human-connection.org/human-connection/) :mag_right:
-
 ## Developer Chat
 
 Join our friendly open-source community on [Discord](https://discordapp.com/invite/DFSjPaX) :heart_eyes_cat:
