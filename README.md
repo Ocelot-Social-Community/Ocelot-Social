@@ -12,7 +12,7 @@ ocelot.social is a nonprofit social, action and knowledge network that connects 
 * **Knowledge**: Read articles about interesting topics and find related posts in the **More Info** tab or by **Filtering** based on **Categories** and **Tagging** or by using the **Fulltext Search**.
 * **Action**: Don't just read about how to make the world a better place, but come into **Action** by following provided suggestions on the **Action** tab provided by other people or **Organisations**.
 
- [![Human-Connection](.gitbook/assets/lets_get_together.png)](https://ocelot.social)
+ [![Ocelot-Social](webapp/static/img/custom/welcome.svg)](https://ocelot.social)
 
 ## Live demo
 
