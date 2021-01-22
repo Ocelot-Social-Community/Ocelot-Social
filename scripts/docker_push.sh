@@ -4,14 +4,14 @@ ROOT_DIR=$(dirname "$0")/..
 
 VERSION=$(jq -r '.version' $ROOT_DIR/package.json)
 IFS='.' read -r major minor patch <<< $VERSION
-apps=(develop-webapp develop-backend develop-neo4j develop-maintenance)
+apps=(webapp backend neo4j maintenance)
 tags=($major $major.$minor $major.$minor.$patch)
 
 # These three docker images have already been built by now:
-# docker build --build-arg BUILD_COMMIT=$BUILD_COMMIT --target production -t ocelotsocialnetwork/develop-backend:latest $ROOT_DIR/backend
-# docker build --build-arg BUILD_COMMIT=$BUILD_COMMIT --target production -t ocelotsocialnetwork/develop-webapp:latest $ROOT_DIR/webapp
-# docker build --build-arg BUILD_COMMIT=$BUILD_COMMIT -t ocelotsocialnetwork/develop-neo4j:latest $ROOT_DIR/neo4j
-docker build -t ocelotsocialnetwork/develop-maintenance:latest $ROOT_DIR/webapp/ -f $ROOT_DIR/webapp/Dockerfile.maintenance
+# docker build --build-arg BUILD_COMMIT=$BUILD_COMMIT --target production -t ocelotsocialnetwork/backend:latest $ROOT_DIR/backend
+# docker build --build-arg BUILD_COMMIT=$BUILD_COMMIT --target production -t ocelotsocialnetwork/webapp:latest $ROOT_DIR/webapp
+# docker build --build-arg BUILD_COMMIT=$BUILD_COMMIT -t ocelotsocialnetwork/neo4j:latest $ROOT_DIR/neo4j
+docker build -t ocelotsocialnetwork/maintenance:latest $ROOT_DIR/webapp/ -f $ROOT_DIR/webapp/Dockerfile.maintenance
 
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 

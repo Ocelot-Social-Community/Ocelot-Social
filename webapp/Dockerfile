@@ -86,5 +86,3 @@ RUN yarn install --production=true --frozen-lockfile --non-interactive --no-cach
 
 # Run command
 CMD /bin/sh -c "yarn run start"
-
-
