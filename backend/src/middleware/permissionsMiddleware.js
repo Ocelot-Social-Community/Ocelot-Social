@@ -37,17 +37,17 @@ const isMySocialMedia = rule({
   cache: 'no_cache',
 })(async (_, args, { user }) => {
   // We need a User
-  if (!user){
+  if (!user) {
     return false
   }
   let socialMedia = await neode.find('SocialMedia', args.id)
   // Did we find a social media node?
-  if(!socialMedia){
+  if (!socialMedia) {
     return false
   }
   socialMedia = await socialMedia.toJson() // whats this for?
 
-  //Is it my social media entry?
+  // Is it my social media entry?
   return socialMedia.ownedBy.node.id === user.id
 })
 
