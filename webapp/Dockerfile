@@ -75,14 +75,15 @@ FROM base as production
 
 # Copy "binary"-files from build image
 COPY --from=build ${DOCKER_WORKDIR}/.nuxt ./.nuxt
-COPY --from=build ${DOCKER_WORKDIR}/nuxt.config.js ./
+COPY --from=build ${DOCKER_WORKDIR}/node_modules ./node_modules
+COPY --from=build ${DOCKER_WORKDIR}/nuxt.config.js ./nuxt.config.js
 # Copy static files
 # TODO - this should be one Folder containign all stuff needed to be copied
 COPY --from=build ${DOCKER_WORKDIR}/constants ./constants
 COPY --from=build ${DOCKER_WORKDIR}/static ./static
 COPY --from=build ${DOCKER_WORKDIR}/locales ./locales
-# yarn install
-RUN yarn install --production=true --frozen-lockfile --non-interactive --no-cache
+# Copy package.json for script definitions (lock file should not be needed)
+COPY --from=build ${DOCKER_WORKDIR}/package.json ./package.json
 
 # Run command
 CMD /bin/sh -c "yarn run start"
