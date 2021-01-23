@@ -45,7 +45,7 @@ services:
       # Also expose the neo4j query browser
       - 7474:7474
     networks:
-      # So we can access the playground from our host machine
+      # So we can access the neo4j query browser from our host machine
       - external-net
   
   ########################################################
