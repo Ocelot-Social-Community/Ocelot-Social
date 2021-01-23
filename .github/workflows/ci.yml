@@ -54,10 +54,10 @@ jobs:
         run: docker run --rm ocelotsocialnetwork/backend:build yarn run lint
 
       # Unit Tests
-      - name: backend | Unit tests
-        run: |
-          docker-compose up
-          docker-compose exec backend yarn test
+      #- name: backend | Unit tests
+      #  run: |
+      #    docker-compose up
+      #    docker-compose exec backend yarn test
 
       ##########################################################################
       # WEBAPP #################################################################
