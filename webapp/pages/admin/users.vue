@@ -48,6 +48,23 @@
         <template #createdAt="scope">
           {{ scope.row.createdAt | dateTime }}
         </template>
+
+        <template slot="role" slot-scope="scope">
+          <ApolloQuery :query="FetchAllRoles">
+            <template v-slot="{ result: { data } }">
+              <template v-if="data">
+                <select
+                  :value="`${scope.row.role}`"
+                  v-on:change="changeUserRole(scope.row.id, $event)"
+                >
+                  <option v-for="value in data.__type.enumValues" :key="value.name">
+                    {{ value.name }}
+                  </option>
+                </select>
+              </template>
+            </template>
+          </ApolloQuery>
+        </template>
       </ds-table>
       <pagination-buttons :hasNext="hasNext" :hasPrevious="hasPrevious" @next="next" @back="back" />
     </base-card>
@@ -62,6 +79,7 @@ import gql from 'graphql-tag'
 import { isEmail } from 'validator'
 import normalizeEmail from '~/components/utils/NormalizeEmail'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
+import { FetchAllRoles, updateUserRole } from '~/graphql/admin/Roles'
 
 export default {
   components: {
@@ -77,6 +95,7 @@ export default {
       hasNext: false,
       email: null,
       filter: null,
+      FetchAllRoles,
       form: {
         formData: {
           query: '',
@@ -173,6 +192,16 @@ export default {
           OR: [{ name_contains: query }, { slug_contains: query }, { about_contains: query }],
         }
       }
+    },
+    changeUserRole(id, event) {
+      const newRole = event.target.value
+      // this.role = '';
+      // const id = this.User[0].id;
+      this.$apollo
+        .mutate({
+          mutation: updateUserRole(newRole, id),
+        })
+        .catch((error) => this.$toast.error(error.message))
     },
   },
 }
