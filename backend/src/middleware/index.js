@@ -14,6 +14,7 @@ import notifications from './notifications/notificationsMiddleware'
 import hashtags from './hashtags/hashtagsMiddleware'
 import email from './email/emailMiddleware'
 import sentry from './sentryMiddleware'
+import languages from './languages/languages'
 
 export default (schema) => {
   const middlewares = {
@@ -30,6 +31,7 @@ export default (schema) => {
     softDelete,
     includedFields,
     orderBy,
+    languages,
   }
 
   let order = [
@@ -39,6 +41,7 @@ export default (schema) => {
     // 'activityPub', disabled temporarily
     'validation',
     'sluggify',
+    'languages',
     'excerpt',
     'email',
     'notifications',

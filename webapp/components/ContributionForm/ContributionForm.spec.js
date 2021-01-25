@@ -1,7 +1,6 @@
 import { config, mount } from '@vue/test-utils'
 import ContributionForm from './ContributionForm.vue'
 
-import Vue from 'vue'
 import Vuex from 'vuex'
 import PostMutations from '~/graphql/PostMutations.js'
 
@@ -17,15 +16,7 @@ config.stubs['nuxt-link'] = '<span><slot /></span>'
 config.stubs['v-popover'] = '<span><slot /></span>'
 
 describe('ContributionForm.vue', () => {
-  let wrapper,
-    postTitleInput,
-    expectedParams,
-    cancelBtn,
-    mocks,
-    propsData,
-    categoryIds,
-    englishLanguage,
-    deutschLanguage
+  let wrapper, postTitleInput, expectedParams, cancelBtn, mocks, propsData
   const postTitle = 'this is a title for a post'
   const postTitleTooShort = 'xx'
   let postTitleTooLong = ''
@@ -52,8 +43,6 @@ describe('ContributionForm.vue', () => {
               slug: 'this-is-a-title-for-a-post',
               content: postContent,
               contentExcerpt: postContent,
-              language: 'en',
-              categoryIds,
             },
           },
         }),
@@ -109,10 +98,6 @@ describe('ContributionForm.vue', () => {
           postTitleInput = wrapper.find('.ds-input')
           postTitleInput.setValue(postTitle)
           await wrapper.vm.updateEditorContent(postContent)
-          englishLanguage = wrapper
-            .findAll('li')
-            .filter((language) => language.text() === 'English')
-          englishLanguage.trigger('click')
         })
 
         it('title cannot be empty', async () => {
@@ -147,7 +132,6 @@ describe('ContributionForm.vue', () => {
             variables: {
               title: postTitle,
               content: postContent,
-              language: 'en',
               id: null,
               image: null,
             },
@@ -155,26 +139,10 @@ describe('ContributionForm.vue', () => {
           postTitleInput = wrapper.find('.ds-input')
           postTitleInput.setValue(postTitle)
           await wrapper.vm.updateEditorContent(postContent)
-          englishLanguage = wrapper
-            .findAll('li')
-            .filter((language) => language.text() === 'English')
-          englishLanguage.trigger('click')
-          await Vue.nextTick()
-          await Vue.nextTick()
         })
 
-        it('creates a post with valid title, content, and at least one category', async () => {
+        it('creates a post with valid title and content', async () => {
           await wrapper.find('form').trigger('submit')
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
-        })
-
-        it('supports changing the language', async () => {
-          expectedParams.variables.language = 'de'
-          deutschLanguage = wrapper
-            .findAll('li')
-            .filter((language) => language.text() === 'Deutsch')
-          deutschLanguage.trigger('click')
-          wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
         })
 
@@ -235,13 +203,6 @@ describe('ContributionForm.vue', () => {
           postTitleInput = wrapper.find('.ds-input')
           postTitleInput.setValue(postTitle)
           await wrapper.vm.updateEditorContent(postContent)
-          categoryIds = ['cat12']
-          englishLanguage = wrapper
-            .findAll('li')
-            .filter((language) => language.text() === 'English')
-          englishLanguage.trigger('click')
-          await Vue.nextTick()
-          await Vue.nextTick()
         })
 
         it('shows an error toaster when apollo mutation rejects', async () => {
@@ -260,14 +221,7 @@ describe('ContributionForm.vue', () => {
             slug: 'dies-ist-ein-post',
             title: 'dies ist ein Post',
             content: 'auf Deutsch geschrieben',
-            language: 'de',
             image,
-            categories: [
-              {
-                id: 'cat12',
-                name: 'Democracy & Politics',
-              },
-            ],
           },
         }
         wrapper = Wrapper()
@@ -290,8 +244,6 @@ describe('ContributionForm.vue', () => {
                 slug: 'this-is-a-title-for-a-post',
                 content: postContent,
                 contentExcerpt: postContent,
-                language: 'en',
-                categoryIds,
               },
             },
           })
@@ -301,7 +253,6 @@ describe('ContributionForm.vue', () => {
             variables: {
               title: propsData.contribution.title,
               content: propsData.contribution.content,
-              language: propsData.contribution.language,
               id: propsData.contribution.id,
               image: {
                 sensitive: false,
