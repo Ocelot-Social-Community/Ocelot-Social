@@ -19,19 +19,19 @@ describe('TabNavigation', () => {
       tabs: [
         {
           type: 'Post',
-          title: 'Post',
+          title: 'Posts',
           count: 12,
           disabled: false,
         },
         {
           type: 'User',
-          title: 'User',
+          title: 'Users',
           count: 9,
           disabled: false,
         },
         {
           type: 'Hashtag',
-          title: 'Hashtag',
+          title: 'Hashtags',
           count: 0,
           disabled: true,
         },
