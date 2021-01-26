@@ -132,56 +132,57 @@ storiesOf('TabNavigator', module)
       },
     },
     template: `
-  <div id="search-results" class="search-results">
-    <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
-      <masonry-grid>
-        <!-- tabs -->
-        <tab-navigation :tabs="tabOptions" :activeTab="activeTab" @switch-tab="switchTab" />
+      <div id="search-results" class="search-results">
+        <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
+          <masonry-grid>
+            <!-- tabs -->
+            <tab-navigation :tabs="tabOptions" :activeTab="activeTab" @switch-tab="switchTab" />
 
-        <!-- search results -->
+            <!-- search results -->
 
-        <template v-if="!(!activeResourceCount || searchCount === 0)">
-          <!-- posts -->
-          <template v-if="activeTab === 'Post'">
-            <masonry-grid-item
-              v-for="post in activeResources"
-              :key="post.id"
-              :imageAspectRatio="post.image && post.image.aspectRatio"
-            >
-              <post-teaser
-                :post="post"
-                :width="{ base: '100%', md: '100%', xl: '50%' }"
-                @removePostFromList="posts = removePostFromList(post, posts)"
-                @pinPost="pinPost(post, refetchPostList)"
-                @unpinPost="unpinPost(post, refetchPostList)"
-              />
-            </masonry-grid-item>
-          </template>
-          <!-- users -->
-          <template v-if="activeTab === 'User'">
-            <ds-grid-item v-for="user in activeResources" :key="user.id" :row-span="2">
-              <base-card :wideContent="true">
-                <user-teaser :user="user" />
-              </base-card>
+            <template v-if="!(!activeResourceCount || searchCount === 0)">
+              <!-- posts -->
+              <template v-if="activeTab === 'Post'">
+                <masonry-grid-item
+                  v-for="post in activeResources"
+                  :key="post.id"
+                  :imageAspectRatio="post.image && post.image.aspectRatio"
+                >
+                  <post-teaser
+                    :post="post"
+                    :width="{ base: '100%', md: '100%', xl: '50%' }"
+                    @removePostFromList="posts = removePostFromList(post, posts)"
+                    @pinPost="pinPost(post, refetchPostList)"
+                    @unpinPost="unpinPost(post, refetchPostList)"
+                  />
+                </masonry-grid-item>
+              </template>
+              <!-- users -->
+              <template v-if="activeTab === 'User'">
+                <ds-grid-item v-for="user in activeResources" :key="user.id" :row-span="2">
+                  <base-card :wideContent="true">
+                    <user-teaser :user="user" />
+                  </base-card>
+                </ds-grid-item>
+              </template>
+              <!-- hashtags -->
+              <template v-if="activeTab === 'Hashtag'">
+                <ds-grid-item v-for="hashtag in activeResources" :key="hashtag.id" :row-span="2">
+                  <base-card :wideContent="true">
+                    <hc-hashtag :id="hashtag.id" />
+                  </base-card>
+                </ds-grid-item>
+              </template>
+            </template>
+
+            <!-- no results -->
+            <ds-grid-item v-else :row-span="7" column-span="fullWidth">
+              <ds-space centered>
+                <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
+              </ds-space>
             </ds-grid-item>
-          </template>
-          <!-- hashtags -->
-          <template v-if="activeTab === 'Hashtag'">
-            <ds-grid-item v-for="hashtag in activeResources" :key="hashtag.id" :row-span="2">
-              <base-card :wideContent="true">
-                <hc-hashtag :id="hashtag.id" />
-              </base-card>
-            </ds-grid-item>
-          </template>
-        </template>
-
-        <!-- no results -->
-        <ds-grid-item v-else :row-span="7" column-span="fullWidth">
-          <ds-space centered>
-            <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
-          </ds-space>
-        </ds-grid-item>
-      </masonry-grid>
-    </ds-flex-item>
-  </div>`,
+          </masonry-grid>
+        </ds-flex-item>
+      </div>
+    `,
   }))
