@@ -104,7 +104,7 @@ describe('webfinger', () => {
                 type: 'application/activity+json',
               },
             ],
-            subject: `acct:some-user@${(new URL(CONFIG.CLIENT_URI)).host}`,
+            subject: `acct:some-user@${new URL(CONFIG.CLIENT_URI).host}`,
           })
         })
       })
