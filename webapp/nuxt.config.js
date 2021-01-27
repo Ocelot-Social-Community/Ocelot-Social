@@ -2,7 +2,7 @@ import path from 'path'
 import manifest from './constants/manifest.js'
 import metadata from './constants/metadata.js'
 
-const CONFIG = require('./config') // we need to use require since this is only evaluated at compile time.
+const CONFIG = require('./config').default // we need to use require since this is only evaluated at compile time.
 
 const styleguidePath = '../styleguide'
 const styleguideStyles = CONFIG.STYLEGUIDE_DEV
