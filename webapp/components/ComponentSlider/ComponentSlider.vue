@@ -1,12 +1,18 @@
 <template>
-  <div>
-    <h2 class="subTitle">{{ $t('login.login') + ' XXX' }}</h2>
-    <!-- <slot /> -->
-    <!-- <div v-for="(item, index) in $slots.default" :key="index" :slot="item"> -->
-    <div v-for="(item, index) in $slots.default" :key="item.id">
-      {{ index }}
-      <slot v-bind:person="item" />
-      <!-- <slot :slot="item" /> -->
+  <div class="Slider">
+    <!-- <h2 class="subTitle">{{ $t('login.login') + ' XXX' }}</h2> -->
+    <div
+      v-for="sliderName in sliders"
+      :key="sliderName"
+      :class="[
+        'Slider__component',
+        activeSliderName === sliderName && '--visible',
+        activeSliderName !== sliderName && '--hidden',
+      ]"
+      :data-test="sliderName + '-component'"
+      @validation="validation(sliderName)"
+    >
+      <slot :name="sliderName" />
     </div>
     <base-button
       style="float: right"
@@ -14,9 +20,11 @@
       type="submit"
       filled
       :loading="false"
-      :disabled="false"
+      :disabled="disabled"
+      @click="nextComponent"
     >
       <!-- {{ $t('actions.save') }} -->
+      <!-- Wolle {{ $t('components.enter-nonce.form.next') }} -->
       Next
     </base-button>
   </div>
@@ -26,138 +34,54 @@
 export default {
   name: 'ComponentSlider',
   components: {
-    // LocaleSwitch,
+    // Wolle LocaleSwitch,
   },
-  // props: {
-  //   id: { type: String },
-  //   loading: { type: Boolean, default: false },
-  //   options: { type: Array, default: () => [] },
-  // },
+  props: {
+    sliders: { type: Array, required: true },
+  },
   data() {
     return {
-      // links,
-      // metadata,
-      // searchValue: '',
-      // value: '',
-      // unprocessedSearchInput: '',
-      // searchProcess: null,
-      // previousSearchTerm: '',
-      // delay: 300,
+      sliderIndex: 0,
+      activeSliderName: this.sliders[0],
+      disabled: true,
     }
   },
   computed: {
-    // emptyText() {
-    //   return this.isActive && !this.loading ? this.$t('search.failed') : this.$t('search.hint')
-    // },
-    // isActive() {
+    // Wolle isActive() {
     //   return !isEmpty(this.previousSearchTerm)
     // },
   },
   methods: {
-    // isFirstOfType(option) {
-    //   return (
-    //     this.options.findIndex((o) => o === option) ===
-    //     this.options.findIndex((o) => o.__typename === option.__typename)
-    //   )
-    // },
-    // onFocus(event) {
-    //   clearTimeout(this.searchProcess)
-    // },
-    // handleInput(event) {
-    //   clearTimeout(this.searchProcess)
-    //   this.value = event.target ? event.target.value.replace(/\s+/g, ' ').trim() : ''
-    //   this.unprocessedSearchInput = this.value
-    //   if (isEmpty(this.value) || this.value.replace(/\s+/g, '').length < 3) {
-    //     return
-    //   }
-    //   this.searchProcess = setTimeout(() => {
-    //     this.previousSearchTerm = this.value
-    //     this.$emit('query', this.value)
-    //   }, this.delay)
-    // },
-    // /**
-    //  * TODO: on enter we should go to a dedicated search page!?
-    //  */
-    // onEnter(event) {
-    //   clearTimeout(this.searchProcess)
-    //   if (!this.loading) {
-    //     this.previousSearchTerm = this.unprocessedSearchInput
-    //     this.$emit('query', this.unprocessedSearchInput)
-    //   }
-    // },
-    // onDelete(event) {
-    //   clearTimeout(this.searchProcess)
-    //   const value = event.target ? event.target.value.trim() : ''
-    //   if (isEmpty(value)) {
-    //     this.clear()
-    //   } else {
-    //     this.handleInput(event)
-    //   }
-    // },
-    // clear() {
-    //   this.unprocessedSearchInput = ''
-    //   this.previousSearchTerm = ''
-    //   this.searchValue = ''
-    //   this.$emit('clearSearch')
-    //   clearTimeout(this.searchProcess)
-    // },
-    // onBlur(event) {
-    //   this.searchValue = this.previousSearchTerm
-    //   clearTimeout(this.searchProcess)
-    // },
-    // onSelect(item) {
-    //   this.goToResource(item)
-    //   this.$nextTick(() => {
-    //     this.searchValue = this.previousSearchTerm
-    //   })
-    // },
-    // isPost(item) {
-    //   return item.__typename === 'Post'
-    // },
-    // isTag(item) {
-    //   return item.__typename === 'Tag'
-    // },
-    // goToResource(item) {
-    //   this.$nextTick(() => {
-    //     if (!this.isTag(item)) {
-    //       this.$router.push({
-    //         name: this.isPost(item) ? 'post-id-slug' : 'profile-id-slug',
-    //         params: { id: item.id, slug: item.slug },
-    //       })
-    //     } else {
-    //       this.$router.push('?hashtag=' + item.id)
-    //     }
-    //   })
-    // },
+    validation(sliderName) {
+      console.log('validation !!!')
+      disabled = false
+    },
+    nextComponent() {
+      if (this.sliderIndex < this.sliders.length - 1) {
+        this.sliderIndex++
+        this.activeSliderName = this.sliders[this.sliderIndex]
+      }
+    },
   },
 }
 </script>
 
 <style lang="scss">
-// .searchable-input {
-//   position: relative;
-//   display: flex;
-//   align-items: center;
-//   width: 100%;
+// Wolle .pointer {
+//    cursor: pointer;
+//  }
 
-//   .ds-form-item {
-//     flex-basis: 100%;
-//     margin-bottom: 0;
-//   }
+.Slider {
+  &__component {
+    // Wolle &:hover {
+    //   border-bottom: 2px solid #c9c6ce;
+    // }
 
-//   .ds-select-dropdown {
-//     max-height: 70vh;
-//     box-shadow: $box-shadow-x-large;
-//   }
-
-//   .option-with-heading {
-//     margin-top: $space-x-small;
-//     padding-top: $space-xx-small;
-//   }
-
-//   .base-button {
-//     position: absolute;
-//     right: $space-xx-small;
-//   }
-// }
+    // Wolle &.--visible {
+    // }
+    &.--hidden {
+      display: none;
+    }
+  }
+}
 </style>

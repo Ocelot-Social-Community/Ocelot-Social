@@ -138,6 +138,7 @@ import { SignupVerificationMutation } from '~/graphql/Registration.js'
 import emails from '~/constants/emails'
 
 export default {
+  name: 'RegistrationItemCreateUserAccount',
   components: {
     PasswordStrength,
     SweetalertIcon,
