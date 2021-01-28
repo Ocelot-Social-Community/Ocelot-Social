@@ -88,8 +88,7 @@ export default {
     // },
     buttonCallback() {
       if (this.sliderIndex === this.sliderData.sliders.length - 1) {
-        // Wolle submit this.sliderData.collectedComponentData
-        console.log('submit data: ', this.sliderData.collectedComponentData)
+        // console.log('submit data: ', this.sliderData.collectedComponentData)
       } else {
         if (this.sliderIndex < this.sliderData.sliders.length - 1) {
           this.sliderData.activeSliderName = this.sliderData.sliders[this.sliderIndex + 1]
