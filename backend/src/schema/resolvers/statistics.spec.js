@@ -21,7 +21,7 @@ const statisticsQuery = gql`
     }
   }
 `
-beforeAll(() => {
+beforeAll(async () => {
   authenticatedUser = undefined
   const { server } = createServer({
     context: () => {
