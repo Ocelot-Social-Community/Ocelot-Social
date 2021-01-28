@@ -8,8 +8,7 @@
       </template>
       <h1 class="title">{{ $t('components.registration.signup.title', metadata) }}</h1>
       <component-slider :sliders="sliders" :submitCallback="submit">
-        <!-- <template #enter-nonce slot="{test}"> -->
-        <template #enter-nonce>
+        <template #enter-invite>
           <registration-item-enter-invite
             :email="'user@example.org'"
             :validateCallback="validation"
@@ -59,7 +58,7 @@ export default {
     return {
       links,
       metadata,
-      sliders: ['enter-nonce', 'create-user-account'],
+      sliders: ['enter-invite', 'create-user-account'],
     }
   },
   computed: {
