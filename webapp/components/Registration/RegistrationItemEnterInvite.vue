@@ -28,7 +28,9 @@
 export default {
   name: 'RegistrationItemEnterInvite',
   props: {
+    validateCallback: { type: Function, required: true },
     email: { type: String, required: true },
+    // test: { type: Boolean, required: true },
   },
   data() {
     return {
@@ -49,7 +51,11 @@ export default {
   },
   methods: {
     async handleInput() {
-      this.disabled = true
+      // Wolle this.disabled = true
+      console.log('handleInput !!!')
+      console.log('email: ', this.email)
+      // console.log('test: ', this.test)
+      this.validateCallback(false)
     },
     async handleInputValid() {
       console.log('handleInputValid !!!')
@@ -57,7 +63,8 @@ export default {
       const { nonce } = this.formData
       const email = this.email
       // Wolle this.$emit('nonceEntered', { email, nonce })
-      this.$emit('validation', { email, nonce })
+      // this.$emit('validation', { email, nonce })
+      this.validateCallback(true, { email, nonce })
     },
     handleSubmitVerify() {
       // const { nonce } = this.formData

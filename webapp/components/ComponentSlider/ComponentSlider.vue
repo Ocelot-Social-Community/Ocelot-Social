@@ -1,19 +1,7 @@
 <template>
   <div class="Slider">
     <!-- <h2 class="subTitle">{{ $t('login.login') + ' XXX' }}</h2> -->
-    <div
-      v-for="sliderName in sliders"
-      :key="sliderName"
-      :class="[
-        'Slider__component',
-        activeSliderName === sliderName && '--visible',
-        activeSliderName !== sliderName && '--hidden',
-      ]"
-      :data-test="sliderName + '-component'"
-      @validation="validation(sliderName)"
-    >
-      <slot :name="sliderName" />
-    </div>
+    <slot :name="activeSliderName" />
     <base-button
       style="float: right"
       icon="check"
@@ -52,10 +40,6 @@ export default {
     // },
   },
   methods: {
-    validation(sliderName) {
-      console.log('validation !!!')
-      disabled = false
-    },
     nextComponent() {
       if (this.sliderIndex < this.sliders.length - 1) {
         this.sliderIndex++
@@ -71,17 +55,17 @@ export default {
 //    cursor: pointer;
 //  }
 
-.Slider {
-  &__component {
-    // Wolle &:hover {
-    //   border-bottom: 2px solid #c9c6ce;
-    // }
+// .Slider {
+//   &__component {
+//     // Wolle &:hover {
+//     //   border-bottom: 2px solid #c9c6ce;
+//     // }
 
-    // Wolle &.--visible {
-    // }
-    &.--hidden {
-      display: none;
-    }
-  }
-}
+//     // Wolle &.--visible {
+//     // }
+//     // &.--hidden {
+//     //   display: none;
+//     // }
+//   }
+// }
 </style>

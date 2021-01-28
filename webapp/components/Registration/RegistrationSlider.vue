@@ -7,16 +7,24 @@
         </a>
       </template>
       <h1 class="title">{{ $t('components.registration.signup.title', metadata) }}</h1>
-      <component-slider :sliders="sliders">
+      <component-slider :sliders="sliders" :submitCallback="submit">
+        <!-- <template #enter-nonce slot="{test}"> -->
         <template #enter-nonce>
-          <registration-item-enter-invite email="user@example.org">
+          <registration-item-enter-invite
+            :email="'user@example.org'"
+            :validateCallback="validation"
+          >
             <ds-space margin-bottom="xxx-small" margin-top="large" centered>
               <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
             </ds-space>
           </registration-item-enter-invite>
         </template>
         <template #create-user-account>
-          <registration-item-create-user-account nonce="AAAAAA" email="user@example.org" />
+          <registration-item-create-user-account
+            nonce="AAAAAA"
+            email="user@example.org"
+            :validateCallback="validation"
+          />
         </template>
       </component-slider>
       <template #topMenu>
@@ -60,16 +68,15 @@ export default {
     // },
   },
   methods: {
-    // Wolle clear() {
-    //   this.unprocessedSearchInput = ''
-    //   this.previousSearchTerm = ''
-    //   this.searchValue = ''
-    //   this.$emit('clearSearch')
-    //   clearTimeout(this.searchProcess)
-    // },
+    validation(is, data = null) {
+      console.log('validation: ', is, data)
+      // this.disabled = !is
+    },
+    submit() {
+      console.log('submit !!!')
+    },
   },
 }
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>
