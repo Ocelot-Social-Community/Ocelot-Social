@@ -79,7 +79,10 @@ export default {
   methods: {
     validateCallback(is, data = null) {
       if (is) {
-        this.sliderData.collectedComponentData = { ...this.sliderData.collectedComponentData, ...data }
+        this.sliderData.collectedComponentData = {
+          ...this.sliderData.collectedComponentData,
+          ...data,
+        }
       }
       this.sliderData.button.disabled = !is
     },
