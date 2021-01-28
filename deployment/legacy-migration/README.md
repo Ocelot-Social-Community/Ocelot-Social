@@ -43,13 +43,13 @@ Then temporarily delete backend and database deployments
 ```bash
 $ kubectl -n ocelot-social get deployments
 NAME            READY   UP-TO-DATE   AVAILABLE   AGE
-develop-backend 1/1     1            1           3d11h
-develop-neo4j   1/1     1            1           3d11h
-develop-webapp  2/2     2            2           73d
-$ kubectl -n ocelot-social delete deployment develop-neo4j
-deployment.extensions "develop-neo4j" deleted
-$ kubectl -n ocelot-social delete deployment develop-backend
-deployment.extensions "develop-backend" deleted
+backend         1/1     1            1           3d11h
+neo4j           1/1     1            1           3d11h
+webapp          2/2     2            2           73d
+$ kubectl -n ocelot-social delete deployment neo4j
+deployment.extensions "neo4j" deleted
+$ kubectl -n ocelot-social delete deployment backend
+deployment.extensions "backend" deleted
 ```
 
 Deploy one-time develop-maintenance-worker pod:
