@@ -50,12 +50,12 @@ export default {
   },
   methods: {
     async handleInput() {
-      console.log('handleInput !!!')
-      console.log('email: ', this.email)
+      // Wolle console.log('handleInput !!!')
+      // console.log('email: ', this.email)
       this.sliderData.validateCallback(false)
     },
     async handleInputValid() {
-      console.log('handleInputValid !!!')
+      // Wolle console.log('handleInputValid !!!')
       const { nonce } = this.formData
       const email = this.email
       this.sliderData.validateCallback(true, { email, nonce })

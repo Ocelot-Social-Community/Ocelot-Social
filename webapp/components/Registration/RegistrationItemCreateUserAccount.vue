@@ -30,7 +30,8 @@
     </ds-space>
 
     <ds-form class="create-user-account" v-model="formData" :schema="formSchema" @submit="submit">
-      <template v-slot="{ errors }">
+      <!-- Wolle <template v-slot="{ errors }"> -->
+      <template>
         <ds-input
           id="name"
           model="name"
@@ -106,7 +107,7 @@
             v-html="$t('components.registration.signup.form.no-political')"
           ></label>
         </ds-text>
-        <base-button
+        <!-- <base-button
           style="float: right"
           icon="check"
           type="submit"
@@ -122,7 +123,7 @@
           "
         >
           {{ $t('actions.save') }}
-        </base-button>
+        </base-button> -->
       </template>
     </ds-form>
   </div>
@@ -165,7 +166,7 @@ export default {
         },
         ...passwordForm.formSchema,
       },
-      disabled: true,
+      // Wolle disabled: true,
       response: null,
       // TODO: Our styleguide does not support checkmarks.
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
@@ -178,8 +179,45 @@ export default {
     }
   },
   props: {
+    sliderData: { type: Object, required: true },
     nonce: { type: String, required: true },
     email: { type: String, required: true },
+  },
+  computed: {
+    valid() {
+      return (
+        this.errors ||
+        !this.termsAndConditionsConfirmed ||
+        !this.dataPrivacy ||
+        !this.minimumAge ||
+        !this.noCommercial ||
+        !this.noPolitical
+      )
+    },
+  },
+  watch: {
+    valid(newVal, _oldVal) {
+      // Wolle const [oldPropertyA, oldProvertyB] = oldVal.split('|');
+      // const [newPropertyA, newProvertyB] = newVal.split('|');
+      // doSomething
+      if (newVal) {
+        this.sliderData.validateCallback(false)
+      } else {
+        const { name, password, about } = this.formData
+        const { email, nonce } = this
+        const termsAndConditionsAgreedVersion = VERSION
+        const locale = this.$i18n.locale()
+        this.sliderData.validateCallback(true, {
+          name,
+          password,
+          about,
+          email,
+          nonce,
+          termsAndConditionsAgreedVersion,
+          locale,
+        })
+      }
+    },
   },
   methods: {
     async submit() {

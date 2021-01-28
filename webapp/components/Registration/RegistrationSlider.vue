@@ -57,10 +57,11 @@ export default {
       metadata,
       sliders: ['enter-invite', 'create-user-account'],
       sliderData: {
+        collectedComponentData: {},
         sliders: ['enter-invite', 'create-user-account'],
         activeSliderName: 'enter-invite',
         validateCallback: this.validateCallback,
-        submitCallback: this.submitCallback,
+        // submitCallback: this.submitCallback,
         button: {
           title: 'Next', // Wolle
           // title: 'Submit', // Wolle
@@ -77,16 +78,26 @@ export default {
   },
   methods: {
     validateCallback(is, data = null) {
-      console.log('validation: ', is, data)
+      if (is) {
+        this.sliderData.collectedComponentData = { ...this.sliderData.collectedComponentData, ...data }
+      }
       this.sliderData.button.disabled = !is
     },
-    submitCallback() {
-      console.log('submit !!!')
-    },
+    // submitCallback() {
+    //   // Wolle console.log('submit !!!') // Wolle
+    // },
     buttonCallback() {
-      console.log('buttonCallback !!!')
-      if (this.sliderIndex < this.sliderData.sliders.length - 1) {
-        this.sliderData.activeSliderName = this.sliderData.sliders[this.sliderIndex + 1]
+      if (this.sliderIndex === this.sliderData.sliders.length - 1) {
+        // Wolle submit this.sliderData.collectedComponentData
+        console.log('submit data: ', this.sliderData.collectedComponentData)
+      } else {
+        if (this.sliderIndex < this.sliderData.sliders.length - 1) {
+          this.sliderData.activeSliderName = this.sliderData.sliders[this.sliderIndex + 1]
+          this.sliderData.button.disabled = true
+        }
+        if (this.sliderIndex === this.sliderData.sliders.length - 1) {
+          this.sliderData.button.title = this.$t('actions.save') // Wolle
+        }
       }
     },
   },
