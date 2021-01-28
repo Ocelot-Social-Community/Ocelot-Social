@@ -7,12 +7,9 @@
         </a>
       </template>
       <h1 class="title">{{ $t('components.registration.signup.title', metadata) }}</h1>
-      <component-slider :sliders="sliders" :submitCallback="submit">
+      <component-slider :sliderData="sliderData">
         <template #enter-invite>
-          <registration-item-enter-invite
-            :email="'user@example.org'"
-            :validateCallback="validation"
-          >
+          <registration-item-enter-invite :sliderData="sliderData" :email="'user@example.org'">
             <ds-space margin-bottom="xxx-small" margin-top="large" centered>
               <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
             </ds-space>
@@ -20,9 +17,9 @@
         </template>
         <template #create-user-account>
           <registration-item-create-user-account
+            :sliderData="sliderData"
             nonce="AAAAAA"
             email="user@example.org"
-            :validateCallback="validation"
           />
         </template>
       </component-slider>
@@ -59,20 +56,38 @@ export default {
       links,
       metadata,
       sliders: ['enter-invite', 'create-user-account'],
+      sliderData: {
+        sliders: ['enter-invite', 'create-user-account'],
+        activeSliderName: 'enter-invite',
+        validateCallback: this.validateCallback,
+        submitCallback: this.submitCallback,
+        button: {
+          title: 'Next', // Wolle
+          // title: 'Submit', // Wolle
+          disabled: true,
+          callback: this.buttonCallback,
+        },
+      },
     }
   },
   computed: {
-    // Wolle emptyText() {
-    //   return this.isActive && !this.loading ? this.$t('search.failed') : this.$t('search.hint')
-    // },
+    sliderIndex() {
+      return this.sliderData.sliders.findIndex((name) => name === this.sliderData.activeSliderName)
+    },
   },
   methods: {
-    validation(is, data = null) {
+    validateCallback(is, data = null) {
       console.log('validation: ', is, data)
-      // this.disabled = !is
+      this.sliderData.button.disabled = !is
     },
-    submit() {
+    submitCallback() {
       console.log('submit !!!')
+    },
+    buttonCallback() {
+      console.log('buttonCallback !!!')
+      if (this.sliderIndex < this.sliderData.sliders.length - 1) {
+        this.sliderData.activeSliderName = this.sliderData.sliders[this.sliderIndex + 1]
+      }
     },
   },
 }
