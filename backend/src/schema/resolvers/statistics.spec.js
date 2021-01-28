@@ -33,6 +33,7 @@ beforeAll(() => {
     },
   })
   query = createTestClient(server).query
+  await cleanDatabase()
 })
 
 afterEach(async () => {
