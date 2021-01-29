@@ -147,8 +147,10 @@ export default {
       const place = encodeURIComponent(value)
       const lang = this.$i18n.locale()
 
-      const { data: { queryLocations: res }} = await this.$apollo.query({ query: queryLocations(), variables: { place, lang } })
-      
+      const {
+        data: { queryLocations: res },
+      } = await this.$apollo.query({ query: queryLocations(), variables: { place, lang } })
+
       this.cities = this.processLocationsResult(res)
       this.loadingGeo = false
     },
