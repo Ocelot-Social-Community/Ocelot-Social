@@ -247,6 +247,7 @@ export default {
     switchUserRole: async (object, args, context, resolveInfo) => {
       const { role, id } = args
 
+      if (context.user.id === id) throw new Error('you-cannot-change-your-own-role')
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const switchUserRoleResponse = await transaction.run(
