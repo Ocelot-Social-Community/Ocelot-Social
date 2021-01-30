@@ -38,8 +38,6 @@ jobs:
       ##########################################################################
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Create output folder
-        run: mkdir -p ./docker
       ##########################################################################
       # NEO4J ##################################################################
       ##########################################################################
@@ -50,15 +48,14 @@ jobs:
           tags: latest
           path: neo4j/
           push: false
-          load: true
-          outputs: type=local,dest=./docker/neo4j.tar
+          outputs: type=local,dest=/tmp/neo4j.tar
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: docker-neo4j-image
-          path: ./docker/neo4j.tar
+          path: /tmp/neo4j.tar
 
   ##############################################################################
   # JOB: DOCKER BUILD TEST BACKEND #############################################
@@ -73,8 +70,6 @@ jobs:
       ##########################################################################
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Create output folder
-        run: mkdir -p ./docker
       ##########################################################################
       # BUILD BACKEND DOCKER IMAGE (build) #####################################
       ##########################################################################
@@ -86,15 +81,14 @@ jobs:
           target: build
           path: backend/
           push: false
-          load: true
-          outputs: type=local,dest=./docker/backend.tar
+          outputs: type=local,dest=/tmp/backend.tar
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: docker-backend-image
-          path: ./docker/backend.tar
+          path: /tmp/backend.tar
 
   ##############################################################################
   # JOB: DOCKER BUILD TEST WEBAPP ##############################################
@@ -109,8 +103,6 @@ jobs:
       ##########################################################################
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Create output folder
-        run: mkdir -p ./docker
       ##########################################################################
       # BUILD WEBAPP DOCKER IMAGE (build) ######################################
       ##########################################################################
@@ -123,14 +115,14 @@ jobs:
           path: webapp/
           push: false
           load: true
-          outputs: type=local,dest=./docker/webapp.tar
+          outputs: type=local,dest=/tmp/webapp.tar
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: docker-webapp-image
-          path: ./docker/webapp.tar
+          path: /tmp/webapp.tar
   
   ##############################################################################
   # JOB: AFTER DOCKER BUILD ####################################################
@@ -156,8 +148,6 @@ jobs:
       ##########################################################################
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Create artifact folder
-        run: mkdir -p ./docker
       ##########################################################################
       # DOWNLOAD DOCKER IMAGE ##################################################
       ##########################################################################
@@ -165,9 +155,9 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: docker-backend-image
-          path: ./docker/backend.tar
+          path: /tmp/backend.tar
       - name: Load Docker Image
-        run: docker load < ./docker/backend.tar
+        run: docker load < /tmp/backend.tar
       ##########################################################################
       # LINT BACKEND ###########################################################
       ##########################################################################
@@ -187,8 +177,6 @@ jobs:
       ##########################################################################
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Create artifact folder
-        run: mkdir -p ./docker
       ##########################################################################
       # DOWNLOAD DOCKER IMAGE ##################################################
       ##########################################################################
@@ -196,9 +184,9 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: docker-webapp-image
-          path: ./docker/webapp.tar
+          path: /tmp/webapp.tar
       - name: Load Docker Image
-        run: docker load < ./docker/webapp.tar
+        run: docker load < /tmp/webapp.tar
       ##########################################################################
       # LINT WEBAPP ############################################################
       ##########################################################################
