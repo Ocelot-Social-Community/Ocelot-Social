@@ -42,15 +42,9 @@ jobs:
       # NEO4J ##################################################################
       ##########################################################################
       - name: Neo4J | Build `community` image
-        uses: docker/build-push-action@v2
-        with:
-          repository: ocelotsocialnetwork/neo4j
-          tags: latest
-          path: neo4j/
-          push: false
-          outputs: type=local,dest=/tmp/neo4j.tar
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+        run: |
+          docker build -t "ocelotsocialnetwork/neo4j:latest" neo4j/
+          docker save "ocelotsocialnetwork/neo4j:latest" > /tmp/neo4j.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -74,7 +68,7 @@ jobs:
       # BUILD BACKEND DOCKER IMAGE (build) #####################################
       ##########################################################################
       - name: backend | Build `build` image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/backend
           tags: build
@@ -82,8 +76,6 @@ jobs:
           path: backend/
           push: false
           outputs: type=local,dest=/tmp/backend.tar
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -107,17 +99,14 @@ jobs:
       # BUILD WEBAPP DOCKER IMAGE (build) ######################################
       ##########################################################################
       - name: webapp | Build `build` image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/webapp
           tags: build
           target: build
           path: webapp/
           push: false
-          load: true
           outputs: type=local,dest=/tmp/webapp.tar
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -241,7 +230,7 @@ jobs:
       ##########################################################################
       # TODO: We want to push this to dockerhub
       #- name: Build backend production image
-      #  uses: docker/build-push-action@v2
+      #  uses: docker/build-push-action@v1.1.0
       #  with:
       #    repository: ocelotsocialnetwork/backend
       #    tags: production
@@ -254,7 +243,7 @@ jobs:
       ##########################################################################
       # TODO: We want to push this to dockerhub
       #- name: Build webapp production image
-      #  uses: docker/build-push-action@v2
+      #  uses: docker/build-push-action@v1.1.0
       #  with:
       #    repository: ocelotsocialnetwork/webapp
       #    tags: production
