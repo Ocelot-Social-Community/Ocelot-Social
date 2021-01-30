@@ -69,8 +69,8 @@ jobs:
       ##########################################################################
       - name: backend | Build `build` image
         run: |
-          docker build --target build -t "ocelotsocialnetwork/backend:latest" backend/
-          docker save "ocelotsocialnetwork/backend:latest" > /tmp/backend.tar
+          docker build --target build -t "ocelotsocialnetwork/backend:build" backend/
+          docker save "ocelotsocialnetwork/backend:build" > /tmp/backend.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -95,8 +95,8 @@ jobs:
       ##########################################################################
       - name: webapp | Build `build` image
         run: |
-          docker build --target build -t "ocelotsocialnetwork/webapp:latest" webapp/
-          docker save "ocelotsocialnetwork/webapp:latest" > /tmp/webapp.tar
+          docker build --target build -t "ocelotsocialnetwork/webapp:build" webapp/
+          docker save "ocelotsocialnetwork/webapp:build" > /tmp/webapp.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
