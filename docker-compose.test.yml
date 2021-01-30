@@ -5,9 +5,9 @@ services:
   # WEBAPP ###############################################
   ########################################################
   webapp:
-    image: ocelotsocialnetwork/webapp:build
+    image: ocelotsocialnetwork/webapp:test
     build:
-      target: build
+      target: test
     environment:
       - NODE_ENV="test"
 
@@ -15,9 +15,9 @@ services:
   # BACKEND ##############################################
   ########################################################
   backend:
-    image: ocelotsocialnetwork/backend:build
+    image: ocelotsocialnetwork/backend:test
     build:
-      target: build
+      target: test
     environment:
       - NODE_ENV="test"
 
@@ -31,7 +31,7 @@ services:
   # MAINTENANCE ##########################################
   ########################################################
   maintenance:
-    image: ocelotsocialnetwork/maintenance:build
+    image: ocelotsocialnetwork/maintenance:test
 
   ########################################################
   # MAILSERVER TO FAKE SMTP ##############################

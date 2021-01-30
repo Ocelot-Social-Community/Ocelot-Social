@@ -67,14 +67,14 @@ jobs:
       ##########################################################################
       # BUILD BACKEND DOCKER IMAGE (build) #####################################
       ##########################################################################
-      - name: backend | Build `build` image
+      - name: backend | Build `test` image
         run: |
-          docker build --target build -t "ocelotsocialnetwork/backend:build" backend/
-          docker save "ocelotsocialnetwork/backend:build" > /tmp/backend.tar
+          docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
+          docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: docker-backend-image
+          name: docker-backend-test
           path: /tmp/backend.tar
 
   ##############################################################################
@@ -93,14 +93,14 @@ jobs:
       ##########################################################################
       # BUILD WEBAPP DOCKER IMAGE (build) ######################################
       ##########################################################################
-      - name: webapp | Build `build` image
+      - name: webapp | Build `test` image
         run: |
-          docker build --target build -t "ocelotsocialnetwork/webapp:build" webapp/
-          docker save "ocelotsocialnetwork/webapp:build" > /tmp/webapp.tar
+          docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
+          docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: docker-webapp-image
+          name: docker-webapp-test
           path: /tmp/webapp.tar
 
   ##############################################################################
@@ -122,7 +122,7 @@ jobs:
       - name: Download Docker Image (Backend)
         uses: actions/download-artifact@v2
         with:
-          name: docker-backend-image
+          name: docker-backend-test
           path: /tmp
       - name: Load Docker Image
         run: docker load < /tmp/backend.tar
@@ -151,7 +151,7 @@ jobs:
       - name: Download Docker Image (Webapp)
         uses: actions/download-artifact@v2
         with:
-          name: docker-webapp-image
+          name: docker-webapp-test
           path: /tmp
       - name: Load Docker Image
         run: docker load < /tmp/webapp.tar
@@ -187,7 +187,7 @@ jobs:
       - name: Download Docker Image (Backend)
         uses: actions/download-artifact@v2
         with:
-          name: docker-backend-image
+          name: docker-backend-test
           path: /tmp
       - name: Load Docker Image
         run: docker load < /tmp/backend.tar
@@ -223,7 +223,7 @@ jobs:
       - name: Download Docker Image (Webapp)
         uses: actions/download-artifact@v2
         with:
-          name: docker-webapp-image
+          name: docker-webapp-test
           path: /tmp
       - name: Load Docker Image
         run: docker load < /tmp/webapp.tar
