@@ -43,7 +43,7 @@ jobs:
       ##########################################################################
       - name: Neo4J | Build `community` image
         run: |
-          docker build -t "ocelotsocialnetwork/neo4j:latest" neo4j/
+          docker build --target community -t "ocelotsocialnetwork/neo4j:latest" neo4j/
           docker save "ocelotsocialnetwork/neo4j:latest" > /tmp/neo4j.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
@@ -68,14 +68,9 @@ jobs:
       # BUILD BACKEND DOCKER IMAGE (build) #####################################
       ##########################################################################
       - name: backend | Build `build` image
-        uses: docker/build-push-action@v1.1.0
-        with:
-          repository: ocelotsocialnetwork/backend
-          tags: build
-          target: build
-          path: backend/
-          push: false
-          outputs: type=local,dest=/tmp/backend.tar
+        run: |
+          docker build --target build -t "ocelotsocialnetwork/backend:latest" backend/
+          docker save "ocelotsocialnetwork/backend:latest" > /tmp/backend.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -99,14 +94,9 @@ jobs:
       # BUILD WEBAPP DOCKER IMAGE (build) ######################################
       ##########################################################################
       - name: webapp | Build `build` image
-        uses: docker/build-push-action@v1.1.0
-        with:
-          repository: ocelotsocialnetwork/webapp
-          tags: build
-          target: build
-          path: webapp/
-          push: false
-          outputs: type=local,dest=/tmp/webapp.tar
+        run: |
+          docker build --target build -t "ocelotsocialnetwork/webapp:latest" webapp/
+          docker save "ocelotsocialnetwork/webapp:latest" > /tmp/webapp.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
