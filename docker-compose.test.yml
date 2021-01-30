@@ -5,9 +5,9 @@ services:
   # WEBAPP ###############################################
   ########################################################
   webapp:
-    image: ocelotsocialnetwork/webapp:test
+    image: ocelotsocialnetwork/webapp:build
     build:
-      target: development
+      target: build
     environment:
       - NODE_ENV="test"
 
@@ -15,9 +15,9 @@ services:
   # BACKEND ##############################################
   ########################################################
   backend:
-    image: ocelotsocialnetwork/backend:test
+    image: ocelotsocialnetwork/backend:build
     build:
-      target: development
+      target: build
     environment:
       - NODE_ENV="test"
 

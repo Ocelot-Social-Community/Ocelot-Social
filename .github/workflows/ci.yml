@@ -65,12 +65,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       ##########################################################################
-      # BUILD BACKEND DOCKER IMAGE (development) ###############################
+      # BUILD BACKEND DOCKER IMAGE (build) #####################################
       ##########################################################################
-      - name: backend | Build `development` image
+      - name: backend | Build `build` image
         run: |
-          docker build --target development -t "ocelotsocialnetwork/backend:development" backend/
-          docker save "ocelotsocialnetwork/backend:development" > /tmp/backend.tar
+          docker build --target build -t "ocelotsocialnetwork/backend:build" backend/
+          docker save "ocelotsocialnetwork/backend:build" > /tmp/backend.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -91,12 +91,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       ##########################################################################
-      # BUILD WEBAPP DOCKER IMAGE (development) ################################
+      # BUILD WEBAPP DOCKER IMAGE (build) ######################################
       ##########################################################################
       - name: webapp | Build `build` image
         run: |
-          docker build --target development -t "ocelotsocialnetwork/webapp:development" webapp/
-          docker save "ocelotsocialnetwork/webapp:development" > /tmp/webapp.tar
+          docker build --target build -t "ocelotsocialnetwork/webapp:build" webapp/
+          docker save "ocelotsocialnetwork/webapp:build" > /tmp/webapp.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -130,7 +130,7 @@ jobs:
       # LINT BACKEND ###########################################################
       ##########################################################################
       - name: backend | Lint
-        run: docker run --rm ocelotsocialnetwork/backend:development yarn run lint
+        run: docker run --rm ocelotsocialnetwork/backend:build yarn run lint
 
   ##############################################################################
   # JOB: LINT WEBAPP ###########################################################
@@ -159,7 +159,7 @@ jobs:
       # LINT WEBAPP ############################################################
       ##########################################################################
       - name: webapp | Lint
-        run: docker run --rm ocelotsocialnetwork/webapp:development yarn run lint
+        run: docker run --rm ocelotsocialnetwork/webapp:build yarn run lint
 
   ##############################################################################
   # JOB: UNIT TEST BACKEND #####################################################
@@ -235,7 +235,7 @@ jobs:
         run: cp webapp/.env.template webapp/.env
       - name: backend | copy env files backend
         run: cp backend/.env.template backend/.env
-      - name: backend | docker-compose & unit-tests
+      - name: backend | docker-compose
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
       - name: webapp | Unit tests
         #run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
