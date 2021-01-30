@@ -51,6 +51,7 @@ jobs:
           path: neo4j/
           push: false
           outputs: type=local,dest=/docker/neo4j.tar
+      - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: docker-neo4j-image
@@ -83,6 +84,7 @@ jobs:
           path: backend/
           push: false
           outputs: type=local,dest=/docker/backend.tar
+      - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: docker-backend-image
@@ -115,6 +117,7 @@ jobs:
           path: webapp/
           push: false
           outputs: type=local,dest=/docker/webapp.tar
+      - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: docker-webapp-image
