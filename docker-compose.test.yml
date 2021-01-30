@@ -1,0 +1,47 @@
+version: "3.4"
+
+services:
+  ########################################################
+  # WEBAPP ###############################################
+  ########################################################
+  webapp:
+    image: ocelotsocialnetwork/webapp:build
+    build:
+      target: build
+    environment:
+      - NODE_ENV="test"
+
+  ########################################################
+  # BACKEND ##############################################
+  ########################################################
+  backend:
+    image: ocelotsocialnetwork/backend:build
+    build:
+      target: build
+    environment:
+      - NODE_ENV="test"
+
+  ########################################################
+  # NEO4J ################################################
+  ########################################################
+  neo4j:
+    image: ocelotsocialnetwork/neo4j:community
+  
+  ########################################################
+  # MAINTENANCE ##########################################
+  ########################################################
+  maintenance:
+    image: ocelotsocialnetwork/maintenance:build
+
+  ########################################################
+  # MAILSERVER TO FAKE SMTP ##############################
+  ########################################################
+  mailserver:
+    image: djfarrelly/maildev
+    ports:
+      - 1080:80
+    networks:
+      - external-net
+volumes:
+  webapp_node_modules:
+  backend_node_modules:
