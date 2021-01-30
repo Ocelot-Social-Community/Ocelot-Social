@@ -50,7 +50,10 @@ jobs:
           tags: latest
           path: neo4j/
           push: false
+          load: true
           outputs: type=local,dest=./docker/neo4j.tar
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -83,7 +86,10 @@ jobs:
           target: build
           path: backend/
           push: false
+          load: true
           outputs: type=local,dest=./docker/backend.tar
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -116,7 +122,10 @@ jobs:
           target: build
           path: webapp/
           push: false
+          load: true
           outputs: type=local,dest=./docker/webapp.tar
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
