@@ -130,7 +130,7 @@ jobs:
       # LINT BACKEND ###########################################################
       ##########################################################################
       - name: backend | Lint
-        run: docker run --rm ocelotsocialnetwork/backend:build yarn run lint
+        run: docker run --rm ocelotsocialnetwork/backend:test yarn run lint
 
   ##############################################################################
   # JOB: LINT WEBAPP ###########################################################
@@ -159,7 +159,7 @@ jobs:
       # LINT WEBAPP ############################################################
       ##########################################################################
       - name: webapp | Lint
-        run: docker run --rm ocelotsocialnetwork/webapp:build yarn run lint
+        run: docker run --rm ocelotsocialnetwork/webapp:test yarn run lint
 
   ##############################################################################
   # JOB: UNIT TEST BACKEND #####################################################
@@ -202,7 +202,7 @@ jobs:
       - name: backend | docker-compose
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps neo4j backend
       - name: backend | Unit test
-        run: docker-compose exec backend yarn test
+        run: docker-compose exec -T backend yarn test
 
   ##############################################################################
   # JOB: UNIT TEST WEBAPP ######################################################
@@ -239,7 +239,7 @@ jobs:
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
       - name: webapp | Unit tests
         #run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
-        run: docker-compose exec webapp yarn test
+        run: docker-compose exec -T webapp yarn test
 
   ##############################################################################
   # JOB: DOCKER BUILD PRODUCTION & PUSH ########################################
