@@ -194,10 +194,10 @@ jobs:
       ##########################################################################
       # UNIT TESTS BACKEND #####################################################
       ##########################################################################
-      #- name: backend | copy env files webapp
-      #  run: cp webapp/.env.template webapp/.env
-      #- name: backend | copy env files backend
-      #  run: cp backend/.env.template backend/.env
+      - name: backend | copy env files webapp
+        run: cp webapp/.env.template webapp/.env
+      - name: backend | copy env files backend
+        run: cp backend/.env.template backend/.env
       - name: backend | docker-compose
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up neo4j backend
       - name: backend | Unit tests
