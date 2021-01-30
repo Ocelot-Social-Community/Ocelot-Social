@@ -200,9 +200,11 @@ jobs:
       - name: backend | copy env files backend
         run: cp backend/.env.template backend/.env
       - name: backend | docker-compose
-        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps neo4j backend
-      - name: backend | Unit test
-        run: docker-compose exec backend yarn test
+        run: |
+          docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps neo4j backend
+          docker-compose exec backend yarn test
+      #- name: backend | Unit test
+      #  run: docker-compose exec backend yarn test
 
   ##############################################################################
   # JOB: UNIT TEST WEBAPP ######################################################
@@ -235,11 +237,13 @@ jobs:
         run: cp webapp/.env.template webapp/.env
       - name: backend | copy env files backend
         run: cp backend/.env.template backend/.env
-      - name: backend | docker-compose
-        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
-      - name: webapp | Unit tests
+      - name: backend | docker-compose & unit-tests
+        run: |
+          docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp 
+          docker-compose exec webapp yarn test
+      #- name: webapp | Unit tests
         #run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
-        run: docker-compose exec webapp yarn test
+      #  run: docker-compose exec webapp yarn test
 
   ##############################################################################
   # JOB: DOCKER BUILD PRODUCTION & PUSH ########################################
