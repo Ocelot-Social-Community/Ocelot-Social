@@ -1,20 +1,38 @@
-name: CI
+name: ocelot.social CI
+
 
 on: [push]
 
 jobs:
-  build:
-    name: Continuous Integration
+  ##############################################################################
+  # JOB: PREPARE #####################################################
+  ##############################################################################
+  prepare:
+    name: Prepare
     runs-on: ubuntu-latest
+    # needs: nothing
     steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
       - name: Checkout code
         uses: actions/checkout@v2
-
+      ##########################################################################
+      # TODO: DO STUFF ??? #####################################################
+      ##########################################################################
       - name: Check translation files
         run: |
           scripts/translations/sort.sh
           scripts/translations/missing-keys.sh
 
+  ##############################################################################
+  # JOB: DOCKER BUILD TEST #####################################################
+  ##############################################################################
+  build_test:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    needs: prepare
+    steps:
       ##########################################################################
       # NEO4J ##################################################################
       ##########################################################################
@@ -25,7 +43,80 @@ jobs:
           tags: latest
           path: neo4j/
           push: false
-      
+
+      ##########################################################################
+      # BUILD BACKEND DOCKER IMAGE (build) #####################################
+      ##########################################################################
+      - name: backend | Build `build` image
+        uses: docker/build-push-action@v1.1.0
+        with:
+          repository: ocelotsocialnetwork/backend
+          tags: build
+          target: build
+          path: backend/
+          push: false
+
+      ##########################################################################
+      # BUILD WEBAPP DOCKER IMAGE (build) ######################################
+      ##########################################################################
+      - name: webapp | Build `build` image
+        uses: docker/build-push-action@v1.1.0
+        with:
+          repository: ocelotsocialnetwork/webapp
+          tags: build
+          target: build
+          path: webapp/
+          push: false
+    
+  ##############################################################################
+  # JOB: LINT ##################################################################
+  ##############################################################################
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    needs: build_test
+    steps:
+      ##########################################################################
+      # LINT BACKEND ###########################################################
+      ##########################################################################
+      - name: backend | Lint
+        run: docker run --rm ocelotsocialnetwork/backend:build yarn run lint
+      ##########################################################################
+      # LINT WEBAPP ############################################################
+      ##########################################################################
+      - name: webapp | Lint
+        run: docker run --rm ocelotsocialnetwork/webapp:build yarn run lint
+
+  ##############################################################################
+  # JOB: UNIT TESTS ############################################################
+  ##############################################################################
+  unit_tests:
+    name: Lint
+    runs-on: ubuntu-latest
+    needs: build_test
+    steps:
+      ##########################################################################
+      # UNIT TESTS BACKEND #####################################################
+      ##########################################################################
+      - name: backend | docker-compose
+        run: docker-compose up
+      - name: backend | Unit tests
+        run: docker-compose exec backend yarn test
+        #run: docker run --network container:webapp-frontend appropriate/curl -s --retry 10 --retry-connrefused http://localhost:5000/
+      ##########################################################################
+      # UNIT TESTS WEBAPP #####################################################
+      ##########################################################################
+      - name: webapp | Unit tests
+        run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
+
+  ##############################################################################
+  # JOB: DOCKER BUILD PRODUCTION & PUSH ########################################
+  ##############################################################################
+  #build_production:
+  #  name: Docker Build Production & Push
+  #  runs-on: ubuntu-latest
+  #  needs: prepare
+  #  steps:
       ##########################################################################
       # BACKEND ################################################################
       ##########################################################################
@@ -39,26 +130,6 @@ jobs:
       #    path: backend/
       #    push: false
 
-      # Build Docker Image (build)
-      - name: backend | Build `build` image
-        uses: docker/build-push-action@v1.1.0
-        with:
-          repository: ocelotsocialnetwork/backend
-          tags: build
-          target: build
-          path: backend/
-          push: false
-      
-      # Lint
-      - name: backend | Lint
-        run: docker run --rm ocelotsocialnetwork/backend:build yarn run lint
-
-      # Unit Tests
-      #- name: backend | Unit tests
-      #  run: |
-      #    docker-compose up
-      #    docker-compose exec backend yarn test
-
       ##########################################################################
       # WEBAPP #################################################################
       ##########################################################################
@@ -71,22 +142,3 @@ jobs:
       #    target: production
       #    path: webapp/
       #    push: false
-
-      # Build Docker Image (build)
-      - name: webapp | Build `build` image
-        uses: docker/build-push-action@v1.1.0
-        with:
-          repository: ocelotsocialnetwork/webapp
-          tags: build
-          target: build
-          path: webapp/
-          push: false
-
-      # Lint
-      - name: webapp | Lint
-        run: docker run --rm ocelotsocialnetwork/webapp:build yarn run lint
-
-      # Unit Tests
-      - name: webapp | Unit tests
-        run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
-
