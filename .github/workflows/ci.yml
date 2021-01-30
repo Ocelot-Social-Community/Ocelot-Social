@@ -44,7 +44,7 @@ jobs:
       # NEO4J ##################################################################
       ##########################################################################
       - name: Neo4J | Build `community` image
-        uses: docker/build-push-action@v1.1.0
+        uses: docker/build-push-action@v2
         with:
           repository: ocelotsocialnetwork/neo4j
           tags: latest
@@ -76,7 +76,7 @@ jobs:
       # BUILD BACKEND DOCKER IMAGE (build) #####################################
       ##########################################################################
       - name: backend | Build `build` image
-        uses: docker/build-push-action@v1.1.0
+        uses: docker/build-push-action@v2
         with:
           repository: ocelotsocialnetwork/backend
           tags: build
@@ -109,7 +109,7 @@ jobs:
       # BUILD WEBAPP DOCKER IMAGE (build) ######################################
       ##########################################################################
       - name: webapp | Build `build` image
-        uses: docker/build-push-action@v1.1.0
+        uses: docker/build-push-action@v2
         with:
           repository: ocelotsocialnetwork/webapp
           tags: build
@@ -244,7 +244,7 @@ jobs:
       ##########################################################################
       # TODO: We want to push this to dockerhub
       #- name: Build backend production image
-      #  uses: docker/build-push-action@v1.1.0
+      #  uses: docker/build-push-action@v2
       #  with:
       #    repository: ocelotsocialnetwork/backend
       #    tags: production
@@ -257,7 +257,7 @@ jobs:
       ##########################################################################
       # TODO: We want to push this to dockerhub
       #- name: Build webapp production image
-      #  uses: docker/build-push-action@v1.1.0
+      #  uses: docker/build-push-action@v2
       #  with:
       #    repository: ocelotsocialnetwork/webapp
       #    tags: production
