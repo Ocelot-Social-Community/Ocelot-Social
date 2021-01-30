@@ -194,8 +194,9 @@ jobs:
       ##########################################################################
       # UNIT TESTS BACKEND #####################################################
       ##########################################################################
-      - name: backend | copy env files (webapp, backend)
+      - name: backend | copy env files webapp
         run: cp webapp/.env.template webapp/.env
+      - name: backend | copy env files backend
         run: cp backend/.env.template backend/.env
       - name: backend | docker-compose
         run: docker-compose up
