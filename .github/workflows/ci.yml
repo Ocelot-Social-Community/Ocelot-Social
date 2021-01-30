@@ -123,7 +123,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: docker-backend-image
-          path: /tmp/backend.tar
+          path: /tmp
       - name: Load Docker Image
         run: docker load < /tmp/backend.tar
       ##########################################################################
@@ -152,7 +152,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: docker-webapp-image
-          path: /tmp/webapp.tar
+          path: /tmp
       - name: Load Docker Image
         run: docker load < /tmp/webapp.tar
       ##########################################################################
@@ -181,14 +181,14 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: docker-neo4j-image
-          path: /tmp/neo4j.tar
+          path: /tmp
       - name: Load Docker Image
         run: docker load < /tmp/neo4j.tar
       - name: Download Docker Image (Backend)
         uses: actions/download-artifact@v2
         with:
           name: docker-backend-image
-          path: /tmp/backend.tar
+          path: /tmp
       - name: Load Docker Image
         run: docker load < /tmp/backend.tar
       ##########################################################################
@@ -224,7 +224,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: docker-webapp-image
-          path: /tmp/webapp.tar
+          path: /tmp
       - name: Load Docker Image
         run: docker load < /tmp/webapp.tar
       ##########################################################################
