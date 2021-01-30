@@ -25,30 +25,6 @@ jobs:
           scripts/translations/sort.sh
           scripts/translations/missing-keys.sh
 
-  test_latest_version_v1:
-    needs: docker_build
-    runs-on: ubuntu-latest
-    name: latest v1
-    env:
-      AWS_CLI_VERSION: 1   
-    steps:    
-      - name: Download Docker Image (Artifact)
-        uses: actions/download-artifact@v2
-        with:
-          name: docker-artifact
-          path: path/to/artifacts
-      - name: Run test in Docker
-        run: |
-          cd path/to/artifacts
-          docker load < docker-image.tar
-          export DOCKER_FULLTAG=$(cat docker-tag)
-          docker run --rm "$DOCKER_FULLTAG" $AWS_CLI_VERSION
-      - uses: actions/checkout@v2 
-      - name: Run test on Runner
-        run: |
-          sudo ./entrypoint.sh
-
-
   ##############################################################################
   # JOB: DOCKER BUILD TEST NEO4J ###############################################
   ##############################################################################
@@ -175,6 +151,7 @@ jobs:
         with:
           name: docker-backend-image
           path: /docker/backend.tar
+      - name: Load Docker Image
         run: docker load < /docker/backend.tar
       ##########################################################################
       # LINT BACKEND ###########################################################
@@ -205,6 +182,7 @@ jobs:
         with:
           name: docker-webapp-image
           path: /docker/webapp.tar
+      - name: Load Docker Image
         run: docker load < /docker/webapp.tar
       ##########################################################################
       # LINT WEBAPP ############################################################
