@@ -95,7 +95,7 @@ beforeEach(() => {
 
 afterEach(cleanDatabase)
 
-describe('Location Service',() => {
+describe('Location Service', () => {
   // Authentication
   // TODO: unify, externalize, simplify, wtf?
   let user
@@ -107,44 +107,44 @@ describe('Location Service',() => {
   })
   it('query Location existing', async () => {
     variables = {
-      place: "Berlin",
-      lang: "en"
+      place: 'Berlin',
+      lang: 'en',
     }
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([
-      {"id": "place.14094307404564380", "place_name": "Berlin, Germany"},
-      {"id": "place.15095411613564380", "place_name": "Berlin, Maryland, United States"},
-      {"id": "place.5225018734564380", "place_name": "Berlin, Connecticut, United States"},
-      {"id": "place.16922023226564380", "place_name": "Berlin, New Jersey, United States"},
-      {"id": "place.4035845612564380", "place_name": "Berlin Township, New Jersey, United States"},
+      { id: 'place.14094307404564380', place_name: 'Berlin, Germany' },
+      { id: 'place.15095411613564380', place_name: 'Berlin, Maryland, United States' },
+      { id: 'place.5225018734564380', place_name: 'Berlin, Connecticut, United States' },
+      { id: 'place.16922023226564380', place_name: 'Berlin, New Jersey, United States' },
+      { id: 'place.4035845612564380', place_name: 'Berlin Township, New Jersey, United States' },
     ])
   })
   it('query Location existing in different language', async () => {
     variables = {
-      place: "Berlin",
-      lang: "de"
+      place: 'Berlin',
+      lang: 'de',
     }
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([
-      {"id": "place.14094307404564380", "place_name": "Berlin, Deutschland"},
-      {"id": "place.15095411613564380", "place_name": "Berlin, Maryland, Vereinigte Staaten"},
-      {"id": "place.16922023226564380", "place_name": "Berlin, New Jersey, Vereinigte Staaten"},
-      {"id": "place.10735893248465990", "place_name": "Berlin Heights, Ohio, Vereinigte Staaten"},
-      {"id": "place.1165756679564380", "place_name": "Berlin, Massachusetts, Vereinigte Staaten"},
+      { id: 'place.14094307404564380', place_name: 'Berlin, Deutschland' },
+      { id: 'place.15095411613564380', place_name: 'Berlin, Maryland, Vereinigte Staaten' },
+      { id: 'place.16922023226564380', place_name: 'Berlin, New Jersey, Vereinigte Staaten' },
+      { id: 'place.10735893248465990', place_name: 'Berlin Heights, Ohio, Vereinigte Staaten' },
+      { id: 'place.1165756679564380', place_name: 'Berlin, Massachusetts, Vereinigte Staaten' },
     ])
   })
   it('query Location not existing', async () => {
     variables = {
-      place: "GbHtsd4sdHa",
-      lang: "en"
+      place: 'GbHtsd4sdHa',
+      lang: 'en',
     }
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([])
   })
   it('query Location without a place name given', async () => {
     variables = {
-      place: "",
-      lang: "en"
+      place: '',
+      lang: 'en',
     }
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([])
