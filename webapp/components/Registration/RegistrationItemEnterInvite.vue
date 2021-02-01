@@ -1,6 +1,6 @@
 <template>
   <ds-form
-    class="enter-nonce"
+    class="enter-invite"
     v-model="formData"
     :schema="formSchema"
     @submit="handleSubmitVerify"
@@ -8,17 +8,17 @@
     @input-valid="handleInputValid"
   >
     <ds-input
-      :placeholder="$t('components.enter-nonce.form.nonce')"
-      model="nonce"
-      name="nonce"
-      id="nonce"
+      :placeholder="$t('components.enter-invite.form.invite-code')"
+      model="inviteCode"
+      name="inviteCode"
+      id="inviteCode"
       icon="question-circle"
     />
     <ds-text>
-      {{ $t('components.enter-nonce.form.description') }}
+      {{ $t('components.enter-invite.form.description') }}
     </ds-text>
     <!-- Wolle <base-button :disabled="disabled" filled name="submit" type="submit">
-      {{ $t('components.enter-nonce.form.next') }}
+      {{ $t('components.enter-invite.form.next') }}
     </base-button> -->
     <slot></slot>
   </ds-form>
@@ -34,15 +34,15 @@ export default {
   data() {
     return {
       formData: {
-        nonce: '',
+        inviteCode: '',
       },
       formSchema: {
-        nonce: {
+        inviteCode: {
           type: 'string',
-          min: 6,
-          max: 6,
+          min: 5,
+          max: 5,
           required: true,
-          message: this.$t('components.enter-nonce.form.validations.length'),
+          message: this.$t('components.enter-invite.form.validations.length'),
         },
       },
       disabled: true,
@@ -56,9 +56,9 @@ export default {
     },
     async handleInputValid() {
       // Wolle console.log('handleInputValid !!!')
-      const { nonce } = this.formData
+      const { inviteCode } = this.formData
       const email = this.email
-      this.sliderData.validateCallback(true, { email, nonce })
+      this.sliderData.validateCallback(true, { email, inviteCode })
     },
     handleSubmitVerify() {
       // Wolle const { nonce } = this.formData
@@ -71,7 +71,7 @@ export default {
 </script>
 
 <style lang="scss">
-.enter-nonce {
+.enter-invite {
   display: flex;
   flex-direction: column;
   margin: $space-large 0 $space-xxx-small 0;

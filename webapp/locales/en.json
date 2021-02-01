@@ -116,6 +116,16 @@
     "versus": "Versus"
   },
   "components": {
+    "enter-invite": {
+      "form": {
+        "description": "Enter the invitation code you received.",
+        "invite-code": "Enter your invite code",
+        "next": "Continue",
+        "validations": {
+          "length": "must be 5 characters long"
+        }
+      }
+    },
     "enter-nonce": {
       "form": {
         "description": "Open your inbox and enter the code that we've sent to you.",

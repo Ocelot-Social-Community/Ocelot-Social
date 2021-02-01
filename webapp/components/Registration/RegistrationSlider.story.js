@@ -5,7 +5,7 @@ import helpers from '~/storybook/helpers'
 
 helpers.init()
 
-// export const searchResults = [
+// Wolle export const searchResults = [
 //   {
 //     id: 'post-by-jenny',
 //     __typename: 'Post',
@@ -119,7 +119,7 @@ storiesOf('RegistrationSlider', module)
     components: { RegistrationSlider },
     store: helpers.store,
     data: () => ({
-      // searchResults,
+      // Wolle searchResults,
     }),
     template: `
       <registration-slider />
