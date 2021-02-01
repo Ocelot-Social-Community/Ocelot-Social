@@ -191,7 +191,13 @@ export default {
   apollo: {
     tokenName: metadata.COOKIE_NAME, // optional, default: apollo-token
     cookieAttributes: {
-      expires: 1, // optional, default: 7 (days)
+      expires: CONFIG.COOKIE_EXPIRE_TIME, // optional, default: 7 (days)
+      /** * Define the path where the cookie is available. Defaults to '/' */
+      // For some reason this can vary - lets see if setting this helps.
+      path: '/', // optional
+      /** * A Boolean indicating if the cookie transmission requires a
+       * secure protocol (https). Defaults to false. */
+      secure: CONFIG.COOKIE_HTTPS_ONLY,
     },
     // includeNodeModules: true, // optional, default: false (this includes graphql-tag for node_modules folder)
 
