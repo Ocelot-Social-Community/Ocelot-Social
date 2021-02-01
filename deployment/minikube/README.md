@@ -18,8 +18,8 @@ minikube dashboard, expose the services you want on your host system.
 For example:
 
 ```text
-$ minikube service develop-webapp --namespace=ocelotsocialnetwork
+$ minikube service webapp --namespace=ocelotsocialnetwork
 # optionally
-$ minikube service develop-backend --namespace=ocelotsocialnetwork
+$ minikube service backend --namespace=ocelotsocialnetwork
 ```
 

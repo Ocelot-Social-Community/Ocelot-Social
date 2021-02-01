@@ -1,6 +1,7 @@
 import { handler } from './webfinger'
 import Factory, { cleanDatabase } from '../../db/factories'
 import { getDriver } from '../../db/neo4j'
+import CONFIG from '../../config'
 
 let resource, res, json, status, contentType
 
@@ -98,12 +99,12 @@ describe('webfinger', () => {
           expect(json).toHaveBeenCalledWith({
             links: [
               {
-                href: 'http://localhost:3000/activitypub/users/some-user',
+                href: `${CONFIG.CLIENT_URI}/activitypub/users/some-user`,
                 rel: 'self',
                 type: 'application/activity+json',
               },
             ],
-            subject: 'acct:some-user@localhost:3000',
+            subject: `acct:some-user@${new URL(CONFIG.CLIENT_URI).host}`,
           })
         })
       })

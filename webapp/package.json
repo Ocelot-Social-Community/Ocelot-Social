@@ -17,7 +17,7 @@
     "lint": "eslint --ext .js,.vue .",
     "locales": "../scripts/translations/missing-keys.sh && ../scripts/translations/sort.sh",
     "precommit": "yarn lint",
-    "test": "jest",
+    "test": "cross-env NODE_ENV=test jest",
     "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand"
   },
   "jest": {
@@ -33,7 +33,7 @@
     ],
     "transform": {
       ".*\\.(vue)$": "vue-jest",
-      "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
+      "^.+\\.js$": "babel-jest"
     },
     "moduleFileExtensions": [
       "js",

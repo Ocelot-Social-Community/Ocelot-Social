@@ -15,32 +15,78 @@ jobs:
           scripts/translations/sort.sh
           scripts/translations/missing-keys.sh
 
-      - name: Build neo4j image
+      ##########################################################################
+      # NEO4J ##################################################################
+      ##########################################################################
+      - name: Neo4J | Build `community` image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/neo4j
           tags: latest
           path: neo4j/
           push: false
-      - name: Build backend base image
+      
+      ##########################################################################
+      # BACKEND ################################################################
+      ##########################################################################
+      # TODO: We want to push this to dockerhub
+      #- name: Build backend production image
+      #  uses: docker/build-push-action@v1.1.0
+      #  with:
+      #    repository: ocelotsocialnetwork/backend
+      #    tags: production
+      #    target: production
+      #    path: backend/
+      #    push: false
+
+      # Build Docker Image (build)
+      - name: backend | Build `build` image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/backend
-          tags: build-and-test
-          target: build-and-test
+          tags: build
+          target: build
           path: backend/
           push: false
-      - name: Build webapp base image
+      
+      # Lint
+      - name: backend | Lint
+        run: docker run --rm ocelotsocialnetwork/backend:build yarn run lint
+
+      # Unit Tests
+      #- name: backend | Unit tests
+      #  run: |
+      #    docker-compose up
+      #    docker-compose exec backend yarn test
+
+      ##########################################################################
+      # WEBAPP #################################################################
+      ##########################################################################
+      # TODO: We want to push this to dockerhub
+      #- name: Build webapp production image
+      #  uses: docker/build-push-action@v1.1.0
+      #  with:
+      #    repository: ocelotsocialnetwork/webapp
+      #    tags: production
+      #    target: production
+      #    path: webapp/
+      #    push: false
+
+      # Build Docker Image (build)
+      - name: webapp | Build `build` image
         uses: docker/build-push-action@v1.1.0
         with:
           repository: ocelotsocialnetwork/webapp
-          tags: build-and-test
-          target: build-and-test
+          tags: build
+          target: build
           path: webapp/
           push: false
 
-      - name: Lint backend
-        run: docker run --rm ocelotsocialnetwork/backend:build-and-test yarn run lint
-      - name: Lint webapp
-        run: docker run --rm ocelotsocialnetwork/webapp:build-and-test yarn run lint
+      # Lint
+      - name: webapp | Lint
+        run: docker run --rm ocelotsocialnetwork/webapp:build yarn run lint
+
+      # Unit Tests
+      - name: webapp | Unit tests
+        run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
 

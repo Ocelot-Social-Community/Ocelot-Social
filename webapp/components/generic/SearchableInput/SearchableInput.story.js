@@ -112,7 +112,7 @@ export const searchResults = [
   },
 ]
 
-storiesOf('Search Field', module)
+storiesOf('SearchableInput', module)
   .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('test', () => ({
@@ -122,6 +122,6 @@ storiesOf('Search Field', module)
       searchResults,
     }),
     template: `
-      <searchable-input :options="searchResults" />
+      <searchable-input :loading="false" :options="searchResults" />
     `,
   }))

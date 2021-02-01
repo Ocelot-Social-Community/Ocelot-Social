@@ -5,10 +5,10 @@ import slug from 'slug'
 import { existsSync, unlinkSync, createWriteStream } from 'fs'
 import { UserInputError } from 'apollo-server'
 import { getDriver } from '../../../db/neo4j'
-import { s3Configs } from '../../../config'
+import CONFIG from '../../../config'
 
 // const widths = [34, 160, 320, 640, 1024]
-const { AWS_ENDPOINT: endpoint, AWS_REGION: region, AWS_BUCKET: Bucket, S3_CONFIGURED } = s3Configs
+const { AWS_ENDPOINT: endpoint, AWS_REGION: region, AWS_BUCKET: Bucket, S3_CONFIGURED } = CONFIG
 
 export async function deleteImage(resource, relationshipType, opts = {}) {
   sanitizeRelationshipType(relationshipType)
