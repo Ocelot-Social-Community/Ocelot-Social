@@ -17,9 +17,6 @@
     <ds-text>
       {{ $t('components.enter-invite.form.description') }}
     </ds-text>
-    <!-- Wolle <base-button :disabled="disabled" filled name="submit" type="submit">
-      {{ $t('components.enter-invite.form.next') }}
-    </base-button> -->
     <slot></slot>
   </ds-form>
 </template>
@@ -29,12 +26,12 @@ export default {
   name: 'RegistrationItemEnterInvite',
   props: {
     sliderData: { type: Object, required: true },
-    email: { type: String, required: true },
+    inviteCode: { type: String, required: false },
   },
   data() {
     return {
       formData: {
-        inviteCode: '',
+        inviteCode: this.inviteCode ? this.inviteCode : '',
       },
       formSchema: {
         inviteCode: {
@@ -45,20 +42,17 @@ export default {
           message: this.$t('components.enter-invite.form.validations.length'),
         },
       },
-      disabled: true,
     }
   },
   methods: {
     async handleInput() {
       // Wolle console.log('handleInput !!!')
-      // console.log('email: ', this.email)
       this.sliderData.validateCallback(false)
     },
     async handleInputValid() {
       // Wolle console.log('handleInputValid !!!')
       const { inviteCode } = this.formData
-      const email = this.email
-      this.sliderData.validateCallback(true, { email, inviteCode })
+      this.sliderData.validateCallback(true, { /* email, */inviteCode })
     },
     handleSubmitVerify() {
       // Wolle const { nonce } = this.formData

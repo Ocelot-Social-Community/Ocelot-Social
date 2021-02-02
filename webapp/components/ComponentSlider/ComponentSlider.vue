@@ -5,29 +5,29 @@
     <ds-flex>
       <ds-flex-item>
         <div
-          v-for="componentName in sliderData.sliders"
-          :key="componentName"
+          v-for="slider in sliderData.sliders"
+          :key="slider.name"
           class="selection-button"
-          :class="[
-            'Sliders__component-selection',
-          ]"
+          :class="['Sliders__component-selection']"
         >
           <base-button
+            :class="[sliderIndexByName(slider.name) >= sliderIndex && '--disabled']"
             style="float: left"
+            :icon="slider.validated && slider.confirmed && 'check'"
             :circle="true"
             size="small"
             type="submit"
             filled
             :loading="false"
-            :disabled="sliderIndexByName(componentName) >= sliderIndex"
-            @click="sliderData.sliderSelectorCallback(componentName)"
+            :disabled="!(slider.confirmed || sliderIndexByName(slider.name) === sliderIndex)"
+            @click="sliderData.sliderSelectorCallback(slider.name)"
           />
         </div>
       </ds-flex-item>
       <ds-flex-item>
         <base-button
           style="float: right"
-          icon="check"
+          :icon="(sliderIndex < sliderData.sliders.length - 1 && 'arrow-right') || (sliderIndex === sliderData.sliders.length - 1 && 'check')"
           type="submit"
           filled
           :loading="false"
@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     sliderIndexByName(name) {
-      return this.sliderData.sliders.findIndex((sliderName) => sliderName === name)
+      return this.sliderData.sliders.findIndex((slider) => slider.name === name)
     },
   },
 }
@@ -88,12 +88,12 @@ export default {
     // &.--active {
     //   border-bottom: 2px solid #17b53f;
     // }
-    // &.--disabled {
-    //   opacity: $opacity-disabled;
-    //   &:hover {
-    //     border-bottom: none;
-    //   }
-    // }
+    &.--disabled {
+      opacity: $opacity-disabled;
+      // &:hover {
+      //   border-bottom: none;
+      // }
+    }
   }
 }
 </style>
