@@ -144,7 +144,7 @@ describe('Location Service', () => {
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([])
   })
-  
+
   it('query Location without a place name given', async () => {
     variables = {
       place: '',
