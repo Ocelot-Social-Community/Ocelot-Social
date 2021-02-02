@@ -11,6 +11,7 @@ describe('index.vue', () => {
 
   beforeEach(() => {
     mocks = {
+      $i18n: { locale: () => 'en' },
       $t: jest.fn(),
       $apollo: {
         mutate: jest
@@ -25,6 +26,36 @@ describe('index.vue', () => {
                 locationName: 'Berlin',
                 about: 'Smth',
               },
+            },
+          }),
+        query: jest
+          .fn()
+          .mockRejectedValue({ message: 'Ouch!' })
+          .mockResolvedValueOnce({
+            data: {
+              queryLocations: [
+                { place_name: 'Brazil', id: 'country.9531777110682710', __typename: 'Location2' },
+                {
+                  place_name: 'United Kingdom',
+                  id: 'country.12405201072814600',
+                  __typename: 'Location2',
+                },
+                {
+                  place_name: 'Buenos Aires, Argentina',
+                  id: 'place.7159025980072860',
+                  __typename: 'Location2',
+                },
+                {
+                  place_name: 'Bandung, West Java, Indonesia',
+                  id: 'place.8224726664248590',
+                  __typename: 'Location2',
+                },
+                {
+                  place_name: 'Banten, Indonesia',
+                  id: 'region.11849645724544000',
+                  __typename: 'Location2',
+                },
+              ],
             },
           }),
       },
@@ -95,6 +126,116 @@ describe('index.vue', () => {
 
           expect(mocks.$apollo.mutate).toHaveBeenCalled()
         })
+      })
+
+      describe('given a new slug and hitting submit', () => {
+        it('calls updateUser mutation', () => {
+          const wrapper = Wrapper()
+
+          wrapper.find('#slug').setValue('peter-der-lustige')
+          wrapper.find('.ds-form').trigger('submit')
+
+          expect(mocks.$apollo.mutate).toHaveBeenCalled()
+        })
+      })
+
+      describe('given a new location and hitting submit', () => {
+        it('calls updateUser mutation', () => {
+          const wrapper = Wrapper()
+
+          wrapper.find('#city').setValue('Berlin, Germany')
+          wrapper.find('.ds-form').trigger('submit')
+
+          expect(mocks.$apollo.mutate).toHaveBeenCalled()
+        })
+      })
+
+      describe('given a new about and hitting submit', () => {
+        it('calls updateUser mutation', () => {
+          const wrapper = Wrapper()
+
+          wrapper.find('#about').setValue('I am Peter!111elf')
+          wrapper.find('.ds-form').trigger('submit')
+
+          expect(mocks.$apollo.mutate).toHaveBeenCalled()
+        })
+      })
+
+      describe('given new username, slug, location and about and hitting submit', () => {
+        it('calls updateUser mutation', () => {
+          const wrapper = Wrapper()
+
+          wrapper.find('#name').setValue('Peter')
+          wrapper.find('#slug').setValue('peter-der-lustige')
+          wrapper.find('#city').setValue('Berlin, Germany')
+          wrapper.find('#about').setValue('I am Peter!111elf')
+          wrapper.find('.ds-form').trigger('submit')
+
+          expect(mocks.$apollo.mutate).toHaveBeenCalled()
+        })
+      })
+    })
+
+    describe('given user input on location field', () => {
+      it('calls queryLocations query', async () => {
+        const wrapper = Wrapper()
+
+        jest.useFakeTimers()
+
+        wrapper.find('#city').trigger('input')
+        wrapper.find('#city').setValue('B')
+
+        jest.runAllTimers()
+
+        expect(mocks.$apollo.query).toHaveBeenCalled()
+      })
+
+      it('opens the dropdown', () => {
+        const wrapper = Wrapper()
+
+        wrapper.find('#city').trigger('input')
+        wrapper.find('#city').setValue('B')
+
+        expect(wrapper.find('.ds-select-dropdown').isVisible()).toBe(true)
+      })
+    })
+
+    describe('given no user input on location field', () => {
+      it('cannot call queryLocations query', async () => {
+        const wrapper = Wrapper()
+
+        jest.useFakeTimers()
+
+        wrapper.find('#city').setValue('')
+        wrapper.find('#city').trigger('input')
+
+        jest.runAllTimers()
+
+        expect(mocks.$apollo.query).not.toHaveBeenCalled()
+      })
+
+      it('does not show the dropdown', () => {
+        const wrapper = Wrapper()
+
+        wrapper.find('#city').setValue('')
+        wrapper.find('#city').trigger('input')
+
+        expect(wrapper.find('.ds-select-is-open').exists()).toBe(false)
+      })
+    })
+
+    describe('given user presses escape on location field', () => {
+      it('closes the dropdown', () => {
+        const wrapper = Wrapper()
+
+        wrapper.find('#city').setValue('B')
+        wrapper.find('#city').trigger('input')
+
+        expect(wrapper.find('.ds-select-dropdown').isVisible()).toBe(true)
+
+        wrapper.find('#city').trigger('keyup.esc')
+
+        expect(wrapper.find('.ds-select-is-open').exists()).toBe(false)
       })
     })
   })

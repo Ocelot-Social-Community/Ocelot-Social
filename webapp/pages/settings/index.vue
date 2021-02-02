@@ -24,7 +24,7 @@
         />
         <!-- eslint-enable vue/use-v-on-exact -->
         <ds-input
-          id="bio"
+          id="about"
           model="about"
           type="textarea"
           rows="3"
@@ -138,7 +138,7 @@ export default {
     },
     async requestGeoData(e) {
       const value = e.target ? e.target.value.trim() : ''
-      if (value === '' || value.length < 3) {
+      if (value === '') {
         this.cities = []
         return
       }
