@@ -99,9 +99,9 @@ describe('Location Service', () => {
   // Authentication
   // TODO: unify, externalize, simplify, wtf?
   let user
-  beforeEach(async () => {
+  beforeAll(async () => {
     user = await Factory.build('user', {
-      id: 'updating-user',
+      id: 'location-user',
     })
     authenticatedUser = await user.toJson()
   })
