@@ -1,31 +1,261 @@
-name: CI
+name: ocelot.social CI
+
 
 on: [push]
 
 jobs:
-  build:
-    name: Continuous Integration
+  ##############################################################################
+  # JOB: PREPARE #####################################################
+  ##############################################################################
+  prepare:
+    name: Prepare
     runs-on: ubuntu-latest
+    # needs: [nothing]
     steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
       - name: Checkout code
         uses: actions/checkout@v2
-
+      ##########################################################################
+      # TODO: DO STUFF ??? #####################################################
+      ##########################################################################
       - name: Check translation files
         run: |
           scripts/translations/sort.sh
           scripts/translations/missing-keys.sh
 
+  ##############################################################################
+  # JOB: DOCKER BUILD TEST NEO4J ###############################################
+  ##############################################################################
+  build_test_neo4j:
+    name: Docker Build Test - Neo4J
+    runs-on: ubuntu-latest
+    needs: [prepare]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
       ##########################################################################
       # NEO4J ##################################################################
       ##########################################################################
       - name: Neo4J | Build `community` image
-        uses: docker/build-push-action@v1.1.0
+        run: |
+          docker build --target community -t "ocelotsocialnetwork/neo4j:community" neo4j/
+          docker save "ocelotsocialnetwork/neo4j:community" > /tmp/neo4j.tar
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
         with:
-          repository: ocelotsocialnetwork/neo4j
-          tags: latest
-          path: neo4j/
-          push: false
-      
+          name: docker-neo4j-image
+          path: /tmp/neo4j.tar
+
+  ##############################################################################
+  # JOB: DOCKER BUILD TEST BACKEND #############################################
+  ##############################################################################
+  build_test_backend:
+    name: Docker Build Test - Backend
+    runs-on: ubuntu-latest
+    needs: [prepare]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # BUILD BACKEND DOCKER IMAGE (build) #####################################
+      ##########################################################################
+      - name: backend | Build `test` image
+        run: |
+          docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
+          docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-backend-test
+          path: /tmp/backend.tar
+
+  ##############################################################################
+  # JOB: DOCKER BUILD TEST WEBAPP ##############################################
+  ##############################################################################
+  build_test_webapp:
+    name: Docker Build Test - WebApp
+    runs-on: ubuntu-latest
+    needs: [prepare]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # BUILD WEBAPP DOCKER IMAGE (build) ######################################
+      ##########################################################################
+      - name: webapp | Build `test` image
+        run: |
+          docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
+          docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-webapp-test
+          path: /tmp/webapp.tar
+
+  ##############################################################################
+  # JOB: LINT BACKEND ##########################################################
+  ##############################################################################
+  lint_backend:
+    name: Lint backend
+    runs-on: ubuntu-latest
+    needs: [build_test_backend]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # DOWNLOAD DOCKER IMAGE ##################################################
+      ##########################################################################
+      - name: Download Docker Image (Backend)
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-backend-test
+          path: /tmp
+      - name: Load Docker Image
+        run: docker load < /tmp/backend.tar
+      ##########################################################################
+      # LINT BACKEND ###########################################################
+      ##########################################################################
+      - name: backend | Lint
+        run: docker run --rm ocelotsocialnetwork/backend:test yarn run lint
+
+  ##############################################################################
+  # JOB: LINT WEBAPP ###########################################################
+  ##############################################################################
+  lint_webapp:
+    name: Lint webapp
+    runs-on: ubuntu-latest
+    needs: [build_test_webapp]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # DOWNLOAD DOCKER IMAGE ##################################################
+      ##########################################################################
+      - name: Download Docker Image (Webapp)
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-webapp-test
+          path: /tmp
+      - name: Load Docker Image
+        run: docker load < /tmp/webapp.tar
+      ##########################################################################
+      # LINT WEBAPP ############################################################
+      ##########################################################################
+      - name: webapp | Lint
+        run: docker run --rm ocelotsocialnetwork/webapp:test yarn run lint
+
+  ##############################################################################
+  # JOB: UNIT TEST BACKEND #####################################################
+  ##############################################################################
+  unit_test_backend:
+    name: Unit tests - backend
+    runs-on: ubuntu-latest
+    needs: [build_test_neo4j,build_test_backend]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # DOWNLOAD DOCKER IMAGES #################################################
+      ##########################################################################
+      - name: Download Docker Image (Neo4J)
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-neo4j-image
+          path: /tmp
+      - name: Load Docker Image
+        run: docker load < /tmp/neo4j.tar
+      - name: Download Docker Image (Backend)
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-backend-test
+          path: /tmp
+      - name: Load Docker Image
+        run: docker load < /tmp/backend.tar
+      ##########################################################################
+      # UNIT TESTS BACKEND #####################################################
+      ##########################################################################
+      # TODO: Why do we need those .envs?
+      - name: backend | copy env files webapp
+        run: cp webapp/.env.template webapp/.env
+      - name: backend | copy env files backend
+        run: cp backend/.env.template backend/.env
+      - name: backend | docker-compose
+        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps neo4j backend
+      - name: backend | Initialize Database
+        run: docker-compose exec -T backend yarn db:migrate init
+      - name: backend | Unit test
+        run: docker-compose exec -T backend yarn test
+
+  ##############################################################################
+  # JOB: UNIT TEST WEBAPP ######################################################
+  ##############################################################################
+  unit_test_webapp:
+    name: Unit tests - webapp
+    runs-on: ubuntu-latest
+    needs: [build_test_webapp]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # DOWNLOAD DOCKER IMAGES #################################################
+      ##########################################################################
+      - name: Download Docker Image (Webapp)
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-webapp-test
+          path: /tmp
+      - name: Load Docker Image
+        run: docker load < /tmp/webapp.tar
+      ##########################################################################
+      # UNIT TESTS WEBAPP #####################################################
+      ##########################################################################
+      # TODO: Why do we need those .envs?
+      - name: backend | copy env files webapp
+        run: cp webapp/.env.template webapp/.env
+      - name: backend | copy env files backend
+        run: cp backend/.env.template backend/.env
+      - name: backend | docker-compose
+        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
+      - name: webapp | Unit tests
+        #run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
+        run: docker-compose exec -T webapp yarn test
+
+  ##############################################################################
+  # JOB: DOCKER BUILD PRODUCTION & PUSH ########################################
+  ##############################################################################
+  #build_production:
+  #  name: Docker Build Production & Push
+  #  runs-on: ubuntu-latest
+  #  needs: prepare
+  #  steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      #- name: Checkout code
+      #  uses: actions/checkout@v2
       ##########################################################################
       # BACKEND ################################################################
       ##########################################################################
@@ -39,26 +269,6 @@ jobs:
       #    path: backend/
       #    push: false
 
-      # Build Docker Image (build)
-      - name: backend | Build `build` image
-        uses: docker/build-push-action@v1.1.0
-        with:
-          repository: ocelotsocialnetwork/backend
-          tags: build
-          target: build
-          path: backend/
-          push: false
-      
-      # Lint
-      - name: backend | Lint
-        run: docker run --rm ocelotsocialnetwork/backend:build yarn run lint
-
-      # Unit Tests
-      #- name: backend | Unit tests
-      #  run: |
-      #    docker-compose up
-      #    docker-compose exec backend yarn test
-
       ##########################################################################
       # WEBAPP #################################################################
       ##########################################################################
@@ -71,22 +281,3 @@ jobs:
       #    target: production
       #    path: webapp/
       #    push: false
-
-      # Build Docker Image (build)
-      - name: webapp | Build `build` image
-        uses: docker/build-push-action@v1.1.0
-        with:
-          repository: ocelotsocialnetwork/webapp
-          tags: build
-          target: build
-          path: webapp/
-          push: false
-
-      # Lint
-      - name: webapp | Lint
-        run: docker run --rm ocelotsocialnetwork/webapp:build yarn run lint
-
-      # Unit Tests
-      - name: webapp | Unit tests
-        run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
-
