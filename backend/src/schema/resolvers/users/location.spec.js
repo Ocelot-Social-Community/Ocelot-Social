@@ -105,6 +105,7 @@ describe('Location Service', () => {
     })
     authenticatedUser = await user.toJson()
   })
+
   it('query Location existing', async () => {
     variables = {
       place: 'Berlin',
@@ -119,6 +120,7 @@ describe('Location Service', () => {
       { id: 'place.4035845612564380', place_name: 'Berlin Township, New Jersey, United States' },
     ])
   })
+
   it('query Location existing in different language', async () => {
     variables = {
       place: 'Berlin',
@@ -133,6 +135,7 @@ describe('Location Service', () => {
       { id: 'place.1165756679564380', place_name: 'Berlin, Massachusetts, Vereinigte Staaten' },
     ])
   })
+
   it('query Location not existing', async () => {
     variables = {
       place: 'GbHtsd4sdHa',
@@ -141,6 +144,7 @@ describe('Location Service', () => {
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([])
   })
+  
   it('query Location without a place name given', async () => {
     variables = {
       place: '',
