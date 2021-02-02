@@ -99,7 +99,7 @@ describe('Location Service', () => {
   // Authentication
   // TODO: unify, externalize, simplify, wtf?
   let user
-  beforeAll(async () => {
+  beforeEach(async () => {
     user = await Factory.build('user', {
       id: 'location-user',
     })
