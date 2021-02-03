@@ -1,4 +1,4 @@
-name: ocelot.social CI
+name: ocelot.social test CI
 
 
 on: [push]
@@ -242,42 +242,3 @@ jobs:
       - name: webapp | Unit tests
         #run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
         run: docker-compose exec -T webapp yarn test
-
-  ##############################################################################
-  # JOB: DOCKER BUILD PRODUCTION & PUSH ########################################
-  ##############################################################################
-  #build_production:
-  #  name: Docker Build Production & Push
-  #  runs-on: ubuntu-latest
-  #  needs: prepare
-  #  steps:
-      ##########################################################################
-      # CHECKOUT CODE ##########################################################
-      ##########################################################################
-      #- name: Checkout code
-      #  uses: actions/checkout@v2
-      ##########################################################################
-      # BACKEND ################################################################
-      ##########################################################################
-      # TODO: We want to push this to dockerhub
-      #- name: Build backend production image
-      #  uses: docker/build-push-action@v1.1.0
-      #  with:
-      #    repository: ocelotsocialnetwork/backend
-      #    tags: production
-      #    target: production
-      #    path: backend/
-      #    push: false
-
-      ##########################################################################
-      # WEBAPP #################################################################
-      ##########################################################################
-      # TODO: We want to push this to dockerhub
-      #- name: Build webapp production image
-      #  uses: docker/build-push-action@v1.1.0
-      #  with:
-      #    repository: ocelotsocialnetwork/webapp
-      #    tags: production
-      #    target: production
-      #    path: webapp/
-      #    push: false
