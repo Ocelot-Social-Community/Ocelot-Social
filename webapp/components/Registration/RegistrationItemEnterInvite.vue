@@ -31,13 +31,14 @@ export default {
   data() {
     return {
       formData: {
+        // inviteCode: this.handleInputOnStart(this.inviteCode),
         inviteCode: this.inviteCode ? this.inviteCode : '',
       },
       formSchema: {
         inviteCode: {
           type: 'string',
-          min: 5,
-          max: 5,
+          min: 6,
+          max: 6,
           required: true,
           message: this.$t('components.enter-invite.form.validations.length'),
         },
@@ -52,6 +53,8 @@ export default {
     async handleInputValid() {
       // Wolle console.log('handleInputValid !!!')
       const { inviteCode } = this.formData
+      // validate in backend
+      // toaster
       this.sliderData.validateCallback(true, { /* email, */inviteCode })
     },
     handleSubmitVerify() {
@@ -60,6 +63,14 @@ export default {
       // this.$emit('nonceEntered', { email, nonce })
       // this.$emit('validation', { email, nonce })
     },
+    // async handleInputOnStart(inviteCode) {
+    //   if (inviteCode) {
+    //     await this.handleInputValid()
+    //     return inviteCode
+    //   } else {
+    //     return ''
+    //   }
+    // },
   },
 }
 </script>

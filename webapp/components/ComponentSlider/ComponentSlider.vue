@@ -5,21 +5,22 @@
     <ds-flex>
       <ds-flex-item>
         <div
-          v-for="slider in sliderData.sliders"
+          v-for="(slider, index) in sliderData.sliders"
           :key="slider.name"
           class="selection-button"
-          :class="['Sliders__component-selection']"
+          :class="[
+            'Sliders__component-selection',
+            sliderIndexByName(slider.name) < sliderIndex && '--confirmed',
+          ]"
         >
           <base-button
-            :class="[sliderIndexByName(slider.name) >= sliderIndex && '--disabled']"
             style="float: left"
-            :icon="slider.validated && slider.confirmed && 'check'"
             :circle="true"
             size="small"
             type="submit"
             filled
             :loading="false"
-            :disabled="!(slider.confirmed || sliderIndexByName(slider.name) === sliderIndex)"
+            :disabled="index > sliderIndex"
             @click="sliderData.sliderSelectorCallback(slider.name)"
           />
         </div>
@@ -31,10 +32,10 @@
           type="submit"
           filled
           :loading="false"
-          :disabled="sliderData.button.disabled"
-          @click="sliderData.button.callback"
+          :disabled="!sliderData.sliders[sliderIndex].validated"
+          @click="sliderData.sliders[sliderIndex].button.callback"
         >
-          {{ sliderData.button.title }}
+          {{ sliderData.sliders[sliderIndex].button.title }}
         </base-button>
       </ds-flex-item>
     </ds-flex>
@@ -61,10 +62,6 @@ export default {
 </script>
 
 <style lang="scss">
-// Wolle .pointer {
-//    cursor: pointer;
-//  }
-
 .Sliders {
   // Wolle position: relative;
   // background-color: #fff;
@@ -88,7 +85,7 @@ export default {
     // &.--active {
     //   border-bottom: 2px solid #17b53f;
     // }
-    &.--disabled {
+    &.--confirmed {
       opacity: $opacity-disabled;
       // &:hover {
       //   border-bottom: none;
