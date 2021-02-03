@@ -14,9 +14,6 @@
       <div class="filter-menu-options">
         <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
         <following-filter />
-        <categories-filter />
-        <emotions-filter />
-        <languages-filter />
       </div>
     </template>
   </dropdown>
@@ -26,17 +23,11 @@
 import Dropdown from '~/components/Dropdown'
 import { mapGetters } from 'vuex'
 import FollowingFilter from './FollowingFilter'
-import CategoriesFilter from './CategoriesFilter'
-import EmotionsFilter from './EmotionsFilter'
-import LanguagesFilter from './LanguagesFilter'
 
 export default {
   components: {
     Dropdown,
     FollowingFilter,
-    CategoriesFilter,
-    EmotionsFilter,
-    LanguagesFilter,
   },
   props: {
     placement: { type: String },
