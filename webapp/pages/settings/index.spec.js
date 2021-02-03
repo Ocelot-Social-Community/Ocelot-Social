@@ -34,7 +34,11 @@ describe('index.vue', () => {
           .mockResolvedValueOnce({
             data: {
               queryLocations: [
-                { place_name: 'Brazil', id: 'country.9531777110682710', __typename: 'LocationMapBox' },
+                {
+                  place_name: 'Brazil',
+                  id: 'country.9531777110682710',
+                  __typename: 'LocationMapBox',
+                },
                 {
                   place_name: 'United Kingdom',
                   id: 'country.12405201072814600',
@@ -124,7 +128,13 @@ describe('index.vue', () => {
           wrapper.find('#name').setValue('Peter')
           wrapper.find('.ds-form').trigger('submit')
 
-          expect(mocks.$apollo.mutate).toHaveBeenCalled()
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: expect.objectContaining({
+                name: 'Peter',
+              }),
+            }),
+          )
         })
       })
 
@@ -135,7 +145,13 @@ describe('index.vue', () => {
           wrapper.find('#slug').setValue('peter-der-lustige')
           wrapper.find('.ds-form').trigger('submit')
 
-          expect(mocks.$apollo.mutate).toHaveBeenCalled()
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: expect.objectContaining({
+                slug: 'peter-der-lustige',
+              }),
+            }),
+          )
         })
       })
 
@@ -144,9 +160,16 @@ describe('index.vue', () => {
           const wrapper = Wrapper()
 
           wrapper.find('#city').setValue('Berlin, Germany')
+          wrapper.find('#city').trigger('input')
           wrapper.find('.ds-form').trigger('submit')
 
-          expect(mocks.$apollo.mutate).toHaveBeenCalled()
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: expect.objectContaining({
+                locationName: 'Berlin, Germany',
+              }),
+            }),
+          )
         })
       })
 
@@ -157,11 +180,17 @@ describe('index.vue', () => {
           wrapper.find('#about').setValue('I am Peter!111elf')
           wrapper.find('.ds-form').trigger('submit')
 
-          expect(mocks.$apollo.mutate).toHaveBeenCalled()
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: expect.objectContaining({
+                about: 'I am Peter!111elf',
+              }),
+            }),
+          )
         })
       })
 
-      describe('given new username, slug, location and about and hitting submit', () => {
+      describe('given new username, slug, location and about then hitting submit', () => {
         it('calls updateUser mutation', () => {
           const wrapper = Wrapper()
 
@@ -171,7 +200,16 @@ describe('index.vue', () => {
           wrapper.find('#about').setValue('I am Peter!111elf')
           wrapper.find('.ds-form').trigger('submit')
 
-          expect(mocks.$apollo.mutate).toHaveBeenCalled()
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: expect.objectContaining({
+                name: 'Peter',
+                slug: 'peter-der-lustige',
+                locationName: 'Berlin, Germany',
+                about: 'I am Peter!111elf',
+              }),
+            }),
+          )
         })
       })
     })
@@ -187,7 +225,13 @@ describe('index.vue', () => {
 
         jest.runAllTimers()
 
-        expect(mocks.$apollo.query).toHaveBeenCalled()
+        expect(mocks.$apollo.query).toHaveBeenCalledWith(
+          expect.objectContaining({
+            variables: expect.objectContaining({
+              place: 'B',
+            }),
+          }),
+        )
       })
 
       it('opens the dropdown', () => {
