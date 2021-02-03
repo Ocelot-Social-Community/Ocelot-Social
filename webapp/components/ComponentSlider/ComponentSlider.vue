@@ -1,19 +1,26 @@
 <template>
   <div class="Sliders">
-    <!-- <h2 class="subTitle">{{ $t('login.login') + ' XXX' }}</h2> -->
+    <slot :name="'header'" />
+
+    <ds-heading v-if="sliderData.sliders[sliderIndex].title" size="h3">
+      {{ sliderData.sliders[sliderIndex].title }}
+    </ds-heading>
+
     <slot :name="sliderData.sliders[sliderIndex].name" />
+
     <ds-flex>
-      <ds-flex-item>
+      <ds-flex-item :centered="true">
         <div
           v-for="(slider, index) in sliderData.sliders"
           :key="slider.name"
-          class="selection-button"
           :class="[
-            'Sliders__component-selection',
             index < sliderIndex && '--confirmed',
           ]"
         >
           <base-button
+            :class="[
+              'Sliders__slider-selection',
+            ]"
             style="float: left"
             :circle="true"
             size="small"
@@ -39,6 +46,8 @@
         </base-button>
       </ds-flex-item>
     </ds-flex>
+
+    <slot :name="'footer'" />
   </div>
 </template>
 
@@ -71,8 +80,9 @@ export default {
   // padding: 0;
   // list-style: none;
 
-  &__component-selection {
-    padding-right: 10px;
+  &__slider-selection {
+    // padding-top: 5px;
+    margin-right: 5px;
 
     // text-align: center;
     // height: 100%;

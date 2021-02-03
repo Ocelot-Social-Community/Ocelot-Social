@@ -7,15 +7,15 @@
         </a>
       </template>
 
-      <h1 class="title">{{ $t('components.registration.signup.title', metadata) }}</h1>
-
       <component-slider :sliderData="sliderData">
+        <template #header>
+          <ds-heading size="h2">
+            {{ $t('components.registration.signup.title', metadata) }}
+          </ds-heading>
+        </template>
+
         <template #enter-invite>
-          <registration-item-enter-invite :sliderData="sliderData" :inviteCode="sliderData.collectedComponentData.inviteCode ? sliderData.collectedComponentData.inviteCode : ''" :email="sliderData.collectedComponentData.email ? sliderData.collectedComponentData.email : ''">
-            <ds-space margin-bottom="xxx-small" margin-top="large" centered>
-              <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
-            </ds-space>
-          </registration-item-enter-invite>
+          <registration-item-enter-invite :sliderData="sliderData" :inviteCode="sliderData.collectedComponentData.inviteCode ? sliderData.collectedComponentData.inviteCode : ''" :email="sliderData.collectedComponentData.email ? sliderData.collectedComponentData.email : ''" />
         </template>
 
         <!-- <template #enter-email> -->
@@ -38,6 +38,12 @@
             nonce="AAAAAA"
             email="user@example.org"
           />
+        </template>
+
+        <template #footer>
+            <ds-space margin-bottom="xxx-small" margin-top="small" centered>
+              <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
+            </ds-space>
         </template>
       </component-slider>
 
@@ -81,6 +87,8 @@ export default {
         sliders: [
           {
             name: 'enter-invite',
+            // title: this.$t('components.registration.create-user-account.title'),
+            title: 'Invitation', // Wolle
             validated: false,
             button: {
               title: 'Next', // Wolle
@@ -91,6 +99,7 @@ export default {
           // {
           //   name: 'enter-email',
             // validated: false,
+            // title: 'E-Mail', // Wolle
             // button: {
             //   title: 'Next', // Wolle
               // icon:           :icon="(sliderIndex < sliderData.sliders.length - 1 && 'arrow-right') || (sliderIndex === sliderData.sliders.length - 1 && 'check')"
@@ -99,6 +108,7 @@ export default {
           // },
           {
             name: 'create-user-account',
+            title: this.$t('components.registration.create-user-account.title'),
             validated: false,
             button: {
               title: this.$t('actions.save'), // Wolle
