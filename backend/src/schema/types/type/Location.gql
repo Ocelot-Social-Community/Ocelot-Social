@@ -16,12 +16,13 @@ type Location {
   parent: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
 }
 
-type Location2 {
+# This is not smart - we need one location for everything - use the same type everywhere!
+type LocationMapBox {
   id: ID!
   place_name: String!
 }
 
 type Query {
-  queryLocations(place: String!, lang: String!): [Location2]!
+  queryLocations(place: String!, lang: String!): [LocationMapBox]!
 }
 
