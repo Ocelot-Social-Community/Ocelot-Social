@@ -118,9 +118,6 @@ export default {
     },
   },
   methods: {
-    sliderIndexByName(name) {
-      return this.sliderData.sliders.findIndex((slider) => slider.name === name)
-    },
     validateCallback(is, data = null) {
       if (is) {
         this.sliderData.collectedComponentData = {

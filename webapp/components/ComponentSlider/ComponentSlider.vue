@@ -10,7 +10,7 @@
           class="selection-button"
           :class="[
             'Sliders__component-selection',
-            sliderIndexByName(slider.name) < sliderIndex && '--confirmed',
+            index < sliderIndex && '--confirmed',
           ]"
         >
           <base-button
@@ -50,13 +50,13 @@ export default {
   },
   computed: {
     sliderIndex() {
-      return this.sliderData.sliderIndex
+      return this.sliderData.sliderIndex // have a shorter notation
     },
   },
   methods: {
-    sliderIndexByName(name) {
-      return this.sliderData.sliders.findIndex((slider) => slider.name === name)
-    },
+    // Wolle sliderIndexByName(name) {
+    //   return this.sliderData.sliders.findIndex((slider) => slider.name === name)
+    // },
   },
 }
 </script>
