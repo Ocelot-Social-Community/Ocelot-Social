@@ -1,7 +1,7 @@
 <template>
   <div class="Sliders">
     <!-- <h2 class="subTitle">{{ $t('login.login') + ' XXX' }}</h2> -->
-    <slot :name="sliderData.activeSliderName" />
+    <slot :name="sliderData.sliders[sliderIndex].name" />
     <ds-flex>
       <ds-flex-item>
         <div
@@ -21,14 +21,14 @@
             filled
             :loading="false"
             :disabled="index > sliderIndex"
-            @click="sliderData.sliderSelectorCallback(slider.name)"
+            @click="sliderData.sliderSelectorCallback(index)"
           />
         </div>
       </ds-flex-item>
       <ds-flex-item>
         <base-button
           style="float: right"
-          :icon="(sliderIndex < sliderData.sliders.length - 1 && 'arrow-right') || (sliderIndex === sliderData.sliders.length - 1 && 'check')"
+          :icon="sliderData.sliders[sliderIndex].button.icon"
           type="submit"
           filled
           :loading="false"
@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     sliderIndex() {
-      return this.sliderIndexByName(this.sliderData.activeSliderName)
+      return this.sliderData.sliderIndex
     },
   },
   methods: {

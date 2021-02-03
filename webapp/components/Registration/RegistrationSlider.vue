@@ -77,13 +77,14 @@ export default {
           inviteCode: null,
           email: null,
         },
-        // sliderIndex: 0,
+        sliderIndex: 0,
         sliders: [
           {
             name: 'enter-invite',
             validated: false,
             button: {
               title: 'Next', // Wolle
+              icon: 'arrow-right',
               callback: this.buttonCallback,
             },
           },
@@ -92,6 +93,7 @@ export default {
             // validated: false,
             // button: {
             //   title: 'Next', // Wolle
+              // icon:           :icon="(sliderIndex < sliderData.sliders.length - 1 && 'arrow-right') || (sliderIndex === sliderData.sliders.length - 1 && 'check')"
             //   callback: this.buttonCallback,
             // },
           // },
@@ -100,11 +102,11 @@ export default {
             validated: false,
             button: {
               title: this.$t('actions.save'), // Wolle
+              icon: 'check',
               callback: this.buttonCallback,
             },
           },
         ],
-        activeSliderName: 'enter-invite',
         sliderSelectorCallback: this.sliderSelectorCallback,
         validateCallback: this.validateCallback,
       },
@@ -112,7 +114,7 @@ export default {
   },
   computed: {
     sliderIndex() {
-      return this.sliderIndexByName(this.sliderData.activeSliderName)
+      return this.sliderData.sliderIndex
     },
   },
   methods: {
@@ -128,9 +130,9 @@ export default {
       }
       this.sliderData.sliders[this.sliderIndex].validated = is
     },
-    sliderSelectorCallback(sliderName) {
-      if (this.sliderIndexByName(sliderName) < this.sliderIndex) {
-        this.sliderData.activeSliderName = sliderName
+    sliderSelectorCallback(selectedIndex) {
+      if (selectedIndex < this.sliderIndex) {
+        this.sliderData.sliderIndex = selectedIndex
       }
     },
     buttonCallback() {
@@ -138,7 +140,7 @@ export default {
         // console.log('submit data: ', this.sliderData.collectedComponentData)
       } else {
         if (this.sliderIndex < this.sliderData.sliders.length - 1) {
-          this.sliderData.activeSliderName = this.sliderData.sliders[this.sliderIndex + 1].name
+          this.sliderData.sliderIndex++
         }
       }
     },
