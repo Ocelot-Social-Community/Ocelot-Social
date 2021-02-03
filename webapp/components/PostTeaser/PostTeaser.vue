@@ -23,18 +23,7 @@
       <div class="content hyphenate-text" v-html="excerpt" />
       <!-- eslint-enable vue/no-v-html -->
       <footer class="footer">
-        <div class="categories">
-          <hc-category
-            v-for="category in post.categories"
-            :key="category.id"
-            v-tooltip="{
-              content: $t(`contribution.category.name.${category.slug}`),
-              placement: 'bottom-start',
-              delay: { show: 500 },
-            }"
-            :icon="category.icon"
-          />
-        </div>
+        <div class="categories-placeholder"></div>
         <counter-icon
           icon="bullhorn"
           :count="post.shoutedCount"
@@ -67,7 +56,6 @@
 <script>
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import HcCategory from '~/components/Category'
 import HcRibbon from '~/components/Ribbon'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import { mapGetters } from 'vuex'
@@ -77,7 +65,6 @@ export default {
   name: 'PostTeaser',
   components: {
     UserTeaser,
-    HcCategory,
     HcRibbon,
     ContentMenu,
     CounterIcon,
@@ -181,7 +168,7 @@ export default {
     justify-content: space-between;
     align-items: center;
 
-    > .categories {
+    > .categories-placeholder {
       flex-grow: 1;
     }
 
