@@ -34,26 +34,26 @@ describe('index.vue', () => {
           .mockResolvedValueOnce({
             data: {
               queryLocations: [
-                { place_name: 'Brazil', id: 'country.9531777110682710', __typename: 'Location2' },
+                { place_name: 'Brazil', id: 'country.9531777110682710', __typename: 'LocationMapBox' },
                 {
                   place_name: 'United Kingdom',
                   id: 'country.12405201072814600',
-                  __typename: 'Location2',
+                  __typename: 'LocationMapBox',
                 },
                 {
                   place_name: 'Buenos Aires, Argentina',
                   id: 'place.7159025980072860',
-                  __typename: 'Location2',
+                  __typename: 'LocationMapBox',
                 },
                 {
                   place_name: 'Bandung, West Java, Indonesia',
                   id: 'place.8224726664248590',
-                  __typename: 'Location2',
+                  __typename: 'LocationMapBox',
                 },
                 {
                   place_name: 'Banten, Indonesia',
                   id: 'region.11849645724544000',
-                  __typename: 'Location2',
+                  __typename: 'LocaLocationMapBoxtion2',
                 },
               ],
             },
