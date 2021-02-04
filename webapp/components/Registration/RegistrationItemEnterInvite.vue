@@ -26,15 +26,11 @@ export default {
   name: 'RegistrationItemEnterInvite',
   props: {
     sliderData: { type: Object, required: true },
-    // inviteCode: { type: String, required: false },
   },
   data() {
     return {
       formData: {
-        // inviteCode: this.inviteCode ? this.inviteCode : '',
-        inviteCode: this.sliderData.collectedInputData.inviteCode
-          ? this.sliderData.collectedInputData.inviteCode
-          : '',
+        inviteCode: '',
       },
       formSchema: {
         inviteCode: {
@@ -46,6 +42,15 @@ export default {
         },
       },
     }
+  },
+  mounted: function () {
+    this.$nextTick(function () {
+      // Code that will run only after the entire view has been rendered
+      // console.log('mounted !!! ')
+      this.formData.inviteCode = this.sliderData.collectedInputData.inviteCode
+        ? this.sliderData.collectedInputData.inviteCode
+        : ''
+    })
   },
   methods: {
     async handleInput() {
@@ -61,18 +66,7 @@ export default {
     },
     handleSubmitVerify() {
       // Wolle const { nonce } = this.formData
-      // const email = this.email
-      // this.$emit('nonceEntered', { email, nonce })
-      // this.$emit('validation', { email, nonce })
     },
-    // async handleInputOnStart(inviteCode) {
-    //   if (inviteCode) {
-    //     await this.handleInputValid()
-    //     return inviteCode
-    //   } else {
-    //     return ''
-    //   }
-    // },
   },
 }
 </script>

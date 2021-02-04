@@ -29,9 +29,15 @@
       </ds-heading>
     </ds-space> -->
 
-    <ds-form class="create-user-account" v-model="formData" :schema="formSchema" @submit="submit">
-      <template v-slot="{ errors }">
-        <!-- <template> -->
+    <ds-form class="create-user-account"
+      v-model="formData"
+      :schema="formSchema"
+      @submit="submit"     
+      @input="handleInput"
+      @input-valid="handleInputValid"
+    >
+      <!-- Wolle <template v-slot="{ errors }"> -->
+      <template>
         <ds-input
           id="name"
           model="name"
@@ -108,10 +114,10 @@
           ></label>
         </ds-text>
         <!-- this is neccessary to have the 'errors' status as 'formErrors' in Javascript. I didn't found another way yet -->
-        <watch-scoped-slots-callback
+        <!-- Wolle <watch-scoped-slots-callback
           :scopedData="{ errors }"
           :changeCallback="watchScopedSlotsCallback"
-        ></watch-scoped-slots-callback>
+        ></watch-scoped-slots-callback> -->
         <!-- <base-button
           style="float: right"
           icon="check"
@@ -176,7 +182,7 @@ export default {
         },
         ...passwordForm.formSchema,
       },
-      formErrors: null,
+      // Wolle formErrors: null,
       response: null,
       // TODO: Our styleguide does not support checkmarks.
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
@@ -191,16 +197,16 @@ export default {
   mounted: function () {
     this.$nextTick(function () {
       // Code that will run only after the entire view has been rendered
-      console.log('mounted !!! ')
-      ;(this.formData.name = this.sliderData.collectedInputData.name
+      // console.log('mounted !!! ')
+      this.formData.name = this.sliderData.collectedInputData.name
         ? this.sliderData.collectedInputData.name
-        : ''),
-        (this.formData.about = this.sliderData.collectedInputData.about
-          ? this.sliderData.collectedInputData.about
-          : ''),
-        (this.formData.password = this.sliderData.collectedInputData.password
-          ? this.sliderData.collectedInputData.password
-          : '')
+        : ''
+      this.formData.about = this.sliderData.collectedInputData.about
+        ? this.sliderData.collectedInputData.about
+        : ''
+      this.formData.password = this.sliderData.collectedInputData.password
+        ? this.sliderData.collectedInputData.password
+        : ''
       this.formData.passwordConfirmation = this.sliderData.collectedInputData.passwordConfirmation
         ? this.sliderData.collectedInputData.passwordConfirmation
         : ''
@@ -241,10 +247,10 @@ export default {
     },
   },
   watch: {
-    formData() {
-      console.log('formData: ', this.formData)
-      this.sendValidation()
-    },
+    // formData() {
+    //   console.log('formData: ', this.formData)
+    //   this.sendValidation()
+    // },
     termsAndConditionsConfirmed() {
       this.sendValidation()
     },
@@ -262,10 +268,10 @@ export default {
     },
   },
   methods: {
-    watchScopedSlotsCallback({ errors }) {
-      this.formErrors = errors
-      console.log('watchScopedSlotsCallback !!! this.formErrors: ', this.formErrors)
-    },
+    // Wolle watchScopedSlotsCallback({ errors }) {
+    //   this.formErrors = errors
+    //   console.log('watchScopedSlotsCallback !!! this.formErrors: ', this.formErrors)
+    // },
     sendValidation() {
       const { name, about, password, passwordConfirmation } = this.formData
       // const { email, nonce } = this
@@ -296,6 +302,19 @@ export default {
       }
       console.log('sendValidation !!!', ' this.valid: ', this.valid, ' value: ', value)
       this.sliderData.validateCallback(this.valid, value)
+    },
+    async handleInput() {
+      // Wolle console.log('handleInput !!!')
+      // this.sliderData.validateCallback(false)
+      this.sendValidation()
+    },
+    async handleInputValid() {
+      // Wolle console.log('handleInputValid !!!')
+      // const { inviteCode } = this.formData
+      // validate in backend
+      // toaster
+      // this.sliderData.validateCallback(true, { /* email, */ inviteCode })
+      this.sendValidation()
     },
     async submit() {
       const { name, password, about } = this.formData
