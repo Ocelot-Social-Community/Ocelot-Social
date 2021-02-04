@@ -156,14 +156,22 @@ describe('index.vue', () => {
       })
 
       describe('given a new location and hitting submit', () => {
-        it('calls updateUser mutation', () => {
+        it('calls updateUser mutation', async () => {
           const wrapper = Wrapper()
-
-          wrapper.find('#city').setValue('Berlin, Germany')
-          wrapper.find('#city').trigger('input')
+          wrapper.setData({
+            cities: [
+              {
+                label: 'Berlin, Germany',
+                value: 'Berlin, Germany',
+                id: '1',
+              },
+            ],
+          })
+          await wrapper.vm.$nextTick()
+          wrapper.find('.ds-select-option').trigger('click')
           wrapper.find('.ds-form').trigger('submit')
 
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          await expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: expect.objectContaining({
                 locationName: 'Berlin, Germany',
@@ -191,21 +199,36 @@ describe('index.vue', () => {
       })
 
       describe('given new username, slug, location and about then hitting submit', () => {
-        it('calls updateUser mutation', () => {
+        it('calls updateUser mutation', async () => {
           const wrapper = Wrapper()
 
+          wrapper.setData({
+            cities: [
+              {
+                label: 'Berlin, Germany',
+                value: 'Berlin, Germany',
+                id: '1',
+              },
+              {
+                label: 'Hamburg, Germany',
+                value: 'Hamburg, Germany',
+                id: '2',
+              },
+            ],
+          })
+          await wrapper.vm.$nextTick()
           wrapper.find('#name').setValue('Peter')
           wrapper.find('#slug').setValue('peter-der-lustige')
-          wrapper.find('#city').setValue('Berlin, Germany')
+          wrapper.findAll('.ds-select-option').at(1).trigger('click')
           wrapper.find('#about').setValue('I am Peter!111elf')
           wrapper.find('.ds-form').trigger('submit')
 
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          await expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: expect.objectContaining({
                 name: 'Peter',
                 slug: 'peter-der-lustige',
-                locationName: 'Berlin, Germany',
+                locationName: 'Hamburg, Germany',
                 about: 'I am Peter!111elf',
               }),
             }),
