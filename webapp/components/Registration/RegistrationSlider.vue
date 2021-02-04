@@ -15,7 +15,7 @@
         </template>
 
         <template #enter-invite>
-          <registration-item-enter-invite :sliderData="sliderData" :inviteCode="sliderData.collectedComponentData.inviteCode ? sliderData.collectedComponentData.inviteCode : ''" :email="sliderData.collectedComponentData.email ? sliderData.collectedComponentData.email : ''" />
+          <registration-item-enter-invite :sliderData="sliderData" />
         </template>
 
         <!-- <template #enter-email> -->
@@ -79,9 +79,20 @@ export default {
       links,
       metadata,
       sliderData: {
-        collectedComponentData: {
+        collectedInputData: {
           inviteCode: null,
           email: null,
+          nonce: null,
+          name: null,
+          // password: null,
+          about: null,
+          termsAndConditionsAgreedVersion: null,
+          termsAndConditionsConfirmed: null,
+          dataPrivacy: null,
+          minimumAge: null,
+          noCommercial: null,
+          noPolitical: null,
+          // locale: null, // Wolle: what to do? Is collected in the last slider?! and gets stored in the database …
         },
         sliderIndex: 0,
         sliders: [
@@ -129,13 +140,14 @@ export default {
   },
   methods: {
     validateCallback(is, data = null) {
-      if (is) {
-        this.sliderData.collectedComponentData = {
-          ...this.sliderData.collectedComponentData,
+      this.sliderData.sliders[this.sliderIndex].validated = is
+      // if (is) {
+      if (data) {
+        this.sliderData.collectedInputData = {
+          ...this.sliderData.collectedInputData,
           ...data,
         }
       }
-      this.sliderData.sliders[this.sliderIndex].validated = is
     },
     sliderSelectorCallback(selectedIndex) {
       if (selectedIndex < this.sliderIndex) {
@@ -144,10 +156,13 @@ export default {
     },
     buttonCallback() {
       if (this.sliderIndex === this.sliderData.sliders.length - 1) {
-        // console.log('submit data: ', this.sliderData.collectedComponentData)
+        // console.log('submit data: ', this.sliderData.collectedInputData)
       } else {
         if (this.sliderIndex < this.sliderData.sliders.length - 1) {
           this.sliderData.sliderIndex++
+          if (this.sliderData.sliders[this.sliderIndex] === 'create-user-account') {
+            this.sliderData.sliders[this.sliderIndex].validated = false
+          }
         }
       }
     },

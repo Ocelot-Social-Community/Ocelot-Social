@@ -23,15 +23,15 @@
     </ds-space>
   </div>
   <div v-else class="create-account-card">
-    <ds-space margin-top="large">
+    <!-- <ds-space margin-top="large">
       <ds-heading size="h3">
         {{ $t('components.registration.create-user-account.title') }}
       </ds-heading>
-    </ds-space>
+    </ds-space> -->
 
     <ds-form class="create-user-account" v-model="formData" :schema="formSchema" @submit="submit">
-      <!-- Wolle <template v-slot="{ errors }"> -->
-      <template>
+      <template v-slot="{ errors }">
+      <!-- <template> -->
         <ds-input
           id="name"
           model="name"
@@ -107,6 +107,8 @@
             v-html="$t('components.registration.signup.form.no-political')"
           ></label>
         </ds-text>
+        <!-- this is neccessary to have the 'errors' status as 'formErrors' in Javascript. I didn't found another way yet -->
+        <watch-scoped-slots-callback :scopedData="{ errors }" :changeCallback="watchScopedSlotsCallback"></watch-scoped-slots-callback>
         <!-- <base-button
           style="float: right"
           icon="check"
@@ -130,19 +132,26 @@
 </template>
 
 <script>
+import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import links from '~/constants/links'
+import emails from '~/constants/emails'
+import WatchScopedSlotsCallback from './WatchScopedSlotsCallback'
 import PasswordStrength from '../Password/Strength'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
-import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { SignupVerificationMutation } from '~/graphql/Registration.js'
-import emails from '~/constants/emails'
 
 export default {
   name: 'RegistrationItemCreateUserAccount',
   components: {
     PasswordStrength,
     SweetalertIcon,
+    WatchScopedSlotsCallback,
+  },
+  props: {
+    sliderData: { type: Object, required: true },
+    // nonce: { type: String, required: true },
+    // email: { type: String, required: true },
   },
   data() {
     const passwordForm = PasswordForm({ translate: this.$t })
@@ -151,7 +160,9 @@ export default {
       supportEmail: emails.SUPPORT,
       formData: {
         name: '',
-        about: '',
+        // about: '',
+        // Wolle name: this.sliderData.collectedInputData.name ? this.sliderData.collectedInputData.name : '',
+        about: this.sliderData.collectedInputData.about ? this.sliderData.collectedInputData.about : '',
         ...passwordForm.formData,
       },
       formSchema: {
@@ -166,63 +177,228 @@ export default {
         },
         ...passwordForm.formSchema,
       },
+      formErrors: null,
       // Wolle disabled: true,
       response: null,
       // TODO: Our styleguide does not support checkmarks.
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
       // have checkmarks available.
-      termsAndConditionsConfirmed: false,
-      dataPrivacy: false,
-      minimumAge: false,
-      noCommercial: false,
-      noPolitical: false,
+      // termsAndConditionsConfirmed: false,
+      // dataPrivacy: false,
+      // minimumAge: false,
+      // noCommercial: false,
+      // noPolitical: false,
+      // TODO: Our styleguide does not support checkmarks.
+      // Integrate termsAndConditionsConfirmed into `this.formData` once we
+      // have checkmarks available.
+      termsAndConditionsConfirmed: this.sliderData.collectedInputData.termsAndConditionsConfirmed ? this.sliderData.collectedInputData.termsAndConditionsConfirmed : false,
+      dataPrivacy: this.sliderData.collectedInputData.dataPrivacy ? this.sliderData.collectedInputData.dataPrivacy : false,
+      minimumAge: this.sliderData.collectedInputData.minimumAge ? this.sliderData.collectedInputData.minimumAge : false,
+      noCommercial: this.sliderData.collectedInputData.noCommercial ? this.sliderData.collectedInputData.noCommercial : false,
+      noPolitical: this.sliderData.collectedInputData.noPolitical ? this.sliderData.collectedInputData.noPolitical : false,
     }
-  },
-  props: {
-    sliderData: { type: Object, required: true },
-    nonce: { type: String, required: true },
-    email: { type: String, required: true },
   },
   computed: {
     valid() {
-      return (
-        this.errors ||
-        !this.termsAndConditionsConfirmed ||
-        !this.dataPrivacy ||
-        !this.minimumAge ||
-        !this.noCommercial ||
-        !this.noPolitical
-      )
+      // console.log('valid !!! this.formErrors: ', this.formErrors)
+      // console.log('valid !!! this.$slots: ', this.$slots)
+      // console.log('valid !!! this.$scopedSlots: ', this.$scopedSlots)
+      // console.log('this.formSchema: ', this.formSchema)
+      // console.log('this.formData: ', this.formData)
+      // return (this.formErrors ||
+      //   !this.termsAndConditionsConfirmed ||
+      //   !this.dataPrivacy ||
+      //   !this.minimumAge ||
+      //   !this.noCommercial ||
+      //   !this.noPolitical)
+      // const isNotValid = 
+      //   // this.formErrors ||
+      //   this.formErrors ||
+      //   !this.termsAndConditionsConfirmed ||
+      //   !this.dataPrivacy ||
+      //   !this.minimumAge ||
+      //   !this.noCommercial ||
+      //   !this.noPolitical
+      const isValid = 
+        !this.formErrors &&
+        this.formData.name.lenght >= 3 &&
+        this.termsAndConditionsConfirmed &&
+        this.dataPrivacy &&
+        this.minimumAge &&
+        this.noCommercial &&
+        this.noPolitical
+      // console.log('valid : ', !isNotValid)
+      console.log('valid : ', isValid)
+      // const { name, about } = this.formData
+      // // const { email, nonce } = this
+      // // const { email, nonce } = this.sliderData.collectedInputData
+      // const termsAndConditionsAgreedVersion = VERSION
+      // const {
+      //   termsAndConditionsConfirmed,
+      //   dataPrivacy,
+      //   minimumAge,
+      //   noCommercial,
+      //   noPolitical,
+      // } = this
+      // // const locale = this.$i18n.locale()
+      // // this.sliderData.validateCallback(true, {
+      // this.sliderData.validateCallback(!isNotValid, {
+      //   name,
+      //   // password,
+      //   about,
+      //   // email,
+      //   // nonce,
+      //   termsAndConditionsAgreedVersion,
+      //   termsAndConditionsConfirmed,
+      //   dataPrivacy,
+      //   minimumAge,
+      //   noCommercial,
+      //   noPolitical,
+      //   // locale,
+      // })
+      // return !isNotValid
+      return isValid
     },
   },
   watch: {
-    valid(newVal, _oldVal) {
+    // notValid(newVal, _oldVal) {
+    //   // Wolle const [oldPropertyA, oldProvertyB] = oldVal.split('|');
+    //   // const [newPropertyA, newProvertyB] = newVal.split('|');
+    //   // doSomething
+    //   if (newVal) {
+    //     this.sliderData.validateCallback(false)
+    //   } else {
+    //     const { name, about } = this.formData
+    //     // const { email, nonce } = this
+    //     // const { email, nonce } = this.sliderData.collectedInputData
+    //     const termsAndConditionsAgreedVersion = VERSION
+    //     const {
+    //       termsAndConditionsConfirmed,
+    //       dataPrivacy,
+    //       minimumAge,
+    //       noCommercial,
+    //       noPolitical,
+    //     } = this
+    //     // const locale = this.$i18n.locale()
+    //     // this.sliderData.validateCallback(true, {
+    //     this.sliderData.validateCallback(true, {
+    //       name,
+    //       // password,
+    //       about,
+    //       // email,
+    //       // nonce,
+    //       termsAndConditionsAgreedVersion,
+    //       termsAndConditionsConfirmed,
+    //       dataPrivacy,
+    //       minimumAge,
+    //       noCommercial,
+    //       noPolitical,
+    //       // locale,
+    //     })
+    //   }
+    // },
+    valid(newVal) {
       // Wolle const [oldPropertyA, oldProvertyB] = oldVal.split('|');
       // const [newPropertyA, newProvertyB] = newVal.split('|');
       // doSomething
       if (newVal) {
         this.sliderData.validateCallback(false)
       } else {
-        const { name, password, about } = this.formData
-        const { email, nonce } = this
+        const { name, about } = this.formData
+        // const { email, nonce } = this
+        // const { email, nonce } = this.sliderData.collectedInputData
         const termsAndConditionsAgreedVersion = VERSION
-        const locale = this.$i18n.locale()
+        const {
+          termsAndConditionsConfirmed,
+          dataPrivacy,
+          minimumAge,
+          noCommercial,
+          noPolitical,
+        } = this
+        // const locale = this.$i18n.locale()
+        // this.sliderData.validateCallback(true, {
         this.sliderData.validateCallback(true, {
           name,
-          password,
+          // password,
           about,
-          email,
-          nonce,
+          // email,
+          // nonce,
           termsAndConditionsAgreedVersion,
-          locale,
+          termsAndConditionsConfirmed,
+          dataPrivacy,
+          minimumAge,
+          noCommercial,
+          noPolitical,
+          // locale,
         })
       }
     },
+    formData: {
+      handler(newValue) {
+        this.sendValidation(newValue)
+      },
+      deep: true,
+      immediate: true,
+    },
+    termsAndConditionsConfirmed(newValue) {
+      this.sendValidation({termsAndConditionsConfirmed: newValue})
+    },
+    dataPrivacy(newValue) {
+      this.sendValidation({dataPrivacy: newValue})
+    },
+    minimumAge(newValue) {
+      this.sendValidation({minimumAge: newValue})
+    },
+    noCommercial(newValue) {
+      this.sendValidation({noCommercial: newValue})
+    },
+    noPolitical(newValue) {
+      this.sendValidation({noPolitical: newValue})
+    },
   },
   methods: {
+    // setErrors(errors) {
+    //   this.formErrors = errors
+    //   // console.log('setErrors !!! this.formErrors: ', this.formErrors)
+    //   return errors
+    // },
+    watchScopedSlotsCallback({errors}) {
+      this.formErrors = errors
+      console.log('watchScopedSlotsCallback !!! this.formErrors: ', this.formErrors)
+    },
+    sendValidation(newValues) {
+      const { name, about } = this.formData
+      // const { email, nonce } = this
+      // const { email, nonce } = this.sliderData.collectedInputData
+      const termsAndConditionsAgreedVersion = VERSION
+      const {
+        termsAndConditionsConfirmed,
+        dataPrivacy,
+        minimumAge,
+        noCommercial,
+        noPolitical,
+      } = this
+      // const locale = this.$i18n.locale()
+      const nowValues = {
+        name,
+        // password,
+        about,
+        // email,
+        // nonce,
+        termsAndConditionsAgreedVersion,
+        termsAndConditionsConfirmed,
+        dataPrivacy,
+        minimumAge,
+        noCommercial,
+        noPolitical,
+        // locale,
+      }
+      this.sliderData.validateCallback(this.valid, {...nowValues, ...newValues})
+    },
     async submit() {
       const { name, password, about } = this.formData
-      const { email, nonce } = this
+      // const { email, nonce } = this
+      const { email, nonce } = this.sliderData.collectedInputData
       const termsAndConditionsAgreedVersion = VERSION
       const locale = this.$i18n.locale()
       try {

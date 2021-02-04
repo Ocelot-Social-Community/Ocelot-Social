@@ -26,13 +26,13 @@ export default {
   name: 'RegistrationItemEnterInvite',
   props: {
     sliderData: { type: Object, required: true },
-    inviteCode: { type: String, required: false },
+    // inviteCode: { type: String, required: false },
   },
   data() {
     return {
       formData: {
-        // inviteCode: this.handleInputOnStart(this.inviteCode),
-        inviteCode: this.inviteCode ? this.inviteCode : '',
+        // inviteCode: this.inviteCode ? this.inviteCode : '',
+        inviteCode: this.sliderData.collectedInputData.inviteCode ? this.sliderData.collectedInputData.inviteCode : '',
       },
       formSchema: {
         inviteCode: {

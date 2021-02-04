@@ -14,12 +14,13 @@
           v-for="(slider, index) in sliderData.sliders"
           :key="slider.name"
           :class="[
+            'Sliders__slider-selection',
             index < sliderIndex && '--confirmed',
           ]"
         >
           <base-button
             :class="[
-              'Sliders__slider-selection',
+              'selection-dot',
             ]"
             style="float: left"
             :circle="true"
@@ -79,10 +80,16 @@ export default {
   // margin: 0;
   // padding: 0;
   // list-style: none;
+  // .selection-dot {
+  //   margin-right: 5px;
+  //   // &:hover {
+  //   //   border-bottom: none;
+  //   // }
+  // }
 
   &__slider-selection {
     // padding-top: 5px;
-    margin-right: 5px;
+    // margin-right: 5px;
 
     // text-align: center;
     // height: 100%;
@@ -92,6 +99,9 @@ export default {
     //   border-bottom: 2px solid #c9c6ce;
     // }
 
+    .selection-dot {
+      margin-right: 2px;
+    }
     // &.--active {
     //   border-bottom: 2px solid #17b53f;
     // }
