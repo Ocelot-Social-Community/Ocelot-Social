@@ -49,8 +49,9 @@ Factory.define('badge')
 
 Factory.define('image')
   .attr('url', faker.image.unsplash.imageUrl)
-  .attr('aspectRatio', 1)
+  .attr('aspectRatio', 1.0)
   .attr('alt', faker.lorem.sentence)
+  .attr('type', 'image/jpeg')
   .after((buildObject, options) => {
     const { url: imageUrl } = buildObject
     if (imageUrl) buildObject.url = uniqueImageUrl(imageUrl)
