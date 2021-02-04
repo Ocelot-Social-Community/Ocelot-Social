@@ -68,7 +68,7 @@ jobs:
   ##############################################################################
   # JOB: DOCKER BUILD Production BACKEND #######################################
   ##############################################################################
-  build_production_backend:run: echo "VERSION=$(yarn run version)" >> $GITHUB_ENV
+  build_production_backend:
     name: Docker Build Production - Backend
     runs-on: ubuntu-latest
     needs: [prepare]
