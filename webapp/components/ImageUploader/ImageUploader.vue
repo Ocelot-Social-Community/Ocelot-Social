@@ -90,6 +90,7 @@ export default {
     fileAdded(file) {
       this.$emit('addImageAspectRatio', file.width / file.height || 1.0)
       this.$emit('addHeroImage', file)
+      this.$emit('addImageType', file.type)
       this.file = file
       if (this.file.type === 'image/jpeg') this.imageCanBeCropped = true
       this.$nextTick((this.isLoadingImage = false))
@@ -113,9 +114,10 @@ export default {
     cropImage() {
       this.isLoadingImage = true
 
-      const onCropComplete = (aspectRatio, imageFile) => {
+      const onCropComplete = (aspectRatio, imageFile, imageType) => {
         this.$emit('addImageAspectRatio', aspectRatio)
         this.$emit('addHeroImage', imageFile)
+        this.$emit('addImageType', imageType)
         this.$nextTick((this.isLoadingImage = false))
         this.closeCropper()
       }
@@ -125,7 +127,7 @@ export default {
         canvas.toBlob((blob) => {
           const imageAspectRatio = canvas.width / canvas.height
           const croppedImageFile = new File([blob], this.file.name, { type: this.file.type })
-          onCropComplete(imageAspectRatio, croppedImageFile)
+          onCropComplete(imageAspectRatio, croppedImageFile, 'image/jpeg')
         }, 'image/jpeg')
       } else {
         // TODO: use cropped file instead of original file
@@ -140,6 +142,7 @@ export default {
     deleteImage() {
       this.$emit('addHeroImage', null)
       this.$emit('addImageAspectRatio', null)
+      this.$emit('addImageType', null)
     },
   },
 }

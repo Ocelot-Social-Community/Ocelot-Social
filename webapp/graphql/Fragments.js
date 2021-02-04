@@ -51,6 +51,7 @@ export const postFragment = gql`
       url
       sensitive
       aspectRatio
+      type
     }
     author {
       ...user
