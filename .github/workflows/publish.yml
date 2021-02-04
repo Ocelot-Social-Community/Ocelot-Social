@@ -1,9 +1,10 @@
 name: ocelot.social publish CI
 
-on:
-  push:
-    branches:
-      - master
+#on:
+#  push:
+#    branches:
+#      - master
+on: [push]
 
 jobs:
   ##############################################################################
