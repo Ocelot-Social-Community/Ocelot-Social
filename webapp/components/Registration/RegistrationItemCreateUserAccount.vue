@@ -31,7 +31,7 @@
 
     <ds-form class="create-user-account" v-model="formData" :schema="formSchema" @submit="submit">
       <template v-slot="{ errors }">
-      <!-- <template> -->
+        <!-- <template> -->
         <ds-input
           id="name"
           model="name"
@@ -108,7 +108,10 @@
           ></label>
         </ds-text>
         <!-- this is neccessary to have the 'errors' status as 'formErrors' in Javascript. I didn't found another way yet -->
-        <watch-scoped-slots-callback :scopedData="{ errors }" :changeCallback="watchScopedSlotsCallback"></watch-scoped-slots-callback>
+        <watch-scoped-slots-callback
+          :scopedData="{ errors }"
+          :changeCallback="watchScopedSlotsCallback"
+        ></watch-scoped-slots-callback>
         <!-- <base-button
           style="float: right"
           icon="check"
@@ -150,8 +153,6 @@ export default {
   },
   props: {
     sliderData: { type: Object, required: true },
-    // nonce: { type: String, required: true },
-    // email: { type: String, required: true },
   },
   data() {
     const passwordForm = PasswordForm({ translate: this.$t })
@@ -161,13 +162,7 @@ export default {
       formData: {
         name: '',
         about: '',
-        // name: this.sliderData.collectedInputData.name ? this.sliderData.collectedInputData.name : '',
-        // about: this.sliderData.collectedInputData.about ? this.sliderData.collectedInputData.about : '',
         ...passwordForm.formData,
-        // ...{
-        //   password: this.sliderData.collectedInputData.password ? this.sliderData.collectedInputData.password : '',
-        //   passwordConfirmation: this.sliderData.collectedInputData.passwordConfirmation ? this.sliderData.collectedInputData.passwordConfirmation : '',
-        // }
       },
       formSchema: {
         name: {
@@ -182,7 +177,6 @@ export default {
         ...passwordForm.formSchema,
       },
       formErrors: null,
-      // Wolle disabled: true,
       response: null,
       // TODO: Our styleguide does not support checkmarks.
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
@@ -192,41 +186,51 @@ export default {
       minimumAge: false,
       noCommercial: false,
       noPolitical: false,
-      // TODO: Our styleguide does not support checkmarks.
-      // Integrate termsAndConditionsConfirmed into `this.formData` once we
-      // have checkmarks available.
-      // termsAndConditionsConfirmed: this.sliderData.collectedInputData.termsAndConditionsConfirmed ? this.sliderData.collectedInputData.termsAndConditionsConfirmed : false,
-      // dataPrivacy: this.sliderData.collectedInputData.dataPrivacy ? this.sliderData.collectedInputData.dataPrivacy : false,
-      // minimumAge: this.sliderData.collectedInputData.minimumAge ? this.sliderData.collectedInputData.minimumAge : false,
-      // noCommercial: this.sliderData.collectedInputData.noCommercial ? this.sliderData.collectedInputData.noCommercial : false,
-      // noPolitical: this.sliderData.collectedInputData.noPolitical ? this.sliderData.collectedInputData.noPolitical : false,
     }
   },
   mounted: function () {
     this.$nextTick(function () {
-      // Code that will run only after the
-      // entire view has been rendered
+      // Code that will run only after the entire view has been rendered
       console.log('mounted !!! ')
-      this.formData.name = this.sliderData.collectedInputData.name ? this.sliderData.collectedInputData.name : '',
-      this.formData.about = this.sliderData.collectedInputData.about ? this.sliderData.collectedInputData.about : '',
-      this.formData.password = this.sliderData.collectedInputData.password ? this.sliderData.collectedInputData.password : ''
-      this.formData.passwordConfirmation = this.sliderData.collectedInputData.passwordConfirmation ? this.sliderData.collectedInputData.passwordConfirmation : ''
-      this.termsAndConditionsConfirmed = this.sliderData.collectedInputData.termsAndConditionsConfirmed ? this.sliderData.collectedInputData.termsAndConditionsConfirmed : false
-      this.dataPrivacy = this.sliderData.collectedInputData.dataPrivacy ? this.sliderData.collectedInputData.dataPrivacy : false
-      this.minimumAge = this.sliderData.collectedInputData.minimumAge ? this.sliderData.collectedInputData.minimumAge : false
-      this.noCommercial = this.sliderData.collectedInputData.noCommercial ? this.sliderData.collectedInputData.noCommercial : false
-      this.noPolitical = this.sliderData.collectedInputData.noPolitical ? this.sliderData.collectedInputData.noPolitical : false
+      ;(this.formData.name = this.sliderData.collectedInputData.name
+        ? this.sliderData.collectedInputData.name
+        : ''),
+        (this.formData.about = this.sliderData.collectedInputData.about
+          ? this.sliderData.collectedInputData.about
+          : ''),
+        (this.formData.password = this.sliderData.collectedInputData.password
+          ? this.sliderData.collectedInputData.password
+          : '')
+      this.formData.passwordConfirmation = this.sliderData.collectedInputData.passwordConfirmation
+        ? this.sliderData.collectedInputData.passwordConfirmation
+        : ''
+      this.termsAndConditionsConfirmed = this.sliderData.collectedInputData
+        .termsAndConditionsConfirmed
+        ? this.sliderData.collectedInputData.termsAndConditionsConfirmed
+        : false
+      this.dataPrivacy = this.sliderData.collectedInputData.dataPrivacy
+        ? this.sliderData.collectedInputData.dataPrivacy
+        : false
+      this.minimumAge = this.sliderData.collectedInputData.minimumAge
+        ? this.sliderData.collectedInputData.minimumAge
+        : false
+      this.noCommercial = this.sliderData.collectedInputData.noCommercial
+        ? this.sliderData.collectedInputData.noCommercial
+        : false
+      this.noPolitical = this.sliderData.collectedInputData.noPolitical
+        ? this.sliderData.collectedInputData.noPolitical
+        : false
     })
   },
   computed: {
     valid() {
       // console.log('valid !!! this.formData: ', this.formData, ' this.formData.password === this.formData.passwordConfirmation: ', this.formData.password === this.formData.passwordConfirmation)
       // console.log('this.formData.name.length: ', this.formData.name.length, ' this.formData.password.length: ', this.formData.password.length)
-      const isValid = 
+      const isValid =
         // !this.formErrors &&
-        (this.formData.name.length >= 3) &&
-        (this.formData.password.length >= 1) &&
-        (this.formData.password === this.formData.passwordConfirmation) &&
+        this.formData.name.length >= 3 &&
+        this.formData.password.length >= 1 &&
+        this.formData.password === this.formData.passwordConfirmation &&
         this.termsAndConditionsConfirmed &&
         this.dataPrivacy &&
         this.minimumAge &&
@@ -237,14 +241,6 @@ export default {
     },
   },
   watch: {
-    // formData: {
-    //   handler() {
-    //     console.log('formData: ', this.formData)
-    //     this.sendValidation()
-    //   },
-    //   deep: true,
-    //   immediate: true,
-    // },
     formData() {
       console.log('formData: ', this.formData)
       this.sendValidation()
@@ -266,7 +262,7 @@ export default {
     },
   },
   methods: {
-    watchScopedSlotsCallback({errors}) {
+    watchScopedSlotsCallback({ errors }) {
       this.formErrors = errors
       console.log('watchScopedSlotsCallback !!! this.formErrors: ', this.formErrors)
     },

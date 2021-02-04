@@ -19,14 +19,14 @@
         </template>
 
         <!-- <template #enter-email> -->
-          <!-- Wolle !!! may create same source with 'webapp/pages/registration/signup.vue' -->
-          <!-- <signup v-if="publicRegistration" :invitation="false" @submit="handleSubmitted"> -->
-          <!-- <signup :invitation="false" @submit="handleSubmitted">
+        <!-- Wolle !!! may create same source with 'webapp/pages/registration/signup.vue' -->
+        <!-- <signup v-if="publicRegistration" :invitation="false" @submit="handleSubmitted"> -->
+        <!-- <signup :invitation="false" @submit="handleSubmitted">
             <ds-space centered margin-top="large">
               <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
             </ds-space>
           </signup> -->
-          <!-- <ds-space v-else centered>
+        <!-- <ds-space v-else centered>
             <hc-empty icon="events" :message="$t('components.registration.signup.unavailable')" />
             <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
           </ds-space> -->
@@ -41,9 +41,9 @@
         </template>
 
         <template #footer>
-            <ds-space margin-bottom="xxx-small" margin-top="small" centered>
-              <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
-            </ds-space>
+          <ds-space margin-bottom="xxx-small" margin-top="small" centered>
+            <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
+          </ds-space>
         </template>
       </component-slider>
 
@@ -109,13 +109,13 @@ export default {
           },
           // {
           //   name: 'enter-email',
-            // validated: false,
-            // title: 'E-Mail', // Wolle
-            // button: {
-            //   title: 'Next', // Wolle
-              // icon:           :icon="(sliderIndex < sliderData.sliders.length - 1 && 'arrow-right') || (sliderIndex === sliderData.sliders.length - 1 && 'check')"
-            //   callback: this.buttonCallback,
-            // },
+          // validated: false,
+          // title: 'E-Mail', // Wolle
+          // button: {
+          //   title: 'Next', // Wolle
+          // icon:           :icon="(sliderIndex < sliderData.sliders.length - 1 && 'arrow-right') || (sliderIndex === sliderData.sliders.length - 1 && 'check')"
+          //   callback: this.buttonCallback,
+          // },
           // },
           {
             name: 'create-user-account',

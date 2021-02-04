@@ -1,5 +1,4 @@
-<template>
-</template>
+<template></template>
 
 <script>
 export default {
@@ -22,7 +21,7 @@ export default {
       },
       deep: true,
       immediate: true,
-    }
+    },
   },
   methods: {
     // Wolle
@@ -30,5 +29,4 @@ export default {
 }
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

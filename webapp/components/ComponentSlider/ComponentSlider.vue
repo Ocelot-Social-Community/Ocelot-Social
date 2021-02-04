@@ -13,15 +13,10 @@
         <div
           v-for="(slider, index) in sliderData.sliders"
           :key="slider.name"
-          :class="[
-            'Sliders__slider-selection',
-            index < sliderIndex && '--confirmed',
-          ]"
+          :class="['Sliders__slider-selection', index < sliderIndex && '--confirmed']"
         >
           <base-button
-            :class="[
-              'selection-dot',
-            ]"
+            :class="['selection-dot']"
             style="float: left"
             :circle="true"
             size="small"

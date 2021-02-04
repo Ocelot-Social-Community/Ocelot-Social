@@ -32,7 +32,9 @@ export default {
     return {
       formData: {
         // inviteCode: this.inviteCode ? this.inviteCode : '',
-        inviteCode: this.sliderData.collectedInputData.inviteCode ? this.sliderData.collectedInputData.inviteCode : '',
+        inviteCode: this.sliderData.collectedInputData.inviteCode
+          ? this.sliderData.collectedInputData.inviteCode
+          : '',
       },
       formSchema: {
         inviteCode: {
@@ -55,7 +57,7 @@ export default {
       const { inviteCode } = this.formData
       // validate in backend
       // toaster
-      this.sliderData.validateCallback(true, { /* email, */inviteCode })
+      this.sliderData.validateCallback(true, { /* email, */ inviteCode })
     },
     handleSubmitVerify() {
       // Wolle const { nonce } = this.formData
