@@ -36,10 +36,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [prepare]
     env:
-      - VERSION: $(yarn run version)
-      - BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
-      - BUILD_VERSION: ${VERSION}.${GITHUB_RUN_ID}
-      - BUILD_COMMIT: $(git rev-parse --short HEAD)
+      VERSION: $(yarn run version)
+      BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+      BUILD_VERSION: ${VERSION}.${GITHUB_RUN_ID}
+      BUILD_COMMIT: $(git rev-parse --short HEAD)
     steps:
       ##########################################################################
       # CHECKOUT CODE ##########################################################
@@ -67,10 +67,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [prepare]
     env:
-      - VERSION: $(yarn run version)
-      - BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
-      - BUILD_VERSION: ${VERSION}.${GITHUB_RUN_ID}
-      - BUILD_COMMIT: $(git rev-parse --short HEAD)
+      VERSION: $(yarn run version)
+      BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+      BUILD_VERSION: ${VERSION}.${GITHUB_RUN_ID}
+      BUILD_COMMIT: $(git rev-parse --short HEAD)
     steps:
       ##########################################################################
       # CHECKOUT CODE ##########################################################
@@ -98,10 +98,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [prepare]
     env:
-      - VERSION: $(yarn run version)
-      - BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
-      - BUILD_VERSION: ${VERSION}.${GITHUB_RUN_ID}
-      - BUILD_COMMIT: $(git rev-parse --short HEAD)
+      VERSION: $(yarn run version)
+      BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+      BUILD_VERSION: ${VERSION}.${GITHUB_RUN_ID}
+      BUILD_COMMIT: $(git rev-parse --short HEAD)
     steps:
       ##########################################################################
       # CHECKOUT CODE ##########################################################
@@ -129,10 +129,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [prepare]
     env:
-      - VERSION: $(yarn run version)
-      - BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
-      - BUILD_VERSION: ${VERSION}.${GITHUB_RUN_ID}
-      - BUILD_COMMIT: $(git rev-parse --short HEAD)
+      VERSION: $(yarn run version)
+      BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+      BUILD_VERSION: ${VERSION}.${GITHUB_RUN_ID}
+      BUILD_COMMIT: $(git rev-parse --short HEAD)
     steps:
       ##########################################################################
       # CHECKOUT CODE ##########################################################
@@ -219,10 +219,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [upload_to_dockerhub]
     env:
-      - VERSION: $(yarn run version)
-      - BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
-      - BUILD_VERSION: ${VERSION}.${GITHUB_RUN_ID}
-      - BUILD_COMMIT: $(git rev-parse --short HEAD)
+      VERSION: $(yarn run version)
+      BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+      BUILD_VERSION: ${VERSION}.${GITHUB_RUN_ID}
+      BUILD_COMMIT: $(git rev-parse --short HEAD)
     steps:
       # Push tag to GitHub if package.json version's tag is not tagged
       - name: package-version
