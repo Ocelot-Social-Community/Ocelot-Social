@@ -167,8 +167,9 @@ jobs:
       # BUILD MAINTENANCE DOCKER IMAGE (build) #################################
       ##########################################################################
       - name: maintenance | Build `production` image
+        # TODO: --target production
         run: |
-          docker build --target production -t "ocelotsocialnetwork/maintenance:latest" -t "ocelotsocialnetwork/maintenance:${VERSION}" -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}" webapp/ -f webapp/Dockerfile.maintenance
+          docker build -t "ocelotsocialnetwork/maintenance:latest" -t "ocelotsocialnetwork/maintenance:${VERSION}" -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}" webapp/ -f webapp/Dockerfile.maintenance
           docker save "ocelotsocialnetwork/maintenance:latest" > /tmp/maintenance.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
