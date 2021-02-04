@@ -45,7 +45,7 @@ jobs:
       # SET ENVS ###############################################################
       ##########################################################################
       - name: ENV - VERSION
-        run: echo "VERSION=$(yarn run version)" >> $GITHUB_ENV
+        run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
       - name: ENV - BUILD_DATE
         run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
       - name: ENV - BUILD_VERSION
@@ -68,7 +68,7 @@ jobs:
   ##############################################################################
   # JOB: DOCKER BUILD Production BACKEND #######################################
   ##############################################################################
-  build_production_backend:
+  build_production_backend:run: echo "VERSION=$(yarn run version)" >> $GITHUB_ENV
     name: Docker Build Production - Backend
     runs-on: ubuntu-latest
     needs: [prepare]
@@ -82,7 +82,7 @@ jobs:
       # SET ENVS ###############################################################
       ##########################################################################
       - name: ENV - VERSION
-        run: echo "VERSION=$(yarn run version)" >> $GITHUB_ENV
+        run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
       - name: ENV - BUILD_DATE
         run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
       - name: ENV - BUILD_VERSION
@@ -119,7 +119,7 @@ jobs:
       # SET ENVS ###############################################################
       ##########################################################################
       - name: ENV - VERSION
-        run: echo "VERSION=$(yarn run version)" >> $GITHUB_ENV
+        run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
       - name: ENV - BUILD_DATE
         run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
       - name: ENV - BUILD_VERSION
@@ -156,7 +156,7 @@ jobs:
       # SET ENVS ###############################################################
       ##########################################################################
       - name: ENV - VERSION
-        run: echo "VERSION=$(yarn run version)" >> $GITHUB_ENV
+        run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
       - name: ENV - BUILD_DATE
         run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
       - name: ENV - BUILD_VERSION
@@ -247,7 +247,7 @@ jobs:
       # SET ENVS ###############################################################
       ##########################################################################
       - name: ENV - VERSION
-        run: echo "VERSION=$(yarn run version)" >> $GITHUB_ENV
+        run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
       - name: ENV - BUILD_DATE
         run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
       - name: ENV - BUILD_VERSION
