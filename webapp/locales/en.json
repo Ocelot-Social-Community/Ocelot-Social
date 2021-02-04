@@ -213,6 +213,7 @@
     "newPost": "Create a new Post",
     "success": "Saved!",
     "teaserImage": {
+      "cropImage": "Crop image",
       "cropperConfirm": "Confirm",
       "errors": {
         "unSupported-file-format": "Please upload an image of file format: JPG, JPEG, PNG or GIF!"

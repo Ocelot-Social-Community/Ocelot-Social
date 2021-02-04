@@ -6,7 +6,7 @@
       :options="dropzoneOptions"
       :use-custom-slot="true"
       @vdropzone-error="onDropzoneError"
-      @vdropzone-file-added="initCropper"
+      @vdropzone-file-added="fileAdded"
     >
       <loading-spinner v-if="isLoadingImage" />
       <base-icon v-else name="image" />
@@ -24,6 +24,11 @@
         {{ $t('contribution.teaserImage.supportedFormats') }}
       </div>
     </vue-dropzone>
+    <div v-show="!showCropper && imageCanBeCropped" class="crop-overlay">
+      <base-button class="crop-confirm" filled @click="initCropper">
+        {{ $t('contribution.teaserImage.cropImage') }}
+      </base-button>
+    </div>
     <div v-show="showCropper" class="crop-overlay">
       <img id="cropping-image" />
       <base-button class="crop-confirm" filled @click="cropImage">
@@ -70,6 +75,7 @@ export default {
       cropper: null,
       file: null,
       showCropper: false,
+      imageCanBeCropped: false,
       isLoadingImage: false,
     }
   },
@@ -81,10 +87,17 @@ export default {
     onUnSupportedFormat(status, message) {
       this.$toast.error(status, message)
     },
-    initCropper(file) {
+    fileAdded(file) {
+      this.$emit('addImageAspectRatio', file.width / file.height || 1.0)
+      this.$emit('addHeroImage', file)
+      this.file = file
+      if (this.file.type === 'image/jpeg') this.imageCanBeCropped = true
+      this.$nextTick((this.isLoadingImage = false))
+    },
+    initCropper() {
       const supportedFormats = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif']
 
-      if (supportedFormats.indexOf(file.type) < 0) {
+      if (supportedFormats.indexOf(this.file.type) < 0) {
         this.onUnSupportedFormat(
           'error',
           this.$t('contribution.teaserImage.errors.unSupported-file-format'),
@@ -92,10 +105,9 @@ export default {
         return
       }
       this.showCropper = true
-      this.file = file
 
       const imageElement = document.querySelector('#cropping-image')
-      imageElement.src = URL.createObjectURL(file)
+      imageElement.src = URL.createObjectURL(this.file)
       this.cropper = new Cropper(imageElement, { zoomable: false, autoCropArea: 0.9 })
     },
     cropImage() {

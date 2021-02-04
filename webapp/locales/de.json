@@ -213,6 +213,7 @@
     "newPost": "Erstelle einen neuen Beitrag",
     "success": "Gespeichert!",
     "teaserImage": {
+      "cropImage": "Bild zuschneiden",
       "cropperConfirm": "Bestätigen",
       "errors": {
         "unSupported-file-format": "Bitte lade ein Bild in den folgenden Formaten hoch: JPG, JPEG, PNG or GIF!"
