@@ -160,10 +160,14 @@ export default {
       supportEmail: emails.SUPPORT,
       formData: {
         name: '',
-        // about: '',
-        // Wolle name: this.sliderData.collectedInputData.name ? this.sliderData.collectedInputData.name : '',
-        about: this.sliderData.collectedInputData.about ? this.sliderData.collectedInputData.about : '',
+        about: '',
+        // name: this.sliderData.collectedInputData.name ? this.sliderData.collectedInputData.name : '',
+        // about: this.sliderData.collectedInputData.about ? this.sliderData.collectedInputData.about : '',
         ...passwordForm.formData,
+        // ...{
+        //   password: this.sliderData.collectedInputData.password ? this.sliderData.collectedInputData.password : '',
+        //   passwordConfirmation: this.sliderData.collectedInputData.passwordConfirmation ? this.sliderData.collectedInputData.passwordConfirmation : '',
+        // }
       },
       formSchema: {
         name: {
@@ -183,191 +187,91 @@ export default {
       // TODO: Our styleguide does not support checkmarks.
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
       // have checkmarks available.
-      // termsAndConditionsConfirmed: false,
-      // dataPrivacy: false,
-      // minimumAge: false,
-      // noCommercial: false,
-      // noPolitical: false,
+      termsAndConditionsConfirmed: false,
+      dataPrivacy: false,
+      minimumAge: false,
+      noCommercial: false,
+      noPolitical: false,
       // TODO: Our styleguide does not support checkmarks.
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
       // have checkmarks available.
-      termsAndConditionsConfirmed: this.sliderData.collectedInputData.termsAndConditionsConfirmed ? this.sliderData.collectedInputData.termsAndConditionsConfirmed : false,
-      dataPrivacy: this.sliderData.collectedInputData.dataPrivacy ? this.sliderData.collectedInputData.dataPrivacy : false,
-      minimumAge: this.sliderData.collectedInputData.minimumAge ? this.sliderData.collectedInputData.minimumAge : false,
-      noCommercial: this.sliderData.collectedInputData.noCommercial ? this.sliderData.collectedInputData.noCommercial : false,
-      noPolitical: this.sliderData.collectedInputData.noPolitical ? this.sliderData.collectedInputData.noPolitical : false,
+      // termsAndConditionsConfirmed: this.sliderData.collectedInputData.termsAndConditionsConfirmed ? this.sliderData.collectedInputData.termsAndConditionsConfirmed : false,
+      // dataPrivacy: this.sliderData.collectedInputData.dataPrivacy ? this.sliderData.collectedInputData.dataPrivacy : false,
+      // minimumAge: this.sliderData.collectedInputData.minimumAge ? this.sliderData.collectedInputData.minimumAge : false,
+      // noCommercial: this.sliderData.collectedInputData.noCommercial ? this.sliderData.collectedInputData.noCommercial : false,
+      // noPolitical: this.sliderData.collectedInputData.noPolitical ? this.sliderData.collectedInputData.noPolitical : false,
     }
+  },
+  mounted: function () {
+    this.$nextTick(function () {
+      // Code that will run only after the
+      // entire view has been rendered
+      console.log('mounted !!! ')
+      this.formData.name = this.sliderData.collectedInputData.name ? this.sliderData.collectedInputData.name : '',
+      this.formData.about = this.sliderData.collectedInputData.about ? this.sliderData.collectedInputData.about : '',
+      this.formData.password = this.sliderData.collectedInputData.password ? this.sliderData.collectedInputData.password : ''
+      this.formData.passwordConfirmation = this.sliderData.collectedInputData.passwordConfirmation ? this.sliderData.collectedInputData.passwordConfirmation : ''
+      this.termsAndConditionsConfirmed = this.sliderData.collectedInputData.termsAndConditionsConfirmed ? this.sliderData.collectedInputData.termsAndConditionsConfirmed : false
+      this.dataPrivacy = this.sliderData.collectedInputData.dataPrivacy ? this.sliderData.collectedInputData.dataPrivacy : false
+      this.minimumAge = this.sliderData.collectedInputData.minimumAge ? this.sliderData.collectedInputData.minimumAge : false
+      this.noCommercial = this.sliderData.collectedInputData.noCommercial ? this.sliderData.collectedInputData.noCommercial : false
+      this.noPolitical = this.sliderData.collectedInputData.noPolitical ? this.sliderData.collectedInputData.noPolitical : false
+    })
   },
   computed: {
     valid() {
-      // console.log('valid !!! this.formErrors: ', this.formErrors)
-      // console.log('valid !!! this.$slots: ', this.$slots)
-      // console.log('valid !!! this.$scopedSlots: ', this.$scopedSlots)
-      // console.log('this.formSchema: ', this.formSchema)
-      // console.log('this.formData: ', this.formData)
-      // return (this.formErrors ||
-      //   !this.termsAndConditionsConfirmed ||
-      //   !this.dataPrivacy ||
-      //   !this.minimumAge ||
-      //   !this.noCommercial ||
-      //   !this.noPolitical)
-      // const isNotValid = 
-      //   // this.formErrors ||
-      //   this.formErrors ||
-      //   !this.termsAndConditionsConfirmed ||
-      //   !this.dataPrivacy ||
-      //   !this.minimumAge ||
-      //   !this.noCommercial ||
-      //   !this.noPolitical
+      // console.log('valid !!! this.formData: ', this.formData, ' this.formData.password === this.formData.passwordConfirmation: ', this.formData.password === this.formData.passwordConfirmation)
+      // console.log('this.formData.name.length: ', this.formData.name.length, ' this.formData.password.length: ', this.formData.password.length)
       const isValid = 
-        !this.formErrors &&
-        this.formData.name.lenght >= 3 &&
+        // !this.formErrors &&
+        (this.formData.name.length >= 3) &&
+        (this.formData.password.length >= 1) &&
+        (this.formData.password === this.formData.passwordConfirmation) &&
         this.termsAndConditionsConfirmed &&
         this.dataPrivacy &&
         this.minimumAge &&
         this.noCommercial &&
         this.noPolitical
-      // console.log('valid : ', !isNotValid)
       console.log('valid : ', isValid)
-      // const { name, about } = this.formData
-      // // const { email, nonce } = this
-      // // const { email, nonce } = this.sliderData.collectedInputData
-      // const termsAndConditionsAgreedVersion = VERSION
-      // const {
-      //   termsAndConditionsConfirmed,
-      //   dataPrivacy,
-      //   minimumAge,
-      //   noCommercial,
-      //   noPolitical,
-      // } = this
-      // // const locale = this.$i18n.locale()
-      // // this.sliderData.validateCallback(true, {
-      // this.sliderData.validateCallback(!isNotValid, {
-      //   name,
-      //   // password,
-      //   about,
-      //   // email,
-      //   // nonce,
-      //   termsAndConditionsAgreedVersion,
-      //   termsAndConditionsConfirmed,
-      //   dataPrivacy,
-      //   minimumAge,
-      //   noCommercial,
-      //   noPolitical,
-      //   // locale,
-      // })
-      // return !isNotValid
       return isValid
     },
   },
   watch: {
-    // notValid(newVal, _oldVal) {
-    //   // Wolle const [oldPropertyA, oldProvertyB] = oldVal.split('|');
-    //   // const [newPropertyA, newProvertyB] = newVal.split('|');
-    //   // doSomething
-    //   if (newVal) {
-    //     this.sliderData.validateCallback(false)
-    //   } else {
-    //     const { name, about } = this.formData
-    //     // const { email, nonce } = this
-    //     // const { email, nonce } = this.sliderData.collectedInputData
-    //     const termsAndConditionsAgreedVersion = VERSION
-    //     const {
-    //       termsAndConditionsConfirmed,
-    //       dataPrivacy,
-    //       minimumAge,
-    //       noCommercial,
-    //       noPolitical,
-    //     } = this
-    //     // const locale = this.$i18n.locale()
-    //     // this.sliderData.validateCallback(true, {
-    //     this.sliderData.validateCallback(true, {
-    //       name,
-    //       // password,
-    //       about,
-    //       // email,
-    //       // nonce,
-    //       termsAndConditionsAgreedVersion,
-    //       termsAndConditionsConfirmed,
-    //       dataPrivacy,
-    //       minimumAge,
-    //       noCommercial,
-    //       noPolitical,
-    //       // locale,
-    //     })
-    //   }
+    // formData: {
+    //   handler() {
+    //     console.log('formData: ', this.formData)
+    //     this.sendValidation()
+    //   },
+    //   deep: true,
+    //   immediate: true,
     // },
-    valid(newVal) {
-      // Wolle const [oldPropertyA, oldProvertyB] = oldVal.split('|');
-      // const [newPropertyA, newProvertyB] = newVal.split('|');
-      // doSomething
-      if (newVal) {
-        this.sliderData.validateCallback(false)
-      } else {
-        const { name, about } = this.formData
-        // const { email, nonce } = this
-        // const { email, nonce } = this.sliderData.collectedInputData
-        const termsAndConditionsAgreedVersion = VERSION
-        const {
-          termsAndConditionsConfirmed,
-          dataPrivacy,
-          minimumAge,
-          noCommercial,
-          noPolitical,
-        } = this
-        // const locale = this.$i18n.locale()
-        // this.sliderData.validateCallback(true, {
-        this.sliderData.validateCallback(true, {
-          name,
-          // password,
-          about,
-          // email,
-          // nonce,
-          termsAndConditionsAgreedVersion,
-          termsAndConditionsConfirmed,
-          dataPrivacy,
-          minimumAge,
-          noCommercial,
-          noPolitical,
-          // locale,
-        })
-      }
+    formData() {
+      console.log('formData: ', this.formData)
+      this.sendValidation()
     },
-    formData: {
-      handler(newValue) {
-        this.sendValidation(newValue)
-      },
-      deep: true,
-      immediate: true,
+    termsAndConditionsConfirmed() {
+      this.sendValidation()
     },
-    termsAndConditionsConfirmed(newValue) {
-      this.sendValidation({termsAndConditionsConfirmed: newValue})
+    dataPrivacy() {
+      this.sendValidation()
     },
-    dataPrivacy(newValue) {
-      this.sendValidation({dataPrivacy: newValue})
+    minimumAge() {
+      this.sendValidation()
     },
-    minimumAge(newValue) {
-      this.sendValidation({minimumAge: newValue})
+    noCommercial() {
+      this.sendValidation()
     },
-    noCommercial(newValue) {
-      this.sendValidation({noCommercial: newValue})
-    },
-    noPolitical(newValue) {
-      this.sendValidation({noPolitical: newValue})
+    noPolitical() {
+      this.sendValidation()
     },
   },
   methods: {
-    // setErrors(errors) {
-    //   this.formErrors = errors
-    //   // console.log('setErrors !!! this.formErrors: ', this.formErrors)
-    //   return errors
-    // },
     watchScopedSlotsCallback({errors}) {
       this.formErrors = errors
       console.log('watchScopedSlotsCallback !!! this.formErrors: ', this.formErrors)
     },
-    sendValidation(newValues) {
-      const { name, about } = this.formData
+    sendValidation() {
+      const { name, about, password, passwordConfirmation } = this.formData
       // const { email, nonce } = this
       // const { email, nonce } = this.sliderData.collectedInputData
       const termsAndConditionsAgreedVersion = VERSION
@@ -379,10 +283,11 @@ export default {
         noPolitical,
       } = this
       // const locale = this.$i18n.locale()
-      const nowValues = {
+      const value = {
         name,
-        // password,
         about,
+        password,
+        passwordConfirmation,
         // email,
         // nonce,
         termsAndConditionsAgreedVersion,
@@ -393,7 +298,8 @@ export default {
         noPolitical,
         // locale,
       }
-      this.sliderData.validateCallback(this.valid, {...nowValues, ...newValues})
+      console.log('sendValidation !!!', ' this.valid: ', this.valid, ' value: ', value)
+      this.sliderData.validateCallback(this.valid, value)
     },
     async submit() {
       const { name, password, about } = this.formData

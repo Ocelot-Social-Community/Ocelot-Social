@@ -139,9 +139,8 @@ export default {
     },
   },
   methods: {
-    validateCallback(is, data = null) {
-      this.sliderData.sliders[this.sliderIndex].validated = is
-      // if (is) {
+    validateCallback(isValid, data = null) {
+      this.sliderData.sliders[this.sliderIndex].validated = isValid
       if (data) {
         this.sliderData.collectedInputData = {
           ...this.sliderData.collectedInputData,
