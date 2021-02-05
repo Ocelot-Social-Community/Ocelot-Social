@@ -49,7 +49,7 @@ Factory.define('badge')
 
 Factory.define('image')
   .attr('url', faker.image.unsplash.imageUrl)
-  .attr('aspectRatio', 1.0)
+  .attr('aspectRatio', 1.3333333333333333)
   .attr('alt', faker.lorem.sentence)
   .attr('type', 'image/jpeg')
   .after((buildObject, options) => {
