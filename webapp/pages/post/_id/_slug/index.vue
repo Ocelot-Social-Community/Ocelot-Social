@@ -176,13 +176,15 @@ export default {
       /*  Return false when image property is not present or is not a number
           so no unnecessary css variables are set.
       */
-      if (!this.post.image || typeof this.post.image.aspectRatio !== 'number') return false
 
+      if (!this.post.image || typeof this.post.image.aspectRatio !== 'number') return false
       /*  Return the aspect ratio as a css variable. Later to be used when calculating
           the height with respect to the width.
+          Why is this correction necessary?
       */
       return {
-        '--hero-image-aspect-ratio': 1 / this.post.image.aspectRatio,
+        '--hero-image-aspect-ratio': 1.0 / this.post.image.aspectRatio,
+        '--hero-image-correction': 1.0 / this.post.image.aspectRatio * 48.0 + 'px',
       }
     },
   },
@@ -258,8 +260,8 @@ export default {
         hero image aspect ratio) before the hero image loads so
         the autoscroll works correctly when following a comment link. 
     */
-    padding-top: calc(var(--hero-image-aspect-ratio) * 100%);
 
+    padding-top: calc(var(--hero-image-aspect-ratio) * 100% + var(--hero-image-correction));
     /*  Letting the image fill the container, since the container
         is the one determining height
     */
