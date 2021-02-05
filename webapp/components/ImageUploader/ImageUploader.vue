@@ -9,7 +9,7 @@
       @vdropzone-file-added="fileAdded"
     >
       <loading-spinner v-if="isLoadingImage" />
-      <base-icon v-else name="image" />
+      <base-icon v-else-if="!hasImage" name="image" />
       <base-button
         v-if="hasImage"
         icon="trash"
@@ -87,8 +87,18 @@ export default {
     onUnSupportedFormat(status, message) {
       this.$toast.error(status, message)
     },
-    fileAdded(file) {
-      this.$emit('addImageAspectRatio', file.width / file.height || 1.0)
+    addImageProcess(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => resolve(img)
+        img.onerror = reject
+        img.src = src
+      })
+    },
+    async fileAdded(file) {
+      const imageURL = URL.createObjectURL(file)
+      const image = await this.addImageProcess(imageURL)
+      this.$emit('addImageAspectRatio', image.width / image.height || 1.0)
       this.$emit('addHeroImage', file)
       this.$emit('addImageType', file.type)
       this.file = file
