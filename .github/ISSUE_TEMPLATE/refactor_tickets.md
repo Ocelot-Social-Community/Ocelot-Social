@@ -10,6 +10,7 @@ title: 🔧 [Refactor]
 
 ### Motive
 <!-- What is the purpose of this refactoring? If it's removing depcrecated code, please link to the deprecation notice. -->
+
 ### Related issues
 <!-- Are there any related issues to link to? Please paste them below for reference. -->
 
