@@ -49,7 +49,7 @@
           {{ scope.row.createdAt | dateTime }}
         </template>
 
-        <template slot="role" slot-scope="scope">
+        <template slot="role" slot-scope="scope" v-if="scope.row.email != currentUser.email">
           <ApolloQuery :query="FetchAllRoles">
             <template v-slot="{ result: { data } }">
               <template v-if="data">
@@ -75,6 +75,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import gql from 'graphql-tag'
 import { isEmail } from 'validator'
 import normalizeEmail from '~/components/utils/NormalizeEmail'
@@ -107,6 +108,9 @@ export default {
     hasPrevious() {
       return this.offset > 0
     },
+    ...mapGetters({
+      currentUser: 'auth/user',
+    }),
     fields() {
       return {
         index: this.$t('admin.users.table.columns.number'),
@@ -194,14 +198,16 @@ export default {
       }
     },
     changeUserRole(id, event) {
-      const newRole = event.target.value
-      // this.role = '';
-      // const id = this.User[0].id;
+      const newRole = event.target.value;
       this.$apollo
         .mutate({
           mutation: updateUserRole(newRole, id),
         })
-        .catch((error) => this.$toast.error(error.message))
+        .catch((error) => {
+            console.log(error.message);
+            this.$toast.error(error.message)
+          }
+        )
     },
   },
 }
