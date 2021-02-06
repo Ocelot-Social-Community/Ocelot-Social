@@ -202,6 +202,7 @@ export default {
       this.$apollo
         .mutate({
           mutation: updateUserRole(newRole, id),
+          variables: { role: newRole, id}
         })
         .catch((error) => {
             console.log(error.message);
