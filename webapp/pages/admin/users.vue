@@ -198,17 +198,16 @@ export default {
       }
     },
     changeUserRole(id, event) {
-      const newRole = event.target.value;
+      const newRole = event.target.value
       this.$apollo
         .mutate({
           mutation: updateUserRole(newRole, id),
-          variables: { role: newRole, id}
+          variables: { role: newRole, id },
         })
         .catch((error) => {
-            console.log(error.message);
-            this.$toast.error(error.message)
-          }
-        )
+          console.log(error.message)
+          this.$toast.error(error.message)
+        })
     },
   },
 }
