@@ -289,6 +289,8 @@ jobs:
       ##########################################################################
       # Push release tag to GitHub #############################################
       ##########################################################################
+      - name: yarn install
+        run: yarn install
       - name: generate changelog
         run: yarn auto-changelog
       - name: package-version-to-git-release
