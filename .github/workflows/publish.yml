@@ -294,7 +294,7 @@ jobs:
       - name: yarn install
         run: yarn install
       - name: generate changelog
-        run: yarn auto-changelog
+        run: yarn auto-changelog --latest-version ${{ env.VERSION }}
       - name: package-version-to-git-release
         continue-on-error: true # Will fail if tag exists
         id: create_release
