@@ -1,17 +1,21 @@
 <template>
   <div class="image-uploader">
     <vue-dropzone
-      v-show="!showCropper"
+      v-show="!showCropper && !hasImage"
       id="postdropzone"
       :options="dropzoneOptions"
       :use-custom-slot="true"
-      @vdropzone-error="onDropzoneError"
-      @vdropzone-file-added="initCropper"
+      @vdropzone-file-added="fileAdded"
     >
       <loading-spinner v-if="isLoadingImage" />
-      <base-icon v-else name="image" />
+      <base-icon v-else-if="!hasImage" name="image" />
+      <div v-if="!hasImage" class="supported-formats">
+        {{ $t('contribution.teaserImage.supportedFormats') }}
+      </div>
+    </vue-dropzone>
+    <div v-show="!showCropper && hasImage">
       <base-button
-        v-if="hasImage"
+        class="delete-image-button"
         icon="trash"
         circle
         danger
@@ -20,10 +24,12 @@
         :title="$t('actions.delete')"
         @click.stop="deleteImage"
       />
-      <div v-if="!hasImage" class="supported-formats">
-        {{ $t('contribution.teaserImage.supportedFormats') }}
-      </div>
-    </vue-dropzone>
+    </div>
+    <div v-show="!showCropper && imageCanBeCropped" class="crop-overlay">
+      <base-button class="crop-confirm" filled @click="initCropper">
+        {{ $t('contribution.teaserImage.cropImage') }}
+      </base-button>
+    </div>
     <div v-show="showCropper" class="crop-overlay">
       <img id="cropping-image" />
       <base-button class="crop-confirm" filled @click="cropImage">
@@ -48,6 +54,8 @@ import Cropper from 'cropperjs'
 import LoadingSpinner from '~/components/_new/generic/LoadingSpinner/LoadingSpinner'
 import 'cropperjs/dist/cropper.css'
 
+const minAspectRatio = 0.3
+
 export default {
   components: {
     LoadingSpinner,
@@ -65,41 +73,69 @@ export default {
         url: () => '',
         maxFilesize: 5.0,
         previewTemplate: '<span class="no-preview" />',
+        acceptedFiles: '.png,.jpg,.jpeg,.gif',
       },
       cropper: null,
       file: null,
       showCropper: false,
+      imageCanBeCropped: false,
       isLoadingImage: false,
     }
   },
   methods: {
-    onDropzoneError(file, message) {
-      this.$toast.error(file.status, message)
+    onUnSupportedFormat(message) {
+      this.$toast.error(message)
     },
-    initCropper(file) {
-      this.showCropper = true
+    addImageProcess(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => resolve(img)
+        img.onerror = reject
+        img.src = src
+      })
+    },
+    async fileAdded(file) {
+      const supportedFormats = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif']
+      if (supportedFormats.indexOf(file.type) < 0) {
+        this.onUnSupportedFormat(this.$t('contribution.teaserImage.errors.unSupported-file-format'))
+        this.$nextTick((this.isLoadingImage = false))
+        return null
+      }
+      const imageURL = URL.createObjectURL(file)
+      const image = await this.addImageProcess(imageURL)
+      const aspectRatio = image.width / image.height
+      if (aspectRatio < minAspectRatio) {
+        this.aspectRatioError()
+        return null
+      }
+      this.saveImage(aspectRatio, file, file.type)
       this.file = file
-
+      if (this.file.type === 'image/jpeg') this.imageCanBeCropped = true
+      this.$nextTick((this.isLoadingImage = false))
+    },
+    initCropper() {
+      this.showCropper = true
       const imageElement = document.querySelector('#cropping-image')
-      imageElement.src = URL.createObjectURL(file)
+      imageElement.src = URL.createObjectURL(this.file)
       this.cropper = new Cropper(imageElement, { zoomable: false, autoCropArea: 0.9 })
     },
     cropImage() {
       this.isLoadingImage = true
-
-      const onCropComplete = (aspectRatio, imageFile) => {
-        this.$emit('addImageAspectRatio', aspectRatio)
-        this.$emit('addHeroImage', imageFile)
+      const onCropComplete = (aspectRatio, imageFile, imageType) => {
+        this.saveImage(aspectRatio, imageFile, imageType)
         this.$nextTick((this.isLoadingImage = false))
         this.closeCropper()
       }
-
       if (this.file.type === 'image/jpeg') {
         const canvas = this.cropper.getCroppedCanvas()
         canvas.toBlob((blob) => {
           const imageAspectRatio = canvas.width / canvas.height
+          if (imageAspectRatio < minAspectRatio) {
+            this.aspectRatioError()
+            return
+          }
           const croppedImageFile = new File([blob], this.file.name, { type: this.file.type })
-          onCropComplete(imageAspectRatio, croppedImageFile)
+          onCropComplete(imageAspectRatio, croppedImageFile, 'image/jpeg')
         }, 'image/jpeg')
       } else {
         // TODO: use cropped file instead of original file
@@ -111,9 +147,18 @@ export default {
       this.showCropper = false
       this.cropper.destroy()
     },
+    aspectRatioError() {
+      this.$toast.error(this.$t('contribution.teaserImage.errors.aspect-ratio-too-small'))
+    },
+    saveImage(aspectRatio = 1.0, file, fileType) {
+      this.$emit('addImageAspectRatio', aspectRatio)
+      this.$emit('addHeroImage', file)
+      this.$emit('addImageType', fileType)
+    },
     deleteImage() {
       this.$emit('addHeroImage', null)
       this.$emit('addImageAspectRatio', null)
+      this.$emit('addImageType', null)
     },
   },
 }
@@ -122,7 +167,6 @@ export default {
 .image-uploader {
   position: relative;
   min-height: $size-image-uploader-min-height;
-  cursor: pointer;
 
   .image + & {
     position: absolute;
@@ -167,6 +211,14 @@ export default {
     }
   }
 
+  .delete-image-button {
+    position: absolute;
+    top: $space-small;
+    right: $space-small;
+    z-index: $z-index-surface;
+    cursor: pointer;
+  }
+
   .dz-message {
     position: absolute;
     display: flex;
@@ -175,6 +227,7 @@ export default {
     width: 100%;
     height: 100%;
     z-index: $z-index-surface;
+    cursor: pointer;
 
     &:hover {
       > .base-icon {

@@ -120,7 +120,7 @@
     "success": "Zapisano!",
     "teaserImage": {
       "cropperConfirm": "Potwierdzać",
-      "supportedFormats": "Wstaw zdjęcie w formacie pliku JPG, PNG lub GIF"
+      "supportedFormats": "Wstaw zdjęcie w formacie pliku JPG, PNG lub GIF!"
     }
   },
   "delete": {

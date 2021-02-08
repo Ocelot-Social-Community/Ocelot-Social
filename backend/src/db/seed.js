@@ -541,6 +541,16 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       ),
     ])
 
+    await Factory.build(
+      'inviteCode',
+      {
+        code: 'AAAAAA',
+      },
+      {
+        generatedBy: jennyRostock,
+      },
+    )
+
     authenticatedUser = await louie.toJson()
     const mention1 =
       'Hey <a class="mention" data-mention-id="u3" href="/profile/u3">@jenny-rostock</a>, what\'s up?'
@@ -931,11 +941,32 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     const additionalUsers = await Promise.all(
       [...Array(30).keys()].map(() => Factory.build('user')),
     )
+
     await Promise.all(
       additionalUsers.map(async (user) => {
         await jennyRostock.relateTo(user, 'following')
         await user.relateTo(jennyRostock, 'following')
       }),
+    )
+
+    await Promise.all(
+      [...Array(30).keys()].map((index) => Factory.build('user', { name: `Jenny${index}` })),
+    )
+
+    await Promise.all(
+      [...Array(30).keys()].map(() =>
+        Factory.build(
+          'post',
+          { content: `Jenny ${faker.lorem.sentence()}` },
+          {
+            categoryIds: ['cat1'],
+            author: jennyRostock,
+            image: Factory.build('image', {
+              url: faker.image.unsplash.objects(),
+            }),
+          },
+        ),
+      ),
     )
 
     await Promise.all(

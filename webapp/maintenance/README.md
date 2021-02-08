@@ -36,7 +36,7 @@ $ docker-compose up
 ````
 
 And the maintenance mode page or service will be started as well in an own container.
-In the browser you can reach it under `http://localhost:3503/`.
+In the browser you can reach it under `http://localhost:5000/`.
 
 {% endtab %}
 {% tab title="On The Server" %}

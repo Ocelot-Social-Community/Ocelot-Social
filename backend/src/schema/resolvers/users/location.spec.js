@@ -6,12 +6,21 @@ import createServer from '../../../server'
 
 const neode = getNeode()
 const driver = getDriver()
-let authenticatedUser, mutate, variables
+let authenticatedUser, mutate, query, variables
 
 const updateUserMutation = gql`
   mutation($id: ID!, $name: String!, $locationName: String) {
     UpdateUser(id: $id, name: $name, locationName: $locationName) {
       locationName
+    }
+  }
+`
+
+const queryLocations = gql`
+  query($place: String!, $lang: String!) {
+    queryLocations(place: $place, lang: $lang) {
+      place_name
+      id
     }
   }
 `
@@ -76,6 +85,7 @@ beforeAll(() => {
     },
   })
   mutate = createTestClient(server).mutate
+  query = createTestClient(server).query
 })
 
 beforeEach(() => {
@@ -84,6 +94,66 @@ beforeEach(() => {
 })
 
 afterEach(cleanDatabase)
+
+describe('Location Service', () => {
+  // Authentication
+  // TODO: unify, externalize, simplify, wtf?
+  let user
+  beforeEach(async () => {
+    user = await Factory.build('user', {
+      id: 'location-user',
+    })
+    authenticatedUser = await user.toJson()
+  })
+
+  it('query Location existing', async () => {
+    variables = {
+      place: 'Berlin',
+      lang: 'en',
+    }
+    const result = await query({ query: queryLocations, variables })
+    expect(result.data.queryLocations).toEqual([
+      { id: 'place.14094307404564380', place_name: 'Berlin, Germany' },
+      { id: 'place.15095411613564380', place_name: 'Berlin, Maryland, United States' },
+      { id: 'place.5225018734564380', place_name: 'Berlin, Connecticut, United States' },
+      { id: 'place.16922023226564380', place_name: 'Berlin, New Jersey, United States' },
+      { id: 'place.4035845612564380', place_name: 'Berlin Township, New Jersey, United States' },
+    ])
+  })
+
+  it('query Location existing in different language', async () => {
+    variables = {
+      place: 'Berlin',
+      lang: 'de',
+    }
+    const result = await query({ query: queryLocations, variables })
+    expect(result.data.queryLocations).toEqual([
+      { id: 'place.14094307404564380', place_name: 'Berlin, Deutschland' },
+      { id: 'place.15095411613564380', place_name: 'Berlin, Maryland, Vereinigte Staaten' },
+      { id: 'place.16922023226564380', place_name: 'Berlin, New Jersey, Vereinigte Staaten' },
+      { id: 'place.10735893248465990', place_name: 'Berlin Heights, Ohio, Vereinigte Staaten' },
+      { id: 'place.1165756679564380', place_name: 'Berlin, Massachusetts, Vereinigte Staaten' },
+    ])
+  })
+
+  it('query Location not existing', async () => {
+    variables = {
+      place: 'GbHtsd4sdHa',
+      lang: 'en',
+    }
+    const result = await query({ query: queryLocations, variables })
+    expect(result.data.queryLocations).toEqual([])
+  })
+
+  it('query Location without a place name given', async () => {
+    variables = {
+      place: '',
+      lang: 'en',
+    }
+    const result = await query({ query: queryLocations, variables })
+    expect(result.data.queryLocations).toEqual([])
+  })
+})
 
 describe('userMiddleware', () => {
   describe('UpdateUser', () => {
@@ -95,7 +165,7 @@ describe('userMiddleware', () => {
       authenticatedUser = await user.toJson()
     })
 
-    it('creates a Location node with localised city/state/country names', async () => {
+    it('creates a Location node with localized city/state/country names', async () => {
       variables = {
         ...variables,
         id: 'updating-user',

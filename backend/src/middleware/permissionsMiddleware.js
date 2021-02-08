@@ -29,15 +29,25 @@ const onlyYourself = rule({
 
 const isMyOwn = rule({
   cache: 'no_cache',
-})(async (parent, args, context, info) => {
-  return context.user.id === parent.id
+})(async (parent, args, { user }, info) => {
+  return user && user.id === parent.id
 })
 
 const isMySocialMedia = rule({
   cache: 'no_cache',
 })(async (_, args, { user }) => {
+  // We need a User
+  if (!user) {
+    return false
+  }
   let socialMedia = await neode.find('SocialMedia', args.id)
-  socialMedia = await socialMedia.toJson()
+  // Did we find a social media node?
+  if (!socialMedia) {
+    return false
+  }
+  socialMedia = await socialMedia.toJson() // whats this for?
+
+  // Is it my social media entry?
   return socialMedia.ownedBy.node.id === user.id
 })
 
@@ -86,7 +96,10 @@ export default shield(
       '*': deny,
       findPosts: allow,
       findUsers: allow,
-      findResources: allow,
+      searchResults: allow,
+      searchPosts: allow,
+      searchUsers: allow,
+      searchHashtags: allow,
       embed: allow,
       Category: allow,
       Tag: allow,
@@ -106,6 +119,9 @@ export default shield(
       notifications: isAuthenticated,
       Donations: isAuthenticated,
       userData: isAuthenticated,
+      MyInviteCodes: isAuthenticated,
+      isValidInviteCode: allow,
+      queryLocations: isAuthenticated,
     },
     Mutation: {
       '*': deny,
@@ -149,6 +165,7 @@ export default shield(
       pinPost: isAdmin,
       unpinPost: isAdmin,
       UpdateDonations: isAdmin,
+      GenerateInviteCode: isAuthenticated,
       switchUserRole: isAdmin,
     },
     User: {

@@ -1,16 +1,17 @@
 export default {
+  code: { type: 'string', primary: true },
   createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
-  token: { type: 'string', primary: true, token: true },
-  generatedBy: {
+  expiresAt: { type: 'string', isoDate: true, default: null },
+  generated: {
     type: 'relationship',
     relationship: 'GENERATED',
     target: 'User',
     direction: 'in',
   },
-  activated: {
+  redeemed: {
     type: 'relationship',
-    relationship: 'ACTIVATED',
-    target: 'EmailAddress',
-    direction: 'out',
+    relationship: 'REDEEMED',
+    target: 'User',
+    direction: 'in',
   },
 }

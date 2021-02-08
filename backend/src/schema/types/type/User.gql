@@ -56,6 +56,9 @@ type User {
   followedBy: [User]! @relation(name: "FOLLOWS", direction: "IN")
   followedByCount: Int! @cypher(statement: "MATCH (this)<-[:FOLLOWS]-(r:User) RETURN COUNT(DISTINCT r)")
 
+  inviteCodes: [InviteCode] @relation(name: "GENERATED", direction: "OUT")
+  redeemedInviteCode: InviteCode @relation(name: "REDEEMED", direction: "OUT")
+
   # Is the currently logged in user following that user?
   followedByCurrentUser: Boolean! @cypher(
   statement: """
@@ -83,7 +86,7 @@ type User {
   RETURN COUNT(user) >= 1
   """
   )
-
+  
   # contributions: [WrittenPost]!
   # contributions2(first: Int = 10, offset: Int = 0): [WrittenPost2]!
   # @cypher(
@@ -104,7 +107,7 @@ type User {
   shouted: [Post]! @relation(name: "SHOUTED", direction: "OUT")
   shoutedCount: Int! @cypher(statement: "MATCH (this)-[:SHOUTED]->(r:Post) WHERE NOT r.deleted = true AND NOT r.disabled = true RETURN COUNT(DISTINCT r)")
 
-  categories: [Category]! @relation(name: "CATEGORIZED", direction: "OUT")
+  categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
   badges: [Badge]! @relation(name: "REWARDED", direction: "IN")
   badgesCount: Int! @cypher(statement: "MATCH (this)<-[:REWARDED]-(r:Badge) RETURN COUNT(r)")

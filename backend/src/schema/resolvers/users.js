@@ -318,6 +318,7 @@ export default {
         avatar: '-[:AVATAR_IMAGE]->(related:Image)',
         invitedBy: '<-[:INVITED]-(related:User)',
         location: '-[:IS_IN]->(related:Location)',
+        redeemedInviteCode: '-[:REDEEMED]->(related:InviteCode)',
       },
       hasMany: {
         followedBy: '<-[:FOLLOWS]-(related:User)',
@@ -329,6 +330,7 @@ export default {
         shouted: '-[:SHOUTED]->(related:Post)',
         categories: '-[:CATEGORIZED]->(related:Category)',
         badges: '<-[:REWARDED]-(related:Badge)',
+        inviteCodes: '-[:GENERATED]->(related:InviteCode)',
       },
     }),
   },

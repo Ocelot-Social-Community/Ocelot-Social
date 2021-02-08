@@ -21,7 +21,7 @@ const statisticsQuery = gql`
     }
   }
 `
-beforeAll(() => {
+beforeAll(async () => {
   authenticatedUser = undefined
   const { server } = createServer({
     context: () => {
@@ -33,6 +33,7 @@ beforeAll(() => {
     },
   })
   query = createTestClient(server).query
+  await cleanDatabase()
 })
 
 afterEach(async () => {

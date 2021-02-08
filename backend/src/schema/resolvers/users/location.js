@@ -137,4 +137,15 @@ const createOrUpdateLocations = async (userId, locationName, session) => {
   })
 }
 
+export const queryLocations = async ({ place, lang }) => {
+  const res = await fetch(
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${CONFIG.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
+  )
+  // Return empty array if no location found or error occurred
+  if (!res || !res.features) {
+    return []
+  }
+  return res.features
+}
+
 export default createOrUpdateLocations

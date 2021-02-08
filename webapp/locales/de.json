@@ -75,6 +75,9 @@
       }
     }
   },
+  "client-only": {
+    "loading": "Lade …"
+  },
   "code-of-conduct": {
     "subheader": "für das Soziale Netzwerk von {ORGANIZATION_NAME}"
   },
@@ -210,7 +213,12 @@
     "newPost": "Erstelle einen neuen Beitrag",
     "success": "Gespeichert!",
     "teaserImage": {
+      "cropImage": "Bild zuschneiden",
       "cropperConfirm": "Bestätigen",
+      "errors": {
+        "aspect-ratio-too-small": "Dieses Bild ist zu hoch.",
+        "unSupported-file-format": "Bitte lade ein Bild in den folgenden Formaten hoch: JPG, JPEG, PNG or GIF!"
+      },
       "supportedFormats": "Füge ein Bild im Dateiformat JPG, PNG oder GIF ein"
     },
     "title": "Titel"
@@ -546,13 +554,18 @@
   },
   "search": {
     "failed": "Nichts gefunden",
+    "for": "Suche nach ",
     "heading": {
-      "Post": "Beiträge",
-      "Tag": "Hashtags",
-      "User": "Benutzer"
+      "Post": "Beitrag ::: Beiträge",
+      "Tag": "Hashtag ::: Hashtags",
+      "User": "Benutzer ::: Benutzer"
     },
     "hint": "Wonach suchst Du?",
-    "placeholder": "Suchen"
+    "no-results": "Keine Ergebnisse für \"{search}\" gefunden. Versuch' es mit einem anderen Begriff!",
+    "page": "Seite",
+    "placeholder": "Suchen",
+    "results": "Ergebnis gefunden ::: Ergebnisse gefunden",
+    "title": "Suchergebnisse"
   },
   "settings": {
     "blocked-users": {

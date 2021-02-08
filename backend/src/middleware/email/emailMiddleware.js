@@ -13,7 +13,7 @@ const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD
 
 let sendMail = () => {}
 if (!hasEmailConfig) {
-  if (process.env.NODE_ENV !== 'test') {
+  if (!CONFIG.TEST) {
     // eslint-disable-next-line no-console
     console.log('Warning: Email middleware will not try to send mails.')
   }

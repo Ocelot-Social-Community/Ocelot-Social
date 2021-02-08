@@ -46,21 +46,6 @@
       <content-viewer class="content hyphenate-text" :content="post.content" />
       <!-- eslint-enable vue/no-v-html -->
       <ds-space margin="xx-large" />
-      <!-- Categories -->
-      <div class="categories">
-        <ds-space margin="xx-small" />
-        <hc-category
-          v-for="category in post.categories"
-          :key="category.id"
-          :icon="category.icon"
-          :name="$t(`contribution.category.name.${category.slug}`)"
-        />
-        <!-- Post language -->
-        <ds-tag v-if="post.language" class="category-tag language">
-          <base-icon name="globe" />
-          {{ post.language.toUpperCase() }}
-        </ds-tag>
-      </div>
       <ds-space margin-bottom="small" />
       <!-- Tags -->
       <div v-if="post.tags && post.tags.length" class="tags">
@@ -110,7 +95,6 @@
 
 <script>
 import ContentViewer from '~/components/Editor/ContentViewer'
-import HcCategory from '~/components/Category'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
@@ -134,7 +118,6 @@ export default {
     mode: 'out-in',
   },
   components: {
-    HcCategory,
     HcHashtag,
     UserTeaser,
     HcShoutButton,
@@ -193,13 +176,13 @@ export default {
       /*  Return false when image property is not present or is not a number
           so no unnecessary css variables are set.
       */
-      if (!this.post.image || typeof this.post.image.aspectRatio !== 'number') return false
 
+      if (!this.post.image || typeof this.post.image.aspectRatio !== 'number') return false
       /*  Return the aspect ratio as a css variable. Later to be used when calculating
           the height with respect to the width.
       */
       return {
-        '--hero-image-aspect-ratio': 1 / this.post.image.aspectRatio,
+        '--hero-image-aspect-ratio': 1.0 / this.post.image.aspectRatio,
       }
     },
   },
@@ -275,8 +258,8 @@ export default {
         hero image aspect ratio) before the hero image loads so
         the autoscroll works correctly when following a comment link. 
     */
-    padding-top: calc(var(--hero-image-aspect-ratio) * 100%);
 
+    padding-top: calc(var(--hero-image-aspect-ratio) * (100% + 48px));
     /*  Letting the image fill the container, since the container
         is the one determining height
     */
