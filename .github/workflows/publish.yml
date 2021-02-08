@@ -271,7 +271,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           github_repo: ${{ github.repository }}
-          version: ${VERSION}
+          version: ${{ env.VERSION }}
           git_commit_sha: ${{ github.sha }}
           git_tag_prefix: "v"
       ##########################################################################
@@ -282,6 +282,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           github_repo: ${{ github.repository }}
-          version: ${BUILD_VERSION}
+          version: ${{ env.BUILD_VERSION }}
           git_commit_sha: ${{ github.sha }}
           git_tag_prefix: "b"
