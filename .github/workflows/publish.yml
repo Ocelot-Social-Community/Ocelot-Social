@@ -285,3 +285,19 @@ jobs:
           version: ${{ env.BUILD_VERSION }}
           git_commit_sha: ${{ github.sha }}
           git_tag_prefix: "b"
+      ##########################################################################
+      # Push release tag to GitHub #############################################
+      ##########################################################################
+      #- name: generate changelog
+      #  run: yarn auto-changelog
+      - name: package-version-to-git-release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: ${{ env.VERSION }}
+          body_path: ./CHANGELOG.md
+          draft: false
+          prerelease: true
