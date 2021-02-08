@@ -209,7 +209,7 @@
     "success": "Сохранено!",
     "teaserImage": {
       "cropperConfirm": "Подтвердить",
-      "supportedFormats": "Вставьте изображение файла формата JPG, PNG или GIF"
+      "supportedFormats": "Вставьте изображение файла формата JPG, PNG или GIF!"
     },
     "title": "Заголовок"
   },

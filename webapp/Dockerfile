@@ -69,6 +69,14 @@ RUN yarn install --production=false --frozen-lockfile --non-interactive
 RUN yarn run build
 
 ##################################################################################
+# TEST ###########################################################################
+##################################################################################
+FROM build as test
+
+# Run command
+CMD /bin/sh -c "yarn run dev"
+
+##################################################################################
 # PRODUCTION (Does contain only "binary"- and static-files to reduce image size) #
 ##################################################################################
 FROM base as production

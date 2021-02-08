@@ -5,7 +5,7 @@ labels: devops
 title: 💥 [DevOps]
 ---
 
-## :fire: DevOps ticket
+## 💥 DevOps ticket
 <!-- Describe your issue in detail. Include screenshots if needed. Give us as much information as possible. Use a clear and concise description of what the problem is.-->
 
 ### Motive

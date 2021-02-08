@@ -121,6 +121,7 @@ export default shield(
       userData: isAuthenticated,
       MyInviteCodes: isAuthenticated,
       isValidInviteCode: allow,
+      queryLocations: isAuthenticated,
     },
     Mutation: {
       '*': deny,

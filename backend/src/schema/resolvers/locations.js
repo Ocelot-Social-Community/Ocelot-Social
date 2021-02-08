@@ -1,4 +1,6 @@
+import { UserInputError } from 'apollo-server'
 import Resolver from './helpers/Resolver'
+import { queryLocations } from './users/location'
 
 export default {
   Location: {
@@ -15,5 +17,14 @@ export default {
         'nameRU',
       ],
     }),
+  },
+  Query: {
+    queryLocations: async (object, args, context, resolveInfo) => {
+      try {
+        return queryLocations(args)
+      } catch (e) {
+        throw new UserInputError(e.message)
+      }
+    },
   },
 }

@@ -65,6 +65,7 @@ export default {
         url: () => '',
         maxFilesize: 5.0,
         previewTemplate: '<span class="no-preview" />',
+        acceptedFiles: '.png,.jpg,.jpeg,.gif',
       },
       cropper: null,
       file: null,
@@ -76,7 +77,20 @@ export default {
     onDropzoneError(file, message) {
       this.$toast.error(file.status, message)
     },
+
+    onUnSupportedFormat(status, message) {
+      this.$toast.error(status, message)
+    },
     initCropper(file) {
+      const supportedFormats = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif']
+
+      if (supportedFormats.indexOf(file.type) < 0) {
+        this.onUnSupportedFormat(
+          'error',
+          this.$t('contribution.teaserImage.errors.unSupported-file-format'),
+        )
+        return
+      }
       this.showCropper = true
       this.file = file
 
