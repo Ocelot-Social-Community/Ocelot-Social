@@ -25,19 +25,11 @@ describe('ImageUploader.vue', () => {
 
     describe('handles errors', () => {
       beforeEach(() => jest.useFakeTimers())
-      const message = 'File upload failed'
-      const fileError = { status: 'error' }
-      const unSupportedFileMessage =
-        'Please upload an image of file format : JPG , JPEG , PNG or GIF'
-
-      it('shows an error toaster when verror is called', () => {
-        wrapper.vm.onDropzoneError(fileError, message)
-        expect(mocks.$toast.error).toHaveBeenCalledWith(fileError.status, message)
-      })
+      const unSupportedFileMessage = 'message'
 
       it('shows an error toaster when unSupported file is uploaded', () => {
-        wrapper.vm.onUnSupportedFormat(fileError.status, unSupportedFileMessage)
-        expect(mocks.$toast.error).toHaveBeenCalledWith(fileError.status, unSupportedFileMessage)
+        wrapper.vm.onUnSupportedFormat(unSupportedFileMessage)
+        expect(mocks.$toast.error).toHaveBeenCalledWith(unSupportedFileMessage)
       })
     })
   })
