@@ -205,7 +205,6 @@ export default {
           variables: { role: newRole, id },
         })
         .catch((error) => {
-          console.log(error.message)
           this.$toast.error(error.message)
         })
     },
