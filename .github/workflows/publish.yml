@@ -58,7 +58,7 @@ jobs:
       - name: Neo4J | Build `community` image
         run: |
           docker build --target community -t "ocelotsocialnetwork/neo4j:community" -t "ocelotsocialnetwork/neo4j:${VERSION}" -t "ocelotsocialnetwork/neo4j:${BUILD_VERSION}" neo4j/
-          docker save "ocelotsocialnetwork/neo4j:community" > /tmp/neo4j.tar
+          docker save "ocelotsocialnetwork/neo4j" > /tmp/neo4j.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -95,7 +95,7 @@ jobs:
       - name: backend | Build `production` image
         run: |
           docker build --target production -t "ocelotsocialnetwork/backend:latest" -t "ocelotsocialnetwork/backend:${VERSION}" -t "ocelotsocialnetwork/backend:${BUILD_VERSION}" backend/
-          docker save "ocelotsocialnetwork/backend:latest" > /tmp/backend.tar
+          docker save "ocelotsocialnetwork/backend" > /tmp/backend.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -132,7 +132,7 @@ jobs:
       - name: webapp | Build `production` image
         run: |
           docker build --target production -t "ocelotsocialnetwork/webapp:latest" -t "ocelotsocialnetwork/webapp:${VERSION}" -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}" webapp/
-          docker save "ocelotsocialnetwork/webapp:latest" > /tmp/webapp.tar
+          docker save "ocelotsocialnetwork/webapp" > /tmp/webapp.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -170,7 +170,7 @@ jobs:
         # TODO: --target production
         run: |
           docker build -t "ocelotsocialnetwork/maintenance:latest" -t "ocelotsocialnetwork/maintenance:${VERSION}" -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}" webapp/ -f webapp/Dockerfile.maintenance
-          docker save "ocelotsocialnetwork/maintenance:latest" > /tmp/maintenance.tar
+          docker save "ocelotsocialnetwork/maintenance" > /tmp/maintenance.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -247,6 +247,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [upload_to_dockerhub]
     steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
       ##########################################################################
       # SET ENVS ###############################################################
       ##########################################################################
