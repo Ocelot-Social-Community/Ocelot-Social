@@ -230,13 +230,14 @@ jobs:
       - name: login to dockerhub
         run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
       - name: Push neo4j
-        run: docker image push --all-tags ocelotsocialnetwork/neo4j
+      # TODO: at some point --all-tags will be needed -.-
+        run: docker push ocelotsocialnetwork/neo4j
       - name: Push backend
-        run: docker image push --all-tags ocelotsocialnetwork/backend
+        run: docker push ocelotsocialnetwork/backend
       - name: Push webapp
-        run: docker image push --all-tags ocelotsocialnetwork/webapp
+        run: docker push ocelotsocialnetwork/webapp
       - name: Push maintenance
-        run: docker image push --all-tags ocelotsocialnetwork/maintenance
+        run: docker push ocelotsocialnetwork/maintenance
 
   ##############################################################################
   # JOB: GITHUB TAG LATEST VERSION #############################################
