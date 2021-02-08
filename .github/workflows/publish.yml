@@ -228,16 +228,15 @@ jobs:
       # Upload #################################################################
       ##########################################################################
       - name: login to dockerhub
-        # TODO: Handle secrets
         run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
       - name: Push neo4j
-        run: docker push ocelotsocialnetwork/neo4j --all-tags
+        run: docker push --all-tags ocelotsocialnetwork/neo4j
       - name: Push backend
-        run: docker push ocelotsocialnetwork/backend --all-tags
+        run: docker push --all-tags ocelotsocialnetwork/backend
       - name: Push webapp
-        run: docker push ocelotsocialnetwork/webapp --all-tags
+        run: docker push --all-tags ocelotsocialnetwork/webapp
       - name: Push maintenance
-        run: docker push ocelotsocialnetwork/maintenance --all-tags
+        run: docker push --all-tags ocelotsocialnetwork/maintenance
 
   ##############################################################################
   # JOB: GITHUB TAG LATEST VERSION #############################################
