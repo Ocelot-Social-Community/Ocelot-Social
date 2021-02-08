@@ -266,14 +266,15 @@ jobs:
       ##########################################################################
       # Push version tag to GitHub #############################################
       ##########################################################################
-      - name: package-version-to-git-tag
-        uses: pkgdeps/git-tag-action@v2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          github_repo: ${{ github.repository }}
-          version: ${{ env.VERSION }}
-          git_commit_sha: ${{ github.sha }}
-          git_tag_prefix: "v"
+      # TODO: this will error on duplicate
+      #- name: package-version-to-git-tag
+      #  uses: pkgdeps/git-tag-action@v2
+      #  with:
+      #    github_token: ${{ secrets.GITHUB_TOKEN }}
+      #    github_repo: ${{ github.repository }}
+      #    version: ${{ env.VERSION }}
+      #    git_commit_sha: ${{ github.sha }}
+      #    git_tag_prefix: "v"
       ##########################################################################
       # Push build tag to GitHub ###############################################
       ##########################################################################
@@ -288,8 +289,8 @@ jobs:
       ##########################################################################
       # Push release tag to GitHub #############################################
       ##########################################################################
-      #- name: generate changelog
-      #  run: yarn auto-changelog
+      - name: generate changelog
+        run: yarn auto-changelog
       - name: package-version-to-git-release
         id: create_release
         uses: actions/create-release@v1
@@ -300,4 +301,4 @@ jobs:
           release_name: ${{ env.VERSION }}
           body_path: ./CHANGELOG.md
           draft: false
-          prerelease: true
+          prerelease: false
