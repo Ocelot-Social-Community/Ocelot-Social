@@ -180,11 +180,9 @@ export default {
       if (!this.post.image || typeof this.post.image.aspectRatio !== 'number') return false
       /*  Return the aspect ratio as a css variable. Later to be used when calculating
           the height with respect to the width.
-          Why is this correction necessary?
       */
       return {
         '--hero-image-aspect-ratio': 1.0 / this.post.image.aspectRatio,
-        '--hero-image-correction': 1.0 / this.post.image.aspectRatio * 48.0 + 'px',
       }
     },
   },
@@ -261,7 +259,7 @@ export default {
         the autoscroll works correctly when following a comment link. 
     */
 
-    padding-top: calc(var(--hero-image-aspect-ratio) * 100% + var(--hero-image-correction));
+    padding-top: calc(var(--hero-image-aspect-ratio) * (100% + 48px));
     /*  Letting the image fill the container, since the container
         is the one determining height
     */
