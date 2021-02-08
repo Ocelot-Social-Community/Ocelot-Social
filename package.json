@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Fullstack and API tests with cypress and cucumber for ocelot.social",
   "author": "ocelot.social Community",
   "license": "MIT",
@@ -23,8 +23,7 @@
     "cypress:open": "cross-env cypress open --browser firefox",
     "cucumber:setup": "cd backend && yarn run dev",
     "cucumber": "wait-on tcp:4000 && cucumber-js --require-module @babel/register --exit",
-    "release": "standard-version",
-    "generate:changelog": "yarn version && auto-changelog"
+    "release": "yarn version --no-git-tag-version --no-commit-hooks --no-commit && auto-changelog && cd backend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\")"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
@@ -51,8 +50,7 @@
     "neode": "^0.3.7",
     "npm-run-all": "^4.1.5",
     "rosie": "^2.0.1",
-    "slug": "^2.1.1",
-    "standard-version": "^8.0.1"
+    "slug": "^2.1.1"
   },
   "resolutions": {
     "set-value": "^2.0.1"
