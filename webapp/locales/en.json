@@ -63,6 +63,7 @@
         "placeholder": "e-mail, name or description"
       },
       "name": "Users",
+      "roleChanged": "Role changed successfully!",
       "table": {
         "columns": {
           "createdAt": "Created at",

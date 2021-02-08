@@ -49,11 +49,12 @@
           {{ scope.row.createdAt | dateTime }}
         </template>
 
-        <template slot="role" slot-scope="scope" v-if="scope.row.email != currentUser.email">
+        <template slot="role" slot-scope="scope">
           <ApolloQuery :query="FetchAllRoles">
             <template v-slot="{ result: { data } }">
               <template v-if="data">
                 <select
+                  v-if="scope.row.id !== currentUser.id"
                   :value="`${scope.row.role}`"
                   v-on:change="changeUserRole(scope.row.id, $event)"
                 >
@@ -61,6 +62,7 @@
                     {{ value.name }}
                   </option>
                 </select>
+                <ds-text v-else>{{ scope.row.role }}</ds-text>
               </template>
             </template>
           </ApolloQuery>
@@ -203,6 +205,9 @@ export default {
         .mutate({
           mutation: updateUserRole(newRole, id),
           variables: { role: newRole, id },
+        })
+        .then(({ data }) => {
+          this.$toast.success(this.$t('admin.users.roleChanged'))
         })
         .catch((error) => {
           this.$toast.error(error.message)
