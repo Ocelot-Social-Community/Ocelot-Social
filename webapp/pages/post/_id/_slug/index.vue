@@ -54,9 +54,6 @@
       </div>
       <ds-space margin-top="x-large">
         <ds-flex :gutter="{ lg: 'small' }">
-          <ds-flex-item :width="{ lg: '75%', md: '75%', sm: '75%', base: '100%' }">
-            <hc-emotions :post="post" />
-          </ds-flex-item>
           <!-- Shout Button -->
           <ds-flex-item
             :width="{ lg: '15%', md: '22%', sm: '22%', base: '100%' }"
@@ -107,7 +104,6 @@ import {
   sortTagsAlphabetically,
 } from '~/components/utils/PostHelpers'
 import PostQuery from '~/graphql/PostQuery'
-import HcEmotions from '~/components/Emotions/Emotions'
 import PostMutations from '~/graphql/PostMutations'
 import links from '~/constants/links.js'
 
@@ -124,7 +120,6 @@ export default {
     ContentMenu,
     CommentForm,
     CommentList,
-    HcEmotions,
     ContentViewer,
   },
   head() {
