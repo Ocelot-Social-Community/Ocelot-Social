@@ -8,35 +8,32 @@ config.stubs['nuxt-link'] = '<span><slot /></span>'
 describe('Users', () => {
   let wrapper
   let Wrapper
-  let mocks
   let getters
 
-  beforeEach(() => {
-    mocks = {
-      $t: jest.fn(),
-      $apollo: {
-        loading: false,
-        mutate: jest
-          .fn()
-          .mockRejectedValue({ message: 'Ouch!' })
-          .mockResolvedValue({
-            data: {
-              switchUserRole: {
-                id: 'user',
-                email: 'user@example.org',
-                name: 'User',
-                role: 'moderator',
-                slug: 'user',
-              },
+  const mocks = {
+    $t: jest.fn(),
+    $apollo: {
+      loading: false,
+      mutate: jest
+        .fn()
+        .mockRejectedValue({ message: 'Ouch!' })
+        .mockResolvedValue({
+          data: {
+            switchUserRole: {
+              id: 'user',
+              email: 'user@example.org',
+              name: 'User',
+              role: 'moderator',
+              slug: 'user',
             },
-          }),
-      },
-      $toast: {
-        error: jest.fn(),
-        success: jest.fn(),
-      },
-    }
-  })
+          },
+        }),
+    },
+    $toast: {
+      error: jest.fn(),
+      success: jest.fn(),
+    },
+  }
 
   describe('mount', () => {
     getters = {
@@ -129,24 +126,24 @@ describe('Users', () => {
         expect(adminRow.find('select').exists()).toBe(false)
       })
 
-      it('changes the role of another user', async () => {
-        jest.useFakeTimers()
-
-        // console.log(wrapper.html())
-
+      it('changes the role of another user', () => {
         const userRow = wrapper.findAll('tr').at(2)
-        await userRow.findAll('option').at(2).setSelected()
+        userRow.findAll('option').at(1).setSelected()
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            variables: {
+              id: 'user',
+              role: 'moderator',
+            },
+          }),
+        )
+        // await expect(mocks.$toast.success).toHaveBeenCalled()
+      })
 
-        jest.runAllTimers()
-
-        await wrapper.vm.$nextTick()
-        await wrapper.vm.$nextTick()
-        await wrapper.vm.$nextTick()
-        await wrapper.vm.$nextTick()
-
-        await mocks.$apollo.mutate
-        // await expect(mocks.$apollo.mutate).toHaveBeenCalled()
-        await expect(mocks.$toast.success).toHaveBeenCalled()
+      it('toasts a success message after role has changed', () => {
+        const userRow = wrapper.findAll('tr').at(2)
+        userRow.findAll('option').at(1).setSelected()
+        expect(mocks.$toast.success).toHaveBeenCalled()
       })
     })
   })
