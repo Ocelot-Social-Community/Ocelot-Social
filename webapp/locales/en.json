@@ -163,7 +163,7 @@
       },
       "signup": {
         "form": {
-          "data-privacy": "I have read and understood the <a href=\"/data-privacy\" target=\"_blank\"><ds-text bold color=\"primary\">Privacy Statement</ds-text></a>.",
+          "data-privacy": "I have read and understood the privacy statement.",
           "description": "To get started, you can register here for free:",
           "errors": {
             "email-exists": "There is already a user account with this e-mail address!",
@@ -767,7 +767,7 @@
   "termsAndConditions": {
     "agree": "I agree!",
     "newTermsAndConditions": "New Terms and Conditions",
-    "termsAndConditionsConfirmed": "I have read and confirmed the Terms and Conditions.",
+    "termsAndConditionsConfirmed": "I have read and confirmed the terms and conditions.",
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
   },
