@@ -69,6 +69,8 @@
 <script>
 import gql from 'graphql-tag'
 import metadata from '~/constants/metadata'
+import { isEmail } from 'validator'
+import normalizeEmail from '~/components/utils/NormalizeEmail'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 
 export const SignupMutation = gql`
@@ -107,18 +109,6 @@ export default {
           required: true,
           message: this.$t('common.validations.email'),
         },
-        // email: [
-        //   { type: 'email', required: true },
-        //   {
-        //     validator(rule, value, callback, source, options) {
-        //       const errors = []
-        //       if (currentEmail === normalizeEmail(value)) {
-        //         errors.push(this.$t('common.validations.email'))
-        //       }
-        //       return errors
-        //     },
-        //   },
-        // ],
       },
       // disabled: true,
       data: null,
@@ -132,6 +122,7 @@ export default {
       this.formData.email = this.sliderData.collectedInputData.email
         ? this.sliderData.collectedInputData.email
         : ''
+      this.sendValidation()
     })
   },
   computed: {
@@ -139,24 +130,39 @@ export default {
       const { email } = this.data.Signup
       return this.$t('components.registration.signup.form.success', { email })
     },
-    // valid() {
-    //   const isValid =
-    //     this.formData.email.XXX === XXX
-    //   return isValid
-    // },
+    valid() {
+      let isValid
+      if (isEmail(this.formData.email)) {
+        this.formData.email = normalizeEmail(this.formData.email)
+        isValid = true
+      } else {
+        isValid = false
+      }
+      return isValid
+    },
   },
   methods: {
+    sendValidation() {
+      const { email } = this.formData
+      const value = {
+        email,
+      }
+      // console.log('sendValidation !!! value: ', value)
+      this.sliderData.validateCallback(this.valid, value)
+    },
     handleInput() {
       // this.disabled = true
-      this.sliderData.validateCallback(false)
+      // this.sliderData.validateCallback(false)
+      this.sendValidation()
     },
     handleInputValid() {
       // this.disabemailled = false
-      const { email } = this.formData
+      // const { email } = this.formData
       // validate in backend?
       // toaster?
-      console.log('sendValidation !!! email: ', email)
-      this.sliderData.validateCallback(true, { email })
+      // console.log('sendValidation !!! email: ', email)
+      // this.sliderData.validateCallback(true, { email })
+      this.sendValidation()
     },
     async handleSubmit() {
       const mutation = this.token ? SignupByInvitationMutation : SignupMutation

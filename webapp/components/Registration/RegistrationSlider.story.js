@@ -26,6 +26,7 @@ storiesOf('RegistrationSlider', module)
         collectedInputData: {
           inviteCode: 'IN1T6Y',
           email: 'wolle.huss@pjannto.com',
+          emailSend: true,
           nonce: 'NTRSCZ',
           name: 'Wolle',
           password: 'Hello',
@@ -45,7 +46,7 @@ storiesOf('RegistrationSlider', module)
       <registration-slider registrationType="invite-code" :overwriteSliderData="overwriteSliderData" />
     `,
   }))
-  .add('public-registration', () => ({
+  .add('public-registration empty', () => ({
     components: { RegistrationSlider },
     store: helpers.store,
     data: () => ({
@@ -55,7 +56,35 @@ storiesOf('RegistrationSlider', module)
       <registration-slider registrationType="public-registration" />
     `,
   }))
-  .add('invite-mail', () => ({
+  .add('public-registration with data', () => ({
+    components: { RegistrationSlider },
+    store: helpers.store,
+    data: () => ({
+      overwriteSliderData: {
+        collectedInputData: {
+          inviteCode: null,
+          email: 'wolle.huss@pjannto.com',
+          emailSend: false,
+          nonce: 'NTRSCZ',
+          name: 'Wolle',
+          password: 'Hello',
+          passwordConfirmation: 'Hello',
+          about: `Hey`,
+          termsAndConditionsAgreedVersion: null,
+          termsAndConditionsConfirmed: true,
+          dataPrivacy: true,
+          minimumAge: true,
+          noCommercial: true,
+          noPolitical: true,
+          locale: null,
+        },
+      },
+    }),
+    template: `
+      <registration-slider registrationType="public-registration" :overwriteSliderData="overwriteSliderData" />
+    `,
+  }))
+  .add('invite-mail empty', () => ({
     components: { RegistrationSlider },
     store: helpers.store,
     data: () => ({
@@ -63,5 +92,33 @@ storiesOf('RegistrationSlider', module)
     }),
     template: `
       <registration-slider registrationType="invite-mail" />
+    `,
+  }))
+  .add('invite-mail with data', () => ({
+    components: { RegistrationSlider },
+    store: helpers.store,
+    data: () => ({
+      overwriteSliderData: {
+        collectedInputData: {
+          inviteCode: null,
+          email: 'wolle.huss@pjannto.com',
+          emailSend: null,
+          nonce: 'NTRSCZ',
+          name: 'Wolle',
+          password: 'Hello',
+          passwordConfirmation: 'Hello',
+          about: `Hey`,
+          termsAndConditionsAgreedVersion: null,
+          termsAndConditionsConfirmed: true,
+          dataPrivacy: true,
+          minimumAge: true,
+          noCommercial: true,
+          noPolitical: true,
+          locale: null,
+        },
+      },
+    }),
+    template: `
+      <registration-slider registrationType="invite-mail" :overwriteSliderData="overwriteSliderData" />
     `,
   }))

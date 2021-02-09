@@ -7,6 +7,11 @@
     @input="handleInput"
     @input-valid="handleInputValid"
   >
+    <ds-text>
+      <!-- Wolle {{ $t('components.enter-nonce.form.description') }} -->
+      Your e-mail address:
+      <b>{{ this.sliderData.collectedInputData.email }}</b>
+    </ds-text>
     <ds-input
       :placeholder="$t('components.enter-nonce.form.nonce')"
       model="nonce"
@@ -54,19 +59,37 @@ export default {
       this.formData.nonce = this.sliderData.collectedInputData.nonce
         ? this.sliderData.collectedInputData.nonce
         : ''
+      this.sendValidation()
     })
   },
+  computed: {
+    valid() {
+      const isValid =
+        this.formData.nonce.length === 6
+      return isValid
+    },
+  },
   methods: {
+    sendValidation() {
+      const { nonce } = this.formData
+      const value = {
+        nonce,
+      }
+      // console.log('sendValidation !!! value: ', value)
+      this.sliderData.validateCallback(this.valid, value)
+    },
     async handleInput() {
       // this.disabled = true
-      this.sliderData.validateCallback(false)
+      // this.sliderData.validateCallback(false)
+      this.sendValidation()
     },
     async handleInputValid() {
       // this.disabled = false
-      const { nonce } = this.formData
+      // const { nonce } = this.formData
       // validate in backend?
       // toaster?
-      this.sliderData.validateCallback(true, { nonce })
+      // this.sliderData.validateCallback(true, { nonce })
+      this.sendValidation()
     },
     handleSubmitVerify() {
       // const { nonce } = this.formData

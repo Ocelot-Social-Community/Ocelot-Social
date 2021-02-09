@@ -66,7 +66,7 @@ export default {
       const value = {
         inviteCode,
       }
-      console.log('sendValidation !!! value: ', value)
+      // console.log('sendValidation !!! value: ', value)
       this.sliderData.validateCallback(this.valid, value)
     },
     async handleInput() {

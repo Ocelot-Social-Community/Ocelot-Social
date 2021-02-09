@@ -100,6 +100,7 @@ export default {
         title: 'E-Mail', // Wolle
         validated: false,
         button: {
+          // title: this.sliderData.collectedInputData.emailSend ? 'Resend E-Mail' : 'Send E-Mail', // Wolle
           title: 'Send E-Mail', // Wolle
           icon: 'envelope',
           callback: this.buttonCallback,
@@ -154,6 +155,7 @@ export default {
         collectedInputData: {
           inviteCode: null,
           email: null,
+          emailSend: null,
           nonce: null,
           name: null,
           password: null,
@@ -196,6 +198,12 @@ export default {
       }
     },
     buttonCallback() {
+      if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
+        console.log('buttonCallback !!! enter-email')
+        this.sliderData.collectedInputData.emailSend = true
+        this.sliderData.sliders[this.sliderIndex].button.title = 'Resend E-Mail' // Wolle
+      }
+
       if (this.sliderIndex === this.sliderData.sliders.length - 1) {
         // console.log('submit data: ', this.sliderData.collectedInputData)
       } else {

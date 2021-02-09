@@ -68,7 +68,13 @@
           autocomplete="off"
           :label="$t('settings.security.change-password.label-new-password-confirm')"
         />
-        <password-strength :password="formData.password" />
+        <password-strength class="password-strength" :password="formData.password" />
+
+        <ds-text>
+          <!-- Wolle {{ $t('components.enter-nonce.form.description') }} -->
+          Your e-mail address:
+          <b>{{ this.sliderData.collectedInputData.email }}</b>
+        </ds-text>
 
         <ds-text>
           <input
@@ -353,8 +359,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.create-account-image {
-  width: 50%;
-  max-width: 200px;
+.password-strength {
+  margin-bottom: 14px;
 }
 </style>
