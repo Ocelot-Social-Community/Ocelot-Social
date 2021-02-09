@@ -3,9 +3,9 @@
     class="enter-invite"
     v-model="formData"
     :schema="formSchema"
-    @submit="handleSubmitVerify"
     @input="handleInput"
     @input-valid="handleInputValid"
+    @submit="handleSubmitVerify"
   >
     <ds-input
       :placeholder="$t('components.enter-invite.form.invite-code')"
@@ -46,23 +46,41 @@ export default {
   mounted: function () {
     this.$nextTick(function () {
       // Code that will run only after the entire view has been rendered
-      // console.log('mounted !!! ')
+      console.log('mounted !!! this.sliderData.collectedInputData.inviteCode: ', this.sliderData.collectedInputData.inviteCode)
       this.formData.inviteCode = this.sliderData.collectedInputData.inviteCode
         ? this.sliderData.collectedInputData.inviteCode
         : ''
+      this.sendValidation()
     })
   },
+  computed: {
+    valid() {
+      const isValid =
+        this.formData.inviteCode.length === 6
+      return isValid
+    },
+  },
   methods: {
+    sendValidation() {
+      const { inviteCode } = this.formData
+      const value = {
+        inviteCode,
+      }
+      console.log('sendValidation !!! value: ', value)
+      this.sliderData.validateCallback(this.valid, value)
+    },
     async handleInput() {
       // Wolle console.log('handleInput !!!')
-      this.sliderData.validateCallback(false)
+      // this.sliderData.validateCallback(false)
+      this.sendValidation()
     },
     async handleInputValid() {
       // Wolle console.log('handleInputValid !!!')
-      const { inviteCode } = this.formData
+      // const { inviteCode } = this.formData
       // validate in backend
       // toaster
-      this.sliderData.validateCallback(true, { /* email, */ inviteCode })
+      // this.sliderData.validateCallback(true, { /* email, */ inviteCode })
+      this.sendValidation()
     },
     handleSubmitVerify() {
       // Wolle const { nonce } = this.formData

@@ -1,0 +1,197 @@
+<template>
+  <ds-space v-if="!data && !error" margin="large">
+    <ds-form
+      v-model="formData"
+      :schema="formSchema"
+      @input="handleInput"
+      @input-valid="handleInputValid"
+      @submit="handleSubmit"
+    >
+      <!-- Wolle <h1>
+        {{
+          invitation
+            ? $t('profile.invites.title', metadata)
+            : $t('components.registration.signup.title', metadata)
+        }}
+      </h1> -->
+      <ds-space v-if="token" margin-botton="large">
+        <ds-text v-html="$t('registration.signup.form.invitation-code', { code: token })" />
+      </ds-space>
+      <ds-space margin-botton="large">
+        <ds-text>
+          {{
+            invitation
+              ? $t('profile.invites.description')
+              : $t('components.registration.signup.form.description')
+          }}
+        </ds-text>
+      </ds-space>
+      <ds-input
+        :placeholder="invitation ? $t('profile.invites.emailPlaceholder') : $t('login.email')"
+        type="email"
+        id="email"
+        model="email"
+        name="email"
+        icon="envelope"
+      />
+      <!-- <base-button
+        :disabled="disabled"
+        :loading="$apollo.loading"
+        filled
+        name="submit"
+        type="submit"
+        icon="envelope"
+      >
+        {{ $t('components.registration.signup.form.submit') }}
+      </base-button> -->
+      <slot></slot>
+    </ds-form>
+  </ds-space>
+  <div v-else margin="large">
+    <template v-if="!error">
+      <transition name="ds-transition-fade">
+        <sweetalert-icon icon="info" />
+      </transition>
+      <ds-text align="center" v-html="submitMessage" />
+    </template>
+    <template v-else>
+      <transition name="ds-transition-fade">
+        <sweetalert-icon icon="error" />
+      </transition>
+      <ds-text align="center">{{ error.message }}</ds-text>
+      <ds-space centered class="space-top">
+        <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
+      </ds-space>
+    </template>
+  </div>
+</template>
+
+<script>
+import gql from 'graphql-tag'
+import metadata from '~/constants/metadata'
+import { SweetalertIcon } from 'vue-sweetalert-icons'
+
+export const SignupMutation = gql`
+  mutation($email: String!) {
+    Signup(email: $email) {
+      email
+    }
+  }
+`
+export const SignupByInvitationMutation = gql`
+  mutation($email: String!, $token: String!) {
+    SignupByInvitation(email: $email, token: $token) {
+      email
+    }
+  }
+`
+export default {
+  name: 'RegistrationItemEnterEmail',
+  components: {
+    SweetalertIcon,
+  },
+  props: {
+    sliderData: { type: Object, required: true },
+    token: { type: String, default: null }, // Wolle not used???
+    invitation: { type: Boolean, default: false },
+  },
+  data() {
+    return {
+      metadata,
+      formData: {
+        email: '',
+      },
+      formSchema: {
+        email: {
+          type: 'email',
+          required: true,
+          message: this.$t('common.validations.email'),
+        },
+        // email: [
+        //   { type: 'email', required: true },
+        //   {
+        //     validator(rule, value, callback, source, options) {
+        //       const errors = []
+        //       if (currentEmail === normalizeEmail(value)) {
+        //         errors.push(this.$t('common.validations.email'))
+        //       }
+        //       return errors
+        //     },
+        //   },
+        // ],
+      },
+      // disabled: true,
+      data: null,
+      error: null,
+    }
+  },
+  mounted: function () {
+    this.$nextTick(function () {
+      // Code that will run only after the entire view has been rendered
+      // console.log('mounted !!! ')
+      this.formData.email = this.sliderData.collectedInputData.email
+        ? this.sliderData.collectedInputData.email
+        : ''
+    })
+  },
+  computed: {
+    submitMessage() {
+      const { email } = this.data.Signup
+      return this.$t('components.registration.signup.form.success', { email })
+    },
+    // valid() {
+    //   const isValid =
+    //     this.formData.email.XXX === XXX
+    //   return isValid
+    // },
+  },
+  methods: {
+    handleInput() {
+      // this.disabled = true
+      this.sliderData.validateCallback(false)
+    },
+    handleInputValid() {
+      // this.disabemailled = false
+      const { email } = this.formData
+      // validate in backend?
+      // toaster?
+      console.log('sendValidation !!! email: ', email)
+      this.sliderData.validateCallback(true, { email })
+    },
+    async handleSubmit() {
+      const mutation = this.token ? SignupByInvitationMutation : SignupMutation
+      const { token } = this
+      const { email } = this.formData
+
+      try {
+        const response = await this.$apollo.mutate({ mutation, variables: { email, token } })
+        this.data = response.data
+        setTimeout(() => {
+          this.$emit('submit', { email: this.data.Signup.email })
+        }, 3000)
+      } catch (err) {
+        const { message } = err
+        const mapping = {
+          'A user account with this email already exists': 'email-exists',
+          'Invitation code already used or does not exist': 'invalid-invitation-token',
+        }
+        for (const [pattern, key] of Object.entries(mapping)) {
+          if (message.includes(pattern))
+            this.error = {
+              key,
+              message: this.$t(`components.registration.signup.form.errors.${key}`),
+            }
+        }
+        if (!this.error) {
+          this.$toast.error(message)
+        }
+      }
+    },
+  },
+}
+</script>
+<style>
+.space-top {
+  margin-top: 6ex;
+}
+</style>

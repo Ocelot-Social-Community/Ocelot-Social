@@ -14,23 +14,25 @@
           </ds-heading>
         </template>
 
-        <template #enter-invite>
+        <template v-if="['invite-code'].includes(registrationType)" #enter-invite>
           <registration-item-enter-invite :sliderData="sliderData" />
         </template>
 
-        <!-- <template #enter-email> -->
-        <!-- Wolle !!! may create same source with 'webapp/pages/registration/signup.vue' -->
-        <!-- <signup v-if="publicRegistration" :invitation="false" @submit="handleSubmitted"> -->
-        <!-- <signup :invitation="false" @submit="handleSubmitted">
-            <ds-space centered margin-top="large">
-              <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
-            </ds-space>
-          </signup> -->
-        <!-- <ds-space v-else centered>
-            <hc-empty icon="events" :message="$t('components.registration.signup.unavailable')" />
-            <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
-          </ds-space> -->
-        <!-- </template> -->
+        <template
+          v-if="['invite-code', 'public-registration'].includes(registrationType)"
+          #enter-email
+        >
+          <!-- Wolle !!! may create same source with 'webapp/pages/registration/signup.vue' -->
+          <!-- <signup v-if="publicRegistration" :invitation="false" @submit="handleSubmitted"> -->
+          <registration-item-enter-email :invitation="false" :sliderData="sliderData" />
+        </template>
+
+        <template
+          v-if="['invite-code', 'public-registration', 'invite-mail'].includes(registrationType)"
+          #enter-nonce
+        >
+          <registration-item-enter-nonce :sliderData="sliderData" />
+        </template>
 
         <template #create-user-account>
           <registration-item-create-user-account
@@ -58,11 +60,12 @@
 import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
 import ComponentSlider from '~/components/ComponentSlider/ComponentSlider'
-import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
-import Signup from '~/components/Registration/Signup'
 import HcEmpty from '~/components/Empty/Empty'
-import RegistrationItemEnterInvite from './RegistrationItemEnterInvite'
+import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import RegistrationItemCreateUserAccount from './RegistrationItemCreateUserAccount'
+import RegistrationItemEnterEmail from '~/components/Registration/RegistrationItemEnterEmail'
+import RegistrationItemEnterInvite from './RegistrationItemEnterInvite'
+import RegistrationItemEnterNonce from './RegistrationItemEnterNonce'
 
 export default {
   name: 'RegistrationSlider',
@@ -70,11 +73,80 @@ export default {
     ComponentSlider,
     HcEmpty,
     LocaleSwitch,
-    RegistrationItemEnterInvite,
     RegistrationItemCreateUserAccount,
-    Signup,
+    RegistrationItemEnterEmail,
+    RegistrationItemEnterInvite,
+    RegistrationItemEnterNonce,
+  },
+  props: {
+    registrationType: { type: String, required: true },
+    overwriteSliderData: { type: Object, default: () => {} },
   },
   data() {
+    const slidersPortfolio = [
+      {
+        name: 'enter-invite',
+        // title: this.$t('components.registration.create-user-account.title'),
+        title: 'Invitation', // Wolle
+        validated: false,
+        button: {
+          title: 'Next', // Wolle
+          icon: 'arrow-right',
+          callback: this.buttonCallback,
+        },
+      },
+      {
+        name: 'enter-email',
+        title: 'E-Mail', // Wolle
+        validated: false,
+        button: {
+          title: 'Send E-Mail', // Wolle
+          icon: 'envelope',
+          callback: this.buttonCallback,
+        },
+      },
+      {
+        name: 'enter-nonce',
+        title: 'E-Mail Confirmation', // Wolle
+        validated: false,
+        button: {
+          title: 'Confirm', // Wolle
+          icon: 'arrow-right',
+          callback: this.buttonCallback,
+        },
+      },
+      {
+        name: 'create-user-account',
+        title: this.$t('components.registration.create-user-account.title'),
+        validated: false,
+        button: {
+          // title: this.$t('actions.save'), // Wolle
+          title: 'Create', // Wolle
+          icon: 'check',
+          callback: this.buttonCallback,
+        },
+      },
+    ]
+    // Wolle console.log('this.registrationType: ', this.registrationType)
+    let sliders = []
+    switch (this.registrationType) {
+      case 'invite-code':
+        sliders = [
+          slidersPortfolio[0],
+          slidersPortfolio[1],
+          slidersPortfolio[2],
+          slidersPortfolio[3],
+        ]
+        break
+      case 'public-registration':
+        sliders = [slidersPortfolio[1], slidersPortfolio[2], slidersPortfolio[3]]
+        break
+      case 'invite-mail':
+        sliders = [slidersPortfolio[2], slidersPortfolio[3]]
+        break
+    }
+    // let sliders = slidersPortfolio
+
     return {
       links,
       metadata,
@@ -84,7 +156,8 @@ export default {
           email: null,
           nonce: null,
           name: null,
-          // password: null,
+          password: null,
+          passwordConfirmation: null,
           about: null,
           termsAndConditionsAgreedVersion: null,
           termsAndConditionsConfirmed: null,
@@ -92,44 +165,13 @@ export default {
           minimumAge: null,
           noCommercial: null,
           noPolitical: null,
-          // locale: null, // Wolle: what to do? Is collected in the last slider?! and gets stored in the database …
+          locale: null, // Wolle: what to do? Is collected in the last slider?! and gets stored in the database …
         },
         sliderIndex: 0,
-        sliders: [
-          {
-            name: 'enter-invite',
-            // title: this.$t('components.registration.create-user-account.title'),
-            title: 'Invitation', // Wolle
-            validated: false,
-            button: {
-              title: 'Next', // Wolle
-              icon: 'arrow-right',
-              callback: this.buttonCallback,
-            },
-          },
-          // {
-          //   name: 'enter-email',
-          // validated: false,
-          // title: 'E-Mail', // Wolle
-          // button: {
-          //   title: 'Next', // Wolle
-          // icon:           :icon="(sliderIndex < sliderData.sliders.length - 1 && 'arrow-right') || (sliderIndex === sliderData.sliders.length - 1 && 'check')"
-          //   callback: this.buttonCallback,
-          // },
-          // },
-          {
-            name: 'create-user-account',
-            title: this.$t('components.registration.create-user-account.title'),
-            validated: false,
-            button: {
-              title: this.$t('actions.save'), // Wolle
-              icon: 'check',
-              callback: this.buttonCallback,
-            },
-          },
-        ],
+        sliders: sliders,
         sliderSelectorCallback: this.sliderSelectorCallback,
         validateCallback: this.validateCallback,
+        ...this.overwriteSliderData,
       },
     }
   },

@@ -29,10 +29,11 @@
       </ds-heading>
     </ds-space> -->
 
-    <ds-form class="create-user-account"
+    <ds-form
+      class="create-user-account"
       v-model="formData"
       :schema="formSchema"
-      @submit="submit"     
+      @submit="submit"
       @input="handleInput"
       @input-valid="handleInputValid"
     >
@@ -226,6 +227,7 @@ export default {
       this.noPolitical = this.sliderData.collectedInputData.noPolitical
         ? this.sliderData.collectedInputData.noPolitical
         : false
+      this.sendValidation()
     })
   },
   computed: {
@@ -284,7 +286,7 @@ export default {
         noCommercial,
         noPolitical,
       } = this
-      // const locale = this.$i18n.locale()
+      const locale = this.$i18n.locale()
       const value = {
         name,
         about,
@@ -298,7 +300,7 @@ export default {
         minimumAge,
         noCommercial,
         noPolitical,
-        // locale,
+        locale,
       }
       console.log('sendValidation !!!', ' this.valid: ', this.valid, ' value: ', value)
       this.sliderData.validateCallback(this.valid, value)
