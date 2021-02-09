@@ -137,7 +137,6 @@ describe('Users', () => {
             },
           }),
         )
-        // await expect(mocks.$toast.success).toHaveBeenCalled()
       })
 
       it('toasts a success message after role has changed', () => {
