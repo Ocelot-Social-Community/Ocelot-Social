@@ -29,7 +29,7 @@ services:
       - BUILD_DATE
       - BUILD_VERSION
       - BUILD_COMMIT
-      - NODE_ENV="development"
+      - NODE_ENV="production"
       # Application only envs
       - HOST=0.0.0.0 # This is nuxt specific, alternative value is HOST=webapp
       - GRAPHQL_URI=http://backend:4000
@@ -60,7 +60,7 @@ services:
       - BUILD_DATE
       - BUILD_VERSION
       - BUILD_COMMIT
-      - NODE_ENV="development"
+      - NODE_ENV="production"
       # Application only envs
       - DEBUG=false
       - NEO4J_URI=bolt://neo4j:7687
