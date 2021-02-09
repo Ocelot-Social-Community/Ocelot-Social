@@ -14,18 +14,14 @@
             : $t('components.registration.signup.title', metadata)
         }}
       </h1> -->
-      <ds-space v-if="token" margin-botton="large">
-        <ds-text v-html="$t('registration.signup.form.invitation-code', { code: token })" />
-      </ds-space>
-      <ds-space margin-botton="large">
-        <ds-text>
-          {{
-            invitation
-              ? $t('profile.invites.description')
-              : $t('components.registration.signup.form.description')
-          }}
-        </ds-text>
-      </ds-space>
+      <ds-text v-if="token" v-html="$t('registration.signup.form.invitation-code', { code: token })" />
+      <ds-text>
+        {{
+          invitation
+            ? $t('profile.invites.description')
+            : $t('components.registration.signup.form.description')
+        }}
+      </ds-text>
       <ds-input
         :placeholder="invitation ? $t('profile.invites.emailPlaceholder') : $t('login.email')"
         type="email"

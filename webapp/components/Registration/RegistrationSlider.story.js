@@ -64,7 +64,7 @@ storiesOf('RegistrationSlider', module)
         collectedInputData: {
           inviteCode: null,
           email: 'wolle.huss@pjannto.com',
-          emailSend: false,
+          emailSend: true,
           nonce: 'NTRSCZ',
           name: 'Wolle',
           password: 'Hello',
@@ -88,10 +88,28 @@ storiesOf('RegistrationSlider', module)
     components: { RegistrationSlider },
     store: helpers.store,
     data: () => ({
-      // Wolle searchResults,
+      overwriteSliderData: {
+        collectedInputData: {
+          inviteCode: null,
+          email: 'wolle.huss@pjannto.com',
+          emailSend: true,
+          nonce: null,
+          name: null,
+          password: null,
+          passwordConfirmation: null,
+          about: null,
+          termsAndConditionsAgreedVersion: null,
+          termsAndConditionsConfirmed: null,
+          dataPrivacy: null,
+          minimumAge: null,
+          noCommercial: null,
+          noPolitical: null,
+          locale: null,
+        },
+      },
     }),
     template: `
-      <registration-slider registrationType="invite-mail" />
+      <registration-slider registrationType="invite-mail" :overwriteSliderData="overwriteSliderData" />
     `,
   }))
   .add('invite-mail with data', () => ({

@@ -59,52 +59,18 @@ export default {
     },
   },
   methods: {
-    // Wolle sliderIndexByName(name) {
-    //   return this.sliderData.sliders.findIndex((slider) => slider.name === name)
-    // },
   },
 }
 </script>
 
 <style lang="scss">
 .Sliders {
-  // Wolle position: relative;
-  // background-color: #fff;
-  // height: 100%;
-  // display: flex;
-  // margin: 0;
-  // padding: 0;
-  // list-style: none;
-  // .selection-dot {
-  //   margin-right: 5px;
-  //   // &:hover {
-  //   //   border-bottom: none;
-  //   // }
-  // }
-
   &__slider-selection {
-    // padding-top: 5px;
-    // margin-right: 5px;
-
-    // text-align: center;
-    // height: 100%;
-    // flex-grow: 1;
-
-    // &:hover {
-    //   border-bottom: 2px solid #c9c6ce;
-    // }
-
     .selection-dot {
       margin-right: 2px;
     }
-    // &.--active {
-    //   border-bottom: 2px solid #17b53f;
-    // }
     &.--confirmed {
       opacity: $opacity-disabled;
-      // &:hover {
-      //   border-bottom: none;
-      // }
     }
   }
 }
