@@ -50,22 +50,18 @@
         </template>
 
         <template slot="role" slot-scope="scope">
-          <ApolloQuery :query="FetchAllRoles">
-            <template v-slot="{ result: { data } }">
-              <template v-if="data">
-                <select
-                  v-if="scope.row.id !== currentUser.id"
-                  :value="`${scope.row.role}`"
-                  v-on:change="changeUserRole(scope.row.id, $event)"
-                >
-                  <option v-for="value in data.__type.enumValues" :key="value.name">
-                    {{ value.name }}
-                  </option>
-                </select>
-                <ds-text v-else>{{ scope.row.role }}</ds-text>
-              </template>
-            </template>
-          </ApolloQuery>
+          <template v-if="userRoles">
+            <select
+              v-if="scope.row.id !== currentUser.id"
+              :value="`${scope.row.role}`"
+              v-on:change="changeUserRole(scope.row.id, $event)"
+            >
+              <option v-for="value in userRoles" :key="value">
+                {{ value }}
+              </option>
+            </select>
+            <ds-text v-else>{{ scope.row.role }}</ds-text>
+          </template>
         </template>
       </ds-table>
       <pagination-buttons :hasNext="hasNext" :hasPrevious="hasPrevious" @next="next" @back="back" />
@@ -98,7 +94,7 @@ export default {
       hasNext: false,
       email: null,
       filter: null,
-      FetchAllRoles,
+      userRoles: [],
       form: {
         formData: {
           query: '',
@@ -178,6 +174,14 @@ export default {
         return User.map((u, i) => Object.assign({}, u, { index: this.offset + i }))
       },
     },
+    userRoles: {
+      query() {
+        return FetchAllRoles()
+      },
+      update({ __type }) {
+        return __type.enumValues.map((item) => item.name)
+      },
+    },
   },
   methods: {
     back() {
@@ -203,7 +207,7 @@ export default {
       const newRole = event.target.value
       this.$apollo
         .mutate({
-          mutation: updateUserRole(newRole, id),
+          mutation: updateUserRole(),
           variables: { role: newRole, id },
         })
         .then(({ data }) => {

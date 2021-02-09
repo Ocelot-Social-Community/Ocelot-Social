@@ -1,27 +1,57 @@
-import { mount } from '@vue/test-utils'
+import { config, mount } from '@vue/test-utils'
+import Vuex from 'vuex'
 import Users from './users.vue'
 
 const localVue = global.localVue
+config.stubs['nuxt-link'] = '<span><slot /></span>'
 
 describe('Users', () => {
   let wrapper
   let Wrapper
   let mocks
+  let getters
 
   beforeEach(() => {
     mocks = {
       $t: jest.fn(),
       $apollo: {
         loading: false,
+        mutate: jest
+          .fn()
+          .mockRejectedValue({ message: 'Ouch!' })
+          .mockResolvedValue({
+            data: {
+              switchUserRole: {
+                id: 'user',
+                email: 'user@example.org',
+                name: 'User',
+                role: 'moderator',
+                slug: 'user',
+              },
+            },
+          }),
+      },
+      $toast: {
+        error: jest.fn(),
+        success: jest.fn(),
       },
     }
   })
 
   describe('mount', () => {
+    getters = {
+      'auth/isAdmin': () => true,
+      'auth/user': () => {
+        return { id: 'admin' }
+      },
+    }
+
     Wrapper = () => {
+      const store = new Vuex.Store({ getters })
       return mount(Users, {
         mocks,
         localVue,
+        store,
       })
     }
 
@@ -67,6 +97,56 @@ describe('Users', () => {
           expect(wrapper.vm.email).toBe(null)
           expect(wrapper.vm.filter).toEqual(expected)
         })
+      })
+    })
+
+    describe('change roles', () => {
+      beforeAll(() => {
+        wrapper = Wrapper()
+        wrapper.setData({
+          User: [
+            {
+              id: 'admin',
+              email: 'admin@example.org',
+              name: 'Admin',
+              role: 'admin',
+              slug: 'admin',
+            },
+            {
+              id: 'user',
+              email: 'user@example.org',
+              name: 'User',
+              role: 'user',
+              slug: 'user',
+            },
+          ],
+          userRoles: ['user', 'moderator', 'admin'],
+        })
+      })
+
+      it('cannot change own role', () => {
+        const adminRow = wrapper.findAll('tr').at(1)
+        expect(adminRow.find('select').exists()).toBe(false)
+      })
+
+      it('changes the role of another user', async () => {
+        jest.useFakeTimers()
+
+        // console.log(wrapper.html())
+
+        const userRow = wrapper.findAll('tr').at(2)
+        await userRow.findAll('option').at(2).setSelected()
+
+        jest.runAllTimers()
+
+        await wrapper.vm.$nextTick()
+        await wrapper.vm.$nextTick()
+        await wrapper.vm.$nextTick()
+        await wrapper.vm.$nextTick()
+
+        await mocks.$apollo.mutate
+        // await expect(mocks.$apollo.mutate).toHaveBeenCalled()
+        await expect(mocks.$toast.success).toHaveBeenCalled()
       })
     })
   })

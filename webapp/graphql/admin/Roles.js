@@ -1,15 +1,17 @@
 import gql from 'graphql-tag'
 
-export const FetchAllRoles = gql`
-  query {
-    __type(name: "UserGroup") {
-      name
-      enumValues {
+export const FetchAllRoles = () => {
+  return gql`
+    query {
+      __type(name: "UserGroup") {
         name
+        enumValues {
+          name
+        }
       }
     }
-  }
-`
+  `
+}
 
 export const updateUserRole = (role, id) => {
   return gql`
