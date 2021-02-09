@@ -16,6 +16,7 @@ describe('rewards', () => {
   }
 
   beforeAll(async () => {
+    await cleanDatabase()
     const { server } = createServer({
       context: () => {
         return {
