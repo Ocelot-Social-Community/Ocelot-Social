@@ -128,7 +128,6 @@ export default {
         },
       },
     ]
-    // Wolle console.log('this.registrationType: ', this.registrationType)
     let sliders = []
     switch (this.registrationType) {
       case 'invite-code':

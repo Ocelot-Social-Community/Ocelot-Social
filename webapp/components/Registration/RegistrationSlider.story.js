@@ -12,7 +12,6 @@ storiesOf('RegistrationSlider', module)
     components: { RegistrationSlider },
     store: helpers.store,
     data: () => ({
-      // Wolle searchResults,
     }),
     template: `
       <registration-slider registrationType="invite-code" />
@@ -50,7 +49,6 @@ storiesOf('RegistrationSlider', module)
     components: { RegistrationSlider },
     store: helpers.store,
     data: () => ({
-      // Wolle searchResults,
     }),
     template: `
       <registration-slider registrationType="public-registration" />

@@ -66,20 +66,14 @@ export default {
       const value = {
         inviteCode,
       }
-      // console.log('sendValidation !!! value: ', value)
+      // validate in backend
+      // toaster
       this.sliderData.validateCallback(this.valid, value)
     },
     async handleInput() {
-      // Wolle console.log('handleInput !!!')
-      // this.sliderData.validateCallback(false)
       this.sendValidation()
     },
     async handleInputValid() {
-      // Wolle console.log('handleInputValid !!!')
-      // const { inviteCode } = this.formData
-      // validate in backend
-      // toaster
-      // this.sliderData.validateCallback(true, { /* email, */ inviteCode })
       this.sendValidation()
     },
     handleSubmitVerify() {

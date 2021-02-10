@@ -37,7 +37,7 @@
       @input="handleInput"
       @input-valid="handleInputValid"
     >
-      <!-- Wolle <template v-slot="{ errors }"> -->
+      <!-- <template v-slot="{ errors }"> --> <!-- leave this here in case the scoped variable is needed in the future nobody would remember this -->
       <template>
         <ds-input
           id="name"
@@ -120,12 +120,7 @@
             v-html="$t('components.registration.signup.form.no-political')"
           ></label>
         </ds-text>
-        <!-- this is neccessary to have the 'errors' status as 'formErrors' in Javascript. I didn't found another way yet -->
-        <!-- Wolle <watch-scoped-slots-callback
-          :scopedData="{ errors }"
-          :changeCallback="watchScopedSlotsCallback"
-        ></watch-scoped-slots-callback> -->
-        <!-- <base-button
+        <!-- Wolle <base-button
           style="float: right"
           icon="check"
           type="submit"
@@ -151,7 +146,6 @@
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import links from '~/constants/links'
 import emails from '~/constants/emails'
-import WatchScopedSlotsCallback from './WatchScopedSlotsCallback'
 import PasswordStrength from '../Password/Strength'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
@@ -162,7 +156,6 @@ export default {
   components: {
     PasswordStrength,
     SweetalertIcon,
-    WatchScopedSlotsCallback,
   },
   props: {
     sliderData: { type: Object, required: true },
@@ -189,7 +182,6 @@ export default {
         },
         ...passwordForm.formSchema,
       },
-      // Wolle formErrors: null,
       response: null,
       // TODO: Our styleguide does not support checkmarks.
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
@@ -204,7 +196,6 @@ export default {
   mounted: function () {
     this.$nextTick(function () {
       // Code that will run only after the entire view has been rendered
-      // console.log('mounted !!! ')
       this.formData.name = this.sliderData.collectedInputData.name
         ? this.sliderData.collectedInputData.name
         : ''
@@ -238,10 +229,7 @@ export default {
   },
   computed: {
     valid() {
-      // console.log('valid !!! this.formData: ', this.formData, ' this.formData.password === this.formData.passwordConfirmation: ', this.formData.password === this.formData.passwordConfirmation)
-      // console.log('this.formData.name.length: ', this.formData.name.length, ' this.formData.password.length: ', this.formData.password.length)
       const isValid =
-        // !this.formErrors &&
         this.formData.name.length >= 3 &&
         this.formData.password.length >= 1 &&
         this.formData.password === this.formData.passwordConfirmation &&
@@ -255,10 +243,6 @@ export default {
     },
   },
   watch: {
-    // formData() {
-    //   console.log('formData: ', this.formData)
-    //   this.sendValidation()
-    // },
     termsAndConditionsConfirmed() {
       this.sendValidation()
     },
@@ -276,14 +260,8 @@ export default {
     },
   },
   methods: {
-    // Wolle watchScopedSlotsCallback({ errors }) {
-    //   this.formErrors = errors
-    //   console.log('watchScopedSlotsCallback !!! this.formErrors: ', this.formErrors)
-    // },
     sendValidation() {
       const { name, about, password, passwordConfirmation } = this.formData
-      // const { email, nonce } = this
-      // const { email, nonce } = this.sliderData.collectedInputData
       const termsAndConditionsAgreedVersion = VERSION
       const {
         termsAndConditionsConfirmed,
@@ -298,8 +276,6 @@ export default {
         about,
         password,
         passwordConfirmation,
-        // email,
-        // nonce,
         termsAndConditionsAgreedVersion,
         termsAndConditionsConfirmed,
         dataPrivacy,
@@ -308,25 +284,19 @@ export default {
         noPolitical,
         locale,
       }
-      console.log('sendValidation !!!', ' this.valid: ', this.valid, ' value: ', value)
+      // Wolle validate in backend
+      // toaster
       this.sliderData.validateCallback(this.valid, value)
     },
     async handleInput() {
-      // Wolle console.log('handleInput !!!')
-      // this.sliderData.validateCallback(false)
       this.sendValidation()
     },
     async handleInputValid() {
-      // Wolle console.log('handleInputValid !!!')
-      // const { inviteCode } = this.formData
-      // validate in backend
-      // toaster
-      // this.sliderData.validateCallback(true, { /* email, */ inviteCode })
       this.sendValidation()
     },
     async submit() {
       const { name, password, about } = this.formData
-      // const { email, nonce } = this
+      // Wolle const { email, nonce } = this
       const { email, nonce } = this.sliderData.collectedInputData
       const termsAndConditionsAgreedVersion = VERSION
       const locale = this.$i18n.locale()

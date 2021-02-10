@@ -22,7 +22,7 @@
     <ds-text>
       {{ $t('components.enter-nonce.form.description') }}
     </ds-text>
-    <!-- <base-button :disabled="disabled" filled name="submit" type="submit">
+    <!-- Wolle <base-button :disabled="disabled" filled name="submit" type="submit">
       {{ $t('components.enter-nonce.form.next') }}
     </base-button> -->
     <slot></slot>
