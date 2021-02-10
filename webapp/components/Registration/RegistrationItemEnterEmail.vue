@@ -14,7 +14,10 @@
             : $t('components.registration.signup.title', metadata)
         }}
       </h1> -->
-      <ds-text v-if="token" v-html="$t('registration.signup.form.invitation-code', { code: token })" />
+      <ds-text
+        v-if="token"
+        v-html="$t('registration.signup.form.invitation-code', { code: token })"
+      />
       <ds-text>
         {{
           invitation
@@ -127,23 +130,19 @@ export default {
       return this.$t('components.registration.signup.form.success', { email })
     },
     valid() {
-      let isValid
-      if (isEmail(this.formData.email)) {
-        this.formData.email = normalizeEmail(this.formData.email)
-        isValid = true
-      } else {
-        isValid = false
-      }
+      const isValid = isEmail(this.formData.email)
       return isValid
     },
   },
   methods: {
     sendValidation() {
+      if (this.formData.email && isEmail(this.formData.email)) {
+        this.formData.email = normalizeEmail(this.formData.email)
+      }
       const { email } = this.formData
       const value = {
         email,
       }
-      // console.log('sendValidation !!! value: ', value)
       this.sliderData.validateCallback(this.valid, value)
     },
     handleInput() {

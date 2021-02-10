@@ -37,7 +37,8 @@
       @input="handleInput"
       @input-valid="handleInputValid"
     >
-      <!-- <template v-slot="{ errors }"> --> <!-- leave this here in case the scoped variable is needed in the future nobody would remember this -->
+      <!-- leave this here in case the scoped variable is needed in the future nobody would remember this -->
+      <!-- <template v-slot="{ errors }"> -->
       <template>
         <ds-input
           id="name"
@@ -238,7 +239,6 @@ export default {
         this.minimumAge &&
         this.noCommercial &&
         this.noPolitical
-      console.log('valid : ', isValid)
       return isValid
     },
   },

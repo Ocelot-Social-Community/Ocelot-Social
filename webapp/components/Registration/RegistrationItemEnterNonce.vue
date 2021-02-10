@@ -64,8 +64,7 @@ export default {
   },
   computed: {
     valid() {
-      const isValid =
-        this.formData.nonce.length === 6
+      const isValid = this.formData.nonce.length === 6
       return isValid
     },
   },

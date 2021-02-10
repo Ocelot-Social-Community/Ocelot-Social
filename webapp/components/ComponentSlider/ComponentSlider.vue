@@ -58,8 +58,6 @@ export default {
       return this.sliderData.sliderIndex // have a shorter notation
     },
   },
-  methods: {
-  },
 }
 </script>
 

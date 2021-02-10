@@ -60,7 +60,6 @@
 import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
 import ComponentSlider from '~/components/ComponentSlider/ComponentSlider'
-import HcEmpty from '~/components/Empty/Empty'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import RegistrationItemCreateUserAccount from './RegistrationItemCreateUserAccount'
 import RegistrationItemEnterEmail from '~/components/Registration/RegistrationItemEnterEmail'
@@ -71,7 +70,6 @@ export default {
   name: 'RegistrationSlider',
   components: {
     ComponentSlider,
-    HcEmpty,
     LocaleSwitch,
     RegistrationItemCreateUserAccount,
     RegistrationItemEnterEmail,
@@ -198,7 +196,6 @@ export default {
     },
     buttonCallback() {
       if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
-        console.log('buttonCallback !!! enter-email')
         this.sliderData.collectedInputData.emailSend = true
         this.sliderData.sliders[this.sliderIndex].button.title = 'Resend E-Mail' // Wolle
       }

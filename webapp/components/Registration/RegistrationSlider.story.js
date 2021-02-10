@@ -11,8 +11,7 @@ storiesOf('RegistrationSlider', module)
   .add('invite-code empty', () => ({
     components: { RegistrationSlider },
     store: helpers.store,
-    data: () => ({
-    }),
+    data: () => ({}),
     template: `
       <registration-slider registrationType="invite-code" />
     `,
@@ -48,8 +47,7 @@ storiesOf('RegistrationSlider', module)
   .add('public-registration empty', () => ({
     components: { RegistrationSlider },
     store: helpers.store,
-    data: () => ({
-    }),
+    data: () => ({}),
     template: `
       <registration-slider registrationType="public-registration" />
     `,

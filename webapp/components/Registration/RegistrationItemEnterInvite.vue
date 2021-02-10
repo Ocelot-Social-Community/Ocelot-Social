@@ -46,7 +46,6 @@ export default {
   mounted: function () {
     this.$nextTick(function () {
       // Code that will run only after the entire view has been rendered
-      console.log('mounted !!! this.sliderData.collectedInputData.inviteCode: ', this.sliderData.collectedInputData.inviteCode)
       this.formData.inviteCode = this.sliderData.collectedInputData.inviteCode
         ? this.sliderData.collectedInputData.inviteCode
         : ''
@@ -55,8 +54,7 @@ export default {
   },
   computed: {
     valid() {
-      const isValid =
-        this.formData.inviteCode.length === 6
+      const isValid = this.formData.inviteCode.length === 6
       return isValid
     },
   },
