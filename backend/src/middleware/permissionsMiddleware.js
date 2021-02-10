@@ -166,6 +166,7 @@ export default shield(
       unpinPost: isAdmin,
       UpdateDonations: isAdmin,
       GenerateInviteCode: isAuthenticated,
+      switchUserRole: isAdmin,
     },
     User: {
       email: or(isMyOwn, isAdmin),

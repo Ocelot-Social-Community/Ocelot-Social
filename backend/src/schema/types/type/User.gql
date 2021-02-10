@@ -215,4 +215,6 @@ type Mutation {
   unmuteUser(id: ID!): User
   blockUser(id: ID!): User
   unblockUser(id: ID!): User
+
+  switchUserRole(role: UserGroup!, id: ID!): User
 }
