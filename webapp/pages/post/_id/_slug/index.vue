@@ -44,19 +44,13 @@
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
       <ds-space margin-bottom="small" />
       <content-viewer class="content hyphenate-text" :content="post.content" />
-      <!-- eslint-enable vue/no-v-html -->
-      <ds-space margin="xx-large" />
-      <ds-space margin-bottom="small" />
       <!-- Tags -->
       <div v-if="post.tags && post.tags.length" class="tags">
         <ds-space margin="xx-small" />
         <hc-hashtag v-for="tag in sortedTags" :key="tag.id" :id="tag.id" />
       </div>
-      <ds-space margin-top="x-large">
+      <ds-space margin-top="small">
         <ds-flex :gutter="{ lg: 'small' }">
-          <ds-flex-item :width="{ lg: '75%', md: '75%', sm: '75%', base: '100%' }">
-            <hc-emotions :post="post" />
-          </ds-flex-item>
           <!-- Shout Button -->
           <ds-flex-item
             :width="{ lg: '15%', md: '22%', sm: '22%', base: '100%' }"
@@ -107,7 +101,6 @@ import {
   sortTagsAlphabetically,
 } from '~/components/utils/PostHelpers'
 import PostQuery from '~/graphql/PostQuery'
-import HcEmotions from '~/components/Emotions/Emotions'
 import PostMutations from '~/graphql/PostMutations'
 import links from '~/constants/links.js'
 
@@ -124,7 +117,6 @@ export default {
     ContentMenu,
     CommentForm,
     CommentList,
-    HcEmotions,
     ContentViewer,
   },
   head() {
