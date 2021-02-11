@@ -21,18 +21,19 @@
         </div>
       </ds-grid-item>
       <template v-if="hasResults">
-        <masonry-grid-item
+        <ds-grid-item
           v-for="post in posts"
+          column-span="fullWidth"
+          :row-span="21"
           :key="post.id"
-          :imageAspectRatio="post.image && post.image.aspectRatio"
-        >
+          :imageAspectRatio="post.image && post.image.aspectRatio">
           <post-teaser
             :post="post"
             @removePostFromList="posts = removePostFromList(post, posts)"
             @pinPost="pinPost(post, refetchPostList)"
             @unpinPost="unpinPost(post, refetchPostList)"
           />
-        </masonry-grid-item>
+        </ds-grid-item>
       </template>
       <template v-else>
         <ds-grid-item :row-span="2" column-span="fullWidth">
