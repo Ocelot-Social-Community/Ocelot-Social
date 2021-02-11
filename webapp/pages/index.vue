@@ -26,7 +26,8 @@
           column-span="fullWidth"
           :row-span="21"
           :key="post.id"
-          :imageAspectRatio="post.image && post.image.aspectRatio">
+          :imageAspectRatio="post.image && post.image.aspectRatio"
+        >
           <post-teaser
             :post="post"
             @removePostFromList="posts = removePostFromList(post, posts)"
@@ -71,7 +72,6 @@ import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter.vue'
 import HcEmpty from '~/components/Empty/Empty'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
-import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import { mapGetters, mapMutations } from 'vuex'
 import { filterPosts } from '~/graphql/PostQuery.js'
 import UpdateQuery from '~/components/utils/UpdateQuery'
@@ -84,7 +84,6 @@ export default {
     PostTeaser,
     HcEmpty,
     MasonryGrid,
-    MasonryGridItem,
   },
   mixins: [postListActions],
   data() {
