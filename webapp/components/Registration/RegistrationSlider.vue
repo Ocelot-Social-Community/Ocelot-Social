@@ -87,6 +87,7 @@ export default {
         // title: this.$t('components.registration.create-user-account.title'),
         title: 'Invitation', // Wolle
         validated: false,
+        data: { request: { variables: null }, response: { isValidInviteCode: false } },
         button: {
           title: 'Next', // Wolle
           icon: 'arrow-right',

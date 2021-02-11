@@ -2,8 +2,24 @@ import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
 import RegistrationSlider from './RegistrationSlider.vue'
 import helpers from '~/storybook/helpers'
+import Vue from 'vue'
 
-helpers.init()
+const plugins = [
+  (app = {}) => {
+    app.$apollo = {
+      mutate: () => {},
+      query: (data) => {
+        if (JSON.stringify(data).includes('isValidInviteCode')) {
+          return { data: { isValidInviteCode: true } }
+        }
+        throw new Error(`Query name not found!`)
+      },
+    }
+    Vue.prototype.$apollo = app.$apollo
+    return app
+  },
+]
+helpers.init({ plugins })
 
 storiesOf('RegistrationSlider', module)
   .addDecorator(withA11y)

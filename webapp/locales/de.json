@@ -125,7 +125,7 @@
         "invite-code": "Einladungs-Code eingeben",
         "next": "Weiter",
         "validations": {
-          "length": "muss genau 5 Buchstaben lang sein"
+          "length": "muss genau 6 Buchstaben lang sein"
         }
       }
     },
@@ -160,6 +160,11 @@
         "help": "Vielleicht war der Bestätigungscode falsch oder abgelaufen? Wenn das Problem weiterhin besteht, schicke uns gerne eine E-Mail an:",
         "success": "Dein Benutzerkonto wurde erstellt!",
         "title": "Benutzerkonto anlegen"
+      },
+      "inviteCode": {
+        "form": {
+          "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!"
+        }
       },
       "signup": {
         "form": {

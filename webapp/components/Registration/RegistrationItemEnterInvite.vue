@@ -22,6 +22,13 @@
 </template>
 
 <script>
+import gql from 'graphql-tag'
+
+export const isValidInviteCodeQuery = gql`
+  query($code: ID!) {
+    isValidInviteCode(code: $code)
+  }
+`
 export default {
   name: 'RegistrationItemEnterInvite',
   props: {
@@ -35,8 +42,8 @@ export default {
       formSchema: {
         inviteCode: {
           type: 'string',
-          min: 6,
-          max: 6,
+          // Wolle min: 6,
+          // max: 6,
           required: true,
           message: this.$t('components.enter-invite.form.validations.length'),
         },
@@ -53,20 +60,25 @@ export default {
     })
   },
   computed: {
-    valid() {
-      const isValid = this.formData.inviteCode.length === 6
-      return isValid
+    sliderIndex() {
+      return this.sliderData.sliderIndex
+    },
+    validInput() {
+      return this.formData.inviteCode.length === 6
     },
   },
   methods: {
-    sendValidation() {
+    async sendValidation() {
       const { inviteCode } = this.formData
-      const value = {
+      const values = {
         inviteCode,
       }
-      // validate in backend
-      // toaster
-      this.sliderData.validateCallback(this.valid, value)
+      let validated = false
+      if (this.validInput) {
+        await this.handleSubmitVerify()
+        validated = this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode
+      }
+      this.sliderData.validateCallback(validated, values)
     },
     async handleInput() {
       this.sendValidation()
@@ -74,8 +86,31 @@ export default {
     async handleInputValid() {
       this.sendValidation()
     },
-    handleSubmitVerify() {
-      // Wolle const { nonce } = this.formData
+    async handleSubmitVerify() {
+      const { inviteCode } = this.formData
+      const variables = { code: inviteCode }
+
+      if (
+        !this.sliderData.sliders[this.sliderIndex].data.request.variables ||
+        (this.sliderData.sliders[this.sliderIndex].data.request.variables &&
+          this.sliderData.sliders[this.sliderIndex].data.request.variables.code !== variables.code)
+      ) {
+        this.sliderData.sliders[this.sliderIndex].data.request.variables = variables
+
+        try {
+          const response = await this.$apollo.query({ query: isValidInviteCodeQuery, variables })
+          this.sliderData.sliders[this.sliderIndex].data.response = response.data
+          if (this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode) {
+            this.$toast.success(
+              this.$t('components.registration.inviteCode.form.success', { inviteCode }),
+            )
+          }
+        } catch (err) {
+          this.sliderData.sliders[this.sliderIndex].data.response = { isValidInviteCode: false }
+          const { message } = err
+          this.$toast.error(message)
+        }
+      }
     },
   },
 }

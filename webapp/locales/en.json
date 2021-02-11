@@ -125,7 +125,7 @@
         "invite-code": "Enter your invite code",
         "next": "Continue",
         "validations": {
-          "length": "must be 5 characters long"
+          "length": "must be 6 characters long"
         }
       }
     },
@@ -160,6 +160,11 @@
         "help": " Maybe the confirmation was invalid? In case of problems, feel free to ask for help by sending us a mail to:",
         "success": "Your account has been created!",
         "title": "Create user account"
+      },
+      "inviteCode": {
+        "form": {
+          "success": "Valid invite code <b>{inviteCode}</b>!"
+        }
       },
       "signup": {
         "form": {

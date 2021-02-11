@@ -129,9 +129,8 @@ export default {
       const { email } = this.data.Signup
       return this.$t('components.registration.signup.form.success', { email })
     },
-    valid() {
-      const isValid = isEmail(this.formData.email)
-      return isValid
+    validInput() {
+      return isEmail(this.formData.email)
     },
   },
   methods: {
@@ -143,7 +142,7 @@ export default {
       const value = {
         email,
       }
-      this.sliderData.validateCallback(this.valid, value)
+      this.sliderData.validateCallback(this.validInput, value)
     },
     handleInput() {
       // this.disabled = true
