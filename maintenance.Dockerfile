@@ -4,5 +4,5 @@
 FROM ocelotsocialnetwork/maintenance:latest as branded
 
 # Copy public constants to the docker image branding it
-COPY static/ static/
-COPY constants/ constants/
+COPY branding/static/ static/
+COPY branding/constants/ constants/
