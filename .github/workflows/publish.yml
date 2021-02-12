@@ -65,7 +65,7 @@ jobs:
           path: /tmp/neo4j.tar
 
   ##############################################################################
-  # JOB: DOCKER BUILD Production BACKEND #######################################
+  # JOB: DOCKER BUILD PRODUCTION BACKEND #######################################
   ##############################################################################
   build_production_backend:
     name: Docker Build Production - Backend
