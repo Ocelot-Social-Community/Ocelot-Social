@@ -1,8 +1,12 @@
+# This docker-compose file is just here for testing
 version: "3.4"
 
 services:
   webapp:
-    image: ocelotsocialnetwork/develop-webapp:master.2020.12.17
+    build:
+      dockerfile: webapp.Dockerfile
+      target: branded
+      context: .
     ports:
       - 3000:3000
     networks:
@@ -14,10 +18,12 @@ services:
       - GRAPHQL_URI=http://backend:4000
       - MAPBOX_TOKEN="pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g"
       - WEBSOCKETS_URI=${WEBSOCKETS_URI}
-      - PUBLIC_REGISTRATION=false
-    command: yarn run dev
+      - PUBLIC_REGISTRATION=true
   backend:
-    image: ocelotsocialnetwork/develop-backend:master.2020.12.17
+    build:
+      dockerfile: backend.Dockerfile
+      target: branded
+      context: .
     networks:
       - hc-network
     depends_on:
@@ -34,13 +40,13 @@ services:
       - EMAIL_SUPPORT=support@wir.social
       - EMAIL_DEFAULT_SENDER=info@wir.social
       - PUBLIC_REGISTRATION=true
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_PORT=${SMTP_PORT}
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
-    command: yarn run dev
+      - SMTP_HOST=mailserver
+      - SMTP_PORT=25
+      - SMTP_IGNORE_TLS=true
   neo4j:
-    image: ocelotsocialnetwork/develop-neo4j:0.6.3
+    image: ocelotsocialnetwork/neo4j:community
     networks:
       - hc-network
     environment:
@@ -49,5 +55,11 @@ services:
       - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
     ports:
       - 7687:7687
+  mailserver:
+    image: djfarrelly/maildev
+    ports:
+      - 1080:80
+    networks:
+      - hc-network
 networks:
   hc-network:
