@@ -1,8 +1,8 @@
 export default {
-  APPLICATION_NAME: 'fyphe_O',
-  APPLICATION_SHORT_NAME: 'fyphe',
-  APPLICATION_DESCRIPTION: 'The Schools in Motion Network',
+  APPLICATION_NAME: 'ocelot.social',
+  APPLICATION_SHORT_NAME: 'ocelot',
+  APPLICATION_DESCRIPTION: 'Ocelot Social Community',
   COOKIE_NAME: 'ocelot-social-token',
-  ORGANIZATION_NAME: 'Ensible e.V.',
-  ORGANIZATION_JURISDICTION: 'Köln',
+  ORGANIZATION_NAME: 'busFaktor e.V.',
+  ORGANIZATION_JURISDICTION: 'Somewhere',
 }
