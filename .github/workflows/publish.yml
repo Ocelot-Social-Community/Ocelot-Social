@@ -35,7 +35,7 @@ jobs:
       ##########################################################################
       - name: backend | Build `branded` image
         run: |
-          docker build --target branded -t "ocelotsocialnetwork/backend-branded:latest" -t "ocelotsocialnetwork/backend-branded:${VERSION}" -t "ocelotsocialnetwork/backend-branded:${BUILD_VERSION}" -f backend.Dockerfile .
+          docker build --target branded -t "ocelotsocialnetwork/backend-branded:latest" -t "ocelotsocialnetwork/backend-branded:${VERSION}" -t "ocelotsocialnetwork/backend-branded:${BUILD_VERSION}" -f docker/backend.Dockerfile .
           docker save "ocelotsocialnetwork/backend-branded" > /tmp/backend-branded.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
@@ -72,7 +72,7 @@ jobs:
       ##########################################################################
       - name: webapp | Build `branded` image
         run: |
-          docker build --target branded -t "ocelotsocialnetwork/webapp-branded:latest" -t "ocelotsocialnetwork/webapp-branded:${VERSION}" -t "ocelotsocialnetwork/webapp-branded:${BUILD_VERSION}" -f webapp.Dockerfile .
+          docker build --target branded -t "ocelotsocialnetwork/webapp-branded:latest" -t "ocelotsocialnetwork/webapp-branded:${VERSION}" -t "ocelotsocialnetwork/webapp-branded:${BUILD_VERSION}" -f docker/webapp.Dockerfile .
           docker save "ocelotsocialnetwork/webapp-branded" > /tmp/webapp-branded.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
@@ -109,7 +109,7 @@ jobs:
       ##########################################################################
       - name: maintenance | Build `branded` image
         run: |
-          docker build --target branded -t "ocelotsocialnetwork/maintenance-branded:latest" -t "ocelotsocialnetwork/maintenance-branded:${VERSION}" -t "ocelotsocialnetwork/maintenance-branded:${BUILD_VERSION}" -f maintenance.Dockerfile .
+          docker build --target branded -t "ocelotsocialnetwork/maintenance-branded:latest" -t "ocelotsocialnetwork/maintenance-branded:${VERSION}" -t "ocelotsocialnetwork/maintenance-branded:${BUILD_VERSION}" -f docker/maintenance.Dockerfile .
           docker save "ocelotsocialnetwork/maintenance-branded" > /tmp/maintenance-branded.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
