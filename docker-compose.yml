@@ -4,13 +4,13 @@ version: "3.4"
 services:
   webapp:
     build:
-      dockerfile: webapp.Dockerfile
+      dockerfile: docker/webapp.Dockerfile
       target: branded
       context: .
     ports:
       - 3000:3000
     networks:
-      - hc-network
+      - test-network
     depends_on:
       - backend
     environment:
@@ -21,11 +21,11 @@ services:
       - PUBLIC_REGISTRATION=true
   backend:
     build:
-      dockerfile: backend.Dockerfile
+      dockerfile: docker/backend.Dockerfile
       target: branded
       context: .
     networks:
-      - hc-network
+      - test-network
     depends_on:
       - neo4j
     ports:
@@ -48,7 +48,7 @@ services:
   neo4j:
     image: ocelotsocialnetwork/neo4j:community
     networks:
-      - hc-network
+      - test-network
     environment:
       - NEO4J_AUTH=none
       - NEO4J_dbms_security_procedures_unrestricted=algo.*,apoc.*
@@ -60,6 +60,6 @@ services:
     ports:
       - 1080:80
     networks:
-      - hc-network
+      - test-network
 networks:
-  hc-network:
+  test-network:
