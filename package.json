@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social",
-  "version": "0.6.10",
+  "version": "0.6.11",
   "description": "Fullstack and API tests with cypress and cucumber for ocelot.social",
   "author": "ocelot.social Community",
   "license": "MIT",
