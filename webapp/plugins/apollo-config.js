@@ -11,7 +11,7 @@ export default ({ req, nuxtState }) => {
   const backendUrl = env.GRAPHQL_URI || 'http://localhost:4000'
 
   return {
-    wsEndpoint: env.WEBSOCKETS_URI || 'ws://localhost:4000/graphql',
+    wsEndpoint: env.WEBSOCKETS_URI,
     httpEndpoint: process.server ? backendUrl : '/api',
     httpLinkOptions: {
       credentials: 'same-origin',
