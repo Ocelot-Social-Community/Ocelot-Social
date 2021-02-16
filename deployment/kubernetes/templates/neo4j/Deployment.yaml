@@ -28,7 +28,7 @@ spec:
         app: {{ .Release.Name }}-neo4j
     spec:
       containers:
-      - name: neo4j
+      - name: container-{{ .Release.Name }}-neo4j
         image: "{{ .Values.NEO4J.DOCKER_IMAGE_REPO }}:{{ .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.NEO4J.DOCKER_IMAGE_PULL_POLICY }}
         ports:
