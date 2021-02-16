@@ -170,6 +170,7 @@ type Query {
   filter: _UserFilter
   ): [User]
 
+  availableRoles: [UserGroup]! 
   mutedUsers: [User]
   blockedUsers: [User]
   isLoggedIn: Boolean!

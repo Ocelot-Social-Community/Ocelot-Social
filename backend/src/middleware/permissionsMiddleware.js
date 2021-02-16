@@ -122,6 +122,7 @@ export default shield(
       MyInviteCodes: isAuthenticated,
       isValidInviteCode: allow,
       queryLocations: isAuthenticated,
+      availableRoles: isAdmin,
     },
     Mutation: {
       '*': deny,
