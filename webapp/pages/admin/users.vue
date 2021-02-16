@@ -178,8 +178,8 @@ export default {
       query() {
         return FetchAllRoles()
       },
-      update({ __type }) {
-        return __type.enumValues.map((item) => item.name)
+      update({ availableRoles }) {
+        return availableRoles
       },
     },
   },

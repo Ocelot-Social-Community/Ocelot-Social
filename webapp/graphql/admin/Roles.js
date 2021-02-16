@@ -3,12 +3,7 @@ import gql from 'graphql-tag'
 export const FetchAllRoles = () => {
   return gql`
     query {
-      __type(name: "UserGroup") {
-        name
-        enumValues {
-          name
-        }
-      }
+      availableRoles
     }
   `
 }
