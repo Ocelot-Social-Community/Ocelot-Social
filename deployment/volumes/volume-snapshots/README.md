@@ -1,19 +1,20 @@
 # Kubernetes Volume Snapshots
 
-It is possible to backup persistent volumes through volume snapshots. This is
-especially handy if you don't want to stop the database to create an [offline
-backup](../neo4j-offline-backup/README.md) thus having a downtime.
+It is possible to backup persistent volumes through volume snapshots. This is especially handy if you don't want to stop the database to create an [offline backup](../neo4j-offline-backup/README.md) thus having a downtime.
 
 Kubernetes announced this feature in a [blog post](https://kubernetes.io/blog/2018/10/09/introducing-volume-snapshot-alpha-for-kubernetes/). Please make yourself familiar with it before you continue.
 
 ## Create a Volume Snapshot
 
-There is an example in this folder how you can e.g. create a volume snapshot for
-the persistent volume claim `neo4j-data-claim`:
+There is an example in this folder how you can e.g. create a volume snapshot for the persistent volume claim of the database `volume-claim-ocelot-neo4j`, or for the uploads of the backend `volume-claim-ocelot-uploads`.
 
-```sh
+Replace `YYYY-MM-DD` in the `metadata.name` entry in the yaml files with the actual date before you enter the following commands:
+
+```bash
 # in folder deployment/volumes/volume-snapshots/
-kubectl apply -f snapshot.yaml
+kubectl apply -f neo4j-data-snapshot.yaml
+# in case the images are stored on backend and not in S3 storage
+kubectl apply -f backen-uploads-snapshot.yaml
 ```
 
 If you are on Digital Ocean the volume snapshot should show up in the Web UI:
@@ -26,13 +27,11 @@ Edit your persistent volume claim configuration and add a `dataSource` pointing
 to your volume snapshot. [The blog post](https://kubernetes.io/blog/2018/10/09/introducing-volume-snapshot-alpha-for-kubernetes/) has an example in section "Provision a new volume from a snapshot with
 Kubernetes".
 
-There is also an example in this folder how the configuration could look like.
-If you apply the configuration new persistent volume claim will be provisioned
-with the data from the volume snapshot:
+There is also an example in this folder how the configuration could look like. If you apply the configuration new persistent volume claim will be provisioned with the data from the volume snapshot:
 
-```
+```bash
 # in folder deployment/volumes/volume-snapshots/
-kubectl apply -f neo4j-data.yaml
+kubectl apply -f neo4j-data-provision-snapshot.yaml
 ```
 
 ## Data Consistency Warning
