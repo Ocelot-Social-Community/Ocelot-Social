@@ -17,16 +17,20 @@ metadata:
 spec:
   tls:
     - hosts:
-      - {{ .Values.LETSENCRYPT.DOMAIN }}
+    {{- range .Values.LETSENCRYPT.DOMAINS }}
+      - {{ . }}
+    {{- end }}
       secretName: tls
   rules:
-    - host: {{ .Values.LETSENCRYPT.DOMAIN }}
+    {{- range .Values.LETSENCRYPT.DOMAINS }}
+    - host: {{ . }}
       http:
         paths:
           - path: /
             pathType: ImplementationSpecific
             backend:
               service:
-                name: {{ .Release.Name }}-webapp
+                name: {{ $.Release.Name }}-webapp
                 port:
                   number: 3000
+    {{- end }}
