@@ -16,7 +16,7 @@ spec:
     port: 7687
     targetPort: 7687
     protocol: TCP
-  #- name: web
+  #- name: {{ .Release.Name }}-http
   #  port: 7474
   #  targetPort: 7474
   selector:
