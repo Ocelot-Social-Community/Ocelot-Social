@@ -330,8 +330,10 @@ li > p {
 
   ul {
     padding-left: $space-small;
+
     li {
       display: block;
+
       p:first-child:before {
         content: '';
         background-image: $background-image-logo;
@@ -341,22 +343,27 @@ li > p {
         padding: $space-none $space-x-small;
         margin-right: $space-x-small;
       }
+
       p:not(:first-child) {
         padding-left: $space-base;
       }
     }
   }
+  
   ol {
     // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters
     counter-reset: item;
     padding-left: $space-small;
+
     li {
       display: block;
+
       p:first-child:before {
         content: counters(item, '.') '.';
         counter-increment: item;
         margin-right: $space-x-small;
       }
+
       p:not(:first-child) {
         padding-left: $space-base;
       }
