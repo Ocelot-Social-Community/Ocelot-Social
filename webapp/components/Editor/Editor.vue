@@ -329,19 +329,25 @@ li > p {
   }
 
   ul {
-    padding-left: $space-small;
+    // padding-left: $space-small;
+    padding-left: $space-x-large;
+    // list-style-position: outside;
+    // list-style-type: circle;
 
     li {
       display: block;
+        list-style-position: outside;
+      text-indent: -$space-large;
 
       p:first-child:before {
-        content: '';
-        background-image: $background-image-logo;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: $line-height-small;
+        // list-style-position: inside;
+        content: '•';
         padding: $space-none $space-x-small;
         margin-right: $space-x-small;
+    // text-indent: -1em;
+    // padding-left: 1em;
+    // padding: 10px 0 10px 20px;
+    // text-indent: -1em;
       }
 
       p:not(:first-child) {
@@ -353,14 +359,18 @@ li > p {
   ol {
     // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters
     counter-reset: item;
-    padding-left: $space-small;
+    // padding-left: $space-small;
+    padding-left: $space-x-large;
 
     li {
       display: block;
+        list-style-position: outside;
+      text-indent: -$space-large;
 
       p:first-child:before {
         content: counters(item, '.') '.';
         counter-increment: item;
+        padding: $space-none $space-x-small;
         margin-right: $space-x-small;
       }
 
