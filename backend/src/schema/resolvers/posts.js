@@ -88,6 +88,7 @@ export default {
             SET post += $params
             SET post.createdAt = toString(datetime())
             SET post.updatedAt = toString(datetime())
+            SET post.clickedCount = 0
             WITH post
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)

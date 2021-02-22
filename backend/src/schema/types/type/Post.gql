@@ -157,9 +157,7 @@ type Post {
     )
 
   clickedCount: Int!
-    @cypher(
-      statement: "MATCH (this)<-[:CLICKED]-(r:User) WHERE NOT r.deleted = true AND NOT r.disabled = true RETURN COUNT(DISTINCT r)"
-    )
+
   emotions: [EMOTED]
   emotionsCount: Int!
     @cypher(statement: "MATCH (this)<-[emoted:EMOTED]-(:User) RETURN COUNT(DISTINCT emoted)")
