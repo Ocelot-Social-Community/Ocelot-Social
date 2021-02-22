@@ -67,6 +67,7 @@ export const postCountsFragment = gql`
     shoutedCount
     shoutedByCurrentUser
     emotionsCount
+    clickedCount
   }
 `
 
