@@ -8,7 +8,7 @@ module.exports.up = async function (next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
-   try {
+  try {
     // Implement your migration here.
     await transaction.run(`
         MATCH (p:Post)
@@ -32,7 +32,7 @@ module.exports.down = async function (next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
-   try {
+  try {
     // Implement your migration here.
     await transaction.run(`
         MATCH (p:Post)
