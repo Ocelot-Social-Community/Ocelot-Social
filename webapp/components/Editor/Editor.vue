@@ -327,5 +327,46 @@ li > p {
   p {
     margin: 0 0 $space-x-small;
   }
+
+  ul {
+    padding-left: $space-x-large;
+
+    li {
+      display: block;
+      text-indent: -$space-large;
+
+      p:first-child:before {
+        content: '•';
+        padding: $space-none $space-x-small;
+        margin-right: $space-x-small;
+      }
+
+      p:not(:first-child) {
+        padding-left: $space-base;
+      }
+    }
+  }
+
+  ol {
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters
+    counter-reset: item;
+    padding-left: $space-x-large + 4px;
+
+    li {
+      display: block;
+      text-indent: -$space-large - 4px;
+
+      p:first-child:before {
+        content: counters(item, '.') '.';
+        counter-increment: item;
+        padding: $space-none $space-x-small;
+        margin-right: $space-x-small;
+      }
+
+      p:not(:first-child) {
+        padding-left: $space-base;
+      }
+    }
+  }
 }
 </style>
