@@ -14,8 +14,7 @@ spec:
   replicas: 1
   strategy:
     rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: "100%"
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: {{ .Release.Name }}-neo4j
@@ -24,6 +23,8 @@ spec:
       name: neo4j
       annotations:
         backup.velero.io/backup-volumes: neo4j-data
+        # make sure the pod is redeployed
+        rollme: {{ randAlphaNum 5 | quote }}
       labels:
         app: {{ .Release.Name }}-neo4j
     spec:

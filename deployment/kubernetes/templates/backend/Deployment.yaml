@@ -16,8 +16,7 @@ spec:
   progressDeadlineSeconds: {{ .Values.BACKEND.PROGRESS_DEADLINE_SECONDS }}
   strategy:
     rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: "100%"
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: {{ .Release.Name }}-backend
@@ -25,6 +24,8 @@ spec:
     metadata:
       annotations:
         backup.velero.io/backup-volumes: uploads
+        # make sure the pod is redeployed
+        rollme: {{ randAlphaNum 5 | quote }}
       labels:
         app: {{ .Release.Name }}-backend
     spec:

@@ -14,11 +14,17 @@ spec:
   replicas: {{ .Values.WEBAPP.REPLICAS }}
   minReadySeconds: {{ .Values.WEBAPP.MIN_READY_SECONDS }}
   progressDeadlineSeconds: {{ .Values.WEBAPP.PROGRESS_DEADLINE_SECONDS }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: {{ .Release.Name }}-webapp
   template:
     metadata:
+      annotations:
+        # make sure the pod is redeployed
+        rollme: {{ randAlphaNum 5 | quote }}
       labels:
         app: {{ .Release.Name }}-webapp
     spec:
