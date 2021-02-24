@@ -1,5 +1,3 @@
-require('intersection-observer')
-
 import { createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import VTooltip from 'v-tooltip'
@@ -10,6 +8,7 @@ import InfiniteLoading from '~/plugins/vue-infinite-loading'
 import Directives from '~/plugins/vue-directives'
 import VueObserveVisibility from '~/plugins/vue-observe-visibility'
 
+require('intersection-observer')
 
 global.localVue = createLocalVue()
 
