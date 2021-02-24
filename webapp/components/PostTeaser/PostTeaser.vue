@@ -6,10 +6,11 @@
     <base-card
       :lang="post.language"
       :class="{
-        'disabled-content': post.disabled,
-        '--blur-image': post.image && post.image.sensitive,
-      }"
+             'disabled-content': post.disabled,
+             '--blur-image': post.image && post.image.sensitive,
+             }"
       :highlight="isPinned"
+      v-observe-visibility="(isVisible, entry) => visibilityChanged(isVisible, entry, post.id)"
     >
       <template v-if="post.image" #heroImage>
         <img :src="post.image | proxyApiUrl" class="image" />
@@ -59,84 +60,87 @@
 </template>
 
 <script>
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
-import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import HcRibbon from '~/components/Ribbon'
-import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
-import { mapGetters } from 'vuex'
-import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostHelpers'
+ import UserTeaser from '~/components/UserTeaser/UserTeaser'
+ import ContentMenu from '~/components/ContentMenu/ContentMenu'
+ import HcRibbon from '~/components/Ribbon'
+ import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
+ import { mapGetters } from 'vuex'
+ import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostHelpers'
 
-export default {
-  name: 'PostTeaser',
-  components: {
-    UserTeaser,
-    HcRibbon,
-    ContentMenu,
-    CounterIcon,
-  },
-  props: {
-    post: {
-      type: Object,
-      required: true,
-    },
-    width: {
-      type: Object,
-      default: () => {},
-    },
-  },
-  mounted() {
-    const { image } = this.post
-    if (!image) return
-    const width = this.$el.offsetWidth
-    const height = Math.min(width / image.aspectRatio, 2000)
-    const imageElement = this.$el.querySelector('.hero-image')
-    if (imageElement) {
-      imageElement.style.height = `${height}px`
-    }
-  },
-  computed: {
-    ...mapGetters({
-      user: 'auth/user',
-    }),
-    excerpt() {
-      return this.$filters.removeLinks(this.post.contentExcerpt)
-    },
-    isAuthor() {
-      const { author } = this.post
-      if (!author) return false
-      return this.user.id === this.post.author.id
-    },
-    menuModalsData() {
-      return postMenuModalsData(
-        // "this.post" may not always be defined at the beginning …
-        this.post ? this.$filters.truncate(this.post.title, 30) : '',
-        this.deletePostCallback,
-      )
-    },
-    isPinned() {
-      return this.post && this.post.pinned
-    },
-  },
-  methods: {
-    async deletePostCallback() {
-      try {
-        const {
-          data: { DeletePost },
-        } = await this.$apollo.mutate(deletePostMutation(this.post.id))
-        this.$toast.success(this.$t('delete.contribution.success'))
-        this.$emit('removePostFromList', DeletePost)
-      } catch (err) {
-        this.$toast.error(err.message)
-      }
-    },
-    pinPost(post) {
-      this.$emit('pinPost', post)
-    },
-    unpinPost(post) {
-      this.$emit('unpinPost', post)
-    },
-  },
-}
+ export default {
+   name: 'PostTeaser',
+   components: {
+     UserTeaser,
+     HcRibbon,
+     ContentMenu,
+     CounterIcon,
+   },
+   props: {
+     post: {
+       type: Object,
+       required: true,
+     },
+     width: {
+       type: Object,
+       default: () => {},
+     },
+   },
+   mounted() {
+     const { image } = this.post
+     if (!image) return
+     const width = this.$el.offsetWidth
+     const height = Math.min(width / image.aspectRatio, 2000)
+     const imageElement = this.$el.querySelector('.hero-image')
+     if (imageElement) {
+       imageElement.style.height = `${height}px`
+     }
+   },
+   computed: {
+     ...mapGetters({
+       user: 'auth/user',
+     }),
+     excerpt() {
+       return this.$filters.removeLinks(this.post.contentExcerpt)
+     },
+     isAuthor() {
+       const { author } = this.post
+       if (!author) return false
+       return this.user.id === this.post.author.id
+     },
+     menuModalsData() {
+       return postMenuModalsData(
+         // "this.post" may not always be defined at the beginning …
+         this.post ? this.$filters.truncate(this.post.title, 30) : '',
+         this.deletePostCallback,
+       )
+     },
+     isPinned() {
+       return this.post && this.post.pinned
+     },
+   },
+   methods: {
+     async deletePostCallback() {
+       try {
+         const {
+           data: { DeletePost },
+         } = await this.$apollo.mutate(deletePostMutation(this.post.id))
+         this.$toast.success(this.$t('delete.contribution.success'))
+         this.$emit('removePostFromList', DeletePost)
+       } catch (err) {
+         this.$toast.error(err.message)
+       }
+     },
+     pinPost(post) {
+       this.$emit('pinPost', post)
+     },
+     unpinPost(post) {
+       this.$emit('unpinPost', post)
+     },
+     visibilityChanged(isVisible, entry, id) {
+       console.log('--', isVisible, id)
+     },
+   },
+ }
 </script>
 <style lang="scss">
 .post-teaser,

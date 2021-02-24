@@ -115,6 +115,7 @@ export default {
     { src: '~/plugins/izi-toast.js', ssr: false },
     { src: '~/plugins/vue-filters.js' },
     { src: '~/plugins/vue-infinite-loading.js', ssr: false },
+    { src: '~/plugins/vue-observe-visibility.js', ssr: false },
   ],
 
   router: {
