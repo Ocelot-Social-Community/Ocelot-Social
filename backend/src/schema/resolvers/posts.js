@@ -336,6 +336,7 @@ export default {
       })
       try {
         const [post] = await writeTxResultPromise
+        post.viewedTeaserCount = post.viewedTeaserCount.low
         return post
       } finally {
         session.close()
