@@ -161,7 +161,12 @@
         "success": "Dein Benutzerkonto wurde erstellt!",
         "title": "Benutzerkonto anlegen"
       },
-      "inviteCode": {
+      "email": {
+        "form": {
+          "success": "Gültige E-Mail Adresse <b>{email}</b>!"
+        }
+      },
+      "invite-code": {
         "form": {
           "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!"
         }

@@ -7,7 +7,15 @@ import Vue from 'vue'
 const plugins = [
   (app = {}) => {
     app.$apollo = {
-      mutate: () => {},
+      mutate: (data) => {
+        if (JSON.stringify(data).includes('Signup')) {
+          return { data: { Signup: { email: data.variables.email } } }
+        }
+        if (JSON.stringify(data).includes('SignupByInvitation')) {
+          return { data: { SignupByInvitation: { email: data.variables.email } } }
+        }
+        throw new Error(`Mutation name not found!`)
+      },
       query: (data) => {
         if (JSON.stringify(data).includes('isValidInviteCode')) {
           return { data: { isValidInviteCode: true } }

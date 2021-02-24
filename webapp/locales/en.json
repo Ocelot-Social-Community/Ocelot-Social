@@ -161,7 +161,12 @@
         "success": "Your account has been created!",
         "title": "Create user account"
       },
-      "inviteCode": {
+      "email": {
+        "form": {
+          "success": "Valid e-mail address <b>{email}</b>!"
+        }
+      },
+      "invite-code": {
         "form": {
           "success": "Valid invite code <b>{inviteCode}</b>!"
         }

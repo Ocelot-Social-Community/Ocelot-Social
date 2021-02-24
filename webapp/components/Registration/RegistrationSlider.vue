@@ -87,7 +87,7 @@ export default {
         // title: this.$t('components.registration.create-user-account.title'),
         title: 'Invitation', // Wolle
         validated: false,
-        data: { request: { variables: null }, response: { isValidInviteCode: false } },
+        data: { request: /* Wolle */{ variables: null }, response: { isValidInviteCode: false } },
         button: {
           title: 'Next', // Wolle
           icon: 'arrow-right',
@@ -98,8 +98,8 @@ export default {
         name: 'enter-email',
         title: 'E-Mail', // Wolle
         validated: false,
+        data: { request: null, response: null },
         button: {
-          // title: this.sliderData.collectedInputData.emailSend ? 'Resend E-Mail' : 'Send E-Mail', // Wolle
           title: 'Send E-Mail', // Wolle
           icon: 'envelope',
           callback: this.buttonCallback,
@@ -144,7 +144,6 @@ export default {
         sliders = [slidersPortfolio[2], slidersPortfolio[3]]
         break
     }
-    // let sliders = slidersPortfolio
 
     return {
       links,

@@ -5,7 +5,6 @@
     :schema="formSchema"
     @input="handleInput"
     @input-valid="handleInputValid"
-    @submit="handleSubmitVerify"
   >
     <ds-input
       :placeholder="$t('components.enter-invite.form.invite-code')"
@@ -70,9 +69,8 @@ export default {
   methods: {
     async sendValidation() {
       const { inviteCode } = this.formData
-      const values = {
-        inviteCode,
-      }
+      const values = { inviteCode }
+
       let validated = false
       if (this.validInput) {
         await this.handleSubmitVerify()
@@ -91,22 +89,25 @@ export default {
       const variables = { code: inviteCode }
 
       if (
+        !this.sliderData.sliders[this.sliderIndex].data.request ||
         !this.sliderData.sliders[this.sliderIndex].data.request.variables ||
         (this.sliderData.sliders[this.sliderIndex].data.request.variables &&
-          this.sliderData.sliders[this.sliderIndex].data.request.variables.code !== variables.code)
+          !this.sliderData.sliders[this.sliderIndex].data.request.variables.is(variables))
       ) {
         this.sliderData.sliders[this.sliderIndex].data.request.variables = variables
 
         try {
           const response = await this.$apollo.query({ query: isValidInviteCodeQuery, variables })
           this.sliderData.sliders[this.sliderIndex].data.response = response.data
-          if (this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode) {
+
+          if (this.sliderData.sliders[this.sliderIndex].data.response && this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode) {
             this.$toast.success(
-              this.$t('components.registration.inviteCode.form.success', { inviteCode }),
+              this.$t('components.registration.invite-code.form.success', { inviteCode }),
             )
           }
         } catch (err) {
           this.sliderData.sliders[this.sliderIndex].data.response = { isValidInviteCode: false }
+          
           const { message } = err
           this.$toast.error(message)
         }

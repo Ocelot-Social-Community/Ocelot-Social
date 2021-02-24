@@ -5,7 +5,6 @@
       :schema="formSchema"
       @input="handleInput"
       @input-valid="handleInputValid"
-      @submit="handleSubmit"
     >
       <!-- Wolle <h1>
         {{
@@ -109,7 +108,7 @@ export default {
           message: this.$t('common.validations.email'),
         },
       },
-      // disabled: true,
+      // Wolle disabled: true,
       data: null,
       error: null,
     }
@@ -117,7 +116,6 @@ export default {
   mounted: function () {
     this.$nextTick(function () {
       // Code that will run only after the entire view has been rendered
-      // console.log('mounted !!! ')
       this.formData.email = this.sliderData.collectedInputData.email
         ? this.sliderData.collectedInputData.email
         : ''
@@ -129,61 +127,80 @@ export default {
       const { email } = this.data.Signup
       return this.$t('components.registration.signup.form.success', { email })
     },
+    sliderIndex() {
+      return this.sliderData.sliderIndex
+    },
     validInput() {
       return isEmail(this.formData.email)
     },
   },
   methods: {
-    sendValidation() {
+    async sendValidation() {
       if (this.formData.email && isEmail(this.formData.email)) {
         this.formData.email = normalizeEmail(this.formData.email)
       }
       const { email } = this.formData
-      const value = {
-        email,
+      const value = { email }
+
+      let validated = false
+      if (this.validInput) {
+        await this.handleSubmitVerify()
+        if (this.sliderData.sliders[this.sliderIndex].data.response) {
+          const {email: respnseEmail} = this.sliderData.sliders[this.sliderIndex].data.response.Signup || this.sliderData.sliders[this.sliderIndex].data.response.SignupByInvitation
+          validated = (email === respnseEmail)
+        }
       }
-      this.sliderData.validateCallback(this.validInput, value)
+      this.sliderData.validateCallback(validated, value)
     },
-    handleInput() {
-      // this.disabled = true
-      // this.sliderData.validateCallback(false)
+    async handleInput() {
       this.sendValidation()
     },
-    handleInputValid() {
-      // this.disabemailled = false
-      // const { email } = this.formData
-      // validate in backend?
-      // toaster?
-      // console.log('sendValidation !!! email: ', email)
-      // this.sliderData.validateCallback(true, { email })
+    async handleInputValid() {
       this.sendValidation()
     },
-    async handleSubmit() {
+    async handleSubmitVerify() {
       const mutation = this.token ? SignupByInvitationMutation : SignupMutation
       const { token } = this
       const { email } = this.formData
+      const variables = { email, token }
 
-      try {
-        const response = await this.$apollo.mutate({ mutation, variables: { email, token } })
-        this.data = response.data
-        setTimeout(() => {
-          this.$emit('submit', { email: this.data.Signup.email })
-        }, 3000)
-      } catch (err) {
-        const { message } = err
-        const mapping = {
-          'A user account with this email already exists': 'email-exists',
-          'Invitation code already used or does not exist': 'invalid-invitation-token',
-        }
-        for (const [pattern, key] of Object.entries(mapping)) {
-          if (message.includes(pattern))
-            this.error = {
-              key,
-              message: this.$t(`components.registration.signup.form.errors.${key}`),
-            }
-        }
-        if (!this.error) {
-          this.$toast.error(message)
+      if (
+        !this.sliderData.sliders[this.sliderIndex].data.request ||
+        !this.sliderData.sliders[this.sliderIndex].data.request.variables ||
+        (this.sliderData.sliders[this.sliderIndex].data.request.variables &&
+          !this.sliderData.sliders[this.sliderIndex].data.request.variables.is(variables))
+      )
+      {
+        this.sliderData.sliders[this.sliderIndex].data.request = { variables }
+
+        try {
+          const response = await this.$apollo.mutate({ mutation, variables })
+          this.sliderData.sliders[this.sliderIndex].data.response = response.data
+
+          if (this.sliderData.sliders[this.sliderIndex].data.response) {
+            const {email: respnseEmail} = this.sliderData.sliders[this.sliderIndex].data.response.Signup || this.sliderData.sliders[this.sliderIndex].data.response.SignupByInvitation
+            this.$toast.success(
+              this.$t('components.registration.email.form.success', { email: respnseEmail }),
+            )
+          }
+        } catch (err) {
+          this.sliderData.sliders[this.sliderIndex].data = { request: null, response: null }
+
+          const { message } = err
+          const mapping = {
+            'A user account with this email already exists': 'email-exists',
+            'Invitation code already used or does not exist': 'invalid-invitation-token',
+          }
+          for (const [pattern, key] of Object.entries(mapping)) {
+            if (message.includes(pattern))
+              this.error = {
+                key,
+                message: this.$t(`components.registration.signup.form.errors.${key}`),
+              }
+          }
+          if (!this.error) {
+            this.$toast.error(message)
+          }
         }
       }
     },

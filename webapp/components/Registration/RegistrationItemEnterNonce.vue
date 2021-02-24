@@ -49,7 +49,7 @@ export default {
           message: this.$t('components.enter-nonce.form.validations.length'),
         },
       },
-      // disabled: true,
+      // Wolle disabled: true,
     }
   },
   mounted: function () {
