@@ -35,7 +35,7 @@
           :title="$t('contribution.amount-comments', { amount: post.commentsCount })"
         />
         <counter-icon
-          icon="eye"
+          icon="hand-pointer"
           :count="post.clickedCount"
           :title="$t('contribution.amount-clicks', { amount: post.clickedCount })"
         />
