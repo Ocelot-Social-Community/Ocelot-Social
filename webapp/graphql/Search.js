@@ -13,6 +13,7 @@ export const searchQuery = gql`
         commentsCount
         shoutedCount
         clickedCount
+        viewedTeaserCount
         author {
           ...user
         }
@@ -42,6 +43,7 @@ export const searchPosts = gql`
         commentsCount
         shoutedCount
         clickedCount
+        viewedTeaserCount
         author {
           ...user
         }

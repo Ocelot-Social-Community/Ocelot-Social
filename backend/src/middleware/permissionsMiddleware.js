@@ -168,6 +168,7 @@ export default shield(
       UpdateDonations: isAdmin,
       GenerateInviteCode: isAuthenticated,
       switchUserRole: isAdmin,
+      markTeaserAsViewed: allow,
     },
     User: {
       email: or(isMyOwn, isAdmin),

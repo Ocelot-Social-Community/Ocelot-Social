@@ -44,6 +44,7 @@ export const post = {
   commentsCount: 12,
   categories: [],
   shoutedCount: 421,
+  viewedTeaserCount: 1584,
   __typename: 'Post',
 }
 
