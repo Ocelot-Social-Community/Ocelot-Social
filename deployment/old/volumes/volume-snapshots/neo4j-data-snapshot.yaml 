@@ -1,12 +1,8 @@
 ---
-  kind: PersistentVolumeClaim
-  apiVersion: v1
-  metadata:
-    name: neo4j-data-claim
-    namespace: ocelot-social
-  spec:
-    accessModes:
-      - ReadWriteOnce
-    resources:
-      requests:
-        storage: "10Gi"  # see requirements for Neo4j v3.5.14 https://neo4j.com/docs/operations-manual/3.5/installation/requirements/
+apiVersion: snapshot.storage.k8s.io/v1beta1
+kind: VolumeSnapshot
+metadata:
+  name: YYYY-MM-DD-neo4j-data-snapshot
+spec:
+  source:
+    persistentVolumeClaimName: volume-claim-ocelot-neo4j 
