@@ -24,7 +24,7 @@
         >
           <!-- Wolle !!! may create same source with 'webapp/pages/registration/signup.vue' -->
           <!-- <signup v-if="publicRegistration" :invitation="false" @submit="handleSubmitted"> -->
-          <registration-item-enter-email  ref="RegistrationItemEnterEmail" :sliderData="sliderData" :sendEmail="sendEmail" :invitation="false" />
+          <registration-item-enter-email  ref="RegistrationItemEnterEmail" :sliderData="sliderData" :invitation="false" />
         </template>
 
         <template
@@ -104,9 +104,6 @@ export default {
           title: this.enterEmailButtonTitle(this.overwriteSliderData.emailSend), // Wolle
           icon: 'envelope',
           callback: this.buttonCallback,
-          // clicked: false,
-          installClickCallback: this.installClickCallback,  // set by component
-          clickCallback: null,  // set by component
         },
       },
       {
@@ -176,7 +173,6 @@ export default {
         validateCallback: this.validateCallback,
         ...this.overwriteSliderData,
       },
-      sendEmail: false,
     }
   },
   computed: {
@@ -187,9 +183,6 @@ export default {
   methods: {
     enterEmailButtonTitle(emailSend) {
       return emailSend ? 'Resend E-Mail' : 'Send E-Mail'
-    },
-    installClickCallback(clickCallback) {
-      this.sliderData.sliders[this.sliderIndex].button.clickCallback = clickCallback
     },
     validateCallback(isValid, data = null) {
       this.sliderData.sliders[this.sliderIndex].validated = isValid
@@ -207,14 +200,7 @@ export default {
     },
     buttonCallback() {
       if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
-        // this.sliderData.sliders[this.sliderIndex].button.clicked = true
-        this.sendEmail = true
-        console.log('buttonCallback !!! ', this.sliderData.sliders[this.sliderIndex].data)
         this.$refs.RegistrationItemEnterEmail.handleSubmitVerify()
-        // if (this.sliderData.sliders[this.sliderIndex].button.clickCallback) {
-        //   console.log('buttonCallback !!! clicked')
-        //   this.sliderData.sliders[this.sliderIndex].button.clickCallback()
-        // }
         this.sliderData.sliders[this.sliderIndex].button.title = this.enterEmailButtonTitle(this.sliderData.collectedInputData.emailSend)
       }
 

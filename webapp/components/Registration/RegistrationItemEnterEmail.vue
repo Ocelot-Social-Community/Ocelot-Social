@@ -92,7 +92,6 @@ export default {
   },
   props: {
     sliderData: { type: Object, required: true },
-    sendEmail: { type: Boolean, required: true },
     token: { type: String, default: null }, // Wolle not used???
     invitation: { type: Boolean, default: false },
   },
@@ -121,9 +120,6 @@ export default {
         ? this.sliderData.collectedInputData.email
         : ''
       this.sendValidation()
-
-      // this.sliderData.sliders[this.sliderIndex].button.clickCallback = this.handleSubmitVerify
-      // this.sliderData.sliders[this.sliderIndex].button.installClickCallback(this.handleSubmitVerify)
     })
   },
   computed: {
@@ -138,34 +134,6 @@ export default {
       return isEmail(this.formData.email)
     },
   },
-  watch: {
-    sendEmail(value) {
-      console.log('sendEmail !!!')
-      if (value) {
-        console.log('value: ', value)
-        this.handleSubmitVerify()
-        this.sendEmail = false
-      }
-    },
-    // sliderData(sliderData) {
-    //   console.log('sliderData !!! clicked: ', sliderData.sliders[this.sliderIndex].button.clicked)
-    //   if (sliderData.sliders[this.sliderIndex].button.clicked) {
-    //     this.handleSubmitVerify()
-    //   }
-    // },
-    // sliderData: {
-    //   handler(sliderData) {
-    //     console.log('sliderData handler !!!')
-    //     if (sliderData.sliders[this.sliderIndex].button.clicked) {
-    //       console.log('sliderData handler !!! clicked: ', sliderData.sliders[this.sliderIndex].button.clicked)
-    //       this.sliderData.sliders[this.sliderIndex].button.clicked = false
-    //       this.handleSubmitVerify()
-    //     }
-    //   },
-    //   deep: true,
-    //   immediate: true,
-    // },
-  },
   methods: {
     async sendValidation() {
       if (this.formData.email && isEmail(this.formData.email)) {
@@ -174,15 +142,6 @@ export default {
       const { email } = this.formData
       const value = { email }
 
-      // let validated = false
-      // if (this.validInput) {
-      //   await this.handleSubmitVerify()
-      //   if (this.sliderData.sliders[this.sliderIndex].data.response) {
-      //     const {email: respnseEmail} = this.sliderData.sliders[this.sliderIndex].data.response.Signup || this.sliderData.sliders[this.sliderIndex].data.response.SignupByInvitation
-      //     validated = (email === respnseEmail)
-      //   }
-      // }
-      // this.sliderData.validateCallback(validated, value)
       this.sliderData.validateCallback(this.validInput, value)
     },
     async handleInput() {
@@ -204,12 +163,10 @@ export default {
           !this.sliderData.sliders[this.sliderIndex].data.request.variables.is(variables))
       )
       {
-        this.sliderData.sliders[this.sliderIndex].data.request = { variables }
+        this.sliderData.sliders[this.sliderIndex].data = {...this.sliderData.sliders[this.sliderIndex].data, request: { variables }}
 
         try {
           const response = await this.$apollo.mutate({ mutation, variables })  // e-mail is send in emailMiddleware of backend
-          // this.sliderData.sliders[this.sliderIndex].data.response = response.data
-          // this.sliderData.sliders[this.sliderIndex].data.response = { Signup: { email } }
           this.sliderData.sliders[this.sliderIndex].data = {...this.sliderData.sliders[this.sliderIndex].data, response: response.data}
 
           if (this.sliderData.sliders[this.sliderIndex].data.response) {
