@@ -208,8 +208,9 @@ export default {
 
         try {
           const response = await this.$apollo.mutate({ mutation, variables })  // e-mail is send in emailMiddleware of backend
-          console.log('handleSubmitVerify !!! response: ', response, ' this.sliderData.sliders[this.sliderIndex]: ', this.sliderData.sliders[this.sliderIndex])
-          this.sliderData.sliders[this.sliderIndex].data.response = response.data
+          // this.sliderData.sliders[this.sliderIndex].data.response = response.data
+          // this.sliderData.sliders[this.sliderIndex].data.response = { Signup: { email } }
+          this.sliderData.sliders[this.sliderIndex].data = {...this.sliderData.sliders[this.sliderIndex].data, response: response.data}
 
           if (this.sliderData.sliders[this.sliderIndex].data.response) {
             this.sliderData.collectedInputData.emailSend = true

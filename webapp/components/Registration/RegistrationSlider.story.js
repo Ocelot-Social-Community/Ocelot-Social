@@ -8,6 +8,9 @@ const plugins = [
   (app = {}) => {
     app.$apollo = {
       mutate: (data) => {
+        if (JSON.stringify(data).includes('UpdateUser')) {
+          return { data: { UpdateUser: { id: data.variables.id, locale: data.variables.locale } } }
+        }
         if (JSON.stringify(data).includes('Signup')) {
           return { data: { Signup: { email: data.variables.email } } }
         }

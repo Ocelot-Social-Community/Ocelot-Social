@@ -163,7 +163,7 @@
       },
       "email": {
         "form": {
-          "success": "Valid e-mail address <b>{email}</b>!"
+          "success": "Verification e-mail send to <b>{email}</b>!"
         }
       },
       "invite-code": {
