@@ -10,7 +10,6 @@
         '--blur-image': post.image && post.image.sensitive,
       }"
       :highlight="isPinned"
-      v-observe-visibility="(isVisible, entry) => visibilityChanged(isVisible, entry, post.id)"
     >
       <template v-if="post.image" #heroImage>
         <img :src="post.image | proxyApiUrl" class="image" />
@@ -23,7 +22,10 @@
       <!-- eslint-disable vue/no-v-html -->
       <div class="content hyphenate-text" v-html="excerpt" />
       <!-- eslint-enable vue/no-v-html -->
-      <footer class="footer">
+      <footer
+        class="footer"
+        v-observe-visibility="(isVisible, entry) => visibilityChanged(isVisible, entry, post.id)"
+      >
         <div class="categories-placeholder"></div>
         <counter-icon
           icon="bullhorn"
