@@ -1,0 +1,14 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: configmap-{{ .Release.Name }}-maintenance
+  labels:
+    app.kubernetes.io/name:       "{{ .Chart.Name }}"
+    app.kubernetes.io/instance:   "{{ .Release.Name }}"
+    app.kubernetes.io/version:    "{{ .Chart.AppVersion }}"
+    app.kubernetes.io/component:  "configmap-maintenance"
+    app.kubernetes.io/part-of:    "{{ .Chart.Name }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    helm.sh/chart:                "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+data:
+  HOST: "0.0.0.0"

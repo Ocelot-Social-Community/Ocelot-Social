@@ -1,0 +1,11 @@
+controller:
+  kind: DaemonSet
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+  ingressClass: nginx
+  daemonset:
+    useHostPort: true
+  service:
+    type: ClusterIP
+rbac:
+  create: true
