@@ -16,7 +16,7 @@ Due to the many limitations of Helm you still have to do several manual steps. T
 
 ### Cert Manager (https)
 
-Please refer to https://cert-manager.io/docs/installation/kubernetes/ for more details.
+Please refer to [cert-manager.io docs](https://cert-manager.io/docs/installation/kubernetes/) for more details.
 
 1. Create Namespace
 
@@ -56,7 +56,7 @@ helm --kubeconfig=/../kubeconfig.yaml install ingress-nginx ingress-nginx/ingres
 
 ### Digital Ocean Firewall
 
-This is only necessary if you run Digital Ocean without load balancer. 
+This is only necessary if you run Digital Ocean without load balancer ([see here for more info](https://stackoverflow.com/questions/54119399/expose-port-80-on-digital-oceans-managed-kubernetes-without-a-load-balancer/55968709)) .
 
 1. Authenticate towards DO with your local `doctl`
 
@@ -109,3 +109,20 @@ Be aware that if you uninstall ocelot the formerly bound volumes become unbound.
 ```bash
 helm --kubeconfig=/../kubeconfig.yaml uninstall ocelot
 ```
+
+## Error reporting
+
+We use [Sentry](https://github.com/getsentry/sentry) for error reporting in both
+our backend and web frontend. You can either use a hosted or a self-hosted
+instance. Just set the two `DSN` in your
+[configmap](../templates/configmap.template.yaml) and update the `COMMIT`
+during a deployment with your commit or the version of your release.
+
+### Self-hosted Sentry
+
+For data privacy it is recommended to set up your own instance of sentry. 
+If you are lucky enough to have a kubernetes cluster with the required hardware
+support, try this [helm chart](https://github.com/helm/charts/tree/master/stable/sentry).
+
+On our kubernetes cluster we get "mult-attach" errors for persistent volumes.
+Apparently Digital Ocean's kubernetes clusters do not fulfill the requirements.
