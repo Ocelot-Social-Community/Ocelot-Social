@@ -91,10 +91,11 @@ export default {
       if (
         !this.sliderData.sliders[this.sliderIndex].data.request ||
         !this.sliderData.sliders[this.sliderIndex].data.request.variables ||
-        (this.sliderData.sliders[this.sliderIndex].data.request.variables &&
+        (this.sliderData.sliders[this.sliderIndex].data.request && this.sliderData.sliders[this.sliderIndex].data.request.variables &&
           !this.sliderData.sliders[this.sliderIndex].data.request.variables.is(variables))
       ) {
-        this.sliderData.sliders[this.sliderIndex].data.request.variables = variables
+        // this.sliderData.sliders[this.sliderIndex].data.request.variables = variables
+        this.sliderData.sliders[this.sliderIndex].data.request = { variables }
 
         try {
           const response = await this.$apollo.query({ query: isValidInviteCodeQuery, variables })

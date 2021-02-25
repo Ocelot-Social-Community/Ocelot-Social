@@ -24,7 +24,7 @@
         >
           <!-- Wolle !!! may create same source with 'webapp/pages/registration/signup.vue' -->
           <!-- <signup v-if="publicRegistration" :invitation="false" @submit="handleSubmitted"> -->
-          <registration-item-enter-email :invitation="false" :sliderData="sliderData" />
+          <registration-item-enter-email :sliderData="sliderData" :sendEmail="sendEmail" :invitation="false" />
         </template>
 
         <template
@@ -87,7 +87,7 @@ export default {
         // title: this.$t('components.registration.create-user-account.title'),
         title: 'Invitation', // Wolle
         validated: false,
-        data: { request: /* Wolle */{ variables: null }, response: { isValidInviteCode: false } },
+        data: { request: null, response: { isValidInviteCode: false } },
         button: {
           title: 'Next', // Wolle
           icon: 'arrow-right',
@@ -100,9 +100,13 @@ export default {
         validated: false,
         data: { request: null, response: null },
         button: {
-          title: 'Send E-Mail', // Wolle
+          // title: 'Send E-Mail', // Wolle
+          title: this.enterEmailButtonTitle(this.overwriteSliderData.emailSend), // Wolle
           icon: 'envelope',
           callback: this.buttonCallback,
+          // clicked: false,
+          installClickCallback: this.installClickCallback,  // set by component
+          clickCallback: null,  // set by component
         },
       },
       {
@@ -172,6 +176,7 @@ export default {
         validateCallback: this.validateCallback,
         ...this.overwriteSliderData,
       },
+      sendEmail: false,
     }
   },
   computed: {
@@ -180,6 +185,12 @@ export default {
     },
   },
   methods: {
+    enterEmailButtonTitle(emailSend) {
+      return emailSend ? 'Resend E-Mail' : 'Send E-Mail'
+    },
+    installClickCallback(clickCallback) {
+      this.sliderData.sliders[this.sliderIndex].button.clickCallback = clickCallback
+    },
     validateCallback(isValid, data = null) {
       this.sliderData.sliders[this.sliderIndex].validated = isValid
       if (data) {
@@ -196,8 +207,14 @@ export default {
     },
     buttonCallback() {
       if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
-        this.sliderData.collectedInputData.emailSend = true
-        this.sliderData.sliders[this.sliderIndex].button.title = 'Resend E-Mail' // Wolle
+        // this.sliderData.sliders[this.sliderIndex].button.clicked = true
+        this.sendEmail = true
+        console.log('buttonCallback !!! this.sendEmail', this.sendEmail)
+        // if (this.sliderData.sliders[this.sliderIndex].button.clickCallback) {
+        //   console.log('buttonCallback !!! clicked')
+        //   this.sliderData.sliders[this.sliderIndex].button.clickCallback()
+        // }
+        this.sliderData.sliders[this.sliderIndex].button.title = this.enterEmailButtonTitle(this.sliderData.collectedInputData.emailSend)
       }
 
       if (this.sliderIndex === this.sliderData.sliders.length - 1) {
