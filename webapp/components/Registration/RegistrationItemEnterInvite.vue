@@ -91,7 +91,8 @@ export default {
       if (
         !this.sliderData.sliders[this.sliderIndex].data.request ||
         !this.sliderData.sliders[this.sliderIndex].data.request.variables ||
-        (this.sliderData.sliders[this.sliderIndex].data.request && this.sliderData.sliders[this.sliderIndex].data.request.variables &&
+        (this.sliderData.sliders[this.sliderIndex].data.request &&
+          this.sliderData.sliders[this.sliderIndex].data.request.variables &&
           !this.sliderData.sliders[this.sliderIndex].data.request.variables.is(variables))
       ) {
         // this.sliderData.sliders[this.sliderIndex].data.request.variables = variables
@@ -101,14 +102,17 @@ export default {
           const response = await this.$apollo.query({ query: isValidInviteCodeQuery, variables })
           this.sliderData.sliders[this.sliderIndex].data.response = response.data
 
-          if (this.sliderData.sliders[this.sliderIndex].data.response && this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode) {
+          if (
+            this.sliderData.sliders[this.sliderIndex].data.response &&
+            this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode
+          ) {
             this.$toast.success(
               this.$t('components.registration.invite-code.form.success', { inviteCode }),
             )
           }
         } catch (err) {
           this.sliderData.sliders[this.sliderIndex].data.response = { isValidInviteCode: false }
-          
+
           const { message } = err
           this.$toast.error(message)
         }

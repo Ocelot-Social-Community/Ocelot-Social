@@ -24,7 +24,11 @@
         >
           <!-- Wolle !!! may create same source with 'webapp/pages/registration/signup.vue' -->
           <!-- <signup v-if="publicRegistration" :invitation="false" @submit="handleSubmitted"> -->
-          <registration-item-enter-email  ref="RegistrationItemEnterEmail" :sliderData="sliderData" :invitation="false" />
+          <registration-item-enter-email
+            ref="RegistrationItemEnterEmail"
+            :sliderData="sliderData"
+            :invitation="false"
+          />
         </template>
 
         <template
@@ -201,7 +205,9 @@ export default {
     buttonCallback() {
       if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
         this.$refs.RegistrationItemEnterEmail.handleSubmitVerify()
-        this.sliderData.sliders[this.sliderIndex].button.title = this.enterEmailButtonTitle(this.sliderData.collectedInputData.emailSend)
+        this.sliderData.sliders[this.sliderIndex].button.title = this.enterEmailButtonTitle(
+          this.sliderData.collectedInputData.emailSend,
+        )
       }
 
       if (this.sliderIndex === this.sliderData.sliders.length - 1) {

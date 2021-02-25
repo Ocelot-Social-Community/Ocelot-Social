@@ -159,19 +159,27 @@ export default {
       if (
         !this.sliderData.sliders[this.sliderIndex].data.request ||
         !this.sliderData.sliders[this.sliderIndex].data.request.variables ||
-        (this.sliderData.sliders[this.sliderIndex].data.request && this.sliderData.sliders[this.sliderIndex].data.request.variables &&
+        (this.sliderData.sliders[this.sliderIndex].data.request &&
+          this.sliderData.sliders[this.sliderIndex].data.request.variables &&
           !this.sliderData.sliders[this.sliderIndex].data.request.variables.is(variables))
-      )
-      {
-        this.sliderData.sliders[this.sliderIndex].data = {...this.sliderData.sliders[this.sliderIndex].data, request: { variables }}
+      ) {
+        this.sliderData.sliders[this.sliderIndex].data = {
+          ...this.sliderData.sliders[this.sliderIndex].data,
+          request: { variables },
+        }
 
         try {
-          const response = await this.$apollo.mutate({ mutation, variables })  // e-mail is send in emailMiddleware of backend
-          this.sliderData.sliders[this.sliderIndex].data = {...this.sliderData.sliders[this.sliderIndex].data, response: response.data}
+          const response = await this.$apollo.mutate({ mutation, variables }) // e-mail is send in emailMiddleware of backend
+          this.sliderData.sliders[this.sliderIndex].data = {
+            ...this.sliderData.sliders[this.sliderIndex].data,
+            response: response.data,
+          }
 
           if (this.sliderData.sliders[this.sliderIndex].data.response) {
             this.sliderData.collectedInputData.emailSend = true
-            const {email: respnseEmail} = this.sliderData.sliders[this.sliderIndex].data.response.Signup || this.sliderData.sliders[this.sliderIndex].data.response.SignupByInvitation
+            const { email: respnseEmail } =
+              this.sliderData.sliders[this.sliderIndex].data.response.Signup ||
+              this.sliderData.sliders[this.sliderIndex].data.response.SignupByInvitation
             this.$toast.success(
               this.$t('components.registration.email.form.success', { email: respnseEmail }),
             )
