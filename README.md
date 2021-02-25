@@ -31,7 +31,6 @@ Logins:
 There are four important directories:
 * [Backend](./backend) runs on the server and is a middleware between database and frontend
 * [Frontend](./webapp) is a server-side-rendered and client-side-rendered web frontend
-* [Deployment](./deployment) configuration for kubernetes
 * [Cypress](./cypress) contains end-to-end tests and executable feature specifications
 
 In order to setup the application and start to develop features you have to
