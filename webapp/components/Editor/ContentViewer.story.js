@@ -1,39 +1,11 @@
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
-import HcEditor from '~/components/Editor/Editor.vue'
+import ContentViewer from '~/components/Editor/ContentViewer.vue'
 import helpers from '~/storybook/helpers'
-import Vue from 'vue'
 
-const embed = {
-  image: 'https://i.ytimg.com/vi/ptCcgLM-p8k/maxresdefault_live.jpg',
-  title: 'Video Titel',
-  // html: null,
-  description: 'Video Description',
-  html:
-    '<iframe width="auto" height="250" src="https://www.youtube.com/embed/qkdXAtO40Fo?feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
-}
+helpers.init()
 
-const plugins = [
-  (app = {}) => {
-    app.$apollo = {
-      mutate: () => {},
-      query: () => {
-        return { data: { embed } }
-      },
-    }
-    Vue.prototype.$apollo = app.$apollo
-    return app
-  },
-]
-helpers.init({ plugins })
-
-const users = [
-  { id: 1, slug: 'peter' },
-  { id: 2, slug: 'sandra' },
-  { id: 3, slug: 'jane' },
-]
-
-storiesOf('Editor', module)
+storiesOf('ContentViewer', module)
   .addDecorator(withA11y)
   .addDecorator((storyFn) => {
     const ctx = storyFn()
@@ -47,25 +19,16 @@ storiesOf('Editor', module)
     }
   })
   .addDecorator(helpers.layout)
-  .add('Empty', () => ({
-    components: { HcEditor },
-    store: helpers.store,
-    data: () => ({
-      users,
-    }),
-    template: `<hc-editor :users="users" />`,
-  }))
   .add('Basic formatting', () => ({
-    components: { HcEditor },
+    components: { ContentViewer },
     store: helpers.store,
     data: () => ({
-      users,
       content: `
         <h3>Basic formatting</h3>
         <p>
           Here is some <em>italic</em>, <b>bold</b> and <u>underline</u> text.
           <br/>
-          Also do we have some <a href="https://ocelot.social">inline links</a> here.
+          Also do we have some <a href="https://human-connection.org">inline links</a> here.
         </p>
         <h3>Heading 3</h3>
         <p>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</p>
@@ -111,60 +74,5 @@ storiesOf('Editor', module)
         </ol>
       `,
     }),
-    template: `<hc-editor :users="users" :value="content" />`,
-  }))
-  .add('@Mentions', () => ({
-    components: { HcEditor },
-    store: helpers.store,
-    data: () => ({
-      users,
-      content: `
-        <p>
-          Here you can mention people like
-          <a class="mention" data-mention-id="2" href="/profile/1" target="_blank" contenteditable="false">@sandra</a> and others.
-          Try it out!
-        </p>
-      `,
-    }),
-    template: `<hc-editor :users="users" :value="content" />`,
-  }))
-  .add('#Hashtags', () => ({
-    components: { HcEditor },
-    store: helpers.store,
-    data: () => ({
-      users,
-      content: `
-        <p>
-          This text contains <a href="#" class="hashtag">#hashtags</a> for projects like <a href="https://ocelot.social" class="hashtag">#ocelot-social</a>
-          Try to add more by typing #.
-        </p>
-      `,
-    }),
-    template: `<hc-editor :users="users" :value="content" />`,
-  }))
-  .add('Embeds with iframe', () => ({
-    components: { HcEditor },
-    store: helpers.store,
-    data: () => ({
-      users,
-      content: `
-        <a class="embed" href="https://www.youtube.com/watch?v=qkdXAtO40Fo">
-          <em>https://www.youtube.com/watch?v=qkdXAtO40Fo</em>
-        </a>
-      `,
-    }),
-    template: `<hc-editor :users="users" :value="content" />`,
-  }))
-  .add('Embeds with plain link', () => ({
-    components: { HcEditor },
-    store: helpers.store,
-    data: () => ({
-      users,
-      content: `
-       <a class="embed" href="https://telegram.org/">
-         <em>https://telegram.org/</em>
-       </a>
-      `,
-    }),
-    template: `<hc-editor :users="users" :value="content" />`,
+    template: `<content-viewer :content="content" />`,
   }))

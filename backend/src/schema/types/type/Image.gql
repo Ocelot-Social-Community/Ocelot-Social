@@ -8,6 +8,7 @@ type Image {
   alt: String,
   sensitive: Boolean,
   aspectRatio: Float,
+  type: String,
 }
 
 input ImageInput {
@@ -15,4 +16,5 @@ input ImageInput {
   upload: Upload,
   sensitive: Boolean,
   aspectRatio: Float,
+  type: String,
 }

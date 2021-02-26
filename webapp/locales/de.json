@@ -63,6 +63,7 @@
         "placeholder": "E-Mail, Name oder Beschreibung"
       },
       "name": "Benutzer",
+      "roleChanged": "Rolle erfolgreich geändert!",
       "table": {
         "columns": {
           "createdAt": "Erstellt am",
@@ -233,8 +234,10 @@
     "newPost": "Erstelle einen neuen Beitrag",
     "success": "Gespeichert!",
     "teaserImage": {
+      "cropImage": "Bild zuschneiden",
       "cropperConfirm": "Bestätigen",
       "errors": {
+        "aspect-ratio-too-small": "Dieses Bild ist zu hoch.",
         "unSupported-file-format": "Bitte lade ein Bild in den folgenden Formaten hoch: JPG, JPEG, PNG or GIF!"
       },
       "supportedFormats": "Füge ein Bild im Dateiformat JPG, PNG oder GIF ein"

@@ -56,7 +56,7 @@ jobs:
       ##########################################################################
       - name: Neo4J | Build `community` image
         run: |
-          docker build --target community -t "ocelotsocialnetwork/neo4j:community" -t "ocelotsocialnetwork/neo4j:${VERSION}" -t "ocelotsocialnetwork/neo4j:${BUILD_VERSION}" neo4j/
+          docker build --target community -t "ocelotsocialnetwork/neo4j:latest" -t "ocelotsocialnetwork/neo4j:community" -t "ocelotsocialnetwork/neo4j:${VERSION}" -t "ocelotsocialnetwork/neo4j:${BUILD_VERSION}" neo4j/
           docker save "ocelotsocialnetwork/neo4j" > /tmp/neo4j.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
@@ -65,7 +65,7 @@ jobs:
           path: /tmp/neo4j.tar
 
   ##############################################################################
-  # JOB: DOCKER BUILD Production BACKEND #######################################
+  # JOB: DOCKER BUILD PRODUCTION BACKEND #######################################
   ##############################################################################
   build_production_backend:
     name: Docker Build Production - Backend
@@ -229,14 +229,13 @@ jobs:
       - name: login to dockerhub
         run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
       - name: Push neo4j
-      # TODO: at some point --all-tags will be needed -.-
-        run: docker push ocelotsocialnetwork/neo4j
+        run: docker push --all-tags ocelotsocialnetwork/neo4j
       - name: Push backend
-        run: docker push ocelotsocialnetwork/backend
+        run: docker push --all-tags ocelotsocialnetwork/backend
       - name: Push webapp
-        run: docker push ocelotsocialnetwork/webapp
+        run: docker push --all-tags ocelotsocialnetwork/webapp
       - name: Push maintenance
-        run: docker push ocelotsocialnetwork/maintenance
+        run: docker push --all-tags ocelotsocialnetwork/maintenance
 
   ##############################################################################
   # JOB: GITHUB TAG LATEST VERSION #############################################

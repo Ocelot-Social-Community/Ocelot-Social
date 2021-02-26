@@ -86,6 +86,7 @@ COPY --from=build ${DOCKER_WORKDIR}/node_modules ./node_modules
 COPY --from=build ${DOCKER_WORKDIR}/nuxt.config.js ./nuxt.config.js
 # Copy static files
 # TODO - this should be one Folder containign all stuff needed to be copied
+COPY --from=build ${DOCKER_WORKDIR}/config/ ./config/
 COPY --from=build ${DOCKER_WORKDIR}/constants ./constants
 COPY --from=build ${DOCKER_WORKDIR}/static ./static
 COPY --from=build ${DOCKER_WORKDIR}/locales ./locales
