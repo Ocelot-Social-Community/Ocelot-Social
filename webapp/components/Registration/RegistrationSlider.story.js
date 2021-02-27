@@ -87,7 +87,7 @@ storiesOf('RegistrationSlider', module)
         collectedInputData: {
           inviteCode: null,
           email: 'wolle.huss@pjannto.com',
-          emailSend: true,
+          emailSend: false,
           nonce: 'NTRSCZ',
           name: 'Wolle',
           password: 'Hello',

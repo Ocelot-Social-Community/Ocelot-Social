@@ -226,6 +226,9 @@ export default {
         ? this.sliderData.collectedInputData.noPolitical
         : false
       this.sendValidation()
+
+      // Wolle this.sliderData.setSliderValuesCallback(this.validInput, {}, {}, this.onNextClick)
+      this.sliderData.setSliderValuesCallback(this.valid, {}, this.onNextClick)
     })
   },
   computed: {
@@ -271,7 +274,7 @@ export default {
         noPolitical,
       } = this
       const locale = this.$i18n.locale()
-      const value = {
+      const values = {
         name,
         about,
         password,
@@ -286,7 +289,7 @@ export default {
       }
       // Wolle validate in backend
       // toaster
-      this.sliderData.validateCallback(this.valid, value)
+      this.sliderData.setSliderValuesCallback(this.valid, { collectedInputData: values }, {})
     },
     async handleInput() {
       this.sendValidation()
@@ -323,6 +326,9 @@ export default {
       } catch (err) {
         this.response = 'error'
       }
+    },
+    onNextClick() {
+      return true
     },
   },
 }

@@ -56,6 +56,8 @@ export default {
         ? this.sliderData.collectedInputData.inviteCode
         : ''
       this.sendValidation()
+
+      this.sliderData.setSliderValuesCallback(this.validInput, {}, this.onNextClick)
     })
   },
   computed: {
@@ -76,7 +78,7 @@ export default {
         await this.handleSubmitVerify()
         validated = this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode
       }
-      this.sliderData.validateCallback(validated, values)
+      this.sliderData.setSliderValuesCallback(validated, { collectedInputData: values })
     },
     async handleInput() {
       this.sendValidation()
@@ -90,17 +92,19 @@ export default {
 
       if (
         !this.sliderData.sliders[this.sliderIndex].data.request ||
-        !this.sliderData.sliders[this.sliderIndex].data.request.variables ||
+        (this.sliderData.sliders[this.sliderIndex].data.request && !this.sliderData.sliders[this.sliderIndex].data.request.variables) ||
         (this.sliderData.sliders[this.sliderIndex].data.request &&
           this.sliderData.sliders[this.sliderIndex].data.request.variables &&
-          !this.sliderData.sliders[this.sliderIndex].data.request.variables.is(variables))
+          !this.sliderData.sliders[this.sliderIndex].data.request.variables === variables)
       ) {
         // this.sliderData.sliders[this.sliderIndex].data.request.variables = variables
-        this.sliderData.sliders[this.sliderIndex].data.request = { variables }
+        // this.sliderData.sliders[this.sliderIndex].data.request = { variables }
+        this.sliderData.setSliderValuesCallback(this.sliderData.sliders[this.sliderIndex].validated, { sliderData: { request: { variables }, response: null } })
 
         try {
           const response = await this.$apollo.query({ query: isValidInviteCodeQuery, variables })
-          this.sliderData.sliders[this.sliderIndex].data.response = response.data
+          // this.sliderData.sliders[this.sliderIndex].data.response = response.data
+          this.sliderData.setSliderValuesCallback(this.sliderData.sliders[this.sliderIndex].validated, { sliderData: { response: response.data } })
 
           if (
             this.sliderData.sliders[this.sliderIndex].data.response &&
@@ -111,12 +115,16 @@ export default {
             )
           }
         } catch (err) {
-          this.sliderData.sliders[this.sliderIndex].data.response = { isValidInviteCode: false }
+          // this.sliderData.sliders[this.sliderIndex].data.response = { isValidInviteCode: false }
+          this.sliderData.setSliderValuesCallback(this.sliderData.sliders[this.sliderIndex].validated, { sliderData: { response: { isValidInviteCode: false } } })
 
           const { message } = err
           this.$toast.error(message)
         }
       }
+    },
+    onNextClick() {
+      return true
     },
   },
 }

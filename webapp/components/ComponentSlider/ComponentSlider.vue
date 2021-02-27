@@ -36,7 +36,7 @@
           filled
           :loading="false"
           :disabled="!sliderData.sliders[sliderIndex].validated"
-          @click="sliderData.sliders[sliderIndex].button.callback"
+          @click="onClick"
         >
           {{ sliderData.sliders[sliderIndex].button.title }}
         </base-button>
@@ -56,6 +56,18 @@ export default {
   computed: {
     sliderIndex() {
       return this.sliderData.sliderIndex // have a shorter notation
+    },
+  },
+  methods: {
+    async onClick() {
+      let success = true
+      if (this.sliderData.sliders[this.sliderIndex].button.slotOnNextClick) {
+        success = await this.sliderData.sliders[this.sliderIndex].button.slotOnNextClick()
+      }
+      // this.sliderData.sliders[this.sliderIndex].button.callback()
+      if (success && this.sliderIndex < this.sliderData.sliders.length - 1) {
+        this.sliderData.sliderSelectorCallback(this.sliderIndex + 1)
+      }
     },
   },
 }

@@ -25,7 +25,6 @@
           <!-- Wolle !!! may create same source with 'webapp/pages/registration/signup.vue' -->
           <!-- <signup v-if="publicRegistration" :invitation="false" @submit="handleSubmitted"> -->
           <registration-item-enter-email
-            ref="RegistrationItemEnterEmail"
             :sliderData="sliderData"
             :invitation="false"
           />
@@ -96,6 +95,7 @@ export default {
           title: 'Next', // Wolle
           icon: 'arrow-right',
           callback: this.buttonCallback,
+          slotOnNextClick: null, // optional set by slot
         },
       },
       {
@@ -108,27 +108,32 @@ export default {
           title: this.enterEmailButtonTitle(this.overwriteSliderData.emailSend), // Wolle
           icon: 'envelope',
           callback: this.buttonCallback,
+          slotOnNextClick: null, // optional set by slot
         },
       },
       {
         name: 'enter-nonce',
         title: 'E-Mail Confirmation', // Wolle
         validated: false,
+        data: { request: null, response: null },
         button: {
           title: 'Confirm', // Wolle
           icon: 'arrow-right',
           callback: this.buttonCallback,
+          slotOnNextClick: null, // optional set by slot
         },
       },
       {
         name: 'create-user-account',
         title: this.$t('components.registration.create-user-account.title'),
         validated: false,
+        data: { request: null, response: null },
         button: {
           // title: this.$t('actions.save'), // Wolle
           title: 'Create', // Wolle
           icon: 'check',
           callback: this.buttonCallback,
+          slotOnNextClick: null, // optional set by slot
         },
       },
     ]
@@ -174,7 +179,7 @@ export default {
         sliderIndex: 0,
         sliders: sliders,
         sliderSelectorCallback: this.sliderSelectorCallback,
-        validateCallback: this.validateCallback,
+        setSliderValuesCallback: this.setSliderValuesCallback,
         ...this.overwriteSliderData,
       },
     }
@@ -186,40 +191,65 @@ export default {
   },
   methods: {
     enterEmailButtonTitle(emailSend) {
-      return emailSend ? 'Resend E-Mail' : 'Send E-Mail'
+      // return emailSend ? 'Resend e-mail' : 'Send e-mail'
+      return emailSend ? 'Skip send' : 'Send e-mail'  // Wolle
     },
-    validateCallback(isValid, data = null) {
+    setSliderValuesCallback(isValid, { collectedInputData, sliderData, sliderSettings }, slotOnNextClick = null) {
       this.sliderData.sliders[this.sliderIndex].validated = isValid
-      if (data) {
+
+      if (collectedInputData) {
         this.sliderData.collectedInputData = {
           ...this.sliderData.collectedInputData,
-          ...data,
+          ...collectedInputData,
         }
+      }
+      if (sliderData) {
+        if (this.sliderData.sliders[this.sliderIndex].data) {
+          this.sliderData.sliders[this.sliderIndex].data = {
+            request: sliderData.request ? sliderData.request : this.sliderData.sliders[this.sliderIndex].data.request,
+            response: sliderData.response ? sliderData.response : this.sliderData.sliders[this.sliderIndex].data.response,
+          }
+        }
+      }
+      if (sliderSettings) {
+        
+      }
+
+      if (slotOnNextClick) {
+        this.sliderData.sliders[this.sliderIndex].button.slotOnNextClick = slotOnNextClick
       }
     },
     sliderSelectorCallback(selectedIndex) {
-      if (selectedIndex < this.sliderIndex) {
+      if (selectedIndex <= this.sliderIndex + 1 && selectedIndex < this.sliderData.sliders.length) {
+        if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
+          this.sliderData.sliders[this.sliderIndex].button.title = this.enterEmailButtonTitle(
+            this.sliderData.collectedInputData.emailSend,
+          )
+        }
         this.sliderData.sliderIndex = selectedIndex
       }
     },
     buttonCallback() {
-      if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
-        this.$refs.RegistrationItemEnterEmail.handleSubmitVerify()
-        this.sliderData.sliders[this.sliderIndex].button.title = this.enterEmailButtonTitle(
-          this.sliderData.collectedInputData.emailSend,
-        )
-      }
+      // Wolle
+      // if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
+      //   // if (this.sliderData.sliders[this.sliderIndex].button.slotOnNextClick) {
+      //   //   this.sliderData.sliders[this.sliderIndex].button.slotOnNextClick()
+      //   // }
+      //   this.sliderData.sliders[this.sliderIndex].button.title = this.enterEmailButtonTitle(
+      //     this.sliderData.collectedInputData.emailSend,
+      //   )
+      // }
 
-      if (this.sliderIndex === this.sliderData.sliders.length - 1) {
-        // console.log('submit data: ', this.sliderData.collectedInputData)
-      } else {
-        if (this.sliderIndex < this.sliderData.sliders.length - 1) {
-          this.sliderData.sliderIndex++
-          if (this.sliderData.sliders[this.sliderIndex] === 'create-user-account') {
-            this.sliderData.sliders[this.sliderIndex].validated = false
-          }
-        }
-      }
+      // if (this.sliderIndex === this.sliderData.sliders.length - 1) {
+      //   // console.log('submit data: ', this.sliderData.collectedInputData)
+      // } else {
+      //   if (this.sliderIndex < this.sliderData.sliders.length - 1) {
+      //     this.sliderData.sliderIndex++
+      //     if (this.sliderData.sliders[this.sliderIndex] === 'create-user-account') {
+      //       this.sliderData.sliders[this.sliderIndex].validated = false
+      //     }
+      //   }
+      // }
     },
   },
 }

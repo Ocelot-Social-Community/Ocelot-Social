@@ -43,6 +43,21 @@
         {{ $t('components.registration.signup.form.submit') }}
       </base-button> -->
       <slot></slot>
+      <ds-text v-if="sliderData.collectedInputData.emailSend">
+      <!-- Wolle <ds-text v-if="sliderData.collectedInputData.emailSend"> -->
+        <input
+          id="checkbox"
+          type="checkbox"
+          v-model="sendEmailAgain"
+          :checked="sendEmailAgain"
+        />
+        <label for="checkbox0">
+          <!-- Wolle {{ $t('termsAndConditions.termsAndConditionsConfirmed') }} -->
+          Send e-mail again
+          <!-- <br />
+          <nuxt-link to="/terms-and-conditions">{{ $t('site.termsAndConditions') }}</nuxt-link> -->
+        </label>
+      </ds-text>
     </ds-form>
   </ds-space>
   <div v-else margin="large">
@@ -108,6 +123,7 @@ export default {
           message: this.$t('common.validations.email'),
         },
       },
+      sendEmailAgain: false,
       // Wolle disabled: true,
       data: null,
       error: null,
@@ -120,6 +136,8 @@ export default {
         ? this.sliderData.collectedInputData.email
         : ''
       this.sendValidation()
+
+      this.sliderData.setSliderValuesCallback(this.validInput, {}, this.onNextClick)
     })
   },
   computed: {
@@ -140,9 +158,9 @@ export default {
         this.formData.email = normalizeEmail(this.formData.email)
       }
       const { email } = this.formData
-      const value = { email }
+      const values = { email }
 
-      this.sliderData.validateCallback(this.validInput, value)
+      this.sliderData.setSliderValuesCallback(this.validInput, { collectedInputData: values }, {})
     },
     async handleInput() {
       this.sendValidation()
@@ -150,30 +168,33 @@ export default {
     async handleInputValid() {
       this.sendValidation()
     },
-    async handleSubmitVerify() {
+    async onNextClick() {
       const mutation = this.token ? SignupByInvitationMutation : SignupMutation
       const { token } = this
       const { email } = this.formData
       const variables = { email, token }
 
+      // Wolle test for resend
       if (
         !this.sliderData.sliders[this.sliderIndex].data.request ||
-        !this.sliderData.sliders[this.sliderIndex].data.request.variables ||
+        (this.sliderData.sliders[this.sliderIndex].data.request && !this.sliderData.sliders[this.sliderIndex].data.request.variables) ||
         (this.sliderData.sliders[this.sliderIndex].data.request &&
           this.sliderData.sliders[this.sliderIndex].data.request.variables &&
-          !this.sliderData.sliders[this.sliderIndex].data.request.variables.is(variables))
+          !this.sliderData.sliders[this.sliderIndex].data.request.variables === variables)
       ) {
-        this.sliderData.sliders[this.sliderIndex].data = {
-          ...this.sliderData.sliders[this.sliderIndex].data,
-          request: { variables },
-        }
+        // this.sliderData.sliders[this.sliderIndex].data = {
+        //   ...this.sliderData.sliders[this.sliderIndex].data,
+        //   request: { variables },
+        // }
+        this.sliderData.setSliderValuesCallback(this.sliderData.sliders[this.sliderIndex].validated, { sliderData: { request: { variables }, response: null } })
 
         try {
           const response = await this.$apollo.mutate({ mutation, variables }) // e-mail is send in emailMiddleware of backend
-          this.sliderData.sliders[this.sliderIndex].data = {
-            ...this.sliderData.sliders[this.sliderIndex].data,
-            response: response.data,
-          }
+          // this.sliderData.sliders[this.sliderIndex].data = {
+          //   ...this.sliderData.sliders[this.sliderIndex].data,
+          //   response: response.data,
+          // }
+          this.sliderData.setSliderValuesCallback(this.sliderData.sliders[this.sliderIndex].validated, { sliderData: { response: response.data } })
 
           if (this.sliderData.sliders[this.sliderIndex].data.response) {
             this.sliderData.collectedInputData.emailSend = true
@@ -184,8 +205,10 @@ export default {
               this.$t('components.registration.email.form.success', { email: respnseEmail }),
             )
           }
+          return true
         } catch (err) {
-          this.sliderData.sliders[this.sliderIndex].data = { request: null, response: null }
+          // this.sliderData.sliders[this.sliderIndex].data = { request: null, response: null }
+          this.sliderData.setSliderValuesCallback(this.sliderData.sliders[this.sliderIndex].validated, { sliderData: { request: null, response: null } })
           this.sliderData.collectedInputData.emailSend = false
 
           const { message } = err
@@ -203,6 +226,7 @@ export default {
           if (!this.error) {
             this.$toast.error(message)
           }
+          return false
         }
       }
     },

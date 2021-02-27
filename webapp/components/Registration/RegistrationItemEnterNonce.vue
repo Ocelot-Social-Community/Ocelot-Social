@@ -43,8 +43,8 @@ export default {
       formSchema: {
         nonce: {
           type: 'string',
-          min: 6,
-          max: 6,
+          // Wolle min: 6,
+          // max: 6,
           required: true,
           message: this.$t('components.enter-nonce.form.validations.length'),
         },
@@ -60,26 +60,28 @@ export default {
         ? this.sliderData.collectedInputData.nonce
         : ''
       this.sendValidation()
+
+      // Wolle this.sliderData.setSliderValuesCallback(this.validInput, {}, {}, this.onNextClick)
+      this.sliderData.setSliderValuesCallback(this.valid, {}, this.onNextClick)
     })
   },
   computed: {
     valid() {
-      const isValid = this.formData.nonce.length === 6
-      return isValid
+      return this.formData.nonce.length === 6
     },
   },
   methods: {
     sendValidation() {
       const { nonce } = this.formData
-      const value = {
+      const values = {
         nonce,
       }
       // console.log('sendValidation !!! value: ', value)
-      this.sliderData.validateCallback(this.valid, value)
+      this.sliderData.setSliderValuesCallback(this.valid, { collectedInputData: values })
     },
     async handleInput() {
       // this.disabled = true
-      // this.sliderData.validateCallback(false)
+      // this.sliderData.setSliderValuesCallback(false)
       this.sendValidation()
     },
     async handleInputValid() {
@@ -87,13 +89,16 @@ export default {
       // const { nonce } = this.formData
       // validate in backend?
       // toaster?
-      // this.sliderData.validateCallback(true, { nonce })
+      // this.sliderData.setSliderValuesCallback(true, { nonce })
       this.sendValidation()
     },
     handleSubmitVerify() {
       // const { nonce } = this.formData
       // const email = this.email
       // this.$emit('nonceEntered', { email, nonce })
+    },
+    onNextClick() {
+      return true
     },
   },
 }
