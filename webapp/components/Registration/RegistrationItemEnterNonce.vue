@@ -61,7 +61,6 @@ export default {
         : ''
       this.sendValidation()
 
-      // Wolle this.sliderData.setSliderValuesCallback(this.validInput, {}, {}, this.onNextClick)
       this.sliderData.setSliderValuesCallback(this.validInput, {
         sliderSettings: { buttonSliderCallback: this.onNextClick },
       })
@@ -75,6 +74,14 @@ export default {
   methods: {
     sendValidation() {
       const { nonce } = this.formData
+
+      // Wolle shall the nonce be validated in the database?
+      // let dbValidated = false
+      // if (this.validInput) {
+      //   await this.handleSubmitVerify()
+      //   dbValidated = this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode
+      // }
+      // this.sliderData.setSliderValuesCallback(dbValidated, {
       this.sliderData.setSliderValuesCallback(this.validInput, {
         collectedInputData: {
           nonce,
