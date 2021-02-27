@@ -36,7 +36,7 @@
           filled
           :loading="false"
           :disabled="!sliderData.sliders[sliderIndex].validated"
-          @click="onClick"
+          @click="onNextClick"
         >
           {{ sliderData.sliders[sliderIndex].button.title }}
         </base-button>
@@ -59,10 +59,10 @@ export default {
     },
   },
   methods: {
-    async onClick() {
+    async onNextClick() {
       let success = true
-      if (this.sliderData.sliders[this.sliderIndex].button.slotOnNextClick) {
-        success = await this.sliderData.sliders[this.sliderIndex].button.slotOnNextClick()
+      if (this.sliderData.sliders[this.sliderIndex].button.sliderCallback) {
+        success = await this.sliderData.sliders[this.sliderIndex].button.sliderCallback()
       }
       success = success && this.sliderData.sliders[this.sliderIndex].button.callback(success)
       if (success && this.sliderIndex < this.sliderData.sliders.length - 1) {

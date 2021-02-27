@@ -62,7 +62,9 @@ export default {
       this.sendValidation()
 
       // Wolle this.sliderData.setSliderValuesCallback(this.validInput, {}, {}, this.onNextClick)
-      this.sliderData.setSliderValuesCallback(this.valid, {}, this.onNextClick)
+      this.sliderData.setSliderValuesCallback(this.valid, {
+        sliderSettings: { buttonSliderCallback: this.onNextClick },
+      })
     })
   },
   computed: {

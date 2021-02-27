@@ -133,11 +133,12 @@ export default {
         : ''
       this.sendValidation()
 
-      this.sliderData.setSliderValuesCallback(
-        this.validInput,
-        this.buttonValues(),
-        this.onNextClick,
-      )
+      this.sliderData.setSliderValuesCallback(this.validInput, {
+        sliderSettings: {
+          ...this.buttonValues().sliderSettings,
+          buttonSliderCallback: this.onNextClick,
+        },
+      })
     })
   },
   watch: {

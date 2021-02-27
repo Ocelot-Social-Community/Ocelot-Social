@@ -92,7 +92,7 @@ export default {
           title: 'Next', // Wolle
           icon: 'arrow-right',
           callback: this.buttonCallback,
-          slotOnNextClick: null, // optional set by slot
+          sliderCallback: null, // optional set by slot
         },
       },
       {
@@ -104,7 +104,7 @@ export default {
           title: '', // set by slider component
           icon: '', // set by slider component
           callback: this.buttonCallback,
-          slotOnNextClick: null, // optional set by slot
+          sliderCallback: null, // optional set by slot
         },
       },
       {
@@ -116,7 +116,7 @@ export default {
           title: 'Confirm', // Wolle
           icon: 'arrow-right',
           callback: this.buttonCallback,
-          slotOnNextClick: null, // optional set by slot
+          sliderCallback: null, // optional set by slot
         },
       },
       {
@@ -129,7 +129,7 @@ export default {
           title: 'Create', // Wolle
           icon: 'check',
           callback: this.buttonCallback,
-          slotOnNextClick: null, // optional set by slot
+          sliderCallback: null, // optional set by slot
         },
       },
     ]
@@ -186,18 +186,9 @@ export default {
     },
   },
   methods: {
-    // Wolle enterEmailButtonTitle(emailSend) {
-    //   // return emailSend ? 'Resend e-mail' : 'Send e-mail'
-    //   return emailSend ? 'Skip resend' : 'Send e-mail' // Wolle
-    // },
-    // enterEmailButtonIcon(emailSend) {
-    //   // return emailSend ? 'Resend e-mail' : 'Send e-mail'
-    //   return emailSend ? 'arrow-right' : 'envelope' // Wolle
-    // },
     setSliderValuesCallback(
       isValid,
-      { collectedInputData, sliderData, sliderSettings },
-      slotOnNextClick = null,
+      { collectedInputData, sliderData, sliderSettings }, // sliderCallback = null,
     ) {
       this.sliderData.sliders[this.sliderIndex].validated = isValid
 
@@ -220,37 +211,32 @@ export default {
         }
       }
       if (sliderSettings) {
-        const { buttonTitle, buttonIcon } = sliderSettings
+        const { buttonTitle, buttonIcon, buttonSliderCallback } = sliderSettings
         if (buttonTitle) {
           this.sliderData.sliders[this.sliderIndex].button.title = buttonTitle
         }
         if (buttonIcon) {
           this.sliderData.sliders[this.sliderIndex].button.icon = buttonIcon
         }
+        if (buttonSliderCallback) {
+          this.sliderData.sliders[this.sliderIndex].button.sliderCallback = buttonSliderCallback
+        }
       }
 
-      if (slotOnNextClick) {
-        this.sliderData.sliders[this.sliderIndex].button.slotOnNextClick = slotOnNextClick
-      }
+      // Wolle if (sliderCallback) {
+      //   this.sliderData.sliders[this.sliderIndex].button.sliderCallback = sliderCallback
+      // }
     },
     sliderSelectorCallback(selectedIndex) {
       if (selectedIndex <= this.sliderIndex + 1 && selectedIndex < this.sliderData.sliders.length) {
-        // Wolle if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
-        //   this.sliderData.sliders[this.sliderIndex].button.title = this.enterEmailButtonTitle(
-        //     this.sliderData.collectedInputData.emailSend,
-        //   )
-        //   this.sliderData.sliders[this.sliderIndex].button.icon = this.enterEmailButtonIcon(
-        //     this.sliderData.collectedInputData.emailSend,
-        //   )
-        // }
         this.sliderData.sliderIndex = selectedIndex
       }
     },
     buttonCallback(success) {
       // Wolle
       // if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
-      //   // if (this.sliderData.sliders[this.sliderIndex].button.slotOnNextClick) {
-      //   //   this.sliderData.sliders[this.sliderIndex].button.slotOnNextClick()
+      //   // if (this.sliderData.sliders[this.sliderIndex].button.sliderCallback) {
+      //   //   this.sliderData.sliders[this.sliderIndex].button.sliderCallback()
       //   // }
       //   this.sliderData.sliders[this.sliderIndex].button.title = this.enterEmailButtonTitle(
       //     this.sliderData.collectedInputData.emailSend,

@@ -57,7 +57,9 @@ export default {
         : ''
       this.sendValidation()
 
-      this.sliderData.setSliderValuesCallback(this.validInput, {}, this.onNextClick)
+      this.sliderData.setSliderValuesCallback(this.validInput, {
+        sliderSettings: { buttonSliderCallback: this.onNextClick },
+      })
     })
   },
   computed: {
