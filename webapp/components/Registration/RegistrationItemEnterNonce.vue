@@ -62,24 +62,24 @@ export default {
       this.sendValidation()
 
       // Wolle this.sliderData.setSliderValuesCallback(this.validInput, {}, {}, this.onNextClick)
-      this.sliderData.setSliderValuesCallback(this.valid, {
+      this.sliderData.setSliderValuesCallback(this.validInput, {
         sliderSettings: { buttonSliderCallback: this.onNextClick },
       })
     })
   },
   computed: {
-    valid() {
+    validInput() {
       return this.formData.nonce.length === 6
     },
   },
   methods: {
     sendValidation() {
       const { nonce } = this.formData
-      const values = {
-        nonce,
-      }
-      // console.log('sendValidation !!! value: ', value)
-      this.sliderData.setSliderValuesCallback(this.valid, { collectedInputData: values })
+      this.sliderData.setSliderValuesCallback(this.validInput, {
+        collectedInputData: {
+          nonce,
+        },
+      })
     },
     async handleInput() {
       // this.disabled = true

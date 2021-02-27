@@ -227,14 +227,14 @@ export default {
         : false
       this.sendValidation()
 
-      this.sliderData.setSliderValuesCallback(this.valid, {
+      this.sliderData.setSliderValuesCallback(this.validInput, {
         sliderSettings: { buttonSliderCallback: this.onNextClick },
       })
     })
   },
   computed: {
-    valid() {
-      const isValid =
+    validInput() {
+      return (
         this.formData.name.length >= 3 &&
         this.formData.password.length >= 1 &&
         this.formData.password === this.formData.passwordConfirmation &&
@@ -243,7 +243,7 @@ export default {
         this.minimumAge &&
         this.noCommercial &&
         this.noPolitical
-      return isValid
+      )
     },
   },
   watch: {
@@ -275,22 +275,23 @@ export default {
         noPolitical,
       } = this
       const locale = this.$i18n.locale()
-      const values = {
-        name,
-        about,
-        password,
-        passwordConfirmation,
-        termsAndConditionsAgreedVersion,
-        termsAndConditionsConfirmed,
-        dataPrivacy,
-        minimumAge,
-        noCommercial,
-        noPolitical,
-        locale,
-      }
       // Wolle validate in backend
       // toaster
-      this.sliderData.setSliderValuesCallback(this.valid, { collectedInputData: values })
+      this.sliderData.setSliderValuesCallback(this.validInput, {
+        collectedInputData: {
+          name,
+          about,
+          password,
+          passwordConfirmation,
+          termsAndConditionsAgreedVersion,
+          termsAndConditionsConfirmed,
+          dataPrivacy,
+          minimumAge,
+          noCommercial,
+          noPolitical,
+          locale,
+        },
+      })
     },
     async handleInput() {
       this.sendValidation()

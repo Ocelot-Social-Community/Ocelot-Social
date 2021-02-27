@@ -164,9 +164,8 @@ export default {
         this.formData.email = normalizeEmail(this.formData.email)
       }
       const { email } = this.formData
-      const values = { email }
 
-      this.sliderData.setSliderValuesCallback(this.validInput, { collectedInputData: values })
+      this.sliderData.setSliderValuesCallback(this.validInput, { collectedInputData: { email } })
     },
     async handleInput() {
       this.sendValidation()

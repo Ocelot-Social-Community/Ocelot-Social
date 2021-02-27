@@ -73,14 +73,13 @@ export default {
   methods: {
     async sendValidation() {
       const { inviteCode } = this.formData
-      const values = { inviteCode }
 
       let validated = false
       if (this.validInput) {
         await this.handleSubmitVerify()
         validated = this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode
       }
-      this.sliderData.setSliderValuesCallback(validated, { collectedInputData: values })
+      this.sliderData.setSliderValuesCallback(validated, { collectedInputData: { inviteCode } })
     },
     async handleInput() {
       this.sendValidation()
