@@ -222,10 +222,6 @@ export default {
           this.sliderData.sliders[this.sliderIndex].button.sliderCallback = buttonSliderCallback
         }
       }
-
-      // Wolle if (sliderCallback) {
-      //   this.sliderData.sliders[this.sliderIndex].button.sliderCallback = sliderCallback
-      // }
     },
     sliderSelectorCallback(selectedIndex) {
       if (selectedIndex <= this.sliderIndex + 1 && selectedIndex < this.sliderData.sliders.length) {
@@ -233,25 +229,6 @@ export default {
       }
     },
     buttonCallback(success) {
-      // Wolle
-      // if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
-      //   // if (this.sliderData.sliders[this.sliderIndex].button.sliderCallback) {
-      //   //   this.sliderData.sliders[this.sliderIndex].button.sliderCallback()
-      //   // }
-      //   this.sliderData.sliders[this.sliderIndex].button.title = this.enterEmailButtonTitle(
-      //     this.sliderData.collectedInputData.emailSend,
-      //   )
-      // }
-      // if (this.sliderIndex === this.sliderData.sliders.length - 1) {
-      //   // console.log('submit data: ', this.sliderData.collectedInputData)
-      // } else {
-      //   if (this.sliderIndex < this.sliderData.sliders.length - 1) {
-      //     this.sliderData.sliderIndex++
-      //     if (this.sliderData.sliders[this.sliderIndex] === 'create-user-account') {
-      //       this.sliderData.sliders[this.sliderIndex].validated = false
-      //     }
-      //   }
-      // }
       return success
     },
   },

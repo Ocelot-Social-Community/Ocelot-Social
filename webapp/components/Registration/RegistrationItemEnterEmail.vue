@@ -174,19 +174,9 @@ export default {
     async handleInputValid() {
       this.sendValidation()
     },
-    // enterEmailButtonTitle(emailSend) {
-    //   // return emailSend ? 'Resend e-mail' : 'Send e-mail'
-    //   return emailSend ? (this.sendEmailAgain ? 'Resend e-mail' : 'Skip resend') : 'Send e-mail' // Wolle
-    // },
-    // enterEmailButtonIcon(emailSend) {
-    //   // return emailSend ? 'Resend e-mail' : 'Send e-mail'
-    //   return emailSend ? (this.sendEmailAgain ? 'envelope' : 'arrow-right') : 'envelope' // Wolle
-    // },
     buttonValues() {
       return {
         sliderSettings: {
-          // buttonTitle: this.enterEmailButtonTitle(this.sliderData.collectedInputData.emailSend),
-          // buttonIcon: this.enterEmailButtonIcon(this.sliderData.collectedInputData.emailSend),
           buttonTitle: this.sliderData.collectedInputData.emailSend
             ? this.sendEmailAgain
               ? 'Resend e-mail'
@@ -217,10 +207,9 @@ export default {
         this.sendEmailAgain ||
         !this.sliderData.sliders[this.sliderIndex].data.request ||
         (this.sliderData.sliders[this.sliderIndex].data.request &&
-          !this.sliderData.sliders[this.sliderIndex].data.request.variables) ||
-        (this.sliderData.sliders[this.sliderIndex].data.request &&
-          this.sliderData.sliders[this.sliderIndex].data.request.variables &&
-          !this.sliderData.sliders[this.sliderIndex].data.request.variables === variables)
+          (!this.sliderData.sliders[this.sliderIndex].data.request.variables ||
+            (this.sliderData.sliders[this.sliderIndex].data.request.variables &&
+              !this.sliderData.sliders[this.sliderIndex].data.request.variables === variables)))
       ) {
         this.sliderData.setSliderValuesCallback(
           this.sliderData.sliders[this.sliderIndex].validated,
@@ -235,7 +224,6 @@ export default {
           )
 
           if (this.sliderData.sliders[this.sliderIndex].data.response) {
-            // this.sliderData.collectedInputData.emailSend = true
             this.sliderData.setSliderValuesCallback(this.validInput, {
               collectedInputData: { emailSend: true },
             })
@@ -254,7 +242,6 @@ export default {
             this.sliderData.sliders[this.sliderIndex].validated,
             { sliderData: { request: null, response: null } },
           )
-          // this.sliderData.collectedInputData.emailSend = false
           this.sliderData.setSliderValuesCallback(this.validInput, {
             collectedInputData: { emailSend: false },
           })

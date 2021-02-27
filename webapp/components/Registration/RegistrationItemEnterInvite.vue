@@ -95,10 +95,9 @@ export default {
       if (
         !this.sliderData.sliders[this.sliderIndex].data.request ||
         (this.sliderData.sliders[this.sliderIndex].data.request &&
-          !this.sliderData.sliders[this.sliderIndex].data.request.variables) ||
-        (this.sliderData.sliders[this.sliderIndex].data.request &&
-          this.sliderData.sliders[this.sliderIndex].data.request.variables &&
-          !this.sliderData.sliders[this.sliderIndex].data.request.variables === variables)
+          (!this.sliderData.sliders[this.sliderIndex].data.request.variables ||
+            (this.sliderData.sliders[this.sliderIndex].data.request.variables &&
+              !this.sliderData.sliders[this.sliderIndex].data.request.variables === variables)))
       ) {
         this.sliderData.setSliderValuesCallback(
           this.sliderData.sliders[this.sliderIndex].validated,
