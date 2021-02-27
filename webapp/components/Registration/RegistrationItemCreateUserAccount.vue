@@ -249,7 +249,6 @@ export default {
   methods: {
     sendValidation() {
       const { name, about, password, passwordConfirmation } = this.formData
-      const termsAndConditionsAgreedVersion = VERSION
       const {
         termsAndConditionsConfirmed,
         dataPrivacy,
@@ -257,22 +256,18 @@ export default {
         noCommercial,
         noPolitical,
       } = this
-      const locale = this.$i18n.locale()
-      // Wolle validate in backend
-      // toaster
+
       this.sliderData.setSliderValuesCallback(this.validInput, {
         collectedInputData: {
           name,
           about,
           password,
           passwordConfirmation,
-          termsAndConditionsAgreedVersion,
           termsAndConditionsConfirmed,
           dataPrivacy,
           minimumAge,
           noCommercial,
           noPolitical,
-          locale,
         },
       })
     },
@@ -301,12 +296,12 @@ export default {
           },
         })
         this.response = 'success'
-        setTimeout(() => {
-          this.$emit('userCreated', {
-            email,
-            password,
-          })
-        }, 3000)
+        // Wolle setTimeout(() => {
+        //   this.$emit('userCreated', {
+        //     email,
+        //     password,
+        //   })
+        // }, 3000)
       } catch (err) {
         this.response = 'error'
       }

@@ -135,7 +135,7 @@ export default {
   },
   computed: {
     sliderIndex() {
-      return this.sliderData.sliderIndex
+      return this.sliderData.sliderIndex // to have a shorter notation
     },
     // Wolle submitMessage() {
     //   const { email } = this.data.Signup

@@ -64,7 +64,7 @@ export default {
   },
   computed: {
     sliderIndex() {
-      return this.sliderData.sliderIndex
+      return this.sliderData.sliderIndex // to have a shorter notation
     },
     validInput() {
       return this.formData.inviteCode.length === 6

@@ -35,11 +35,7 @@
         </template>
 
         <template #create-user-account>
-          <registration-item-create-user-account
-            :sliderData="sliderData"
-            nonce="AAAAAA"
-            email="user@example.org"
-          />
+          <registration-item-create-user-account :sliderData="sliderData" />
         </template>
 
         <template #footer>
@@ -164,13 +160,11 @@ export default {
           password: null,
           passwordConfirmation: null,
           about: null,
-          termsAndConditionsAgreedVersion: null,
           termsAndConditionsConfirmed: null,
           dataPrivacy: null,
           minimumAge: null,
           noCommercial: null,
           noPolitical: null,
-          locale: null, // Wolle: what to do? Is collected in the last slider?! and gets stored in the database …
         },
         sliderIndex: 0,
         sliders: sliders,
@@ -182,7 +176,7 @@ export default {
   },
   computed: {
     sliderIndex() {
-      return this.sliderData.sliderIndex
+      return this.sliderData.sliderIndex // to have a shorter notation
     },
   },
   methods: {

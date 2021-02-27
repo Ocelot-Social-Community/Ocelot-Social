@@ -55,7 +55,7 @@ export default {
   },
   computed: {
     sliderIndex() {
-      return this.sliderData.sliderIndex // have a shorter notation
+      return this.sliderData.sliderIndex // to have a shorter notation
     },
   },
   methods: {
