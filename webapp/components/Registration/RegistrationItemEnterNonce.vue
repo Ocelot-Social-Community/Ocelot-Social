@@ -90,8 +90,7 @@ export default {
     async handleInputValid() {
       this.sendValidation()
     },
-    handleSubmitVerify() {
-    },
+    handleSubmitVerify() {},
     onNextClick() {
       return true
     },
