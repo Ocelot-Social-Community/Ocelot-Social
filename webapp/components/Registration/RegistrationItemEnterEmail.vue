@@ -32,19 +32,8 @@
       name="email"
       icon="envelope"
     />
-    <!-- Wolle <base-button
-        :disabled="disabled"
-        :loading="$apollo.loading"
-        filled
-        name="submit"
-        type="submit"
-        icon="envelope"
-      >
-        {{ $t('components.registration.signup.form.submit') }}
-      </base-button> -->
     <slot></slot>
     <ds-text v-if="sliderData.collectedInputData.emailSend">
-      <!-- Wolle <ds-text v-if="sliderData.collectedInputData.emailSend"> -->
       <input id="checkbox" type="checkbox" v-model="sendEmailAgain" :checked="sendEmailAgain" />
       <label for="checkbox0">
         <!-- Wolle {{ $t('termsAndConditions.termsAndConditionsConfirmed') }} -->
@@ -120,8 +109,6 @@ export default {
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
       // have checkmarks available.
       sendEmailAgain: false,
-      // Wolle disabled: true,
-      // Wolle data: null,
       error: null, // Wolle
     }
   },

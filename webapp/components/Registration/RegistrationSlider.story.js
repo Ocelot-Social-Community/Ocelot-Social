@@ -17,6 +17,9 @@ const plugins = [
         if (JSON.stringify(data).includes('SignupByInvitation')) {
           return { data: { SignupByInvitation: { email: data.variables.email } } }
         }
+        if (JSON.stringify(data).includes('SignupVerification')) {
+          return { data: { SignupByInvitation: { ...data.variables } } }
+        }
         throw new Error(`Mutation name not found!`)
       },
       query: (data) => {

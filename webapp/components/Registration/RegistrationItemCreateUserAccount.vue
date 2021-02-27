@@ -23,7 +23,7 @@
     </ds-space>
   </div>
   <div v-else class="create-account-card">
-    <!-- <ds-space margin-top="large">
+    <!-- Wolle <ds-space margin-top="large">
       <ds-heading size="h3">
         {{ $t('components.registration.create-user-account.title') }}
       </ds-heading>
@@ -121,23 +121,6 @@
             v-html="$t('components.registration.signup.form.no-political')"
           ></label>
         </ds-text>
-        <!-- Wolle <base-button
-          style="float: right"
-          icon="check"
-          type="submit"
-          filled
-          :loading="$apollo.loading"
-          :disabled="
-            errors ||
-            !termsAndConditionsConfirmed ||
-            !dataPrivacy ||
-            !minimumAge ||
-            !noCommercial ||
-            !noPolitical
-          "
-        >
-          {{ $t('actions.save') }}
-        </base-button> -->
       </template>
     </ds-form>
   </div>
@@ -183,7 +166,7 @@ export default {
         },
         ...passwordForm.formSchema,
       },
-      response: null,
+      response: null, // Wolle
       // TODO: Our styleguide does not support checkmarks.
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
       // have checkmarks available.
@@ -301,7 +284,6 @@ export default {
     },
     async submit() {
       const { name, password, about } = this.formData
-      // Wolle const { email, nonce } = this
       const { email, nonce } = this.sliderData.collectedInputData
       const termsAndConditionsAgreedVersion = VERSION
       const locale = this.$i18n.locale()
@@ -330,6 +312,7 @@ export default {
       }
     },
     onNextClick() {
+      this.submit()
       return true
     },
   },

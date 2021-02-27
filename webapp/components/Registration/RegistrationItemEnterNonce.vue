@@ -22,9 +22,6 @@
     <ds-text>
       {{ $t('components.enter-nonce.form.description') }}
     </ds-text>
-    <!-- Wolle <base-button :disabled="disabled" filled name="submit" type="submit">
-      {{ $t('components.enter-nonce.form.next') }}
-    </base-button> -->
     <slot></slot>
   </ds-form>
 </template>
@@ -49,7 +46,6 @@ export default {
           message: this.$t('components.enter-nonce.form.validations.length'),
         },
       },
-      // Wolle disabled: true,
     }
   },
   mounted: function () {
@@ -89,22 +85,12 @@ export default {
       })
     },
     async handleInput() {
-      // this.disabled = true
-      // this.sliderData.setSliderValuesCallback(false)
       this.sendValidation()
     },
     async handleInputValid() {
-      // this.disabled = false
-      // const { nonce } = this.formData
-      // validate in backend?
-      // toaster?
-      // this.sliderData.setSliderValuesCallback(true, { nonce })
       this.sendValidation()
     },
     handleSubmitVerify() {
-      // const { nonce } = this.formData
-      // const email = this.email
-      // this.$emit('nonceEntered', { email, nonce })
     },
     onNextClick() {
       return true
