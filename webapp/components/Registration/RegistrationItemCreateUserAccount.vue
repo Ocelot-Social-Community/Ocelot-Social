@@ -289,7 +289,7 @@ export default {
       }
       // Wolle validate in backend
       // toaster
-      this.sliderData.setSliderValuesCallback(this.valid, { collectedInputData: values }, {})
+      this.sliderData.setSliderValuesCallback(this.valid, { collectedInputData: values })
     },
     async handleInput() {
       this.sendValidation()

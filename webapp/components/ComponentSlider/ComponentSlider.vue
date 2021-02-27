@@ -64,7 +64,7 @@ export default {
       if (this.sliderData.sliders[this.sliderIndex].button.slotOnNextClick) {
         success = await this.sliderData.sliders[this.sliderIndex].button.slotOnNextClick()
       }
-      // this.sliderData.sliders[this.sliderIndex].button.callback()
+      success = success && this.sliderData.sliders[this.sliderIndex].button.callback(success)
       if (success && this.sliderIndex < this.sliderData.sliders.length - 1) {
         this.sliderData.sliderSelectorCallback(this.sliderIndex + 1)
       }

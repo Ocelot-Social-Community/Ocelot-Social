@@ -24,10 +24,7 @@
         >
           <!-- Wolle !!! may create same source with 'webapp/pages/registration/signup.vue' -->
           <!-- <signup v-if="publicRegistration" :invitation="false" @submit="handleSubmitted"> -->
-          <registration-item-enter-email
-            :sliderData="sliderData"
-            :invitation="false"
-          />
+          <registration-item-enter-email :sliderData="sliderData" :invitation="false" />
         </template>
 
         <template
@@ -104,9 +101,8 @@ export default {
         validated: false,
         data: { request: null, response: null },
         button: {
-          // title: 'Send E-Mail', // Wolle
-          title: this.enterEmailButtonTitle(this.overwriteSliderData.emailSend), // Wolle
-          icon: 'envelope',
+          title: '', // set by slider component
+          icon: '', // set by slider component
           callback: this.buttonCallback,
           slotOnNextClick: null, // optional set by slot
         },
@@ -190,11 +186,19 @@ export default {
     },
   },
   methods: {
-    enterEmailButtonTitle(emailSend) {
-      // return emailSend ? 'Resend e-mail' : 'Send e-mail'
-      return emailSend ? 'Skip send' : 'Send e-mail'  // Wolle
-    },
-    setSliderValuesCallback(isValid, { collectedInputData, sliderData, sliderSettings }, slotOnNextClick = null) {
+    // Wolle enterEmailButtonTitle(emailSend) {
+    //   // return emailSend ? 'Resend e-mail' : 'Send e-mail'
+    //   return emailSend ? 'Skip resend' : 'Send e-mail' // Wolle
+    // },
+    // enterEmailButtonIcon(emailSend) {
+    //   // return emailSend ? 'Resend e-mail' : 'Send e-mail'
+    //   return emailSend ? 'arrow-right' : 'envelope' // Wolle
+    // },
+    setSliderValuesCallback(
+      isValid,
+      { collectedInputData, sliderData, sliderSettings },
+      slotOnNextClick = null,
+    ) {
       this.sliderData.sliders[this.sliderIndex].validated = isValid
 
       if (collectedInputData) {
@@ -206,13 +210,23 @@ export default {
       if (sliderData) {
         if (this.sliderData.sliders[this.sliderIndex].data) {
           this.sliderData.sliders[this.sliderIndex].data = {
-            request: sliderData.request ? sliderData.request : this.sliderData.sliders[this.sliderIndex].data.request,
-            response: sliderData.response ? sliderData.response : this.sliderData.sliders[this.sliderIndex].data.response,
+            request: sliderData.request
+              ? sliderData.request
+              : this.sliderData.sliders[this.sliderIndex].data.request,
+            response: sliderData.response
+              ? sliderData.response
+              : this.sliderData.sliders[this.sliderIndex].data.response,
           }
         }
       }
       if (sliderSettings) {
-        
+        const { buttonTitle, buttonIcon } = sliderSettings
+        if (buttonTitle) {
+          this.sliderData.sliders[this.sliderIndex].button.title = buttonTitle
+        }
+        if (buttonIcon) {
+          this.sliderData.sliders[this.sliderIndex].button.icon = buttonIcon
+        }
       }
 
       if (slotOnNextClick) {
@@ -221,15 +235,18 @@ export default {
     },
     sliderSelectorCallback(selectedIndex) {
       if (selectedIndex <= this.sliderIndex + 1 && selectedIndex < this.sliderData.sliders.length) {
-        if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
-          this.sliderData.sliders[this.sliderIndex].button.title = this.enterEmailButtonTitle(
-            this.sliderData.collectedInputData.emailSend,
-          )
-        }
+        // Wolle if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
+        //   this.sliderData.sliders[this.sliderIndex].button.title = this.enterEmailButtonTitle(
+        //     this.sliderData.collectedInputData.emailSend,
+        //   )
+        //   this.sliderData.sliders[this.sliderIndex].button.icon = this.enterEmailButtonIcon(
+        //     this.sliderData.collectedInputData.emailSend,
+        //   )
+        // }
         this.sliderData.sliderIndex = selectedIndex
       }
     },
-    buttonCallback() {
+    buttonCallback(success) {
       // Wolle
       // if (this.sliderData.sliders[this.sliderIndex].name === 'enter-email') {
       //   // if (this.sliderData.sliders[this.sliderIndex].button.slotOnNextClick) {
@@ -239,7 +256,6 @@ export default {
       //     this.sliderData.collectedInputData.emailSend,
       //   )
       // }
-
       // if (this.sliderIndex === this.sliderData.sliders.length - 1) {
       //   // console.log('submit data: ', this.sliderData.collectedInputData)
       // } else {
@@ -250,6 +266,7 @@ export default {
       //     }
       //   }
       // }
+      return success
     },
   },
 }

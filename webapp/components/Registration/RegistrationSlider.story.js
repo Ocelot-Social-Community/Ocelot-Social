@@ -51,7 +51,7 @@ storiesOf('RegistrationSlider', module)
         collectedInputData: {
           inviteCode: 'IN1T6Y',
           email: 'wolle.huss@pjannto.com',
-          emailSend: true,
+          emailSend: false,
           nonce: 'NTRSCZ',
           name: 'Wolle',
           password: 'Hello',
@@ -115,7 +115,7 @@ storiesOf('RegistrationSlider', module)
         collectedInputData: {
           inviteCode: null,
           email: 'wolle.huss@pjannto.com',
-          emailSend: true,
+          emailSend: false,
           nonce: null,
           name: null,
           password: null,
