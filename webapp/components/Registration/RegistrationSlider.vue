@@ -180,10 +180,9 @@ export default {
     },
   },
   methods: {
-    setSliderValuesCallback(
-      isValid,
-      { collectedInputData, sliderData, sliderSettings }, // sliderCallback = null,
-    ) {
+    setSliderValuesCallback(isValid, { collectedInputData, sliderData, sliderSettings }) {
+      // all changes of 'this.sliders' has to be filled in from the top to be spread to the component slider and all slider components in the slot
+
       this.sliderData.sliders[this.sliderIndex].validated = isValid
 
       if (collectedInputData) {
@@ -218,11 +217,15 @@ export default {
       }
     },
     sliderSelectorCallback(selectedIndex) {
+      // all changes of 'this.sliders' has to be filled in from the top to be spread to the component slider and all slider components in the slot
+
       if (selectedIndex <= this.sliderIndex + 1 && selectedIndex < this.sliderData.sliders.length) {
         this.sliderData.sliderIndex = selectedIndex
       }
     },
     buttonCallback(success) {
+      // all changes of 'this.sliders' has to be filled in from the top to be spread to the component slider and all slider components in the slot
+
       return success
     },
   },
