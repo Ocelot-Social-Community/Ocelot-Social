@@ -120,6 +120,16 @@
     "versus": "Versus"
   },
   "components": {
+    "enter-invite": {
+      "form": {
+        "description": "Gib den Einladungs-Code ein, den du bekommen hast.",
+        "invite-code": "Einladungs-Code eingeben",
+        "next": "Weiter",
+        "validations": {
+          "length": "muss genau 6 Buchstaben lang sein"
+        }
+      }
+    },
     "enter-nonce": {
       "form": {
         "description": "Öffne Dein E-Mail Postfach und gib den Code ein, den wir geschickt haben.",
@@ -152,9 +162,19 @@
         "success": "Dein Benutzerkonto wurde erstellt!",
         "title": "Benutzerkonto anlegen"
       },
+      "email": {
+        "form": {
+          "success": "Verifikations-E-Mail gesendet an <b>{email}</b>!"
+        }
+      },
+      "invite-code": {
+        "form": {
+          "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!"
+        }
+      },
       "signup": {
         "form": {
-          "data-privacy": "Ich habe die <a href=\"/data-privacy\" target=\"_blank\"><ds-text bold color=\"primary\">Datenschutzerklärung</ds-text></a> gelesen und verstanden",
+          "data-privacy": "Ich habe die Datenschutzerklärung gelesen und verstanden.",
           "description": "Um loszulegen, kannst Du Dich hier kostenfrei registrieren:",
           "errors": {
             "email-exists": "Es gibt schon ein Benutzerkonto mit dieser E-Mail-Adresse!",
@@ -733,7 +753,7 @@
     "bank": "Bankverbindung",
     "code-of-conduct": "Verhaltenscodex",
     "contact": "Kontakt",
-    "data-privacy": "Datenschutz",
+    "data-privacy": "Datenschutzerklärung",
     "director": "Geschäftsführer",
     "error-occurred": "Ein Fehler ist aufgetreten.",
     "faq": "FAQ",
