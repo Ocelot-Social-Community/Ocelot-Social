@@ -48,7 +48,7 @@ jobs:
       - name: ENV - BUILD_DATE
         run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
       - name: ENV - BUILD_VERSION
-        run: echo "BUILD_VERSION=${VERSION}.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+        run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       - name: ENV - BUILD_COMMIT
         run: echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
       ##########################################################################
@@ -85,7 +85,7 @@ jobs:
       - name: ENV - BUILD_DATE
         run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
       - name: ENV - BUILD_VERSION
-        run: echo "BUILD_VERSION=${VERSION}.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+        run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       - name: ENV - BUILD_COMMIT
         run: echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
       ##########################################################################
@@ -122,7 +122,7 @@ jobs:
       - name: ENV - BUILD_DATE
         run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
       - name: ENV - BUILD_VERSION
-        run: echo "BUILD_VERSION=${VERSION}.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+        run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       - name: ENV - BUILD_COMMIT
         run: echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
       ##########################################################################
@@ -159,7 +159,7 @@ jobs:
       - name: ENV - BUILD_DATE
         run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
       - name: ENV - BUILD_VERSION
-        run: echo "BUILD_VERSION=${VERSION}.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+        run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       - name: ENV - BUILD_COMMIT
         run: echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
       ##########################################################################
@@ -260,7 +260,7 @@ jobs:
       - name: ENV - BUILD_DATE
         run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
       - name: ENV - BUILD_VERSION
-        run: echo "BUILD_VERSION=${VERSION}.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+        run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       - name: ENV - BUILD_COMMIT
         run: echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
       ##########################################################################
