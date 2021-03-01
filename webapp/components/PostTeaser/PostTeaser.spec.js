@@ -26,6 +26,7 @@ describe('PostTeaser', () => {
         shoutedCount: 0,
         commentsCount: 0,
         clickedCount: 0,
+        viewedTeaserCount: 0,
         name: 'It is a post',
         author: {
           id: 'u1',

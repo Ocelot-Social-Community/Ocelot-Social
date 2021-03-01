@@ -82,6 +82,7 @@ const helpers = {
         shoutedCount: faker.random.number(),
         commentsCount: faker.random.number(),
         clickedCount: faker.random.number(),
+        viewedTeaserCount: faker.random.number(),
       }
     })
   },

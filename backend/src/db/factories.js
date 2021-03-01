@@ -131,6 +131,7 @@ Factory.define('post')
     imageBlurred: false,
     imageAspectRatio: 1.333,
     clickedCount: 0,
+    viewedTeaserCount: 0,
   })
   .attr('pinned', ['pinned'], (pinned) => {
     // Convert false to null

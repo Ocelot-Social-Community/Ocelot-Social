@@ -16,6 +16,7 @@ describe('SearchPost.vue', () => {
         commentsCount: 3,
         shoutedCount: 6,
         clickedCount: 5,
+        viewedTeaserCount: 15,
         createdAt: '23.08.2019',
         author: {
           name: 'Post Author',

@@ -177,6 +177,7 @@
     "amount-clicks": "{amount} clicks",
     "amount-comments": "{amount} comments",
     "amount-shouts": "{amount} recommendations",
+    "amount-views": "{amount} views",
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} von {max} Kategorien ausgewählt"
     },

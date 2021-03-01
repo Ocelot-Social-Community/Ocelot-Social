@@ -39,7 +39,8 @@ const searchPostsSetup = {
     author: properties(author),
     commentsCount: toString(size(comments)),
     shoutedCount: toString(size(shouter)),
-    clickedCount: toString(resource.clickedCount)
+    clickedCount: toString(resource.clickedCount),
+    viewedTeaserCount: toString(resource.viewedTeaserCount)
   }`,
   limit: 'LIMIT $limit',
 }
