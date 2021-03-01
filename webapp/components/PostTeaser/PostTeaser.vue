@@ -41,7 +41,7 @@
           icon="hand-pointer"
           :count="post.clickedCount"
           :title="$t('contribution.amount-clicks', { amount: post.clickedCount })"
-        </counter-icon>
+        />
         <counter-icon
           icon="eye"
           :count="post.viewedTeaserCount"
