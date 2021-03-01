@@ -1,5 +1,5 @@
 <template>
-  <section class="login-form">
+  <section class="registration-form">
     <base-card>
       <template #imageColumn>
         <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">

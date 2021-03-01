@@ -1,45 +1,61 @@
 <template>
-  <ds-container width="small">
+  <section class="registration-form">
     <base-card>
-      <template #imageColumn>
-        <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
-          <img class="image" alt="Sign up" src="/img/custom/sign-up.svg" />
-        </a>
-      </template>
-      <nuxt-child />
+      <registration-slider
+        v-if="registrationType"
+        :registrationType="registrationType"
+        :overwriteSliderData="overwriteSliderData"
+      />
+      <ds-space v-else centered>
+        <hc-empty icon="events" :message="$t('components.registration.signup.unavailable')" />
+        <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
+      </ds-space>
       <template #topMenu>
         <locale-switch offset="5" />
       </template>
     </base-card>
-  </ds-container>
+  </section>
 </template>
 
 <script>
-import links from '~/constants/links.js'
-import metadata from '~/constants/metadata.js'
+import HcEmpty from '~/components/Empty/Empty'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import RegistrationSlider from '~/components/Registration/RegistrationSlider'
 
 export default {
+  name: 'Registration',
   components: {
+    HcEmpty,
     LocaleSwitch,
+    RegistrationSlider,
   },
-  layout: 'no-header',
   data() {
+    const { method = null, email = null, inviteCode = null, nonce = null } = this.$route.query
     return {
-      metadata,
-      links,
+      method,
+      overwriteSliderData: {
+        collectedInputData: {
+          inviteCode,
+          email,
+          emailSend: !!email,
+          nonce,
+        },
+      },
     }
   },
-  asyncData({ store, redirect }) {
-    if (store.getters['auth/isLoggedIn']) {
-      redirect('/')
+  asyncData({ app }) {
+    return {
+      publicRegistration: app.$env.PUBLIC_REGISTRATION === 'true',
+      inviteRegistration: app.$env.INVITE_REGISTRATION === 'true',
     }
+  },
+  computed: {
+    registrationType() {
+      if (this.method && ['invite-code', 'invite-mail'].includes(this.method)) {
+        return this.method
+      }
+      return this.publicRegistration ? 'public-registration' : false
+    },
   },
 }
 </script>
-
-<style lang="scss">
-.image {
-  width: 100%;
-}
-</style>
