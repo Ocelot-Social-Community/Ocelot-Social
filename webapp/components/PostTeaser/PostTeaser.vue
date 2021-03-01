@@ -34,6 +34,11 @@
           :count="post.commentsCount"
           :title="$t('contribution.amount-comments', { amount: post.commentsCount })"
         />
+        <counter-icon
+          icon="hand-pointer"
+          :count="post.clickedCount"
+          :title="$t('contribution.amount-clicks', { amount: post.clickedCount })"
+        />
         <client-only>
           <content-menu
             resource-type="contribution"

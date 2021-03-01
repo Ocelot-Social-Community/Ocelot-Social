@@ -11,7 +11,8 @@ let variables
 const driver = getDriver()
 const neode = getNeode()
 
-beforeAll(() => {
+beforeAll(async () => {
+  await cleanDatabase()
   const { server } = createServer({
     context: () => {
       return {

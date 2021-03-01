@@ -28,6 +28,7 @@ export const post = {
     shoutedCount: 5,
     commentedCount: 39,
     followedByCount: 2,
+    clickedCount: 42,
     followedByCurrentUser: true,
     location: null,
     badges: [
