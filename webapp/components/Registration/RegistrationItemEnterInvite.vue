@@ -41,7 +41,8 @@ export default {
       formSchema: {
         inviteCode: {
           type: 'string',
-          // Wolle min: 6,
+          // add again if the input has a validation without focus and typing
+          // min: 6,
           // max: 6,
           required: true,
           message: this.$t('components.enter-invite.form.validations.length'),

@@ -296,12 +296,6 @@ export default {
           },
         })
         this.response = 'success'
-        // Wolle setTimeout(() => {
-        //   this.$emit('userCreated', {
-        //     email,
-        //     password,
-        //   })
-        // }, 3000)
       } catch (err) {
         this.response = 'error'
       }

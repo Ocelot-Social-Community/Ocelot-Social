@@ -40,8 +40,9 @@ export default {
       formSchema: {
         nonce: {
           type: 'string',
-          // Wolle min: 6,
-          // max: 6,
+          // add again if the input has a validation without focus and typing
+          // min: 5,
+          // max: 5,
           required: true,
           message: this.$t('components.enter-nonce.form.validations.length'),
         },
@@ -64,7 +65,7 @@ export default {
   },
   computed: {
     validInput() {
-      return this.formData.nonce.length === 6
+      return this.formData.nonce.length === 5
     },
   },
   methods: {
