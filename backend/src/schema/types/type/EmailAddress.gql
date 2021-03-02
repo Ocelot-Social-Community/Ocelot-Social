@@ -4,6 +4,10 @@ type EmailAddress {
   createdAt: String
 }
 
+type Query {
+  VerifyNonce(email: String!, nonce: String!): Boolean!
+}
+
 type Mutation {
   Signup(email: String!): EmailAddress
   SignupByInvitation(email: String!, token: String!): EmailAddress

@@ -6,7 +6,7 @@ import { createTestClient } from 'apollo-server-testing'
 
 const neode = getNeode()
 
-let mutate
+let mutate, query
 let authenticatedUser
 let user
 let variables
@@ -16,7 +16,8 @@ beforeEach(async () => {
   variables = {}
 })
 
-beforeAll(() => {
+beforeAll(async () => {
+  await cleanDatabase()
   const { server } = createServer({
     context: () => {
       return {
@@ -27,6 +28,7 @@ beforeAll(() => {
     },
   })
   mutate = createTestClient(server).mutate
+  query = createTestClient(server).query
 })
 
 afterEach(async () => {
@@ -292,6 +294,43 @@ describe('VerifyEmailAddress', () => {
           })
         })
       })
+    })
+  })
+})
+
+describe('VerifyNonce', () => {
+  beforeEach(async () => {
+    await Factory.build('unverifiedEmailAddress', {
+      nonce: 'abcdef',
+      verifiedAt: null,
+      createdAt: new Date().toISOString(),
+      email: 'to-be-verified@example.org',
+    })
+  })
+
+  const verifyNonceQuery = gql`
+    query($email: String!, $nonce: String!) {
+      VerifyNonce(email: $email, nonce: $nonce)
+    }
+  `
+
+  it('returns true when nonce and email match', async () => {
+    variables = {
+      nonce: 'abcdef',
+      email: 'to-be-verified@example.org',
+    }
+    await expect(query({ query: verifyNonceQuery, variables })).resolves.toMatchObject({
+      data: { VerifyNonce: true },
+    })
+  })
+
+  it('returns false when nonce and email do not match', async () => {
+    variables = {
+      nonce: '---',
+      email: 'to-be-verified@example.org',
+    }
+    await expect(query({ query: verifyNonceQuery, variables })).resolves.toMatchObject({
+      data: { VerifyNonce: false },
     })
   })
 })

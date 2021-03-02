@@ -121,6 +121,7 @@ export default shield(
       userData: isAuthenticated,
       MyInviteCodes: isAuthenticated,
       isValidInviteCode: allow,
+      VerifyNonce: allow,
       queryLocations: isAuthenticated,
       availableRoles: isAdmin,
     },
