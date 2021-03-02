@@ -29,7 +29,7 @@ export const isValidInviteCodeQuery = gql`
   }
 `
 export default {
-  name: 'RegistrationItemEnterInvite',
+  name: 'RegistrationSlideInvite',
   props: {
     sliderData: { type: Object, required: true },
   },

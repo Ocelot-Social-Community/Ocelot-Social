@@ -83,7 +83,7 @@ export const SignupByInvitationMutation = gql`
   }
 `
 export default {
-  name: 'RegistrationItemEnterEmail',
+  name: 'RegistrationSlideEmail',
   components: {
     // Wolle SweetalertIcon,
   },

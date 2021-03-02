@@ -15,7 +15,7 @@
         </template>
 
         <template v-if="['invite-code'].includes(registrationType)" #enter-invite>
-          <registration-item-enter-invite :sliderData="sliderData" />
+          <registration-slide-invite :sliderData="sliderData" />
         </template>
 
         <template
@@ -24,18 +24,18 @@
         >
           <!-- Wolle !!! may create same source with 'webapp/pages/registration/signup.vue' -->
           <!-- <signup v-if="publicRegistration" :invitation="false" @submit="handleSubmitted"> -->
-          <registration-item-enter-email :sliderData="sliderData" :invitation="false" />
+          <registration-slide-email :sliderData="sliderData" :invitation="false" />
         </template>
 
         <template
           v-if="['invite-code', 'public-registration', 'invite-mail'].includes(registrationType)"
           #enter-nonce
         >
-          <registration-item-enter-nonce :sliderData="sliderData" />
+          <registration-slide-nonce :sliderData="sliderData" />
         </template>
 
         <template #create-user-account>
-          <registration-item-create-user-account :sliderData="sliderData" />
+          <registration-slide-create :sliderData="sliderData" />
         </template>
 
         <template #footer>
@@ -57,20 +57,20 @@ import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
 import ComponentSlider from '~/components/ComponentSlider/ComponentSlider'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
-import RegistrationItemCreateUserAccount from './RegistrationItemCreateUserAccount'
-import RegistrationItemEnterEmail from '~/components/Registration/RegistrationItemEnterEmail'
-import RegistrationItemEnterInvite from './RegistrationItemEnterInvite'
-import RegistrationItemEnterNonce from './RegistrationItemEnterNonce'
+import RegistrationSlideCreate from './RegistrationSlideCreate'
+import RegistrationSlideEmail from '~/components/Registration/RegistrationSlideEmail'
+import RegistrationSlideInvite from './RegistrationSlideInvite'
+import RegistrationSlideNonce from './RegistrationSlideNonce'
 
 export default {
   name: 'RegistrationSlider',
   components: {
     ComponentSlider,
     LocaleSwitch,
-    RegistrationItemCreateUserAccount,
-    RegistrationItemEnterEmail,
-    RegistrationItemEnterInvite,
-    RegistrationItemEnterNonce,
+    RegistrationSlideCreate,
+    RegistrationSlideEmail,
+    RegistrationSlideInvite,
+    RegistrationSlideNonce,
   },
   props: {
     registrationType: { type: String, required: true },

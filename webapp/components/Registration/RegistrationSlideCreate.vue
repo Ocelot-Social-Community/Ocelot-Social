@@ -136,7 +136,7 @@ import PasswordForm from '~/components/utils/PasswordFormHelper'
 import { SignupVerificationMutation } from '~/graphql/Registration.js'
 
 export default {
-  name: 'RegistrationItemCreateUserAccount',
+  name: 'RegistrationSlideCreate',
   components: {
     PasswordStrength,
     SweetalertIcon,

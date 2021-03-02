@@ -28,7 +28,7 @@
 
 <script>
 export default {
-  name: 'RegistrationItemEnterNonce',
+  name: 'RegistrationSlideNonce',
   props: {
     sliderData: { type: Object, required: true },
   },
