@@ -1,7 +1,7 @@
 ##################################################################################
 # COMMUNITY ######################################################################
 ##################################################################################
-FROM neo4j:3.5.14 as community
+FROM neo4j:4.2.3 as community
 
 # ENVs (available in production aswell, can be overwritten by commandline or env file)
 ## We Cannot do `$(date -u +'%Y-%m-%dT%H:%M:%SZ')` here so we use unix timestamp=0
@@ -33,7 +33,7 @@ RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/downloa
 ##################################################################################
 # ENTERPRISE #####################################################################
 ##################################################################################
-FROM neo4j:3.5.14-enterprise as enterprise
+FROM neo4j:4.2.3 as enterprise
 
 # Install Additional Software
 ## install: wget, htop (TODO: why do we need htop?)
