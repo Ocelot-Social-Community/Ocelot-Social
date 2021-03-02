@@ -180,6 +180,15 @@ export default {
     setButtonValues() {
       this.sliderData.setSliderValuesCallback(this.validInput, this.buttonValues())
     },
+    isVariablesRequested(variables) {
+      return (
+        this.sliderData.sliders[this.sliderIndex].data.request &&
+        this.sliderData.sliders[this.sliderIndex].data.request.variables &&
+        this.sliderData.sliders[this.sliderIndex].data.request.variables.email === variables.email
+        // Wolle &&
+        // this.sliderData.sliders[this.sliderIndex].data.request.variables.token === variables.code
+      )
+    },
     async onNextClick() {
       const mutation = this.token ? SignupByInvitationMutation : SignupMutation
       const { token } = this
@@ -190,24 +199,12 @@ export default {
         return true
       }
 
-      if (
-        this.sendEmailAgain ||
-        !this.sliderData.sliders[this.sliderIndex].data.request ||
-        (this.sliderData.sliders[this.sliderIndex].data.request &&
-          (!this.sliderData.sliders[this.sliderIndex].data.request.variables ||
-            (this.sliderData.sliders[this.sliderIndex].data.request.variables &&
-              !this.sliderData.sliders[this.sliderIndex].data.request.variables === variables)))
-      ) {
-        this.sliderData.setSliderValuesCallback(
-          this.sliderData.sliders[this.sliderIndex].validated,
-          { sliderData: { request: { variables }, response: null } },
-        )
-
+      if (this.sendEmailAgain || !this.isVariablesRequested(variables)) {
         try {
           const response = await this.$apollo.mutate({ mutation, variables }) // e-mail is send in emailMiddleware of backend
           this.sliderData.setSliderValuesCallback(
             this.sliderData.sliders[this.sliderIndex].validated,
-            { sliderData: { response: response.data } },
+            { sliderData: { request: { variables }, response: response.data } },
           )
 
           if (this.sliderData.sliders[this.sliderIndex].data.response) {

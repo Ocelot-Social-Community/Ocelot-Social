@@ -27,6 +27,13 @@
 </template>
 
 <script>
+import gql from 'graphql-tag'
+
+export const verifyNonceQuery = gql`
+  query($email: String!, $nonce: String!) {
+    VerifyNonce(email: $email, nonce: $nonce)
+  }
+`
 export default {
   name: 'RegistrationSlideNonce',
   props: {
@@ -64,26 +71,25 @@ export default {
     })
   },
   computed: {
+    sliderIndex() {
+      return this.sliderData.sliderIndex // to have a shorter notation
+    },
     validInput() {
       return this.formData.nonce.length === 5
     },
   },
   methods: {
-    sendValidation() {
+    async sendValidation() {
       const { nonce } = this.formData
 
-      // Wolle shall the nonce be validated in the database?
-      // let dbValidated = false
-      // if (this.validInput) {
-      //   await this.handleSubmitVerify()
-      //   dbValidated = this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode
-      // }
-      // this.sliderData.setSliderValuesCallback(dbValidated, {
-      this.sliderData.setSliderValuesCallback(this.validInput, {
-        collectedInputData: {
-          nonce,
-        },
-      })
+      this.sliderData.setSliderValuesCallback(null, { collectedInputData: { nonce } })
+
+      let dbValidated = false
+      if (this.validInput) {
+        await this.handleSubmitVerify()
+        dbValidated = this.sliderData.sliders[this.sliderIndex].data.response.VerifyNonce
+      }
+      this.sliderData.setSliderValuesCallback(dbValidated)
     },
     async handleInput() {
       this.sendValidation()
@@ -91,7 +97,46 @@ export default {
     async handleInputValid() {
       this.sendValidation()
     },
-    handleSubmitVerify() {},
+    isVariablesRequested(variables) {
+      return (
+        this.sliderData.sliders[this.sliderIndex].data.request &&
+        this.sliderData.sliders[this.sliderIndex].data.request.variables &&
+        this.sliderData.sliders[this.sliderIndex].data.request.variables.email ===
+          variables.email &&
+        this.sliderData.sliders[this.sliderIndex].data.request.variables.nonce === variables.nonce
+      )
+    },
+    async handleSubmitVerify() {
+      const { email, nonce } = this.sliderData.collectedInputData
+      const variables = { email, nonce }
+
+      if (!this.isVariablesRequested(variables)) {
+        try {
+          const response = await this.$apollo.query({ query: verifyNonceQuery, variables })
+          this.sliderData.setSliderValuesCallback(
+            this.sliderData.sliders[this.sliderIndex].validated,
+            { sliderData: { request: { variables }, response: response.data } },
+          )
+
+          if (
+            this.sliderData.sliders[this.sliderIndex].data.response &&
+            this.sliderData.sliders[this.sliderIndex].data.response.VerifyNonce
+          ) {
+            this.$toast.success(
+              this.$t('components.registration.email-nonce.form.success', { email, nonce }),
+            )
+          }
+        } catch (err) {
+          this.sliderData.setSliderValuesCallback(
+            this.sliderData.sliders[this.sliderIndex].validated,
+            { sliderData: { response: { VerifyNonce: false } } },
+          )
+
+          const { message } = err
+          this.$toast.error(message)
+        }
+      }
+    },
     onNextClick() {
       return true
     },

@@ -118,7 +118,7 @@ export default {
         name: 'enter-nonce',
         title: 'E-Mail Confirmation', // Wolle
         validated: false,
-        data: { request: null, response: null },
+        data: { request: null, response: { VerifyNonce: false } },
         button: {
           title: 'Confirm', // Wolle
           icon: 'arrow-right',
@@ -198,11 +198,15 @@ export default {
     },
   },
   methods: {
-    setSliderValuesCallback(isValid, { collectedInputData, sliderData, sliderSettings }) {
+    setSliderValuesCallback(
+      isValid = null,
+      { collectedInputData, sliderData, sliderSettings } = {},
+    ) {
       // all changes of 'this.sliders' has to be filled in from the top to be spread to the component slider and all slider components in the slot
 
-      this.sliderData.sliders[this.sliderIndex].validated = isValid
-
+      if (isValid !== null) {
+        this.sliderData.sliders[this.sliderIndex].validated = isValid
+      }
       if (collectedInputData) {
         this.sliderData.collectedInputData = {
           ...this.sliderData.collectedInputData,

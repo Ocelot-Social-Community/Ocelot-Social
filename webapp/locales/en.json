@@ -167,6 +167,11 @@
           "success": "Verification e-mail send to <b>{email}</b>!"
         }
       },
+      "email-nonce": {
+        "form": {
+          "success": "Valid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!"
+        }
+      },
       "invite-code": {
         "form": {
           "success": "Valid invite code <b>{inviteCode}</b>!"

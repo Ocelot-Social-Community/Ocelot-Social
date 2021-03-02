@@ -26,6 +26,9 @@ const plugins = [
         if (JSON.stringify(data).includes('isValidInviteCode')) {
           return { data: { isValidInviteCode: true } }
         }
+        if (JSON.stringify(data).includes('VerifyNonce')) {
+          return { data: { VerifyNonce: true } }
+        }
         throw new Error(`Query name not found!`)
       },
     }

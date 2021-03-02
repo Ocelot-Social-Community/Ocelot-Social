@@ -76,12 +76,14 @@ export default {
     async sendValidation() {
       const { inviteCode } = this.formData
 
+      this.sliderData.setSliderValuesCallback(null, { collectedInputData: { inviteCode } })
+
       let dbValidated = false
       if (this.validInput) {
         await this.handleSubmitVerify()
         dbValidated = this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode
       }
-      this.sliderData.setSliderValuesCallback(dbValidated, { collectedInputData: { inviteCode } })
+      this.sliderData.setSliderValuesCallback(dbValidated)
     },
     async handleInput() {
       this.sendValidation()
@@ -89,28 +91,26 @@ export default {
     async handleInputValid() {
       this.sendValidation()
     },
+    isVariablesRequested(variables) {
+      return (
+        this.sliderData.sliders[this.sliderIndex].data.request &&
+        this.sliderData.sliders[this.sliderIndex].data.request.variables &&
+        this.sliderData.sliders[this.sliderIndex].data.request.variables.code === variables.code
+      )
+    },
     async handleSubmitVerify() {
-      const { inviteCode } = this.formData
+      const { inviteCode } = this.sliderData.collectedInputData
       const variables = { code: inviteCode }
 
-      if (
-        !this.sliderData.sliders[this.sliderIndex].data.request ||
-        (this.sliderData.sliders[this.sliderIndex].data.request &&
-          (!this.sliderData.sliders[this.sliderIndex].data.request.variables ||
-            (this.sliderData.sliders[this.sliderIndex].data.request.variables &&
-              !this.sliderData.sliders[this.sliderIndex].data.request.variables === variables)))
-      ) {
-        this.sliderData.setSliderValuesCallback(
-          this.sliderData.sliders[this.sliderIndex].validated,
-          { sliderData: { request: { variables }, response: null } },
-        )
-
+      if (!this.isVariablesRequested(variables)) {
         try {
           const response = await this.$apollo.query({ query: isValidInviteCodeQuery, variables })
-          this.sliderData.setSliderValuesCallback(
-            this.sliderData.sliders[this.sliderIndex].validated,
-            { sliderData: { response: response.data } },
-          )
+          this.sliderData.setSliderValuesCallback(null, {
+            sliderData: {
+              request: { variables },
+              response: response.data,
+            },
+          })
 
           if (
             this.sliderData.sliders[this.sliderIndex].data.response &&
