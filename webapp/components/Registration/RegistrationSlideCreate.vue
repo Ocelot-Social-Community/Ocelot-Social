@@ -180,6 +180,7 @@ export default {
   mounted: function () {
     this.$nextTick(function () {
       // Code that will run only after the entire view has been rendered
+
       this.formData.name = this.sliderData.collectedInputData.name
         ? this.sliderData.collectedInputData.name
         : ''

@@ -52,7 +52,7 @@ export default {
   mounted: function () {
     this.$nextTick(function () {
       // Code that will run only after the entire view has been rendered
-      // console.log('mounted !!! ')
+
       this.formData.nonce = this.sliderData.collectedInputData.nonce
         ? this.sliderData.collectedInputData.nonce
         : ''

@@ -115,6 +115,7 @@ export default {
   mounted: function () {
     this.$nextTick(function () {
       // Code that will run only after the entire view has been rendered
+
       this.formData.email = this.sliderData.collectedInputData.email
         ? this.sliderData.collectedInputData.email
         : ''

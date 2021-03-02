@@ -158,3 +158,11 @@ storiesOf('RegistrationSlider', module)
       <registration-slider registrationType="invite-mail" :overwriteSliderData="overwriteSliderData" />
     `,
   }))
+  .add('no-public-registration', () => ({
+    components: { RegistrationSlider },
+    store: helpers.store,
+    data: () => ({}),
+    template: `
+      <registration-slider registrationType="no-public-registration" />
+    `,
+  }))

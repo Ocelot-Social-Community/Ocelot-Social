@@ -14,23 +14,19 @@
           </ds-heading>
         </template>
 
-        <template v-if="['invite-code'].includes(registrationType)" #enter-invite>
+        <template #no-public-registration>
+          <registration-slide-no-public :sliderData="sliderData" />
+        </template>
+
+        <template #enter-invite>
           <registration-slide-invite :sliderData="sliderData" />
         </template>
 
-        <template
-          v-if="['invite-code', 'public-registration'].includes(registrationType)"
-          #enter-email
-        >
-          <!-- Wolle !!! may create same source with 'webapp/pages/registration/signup.vue' -->
-          <!-- <signup v-if="publicRegistration" :invitation="false" @submit="handleSubmitted"> -->
+        <template #enter-email>
           <registration-slide-email :sliderData="sliderData" :invitation="false" />
         </template>
 
-        <template
-          v-if="['invite-code', 'public-registration', 'invite-mail'].includes(registrationType)"
-          #enter-nonce
-        >
+        <template #enter-nonce>
           <registration-slide-nonce :sliderData="sliderData" />
         </template>
 
@@ -38,7 +34,7 @@
           <registration-slide-create :sliderData="sliderData" />
         </template>
 
-        <template #footer>
+        <template v-if="registrationType !== 'no-public-registration'" #footer>
           <ds-space margin-bottom="xxx-small" margin-top="small" centered>
             <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
           </ds-space>
@@ -61,6 +57,7 @@ import RegistrationSlideCreate from './RegistrationSlideCreate'
 import RegistrationSlideEmail from '~/components/Registration/RegistrationSlideEmail'
 import RegistrationSlideInvite from './RegistrationSlideInvite'
 import RegistrationSlideNonce from './RegistrationSlideNonce'
+import RegistrationSlideNoPublic from './RegistrationSlideNoPublic'
 
 export default {
   name: 'RegistrationSlider',
@@ -71,14 +68,28 @@ export default {
     RegistrationSlideEmail,
     RegistrationSlideInvite,
     RegistrationSlideNonce,
+    RegistrationSlideNoPublic,
   },
   props: {
     registrationType: { type: String, required: true },
     overwriteSliderData: { type: Object, default: () => {} },
   },
   data() {
-    const slidersPortfolio = [
-      {
+    const slidersPortfolio = {
+      noPublicRegistration: {
+        name: 'no-public-registration',
+        // title: this.$t('components.registration.create-user-account.title'),
+        title: 'No Public Registration', // Wolle
+        validated: false,
+        data: { request: null, response: null },
+        button: {
+          title: this.$t('site.back-to-login'), // Wolle
+          icon: 'arrow-right',
+          callback: this.buttonCallback,
+          sliderCallback: null, // optional set by slot
+        },
+      },
+      enterInvite: {
         name: 'enter-invite',
         // title: this.$t('components.registration.create-user-account.title'),
         title: 'Invitation', // Wolle
@@ -91,7 +102,7 @@ export default {
           sliderCallback: null, // optional set by slot
         },
       },
-      {
+      enterEmail: {
         name: 'enter-email',
         title: 'E-Mail', // Wolle
         validated: false,
@@ -103,7 +114,7 @@ export default {
           sliderCallback: null, // optional set by slot
         },
       },
-      {
+      enterNonce: {
         name: 'enter-nonce',
         title: 'E-Mail Confirmation', // Wolle
         validated: false,
@@ -115,7 +126,7 @@ export default {
           sliderCallback: null, // optional set by slot
         },
       },
-      {
+      createUserAccount: {
         name: 'create-user-account',
         title: this.$t('components.registration.create-user-account.title'),
         validated: false,
@@ -128,22 +139,29 @@ export default {
           sliderCallback: null, // optional set by slot
         },
       },
-    ]
+    }
     let sliders = []
     switch (this.registrationType) {
+      case 'no-public-registration':
+        sliders = [slidersPortfolio.noPublicRegistration]
+        break
       case 'invite-code':
         sliders = [
-          slidersPortfolio[0],
-          slidersPortfolio[1],
-          slidersPortfolio[2],
-          slidersPortfolio[3],
+          slidersPortfolio.enterInvite,
+          slidersPortfolio.enterEmail,
+          slidersPortfolio.enterNonce,
+          slidersPortfolio.createUserAccount,
         ]
         break
       case 'public-registration':
-        sliders = [slidersPortfolio[1], slidersPortfolio[2], slidersPortfolio[3]]
+        sliders = [
+          slidersPortfolio.enterEmail,
+          slidersPortfolio.enterNonce,
+          slidersPortfolio.createUserAccount,
+        ]
         break
       case 'invite-mail':
-        sliders = [slidersPortfolio[2], slidersPortfolio[3]]
+        sliders = [slidersPortfolio.enterNonce, slidersPortfolio.createUserAccount]
         break
     }
 

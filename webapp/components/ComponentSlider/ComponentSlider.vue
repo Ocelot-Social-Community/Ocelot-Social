@@ -9,7 +9,7 @@
     <slot :name="sliderData.sliders[sliderIndex].name" />
 
     <ds-flex>
-      <ds-flex-item :centered="true">
+      <ds-flex-item v-if="sliderData.sliders.length > 1" :centered="true">
         <div
           v-for="(slider, index) in sliderData.sliders"
           :key="slider.name"

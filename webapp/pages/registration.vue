@@ -43,7 +43,10 @@ export default {
       },
     }
   },
-  asyncData({ app }) {
+  asyncData({ app, store, redirect }) {
+    if (store.getters['auth/isLoggedIn']) {
+      redirect('/')
+    }
     return {
       publicRegistration: app.$env.PUBLIC_REGISTRATION === 'true',
       inviteRegistration: app.$env.INVITE_REGISTRATION === 'true',
@@ -54,7 +57,7 @@ export default {
       if (this.method && ['invite-code', 'invite-mail'].includes(this.method)) {
         return this.method
       }
-      return this.publicRegistration ? 'public-registration' : false
+      return this.publicRegistration ? 'public-registration' : 'no-public-registration'
     },
   },
 }

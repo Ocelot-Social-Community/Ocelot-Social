@@ -53,6 +53,7 @@ export default {
   mounted: function () {
     this.$nextTick(function () {
       // Code that will run only after the entire view has been rendered
+
       this.formData.inviteCode = this.sliderData.collectedInputData.inviteCode
         ? this.sliderData.collectedInputData.inviteCode
         : ''
