@@ -31,7 +31,6 @@ Logins:
 There are four important directories:
 * [Backend](./backend) runs on the server and is a middleware between database and frontend
 * [Frontend](./webapp) is a server-side-rendered and client-side-rendered web frontend
-* [Deployment](./deployment) configuration for kubernetes
 * [Cypress](./cypress) contains end-to-end tests and executable feature specifications
 
 In order to setup the application and start to develop features you have to
@@ -97,6 +96,12 @@ docker-compose -f docker-compose.yml up
 ```
 
 This will start all required Docker containers
+
+## Deployment
+
+Deployment methods can be found in the [Ocelot-Social-Deploy-Rebranding](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding) repository.
+
+The only deployment method in this repository is `docker-compose` for development purposes as described above.
 
 ## Developer Chat
 
