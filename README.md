@@ -97,6 +97,12 @@ docker-compose -f docker-compose.yml up
 
 This will start all required Docker containers
 
+## Deployment
+
+Deployment methods can be found in the [Ocelot-Social-Deploy-Rebranding](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding) repository.
+
+The only deployment method in this repository is `docker-compose` for development purposes as described above.
+
 ## Developer Chat
 
 Join our friendly open-source community on [Discord](https://discordapp.com/invite/DFSjPaX) :heart_eyes_cat:
