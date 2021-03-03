@@ -154,7 +154,6 @@
           "description": "Pour commencer, entrez votre adresse mail :",
           "errors": {
             "email-exists": "Il existe déjà un compte utilisateur avec cette adresse mail!",
-            "invalid-invitation-token": "On dirait que l'invitation a déjà été utilisée. Les liens d'invitation ne peuvent être utilisés qu'une seule fois."
           },
           "invitation-code": "Votre code d'invitation est: <b> {code} </b>",
           "minimum-age": "J'ai 18 ans ou plus.",

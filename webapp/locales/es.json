@@ -154,7 +154,6 @@
           "description": "Para empezar, introduzca su dirección de correo electrónico:",
           "errors": {
             "email-exists": "¡Ya hay una cuenta de usuario con esta dirección de correo electrónico!",
-            "invalid-invitation-token": "Parece que el código de invitación ya ha sido canjeado. Cada código sólo se puede utilizar una vez."
           },
           "invitation-code": "Su código de invitación es: <b>{code}</b>",
           "minimum-age": "Tengo 18 años o más.",

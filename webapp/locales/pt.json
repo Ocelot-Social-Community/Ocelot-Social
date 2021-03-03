@@ -201,7 +201,6 @@
           "description": "Para começar, digite seu endereço de e-mail:",
           "errors": {
             "email-exists": "Já existe uma conta de usuário com este endereço de e-mail!",
-            "invalid-invitation-token": "Parece que o convite já foi usado. Os links para convites só podem ser usados uma vez."
           },
           "invitation-code": "O seu código de convite é: <b>{code}</b>",
           "minimum-age": "Tenho 18 anos ou mais.",

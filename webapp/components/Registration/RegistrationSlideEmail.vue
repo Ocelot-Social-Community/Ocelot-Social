@@ -13,10 +13,10 @@
             : $t('components.registration.signup.title', metadata)
         }}
       </h1> -->
-    <ds-text
+    <!-- Wolle <ds-text
       v-if="token"
       v-html="$t('registration.signup.form.invitation-code', { code: token })"
-    />
+    /> -->
     <ds-text>
       {{
         invitation
@@ -75,13 +75,6 @@ export const SignupMutation = gql`
     }
   }
 `
-export const SignupByInvitationMutation = gql`
-  mutation($email: String!, $token: String!) {
-    SignupByInvitation(email: $email, token: $token) {
-      email
-    }
-  }
-`
 export default {
   name: 'RegistrationSlideEmail',
   components: {
@@ -89,8 +82,8 @@ export default {
   },
   props: {
     sliderData: { type: Object, required: true },
-    token: { type: String, default: null }, // Wolle not used???
-    invitation: { type: Boolean, default: false },
+    // token: { type: String, default: null }, // Wolle not used???
+    invitation: { type: Boolean, default: false }, // Wolle ???
   },
   data() {
     return {
@@ -185,15 +178,11 @@ export default {
         this.sliderData.sliders[this.sliderIndex].data.request &&
         this.sliderData.sliders[this.sliderIndex].data.request.variables &&
         this.sliderData.sliders[this.sliderIndex].data.request.variables.email === variables.email
-        // Wolle &&
-        // this.sliderData.sliders[this.sliderIndex].data.request.variables.token === variables.code
       )
     },
     async onNextClick() {
-      const mutation = this.token ? SignupByInvitationMutation : SignupMutation
-      const { token } = this
       const { email } = this.formData
-      const variables = { email, token }
+      const variables = { email }
 
       if (!this.sendEmailAgain && this.sliderData.collectedInputData.emailSend) {
         return true
@@ -201,7 +190,7 @@ export default {
 
       if (this.sendEmailAgain || !this.isVariablesRequested(variables)) {
         try {
-          const response = await this.$apollo.mutate({ mutation, variables }) // e-mail is send in emailMiddleware of backend
+          const response = await this.$apollo.mutate({ SignupMutation, variables }) // e-mail is send in emailMiddleware of backend
           this.sliderData.setSliderValuesCallback(
             this.sliderData.sliders[this.sliderIndex].validated,
             { sliderData: { request: { variables }, response: response.data } },
@@ -213,9 +202,9 @@ export default {
             })
             this.setButtonValues()
 
-            const { email: respnseEmail } =
-              this.sliderData.sliders[this.sliderIndex].data.response.Signup ||
-              this.sliderData.sliders[this.sliderIndex].data.response.SignupByInvitation
+            const { email: respnseEmail } = this.sliderData.sliders[
+              this.sliderIndex
+            ].data.response.Signup
             this.$toast.success(
               this.$t('components.registration.email.form.success', { email: respnseEmail }),
             )
@@ -234,7 +223,7 @@ export default {
           const { message } = err
           const mapping = {
             'A user account with this email already exists': 'email-exists',
-            'Invitation code already used or does not exist': 'invalid-invitation-token',
+            // Wolle 'Invitation code already used or does not exist': 'invalid-invitation-token',
           }
           for (const [pattern, key] of Object.entries(mapping)) {
             if (message.includes(pattern))

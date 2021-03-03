@@ -14,9 +14,6 @@
             : $t('components.registration.signup.title', metadata)
         }}
       </h1>
-      <ds-space v-if="token" margin-botton="large">
-        <ds-text v-html="$t('registration.signup.form.invitation-code', { code: token })" />
-      </ds-space>
       <ds-space margin-botton="large">
         <ds-text>
           {{
@@ -78,20 +75,12 @@ export const SignupMutation = gql`
     }
   }
 `
-export const SignupByInvitationMutation = gql`
-  mutation($email: String!, $token: String!) {
-    SignupByInvitation(email: $email, token: $token) {
-      email
-    }
-  }
-`
 export default {
   name: 'Signup',
   components: {
     SweetalertIcon,
   },
   props: {
-    token: { type: String, default: null },
     invitation: { type: Boolean, default: false },
   },
   data() {
@@ -126,12 +115,10 @@ export default {
       this.disabled = false
     },
     async handleSubmit() {
-      const mutation = this.token ? SignupByInvitationMutation : SignupMutation
-      const { token } = this
       const { email } = this.formData
 
       try {
-        const response = await this.$apollo.mutate({ mutation, variables: { email, token } })
+        const response = await this.$apollo.mutate({ SignupMutation, variables: { email } })
         this.data = response.data
         setTimeout(() => {
           this.$emit('submit', { email: this.data.Signup.email })
@@ -140,7 +127,7 @@ export default {
         const { message } = err
         const mapping = {
           'A user account with this email already exists': 'email-exists',
-          'Invitation code already used or does not exist': 'invalid-invitation-token',
+          // Wolle 'Invitation code already used or does not exist': 'invalid-invitation-token',
         }
         for (const [pattern, key] of Object.entries(mapping)) {
           if (message.includes(pattern))

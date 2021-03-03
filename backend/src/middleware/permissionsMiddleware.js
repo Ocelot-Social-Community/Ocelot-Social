@@ -128,7 +128,6 @@ export default shield(
     Mutation: {
       '*': deny,
       login: allow,
-      SignupByInvitation: allow,
       Signup: or(publicRegistration, isAdmin),
       SignupVerification: allow,
       UpdateUser: onlyYourself,
