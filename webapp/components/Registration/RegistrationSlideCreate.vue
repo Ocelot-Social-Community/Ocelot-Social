@@ -285,7 +285,7 @@ export default {
       const locale = this.$i18n.locale()
       try {
         await this.$apollo.mutate({
-          mutation: SignupVerificationMutation,
+          mutation: SignupVerificationMutation, // Wolle add nonce in 'SignupVerificationMutation' definition in case
           variables: {
             name,
             password,

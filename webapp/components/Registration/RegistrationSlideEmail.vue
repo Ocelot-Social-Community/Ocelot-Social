@@ -68,6 +68,7 @@ import { isEmail } from 'validator'
 import normalizeEmail from '~/components/utils/NormalizeEmail'
 // Wolle import { SweetalertIcon } from 'vue-sweetalert-icons'
 
+// Wolle add nonce in in case
 export const SignupMutation = gql`
   mutation($email: String!) {
     Signup(email: $email) {
@@ -182,7 +183,7 @@ export default {
     },
     async onNextClick() {
       const { email } = this.formData
-      const variables = { email }
+      const variables = { email } // Wolle add nonce in case
 
       if (!this.sendEmailAgain && this.sliderData.collectedInputData.emailSend) {
         return true
