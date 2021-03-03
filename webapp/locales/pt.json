@@ -200,7 +200,7 @@
           "data-privacy": "Eu li e entendi o Política de Privacidade.",
           "description": "Para começar, digite seu endereço de e-mail:",
           "errors": {
-            "email-exists": "Já existe uma conta de usuário com este endereço de e-mail!",
+            "email-exists": "Já existe uma conta de usuário com este endereço de e-mail!"
           },
           "invitation-code": "O seu código de convite é: <b>{code}</b>",
           "minimum-age": "Tenho 18 anos ou mais.",

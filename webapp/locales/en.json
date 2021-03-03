@@ -182,7 +182,7 @@
           "data-privacy": "I have read and understood the privacy statement.",
           "description": "To get started, you can register here for free:",
           "errors": {
-            "email-exists": "There is already a user account with this e-mail address!",
+            "email-exists": "There is already a user account with this e-mail address!"
           },
           "invitation-code": "Your invitation code is: <b>{code}</b>",
           "minimum-age": "I'm 18 years or older.",
