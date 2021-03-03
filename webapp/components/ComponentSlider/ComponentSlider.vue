@@ -9,7 +9,7 @@
     <slot :name="sliderData.sliders[sliderIndex].name" />
 
     <ds-flex>
-      <ds-flex-item v-if="sliderData.sliders.length > 1" :centered="true">
+      <ds-flex-item v-if="multipleSliders" :centered="true">
         <div
           v-for="(slider, index) in sliderData.sliders"
           :key="slider.name"
@@ -30,7 +30,7 @@
       </ds-flex-item>
       <ds-flex-item>
         <base-button
-          style="float: right"
+          :style="multipleSliders && 'float: right'"
           :icon="sliderData.sliders[sliderIndex].button.icon"
           type="submit"
           filled
@@ -56,6 +56,9 @@ export default {
   computed: {
     sliderIndex() {
       return this.sliderData.sliderIndex // to have a shorter notation
+    },
+    multipleSliders() {
+      return this.sliderData.sliders.length > 1
     },
   },
   methods: {

@@ -1,12 +1,16 @@
 <template>
-  <section class="registration-form">
-    <base-card>
-      <registration-slider
+  <!-- <section class="registration-form">
+    <base-card> -->
+  <!-- <registration-slider
         v-if="registrationType"
         :registrationType="registrationType"
         :overwriteSliderData="overwriteSliderData"
-      />
-      <ds-space v-else centered>
+      /> -->
+  <registration-slider
+    :registrationType="registrationType"
+    :overwriteSliderData="overwriteSliderData"
+  />
+  <!-- <ds-space v-else centered>
         <hc-empty icon="events" :message="$t('components.registration.signup.unavailable')" />
         <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
       </ds-space>
@@ -14,19 +18,19 @@
         <locale-switch offset="5" />
       </template>
     </base-card>
-  </section>
+  </section> -->
 </template>
 
 <script>
-import HcEmpty from '~/components/Empty/Empty'
-import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+// import HcEmpty from '~/components/Empty/Empty'
+// import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import RegistrationSlider from '~/components/Registration/RegistrationSlider'
 
 export default {
   name: 'Registration',
   components: {
-    HcEmpty,
-    LocaleSwitch,
+    // HcEmpty,
+    // LocaleSwitch,
     RegistrationSlider,
   },
   data() {
@@ -48,8 +52,8 @@ export default {
       redirect('/')
     }
     return {
-      publicRegistration: app.$env.PUBLIC_REGISTRATION === 'true',
-      inviteRegistration: app.$env.INVITE_REGISTRATION === 'true',
+      publicRegistration: app.$env.PUBLIC_REGISTRATION,
+      inviteRegistration: app.$env.INVITE_REGISTRATION,
     }
   },
   computed: {
