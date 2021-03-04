@@ -182,8 +182,7 @@
           "data-privacy": "Ich habe die Datenschutzerklärung gelesen und verstanden.",
           "description": "Um loszulegen, kannst Du Dich hier kostenfrei registrieren:",
           "errors": {
-            "email-exists": "Es gibt schon ein Benutzerkonto mit dieser E-Mail-Adresse!",
-            "invalid-invitation-token": "Es sieht so aus, als ob der Einladungscode schon eingelöst wurde. Jeder Code kann nur einmalig benutzt werden."
+            "email-exists": "Es gibt schon ein Benutzerkonto mit dieser E-Mail-Adresse!"
           },
           "invitation-code": "Dein Einladungscode lautet: <b>{code}</b>",
           "minimum-age": "Ich bin 18 Jahre oder älter.",

@@ -1,5 +1,5 @@
 import { config, mount } from '@vue/test-utils'
-import Signup, { SignupMutation, SignupByInvitationMutation } from './Signup'
+import Signup, { SignupMutation } from './Signup'
 
 const localVue = global.localVue
 
@@ -98,12 +98,6 @@ describe('Signup', () => {
       })
 
       describe('submit', () => {
-        it('calls SignupByInvitation graphql mutation', async () => {
-          await action()
-          const expected = expect.objectContaining({ mutation: SignupByInvitationMutation })
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
-        })
-
         it('delivers invitation token to backend', async () => {
           await action()
           const expected = expect.objectContaining({
@@ -125,23 +119,6 @@ describe('Signup', () => {
             await action()
             expect(mocks.$t).toHaveBeenCalledWith(
               'components.registration.signup.form.errors.email-exists',
-            )
-          })
-        })
-
-        describe('in case the invitation code was incorrect', () => {
-          beforeEach(() => {
-            mocks.$apollo.mutate = jest
-              .fn()
-              .mockRejectedValue(
-                new Error('UserInputError: Invitation code already used or does not exist.'),
-              )
-          })
-
-          it('explains the error', async () => {
-            await action()
-            expect(mocks.$t).toHaveBeenCalledWith(
-              'components.registration.signup.form.errors.invalid-invitation-token',
             )
           })
         })

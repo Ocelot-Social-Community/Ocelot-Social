@@ -160,8 +160,7 @@
           "data-privacy": null,
           "description": null,
           "errors": {
-            "email-exists": null,
-            "invalid-invitation-token": "Sembra che l'invito sia già stato utilizzato. I link di invito possono essere utilizzati una sola volta."
+            "email-exists": null
           },
           "invitation-code": null,
           "minimum-age": null,
