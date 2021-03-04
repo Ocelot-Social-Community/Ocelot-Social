@@ -39,8 +39,8 @@ export default {
       const { code } = args
       const session = context.driver.session()
       if (!code) return false
-      return await validateInviteCode(session, code)
-    }
+      return validateInviteCode(session, code)
+    },
   },
   Mutation: {
     GenerateInviteCode: async (_parent, args, context, _resolveInfo) => {

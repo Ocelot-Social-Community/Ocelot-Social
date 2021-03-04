@@ -1,6 +1,7 @@
 import { rule, shield, deny, allow, or } from 'graphql-shield'
 import { getNeode } from '../db/neo4j'
 import CONFIG from '../config'
+import { validateInviteCode } from '../schema/resolvers/transactions/inviteCodes'
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true
@@ -89,6 +90,13 @@ const noEmailFilter = rule({
 
 const publicRegistration = rule()(() => !!CONFIG.PUBLIC_REGISTRATION)
 
+const inviteRegistration = rule()(async (_parent, args, { user, driver }) => {
+  if (!CONFIG.INVITE_REGISTRATION) return false
+  const { inviteCode } = args
+  const session = driver.session()
+  return validateInviteCode(session, inviteCode)
+})
+
 // Permissions
 export default shield(
   {
@@ -128,7 +136,7 @@ export default shield(
     Mutation: {
       '*': deny,
       login: allow,
-      Signup: or(publicRegistration, isAdmin),
+      Signup: or(publicRegistration, inviteRegistration, isAdmin),
       SignupVerification: allow,
       UpdateUser: onlyYourself,
       CreatePost: isAuthenticated,

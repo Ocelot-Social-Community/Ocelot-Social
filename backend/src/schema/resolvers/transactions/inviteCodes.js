@@ -11,7 +11,7 @@ export async function validateInviteCode(session, inviteCode) {
         inviteCode,
       },
     )
-    return result.records.map((record) => record.get('result')) 
+    return result.records.map((record) => record.get('result'))
   })
   try {
     const txResult = await readTxResultPromise
