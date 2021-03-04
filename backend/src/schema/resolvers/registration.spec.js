@@ -15,7 +15,8 @@ beforeEach(async () => {
   variables = {}
 })
 
-beforeAll(() => {
+beforeAll(async () => {
+  await cleanDatabase()
   const { server } = createServer({
     context: () => {
       return {
@@ -34,8 +35,8 @@ afterEach(async () => {
 
 describe('Signup', () => {
   const mutation = gql`
-    mutation($email: String!) {
-      Signup(email: $email) {
+    mutation($email: String!, $inviteCode: String) {
+      Signup(email: $email, inviteCode: $inviteCode) {
         email
       }
     }
