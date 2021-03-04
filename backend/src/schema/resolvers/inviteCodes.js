@@ -1,5 +1,6 @@
 import generateInviteCode from './helpers/generateInviteCode'
 import Resolver from './helpers/Resolver'
+import { validateInviteCode } from './transactions/inviteCodes'
 
 const uniqueInviteCode = async (session, code) => {
   return session.readTransaction(async (txc) => {
@@ -36,29 +37,10 @@ export default {
     },
     isValidInviteCode: async (_parent, args, context, _resolveInfo) => {
       const { code } = args
-      if (!code) return false
       const session = context.driver.session()
-      const readTxResultPromise = session.readTransaction(async (txc) => {
-        const result = await txc.run(
-          `MATCH (ic:InviteCode { code: toUpper($code) })
-           RETURN
-           CASE
-           WHEN ic.expiresAt IS NULL THEN true
-           WHEN datetime(ic.expiresAt) >=  datetime() THEN true
-           ELSE false END AS result`,
-          {
-            code,
-          },
-        )
-        return result.records.map((record) => record.get('result'))
-      })
-      try {
-        const txResult = await readTxResultPromise
-        return !!txResult[0]
-      } finally {
-        session.close()
-      }
-    },
+      if (!code) return false
+      return await validateInviteCode(session, code)
+    }
   },
   Mutation: {
     GenerateInviteCode: async (_parent, args, context, _resolveInfo) => {
