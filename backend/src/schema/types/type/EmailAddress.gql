@@ -13,7 +13,7 @@ type Mutation {
   SignupVerification(
     nonce: String!
     email: String!
-    inviteCode: String
+    inviteCode: String = null
     name: String!
     password: String!
     slug: String
