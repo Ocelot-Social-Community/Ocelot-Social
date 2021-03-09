@@ -280,17 +280,18 @@ export default {
     },
     async submit() {
       const { name, password, about } = this.formData
-      const { email, nonce } = this.sliderData.collectedInputData
+      const { email, inviteCode = null, nonce } = this.sliderData.collectedInputData
       const termsAndConditionsAgreedVersion = VERSION
       const locale = this.$i18n.locale()
       try {
         await this.$apollo.mutate({
-          mutation: SignupVerificationMutation, // Wolle add nonce in 'SignupVerificationMutation' definition in case
+          mutation: SignupVerificationMutation,
           variables: {
             name,
             password,
             about,
             email,
+            inviteCode,
             nonce,
             termsAndConditionsAgreedVersion,
             locale,

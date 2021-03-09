@@ -68,10 +68,9 @@ import { isEmail } from 'validator'
 import normalizeEmail from '~/components/utils/NormalizeEmail'
 // Wolle import { SweetalertIcon } from 'vue-sweetalert-icons'
 
-// Wolle add nonce in in case
 export const SignupMutation = gql`
-  mutation($email: String!) {
-    Signup(email: $email) {
+  mutation($email: String!, $inviteCode: String) {
+    Signup(email: $email, inviteCode: $inviteCode) {
       email
     }
   }
@@ -183,7 +182,8 @@ export default {
     },
     async onNextClick() {
       const { email } = this.formData
-      const variables = { email } // Wolle add nonce in case
+      const { inviteCode = null } = this.sliderData.collectedInputData
+      const variables = { email, inviteCode }
 
       if (!this.sendEmailAgain && this.sliderData.collectedInputData.emailSend) {
         return true
@@ -192,10 +192,9 @@ export default {
       if (this.sendEmailAgain || !this.isVariablesRequested(variables)) {
         try {
           const response = await this.$apollo.mutate({ SignupMutation, variables }) // e-mail is send in emailMiddleware of backend
-          this.sliderData.setSliderValuesCallback(
-            this.sliderData.sliders[this.sliderIndex].validated,
-            { sliderData: { request: { variables }, response: response.data } },
-          )
+          this.sliderData.setSliderValuesCallback(null, {
+            sliderData: { request: { variables }, response: response.data },
+          })
 
           if (this.sliderData.sliders[this.sliderIndex].data.response) {
             this.sliderData.setSliderValuesCallback(this.validInput, {
@@ -212,10 +211,9 @@ export default {
           }
           return true
         } catch (err) {
-          this.sliderData.setSliderValuesCallback(
-            this.sliderData.sliders[this.sliderIndex].validated,
-            { sliderData: { request: null, response: null } },
-          )
+          this.sliderData.setSliderValuesCallback(null, {
+            sliderData: { request: null, response: null },
+          })
           this.sliderData.setSliderValuesCallback(this.validInput, {
             collectedInputData: { emailSend: false },
           })

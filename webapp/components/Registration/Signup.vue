@@ -69,8 +69,8 @@ import metadata from '~/constants/metadata'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 
 export const SignupMutation = gql`
-  mutation($email: String!) {
-    Signup(email: $email) {
+  mutation($email: String!, $inviteCode: String) {
+    Signup(email: $email, inviteCode: $inviteCode) {
       email
     }
   }
@@ -118,7 +118,10 @@ export default {
       const { email } = this.formData
 
       try {
-        const response = await this.$apollo.mutate({ SignupMutation, variables: { email } })
+        const response = await this.$apollo.mutate({
+          SignupMutation,
+          variables: { email, inviteCode: null },
+        })
         this.data = response.data
         setTimeout(() => {
           this.$emit('submit', { email: this.data.Signup.email })

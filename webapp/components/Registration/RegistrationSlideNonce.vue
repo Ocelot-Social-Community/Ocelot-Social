@@ -113,10 +113,9 @@ export default {
       if (!this.isVariablesRequested(variables)) {
         try {
           const response = await this.$apollo.query({ query: verifyNonceQuery, variables })
-          this.sliderData.setSliderValuesCallback(
-            this.sliderData.sliders[this.sliderIndex].validated,
-            { sliderData: { request: { variables }, response: response.data } },
-          )
+          this.sliderData.setSliderValuesCallback(null, {
+            sliderData: { request: { variables }, response: response.data },
+          })
 
           if (
             this.sliderData.sliders[this.sliderIndex].data.response &&
@@ -127,10 +126,9 @@ export default {
             )
           }
         } catch (err) {
-          this.sliderData.setSliderValuesCallback(
-            this.sliderData.sliders[this.sliderIndex].validated,
-            { sliderData: { response: { VerifyNonce: false } } },
-          )
+          this.sliderData.setSliderValuesCallback(null, {
+            sliderData: { response: { VerifyNonce: false } },
+          })
 
           const { message } = err
           this.$toast.error(message)

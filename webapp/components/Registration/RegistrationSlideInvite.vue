@@ -121,10 +121,9 @@ export default {
             )
           }
         } catch (err) {
-          this.sliderData.setSliderValuesCallback(
-            this.sliderData.sliders[this.sliderIndex].validated,
-            { sliderData: { response: { isValidInviteCode: false } } },
-          )
+          this.sliderData.setSliderValuesCallback(null, {
+            sliderData: { response: { isValidInviteCode: false } },
+          })
 
           const { message } = err
           this.$toast.error(message)
