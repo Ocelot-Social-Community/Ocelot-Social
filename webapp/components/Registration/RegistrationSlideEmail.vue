@@ -211,10 +211,8 @@ export default {
           }
           return true
         } catch (err) {
-          this.sliderData.setSliderValuesCallback(null, {
-            sliderData: { request: null, response: null },
-          })
           this.sliderData.setSliderValuesCallback(this.validInput, {
+            sliderData: { request: null, response: null },
             collectedInputData: { emailSend: false },
           })
           this.setButtonValues()

@@ -126,7 +126,7 @@ export default {
             )
           }
         } catch (err) {
-          this.sliderData.setSliderValuesCallback(null, {
+          this.sliderData.setSliderValuesCallback(false, {
             sliderData: { response: { VerifyNonce: false } },
           })
 
