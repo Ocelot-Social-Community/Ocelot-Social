@@ -1,6 +1,6 @@
 # Change all the below if needed
 PUBLIC_REGISTRATION: false
-INVITE_REGISTRATION: true
+INVITE_REGISTRATION: false
 
 BACKEND:
   # Change all the below if needed
