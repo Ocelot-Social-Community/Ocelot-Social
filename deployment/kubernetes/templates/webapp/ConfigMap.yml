@@ -13,5 +13,6 @@ metadata:
 data:
   HOST: "0.0.0.0"
   PUBLIC_REGISTRATION: "{{ .Values.PUBLIC_REGISTRATION }}"
+  INVITE_REGISTRATION: "{{ .Values.INVITE_REGISTRATION }}"
   WEBSOCKETS_URI: "{{ .Values.WEBAPP.WEBSOCKETS_URI }}"
   GRAPHQL_URI: "http://{{ .Release.Name }}-backend:4000"

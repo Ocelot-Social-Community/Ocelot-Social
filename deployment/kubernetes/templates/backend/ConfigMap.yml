@@ -12,6 +12,7 @@ metadata:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 data:
   PUBLIC_REGISTRATION: "{{ .Values.PUBLIC_REGISTRATION }}"
+  INVITE_REGISTRATION: "{{ .Values.INVITE_REGISTRATION }}"
   CLIENT_URI: "{{ .Values.BACKEND.CLIENT_URI }}"
   EMAIL_DEFAULT_SENDER: "{{ .Values.BACKEND.EMAIL_DEFAULT_SENDER }}"
   SMTP_HOST: "{{ .Values.BACKEND.SMTP_HOST }}"
