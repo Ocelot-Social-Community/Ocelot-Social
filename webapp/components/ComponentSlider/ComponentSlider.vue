@@ -13,7 +13,7 @@
         <div
           v-for="(slider, index) in sliderData.sliders"
           :key="slider.name"
-          :class="['Sliders__slider-selection', index < sliderIndex && '--confirmed']"
+          :class="['Sliders__slider-selection', index === sliderIndex && '--unconfirmed']"
         >
           <base-button
             :class="['selection-dot']"
@@ -82,7 +82,7 @@ export default {
     .selection-dot {
       margin-right: 2px;
     }
-    &.--confirmed {
+    &.--unconfirmed {
       opacity: $opacity-disabled;
     }
   }
