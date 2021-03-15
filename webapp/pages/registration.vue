@@ -1,36 +1,16 @@
 <template>
-  <!-- <section class="registration-form">
-    <base-card> -->
-  <!-- <registration-slider
-        v-if="registrationType"
-        :registrationType="registrationType"
-        :overwriteSliderData="overwriteSliderData"
-      /> -->
   <registration-slider
     :registrationType="registrationType"
     :overwriteSliderData="overwriteSliderData"
   />
-  <!-- <ds-space v-else centered>
-        <hc-empty icon="events" :message="$t('components.registration.signup.unavailable')" />
-        <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
-      </ds-space>
-      <template #topMenu>
-        <locale-switch offset="5" />
-      </template>
-    </base-card>
-  </section> -->
 </template>
 
 <script>
-// import HcEmpty from '~/components/Empty/Empty'
-// import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import RegistrationSlider from '~/components/Registration/RegistrationSlider'
 
 export default {
   name: 'Registration',
   components: {
-    // HcEmpty,
-    // LocaleSwitch,
     RegistrationSlider,
   },
   data() {
@@ -58,10 +38,21 @@ export default {
   },
   computed: {
     registrationType() {
-      if (this.method && ['invite-code', 'invite-mail'].includes(this.method)) {
-        return this.method
+      if (!this.method) {
+        return (
+          (this.publicRegistration && 'public-registration') ||
+          (this.inviteRegistration && 'invite-code') ||
+          'no-public-registration'
+        )
+      } else {
+        if (
+          this.method === 'invite-mail' ||
+          (this.method === 'invite-code' && this.inviteRegistration)
+        ) {
+          return this.method
+        }
+        return this.publicRegistration ? 'public-registration' : 'no-public-registration'
       }
-      return this.publicRegistration ? 'public-registration' : 'no-public-registration'
     },
   },
 }
