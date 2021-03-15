@@ -82,8 +82,8 @@ const options = {
   SUPPORT_URL: links.SUPPORT,
   APPLICATION_NAME: metadata.APPLICATION_NAME,
   ORGANIZATION_URL: links.ORGANIZATION,
-  PUBLIC_REGISTRATION: env.PUBLIC_REGISTRATION === 'true',
-  INVITE_REGISTRATION: env.INVITE_REGISTRATION === 'true',
+  PUBLIC_REGISTRATION: env.PUBLIC_REGISTRATION === 'true', // because env booleans are given as string in differenz to the webapp
+  INVITE_REGISTRATION: env.INVITE_REGISTRATION === 'true', // because env booleans are given as string in differenz to the webapp
 }
 
 // Check if all required configs are present
