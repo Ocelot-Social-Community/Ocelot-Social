@@ -48,6 +48,7 @@ export default {
           message: this.$t('components.enter-invite.form.validations.length'),
         },
       },
+      dbRequestInProgress: false,
     }
   },
   mounted: function () {
@@ -102,8 +103,10 @@ export default {
       const { inviteCode } = this.sliderData.collectedInputData
       const variables = { code: inviteCode }
 
-      if (!this.isVariablesRequested(variables)) {
+      if (!this.isVariablesRequested(variables) && !this.dbRequestInProgress) {
         try {
+          this.dbRequestInProgress = true
+
           const response = await this.$apollo.query({ query: isValidInviteCodeQuery, variables })
           this.sliderData.setSliderValuesCallback(null, {
             sliderData: {
@@ -127,6 +130,8 @@ export default {
 
           const { message } = err
           this.$toast.error(message)
+        } finally {
+          this.dbRequestInProgress = false
         }
       }
     },
