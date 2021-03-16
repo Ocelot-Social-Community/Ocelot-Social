@@ -29,6 +29,8 @@ const sentry = {
 const options = {
   VERSION: process.env.VERSION || pkg.version,
   DESCRIPTION: process.env.DESCRIPTION || pkg.description,
+  PUBLIC_REGISTRATION: process.env.PUBLIC_REGISTRATION === 'true',
+  INVITE_REGISTRATION: process.env.INVITE_REGISTRATION === 'true',
   // Cookies
   COOKIE_EXPIRE_TIME: process.env.COOKIE_EXPIRE_TIME || 730, // Two years by default
   COOKIE_HTTPS_ONLY: process.env.COOKIE_HTTPS_ONLY || process.env.NODE_ENV === 'production', // ensure true in production if not set explicitly
