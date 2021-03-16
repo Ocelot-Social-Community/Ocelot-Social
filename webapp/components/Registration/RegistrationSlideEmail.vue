@@ -37,7 +37,7 @@
       <input id="checkbox" type="checkbox" v-model="sendEmailAgain" :checked="sendEmailAgain" />
       <label for="checkbox0">
         <!-- Wolle {{ $t('termsAndConditions.termsAndConditionsConfirmed') }} -->
-        {{ 'Send e-mail again' }}
+        {{ $t('components.email.form.sendEmailAgain') }}
       </label>
     </ds-text>
   </ds-form>
@@ -157,16 +157,16 @@ export default {
     buttonValues() {
       return {
         sliderSettings: {
-          buttonTitle: this.sliderData.collectedInputData.emailSend
+          buttonTitleIdent: this.sliderData.collectedInputData.emailSend
             ? this.sendEmailAgain
-              ? 'Resend e-mail'
-              : 'Skip resend'
-            : 'Send e-mail', // Wolle
+              ? 'components.email.buttonTitleResend'
+              : 'components.email.buttonTitleSkipResend'
+            : 'components.email.buttonTitleSend',
           buttonIcon: this.sliderData.collectedInputData.emailSend
             ? this.sendEmailAgain
               ? 'envelope'
               : 'arrow-right'
-            : 'envelope', // Wolle
+            : 'envelope',
         },
       }
     },
@@ -191,7 +191,7 @@ export default {
 
       if (this.sendEmailAgain || !this.isVariablesRequested(variables)) {
         try {
-          const response = await this.$apollo.mutate({ SignupMutation, variables }) // e-mail is send in emailMiddleware of backend
+          const response = await this.$apollo.mutate({ mutation: SignupMutation, variables }) // e-mail is send in emailMiddleware of backend
           this.sliderData.setSliderValuesCallback(null, {
             sliderData: { request: { variables }, response: response.data },
           })
@@ -202,11 +202,11 @@ export default {
             })
             this.setButtonValues()
 
-            const { email: respnseEmail } = this.sliderData.sliders[
+            const { email: responseEmail } = this.sliderData.sliders[
               this.sliderIndex
             ].data.response.Signup
             this.$toast.success(
-              this.$t('components.registration.email.form.success', { email: respnseEmail }),
+              this.$t('components.registration.email.form.success', { email: responseEmail }),
             )
           }
           return true

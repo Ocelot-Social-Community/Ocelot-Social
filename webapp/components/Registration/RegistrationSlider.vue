@@ -78,12 +78,11 @@ export default {
     const slidersPortfolio = {
       noPublicRegistration: {
         name: 'no-public-registration',
-        // title: this.$t('components.registration.create-user-account.title'),
-        title: 'No Public Registration', // Wolle
+        titleIdent: 'No Public Registration', // Wolle
         validated: false,
         data: { request: null, response: null },
         button: {
-          title: this.$t('site.back-to-login'), // Wolle
+          titleIdent: this.$t('site.back-to-login'), // Wolle
           icon: 'arrow-right',
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
@@ -91,12 +90,11 @@ export default {
       },
       enterInvite: {
         name: 'enter-invite',
-        // title: this.$t('components.registration.create-user-account.title'),
-        title: 'Invitation', // Wolle
+        titleIdent: 'components.registration.invite-code.title',
         validated: false,
         data: { request: null, response: { isValidInviteCode: false } },
         button: {
-          title: 'Next', // Wolle
+          titleIdent: 'components.registration.invite-code.buttonTitle',
           icon: 'arrow-right',
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
@@ -104,11 +102,11 @@ export default {
       },
       enterEmail: {
         name: 'enter-email',
-        title: 'E-Mail', // Wolle
+        titleIdent: 'components.registration.email.title',
         validated: false,
         data: { request: null, response: null },
         button: {
-          title: '', // set by slider component
+          titleIdent: '', // set by slider component
           icon: '', // set by slider component
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
@@ -116,11 +114,11 @@ export default {
       },
       enterNonce: {
         name: 'enter-nonce',
-        title: 'E-Mail Confirmation', // Wolle
+        titleIdent: 'components.registration.email-nonce.title',
         validated: false,
         data: { request: null, response: { VerifyNonce: false } },
         button: {
-          title: 'Confirm', // Wolle
+          titleIdent: 'components.registration.email-nonce.buttonTitle',
           icon: 'arrow-right',
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
@@ -128,12 +126,11 @@ export default {
       },
       createUserAccount: {
         name: 'create-user-account',
-        title: this.$t('components.registration.create-user-account.title'),
+        titleIdent: this.$t('components.registration.create-user-account.title'),
         validated: false,
         data: { request: null, response: null },
         button: {
-          // title: this.$t('actions.save'), // Wolle
-          title: 'Create', // Wolle
+          titleIdent: 'Create', // Wolle
           icon: 'check',
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
@@ -226,9 +223,9 @@ export default {
         }
       }
       if (sliderSettings) {
-        const { buttonTitle, buttonIcon, buttonSliderCallback } = sliderSettings
-        if (buttonTitle) {
-          this.sliderData.sliders[this.sliderIndex].button.title = buttonTitle
+        const { buttonTitleIdent, buttonIcon, buttonSliderCallback } = sliderSettings
+        if (buttonTitleIdent) {
+          this.sliderData.sliders[this.sliderIndex].button.titleIdent = buttonTitleIdent
         }
         if (buttonIcon) {
           this.sliderData.sliders[this.sliderIndex].button.icon = buttonIcon

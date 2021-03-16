@@ -8,9 +8,23 @@
     @input-valid="handleInputValid"
   >
     <ds-text>
-      <!-- Wolle {{ $t('components.enter-nonce.form.description') }} -->
-      Your e-mail address:
-      <b>{{ this.sliderData.collectedInputData.email }}</b>
+      {{ $t('components.enter-nonce.form.yourEmail') }}
+      <b
+        v-if="sliderData.collectedInputData.email && sliderData.collectedInputData.email.length > 0"
+      >
+        {{ sliderData.collectedInputData.email }}
+      </b>
+      <b v-else class="warning">{{ $t('components.enter-nonce.form.yourEmailWarningUndef') }}</b>
+      <b
+        v-if="
+          sliderData.collectedInputData.email &&
+          sliderData.collectedInputData.email.length > 0 &&
+          !isEmailFormat
+        "
+        class="warning"
+      >
+        {{ $t('components.enter-nonce.form.yourEmailWarningFormat') }}
+      </b>
     </ds-text>
     <ds-input
       :placeholder="$t('components.enter-nonce.form.nonce')"
@@ -28,6 +42,7 @@
 
 <script>
 import gql from 'graphql-tag'
+import { isEmail } from 'validator'
 
 export const verifyNonceQuery = gql`
   query($email: String!, $nonce: String!) {
@@ -54,6 +69,7 @@ export default {
           message: this.$t('components.enter-nonce.form.validations.length'),
         },
       },
+      dbRequestInProgress: false,
     }
   },
   mounted: function () {
@@ -76,6 +92,9 @@ export default {
     },
     validInput() {
       return this.formData.nonce.length === 5
+    },
+    isEmailFormat() {
+      return isEmail(this.sliderData.collectedInputData.email)
     },
   },
   methods: {
@@ -110,9 +129,13 @@ export default {
       const { email, nonce } = this.sliderData.collectedInputData
       const variables = { email, nonce }
 
-      if (!this.isVariablesRequested(variables)) {
+      if (!this.isVariablesRequested(variables) && !this.dbRequestInProgress) {
         try {
+          this.dbRequestInProgress = true
+
+          console.log('handleSubmitVerify !!! variables: ', variables)
           const response = await this.$apollo.query({ query: verifyNonceQuery, variables })
+          console.log('handleSubmitVerify !!! response: ', response)
           this.sliderData.setSliderValuesCallback(null, {
             sliderData: { request: { variables }, response: response.data },
           })
@@ -132,6 +155,8 @@ export default {
 
           const { message } = err
           this.$toast.error(message)
+        } finally {
+          this.dbRequestInProgress = false
         }
       }
     },
@@ -147,5 +172,9 @@ export default {
   display: flex;
   flex-direction: column;
   margin: $space-large 0 $space-xxx-small 0;
+
+  .warning {
+    color: $text-color-warning;
+  }
 }
 </style>

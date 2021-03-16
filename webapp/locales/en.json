@@ -120,6 +120,14 @@
     "versus": "Versus"
   },
   "components": {
+    "email": {
+      "buttonTitleResend": "Resend e-mail",
+      "buttonTitleSend": "Send e-mail",
+      "buttonTitleSkipResend": "Skip resend",
+      "form": {
+        "sendEmailAgain": "Send e-mail again"
+      }
+    },
     "enter-invite": {
       "form": {
         "description": "Enter the invitation code you received.",
@@ -137,7 +145,10 @@
         "nonce": "Enter your code",
         "validations": {
           "length": "must be 6 characters long"
-        }
+        },
+        "yourEmail": "Your e-mail address:",
+        "yourEmailWarningFormat": "⚠️ E-mail has wrong format!",
+        "yourEmailWarningUndef": "⚠️ No e-mail defined!"
       }
     },
     "password-reset": {
@@ -165,17 +176,22 @@
       "email": {
         "form": {
           "success": "Verification e-mail send to <b>{email}</b>!"
-        }
+        },
+        "title": "E-Mail"
       },
       "email-nonce": {
+        "buttonTitle": "Confirm",
         "form": {
           "success": "Valid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!"
-        }
+        },
+        "title": "E-Mail Confirmation"
       },
       "invite-code": {
+        "buttonTitle": "Next",
         "form": {
           "success": "Valid invite code <b>{inviteCode}</b>!"
-        }
+        },
+        "title": "Invitation"
       },
       "signup": {
         "form": {

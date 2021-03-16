@@ -2,8 +2,14 @@
   <div class="Sliders">
     <slot :name="'header'" />
 
-    <ds-heading v-if="sliderData.sliders[sliderIndex].title" size="h3">
-      {{ sliderData.sliders[sliderIndex].title }}
+    <ds-heading
+      v-if="
+        sliderData.sliders[sliderIndex].titleIdent &&
+        $t(sliderData.sliders[sliderIndex].titleIdent).length > 0
+      "
+      size="h3"
+    >
+      {{ $t(sliderData.sliders[sliderIndex].titleIdent) }}
     </ds-heading>
 
     <slot :name="sliderData.sliders[sliderIndex].name" />
@@ -38,7 +44,7 @@
           :disabled="!sliderData.sliders[sliderIndex].validated"
           @click="onNextClick"
         >
-          {{ sliderData.sliders[sliderIndex].button.title }}
+          {{ $t(sliderData.sliders[sliderIndex].button.titleIdent) }}
         </base-button>
       </ds-flex-item>
     </ds-flex>
