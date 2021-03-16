@@ -114,22 +114,10 @@ describe('Location Service', () => {
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([
       { id: 'place.14094307404564380', place_name: 'Berlin, Germany' },
-      {
-        id: expect.stringMatching(/^place\.[0-9]+$/),
-        place_name: 'Berlin, Maryland, United States',
-      },
-      {
-        id: expect.stringMatching(/^place\.[0-9]+$/),
-        place_name: 'Berlin, Connecticut, United States',
-      },
-      {
-        id: expect.stringMatching(/^place\.[0-9]+$/),
-        place_name: 'Berlin, New Jersey, United States',
-      },
-      {
-        id: expect.stringMatching(/^place\.[0-9]+$/),
-        place_name: 'Berlin Township, New Jersey, United States',
-      },
+      { id: 'place.15095411613564380', place_name: 'Berlin, Maryland, United States' },
+      { id: 'place.5225018734564380', place_name: 'Berlin, Connecticut, United States' },
+      { id: 'place.16922023226564380', place_name: 'Berlin, New Jersey, United States' },
+      { id: 'place.4035845612564380', place_name: 'Berlin Township, New Jersey, United States' },
     ])
   })
 
@@ -140,23 +128,11 @@ describe('Location Service', () => {
     }
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([
-      { id: expect.stringMatching(/^place\.[0-9]+$/), place_name: 'Berlin, Deutschland' },
-      {
-        id: expect.stringMatching(/^place\.[0-9]+$/),
-        place_name: 'Berlin, Maryland, Vereinigte Staaten',
-      },
-      {
-        id: expect.stringMatching(/^place\.[0-9]+$/),
-        place_name: 'Berlin, New Jersey, Vereinigte Staaten',
-      },
-      {
-        id: expect.stringMatching(/^place\.[0-9]+$/),
-        place_name: 'Berlin Heights, Ohio, Vereinigte Staaten',
-      },
-      {
-        id: expect.stringMatching(/^place\.[0-9]+$/),
-        place_name: 'Berlin, Massachusetts, Vereinigte Staaten',
-      },
+      { id: 'place.14094307404564380', place_name: 'Berlin, Deutschland' },
+      { id: 'place.15095411613564380', place_name: 'Berlin, Maryland, Vereinigte Staaten' },
+      { id: 'place.16922023226564380', place_name: 'Berlin, New Jersey, Vereinigte Staaten' },
+      { id: 'place.10735893248465990', place_name: 'Berlin Heights, Ohio, Vereinigte Staaten' },
+      { id: 'place.1165756679564380', place_name: 'Berlin, Massachusetts, Vereinigte Staaten' },
     ])
   })
 
