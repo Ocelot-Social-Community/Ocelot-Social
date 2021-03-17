@@ -12,7 +12,7 @@ export default {
       const readTxResultPromise = session.readTransaction(async (txc) => {
         const result = await txc.run(
           `
-            MATCH (email:UnverifiedEmailAddress {email: $email, nonce: $nonce})
+            MATCH (email:EmailAddress {email: $email, nonce: $nonce})
             RETURN count(email) > 0 AS result
           `,
           { email: args.email, nonce: args.nonce },
