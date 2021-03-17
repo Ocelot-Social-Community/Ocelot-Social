@@ -185,6 +185,9 @@ export default {
           if (this.suggestionType === HASHTAG && this.query !== '') {
             this.selectItem({ id: this.query })
           }
+          if (this.suggestionType === MENTION && item) {
+            this.selectItem(item)
+          }
           return true
 
         default:
