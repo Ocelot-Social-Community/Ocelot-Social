@@ -1,8 +1,10 @@
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
-import RegistrationSlider from './RegistrationSlider.vue'
+import { action } from '@storybook/addon-actions'
+import Vuex from 'vuex'
 import helpers from '~/storybook/helpers'
 import Vue from 'vue'
+import RegistrationSlider from './RegistrationSlider.vue'
 
 const plugins = [
   (app = {}) => {
@@ -35,12 +37,51 @@ const plugins = [
 ]
 helpers.init({ plugins })
 
+const createStore = ({ loginSuccess }) => {
+  return new Vuex.Store({
+    modules: {
+      auth: {
+        namespaced: true,
+        state: () => ({
+          pending: false,
+        }),
+        mutations: {
+          SET_PENDING(state, pending) {
+            state.pending = pending
+          },
+        },
+        getters: {
+          pending(state) {
+            return !!state.pending
+          },
+        },
+        actions: {
+          async login({ commit, dispatch }, args) {
+            action('Vuex action `auth/login`')(args)
+            return new Promise((resolve, reject) => {
+              commit('SET_PENDING', true)
+              setTimeout(() => {
+                commit('SET_PENDING', false)
+                if (loginSuccess) {
+                  resolve(loginSuccess)
+                } else {
+                  reject(new Error('Login unsuccessful'))
+                }
+              }, 1000)
+            })
+          },
+        },
+      },
+    },
+  })
+}
+
 storiesOf('RegistrationSlider', module)
   .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('invite-code empty', () => ({
     components: { RegistrationSlider },
-    store: helpers.store,
+    store: createStore({ loginSuccess: true }),
     data: () => ({}),
     template: `
       <registration-slider registrationType="invite-code" />
@@ -48,7 +89,7 @@ storiesOf('RegistrationSlider', module)
   }))
   .add('invite-code with data', () => ({
     components: { RegistrationSlider },
-    store: helpers.store,
+    store: createStore({ loginSuccess: true }),
     data: () => ({
       overwriteSliderData: {
         collectedInputData: {
@@ -74,7 +115,7 @@ storiesOf('RegistrationSlider', module)
   }))
   .add('public-registration empty', () => ({
     components: { RegistrationSlider },
-    store: helpers.store,
+    store: createStore({ loginSuccess: true }),
     data: () => ({}),
     template: `
       <registration-slider registrationType="public-registration" />
@@ -82,7 +123,7 @@ storiesOf('RegistrationSlider', module)
   }))
   .add('public-registration with data', () => ({
     components: { RegistrationSlider },
-    store: helpers.store,
+    store: createStore({ loginSuccess: true }),
     data: () => ({
       overwriteSliderData: {
         collectedInputData: {
@@ -108,7 +149,7 @@ storiesOf('RegistrationSlider', module)
   }))
   .add('invite-mail empty', () => ({
     components: { RegistrationSlider },
-    store: helpers.store,
+    store: createStore({ loginSuccess: true }),
     data: () => ({
       overwriteSliderData: {
         collectedInputData: {
@@ -134,7 +175,7 @@ storiesOf('RegistrationSlider', module)
   }))
   .add('invite-mail with data', () => ({
     components: { RegistrationSlider },
-    store: helpers.store,
+    store: createStore({ loginSuccess: true }),
     data: () => ({
       overwriteSliderData: {
         collectedInputData: {
@@ -160,7 +201,7 @@ storiesOf('RegistrationSlider', module)
   }))
   .add('no-public-registration', () => ({
     components: { RegistrationSlider },
-    store: helpers.store,
+    store: createStore({ loginSuccess: true }),
     data: () => ({}),
     template: `
       <registration-slider registrationType="no-public-registration" />

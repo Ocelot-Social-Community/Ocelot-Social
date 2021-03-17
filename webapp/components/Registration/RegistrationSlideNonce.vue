@@ -133,9 +133,7 @@ export default {
         try {
           this.dbRequestInProgress = true
 
-          console.log('handleSubmitVerify !!! variables: ', variables)
           const response = await this.$apollo.query({ query: verifyNonceQuery, variables })
-          console.log('handleSubmitVerify !!! response: ', response)
           this.sliderData.setSliderValuesCallback(null, {
             sliderData: { request: { variables }, response: response.data },
           })

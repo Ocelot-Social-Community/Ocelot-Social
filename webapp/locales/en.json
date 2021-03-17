@@ -121,9 +121,11 @@
   },
   "components": {
     "email": {
-      "buttonTitleResend": "Resend e-mail",
-      "buttonTitleSend": "Send e-mail",
-      "buttonTitleSkipResend": "Skip resend",
+      "buttonTitle": {
+        "resend": "Resend e-mail",
+        "send": "Send e-mail",
+        "skipResend": "Skip resend"
+      },
       "form": {
         "sendEmailAgain": "Send e-mail again"
       }
@@ -168,6 +170,7 @@
     },
     "registration": {
       "create-user-account": {
+        "buttonTitle": "Create",
         "error": "No user account could be created!",
         "help": " Maybe the confirmation was invalid? In case of problems, feel free to ask for help by sending us a mail to:",
         "success": "Your account has been created!",

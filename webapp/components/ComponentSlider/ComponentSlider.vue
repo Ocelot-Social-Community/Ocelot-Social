@@ -40,7 +40,11 @@
           :icon="sliderData.sliders[sliderIndex].button.icon"
           type="submit"
           filled
-          :loading="false"
+          :loading="
+            sliderData.sliders[sliderIndex].button.loading !== undefined
+              ? sliderData.sliders[sliderIndex].button.loading
+              : false
+          "
           :disabled="!sliderData.sliders[sliderIndex].validated"
           @click="onNextClick"
         >

@@ -284,6 +284,9 @@ export default {
       const termsAndConditionsAgreedVersion = VERSION
       const locale = this.$i18n.locale()
       try {
+        this.sliderData.setSliderValuesCallback(null, {
+          sliderSettings: { buttonLoading: true },
+        })
         await this.$apollo.mutate({
           mutation: SignupVerificationMutation,
           variables: {
@@ -298,7 +301,18 @@ export default {
           },
         })
         this.response = 'success'
+        setTimeout(async () => {
+          await this.$store.dispatch('auth/login', { email, password })
+          this.$toast.success('You are logged in!') // Wolle
+          this.$router.push('/')
+          this.sliderData.setSliderValuesCallback(null, {
+            sliderSettings: { buttonLoading: false },
+          })
+        }, 3000)
       } catch (err) {
+        this.sliderData.setSliderValuesCallback(null, {
+          sliderSettings: { buttonLoading: false },
+        })
         this.response = 'error'
       }
     },

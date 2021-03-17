@@ -1,5 +1,4 @@
 <template>
-  <!-- Wolle <ds-space v-if="!data && !error" margin="large"> -->
   <ds-form
     v-model="formData"
     :schema="formSchema"
@@ -41,24 +40,6 @@
       </label>
     </ds-text>
   </ds-form>
-  <!-- Wolle </ds-space>
-  <div v-else margin="large">
-    <template v-if="!error">
-      <transition name="ds-transition-fade">
-        <sweetalert-icon icon="info" />
-      </transition>
-      <ds-text align="center" v-html="submitMessage" />
-    </template>
-    <template v-else>
-      <transition name="ds-transition-fade">
-        <sweetalert-icon icon="error" />
-      </transition>
-      <ds-text align="center">{{ error.message }}</ds-text>
-      <ds-space centered class="space-top">
-        <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
-      </ds-space>
-    </template>
-  </div> -->
 </template>
 
 <script>
@@ -66,6 +47,7 @@ import gql from 'graphql-tag'
 import metadata from '~/constants/metadata'
 import { isEmail } from 'validator'
 import normalizeEmail from '~/components/utils/NormalizeEmail'
+import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
 // Wolle import { SweetalertIcon } from 'vue-sweetalert-icons'
 
 export const SignupMutation = gql`
@@ -102,7 +84,6 @@ export default {
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
       // have checkmarks available.
       sendEmailAgain: false,
-      error: null, // Wolle
     }
   },
   mounted: function () {
@@ -131,10 +112,6 @@ export default {
     sliderIndex() {
       return this.sliderData.sliderIndex // to have a shorter notation
     },
-    // Wolle submitMessage() {
-    //   const { email } = this.data.Signup
-    //   return this.$t('components.registration.signup.form.success', { email })
-    // },
     validInput() {
       return isEmail(this.formData.email)
     },
@@ -159,9 +136,9 @@ export default {
         sliderSettings: {
           buttonTitleIdent: this.sliderData.collectedInputData.emailSend
             ? this.sendEmailAgain
-              ? 'components.email.buttonTitleResend'
-              : 'components.email.buttonTitleSkipResend'
-            : 'components.email.buttonTitleSend',
+              ? 'components.email.buttonTitle.resend'
+              : 'components.email.buttonTitle.skipResend'
+            : 'components.email.buttonTitle.send',
           buttonIcon: this.sliderData.collectedInputData.emailSend
             ? this.sendEmailAgain
               ? 'envelope'
@@ -185,12 +162,19 @@ export default {
       const { inviteCode = null } = this.sliderData.collectedInputData
       const variables = { email, inviteCode }
 
-      if (!this.sendEmailAgain && this.sliderData.collectedInputData.emailSend) {
+      if (this.sliderData.collectedInputData.emailSend && !this.sendEmailAgain) {
         return true
       }
 
-      if (this.sendEmailAgain || !this.isVariablesRequested(variables)) {
+      if (
+        !this.sliderData.collectedInputData.emailSend ||
+        this.sendEmailAgain ||
+        !this.isVariablesRequested(variables)
+      ) {
         try {
+          this.sliderData.setSliderValuesCallback(null, {
+            sliderSettings: { buttonLoading: true },
+          })
           const response = await this.$apollo.mutate({ mutation: SignupMutation, variables }) // e-mail is send in emailMiddleware of backend
           this.sliderData.setSliderValuesCallback(null, {
             sliderData: { request: { variables }, response: response.data },
@@ -209,29 +193,28 @@ export default {
               this.$t('components.registration.email.form.success', { email: responseEmail }),
             )
           }
+          this.sliderData.setSliderValuesCallback(null, {
+            sliderSettings: { buttonLoading: false },
+          })
           return true
         } catch (err) {
           this.sliderData.setSliderValuesCallback(this.validInput, {
             sliderData: { request: null, response: null },
             collectedInputData: { emailSend: false },
+            sliderSettings: { buttonLoading: false },
           })
           this.setButtonValues()
 
-          const { message } = err
-          const mapping = {
-            'A user account with this email already exists': 'email-exists',
-            // Wolle 'Invitation code already used or does not exist': 'invalid-invitation-token',
-          }
-          for (const [pattern, key] of Object.entries(mapping)) {
-            if (message.includes(pattern))
-              this.error = {
-                key,
-                message: this.$t(`components.registration.signup.form.errors.${key}`),
-              }
-          }
-          if (!this.error) {
-            this.$toast.error(message)
-          }
+          this.$toast.error(
+            translateErrorMessage(
+              err.message,
+              {
+                'A user account with this email already exists':
+                  'components.registration.signup.form.errors.email-exists',
+              },
+              this.$t,
+            ),
+          )
           return false
         }
       }

@@ -121,9 +121,11 @@
   },
   "components": {
     "email": {
-      "buttonTitleResend": "Erneut senden",
-      "buttonTitleSend": "Sende E-Mail",
-      "buttonTitleSkipResend": "Nicht senden",
+      "buttonTitle": {
+        "resend": "Erneut senden",
+        "send": "Sende E-Mail",
+        "skipResend": "Nicht senden"
+      },
       "form": {
         "sendEmailAgain": "E-Mail erneut senden"
       }
@@ -168,6 +170,7 @@
     },
     "registration": {
       "create-user-account": {
+        "buttonTitle": "Erstellen",
         "error": "Es konnte kein Benutzerkonto erstellt werden!",
         "help": "Vielleicht war der Bestätigungscode falsch oder abgelaufen? Wenn das Problem weiterhin besteht, schicke uns gerne eine E-Mail an:",
         "success": "Dein Benutzerkonto wurde erstellt!",

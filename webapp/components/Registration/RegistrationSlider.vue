@@ -106,8 +106,8 @@ export default {
         validated: false,
         data: { request: null, response: null },
         button: {
-          titleIdent: '', // set by slider component
-          icon: '', // set by slider component
+          titleIdent: 'components.email.buttonTitle.send', // changed by slider component
+          icon: 'envelope', // changed by slider component
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
         },
@@ -126,12 +126,13 @@ export default {
       },
       createUserAccount: {
         name: 'create-user-account',
-        titleIdent: this.$t('components.registration.create-user-account.title'),
+        titleIdent: 'components.registration.create-user-account.title',
         validated: false,
         data: { request: null, response: null },
         button: {
-          titleIdent: 'Create', // Wolle
+          titleIdent: 'components.registration.create-user-account.buttonTitle',
           icon: 'check',
+          loading: false,
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
         },
@@ -223,14 +224,17 @@ export default {
         }
       }
       if (sliderSettings) {
-        const { buttonTitleIdent, buttonIcon, buttonSliderCallback } = sliderSettings
-        if (buttonTitleIdent) {
+        const { buttonTitleIdent, buttonIcon, buttonLoading, buttonSliderCallback } = sliderSettings
+        if (buttonTitleIdent !== undefined) {
           this.sliderData.sliders[this.sliderIndex].button.titleIdent = buttonTitleIdent
         }
-        if (buttonIcon) {
+        if (buttonIcon !== undefined) {
           this.sliderData.sliders[this.sliderIndex].button.icon = buttonIcon
         }
-        if (buttonSliderCallback) {
+        if (buttonLoading !== undefined) {
+          this.sliderData.sliders[this.sliderIndex].button.loading = buttonLoading
+        }
+        if (buttonSliderCallback !== undefined) {
           this.sliderData.sliders[this.sliderIndex].button.sliderCallback = buttonSliderCallback
         }
       }
@@ -240,6 +244,10 @@ export default {
 
       if (selectedIndex <= this.sliderIndex + 1 && selectedIndex < this.sliderData.sliders.length) {
         this.sliderData.sliderIndex = selectedIndex
+
+        if (this.sliderData.sliders[this.sliderIndex].button.loading !== undefined) {
+          this.sliderData.sliders[this.sliderIndex].button.loading = false
+        }
       }
     },
     buttonCallback(success) {
