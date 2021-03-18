@@ -123,6 +123,7 @@ export default shield(
       isValidInviteCode: allow,
       queryLocations: isAuthenticated,
       availableRoles: isAdmin,
+      getInviteCode: isAuthenticated, // and inviteRegistration
     },
     Mutation: {
       '*': deny,

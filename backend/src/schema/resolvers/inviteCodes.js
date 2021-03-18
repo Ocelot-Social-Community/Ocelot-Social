@@ -12,6 +12,52 @@ const uniqueInviteCode = async (session, code) => {
 
 export default {
   Query: {
+    getInviteCode: async (_parent, args, context, _resolveInfo) => {
+      const {
+        user: { id: userId },
+      } = context
+      const session = context.driver.session()
+      const readTxResultPromise = session.readTransaction(async (txc) => {
+        const result = await txc.run(
+          `MATCH (user:User {id: $userId})-[:GENERATED]->(ic:InviteCode)
+           WHERE ic.expiresAt IS NULL
+           OR datetime(ic.expiresAt) >=  datetime()
+           RETURN properties(ic) AS inviteCodes`,
+          {
+            userId,
+          },
+        )
+        return result.records.map((record) => record.get('inviteCodes'))
+      })
+      try {
+        const inviteCode = await readTxResultPromise
+        if (inviteCode && inviteCode.length > 0) return inviteCode[0]
+        let code = generateInviteCode()
+        while (!(await uniqueInviteCode(session, code))) {
+          code = generateInviteCode()
+        }
+        const writeTxResultPromise = session.writeTransaction(async (txc) => {
+          const result = await txc.run(
+            `MATCH (user:User {id: $userId})
+             MERGE (user)-[:GENERATED]->(ic:InviteCode { code: $code })
+             ON CREATE SET
+             ic.createdAt = toString(datetime()),
+             ic.expiresAt = $expiresAt
+             RETURN ic AS inviteCode`,
+            {
+              userId,
+              code,
+              expiresAt: null,
+            },
+          )
+          return result.records.map((record) => record.get('inviteCode').properties)
+        })
+        const txResult = await writeTxResultPromise
+        return txResult[0]
+      } finally {
+        session.close()
+      }
+    },
     MyInviteCodes: async (_parent, args, context, _resolveInfo) => {
       const {
         user: { id: userId },
