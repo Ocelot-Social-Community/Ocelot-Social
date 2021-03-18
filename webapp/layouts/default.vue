@@ -40,9 +40,9 @@
               <div
                 class="main-navigation-right"
                 :class="{
-                       'desktop-view': !toggleMobileMenu,
-                       'hide-mobile-menu': !toggleMobileMenu,
-                       }"
+                  'desktop-view': !toggleMobileMenu,
+                  'hide-mobile-menu': !toggleMobileMenu,
+                }"
                 style="flex-basis: auto"
               >
                 <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
@@ -50,10 +50,11 @@
                   <client-only>
                     <notification-menu placement="top" />
                   </client-only>
-                  XXX {{ showInviteButton }}
-                  <client-only v-if="showInviteButton">
-                    <invite-button placement="top" />
-                  </client-only>
+                  <div v-if="inviteRegistration">
+                    <client-only>
+                      <invite-button placement="top" />
+                    </client-only>
+                  </div>
                   <client-only>
                     <avatar-menu placement="top" />
                   </client-only>
@@ -78,106 +79,99 @@
 </template>
 
 <script>
- import Logo from '~/components/Logo/Logo'
- import { mapGetters } from 'vuex'
- import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
- import SearchField from '~/components/features/SearchField/SearchField.vue'
- import Modal from '~/components/Modal'
- import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
- import seo from '~/mixins/seo'
- import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
- import PageFooter from '~/components/PageFooter/PageFooter'
- import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
- import InviteButton from '~/components/InviteButton/InviteButton'
+import Logo from '~/components/Logo/Logo'
+import { mapGetters } from 'vuex'
+import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import SearchField from '~/components/features/SearchField/SearchField.vue'
+import Modal from '~/components/Modal'
+import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
+import seo from '~/mixins/seo'
+import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
+import PageFooter from '~/components/PageFooter/PageFooter'
+import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
+import InviteButton from '~/components/InviteButton/InviteButton'
 
- export default {
-   components: {
-     Logo,
-     LocaleSwitch,
-     SearchField,
-     Modal,
-     NotificationMenu,
-     AvatarMenu,
-     FilterMenu,
-     PageFooter,
-     InviteButton,
-   },
-   mixins: [seo],
-   data() {
-     return {
-       mobileSearchVisible: false,
-       toggleMobileMenu: false,
-     }
-   },
-   asyncData({ app }) {
-     return {
-       inviteRegistration: app.$env.INVITE_REGISTRATION,
-     }
-   },
-   computed: {
-     ...mapGetters({
-       isLoggedIn: 'auth/isLoggedIn',
-     }),
-     showFilterMenuDropdown() {
-       const [firstRoute] = this.$route.matched
-       return firstRoute && firstRoute.name === 'index'
-     },
-     showInviteButton() {
-       return this.inviteRegistration
-     },
-   },
-   methods: {
-     toggleMobileMenuView() {
-       this.toggleMobileMenu = !this.toggleMobileMenu
-     },
-   },
- }
+export default {
+  components: {
+    Logo,
+    LocaleSwitch,
+    SearchField,
+    Modal,
+    NotificationMenu,
+    AvatarMenu,
+    FilterMenu,
+    PageFooter,
+    InviteButton,
+  },
+  mixins: [seo],
+  data() {
+    return {
+      mobileSearchVisible: false,
+      toggleMobileMenu: false,
+      inviteRegistration: this.$env.inviteRegistration,
+    }
+  },
+  computed: {
+    ...mapGetters({
+      isLoggedIn: 'auth/isLoggedIn',
+    }),
+    showFilterMenuDropdown() {
+      const [firstRoute] = this.$route.matched
+      return firstRoute && firstRoute.name === 'index'
+    },
+  },
+  methods: {
+    toggleMobileMenuView() {
+      this.toggleMobileMenu = !this.toggleMobileMenu
+    },
+  },
+}
 </script>
 
 <style lang="scss">
- .topbar-locale-switch {
-   display: flex;
-   margin-right: $space-xx-small;
-   align-self: center;
-   display: inline-flex;
- }
- .main-container {
-   padding-top: 6rem;
-   padding-bottom: 5rem;
- }
+.topbar-locale-switch {
+  display: flex;
+  margin-right: $space-xx-small;
+  align-self: center;
+  display: inline-flex;
+}
+.main-container {
+  padding-top: 6rem;
+  padding-bottom: 5rem;
+}
 
- .main-navigation-flex {
-   align-items: center;
- }
+.main-navigation-flex {
+  align-items: center;
+}
 
- .main-navigation {
-   a {
-     color: $text-color-soft;
-   }
- }
- .main-navigation-right {
-   display: flex;
-   justify-content: flex-end;
- }
- .main-navigation-right .desktop-view {
-   float: right;
- }
- .ds-flex-item.mobile-hamburger-menu {
-   margin-left: auto;
-   text-align: right;
- }
- @media only screen and (min-width: 730px) {
-   .mobile-hamburger-menu {
-     display: none;
-   }
- }
- @media only screen and (max-width: 730px) {
-   #nav-search-box,
-   .main-navigation-right {
-     margin: 10px 0px;
-   }
-   .hide-mobile-menu {
-     display: none;
-   }
- }
+.main-navigation {
+  a {
+    color: $text-color-soft;
+  }
+}
+.main-navigation-right {
+  display: flex;
+  justify-content: flex-end;
+}
+.main-navigation-right .desktop-view {
+  float: right;
+}
+.ds-flex-item.mobile-hamburger-menu {
+  margin-left: auto;
+  text-align: right;
+}
+@media only screen and (min-width: 730px) {
+  .mobile-hamburger-menu {
+    display: none;
+  }
+}
+@media only screen and (max-width: 730px) {
+  #nav-search-box,
+  .main-navigation-right {
+    margin: 10px 0px;
+  }
+  .hide-mobile-menu {
+    display: none;
+  }
+}
 </style>

@@ -28,6 +28,8 @@ export default {
 
   env: {
     release: CONFIG.VERSION,
+    publicRegistration: String(CONFIG.PUBLIC_REGISTRATION) === 'true',
+    inviteRegistration: String(CONFIG.INVITE_REGISTRATION) === 'true',
     // pages which do NOT require a login
     publicPages: [
       'login',
