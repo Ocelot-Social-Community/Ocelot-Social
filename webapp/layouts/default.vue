@@ -108,7 +108,7 @@ export default {
     return {
       mobileSearchVisible: false,
       toggleMobileMenu: false,
-      inviteRegistration: this.$env.inviteRegistration,
+      inviteRegistration: this.$env.INVITE_REGISTRATION,
     }
   },
   computed: {
