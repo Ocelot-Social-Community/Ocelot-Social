@@ -311,7 +311,6 @@ jobs:
       ##########################################################################
       # FULLSTACK TESTS CYPRESS ################################################
       ##########################################################################
-      # TODO: Why do we need those .envs?
       - name: backend | copy env files webapp
         run: cp webapp/.env.template webapp/.env
       - name: backend | copy env files backend
