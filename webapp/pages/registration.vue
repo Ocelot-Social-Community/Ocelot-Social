@@ -25,15 +25,13 @@ export default {
           nonce,
         },
       },
+      publicRegistration: this.$env.PUBLIC_REGISTRATION === 'true', // for 'false' in .env PUBLIC_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling
+      inviteRegistration: this.$env.INVITE_REGISTRATION === 'true', // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling
     }
   },
-  asyncData({ app, store, redirect }) {
+  asyncData({ store, redirect }) {
     if (store.getters['auth/isLoggedIn']) {
       redirect('/')
-    }
-    return {
-      publicRegistration: app.$env.PUBLIC_REGISTRATION,
-      inviteRegistration: app.$env.INVITE_REGISTRATION,
     }
   },
   computed: {
