@@ -175,7 +175,6 @@ export default {
           name: null,
           password: null,
           passwordConfirmation: null,
-          // Wolle about: null,
           termsAndConditionsConfirmed: null,
           dataPrivacy: null,
           minimumAge: null,
