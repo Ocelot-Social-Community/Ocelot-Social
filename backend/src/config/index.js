@@ -83,7 +83,7 @@ const options = {
   APPLICATION_NAME: metadata.APPLICATION_NAME,
   ORGANIZATION_URL: links.ORGANIZATION,
   PUBLIC_REGISTRATION: env.PUBLIC_REGISTRATION === 'true' || false,
-  INVITE_REGISTRATION: env.INVITE_REGISTRATION !== 'false', //default = true
+  INVITE_REGISTRATION: env.INVITE_REGISTRATION !== 'false', // default = true
 }
 
 // Check if all required configs are present
