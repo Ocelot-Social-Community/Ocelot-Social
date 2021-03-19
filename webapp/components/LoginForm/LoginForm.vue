@@ -45,7 +45,7 @@
         </base-button>
         <p>
           {{ $t('login.no-account') }}
-          <nuxt-link to="/registration/signup">{{ $t('login.register') }}</nuxt-link>
+          <nuxt-link to="/registration">{{ $t('login.register') }}</nuxt-link>
         </p>
       </form>
       <template #topMenu>
