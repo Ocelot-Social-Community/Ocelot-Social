@@ -108,7 +108,10 @@ describe('Editor.vue', () => {
         }
         propsData.users = manyUsersList
         wrapper = Wrapper()
-        const suggestionList = wrapper.vm.editor.extensions.options.mention.onFilter(propsData.users, 'moderator')
+        const suggestionList = wrapper.vm.editor.extensions.options.mention.onFilter(
+          propsData.users,
+          'moderator',
+        )
         expect(suggestionList).toHaveLength(10)
         for (var i = 0; i < suggestionList.length; i++) {
           expect(suggestionList[i].id).toMatch(/^moderator.*/)
@@ -123,7 +126,7 @@ describe('Editor.vue', () => {
         propsData.users = manyUsersList
         wrapper = Wrapper()
         expect(
-          wrapper.vm.editor.extensions.options.mention.onFilter(propsData.users, 'user7')[0].id
+          wrapper.vm.editor.extensions.options.mention.onFilter(propsData.users, 'user7')[0].id,
         ).toMatch('user7')
       })
 
