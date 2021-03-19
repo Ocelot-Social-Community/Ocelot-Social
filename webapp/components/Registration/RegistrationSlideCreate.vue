@@ -47,14 +47,14 @@
           :label="$t('settings.data.labelName')"
           :placeholder="$t('settings.data.namePlaceholder')"
         />
-        <ds-input
+        <!-- Wolle <ds-input
           id="about"
           model="about"
           type="textarea"
           rows="3"
           :label="$t('settings.data.labelBio')"
           :placeholder="$t('settings.data.labelBio')"
-        />
+        /> -->
         <ds-input
           id="password"
           model="password"
@@ -149,7 +149,7 @@ export default {
       supportEmail: emails.SUPPORT,
       formData: {
         name: '',
-        about: '',
+        // Wolle about: '',
         ...passwordForm.formData,
       },
       formSchema: {
@@ -158,10 +158,10 @@ export default {
           required: true,
           min: 3,
         },
-        about: {
-          type: 'string',
-          required: false,
-        },
+        // Wolle about: {
+        //   type: 'string',
+        //   required: false,
+        // },
         ...passwordForm.formSchema,
       },
       response: null, // Wolle
@@ -182,9 +182,9 @@ export default {
       this.formData.name = this.sliderData.collectedInputData.name
         ? this.sliderData.collectedInputData.name
         : ''
-      this.formData.about = this.sliderData.collectedInputData.about
-        ? this.sliderData.collectedInputData.about
-        : ''
+      // Wolle this.formData.about = this.sliderData.collectedInputData.about
+      //   ? this.sliderData.collectedInputData.about
+      //   : ''
       this.formData.password = this.sliderData.collectedInputData.password
         ? this.sliderData.collectedInputData.password
         : ''
@@ -247,7 +247,8 @@ export default {
   },
   methods: {
     sendValidation() {
-      const { name, about, password, passwordConfirmation } = this.formData
+      // Wolle const { name, about, password, passwordConfirmation } = this.formData
+      const { name, password, passwordConfirmation } = this.formData
       const {
         termsAndConditionsConfirmed,
         dataPrivacy,
@@ -259,7 +260,7 @@ export default {
       this.sliderData.setSliderValuesCallback(this.validInput, {
         collectedInputData: {
           name,
-          about,
+          // Wolle about,
           password,
           passwordConfirmation,
           termsAndConditionsConfirmed,
@@ -277,7 +278,8 @@ export default {
       this.sendValidation()
     },
     async submit() {
-      const { name, password, about } = this.formData
+      // Wolle const { name, password, about } = this.formData
+      const { name, password } = this.formData
       const { email, inviteCode = null, nonce } = this.sliderData.collectedInputData
       const termsAndConditionsAgreedVersion = VERSION
       const locale = this.$i18n.locale()
@@ -290,7 +292,7 @@ export default {
           variables: {
             name,
             password,
-            about,
+            // Wolle about,
             email,
             inviteCode,
             nonce,
