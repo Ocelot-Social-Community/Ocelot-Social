@@ -147,10 +147,7 @@
         "nonce": "Enter your code",
         "validations": {
           "length": "must be 6 characters long"
-        },
-        "yourEmail": "Your e-mail address:",
-        "yourEmailWarningFormat": "⚠️ E-mail has wrong format!",
-        "yourEmailWarningUndef": "⚠️ No e-mail defined!"
+        }
       }
     },
     "password-reset": {
@@ -181,6 +178,11 @@
           "success": "Verification e-mail send to <b>{email}</b>!"
         },
         "title": "E-Mail"
+      },
+      "email-display": {
+        "warningFormat": "⚠️ E-mail has wrong format!",
+        "warningUndef": "⚠️ No e-mail defined!",
+        "yourEmail": "Your e-mail address:"
       },
       "email-nonce": {
         "buttonTitle": "Confirm",

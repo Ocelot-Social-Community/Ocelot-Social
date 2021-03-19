@@ -7,25 +7,7 @@
     @input="handleInput"
     @input-valid="handleInputValid"
   >
-    <ds-text>
-      {{ $t('components.enter-nonce.form.yourEmail') }}
-      <b
-        v-if="sliderData.collectedInputData.email && sliderData.collectedInputData.email.length > 0"
-      >
-        {{ sliderData.collectedInputData.email }}
-      </b>
-      <b v-else class="warning">{{ $t('components.enter-nonce.form.yourEmailWarningUndef') }}</b>
-      <b
-        v-if="
-          sliderData.collectedInputData.email &&
-          sliderData.collectedInputData.email.length > 0 &&
-          !isEmailFormat
-        "
-        class="warning"
-      >
-        {{ $t('components.enter-nonce.form.yourEmailWarningFormat') }}
-      </b>
-    </ds-text>
+    <email-display-and-verify :email="sliderData.collectedInputData.email" />
     <ds-input
       :placeholder="$t('components.enter-nonce.form.nonce')"
       model="nonce"
@@ -43,6 +25,7 @@
 <script>
 import gql from 'graphql-tag'
 import { isEmail } from 'validator'
+import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 
 export const verifyNonceQuery = gql`
   query($email: String!, $nonce: String!) {
@@ -51,6 +34,9 @@ export const verifyNonceQuery = gql`
 `
 export default {
   name: 'RegistrationSlideNonce',
+  components: {
+    EmailDisplayAndVerify,
+  },
   props: {
     sliderData: { type: Object, required: true },
   },
@@ -66,7 +52,7 @@ export default {
           // min: 5,
           // max: 5,
           required: true,
-          message: this.$t('components.enter-nonce.form.validations.length'),
+          message: this.$t('components.enter-nonce.form.validations.length'), // Wolle here 6 characters are mentioned
         },
       },
       dbRequestInProgress: false,
@@ -170,9 +156,5 @@ export default {
   display: flex;
   flex-direction: column;
   margin: $space-large 0 $space-xxx-small 0;
-
-  .warning {
-    color: $text-color-warning;
-  }
 }
 </style>

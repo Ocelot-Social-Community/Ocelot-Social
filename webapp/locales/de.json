@@ -147,10 +147,7 @@
         "nonce": "Code eingeben",
         "validations": {
           "length": "muss genau 6 Buchstaben lang sein"
-        },
-        "yourEmail": "Deine E-Mail-Adresse:",
-        "yourEmailWarningFormat": "⚠️ E-Mail hat ein ungültiges Format!",
-        "yourEmailWarningUndef": "⚠️ Keine E-Mail definiert!"
+        }
       }
     },
     "password-reset": {
@@ -181,6 +178,11 @@
           "success": "Verifikations-E-Mail gesendet an <b>{email}</b>!"
         },
         "title": "E-Mail"
+      },
+      "email-display": {
+        "warningFormat": "⚠️ E-Mail hat ein ungültiges Format!",
+        "warningUndef": "⚠️ Keine E-Mail definiert!",
+        "yourEmail": "Deine E-Mail-Adresse:"
       },
       "email-nonce": {
         "buttonTitle": "Bestätigen",

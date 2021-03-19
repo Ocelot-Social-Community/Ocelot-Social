@@ -71,11 +71,7 @@
         />
         <password-strength class="password-strength" :password="formData.password" />
 
-        <ds-text>
-          <!-- Wolle {{ $t('components.enter-nonce.form.description') }} -->
-          Your e-mail address:
-          <b>{{ this.sliderData.collectedInputData.email }}</b>
-        </ds-text>
+        <email-display-and-verify :email="sliderData.collectedInputData.email" />
 
         <ds-text>
           <input
@@ -130,7 +126,8 @@
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import links from '~/constants/links'
 import emails from '~/constants/emails'
-import PasswordStrength from '../Password/Strength'
+import PasswordStrength from '~/components/Password/Strength'
+import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
 import { SignupVerificationMutation } from '~/graphql/Registration.js'
@@ -139,6 +136,7 @@ export default {
   name: 'RegistrationSlideCreate',
   components: {
     PasswordStrength,
+    EmailDisplayAndVerify,
     SweetalertIcon,
   },
   props: {

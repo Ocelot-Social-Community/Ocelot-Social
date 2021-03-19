@@ -40,7 +40,7 @@ export default {
           min: 6,
           max: 6,
           required: true,
-          message: this.$t('components.enter-nonce.form.validations.length'),
+          message: this.$t('components.enter-nonce.form.validations.length'), // Wolle here 6 characters are mentioned
         },
       },
       disabled: true,
