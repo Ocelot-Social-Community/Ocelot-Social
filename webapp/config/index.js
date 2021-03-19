@@ -29,7 +29,7 @@ const options = {
   VERSION: process.env.VERSION || pkg.version,
   DESCRIPTION: process.env.DESCRIPTION || pkg.description,
   PUBLIC_REGISTRATION: process.env.PUBLIC_REGISTRATION === 'true' || false,
-  INVITE_REGISTRATION: process.env.INVITE_REGISTRATION !== 'false', //default = true
+  INVITE_REGISTRATION: process.env.INVITE_REGISTRATION !== 'false', // default = true
   // Cookies
   COOKIE_EXPIRE_TIME: process.env.COOKIE_EXPIRE_TIME || 730, // Two years by default
   COOKIE_HTTPS_ONLY: process.env.COOKIE_HTTPS_ONLY || process.env.NODE_ENV === 'production', // ensure true in production if not set explicitly

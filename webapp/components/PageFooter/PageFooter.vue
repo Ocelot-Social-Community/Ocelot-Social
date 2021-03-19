@@ -31,7 +31,7 @@
 import links from '~/constants/links.js'
 export default {
   data() {
-    return { links, version: `v${this.$env.RELEASE}` }
+    return { links, version: `v${this.$env.VERSION}` }
   },
 }
 </script>

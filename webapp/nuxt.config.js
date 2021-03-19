@@ -27,9 +27,7 @@ export default {
   },
 
   env: {
-    RELEASE: CONFIG.VERSION,
-    PUBLIC_REGISTRATION: CONFIG.PUBLIC_REGISTRATION,
-    INVITE_REGISTRATION: CONFIG.INVITE_REGISTRATION,
+    ...CONFIG,
     // pages which do NOT require a login
     publicPages: [
       'login',
