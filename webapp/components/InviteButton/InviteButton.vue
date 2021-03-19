@@ -7,16 +7,14 @@
       <div class="invite-button-menu-popover">
         <div v-if="inviteCode && inviteCode.code">
           <ds-text align="center">{{ $t('invite-codes.your-code') }}</ds-text>
-          <ds-text bold>
-            {{ inviteCode.code }}
-            <base-button
-              v-if="canCopy"
-              icon="copy"
-              ghost
-              size="small"
-              @click="copyInviteCode"
-            ></base-button>
-          </ds-text>
+          <base-button class="invite-code" v-if="canCopy" ghost @click="copyInviteCode">
+            <ds-text bold>
+              {{ inviteCode.code }}
+            </ds-text>
+          </base-button>
+          <base-button v-if="canCopy" icon="copy" ghost @click="copyInviteLink">
+            {{ $t('invite-codes.copy-link') }}
+          </base-button>
         </div>
         <div v-else>
           <ds-text>{{ $t('invite-codes.not-available') }}</ds-text>
@@ -51,6 +49,15 @@ export default {
       await navigator.clipboard.writeText(this.inviteCode.code)
       this.$toast.success(this.$t('invite-codes.copy-success'))
     },
+    async copyInviteLink() {
+      await navigator.clipboard.writeText(
+        'https://' +
+          window.location.hostname +
+          '/registration?method=invite-code&inviteCode=' +
+          this.inviteCode.code,
+      )
+      this.$toast.success(this.$t('invite-codes.copy-success'))
+    },
   },
   apollo: {
     inviteCode: {
@@ -79,5 +86,11 @@ export default {
 
 .invite-button-menu-popover {
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.invite-code {
+  left: 50%;
 }
 </style>
