@@ -170,7 +170,9 @@
         "buttonTitle": "Erstellen",
         "error": "Es konnte kein Benutzerkonto erstellt werden!",
         "help": "Vielleicht war der Bestätigungscode falsch oder abgelaufen? Wenn das Problem weiterhin besteht, schicke uns gerne eine E-Mail an:",
+        "recieveCommunicationAsEmailsEtcConfirmed": "Ich stimme auch dem Erhalt von E-Mails und anderen Formen der Kommunikation (z.B. Push-Benachrichtigungen) zu.",
         "success": "Dein Benutzerkonto wurde erstellt!",
+        "termsAndCondsEtcConfirmed": "Ich habe folgendes gelesen, verstanden und stimme zu:",
         "title": "Benutzerkonto anlegen"
       },
       "email": {

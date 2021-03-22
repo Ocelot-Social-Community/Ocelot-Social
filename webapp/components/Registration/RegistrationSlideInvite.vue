@@ -45,7 +45,7 @@ export default {
           // min: 6,
           // max: 6,
           required: true,
-          message: this.$t('components.enter-invite.form.validations.length'),
+          // Wolle don't mention the amount of chars (remove from locales) message: this.$t('components.enter-invite.form.validations.length'),
         },
       },
       dbRequestInProgress: false,

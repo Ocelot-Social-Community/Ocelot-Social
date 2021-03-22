@@ -35,7 +35,6 @@
     <ds-text v-if="sliderData.collectedInputData.emailSend">
       <input id="checkbox" type="checkbox" v-model="sendEmailAgain" :checked="sendEmailAgain" />
       <label for="checkbox0">
-        <!-- Wolle {{ $t('termsAndConditions.termsAndConditionsConfirmed') }} -->
         {{ $t('components.email.form.sendEmailAgain') }}
       </label>
     </ds-text>
