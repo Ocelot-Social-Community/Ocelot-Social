@@ -199,10 +199,7 @@ export default {
   methods: {
     sendValidation() {
       const { name, password, passwordConfirmation } = this.formData
-      const {
-        termsAndConditionsConfirmed,
-        recieveCommunicationAsEmailsEtcConfirmed,
-      } = this
+      const { termsAndConditionsConfirmed, recieveCommunicationAsEmailsEtcConfirmed } = this
 
       this.sliderData.setSliderValuesCallback(this.validInput, {
         collectedInputData: {
@@ -248,7 +245,7 @@ export default {
         this.response = 'success'
         setTimeout(async () => {
           await this.$store.dispatch('auth/login', { email, password })
-          this.$toast.success('You are logged in!') // Wolle
+          this.$toast.success(this.$t('login.success'))
           this.$router.push('/')
           this.sliderData.setSliderValuesCallback(null, {
             sliderSettings: { buttonLoading: false },
