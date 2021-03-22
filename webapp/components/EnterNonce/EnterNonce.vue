@@ -37,10 +37,10 @@ export default {
       formSchema: {
         nonce: {
           type: 'string',
-          min: 6,
-          max: 6,
+          min: 5,
+          max: 5,
           required: true,
-          message: this.$t('components.registration.email-nonce.form.validations.length'), // Wolle here 6 characters are mentioned
+          message: this.$t('components.registration.email-nonce.form.validations.length'),
         },
       },
       disabled: true,
