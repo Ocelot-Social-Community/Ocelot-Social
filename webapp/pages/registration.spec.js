@@ -88,9 +88,7 @@ describe('Registration', () => {
       $route: {
         query: {},
       },
-      app: {
-        $env: {},
-      },
+      $env: {},
     }
   })
 
@@ -109,7 +107,7 @@ describe('Registration', () => {
 
     describe('no "PUBLIC_REGISTRATION" and no "INVITE_REGISTRATION"', () => {
       beforeEach(() => {
-        mocks.app.$env = {
+        mocks.$env = {
           PUBLIC_REGISTRATION: false,
           INVITE_REGISTRATION: false,
         }
