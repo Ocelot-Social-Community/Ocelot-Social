@@ -25,8 +25,8 @@ export default {
           nonce,
         },
       },
-      publicRegistration: this.$env.PUBLIC_REGISTRATION === 'true', // for 'false' in .env PUBLIC_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling
-      inviteRegistration: this.$env.INVITE_REGISTRATION === 'true', // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling
+      publicRegistration: this.$env.PUBLIC_REGISTRATION === true, // for 'false' in .env PUBLIC_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling
+      inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling
     }
   },
   asyncData({ store, redirect }) {
