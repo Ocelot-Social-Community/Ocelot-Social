@@ -14,4 +14,5 @@ type Mutation {
 type Query {
   MyInviteCodes: [InviteCode]
   isValidInviteCode(code: ID!): Boolean
+  getInviteCode: InviteCode
 }

@@ -12,7 +12,6 @@ const environment = {
   PRODUCTION: process.env.NODE_ENV === 'production' || false,
   NUXT_BUILD: process.env.NUXT_BUILD || '.nuxt',
   STYLEGUIDE_DEV: process.env.STYLEGUIDE_DEV || false,
-  RELEASE: process.env.release,
 }
 
 const server = {

@@ -88,7 +88,7 @@ const noEmailFilter = rule({
   return !('email' in args)
 })
 
-const publicRegistration = rule()(() => !!CONFIG.PUBLIC_REGISTRATION)
+const publicRegistration = rule()(() => CONFIG.PUBLIC_REGISTRATION)
 
 const inviteRegistration = rule()(async (_parent, args, { user, driver }) => {
   if (!CONFIG.INVITE_REGISTRATION) return false
@@ -132,6 +132,7 @@ export default shield(
       VerifyNonce: allow,
       queryLocations: isAuthenticated,
       availableRoles: isAdmin,
+      getInviteCode: isAuthenticated, // and inviteRegistration
     },
     Mutation: {
       '*': deny,
