@@ -147,5 +147,47 @@ describe('Registration', () => {
         })
       })
     })
+
+    // Wolle copied from webapp/components/Registration/Signup.spec.js as testing template
+    // describe('with invitation code', () => {
+    //   let action
+    //   beforeEach(() => {
+    //     propsData.token = '12345'
+    //     action = async () => {
+    //       wrapper = Wrapper()
+    //       wrapper.find('input#email').setValue('mail@example.org')
+    //       await wrapper.find('form').trigger('submit')
+    //       await wrapper.html()
+    //     }
+    //   })
+
+    //   describe('submit', () => {
+    //     it('delivers invitation code to backend', async () => {
+    //       await action()
+    //       const expected = expect.objectContaining({
+    //         mutation: SignupMutation,
+    //         variables: { email: 'mail@example.org', inviteCode: '12345' },
+    //       })
+    //       expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
+    //     })
+
+    //     describe('in case a user account with the email already exists', () => {
+    //       beforeEach(() => {
+    //         mocks.$apollo.mutate = jest
+    //           .fn()
+    //           .mockRejectedValue(
+    //             new Error('UserInputError: A user account with this email already exists.'),
+    //           )
+    //       })
+
+    //       it('explains the error', async () => {
+    //         await action()
+    //         expect(mocks.$t).toHaveBeenCalledWith(
+    //           'components.registration.signup.form.errors.email-exists',
+    //         )
+    //       })
+    //     })
+    //   })
+    // })
   })
 })

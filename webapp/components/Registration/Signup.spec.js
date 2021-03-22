@@ -58,7 +58,8 @@ describe('Signup', () => {
 
         it('delivers email to backend', () => {
           const expected = expect.objectContaining({
-            variables: { email: 'mAIL@exAMPLE.org', token: null },
+            mutation: SignupMutation,
+            variables: { email: 'mAIL@exAMPLE.org', inviteCode: null },
           })
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
         })
@@ -80,46 +81,6 @@ describe('Signup', () => {
 
           it('emits `submit`', () => {
             expect(wrapper.emitted('submit')).toEqual([[{ email: 'mail@example.org' }]])
-          })
-        })
-      })
-    })
-
-    describe('with invitation code', () => {
-      let action
-      beforeEach(() => {
-        propsData.token = '666777'
-        action = async () => {
-          wrapper = Wrapper()
-          wrapper.find('input#email').setValue('mail@example.org')
-          await wrapper.find('form').trigger('submit')
-          await wrapper.html()
-        }
-      })
-
-      describe('submit', () => {
-        it('delivers invitation token to backend', async () => {
-          await action()
-          const expected = expect.objectContaining({
-            variables: { email: 'mail@example.org', token: '666777' },
-          })
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
-        })
-
-        describe('in case a user account with the email already exists', () => {
-          beforeEach(() => {
-            mocks.$apollo.mutate = jest
-              .fn()
-              .mockRejectedValue(
-                new Error('UserInputError: A user account with this email already exists.'),
-              )
-          })
-
-          it('explains the error', async () => {
-            await action()
-            expect(mocks.$t).toHaveBeenCalledWith(
-              'components.registration.signup.form.errors.email-exists',
-            )
           })
         })
       })

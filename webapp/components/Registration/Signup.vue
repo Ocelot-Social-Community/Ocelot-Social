@@ -119,7 +119,7 @@ export default {
 
       try {
         const response = await this.$apollo.mutate({
-          SignupMutation,
+          mutation: SignupMutation,
           variables: { email, inviteCode: null },
         })
         this.data = response.data
