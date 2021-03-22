@@ -73,15 +73,12 @@
             :checked="termsAndConditionsConfirmed"
           />
           <label for="checkbox0">
-            <!-- Wolle {{ $t('termsAndConditions.termsAndConditionsConfirmed') }} -->
             {{ $t('components.registration.create-user-account.termsAndCondsEtcConfirmed') }}
             <br />
-            <!-- Wolle <nuxt-link to="/terms-and-conditions">{{ $t('site.termsAndConditions') }}</nuxt-link> -->
             <a :href="'/terms-and-conditions'" target="_blank">
               {{ $t('site.termsAndConditions') }}
             </a>
             <br />
-            <!-- Wolle <nuxt-link to="/data-privacy">{{ $t('site.data-privacy') }}</nuxt-link> -->
             <a :href="'/data-privacy'" target="_blank">
               {{ $t('site.data-privacy') }}
             </a>
@@ -95,39 +92,13 @@
             :checked="recieveCommunicationAsEmailsEtcConfirmed"
           />
           <label for="checkbox1">
-            <!-- Wolle {{ $t('components.registration.signup.form.data-privacy') }} -->
             {{
               $t(
                 'components.registration.create-user-account.recieveCommunicationAsEmailsEtcConfirmed',
               )
             }}
-            <!-- Wolle <br />
-            <nuxt-link to="/data-privacy">
-              {{ $t('site.data-privacy') }}
-            </nuxt-link> -->
           </label>
         </ds-text>
-        <!-- Wolle <ds-text>
-          <input id="checkbox2" type="checkbox" v-model="minimumAge" :checked="minimumAge" />
-          <label
-            for="checkbox2"
-            v-html="$t('components.registration.signup.form.minimum-age')"
-          ></label>
-        </ds-text>
-        <ds-text>
-          <input id="checkbox3" type="checkbox" v-model="noCommercial" :checked="noCommercial" />
-          <label
-            for="checkbox3"
-            v-html="$t('components.registration.signup.form.no-commercial')"
-          ></label>
-        </ds-text>
-        <ds-text>
-          <input id="checkbox4" type="checkbox" v-model="noPolitical" :checked="noPolitical" />
-          <label
-            for="checkbox4"
-            v-html="$t('components.registration.signup.form.no-political')"
-          ></label>
-        </ds-text> -->
       </template>
     </ds-form>
   </div>
@@ -176,10 +147,6 @@ export default {
       // have checkmarks available.
       termsAndConditionsConfirmed: false,
       recieveCommunicationAsEmailsEtcConfirmed: false,
-      // Wolle dataPrivacy: false,
-      // minimumAge: false,
-      // noCommercial: false,
-      // noPolitical: false,
     }
   },
   mounted: function () {
@@ -203,18 +170,6 @@ export default {
         .recieveCommunicationAsEmailsEtcConfirmed
         ? this.sliderData.collectedInputData.recieveCommunicationAsEmailsEtcConfirmed
         : false
-      // Wolle this.dataPrivacy = this.sliderData.collectedInputData.dataPrivacy
-      //   ? this.sliderData.collectedInputData.dataPrivacy
-      //   : false
-      // this.minimumAge = this.sliderData.collectedInputData.minimumAge
-      //   ? this.sliderData.collectedInputData.minimumAge
-      //   : false
-      // this.noCommercial = this.sliderData.collectedInputData.noCommercial
-      //   ? this.sliderData.collectedInputData.noCommercial
-      //   : false
-      // this.noPolitical = this.sliderData.collectedInputData.noPolitical
-      //   ? this.sliderData.collectedInputData.noPolitical
-      //   : false
       this.sendValidation()
 
       this.sliderData.setSliderValuesCallback(this.validInput, {
@@ -230,10 +185,6 @@ export default {
         this.formData.password === this.formData.passwordConfirmation &&
         this.termsAndConditionsConfirmed &&
         this.recieveCommunicationAsEmailsEtcConfirmed
-        // Wolle this.dataPrivacy &&
-        // this.minimumAge &&
-        // this.noCommercial &&
-        // this.noPolitical
       )
     },
   },
@@ -244,18 +195,6 @@ export default {
     recieveCommunicationAsEmailsEtcConfirmed() {
       this.sendValidation()
     },
-    // Wolle dataPrivacy() {
-    //   this.sendValidation()
-    // },
-    // minimumAge() {
-    //   this.sendValidation()
-    // },
-    // noCommercial() {
-    //   this.sendValidation()
-    // },
-    // noPolitical() {
-    //   this.sendValidation()
-    // },
   },
   methods: {
     sendValidation() {
@@ -263,10 +202,6 @@ export default {
       const {
         termsAndConditionsConfirmed,
         recieveCommunicationAsEmailsEtcConfirmed,
-        // Wolle dataPrivacy,
-        // minimumAge,
-        // noCommercial,
-        // noPolitical,
       } = this
 
       this.sliderData.setSliderValuesCallback(this.validInput, {
