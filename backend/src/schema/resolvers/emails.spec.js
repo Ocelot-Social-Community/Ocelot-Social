@@ -187,7 +187,7 @@ describe('VerifyEmailAddress', () => {
       let emailAddress
       beforeEach(async () => {
         emailAddress = await Factory.build('unverifiedEmailAddress', {
-          nonce: 'abcdef',
+          nonce: '12345',
           verifiedAt: null,
           createdAt: new Date().toISOString(),
           email: 'to-be-verified@example.org',
@@ -206,7 +206,7 @@ describe('VerifyEmailAddress', () => {
 
       describe('given valid nonce for `UnverifiedEmailAddress` node', () => {
         beforeEach(() => {
-          variables = { ...variables, nonce: 'abcdef' }
+          variables = { ...variables, nonce: '12345' }
         })
 
         describe('but the address does not belong to the authenticated user', () => {
@@ -300,8 +300,8 @@ describe('VerifyEmailAddress', () => {
 
 describe('VerifyNonce', () => {
   beforeEach(async () => {
-    await Factory.build('unverifiedEmailAddress', {
-      nonce: 'abcdef',
+    await Factory.build('emailAddress', {
+      nonce: '12345',
       verifiedAt: null,
       createdAt: new Date().toISOString(),
       email: 'to-be-verified@example.org',
@@ -316,8 +316,8 @@ describe('VerifyNonce', () => {
 
   it('returns true when nonce and email match', async () => {
     variables = {
-      nonce: 'abcdef',
       email: 'to-be-verified@example.org',
+      nonce: '12345',
     }
     await expect(query({ query: verifyNonceQuery, variables })).resolves.toMatchObject({
       data: { VerifyNonce: true },
@@ -326,8 +326,8 @@ describe('VerifyNonce', () => {
 
   it('returns false when nonce and email do not match', async () => {
     variables = {
-      nonce: '---',
       email: 'to-be-verified@example.org',
+      nonce: '---',
     }
     await expect(query({ query: verifyNonceQuery, variables })).resolves.toMatchObject({
       data: { VerifyNonce: false },
