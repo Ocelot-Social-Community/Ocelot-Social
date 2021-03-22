@@ -35,7 +35,7 @@
     <ds-text v-if="sliderData.collectedInputData.emailSend">
       <input id="checkbox" type="checkbox" v-model="sendEmailAgain" :checked="sendEmailAgain" />
       <label for="checkbox0">
-        {{ $t('components.email.form.sendEmailAgain') }}
+        {{ $t('components.registration.email.form.sendEmailAgain') }}
       </label>
     </ds-text>
   </ds-form>
@@ -135,9 +135,9 @@ export default {
         sliderSettings: {
           buttonTitleIdent: this.sliderData.collectedInputData.emailSend
             ? this.sendEmailAgain
-              ? 'components.email.buttonTitle.resend'
-              : 'components.email.buttonTitle.skipResend'
-            : 'components.email.buttonTitle.send',
+              ? 'components.registration.email.buttonTitle.resend'
+              : 'components.registration.email.buttonTitle.skipResend'
+            : 'components.registration.email.buttonTitle.send',
           buttonIcon: this.sliderData.collectedInputData.emailSend
             ? this.sendEmailAgain
               ? 'envelope'

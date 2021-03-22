@@ -29,6 +29,7 @@
       </ds-heading>
     </ds-space> -->
 
+    <!-- Wolle ??? submit -->
     <ds-form
       class="create-user-account"
       v-model="formData"
@@ -208,10 +209,6 @@ export default {
           passwordConfirmation,
           termsAndConditionsConfirmed,
           recieveCommunicationAsEmailsEtcConfirmed,
-          // dataPrivacy,
-          // minimumAge,
-          // noCommercial,
-          // noPolitical,
         },
       })
     },

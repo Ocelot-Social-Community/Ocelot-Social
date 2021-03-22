@@ -106,7 +106,7 @@ export default {
         validated: false,
         data: { request: null, response: null },
         button: {
-          titleIdent: 'components.email.buttonTitle.send', // changed by slider component
+          titleIdent: 'components.registration.email.buttonTitle.send', // changed by slider component
           icon: 'envelope', // changed by slider component
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot

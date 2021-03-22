@@ -7,14 +7,14 @@
     @input-valid="handleInputValid"
   >
     <ds-input
-      :placeholder="$t('components.enter-invite.form.invite-code')"
+      :placeholder="$t('components.registration.invite-code.form.invite-code')"
       model="inviteCode"
       name="inviteCode"
       id="inviteCode"
       icon="question-circle"
     />
     <ds-text>
-      {{ $t('components.enter-invite.form.description') }}
+      {{ $t('components.registration.invite-code.form.description') }}
     </ds-text>
     <slot></slot>
   </ds-form>
@@ -41,11 +41,10 @@ export default {
       formSchema: {
         inviteCode: {
           type: 'string',
-          // add again if the input has a validation without focus and typing
-          // min: 6,
-          // max: 6,
+          min: 6,
+          max: 6,
           required: true,
-          // Wolle don't mention the amount of chars (remove from locales) message: this.$t('components.enter-invite.form.validations.length'),
+          message: this.$t('components.registration.invite-code.form.validations.length'),
         },
       },
       dbRequestInProgress: false,

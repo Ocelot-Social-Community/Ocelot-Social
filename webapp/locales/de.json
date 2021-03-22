@@ -120,36 +120,6 @@
     "versus": "Versus"
   },
   "components": {
-    "email": {
-      "buttonTitle": {
-        "resend": "Erneut senden",
-        "send": "Sende E-Mail",
-        "skipResend": "Nicht senden"
-      },
-      "form": {
-        "sendEmailAgain": "E-Mail erneut senden"
-      }
-    },
-    "enter-invite": {
-      "form": {
-        "description": "Gib den Einladungs-Code ein, den du bekommen hast.",
-        "invite-code": "Einladungs-Code eingeben",
-        "next": "Weiter",
-        "validations": {
-          "length": "muss genau 6 Buchstaben lang sein"
-        }
-      }
-    },
-    "enter-nonce": {
-      "form": {
-        "description": "Öffne Dein E-Mail Postfach und gib den Code ein, den wir geschickt haben.",
-        "next": "Weiter",
-        "nonce": "Code eingeben",
-        "validations": {
-          "length": "muss genau 6 Buchstaben lang sein"
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "Passwort Änderung fehlgeschlagen. Möglicherweise falscher Sicherheitscode?",
@@ -176,7 +146,13 @@
         "title": "Benutzerkonto anlegen"
       },
       "email": {
+        "buttonTitle": {
+          "resend": "Erneut senden",
+          "send": "Sende E-Mail",
+          "skipResend": "Nicht senden"
+        },
         "form": {
+          "sendEmailAgain": "E-Mail erneut senden",
           "success": "Verifikations-E-Mail gesendet an <b>{email}</b>!"
         },
         "title": "E-Mail"
@@ -189,14 +165,26 @@
       "email-nonce": {
         "buttonTitle": "Bestätigen",
         "form": {
-          "success": "Gültiger Bestätigungs-Code <b>{nonce}</b> für E-Mail <b>{email}</b>!"
+          "description": "Öffne Dein E-Mail Postfach und gib den Code ein, den wir geschickt haben.",
+          "next": "Weiter",
+          "nonce": "E-Mail-Code: 32143",
+          "success": "Gültiger Bestätigungs-Code <b>{nonce}</b> für E-Mail <b>{email}</b>!",
+          "validations": {
+            "length": "muss genau 5 Buchstaben lang sein"
+          }
         },
         "title": "E-Mail Bestätigung"
       },
       "invite-code": {
         "buttonTitle": "Weiter",
         "form": {
-          "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!"
+          "description": "Gib den Einladungs-Code ein, den du bekommen hast.",
+          "invite-code": "Einladungs-Code: ACJERB",
+          "next": "Weiter",
+          "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!",
+          "validations": {
+            "length": "muss genau 6 Buchstaben lang sein"
+          }
         },
         "title": "Einladung"
       },

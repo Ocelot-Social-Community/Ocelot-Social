@@ -120,36 +120,6 @@
     "versus": "Versus"
   },
   "components": {
-    "email": {
-      "buttonTitle": {
-        "resend": "Resend e-mail",
-        "send": "Send e-mail",
-        "skipResend": "Skip resend"
-      },
-      "form": {
-        "sendEmailAgain": "Send e-mail again"
-      }
-    },
-    "enter-invite": {
-      "form": {
-        "description": "Enter the invitation code you received.",
-        "invite-code": "Enter your invite code",
-        "next": "Continue",
-        "validations": {
-          "length": "must be 6 characters long"
-        }
-      }
-    },
-    "enter-nonce": {
-      "form": {
-        "description": "Open your inbox and enter the code that we've sent to you.",
-        "next": "Continue",
-        "nonce": "Enter your code",
-        "validations": {
-          "length": "must be 6 characters long"
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "Changing your password failed. Maybe the security code was not correct?",
@@ -176,7 +146,13 @@
         "title": "Create user account"
       },
       "email": {
+        "buttonTitle": {
+          "resend": "Resend e-mail",
+          "send": "Send e-mail",
+          "skipResend": "Skip resend"
+        },
         "form": {
+          "sendEmailAgain": "Send e-mail again",
           "success": "Verification e-mail send to <b>{email}</b>!"
         },
         "title": "E-Mail"
@@ -189,14 +165,26 @@
       "email-nonce": {
         "buttonTitle": "Confirm",
         "form": {
-          "success": "Valid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!"
+          "description": "Open your inbox and enter the code that we've sent to you.",
+          "next": "Continue",
+          "nonce": "E-mail code: 32143",
+          "success": "Valid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!",
+          "validations": {
+            "length": "must be 5 characters long"
+          }
         },
         "title": "E-Mail Confirmation"
       },
       "invite-code": {
         "buttonTitle": "Next",
         "form": {
-          "success": "Valid invite code <b>{inviteCode}</b>!"
+          "description": "Enter the invitation code you received.",
+          "invite-code": "Invite code: ACJERB",
+          "next": "Continue",
+          "success": "Valid invite code <b>{inviteCode}</b>!",
+          "validations": {
+            "length": "must be 6 characters long"
+          }
         },
         "title": "Invitation"
       },

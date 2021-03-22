@@ -9,14 +9,14 @@
   >
     <email-display-and-verify :email="sliderData.collectedInputData.email" />
     <ds-input
-      :placeholder="$t('components.enter-nonce.form.nonce')"
+      :placeholder="$t('components.registration.email-nonce.form.nonce')"
       model="nonce"
       name="nonce"
       id="nonce"
       icon="question-circle"
     />
     <ds-text>
-      {{ $t('components.enter-nonce.form.description') }}
+      {{ $t('components.registration.email-nonce.form.description') }}
     </ds-text>
     <slot></slot>
   </ds-form>
@@ -48,11 +48,10 @@ export default {
       formSchema: {
         nonce: {
           type: 'string',
-          // add again if the input has a validation without focus and typing
-          // min: 5,
-          // max: 5,
+          min: 5,
+          max: 5,
           required: true,
-          message: this.$t('components.enter-nonce.form.validations.length'), // Wolle here 6 characters are mentioned
+          message: this.$t('components.registration.email-nonce.form.validations.length'),
         },
       },
       dbRequestInProgress: false,

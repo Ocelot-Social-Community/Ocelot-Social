@@ -8,17 +8,17 @@
     @input-valid="handleInputValid"
   >
     <ds-input
-      :placeholder="$t('components.enter-nonce.form.nonce')"
+      :placeholder="$t('components.registration.email-nonce.form.nonce')"
       model="nonce"
       name="nonce"
       id="nonce"
       icon="question-circle"
     />
     <ds-text>
-      {{ $t('components.enter-nonce.form.description') }}
+      {{ $t('components.registration.email-nonce.form.description') }}
     </ds-text>
     <base-button :disabled="disabled" filled name="submit" type="submit">
-      {{ $t('components.enter-nonce.form.next') }}
+      {{ $t('components.registration.email-nonce.form.next') }}
     </base-button>
     <slot></slot>
   </ds-form>
@@ -40,7 +40,7 @@ export default {
           min: 6,
           max: 6,
           required: true,
-          message: this.$t('components.enter-nonce.form.validations.length'), // Wolle here 6 characters are mentioned
+          message: this.$t('components.registration.email-nonce.form.validations.length'), // Wolle here 6 characters are mentioned
         },
       },
       disabled: true,
