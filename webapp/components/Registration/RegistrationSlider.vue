@@ -78,12 +78,12 @@ export default {
     const slidersPortfolio = {
       noPublicRegistration: {
         name: 'no-public-registration',
-        titleIdent: 'No Public Registration', // Wolle
+        titleIdent: 'components.registration.no-public-registrstion.title',
         validated: false,
         data: { request: null, response: null },
         button: {
-          titleIdent: this.$t('site.back-to-login'), // Wolle
-          icon: 'arrow-right',
+          titleIdent: 'site.back-to-login',
+          icon: null,
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
         },

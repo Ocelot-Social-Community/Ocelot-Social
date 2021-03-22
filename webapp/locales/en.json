@@ -200,6 +200,9 @@
         },
         "title": "Invitation"
       },
+      "no-public-registrstion": {
+        "title": "No Public Registration"
+      },
       "signup": {
         "form": {
           "data-privacy": "I have read and understood the privacy statement.",

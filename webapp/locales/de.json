@@ -200,6 +200,9 @@
         },
         "title": "Einladung"
       },
+      "no-public-registrstion": {
+        "title": "Keine öffentliche Registrierung möglich"
+      },
       "signup": {
         "form": {
           "data-privacy": "Ich habe die Datenschutzerklärung gelesen und verstanden.",
