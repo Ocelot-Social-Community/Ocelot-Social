@@ -696,9 +696,7 @@
     }
   },
   "termsAndConditions": {
-    "agree": "J'accepte!",
     "newTermsAndConditions": "Nouvelles conditions générales",
-    "termsAndConditionsConfirmed": "J'ai lu et accepte les conditions générales.",
     "termsAndConditionsNewConfirm": "J'ai lu et accepté les nouvelles conditions générales.",
     "termsAndConditionsNewConfirmText": "Veuillez lire les nouvelles conditions d'utilisation dès maintenant !"
   },

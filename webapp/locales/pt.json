@@ -679,9 +679,7 @@
     }
   },
   "termsAndConditions": {
-    "agree": "Eu concordo!",
     "newTermsAndConditions": "Novos Termos e Condições",
-    "termsAndConditionsConfirmed": "Eu li e confirmei os Terms and Conditions.",
     "termsAndConditionsNewConfirm": "Eu li e concordo com os novos termos de condições.",
     "termsAndConditionsNewConfirmText": "Por favor, leia os novos termos de uso agora!"
   },

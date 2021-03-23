@@ -728,9 +728,7 @@
     }
   },
   "termsAndConditions": {
-    "agree": "¡Estoy de acuerdo!",
     "newTermsAndConditions": "Nuevos términos de uso",
-    "termsAndConditionsConfirmed": "He leído y acepto los términos de uso.",
     "termsAndConditionsNewConfirm": "He leído y acepto los nuevos términos de uso.",
     "termsAndConditionsNewConfirmText": "¡Por favor, lea los nuevos términos de uso ahora!"
   },

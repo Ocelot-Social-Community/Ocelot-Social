@@ -644,9 +644,7 @@
     }
   },
   "termsAndConditions": {
-    "agree": "Sono d'accordo!",
     "newTermsAndConditions": "Nuovi Termini e Condizioni",
-    "termsAndConditionsConfirmed": "Ho letto e confermato i Termini e condizioni.",
     "termsAndConditionsNewConfirm": "Ho letto e accetto le nuove condizioni generali di contratto.",
     "termsAndConditionsNewConfirmText": "Si prega di leggere le nuove condizioni d'uso ora!"
   },

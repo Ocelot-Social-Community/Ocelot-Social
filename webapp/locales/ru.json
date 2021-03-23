@@ -728,9 +728,7 @@
     }
   },
   "termsAndConditions": {
-    "agree": "Я согласен(на)!",
     "newTermsAndConditions": "Новые условия и положения",
-    "termsAndConditionsConfirmed": "Я прочитал(а) и подтверждаю Условия и положения.",
     "termsAndConditionsNewConfirm": "Я прочитал(а) и согласен(на) с новыми условиями.",
     "termsAndConditionsNewConfirmText": "Пожалуйста, ознакомьтесь с новыми условиями использования!"
   },

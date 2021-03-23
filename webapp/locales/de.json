@@ -804,9 +804,7 @@
     }
   },
   "termsAndConditions": {
-    "agree": "Ich stimme zu!",
     "newTermsAndConditions": "Neue Nutzungsbedingungen",
-    "termsAndConditionsConfirmed": "Ich habe die Nutzungsbedingungen durchgelesen und stimme ihnen zu.",
     "termsAndConditionsNewConfirm": "Ich habe die neuen Nutzungsbedingungen durchgelesen und stimme zu.",
     "termsAndConditionsNewConfirmText": "Bitte lies Dir die neuen Nutzungsbedingungen jetzt durch!"
   },

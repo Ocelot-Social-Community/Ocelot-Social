@@ -23,12 +23,6 @@
     </ds-space>
   </div>
   <div v-else class="create-account-card">
-    <!-- Wolle <ds-space margin-top="large">
-      <ds-heading size="h3">
-        {{ $t('components.registration.create-user-account.title') }}
-      </ds-heading>
-    </ds-space> -->
-
     <!-- Wolle ??? submit -->
     <ds-form
       class="create-user-account"
