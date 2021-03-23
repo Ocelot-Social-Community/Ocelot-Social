@@ -162,7 +162,6 @@
           "errors": {
             "email-exists": null
           },
-          "invitation-code": null,
           "minimum-age": null,
           "submit": null,
           "success": null,

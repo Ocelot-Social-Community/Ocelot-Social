@@ -67,6 +67,7 @@
 import gql from 'graphql-tag'
 import metadata from '~/constants/metadata'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
+import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
 
 export const SignupMutation = gql`
   mutation($email: String!, $inviteCode: String) {
@@ -127,21 +128,16 @@ export default {
           this.$emit('submit', { email: this.data.Signup.email })
         }, 3000)
       } catch (err) {
-        const { message } = err
-        const mapping = {
-          'A user account with this email already exists': 'email-exists',
-          // Wolle 'Invitation code already used or does not exist': 'invalid-invitation-token',
-        }
-        for (const [pattern, key] of Object.entries(mapping)) {
-          if (message.includes(pattern))
-            this.error = {
-              key,
-              message: this.$t(`components.registration.signup.form.errors.${key}`),
-            }
-        }
-        if (!this.error) {
-          this.$toast.error(message)
-        }
+        this.$toast.error(
+          translateErrorMessage(
+            err.message,
+            {
+              'A user account with this email already exists':
+                'components.registration.signup.form.errors.email-exists',
+            },
+            this.$t,
+          ),
+        )
       }
     },
   },

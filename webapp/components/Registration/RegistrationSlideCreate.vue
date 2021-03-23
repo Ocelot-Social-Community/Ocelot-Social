@@ -23,12 +23,10 @@
     </ds-space>
   </div>
   <div v-else class="create-account-card">
-    <!-- Wolle ??? submit -->
     <ds-form
       class="create-user-account"
       v-model="formData"
       :schema="formSchema"
-      @submit="submit"
       @input="handleInput"
       @input-valid="handleInputValid"
     >
@@ -136,7 +134,7 @@ export default {
         },
         ...passwordForm.formSchema,
       },
-      response: null, // Wolle
+      response: null,
       // TODO: Our styleguide does not support checkmarks.
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
       // have checkmarks available.

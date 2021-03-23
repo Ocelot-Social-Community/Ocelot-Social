@@ -198,7 +198,6 @@
           "errors": {
             "email-exists": "There is already a user account with this e-mail address!"
           },
-          "invitation-code": "Your invitation code is: <b>{code}</b>",
           "minimum-age": "I'm 18 years or older.",
           "no-commercial": "I have no commercial interests and I am not representing a company or any other commercial organisation on the network.",
           "no-political": "I am not on behalf of a party or political organization in the network.",

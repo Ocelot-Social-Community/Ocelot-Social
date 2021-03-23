@@ -202,7 +202,6 @@
           "errors": {
             "email-exists": "Já existe uma conta de usuário com este endereço de e-mail!"
           },
-          "invitation-code": "O seu código de convite é: <b>{code}</b>",
           "minimum-age": "Tenho 18 anos ou mais.",
           "submit": "Criar uma conta",
           "success": "Um e-mail com um link para completar o seu registo foi enviado para <b>{email}</b>",

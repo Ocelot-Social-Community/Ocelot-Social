@@ -155,7 +155,6 @@
           "errors": {
             "email-exists": "¡Ya hay una cuenta de usuario con esta dirección de correo electrónico!"
           },
-          "invitation-code": "Su código de invitación es: <b>{code}</b>",
           "minimum-age": "Tengo 18 años o más.",
           "no-commercial": "No tengo intensiones comerciales y no represento una empresa u organización comercial.",
           "no-political": "No estoy en la red en nombre de un partido o una organización política.",

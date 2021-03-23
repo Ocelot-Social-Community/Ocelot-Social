@@ -198,7 +198,6 @@
           "errors": {
             "email-exists": "Es gibt schon ein Benutzerkonto mit dieser E-Mail-Adresse!"
           },
-          "invitation-code": "Dein Einladungscode lautet: <b>{code}</b>",
           "minimum-age": "Ich bin 18 Jahre oder älter.",
           "no-commercial": "Ich habe keine kommerziellen Absichten und ich repräsentiere kein kommerzielles Unternehmen oder Organisation.",
           "no-political": "Ich bin nicht im Auftrag einer Partei oder politischen Organisation im Netzwerk.",

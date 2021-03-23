@@ -6,26 +6,11 @@
     @input="handleInput"
     @input-valid="handleInputValid"
   >
-    <!-- Wolle <h1>
-        {{
-          invitation
-            ? $t('profile.invites.title', metadata)
-            : $t('components.registration.signup.title', metadata)
-        }}
-      </h1> -->
-    <!-- Wolle <ds-text
-      v-if="token"
-      v-html="$t('registration.signup.form.invitation-code', { code: token })"
-    /> -->
     <ds-text>
-      {{
-        invitation
-          ? $t('profile.invites.description')
-          : $t('components.registration.signup.form.description')
-      }}
+      {{ $t('components.registration.signup.form.description') }}
     </ds-text>
     <ds-input
-      :placeholder="invitation ? $t('profile.invites.emailPlaceholder') : $t('login.email')"
+      :placeholder="$t('login.email')"
       type="email"
       id="email"
       model="email"
@@ -48,7 +33,6 @@ import metadata from '~/constants/metadata'
 import { isEmail } from 'validator'
 import normalizeEmail from '~/components/utils/NormalizeEmail'
 import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
-// Wolle import { SweetalertIcon } from 'vue-sweetalert-icons'
 
 export const SignupMutation = gql`
   mutation($email: String!, $inviteCode: String) {
@@ -59,13 +43,8 @@ export const SignupMutation = gql`
 `
 export default {
   name: 'RegistrationSlideEmail',
-  components: {
-    // Wolle SweetalertIcon,
-  },
   props: {
     sliderData: { type: Object, required: true },
-    // token: { type: String, default: null }, // Wolle not used???
-    invitation: { type: Boolean, default: false }, // Wolle ???
   },
   data() {
     return {
