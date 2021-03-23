@@ -202,7 +202,6 @@
           "errors": {
             "email-exists": "Já existe uma conta de usuário com este endereço de e-mail!"
           },
-          "minimum-age": "Tenho 18 anos ou mais.",
           "submit": "Criar uma conta",
           "success": "Um e-mail com um link para completar o seu registo foi enviado para <b>{email}</b>",
           "terms-and-condition": "Eu concordo com os Termos e condições."

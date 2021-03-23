@@ -155,9 +155,6 @@
           "errors": {
             "email-exists": "¡Ya hay una cuenta de usuario con esta dirección de correo electrónico!"
           },
-          "minimum-age": "Tengo 18 años o más.",
-          "no-commercial": "No tengo intensiones comerciales y no represento una empresa u organización comercial.",
-          "no-political": "No estoy en la red en nombre de un partido o una organización política.",
           "submit": "Crear una cuenta",
           "success": "Se ha enviado un correo electrónico con un enlace de confirmación para el registro a <b>{email}</b>.",
           "terms-and-condition": "Estoy de acuerdo con los términos de uso."
