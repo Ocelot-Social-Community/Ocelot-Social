@@ -93,10 +93,10 @@ storiesOf('RegistrationSlider', module)
     data: () => ({
       overwriteSliderData: {
         collectedInputData: {
-          inviteCode: 'IN1T6Y',
+          inviteCode: 'INZTBY',
           email: 'wolle.huss@pjannto.com',
           emailSend: false,
-          nonce: 'NTRSC',
+          nonce: '47539',
           name: 'Wolle',
           password: 'Hello',
           passwordConfirmation: 'Hello',
@@ -126,7 +126,7 @@ storiesOf('RegistrationSlider', module)
           inviteCode: null,
           email: 'wolle.huss@pjannto.com',
           emailSend: false,
-          nonce: 'NTRSC',
+          nonce: '47539',
           name: 'Wolle',
           password: 'Hello',
           passwordConfirmation: 'Hello',
@@ -170,7 +170,7 @@ storiesOf('RegistrationSlider', module)
           inviteCode: null,
           email: 'wolle.huss@pjannto.com',
           emailSend: true,
-          nonce: 'NTRSC',
+          nonce: '47539',
           name: 'Wolle',
           password: 'Hello',
           passwordConfirmation: 'Hello',
