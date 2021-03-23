@@ -163,16 +163,6 @@
     "versus": "Contra"
   },
   "components": {
-    "enter-nonce": {
-      "form": {
-        "description": "Abra a sua caixa de entrada e digite o código que lhe enviamos.",
-        "next": "Continue",
-        "nonce": "Digite seu código",
-        "validations": {
-          "length": "deve ter 6 caracteres"
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "A alteração da sua senha falhou. Talvez o código de segurança não estava correto?",
@@ -194,6 +184,16 @@
         "help": " Talvez a confirmação tenha sido inválida? Em caso de problemas, sinta-se à vontade para pedir ajuda, enviando um e-mail para:",
         "success": "A sua conta foi criada!",
         "title": "Criar uma conta de usuário"
+      },
+      "email-nonce": {
+        "form": {
+          "description": "Abra a sua caixa de entrada e digite o código que lhe enviamos.",
+          "next": "Continue",
+          "nonce": "Digite seu código",
+          "validations": {
+            "length": "deve ter 5 caracteres"
+          }
+        }
       },
       "signup": {
         "form": {

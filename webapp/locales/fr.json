@@ -116,16 +116,6 @@
     "versus": "Versus"
   },
   "components": {
-    "enter-nonce": {
-      "form": {
-        "description": "Ouvrez votre boîte de réception et entrez le code que nous vous avons envoyé.",
-        "next": "Continuer",
-        "nonce": "Entrez votre code",
-        "validations": {
-          "length": "doit comporter 6 caractères"
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "La modification de votre mot de passe a échoué. Peut-être que le code de sécurité n'était pas correct ?",
@@ -147,6 +137,16 @@
         "help": " Peut-être que la confirmation n'était pas valide? En cas de problème, n'hésitez pas à nous demander de l'aide en nous envoyant un mail à:",
         "success": "Votre compte a été créé!",
         "title": "Créer un compte utilisateur"
+      },
+      "email-nonce": {
+        "form": {
+          "description": "Ouvrez votre boîte de réception et entrez le code que nous vous avons envoyé.",
+          "next": "Continuer",
+          "nonce": "Entrez votre code",
+          "validations": {
+            "length": "doit comporter 5 caractères"
+          }
+        }
       },
       "signup": {
         "form": {

@@ -116,16 +116,6 @@
     "versus": "Versus"
   },
   "components": {
-    "enter-nonce": {
-      "form": {
-        "description": "Abra su buzón de correo e introduzca el código que le enviamos.",
-        "next": "Continuar",
-        "nonce": "Introduzca el código",
-        "validations": {
-          "length": "debe tener exactamente 6 letras"
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "Error al cambiar la contraseña. ¿Posiblemente un código de seguridad incorrecto?",
@@ -147,6 +137,16 @@
         "help": "¿Tal vez el código de verificación era incorrecto o expiró? Si el problema persiste, por favor envíenos un correo electrónico a:",
         "success": "¡Su cuenta de usuario ha sido creada!",
         "title": "Crear una cuenta de usuario"
+      },
+      "email-nonce": {
+        "form": {
+          "description": "Abra su buzón de correo e introduzca el código que le enviamos.",
+          "next": "Continuar",
+          "nonce": "Introduzca el código",
+          "validations": {
+            "length": "debe tener exactamente 5 letras"
+          }
+        }
       },
       "signup": {
         "form": {

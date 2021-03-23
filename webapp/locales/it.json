@@ -123,16 +123,6 @@
     "versus": "Verso"
   },
   "components": {
-    "enter-nonce": {
-      "form": {
-        "description": null,
-        "next": null,
-        "nonce": null,
-        "validations": {
-          "length": null
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "Modifica della password non riuscita. Forse il codice di sicurezza non era corretto?",
@@ -154,6 +144,16 @@
         "help": null,
         "success": null,
         "title": null
+      },
+      "email-nonce": {
+        "form": {
+          "description": null,
+          "next": null,
+          "nonce": null,
+          "validations": {
+            "length": null
+          }
+        }
       },
       "signup": {
         "form": {

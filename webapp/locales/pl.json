@@ -83,16 +83,6 @@
     "versus": "werset"
   },
   "components": {
-    "enter-nonce": {
-      "form": {
-        "description": "Otwórz swoją skrzynkę odbiorczą i wpisz kod, który do Ciebie wysłaliśmy.",
-        "next": "Kontynuuj",
-        "nonce": "Wprowadź swój kod",
-        "validations": {
-          "length": "musi mieć długość 6 znaków."
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "Zmiana hasła nie powiodła się. Może kod bezpieczeństwa nie był poprawny?",
@@ -106,6 +96,18 @@
           "submitted": "Na adres <b>{email}</b> została wysłana wiadomość z dalszymi instrukcjami."
         },
         "title": "Zresetuj hasło"
+      }
+    },
+    "registration": {
+      "email-nonce": {
+        "form": {
+          "description": "Otwórz swoją skrzynkę odbiorczą i wpisz kod, który do Ciebie wysłaliśmy.",
+          "next": "Kontynuuj",
+          "nonce": "Wprowadź swój kod",
+          "validations": {
+            "length": "musi mieć długość 5 znaków."
+          }
+        }
       }
     }
   },
