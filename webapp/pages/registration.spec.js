@@ -117,6 +117,8 @@ describe('Registration', () => {
         mocks.$route.query = {}
         wrapper = Wrapper()
         expect(wrapper.find('.hc-empty').exists()).toBe(true)
+        expect(wrapper.find('.enter-invite').exists()).toBe(false)
+        expect(wrapper.find('.enter-email').exists()).toBe(false)
       })
 
       describe('"method=invite-mail" in URI show "RegistrationSlideNonce"', () => {
@@ -133,22 +135,209 @@ describe('Registration', () => {
             expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
           })
 
-          it('"nonce=648bd3" query in URI have nonce in input', async () => {
+          it('"nonce=64835" query in URI have nonce in input', async () => {
             mocks.$route.query = {
               method: 'invite-mail',
               email: 'user@example.org',
-              nonce: '648bd3',
+              nonce: '64835',
             }
             wrapper = Wrapper()
             await Vue.nextTick()
             const form = wrapper.find('.enter-nonce')
-            expect(form.vm.formData.nonce).toEqual('648bd3')
+            expect(form.vm.formData.nonce).toEqual('64835')
           })
+        })
+      })
+
+      describe('"method=invite-code" in URI show "RegistrationSlideNoPublic"', () => {
+        it('no "inviteCode" query in URI', () => {
+          mocks.$route.query = { method: 'invite-code' }
+          wrapper = Wrapper()
+          expect(wrapper.find('.hc-empty').exists()).toBe(true)
+        })
+
+        it('"inviteCode=AAAAAA" query in URI', () => {
+          mocks.$route.query = { method: 'invite-code', inviteCode: 'AAAAAA' }
+          wrapper = Wrapper()
+          expect(wrapper.find('.hc-empty').exists()).toBe(true)
         })
       })
     })
 
-    // Wolle copied from webapp/components/Registration/Signup.spec.js as testing template
+    describe('no "PUBLIC_REGISTRATION" but "INVITE_REGISTRATION"', () => {
+      beforeEach(() => {
+        mocks.$env = {
+          PUBLIC_REGISTRATION: false,
+          INVITE_REGISTRATION: true,
+        }
+      })
+
+      it('no "method" query in URI show "RegistrationSlideInvite"', () => {
+        mocks.$route.query = {}
+        wrapper = Wrapper()
+        expect(wrapper.find('.enter-invite').exists()).toBe(true)
+        expect(wrapper.find('.enter-email').exists()).toBe(false)
+      })
+
+      describe('"method=invite-mail" in URI show "RegistrationSlideNonce"', () => {
+        it('no "inviteCode" query in URI', () => {
+          mocks.$route.query = { method: 'invite-mail' }
+          wrapper = Wrapper()
+          expect(wrapper.find('.enter-nonce').exists()).toBe(true)
+        })
+
+        describe('"email=user%40example.org" query in URI', () => {
+          it('have email displayed', () => {
+            mocks.$route.query = { method: 'invite-mail', email: 'user@example.org' }
+            wrapper = Wrapper()
+            expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
+          })
+
+          it('"nonce=64835" query in URI have nonce in input', async () => {
+            mocks.$route.query = {
+              method: 'invite-mail',
+              email: 'user@example.org',
+              nonce: '64835',
+            }
+            wrapper = Wrapper()
+            await Vue.nextTick()
+            const form = wrapper.find('.enter-nonce')
+            expect(form.vm.formData.nonce).toEqual('64835')
+          })
+        })
+      })
+
+      describe('"method=invite-code" in URI show "RegistrationSlideInvite"', () => {
+        it('no "inviteCode" query in URI', () => {
+          mocks.$route.query = { method: 'invite-code' }
+          wrapper = Wrapper()
+          expect(wrapper.find('.enter-invite').exists()).toBe(true)
+        })
+
+        it('"inviteCode=AAAAAA" query in URI have invite code in input', async () => {
+          mocks.$route.query = { method: 'invite-code', inviteCode: 'AAAAAA' }
+          wrapper = Wrapper()
+          await Vue.nextTick()
+          const form = wrapper.find('.enter-invite')
+          expect(form.vm.formData.inviteCode).toEqual('AAAAAA')
+        })
+      })
+    })
+
+    describe('"PUBLIC_REGISTRATION" but no "INVITE_REGISTRATION"', () => {
+      beforeEach(() => {
+        mocks.$env = {
+          PUBLIC_REGISTRATION: true,
+          INVITE_REGISTRATION: false,
+        }
+      })
+
+      it('no "method" query in URI show "RegistrationSlideEmail"', () => {
+        mocks.$route.query = {}
+        wrapper = Wrapper()
+        expect(wrapper.find('.enter-email').exists()).toBe(true)
+        expect(wrapper.find('.enter-invite').exists()).toBe(false)
+      })
+
+      describe('"method=invite-mail" in URI show "RegistrationSlideNonce"', () => {
+        it('no "inviteCode" query in URI', () => {
+          mocks.$route.query = { method: 'invite-mail' }
+          wrapper = Wrapper()
+          expect(wrapper.find('.enter-nonce').exists()).toBe(true)
+        })
+
+        describe('"email=user%40example.org" query in URI', () => {
+          it('have email displayed', () => {
+            mocks.$route.query = { method: 'invite-mail', email: 'user@example.org' }
+            wrapper = Wrapper()
+            expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
+          })
+
+          it('"nonce=64835" query in URI have nonce in input', async () => {
+            mocks.$route.query = {
+              method: 'invite-mail',
+              email: 'user@example.org',
+              nonce: '64835',
+            }
+            wrapper = Wrapper()
+            await Vue.nextTick()
+            const form = wrapper.find('.enter-nonce')
+            expect(form.vm.formData.nonce).toEqual('64835')
+          })
+        })
+      })
+
+      describe('"method=invite-code" in URI show "RegistrationSlideEmail"', () => {
+        it('no "inviteCode" query in URI', () => {
+          mocks.$route.query = { method: 'invite-code' }
+          wrapper = Wrapper()
+          expect(wrapper.find('.enter-email').exists()).toBe(true)
+          expect(wrapper.find('.enter-invite').exists()).toBe(false)
+        })
+      })
+    })
+
+    describe('"PUBLIC_REGISTRATION" and  "INVITE_REGISTRATION"', () => {
+      beforeEach(() => {
+        mocks.$env = {
+          PUBLIC_REGISTRATION: true,
+          INVITE_REGISTRATION: true,
+        }
+      })
+
+      it('no "method" query in URI show "RegistrationSlideEmail"', () => {
+        mocks.$route.query = {}
+        wrapper = Wrapper()
+        expect(wrapper.find('.enter-email').exists()).toBe(true)
+        expect(wrapper.find('.enter-invite').exists()).toBe(false)
+      })
+
+      describe('"method=invite-mail" in URI show "RegistrationSlideNonce"', () => {
+        it('no "inviteCode" query in URI', () => {
+          mocks.$route.query = { method: 'invite-mail' }
+          wrapper = Wrapper()
+          expect(wrapper.find('.enter-nonce').exists()).toBe(true)
+        })
+
+        describe('"email=user%40example.org" query in URI', () => {
+          it('have email displayed', () => {
+            mocks.$route.query = { method: 'invite-mail', email: 'user@example.org' }
+            wrapper = Wrapper()
+            expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
+          })
+
+          it('"nonce=64835" query in URI have nonce in input', async () => {
+            mocks.$route.query = {
+              method: 'invite-mail',
+              email: 'user@example.org',
+              nonce: '64835',
+            }
+            wrapper = Wrapper()
+            await Vue.nextTick()
+            const form = wrapper.find('.enter-nonce')
+            expect(form.vm.formData.nonce).toEqual('64835')
+          })
+        })
+      })
+
+      describe('"method=invite-code" in URI show "RegistrationSlideInvite"', () => {
+        it('no "inviteCode" query in URI', () => {
+          mocks.$route.query = { method: 'invite-code' }
+          wrapper = Wrapper()
+          expect(wrapper.find('.enter-invite').exists()).toBe(true)
+        })
+
+        it('"inviteCode=AAAAAA" query in URI have invite code in input', async () => {
+          mocks.$route.query = { method: 'invite-code', inviteCode: 'AAAAAA' }
+          wrapper = Wrapper()
+          await Vue.nextTick()
+          const form = wrapper.find('.enter-invite')
+          expect(form.vm.formData.inviteCode).toEqual('AAAAAA')
+        })
+      })
+    })
+
+    // copied from webapp/components/Registration/Signup.spec.js as testing template
     // describe('with invitation code', () => {
     //   let action
     //   beforeEach(() => {
@@ -192,7 +381,7 @@ describe('Registration', () => {
   })
 })
 
-// Wolle templete from deleted webapp/components/Registration/CreateUserAccount.spec.js
+// template from deleted webapp/components/Registration/CreateUserAccount.spec.js
 // import { config, mount } from '@vue/test-utils'
 // import Vue from 'vue'
 // import { VERSION } from '~/constants/terms-and-conditions-version.js'

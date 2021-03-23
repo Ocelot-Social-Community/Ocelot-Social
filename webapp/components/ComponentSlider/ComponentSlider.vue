@@ -47,6 +47,7 @@
           "
           :disabled="!sliderData.sliders[sliderIndex].validated"
           @click="onNextClick"
+          data-test="next-button"
         >
           {{ $t(sliderData.sliders[sliderIndex].button.titleIdent) }}
         </base-button>

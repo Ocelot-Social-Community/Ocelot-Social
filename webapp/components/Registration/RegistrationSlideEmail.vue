@@ -1,5 +1,6 @@
 <template>
   <ds-form
+    class="enter-email"
     v-model="formData"
     :schema="formSchema"
     @input="handleInput"
