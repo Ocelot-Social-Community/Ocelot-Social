@@ -337,11 +337,11 @@
     "no-results": "Keine Beiträge gefunden."
   },
   "invite-codes": {
-    "copy-code": "Einladungscode in die Zwischenablage kopieren",
-    "copy-link": "Einladungslink in die Zwischenablage kopieren",
+    "copy-code": "Code:",
+    "copy-link": "Link:",
     "copy-success": "Einladungscode erfolgreich in die Zwischenablage kopiert",
     "not-available": "Du hast keinen Einladungscode zur Verfügung!",
-    "your-code": "Das ist dein Einladungscode:"
+    "your-code": "Kopiere deinen Einladungscode in die Ablage:"
   },
   "login": {
     "email": "Deine E-Mail",

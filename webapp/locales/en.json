@@ -337,11 +337,11 @@
     "no-results": "No contributions found."
   },
   "invite-codes": {
-    "copy-code": "Copy invite code to clipboard",
-    "copy-link": "Copy invite link to clipboard",
+    "copy-code": "Code:",
+    "copy-link": "Link:",
     "copy-success": "Invite code copied to clipboard",
     "not-available": "You have no valid invite code available!",
-    "your-code": "This is your invite code:"
+    "your-code": "Copy your invite code to the clipboard:"
   },
   "login": {
     "email": "Your E-mail",
