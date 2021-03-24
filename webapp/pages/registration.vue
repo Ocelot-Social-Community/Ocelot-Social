@@ -9,6 +9,7 @@
 import RegistrationSlider from '~/components/Registration/RegistrationSlider'
 
 export default {
+  layout: 'no-header',
   name: 'Registration',
   components: {
     RegistrationSlider,
