@@ -5,11 +5,25 @@
     <ds-heading
       v-if="
         sliderData.sliders[sliderIndex].titleIdent &&
-        $t(sliderData.sliders[sliderIndex].titleIdent).length > 0
+        ((typeof sliderData.sliders[sliderIndex].titleIdent === 'string' &&
+          $t(sliderData.sliders[sliderIndex].titleIdent).length > 0) ||
+          (typeof sliderData.sliders[sliderIndex].titleIdent === 'object' &&
+            $t(
+              sliderData.sliders[sliderIndex].titleIdent.id,
+              sliderData.sliders[sliderIndex].titleIdent.data,
+            ).length > 0))
       "
       size="h3"
     >
-      {{ $t(sliderData.sliders[sliderIndex].titleIdent) }}
+      {{
+        (typeof sliderData.sliders[sliderIndex].titleIdent === 'string' &&
+          $t(sliderData.sliders[sliderIndex].titleIdent)) ||
+        (typeof sliderData.sliders[sliderIndex].titleIdent === 'object' &&
+          $t(
+            sliderData.sliders[sliderIndex].titleIdent.id,
+            sliderData.sliders[sliderIndex].titleIdent.data,
+          ))
+      }}
     </ds-heading>
 
     <slot :name="sliderData.sliders[sliderIndex].name" />

@@ -8,12 +8,6 @@
       </template>
 
       <component-slider :sliderData="sliderData">
-        <template #header>
-          <ds-heading size="h2">
-            {{ $t('components.registration.signup.title', metadata) }}
-          </ds-heading>
-        </template>
-
         <template #no-public-registration>
           <registration-slide-no-public :sliderData="sliderData" />
         </template>
@@ -90,7 +84,7 @@ export default {
       },
       enterInvite: {
         name: 'enter-invite',
-        titleIdent: 'components.registration.invite-code.title',
+        titleIdent: { id: 'components.registration.signup.title', data: metadata },
         validated: false,
         data: { request: null, response: { isValidInviteCode: false } },
         button: {

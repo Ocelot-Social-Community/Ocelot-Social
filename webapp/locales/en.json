@@ -185,8 +185,7 @@
           "validations": {
             "length": "must be 6 characters long"
           }
-        },
-        "title": "Invitation"
+        }
       },
       "no-public-registrstion": {
         "title": "No Public Registration"

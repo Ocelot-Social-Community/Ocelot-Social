@@ -185,8 +185,7 @@
           "validations": {
             "length": "muss genau 6 Buchstaben lang sein"
           }
-        },
-        "title": "Einladung"
+        }
       },
       "no-public-registrstion": {
         "title": "Keine öffentliche Registrierung möglich"
