@@ -338,7 +338,6 @@
   },
   "invite-codes": {
     "copy-code": "Code:",
-    "copy-link": "Link:",
     "copy-success": "Einladungscode erfolgreich in die Zwischenablage kopiert",
     "not-available": "Du hast keinen Einladungscode zur Verfügung!",
     "your-code": "Kopiere deinen Einladungscode in die Ablage:"

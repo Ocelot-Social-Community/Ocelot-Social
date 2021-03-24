@@ -338,7 +338,6 @@
   },
   "invite-codes": {
     "copy-code": "Code:",
-    "copy-link": "Link:",
     "copy-success": "Invite code copied to clipboard",
     "not-available": "You have no valid invite code available!",
     "your-code": "Copy your invite code to the clipboard:"

@@ -6,12 +6,8 @@
     <template #popover>
       <div class="invite-button-menu-popover">
         <div v-if="inviteCode && inviteCode.code">
-          <!-- Wolle <ds-text align="center">{{ $t('invite-codes.your-code') }}</ds-text> -->
-          <!-- <ds-text align="center" bold>Copy to clipboard</ds-text> -->
-          <!-- <p class="description">{{ $t(`invite-codes.your-code`) }}</p> -->
           <p class="description">{{ $t('invite-codes.your-code') }}</p>
           <base-card class="code-card" wideContent>
-            <!-- Wolle <ds-text bold>As code</ds-text> -->
             <base-button
               v-if="canCopy"
               class="invite-code"
@@ -20,17 +16,10 @@
               @click="copyInviteLink"
             >
               <ds-text bold>
-                <!-- Wolle {{ inviteCode.code }} -->
                 {{ $t('invite-codes.copy-code') }}
                 {{ inviteCode.code }}
               </ds-text>
             </base-button>
-            <!-- Wolle <ds-text bold>As link</ds-text> -->
-            <!-- <base-button v-if="canCopy" icon="copy" ghost @click="copyInviteLink">
-              <!-- Wolle {{ $t('invite-codes.copy-link') }} -->
-              <!-- {{ $t('invite-codes.copy-link') }}
-              {{ inviteLink | truncateStr(30) }}
-            </base-button> -->
           </base-card>
         </div>
         <div v-else>
@@ -74,10 +63,6 @@ export default {
     },
   },
   methods: {
-    // Wolle async copyInviteCode() {
-    //   await navigator.clipboard.writeText(this.inviteCode.code)
-    //   this.$toast.success(this.$t('invite-codes.copy-success'))
-    // },
     async copyInviteLink() {
       await navigator.clipboard.writeText(this.inviteLink)
       this.$toast.success(this.$t('invite-codes.copy-success'))
@@ -109,7 +94,6 @@ export default {
 }
 
 .invite-button-menu-popover {
-  // Wolle text-align: center;
   display: flex;
   justify-content: center;
   align-items: center;
