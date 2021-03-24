@@ -123,13 +123,22 @@ export default {
             sliderData: { request: { variables }, response: response.data },
           })
 
-          if (
-            this.sliderData.sliders[this.sliderIndex].data.response &&
-            this.sliderData.sliders[this.sliderIndex].data.response.VerifyNonce
-          ) {
-            this.$toast.success(
-              this.$t('components.registration.email-nonce.form.success', { email, nonce }),
-            )
+          if (this.sliderData.sliders[this.sliderIndex].data.response) {
+            if (this.sliderData.sliders[this.sliderIndex].data.response.VerifyNonce) {
+              this.$toast.success(
+                this.$t('components.registration.email-nonce.form.validations.success', {
+                  email,
+                  nonce,
+                }),
+              )
+            } else {
+              this.$toast.error(
+                this.$t('components.registration.email-nonce.form.validations.error', {
+                  email,
+                  nonce,
+                }),
+              )
+            }
           }
         } catch (err) {
           this.sliderData.setSliderValuesCallback(false, {

@@ -168,9 +168,10 @@
           "description": "Öffne Dein E-Mail Postfach und gib den Code ein, den wir geschickt haben.",
           "next": "Weiter",
           "nonce": "E-Mail-Code: 32143",
-          "success": "Gültiger Bestätigungs-Code <b>{nonce}</b> für E-Mail <b>{email}</b>!",
           "validations": {
-            "length": "muss genau 5 Buchstaben lang sein"
+            "error": "Ungültiger Bestätigungs-Code <b>{nonce}</b> für E-Mail <b>{email}</b>!",
+            "length": "muss genau 5 Buchstaben lang sein",
+            "success": "Gültiger Bestätigungs-Code <b>{nonce}</b> für E-Mail <b>{email}</b>!"
           }
         },
         "title": "E-Mail Bestätigung"
@@ -181,9 +182,10 @@
           "description": "Gib den Einladungs-Code ein, den du bekommen hast.",
           "invite-code": "Einladungs-Code: ACJERB",
           "next": "Weiter",
-          "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!",
           "validations": {
-            "length": "muss genau 6 Buchstaben lang sein"
+            "error": "Ungültiger Einladungs-Code <b>{inviteCode}</b>!",
+            "length": "muss genau 6 Buchstaben lang sein",
+            "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!"
           }
         }
       },

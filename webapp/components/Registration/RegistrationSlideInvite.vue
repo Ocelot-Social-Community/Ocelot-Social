@@ -114,13 +114,20 @@ export default {
             },
           })
 
-          if (
-            this.sliderData.sliders[this.sliderIndex].data.response &&
-            this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode
-          ) {
-            this.$toast.success(
-              this.$t('components.registration.invite-code.form.success', { inviteCode }),
-            )
+          if (this.sliderData.sliders[this.sliderIndex].data.response) {
+            if (this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode) {
+              this.$toast.success(
+                this.$t('components.registration.invite-code.form.validations.success', {
+                  inviteCode,
+                }),
+              )
+            } else {
+              this.$toast.error(
+                this.$t('components.registration.invite-code.form.validations.error', {
+                  inviteCode,
+                }),
+              )
+            }
           }
         } catch (err) {
           this.sliderData.setSliderValuesCallback(false, {

@@ -168,9 +168,10 @@
           "description": "Open your inbox and enter the code that we've sent to you.",
           "next": "Continue",
           "nonce": "E-mail code: 32143",
-          "success": "Valid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!",
           "validations": {
-            "length": "must be 5 characters long"
+            "error": "Invalid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!",
+            "length": "must be 5 characters long",
+            "success": "Valid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!"
           }
         },
         "title": "E-Mail Confirmation"
@@ -181,9 +182,10 @@
           "description": "Enter the invitation code you received.",
           "invite-code": "Invite code: ACJERB",
           "next": "Continue",
-          "success": "Valid invite code <b>{inviteCode}</b>!",
           "validations": {
-            "length": "must be 6 characters long"
+            "error": "Invalid invite code <b>{inviteCode}</b>!",
+            "length": "must be 6 characters long",
+            "success": "Valid invite code <b>{inviteCode}</b>!"
           }
         }
       },
