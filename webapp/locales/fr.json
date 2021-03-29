@@ -98,7 +98,6 @@
     "letsTalk": "Parlons-en",
     "loading": "chargement",
     "loadMore": "charger plus",
-    "moreInfo": "Plus d'infos",
     "name": "Nom",
     "organization": "Organisation ::: Organisations",
     "post": "Message ::: Messages",
@@ -412,14 +411,6 @@
       "pinnedSuccessfully": "Poste épinglé avec succès!",
       "unpin": "Retirer l'épingle du poste",
       "unpinnedSuccessfully": "Épingle retirer du Post avec succès!"
-    },
-    "moreInfo": {
-      "description": "Ici vous pouvez trouver plus d'informations à ce sujet.",
-      "name": "Plus d'infos",
-      "title": "Plus d'information",
-      "titleOfCategoriesSection": "Catégories",
-      "titleOfHashtagsSection": "Hashtags",
-      "titleOfRelatedContributionsSection": "Articles Similaires"
     },
     "name": "Post",
     "pinned": "Annonce",

@@ -102,7 +102,6 @@
     "letsTalk": "Miteinander reden",
     "loading": "wird geladen",
     "loadMore": "mehr laden",
-    "moreInfo": "Mehr Info",
     "name": "Name",
     "organization": "Organisation ::: Organisationen",
     "post": "Beitrag ::: Beiträge",
@@ -463,14 +462,6 @@
       "pinnedSuccessfully": "Beitrag erfolgreich angeheftet!",
       "unpin": "Beitrag loslösen",
       "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!"
-    },
-    "moreInfo": {
-      "description": "Hier findest Du weitere Infos zum Thema.",
-      "name": "Mehr Info",
-      "title": "Mehr Informationen",
-      "titleOfCategoriesSection": "Kategorien",
-      "titleOfHashtagsSection": "Hashtags",
-      "titleOfRelatedContributionsSection": "Verwandte Beiträge"
     },
     "name": "Beitrag",
     "pinned": "Meldung",

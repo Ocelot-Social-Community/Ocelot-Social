@@ -105,7 +105,6 @@
     "letsTalk": "Discutiamo",
     "loading": "Caricamento in corso",
     "loadMore": "Caricare di più",
-    "moreInfo": "Ulteriori informazioni",
     "name": "Nome",
     "organization": "Organizzazione ::: Organizzazioni",
     "post": "Messaggio ::: Messaggi",
@@ -363,14 +362,6 @@
       "pinnedSuccessfully": null,
       "unpin": null,
       "unpinnedSuccessfully": null
-    },
-    "moreInfo": {
-      "description": null,
-      "name": "Ulteriori informazioni",
-      "title": null,
-      "titleOfCategoriesSection": null,
-      "titleOfHashtagsSection": null,
-      "titleOfRelatedContributionsSection": null
     },
     "name": "Messaggio",
     "pinned": null,

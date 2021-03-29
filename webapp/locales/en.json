@@ -102,7 +102,6 @@
     "letsTalk": "Let`s Talk",
     "loading": "loading",
     "loadMore": "load more",
-    "moreInfo": "More Info",
     "name": "Name",
     "organization": "Organization ::: Organizations",
     "post": "Post ::: Posts",
@@ -463,14 +462,6 @@
       "pinnedSuccessfully": "Post pinned successfully!",
       "unpin": "Unpin post",
       "unpinnedSuccessfully": "Post unpinned successfully!"
-    },
-    "moreInfo": {
-      "description": "Here you can find more information about this topic.",
-      "name": "More info",
-      "title": "More information",
-      "titleOfCategoriesSection": "Categories",
-      "titleOfHashtagsSection": "Hashtags",
-      "titleOfRelatedContributionsSection": "Related posts"
     },
     "name": "Post",
     "pinned": "Announcement",

@@ -98,7 +98,6 @@
     "letsTalk": "Hablemos",
     "loading": "cargando",
     "loadMore": "cargar más",
-    "moreInfo": "Más información",
     "name": "Nombre",
     "organization": "Organización ::: Organizaciones",
     "post": "Mensaje ::: Mensajes",
@@ -424,14 +423,6 @@
       "pinnedSuccessfully": "¡Contribución anclado con éxito!",
       "unpin": "Desanclar contribución",
       "unpinnedSuccessfully": "¡Contribución desanclado con éxito!"
-    },
-    "moreInfo": {
-      "description": "Aquí puede encontrar más información sobre este tema.",
-      "name": "Más info",
-      "title": "Más información",
-      "titleOfCategoriesSection": "Categorías",
-      "titleOfHashtagsSection": "Hashtags",
-      "titleOfRelatedContributionsSection": "Contribuciones relacionadas"
     },
     "name": "Contribución",
     "pinned": "Anuncio",
