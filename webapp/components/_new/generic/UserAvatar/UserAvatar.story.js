@@ -57,7 +57,7 @@ storiesOf('UserAvatar', module)
   .add('small', () => ({
     components: { UserAvatar },
     data: () => ({
-      user,
+      user: userWithoutAvatar,
     }),
     template: '<user-avatar :user="user" size="small"/>',
   }))
@@ -71,7 +71,7 @@ storiesOf('UserAvatar', module)
   .add('large', () => ({
     components: { UserAvatar },
     data: () => ({
-      user,
+      user: userWithoutAvatar,
     }),
     template: '<user-avatar :user="user" size="large"/>',
   }))
