@@ -7,14 +7,14 @@
     @input-valid="handleInputValid"
   >
     <ds-input
-      :placeholder="$t('components.enter-invite.form.invite-code')"
+      :placeholder="$t('components.registration.invite-code.form.invite-code')"
       model="inviteCode"
       name="inviteCode"
       id="inviteCode"
       icon="question-circle"
     />
     <ds-text>
-      {{ $t('components.enter-invite.form.description') }}
+      {{ $t('components.registration.invite-code.form.description') }}
     </ds-text>
     <slot></slot>
   </ds-form>
@@ -29,7 +29,7 @@ export const isValidInviteCodeQuery = gql`
   }
 `
 export default {
-  name: 'RegistrationItemEnterInvite',
+  name: 'RegistrationSlideInvite',
   props: {
     sliderData: { type: Object, required: true },
   },
@@ -41,17 +41,19 @@ export default {
       formSchema: {
         inviteCode: {
           type: 'string',
-          // Wolle min: 6,
-          // max: 6,
+          min: 6,
+          max: 6,
           required: true,
-          message: this.$t('components.enter-invite.form.validations.length'),
+          message: this.$t('components.registration.invite-code.form.validations.length'),
         },
       },
+      dbRequestInProgress: false,
     }
   },
   mounted: function () {
     this.$nextTick(function () {
       // Code that will run only after the entire view has been rendered
+
       this.formData.inviteCode = this.sliderData.collectedInputData.inviteCode
         ? this.sliderData.collectedInputData.inviteCode
         : ''
@@ -74,12 +76,14 @@ export default {
     async sendValidation() {
       const { inviteCode } = this.formData
 
+      this.sliderData.setSliderValuesCallback(null, { collectedInputData: { inviteCode } })
+
       let dbValidated = false
       if (this.validInput) {
         await this.handleSubmitVerify()
         dbValidated = this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode
       }
-      this.sliderData.setSliderValuesCallback(dbValidated, { collectedInputData: { inviteCode } })
+      this.sliderData.setSliderValuesCallback(dbValidated)
     },
     async handleInput() {
       this.sendValidation()
@@ -87,45 +91,53 @@ export default {
     async handleInputValid() {
       this.sendValidation()
     },
+    isVariablesRequested(variables) {
+      return (
+        this.sliderData.sliders[this.sliderIndex].data.request &&
+        this.sliderData.sliders[this.sliderIndex].data.request.variables &&
+        this.sliderData.sliders[this.sliderIndex].data.request.variables.code === variables.code
+      )
+    },
     async handleSubmitVerify() {
-      const { inviteCode } = this.formData
+      const { inviteCode } = this.sliderData.collectedInputData
       const variables = { code: inviteCode }
 
-      if (
-        !this.sliderData.sliders[this.sliderIndex].data.request ||
-        (this.sliderData.sliders[this.sliderIndex].data.request &&
-          (!this.sliderData.sliders[this.sliderIndex].data.request.variables ||
-            (this.sliderData.sliders[this.sliderIndex].data.request.variables &&
-              !this.sliderData.sliders[this.sliderIndex].data.request.variables === variables)))
-      ) {
-        this.sliderData.setSliderValuesCallback(
-          this.sliderData.sliders[this.sliderIndex].validated,
-          { sliderData: { request: { variables }, response: null } },
-        )
-
+      if (!this.isVariablesRequested(variables) && !this.dbRequestInProgress) {
         try {
-          const response = await this.$apollo.query({ query: isValidInviteCodeQuery, variables })
-          this.sliderData.setSliderValuesCallback(
-            this.sliderData.sliders[this.sliderIndex].validated,
-            { sliderData: { response: response.data } },
-          )
+          this.dbRequestInProgress = true
 
-          if (
-            this.sliderData.sliders[this.sliderIndex].data.response &&
-            this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode
-          ) {
-            this.$toast.success(
-              this.$t('components.registration.invite-code.form.success', { inviteCode }),
-            )
+          const response = await this.$apollo.query({ query: isValidInviteCodeQuery, variables })
+          this.sliderData.setSliderValuesCallback(null, {
+            sliderData: {
+              request: { variables },
+              response: response.data,
+            },
+          })
+
+          if (this.sliderData.sliders[this.sliderIndex].data.response) {
+            if (this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode) {
+              this.$toast.success(
+                this.$t('components.registration.invite-code.form.validations.success', {
+                  inviteCode,
+                }),
+              )
+            } else {
+              this.$toast.error(
+                this.$t('components.registration.invite-code.form.validations.error', {
+                  inviteCode,
+                }),
+              )
+            }
           }
         } catch (err) {
-          this.sliderData.setSliderValuesCallback(
-            this.sliderData.sliders[this.sliderIndex].validated,
-            { sliderData: { response: { isValidInviteCode: false } } },
-          )
+          this.sliderData.setSliderValuesCallback(false, {
+            sliderData: { response: { isValidInviteCode: false } },
+          })
 
           const { message } = err
           this.$toast.error(message)
+        } finally {
+          this.dbRequestInProgress = false
         }
       }
     },

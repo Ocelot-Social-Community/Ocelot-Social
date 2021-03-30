@@ -120,26 +120,6 @@
     "versus": "Versus"
   },
   "components": {
-    "enter-invite": {
-      "form": {
-        "description": "Enter the invitation code you received.",
-        "invite-code": "Enter your invite code",
-        "next": "Continue",
-        "validations": {
-          "length": "must be 6 characters long"
-        }
-      }
-    },
-    "enter-nonce": {
-      "form": {
-        "description": "Open your inbox and enter the code that we've sent to you.",
-        "next": "Continue",
-        "nonce": "Enter your code",
-        "validations": {
-          "length": "must be 6 characters long"
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "Changing your password failed. Maybe the security code was not correct?",
@@ -157,33 +137,68 @@
     },
     "registration": {
       "create-user-account": {
+        "buttonTitle": "Create",
         "error": "No user account could be created!",
         "help": " Maybe the confirmation was invalid? In case of problems, feel free to ask for help by sending us a mail to:",
+        "recieveCommunicationAsEmailsEtcConfirmed": "I also agree to receive e-mails and other forms of communication (e.g. push notifications).",
         "success": "Your account has been created!",
+        "termsAndCondsEtcConfirmed": "I have read, understand and agree to the following:",
         "title": "Create user account"
       },
       "email": {
+        "buttonTitle": {
+          "resend": "Resend e-mail",
+          "send": "Send e-mail",
+          "skipResend": "Skip resend"
+        },
         "form": {
+          "sendEmailAgain": "Send e-mail again",
           "success": "Verification e-mail send to <b>{email}</b>!"
-        }
+        },
+        "title": "E-Mail"
+      },
+      "email-display": {
+        "warningFormat": "⚠️ E-mail has wrong format!",
+        "warningUndef": "⚠️ No e-mail defined!",
+        "yourEmail": "Your e-mail address:"
+      },
+      "email-nonce": {
+        "buttonTitle": "Confirm",
+        "form": {
+          "description": "Open your inbox and enter the code that we've sent to you.",
+          "next": "Continue",
+          "nonce": "E-mail code: 32143",
+          "validations": {
+            "error": "Invalid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!",
+            "length": "must be 5 characters long",
+            "success": "Valid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!"
+          }
+        },
+        "title": "E-Mail Confirmation"
       },
       "invite-code": {
+        "buttonTitle": "Next",
         "form": {
-          "success": "Valid invite code <b>{inviteCode}</b>!"
+          "description": "Enter the invitation code you received.",
+          "invite-code": "Invite code: ACJERB",
+          "next": "Continue",
+          "validations": {
+            "error": "Invalid invite code <b>{inviteCode}</b>!",
+            "length": "must be 6 characters long",
+            "success": "Valid invite code <b>{inviteCode}</b>!"
+          }
         }
+      },
+      "no-public-registrstion": {
+        "title": "No Public Registration"
       },
       "signup": {
         "form": {
           "data-privacy": "I have read and understood the privacy statement.",
           "description": "To get started, you can register here for free:",
           "errors": {
-            "email-exists": "There is already a user account with this e-mail address!",
-            "invalid-invitation-token": "It looks like as if the invitation has been used already. Invitation links can only be used once."
+            "email-exists": "There is already a user account with this e-mail address!"
           },
-          "invitation-code": "Your invitation code is: <b>{code}</b>",
-          "minimum-age": "I'm 18 years or older.",
-          "no-commercial": "I have no commercial interests and I am not representing a company or any other commercial organisation on the network.",
-          "no-political": "I am not on behalf of a party or political organization in the network.",
           "submit": "Create an account",
           "success": "A mail with a link to complete your registration has been sent to <b>{email}</b>",
           "terms-and-condition": "I confirm to the  <a href=\"/terms-and-conditions\" target=\"_blank\"><ds-text bold color=\"primary\">Terms and conditions</ds-text></a>."
@@ -335,6 +350,12 @@
   "index": {
     "change-filter-settings": "Change your filter settings to get more results.",
     "no-results": "No contributions found."
+  },
+  "invite-codes": {
+    "copy-code": "Code:",
+    "copy-success": "Invite code copied to clipboard",
+    "not-available": "You have no valid invite code available!",
+    "your-code": "Copy your invite code to the clipboard:"
   },
   "login": {
     "email": "Your E-mail",
@@ -780,9 +801,7 @@
     }
   },
   "termsAndConditions": {
-    "agree": "I agree!",
     "newTermsAndConditions": "New Terms and Conditions",
-    "termsAndConditionsConfirmed": "I have read and confirmed the terms and conditions.",
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
   },

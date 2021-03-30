@@ -15,9 +15,11 @@ const defaultParams = {
 
 export const signupTemplate = ({ email, nonce }) => {
   const subject = `Willkommen, Bienvenue, Welcome to ${CONFIG.APPLICATION_NAME}!`
-  const actionUrl = new URL('/registration/create-user-account', CONFIG.CLIENT_URI)
-  actionUrl.searchParams.set('nonce', nonce)
+  // dev format example: http://localhost:3000/registration?method=invite-mail&email=wolle.huss%40pjannto.com&nonce=64853
+  const actionUrl = new URL('/registration', CONFIG.CLIENT_URI)
+  actionUrl.searchParams.set('method', 'invite-mail')
   actionUrl.searchParams.set('email', email)
+  actionUrl.searchParams.set('nonce', nonce)
 
   return {
     from,
@@ -34,8 +36,8 @@ export const signupTemplate = ({ email, nonce }) => {
 export const emailVerificationTemplate = ({ email, nonce, name }) => {
   const subject = 'Neue E-Mail Adresse | New E-Mail Address'
   const actionUrl = new URL('/settings/my-email-address/verify', CONFIG.CLIENT_URI)
-  actionUrl.searchParams.set('nonce', nonce)
   actionUrl.searchParams.set('email', email)
+  actionUrl.searchParams.set('nonce', nonce)
 
   return {
     from,
