@@ -71,6 +71,5 @@ export default {
     AddEmailAddress: sendEmailVerificationMail,
     requestPasswordReset: sendPasswordResetMail,
     Signup: sendSignupMail,
-    SignupByInvitation: sendSignupMail,
   },
 }

@@ -23,17 +23,10 @@
     </ds-space>
   </div>
   <div v-else class="create-account-card">
-    <!-- Wolle <ds-space margin-top="large">
-      <ds-heading size="h3">
-        {{ $t('components.registration.create-user-account.title') }}
-      </ds-heading>
-    </ds-space> -->
-
     <ds-form
       class="create-user-account"
       v-model="formData"
       :schema="formSchema"
-      @submit="submit"
       @input="handleInput"
       @input-valid="handleInputValid"
     >
@@ -46,14 +39,6 @@
           icon="user"
           :label="$t('settings.data.labelName')"
           :placeholder="$t('settings.data.namePlaceholder')"
-        />
-        <ds-input
-          id="about"
-          model="about"
-          type="textarea"
-          rows="3"
-          :label="$t('settings.data.labelBio')"
-          :placeholder="$t('settings.data.labelBio')"
         />
         <ds-input
           id="password"
@@ -71,11 +56,7 @@
         />
         <password-strength class="password-strength" :password="formData.password" />
 
-        <ds-text>
-          <!-- Wolle {{ $t('components.enter-nonce.form.description') }} -->
-          Your e-mail address:
-          <b>{{ this.sliderData.collectedInputData.email }}</b>
-        </ds-text>
+        <email-display-and-verify :email="sliderData.collectedInputData.email" />
 
         <ds-text>
           <input
@@ -85,41 +66,31 @@
             :checked="termsAndConditionsConfirmed"
           />
           <label for="checkbox0">
-            {{ $t('termsAndConditions.termsAndConditionsConfirmed') }}
+            {{ $t('components.registration.create-user-account.termsAndCondsEtcConfirmed') }}
             <br />
-            <nuxt-link to="/terms-and-conditions">{{ $t('site.termsAndConditions') }}</nuxt-link>
-          </label>
-        </ds-text>
-        <ds-text>
-          <input id="checkbox1" type="checkbox" v-model="dataPrivacy" :checked="dataPrivacy" />
-          <label for="checkbox1">
-            {{ $t('components.registration.signup.form.data-privacy') }}
+            <a :href="'/terms-and-conditions'" target="_blank">
+              {{ $t('site.termsAndConditions') }}
+            </a>
             <br />
-            <nuxt-link to="/data-privacy">
+            <a :href="'/data-privacy'" target="_blank">
               {{ $t('site.data-privacy') }}
-            </nuxt-link>
+            </a>
           </label>
         </ds-text>
         <ds-text>
-          <input id="checkbox2" type="checkbox" v-model="minimumAge" :checked="minimumAge" />
-          <label
-            for="checkbox2"
-            v-html="$t('components.registration.signup.form.minimum-age')"
-          ></label>
-        </ds-text>
-        <ds-text>
-          <input id="checkbox3" type="checkbox" v-model="noCommercial" :checked="noCommercial" />
-          <label
-            for="checkbox3"
-            v-html="$t('components.registration.signup.form.no-commercial')"
-          ></label>
-        </ds-text>
-        <ds-text>
-          <input id="checkbox4" type="checkbox" v-model="noPolitical" :checked="noPolitical" />
-          <label
-            for="checkbox4"
-            v-html="$t('components.registration.signup.form.no-political')"
-          ></label>
+          <input
+            id="checkbox1"
+            type="checkbox"
+            v-model="recieveCommunicationAsEmailsEtcConfirmed"
+            :checked="recieveCommunicationAsEmailsEtcConfirmed"
+          />
+          <label for="checkbox1">
+            {{
+              $t(
+                'components.registration.create-user-account.recieveCommunicationAsEmailsEtcConfirmed',
+              )
+            }}
+          </label>
         </ds-text>
       </template>
     </ds-form>
@@ -130,15 +101,17 @@
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import links from '~/constants/links'
 import emails from '~/constants/emails'
-import PasswordStrength from '../Password/Strength'
+import PasswordStrength from '~/components/Password/Strength'
+import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
 import { SignupVerificationMutation } from '~/graphql/Registration.js'
 
 export default {
-  name: 'RegistrationItemCreateUserAccount',
+  name: 'RegistrationSlideCreate',
   components: {
     PasswordStrength,
+    EmailDisplayAndVerify,
     SweetalertIcon,
   },
   props: {
@@ -151,7 +124,6 @@ export default {
       supportEmail: emails.SUPPORT,
       formData: {
         name: '',
-        about: '',
         ...passwordForm.formData,
       },
       formSchema: {
@@ -160,31 +132,22 @@ export default {
           required: true,
           min: 3,
         },
-        about: {
-          type: 'string',
-          required: false,
-        },
         ...passwordForm.formSchema,
       },
-      response: null, // Wolle
+      response: null,
       // TODO: Our styleguide does not support checkmarks.
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
       // have checkmarks available.
       termsAndConditionsConfirmed: false,
-      dataPrivacy: false,
-      minimumAge: false,
-      noCommercial: false,
-      noPolitical: false,
+      recieveCommunicationAsEmailsEtcConfirmed: false,
     }
   },
   mounted: function () {
     this.$nextTick(function () {
       // Code that will run only after the entire view has been rendered
+
       this.formData.name = this.sliderData.collectedInputData.name
         ? this.sliderData.collectedInputData.name
-        : ''
-      this.formData.about = this.sliderData.collectedInputData.about
-        ? this.sliderData.collectedInputData.about
         : ''
       this.formData.password = this.sliderData.collectedInputData.password
         ? this.sliderData.collectedInputData.password
@@ -196,17 +159,9 @@ export default {
         .termsAndConditionsConfirmed
         ? this.sliderData.collectedInputData.termsAndConditionsConfirmed
         : false
-      this.dataPrivacy = this.sliderData.collectedInputData.dataPrivacy
-        ? this.sliderData.collectedInputData.dataPrivacy
-        : false
-      this.minimumAge = this.sliderData.collectedInputData.minimumAge
-        ? this.sliderData.collectedInputData.minimumAge
-        : false
-      this.noCommercial = this.sliderData.collectedInputData.noCommercial
-        ? this.sliderData.collectedInputData.noCommercial
-        : false
-      this.noPolitical = this.sliderData.collectedInputData.noPolitical
-        ? this.sliderData.collectedInputData.noPolitical
+      this.recieveCommunicationAsEmailsEtcConfirmed = this.sliderData.collectedInputData
+        .recieveCommunicationAsEmailsEtcConfirmed
+        ? this.sliderData.collectedInputData.recieveCommunicationAsEmailsEtcConfirmed
         : false
       this.sendValidation()
 
@@ -222,10 +177,7 @@ export default {
         this.formData.password.length >= 1 &&
         this.formData.password === this.formData.passwordConfirmation &&
         this.termsAndConditionsConfirmed &&
-        this.dataPrivacy &&
-        this.minimumAge &&
-        this.noCommercial &&
-        this.noPolitical
+        this.recieveCommunicationAsEmailsEtcConfirmed
       )
     },
   },
@@ -233,41 +185,22 @@ export default {
     termsAndConditionsConfirmed() {
       this.sendValidation()
     },
-    dataPrivacy() {
-      this.sendValidation()
-    },
-    minimumAge() {
-      this.sendValidation()
-    },
-    noCommercial() {
-      this.sendValidation()
-    },
-    noPolitical() {
+    recieveCommunicationAsEmailsEtcConfirmed() {
       this.sendValidation()
     },
   },
   methods: {
     sendValidation() {
-      const { name, about, password, passwordConfirmation } = this.formData
-      const {
-        termsAndConditionsConfirmed,
-        dataPrivacy,
-        minimumAge,
-        noCommercial,
-        noPolitical,
-      } = this
+      const { name, password, passwordConfirmation } = this.formData
+      const { termsAndConditionsConfirmed, recieveCommunicationAsEmailsEtcConfirmed } = this
 
       this.sliderData.setSliderValuesCallback(this.validInput, {
         collectedInputData: {
           name,
-          about,
           password,
           passwordConfirmation,
           termsAndConditionsConfirmed,
-          dataPrivacy,
-          minimumAge,
-          noCommercial,
-          noPolitical,
+          recieveCommunicationAsEmailsEtcConfirmed,
         },
       })
     },
@@ -278,31 +211,39 @@ export default {
       this.sendValidation()
     },
     async submit() {
-      const { name, password, about } = this.formData
-      const { email, nonce } = this.sliderData.collectedInputData
+      const { name, password } = this.formData
+      const { email, inviteCode = null, nonce } = this.sliderData.collectedInputData
       const termsAndConditionsAgreedVersion = VERSION
       const locale = this.$i18n.locale()
       try {
+        this.sliderData.setSliderValuesCallback(null, {
+          sliderSettings: { buttonLoading: true },
+        })
         await this.$apollo.mutate({
           mutation: SignupVerificationMutation,
           variables: {
             name,
             password,
-            about,
             email,
+            inviteCode,
             nonce,
             termsAndConditionsAgreedVersion,
             locale,
           },
         })
         this.response = 'success'
-        // Wolle setTimeout(() => {
-        //   this.$emit('userCreated', {
-        //     email,
-        //     password,
-        //   })
-        // }, 3000)
+        setTimeout(async () => {
+          await this.$store.dispatch('auth/login', { email, password })
+          this.$toast.success(this.$t('login.success'))
+          this.$router.push('/')
+          this.sliderData.setSliderValuesCallback(null, {
+            sliderSettings: { buttonLoading: false },
+          })
+        }, 3000)
       } catch (err) {
+        this.sliderData.setSliderValuesCallback(null, {
+          sliderSettings: { buttonLoading: false },
+        })
         this.response = 'error'
       }
     },

@@ -120,26 +120,6 @@
     "versus": "Versus"
   },
   "components": {
-    "enter-invite": {
-      "form": {
-        "description": "Gib den Einladungs-Code ein, den du bekommen hast.",
-        "invite-code": "Einladungs-Code eingeben",
-        "next": "Weiter",
-        "validations": {
-          "length": "muss genau 6 Buchstaben lang sein"
-        }
-      }
-    },
-    "enter-nonce": {
-      "form": {
-        "description": "Öffne Dein E-Mail Postfach und gib den Code ein, den wir geschickt haben.",
-        "next": "Weiter",
-        "nonce": "Code eingeben",
-        "validations": {
-          "length": "muss genau 6 Buchstaben lang sein"
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "Passwort Änderung fehlgeschlagen. Möglicherweise falscher Sicherheitscode?",
@@ -157,33 +137,68 @@
     },
     "registration": {
       "create-user-account": {
+        "buttonTitle": "Erstellen",
         "error": "Es konnte kein Benutzerkonto erstellt werden!",
         "help": "Vielleicht war der Bestätigungscode falsch oder abgelaufen? Wenn das Problem weiterhin besteht, schicke uns gerne eine E-Mail an:",
+        "recieveCommunicationAsEmailsEtcConfirmed": "Ich stimme auch dem Erhalt von E-Mails und anderen Formen der Kommunikation (z.B. Push-Benachrichtigungen) zu.",
         "success": "Dein Benutzerkonto wurde erstellt!",
+        "termsAndCondsEtcConfirmed": "Ich habe folgendes gelesen, verstanden und stimme zu:",
         "title": "Benutzerkonto anlegen"
       },
       "email": {
+        "buttonTitle": {
+          "resend": "Erneut senden",
+          "send": "Sende E-Mail",
+          "skipResend": "Nicht senden"
+        },
         "form": {
+          "sendEmailAgain": "E-Mail erneut senden",
           "success": "Verifikations-E-Mail gesendet an <b>{email}</b>!"
-        }
+        },
+        "title": "E-Mail"
+      },
+      "email-display": {
+        "warningFormat": "⚠️ E-Mail hat ein ungültiges Format!",
+        "warningUndef": "⚠️ Keine E-Mail definiert!",
+        "yourEmail": "Deine E-Mail-Adresse:"
+      },
+      "email-nonce": {
+        "buttonTitle": "Bestätigen",
+        "form": {
+          "description": "Öffne Dein E-Mail Postfach und gib den Code ein, den wir geschickt haben.",
+          "next": "Weiter",
+          "nonce": "E-Mail-Code: 32143",
+          "validations": {
+            "error": "Ungültiger Bestätigungs-Code <b>{nonce}</b> für E-Mail <b>{email}</b>!",
+            "length": "muss genau 5 Buchstaben lang sein",
+            "success": "Gültiger Bestätigungs-Code <b>{nonce}</b> für E-Mail <b>{email}</b>!"
+          }
+        },
+        "title": "E-Mail Bestätigung"
       },
       "invite-code": {
+        "buttonTitle": "Weiter",
         "form": {
-          "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!"
+          "description": "Gib den Einladungs-Code ein, den du bekommen hast.",
+          "invite-code": "Einladungs-Code: ACJERB",
+          "next": "Weiter",
+          "validations": {
+            "error": "Ungültiger Einladungs-Code <b>{inviteCode}</b>!",
+            "length": "muss genau 6 Buchstaben lang sein",
+            "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!"
+          }
         }
+      },
+      "no-public-registrstion": {
+        "title": "Keine öffentliche Registrierung möglich"
       },
       "signup": {
         "form": {
           "data-privacy": "Ich habe die Datenschutzerklärung gelesen und verstanden.",
           "description": "Um loszulegen, kannst Du Dich hier kostenfrei registrieren:",
           "errors": {
-            "email-exists": "Es gibt schon ein Benutzerkonto mit dieser E-Mail-Adresse!",
-            "invalid-invitation-token": "Es sieht so aus, als ob der Einladungscode schon eingelöst wurde. Jeder Code kann nur einmalig benutzt werden."
+            "email-exists": "Es gibt schon ein Benutzerkonto mit dieser E-Mail-Adresse!"
           },
-          "invitation-code": "Dein Einladungscode lautet: <b>{code}</b>",
-          "minimum-age": "Ich bin 18 Jahre oder älter.",
-          "no-commercial": "Ich habe keine kommerziellen Absichten und ich repräsentiere kein kommerzielles Unternehmen oder Organisation.",
-          "no-political": "Ich bin nicht im Auftrag einer Partei oder politischen Organisation im Netzwerk.",
           "submit": "Konto erstellen",
           "success": "Eine E-Mail mit einem Link zum Abschließen Deiner Registrierung wurde an <b>{email}</b> geschickt",
           "terms-and-condition": "Ich stimme den <a href=\"/terms-and-conditions\" target=\"_blank\"><ds-text bold color=\"primary\">Nutzungsbedingungen</ds-text></a> zu."
@@ -786,9 +801,7 @@
     }
   },
   "termsAndConditions": {
-    "agree": "Ich stimme zu!",
     "newTermsAndConditions": "Neue Nutzungsbedingungen",
-    "termsAndConditionsConfirmed": "Ich habe die Nutzungsbedingungen durchgelesen und stimme ihnen zu.",
     "termsAndConditionsNewConfirm": "Ich habe die neuen Nutzungsbedingungen durchgelesen und stimme zu.",
     "termsAndConditionsNewConfirmText": "Bitte lies Dir die neuen Nutzungsbedingungen jetzt durch!"
   },
