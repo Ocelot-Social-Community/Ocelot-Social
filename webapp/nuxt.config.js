@@ -27,7 +27,7 @@ export default {
   },
 
   env: {
-    release: CONFIG.VERSION,
+    ...CONFIG,
     // pages which do NOT require a login
     publicPages: [
       'login',

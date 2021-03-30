@@ -336,6 +336,12 @@
     "change-filter-settings": "Verändere die Filter-Einstellungen, um mehr Ergebnisse zu erhalten.",
     "no-results": "Keine Beiträge gefunden."
   },
+  "invite-codes": {
+    "copy-code": "Code:",
+    "copy-success": "Einladungscode erfolgreich in die Zwischenablage kopiert",
+    "not-available": "Du hast keinen Einladungscode zur Verfügung!",
+    "your-code": "Kopiere deinen Einladungscode in die Ablage:"
+  },
   "login": {
     "email": "Deine E-Mail",
     "failure": "Fehlerhafte E-Mail-Adresse oder Passwort.",

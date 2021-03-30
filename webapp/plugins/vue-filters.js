@@ -33,6 +33,18 @@ export default ({ app = {} }) => {
       }
       return trunc(value, length).html
     },
+    truncateStr: (value = '', length = -1) => {
+      if (!value || typeof value !== 'string' || value.length <= 0) {
+        return ''
+      }
+      if (length <= 0) {
+        return value
+      }
+      if (length < value.length) {
+        return value.substring(0, length) + '…'
+      }
+      return value
+    },
     list: (value, glue = ', ', truncate = 0) => {
       if (!Array.isArray(value) || !value.length) {
         return ''

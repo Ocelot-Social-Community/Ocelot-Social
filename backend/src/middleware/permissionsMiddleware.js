@@ -87,7 +87,7 @@ const noEmailFilter = rule({
   return !('email' in args)
 })
 
-const publicRegistration = rule()(() => !!CONFIG.PUBLIC_REGISTRATION)
+const publicRegistration = rule()(() => CONFIG.PUBLIC_REGISTRATION)
 
 // Permissions
 export default shield(
@@ -123,6 +123,7 @@ export default shield(
       isValidInviteCode: allow,
       queryLocations: isAuthenticated,
       availableRoles: isAdmin,
+      getInviteCode: isAuthenticated, // and inviteRegistration
     },
     Mutation: {
       '*': deny,

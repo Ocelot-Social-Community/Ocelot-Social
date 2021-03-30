@@ -336,6 +336,12 @@
     "change-filter-settings": "Change your filter settings to get more results.",
     "no-results": "No contributions found."
   },
+  "invite-codes": {
+    "copy-code": "Code:",
+    "copy-success": "Invite code copied to clipboard",
+    "not-available": "You have no valid invite code available!",
+    "your-code": "Copy your invite code to the clipboard:"
+  },
   "login": {
     "email": "Your E-mail",
     "failure": "Incorrect email address or password.",
