@@ -52,7 +52,15 @@ export default {
     target: 'Badge',
     direction: 'in',
   },
-  invitedBy: { type: 'relationship', relationship: 'INVITED', target: 'User', direction: 'in' },
+  invitedBy: {
+    type: 'relationship',
+    relationship: 'INVITED',
+    target: 'User',
+    direction: 'in',
+    properties: {
+      createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
+    },
+  },
   lastActiveAt: { type: 'string', isoDate: true },
   createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
   updatedAt: {
@@ -111,6 +119,9 @@ export default {
     relationship: 'REDEEMED',
     target: 'InviteCode',
     direction: 'out',
+    properties: {
+      createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
+    },
   },
   termsAndConditionsAgreedVersion: {
     type: 'string',

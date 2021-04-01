@@ -66,16 +66,23 @@ export default {
 const signupCypher = (inviteCode) => {
   let optionalMatch = ''
   let optionalMerge = ''
+  let optionalSet = ''
   if (inviteCode) {
     optionalMatch = `
       OPTIONAL MATCH
       (inviteCode:InviteCode {code: $inviteCode})<-[:GENERATED]-(host:User)
       `
     optionalMerge = `
-      MERGE(user)-[:REDEEMED]->(inviteCode)
-      MERGE(host)-[:INVITED]->(user)
-      MERGE(user)-[:FOLLOWS]->(host)
-      MERGE(host)-[:FOLLOWS]->(user)
+      MERGE(user)-[redeemed:REDEEMED]->(inviteCode)
+      MERGE(host)-[invited:INVITED]->(user)
+      MERGE(user)-[uFollowsH:FOLLOWS]->(host)
+      MERGE(host)-[hFollowsU:FOLLOWS]->(user)
+      `
+    optionalSet = `
+      SET redeemed.createdAt = user.createdAt
+      SET invited.createdAt = user.createdAt
+      SET uFollowsH.createdAt = user.createdAt
+      SET hFollowsU.createdAt = user.createdAt
       `
   }
   const cypher = `
@@ -90,10 +97,11 @@ const signupCypher = (inviteCode) => {
       SET user.id = randomUUID()
       SET user.role = 'user'
       SET user.createdAt = toString(datetime())
-      SET user.updatedAt = toString(datetime())
+      SET user.updatedAt = user.createdAt
       SET user.allowEmbedIframes = FALSE
       SET user.showShoutsPublicly = FALSE
-      SET email.verifiedAt = toString(datetime())
+      SET email.verifiedAt = user.createdAt
+      ${optionalSet}
       RETURN user {.*}
     `
   return cypher

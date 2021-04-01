@@ -13,5 +13,8 @@ export default {
     relationship: 'REDEEMED',
     target: 'User',
     direction: 'in',
+    properties: {
+      createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
+    },
   },
 }
