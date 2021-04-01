@@ -35,6 +35,7 @@ const required = {
 const server = {
   CLIENT_URI: env.CLIENT_URI || 'http://localhost:3000',
   GRAPHQL_URI: env.GRAPHQL_URI || 'http://localhost:4000',
+  JWT_EXPIRES: env.JWT_EXPIRES || '2y',
 }
 
 const smtp = {
