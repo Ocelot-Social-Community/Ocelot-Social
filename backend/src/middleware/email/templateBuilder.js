@@ -13,14 +13,19 @@ const defaultParams = {
   welcomeImageUrl,
 }
 
-export const signupTemplate = ({ email, nonce }) => {
+export const signupTemplate = ({ email, nonce, inviteCode = null }) => {
   const subject = `Willkommen, Bienvenue, Welcome to ${CONFIG.APPLICATION_NAME}!`
   // dev format example: http://localhost:3000/registration?method=invite-mail&email=wolle.huss%40pjannto.com&nonce=64853
   const actionUrl = new URL('/registration', CONFIG.CLIENT_URI)
-  actionUrl.searchParams.set('method', 'invite-mail')
   actionUrl.searchParams.set('email', email)
   actionUrl.searchParams.set('nonce', nonce)
-
+  if (inviteCode) {
+    actionUrl.searchParams.set('inviteCode', inviteCode)
+    actionUrl.searchParams.set('method', 'invite-code')
+  } else {
+    actionUrl.searchParams.set('method', 'invite-mail')
+  }
+  
   return {
     from,
     to: email,
