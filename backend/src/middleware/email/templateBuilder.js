@@ -25,7 +25,7 @@ export const signupTemplate = ({ email, nonce, inviteCode = null }) => {
   } else {
     actionUrl.searchParams.set('method', 'invite-mail')
   }
-  
+
   return {
     from,
     to: email,
