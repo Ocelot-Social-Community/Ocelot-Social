@@ -10,6 +10,8 @@ services:
       target: test
     environment:
       - NODE_ENV="test"
+    env_file:
+      - ./webapp/.env
 
   ########################################################
   # BACKEND ##############################################
@@ -20,6 +22,8 @@ services:
       target: test
     environment:
       - NODE_ENV="test"
+    env_file:
+      - ./backend/.env
 
   ########################################################
   # NEO4J ################################################
