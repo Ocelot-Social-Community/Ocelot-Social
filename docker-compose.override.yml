@@ -12,8 +12,6 @@ services:
       - NODE_ENV="development"
       # - DEBUG=true
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
-    env_file:
-      - ./webapp/.env
     volumes:
       # This makes sure the docker container has its own node modules.
       # Therefore it is possible to have a different node version on the host machine
@@ -31,8 +29,6 @@ services:
     environment:
       - NODE_ENV="development"
       - DEBUG=true
-    env_file:
-      - ./backend/.env
     volumes:
       # This makes sure the docker container has its own node modules.
       # Therefore it is possible to have a different node version on the host machine

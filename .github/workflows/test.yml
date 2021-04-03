@@ -229,7 +229,7 @@ jobs:
       - name: Load Docker Image
         run: docker load < /tmp/webapp.tar
       ##########################################################################
-      # UNIT TESTS WEBAPP #####################################################
+      # UNIT TESTS WEBAPP ######################################################
       ##########################################################################
       - name: backend | copy env files webapp
         run: cp webapp/.env.template webapp/.env
