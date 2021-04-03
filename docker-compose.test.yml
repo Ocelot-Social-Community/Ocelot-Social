@@ -20,6 +20,9 @@ services:
       target: test
     environment:
       - NODE_ENV="test"
+      - JWT_SECRET="b/&&7b78BF&fv/Vd"
+      - MAPBOX_TOKEN="pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g"
+      - PRIVATE_KEY_PASSPHRASE="a7dsf78sadg87ad87sfagsadg78"
 
   ########################################################
   # NEO4J ################################################
