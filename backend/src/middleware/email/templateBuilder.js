@@ -13,13 +13,15 @@ const defaultParams = {
   welcomeImageUrl,
 }
 
-export const signupTemplate = ({ email, nonce }) => {
+export const signupTemplate = ({ email, nonce, inviteCode = null }) => {
   const subject = `Willkommen, Bienvenue, Welcome to ${CONFIG.APPLICATION_NAME}!`
   // dev format example: http://localhost:3000/registration?method=invite-mail&email=wolle.huss%40pjannto.com&nonce=64853
   const actionUrl = new URL('/registration', CONFIG.CLIENT_URI)
   actionUrl.searchParams.set('method', 'invite-mail')
   actionUrl.searchParams.set('email', email)
   actionUrl.searchParams.set('nonce', nonce)
+
+  const content = inviteCode ? templates.signupInviteCode : templates.signup
 
   return {
     from,
@@ -28,7 +30,7 @@ export const signupTemplate = ({ email, nonce }) => {
     html: mustache.render(
       templates.layout,
       { ...defaultParams, actionUrl, nonce, subject },
-      { content: templates.signup },
+      { content: content },
     ),
   }
 }
