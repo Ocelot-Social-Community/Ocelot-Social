@@ -194,7 +194,6 @@ jobs:
       ##########################################################################
       # UNIT TESTS BACKEND #####################################################
       ##########################################################################
-      # TODO: Why do we need those .envs?
       - name: backend | copy env files webapp
         run: cp webapp/.env.template webapp/.env
       - name: backend | copy env files backend
@@ -230,9 +229,8 @@ jobs:
       - name: Load Docker Image
         run: docker load < /tmp/webapp.tar
       ##########################################################################
-      # UNIT TESTS WEBAPP #####################################################
+      # UNIT TESTS WEBAPP ######################################################
       ##########################################################################
-      # TODO: Why do we need those .envs?
       - name: backend | copy env files webapp
         run: cp webapp/.env.template webapp/.env
       - name: backend | copy env files backend
@@ -240,5 +238,4 @@ jobs:
       - name: backend | docker-compose
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
       - name: webapp | Unit tests
-        #run: docker run --rm ocelotsocialnetwork/webapp:build yarn run test
         run: docker-compose exec -T webapp yarn test

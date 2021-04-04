@@ -7,9 +7,8 @@ if (require.resolve) {
   try {
     dotenv.config({ path: require.resolve('../../.env') })
   } catch (error) {
-    if (error.code === 'MODULE_NOT_FOUND') {
-      console.log('WARN: No `.env` file found in `/app` (docker) or `/backend` (no docker)') // eslint-disable-line no-console
-    } else {
+    // This error is thrown when the .env is not found
+    if (error.code !== 'MODULE_NOT_FOUND') {
       throw error
     }
   }
