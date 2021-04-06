@@ -1,6 +1,7 @@
 <template>
   <registration-slider
-    :registrationType="registrationType"
+    :registrationType="registrationType.method"
+    :activePage="registrationType.activePage"
     :overwriteSliderData="overwriteSliderData"
   />
 </template>
@@ -39,18 +40,31 @@ export default {
     registrationType() {
       if (!this.method) {
         return (
-          (this.publicRegistration && 'public-registration') ||
-          (this.inviteRegistration && 'invite-code') ||
-          'no-public-registration'
+          (this.publicRegistration && { method: 'public-registration', activePage: null }) ||
+          (this.inviteRegistration && { method: 'invite-code', activePage: null }) || {
+            method: 'no-public-registration',
+            activePage: null,
+          }
         )
       } else {
         if (
           this.method === 'invite-mail' ||
           (this.method === 'invite-code' && this.inviteRegistration)
         ) {
-          return this.method
+          if (
+            this.method === 'invite-code' &&
+            this.overwriteSliderData.collectedInputData.inviteCode &&
+            this.overwriteSliderData.collectedInputData.nonce &&
+            this.overwriteSliderData.collectedInputData.email
+          ) {
+            return { method: this.method, activePage: 'enter-nonce' }
+          }
+          return { method: this.method, activePage: null }
         }
-        return this.publicRegistration ? 'public-registration' : 'no-public-registration'
+        return {
+          method: this.publicRegistration ? 'public-registration' : 'no-public-registration',
+          activePage: null,
+        }
       }
     },
   },

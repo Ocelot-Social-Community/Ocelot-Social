@@ -43,9 +43,14 @@ if (!hasEmailConfig) {
 }
 
 const sendSignupMail = async (resolve, root, args, context, resolveInfo) => {
+  const { inviteCode } = args
   const response = await resolve(root, args, context, resolveInfo)
   const { email, nonce } = response
-  await sendMail(signupTemplate({ email, nonce }))
+  if (inviteCode) {
+    await sendMail(signupTemplate({ email, nonce, inviteCode }))
+  } else {
+    await sendMail(signupTemplate({ email, nonce }))
+  }
   delete response.nonce
   return response
 }

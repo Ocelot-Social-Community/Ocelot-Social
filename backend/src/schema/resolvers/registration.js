@@ -72,10 +72,10 @@ const signupCypher = (inviteCode) => {
       (inviteCode:InviteCode {code: $inviteCode})<-[:GENERATED]-(host:User)
       `
     optionalMerge = `
-      MERGE(user)-[:REDEEMED]->(inviteCode)
-      MERGE(host)-[:INVITED]->(user)
-      MERGE(user)-[:FOLLOWS]->(host)
-      MERGE(host)-[:FOLLOWS]->(user)
+      MERGE(user)-[:REDEEMED { createdAt: toString(datetime()) }]->(inviteCode)
+      MERGE(host)-[:INVITED { createdAt: toString(datetime()) }]->(user)
+      MERGE(user)-[:FOLLOWS { createdAt: toString(datetime()) }]->(host)
+      MERGE(host)-[:FOLLOWS { createdAt: toString(datetime()) }]->(user)
       `
   }
   const cypher = `
