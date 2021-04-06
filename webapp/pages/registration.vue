@@ -51,8 +51,14 @@ export default {
           this.method === 'invite-mail' ||
           (this.method === 'invite-code' && this.inviteRegistration)
         ) {
-          if (this.method === 'invite-code' && this.inviteCode && this.nonce && this.email)
+          if (
+            this.method === 'invite-code' &&
+            this.overwriteSliderData.collectedInputData.inviteCode &&
+            this.overwriteSliderData.collectedInputData.nonce &&
+            this.overwriteSliderData.collectedInputData.email
+          ) {
             return { method: this.method, activePage: 'enter-nonce' }
+          }
           return { method: this.method, activePage: null }
         }
         return {
