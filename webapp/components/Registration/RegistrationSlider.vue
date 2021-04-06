@@ -67,6 +67,7 @@ export default {
   props: {
     registrationType: { type: String, required: true },
     overwriteSliderData: { type: Object, default: () => {} },
+    activePage: { type: String, default: null, required: false },
   },
   data() {
     const slidersPortfolio = {
@@ -172,7 +173,8 @@ export default {
           termsAndConditionsConfirmed: null,
           recieveCommunicationAsEmailsEtcConfirmed: null,
         },
-        sliderIndex: 0,
+        sliderIndex:
+          this.activePage === null ? 0 : sliders.findIndex((el) => el.name === this.activePage),
         sliders: sliders,
         sliderSelectorCallback: this.sliderSelectorCallback,
         setSliderValuesCallback: this.setSliderValuesCallback,
