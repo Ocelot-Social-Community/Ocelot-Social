@@ -12,6 +12,7 @@ metadata:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
   replicas: 1
+  revisionHistoryLimit: {{ .Values.NEO4J.REVISIONS_HISTORY_LIMIT }}
   strategy:
     rollingUpdate:
       maxUnavailable: 1

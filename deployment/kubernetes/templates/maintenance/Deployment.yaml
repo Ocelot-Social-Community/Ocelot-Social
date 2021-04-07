@@ -11,6 +11,7 @@ metadata:
     app.kubernetes.io/managed-by: "{{ .Release.Service }}"
     helm.sh/chart:                "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
+  revisionHistoryLimit: {{ .Values.MAINTENANCE.REVISIONS_HISTORY_LIMIT }}
   strategy:
     rollingUpdate:
       maxUnavailable: 1

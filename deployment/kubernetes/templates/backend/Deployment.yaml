@@ -14,6 +14,7 @@ spec:
   replicas: 1
   minReadySeconds: {{ .Values.BACKEND.MIN_READY_SECONDS }}
   progressDeadlineSeconds: {{ .Values.BACKEND.PROGRESS_DEADLINE_SECONDS }}
+  revisionHistoryLimit: {{ .Values.BACKEND.REVISIONS_HISTORY_LIMIT }}
   strategy:
     rollingUpdate:
       maxUnavailable: 1
