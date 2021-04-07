@@ -84,7 +84,7 @@ export const wrongAccountTemplate = ({ email }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, supportUrl: CONFIG.SUPPORT_URL, welcomeImageUrl },
+      { ...defaultParams, actionUrl, supportUrl: CONFIG.SUPPORT_URL, welcomeImageUrl },
       { content: templates.wrongAccount },
     ),
   }
