@@ -14,6 +14,7 @@ spec:
   replicas: {{ .Values.WEBAPP.REPLICAS }}
   minReadySeconds: {{ .Values.WEBAPP.MIN_READY_SECONDS }}
   progressDeadlineSeconds: {{ .Values.WEBAPP.PROGRESS_DEADLINE_SECONDS }}
+  revisionHistoryLimit: {{ .Values.WEBAPP.REVISIONS_HISTORY_LIMIT }}
   strategy:
     rollingUpdate:
       maxUnavailable: 1
