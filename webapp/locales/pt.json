@@ -145,7 +145,6 @@
     "letsTalk": "Vamos Conversar",
     "loading": "Carregando",
     "loadMore": "Carregar mais",
-    "moreInfo": "Mais informações",
     "name": "Nome",
     "organization": "Organização ::: Organizações",
     "post": "Postagem ::: Postagens",
@@ -396,14 +395,6 @@
       "pinnedSuccessfully": "Publicação fixada com sucesso!",
       "unpin": "Desafixar publicação",
       "unpinnedSuccessfully": "Publicação desafixada com sucesso!"
-    },
-    "moreInfo": {
-      "description": "Aqui você pode encontrar mais informações sobre este tópico.",
-      "name": "Mais informações",
-      "title": "Mais informações",
-      "titleOfCategoriesSection": "Categorias",
-      "titleOfHashtagsSection": "Hashtags",
-      "titleOfRelatedContributionsSection": "Publicações relacionadas"
     },
     "name": "Postar",
     "pinned": "Anúncio",

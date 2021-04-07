@@ -98,7 +98,6 @@
     "letsTalk": "Давай поговорим",
     "loading": "загрузка",
     "loadMore": "Загрузить ещё",
-    "moreInfo": "Больше информации",
     "name": "Имя",
     "organization": "Организация ::: Организации ::: Организации",
     "post": "Пост ::: Посты ::: Посты",
@@ -419,14 +418,6 @@
       "pinnedSuccessfully": "Пост больше не закреплен!",
       "unpin": "Открепить пост",
       "unpinnedSuccessfully": "Пост успешно не закреплено!"
-    },
-    "moreInfo": {
-      "description": "Здесь содержится дополнительная информация по теме.",
-      "name": "Дополнительная информация",
-      "title": "Дополнительная информация",
-      "titleOfCategoriesSection": "Категории",
-      "titleOfHashtagsSection": "Хэштеги",
-      "titleOfRelatedContributionsSection": "Похожие посты"
     },
     "name": "Пост",
     "pinned": "Объявление",

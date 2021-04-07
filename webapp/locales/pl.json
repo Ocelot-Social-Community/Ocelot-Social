@@ -67,7 +67,6 @@
     "letsTalk": "Porozmawiajmy",
     "loading": "załadunek",
     "loadMore": "Obciążenie więcej",
-    "moreInfo": "Więcej informacji",
     "name": "Nazwa",
     "organization": "Organization ::: Organizations",
     "post": "Poczta ::: Posty",
@@ -202,9 +201,6 @@
     "menu": {
       "delete": "Usuń wpis",
       "edit": "Edytuj wpis"
-    },
-    "moreInfo": {
-      "name": "Więcej informacji"
     },
     "name": "Poczta",
     "takeAction": {
