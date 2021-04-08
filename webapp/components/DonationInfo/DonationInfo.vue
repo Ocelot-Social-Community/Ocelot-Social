@@ -1,9 +1,10 @@
 <template>
   <div class="donation-info">
-    <progress-bar :title="computedTitle" :label="label" :goal="goal" :progress="progress" />
-    <!-- Wolle <a target="_blank" :href="links.DONATE">
-      <base-button filled>{{ $t('donations.donate-now') }}</base-button>
-    </a> -->
+    <progress-bar :title="computedTitle" :label="label" :goal="goal" :progress="progress">
+      <a target="_blank" :href="links.DONATE" align="right">
+        <base-button filled>{{ $t('donations.donate-now') }}</base-button>
+      </a>
+    </progress-bar>
   </div>
 </template>
 
@@ -60,14 +61,16 @@ export default {
 .donation-info {
   // Wolle
   display: flex;
-  align-items: flex-end;
+  // align-items: flex-end;
+  width: 100%;
   // height: 100%;
+  margin-bottom: $space-x-small;
 
-  @media (max-width: 546px) {
-    width: 100%;
-    height: 50%;
-    justify-content: flex-end;
-    margin-bottom: $space-x-small;
-  }
+  // @media (max-width: 546px) {
+  //   // width: 100%;
+  //   height: 50%;
+  //   // justify-content: flex-end;
+  //   // margin-bottom: $space-x-small;
+  // }
 }
 </style>

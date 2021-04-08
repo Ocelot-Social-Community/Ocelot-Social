@@ -1,10 +1,17 @@
 <template>
   <div>
     <h4 v-if="title" class="progress-bar__title">{{ title }}</h4>
-    <div class="progress-bar">
-      <div class="progress-bar__goal"></div>
-      <div class="progress-bar__progress" :style="progressBarWidth"></div>
-    </div>
+    <ds-flex :width="{ base: '300px' }">
+      <ds-flex-item :width="{ base: '152px' }">
+        <div class="progress-bar">
+          <div class="progress-bar__goal"></div>
+          <div class="progress-bar__progress" :style="progressBarWidth"></div>
+        </div>
+      </ds-flex-item>
+      <ds-flex-item :width="{ base: '100px' }">
+        <slot />
+      </ds-flex-item>
+    </ds-flex>
     <span v-if="label" class="progress-bar__label">{{ label }}</span>
   </div>
 </template>
@@ -39,7 +46,7 @@ export default {
 .progress-bar {
   position: relative;
   height: 100%;
-  width: 240px;
+  width: 150px;
   margin-right: $space-x-small;
 
   // @media (max-width: 680px) {
@@ -56,16 +63,16 @@ export default {
   // Wolle
   // position: absolute;
   // top: -2px;
-  // left: $space-xx-small;
+  margin-left: $space-xxx-small;
   // margin: 0;
 
-  // @media (max-width: 546px) {
-  //   top: $space-xx-small;
-  // }
+  @media (max-width: 546px) {
+    top: $space-xx-small;
+  }
 
-  // @media (max-width: 350px) {
-  //   font-size: $font-size-small;
-  // }
+  @media (max-width: 350px) {
+    font-size: $font-size-small;
+  }
 }
 
 .progress-bar__goal {
@@ -92,10 +99,10 @@ export default {
   // Wolle
   // position: absolute;
   // top: 50px;
-  // left: $space-xx-small;
+  margin-left: $space-xxx-small;
 
-  // @media (max-width: 350px) {
-  //   font-size: $font-size-small;
-  // }
+  @media (max-width: 350px) {
+    font-size: $font-size-small;
+  }
 }
 </style>

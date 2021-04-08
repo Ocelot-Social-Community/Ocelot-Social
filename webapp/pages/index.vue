@@ -1,17 +1,19 @@
 <template>
   <div>
-    <ds-space />
-    <ds-flex :width="{ base: '100%' }" gutter="base">
-      <ds-flex-item
+    <!-- <ds-space /> -->
+    <!-- <ds-flex :width="{ base: '100%' }" gutter="base"> -->
+    <ds-flex>
+      <!-- <ds-flex-item
         v-if="NEWSFEED_SHOW_INFO_LEFT_LANE"
         :width="{ base: '100%', sm: 2, md: 2, lg: 1 }"
-      >
+      > -->
+      <ds-flex-item v-if="NEWSFEED_SHOW_INFO_LEFT_LANE" :width="{ base: '270px' }">
+        <!-- Wolle -->
         <donation-info
           v-if="DONATIONS_SHOW_INFO"
           class="newsfeed-left-side-navigation"
-          :title="'Donations progress'"
+          :title="'Donation progress'"
         />
-        <!-- Wolle -->
         <!-- Wolle <div v-if-else>
           <a target="_blank" :href="links.DONATE">
             <base-button filled>{{ $t('donations.donate-now') }}</base-button>
