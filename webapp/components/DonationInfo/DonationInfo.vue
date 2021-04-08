@@ -1,9 +1,9 @@
 <template>
   <div class="donation-info">
-    <progress-bar :title="title" :label="label" :goal="goal" :progress="progress" />
-    <a target="_blank" :href="links.DONATE">
+    <progress-bar :title="computedTitle" :label="label" :goal="goal" :progress="progress" />
+    <!-- Wolle <a target="_blank" :href="links.DONATE">
       <base-button filled>{{ $t('donations.donate-now') }}</base-button>
-    </a>
+    </a> -->
   </div>
 </template>
 
@@ -16,6 +16,9 @@ export default {
   components: {
     ProgressBar,
   },
+  props: {
+    title: { type: String, required: false },
+  },
   data() {
     return {
       links,
@@ -24,7 +27,8 @@ export default {
     }
   },
   computed: {
-    title() {
+    computedTitle() {
+      if (this.title) return this.title
       const today = new Date()
       const month = today.toLocaleString(this.$i18n.locale(), { month: 'long' })
       return `${this.$t('donations.donations-for')} ${month}`
@@ -54,9 +58,10 @@ export default {
 
 <style lang="scss">
 .donation-info {
+  // Wolle
   display: flex;
   align-items: flex-end;
-  height: 100%;
+  // height: 100%;
 
   @media (max-width: 546px) {
     width: 100%;

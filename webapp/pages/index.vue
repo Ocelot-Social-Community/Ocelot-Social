@@ -1,47 +1,69 @@
 <template>
   <div>
-    <masonry-grid>
-      <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
-        <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
-      </ds-grid-item>
-      <ds-grid-item :row-span="2" column-span="fullWidth" class="top-info-bar">
-        <!--<donation-info /> -->
-        <div>
+    <ds-space />
+    <ds-flex :width="{ base: '100%' }" gutter="base">
+      <ds-flex-item
+        v-if="NEWSFEED_SHOW_INFO_LEFT_LANE"
+        :width="{ base: '100%', sm: 2, md: 2, lg: 1 }"
+      >
+        <donation-info
+          v-if="DONATIONS_SHOW_INFO"
+          class="newsfeed-left-side-navigation"
+          :title="'Donations progress'"
+        />
+        <!-- Wolle -->
+        <!-- Wolle <div v-if-else>
           <a target="_blank" :href="links.DONATE">
             <base-button filled>{{ $t('donations.donate-now') }}</base-button>
           </a>
-        </div>
-        <div class="sorting-dropdown">
-          <ds-select
-            v-model="selected"
-            :options="sortingOptions"
-            size="large"
-            :icon-right="sortingIcon"
-          ></ds-select>
-        </div>
-      </ds-grid-item>
-      <template v-if="hasResults">
-        <masonry-grid-item
-          v-for="post in posts"
-          :key="post.id"
-          :imageAspectRatio="post.image && post.image.aspectRatio"
-        >
-          <post-teaser
-            :post="post"
-            @removePostFromList="posts = removePostFromList(post, posts)"
-            @pinPost="pinPost(post, refetchPostList)"
-            @unpinPost="unpinPost(post, refetchPostList)"
-          />
-        </masonry-grid-item>
-      </template>
-      <template v-else>
-        <ds-grid-item :row-span="2" column-span="fullWidth">
-          <hc-empty icon="docs" />
-          <ds-text align="center">{{ $t('index.no-results') }}</ds-text>
-          <ds-text align="center">{{ $t('index.change-filter-settings') }}</ds-text>
-        </ds-grid-item>
-      </template>
-    </masonry-grid>
+        </div> -->
+      </ds-flex-item>
+
+      <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
+        <masonry-grid>
+          <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
+            <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
+          </ds-grid-item>
+          <!-- Wolle <ds-grid-item :row-span="2" column-span="fullWidth" class="top-info-bar"> -->
+          <!--<donation-info /> -->
+          <!-- Wolle <div>
+              <a target="_blank" :href="links.DONATE">
+                <base-button filled>{{ $t('donations.donate-now') }}</base-button>
+              </a>
+            </div> -->
+          <!-- Wolle <div class="sorting-dropdown">
+              <ds-select
+                v-model="selected"
+                :options="sortingOptions"
+                size="large"
+                :icon-right="sortingIcon"
+              ></ds-select>
+            </div> -->
+          <!-- </ds-grid-item> -->
+          <template v-if="hasResults">
+            <masonry-grid-item
+              v-for="post in posts"
+              :key="post.id"
+              :imageAspectRatio="post.image && post.image.aspectRatio"
+            >
+              <post-teaser
+                :post="post"
+                @removePostFromList="posts = removePostFromList(post, posts)"
+                @pinPost="pinPost(post, refetchPostList)"
+                @unpinPost="unpinPost(post, refetchPostList)"
+              />
+            </masonry-grid-item>
+          </template>
+          <template v-else>
+            <ds-grid-item :row-span="2" column-span="fullWidth">
+              <hc-empty icon="docs" />
+              <ds-text align="center">{{ $t('index.no-results') }}</ds-text>
+              <ds-text align="center">{{ $t('index.change-filter-settings') }}</ds-text>
+            </ds-grid-item>
+          </template>
+        </masonry-grid>
+      </ds-flex-item>
+    </ds-flex>
     <client-only>
       <nuxt-link :to="{ name: 'post-create' }">
         <base-button
@@ -64,8 +86,10 @@
 </template>
 
 <script>
+import { DONATIONS_SHOW_INFO } from '~/constants/donations'
+import { NEWSFEED_SHOW_INFO_LEFT_LANE } from '~/constants/newsfeed'
 import postListActions from '~/mixins/postListActions'
-// import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
+import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter.vue'
 import HcEmpty from '~/components/Empty/Empty'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
@@ -78,7 +102,7 @@ import links from '~/constants/links.js'
 
 export default {
   components: {
-    // DonationInfo,
+    DonationInfo,
     HashtagsFilter,
     PostTeaser,
     HcEmpty,
@@ -89,6 +113,8 @@ export default {
   data() {
     const { hashtag = null } = this.$route.query
     return {
+      DONATIONS_SHOW_INFO,
+      NEWSFEED_SHOW_INFO_LEFT_LANE,
       links,
       posts: [],
       hasMore: true,
@@ -196,6 +222,12 @@ export default {
 </script>
 
 <style lang="scss">
+.newsfeed-left-side-navigation {
+  position: sticky;
+  top: 65px;
+  z-index: 2;
+}
+
 .masonry-grid {
   display: grid;
   grid-gap: 10px;

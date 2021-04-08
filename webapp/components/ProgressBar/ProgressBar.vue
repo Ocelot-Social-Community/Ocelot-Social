@@ -1,8 +1,10 @@
 <template>
-  <div class="progress-bar">
-    <div class="progress-bar__goal"></div>
-    <div class="progress-bar__progress" :style="progressBarWidth"></div>
+  <div>
     <h4 v-if="title" class="progress-bar__title">{{ title }}</h4>
+    <div class="progress-bar">
+      <div class="progress-bar__goal"></div>
+      <div class="progress-bar__progress" :style="progressBarWidth"></div>
+    </div>
     <span v-if="label" class="progress-bar__label">{{ label }}</span>
   </div>
 </template>
@@ -40,33 +42,34 @@ export default {
   width: 240px;
   margin-right: $space-x-small;
 
-  @media (max-width: 680px) {
-    width: 180px;
-  }
+  // @media (max-width: 680px) {
+  //   width: 180px;
+  // }
 
-  @media (max-width: 546px) {
-    flex-basis: 50%;
-    flex-grow: 1;
-  }
+  // @media (max-width: 546px) {
+  //   flex-basis: 50%;
+  //   flex-grow: 1;
+  // }
 }
 
 .progress-bar__title {
-  position: absolute;
-  top: -2px;
-  left: $space-xx-small;
-  margin: 0;
+  // Wolle
+  // position: absolute;
+  // top: -2px;
+  // left: $space-xx-small;
+  // margin: 0;
 
-  @media (max-width: 546px) {
-    top: $space-xx-small;
-  }
+  // @media (max-width: 546px) {
+  //   top: $space-xx-small;
+  // }
 
-  @media (max-width: 350px) {
-    font-size: $font-size-small;
-  }
+  // @media (max-width: 350px) {
+  //   font-size: $font-size-small;
+  // }
 }
 
 .progress-bar__goal {
-  position: absolute;
+  position: relative;
   bottom: 0;
   left: 0;
   height: 37.5px; // styleguide-button-size
@@ -77,8 +80,8 @@ export default {
 
 .progress-bar__progress {
   position: absolute;
-  bottom: 1px;
-  left: 0;
+  top: 1px;
+  left: 1px;
   height: 35.5px; // styleguide-button-size - 2px border
   max-width: 100%;
   background-color: $color-yellow;
@@ -86,12 +89,13 @@ export default {
 }
 
 .progress-bar__label {
-  position: absolute;
-  top: 50%;
-  left: $space-xx-small;
+  // Wolle
+  // position: absolute;
+  // top: 50px;
+  // left: $space-xx-small;
 
-  @media (max-width: 350px) {
-    font-size: $font-size-small;
-  }
+  // @media (max-width: 350px) {
+  //   font-size: $font-size-small;
+  // }
 }
 </style>
