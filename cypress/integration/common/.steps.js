@@ -84,15 +84,6 @@ Given("we have a selection of tags and categories as well as posts", () => {
     })
 });
 
-Given("we have the following user accounts:", table => {
-  table.hashes().forEach(params => {
-    cy.factory().build("user", {
-      ...params,
-      ...termsAndConditionsAgreedVersion
-    }, params);
-  });
-});
-
 Given("my user account has the role {string}", role => {
   cy.factory().build("user", {
     role,
