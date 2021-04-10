@@ -33,7 +33,6 @@ export default {
       } catch (err) {
         // throw new Error(`Problem handling something: ${err}.`);
         // TODO this is causing trouble - most likely due to double redirect on terms&conditions
-        console.log(`Problem handling something: ${err}.`)
       }
     },
   },
