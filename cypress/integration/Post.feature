@@ -1,4 +1,4 @@
-Feature: Create a post
+Feature: See a post
   As an logged in user
   I would like to see a post
   And to see the whole content of it
@@ -6,7 +6,9 @@ Feature: Create a post
   Background:
     Given I have an user account
     And I am logged in
-    And I previously created a post
+    And the following "posts" are in the database:
+      | id         | title                   | slug                    | authorId        | content           |
+      | aBcDeFgHiJ | previously created post | previously-created-post | id-of-peter-pan | with some content |
 
   Scenario: See a post on the landing page
     When I navigate to page "landing"
