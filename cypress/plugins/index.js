@@ -15,17 +15,14 @@
 const cucumber = require('cypress-cucumber-preprocessor').default
 const dotenv = require('dotenv')
 
+// Import backend .env (smart)?
+const { parsed } = dotenv.config({ path: require.resolve('../../backend/.env') })
+
 module.exports = (on, config) => {
-  // (on, config) => {
-  // `on` is used to hook into various events Cypress emits
-  // `config` is the resolved Cypress config
-  const { parsed } = dotenv.config({ path: require.resolve('../../backend/.env') })
   config.env.NEO4J_URI = parsed.NEO4J_URI
   config.env.NEO4J_USERNAME = parsed.NEO4J_USERNAME
   config.env.NEO4J_PASSWORD = parsed.NEO4J_PASSWORD
   config.env.JWT_SECRET = parsed.JWT_SECRET
-  // config.baseUrl = 'http://localhost:3000'
-  // config.chromeWebSecurity = false
   on('file:preprocessor', cucumber())
   return config
 }

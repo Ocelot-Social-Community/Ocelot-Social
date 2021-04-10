@@ -13,18 +13,8 @@ import orderBy from 'lodash/orderBy'
 const languages = orderBy(locales, 'name')
 let lastPost = {};
 
-let loginCredentials = {
-  email: "peterpan@example.org",
-  password: "1234"
-};
 const termsAndConditionsAgreedVersion = {
   termsAndConditionsAgreedVersion: VERSION
-};
-const narratorParams = {
-  id: 'id-of-peter-pan',
-  name: "Peter Pan",
-  slug: "peter-pan",
-  ...termsAndConditionsAgreedVersion,
 };
 
 const annoyingParams = {
@@ -121,10 +111,6 @@ Given("we have the following user accounts:", table => {
   });
 });
 
-Given("I have a user account", () => {
-  cy.factory().build("user", narratorParams, loginCredentials);
-});
-
 Given("my user account has the role {string}", role => {
   cy.factory().build("user", {
     role,
@@ -135,10 +121,6 @@ Given("my user account has the role {string}", role => {
 When("I log out", cy.logout);
 
 When("I visit {string}", page => {
-  cy.openPage(page);
-});
-
-When("I visit the {string} page", page => {
   cy.openPage(page);
 });
 
@@ -159,10 +141,6 @@ When("a blocked user visits the post page of one of my authored posts", () => {
 
 Given("I am on the {string} page", page => {
   cy.openPage(page);
-});
-
-When("I fill in my email and password combination and click submit", () => {
-  cy.manualLogin(loginCredentials);
 });
 
 When(/(?:when )?I refresh the page/, () => {
