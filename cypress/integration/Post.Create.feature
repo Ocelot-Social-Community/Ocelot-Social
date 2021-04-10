@@ -24,6 +24,6 @@ Feature: Create a post
     And the post was saved successfully
 
   Scenario: See a post on the landing page
-    Given I previously created a post
+    When I previously created a post
     And I navigate to page "landing"
-    And the post shows up on the landing page at position 1
+    Then the post shows up on the landing page at position 1
