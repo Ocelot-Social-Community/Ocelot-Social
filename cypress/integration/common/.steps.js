@@ -23,19 +23,6 @@ const annoyingParams = {
   password: "1234",
 };
 
-Given("I am logged in", () => {
-  cy.neode()
-    .first("User", {
-      name: narratorParams.name
-    })
-    .then(user => {
-      return new Cypress.Promise((resolve, reject) => {
-        return user.toJson().then((user) => resolve(user))
-      })
-    })
-    .then(user => cy.login(user))
-});
-
 Given("I log in as {string}", name => {
   cy.logout()
   cy.neode()
@@ -141,31 +128,6 @@ When("a blocked user visits the post page of one of my authored posts", () => {
 
 Given("I am on the {string} page", page => {
   cy.openPage(page);
-});
-
-When(/(?:when )?I refresh the page/, () => {
-  cy.visit('/')
-    .reload();
-});
-
-When("I log out through the menu in the top right corner", () => {
-  cy.get(".avatar-menu").click();
-  cy.get(".avatar-menu-popover")
-    .find('a[href="/logout"]')
-    .click();
-});
-
-Then("I can see my name {string} in the dropdown menu", () => {
-  cy.get(".avatar-menu-popover").should("contain", narratorParams.name);
-});
-
-Then("I see the login screen again", () => {
-  cy.location("pathname").should("contain", "/login");
-});
-
-Then("I am still logged in", () => {
-  cy.get(".avatar-menu").click();
-  cy.get(".avatar-menu-popover").contains(narratorParams.name);
 });
 
 When("I select {string} in the language menu", name => {
