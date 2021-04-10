@@ -280,7 +280,7 @@ jobs:
       ##########################################################################
       # FULLSTACK TESTS CYPRESS ################################################
       ##########################################################################
-      - name: backend | copy env files webapp
+      - name: webapp | copy env files webapp
         run: cp webapp/.env.template webapp/.env
       - name: backend | copy env files backend
         run: cp backend/.env.template backend/.env
@@ -290,3 +290,17 @@ jobs:
         run: |
           yarn install
           yarn run cypress:run
+
+      ##########################################################################
+      # UPLOAD SCREENSHOTS & VIDEO #############################################
+      ##########################################################################
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots/
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cypress-videos
+          path: cypress/videos/
