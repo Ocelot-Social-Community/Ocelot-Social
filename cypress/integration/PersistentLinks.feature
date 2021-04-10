@@ -8,7 +8,6 @@ Feature: Persistent Links
   | Slug | yes        | yes           | yes    | @-Mentions, SEO-friendly URL  |
   | Name | yes        | no            | no     | Search, self-description      |
 
-
   Background:
     Given I have an user account
     And I am logged in
