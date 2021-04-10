@@ -53,7 +53,7 @@ Cypress.Commands.add("switchLanguage", (name, force) => {
 
 Cypress.Commands.add("login", user => {
   const token = encode(user)
-  cy.setCookie('human-connection-token', token)
+  cy.setCookie('ocelot-social-token', token)
     .visit("/")
 });
 
