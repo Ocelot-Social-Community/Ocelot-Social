@@ -54,7 +54,6 @@ Cypress.Commands.add("switchLanguage", (name, force) => {
 Cypress.Commands.add("login", user => {
   const token = encode(user)
   cy.setCookie('ocelot-social-token', token)
-    .visit("/")
 });
 
 /*Cypress.Commands.add("manualLogin", ({ email, password }) => {
@@ -73,13 +72,6 @@ Cypress.Commands.add("login", user => {
 Cypress.Commands.add("logout", () => {
   cy.visit(`/logout`);
   cy.location("pathname").should("contain", "/login"); // we're out
-});
-
-Cypress.Commands.add("openPage", page => {
-  if (page === "landing") {
-    page = "";
-  }
-  cy.visit(`/${page}`);
 });
 
 Cypress.Commands.add(

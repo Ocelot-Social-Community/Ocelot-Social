@@ -17,8 +17,6 @@ Feature: Notification for a mention
       Big shout to our fellow contributor
       """
     And mention "@matt-rider" in the text
-    And I select a category
-    And I choose "en" as the language for the post
     And I click on "Save"
     And I log in as "Matt Rider"
     And see 1 unread notifications in the top menu
