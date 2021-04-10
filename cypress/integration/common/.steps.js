@@ -163,11 +163,6 @@ Then("I see the login screen again", () => {
   cy.location("pathname").should("contain", "/login");
 });
 
-Then("I can click on my profile picture in the top right corner", () => {
-  cy.get(".avatar-menu").click();
-  cy.get(".avatar-menu-popover");
-});
-
 Then("I am still logged in", () => {
   cy.get(".avatar-menu").click();
   cy.get(".avatar-menu-popover").contains(narratorParams.name);
