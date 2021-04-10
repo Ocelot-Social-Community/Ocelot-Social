@@ -27,15 +27,14 @@ export default {
   methods: {
     async handleSuccess() {
       this.$i18n.set(this.user.locale || 'en')
-    
+
       try {
         await this.$router.replace(this.$route.query.path || '/')
       } catch (err) {
-        //throw new Error(`Problem handling something: ${err}.`);
+        // throw new Error(`Problem handling something: ${err}.`);
         // TODO this is causing trouble - most likely due to double redirect on terms&conditions
         console.log(`Problem handling something: ${err}.`)
       }
-      
     },
   },
 }
