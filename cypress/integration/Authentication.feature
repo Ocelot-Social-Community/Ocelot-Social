@@ -10,7 +10,7 @@ Feature: Authentication
   Scenario: Log in
     When I navigate to page "login"
     And I fill in my credentials
-    And I click submit
+    And I click on "submit button"
     Then I am logged in as "Peter Pan"
 
   Scenario: Refresh and stay logged in
