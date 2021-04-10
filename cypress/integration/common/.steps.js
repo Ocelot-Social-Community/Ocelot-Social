@@ -4,7 +4,6 @@ import {
   Then
 } from "cypress-cucumber-preprocessor/steps";
 import helpers from "../../support/helpers";
-import { VERSION } from '../../constants/terms-and-conditions-version.js'
 import locales from '../../../webapp/locales'
 import orderBy from 'lodash/orderBy'
 
@@ -12,10 +11,6 @@ import orderBy from 'lodash/orderBy'
 
 const languages = orderBy(locales, 'name')
 let lastPost = {};
-
-const termsAndConditionsAgreedVersion = {
-  termsAndConditionsAgreedVersion: VERSION
-};
 
 const annoyingParams = {
   email: "spammy-spammer@example.org",

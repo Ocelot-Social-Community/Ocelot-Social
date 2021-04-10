@@ -2,6 +2,7 @@ Feature: Authentication
   As an user 
   I want to sign in
   In order to be able to posts and do other contributions as myself
+  Furthermore I want to be able to stay logged in and logout again
 
   Background:
     Given I have an user account
