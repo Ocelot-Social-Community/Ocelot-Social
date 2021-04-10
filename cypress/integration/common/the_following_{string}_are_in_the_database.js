@@ -9,19 +9,24 @@ Given("the following {string} are in the database:", (table,data) => {
           deleted: Boolean(attributesOrOptions.deleted),
           disabled: Boolean(attributesOrOptions.disabled),
           pinned: Boolean(attributesOrOptions.pinned),
-        }, {
-          ...attributesOrOptions,
-        });
+        },
+          attributesOrOptions,
+        );
       })
       break
     case "comments":
       data.hashes().forEach((attributesOrOptions, i) => {
-        cy.factory().build("comment", {
-          ...attributesOrOptions,
-        }, {
-          ...attributesOrOptions,
-        });
+        cy.factory().build("comment",
+          attributesOrOptions,
+          attributesOrOptions,
+        );
       })
       break
+    case "users":
+      data.hashes().forEach(params => {
+        cy.factory().build("user",
+          params,
+          params);
+      });
   }
 })
