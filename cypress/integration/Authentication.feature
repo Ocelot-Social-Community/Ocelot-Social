@@ -8,7 +8,7 @@ Feature: Authentication
     Given I have an user account
 
   Scenario: Log in
-    When I visit the "login" page
+    When I navigate to page "login"
     And I fill in my credentials
     And I click submit
     Then I am logged in as "Peter Pan"

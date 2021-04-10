@@ -145,10 +145,6 @@ Then("I see a button with the label {string}", label => {
   cy.contains("button", label);
 });
 
-When(`I click on {string}`, linkOrButton => {
-  cy.contains(linkOrButton).click();
-});
-
 When(`I click on the menu item {string}`, linkOrButton => {
   cy.contains(".ds-menu-item", linkOrButton).click();
 });
@@ -186,64 +182,6 @@ Then("I see a success message:", message => {
 
 When("I click on the avatar menu in the top right corner", () => {
   cy.get(".avatar-menu").click();
-});
-
-When(
-  "I click on the big plus icon in the bottom right corner to create post",
-  () => {
-    cy.get(".post-add-button").click();
-    cy.location("pathname").should('eq', '/post/create')
-  }
-);
-
-Given("I previously created a post", () => {
-  lastPost = {
-    lastPost,
-    title:  "previously created post",
-    content: "with some content",
-  };
-  cy.factory()
-    .build("post", lastPost, {
-      authorId: narratorParams.id
-    });
-});
-
-When("I choose {string} as the title of the post", title => {
-  lastPost.title = title.replace("\n", " ");
-  cy.get('input[name="title"]').type(lastPost.title);
-});
-
-When("I type in the following text:", text => {
-  lastPost.content = text.replace("\n", " ");
-  cy.get(".editor .ProseMirror").type(lastPost.content);
-});
-
-Then("I select a category", () => {
-  cy.get(".base-button")
-    .contains("Just for Fun")
-    .click();
-});
-
-When("I choose {string} as the language for the post", (languageCode) => {
-  cy.get('.contribution-form .ds-select')
-    .click().get('.ds-select-option')
-    .eq(languages.findIndex(l => l.code === languageCode)).click()
-})
-
-Then("the post shows up on the landing page at position {int}", index => {
-  cy.openPage("landing");
-  const selector = `.post-teaser:nth-child(${index}) > .base-card`;
-  cy.get(selector).should("contain", lastPost.title);
-  cy.get(selector).should("contain", lastPost.content);
-});
-
-Then("I get redirected to {string}", route => {
-  cy.location("pathname").should("contain", route.replace("...", ""));
-});
-
-Then("the post was saved successfully", () => {
-  cy.get(".base-card > .title").should("contain", lastPost.title);
-  cy.get(".content").should("contain", lastPost.content);
 });
 
 Then(/^I should see only ([0-9]+) posts? on the landing page/, postCount => {
