@@ -57,7 +57,7 @@ Cypress.Commands.add("login", user => {
     .visit("/")
 });
 
-Cypress.Commands.add("manualLogin", ({ email, password }) => {
+/*Cypress.Commands.add("manualLogin", ({ email, password }) => {
   cy.visit(`/login`)
     .get("input[name=email]")
     .trigger("focus")
@@ -68,7 +68,7 @@ Cypress.Commands.add("manualLogin", ({ email, password }) => {
     .get("button[name=submit]")
     .as("submitButton")
     .click();
-});
+});*/
 
 Cypress.Commands.add("logout", () => {
   cy.visit(`/logout`);
