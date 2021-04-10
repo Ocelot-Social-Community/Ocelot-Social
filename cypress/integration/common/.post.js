@@ -4,60 +4,11 @@ import orderBy from 'lodash/orderBy'
 
 const languages = orderBy(locales, 'name')
 
-When("I type in a comment with {int} characters", size => {
-  var c="";
-  for (var i = 0; i < size; i++) {
-    c += "c"
-  }
-  cy.get(".editor .ProseMirror").type(c);
-});
-
 Then("I click on the {string} button", text => {
   cy.get("button")
     .contains(text)
     .click();
 });
-
-Then("I click on the reply button", () => {
-  cy.get(".reply-button")
-    .click();
-});
-
-Then("my comment should be successfully created", () => {
-  cy.get(".iziToast-message").contains("Comment submitted!");
-});
-
-Then("I should see my comment", () => {
-  cy.get("article.comment-card p")
-    .should("contain", "Human Connection rocks")
-    .get(".user-teaser span.slug")
-    .should("contain", "@peter-pan") // specific enough
-    .get(".user-avatar img")
-    .should("have.attr", "src")
-    .and("contain", 'https://') // some url
-    .get(".user-teaser > .info > .text")
-    .should("contain", "today at");
-});
-
-Then("I should see the entirety of my comment", () => {
-  cy.get("article.comment-card")
-  .should("not.contain", "show more")
-});
-
-Then("I should see an abreviated version of my comment", () => {
-  cy.get("article.comment-card")
-  .should("contain", "show more")
-});
-
-Then("the editor should be cleared", () => {
-  cy.get(".ProseMirror p").should("have.class", "is-empty");
-});
-
-Then("it should create a mention in the CommentForm", () => {
-  cy.get(".ProseMirror a")
-    .should('have.class', 'mention')
-    .should('contain', '@peter-pan')
-})
 
 When("I open the content menu of post {string}", (title)=> {
   cy.contains('.post-teaser', title)

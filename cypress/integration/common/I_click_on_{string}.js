@@ -5,7 +5,9 @@ When("I click on {string}", element => {
     'submit button': 'button[name=submit]',
     'create post button': '.post-add-button',
     'save button': 'button[type=submit]',
-    'the first post': '.post-teaser:nth-child(1)',
+    'the first post': '.post-teaser:first-child',
+    'comment button': 'button[type=submit]',
+    'reply button': '.reply-button',
   }
 
   cy.get(elementSelectors[element])

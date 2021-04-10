@@ -153,16 +153,6 @@ When("I press {string}", label => {
   cy.contains(label).click();
 });
 
-Given("we have the following comments in our database:", table => {
-  table.hashes().forEach((attributesOrOptions, i) => {
-    cy.factory().build("comment", {
-      ...attributesOrOptions,
-    }, {
-      ...attributesOrOptions,
-    });
-  })
-});
-
 Given("we have the following posts in our database:", table => {
   table.hashes().forEach((attributesOrOptions, i) => {
     cy.factory().build("post", {
