@@ -1,4 +1,4 @@
-Feature: List Social Media Accounts
+Feature: User profile - list social media accounts
   As a User
   I'd like to enter my social media
   So I can show them to other users to get in contact
