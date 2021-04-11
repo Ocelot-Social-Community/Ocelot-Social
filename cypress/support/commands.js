@@ -18,7 +18,6 @@ import helpers from "./helpers";
 import { GraphQLClient, request } from 'graphql-request'
 import { gql } from '../../backend/src/helpers/jest'
 import config from '../../backend/src/config'
-import encode from '../../backend/src/jwt/encode'
 
 const switchLang = name => {
   cy.get(".locale-menu").click();
@@ -50,24 +49,6 @@ Cypress.Commands.add("switchLanguage", (name, force) => {
     });
   }
 });
-
-Cypress.Commands.add("login", user => {
-  const token = encode(user)
-  cy.setCookie('ocelot-social-token', token)
-});
-
-/*Cypress.Commands.add("manualLogin", ({ email, password }) => {
-  cy.visit(`/login`)
-    .get("input[name=email]")
-    .trigger("focus")
-    .type(email)
-    .get("input[name=password]")
-    .trigger("focus")
-    .type(password)
-    .get("button[name=submit]")
-    .as("submitButton")
-    .click();
-});*/
 
 Cypress.Commands.add("logout", () => {
   cy.visit(`/logout`);

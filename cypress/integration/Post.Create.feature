@@ -4,8 +4,10 @@ Feature: Create a post
   To say something to everyone in the community
 
   Background:
-    Given I have an user account
-    And I am logged in
+    Given the following "users" are in the database:
+      | slug     | email                | password | id             | name            | termsAndConditionsAgreedVersion |
+      | narrator | narrator@example.org | 1234     | narrator       | Nathan Narrator | 0.0.4                           |
+    And I am logged in as "narrator"
     And I navigate to page "landing"
 
   Scenario: Create a post

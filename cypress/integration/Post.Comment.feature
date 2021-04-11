@@ -4,14 +4,17 @@ Feature: Comments on post
   To be able to express my thoughts and emotions about these, discuss, and add give further information.
 
   Background:
-    Given I have an user account
-    And I am logged in
+    Given the following "users" are in the database:
+      | slug     | email                | password | id             | name            | termsAndConditionsAgreedVersion |
+      | peter-pan| peter@pan.com        | abcd     | id-of-peter-pan| Peter Pan       | 0.0.4                           |
+      | narrator | narrator@example.org | 1234     | narrator       | Nathan Narrator | 0.0.4                           |
     And the following "posts" are in the database:
       | id         | title                                         | slug       | authorId        |
       | bWBjpkTKZp | 101 Essays that will change the way you think | 101-essays | id-of-peter-pan |
     And the following "comments" are in the database:
       | postId     | content                | authorId        |
       | bWBjpkTKZp | @peter-pan reply to me | id-of-peter-pan |
+    And I am logged in as "narrator"
 
   Scenario: Comment creation
     Given I navigate to page "post/bWBjpkTKZp/101-essays"
