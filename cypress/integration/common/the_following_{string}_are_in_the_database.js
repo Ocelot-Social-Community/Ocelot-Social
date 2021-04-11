@@ -3,30 +3,33 @@ import { Given } from "cypress-cucumber-preprocessor/steps";
 Given("the following {string} are in the database:", (table,data) => {
   switch(table){
     case "posts":
-      data.hashes().forEach((attributesOrOptions, i) => {
+      data.hashes().forEach( entry => {
         cy.factory().build("post", {
-          ...attributesOrOptions,
-          deleted: Boolean(attributesOrOptions.deleted),
-          disabled: Boolean(attributesOrOptions.disabled),
-          pinned: Boolean(attributesOrOptions.pinned),
-        },
-          attributesOrOptions,
-        );
+          ...entry,
+          deleted: Boolean(entry.deleted),
+          disabled: Boolean(entry.disabled),
+          pinned: Boolean(entry.pinned),
+        },{
+          ...entry,
+          tagIds: entry.tagIds.split(',').map(item => item.trim()),
+        });
       })
       break
     case "comments":
-      data.hashes().forEach((attributesOrOptions, i) => {
-        cy.factory().build("comment",
-          attributesOrOptions,
-          attributesOrOptions,
-        );
+      data.hashes().forEach( entry => {
+        cy.factory()
+          .build("comment",entry,entry);
       })
       break
     case "users":
-      data.hashes().forEach(params => {
-        cy.factory().build("user",
-          params,
-          params);
+      data.hashes().forEach( entry => {
+        cy.factory().build("user",entry,entry);
       });
+      break
+    case "tags":
+      data.hashes().forEach( entry => {
+        cy.factory().build("tag", entry, entry)
+      });
+      break
   }
 })
