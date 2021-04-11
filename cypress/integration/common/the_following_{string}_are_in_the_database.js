@@ -11,7 +11,7 @@ Given("the following {string} are in the database:", (table,data) => {
           pinned: Boolean(entry.pinned),
         },{
           ...entry,
-          tagIds: entry.tagIds.split(',').map(item => item.trim()),
+          tagIds: entry.tagIds ? entry.tagIds.split(',').map(item => item.trim()) : [],
         });
       })
       break

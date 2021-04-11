@@ -76,26 +76,6 @@ When("I click on the avatar menu in the top right corner", () => {
   cy.get(".avatar-menu").click();
 });
 
-Then(/^I should see only ([0-9]+) posts? on the newsfeed/, postCount => {
-  cy.get(".post-teaser").should("have.length", postCount);
-});
-
-Then(
-  "the page {string} returns a 404 error with a message:",
-  (route, message) => {
-    cy.request({
-        url: route,
-        failOnStatusCode: false
-      })
-      .its("status")
-      .should("eq", 404);
-    cy.visit(route, {
-      failOnStatusCode: false
-    });
-    cy.get(".error-message").should("contain", message);
-  }
-);
-
 Given("there is an annoying user called {string}", name => {
   cy.factory().build("user", {
     id: "annoying-user",
