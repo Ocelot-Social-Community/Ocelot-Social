@@ -37,7 +37,7 @@ Feature: User - block an user
     And I "should" see "Unblock user" from the content menu in the user info box
 
   Scenario: Posts of blocked users are not filtered from search results
-    Given "Harassing User" wrote a post "You can still see my posts"
+    Given "harassing-user" wrote a post "You can still see my posts"
     And I block the user "Harassing User"
     When I search for "see"
     Then I should see the following posts in the select dropdown:

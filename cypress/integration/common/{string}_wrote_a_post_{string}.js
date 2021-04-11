@@ -1,10 +1,10 @@
 import { Given } from "cypress-cucumber-preprocessor/steps";
 
-Given('{string} wrote a post {string}', (_, title) => {
+Given('{string} wrote a post {string}', (author, title) => {
   cy.factory()
     .build("post", {
       title,
     }, {
-      authorId: 'harassing-user',
+      authorId: author,
     });
 });
