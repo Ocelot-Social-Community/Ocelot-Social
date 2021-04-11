@@ -31,7 +31,7 @@ Feature: Report and Moderate
       """
     Examples:
       | Page         |
-      | landing page |
+      | newsfeed page|
       | post page    |
 
   Scenario: Report user

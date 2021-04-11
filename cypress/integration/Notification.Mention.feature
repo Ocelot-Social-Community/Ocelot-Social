@@ -11,8 +11,8 @@ Feature: Notification for a mention
 
   Scenario: Mention another user, re-login as this user and see notifications
     Given I am logged in as "wolle-aus-hamburg"
-    And I navigate to page "landing"
-    And I navigate to page "post/create"
+    And I navigate to page "/"
+    And I navigate to page "/post/create"
     And I start to write a new post with the title "Hey Matt" beginning with:
       """
       Big shout to our fellow contributor
@@ -20,7 +20,7 @@ Feature: Notification for a mention
     And mention "@matt-rider" in the text
     And I click on "save button"
     And I am logged in as "matt-rider"
-    And I navigate to page "landing"
+    And I navigate to page "/"
     And see 1 unread notifications in the top menu
     And open the notification menu and click on the first item
     Then I am on page "/post/.*/hey-matt"

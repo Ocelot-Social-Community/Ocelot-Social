@@ -13,7 +13,7 @@ Feature: User change password
       | email                | password | id              | name      | slug      | termsAndConditionsAgreedVersion |
       | peterpan@example.org | exposed  | id-of-peter-pan | Peter Pan | peter-pan | 0.0.4                           |
     And I am logged in as "peter-pan"
-    And I navigate to page "settings"
+    And I navigate to page "/settings"
     And I click on "security menu"
 
   Scenario: Incorrect Old Password
@@ -35,7 +35,7 @@ Feature: User change password
     And I cannot submit the form
 
   Scenario: Change my password
-    Given I navigate to page "settings" 
+    Given I navigate to page "/settings" 
     And I click on "security menu"
     When I fill the password form with:
       | Your old password    | exposed |

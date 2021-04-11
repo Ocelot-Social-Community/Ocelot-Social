@@ -11,7 +11,7 @@ Feature: Upload/Delete images on posts
       | authorId | id | title              | content              | 
       | narrator | p1 | Post to be updated | successfully updated |
     And I am logged in as "narrator"
-    And I navigate to page "landing"
+    And I navigate to page "/"
 
   Scenario: Create a Post with a Teaser Image
     When I click on "create post button"
@@ -24,7 +24,7 @@ Feature: Upload/Delete images on posts
     And the post was saved successfully with the "new" teaser image
 
   Scenario: Update a Post to add an image
-    Given I navigate to page "post/edit/p1"
+    Given I navigate to page "/post/edit/p1"
     And I should be able to "change" a teaser image
     And I click on "save button"
     Then I see a toaster with "Saved!"
@@ -51,7 +51,7 @@ Feature: Upload/Delete images on posts
     And the "new" post was saved successfully without a teaser image
 
   Scenario: Delete existing image
-    Given I navigate to page "post/edit/p1"
+    Given I navigate to page "/post/edit/p1"
     And my post has a teaser image
     Then I should be able to "remove" a teaser image
     And I click on "save button"

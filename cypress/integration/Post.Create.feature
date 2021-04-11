@@ -8,7 +8,7 @@ Feature: Create a post
       | slug     | email                | password | id             | name            | termsAndConditionsAgreedVersion |
       | narrator | narrator@example.org | 1234     | narrator       | Nathan Narrator | 0.0.4                           |
     And I am logged in as "narrator"
-    And I navigate to page "landing"
+    And I navigate to page "/"
 
   Scenario: Create a post
     When I click on "create post button"
