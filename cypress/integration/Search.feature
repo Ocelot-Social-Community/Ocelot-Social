@@ -4,17 +4,17 @@ Feature: Search
   In order to find related content
 
   Background:
-    Given I have a user account
-    And we have the following posts in our database:
+    Given the following "users" are in the database:
+      | slug            | email                | password | id              | name            | termsAndConditionsAgreedVersion |
+      | narrator        | narrator@example.org | 1234     | narrator        | Nathan Narrator | 0.0.4                           |
+      | search-for-me   | u1@example.org       | 1234     | user-for-search | Search for me   | 0.0.4                           |
+      | not-to-be-found | u2@example.org       | 1234     | just-an-id      | Not to be found | 0.0.4                           |
+    And the following "posts" are in the database:
       | id | title                                         | content                                 |
       | p1 | 101 Essays that will change the way you think | 101 Essays, of course (PR)!             |
-      | p2 | No content                       | will be found in this post, I guarantee |
-    And we have the following user accounts:
-      | slug            | name            | id               |
-      | search-for-me   | Search for me   | user-for-search  |
-      | not-to-be-found | Not to be found | just-an-id       | 
-
-    Given I am logged in
+      | p2 | No content                                    | will be found in this post, I guarantee |
+    And I am logged in as "narrator"
+    And I navigate to page "landing"
 
   Scenario: Search for specific words
     When I search for "Essays"
@@ -25,10 +25,12 @@ Feature: Search
 
   Scenario: Press enter opens search page
     When I type "PR" and press Enter
-    Then I should see the search results page
-    Then I should see the following posts on the search results page
+    Then I am on page "/search/search-results"
+    And the search parameter equals "?search=PR"
+    Then I should see the following posts on the search results page:
       | title                                         |
       | 101 Essays that will change the way you think |
+    And I wait for 750 milliseconds
 
   Scenario: Press escape clears search
     When I type "Ess" and press escape
@@ -37,7 +39,7 @@ Feature: Search
   Scenario: Select entry goes to post
     When I search for "Essays"
     And I select a post entry
-    Then I should be on the post's page
+    Then I am on page "/post/p1/101-essays-that-will-change-the-way-you-think"
 
   Scenario: Select dropdown content
     When I search for "Essays"
@@ -52,4 +54,4 @@ Feature: Search
       | slug            |
       | search-for-me   |
     And I select a user entry
-    Then I should be on the user's profile
+    Then I am on page "/profile/user-for-search/search-for-me"
