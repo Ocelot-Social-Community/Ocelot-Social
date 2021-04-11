@@ -4,7 +4,7 @@ Feature: Internationalization
   In order to be able to understand the interface
 
   Background:
-    Given I am on the "login" page
+    Given I navigate to page "/login"
 
   Scenario Outline: I select "<language>" in the language menu and see "<buttonLabel>"
     When I select "<language>" in the language menu
@@ -18,6 +18,6 @@ Feature: Internationalization
         | English    | Login       |
 
   Scenario: Keep preferred language after refresh
-    Given I previously switched the language to "Français"
+    When I select "Français" in the language menu
     And I refresh the page
     Then the whole user interface appears in "Français"
