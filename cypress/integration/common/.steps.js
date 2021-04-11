@@ -3,7 +3,6 @@ import {
   When,
   Then
 } from "cypress-cucumber-preprocessor/steps";
-import helpers from "../../support/helpers";
 import locales from '../../../webapp/locales'
 import orderBy from 'lodash/orderBy'
 
