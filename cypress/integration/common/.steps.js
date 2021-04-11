@@ -165,10 +165,6 @@ Then(/^I should see only ([0-9]+) posts? on the newsfeed/, postCount => {
   cy.get(".post-teaser").should("have.length", postCount);
 });
 
-Then("the first post on the newsfeed has the title:", title => {
-  cy.get(".post-teaser:first").should("contain", title);
-});
-
 Then(
   "the page {string} returns a 404 error with a message:",
   (route, message) => {
