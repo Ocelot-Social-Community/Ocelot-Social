@@ -10,10 +10,10 @@ Feature: Hide Posts
       | p2 | This post is disabled       |         | x        |
       | p3 | This post is deleted        | x       |          |
 
-  Scenario: Disabled posts don't show up on the landing page
+  Scenario: Disabled posts don't show up on the newsfeed
     Given I am logged in with a "user" role
-    Then I should see only 1 post on the landing page
-    And the first post on the landing page has the title:
+    Then I should see only 1 post on the newsfeed
+    And the first post on the newsfeed has the title:
       """
       This post should be visible
       """
