@@ -10,7 +10,7 @@ Feature: User authentication
       | peterpan@example.org | 1234     | id-of-peter-pan | Peter Pan | peter-pan | 0.0.4                           |
 
   Scenario: Log in
-    When I navigate to page "login"
+    When I navigate to page "/login"
     And I fill in my credentials "peterpan@example.org" "1234"
     And I click on "submit button"
     Then I am logged in with username "Peter Pan"

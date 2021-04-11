@@ -14,7 +14,7 @@ Feature: Search
       | p1 | 101 Essays that will change the way you think | 101 Essays, of course (PR)!             |
       | p2 | No content                                    | will be found in this post, I guarantee |
     And I am logged in as "narrator"
-    And I navigate to page "landing"
+    And I navigate to page "/"
 
   Scenario: Search for specific words
     When I search for "Essays"

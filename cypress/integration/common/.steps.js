@@ -161,11 +161,11 @@ When("I click on the avatar menu in the top right corner", () => {
   cy.get(".avatar-menu").click();
 });
 
-Then(/^I should see only ([0-9]+) posts? on the landing page/, postCount => {
+Then(/^I should see only ([0-9]+) posts? on the newsfeed/, postCount => {
   cy.get(".post-teaser").should("have.length", postCount);
 });
 
-Then("the first post on the landing page has the title:", title => {
+Then("the first post on the newsfeed has the title:", title => {
   cy.get(".post-teaser:first").should("contain", title);
 });
 

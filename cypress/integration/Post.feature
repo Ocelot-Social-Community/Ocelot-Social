@@ -13,11 +13,11 @@ Feature: See a post
       | aBcDeFgHiJ | previously created post | previously-created-post | id-of-peter-pan | with some content |
     And I am logged in as "narrator"
 
-  Scenario: See a post on the landing page
-    When I navigate to page "landing"
-    Then the post shows up on the landing page at position 1
+  Scenario: See a post on the newsfeed
+    When I navigate to page "/"
+    Then the post shows up on the newsfeed at position 1
 
   Scenario: Navigate to the Post Page
-    When I navigate to page "landing"
+    When I navigate to page "/"
     And I click on "the first post"
     Then I am on page "/post/.*"

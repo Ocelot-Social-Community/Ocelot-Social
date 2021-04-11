@@ -17,7 +17,7 @@ Feature: Comments on post
     And I am logged in as "narrator"
 
   Scenario: Comment creation
-    Given I navigate to page "post/bWBjpkTKZp/101-essays"
+    Given I navigate to page "/post/bWBjpkTKZp/101-essays"
     And I comment the following:
     """
     Ocelot.social rocks
@@ -28,7 +28,7 @@ Feature: Comments on post
     And the editor should be cleared
 
   Scenario: View medium length comments
-    Given I navigate to page "post/bWBjpkTKZp/101-essays"
+    Given I navigate to page "/post/bWBjpkTKZp/101-essays"
     And I type in a comment with 305 characters
     And I click on "comment button"
     Then my comment should be successfully created
@@ -36,7 +36,7 @@ Feature: Comments on post
     And the editor should be cleared
 
   Scenario: View long comments
-    Given I navigate to page "post/bWBjpkTKZp/101-essays"
+    Given I navigate to page "/post/bWBjpkTKZp/101-essays"
     And I type in a comment with 1205 characters
     And I click on "comment button"
     Then my comment should be successfully created
@@ -44,6 +44,6 @@ Feature: Comments on post
     And the editor should be cleared
 
   Scenario: Direct reply to Comment
-    Given I navigate to page "post/bWBjpkTKZp/101-essays"
+    Given I navigate to page "/post/bWBjpkTKZp/101-essays"
     And I click on "reply button"
     Then it should create a mention in the CommentForm

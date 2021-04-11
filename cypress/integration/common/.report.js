@@ -20,8 +20,8 @@ const savePostTitle = $post => {
     })
 }
 
-Given("I see David Irving's post on the landing page", page => {
-  cy.openPage('landing')
+Given("I see David Irving's post on the newsfeed", page => {
+  cy.openPage('newsfeed')
 })
 
 Given("I see David Irving's post on the post page", page => {
