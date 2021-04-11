@@ -20,4 +20,4 @@ Feature: See a post
   Scenario: Navigate to the Post Page
     When I navigate to page "landing"
     And I click on "the first post"
-    Then I am on page "post/..."
+    Then I am on page "/post/.*"

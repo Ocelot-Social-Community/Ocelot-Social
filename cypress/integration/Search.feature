@@ -30,7 +30,6 @@ Feature: Search
     Then I should see the following posts on the search results page:
       | title                                         |
       | 101 Essays that will change the way you think |
-    And I wait for 750 milliseconds
 
   Scenario: Press escape clears search
     When I type "Ess" and press escape
