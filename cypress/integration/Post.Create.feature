@@ -20,5 +20,5 @@ Feature: Create a post
       for active citizenship.
       """
     And I click on "save button"
-    Then I am on page ".../my-first-post"
+    Then I am on page "/post/.*/my-first-post"
     And the post was saved successfully

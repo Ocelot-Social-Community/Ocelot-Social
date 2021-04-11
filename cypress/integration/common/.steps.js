@@ -185,50 +185,6 @@ Then(
   }
 );
 
-When("open the notification menu and click on the first item", () => {
-  cy.get(".notifications-menu").invoke('show').click(); // "invoke('show')" because of the delay for show the menu
-  cy.get(".notification .link")
-    .first()
-    .click({
-      force: true
-    });
-});
-
-Then("see {int} unread notifications in the top menu", count => {
-  cy.get(".notifications-menu").should("contain", count);
-});
-
-Then("I get to the post page of {string}", path => {
-  path = path.replace("...", "");
-  cy.url().should("contain", "/post/");
-  cy.url().should("contain", path);
-});
-
-When(
-  "I start to write a new post with the title {string} beginning with:",
-  (title, intro) => {
-    cy.get(".post-add-button").click();
-    cy.get('input[name="title"]').type(title);
-    cy.get(".ProseMirror").type(intro);
-  }
-);
-
-When("mention {string} in the text", mention => {
-  cy.get(".ProseMirror").type(" @");
-  cy.get(".suggestion-list__item")
-    .contains(mention)
-    .click();
-});
-
-Then("the unread counter is removed", () => {
-  cy.get('.notifications-menu .counter-icon').should('not.exist');
-});
-
-Then("the notification menu button links to the all notifications page", () => {
-  cy.get(".notifications-menu").click();
-  cy.location("pathname").should("contain", "/notifications");
-});
-
 Given("there is an annoying user called {string}", name => {
   cy.factory().build("user", {
     id: "annoying-user",

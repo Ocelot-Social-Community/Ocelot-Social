@@ -19,7 +19,7 @@ Feature: Upload/Delete images on posts
     And I add all required fields
     And I click on "save button"
     And I wait for 750 milliseconds
-    Then I am on page ".../new-post"
+    Then I am on page "/post/.*/new-post"
     And I wait for 750 milliseconds
     And the post was saved successfully with the "new" teaser image
 
@@ -29,7 +29,7 @@ Feature: Upload/Delete images on posts
     And I click on "save button"
     Then I see a toaster with "Saved!"
     And I wait for 750 milliseconds
-    And I am on page ".../post-to-be-updated"
+    And I am on page "/post/.*/post-to-be-updated"
     And I wait for 750 milliseconds
     Then the post was saved successfully with the "updated" teaser image
   
@@ -46,7 +46,7 @@ Feature: Upload/Delete images on posts
     And I add all required fields
     And I click on "save button"
     And I wait for 750 milliseconds
-    Then I am on page ".../new-post"
+    Then I am on page "/post/.*/new-post"
     And I wait for 750 milliseconds
     And the "new" post was saved successfully without a teaser image
 
@@ -56,6 +56,6 @@ Feature: Upload/Delete images on posts
     Then I should be able to "remove" a teaser image
     And I click on "save button"
     And I wait for 750 milliseconds
-    Then I am on page ".../post-to-be-updated"
+    Then I am on page "/post/.*/post-to-be-updated"
     And I wait for 750 milliseconds
     And the "updated" post was saved successfully without a teaser image
