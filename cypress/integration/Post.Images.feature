@@ -18,6 +18,7 @@ Feature: Upload/Delete images on posts
     Then I should be able to "add" a teaser image
     And I add all required fields
     And I click on "save button"
+    And I wait for 750 milliseconds
     Then I am on page ".../new-post"
     And I wait for 750 milliseconds
     And the post was saved successfully with the "new" teaser image
@@ -27,6 +28,7 @@ Feature: Upload/Delete images on posts
     And I should be able to "change" a teaser image
     And I click on "save button"
     Then I see a toaster with "Saved!"
+    And I wait for 750 milliseconds
     And I am on page ".../post-to-be-updated"
     And I wait for 750 milliseconds
     Then the post was saved successfully with the "updated" teaser image
@@ -40,9 +42,10 @@ Feature: Upload/Delete images on posts
   Scenario: Add image, then delete it
     When I click on "create post button"
     Then I should be able to "add" a teaser image
-    And I should be able to remove the image
+    Then I should be able to "remove" a teaser image
     And I add all required fields
     And I click on "save button"
+    And I wait for 750 milliseconds
     Then I am on page ".../new-post"
     And I wait for 750 milliseconds
     And the "new" post was saved successfully without a teaser image
@@ -50,8 +53,9 @@ Feature: Upload/Delete images on posts
   Scenario: Delete existing image
     Given I navigate to page "post/edit/p1"
     And my post has a teaser image
-    Then I should be able to remove the image
+    Then I should be able to "remove" a teaser image
     And I click on "save button"
+    And I wait for 750 milliseconds
     Then I am on page ".../post-to-be-updated"
     And I wait for 750 milliseconds
     And the "updated" post was saved successfully without a teaser image

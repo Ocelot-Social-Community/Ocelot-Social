@@ -39,9 +39,3 @@ And("the post with title {string} has a ribbon for pinned posts", (title) => {
   cy.get('.crop-confirm')
     .click()
 }) */
-
-
-/*Then('I should be able to remove the image', () => {
-  cy.get('.dz-message > .base-button')
-    .click()
-})*/
