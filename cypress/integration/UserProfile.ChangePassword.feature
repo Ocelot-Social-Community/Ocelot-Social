@@ -1,4 +1,4 @@
-Feature: User change password
+Feature: User profile - change password
   As a user
   I want to change my password in my settings
   For security, e.g. if I exposed my password by accident
