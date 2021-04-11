@@ -52,26 +52,6 @@ When("a blocked user visits the post page of one of my authored posts", () => {
   cy.openPage('post/previously-created-post')
 })
 
-When("I select {string} in the language menu", name => {
-  cy.switchLanguage(name, true);
-});
-
-Given("I previously switched the language to {string}", name => {
-  cy.switchLanguage(name, true);
-});
-
-Then("the whole user interface appears in {string}", name => {
-  const {
-    code
-  } = helpers.getLangByName(name);
-  cy.get(`html[lang=${code}]`);
-  cy.getCookie("locale").should("have.property", "value", code);
-});
-
-Then("I see a button with the label {string}", label => {
-  cy.contains("button", label);
-});
-
 When(`I click on the menu item {string}`, linkOrButton => {
   cy.contains(".ds-menu-item", linkOrButton).click();
 });

@@ -19,11 +19,6 @@ import { GraphQLClient, request } from 'graphql-request'
 import { gql } from '../../backend/src/helpers/jest'
 import config from '../../backend/src/config'
 
-const switchLang = name => {
-  cy.get(".locale-menu").click();
-  cy.contains(".locale-menu-popover a", name).click();
-};
-
 const authenticatedHeaders = (variables) => {
   const mutation = gql`
     mutation($email: String!, $password: String!) {
@@ -36,19 +31,6 @@ const authenticatedHeaders = (variables) => {
     })
   })
 }
-
-Cypress.Commands.add("switchLanguage", (name, force) => {
-  const { code } = helpers.getLangByName(name);
-  if (force) {
-    switchLang(name);
-  } else {
-    cy.get("html").then($html => {
-      if ($html && $html.attr("lang") !== code) {
-        switchLang(name);
-      }
-    });
-  }
-});
 
 Cypress.Commands.add("logout", () => {
   cy.visit(`/logout`);
