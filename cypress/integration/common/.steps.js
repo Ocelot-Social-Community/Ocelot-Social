@@ -18,20 +18,6 @@ const annoyingParams = {
   password: "1234",
 };
 
-Given("I log in as {string}", name => {
-  cy.logout()
-  cy.neode()
-    .first("User", {
-      name
-    })
-    .then(user => {
-      return new Cypress.Promise((resolve, reject) => {
-        return user.toJson().then((user) => resolve(user))
-      })
-    })
-    .then(user => cy.login(user))
-})
-
 Given("the {string} user searches for {string}", (_, postTitle) => {
   cy.logout()
   cy.neode()
@@ -49,53 +35,7 @@ Given("the {string} user searches for {string}", (_, postTitle) => {
     .type(postTitle);
 });
 
-Given("we have a selection of categories", () => {
-  cy.factory().build('category', { id: "cat0", slug: "just-for-fun" });
-});
-
-Given("we have a selection of tags and categories as well as posts", () => {
-  cy.factory()
-    .build('category', { id: 'cat12', name: "Just For Fun", icon: "smile", })
-    .build('category', { id: 'cat121', name: "Happiness & Values", icon: "heart-o"})
-    .build('category', { id: 'cat122', name: "Health & Wellbeing", icon: "medkit"})
-    .build("tag", { id: "Ecology" })
-    .build("tag", { id: "Nature" })
-    .build("tag", { id: "Democracy" })
-    .build("user", { id: 'a1' })
-    .build("post", {}, {
-      authorId: 'a1',
-      tagIds: ["Ecology", "Nature", "Democracy"],
-      categoryIds: ["cat12"]
-    })
-    .build("post", {}, {
-      authorId: 'a1',
-      tagIds: ["Nature", "Democracy"],
-      categoryIds: ["cat121"]
-    })
-    .build("user", { id: 'a2' })
-    .build("post", {}, {
-      authorId: 'a2',
-      tagIds: ['Nature', 'Democracy'],
-      categoryIds: ["cat12"]
-    })
-    .build("post", {}, {
-      tagIds: ['Democracy'],
-      categoryIds: ["cat122"]
-    })
-});
-
-Given("my user account has the role {string}", role => {
-  cy.factory().build("user", {
-    role,
-    ...termsAndConditionsAgreedVersion,
-  }, /*loginCredentials*/ 'TODO');
-});
-
 When("I log out", cy.logout);
-
-When("I visit {string}", page => {
-  cy.openPage(page);
-});
 
 When("a blocked user visits the post page of one of my authored posts", () => {
   cy.logout()
@@ -111,10 +51,6 @@ When("a blocked user visits the post page of one of my authored posts", () => {
     .then(user => cy.login(user))
   cy.openPage('post/previously-created-post')
 })
-
-Given("I am on the {string} page", page => {
-  cy.openPage(page);
-});
 
 When("I select {string} in the language menu", name => {
   cy.switchLanguage(name, true);

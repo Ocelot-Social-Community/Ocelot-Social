@@ -105,12 +105,12 @@ Factory.define('user')
   })
 
 Factory.define('post')
-  /*.option('categoryIds', [])
+  /* .option('categoryIds', [])
   .option('categories', ['categoryIds'], (categoryIds) => {
     if (categoryIds.length) return Promise.all(categoryIds.map((id) => neode.find('Category', id)))
     // there must be at least one category
     return Promise.all([Factory.build('category')])
-  })*/
+  }) */
   .option('tagIds', [])
   .option('tags', ['tagIds'], (tagIds) => {
     return Promise.all(tagIds.map((id) => neode.find('Tag', id)))
@@ -147,16 +147,16 @@ Factory.define('post')
     return language || 'en'
   })
   .after(async (buildObject, options) => {
-    const [post, author, image, /*categories,*/ tags] = await Promise.all([
+    const [post, author, image, /* categories, */ tags] = await Promise.all([
       neode.create('Post', buildObject),
       options.author,
       options.image,
-      //options.categories,
+      // options.categories,
       options.tags,
     ])
     await Promise.all([
       post.relateTo(author, 'author'),
-      //Promise.all(categories.map((c) => c.relateTo(post, 'post'))),
+      // Promise.all(categories.map((c) => c.relateTo(post, 'post'))),
       Promise.all(tags.map((t) => t.relateTo(post, 'post'))),
     ])
     if (image) await post.relateTo(image, 'image')
