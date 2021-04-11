@@ -88,7 +88,7 @@ Given("my user account has the role {string}", role => {
   cy.factory().build("user", {
     role,
     ...termsAndConditionsAgreedVersion,
-  }, loginCredentials);
+  }, /*loginCredentials*/ 'TODO');
 });
 
 When("I log out", cy.logout);
@@ -157,10 +157,6 @@ Given("we have the following posts in our database:", table => {
   })
 })
 
-Then("I see a success message:", message => {
-  cy.contains(message);
-});
-
 When("I click on the avatar menu in the top right corner", () => {
   cy.get(".avatar-menu").click();
 });
@@ -188,52 +184,6 @@ Then(
     cy.get(".error-message").should("contain", message);
   }
 );
-
-Given("I am logged in with these credentials:", table => {
-  loginCredentials = table.hashes()[0];
-  cy.factory().build("user", {
-    ...termsAndConditionsAgreedVersion,
-    name: loginCredentials.email,
-  }, loginCredentials);
-  cy.neode()
-    .first("User", {
-      name: loginCredentials.email,
-    })
-    .then(user => {
-      return new Cypress.Promise((resolve, reject) => {
-        return user.toJson().then((user) => resolve(user))
-      })
-    })
-    .then(user => cy.login(user))
-});
-
-When("I fill the password form with:", table => {
-  table = table.rowsHash();
-  cy.get("input[id=oldPassword]")
-    .type(table["Your old password"])
-    .get("input[id=password]")
-    .type(table["Your new passsword"])
-    .get("input[id=passwordConfirmation]")
-    .type(table["Confirm new password"]);
-});
-
-When("submit the form", () => {
-  cy.get("form").submit();
-});
-
-Then("I cannot login anymore with password {string}", password => {
-  cy.reload();
-  const { email } = loginCredentials
-  cy.manualLogin({ email, password })
-    .get(".iziToast-wrapper").should("contain", "Incorrect email address or password.");
-});
-
-Then("I can login successfully with password {string}", password => {
-  cy.reload();
-  const { email } = loginCredentials
-  cy.manualLogin({ email, password })
-    .get(".iziToast-wrapper").should("contain", "You are logged in!");
-});
 
 When("open the notification menu and click on the first item", () => {
   cy.get(".notifications-menu").invoke('show').click(); // "invoke('show')" because of the delay for show the menu

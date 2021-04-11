@@ -8,6 +8,7 @@ When("I click on {string}", element => {
     'the first post': '.post-teaser:first-child',
     'comment button': 'button[type=submit]',
     'reply button': '.reply-button',
+    'security menu': 'a[href="/settings/security"]',
   }
 
   cy.get(elementSelectors[element])

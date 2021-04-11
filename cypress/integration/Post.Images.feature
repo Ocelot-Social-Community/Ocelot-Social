@@ -4,11 +4,13 @@ Feature: Upload/Delete images on posts
   So that I can personalize my posts
 
   Background:
-    Given I have an user account
-    And I am logged in
+    Given the following "users" are in the database:
+      | slug     | email                | password | id             | name            | termsAndConditionsAgreedVersion |
+      | narrator | narrator@example.org | 1234     | narrator       | Nathan Narrator | 0.0.4                           |
     And the following "posts" are in the database:
-      | authorId         | id | title              | content              | 
-      | id-of-peter-pan  | p1 | Post to be updated | successfully updated |
+      | authorId | id | title              | content              | 
+      | narrator | p1 | Post to be updated | successfully updated |
+    And I am logged in as "narrator"
     And I navigate to page "landing"
 
   Scenario: Create a Post with a Teaser Image
@@ -17,6 +19,7 @@ Feature: Upload/Delete images on posts
     And I add all required fields
     And I click on "save button"
     Then I am on page ".../new-post"
+    And I wait for 750 milliseconds
     And the post was saved successfully with the "new" teaser image
 
   Scenario: Update a Post to add an image
@@ -25,6 +28,7 @@ Feature: Upload/Delete images on posts
     And I click on "save button"
     Then I see a toaster with "Saved!"
     And I am on page ".../post-to-be-updated"
+    And I wait for 750 milliseconds
     Then the post was saved successfully with the "updated" teaser image
   
   Scenario: Add image, then add a different image
@@ -40,6 +44,7 @@ Feature: Upload/Delete images on posts
     And I add all required fields
     And I click on "save button"
     Then I am on page ".../new-post"
+    And I wait for 750 milliseconds
     And the "new" post was saved successfully without a teaser image
 
   Scenario: Delete existing image
@@ -48,4 +53,5 @@ Feature: Upload/Delete images on posts
     Then I should be able to remove the image
     And I click on "save button"
     Then I am on page ".../post-to-be-updated"
+    And I wait for 750 milliseconds
     And the "updated" post was saved successfully without a teaser image

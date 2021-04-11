@@ -9,14 +9,14 @@ Feature: Persistent Links
   | Name | yes        | no            | no     | Search, self-description      |
 
   Background:
-    Given I have an user account
-    And I am logged in
-    And the following "users" are in the database:
-      | id         | name            | slug    |
-      | MHNqce98y1 | Stephen Hawking | thehawk |
+    Given the following "users" are in the database:
+      | slug     | email                | password | id         | name            | termsAndConditionsAgreedVersion |
+      | thehawk  | hawk@example.org     | abcd     | MHNqce98y1 | Stephen Hawking | 0.0.4                           |
+      | narrator | narrator@example.org | 1234     | narrator   | Nathan Narrator | 0.0.4                           |
     And the following "posts" are in the database:
       | id         | title                                         | slug       |
       | bWBjpkTKZp | 101 Essays that will change the way you think | 101-essays |
+    And I am logged in as "narrator"
 
   Scenario Outline: Link with healable information is valid and gets auto-completed
     When I navigate to page "<url>"
