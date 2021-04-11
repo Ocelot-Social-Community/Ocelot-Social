@@ -66,39 +66,12 @@ Given("there is an annoying user who has muted me", () => {
     });
 });
 
-Given("I am on the profile page of the annoying user", name => {
-  cy.openPage("profile/annoying-user/spammy-spammer");
-});
-
-When("I ", name => {
-  cy.openPage("profile/annoying-user");
-});
-
-Then("the list of posts of this user is empty", () => {
-  cy.get(".base-card").not(".post-link");
-  cy.get(".main-container").find(".ds-space.hc-empty");
-});
-
 Given("I wrote a post {string}", title => {
   cy.factory()
     .build("post", {
       title,
     }, {
       authorId: narratorParams.id,
-    });
-});
-
-When("I mute the user {string}", name => {
-  cy.neode()
-    .first("User", {
-      name
-    })
-    .then(mutedUser => {
-      cy.neode()
-        .first("User", {
-          name: narratorParams.name
-        })
-        .relateTo(mutedUser, "muted");
     });
 });
 
