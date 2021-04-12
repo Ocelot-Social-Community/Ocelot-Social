@@ -15,6 +15,10 @@
         <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
         <following-filter />
       </div>
+      <div class="filter-menu-options">
+        <h2 class="title">{{ 'Sorted by …' }}</h2> <!-- Wolle -->
+        <date-sort-filter />
+      </div>
     </template>
   </dropdown>
 </template>
@@ -23,11 +27,13 @@
 import Dropdown from '~/components/Dropdown'
 import { mapGetters } from 'vuex'
 import FollowingFilter from './FollowingFilter'
+import DateSortFilter from './DateSortFilter'
 
 export default {
   components: {
     Dropdown,
     FollowingFilter,
+    DateSortFilter,
   },
   props: {
     placement: { type: String },

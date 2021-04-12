@@ -24,20 +24,21 @@ describe('PostIndex', () => {
     store = new Vuex.Store({
       getters: {
         'posts/filter': () => ({}),
-        'posts/orderOptions': () => () => [
-          {
-            key: 'store.posts.orderBy.oldest.label',
-            label: 'store.posts.orderBy.oldest.label',
-            icon: 'sort-amount-asc',
-            value: 'createdAt_asc',
-          },
-          {
-            key: 'store.posts.orderBy.newest.label',
-            label: 'store.posts.orderBy.newest.label',
-            icon: 'sort-amount-desc',
-            value: 'createdAt_desc',
-          },
-        ],
+        // Wolle
+        // 'posts/orderOptions': () => () => [
+        //   {
+        //     key: 'store.posts.orderBy.oldest.label',
+        //     label: 'store.posts.orderBy.oldest.label',
+        //     icon: 'sort-amount-asc',
+        //     value: 'createdAt_asc',
+        //   },
+        //   {
+        //     key: 'store.posts.orderBy.newest.label',
+        //     label: 'store.posts.orderBy.newest.label',
+        //     icon: 'sort-amount-desc',
+        //     value: 'createdAt_desc',
+        //   },
+        // ],
         'posts/selectedOrder': () => () => 'createdAt_desc',
         'posts/orderIcon': () => 'sort-amount-desc',
         'posts/orderBy': () => 'createdAt_desc',
@@ -119,10 +120,10 @@ describe('PostIndex', () => {
         })
       })
 
-      it('calls store when using order by menu', () => {
-        wrapper.findAll('li').at(0).trigger('click')
-        expect(mutations['posts/SELECT_ORDER']).toHaveBeenCalledWith({}, 'createdAt_asc')
-      })
+      // Wolle it('calls store when using order by menu', () => {
+      //   wrapper.findAll('li').at(0).trigger('click')
+      //   expect(mutations['posts/SELECT_ORDER']).toHaveBeenCalledWith({}, 'createdAt_asc')
+      // })
     })
   })
 })

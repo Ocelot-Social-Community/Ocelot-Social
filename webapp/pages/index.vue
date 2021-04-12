@@ -97,7 +97,8 @@ import HcEmpty from '~/components/Empty/Empty'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
-import { mapGetters, mapMutations } from 'vuex'
+// Wolle import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
 import { filterPosts } from '~/graphql/PostQuery.js'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import links from '~/constants/links.js'
@@ -129,24 +130,24 @@ export default {
   computed: {
     ...mapGetters({
       postsFilter: 'posts/filter',
-      orderOptions: 'posts/orderOptions',
+      // Wolle care for the store !!! orderOptions: 'posts/orderOptions',
       orderBy: 'posts/orderBy',
-      selectedOrder: 'posts/selectedOrder',
-      sortingIcon: 'posts/orderIcon',
+      // Wolle selectedOrder: 'posts/selectedOrder',
+      // Wolle sortingIcon: 'posts/orderIcon',
     }),
-    selected: {
-      get() {
-        return this.selectedOrder(this)
-      },
-      set({ value }) {
-        this.offset = 0
-        this.posts = []
-        this.selectOrder(value)
-      },
-    },
-    sortingOptions() {
-      return this.orderOptions(this)
-    },
+    // Wolle selected: {
+    //   get() {
+    //     return this.selectedOrder(this)
+    //   },
+    //   set({ value }) {
+    //     this.offset = 0
+    //     this.posts = []
+    //     this.selectOrder(value)
+    //   },
+    // },
+    // Wolle sortingOptions() {
+    //   return this.orderOptions(this)
+    // },
     finalFilters() {
       let filter = this.postsFilter
       if (this.hashtag) {
@@ -163,9 +164,9 @@ export default {
   },
   watchQuery: ['hashtag'],
   methods: {
-    ...mapMutations({
-      selectOrder: 'posts/SELECT_ORDER',
-    }),
+    // Wolle ...mapMutations({
+    //   selectOrder: 'posts/SELECT_ORDER',
+    // }),
     clearSearch() {
       this.$router.push({ path: '/' })
       this.hashtag = null
