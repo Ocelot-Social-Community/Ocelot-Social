@@ -33,18 +33,18 @@ Feature: Mute a User
   Scenario: Posts of muted users are filtered from search results, users are not
     Given "annoying-user" wrote a post "Spam Spam Spam"
     When I search for "Spam"
-    And I wait for 750 milliseconds
+    And I wait for 3000 milliseconds
     Then I should see the following posts in the select dropdown:
       | title          |
       | Spam Spam Spam |
     When I mute the user "Annoying User"
     And I refresh the page
     And I search for "Anno"
-    And I wait for 750 milliseconds
+    And I wait for 3000 milliseconds
     Then the search should not contain posts by the annoying user
     But the search should contain the annoying user
     But I search for "not muted"
-    And I wait for 750 milliseconds
+    And I wait for 3000 milliseconds
     Then I should see the following posts in the select dropdown:
       | title                    |
       | Post that should be seen |
@@ -54,7 +54,7 @@ Feature: Mute a User
     And I am logged in as "annoying-user"
     And I navigate to page "/"
     And I search for "previously created"
-    And I wait for 750 milliseconds
+    And I wait for 3000 milliseconds
     Then I should see the following posts in the select dropdown:
       | title                   |
       | previously created post |

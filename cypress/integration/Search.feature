@@ -18,7 +18,7 @@ Feature: Search
 
   Scenario: Search for specific words
     When I search for "Essays"
-    And I wait for 750 milliseconds
+    And I wait for 3000 milliseconds
     Then I should have one item in the select dropdown
     Then I should see the following posts in the select dropdown:
       | title                                         |
@@ -38,7 +38,7 @@ Feature: Search
 
   Scenario: Select entry goes to post
     When I search for "Essays"
-    And I wait for 750 milliseconds
+    And I wait for 3000 milliseconds
     And I select a post entry
     Then I am on page "/post/p1/101-essays-that-will-change-the-way-you-think"
 
