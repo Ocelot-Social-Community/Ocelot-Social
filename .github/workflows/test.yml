@@ -281,7 +281,6 @@ jobs:
     strategy:
       matrix:
         # run copies of the current job in parallel
-        jobs: 5
         job: [0, 1, 2, 3, 4]
     steps:
       ##########################################################################
@@ -325,7 +324,7 @@ jobs:
       - name: cypress | Fullstack tests
         run: |
           yarn install
-          yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ matrix.jobs }})
+          yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} 5 )
       ##########################################################################
       # UPLOAD SCREENSHOTS & VIDEO #############################################
       ##########################################################################
