@@ -40,7 +40,7 @@ Feature: User - block an user
     Given "harassing-user" wrote a post "You can still see my posts"
     And I block the user "Harassing User"
     When I search for "see"
-    And I wait for 750 milliseconds
+    And I wait for 3000 milliseconds
     Then I should see the following posts in the select dropdown:
       | title                      |
       | You can still see my posts |
@@ -50,7 +50,7 @@ Feature: User - block an user
     And I am logged in as "harassing-user"
     And I navigate to page "/"
     And I search for "previously created"
-    And I wait for 750 milliseconds
+    And I wait for 3000 milliseconds
     Then I should see the following posts in the select dropdown:
       | title                   |
       | previously created post |
