@@ -16,7 +16,7 @@
         <following-filter />
       </div>
       <div class="filter-menu-options">
-        <h2 class="title">{{ $t('filter-menu.order-by') }}</h2> <!-- Wolle -->
+        <h2 class="title">{{ $t('filter-menu.order-by') }}</h2>
         <date-sort-filter />
       </div>
     </template>

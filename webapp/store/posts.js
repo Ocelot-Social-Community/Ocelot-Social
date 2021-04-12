@@ -7,25 +7,11 @@ import clone from 'lodash/clone'
 
 const defaultFilter = {}
 
-// Wolle const orderOptions = {
-//   createdAt_asc: {
-//     value: 'createdAt_asc',
-//     key: 'store.posts.orderBy.oldest.label',
-//     icon: 'sort-amount-asc',
-//   },
-//   createdAt_desc: {
-//     value: 'createdAt_desc',
-//     key: 'store.posts.orderBy.newest.label',
-//     icon: 'sort-amount-desc',
-//   },
-// }
-
 export const state = () => {
   return {
     filter: {
       ...defaultFilter,
     },
-    // Wolle order: orderOptions.createdAt_desc,
     order: 'createdAt_desc',
   }
 }
@@ -78,7 +64,6 @@ export const mutations = {
     state.filter = filter
   },
   TOGGLE_ORDER(state, value) {
-    // Wolle state.order = orderOptions[value]
     state.order = value
   },
 }
@@ -102,24 +87,7 @@ export const getters = {
   filteredByEmotions(state) {
     return get(state.filter, 'emotions_some.emotion_in') || []
   },
-  // Wolle orderOptions: (state) => ({ $t }) =>
-  //   Object.values(orderOptions).map((option) => {
-  //     return {
-  //       ...option,
-  //       label: $t(option.key),
-  //     }
-  //   }),
-  // Wolle selectedOrder: (state) => ({ $t }) => {
-  //   return {
-  //     ...state.order,
-  //     label: $t(state.order.key),
-  //   }
-  // },
   orderBy(state) {
-    // return state.order.value
     return state.order
   },
-  // Wolle orderIcon(state) {
-  //   return state.order.icon
-  // },
 }
