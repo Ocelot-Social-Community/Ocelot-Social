@@ -280,9 +280,19 @@
     "all": "Все",
     "categories": "Категории",
     "emotions": "",
-    "filter-by": "Другие фильтры",
+    "filter-by": "Другие фильтры ...",
     "following": "Мои подписки",
-    "languages": "Языки"
+    "languages": "Языки",
+    "order": {
+      "newest": {
+        "hint": null,
+        "label": "Сначала новые"
+      },
+      "oldest": {
+        "hint": null,
+        "label": "Сначала старые"
+      }
+    }
   },
   "followButton": {
     "follow": "Подписаться",
@@ -701,18 +711,6 @@
     "termsAndConditions": "Условия и положения",
     "thanks": "Спасибо!",
     "tribunal": "Суд регистрации"
-  },
-  "store": {
-    "posts": {
-      "orderBy": {
-        "newest": {
-          "label": "Сначала новые"
-        },
-        "oldest": {
-          "label": "Сначала старые"
-        }
-      }
-    }
   },
   "termsAndConditions": {
     "newTermsAndConditions": "Новые условия и положения",

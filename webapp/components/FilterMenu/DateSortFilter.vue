@@ -1,29 +1,21 @@
 <template>
   <filter-menu-section :divider="false" class="date-sort-filter">
     <template #filter-list>
-      <!-- Wolle 👇🏼 translations & click
-      <labeled-button
-        icon="user-plus"
-        :label="$t('filter-menu.following')"
-        :filled="filteredByUsersFollowed"
-        :title="$t('contribution.filterFollow')"
-        @click="toggleFilteredByFollowed(currentUser.id)"
-      /> -->
       <li class="item">
         <labeled-button
           icon="sort-amount-asc"
-          :label="'Newest first'"
+          :label="$t('filter-menu.order.newest.label')"
           :filled="orderBy === 'createdAt_desc'"
-          :title="'Sort posts by the newest first'"
+          :title="$t('filter-menu.order.newest.hint')"
           @click="toggleOrder('createdAt_desc')"
         />
       </li>
       <li class="item">
         <labeled-button
           icon="sort-amount-desc"
-          :label="'Oldest first'"
+          :label="$t('filter-menu.order.oldest.label')"
           :filled="orderBy === 'createdAt_asc'"
-          :title="'Sort posts by the oldest first'"
+          :title="$t('filter-menu.order.oldest.hint')"
           @click="toggleOrder('createdAt_asc')"
         />
       </li>

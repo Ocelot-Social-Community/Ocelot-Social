@@ -39,8 +39,8 @@ describe('PostIndex', () => {
         //     value: 'createdAt_desc',
         //   },
         // ],
-        'posts/selectedOrder': () => () => 'createdAt_desc',
-        'posts/orderIcon': () => 'sort-amount-desc',
+        // 'posts/selectedOrder': () => () => 'createdAt_desc',
+        // 'posts/orderIcon': () => 'sort-amount-desc',
         'posts/orderBy': () => 'createdAt_desc',
         'auth/user': () => {
           return { id: 'u23' }

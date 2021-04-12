@@ -333,9 +333,20 @@
     "all": "All",
     "categories": "Categories of Content",
     "emotions": "Emotions",
-    "filter-by": "Filter by...",
+    "filter-by": "Filter by ...",
     "following": "Users I follow",
-    "languages": "Languages"
+    "languages": "Languages",
+    "order": {
+      "newest": {
+        "hint": "Sort posts by the newest first",
+        "label": "Newest first"
+      },
+      "oldest": {
+        "hint": "Sort posts by the oldest first",
+        "label": "Oldest first"
+      }
+    },
+    "order-by": "Order by ..."
   },
   "followButton": {
     "follow": "Follow",
@@ -778,18 +789,6 @@
     "termsAndConditions": "Terms and conditions",
     "thanks": "Thanks!",
     "tribunal": "Registry court"
-  },
-  "store": {
-    "posts": {
-      "orderBy": {
-        "newest": {
-          "label": "Newest"
-        },
-        "oldest": {
-          "label": "Oldest"
-        }
-      }
-    }
   },
   "termsAndConditions": {
     "newTermsAndConditions": "New Terms and Conditions",

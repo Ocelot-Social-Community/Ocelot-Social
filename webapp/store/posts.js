@@ -109,17 +109,17 @@ export const getters = {
   //       label: $t(option.key),
   //     }
   //   }),
-  selectedOrder: (state) => ({ $t }) => {
-    return {
-      ...state.order,
-      label: $t(state.order.key),
-    }
-  },
+  // Wolle selectedOrder: (state) => ({ $t }) => {
+  //   return {
+  //     ...state.order,
+  //     label: $t(state.order.key),
+  //   }
+  // },
   orderBy(state) {
     // return state.order.value
     return state.order
   },
-  orderIcon(state) {
-    return state.order.icon
-  },
+  // Wolle orderIcon(state) {
+  //   return state.order.icon
+  // },
 }
