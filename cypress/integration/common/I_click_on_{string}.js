@@ -10,6 +10,7 @@ When("I click on {string}", element => {
     'reply button': '.reply-button',
     'security menu': 'a[href="/settings/security"]',
     'pin post': '.ds-menu-item:first-child',
+    'Moderation': 'a[href="/moderation"]',
   }
 
   cy.get(elementSelectors[element])

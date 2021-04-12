@@ -40,30 +40,12 @@ Given("we have the following posts in our database:", table => {
   })
 })
 
-When("I click on the avatar menu in the top right corner", () => {
-  cy.get(".avatar-menu").click();
-});
-
 Given("there is an annoying user called {string}", name => {
   cy.factory().build("user", {
     id: "annoying-user",
     name,
     ...termsAndConditionsAgreedVersion,
   }, annoyingParams);
-});
-
-Given("there is an annoying user who has muted me", () => {
-  cy.neode()
-    .first("User", {
-      role: 'moderator'
-    })
-    .then(mutedUser => {
-      cy.neode()
-        .first("User", {
-          id: 'annoying-user'
-        })
-        .relateTo(mutedUser, "muted");
-    });
 });
 
 Given("I wrote a post {string}", title => {
