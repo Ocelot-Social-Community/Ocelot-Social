@@ -38,6 +38,7 @@ Feature: Search
 
   Scenario: Select entry goes to post
     When I search for "Essays"
+    And I wait for 750 milliseconds
     And I select a post entry
     Then I am on page "/post/p1/101-essays-that-will-change-the-way-you-think"
 
