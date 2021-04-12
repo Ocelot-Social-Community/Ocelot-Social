@@ -2,7 +2,8 @@
   "projectId": "qa7fe2",
   "ignoreTestFiles": "*.js",
   "baseUrl": "http://localhost:3000",
-  "env": {
-    "RETRIES": 2
+  "retries": {
+    "runMode": 2,
+    "openMode": 0
   }
 }
