@@ -23,6 +23,7 @@ Feature: Notification for a mention
     And I navigate to page "/"
     And see 1 unread notifications in the top menu
     And open the notification menu and click on the first item
+    And I wait for 750 milliseconds
     Then I am on page "/post/.*/hey-matt"
     And the unread counter is removed
     And the notification menu button links to the all notifications page
