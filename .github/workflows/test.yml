@@ -236,11 +236,9 @@ jobs:
       - name: backend | copy env files backend
         run: cp backend/.env.template backend/.env
       - name: backend | docker-compose
-        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
+        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up -v ~/coverage:/app/coverage --detach --no-deps webapp
       - name: webapp | Unit tests
-        run: |
-          docker-compose -v ~/coverage:/app/coverage exec -T webapp yarn test
-          cp -r ~/coverage ./coverage
+        run: docker-compose exec -T webapp yarn test
       ##########################################################################
       # COVERAGE REPORT FRONTEND ################################################
       ##########################################################################
