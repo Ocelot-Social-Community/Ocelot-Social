@@ -19,7 +19,7 @@ describe('PostIndex', () => {
 
   beforeEach(() => {
     mutations = {
-      'posts/SELECT_ORDER': jest.fn(),
+      'posts/TOGGLE_ORDER': jest.fn(),
     }
     store = new Vuex.Store({
       getters: {

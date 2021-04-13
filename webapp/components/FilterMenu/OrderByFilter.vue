@@ -1,5 +1,5 @@
 <template>
-  <filter-menu-section :divider="false" class="date-sort-filter">
+  <filter-menu-section :divider="false" class="order-by-Filter">
     <template #filter-list>
       <li class="item">
         <labeled-button
@@ -29,7 +29,7 @@ import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
 
 export default {
-  name: 'DateSortFilter',
+  name: 'OrderByFilter',
   components: {
     FilterMenuSection,
     LabeledButton,
