@@ -204,6 +204,16 @@ jobs:
         run: docker-compose exec -T backend yarn db:migrate init
       - name: backend | Unit test
         run: docker-compose exec -T backend yarn test
+      ##########################################################################
+      # COVERAGE CHECK BACKEND #################################################
+      ##########################################################################
+      - name: backend | Coverage check
+        uses: devmasx/coverage-check-action@v1.2.0
+        with:
+          type: lcov
+          result_path: ./coverage/lcov.info
+          min_coverage: 52
+          token: ${{ github.token }}
 
   ##############################################################################
   # JOB: UNIT TEST WEBAPP ######################################################
@@ -249,9 +259,9 @@ jobs:
       #    github-token: ${{ secrets.GITHUB_TOKEN }}
       #    lcov-file: ./coverage/lcov.info
       ##########################################################################
-      # COVERAGE CHECK FRONTEND ################################################
+      # COVERAGE CHECK WEBAPP ##################################################
       ##########################################################################
-      - name: frontend | Coverage check
+      - name: webapp | Coverage check
         uses: devmasx/coverage-check-action@v1.2.0
         with:
           type: lcov
