@@ -1,5 +1,5 @@
 <template>
-  <filter-menu-section :divider="false" class="order-by-Filter">
+  <filter-menu-section :divider="false" class="order-by-filter">
     <template #filter-list>
       <li class="item">
         <labeled-button
@@ -8,6 +8,7 @@
           :filled="orderBy === 'createdAt_desc'"
           :title="$t('filter-menu.order.newest.hint')"
           @click="toggleOrder('createdAt_desc')"
+          data-test="newest-button"
         />
       </li>
       <li class="item">
@@ -17,6 +18,7 @@
           :filled="orderBy === 'createdAt_asc'"
           :title="$t('filter-menu.order.oldest.hint')"
           @click="toggleOrder('createdAt_asc')"
+          data-test="oldest-button"
         />
       </li>
     </template>

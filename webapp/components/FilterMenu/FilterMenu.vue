@@ -17,7 +17,7 @@
       </div>
       <div class="filter-menu-options">
         <h2 class="title">{{ $t('filter-menu.order-by') }}</h2>
-        <order-by-Filter />
+        <order-by-filter />
       </div>
     </template>
   </dropdown>
