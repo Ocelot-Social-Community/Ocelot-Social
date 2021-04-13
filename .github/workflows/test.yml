@@ -244,7 +244,7 @@ jobs:
       ##########################################################################
       # TODO: Maybe remove this later on to avoid spam?
       - name: frontend | Coverage report
-        uses: romeovs/lcov-reporter-action@v0.2.21
+        uses: mszlgr/lcov-reporter-action@v0.2.23
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           lcov-file: ./coverage/lcov.info
