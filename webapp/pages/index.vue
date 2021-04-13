@@ -1,39 +1,41 @@
 <template>
   <div>
-    <!-- <ds-space /> -->
+    <!-- Wolle <ds-space /> -->
     <!-- <ds-flex :width="{ base: '100%' }" gutter="base"> -->
-    <ds-flex>
-      <!-- <ds-flex-item
+    <!-- <ds-flex> -->
+    <!-- <ds-flex-item
         v-if="NEWSFEED_SHOW_INFO_LEFT_LANE"
         :width="{ base: '100%', sm: 2, md: 2, lg: 1 }"
       > -->
-      <ds-flex-item v-if="NEWSFEED_SHOW_INFO_LEFT_LANE" :width="{ base: '270px' }">
-        <!-- Wolle -->
-        <donation-info
+    <!-- <ds-flex-item v-if="NEWSFEED_SHOW_INFO_LEFT_LANE" :width="{ base: '270px' }"> -->
+    <!-- Wolle -->
+    <!-- <donation-info
           v-if="DONATIONS_SHOW_INFO"
           class="newsfeed-left-side-navigation"
           :title="'Donation progress'"
-        />
-        <!-- Wolle <div v-if-else>
+        /> -->
+    <!-- Wolle <div v-if-else>
           <a target="_blank" :href="links.DONATE">
             <base-button filled>{{ $t('donations.donate-now') }}</base-button>
           </a>
         </div> -->
-      </ds-flex-item>
+    <!-- </ds-flex-item>
 
-      <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
-        <masonry-grid>
-          <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
-            <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
-          </ds-grid-item>
-          <!-- Wolle <ds-grid-item :row-span="2" column-span="fullWidth" class="top-info-bar"> -->
-          <!--<donation-info /> -->
-          <!-- Wolle <div>
+      <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }"> -->
+    <masonry-grid>
+      <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
+        <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
+      </ds-grid-item>
+      <ds-grid-item class="top-info-bar" :row-span="1" column-span="fullWidth">
+        <!--<donation-info /> -->
+        <donation-info v-if="DONATIONS_SHOW_INFO" :title="'Donation progress'" />
+        <!-- class="newsfeed-left-side-navigation" -->
+        <!-- Wolle <div>
               <a target="_blank" :href="links.DONATE">
                 <base-button filled>{{ $t('donations.donate-now') }}</base-button>
               </a>
             </div> -->
-          <!-- Wolle <div class="sorting-dropdown">
+        <!-- Wolle <div class="sorting-dropdown">
               <ds-select
                 v-model="selected"
                 :options="sortingOptions"
@@ -41,31 +43,31 @@
                 :icon-right="sortingIcon"
               ></ds-select>
             </div> -->
-          <!-- </ds-grid-item> -->
-          <template v-if="hasResults">
-            <masonry-grid-item
-              v-for="post in posts"
-              :key="post.id"
-              :imageAspectRatio="post.image && post.image.aspectRatio"
-            >
-              <post-teaser
-                :post="post"
-                @removePostFromList="posts = removePostFromList(post, posts)"
-                @pinPost="pinPost(post, refetchPostList)"
-                @unpinPost="unpinPost(post, refetchPostList)"
-              />
-            </masonry-grid-item>
-          </template>
-          <template v-else>
-            <ds-grid-item :row-span="2" column-span="fullWidth">
-              <hc-empty icon="docs" />
-              <ds-text align="center">{{ $t('index.no-results') }}</ds-text>
-              <ds-text align="center">{{ $t('index.change-filter-settings') }}</ds-text>
-            </ds-grid-item>
-          </template>
-        </masonry-grid>
-      </ds-flex-item>
-    </ds-flex>
+      </ds-grid-item>
+      <template v-if="hasResults">
+        <masonry-grid-item
+          v-for="post in posts"
+          :key="post.id"
+          :imageAspectRatio="post.image && post.image.aspectRatio"
+        >
+          <post-teaser
+            :post="post"
+            @removePostFromList="posts = removePostFromList(post, posts)"
+            @pinPost="pinPost(post, refetchPostList)"
+            @unpinPost="unpinPost(post, refetchPostList)"
+          />
+        </masonry-grid-item>
+      </template>
+      <template v-else>
+        <ds-grid-item :row-span="2" column-span="fullWidth">
+          <hc-empty icon="docs" />
+          <ds-text align="center">{{ $t('index.no-results') }}</ds-text>
+          <ds-text align="center">{{ $t('index.change-filter-settings') }}</ds-text>
+        </ds-grid-item>
+      </template>
+    </masonry-grid>
+    <!-- </ds-flex-item> -->
+    <!-- Wolle </ds-flex> -->
     <client-only>
       <nuxt-link :to="{ name: 'post-create' }">
         <base-button
@@ -205,11 +207,11 @@ export default {
 </script>
 
 <style lang="scss">
-.newsfeed-left-side-navigation {
-  position: sticky;
-  top: 65px;
-  z-index: 2;
-}
+// Wolle .newsfeed-left-side-navigation {
+//   position: sticky;
+//   top: 65px;
+//   z-index: 2;
+// }
 
 .masonry-grid {
   display: grid;
@@ -248,13 +250,15 @@ export default {
 }
 
 .top-info-bar {
+  // margin-bottom: $space-x-small;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+  // justify-content: space-between;
+  // align-items: flex-end;
+  align-items: center;
 
-  @media (max-width: 546px) {
-    grid-row-end: span 3 !important;
-    flex-direction: column;
-  }
+  // Wolle @media (max-width: 546px) {
+  //   grid-row-end: span 3 !important;
+  //   flex-direction: column;
+  // }
 }
 </style>

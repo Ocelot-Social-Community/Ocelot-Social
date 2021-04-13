@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils'
 import ProgressBar from './ProgressBar'
 
+const localVue = global.localVue
+
 describe('ProgessBar.vue', () => {
   let propsData
 
@@ -11,7 +13,7 @@ describe('ProgessBar.vue', () => {
     }
   })
 
-  const Wrapper = () => mount(ProgressBar, { propsData })
+  const Wrapper = () => mount(ProgressBar, { localVue, propsData })
 
   describe('given only goal and progress', () => {
     it('renders no title', () => {
