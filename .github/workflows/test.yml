@@ -238,4 +238,25 @@ jobs:
       - name: backend | docker-compose
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
       - name: webapp | Unit tests
-        run: docker-compose exec -T webapp yarn test
+        run: |
+          docker-compose -v ~/coverage:/app/coverage exec -T webapp yarn test
+          cp -r ~/coverage ./coverage
+      ##########################################################################
+      # COVERAGE REPORT FRONTEND ################################################
+      ##########################################################################
+      # TODO: Maybe remove this later on to avoid spam?
+      - name: frontend | Coverage report
+        uses: romeovs/lcov-reporter-action@v0.2.21
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: ./coverage/lcov.info
+      ##########################################################################
+      # COVERAGE CHECK FRONTEND ################################################
+      ##########################################################################
+      - name: frontend | Coverage check
+        uses: devmasx/coverage-check-action@v1.2.0
+        with:
+          type: lcov
+          result_path: ./coverage/lcov.info
+          min_coverage: 45
+          token: ${{ github.token }}
