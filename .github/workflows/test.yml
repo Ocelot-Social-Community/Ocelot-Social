@@ -210,7 +210,7 @@ jobs:
       - name: backend | Coverage check
         uses: webcraftmedia/coverage-check-action@master
         with:
-          name: Coverage Backend
+          report_name: Coverage Backend
           type: lcov
           result_path: ./coverage/lcov.info
           min_coverage: 58
@@ -265,7 +265,7 @@ jobs:
       - name: webapp | Coverage check
         uses: webcraftmedia/coverage-check-action@master
         with:
-          name: Coverage Webapp
+          report_name: Coverage Webapp
           type: lcov
           result_path: ./coverage/lcov.info
           min_coverage: 52
