@@ -204,6 +204,17 @@ jobs:
         run: docker-compose exec -T backend yarn db:migrate init
       - name: backend | Unit test
         run: docker-compose exec -T backend yarn test
+      ##########################################################################
+      # COVERAGE CHECK BACKEND #################################################
+      ##########################################################################
+      - name: backend | Coverage check
+        uses: webcraftmedia/coverage-check-action@master
+        with:
+          report_name: Coverage Backend
+          type: lcov
+          result_path: ./coverage/lcov.info
+          min_coverage: 58
+          token: ${{ github.token }}
 
   ##############################################################################
   # JOB: UNIT TEST WEBAPP ######################################################
@@ -239,3 +250,23 @@ jobs:
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
       - name: webapp | Unit tests
         run: docker-compose exec -T webapp yarn test
+      ##########################################################################
+      # COVERAGE REPORT FRONTEND ################################################
+      ##########################################################################
+      # TODO: Maybe remove this later on to avoid spam?
+      #- name: frontend | Coverage report
+      #  uses: romeovs/lcov-reporter-action@v0.2.21
+      #  with:
+      #    github-token: ${{ secrets.GITHUB_TOKEN }}
+      #    lcov-file: ./coverage/lcov.info
+      ##########################################################################
+      # COVERAGE CHECK WEBAPP ##################################################
+      ##########################################################################
+      - name: webapp | Coverage check
+        uses: webcraftmedia/coverage-check-action@master
+        with:
+          report_name: Coverage Webapp
+          type: lcov
+          result_path: ./coverage/lcov.info
+          min_coverage: 52
+          token: ${{ github.token }}
