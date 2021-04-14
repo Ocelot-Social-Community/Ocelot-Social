@@ -8,6 +8,9 @@
     <div class="progress-bar">
       <div class="progress-bar__goal"></div>
       <div class="progress-bar__progress" :style="progressBarWidth"></div>
+      <div class="progress-bar__border" style="width: 100%">
+        <span v-if="label" class="progress-bar__label">{{ label }}</span>
+      </div>
     </div>
     <!-- </ds-flex-item> -->
     <!-- <ds-flex-item :width="{ base: '100px' }"> -->
@@ -106,11 +109,12 @@ export default {
 
 .progress-bar__goal {
   position: relative;
-  bottom: 0;
-  left: 0;
   height: 36px; // styleguide-button-size
-  // width: 100%;
-  background-color: $color-neutral-100;
+  // Wolle width: 100%;
+  border: 1px solid $color-primary;
+  // Wolle background-color: $color-neutral-100;
+  // background-color: $color-neutral-70;
+  background: repeating-linear-gradient(120deg, $color-neutral-80, $color-neutral-70);
   border-radius: $border-radius-base;
 }
 
@@ -120,23 +124,51 @@ export default {
   left: 0px;
   height: 36px; // styleguide-button-size
   max-width: 100%;
-  background-color: $color-yellow;
+  // Wolle background-color: $color-yellow;
+  // background: repeating-linear-gradient(60deg, $color-primary-light, $color-primary-light 35px, $color-primary 35px, $color-primary 70px);
+  // background: repeating-linear-gradient(60deg, $color-primary-light, $color-primary-light 35px, $color-primary 35px, $color-primary 50px);
+  // background: repeating-linear-gradient(60deg, $color-primary-light, $color-primary-light 25px, $color-primary 35px, $color-primary 50px, $color-primary-light, $color-primary, $color-primary);
+  // background: repeating-linear-gradient(120deg, $color-primary 0px, $color-primary 35px, $color-primary-light 45px, $color-primary-light 80px, $color-primary 90px);
+  background: repeating-linear-gradient(
+    120deg,
+    $color-primary 0px,
+    $color-primary 30px,
+    $color-primary-light 50px,
+    $color-primary-light 75px,
+    $color-primary 95px
+  );
+  border-radius: $border-radius-base;
+}
+
+.progress-bar__border {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 36px; // styleguide-button-size
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  // Wolle border: 1px solid $color-primary;
   border-radius: $border-radius-base;
 }
 
 .progress-bar__label {
   // Wolle
-  // position: absolute;
-  // top: 50px;
-  margin-left: $space-xxx-small;
+  position: relative;
+  // top: 8px;
+  // right: 8px;
+  // text-align: right;
+  float: right;
+  // margin-left: $space-xxx-small;
 
   @media (max-width: 350px) {
     font-size: $font-size-small;
+    // top: 10px;
   }
 }
 
 .progress-bar-button {
-  // justify-content: flex-end;
   float: right;
 }
 </style>
