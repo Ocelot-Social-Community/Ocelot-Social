@@ -8,39 +8,37 @@
 
 <script>
 export default {
-  props: [
-    'iconName'
-  ],
+  props: ['iconName'],
   emits: ['toggle-password'],
   methods: {
     togglePassword(event) {
       event.preventDefault()
       this.$emit('show-password')
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss">
-  .icon-wrapper {
-    margin-right: 2px;
-  }
+.icon-wrapper {
+  margin-right: 2px;
+}
 
-  .click-wrapper {
-    padding: 8px;
-    align-content: center;
-    color: $text-color-disabled;
-    cursor: pointer;
-  }
+.click-wrapper {
+  padding: 8px;
+  align-content: center;
+  color: $text-color-disabled;
+  cursor: pointer;
+}
 
-  .click-wrapper:hover {
-    &:focus-within {
-      background-color: $background-color-base;
-      border: $input-border-size solid $border-color-active;
+.click-wrapper:hover {
+  &:focus-within {
+    background-color: $background-color-base;
+    border: $input-border-size solid $border-color-active;
 
-      .toggle-icon {
-        color: $text-color-base;
-      }
+    .toggle-icon {
+      color: $text-color-base;
     }
   }
+}
 </style>

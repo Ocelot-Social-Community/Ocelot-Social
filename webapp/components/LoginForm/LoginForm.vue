@@ -31,7 +31,7 @@
             ref="password"
             :type="showPassword ? 'text' : 'password'"
           />
-          <show-password @show-password="toggleShowPassword" :iconName='iconName' />
+          <show-password @show-password="toggleShowPassword" :iconName="iconName" />
         </div>
         <nuxt-link to="/password-reset/request">
           {{ $t('login.forgotPassword') }}
@@ -60,7 +60,7 @@ import ShowPassword from '../ShowPassword/ShowPassword.vue'
 export default {
   components: {
     LocaleSwitch,
-    ShowPassword
+    ShowPassword,
   },
   data() {
     return {
