@@ -208,8 +208,9 @@ jobs:
       # COVERAGE CHECK BACKEND #################################################
       ##########################################################################
       - name: backend | Coverage check
-        uses: devmasx/coverage-check-action@v1.2.0
+        uses: webcraftmedia/coverage-check-action@master
         with:
+          name: Coverage Backend
           type: lcov
           result_path: ./coverage/lcov.info
           min_coverage: 58
@@ -262,8 +263,9 @@ jobs:
       # COVERAGE CHECK WEBAPP ##################################################
       ##########################################################################
       - name: webapp | Coverage check
-        uses: devmasx/coverage-check-action@v1.2.0
+        uses: webcraftmedia/coverage-check-action@master
         with:
+          name: Coverage Webapp
           type: lcov
           result_path: ./coverage/lcov.info
           min_coverage: 52
