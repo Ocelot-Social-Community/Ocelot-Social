@@ -2,7 +2,7 @@
   <div class="donation-info">
     <progress-bar :title="computedTitle" :label="label" :goal="goal" :progress="progress">
       <a target="_blank" :href="links.DONATE">
-        <base-button filled>{{ $t('donations.donate-now') }}</base-button>
+        <base-button size="small" filled>{{ $t('donations.donate-now') }}</base-button>
       </a>
     </progress-bar>
   </div>

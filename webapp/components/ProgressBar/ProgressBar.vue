@@ -53,12 +53,14 @@ export default {
 <style lang="scss">
 .progress-bar-component {
   height: 100%;
+  position: relative;
   // width: 150px;
   // width: 100%;
   // flex: 0 0 100%;
   // align-self: stretch;
   flex: 1;
   display: flex;
+  top: $space-xx-small;
   // margin-right: $space-x-small;
 
   // @media (max-width: 680px) {
@@ -109,7 +111,7 @@ export default {
 
 .progress-bar__goal {
   position: relative;
-  height: 36px; // styleguide-button-size
+  height: 26px; // styleguide-button-size
   // Wolle width: 100%;
   border: 1px solid $color-primary;
   // Wolle background-color: $color-neutral-100;
@@ -122,7 +124,7 @@ export default {
   position: absolute;
   top: 0px;
   left: 0px;
-  height: 36px; // styleguide-button-size
+  height: 26px; // styleguide-button-size
   max-width: 100%;
   // Wolle background-color: $color-yellow;
   // background: repeating-linear-gradient(60deg, $color-primary-light, $color-primary-light 35px, $color-primary 35px, $color-primary 70px);
@@ -144,7 +146,7 @@ export default {
   position: absolute;
   top: 0px;
   left: 0px;
-  height: 36px; // styleguide-button-size
+  height: 26px; // styleguide-button-size
   max-width: 100%;
   display: inline-flex;
   align-items: center;
@@ -169,6 +171,7 @@ export default {
 }
 
 .progress-bar-button {
+  position: relative;
   float: right;
 }
 </style>
