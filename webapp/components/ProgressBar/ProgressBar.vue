@@ -31,14 +31,14 @@ export default {
       type: Number,
       required: true,
     },
-    label: {
-      type: String,
-    },
     progress: {
       type: Number,
       required: true,
     },
     title: {
+      type: String,
+    },
+    label: {
       type: String,
     },
   },

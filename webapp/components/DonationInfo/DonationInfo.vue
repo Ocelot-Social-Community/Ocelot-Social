@@ -10,7 +10,7 @@
 
 <script>
 import links from '~/constants/links.js'
-import { DonationsQuery } from '~/graphql/Donations'
+// Wolle import { DonationsQuery } from '~/graphql/Donations'
 import ProgressBar from '~/components/ProgressBar/ProgressBar.vue'
 
 export default {
@@ -18,17 +18,26 @@ export default {
     ProgressBar,
   },
   props: {
-    title: { type: String, required: false },
+    title: { type: String, required: false, default: () => null },
+    goal: {
+      type: Number,
+      required: true,
+    },
+    progress: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
       links,
-      goal: 15000,
-      progress: 0,
+      // Wolle goal: 15000,
+      // progress: 0,
     }
   },
   computed: {
     computedTitle() {
+      // Wolle
       if (this.title) return this.title
       const today = new Date()
       const month = today.toLocaleString(this.$i18n.locale(), { month: 'long' })
@@ -41,19 +50,19 @@ export default {
       })
     },
   },
-  apollo: {
-    Donations: {
-      query() {
-        return DonationsQuery()
-      },
-      update({ Donations }) {
-        if (!Donations[0]) return
-        const { goal, progress } = Donations[0] // Wolle showDonations
-        this.goal = goal
-        this.progress = progress
-      },
-    },
-  },
+  // Wolle apollo: {
+  //   Donations: {
+  //     query() {
+  //       return DonationsQuery()
+  //     },
+  //     update({ Donations }) {
+  //       if (!Donations[0]) return
+  //       const { goal, progress } = Donations[0] // Wolle showDonations
+  //       this.goal = goal
+  //       this.progress = progress
+  //     },
+  //   },
+  // },
 }
 </script>
 

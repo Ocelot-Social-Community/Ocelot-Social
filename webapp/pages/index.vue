@@ -1,49 +1,14 @@
 <template>
   <div>
-    <!-- Wolle <ds-space /> -->
-    <!-- <ds-flex :width="{ base: '100%' }" gutter="base"> -->
-    <!-- <ds-flex> -->
-    <!-- <ds-flex-item
-        v-if="NEWSFEED_SHOW_INFO_LEFT_LANE"
-        :width="{ base: '100%', sm: 2, md: 2, lg: 1 }"
-      > -->
-    <!-- <ds-flex-item v-if="NEWSFEED_SHOW_INFO_LEFT_LANE" :width="{ base: '270px' }"> -->
-    <!-- Wolle -->
-    <!-- <donation-info
-          v-if="DONATIONS_SHOW_INFO"
-          class="newsfeed-left-side-navigation"
-          :title="'Donation progress'"
-        /> -->
-    <!-- Wolle <div v-if-else>
-          <a target="_blank" :href="links.DONATE">
-            <base-button filled>{{ $t('donations.donate-now') }}</base-button>
-          </a>
-        </div> -->
-    <!-- </ds-flex-item>
-
-      <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }"> -->
     <masonry-grid>
       <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </ds-grid-item>
-      <ds-grid-item class="top-info-bar" :row-span="1" column-span="fullWidth">
-        <!--<donation-info /> -->
-        <donation-info v-if="DONATIONS_SHOW_INFO" :title="'Donation progress'" />
-        <!-- class="newsfeed-left-side-navigation" -->
-        <!-- Wolle <div>
-              <a target="_blank" :href="links.DONATE">
-                <base-button filled>{{ $t('donations.donate-now') }}</base-button>
-              </a>
-            </div> -->
-        <!-- Wolle <div class="sorting-dropdown">
-              <ds-select
-                v-model="selected"
-                :options="sortingOptions"
-                size="large"
-                :icon-right="sortingIcon"
-              ></ds-select>
-            </div> -->
+      <!-- donation info -->
+      <ds-grid-item v-if="showDonations" class="top-info-bar" :row-span="1" column-span="fullWidth">
+        <donation-info :goal="goal" :progress="progress" />
       </ds-grid-item>
+      <!-- newsfeed -->
       <template v-if="hasResults">
         <masonry-grid-item
           v-for="post in posts"
@@ -66,8 +31,7 @@
         </ds-grid-item>
       </template>
     </masonry-grid>
-    <!-- </ds-flex-item> -->
-    <!-- Wolle </ds-flex> -->
+    <!-- create post -->
     <client-only>
       <nuxt-link :to="{ name: 'post-create' }">
         <base-button
@@ -83,6 +47,7 @@
         />
       </nuxt-link>
     </client-only>
+    <!-- infinite loading -->
     <client-only>
       <infinite-loading v-if="hasMore" @infinite="showMoreContributions" />
     </client-only>
@@ -90,8 +55,6 @@
 </template>
 
 <script>
-import { DONATIONS_SHOW_INFO } from '~/constants/donations' // Wolle
-import { NEWSFEED_SHOW_INFO_LEFT_LANE } from '~/constants/newsfeed' // Wolle
 import postListActions from '~/mixins/postListActions'
 import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter.vue'
@@ -100,9 +63,9 @@ import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import { mapGetters } from 'vuex'
+import { DonationsQuery } from '~/graphql/Donations'
 import { filterPosts } from '~/graphql/PostQuery.js'
 import UpdateQuery from '~/components/utils/UpdateQuery'
-import links from '~/constants/links.js'
 
 export default {
   components: {
@@ -117,9 +80,9 @@ export default {
   data() {
     const { hashtag = null } = this.$route.query
     return {
-      DONATIONS_SHOW_INFO,
-      NEWSFEED_SHOW_INFO_LEFT_LANE,
-      links,
+      showDonations: true,
+      goal: 15000,
+      progress: 0,
       posts: [],
       hasMore: true,
       // Initialize your apollo data
@@ -185,6 +148,18 @@ export default {
     },
   },
   apollo: {
+    Donations: {
+      query() {
+        return DonationsQuery()
+      },
+      update({ Donations }) {
+        if (!Donations[0]) return
+        const { showDonations, goal, progress } = Donations[0]
+        this.showDonations = showDonations
+        this.goal = goal
+        this.progress = progress
+      },
+    },
     Post: {
       query() {
         return filterPosts(this.$i18n)
@@ -207,12 +182,6 @@ export default {
 </script>
 
 <style lang="scss">
-// Wolle .newsfeed-left-side-navigation {
-//   position: sticky;
-//   top: 65px;
-//   z-index: 2;
-// }
-
 .masonry-grid {
   display: grid;
   grid-gap: 10px;
@@ -240,25 +209,8 @@ export default {
   box-shadow: $box-shadow-x-large;
 }
 
-.sorting-dropdown {
-  width: 250px;
-  position: relative;
-
-  @media (max-width: 680px) {
-    width: 180px;
-  }
-}
-
 .top-info-bar {
-  // margin-bottom: $space-x-small;
   display: flex;
-  // justify-content: space-between;
-  // align-items: flex-end;
   align-items: center;
-
-  // Wolle @media (max-width: 546px) {
-  //   grid-row-end: span 3 !important;
-  //   flex-direction: column;
-  // }
 }
 </style>
