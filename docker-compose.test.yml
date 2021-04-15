@@ -10,6 +10,8 @@ services:
       target: test
     environment:
       - NODE_ENV="test"
+    volumes:
+      - ./coverage:/app/coverage 
 
   ########################################################
   # BACKEND ##############################################
@@ -20,6 +22,8 @@ services:
       target: test
     environment:
       - NODE_ENV="test"
+    volumes:
+      - ./coverage:/app/coverage 
 
   ########################################################
   # NEO4J ################################################
