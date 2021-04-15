@@ -48,7 +48,7 @@ export default {
       },
       update({ Donations }) {
         if (!Donations[0]) return
-        const { goal, progress } = Donations[0]
+        const { goal, progress } = Donations[0] // Wolle showDonations
         this.goal = goal
         this.progress = progress
       },

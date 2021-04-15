@@ -1,7 +1,8 @@
 type Donations {
   id: ID!
-  goal: Int!
-  progress: Int!
+  showDonations: Boolean! # Wolle make it required in the schema
+  goal: Int! # Wolle make it required in the schema
+  progress: Int! # Wolle make it required in the schema
   createdAt: String
   updatedAt: String
 }
@@ -11,5 +12,5 @@ type Query {
 }
 
 type Mutation {
-  UpdateDonations(goal: Int, progress: Int): Donations
+  UpdateDonations(showDonations: Boolean, goal: Int, progress: Int): Donations
 }

@@ -29,12 +29,8 @@
         icon="money"
         :disabled="!showDonations"
       />
-      <base-button
-        class="donations-info-button"
-        filled
-        type="submit"
-        :disabled="!formData.goal || !formData.progress"
-      >
+      <base-button class="donations-info-button" filled type="submit">
+        <!-- Wolle :disabled="formData.showDonations === null || !formData.goal || !formData.progress" -->
         {{ $t('actions.save') }}
       </base-button>
     </ds-form>
@@ -59,11 +55,13 @@ export default {
   },
   methods: {
     submit() {
+      const { showDonations } = this
       const { goal, progress } = this.formData
       this.$apollo
         .mutate({
           mutation: UpdateDonations(),
           variables: {
+            showDonations,
             goal: parseInt(goal),
             progress: parseInt(progress),
           },
@@ -81,7 +79,8 @@ export default {
       },
       update({ Donations }) {
         if (!Donations[0]) return
-        const { goal, progress } = Donations[0]
+        const { showDonations, goal, progress } = Donations[0]
+        this.showDonations = showDonations
         this.formData = {
           goal,
           progress,

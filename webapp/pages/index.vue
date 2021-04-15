@@ -90,8 +90,8 @@
 </template>
 
 <script>
-import { DONATIONS_SHOW_INFO } from '~/constants/donations'
-import { NEWSFEED_SHOW_INFO_LEFT_LANE } from '~/constants/newsfeed'
+import { DONATIONS_SHOW_INFO } from '~/constants/donations' // Wolle
+import { NEWSFEED_SHOW_INFO_LEFT_LANE } from '~/constants/newsfeed' // Wolle
 import postListActions from '~/mixins/postListActions'
 import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter.vue'
