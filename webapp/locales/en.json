@@ -30,6 +30,7 @@
       "goal": "Monthly donations needed",
       "name": "Donations info",
       "progress": "Donations collected so far",
+      "showDonationsCheckboxLabel": "Show donations progress bar",
       "successfulUpdate": "Donations info updated successfully!"
     },
     "hashtags": {

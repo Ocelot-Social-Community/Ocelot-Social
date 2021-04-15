@@ -30,6 +30,7 @@
       "goal": "Monatlich benötigte Spenden",
       "name": "Spendeninfo",
       "progress": "Bereits gesammelte Spenden",
+      "showDonationsCheckboxLabel": "Spendenfortschritt anzeigen",
       "successfulUpdate": "Spenden-Info erfolgreich aktualisiert!"
     },
     "hashtags": {
