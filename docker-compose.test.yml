@@ -30,6 +30,17 @@ services:
   ########################################################
   neo4j:
     image: ocelotsocialnetwork/neo4j:community
+    #environment:
+    #  - NEO4J_dbms_connector_bolt_enabled=true
+    #  - NEO4J_dbms_connector_bolt_tls__level=OPTIONAL
+    #  - NEO4J_dbms_connector_bolt_listen__address=0.0.0.0:7687
+    #  - NEO4J_auth=none
+    #  - NEO4J_dbms_connectors_default__listen__address=0.0.0.0
+    #  - NEO4J_dbms_connector_http_listen__address=0.0.0.0:7474
+    #  - NEO4J_dbms_connector_https_listen__address=0.0.0.0:7473
+    networks:
+      # So we can access the neo4j query browser from our host machine
+      - external-net
   
   ########################################################
   # MAINTENANCE ##########################################
