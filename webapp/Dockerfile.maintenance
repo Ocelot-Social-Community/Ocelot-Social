@@ -48,6 +48,7 @@ WORKDIR ${DOCKER_WORKDIR}
 ##################################################################################
 # PRODUCTION ### TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO ####
 ##################################################################################
+FROM base as production
 
 CMD ["yarn", "run", "start"]
 
