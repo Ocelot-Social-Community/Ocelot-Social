@@ -5,7 +5,7 @@ FROM node:12.19.0-alpine3.10 as base
 
 # ENVs
 ## DOCKER_WORKDIR would be a classical ARG, but that is not multi layer persistent - shame
-ENV DOCKER_WORKDIR="/app"
+ENV DOCKER_WORKDIR="/develop-webapp"
 ## We Cannot do `$(date -u +'%Y-%m-%dT%H:%M:%SZ')` here so we use unix timestamp=0
 ARG BBUILD_DATE="1970-01-01T00:00:00.00Z"
 ENV BUILD_DATE=$BBUILD_DATE
@@ -78,6 +78,6 @@ RUN yarn run generate
 ##################################################################################
 FROM nginx:alpine as production
 
-COPY --from=build ./app/dedist/ /usr/share/nginx/html/
+COPY --from=build ./develop-webapp/dedist/ /usr/share/nginx/html/
 RUN rm /etc/nginx/conf.d/default.conf
 COPY maintenance/nginx/custom.conf /etc/nginx/conf.d/
