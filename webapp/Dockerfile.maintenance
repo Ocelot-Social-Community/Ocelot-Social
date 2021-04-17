@@ -45,12 +45,12 @@ EXPOSE ${PORT}
 RUN mkdir -p ${DOCKER_WORKDIR}
 WORKDIR ${DOCKER_WORKDIR}
 
-##################################################################################
-# PRODUCTION ### TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO ####
-##################################################################################
-FROM base as production
-
 CMD ["yarn", "run", "start"]
+
+##################################################################################
+# BUILD ### TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO ##
+##################################################################################
+FROM base as build
 
 COPY package.json yarn.lock ./
 RUN yarn install --production=false --frozen-lockfile --non-interactive
@@ -73,8 +73,11 @@ COPY maintenance/source ./
 
 RUN yarn run generate
 
+##################################################################################
+# PRODUCTION ### TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO ####
+##################################################################################
+FROM nginx:alpine as production
 
-FROM nginx:alpine
 COPY --from=build ./app/dedist/ /usr/share/nginx/html/
 RUN rm /etc/nginx/conf.d/default.conf
 COPY maintenance/nginx/custom.conf /etc/nginx/conf.d/
