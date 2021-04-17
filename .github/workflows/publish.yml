@@ -55,9 +55,19 @@ jobs:
       # NEO4J ##################################################################
       ##########################################################################
       - name: Neo4J | Build `community` image
-        run: |
-          docker build --target community -t "ocelotsocialnetwork/neo4j:latest" -t "ocelotsocialnetwork/neo4j:community" -t "ocelotsocialnetwork/neo4j:${VERSION}" -t "ocelotsocialnetwork/neo4j:${BUILD_VERSION}" --build-arg BUILD_DATE=$BUILD_DATE --build-arg BUILD_VERSION=$BUILD_VERSION --build-arg BUILD_COMMIT=$BUILD_COMMIT neo4j/
-          docker save "ocelotsocialnetwork/neo4j" > /tmp/neo4j.tar
+        run: >
+          docker build
+            --target community
+            -t "ocelotsocialnetwork/neo4j:latest"
+            -t "ocelotsocialnetwork/neo4j:community"
+            -t "ocelotsocialnetwork/neo4j:${VERSION}"
+            -t "ocelotsocialnetwork/neo4j:${BUILD_VERSION}"
+            --build-arg BBUILD_DATE=$BUILD_DATE
+            --build-arg BBUILD_VERSION=$BUILD_VERSION
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT
+            neo4j/
+      - name: Neo4J | Save docker image 
+        run: docker save "ocelotsocialnetwork/neo4j" > /tmp/neo4j.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -91,10 +101,19 @@ jobs:
       ##########################################################################
       # BUILD BACKEND DOCKER IMAGE (production) ################################
       ##########################################################################
-      - name: backend | Build `production` image
-        run: |
-          docker build --target production -t "ocelotsocialnetwork/backend:latest" -t "ocelotsocialnetwork/backend:${VERSION}" -t "ocelotsocialnetwork/backend:${BUILD_VERSION}" --build-arg BUILD_DATE=$BUILD_DATE --build-arg BUILD_VERSION=$BUILD_VERSION --build-arg BUILD_COMMIT=$BUILD_COMMIT backend/
-          docker save "ocelotsocialnetwork/backend" > /tmp/backend.tar
+      - name: Backend | Build `production` image
+        run: >
+          docker build
+            --target production
+            -t "ocelotsocialnetwork/backend:latest"
+            -t "ocelotsocialnetwork/backend:${VERSION}"
+            -t "ocelotsocialnetwork/backend:${BUILD_VERSION}"
+            --build-arg BBUILD_DATE=$BUILD_DATE
+            --build-arg BBUILD_VERSION=$BUILD_VERSION
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT
+            backend/
+      - name: Backend | Save docker image
+        run: docker save "ocelotsocialnetwork/backend" > /tmp/backend.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -128,10 +147,19 @@ jobs:
       ##########################################################################
       # BUILD WEBAPP DOCKER IMAGE (build) ######################################
       ##########################################################################
-      - name: webapp | Build `production` image
-        run: |
-          docker build --target production -t "ocelotsocialnetwork/webapp:latest" -t "ocelotsocialnetwork/webapp:${VERSION}" -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}" --build-arg BUILD_DATE=$BUILD_DATE --build-arg BUILD_VERSION=$BUILD_VERSION --build-arg BUILD_COMMIT=$BUILD_COMMIT webapp/
-          docker save "ocelotsocialnetwork/webapp" > /tmp/webapp.tar
+      - name: Webapp | Build `production` image
+        run: >
+          docker build
+            --target production
+            -t "ocelotsocialnetwork/webapp:latest"
+            -t "ocelotsocialnetwork/webapp:${VERSION}"
+            -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}"
+            --build-arg BBUILD_DATE=$BUILD_DATE
+            --build-arg BBUILD_VERSION=$BUILD_VERSION
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT
+            webapp/
+      - name: Webapp | Save docker image
+        run: docker save "ocelotsocialnetwork/webapp" > /tmp/webapp.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -165,11 +193,19 @@ jobs:
       ##########################################################################
       # BUILD MAINTENANCE DOCKER IMAGE (build) #################################
       ##########################################################################
-      - name: maintenance | Build `production` image
+      - name: Maintenance | Build `production` image
         # TODO: --target production
-        run: |
-          docker build -t "ocelotsocialnetwork/maintenance:latest" -t "ocelotsocialnetwork/maintenance:${VERSION}" -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}" --build-arg BUILD_DATE=$BUILD_DATE --build-arg BUILD_VERSION=$BUILD_VERSION --build-arg BUILD_COMMIT=$BUILD_COMMIT webapp/ -f webapp/Dockerfile.maintenance
-          docker save "ocelotsocialnetwork/maintenance" > /tmp/maintenance.tar
+        run: >
+          docker build
+            -t "ocelotsocialnetwork/maintenance:latest"
+            -t "ocelotsocialnetwork/maintenance:${VERSION}"
+            -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}"
+            --build-arg BBUILD_DATE=$BUILD_DATE
+            --build-arg BBUILD_VERSION=$BUILD_VERSION
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/
+            -f webapp/Dockerfile.maintenance
+      - name: Maintenance | Save docker image
+        run: docker save "ocelotsocialnetwork/maintenance" > /tmp/maintenance.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
