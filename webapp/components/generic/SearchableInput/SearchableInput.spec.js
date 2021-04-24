@@ -131,6 +131,5 @@ describe('SearchableInput.vue', () => {
         query: { search: 'peter lustig' },
       })
     })
-
   })
 })
