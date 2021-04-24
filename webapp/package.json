@@ -31,10 +31,10 @@
       "!**/coverage/**",
       "!**/config/**",
       "!**/maintenance/**",
-      "!**/plugins/**"
+      "!**/plugins/**",
       "!**/.eslintrc.js",
       "!**/.prettierrc.js",
-      "!**/nuxt.config.js",
+      "!**/nuxt.config.js"
     ],
     "coverageReporters": [
       "lcov"
