@@ -13,9 +13,9 @@ describe('PageFooter.vue', () => {
     mocks = {
       $t: jest.fn(),
       $env: {
-        VERSION: 'v1.0.0'
+        VERSION: 'v1.0.0',
       },
-      links
+      links,
     }
   })
 
