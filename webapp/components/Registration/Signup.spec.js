@@ -76,6 +76,21 @@ describe('Signup', () => {
           expect(mocks.$t).toHaveBeenCalledWith(...expected)
         })
 
+        describe('mutation is rejected', () => {
+          beforeEach(async () => {
+            mocks.$apollo.mutate = jest.fn().mockRejectedValue({
+              message: 'Ouch!',
+            })
+            wrapper = Wrapper()
+            wrapper.find('input#email').setValue('mail@example.org')
+            await wrapper.find('form').trigger('submit')
+          })
+
+          it('displays error message', async () => {
+            expect(mocks.$toast.error).toHaveBeenCalledWith('Ouch!')
+          })
+        })
+
         describe('after animation', () => {
           beforeEach(jest.runAllTimers)
 
@@ -83,6 +98,7 @@ describe('Signup', () => {
             expect(wrapper.emitted('submit')).toEqual([[{ email: 'mail@example.org' }]])
           })
         })
+
       })
     })
   })
