@@ -24,9 +24,17 @@
     "verbose": true,
     "collectCoverageFrom": [
       "**/*.{js,vue}",
+      "!**/?(*.)+(spec|test|story).js?(x)",
       "!**/node_modules/**",
       "!**/.nuxt/**",
-      "!**/?(*.)+(spec|test).js?(x)"
+      "!**/storybook/**",
+      "!**/coverage/**",
+      "!**/config/**",
+      "!**/maintenance/**",
+      "!**/plugins/**"
+      "!**/.eslintrc.js",
+      "!**/.prettierrc.js",
+      "!**/nuxt.config.js",
     ],
     "coverageReporters": [
       "lcov"
