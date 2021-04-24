@@ -98,7 +98,6 @@ describe('Signup', () => {
             expect(wrapper.emitted('submit')).toEqual([[{ email: 'mail@example.org' }]])
           })
         })
-
       })
     })
   })
