@@ -134,7 +134,7 @@ describe('ChangePassword.vue', () => {
             await wrapper.find('form').trigger('submit')
           })
 
-          it('displays error message', async () => {            
+          it('displays error message', async () => {
             expect(mocks.$toast.error).toHaveBeenCalledWith('Ouch!')
           })
         })
