@@ -122,8 +122,7 @@ describe('SearchableInput.vue', () => {
     })
 
     it('replaces irregular whitespace with a single space', async () => {
-      select.element.value = 'peter   \
-      lustig'
+      select.element.value = 'peter      lustig'
       select.trigger('input')
       select.trigger('keyup.enter')
       expect(mocks.$router.push).toHaveBeenCalledWith({
