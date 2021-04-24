@@ -120,5 +120,17 @@ describe('SearchableInput.vue', () => {
         query: { search: 'ab' },
       })
     })
+
+    it('replaces irregular whitespace with a single space', async () => {
+      select.element.value = 'peter   \
+      lustig'
+      select.trigger('input')
+      select.trigger('keyup.enter')
+      expect(mocks.$router.push).toHaveBeenCalledWith({
+        path: '/search/search-results',
+        query: { search: 'peter lustig' },
+      })
+    })
+
   })
 })
