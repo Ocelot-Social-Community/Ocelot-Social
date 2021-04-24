@@ -41,7 +41,7 @@ export default {
     ReportRow,
   },
   props: {
-    reports: { type: Array, default: [] },
+    reports: { type: Array, default: () => [] },
   },
 }
 </script>
