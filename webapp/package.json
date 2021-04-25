@@ -49,10 +49,10 @@
       "vue"
     ],
     "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1",
-      "^~/(.*)$": "<rootDir>/$1",
+      "\\.(svg)$": "<rootDir>/test/fileMock.js",
       "\\.(css|less)$": "identity-obj-proxy",
-      "\\.(svg)$": "<rootDir>/test/fileMock.js"
+      "^@/(.*)$": "<rootDir>/src/$1",
+      "^~/(.*)$": "<rootDir>/$1"
     },
     "setupFiles": [
       "<rootDir>/test/registerContext.js",
