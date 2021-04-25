@@ -32,6 +32,5 @@ describe('post/_id.vue', () => {
     it('renders', () => {
       expect(wrapper.findAll('.post-side-navigation')).toHaveLength(1)
     })
-
   })
 })
