@@ -1,5 +1,7 @@
-import { mount } from '@vue/test-utils'
+import { config, mount } from '@vue/test-utils'
 import moderation from './moderation.vue'
+
+config.stubs['nuxt-child'] = '<span><slot /></span>'
 
 const localVue = global.localVue
 
