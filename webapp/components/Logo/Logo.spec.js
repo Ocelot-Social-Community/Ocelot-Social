@@ -1,8 +1,7 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Logo from './Logo.vue'
 
 const localVue = global.localVue
-// config.stubs['client-only'] = '<span><slot /></span>'
 
 describe('Logo.vue', () => {
   let wrapper
