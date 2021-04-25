@@ -10,7 +10,7 @@ describe('profile/_id.vue', () => {
 
   beforeEach(() => {
     mocks = {
-      $t: jest.fn()
+      $t: jest.fn(),
     }
   })
 
@@ -26,6 +26,5 @@ describe('profile/_id.vue', () => {
     it('renders', () => {
       expect(wrapper.findAll('.nuxt-child')).toHaveLength(1)
     })
-
   })
 })

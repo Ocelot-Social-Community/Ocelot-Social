@@ -1,3 +1,3 @@
 module.exports = {
-	render: () => 'test-file-stub'
-};
+  render: () => 'test-file-stub',
+}

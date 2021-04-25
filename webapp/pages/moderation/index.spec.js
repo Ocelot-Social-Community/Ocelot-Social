@@ -10,7 +10,7 @@ describe('moderation/index.vue', () => {
 
   beforeEach(() => {
     mocks = {
-      $t: jest.fn()
+      $t: jest.fn(),
     }
   })
 
@@ -26,6 +26,5 @@ describe('moderation/index.vue', () => {
     it('renders', () => {
       expect(wrapper.is('.base-card')).toBe(true)
     })
-
   })
 })

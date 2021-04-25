@@ -26,6 +26,5 @@ describe('search-results.vue', () => {
     it('renders', () => {
       expect(wrapper.findAll('.search-results')).toHaveLength(1)
     })
-
   })
 })

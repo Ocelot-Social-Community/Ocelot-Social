@@ -25,6 +25,5 @@ describe('create.vue', () => {
     it('renders', () => {
       expect(wrapper.findAll('.contribution-form')).toHaveLength(1)
     })
-
   })
 })

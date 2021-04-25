@@ -9,7 +9,7 @@ describe('Logo.vue', () => {
 
   beforeEach(() => {
     mocks = {
-      $t: jest.fn()
+      $t: jest.fn(),
     }
   })
 
@@ -25,6 +25,5 @@ describe('Logo.vue', () => {
     it('renders', () => {
       expect(wrapper.findAll('.ds-logo')).toHaveLength(1)
     })
-
   })
 })
