@@ -1,7 +1,10 @@
 import { config, mount } from '@vue/test-utils'
 import searchResults from './search-results.vue'
+import VueMeta from 'vue-meta'
 
 const localVue = global.localVue
+localVue.use(VueMeta, { keyName: 'head' })
+
 config.stubs['client-only'] = '<span class="client-only"><slot /></span>'
 
 describe('search-results.vue', () => {
@@ -10,7 +13,7 @@ describe('search-results.vue', () => {
 
   beforeEach(() => {
     mocks = {
-      $t: jest.fn(),
+      $t: (t) => t,
     }
   })
 
@@ -25,6 +28,10 @@ describe('search-results.vue', () => {
 
     it('renders', () => {
       expect(wrapper.findAll('.search-results')).toHaveLength(1)
+    })
+
+    it('has correct <head> content', () => {
+      expect(wrapper.vm.$metaInfo.title).toBe('search.title')
     })
   })
 })
