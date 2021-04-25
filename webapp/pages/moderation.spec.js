@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils'
-import admin from './admin.vue'
+import moderation from './moderation.vue'
 
 const localVue = global.localVue
 
-describe('admin.vue', () => {
+describe('moderation.vue', () => {
   let wrapper
   let mocks
 
@@ -15,7 +15,7 @@ describe('admin.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(admin, {
+      return mount(moderation, {
         mocks,
         localVue,
       })
