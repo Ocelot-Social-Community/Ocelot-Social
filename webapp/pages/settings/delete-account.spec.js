@@ -18,7 +18,7 @@ describe('delete-account.vue', () => {
         'auth/user': () => {
           return { id: 'u343', name: 'Delete MyAccount' }
         },
-      }
+      },
     })
   })
 
