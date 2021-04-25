@@ -1,8 +1,5 @@
-import Vue from 'vue'
 import { config, mount } from '@vue/test-utils'
 import InviteButton from './InviteButton.vue'
-
-const localVue = global.localVue
 
 config.stubs['v-popover'] = '<span><slot /></span>'
 
@@ -42,14 +39,14 @@ describe('InviteButton.vue', () => {
     })
 
     it('invite codes not available', async () => {
-      wrapper.find('.base-button').trigger('click') //open popup
-      wrapper.find('.invite-button').trigger('click') //click copy button
+      wrapper.find('.base-button').trigger('click') // open popup
+      wrapper.find('.invite-button').trigger('click') // click copy button
       expect(mocks.$t).toHaveBeenCalledWith('invite-codes.not-available')
     })
 
     it.skip('invite codes copied to clipboard', async () => {
-      wrapper.find('.base-button').trigger('click') //open popup
-      wrapper.find('.invite-button').trigger('click') //click copy button
+      wrapper.find('.base-button').trigger('click') // open popup
+      wrapper.find('.invite-button').trigger('click') // click copy button
       expect(mocks.$t).toHaveBeenCalledWith('invite-codes.not-available')
     })
   })
