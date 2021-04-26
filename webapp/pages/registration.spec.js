@@ -102,7 +102,7 @@ describe('Registration', () => {
             expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
           })
 
-          it.skip('"nonce=64835" query in URI have nonce in input', async () => {
+          it('"nonce=64835" query in URI have nonce in input', async () => {
             mocks.$route.query = {
               method: 'invite-mail',
               email: 'user@example.org',
@@ -160,7 +160,7 @@ describe('Registration', () => {
             expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
           })
 
-          it.skip('"nonce=64835" query in URI have nonce in input', async () => {
+          it('"nonce=64835" query in URI have nonce in input', async () => {
             mocks.$route.query = {
               method: 'invite-mail',
               email: 'user@example.org',
@@ -181,7 +181,7 @@ describe('Registration', () => {
           expect(wrapper.find('.enter-invite').exists()).toBe(true)
         })
 
-        it.skip('"inviteCode=AAAAAA" query in URI have invite code in input', async () => {
+        it('"inviteCode=AAAAAA" query in URI have invite code in input', async () => {
           mocks.$route.query = { method: 'invite-code', inviteCode: 'AAAAAA' }
           wrapper = Wrapper()
           await Vue.nextTick()
@@ -220,7 +220,7 @@ describe('Registration', () => {
             expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
           })
 
-          it.skip('"nonce=64835" query in URI have nonce in input', async () => {
+          it('"nonce=64835" query in URI have nonce in input', async () => {
             mocks.$route.query = {
               method: 'invite-mail',
               email: 'user@example.org',
@@ -273,7 +273,7 @@ describe('Registration', () => {
             expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
           })
 
-          it.skip('"nonce=64835" query in URI have nonce in input', async () => {
+          it('"nonce=64835" query in URI have nonce in input', async () => {
             mocks.$route.query = {
               method: 'invite-mail',
               email: 'user@example.org',
@@ -294,7 +294,7 @@ describe('Registration', () => {
           expect(wrapper.find('.enter-invite').exists()).toBe(true)
         })
 
-        it.skip('"inviteCode=AAAAAA" query in URI have invite code in input', async () => {
+        it('"inviteCode=AAAAAA" query in URI have invite code in input', async () => {
           mocks.$route.query = { method: 'invite-code', inviteCode: 'AAAAAA' }
           wrapper = await Wrapper()
           await Vue.nextTick()
