@@ -108,7 +108,7 @@ describe('Registration', () => {
               email: 'user@example.org',
               nonce: '64835',
             }
-            wrapper = Wrapper()
+            wrapper = await Wrapper()
             await Vue.nextTick()
             const form = wrapper.find('.enter-nonce')
             expect(form.vm.formData.nonce).toEqual('64835')
@@ -166,7 +166,7 @@ describe('Registration', () => {
               email: 'user@example.org',
               nonce: '64835',
             }
-            wrapper = Wrapper()
+            wrapper = await Wrapper()
             await Vue.nextTick()
             const form = wrapper.find('.enter-nonce')
             expect(form.vm.formData.nonce).toEqual('64835')
@@ -183,7 +183,7 @@ describe('Registration', () => {
 
         it('"inviteCode=AAAAAA" query in URI have invite code in input', async () => {
           mocks.$route.query = { method: 'invite-code', inviteCode: 'AAAAAA' }
-          wrapper = Wrapper()
+          wrapper = await Wrapper()
           await Vue.nextTick()
           const form = wrapper.find('.enter-invite')
           expect(form.vm.formData.inviteCode).toEqual('AAAAAA')
@@ -226,7 +226,7 @@ describe('Registration', () => {
               email: 'user@example.org',
               nonce: '64835',
             }
-            wrapper = Wrapper()
+            wrapper = await Wrapper()
             await Vue.nextTick()
             const form = wrapper.find('.enter-nonce')
             expect(form.vm.formData.nonce).toEqual('64835')
@@ -279,7 +279,7 @@ describe('Registration', () => {
               email: 'user@example.org',
               nonce: '64835',
             }
-            wrapper = Wrapper()
+            wrapper = await Wrapper()
             await Vue.nextTick()
             const form = wrapper.find('.enter-nonce')
             expect(form.vm.formData.nonce).toEqual('64835')
