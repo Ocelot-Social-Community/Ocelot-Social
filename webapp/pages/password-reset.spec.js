@@ -15,7 +15,6 @@ describe('password-reset.vue', () => {
   let redirect
   let isLoggedIn
 
-
   beforeEach(() => {
     mocks = {
       $t: (t) => t,
@@ -28,7 +27,7 @@ describe('password-reset.vue', () => {
     redirect = jest.fn()
   })
 
-  describe('mount',  () => {
+  describe('mount', () => {
     const Wrapper = async () => {
       store = new Vuex.Store({
         getters: {
@@ -39,11 +38,11 @@ describe('password-reset.vue', () => {
         const data = PasswordReset.data ? PasswordReset.data() : {}
         const aData = await PasswordReset.asyncData({
           store,
-          redirect
+          redirect,
         })
-        PasswordReset.data = function() {
-          return { ...data, ...aData};
-        };
+        PasswordReset.data = function () {
+          return { ...data, ...aData }
+        }
       }
       return mount(PasswordReset, {
         mocks,

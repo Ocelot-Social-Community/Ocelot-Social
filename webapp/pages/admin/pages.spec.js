@@ -12,7 +12,7 @@ describe('pages.vue', () => {
       $t: jest.fn(),
       $apollo: {
         loading: false,
-      }
+      },
     }
   })
 

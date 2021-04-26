@@ -29,10 +29,8 @@ describe('post/_id.vue', () => {
           defaultClient: {
             query: jest.fn().mockResolvedValue({
               data: {
-                Post: [
-                  { author: { id: authorId } }
-                ]
-              }
+                Post: [{ author: { id: authorId } }],
+              },
             }),
           },
         },
@@ -52,9 +50,9 @@ describe('post/_id.vue', () => {
           error,
           params: { id: '123' },
         })
-        _id.data = function() {
-          return { ...data, ...aData};
-        };
+        _id.data = function () {
+          return { ...data, ...aData }
+        }
       }
       return mount(_id, { store, mocks, localVue })
     }
@@ -70,7 +68,7 @@ describe('post/_id.vue', () => {
       authorId = 'some-author'
       userId = 'some-user'
       wrapper = await Wrapper()
-      expect(error).toBeCalledWith({"message": "error-pages.cannot-edit-post", "statusCode": 403})
+      expect(error).toBeCalledWith({ message: 'error-pages.cannot-edit-post', statusCode: 403 })
     })
 
     it('renders with asyncData of same user', async () => {

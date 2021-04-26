@@ -12,7 +12,7 @@ describe('notifications.vue', () => {
       $t: jest.fn(),
       $apollo: {
         loading: false,
-      }
+      },
     }
   })
 

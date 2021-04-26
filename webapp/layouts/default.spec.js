@@ -4,7 +4,7 @@ import Default from './default.vue'
 
 const localVue = global.localVue
 
-config.stubs['nuxt'] = '<span><slot /></span>'
+config.stubs.nuxt = '<span><slot /></span>'
 config.stubs['client-only'] = '<span><slot /></span>'
 config.stubs['nuxt-link'] = '<span><slot /></span>'
 
@@ -17,7 +17,7 @@ describe('default.vue', () => {
     mocks = {
       $t: jest.fn(),
       $env: {
-        INVITE_REGISTRATION: true
+        INVITE_REGISTRATION: true,
       },
     }
     store = new Vuex.Store({

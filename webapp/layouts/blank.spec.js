@@ -3,7 +3,7 @@ import Blank from './blank.vue'
 
 const localVue = global.localVue
 
-config.stubs['nuxt'] = '<span><slot /></span>'
+config.stubs.nuxt = '<span><slot /></span>'
 
 describe('blank.vue', () => {
   let wrapper

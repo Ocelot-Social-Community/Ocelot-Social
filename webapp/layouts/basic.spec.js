@@ -3,7 +3,7 @@ import Basic from './basic.vue'
 
 const localVue = global.localVue
 
-config.stubs['nuxt'] = '<span><slot /></span>'
+config.stubs.nuxt = '<span><slot /></span>'
 
 describe('basic.vue', () => {
   let wrapper

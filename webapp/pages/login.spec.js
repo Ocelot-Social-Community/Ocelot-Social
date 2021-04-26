@@ -16,7 +16,6 @@ describe('Login.vue', () => {
   let tosVersion
   let redirect
 
-
   beforeEach(() => {
     mutations = {
       // 'posts/SELECT_ORDER': jest.fn(),
@@ -46,11 +45,11 @@ describe('Login.vue', () => {
         const data = login.data ? login.data() : {}
         const aData = await login.asyncData({
           store,
-          redirect
+          redirect,
         })
-        login.data = function() {
-          return { ...data, ...aData};
-        };
+        login.data = function () {
+          return { ...data, ...aData }
+        }
       }
       return mount(login, {
         store,
@@ -76,7 +75,5 @@ describe('Login.vue', () => {
       wrapper = await Wrapper()
       expect(redirect).toBeCalledWith('/')
     })
-
-    
   })
 })

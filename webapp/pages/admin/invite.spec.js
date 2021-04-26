@@ -12,7 +12,7 @@ describe('invite.vue', () => {
       $t: jest.fn(),
       $apollo: {
         loading: false,
-      }
+      },
     }
   })
 
