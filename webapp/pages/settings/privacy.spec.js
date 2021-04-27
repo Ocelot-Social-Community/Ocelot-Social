@@ -13,7 +13,7 @@ describe('privacy.vue', () => {
     mocks = {
       $t: jest.fn(),
       $apollo: {
-        mutate: jest.fn()
+        mutate: jest.fn(),
       },
       $toast: {
         success: jest.fn(),
@@ -26,7 +26,8 @@ describe('privacy.vue', () => {
           return {
             id: 'u343',
             name: 'MyAccount',
-            showShoutsPublicly: true }
+            showShoutsPublicly: true,
+          }
         },
       },
     })
