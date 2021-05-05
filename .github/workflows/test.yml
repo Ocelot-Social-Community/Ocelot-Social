@@ -253,7 +253,6 @@ jobs:
       ##########################################################################
       # COVERAGE REPORT FRONTEND ################################################
       ##########################################################################
-      # TODO: Maybe remove this later on to avoid spam?
       #- name: frontend | Coverage report
       #  uses: romeovs/lcov-reporter-action@v0.2.21
       #  with:
