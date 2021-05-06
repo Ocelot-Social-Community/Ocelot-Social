@@ -1,5 +1,6 @@
 import { config, shallowMount, mount } from '@vue/test-utils'
 import PostIndex from './index.vue'
+import Vue from 'vue'
 import Vuex from 'vuex'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter'
 
@@ -93,14 +94,32 @@ describe('PostIndex', () => {
       wrapper.find(HashtagsFilter).vm.$emit('clearSearch')
       expect(wrapper.vm.hashtag).toBeNull()
     })
+  })
 
-    describe('mount', () => {
-      beforeEach(() => {
-        wrapper = mount(PostIndex, {
-          store,
-          mocks,
-          localVue,
-        })
+  describe('mount', () => {
+    Wrapper = () => {
+      return mount(PostIndex, {
+        store,
+        mocks,
+        localVue,
+      })
+    }
+
+    beforeEach(() => {
+      wrapper = Wrapper()
+    })
+
+    describe('donation-info', () => {
+      it('shows donation-info on default', () => {
+        wrapper = Wrapper()
+        expect(wrapper.find('.top-info-bar').exists()).toBe(true)
+      })
+
+      it('hides donation-info if not "showDonations"', () => {
+        wrapper = Wrapper()
+        wrapper.setData({ showDonations: false })
+        Vue.nextTick()
+        expect(wrapper.find('.top-info-bar').exists()).toBe(false)
       })
     })
   })

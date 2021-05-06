@@ -253,7 +253,8 @@
   },
   "donations": {
     "amount-of-total": "{amount} of {total} € collezionato",
-    "donate-now": "Dona ora"  },
+    "donate-now": "Dona ora"
+  },
   "editor": {
     "embed": {
       "always_allow": null,
