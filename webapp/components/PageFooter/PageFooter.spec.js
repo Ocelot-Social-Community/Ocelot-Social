@@ -36,5 +36,9 @@ describe('PageFooter.vue', () => {
     it('renders four nuxt-links', () => {
       expect(wrapper.findAll('.nuxt-link')).toHaveLength(4)
     })
+
+    it('renders version', () => {
+      expect(wrapper.find('.ds-footer').text()).toContain('v1.0.0')
+    })
   })
 })

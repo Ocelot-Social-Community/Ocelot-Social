@@ -3,6 +3,7 @@ import { config, shallowMount } from '@vue/test-utils'
 import Default from './default.vue'
 
 const localVue = global.localVue
+localVue.directive('scrollTo', jest.fn())
 
 config.stubs.nuxt = '<span><slot /></span>'
 config.stubs['client-only'] = '<span><slot /></span>'
@@ -15,13 +16,19 @@ describe('default.vue', () => {
 
   beforeEach(() => {
     mocks = {
+      $route: {
+        matched: [{ name: 'index' }],
+      },
+      $scrollTo: jest.fn(),
       $t: jest.fn(),
       $env: {
         INVITE_REGISTRATION: true,
       },
     }
     store = new Vuex.Store({
-      getters: {},
+      getters: {
+        'auth/isLoggedIn': () => true,
+      },
     })
   })
 

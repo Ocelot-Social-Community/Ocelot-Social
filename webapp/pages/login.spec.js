@@ -8,7 +8,6 @@ config.stubs['client-only'] = '<span class="client-only"><slot /></span>'
 config.stubs['nuxt-link'] = '<span class="nuxt-link"><slot /></span>'
 
 describe('Login.vue', () => {
-  let mutations
   let store
   let mocks
   let wrapper
@@ -17,9 +16,6 @@ describe('Login.vue', () => {
   let redirect
 
   beforeEach(() => {
-    mutations = {
-      // 'posts/SELECT_ORDER': jest.fn(),
-    }
     mocks = {
       $t: jest.fn(),
       $i18n: {
@@ -39,7 +35,6 @@ describe('Login.vue', () => {
             return { termsAndConditionsAgreedVersion: tosVersion }
           },
         },
-        mutations,
       })
       if (asyncData) {
         const data = login.data ? login.data() : {}

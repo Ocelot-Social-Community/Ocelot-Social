@@ -5,7 +5,6 @@ import Hashtag from './Hashtag'
 const localVue = global.localVue
 
 config.stubs['nuxt-link'] = '<span><slot /></span>'
-config.stubs['nuxt-child'] = '<span><slot /></span>'
 
 describe('Hashtag', () => {
   let id

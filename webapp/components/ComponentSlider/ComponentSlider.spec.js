@@ -1,7 +1,5 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import ComponentSlider from './ComponentSlider.vue'
-
-config.stubs['nuxt-child'] = '<span><slot /></span>'
 
 const localVue = global.localVue
 

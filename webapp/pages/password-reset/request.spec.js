@@ -2,6 +2,7 @@ import { config, mount } from '@vue/test-utils'
 import request from './request.vue'
 
 const localVue = global.localVue
+
 // config.stubs['sweetalert-icon'] = '<span><slot /></span>'
 config.stubs['nuxt-link'] = '<span class="nuxt-link"><slot /></span>'
 

@@ -2,6 +2,7 @@ import { config, mount } from '@vue/test-utils'
 import enterNonce from './enter-nonce.vue'
 
 const localVue = global.localVue
+
 config.stubs['nuxt-link'] = '<span class="nuxt-link"><slot /></span>'
 
 describe('enter-nonce.vue', () => {
