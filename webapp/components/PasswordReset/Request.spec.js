@@ -95,5 +95,20 @@ describe('Request', () => {
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
       })
     })
+
+    describe('backend throws an error', () => {
+      beforeEach(() => {
+        mocks.$apollo.mutate = jest.fn().mockRejectedValue({
+          message: 'Ouch!',
+        })
+        wrapper = Wrapper()
+        wrapper.find('input#email').setValue('mail@gmail.com')
+        wrapper.find('form').trigger('submit')
+      })
+
+      it('display a toast error', () => {
+        expect(mocks.$toast.error).toHaveBeenCalled()
+      })
+    })
   })
 })

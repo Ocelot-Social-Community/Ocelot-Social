@@ -13,14 +13,10 @@
     "nonGlobalStepDefinitions": true
   },
   "scripts": {
-    "install:all": "yarn install && cd backend && yarn install && cd ../webapp && yarn install",
     "db:seed": "cd backend && yarn run db:seed",
     "db:reset": "cd backend && yarn run db:reset",
-    "cypress:backend": "cd backend && yarn run dev",
-    "cypress:webapp": "cd webapp && yarn run dev",
-    "cypress:setup": "run-p cypress:backend cypress:webapp",
-    "cypress:run": "cross-env cypress run --browser firefox",
-    "cypress:open": "cross-env cypress open --browser firefox",
+    "cypress:run": "cypress run --browser electron --config-file ./cypress/cypress.json",
+    "cypress:open": "cypress open --browser electron --config-file ./cypress/cypress.json",
     "cucumber:setup": "cd backend && yarn run dev",
     "cucumber": "wait-on tcp:4000 && cucumber-js --require-module @babel/register --exit",
     "release": "yarn version --no-git-tag-version --no-commit-hooks --no-commit && auto-changelog --latest-version $(node -p -e \"require('./package.json').version\") && cd backend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\")"
@@ -34,10 +30,9 @@
     "codecov": "^3.7.1",
     "cross-env": "^7.0.2",
     "cucumber": "^6.0.5",
-    "cypress": "^4.2.0",
+    "cypress": "^7.0.1",
     "cypress-cucumber-preprocessor": "^2.2.1",
     "cypress-file-upload": "^3.5.3",
-    "cypress-plugin-retries": "^1.5.2",
     "date-fns": "^2.12.0",
     "dotenv": "^8.2.0",
     "expect": "^25.3.0",
