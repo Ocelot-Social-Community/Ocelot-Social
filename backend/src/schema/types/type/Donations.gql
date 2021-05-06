@@ -1,10 +1,10 @@
 type Donations {
   id: ID!
+  createdAt: String
+  updatedAt: String
   showDonations: Boolean! # Wolle make it required in the schema
   goal: Int! # Wolle make it required in the schema
   progress: Int! # Wolle make it required in the schema
-  createdAt: String
-  updatedAt: String
 }
 
 type Query {

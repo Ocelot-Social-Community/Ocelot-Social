@@ -8,7 +8,7 @@ const mockDate = new Date(2019, 11, 6)
 global.Date = jest.fn(() => mockDate)
 
 describe('DonationInfo.vue', () => {
-  let mocks, wrapper
+  let mocks, wrapper, propsData
 
   beforeEach(() => {
     mocks = {
@@ -17,9 +17,13 @@ describe('DonationInfo.vue', () => {
         locale: () => 'de',
       },
     }
+    propsData = {
+      goal: 50000,
+      progress: 10000,
+    }
   })
 
-  const Wrapper = () => mount(DonationInfo, { mocks, localVue })
+  const Wrapper = () => mount(DonationInfo, { mocks, localVue, propsData })
 
   it('includes a link to the ocelot.social donations website', () => {
     expect(Wrapper().find('a').attributes('href')).toBe(
@@ -31,6 +35,7 @@ describe('DonationInfo.vue', () => {
     expect(Wrapper().find('.base-button').text()).toBe('donations.donate-now')
   })
 
+  // Wolle
   it.skip('creates a title from the current month and a translation string', () => {
     mocks.$t = jest.fn(() => 'Spenden für')
     expect(Wrapper().vm.title).toBe('Spenden für Dezember')
@@ -43,6 +48,7 @@ describe('DonationInfo.vue', () => {
     })
 
     describe('given german locale', () => {
+      // Wolle
       it.skip('creates a label from the given amounts and a translation string', () => {
         expect(mocks.$t).toBeCalledWith(
           'donations.amount-of-total',
@@ -59,6 +65,7 @@ describe('DonationInfo.vue', () => {
         mocks.$i18n.locale = () => 'en'
       })
 
+      // Wolle
       it.skip('creates a label from the given amounts and a translation string', () => {
         expect(mocks.$t).toBeCalledWith(
           'donations.amount-of-total',
