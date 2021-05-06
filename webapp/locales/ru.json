@@ -245,8 +245,7 @@
   },
   "donations": {
     "amount-of-total": "{amount} из {total} € собрано",
-    "donate-now": "Пожертвуйте сейчас",
-    "donations-for": "Пожертвования для"
+    "donate-now": "Пожертвуйте сейчас"
   },
   "editor": {
     "embed": {

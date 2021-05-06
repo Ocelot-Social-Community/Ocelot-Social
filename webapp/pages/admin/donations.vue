@@ -30,7 +30,6 @@
         :disabled="!showDonations"
       />
       <base-button class="donations-info-button" filled type="submit">
-        <!-- Wolle :disabled="formData.showDonations === null || !formData.goal || !formData.progress" -->
         {{ $t('actions.save') }}
       </base-button>
     </ds-form>

@@ -253,9 +253,7 @@
   },
   "donations": {
     "amount-of-total": "{amount} of {total} € collezionato",
-    "donate-now": "Dona ora",
-    "donations-for": "Donazioni per"
-  },
+    "donate-now": "Dona ora"  },
   "editor": {
     "embed": {
       "always_allow": null,

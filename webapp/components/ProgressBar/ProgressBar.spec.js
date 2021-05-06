@@ -29,17 +29,6 @@ describe('ProgessBar.vue', () => {
     })
   })
 
-  describe('given a title', () => {
-    beforeEach(() => {
-      propsData.title = 'This is progress'
-    })
-
-    // Wolle
-    it.skip('renders the title', () => {
-      expect(Wrapper().find('.progress-bar__title').text()).toBe('This is progress')
-    })
-  })
-
   describe('given a label', () => {
     beforeEach(() => {
       propsData.label = 'Going well'

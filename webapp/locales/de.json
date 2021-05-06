@@ -299,8 +299,7 @@
   },
   "donations": {
     "amount-of-total": "{amount} von {total} € erreicht",
-    "donate-now": "Jetzt spenden",
-    "donations-for": "Spenden für"
+    "donate-now": "Jetzt spenden"
   },
   "editor": {
     "embed": {

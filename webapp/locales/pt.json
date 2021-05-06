@@ -291,8 +291,7 @@
   },
   "donations": {
     "amount-of-total": "{amount} dos {total} € foram coletados",
-    "donate-now": "Doe agora",
-    "donations-for": "Doações para"
+    "donate-now": "Doe agora"
   },
   "editor": {
     "embed": {
