@@ -1,6 +1,5 @@
 import { config, shallowMount, mount } from '@vue/test-utils'
 import PostIndex from './index.vue'
-import Vue from 'vue'
 import Vuex from 'vuex'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter'
 
@@ -115,10 +114,9 @@ describe('PostIndex', () => {
         expect(wrapper.find('.top-info-bar').exists()).toBe(true)
       })
 
-      it('hides donation-info if not "showDonations"', () => {
+      it('hides donation-info if not "showDonations"', async () => {
         wrapper = Wrapper()
-        wrapper.setData({ showDonations: false })
-        Vue.nextTick()
+        await wrapper.setData({ showDonations: false })
         expect(wrapper.find('.top-info-bar').exists()).toBe(false)
       })
     })

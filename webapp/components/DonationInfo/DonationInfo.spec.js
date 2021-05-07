@@ -14,7 +14,7 @@ describe('DonationInfo.vue', () => {
     mocks = {
       $t: jest.fn((string) => string),
       $i18n: {
-        locale: () => 'de',
+        locale: () => 'en',
       },
     }
     propsData = {
@@ -25,31 +25,29 @@ describe('DonationInfo.vue', () => {
 
   const Wrapper = () => mount(DonationInfo, { mocks, localVue, propsData })
 
+  it('displays the progress bar', () => {
+    wrapper = Wrapper()
+    expect(wrapper.find('.progress-bar').exists()).toBe(true)
+  })
+
+  it('displays the action button', () => {
+    wrapper = Wrapper()
+    expect(wrapper.find('.base-button').text()).toBe('donations.donate-now')
+  })
+
   it('includes a link to the ocelot.social donations website', () => {
-    expect(Wrapper().find('a').attributes('href')).toBe(
+    wrapper = Wrapper()
+    expect(wrapper.find('a').attributes('href')).toBe(
       'https://ocelot-social.herokuapp.com/donations',
     )
   })
 
-  it('displays a call to action button', () => {
-    expect(Wrapper().find('.base-button').text()).toBe('donations.donate-now')
-  })
-
-  // Wolle
-  it.skip('creates a title from the current month and a translation string', () => {
-    mocks.$t = jest.fn(() => 'Spenden für')
-    expect(Wrapper().vm.title).toBe('Spenden für Dezember')
-  })
-
   describe('mount with data', () => {
-    beforeEach(() => {
-      wrapper = Wrapper()
-      wrapper.setData({ goal: 50000, progress: 10000 })
-    })
-
     describe('given german locale', () => {
-      // Wolle
       it.skip('creates a label from the given amounts and a translation string', () => {
+        // couldn't find out why it's not working
+        mocks.$i18n.locale = () => 'de'
+        wrapper = Wrapper()
         expect(mocks.$t).toBeCalledWith(
           'donations.amount-of-total',
           expect.objectContaining({
@@ -61,12 +59,8 @@ describe('DonationInfo.vue', () => {
     })
 
     describe('given english locale', () => {
-      beforeEach(() => {
-        mocks.$i18n.locale = () => 'en'
-      })
-
-      // Wolle
-      it.skip('creates a label from the given amounts and a translation string', () => {
+      it('creates a label from the given amounts and a translation string', () => {
+        wrapper = Wrapper()
         expect(mocks.$t).toBeCalledWith(
           'donations.amount-of-total',
           expect.objectContaining({
