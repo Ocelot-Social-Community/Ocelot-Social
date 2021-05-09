@@ -40,7 +40,9 @@
           :label="$t('settings.data.labelName')"
           :placeholder="$t('settings.data.namePlaceholder')"
         />
-        <label for='password'>{{$t('settings.security.change-password.label-new-password')}}</label>
+        <label for="password">
+          {{ $t('settings.security.change-password.label-new-password') }}
+        </label>
         <div class="password-wrapper">
           <ds-input
             id="password"
@@ -50,9 +52,14 @@
             class="password-field"
             ref="password"
           />
-          <show-password @show-password="toggleShowPassword('password')" :iconName="iconNamePassword" />
+          <show-password
+            @show-password="toggleShowPassword('password')"
+            :iconName="iconNamePassword"
+          />
         </div>
-        <label for='passwordConfirmation'>{{$t('settings.security.change-password.label-new-password-confirm')}}</label>
+        <label for="passwordConfirmation">
+          {{ $t('settings.security.change-password.label-new-password-confirm') }}
+        </label>
         <div class="password-wrapper">
           <ds-input
             id="passwordConfirmation"
@@ -62,7 +69,10 @@
             class="password-field"
             ref="confirmPassword"
           />
-          <show-password @show-password="toggleShowPassword('confirmPassword')" :iconName="iconNamePasswordConfirm" />
+          <show-password
+            @show-password="toggleShowPassword('confirmPassword')"
+            :iconName="iconNamePasswordConfirm"
+          />
         </div>
         <password-strength class="password-strength" :password="formData.password" />
 
@@ -271,14 +281,13 @@ export default {
       return true
     },
     toggleShowPassword(e) {
-      if(e === 'password'){
+      if (e === 'password') {
         this.showPassword = !this.showPassword
         this.$nextTick(() => {
           this.$refs.password.$el.children[1].children[0].focus()
           this.$emit('focus')
         })
-      } 
-      else {
+      } else {
         this.showPasswordConfirm = !this.showPasswordConfirm
         this.$nextTick(() => {
           this.$refs.confirmPassword.$el.children[1].children[0].focus()
@@ -332,6 +341,6 @@ export default {
     appearance: none;
     margin-left: 0;
     width: 100%;
-  } 
+  }
 }
 </style>
