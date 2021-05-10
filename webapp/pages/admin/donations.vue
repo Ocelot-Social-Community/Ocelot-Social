@@ -20,6 +20,7 @@
         placeholder="15000"
         icon="money"
         :disabled="!showDonations"
+        data-test="donations-goal"
       />
       <ds-input
         class="donations-data"
@@ -28,6 +29,7 @@
         placeholder="1200"
         icon="money"
         :disabled="!showDonations"
+        data-test="donations-progress"
       />
       <base-button class="donations-info-button" filled type="submit">
         {{ $t('actions.save') }}
