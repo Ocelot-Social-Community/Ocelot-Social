@@ -6,7 +6,7 @@ BACKEND:
   # Change all the below if needed
   # DOCKER_IMAGE_REPO - change that to your branded docker image
   #  Label is appended based on .Chart.appVersion
-  DOCKER_IMAGE_REPO: "ocelotsocialnetwork/backend"
+  DOCKER_IMAGE_REPO: "ocelotsocialnetwork/backend-branded"
   CLIENT_URI: "https://staging.ocelot.social"
   JWT_SECRET: "b/&&7b78BF&fv/Vd"
   MAPBOX_TOKEN: "pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g"
@@ -32,7 +32,7 @@ WEBAPP:
   # Change all the below if needed
   # DOCKER_IMAGE_REPO - change that to your branded docker image
   #  Label is appended based on .Chart.appVersion
-  DOCKER_IMAGE_REPO: "ocelotsocialnetwork/webapp"
+  DOCKER_IMAGE_REPO: "ocelotsocialnetwork/webapp-branded"
   WEBSOCKETS_URI: "wss://staging.ocelot.social/api/graphql"
 
   # Most likely you don't need to change this
@@ -76,7 +76,7 @@ MAINTENANCE:
   # Change all the below if needed
   # DOCKER_IMAGE_REPO - change that to your branded docker image
   #  Label is appended based on .Chart.appVersion
-  DOCKER_IMAGE_REPO: "ocelotsocialnetwork/maintenance"
+  DOCKER_IMAGE_REPO: "ocelotsocialnetwork/maintenance-branded"
 
   # Most likely you don't need to change this
   REVISIONS_HISTORY_LIMIT: "25"
