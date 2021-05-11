@@ -1,6 +1,6 @@
 # Helm installation of Ocelot.social
 
-Deploying Ocelot.social with Helm is very straight forward. All you have to do is to change certain parameters, like domain names and API keys, then you just install our provided Helm chart to your cluster.
+Deploying *ocelot.social* with Helm is very straight forward. All you have to do is to change certain parameters, like domain names and API keys, then you just install our provided Helm chart to your cluster.
 
 ## Configuration
 
