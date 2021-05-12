@@ -1,9 +1,8 @@
 {
   "name": "ocelot-social-branded",
   "version": "1.0.2",
-  "build-number": "79",
-  "docker-organisation-source": "ocelotsocialnetwork",
-  "docker-organisation-push": "ocelotsocialnetwork",
+  "ocelot-docker-version-tag": "1.0.2-79",
+  "docker-organisation": "ocelotsocialnetwork",
   "description": "Ocelot Social Branded",
   "author": "ocelot.social Community",
   "license": "MIT",
