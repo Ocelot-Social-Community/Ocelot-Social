@@ -47,7 +47,7 @@ WEBAPP:
 NEO4J:
   # Most likely you don't need to change this
   REVISIONS_HISTORY_LIMIT: "25"
-  DOCKER_IMAGE_REPO: "ocelotsocialnetwork/neo4j"
+  DOCKER_IMAGE_REPO: "ocelotsocialnetwork/neo4j-community-branded"
   DOCKER_IMAGE_PULL_POLICY: "Always"
   CONTAINER_RESTART_POLICY: "Always"
   CONTAINER_TERMINATION_GRACE_PERIOD_SECONDS: "30"
