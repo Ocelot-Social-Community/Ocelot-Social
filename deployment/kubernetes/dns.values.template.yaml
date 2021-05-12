@@ -1,3 +1,5 @@
+# please duplicate template file and rename to "dns.values.yaml" and fill in your value
+
 provider: digitalocean
 digitalocean:
   # create the API token at https://cloud.digitalocean.com/account/api/tokens

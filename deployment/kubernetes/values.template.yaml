@@ -1,4 +1,6 @@
-# Change all the below if needed
+# please duplicate template file and rename to "values.yaml" and fill in your value
+
+# change all the below if needed
 PUBLIC_REGISTRATION: false
 INVITE_REGISTRATION: false
 
