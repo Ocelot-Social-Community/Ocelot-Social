@@ -1,4 +1,4 @@
-ARG APP_IMAGE=ocelotsocialnetwork/neo4j:latest
+ARG APP_IMAGE=ocelotsocialnetwork/neo4j-community-branded:latest
 
 ##################################################################################
 # COMMUNITY ######################################################################

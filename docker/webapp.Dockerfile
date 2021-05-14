@@ -1,9 +1,9 @@
 ##################################################################################
 # BRANDED ########################################################################
 ##################################################################################
-ARG APP_IMAGE=ocelotsocialnetwork/webapp:latest
+ARG APP_IMAGE=ocelotsocialnetwork/webapp-branded:latest
 FROM $APP_IMAGE as branded
 
-# Copy public constants to the docker image and brand it
+# copy public constants into the Docker image to brand it
 COPY branding/static/ static/
 COPY branding/constants/ constants/
