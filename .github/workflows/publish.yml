@@ -1,10 +1,10 @@
 name: ocelot.social publish branded CI
 
-# Wolle on:
-#   push:
-#     branches:
-#       - master
-on: [push]
+on:
+  push:
+    branches:
+      - master
+# on: [push] # for testing while developing
 
 jobs:
   ##############################################################################

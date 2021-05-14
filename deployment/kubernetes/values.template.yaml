@@ -5,11 +5,12 @@ PUBLIC_REGISTRATION: false
 INVITE_REGISTRATION: false
 
 BACKEND:
-  # Change all the below if needed
+  # change all the below if needed
   # DOCKER_IMAGE_REPO - change that to your branded docker image
-  #  Label is appended based on .Chart.appVersion
+  #  label is appended based on .Chart.appVersion
   DOCKER_IMAGE_REPO: "ocelotsocialnetwork/backend-branded"
   CLIENT_URI: "https://staging.ocelot.social"
+  # create a new one for your network
   JWT_SECRET: "b/&&7b78BF&fv/Vd"
   MAPBOX_TOKEN: "pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g"
   PRIVATE_KEY_PASSPHRASE: "a7dsf78sadg87ad87sfagsadg78"
@@ -21,7 +22,7 @@ BACKEND:
   SMTP_IGNORE_TLS: 'true'
   SMTP_SECURE: 'false'
 
-  # Most likely you don't need to change this
+  # most likely you don't need to change this
   MIN_READY_SECONDS: "15"
   PROGRESS_DEADLINE_SECONDS: "60"
   REVISIONS_HISTORY_LIMIT: "25"
@@ -31,9 +32,9 @@ BACKEND:
   STORAGE_UPLOADS: "25Gi"
 
 WEBAPP:
-  # Change all the below if needed
+  # change all the below if needed
   # DOCKER_IMAGE_REPO - change that to your branded docker image
-  #  Label is appended based on .Chart.appVersion
+  #  label is appended based on .Chart.appVersion
   DOCKER_IMAGE_REPO: "ocelotsocialnetwork/webapp-branded"
   WEBSOCKETS_URI: "wss://staging.ocelot.social/api/graphql"
 
@@ -47,7 +48,7 @@ WEBAPP:
   DOCKER_IMAGE_PULL_POLICY: "Always"
 
 NEO4J:
-  # Most likely you don't need to change this
+  # most likely you don't need to change this
   REVISIONS_HISTORY_LIMIT: "25"
   DOCKER_IMAGE_REPO: "ocelotsocialnetwork/neo4j-community-branded"
   DOCKER_IMAGE_PULL_POLICY: "Always"
@@ -75,9 +76,9 @@ NEO4J:
   DBMS_SECURITY_PROCEDURES_UNRESTRICTED: "algo.*,apoc.*"
 
 MAINTENANCE:
-  # Change all the below if needed
+  # change all the below if needed
   # DOCKER_IMAGE_REPO - change that to your branded docker image
-  #  Label is appended based on .Chart.appVersion
+  #  label is appended based on .Chart.appVersion
   DOCKER_IMAGE_REPO: "ocelotsocialnetwork/maintenance-branded"
 
   # Most likely you don't need to change this
@@ -87,7 +88,7 @@ MAINTENANCE:
   DOCKER_IMAGE_PULL_POLICY: "Always"
 
 LETSENCRYPT:
-  # Change all the below if needed
+  # change all the below if needed
   # ISSUER is used by cert-manager to set up certificates with the given provider.
   #  change it to "letsencrypt-production" once you are ready to have valid cetrificates.
   #  Be aware that the is an issuing limit with letsencrypt, so a dry run with staging might be wise
@@ -98,14 +99,14 @@ LETSENCRYPT:
     - "www.staging.ocelot.social"
 
 NGINX:
-  # Most likely you don't need to change this
+  # most likely you don't need to change this
   PROXY_BODY_SIZE: "10m"
 
 STORAGE:
-  # Change all the below if needed
+  # change all the below if needed
   PROVISIONER: "dobs.csi.digitalocean.com"
 
-  # Most likely you don't need to change this
+  # most likely you don't need to change this
   RECLAIM_POLICY: "Retain"
   VOLUME_BINDING_MODE: "Immediate"
   ALLOW_VOLUME_EXPANSION: true
