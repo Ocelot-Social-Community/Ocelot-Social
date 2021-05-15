@@ -5,8 +5,8 @@ version: "1.0.0"
 # The appVersion defines which docker image is pulled.
 # Having it set to latest will pull the latest build on dockerhub.
 # You are free to define a specific version here tho.
-# e.g. appVersion: "0.6.10"
-# Be aware that this requires all dockers to have the same version available.
+# e.g. appVersion: "latest" or "1.0.2-3-ocelot.social1.0.2-79"
+# Be aware that this requires all your apps to have the same docker image version available.
 appVersion: "latest"
 description: The Helm chart for ocelot.social
 home: https://ocelot.social

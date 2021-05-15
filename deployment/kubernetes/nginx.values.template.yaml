@@ -1,3 +1,5 @@
+# please duplicate template file and rename to "nginx.values.yaml" and fill in your value
+
 controller:
   kind: DaemonSet
   hostNetwork: true
