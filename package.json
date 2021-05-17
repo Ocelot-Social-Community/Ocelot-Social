@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "ocelotDockerVersionTag": "1.0.2-79",
   "dockerOrganisation": "ocelotsocialnetwork",
-  "description": "Ocelot Social Branded",
+  "description": "ocelot.social Branded",
   "author": "ocelot.social Community",
   "license": "MIT",
   "private": false,
