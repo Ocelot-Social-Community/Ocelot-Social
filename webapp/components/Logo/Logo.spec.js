@@ -11,7 +11,7 @@ describe('Logo.vue', () => {
       $t: jest.fn(),
     }
     propsData = {
-      type: 'header',
+      logoType: 'header',
     }
   })
 
