@@ -9,7 +9,11 @@
           <ds-flex-item :width="{ base: '100%', sm: 1, md: 1 }">
             <ds-space>
               <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
-                <logo type="maintenance" />
+                <img
+                  class="image"
+                  alt="Under maintenance"
+                  src="/img/custom/under-maintenance.svg"
+                />
               </a>
             </ds-space>
           </ds-flex-item>
@@ -38,13 +42,11 @@ import emails from '~/constants/emails.js'
 import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
-import Logo from '~/components/Logo/Logo'
 
 export default {
   layout: 'blank',
   components: {
     LocaleSwitch,
-    Logo,
   },
   data() {
     return { links, metadata, supportEmail: emails.SUPPORT }
@@ -52,4 +54,9 @@ export default {
 }
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.image {
+  width: 75%;
+  height: auto;
+}
+</style>
