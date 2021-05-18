@@ -4,18 +4,20 @@ import Logo from './Logo.vue'
 const localVue = global.localVue
 
 describe('Logo.vue', () => {
-  let wrapper
-  let mocks
+  let mocks, propsData, wrapper
 
   beforeEach(() => {
     mocks = {
       $t: jest.fn(),
     }
+    propsData = {
+      type: 'header',
+    }
   })
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(Logo, { mocks, localVue })
+      return mount(Logo, { mocks, localVue, propsData })
     }
 
     beforeEach(() => {
