@@ -5,14 +5,14 @@
       class="ds-logo-svg"
       :alt="metadata.APPLICATION_NAME + ' ' + logo.alt"
       :src="logo.path"
-      :style="logoWidth"
+      :style="logoWidthStyle"
     />
     <img
       v-else
       class="ds-logo-svg"
       :alt="metadata.APPLICATION_NAME + ' ' + logo.alt"
       :src="logo.path"
-      :style="logoWidth"
+      :style="logoWidthStyle"
     />
   </component>
 </template>
@@ -31,14 +31,14 @@ export default {
     /**
      * Logo type
      */
-    type: {
+    logoType: {
       type: String,
       required: true,
     },
     /**
-     * Logo type
+     * Logo width
      */
-    width: {
+    logoWidth: {
       type: String,
       default: null,
     },
@@ -75,17 +75,17 @@ export default {
       },
     }
     return {
-      logo: logosObject[this.type],
+      logo: logosObject[this.logoType],
       metadata,
     }
   },
   computed: {
-    logoWidth() {
+    logoWidthStyle() {
       let width = ''
-      if (this.width === null) {
+      if (this.logoWidth === null) {
         width = this.logo.widthDefault
       } else {
-        width = this.width
+        width = this.logoWidth
       }
       return `width: ${width};`
     },

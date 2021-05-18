@@ -3,7 +3,7 @@
     <base-card>
       <template #imageColumn>
         <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
-          <logo type="signup" />
+          <logo logoType="signup" />
         </a>
       </template>
 

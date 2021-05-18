@@ -6,7 +6,7 @@
           <ds-flex-item width="5.5%" />
           <ds-flex-item style="flex-grow: 1" width="20%">
             <a @click="redirectToRoot">
-              <logo type="header" />
+              <logo logoType="header" />
             </a>
           </ds-flex-item>
           <ds-flex-item width="20%" style="flex-grow: 0">

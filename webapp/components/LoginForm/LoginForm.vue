@@ -7,7 +7,7 @@
     <base-card>
       <template #imageColumn>
         <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
-          <logo type="welcome" />
+          <logo logoType="welcome" />
         </a>
       </template>
       <h2 class="title">{{ $t('login.login') }}</h2>

@@ -3,7 +3,7 @@
     <base-card>
       <template #imageColumn>
         <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
-          <logo type="passwordReset" />
+          <logo logoType="passwordReset" />
         </a>
       </template>
       <nuxt-child />

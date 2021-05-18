@@ -3,7 +3,7 @@
     <ds-flex>
       <ds-flex-item :width="{ base: '100%' }" centered>
         <ds-space style="text-align: center" margin-top="large" margin-bottom="xxx-small" centered>
-          <logo type="logout" />
+          <logo logoType="logout" />
         </ds-space>
         <ds-space style="text-align: center" margin-top="small" margin-bottom="xxx-small" centered>
           <ds-heading tag="h3" soft>Logging out...</ds-heading>
