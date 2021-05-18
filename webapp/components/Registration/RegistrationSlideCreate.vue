@@ -40,24 +40,43 @@
           :label="$t('settings.data.labelName')"
           :placeholder="$t('settings.data.namePlaceholder')"
         />
-        <ds-input
-          id="password"
-          model="password"
-          type="password"
-          autocomplete="off"
-          :label="$t('settings.security.change-password.label-new-password')"
-        />
-        <ds-input
-          id="passwordConfirmation"
-          model="passwordConfirmation"
-          type="password"
-          autocomplete="off"
-          :label="$t('settings.security.change-password.label-new-password-confirm')"
-        />
+        <label for="password">
+          {{ $t('settings.security.change-password.label-new-password') }}
+        </label>
+        <div class="password-wrapper">
+          <ds-input
+            id="password"
+            model="password"
+            :type="showPassword ? 'text' : 'password'"
+            autocomplete="off"
+            class="password-field"
+            ref="password"
+          />
+          <show-password
+            @show-password="toggleShowPassword('password')"
+            :iconName="iconNamePassword"
+          />
+        </div>
+        <label for="passwordConfirmation">
+          {{ $t('settings.security.change-password.label-new-password-confirm') }}
+        </label>
+        <div class="password-wrapper">
+          <ds-input
+            id="passwordConfirmation"
+            model="passwordConfirmation"
+            :type="showPasswordConfirm ? 'text' : 'password'"
+            autocomplete="off"
+            class="password-field"
+            ref="confirmPassword"
+          />
+          <show-password
+            @show-password="toggleShowPassword('confirmPassword')"
+            :iconName="iconNamePasswordConfirm"
+          />
+        </div>
         <password-strength class="password-strength" :password="formData.password" />
 
         <email-display-and-verify :email="sliderData.collectedInputData.email" />
-
         <ds-text>
           <input
             id="checkbox0"
@@ -106,6 +125,7 @@ import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
 import { SignupVerificationMutation } from '~/graphql/Registration.js'
+import ShowPassword from '../ShowPassword/ShowPassword.vue'
 
 export default {
   name: 'RegistrationSlideCreate',
@@ -113,6 +133,7 @@ export default {
     PasswordStrength,
     EmailDisplayAndVerify,
     SweetalertIcon,
+    ShowPassword,
   },
   props: {
     sliderData: { type: Object, required: true },
@@ -140,6 +161,8 @@ export default {
       // have checkmarks available.
       termsAndConditionsConfirmed: false,
       recieveCommunicationAsEmailsEtcConfirmed: false,
+      showPassword: false,
+      showPasswordConfirm: false,
     }
   },
   mounted: function () {
@@ -179,6 +202,12 @@ export default {
         this.termsAndConditionsConfirmed &&
         this.recieveCommunicationAsEmailsEtcConfirmed
       )
+    },
+    iconNamePassword() {
+      return this.showPassword ? 'eye-slash' : 'eye'
+    },
+    iconNamePasswordConfirm() {
+      return this.showPasswordConfirm ? 'eye-slash' : 'eye'
     },
   },
   watch: {
@@ -251,6 +280,21 @@ export default {
       this.submit()
       return true
     },
+    toggleShowPassword(e) {
+      if (e === 'password') {
+        this.showPassword = !this.showPassword
+        this.$nextTick(() => {
+          this.$refs.password.$el.children[1].children[0].focus()
+          this.$emit('focus')
+        })
+      } else {
+        this.showPasswordConfirm = !this.showPasswordConfirm
+        this.$nextTick(() => {
+          this.$refs.confirmPassword.$el.children[1].children[0].focus()
+          this.$emit('focus')
+        })
+      }
+    },
   },
 }
 </script>
@@ -258,5 +302,45 @@ export default {
 <style lang="scss" scoped>
 .password-strength {
   margin-bottom: 14px;
+}
+
+.password-wrapper {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: $input-padding-vertical $space-x-small;
+  padding-left: 0;
+  padding-right: 0;
+  height: $input-height;
+  margin-bottom: 10px;
+  margin-bottom: 16px;
+
+  color: $text-color-base;
+  background: $background-color-disabled;
+
+  border: $input-border-size solid $border-color-softer;
+  border-left: none;
+  border-radius: $border-radius-base;
+  outline: none;
+  transition: all $duration-short $ease-out;
+
+  &:focus-within {
+    background-color: $background-color-base;
+    border: $input-border-size solid $border-color-active;
+
+    .toggle-icon {
+      color: $text-color-base;
+    }
+  }
+
+  .password-field {
+    position: relative;
+    padding-top: 16px;
+    border: none;
+    border-style: none;
+    appearance: none;
+    margin-left: 0;
+    width: 100%;
+  }
 }
 </style>
