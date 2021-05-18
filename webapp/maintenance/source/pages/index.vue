@@ -9,11 +9,7 @@
           <ds-flex-item :width="{ base: '100%', sm: 1, md: 1 }">
             <ds-space>
               <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
-                <img
-                  class="image"
-                  alt="Under maintenance"
-                  src="/img/custom/logo-squared.svg"
-                />
+                <img class="image" alt="Under maintenance" src="/img/custom/logo-squared.svg" />
               </a>
             </ds-space>
           </ds-flex-item>
