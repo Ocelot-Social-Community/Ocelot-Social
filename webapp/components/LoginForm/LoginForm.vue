@@ -7,7 +7,7 @@
     <base-card>
       <template #imageColumn>
         <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
-          <img class="image" alt="Welcome" src="/img/custom/welcome.svg" />
+          <logo type="welcome" />
         </a>
       </template>
       <h2 class="title">{{ $t('login.login') }}</h2>
@@ -56,13 +56,15 @@
 </template>
 
 <script>
-import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
+import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import Logo from '~/components/Logo/Logo'
 
 export default {
   components: {
     LocaleSwitch,
+    Logo,
   },
   data() {
     return {
@@ -122,9 +124,9 @@ export default {
     margin-top: $space-large;
     margin-bottom: $space-small;
   }
-  .image {
-    width: 100%;
-  }
+  // .image {
+  //   width: 100%;
+  // }
 }
 
 .password-wrapper {

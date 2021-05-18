@@ -13,7 +13,7 @@ ocelot.social is a nonprofit social, action and knowledge network that connects 
 * **Action**: Don't just read about how to make the world a better place, but come into **Action** by following provided suggestions on the **Action** tab provided by other people or **Organisations**.
 
 <p align="center">
-  <img src="webapp/static/img/custom/welcome.svg" alt="Ocelot-Social" width="40%" height="40%">
+  <img src="webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%">
 </p>
 
 ## Live demo
