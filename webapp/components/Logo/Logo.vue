@@ -71,7 +71,7 @@ export default {
       maintenance: {
         path: logos.LOGO_MAINTENACE_RESET_PATH,
         alt: 'Under Maintenance',
-        widthDefault: '75%',
+        widthDefault: '200px',
       },
     }
     return {

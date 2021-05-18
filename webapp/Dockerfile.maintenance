@@ -56,8 +56,10 @@ COPY package.json yarn.lock ./
 RUN yarn install --production=false --frozen-lockfile --non-interactive
 
 COPY assets assets
-COPY components/LocaleSwitch/ components/LocaleSwitch
+COPY components/_new/features/Maintenance/ components/_new/features/Maintenance
 COPY components/Dropdown.vue components/Dropdown.vue
+COPY components/LocaleSwitch/ components/LocaleSwitch
+COPY components/Logo/ components/Logo
 COPY layouts/blank.vue layouts/blank.vue
 COPY locales locales
 COPY mixins mixins
