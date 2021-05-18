@@ -31,11 +31,7 @@
             ref="password"
             :type="showPassword ? 'text' : 'password'"
           />
-          <span class="click-wrapper" @click="toggleShowPassword">
-            <span class="icon-wrapper" :data-test="iconName">
-              <base-icon class="toggle-icon" :name="iconName" />
-            </span>
-          </span>
+          <show-password @show-password="toggleShowPassword" :iconName="iconName" />
         </div>
         <nuxt-link to="/password-reset/request">
           {{ $t('login.forgotPassword') }}
@@ -59,10 +55,12 @@
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
+import ShowPassword from '../ShowPassword/ShowPassword.vue'
 
 export default {
   components: {
     LocaleSwitch,
+    ShowPassword,
   },
   data() {
     return {
@@ -98,9 +96,8 @@ export default {
         }
       }
     },
-    toggleShowPassword(event) {
+    toggleShowPassword() {
       this.showPassword = !this.showPassword
-      event.preventDefault()
       this.$nextTick(() => {
         this.$refs.password.$el.children[1].children[1].focus()
         this.$emit('focus')
@@ -114,7 +111,7 @@ export default {
 .login-form {
   width: 80vw;
   max-width: 620px;
-  margin: auto;
+  /* margin: auto; */
 
   .base-button {
     display: block;
@@ -144,28 +141,6 @@ export default {
   border-radius: $border-radius-base;
   outline: none;
   transition: all $duration-short $ease-out;
-
-  .icon-wrapper {
-    margin-right: 2px;
-  }
-
-  .click-wrapper {
-    padding: 8px;
-    align-content: center;
-    color: $text-color-disabled;
-    cursor: pointer;
-  }
-
-  .click-wrapper:hover {
-    &:focus-within {
-      background-color: $background-color-base;
-      border: $input-border-size solid $border-color-active;
-
-      .toggle-icon {
-        color: $text-color-base;
-      }
-    }
-  }
 
   &:focus-within {
     background-color: $background-color-base;
