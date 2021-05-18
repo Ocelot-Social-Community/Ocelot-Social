@@ -12,7 +12,7 @@
                 <img
                   class="image"
                   alt="Under maintenance"
-                  src="/img/custom/under-maintenance.svg"
+                  src="/img/custom/logo-squared.svg"
                 />
               </a>
             </ds-space>
