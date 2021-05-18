@@ -1,7 +1,19 @@
 <template>
   <component :is="tag" class="ds-logo" :class="[inverse && 'ds-logo-inverse']">
-    <img v-if="!inverse" class="ds-logo-svg" :alt="metadata.APPLICATION_NAME + ' ' + logo.alt" :src="logo.path" :style="logoWidth" />
-    <img v-else class="ds-logo-svg" :alt="metadata.APPLICATION_NAME + ' ' + logo.alt" :src="logo.path" :style="logoWidth" />
+    <img
+      v-if="!inverse"
+      class="ds-logo-svg"
+      :alt="metadata.APPLICATION_NAME + ' ' + logo.alt"
+      :src="logo.path"
+      :style="logoWidth"
+    />
+    <img
+      v-else
+      class="ds-logo-svg"
+      :alt="metadata.APPLICATION_NAME + ' ' + logo.alt"
+      :src="logo.path"
+      :style="logoWidth"
+    />
   </component>
 </template>
 
@@ -47,12 +59,20 @@ export default {
   },
   data() {
     const logosObject = {
-      header: { path: logos.LOGO_HEADER_PATH, alt: 'Header', widthDefault: '130px'},
-      welcome: { path: logos.LOGO_WELCOME_PATH, alt: 'Welcome', widthDefault: '200px'},
-      signup: { path: logos.LOGO_SIGNUP_PATH, alt: 'Sign Up', widthDefault: '200px'},
-      logout: { path: logos.LOGO_LOGOUT_PATH, alt: 'Logging Out', widthDefault: '200px'},
-      passwordReset: { path: logos.LOGO_PASSWORD_RESET_PATH, alt: 'Reset Your Password', widthDefault: '200px'},
-      maintenance: { path: logos.LOGO_MAINTENACE_RESET_PATH, alt: 'Under Maintenance', widthDefault: '75%'},
+      header: { path: logos.LOGO_HEADER_PATH, alt: 'Header', widthDefault: '130px' },
+      welcome: { path: logos.LOGO_WELCOME_PATH, alt: 'Welcome', widthDefault: '200px' },
+      signup: { path: logos.LOGO_SIGNUP_PATH, alt: 'Sign Up', widthDefault: '200px' },
+      logout: { path: logos.LOGO_LOGOUT_PATH, alt: 'Logging Out', widthDefault: '200px' },
+      passwordReset: {
+        path: logos.LOGO_PASSWORD_RESET_PATH,
+        alt: 'Reset Your Password',
+        widthDefault: '200px',
+      },
+      maintenance: {
+        path: logos.LOGO_MAINTENACE_RESET_PATH,
+        alt: 'Under Maintenance',
+        widthDefault: '75%',
+      },
     }
     return {
       logo: logosObject[this.type],
