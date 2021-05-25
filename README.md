@@ -9,7 +9,7 @@ This repository is an in use template to rebrand, configure, and deploy [ocelot.
 <!-- [![Open Source Helpers](https://www.codetriage.com/human-connection/human-connection/badges/users.svg)](https://www.codetriage.com/human-connection/human-connection) -->
 
 <p align="center">
-  <img src="branding/static/img/custom/welcome.svg" alt="Ocelot-Social" width="40%" height="40%">
+  <img src="branding/static/img/custom/logo-squared.svg" alt="Ocelot-Social" width="40%" height="40%">
 </p>
 
 <!--
