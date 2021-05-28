@@ -4483,6 +4483,19 @@ neo-async@^2.6.0:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.1.tgz#ac27ada66167fa8849a6addd837f6b189ad2081c"
   integrity sha512-iyam8fBuCUpWeKPGpaNMetEocMt364qkCsfL9JuhjXX6dRnguRVOfk2GZaDpPjcOKiiXCPINZC1GczQ7iTq3Zw==
 
+neo4j-driver-bolt-connection@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/neo4j-driver-bolt-connection/-/neo4j-driver-bolt-connection-4.3.0.tgz#150089f92eb094792a63f62b9a8f0c34725380f3"
+  integrity sha512-MTzixvHoZNmYbWgUeggXFUhgetr5BlVZ9hY5pWCnkttoTwS21D/ygs+oDyn3tJKvNd8INRsrwKh4dG3izvp2Xg==
+  dependencies:
+    neo4j-driver-core "^4.3.0"
+    text-encoding-utf-8 "^1.0.2"
+
+neo4j-driver-core@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/neo4j-driver-core/-/neo4j-driver-core-4.3.0.tgz#a6d33f604dec7cf3b200bb14c1ac42292b3ab488"
+  integrity sha512-XJULrmfeTtDKonchufDqTpf5qQ93RI5vbyOxZ/S4VospfKGeWsl6KmwXvp3fY1nCKWTny/Ekm4hw1vod2XyZEA==
+
 neo4j-driver@^1.7.6:
   version "1.7.6"
   resolved "https://registry.yarnpkg.com/neo4j-driver/-/neo4j-driver-1.7.6.tgz#eccb135a71eba9048c68717444593a6424cffc49"
@@ -4492,15 +4505,15 @@ neo4j-driver@^1.7.6:
     text-encoding-utf-8 "^1.0.2"
     uri-js "^4.2.2"
 
-neo4j-driver@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/neo4j-driver/-/neo4j-driver-4.0.2.tgz#78de3b91e91572bcbd9d2e02554322fe1ab399ea"
-  integrity sha512-xQN4BZZsweaNNac7FDYAV6f/JybghwY3lk4fwblS8V5KQ+DBMPe4Pthh672mp+wEYZGyzPalq5CfpcBrWaZ4Gw==
+neo4j-driver@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/neo4j-driver/-/neo4j-driver-4.3.0.tgz#367e80925c671d364ecd406d049958469c7ce577"
+  integrity sha512-vG+KsKQXTAIwhspMQw4pFVJ+Mr8XrBC2vPw19C+WVUR2qx5w+zynB2WxOyFI+9oxya9B5xCWxgQ4I5KyMDtElw==
   dependencies:
     "@babel/runtime" "^7.5.5"
-    rxjs "^6.5.2"
-    text-encoding-utf-8 "^1.0.2"
-    uri-js "^4.2.2"
+    neo4j-driver-bolt-connection "^4.3.0"
+    neo4j-driver-core "^4.3.0"
+    rxjs "^6.6.3"
 
 neode@^0.3.7:
   version "0.3.7"
@@ -5301,10 +5314,10 @@ rosie@^2.0.1:
   resolved "https://registry.yarnpkg.com/rosie/-/rosie-2.0.1.tgz#c250c4787ce450b72aa9eff26509f68589814fa2"
   integrity sha1-wlDEeHzkULcqqe/yZQn2hYmBT6I=
 
-rxjs@^6.3.3, rxjs@^6.5.2:
-  version "6.5.4"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.5.4.tgz#e0777fe0d184cec7872df147f303572d414e211c"
-  integrity sha512-naMQXcgEo3csAEGvw/NydRA0fuS2nDZJiw1YUWFKU7aPPAPGZEsD4Iimit96qwCieH6y614MCLYwdkrWx7z/7Q==
+rxjs@^6.3.3, rxjs@^6.6.3:
+  version "6.6.7"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.6.7.tgz#90ac018acabf491bf65044235d5863c4dab804c9"
+  integrity sha512-hTdwr+7yYNIT5n4AMYp85KA6yw2Va0FLa3Rguvbpa4W3I5xynaBZo41cM3XM+4Q6fRMj3sBYIR1VAmZMXYJvRQ==
   dependencies:
     tslib "^1.9.0"
 
