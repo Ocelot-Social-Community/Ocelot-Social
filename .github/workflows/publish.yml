@@ -31,7 +31,7 @@ jobs:
         run: echo "OCELOT_DOCKER_VERSION_TAG=$(node -p -e "require('./package.json').ocelotDockerVersionTag")" >> $GITHUB_ENV
       - name: ENV - DOCKER_ORGANISATION
         run: echo "DOCKER_ORGANISATION=$(node -p -e "require('./package.json').dockerOrganisation")" >> $GITHUB_ENV
-      # this is oriented on the node docker version tag "node:12.19.0-alpine3.10" and looks like "app-branded:1.0.2-3-ocelot.social1.0.2-79"
+      # this is based on the node Docker version tag "node:12.19.0-alpine3.10" and looks like "app-branded:1.0.2-3-ocelot.social1.0.2-79"
       - name: ENV - BUILD_VERSION
         run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}-ocelot.social${OCELOT_DOCKER_VERSION_TAG}" >> $GITHUB_ENV
       - name: ENV - BUILD_COMMIT
@@ -73,7 +73,7 @@ jobs:
         run: echo "OCELOT_DOCKER_VERSION_TAG=$(node -p -e "require('./package.json').ocelotDockerVersionTag")" >> $GITHUB_ENV
       - name: ENV - DOCKER_ORGANISATION
         run: echo "DOCKER_ORGANISATION=$(node -p -e "require('./package.json').dockerOrganisation")" >> $GITHUB_ENV
-      # this is oriented on the node docker version tag "node:12.19.0-alpine3.10" and looks like "app-branded:1.0.2-3-ocelot.social1.0.2-79"
+      # this is based on the node Docker version tag "node:12.19.0-alpine3.10" and looks like "app-branded:1.0.2-3-ocelot.social1.0.2-79"
       - name: ENV - BUILD_VERSION
         run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}-ocelot.social${OCELOT_DOCKER_VERSION_TAG}" >> $GITHUB_ENV
       - name: ENV - BUILD_COMMIT
@@ -115,7 +115,7 @@ jobs:
         run: echo "OCELOT_DOCKER_VERSION_TAG=$(node -p -e "require('./package.json').ocelotDockerVersionTag")" >> $GITHUB_ENV
       - name: ENV - DOCKER_ORGANISATION
         run: echo "DOCKER_ORGANISATION=$(node -p -e "require('./package.json').dockerOrganisation")" >> $GITHUB_ENV
-      # this is oriented on the node docker version tag "node:12.19.0-alpine3.10" and looks like "app-branded:1.0.2-3-ocelot.social1.0.2-79"
+      # this is based on the node Docker version tag "node:12.19.0-alpine3.10" and looks like "app-branded:1.0.2-3-ocelot.social1.0.2-79"
       - name: ENV - BUILD_VERSION
         run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}-ocelot.social${OCELOT_DOCKER_VERSION_TAG}" >> $GITHUB_ENV
       - name: ENV - BUILD_COMMIT
@@ -157,7 +157,7 @@ jobs:
         run: echo "OCELOT_DOCKER_VERSION_TAG=$(node -p -e "require('./package.json').ocelotDockerVersionTag")" >> $GITHUB_ENV
       - name: ENV - DOCKER_ORGANISATION
         run: echo "DOCKER_ORGANISATION=$(node -p -e "require('./package.json').dockerOrganisation")" >> $GITHUB_ENV
-      # this is oriented on the node docker version tag "node:12.19.0-alpine3.10" and looks like "app-branded:1.0.2-3-ocelot.social1.0.2-79"
+      # this is based on the node Docker version tag "node:12.19.0-alpine3.10" and looks like "app-branded:1.0.2-3-ocelot.social1.0.2-79"
       - name: ENV - BUILD_VERSION
         run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}-ocelot.social${OCELOT_DOCKER_VERSION_TAG}" >> $GITHUB_ENV
       - name: ENV - BUILD_COMMIT
@@ -202,7 +202,7 @@ jobs:
         run: echo "OCELOT_DOCKER_VERSION_TAG=$(node -p -e "require('./package.json').ocelotDockerVersionTag")" >> $GITHUB_ENV
       - name: ENV - DOCKER_ORGANISATION
         run: echo "DOCKER_ORGANISATION=$(node -p -e "require('./package.json').dockerOrganisation")" >> $GITHUB_ENV
-      # this is oriented on the node docker version tag "node:12.19.0-alpine3.10" and looks like "app-branded:1.0.2-3-ocelot.social1.0.2-79"
+      # this is based on the node Docker version tag "node:12.19.0-alpine3.10" and looks like "app-branded:1.0.2-3-ocelot.social1.0.2-79"
       - name: ENV - BUILD_VERSION
         run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}-ocelot.social${OCELOT_DOCKER_VERSION_TAG}" >> $GITHUB_ENV
       - name: ENV - BUILD_COMMIT
@@ -282,7 +282,7 @@ jobs:
         run: echo "OCELOT_DOCKER_VERSION_TAG=$(node -p -e "require('./package.json').ocelotDockerVersionTag")" >> $GITHUB_ENV
       - name: ENV - DOCKER_ORGANISATION
         run: echo "DOCKER_ORGANISATION=$(node -p -e "require('./package.json').dockerOrganisation")" >> $GITHUB_ENV
-      # this is oriented on the node docker version tag "node:12.19.0-alpine3.10" and looks like "app-branded:1.0.2-3-ocelot.social1.0.2-79"
+      # this is based on the node Docker version tag "node:12.19.0-alpine3.10" and looks like "app-branded:1.0.2-3-ocelot.social1.0.2-79"
       - name: ENV - BUILD_VERSION
         run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}-ocelot.social${OCELOT_DOCKER_VERSION_TAG}" >> $GITHUB_ENV
       - name: ENV - BUILD_COMMIT
