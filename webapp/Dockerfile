@@ -1,5 +1,5 @@
 ##################################################################################
-# BASE ###########################################################################
+# BASE (Is pushed to DockerHub for rebranding) ###################################
 ##################################################################################
 FROM node:12.19.0-alpine3.10 as base
 
@@ -59,12 +59,18 @@ FROM base as development
 CMD /bin/sh -c "yarn install && yarn run dev"
 
 ##################################################################################
-# BUILD (Does contain all files and is therefore bloated) ########################
+# CODE (Does contain all code files and is pushed to DockerHub for rebranding) ###
 ##################################################################################
-FROM base as build
+FROM base as code
 
-# Copy everything
+# copy everything, but do not build.
 COPY . .
+
+##################################################################################
+# BUILD (Does contain all files and the compilate and is therefore bloated) ######
+##################################################################################
+FROM code as build
+
 # yarn install
 RUN yarn install --production=false --frozen-lockfile --non-interactive
 # yarn build
@@ -83,11 +89,13 @@ CMD /bin/sh -c "yarn run dev"
 ##################################################################################
 FROM base as production
 
+# TODO - do all copying with one COPY command to have one layer
 # Copy "binary"-files from build image
 COPY --from=build ${DOCKER_WORKDIR}/.nuxt ./.nuxt
 COPY --from=build ${DOCKER_WORKDIR}/node_modules ./node_modules
 COPY --from=build ${DOCKER_WORKDIR}/nuxt.config.js ./nuxt.config.js
 # Copy static files
+# TODO - this seems not be needed anymore for the new rebranding
 # TODO - this should be one Folder containign all stuff needed to be copied
 COPY --from=build ${DOCKER_WORKDIR}/config/ ./config/
 COPY --from=build ${DOCKER_WORKDIR}/constants ./constants

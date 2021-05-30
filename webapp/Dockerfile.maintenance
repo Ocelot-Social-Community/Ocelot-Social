@@ -48,11 +48,12 @@ WORKDIR ${DOCKER_WORKDIR}
 CMD ["yarn", "run", "start"]
 
 ##################################################################################
-# BUILD ### TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO ##
+# CODE (Does contain all code files and is pushed to DockerHub for rebranding) ###
 ##################################################################################
-FROM base as build
+FROM base as code
 
 COPY package.json yarn.lock ./
+# yarn install
 RUN yarn install --production=false --frozen-lockfile --non-interactive
 
 COPY assets assets
@@ -70,7 +71,12 @@ COPY config/ config/
 # this will also ovewrite the existing package.json
 COPY maintenance/source ./
 
+##################################################################################
+# BUILD ### TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO ##
+##################################################################################
+FROM code as build
 
+# yarn generate
 RUN yarn run generate
 
 ##################################################################################
