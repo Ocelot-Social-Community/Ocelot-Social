@@ -93,7 +93,6 @@ jobs:
       # BUILD BACKEND DOCKER IMAGE (production) ################################
       ##########################################################################
       - name: Backend | Build `production` image
-        # TODO build and push "latest-base" and "latest-code"
         run: |
           docker build --target base -t "ocelotsocialnetwork/backend:latest-base" -t "ocelotsocialnetwork/backend:${VERSION}-base" -t "ocelotsocialnetwork/backend:${BUILD_VERSION}-base" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT backend/
           docker build --target code -t "ocelotsocialnetwork/backend:latest-code" -t "ocelotsocialnetwork/backend:${VERSION}-code" -t "ocelotsocialnetwork/backend:${BUILD_VERSION}-code" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT backend/
@@ -134,7 +133,6 @@ jobs:
       # BUILD WEBAPP DOCKER IMAGE (build) ######################################
       ##########################################################################
       - name: Webapp | Build `production` image
-        # TODO build and push "latest-base" and "latest-code"
         run: |
           docker build --target base -t "ocelotsocialnetwork/webapp:latest-base" -t "ocelotsocialnetwork/webapp:${VERSION}-base" -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}-base" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/
           docker build --target code -t "ocelotsocialnetwork/webapp:latest-code" -t "ocelotsocialnetwork/webapp:${VERSION}-code" -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}-code" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/
@@ -175,7 +173,6 @@ jobs:
       # BUILD MAINTENANCE DOCKER IMAGE (build) #################################
       ##########################################################################
       - name: Maintenance | Build `production` image
-        # TODO build and push "latest-base" and "latest-code"
         run: |
           docker build --target base -t "ocelotsocialnetwork/maintenance:latest-base" -t "ocelotsocialnetwork/maintenance:${VERSION}-base" -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}-base" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/ -f webapp/Dockerfile.maintenance
           docker build --target code -t "ocelotsocialnetwork/maintenance:latest-code" -t "ocelotsocialnetwork/maintenance:${VERSION}-code" -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}-code" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/ -f webapp/Dockerfile.maintenance
