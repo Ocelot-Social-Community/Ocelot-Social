@@ -12,7 +12,6 @@ services:
       - NODE_ENV="test"
     volumes:
       - ./coverage:/app/coverage 
-
   ########################################################
   # BACKEND ##############################################
   ########################################################
@@ -24,7 +23,6 @@ services:
       - NODE_ENV="test"
     volumes:
       - ./coverage:/app/coverage 
-
   ########################################################
   # NEO4J ################################################
   ########################################################
@@ -41,13 +39,11 @@ services:
     networks:
       # So we can access the neo4j query browser from our host machine
       - external-net
-  
   ########################################################
   # MAINTENANCE ##########################################
   ########################################################
   maintenance:
     image: ocelotsocialnetwork/maintenance:test
-
   ########################################################
   # MAILSERVER TO FAKE SMTP ##############################
   ########################################################
@@ -57,6 +53,7 @@ services:
       - 1080:80
     networks:
       - external-net
+      
 volumes:
   webapp_node_modules:
   backend_node_modules:
