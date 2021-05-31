@@ -42,10 +42,11 @@ There are many volunteers all around the world helping us build this network and
 
 You can see the core team behind Human Connection [on our website](https://human-connection.org/en/the-team/). On Github you will mostly run into our developers:
 
-* Ulf (@Tirokk)
-* Moriz (@Tirokk)
+* Ulf (@ulfgebhardt)
+* Moriz (@Mogge)
 * Wolle (@Tirokk)
 * Alex (@ogerly)
+
 <!-- * Robert (@roschaefer)
 * Matt (@mattwr18)
 * Alina (@alina-beck)
