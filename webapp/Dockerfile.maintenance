@@ -68,6 +68,8 @@ COPY constants constants
 COPY nuxt.config.js nuxt.config.js
 COPY config/ config/
 
+# this is needed in rebranding
+COPY maintenance/nginx maintenance/nginx
 # this will also ovewrite the existing package.json
 COPY maintenance/source ./
 
