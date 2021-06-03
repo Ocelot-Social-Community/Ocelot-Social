@@ -29,11 +29,11 @@ describe('PageFooter.vue', () => {
         wrapper = Wrapper()
       })
 
-      it('renders three links', () => {
+      it('renders four links', () => {
         expect(wrapper.findAll('a')).toHaveLength(4)
       })
 
-      it('renders four nuxt-links', () => {
+      it('renders three nuxt-links', () => {
         expect(wrapper.findAll('.nuxt-link')).toHaveLength(3)
       })
 
