@@ -1,12 +1,12 @@
 <template>
   <div id="footer" class="ds-footer">
     <!-- made with ❤️ -->
-    <a :href="links.ORGANIZATION" target="_blank">
+    <a :href="links.ORGANIZATION" target="_blank" data-test="organization-link">
       {{ $t('site.made') }}
     </a>
     <span>-</span>
     <!-- imprint -->
-    <nuxt-link v-if="noLinkDefined(links.IMPRINT)" to="/imprint">
+    <nuxt-link v-if="noLinkDefined(links.IMPRINT)" to="/imprint" data-test="imprint-nuxt-link">
       {{ $t('site.imprint') }}
     </nuxt-link>
     <a v-else :href="links.IMPRINT" target="_blank">
@@ -14,7 +14,11 @@
     </a>
     <span>-</span>
     <!-- terms and conditions -->
-    <nuxt-link v-if="noLinkDefined(links.TERMS_AND_CONDITIONS)" to="/terms-and-conditions">
+    <nuxt-link
+      v-if="noLinkDefined(links.TERMS_AND_CONDITIONS)"
+      to="/terms-and-conditions"
+      data-test="terms-nuxt-link"
+    >
       {{ $t('site.termsAndConditions') }}
     </nuxt-link>
     <a v-else :href="links.TERMS_AND_CONDITIONS" target="_blank">
@@ -22,7 +26,11 @@
     </a>
     <span>-</span>
     <!-- code of conduct -->
-    <nuxt-link v-if="noLinkDefined(links.CODE_OF_CONDUCT)" to="/code-of-conduct">
+    <nuxt-link
+      v-if="noLinkDefined(links.CODE_OF_CONDUCT)"
+      to="/code-of-conduct"
+      data-test="code-nuxt-link"
+    >
       {{ $t('site.code-of-conduct') }}
     </nuxt-link>
     <a v-else :href="links.CODE_OF_CONDUCT" target="_blank">
@@ -30,7 +38,11 @@
     </a>
     <span>-</span>
     <!-- data privacy -->
-    <nuxt-link v-if="noLinkDefined(links.DATA_PRIVACY)" to="/data-privacy">
+    <nuxt-link
+      v-if="noLinkDefined(links.DATA_PRIVACY)"
+      to="/data-privacy"
+      data-test="data-nuxt-link"
+    >
       {{ $t('site.data-privacy') }}
     </nuxt-link>
     <a v-else :href="links.DATA_PRIVACY" target="_blank">
@@ -38,7 +50,7 @@
     </a>
     <span>-</span>
     <!-- faq -->
-    <nuxt-link v-if="noLinkDefined(links.FAQ)" to="/faq">
+    <nuxt-link v-if="noLinkDefined(links.FAQ)" to="/faq" data-test="faq-nuxt-link">
       {{ $t('site.faq') }}
     </nuxt-link>
     <a v-else :href="links.FAQ" target="_blank">
@@ -49,6 +61,7 @@
     <a
       href="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/CHANGELOG.md"
       target="_blank"
+      data-test="version-link"
     >
       {{ version }}
     </a>
