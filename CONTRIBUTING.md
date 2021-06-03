@@ -23,7 +23,7 @@ This is how we solve bugs and implement features, step by step:
 1. We find an issue we want to work on, usually during the sprint planning but as an open source contributor this can happen at any time.
 2. We communicate with the team to see if the issue is still available. (When you comment on an issue but don't get an answer there within 1-2 days try to mention @Human-Connection/hc-dev-team to make sure we check in.)
 3. We make sure we understand the issue in detail – what problem is it solving and how should it be implemented?
-4. We assign ourselves to the issue and move it to `In Progress` on [Zenhub](https://app.zenhub.com/workspaces/human-connection-nitro-5c0154ecc699f60fc92cf11f).
+4. We assign ourselves to the issue and move it to `In Progress` on [Zenhub](https://app.zenhub.com/workspaces/ocelotsocial-5fb21ff922cb410015dd6535/board?filterLogic=any&repos=301151089).
 5. We start working on it in a `new branch` and open a `pull request` prefixed with `[WIP]` (work in progress) to which we regularly push our changes.
 6. When questions come up we clarify them with the team (directly in the issue on Github).
 7. When we are happy with our work and our PR is passing all tests we remove the `[WIP]` from the PR description and ask for reviews (if you're not sure who to ask there is @Human-Connection/hc-dev-team which pings all core developers).
@@ -40,7 +40,7 @@ Every pull request needs to:
 
 There are many volunteers all around the world helping us build this network and without their contributions we wouldn't be where we are today. Big thank you to all of you!
 
-You can see the core team behind Human Connection [on our website](https://human-connection.org/en/the-team/). On Github you will mostly run into our developers:
+You can talk to our core team on [Discord](https://discord.gg/AJSX9DCSUA). And on Github you will mostly run into our core developers:
 
 * Ulf (@ulfgebhardt)
 * Moriz (@Mogge)
@@ -60,7 +60,7 @@ Times below refer to **German Time** – that's CET (GMT+1) in winter and CEST (
 Daily standup
 
 * every Monday–Thursday 11:30 am (german time see above 👆🏼)
-* in our Discord `Office Cube`
+* in our [Discord](https://discord.gg/AJSX9DCSUA) `Office Cube`
 * all contributors welcome!
 * everybody shares what they are working on and asks for help if they are blocked
 
