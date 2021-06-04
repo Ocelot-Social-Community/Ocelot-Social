@@ -1,9 +1,8 @@
 <template>
   <div>
-    <ds-space>
+    <ds-space margin="small">
       <ds-heading tag="h2">{{ $t('site.imprint') }}</ds-heading>
     </ds-space>
-
     <ds-container>
       <div v-html="$t('html.imprint')" />
     </ds-container>
