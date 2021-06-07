@@ -92,7 +92,7 @@ FROM base as production
 # TODO - do all copying with one COPY command to have one layer
 # Copy "binary"-files from build image
 COPY --from=build ${DOCKER_WORKDIR}/.nuxt ./.nuxt
-#COPY --from=build ${DOCKER_WORKDIR}/node_modules ./node_modules
+COPY --from=build ${DOCKER_WORKDIR}/node_modules ./node_modules
 COPY --from=build ${DOCKER_WORKDIR}/nuxt.config.js ./nuxt.config.js
 # Copy static files
 # TODO - this seems not be needed anymore for the new rebranding
