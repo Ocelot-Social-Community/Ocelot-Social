@@ -91,18 +91,11 @@ FROM base as production
 
 # TODO - do all copying with one COPY command to have one layer
 # Copy "binary"-files from build image
-COPY --from=build ${DOCKER_WORKDIR}/.nuxt ./.nuxt
-COPY --from=build ${DOCKER_WORKDIR}/node_modules ./node_modules
-COPY --from=build ${DOCKER_WORKDIR}/nuxt.config.js ./nuxt.config.js
-# Copy static files
-# TODO - this seems not be needed anymore for the new rebranding
-# TODO - this should be one Folder containign all stuff needed to be copied
-COPY --from=build ${DOCKER_WORKDIR}/config/ ./config/
-COPY --from=build ${DOCKER_WORKDIR}/constants ./constants
-COPY --from=build ${DOCKER_WORKDIR}/static ./static
-COPY --from=build ${DOCKER_WORKDIR}/locales ./locales
+COPY --from=build ./.nuxt ./.nuxt
+COPY --from=build ./node_modules ./node_modules
+COPY --from=build ./nuxt.config.js ./nuxt.config.js
 # Copy package.json for script definitions (lock file should not be needed)
-COPY --from=build ${DOCKER_WORKDIR}/package.json ./package.json
+COPY --from=build ./package.json ./package.json
 
 # Run command
 CMD /bin/sh -c "yarn run start"
