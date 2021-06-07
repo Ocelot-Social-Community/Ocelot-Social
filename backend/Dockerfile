@@ -90,13 +90,13 @@ CMD /bin/sh -c "yarn run dev"
 FROM base as production
 
 # Copy "binary"-files from build image
-COPY --from=build ./dist ./dist
+COPY --from=build ${DOCKER_WORKDIR}/dist ./dist
 # Copy static files
 # TODO - externalize the uploads so we can copy the whole folder
-COPY --from=build ./public/img/ ./public/img/
-COPY --from=build ./public/providers.json ./public/providers.json
+COPY --from=build ${DOCKER_WORKDIR}/public/img/ ./public/img/
+COPY --from=build ${DOCKER_WORKDIR}/public/providers.json ./public/providers.json
 # Copy package.json for script definitions (lock file should not be needed)
-COPY --from=build ./package.json ./package.json
+COPY --from=build ${DOCKER_WORKDIR}/package.json ./package.json
 
 # Run command
 CMD /bin/sh -c "yarn run start"
