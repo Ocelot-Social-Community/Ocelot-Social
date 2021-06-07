@@ -2,6 +2,9 @@
 version: "3.4"
 
 services:
+  ########################################################
+  # WEBAPP ###############################################
+  ########################################################
   webapp:
     build:
       dockerfile: docker/webapp.Dockerfile
@@ -19,6 +22,9 @@ services:
       - MAPBOX_TOKEN="pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g"
       - WEBSOCKETS_URI=${WEBSOCKETS_URI}
       - PUBLIC_REGISTRATION=true
+  ########################################################
+  # BACKEND ##############################################
+  ########################################################
   backend:
     build:
       dockerfile: docker/backend.Dockerfile
@@ -45,6 +51,9 @@ services:
       - SMTP_HOST=mailserver
       - SMTP_PORT=25
       - SMTP_IGNORE_TLS=true
+  ########################################################
+  # NEO4J ################################################
+  ########################################################
   neo4j:
     image: ocelotsocialnetwork/neo4j:community
     networks:
@@ -55,6 +64,22 @@ services:
       - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
     ports:
       - 7687:7687
+  ########################################################
+  # MAINTENANCE ##########################################
+  ########################################################
+  maintenance:
+    build:
+      # TODO: Separate from webapp, this must be independent
+      dockerfile: docker/maintenance.Dockerfile
+      target: branded
+      context: .
+    networks:
+      - test-network
+    ports:
+      - 5000:80
+  ########################################################
+  # MAILSERVER TO FAKE SMTP ##############################
+  ########################################################
   mailserver:
     image: djfarrelly/maildev
     ports:
