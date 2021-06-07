@@ -72,7 +72,7 @@ COPY . .
 FROM code as build
 
 # yarn install
-RUN yarn install --production=false --frozen-lockfile --non-interactive
+RUN yarn install --production=true --frozen-lockfile --non-interactive
 # yarn build
 RUN yarn run build
 
@@ -91,8 +91,8 @@ FROM base as production
 
 # Copy "binary"-files from build image
 COPY --from=build ${DOCKER_WORKDIR}/dist ./dist
-COPY --from=build ${DOCKER_WORKDIR}/node_modules ./node_modules
-# Copy static files # Wolle comment overfluid here?
+# COPY --from=build ${DOCKER_WORKDIR}/node_modules ./node_modules
+# Copy static files
 # TODO - externalize the uploads so we can copy the whole folder
 COPY --from=build ${DOCKER_WORKDIR}/public/img/ ./public/img/
 COPY --from=build ${DOCKER_WORKDIR}/public/providers.json ./public/providers.json

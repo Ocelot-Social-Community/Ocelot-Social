@@ -54,7 +54,7 @@ FROM base as code
 
 COPY package.json yarn.lock ./
 # yarn install
-RUN yarn install --production=false --frozen-lockfile --non-interactive
+RUN yarn install --production=true --frozen-lockfile --non-interactive
 
 COPY assets assets
 COPY components/LocaleSwitch/ components/LocaleSwitch
