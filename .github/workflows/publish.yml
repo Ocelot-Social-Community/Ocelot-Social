@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - 4451-new-deployment-with-base-and-code # for testing while developing
+      # - 4451-new-deployment-with-base-and-code # for testing while developing
 
 jobs:
   ##############################################################################
