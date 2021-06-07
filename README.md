@@ -38,12 +38,12 @@ Afterwards you can [deploy](deployment/README.md) it on your server:
 
 ## Developer Chat
 
-Join our friendly open-source community on [Discord](https://discordapp.com/invite/DFSjPaX) :heart_eyes_cat:
+Join our friendly open-source community on [Discord](https://discord.gg/AJSX9DCSUA) :heart_eyes_cat:
 Just introduce yourself at `#introduce-yourself` and mention `@@Mentor` to get you onboard :neckbeard:
 Check out the [contribution guideline](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/CONTRIBUTING.md), too!
 
 We give write permissions to every developer who asks for it. Just text us on
-[Discord](https://discord.gg/6ub73U3).
+[Discord](https://discord.gg/AJSX9DCSUA).
 
 ## Technology Stack
 

@@ -1,9 +1,11 @@
-ARG APP_IMAGE=ocelotsocialnetwork/neo4j:latest
+ARG APP_IMAGE=ocelotsocialnetwork/neo4j
+ARG APP_IMAGE_TAG=latest
+ARG APP_IMAGE_COMMUNITY=${APP_IMAGE}:${APP_IMAGE_TAG}
 
 ##################################################################################
 # COMMUNITY ######################################################################
 ##################################################################################
-FROM $APP_IMAGE as community-branded
+FROM $APP_IMAGE_COMMUNITY as community-branded
 
 ##################################################################################
 # ENTERPRISE #####################################################################

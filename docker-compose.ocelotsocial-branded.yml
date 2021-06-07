@@ -6,10 +6,7 @@ services:
   # WEBAPP ###############################################
   ########################################################
   webapp:
-    build:
-      dockerfile: docker/webapp.Dockerfile
-      target: branded
-      context: .
+    image: ocelotsocialnetwork/webapp-branded:latest
     ports:
       - 3000:3000
     networks:
@@ -26,10 +23,7 @@ services:
   # BACKEND ##############################################
   ########################################################
   backend:
-    build:
-      dockerfile: docker/backend.Dockerfile
-      target: branded
-      context: .
+    image: ocelotsocialnetwork/backend-branded:latest
     networks:
       - test-network
     depends_on:
@@ -55,7 +49,7 @@ services:
   # NEO4J ################################################
   ########################################################
   neo4j:
-    image: ocelotsocialnetwork/neo4j:community
+    image: ocelotsocialnetwork/neo4j-community-branded:latest
     networks:
       - test-network
     environment:
@@ -68,11 +62,7 @@ services:
   # MAINTENANCE ##########################################
   ########################################################
   maintenance:
-    build:
-      # TODO: Separate from webapp, this must be independent
-      dockerfile: docker/maintenance.Dockerfile
-      target: branded
-      context: .
+    image: ocelotsocialnetwork/maintenance-branded:latest
     networks:
       - test-network
     ports:

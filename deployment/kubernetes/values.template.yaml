@@ -20,7 +20,7 @@ BACKEND:
   SMTP_PASSWORD: "devops@ocelot.social"
   SMTP_PORT: "465"
   SMTP_IGNORE_TLS: 'true'
-  SMTP_SECURE: 'false'
+  SMTP_SECURE: 'false' # true for 465, false for other ports
 
   # most likely you don't need to change this
   MIN_READY_SECONDS: "15"
