@@ -72,7 +72,7 @@ COPY . .
 FROM code as build
 
 # yarn install
-RUN yarn install --production=true --frozen-lockfile --non-interactive
+RUN yarn install --production=false --frozen-lockfile --non-interactive
 # yarn build
 RUN yarn run build
 
