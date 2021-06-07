@@ -1,10 +1,10 @@
 name: ocelot.social publish CI
 
-# on:
-#   push:
-#     branches:
-#       - master
-on: [push] # for testing while developing
+on:
+  push:
+    branches:
+      - master
+      - 4451-new-deployment-with-base-and-code # for testing while developing
 
 jobs:
   ##############################################################################
