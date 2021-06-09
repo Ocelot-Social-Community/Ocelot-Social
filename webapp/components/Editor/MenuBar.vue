@@ -59,6 +59,19 @@
         :onClick="commands.horizontal_rule"
         icon="minus"
       />
+
+      <menu-bar-button
+        @mouseover="hover = true"
+        @mouseleave="hover = false"
+        :isActive="isActive.horizontal_rule()"
+        :onClick="commands.horizontal_rule"
+        icon="question-circle"
+        class="legend-button"
+      />
+
+      <menu-legend>
+      </menu-legend>
+
     </div>
   </editor-menu-bar>
 </template>
@@ -66,11 +79,19 @@
 <script>
 import { EditorMenuBar } from 'tiptap'
 import MenuBarButton from './MenuBarButton'
+import MenuLegend from './MenuLegend.vue'
 
 export default {
+  data() {
+    return {
+      hover: false
+    }
+  },
   components: {
     EditorMenuBar,
     MenuBarButton,
+    MenuLegend,
+    
   },
   props: {
     editor: Object,
@@ -78,3 +99,14 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+  .legend-button{
+    color: #70677e;
+    position:relative;
+
+    .base-icon {
+      font-size: 1.2rem;
+    }
+  }
+</style>
