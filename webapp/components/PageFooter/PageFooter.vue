@@ -1,26 +1,74 @@
 <template>
   <div id="footer" class="ds-footer">
-    <a :href="links.ORGANIZATION" target="_blank" v-html="$t('site.made')"></a>
+    <!-- made with ❤️ -->
+    <nuxt-link
+      v-if="noLinkDefined(links.ORGANIZATION)"
+      to="/organization"
+      data-test="organization-nuxt-link"
+    >
+      {{ $t('site.made') }}
+    </nuxt-link>
+    <a v-else :href="links.ORGANIZATION" target="_blank" data-test="organization-link">
+      {{ $t('site.made') }}
+    </a>
     <span>-</span>
-    <nuxt-link to="/imprint">
+    <!-- imprint -->
+    <nuxt-link v-if="noLinkDefined(links.IMPRINT)" to="/imprint" data-test="imprint-nuxt-link">
       {{ $t('site.imprint') }}
     </nuxt-link>
+    <a v-else :href="links.IMPRINT" target="_blank">
+      {{ $t('site.imprint') }}
+    </a>
     <span>-</span>
-    <nuxt-link to="/terms-and-conditions">{{ $t('site.termsAndConditions') }}</nuxt-link>
+    <!-- terms and conditions -->
+    <nuxt-link
+      v-if="noLinkDefined(links.TERMS_AND_CONDITIONS)"
+      to="/terms-and-conditions"
+      data-test="terms-nuxt-link"
+    >
+      {{ $t('site.termsAndConditions') }}
+    </nuxt-link>
+    <a v-else :href="links.TERMS_AND_CONDITIONS" target="_blank">
+      {{ $t('site.termsAndConditions') }}
+    </a>
     <span>-</span>
-    <nuxt-link to="/code-of-conduct">{{ $t('site.code-of-conduct') }}</nuxt-link>
+    <!-- code of conduct -->
+    <nuxt-link
+      v-if="noLinkDefined(links.CODE_OF_CONDUCT)"
+      to="/code-of-conduct"
+      data-test="code-nuxt-link"
+    >
+      {{ $t('site.code-of-conduct') }}
+    </nuxt-link>
+    <a v-else :href="links.CODE_OF_CONDUCT" target="_blank">
+      {{ $t('site.code-of-conduct') }}
+    </a>
     <span>-</span>
-    <nuxt-link to="/data-privacy">
+    <!-- data privacy -->
+    <nuxt-link
+      v-if="noLinkDefined(links.DATA_PRIVACY)"
+      to="/data-privacy"
+      data-test="data-nuxt-link"
+    >
       {{ $t('site.data-privacy') }}
     </nuxt-link>
+    <a v-else :href="links.DATA_PRIVACY" target="_blank">
+      {{ $t('site.data-privacy') }}
+    </a>
     <span>-</span>
-    <a :href="links.FAQ" target="_blank">
+    <!-- faq -->
+    <nuxt-link v-if="noLinkDefined(links.FAQ)" to="/faq" data-test="faq-nuxt-link">
+      {{ $t('site.faq') }}
+    </nuxt-link>
+    <a v-else :href="links.FAQ" target="_blank">
       {{ $t('site.faq') }}
     </a>
     <span>-</span>
+    <!-- version -->
     <a
       href="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/CHANGELOG.md"
       target="_blank"
+      data-test="version-link"
     >
       {{ version }}
     </a>
@@ -29,9 +77,15 @@
 
 <script>
 import links from '~/constants/links.js'
+
 export default {
   data() {
     return { links, version: `v${this.$env.VERSION}` }
+  },
+  methods: {
+    noLinkDefined(link) {
+      return !link || link.length === 0
+    },
   },
 }
 </script>

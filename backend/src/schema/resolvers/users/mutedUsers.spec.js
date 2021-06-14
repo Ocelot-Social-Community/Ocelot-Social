@@ -12,6 +12,14 @@ let mutedUser
 let authenticatedUser
 let server
 
+beforeAll(async () => {
+  await cleanDatabase()
+})
+
+afterAll(async () => {
+  await cleanDatabase()
+})
+
 beforeEach(() => {
   authenticatedUser = undefined
   ;({ server } = createServer({
@@ -28,6 +36,7 @@ beforeEach(() => {
   }))
 })
 
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -93,7 +102,7 @@ describe('muteUser', () => {
     muteAction = (variables) => {
       const { mutate } = createTestClient(server)
       const muteUserMutation = gql`
-        mutation($id: ID!) {
+        mutation ($id: ID!) {
           muteUser(id: $id) {
             id
             name
@@ -310,7 +319,7 @@ describe('unmuteUser', () => {
     unmuteAction = (variables) => {
       const { mutate } = createTestClient(server)
       const unmuteUserMutation = gql`
-        mutation($id: ID!) {
+        mutation ($id: ID!) {
           unmuteUser(id: $id) {
             id
             name

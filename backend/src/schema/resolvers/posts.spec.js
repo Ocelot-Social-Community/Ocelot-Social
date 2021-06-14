@@ -16,7 +16,7 @@ const categoryIds = ['cat9', 'cat4', 'cat15']
 let variables
 
 const createPostMutation = gql`
-  mutation($id: ID, $title: String!, $content: String!, $language: String, $categoryIds: [ID]) {
+  mutation ($id: ID, $title: String!, $content: String!, $language: String, $categoryIds: [ID]) {
     CreatePost(
       id: $id
       title: $title
@@ -40,6 +40,7 @@ const createPostMutation = gql`
 
 beforeAll(async () => {
   await cleanDatabase()
+
   const { server } = createServer({
     context: () => {
       return {
@@ -51,6 +52,10 @@ beforeAll(async () => {
   })
   query = createTestClient(server).query
   mutate = createTestClient(server).mutate
+})
+
+afterAll(async () => {
+  await cleanDatabase()
 })
 
 beforeEach(async () => {
@@ -91,6 +96,7 @@ beforeEach(async () => {
   authenticatedUser = null
 })
 
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -323,7 +329,7 @@ describe('CreatePost', () => {
 describe('UpdatePost', () => {
   let author, newlyCreatedPost
   const updatePostMutation = gql`
-    mutation($id: ID!, $title: String!, $content: String!, $image: ImageInput) {
+    mutation ($id: ID!, $title: String!, $content: String!, $image: ImageInput) {
       UpdatePost(id: $id, title: $title, content: $content, image: $image) {
         id
         title
@@ -497,7 +503,7 @@ describe('UpdatePost', () => {
 describe('pin posts', () => {
   let author
   const pinPostMutation = gql`
-    mutation($id: ID!) {
+    mutation ($id: ID!) {
       pinPost(id: $id) {
         id
         title
@@ -773,7 +779,7 @@ describe('pin posts', () => {
 
         it('pinned post appear first even when created before other posts', async () => {
           const postOrderingQuery = gql`
-            query($orderBy: [_PostOrdering]) {
+            query ($orderBy: [_PostOrdering]) {
               Post(orderBy: $orderBy) {
                 id
                 pinned
@@ -816,7 +822,7 @@ describe('pin posts', () => {
 describe('unpin posts', () => {
   let pinnedPost
   const unpinPostMutation = gql`
-    mutation($id: ID!) {
+    mutation ($id: ID!) {
       unpinPost(id: $id) {
         id
         title
@@ -928,7 +934,7 @@ describe('unpin posts', () => {
 describe('DeletePost', () => {
   let author
   const deletePostMutation = gql`
-    mutation($id: ID!) {
+    mutation ($id: ID!) {
       DeletePost(id: $id) {
         id
         deleted
@@ -1052,14 +1058,14 @@ describe('DeletePost', () => {
 describe('emotions', () => {
   let author, postToEmote
   const PostsEmotionsCountQuery = gql`
-    query($id: ID!) {
+    query ($id: ID!) {
       Post(id: $id) {
         emotionsCount
       }
     }
   `
   const PostsEmotionsQuery = gql`
-    query($id: ID!) {
+    query ($id: ID!) {
       Post(id: $id) {
         emotions {
           emotion
@@ -1093,7 +1099,7 @@ describe('emotions', () => {
 
   describe('AddPostEmotions', () => {
     const addPostEmotionsMutation = gql`
-      mutation($to: _PostInput!, $data: _EMOTEDInput!) {
+      mutation ($to: _PostInput!, $data: _EMOTEDInput!) {
         AddPostEmotions(to: $to, data: $data) {
           from {
             id
@@ -1210,7 +1216,7 @@ describe('emotions', () => {
   describe('RemovePostEmotions', () => {
     let removePostEmotionsVariables, postsEmotionsQueryVariables
     const removePostEmotionsMutation = gql`
-      mutation($to: _PostInput!, $data: _EMOTEDInput!) {
+      mutation ($to: _PostInput!, $data: _EMOTEDInput!) {
         RemovePostEmotions(to: $to, data: $data) {
           from {
             id
@@ -1309,13 +1315,13 @@ describe('emotions', () => {
     let PostsEmotionsByCurrentUserVariables
 
     const PostsEmotionsCountByEmotionQuery = gql`
-      query($postId: ID!, $data: _EMOTEDInput!) {
+      query ($postId: ID!, $data: _EMOTEDInput!) {
         PostsEmotionsCountByEmotion(postId: $postId, data: $data)
       }
     `
 
     const PostsEmotionsByCurrentUserQuery = gql`
-      query($postId: ID!) {
+      query ($postId: ID!) {
         PostsEmotionsByCurrentUser(postId: $postId)
       }
     `

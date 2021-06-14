@@ -12,6 +12,8 @@ const driver = getDriver()
 const neode = getNeode()
 
 beforeAll(async () => {
+  await cleanDatabase()
+
   const { server } = createServer({
     context: () => {
       return {
@@ -29,7 +31,7 @@ afterAll(async () => {
 })
 
 const createPostMutation = gql`
-  mutation($title: String!, $content: String!, $categoryIds: [ID]) {
+  mutation ($title: String!, $content: String!, $categoryIds: [ID]) {
     CreatePost(title: $title, content: $content, categoryIds: $categoryIds) {
       language
     }
@@ -43,7 +45,6 @@ describe('languagesMiddleware', () => {
   }
 
   beforeAll(async () => {
-    await cleanDatabase()
     const user = await Factory.build('user')
     authenticatedUser = await user.toJson()
     await Factory.build('category', {

@@ -10,7 +10,7 @@ const driver = getDriver()
 const neode = getNeode()
 
 const postQuery = gql`
-  query($id: ID) {
+  query ($id: ID) {
     Post(id: $id) {
       clickedCount
     }
@@ -19,6 +19,7 @@ const postQuery = gql`
 
 beforeAll(async () => {
   await cleanDatabase()
+
   aUser = await Factory.build('user', {
     id: 'a-user',
   })

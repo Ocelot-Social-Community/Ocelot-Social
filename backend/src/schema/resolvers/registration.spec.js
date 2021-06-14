@@ -12,12 +12,9 @@ let authenticatedUser
 let variables
 const driver = getDriver()
 
-beforeEach(async () => {
-  variables = {}
-})
-
 beforeAll(async () => {
   await cleanDatabase()
+
   const { server } = createServer({
     context: () => {
       return {
@@ -30,13 +27,22 @@ beforeAll(async () => {
   mutate = createTestClient(server).mutate
 })
 
+afterAll(async () => {
+  await cleanDatabase()
+})
+
+beforeEach(async () => {
+  variables = {}
+})
+
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
 
 describe('Signup', () => {
   const mutation = gql`
-    mutation($email: String!, $inviteCode: String) {
+    mutation ($email: String!, $inviteCode: String) {
       Signup(email: $email, inviteCode: $inviteCode) {
         email
       }
@@ -145,7 +151,7 @@ describe('Signup', () => {
 
 describe('SignupVerification', () => {
   const mutation = gql`
-    mutation(
+    mutation (
       $name: String!
       $password: String!
       $email: String!

@@ -13,6 +13,7 @@ const neode = getNeode()
 
 beforeAll(async () => {
   await cleanDatabase()
+
   const { server } = createServer({
     context: () => {
       return {
@@ -23,6 +24,10 @@ beforeAll(async () => {
     },
   })
   mutate = createTestClient(server).mutate
+})
+
+afterAll(async () => {
+  await cleanDatabase()
 })
 
 beforeEach(async () => {
@@ -46,6 +51,7 @@ beforeEach(async () => {
   authenticatedUser = await admin.toJson()
 })
 
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -54,7 +60,7 @@ describe('slugifyMiddleware', () => {
   describe('CreatePost', () => {
     const categoryIds = ['cat9']
     const createPostMutation = gql`
-      mutation($title: String!, $content: String!, $categoryIds: [ID]!, $slug: String) {
+      mutation ($title: String!, $content: String!, $categoryIds: [ID]!, $slug: String) {
         CreatePost(title: $title, content: $content, categoryIds: $categoryIds, slug: $slug) {
           slug
         }
@@ -164,7 +170,7 @@ describe('slugifyMiddleware', () => {
 
   describe('SignupVerification', () => {
     const mutation = gql`
-      mutation(
+      mutation (
         $password: String!
         $email: String!
         $name: String!

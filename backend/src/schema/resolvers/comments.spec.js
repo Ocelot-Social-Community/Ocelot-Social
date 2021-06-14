@@ -11,6 +11,7 @@ let variables, mutate, authenticatedUser, commentAuthor, newlyCreatedComment
 
 beforeAll(async () => {
   await cleanDatabase()
+
   const { server } = createServer({
     context: () => {
       return {
@@ -22,6 +23,10 @@ beforeAll(async () => {
   mutate = createTestClient(server).mutate
 })
 
+afterAll(async () => {
+  await cleanDatabase()
+})
+
 beforeEach(async () => {
   variables = {}
   await neode.create('Category', {
@@ -31,12 +36,13 @@ beforeEach(async () => {
   })
 })
 
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
 
 const createCommentMutation = gql`
-  mutation($id: ID, $postId: ID!, $content: String!) {
+  mutation ($id: ID, $postId: ID!, $content: String!) {
     CreateComment(id: $id, postId: $postId, content: $content) {
       id
       content
@@ -128,7 +134,7 @@ describe('CreateComment', () => {
 
 describe('UpdateComment', () => {
   const updateCommentMutation = gql`
-    mutation($content: String!, $id: ID!) {
+    mutation ($content: String!, $id: ID!) {
       UpdateComment(content: $content, id: $id) {
         id
         content
@@ -220,7 +226,7 @@ describe('UpdateComment', () => {
 
 describe('DeleteComment', () => {
   const deleteCommentMutation = gql`
-    mutation($id: ID!) {
+    mutation ($id: ID!) {
       DeleteComment(id: $id) {
         id
         content

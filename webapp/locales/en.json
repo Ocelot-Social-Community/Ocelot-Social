@@ -313,6 +313,20 @@
       "addLetter": "Type a letter",
       "noHashtagsFound": "No hashtags found"
     },
+    "legend": {
+      "bold": "Bold",
+      "heading3": "Heading 3",
+      "heading4": "Heading 4",
+      "italic": "Italic",
+      "legendTitle": "Keyboard shortcuts and markdown code",
+      "link": "Link",
+      "orderedList": "Ordered list",
+      "paragraph": "Paragraph",
+      "quote": "Quote",
+      "ruler": "Ruler",
+      "underline": "Underline",
+      "unorderedList": "Unordered list"
+    },
     "mention": {
       "noUsersFound": "No users found"
     },
@@ -782,9 +796,10 @@
     "faq": "FAQ",
     "germany": "Germany",
     "imprint": "Imprint",
-    "made": "Made with &#10084;",
+    "made": "Made with ❤️",
     "register": "Registry number",
     "responsible": "responsible for contents of this page (§ 55 Abs. 2 RStV)",
+    "support": "Support",
     "taxident": "USt-ID. according to §27a of the German Sales Tax Law:",
     "termsAndConditions": "Terms and conditions",
     "thanks": "Thanks!",

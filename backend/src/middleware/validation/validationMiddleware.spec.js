@@ -17,14 +17,14 @@ let authenticatedUser,
   commentingUser
 
 const createCommentMutation = gql`
-  mutation($id: ID, $postId: ID!, $content: String!) {
+  mutation ($id: ID, $postId: ID!, $content: String!) {
     CreateComment(id: $id, postId: $postId, content: $content) {
       id
     }
   }
 `
 const updateCommentMutation = gql`
-  mutation($content: String!, $id: ID!) {
+  mutation ($content: String!, $id: ID!) {
     UpdateComment(content: $content, id: $id) {
       id
     }
@@ -32,7 +32,7 @@ const updateCommentMutation = gql`
 `
 
 const reportMutation = gql`
-  mutation($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
+  mutation ($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
     fileReport(
       resourceId: $resourceId
       reasonCategory: $reasonCategory
@@ -43,22 +43,24 @@ const reportMutation = gql`
   }
 `
 const reviewMutation = gql`
-  mutation($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
+  mutation ($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
     review(resourceId: $resourceId, disable: $disable, closed: $closed) {
       createdAt
       updatedAt
     }
   }
 `
-
 const updateUserMutation = gql`
-  mutation($id: ID!, $name: String) {
+  mutation ($id: ID!, $name: String) {
     UpdateUser(id: $id, name: $name) {
       name
     }
   }
 `
-beforeAll(() => {
+
+beforeAll(async () => {
+  await cleanDatabase()
+
   const { server } = createServer({
     context: () => {
       return {
@@ -69,6 +71,10 @@ beforeAll(() => {
     },
   })
   mutate = createTestClient(server).mutate
+})
+
+afterAll(async () => {
+  await cleanDatabase()
 })
 
 beforeEach(async () => {
@@ -120,6 +126,7 @@ beforeEach(async () => {
   offensivePost = posts[0]
 })
 
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })

@@ -17,7 +17,7 @@ const driver = getDriver()
 const neode = getNeode()
 
 const deleteUserMutation = gql`
-  mutation($id: ID!, $resource: [Deletable]) {
+  mutation ($id: ID!, $resource: [Deletable]) {
     DeleteUser(id: $id, resource: $resource) {
       id
       name
@@ -44,9 +44,8 @@ const deleteUserMutation = gql`
     }
   }
 `
-
 const switchUserRoleMutation = gql`
-  mutation($role: UserGroup!, $id: ID!) {
+  mutation ($role: UserGroup!, $id: ID!) {
     switchUserRole(role: $role, id: $id) {
       name
       role
@@ -57,7 +56,9 @@ const switchUserRoleMutation = gql`
   }
 `
 
-beforeAll(() => {
+beforeAll(async () => {
+  await cleanDatabase()
+
   const { server } = createServer({
     context: () => {
       return {
@@ -71,7 +72,12 @@ beforeAll(() => {
   mutate = createTestClient(server).mutate
 })
 
-beforeEach(async () => {
+afterAll(async () => {
+  await cleanDatabase()
+})
+
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
+afterEach(async () => {
   await cleanDatabase()
 })
 
@@ -81,7 +87,7 @@ describe('User', () => {
 
     beforeEach(async () => {
       userQuery = gql`
-        query($email: String) {
+        query ($email: String) {
           User(email: $email) {
             name
           }
@@ -144,7 +150,7 @@ describe('UpdateUser', () => {
 
   beforeEach(async () => {
     updateUserMutation = gql`
-      mutation(
+      mutation (
         $id: ID!
         $name: String
         $termsAndConditionsAgreedVersion: String
