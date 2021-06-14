@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social-backend",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "GraphQL Backend for ocelot.social",
   "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
   "author": "ocelot.social Community",
@@ -39,6 +39,12 @@
     ]
   },
   "dependencies": {
+    "@babel/cli": "~7.8.4",
+    "@babel/core": "~7.9.0",
+    "@babel/node": "~7.8.7",
+    "@babel/plugin-proposal-throw-expressions": "^7.8.3",
+    "@babel/preset-env": "~7.9.5",
+    "@babel/register": "^7.9.0",
     "@hapi/joi": "^17.1.1",
     "@sentry/node": "^5.15.4",
     "apollo-cache-inmemory": "~1.6.5",
@@ -48,6 +54,9 @@
     "apollo-server": "~2.14.2",
     "apollo-server-express": "^2.14.2",
     "aws-sdk": "^2.652.0",
+    "babel-core": "~7.0.0-0",
+    "babel-eslint": "~10.1.0",
+    "babel-jest": "~25.2.6",
     "babel-plugin-transform-runtime": "^6.23.0",
     "bcryptjs": "~2.4.3",
     "cheerio": "~1.0.0-rc.3",
@@ -111,16 +120,7 @@
     "xregexp": "^4.3.0"
   },
   "devDependencies": {
-    "@babel/cli": "~7.8.4",
-    "@babel/core": "~7.9.0",
-    "@babel/node": "~7.8.7",
-    "@babel/plugin-proposal-throw-expressions": "^7.8.3",
-    "@babel/preset-env": "~7.9.5",
-    "@babel/register": "^7.9.0",
     "apollo-server-testing": "~2.11.0",
-    "babel-core": "~7.0.0-0",
-    "babel-eslint": "~10.1.0",
-    "babel-jest": "~25.2.6",
     "chai": "~4.2.0",
     "cucumber": "~6.0.5",
     "eslint": "~6.8.0",
