@@ -57,7 +57,9 @@ describe('donations.vue', () => {
       })
 
       it('showDonations label', () => {
-        expect(wrapper.find('.show-donations-checkbox').text()).toBe('admin.donations.showDonationsCheckboxLabel')
+        expect(wrapper.find('.show-donations-checkbox').text()).toBe(
+          'admin.donations.showDonationsCheckboxLabel',
+        )
       })
 
       it('donations goal label', () => {
@@ -65,7 +67,9 @@ describe('donations.vue', () => {
       })
 
       it('donations progress label', () => {
-        expect(wrapper.find('[data-test="donations-progress"]').text()).toBe('admin.donations.progress')
+        expect(wrapper.find('[data-test="donations-progress"]').text()).toBe(
+          'admin.donations.progress',
+        )
       })
 
       it('save button text', () => {
@@ -94,26 +98,19 @@ describe('donations.vue', () => {
     })
 
     describe('showDonations', () => {
-      it.skip('set as default', () => {
-      })
+      it.skip('set as default', () => {})
 
-      it.skip('click changes value', () => {
-      })
+      it.skip('click changes value', () => {})
     })
 
-    it.skip('XXX', () => {
-    })
+    it.skip('XXX', () => {})
 
-    it.skip('XXX', () => {
-    })
+    it.skip('XXX', () => {})
 
-    it.skip('XXX', () => {
-    })
+    it.skip('XXX', () => {})
 
-    it.skip('XXX', () => {
-    })
+    it.skip('XXX', () => {})
 
-    it.skip('XXX', () => {
-    })
+    it.skip('XXX', () => {})
   })
 })
