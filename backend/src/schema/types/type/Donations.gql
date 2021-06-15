@@ -8,7 +8,7 @@ type Donations {
 }
 
 type Query {
-  Donations: [Donations]
+  Donations: Donations
 }
 
 type Mutation {

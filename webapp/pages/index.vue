@@ -154,11 +154,11 @@ export default {
         return DonationsQuery()
       },
       update({ Donations }) {
-        if (!Donations[0]) return
-        const { showDonations, goal, progress } = Donations[0]
+        if (!Donations) return
+        const { showDonations, goal, progress } = Donations
         this.showDonations = showDonations
         this.goal = goal
-        this.progress = progress
+        this.progress = progress < goal ? progress : goal
       },
     },
     Post: {

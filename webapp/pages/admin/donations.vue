@@ -57,14 +57,25 @@ export default {
   methods: {
     submit() {
       const { showDonations } = this
-      const { goal, progress } = this.formData
+      let { goal, progress } = this.formData
+      goal = typeof goal === 'string' && goal.length > 0 ? goal : '15000'
+      progress = typeof progress === 'string' && progress.length > 0 ? progress : '0'
       this.$apollo
         .mutate({
           mutation: UpdateDonations(),
           variables: {
             showDonations,
             goal: parseInt(goal),
-            progress: parseInt(progress),
+            progress: parseInt(progress) < parseInt(goal) ? parseInt(progress) : parseInt(goal),
+          },
+          update: (_store, { data }) => {
+            if (!data || !data.UpdateDonations) return
+            const { showDonations, goal, progress } = data.UpdateDonations
+            this.showDonations = showDonations
+            this.formData = {
+              goal: goal.toString(10),
+              progress: progress < goal ? progress.toString(10) : goal.toString(10),
+            }
           },
         })
         .then(() => {
@@ -79,12 +90,12 @@ export default {
         return DonationsQuery()
       },
       update({ Donations }) {
-        if (!Donations[0]) return
-        const { showDonations, goal, progress } = Donations[0]
+        if (!Donations) return
+        const { showDonations, goal, progress } = Donations
         this.showDonations = showDonations
         this.formData = {
-          goal,
-          progress,
+          goal: goal.toString(10),
+          progress: progress < goal ? progress.toString(10) : goal.toString(10),
         }
       },
     },
