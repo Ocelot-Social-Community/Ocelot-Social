@@ -1,4 +1,4 @@
-# Ocelot-Social-Deploy-Rebranding
+# Ocelot.Social Deploy And Rebranding
 
 This repository is an in use template to rebrand, configure, and deploy [ocelot.social](https://github.com/Ocelot-Social-Community/Ocelot-Social) networks.
 
@@ -28,13 +28,13 @@ Logins:
 
 ## Usage
 
-Fork this repository and configure as well as rebrand it for your own [ocelot.social](https://github.com/Ocelot-Social-Community/Ocelot-Social) network.
+Fork this repository and configure as well as rebrand it for your own [ocelot.social](/branding/README.md) network.
 
 - [Configure And Rebrand](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/tree/master/branding)
 
-Afterwards you can [deploy](deployment/README.md) it on your server:
+Afterwards you can [deploy](/deployment/README.md) it on your server:
 
-- [Kubernetes with Helm](deployment/kubernetes/README.md)
+- [Kubernetes with Helm](/deployment/kubernetes/README.md)
 
 ## Developer Chat
 
@@ -63,4 +63,4 @@ Browser compatibility testing with [BrowserStack](https://www.browserstack.com/)
 
 ## License
 
-See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
+See the [LICENSE](/LICENSE.md) file for license rights and limitations (MIT).
