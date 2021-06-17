@@ -76,7 +76,12 @@ Secondly, in your GitHub repository, click on the 'Settings' tab and go to the '
 
 ### Proof DockerHub Images
 
-To check your pushed Docker images in your organisation's DockerHub repositories, rename the file `docker-compose.ocelotsocial-branded.yml` with your network name, remove any local Docker images if necessary, and do the following:
+To check your pushed Docker images in your organisation's DockerHub repositories locally:
+
+- rename the file `docker-compose.ocelotsocial-branded.yml` with your network name
+- in the file, rename the ocelot.social DockerHub organisation `ocelotsocialnetwork` to your organisations name
+
+Remove any local Docker images if necessary and do the following:
 
 ```bash
 # in main folder
