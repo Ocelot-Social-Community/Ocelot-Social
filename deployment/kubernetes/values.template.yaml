@@ -14,13 +14,18 @@ BACKEND:
   JWT_SECRET: "b/&&7b78BF&fv/Vd"
   MAPBOX_TOKEN: "pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g"
   PRIVATE_KEY_PASSPHRASE: "a7dsf78sadg87ad87sfagsadg78"
+  # ocelot.social mail dummy
   EMAIL_DEFAULT_SENDER: "devops@ocelot.social"
   SMTP_HOST: "mail.ocelot.social"
   SMTP_USERNAME: "devops@ocelot.social"
   SMTP_PASSWORD: "devops@ocelot.social"
-  SMTP_PORT: "465"
-  SMTP_IGNORE_TLS: 'true'
+  SMTP_PORT: "587"
+  SMTP_IGNORE_TLS: 'false'
   SMTP_SECURE: 'false' # true for 465, false for other ports
+  # or
+  # SMTP_PORT: "465"
+  # SMTP_IGNORE_TLS: 'true'
+  # SMTP_SECURE: 'true' # true for 465, false for other ports
 
   # most likely you don't need to change this
   MIN_READY_SECONDS: "15"
