@@ -1,10 +1,19 @@
-# Helm Installation Of Ocelot.Social
+# Kubernetes Helm Installation Of Ocelot.Social
 
-Deploying *ocelot.social* with Helm is very straight forward. All you have to do is to change certain parameters, like domain names and API keys, then you just install our provided Helm chart to your cluster.
+Deploying [ocelot.social](https://github.com/Ocelot-Social-Community/Ocelot-Social) with [Helm](https://helm.sh) for [Kubernetes](https://kubernetes.io) is very straight forward. All you have to do is to change certain parameters, like domain names and API keys, then you just install our provided Helm chart to your cluster.
+
+## Kubernetes Cloud Hosting
+
+There are various ways to set up your own or a managed Kubernetes cluster. We will extend the following lists over time.  
+Please contact us if you are interested in options not listed below.
+
+Managed Kubernetes:
+
+- [DigitalOcean](/deployment/kubernetes/DigitalOcean.md)
 
 ## Configuration
 
-You can customize the network with your configuration by duplicate the `values.template.yaml` to a new `values.yaml` file and change it to your need. All included variables will be available as environment variables in your deployed kubernetes pods.
+You can customize the network server with your configuration by duplicate the `values.template.yaml` to a new `values.yaml` file and change it to your need. All included variables will be available as environment variables in your deployed kubernetes pods.
 
 Besides the `values.template.yaml` file we provide a `nginx.values.template.yaml` and `dns.values.template.yaml` for a similar procedure. The new `nginx.values.yaml` is the configuration for the ingress-nginx Helm chart, while the `dns.values.yaml` file is for automatically updating the dns values on digital ocean and therefore optional.
 
