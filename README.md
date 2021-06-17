@@ -60,16 +60,8 @@ The database is then initialised with the default administrator:
 - E-mail: admin@example.org
 - Password: 1234
 
-To check your pushed Docker images in your organisation's DockerHub repositories, rename the file `docker-compose.ocelotsocial-branded.yml` with your network name, remove any local Docker images if necessary, and do the following:
-
-```bash
-# in main folder
-$ docker-compose -f docker-compose.<your-organisation>-branded.yml up
-# fill the database with an initial admin
-$ docker-compose exec backend yarn run prod:migrate init
-```
-
-See the login details above.
+For login or registration have a look in your browser at `http://localhost:3000/`.  
+For the maintenance page have a look in your browser at `http://localhost:5000/`.
 
 ### Push Changes To GitHub
 
@@ -81,6 +73,19 @@ Secondly, in your GitHub repository, click on the 'Settings' tab and go to the '
 
 1. Named `DOCKERHUB_TOKEN` with the newly created DockerHub token (only the code, not the token name).
 2. Named `DOCKERHUB_USERNAME` with your DockerHub username.
+
+### Proof DockerHub Images
+
+To check your pushed Docker images in your organisation's DockerHub repositories, rename the file `docker-compose.ocelotsocial-branded.yml` with your network name, remove any local Docker images if necessary, and do the following:
+
+```bash
+# in main folder
+$ docker-compose -f docker-compose.<your-organisation>-branded.yml up
+# fill the database with an initial admin
+$ docker-compose exec backend yarn run prod:migrate init
+```
+
+See the login details and browser addresses above.
 
 ### Deployment
 
