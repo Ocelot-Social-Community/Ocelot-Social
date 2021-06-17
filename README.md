@@ -44,7 +44,7 @@ The next step is:
 
 - [Configure And Branding](/branding/README.md)
 
-### Proof Configuration And Branding Locally
+### Optional: Proof Configuration And Branding Locally
 
 Just in case you have Docker installed and run the following, you can check your branding locally:
 
@@ -74,9 +74,9 @@ Secondly, in your GitHub repository, click on the 'Settings' tab and go to the '
 1. Named `DOCKERHUB_TOKEN` with the newly created DockerHub token (only the code, not the token name).
 2. Named `DOCKERHUB_USERNAME` with your DockerHub username.
 
-### Proof DockerHub Images
+### Optional: Proof DockerHub Images Locally
 
-To check your pushed Docker images in your organisation's DockerHub repositories locally:
+Just in case you like to check your pushed Docker images in your organisation's DockerHub repositories locally:
 
 - rename the file `docker-compose.ocelotsocial-branded.yml` with your network name
 - in the file, rename the ocelot.social DockerHub organisation `ocelotsocialnetwork` to your organisations name
