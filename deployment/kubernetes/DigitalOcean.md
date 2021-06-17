@@ -1,0 +1,54 @@
+# DigitalOcean
+
+If you want to set up a [Kubernetes](https://kubernetes.io) cluster on [DigitalOcean](https://www.digitalocean.com), follow this guide.
+
+## Create Account
+
+Create an account with DigitalOcean.
+
+## Add Project
+
+On the left side you will see a menu. Click on `New Project`. Enter a name and click `Create Project`.  
+Skip moving resources, probably.
+
+## Create Kubernetes Cluster
+
+On the right top you find the button `Create`. Click on it and choose `Kubernetes - Create Kubernetes Cluster`.
+
+- use the latest Kubernetes version
+- choose your datacenter region
+- name your node pool: e.g. `pool-<your-network-name>`
+- 2 `Basic node` with a total of 4GB and 2 shared CPUs are enough to start with
+- no tags necessary
+- set your cluster name: e.g. `cluster-<your-network-name>`
+- select your project
+
+## Getting Started
+
+After your cluster is set up, see progress bar above, click on `Getting started`. Please install the following management tools:
+
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [doctl](https://github.com/digitalocean/doctl)
+
+Install the tools as described on the tab or see the links here.
+
+After the installation, click on `Continue`.
+
+### Download Configuration File
+
+Follow the steps to download the configuration file.
+
+You can skip this step if necessary, as you can download the file later. You can then do this by clicking on `Kubernetes` in the left menu. In the menu to the right of the cluster name in the cluster list, click on `More` and select `Download Config`.
+
+### Patch & Minor Version Upgrades
+
+Skip `Patch & Minor Version Upgrades` for now.
+
+### Install 1-Click Apps
+
+You don't need a 1-click app. Our helmet script will install the required NGINXs.
+Therefore, skip this step as well.
+
+## Deploy
+
+Yeah, you're done here. Back to [Deployment with Helm for Kubernetes](deployment/kubernetes/README.md).
