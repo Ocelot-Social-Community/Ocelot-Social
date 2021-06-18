@@ -19,7 +19,7 @@ Besides the `values.template.yaml` file we provide a `nginx.values.template.yaml
 
 ## Installation
 
-Due to the many limitations of Helm you still have to do several manual steps. Those occur before you run the actual *ocelot.social* Helm chart. Obviously it is expected of you to have `helm` and `kubectl` installed. For Digital Ocean you might require `doctl` aswell.
+Due to the many limitations of Helm you still have to do several manual steps. Those occur before you run the actual *ocelot.social* Helm chart. Obviously it is expected of you to have `helm` and `kubectl` installed. For DigitalOcean you might require `doctl` aswell.
 
 ### Cert Manager (https)
 
@@ -101,7 +101,14 @@ You will need an API token, which you can generate in the control panel at <http
 
 2. Generate DO firewall
 
-Fill in the `CLUSTER_UUID` and `your-domain` (Get the `CLUSTER_UUID` value from the dashboard or the ID column from doctl kubernetes cluster list.):
+ Get the `CLUSTER_UUID` value from the dashboard or from the ID column via `doctl kubernetes cluster list`:
+
+```bash
+# need to apply access token by `doctl auth init` before
+$ doctl kubernetes cluster list
+```
+
+Fill in the `CLUSTER_UUID` and `your-domain`:
 
 ```bash
 # without doctl context
