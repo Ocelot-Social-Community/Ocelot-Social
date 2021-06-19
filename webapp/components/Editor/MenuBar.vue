@@ -61,15 +61,18 @@
       />
 
       <menu-bar-button
-        @mouseover="hover = true"
-        @mouseleave="hover = false"
+        @mouseover.native="hover = true"
+        @mouseleave.native="hover = false"
         :isActive="isActive.horizontal_rule()"
         :onClick="commands.horizontal_rule"
         icon="question-circle"
         class="legend-button"
       />
 
-      <menu-legend>
+      <menu-legend
+        v-if="hover"
+        class="menu-legend"
+      >
       </menu-legend>
 
     </div>
@@ -91,7 +94,6 @@ export default {
     EditorMenuBar,
     MenuBarButton,
     MenuLegend,
-    
   },
   props: {
     editor: Object,

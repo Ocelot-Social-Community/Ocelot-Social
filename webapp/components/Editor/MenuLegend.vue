@@ -7,7 +7,7 @@
                     <span v-if="item.label">{{ item.label }}</span>
                 </base-button>
                 <span>{{item.name}}</span>
-                <span>{{item.shortcut}}</span>
+                <span class="tool-shortcut">{{item.shortcut}}</span>
             </div>
         </div>
     </ds-card>
@@ -37,12 +37,10 @@ export default {
 
 <style lang="scss">
 .legend{
-    z-index: 1;
+    z-index: 5;
     position: absolute;
-    width: 400px;
-    top: 0;
-    right:0;
-    padding: 0.5em;
+    width: 22rem;
+    padding: 0rem;
     border: 1px solid #e5e3e8;
 }
 .legend-container{
@@ -54,8 +52,12 @@ export default {
 }
 .legend-table{
     display:grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    grid-template-columns: 0.5fr 1fr 2fr;
     border-bottom: 0.5px solid grey;
     padding: 0.2em;
+}
+.tool-shortcut{
+  padding-left: 2rem;
 }
 </style>
