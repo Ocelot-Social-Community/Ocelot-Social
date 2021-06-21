@@ -49,6 +49,22 @@ Skip `Patch & Minor Version Upgrades` for now.
 You don't need a 1-click app. Our helmet script will install the required NGINXs.
 Therefore, skip this step as well.
 
+## DNS Configuration
+
+There are the following two ways to set up the DNS.
+
+### Manage DNS With A Different Domain Provider
+
+If you have registered your domain or subdomain with another domain provider, add an `A` record there with one of the IP addresses from one of the cluster droplets in the DNS.
+
+To find the correct IP address to set in the DNS `A` record, click `Droplets` in the left main menu.
+A list of all your droplets will be displayed.
+Take one of the IPs of perhaps two or more droplets in your cluster from the list and enter it into the `A` record.
+
+### Manage DNS With DigitalOcean
+
+TODO: Describe what the purpose is and how to implement it …
+
 ## Deploy
 
 Yeah, you're done here. Back to [Deployment with Helm for Kubernetes](deployment/kubernetes/README.md).
