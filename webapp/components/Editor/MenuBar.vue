@@ -60,21 +60,7 @@
         icon="minus"
       />
 
-      <menu-bar-button
-        @mouseover.native="hover = true"
-        @mouseleave.native="hover = false"
-        :isActive="isActive.horizontal_rule()"
-        :onClick="commands.horizontal_rule"
-        icon="question-circle"
-        class="legend-button"
-      />
-
-      <menu-legend
-        v-if="hover"
-        class="menu-legend"
-      >
-      </menu-legend>
-
+      <menu-legend class="legend-button" />
     </div>
   </editor-menu-bar>
 </template>
@@ -86,9 +72,7 @@ import MenuLegend from './MenuLegend.vue'
 
 export default {
   data() {
-    return {
-      hover: false
-    }
+    return {}
   },
   components: {
     EditorMenuBar,
@@ -103,12 +87,13 @@ export default {
 </script>
 
 <style lang="scss">
-  .legend-button{
-    color: #70677e;
-    position:relative;
+.legend-button {
+  display: inline;
+  position: relative;
 
-    .base-icon {
-      font-size: 1.2rem;
-    }
+  .base-icon {
+    font-size: 1.2rem;
+    color: #70677e !important;
   }
+}
 </style>
