@@ -14,6 +14,7 @@
         </label>
       </ds-text>
       <ds-input
+        id="donations-goal"
         class="donations-data"
         model="goal"
         :label="$t('admin.donations.goal')"
@@ -51,7 +52,7 @@ export default {
       // TODO: Our styleguide does not support checkmarks.
       // Integrate showDonations into `this.formData` once we
       // have checkmarks available.
-      showDonations: null,
+      showDonations: false,
     }
   },
   methods: {
