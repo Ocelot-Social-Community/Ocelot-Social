@@ -313,6 +313,19 @@
       "addLetter": "Type a letter",
       "noHashtagsFound": "No hashtags found"
     },
+    "legend": {
+      "bold": "bold",
+      "italic": "italic",
+      "underline": "underline",
+      "link": "link",
+      "paragraph": "paragraph",
+      "heading3": "heading3",
+      "heading4": "heading4",
+      "unorderedList": "unordered list",
+      "orderedList": "ordered list",
+      "quote": "quote",
+      "ruler": "ruler"
+    },
     "mention": {
       "noUsersFound": "No users found"
     },

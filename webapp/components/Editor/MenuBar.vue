@@ -71,9 +71,6 @@ import MenuBarButton from './MenuBarButton'
 import MenuLegend from './MenuLegend.vue'
 
 export default {
-  data() {
-    return {}
-  },
   components: {
     EditorMenuBar,
     MenuBarButton,

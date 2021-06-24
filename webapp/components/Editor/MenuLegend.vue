@@ -1,14 +1,16 @@
 <template>
   <dropdown class="content-menu" :placement="placement" offset="5">
-    <template #default="{ toggleMenu }">
-      <slot name="button" :toggleMenu="toggleMenu">
+    <template #default="{ openMenu, closeMenu }">
+      <slot name="button">
         <base-button
           data-test="content-menu-button"
           icon="question-circle"
           size="small"
           circle
           ghost
-          @click="toggleMenu()"
+          
+          @mouseover.native="openMenu()"
+          @mouseleave.native="closeMenu()"
         />
       </slot>
     </template>
@@ -19,7 +21,7 @@
           <base-button size="small" circle ghost :icon="item.iconname" class="legend-icon">
             <span v-if="item.label">{{ item.label }}</span>
           </base-button>
-          <span>{{ item.name }}</span>
+          <span>{{ $t(item.name)}}</span>
           <span class="tool-shortcut">{{ item.shortcut }}</span>
         </div>
       </div>
@@ -39,19 +41,18 @@ export default {
   },
   data() {
     return {
-      hover: false,
       legenditems: [
-        { iconname: 'bold', name: 'bold', shortcut: 'Ctrl+b' },
-        { iconname: 'italic', name: 'italic', shortcut: 'Ctrl+i' },
-        { iconname: 'underline', name: 'underline', shortcut: 'Ctrl+u' },
-        { iconname: 'link', name: 'link', shortcut: '' },
-        { iconname: 'paragraph', name: 'paragraph', shortcut: '' },
-        { label: 'H3', name: 'heading 3', shortcut: '### + space' },
-        { label: 'H4', name: 'heading 4', shortcut: '#### + space' },
-        { iconname: 'list-ul', name: 'unordered list', shortcut: '* + space' },
-        { iconname: 'list-ol', name: 'ordered list', shortcut: '1. + space' },
-        { iconname: 'quote-right', name: 'quote', shortcut: '> + space' },
-        { iconname: 'minus', name: 'ruler', shortcut: '---' },
+        { iconname: 'bold', name: `editor.legend.bold`, shortcut: 'Ctrl+b' },
+        { iconname: 'italic', name: `editor.legend.italic`, shortcut: 'Ctrl+i' },
+        { iconname: 'underline', name:`editor.legend.underline`, shortcut: 'Ctrl+u' },
+        { iconname: 'link', name:`editor.legend.link`, shortcut: '' },
+        { iconname: 'paragraph', name:`editor.legend.paragraph`, shortcut: '' },
+        { label: 'H3', name:`editor.legend.heading3`, shortcut: '### + space' },
+        { label: 'H4', name:`editor.legend.heading4`, shortcut: '#### + space' },
+        { iconname: 'list-ul', name:`editor.legend.unorderedList`, shortcut: '* + space' },
+        { iconname: 'list-ol', name:`editor.legend.orderedList`, shortcut: '1. + space' },
+        { iconname: 'quote-right', name:`editor.legend.quote`, shortcut: '> + space' },
+        { iconname: 'minus', name:`editor.legend.ruler`, shortcut: '---' },
       ],
     }
   },

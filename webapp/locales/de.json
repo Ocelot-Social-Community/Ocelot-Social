@@ -313,6 +313,19 @@
       "addLetter": "Tippe einen Buchstaben",
       "noHashtagsFound": "Keine Hashtags gefunden"
     },
+    "legend": {
+      "bold": "Fett",
+      "italic": "Kursiv",
+      "underline": "underline",
+      "link": "link",
+      "paragraph": "paragraph",
+      "heading3": "heading3",
+      "heading4": "heading4",
+      "unorderedList": "unordered list",
+      "orderedList": "ordered list",
+      "quote": "quote",
+      "ruler": "ruler"
+    },
     "mention": {
       "noUsersFound": "Keine Benutzer gefunden"
     },
