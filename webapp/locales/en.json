@@ -314,6 +314,7 @@
       "noHashtagsFound": "No hashtags found"
     },
     "legend": {
+      "legendTitle": "Keyboard shortcuts and markdown code",
       "bold": "bold",
       "italic": "italic",
       "underline": "underline",

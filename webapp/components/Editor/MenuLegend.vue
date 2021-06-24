@@ -16,12 +16,12 @@
     </template>
     <template #popover="" class="legend">
       <div class="legend-container">
-        <div class="legend-header">Keyboard shortcuts and markdown code</div>
+        <div class="legend-header">{{$t(`editor.legend.legendTitle`)}}</div>
         <div class="legend-table" v-for="item in legenditems" :key="item.name">
           <base-button size="small" circle ghost :icon="item.iconname" class="legend-icon">
             <span v-if="item.label">{{ item.label }}</span>
           </base-button>
-          <span>{{ $t(item.name)}}</span>
+          <span>{{$t(item.name)}}</span>
           <span class="tool-shortcut">{{ item.shortcut }}</span>
         </div>
       </div>
@@ -71,6 +71,7 @@ export default {
 }
 .legend-header {
   margin-bottom: 0.5em;
+  text-align:center;
 }
 .legend-table {
   display: grid;

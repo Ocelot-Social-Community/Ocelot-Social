@@ -314,6 +314,7 @@
       "noHashtagsFound": "Keine Hashtags gefunden"
     },
     "legend": {
+      "legendTitle": "Tastaturkürzel und Markdown-Code",
       "bold": "Fett",
       "italic": "Kursiv",
       "underline": "underline",
