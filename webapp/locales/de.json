@@ -314,18 +314,18 @@
       "noHashtagsFound": "Keine Hashtags gefunden"
     },
     "legend": {
-      "legendTitle": "Tastaturkürzel und Markdown-Code",
       "bold": "Fett",
-      "italic": "Kursiv",
-      "underline": "Unterstrichen",
-      "link": "Verlinkung",
-      "paragraph": "Absatz",
       "heading3": "Überschrift 3",
       "heading4": "Überschrift 4",
-      "unorderedList": "Ungeordnete Liste",
+      "italic": "Kursiv",
+      "legendTitle": "Tastaturkürzel und Markdown-Code",
+      "link": "Verlinkung",
       "orderedList": "Geordnete Liste",
+      "paragraph": "Absatz",
       "quote": "Zitat",
-      "ruler": "Linie"
+      "ruler": "Linie",
+      "underline": "Unterstrichen",
+      "unorderedList": "Ungeordnete Liste"
     },
     "mention": {
       "noUsersFound": "Keine Benutzer gefunden"

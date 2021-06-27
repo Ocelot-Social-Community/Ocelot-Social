@@ -314,18 +314,18 @@
       "noHashtagsFound": "No hashtags found"
     },
     "legend": {
-      "legendTitle": "Keyboard shortcuts and markdown code",
       "bold": "bold",
-      "italic": "italic",
-      "underline": "underline",
-      "link": "link",
-      "paragraph": "paragraph",
       "heading3": "heading3",
       "heading4": "heading4",
-      "unorderedList": "unordered list",
+      "italic": "italic",
+      "legendTitle": "Keyboard shortcuts and markdown code",
+      "link": "link",
       "orderedList": "ordered list",
+      "paragraph": "paragraph",
       "quote": "quote",
-      "ruler": "ruler"
+      "ruler": "ruler",
+      "underline": "underline",
+      "unorderedList": "unordered list"
     },
     "mention": {
       "noUsersFound": "No users found"
