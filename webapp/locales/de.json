@@ -317,15 +317,15 @@
       "legendTitle": "Tastaturkürzel und Markdown-Code",
       "bold": "Fett",
       "italic": "Kursiv",
-      "underline": "underline",
-      "link": "link",
-      "paragraph": "paragraph",
-      "heading3": "heading3",
-      "heading4": "heading4",
-      "unorderedList": "unordered list",
-      "orderedList": "ordered list",
-      "quote": "quote",
-      "ruler": "ruler"
+      "underline": "Unterstrichen",
+      "link": "Verlinkung",
+      "paragraph": "Absatz",
+      "heading3": "Überschrift 3",
+      "heading4": "Überschrift 4",
+      "unorderedList": "Ungeordnete Liste",
+      "orderedList": "Geordnete Liste",
+      "quote": "Zitat",
+      "ruler": "Linie"
     },
     "mention": {
       "noUsersFound": "Keine Benutzer gefunden"

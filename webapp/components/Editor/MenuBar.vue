@@ -87,10 +87,5 @@ export default {
 .legend-button {
   display: inline;
   position: relative;
-
-  .base-icon {
-    font-size: 1.2rem;
-    color: #70677e !important;
-  }
 }
 </style>
