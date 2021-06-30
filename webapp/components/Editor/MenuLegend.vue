@@ -1,5 +1,5 @@
 <template>
-  <dropdown class="content-menu" :placement="placement" offset="5">
+  <dropdown :placement="placement" offset="5">
     <template #default="{ openMenu, closeMenu }">
       <slot name="button">
         <menu-bar-button
