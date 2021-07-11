@@ -72,7 +72,7 @@ describe('Registration', () => {
       })
     }
 
-    it('renders', () => {
+    it('renders', async () => {
       wrapper = await Wrapper()
       expect(wrapper.contains('div')).toBeTruthy()
     })
