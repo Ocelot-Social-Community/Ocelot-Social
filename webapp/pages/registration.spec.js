@@ -73,7 +73,7 @@ describe('Registration', () => {
     }
 
     it('renders', () => {
-      wrapper = Wrapper()
+      wrapper = await Wrapper()
       expect(wrapper.contains('div')).toBeTruthy()
     })
 
