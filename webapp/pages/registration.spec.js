@@ -74,7 +74,7 @@ describe('Registration', () => {
 
     it('renders', () => {
       wrapper = Wrapper()
-      expect(wrapper.contains('div')).toBe(true)
+      expect(wrapper.contains('div')).toBeTruthy()
     })
 
     describe('no "PUBLIC_REGISTRATION" and no "INVITE_REGISTRATION"', () => {
