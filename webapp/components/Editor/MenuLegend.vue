@@ -15,9 +15,13 @@
     <template #popover="" class="legend">
       <div class="legend-container">
         <div class="legend-header">{{ $t(`editor.legend.legendTitle`) }}</div>
-        <div class="legend-table" v-for="item in legenditems" :key="item.name">
+        <div
+          :class="['legend-table', index < legendItems.length - 1 && 'legend-table-split-line']"
+          v-for="(item, index) in legendItems"
+          :key="item.name"
+        >
           <div>
-            <base-button size="small" circle ghost :icon="item.iconname" class="legend-icon">
+            <base-button size="small" circle ghost :icon="item.iconName" class="legend-icon">
               <span v-if="item.label">{{ item.label }}</span>
             </base-button>
             <span>{{ $t(item.name) }}</span>
@@ -43,18 +47,18 @@ export default {
   },
   data() {
     return {
-      legenditems: [
-        { iconname: 'bold', name: `editor.legend.bold`, shortcut: 'Ctrl+b' },
-        { iconname: 'italic', name: `editor.legend.italic`, shortcut: 'Ctrl+i' },
-        { iconname: 'underline', name: `editor.legend.underline`, shortcut: 'Ctrl+u' },
-        { iconname: 'link', name: `editor.legend.link`, shortcut: '' },
-        { iconname: 'paragraph', name: `editor.legend.paragraph`, shortcut: '' },
+      legendItems: [
+        { iconName: 'bold', name: `editor.legend.bold`, shortcut: 'ctrl + b' },
+        { iconName: 'italic', name: `editor.legend.italic`, shortcut: 'ctrl + i' },
+        { iconName: 'underline', name: `editor.legend.underline`, shortcut: 'ctrl + u' },
+        { iconName: 'link', name: `editor.legend.link`, shortcut: '' },
+        { iconName: 'paragraph', name: `editor.legend.paragraph`, shortcut: '' },
         { label: 'H3', name: `editor.legend.heading3`, shortcut: '### + space' },
         { label: 'H4', name: `editor.legend.heading4`, shortcut: '#### + space' },
-        { iconname: 'list-ul', name: `editor.legend.unorderedList`, shortcut: '* + space' },
-        { iconname: 'list-ol', name: `editor.legend.orderedList`, shortcut: '1. + space' },
-        { iconname: 'quote-right', name: `editor.legend.quote`, shortcut: '> + space' },
-        { iconname: 'minus', name: `editor.legend.ruler`, shortcut: '---' },
+        { iconName: 'list-ul', name: `editor.legend.unorderedList`, shortcut: '* + space' },
+        { iconName: 'list-ol', name: `editor.legend.orderedList`, shortcut: '1. + space' },
+        { iconName: 'quote-right', name: `editor.legend.quote`, shortcut: '> + space' },
+        { iconName: 'minus', name: `editor.legend.ruler`, shortcut: '---' },
       ],
     }
   },
@@ -91,8 +95,10 @@ export default {
   display: grid;
   align-items: center;
   grid-template-columns: 1fr 1fr;
-  border-bottom: 0.5px solid grey;
   padding: 0.2em;
+}
+.legend-table-split-line {
+  border-bottom: 0.5px solid grey;
 }
 
 .legend-table > div {
