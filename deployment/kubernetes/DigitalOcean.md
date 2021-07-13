@@ -63,7 +63,15 @@ Take one of the IPs of perhaps two or more droplets in your cluster from the lis
 
 ### Manage DNS With DigitalOcean
 
-TODO: Describe what the purpose is and how to implement it …
+***TODO:** How to configure the DigitalOcean DNS management service …*
+
+To understand what makes sense to do when managing your DNS with DigitalOcean, you need to know how DNS works:
+
+DNS means `Domain Name System`. It resolves domains like `example.com` into an IP like `123.123.123`.
+DigitalOcean is not a domain registrar, but provides a DNS management service. If you use DigitalOcean's DNS management service, you can configure [your cluster](/deployment/kubernetes/README.md#dns) to always resolve the domain to the correct IP and automatically update it for that.  
+The IPs of the DigitalOcean machines are not necessarily stable, so the cluster's DNS service will update the DNS records managed by DigitalOcean to the new IP as needed.
+
+***CAUTION:** If you are using an external DNS, you currently have to do this manually, which can cause downtime.*
 
 ## Deploy
 

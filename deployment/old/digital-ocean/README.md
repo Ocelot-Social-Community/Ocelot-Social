@@ -1,10 +1,10 @@
-# Digital Ocean
+# DigitalOcean
 
-As a start, read the [introduction into Kubernetes](https://www.digitalocean.com/community/tutorials/an-introduction-to-kubernetes) by the folks at Digital Ocean. The following section should enable you to deploy ocelot.social to your Kubernetes cluster.
+As a start, read the [introduction into Kubernetes](https://www.digitalocean.com/community/tutorials/an-introduction-to-kubernetes) by the folks at DigitalOcean. The following section should enable you to deploy ocelot.social to your Kubernetes cluster.
 
 ## Connect to your local cluster
 
-1. Create a cluster at [Digital Ocean](https://www.digitalocean.com/).
+1. Create a cluster at [DigitalOcean](https://www.digitalocean.com/).
 2. Download the `***-kubeconfig.yaml` from the Web UI.
 3. Move the file to the default location where kubectl expects it to be: `mv ***-kubeconfig.yaml ~/.kube/config`. Alternatively you can set the config on every command: `--kubeconfig ***-kubeconfig.yaml`
 4. Now check if you can connect to the cluster and if its your newly created one by running: `kubectl get nodes`
@@ -21,7 +21,7 @@ nifty-driscoll-uusn   Ready    <none>   69d   v1.13.2
 
 If you got the steps right above and see your nodes you can continue.
 
-Digital Ocean Kubernetes clusters don't have a graphical interface, so I suggest
+DigitalOcean Kubernetes clusters don't have a graphical interface, so I suggest
 to setup the [Kubernetes dashboard](./dashboard/README.md) as a next step.
 Configuring [HTTPS](./https/README.md) is bit tricky and therefore I suggest to
 do this as a last step.

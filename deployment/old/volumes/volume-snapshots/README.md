@@ -17,9 +17,9 @@ kubectl apply -f neo4j-data-snapshot.yaml
 kubectl apply -f backen-uploads-snapshot.yaml
 ```
 
-If you are on Digital Ocean the volume snapshot should show up in the Web UI:
+If you are on DigitalOcean the volume snapshot should show up in the Web UI:
 
-![Digital Ocean Web UI showing a volume snapshot](./digital-ocean-volume-snapshots.png)
+![DigitalOcean Web UI showing a volume snapshot](./digital-ocean-volume-snapshots.png)
 
 ## Provision a Volume based on a Snapshot
 
