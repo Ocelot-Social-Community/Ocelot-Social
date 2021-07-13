@@ -1,6 +1,6 @@
 ---
 name: 🌟 Epic
-about: Define a big development Step
+about: Define a big development step.
 labels: epic
 title: 🌟 [EPIC] 
 ---
