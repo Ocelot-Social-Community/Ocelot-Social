@@ -5,7 +5,7 @@ I tried Velero and it did not work reliably all the time. Sometimes the
 kubernetes cluster crashes during recovery or data is not fully recovered.
 
 Feel free to test it out and update this documentation once you feel that it's
-working reliably. It is very likely that Digital Ocean had some bugs when I
+working reliably. It is very likely that DigitalOcean had some bugs when I
 tried out the steps below.
 {% endhint %}
 

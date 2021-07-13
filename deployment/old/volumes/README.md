@@ -3,7 +3,7 @@
 At the moment, the application needs two persistent volumes:
 
 * The `/data/` folder where `neo4j` stores its database and
-* the folder `/develop-backend/public/uploads` where the backend stores uploads, in case you don't use Digital Ocean Spaces (an AWS S3 bucket) for this purpose.
+* the folder `/develop-backend/public/uploads` where the backend stores uploads, in case you don't use DigitalOcean Spaces (an AWS S3 bucket) for this purpose.
 
 As a matter of precaution, the persistent volume claims that setup these volumes
 live in a separate folder. You don't want to accidently loose all your data in

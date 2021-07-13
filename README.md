@@ -1,4 +1,4 @@
-# Ocelot-Social-Deploy-Rebranding
+# Ocelot.Social Deploy And Rebranding
 
 This repository is an in use template to rebrand, configure, and deploy [ocelot.social](https://github.com/Ocelot-Social-Community/Ocelot-Social) networks.
 
@@ -28,13 +28,75 @@ Logins:
 
 ## Usage
 
-Fork this repository and configure as well as rebrand it for your own [ocelot.social](https://github.com/Ocelot-Social-Community/Ocelot-Social) network.
+Fork this repository to configure and rebrand it for your own [ocelot.social](https://github.com/Ocelot-Social-Community/Ocelot-Social) network.
 
-- [Configure And Rebrand](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/tree/master/branding)
+### Package.Json And DockerHub Organisation
 
-Afterwards you can [deploy](deployment/README.md) it on your server:
+Write your own data into the main configuration file:
 
-- [Kubernetes with Helm](deployment/kubernetes/README.md)
+- [package.json](/package.json)
+
+Since all deployment methods described here depend on [Docker](https://docker.com) and [DockerHub](https://hub.docker.com), you need to create your own organisation on DockerHub and put its name in the [package.json](/package.json) file as your `dockerOrganisation`.
+
+### Configure And Branding
+
+The next step is:
+
+- [Configure And Branding](/branding/README.md)
+
+### Optional: Proof Configuration And Branding Locally
+
+Just in case you have Docker installed and run the following, you can check your branding locally:
+
+```bash
+# in main folder
+$ docker-compose up
+# fill the database with an initial admin
+$ docker-compose exec backend yarn run prod:migrate init
+```
+
+The database is then initialised with the default administrator:
+
+- E-mail: admin@example.org
+- Password: 1234
+
+For login or registration have a look in your browser at `http://localhost:3000/`.  
+For the maintenance page have a look in your browser at `http://localhost:5000/`.
+
+### Push Changes To GitHub
+
+Before merging these changes into the "master" branch on your GitHub fork repository, you need to configure the GitHub repository secrets.  This is necessary to [publish](/.github/workflows/publish.yml) the Docker images by pushing them via GitHub actions to repositories belonging to your DockerHub organisation.
+
+First, go to your DockerHub profile under `Account Settings` and click on the `Security` tab. There you create an access token called `<your-organisation>-access-token` and copy the token to a safe place.
+
+Secondly, in your GitHub repository, click on the 'Settings' tab and go to the 'Secrets' tab.  There you create two secrets by clicking on `New repository secret`:
+
+1. Named `DOCKERHUB_TOKEN` with the newly created DockerHub token (only the code, not the token name).
+2. Named `DOCKERHUB_USERNAME` with your DockerHub username.
+
+### Optional: Proof DockerHub Images Locally
+
+Just in case you like to check your pushed Docker images in your organisation's DockerHub repositories locally:
+
+- rename the file `docker-compose.ocelotsocial-branded.yml` with your network name
+- in the file, rename the ocelot.social DockerHub organisation `ocelotsocialnetwork` to your organisations name
+
+Remove any local Docker images if necessary and do the following:
+
+```bash
+# in main folder
+$ docker-compose -f docker-compose.<your-organisation>-branded.yml up
+# fill the database with an initial admin
+$ docker-compose exec backend yarn run prod:migrate init
+```
+
+See the login details and browser addresses above.
+
+### Deployment
+
+Afterwards you can [deploy](/deployment/README.md) it on your server:
+
+- [Kubernetes with Helm](/deployment/kubernetes/README.md)
 
 ## Developer Chat
 
@@ -47,9 +109,9 @@ We give write permissions to every developer who asks for it. Just text us on
 
 ## Technology Stack
 
+- [Docker](https://www.docker.com)
 - [Kubernetes](https://kubernetes.io)
 - [Helm](https://helm.sh)
-- [Docker](https://www.docker.com)
 
 <!--
 ## Attributions
@@ -63,4 +125,4 @@ Browser compatibility testing with [BrowserStack](https://www.browserstack.com/)
 
 ## License
 
-See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
+See the [LICENSE](/LICENSE.md) file for license rights and limitations (MIT).

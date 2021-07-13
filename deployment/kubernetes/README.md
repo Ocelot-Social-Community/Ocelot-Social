@@ -1,16 +1,25 @@
-# Helm Installation Of Ocelot.Social
+# Kubernetes Helm Installation Of Ocelot.Social
 
-Deploying *ocelot.social* with Helm is very straight forward. All you have to do is to change certain parameters, like domain names and API keys, then you just install our provided Helm chart to your cluster.
+Deploying [ocelot.social](https://github.com/Ocelot-Social-Community/Ocelot-Social) with [Helm](https://helm.sh) for [Kubernetes](https://kubernetes.io) is very straight forward. All you have to do is to change certain parameters, like domain names and API keys, then you just install our provided Helm chart to your cluster.
+
+## Kubernetes Cloud Hosting
+
+There are various ways to set up your own or a managed Kubernetes cluster. We will extend the following lists over time.  
+Please contact us if you are interested in options not listed below.
+
+Managed Kubernetes:
+
+- [DigitalOcean](/deployment/kubernetes/DigitalOcean.md)
 
 ## Configuration
 
-You can customize the network with your configuration by duplicate the `values.template.yaml` to a new `values.yaml` file and change it to your need. All included variables will be available as environment variables in your deployed kubernetes pods.
+You can customize the network server with your configuration by duplicate the `values.template.yaml` to a new `values.yaml` file and change it to your need. All included variables will be available as environment variables in your deployed kubernetes pods.
 
-Besides the `values.template.yaml` file we provide a `nginx.values.template.yaml` and `dns.values.template.yaml` for a similar procedure. The new `nginx.values.yaml` is the configuration for the ingress-nginx Helm chart, while the `dns.values.yaml` file is for automatically updating the dns values on digital ocean and therefore optional.
+Besides the `values.template.yaml` file we provide a `nginx.values.template.yaml` and `dns.values.template.yaml` for a similar procedure. The new `nginx.values.yaml` is the configuration for the ingress-nginx Helm chart, while the `dns.values.yaml` file is for automatically updating the dns values on DigitalOcean and therefore optional.
 
 ## Installation
 
-Due to the many limitations of Helm you still have to do several manual steps. Those occur before you run the actual *ocelot.social* Helm chart. Obviously it is expected of you to have `helm` and `kubectl` installed. For Digital Ocean you might require `doctl` aswell.
+Due to the many limitations of Helm you still have to do several manual steps. Those occur before you run the actual *ocelot.social* Helm chart. Obviously it is expected of you to have `helm` and `kubectl` installed. For DigitalOcean you might require `doctl` aswell.
 
 ### Cert Manager (https)
 
@@ -18,7 +27,7 @@ Please refer to [cert-manager.io docs](https://cert-manager.io/docs/installation
 
 ***ATTENTION:*** *Be with the Terminal in your repository in the folder of this README.*
 
-1. Create Namespace
+#### 1. Create Namespace
 
 ```bash
 # kubeconfig.yaml set globaly
@@ -27,14 +36,14 @@ $ kubectl create namespace cert-manager
 $ kubectl --kubeconfig=/../kubeconfig.yaml create namespace cert-manager
 ```
 
-2. Add Helm repository and update
+#### 2. Add Helm repository and update
 
 ```bash
 $ helm repo add jetstack https://charts.jetstack.io
 $ helm repo update
 ```
 
-3. Install Cert-Manager Helm chart
+#### 3. Install Cert-Manager Helm chart
 
 ```bash
 # option 1
@@ -57,14 +66,14 @@ $ helm --kubeconfig=/../kubeconfig.yaml \
 
 ### Ingress-Nginx
 
-1. Add Helm repository and update
+#### 1. Add Helm repository and update
 
 ```bash
 $ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 $ helm repo update
 ```
 
-2. Install ingress-nginx
+#### 2. Install ingress-nginx
 
 ```bash
 # kubeconfig.yaml set globaly
@@ -73,11 +82,11 @@ $ helm install ingress-nginx ingress-nginx/ingress-nginx -f nginx.values.yaml
 $ helm --kubeconfig=/../kubeconfig.yaml install ingress-nginx ingress-nginx/ingress-nginx -f nginx.values.yaml
 ```
 
-### Digital Ocean Firewall
+### DigitalOcean Firewall
 
-This is only necessary if you run Digital Ocean without load balancer ([see here for more info](https://stackoverflow.com/questions/54119399/expose-port-80-on-digital-oceans-managed-kubernetes-without-a-load-balancer/55968709)) .
+This is only necessary if you run DigitalOcean without load balancer ([see here for more info](https://stackoverflow.com/questions/54119399/expose-port-80-on-digital-oceans-managed-kubernetes-without-a-load-balancer/55968709)) .
 
-1. Authenticate towards DO with your local `doctl`
+#### 1. Authenticate towards DO with your local `doctl`
 
 You will need a DO token for that.
 
@@ -90,9 +99,16 @@ $ doctl auth init --context <new-context-name>
 
 You will need an API token, which you can generate in the control panel at <https://cloud.digitalocean.com/account/api/tokens> .
 
-2. Generate DO firewall
+#### 2. Generate DO firewall
 
-Fill in the `CLUSTER_UUID` and `your-domain` (Get the `CLUSTER_UUID` value from the dashboard or the ID column from doctl kubernetes cluster list.):
+ Get the `CLUSTER_UUID` value from the dashboard or from the ID column via `doctl kubernetes cluster list`:
+
+```bash
+# need to apply access token by `doctl auth init` before
+$ doctl kubernetes cluster list
+```
+
+Fill in the `CLUSTER_UUID` and `your-domain`:
 
 ```bash
 # without doctl context
@@ -118,17 +134,19 @@ $ doctl compute firewall get <ID> --context <context-name>
 
 ### DNS
 
-This chart is only necessary (recommended is more precise) if you run Digital Ocean without load balancer.
+***TODO:** I thought this is necessary if we use the DigitalOcean DNS management service? See [Manage DNS With DigitalOcean](/deployment/kubernetes/DigitalOcean.md#manage-dns-with-digitalocean)*
+
+This chart is only necessary (recommended is more precise) if you run DigitalOcean without load balancer.
 You need to generate an access token with read + write for the `dns.values.yaml` at <https://cloud.digitalocean.com/account/api/tokens> and fill it in.
 
-1. Add Helm repository and update
+#### 1. Add Helm repository and update
 
 ```bash
 $ helm repo add bitnami https://charts.bitnami.com/bitnami
 $ helm repo update
 ```
 
-2. Install DNS
+#### 2. Install DNS
 
 ```bash
 # kubeconfig.yaml set globaly
@@ -189,4 +207,4 @@ If you are lucky enough to have a kubernetes cluster with the required hardware
 support, try this [helm chart](https://github.com/helm/charts/tree/master/stable/sentry).
 
 On our kubernetes cluster we get "mult-attach" errors for persistent volumes.
-Apparently Digital Ocean's kubernetes clusters do not fulfill the requirements.
+Apparently DigitalOcean's kubernetes clusters do not fulfill the requirements.

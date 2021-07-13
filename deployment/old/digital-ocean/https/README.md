@@ -19,7 +19,7 @@ $ kubectl apply -f .
 ```
 
 {% hint style="info" %}
-CAUTION: It seems that the behaviour of Digital Ocean has changed and the load balancer is not created automatically anymore.
+CAUTION: It seems that the behaviour of DigitalOcean has changed and the load balancer is not created automatically anymore.
 And to create a load balancer costs money. Please refine the following documentation if required.
 {% endhint %}
 
@@ -29,20 +29,20 @@ And to create a load balancer costs money. Please refine the following documenta
 A solution without a load balance you can find [here](../no-loadbalancer/README.md).
 
 {% endtab %}
-{% tab title="With Digital Ocean Load Balancer" %}
+{% tab title="With DigitalOcean Load Balancer" %}
 
 {% hint style="info" %}
-CAUTION: It seems that the behaviour of Digital Ocean has changed and the load balancer is not created automatically anymore.
+CAUTION: It seems that the behaviour of DigitalOcean has changed and the load balancer is not created automatically anymore.
 Please refine the following documentation if required.
 {% endhint %}
 
 In earlier days by now, your cluster should have a load balancer assigned with an external IP
-address. On Digital Ocean, this is how it should look like:
+address. On DigitalOcean, this is how it should look like:
 
-![Screenshot of Digital Ocean dashboard showing external ip address](./ip-address.png)
+![Screenshot of DigitalOcean dashboard showing external ip address](./ip-address.png)
 
-If the load balancer isn't created automatically you have to create it your self on Digital Ocean under Networks.
-In case you don't need a Digital Ocean load balancer (which costs money by the way) have a look in the tab `Without Load Balancer`.
+If the load balancer isn't created automatically you have to create it your self on DigitalOcean under Networks.
+In case you don't need a DigitalOcean load balancer (which costs money by the way) have a look in the tab `Without Load Balancer`.
 
 {% endtab %}
 {% endtabs %}
