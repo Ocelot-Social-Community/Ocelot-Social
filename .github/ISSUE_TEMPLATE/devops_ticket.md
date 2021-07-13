@@ -1,6 +1,6 @@
 ---
 name: 💥 DevOps Ticket
-about: Help us manage our deployed App.
+about: Help us manage our deployed app.
 labels: devops
 title: 💥 [DevOps]
 ---
