@@ -13,7 +13,7 @@ const driver = getDriver()
 const neode = getNeode()
 const categoryIds = ['cat9']
 const createPostMutation = gql`
-  mutation($id: ID, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
+  mutation ($id: ID, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
     CreatePost(id: $id, title: $title, content: $postContent, categoryIds: $categoryIds) {
       id
       title
@@ -22,7 +22,7 @@ const createPostMutation = gql`
   }
 `
 const updatePostMutation = gql`
-  mutation($id: ID!, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
+  mutation ($id: ID!, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
     UpdatePost(id: $id, content: $postContent, title: $title, categoryIds: $categoryIds) {
       title
       content
@@ -95,7 +95,7 @@ describe('hashtags', () => {
     </p>
   `
   const postWithHastagsQuery = gql`
-    query($id: ID) {
+    query ($id: ID) {
       Post(id: $id) {
         tags {
           id
