@@ -118,11 +118,15 @@ describe('PageFooter.vue', () => {
       })
 
       it('renders TERMS_AND_CONDITIONS as "a" tag link', () => {
-        expect(wrapper.find(`a[href="https://ocelot.social/TERMS_AND_CONDITIONS"]`).exists()).toBeTruthy()
+        expect(
+          wrapper.find(`a[href="https://ocelot.social/TERMS_AND_CONDITIONS"]`).exists(),
+        ).toBeTruthy()
       })
 
       it('renders CODE_OF_CONDUCT as "a" tag link', () => {
-        expect(wrapper.find(`a[href="https://ocelot.social/CODE_OF_CONDUCT"]`).exists()).toBeTruthy()
+        expect(
+          wrapper.find(`a[href="https://ocelot.social/CODE_OF_CONDUCT"]`).exists(),
+        ).toBeTruthy()
       })
 
       it('renders DATA_PRIVACY as "a" tag link', () => {

@@ -1,7 +1,11 @@
 <template>
   <div id="footer" class="ds-footer">
     <!-- made with ❤️ -->
-    <nuxt-link v-if="noLinkDefined(links.ORGANIZATION)" to="/organization" data-test="organization-nuxt-link">
+    <nuxt-link
+      v-if="noLinkDefined(links.ORGANIZATION)"
+      to="/organization"
+      data-test="organization-nuxt-link"
+    >
       {{ $t('site.made') }}
     </nuxt-link>
     <a v-else :href="links.ORGANIZATION" target="_blank" data-test="organization-link">
