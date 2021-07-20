@@ -36,7 +36,7 @@ afterEach(async () => {
 
 describe('Signup', () => {
   const mutation = gql`
-    mutation($email: String!, $inviteCode: String) {
+    mutation ($email: String!, $inviteCode: String) {
       Signup(email: $email, inviteCode: $inviteCode) {
         email
       }
@@ -145,7 +145,7 @@ describe('Signup', () => {
 
 describe('SignupVerification', () => {
   const mutation = gql`
-    mutation(
+    mutation (
       $name: String!
       $password: String!
       $email: String!
