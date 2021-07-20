@@ -42,6 +42,7 @@ export default {
       'changelog',
       'imprint',
       'data-privacy',
+      'faq',
     ],
     // pages to keep alive
     keepAlivePages: ['index'],
