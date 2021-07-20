@@ -2,7 +2,7 @@
 export default {
   LANDING_PAGE: '/login', // examples: '/login', '/registration', '/organization', or external 'https://ocelot.social'
   SUPPORT: 'https://ocelot.social', // example for internal support page: 'https://staging.ocelot.social/support'. set a full URL please, because it is used in e-mails as well!
-  
+
   // on null or empty strings internal pages are used, see 'webapp/locales/html/'
   //   you can find and store templates at https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/tree/master/branding/templates/
   ORGANIZATION: 'https://ocelot.social',
