@@ -37,6 +37,8 @@ export default {
       'password-reset-change-password',
       'registration',
       'pages-slug',
+      'organization',
+      'support',
       'terms-and-conditions',
       'code-of-conduct',
       'changelog',
