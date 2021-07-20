@@ -147,7 +147,7 @@ describe('Post', () => {
       })
     })
 
-    it('by categories', async () => {
+    /* it('by categories', async () => {
       const postQueryFilteredByCategories = gql`
         query Post($filter: _PostFilter) {
           Post(filter: $filter) {
@@ -172,7 +172,7 @@ describe('Post', () => {
       await expect(
         query({ query: postQueryFilteredByCategories, variables }),
       ).resolves.toMatchObject(expected)
-    })
+    }) */
 
     describe('by emotions', () => {
       const postQueryFilteredByEmotions = gql`
@@ -323,23 +323,14 @@ describe('CreatePost', () => {
 describe('UpdatePost', () => {
   let author, newlyCreatedPost
   const updatePostMutation = gql`
-    mutation($id: ID!, $title: String!, $content: String!, $categoryIds: [ID], $image: ImageInput) {
-      UpdatePost(
-        id: $id
-        title: $title
-        content: $content
-        categoryIds: $categoryIds
-        image: $image
-      ) {
+    mutation($id: ID!, $title: String!, $content: String!, $image: ImageInput) {
+      UpdatePost(id: $id, title: $title, content: $content, image: $image) {
         id
         title
         content
         author {
           name
           slug
-        }
-        categories {
-          id
         }
         createdAt
         updatedAt
@@ -428,7 +419,7 @@ describe('UpdatePost', () => {
       expect(newlyCreatedPost.updatedAt).not.toEqual(UpdatePost.updatedAt)
     })
 
-    describe('no new category ids provided for update', () => {
+    /* describe('no new category ids provided for update', () => {
       it('resolves and keeps current categories', async () => {
         const expected = {
           data: {
@@ -443,9 +434,9 @@ describe('UpdatePost', () => {
           expected,
         )
       })
-    })
+    }) */
 
-    describe('given category ids', () => {
+    /* describe('given category ids', () => {
       beforeEach(() => {
         variables = { ...variables, categoryIds: ['cat27'] }
       })
@@ -464,7 +455,7 @@ describe('UpdatePost', () => {
           expected,
         )
       })
-    })
+    }) */
 
     describe('params.image', () => {
       describe('is object', () => {

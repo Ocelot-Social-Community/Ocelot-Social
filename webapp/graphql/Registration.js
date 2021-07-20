@@ -4,6 +4,7 @@ export const SignupVerificationMutation = gql`
     $nonce: String!
     $name: String!
     $email: String!
+    $inviteCode: String
     $password: String!
     $about: String
     $termsAndConditionsAgreedVersion: String!
@@ -12,6 +13,7 @@ export const SignupVerificationMutation = gql`
     SignupVerification(
       nonce: $nonce
       email: $email
+      inviteCode: $inviteCode
       name: $name
       password: $password
       about: $about

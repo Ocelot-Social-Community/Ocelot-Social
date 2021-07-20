@@ -45,6 +45,18 @@ const deleteUserMutation = gql`
   }
 `
 
+const switchUserRoleMutation = gql`
+  mutation($role: UserGroup!, $id: ID!) {
+    switchUserRole(role: $role, id: $id) {
+      name
+      role
+      id
+      updatedAt
+      email
+    }
+  }
+`
+
 beforeAll(() => {
   const { server } = createServer({
     context: () => {
@@ -265,9 +277,9 @@ describe('UpdateUser', () => {
     })
 
     it('supports updating location', async () => {
-      variables = { ...variables, locationName: 'Hamburg, New Jersey, United States of America' }
+      variables = { ...variables, locationName: 'Hamburg, New Jersey, United States' }
       await expect(mutate({ mutation: updateUserMutation, variables })).resolves.toMatchObject({
-        data: { UpdateUser: { locationName: 'Hamburg, New Jersey, United States of America' } },
+        data: { UpdateUser: { locationName: 'Hamburg, New Jersey, United States' } },
         errors: undefined,
       })
     })
@@ -455,6 +467,74 @@ describe('Delete a User as admin', () => {
           await expect(neode.all('SocialMedia')).resolves.toHaveLength(0)
         })
       })
+    })
+  })
+})
+
+describe('switch user role', () => {
+  beforeEach(async () => {
+    user = await Factory.build('user', {
+      id: 'user',
+      role: 'user',
+    })
+    admin = await Factory.build('user', {
+      role: 'admin',
+      id: 'admin',
+    })
+  })
+
+  describe('as simple user', () => {
+    it('cannot change the role', async () => {
+      authenticatedUser = await user.toJson()
+      variables = {
+        id: 'user',
+        role: 'admin',
+      }
+      await expect(mutate({ mutation: switchUserRoleMutation, variables })).resolves.toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'Not Authorised!',
+            }),
+          ],
+        }),
+      )
+    })
+  })
+
+  describe('as admin', () => {
+    it('changes the role of other user', async () => {
+      authenticatedUser = await admin.toJson()
+      variables = {
+        id: 'user',
+        role: 'moderator',
+      }
+      await expect(mutate({ mutation: switchUserRoleMutation, variables })).resolves.toEqual(
+        expect.objectContaining({
+          data: {
+            switchUserRole: expect.objectContaining({
+              role: 'moderator',
+            }),
+          },
+        }),
+      )
+    })
+
+    it('cannot change own role', async () => {
+      authenticatedUser = await admin.toJson()
+      variables = {
+        id: 'admin',
+        role: 'moderator',
+      }
+      await expect(mutate({ mutation: switchUserRoleMutation, variables })).resolves.toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'you-cannot-change-your-own-role',
+            }),
+          ],
+        }),
+      )
     })
   })
 })

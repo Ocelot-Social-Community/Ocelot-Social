@@ -151,6 +151,7 @@ describe('ContributionForm.vue', () => {
             aspectRatio: null,
             sensitive: false,
             upload: imageUpload,
+            type: null,
           }
           const spy = jest
             .spyOn(FileReader.prototype, 'readAsDataURL')

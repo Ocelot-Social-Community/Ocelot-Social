@@ -6,7 +6,7 @@
           <ds-flex class="main-navigation-flex">
             <ds-flex-item :width="{ base: '142px' }">
               <nuxt-link :to="{ name: 'index' }" v-scroll-to="'.main-navigation'">
-                <logo />
+                <logo logoType="header" />
               </nuxt-link>
             </ds-flex-item>
             <ds-flex-item
@@ -50,6 +50,11 @@
                   <client-only>
                     <notification-menu placement="top" />
                   </client-only>
+                  <div v-if="inviteRegistration">
+                    <client-only>
+                      <invite-button placement="top" />
+                    </client-only>
+                  </div>
                   <client-only>
                     <avatar-menu placement="top" />
                   </client-only>
@@ -84,6 +89,7 @@ import seo from '~/mixins/seo'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import PageFooter from '~/components/PageFooter/PageFooter'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
+import InviteButton from '~/components/InviteButton/InviteButton'
 
 export default {
   components: {
@@ -95,12 +101,14 @@ export default {
     AvatarMenu,
     FilterMenu,
     PageFooter,
+    InviteButton,
   },
   mixins: [seo],
   data() {
     return {
       mobileSearchVisible: false,
       toggleMobileMenu: false,
+      inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
     }
   },
   computed: {

@@ -28,6 +28,7 @@ export const post = {
     shoutedCount: 5,
     commentedCount: 39,
     followedByCount: 2,
+    clickedCount: 42,
     followedByCurrentUser: true,
     location: null,
     badges: [
@@ -43,6 +44,7 @@ export const post = {
   commentsCount: 12,
   categories: [],
   shoutedCount: 421,
+  viewedTeaserCount: 1584,
   __typename: 'Post',
 }
 

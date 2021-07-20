@@ -3,6 +3,7 @@ import { gql } from '../../helpers/jest'
 import { getDriver, getNeode } from '../../db/neo4j'
 import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
+import CONFIG from '../../config'
 
 const neode = getNeode()
 
@@ -15,7 +16,8 @@ beforeEach(async () => {
   variables = {}
 })
 
-beforeAll(() => {
+beforeAll(async () => {
+  await cleanDatabase()
   const { server } = createServer({
     context: () => {
       return {
@@ -34,8 +36,8 @@ afterEach(async () => {
 
 describe('Signup', () => {
   const mutation = gql`
-    mutation($email: String!) {
-      Signup(email: $email) {
+    mutation($email: String!, $inviteCode: String) {
+      Signup(email: $email, inviteCode: $inviteCode) {
         email
       }
     }
@@ -50,6 +52,8 @@ describe('Signup', () => {
     })
 
     it('throws AuthorizationError', async () => {
+      CONFIG.INVITE_REGISTRATION = false
+      CONFIG.PUBLIC_REGISTRATION = false
       await expect(mutate({ mutation, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorised!' }],
       })

@@ -13,16 +13,13 @@ $ docker-compose up
 
 ## Setup without docker
 
-First, you have to tell cypress how to connect to your local neo4j database
-among other things. You can copy our template configuration and change the new
-file according to your needs.
+To start the services that are required for cypress testing manually. You basically need the whole setup to run:
 
-To start the services that are required for cypress testing, run:
+- backend
+- webapp
+- neo4j
 
-```bash
-# in the top level folder Ocelot-Social/
-$ yarn cypress:setup
-```
+Navigate to the corresponding folders and start the services.
 
 ## Install cypress
 
@@ -35,21 +32,11 @@ without docker, you would have to install cypress and its dependencies first:
 $ yarn install
 ```
 
-## Run cypress
-
-After verifying that there are no errors with the servers starting, open another tab in your terminal and run the following command:
-
-```bash
-$ yarn cypress:run
-```
-
-![Console output after running cypress test](../.gitbook/assets/grafik%20%281%29.png)
-
 ### Open Interactive Test Console
 
-If you are like me, you might want to see some visual output. The interactive cypress environment also helps at debugging your tests, you can even time travel between individual steps and see the exact state of the app.
+The interactive cypress test console allows to run tests and have visual feedback on that. The interactive cypress environment also helps at debugging the tests, you can even time travel between individual steps and see the exact state of the app.
 
-To use this feature, instead of `yarn cypress:run` you would run the following command:
+To use this feature run:
 
 ```bash
 $ yarn cypress:open
@@ -57,7 +44,19 @@ $ yarn cypress:open
 
 ![Interactive Cypress Environment](../.gitbook/assets/grafik-1%20%281%29.png)
 
+## Run cypress
+
+To run cypress without the user interface:
+
+```bash
+$ yarn cypress:run
+```
+
+This is used to run cypress in CI or in console
+
+![Console output after running cypress test](../.gitbook/assets/grafik%20%281%29.png)
+
 ## Write some Tests
 
 Check out the Cypress documentation for further information on how to write tests:
-[https://docs.cypress.io/guides/getting-started/writing-your-first-test.html\#Write-a-simple-test](https://docs.cypress.io/guides/getting-started/writing-your-first-test.html#Write-a-simple-test)
+[Write-a-simple-test](https://docs.cypress.io/guides/getting-started/writing-your-first-test.html#Write-a-simple-test)

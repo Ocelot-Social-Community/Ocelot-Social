@@ -170,6 +170,7 @@ type Query {
   filter: _UserFilter
   ): [User]
 
+  availableRoles: [UserGroup]! 
   mutedUsers: [User]
   blockedUsers: [User]
   isLoggedIn: Boolean!
@@ -215,4 +216,6 @@ type Mutation {
   unmuteUser(id: ID!): User
   blockUser(id: ID!): User
   unblockUser(id: ID!): User
+
+  switchUserRole(role: UserGroup!, id: ID!): User
 }
