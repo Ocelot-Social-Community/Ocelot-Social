@@ -11,7 +11,7 @@ let mutate
 const driver = getDriver()
 
 const generateInviteCodeMutation = gql`
-  mutation($expiresAt: String = null) {
+  mutation ($expiresAt: String = null) {
     GenerateInviteCode(expiresAt: $expiresAt) {
       code
       createdAt
@@ -31,7 +31,7 @@ const myInviteCodesQuery = gql`
 `
 
 const isValidInviteCodeQuery = gql`
-  query($code: ID!) {
+  query ($code: ID!) {
     isValidInviteCode(code: $code)
   }
 `

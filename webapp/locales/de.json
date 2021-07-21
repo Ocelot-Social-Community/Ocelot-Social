@@ -313,6 +313,20 @@
       "addLetter": "Tippe einen Buchstaben",
       "noHashtagsFound": "Keine Hashtags gefunden"
     },
+    "legend": {
+      "bold": "Fett",
+      "heading3": "Überschrift 3",
+      "heading4": "Überschrift 4",
+      "italic": "Kursiv",
+      "legendTitle": "Tastaturkürzel und Markdown-Code",
+      "link": "Verlinkung",
+      "orderedList": "Geordnete Liste",
+      "paragraph": "Absatz",
+      "quote": "Zitat",
+      "ruler": "Linie",
+      "underline": "Unterstrichen",
+      "unorderedList": "Ungeordnete Liste"
+    },
     "mention": {
       "noUsersFound": "Keine Benutzer gefunden"
     },

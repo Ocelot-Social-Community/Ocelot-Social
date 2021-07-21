@@ -8,5 +8,5 @@ title: 💬 [Question]
 <!-- If you need an answer right away, visit the ocelot.social Discord:
 https://discord.gg/AJSX9DCSUA -->
 
-## :speech_balloon: Question
+## 💬 Question
 <!-- Describe your Question in detail. Include screenshots and drawings if needed. -->
