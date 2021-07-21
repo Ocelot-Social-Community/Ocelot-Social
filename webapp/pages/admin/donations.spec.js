@@ -13,7 +13,7 @@ describe('donations.vue', () => {
       $t: jest.fn((string) => string),
       $apollo: {
         // queries: {
-          // Donations: {
+        // Donations: {
         //     refetch: jest.fn(),
         //     // fetchMore: jest.fn().mockResolvedValue([
         //     //   {
@@ -24,7 +24,7 @@ describe('donations.vue', () => {
         //     //     },
         //     //   },
         //     // ]),
-          // },
+        // },
         // },
         // query: jest.fn().mockResolvedValue({
         //   data: {
@@ -129,7 +129,11 @@ describe('donations.vue', () => {
           wrapper.find('.donations-info-button').trigger('submit')
           await mocks.$apollo.mutate
           // await flushPromises()
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining({variables: { showDonations: false, goal: 15000, progress: 0 }}))
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: { showDonations: false, goal: 15000, progress: 0 },
+            }),
+          )
           expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
         })
 
@@ -143,7 +147,11 @@ describe('donations.vue', () => {
           wrapper.find('.donations-info-button').trigger('submit')
           await mocks.$apollo.mutate
           await flushPromises()
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining({variables: { showDonations: true, goal: 15000, progress: 0 }}))
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: { showDonations: true, goal: 15000, progress: 0 },
+            }),
+          )
           expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
         })
 
@@ -158,7 +166,9 @@ describe('donations.vue', () => {
         })
 
         it.skip('default values are displayed', async () => {
-          mocks.$apollo.mutate = jest.fn().mockResolvedValue({ data: { UpdateDonations: { showDonations: true, goal: 10, progress: 20 } } })
+          mocks.$apollo.mutate = jest.fn().mockResolvedValue({
+            data: { UpdateDonations: { showDonations: true, goal: 10, progress: 20 } },
+          })
           wrapper.find('.donations-info-button').trigger('submit')
           await mocks.$apollo.mutate
           await Vue.nextTick()
