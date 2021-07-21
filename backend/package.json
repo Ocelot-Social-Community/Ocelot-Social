@@ -81,7 +81,7 @@
     "languagedetect": "^2.0.0",
     "linkifyjs": "~2.1.8",
     "lodash": "~4.17.14",
-    "merge-graphql-schemas": "^1.7.7",
+    "merge-graphql-schemas": "^1.7.8",
     "metascraper": "^5.11.8",
     "metascraper-audio": "^5.14.26",
     "metascraper-author": "^5.14.22",
@@ -134,7 +134,7 @@
     "eslint-plugin-standard": "~4.0.1",
     "jest": "~25.3.0",
     "nodemon": "~2.0.2",
-    "prettier": "~2.2.0",
+    "prettier": "~2.3.2",
     "rosie": "^2.0.1",
     "supertest": "~4.0.2"
   },

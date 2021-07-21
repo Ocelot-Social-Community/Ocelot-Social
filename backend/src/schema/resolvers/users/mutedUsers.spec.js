@@ -93,7 +93,7 @@ describe('muteUser', () => {
     muteAction = (variables) => {
       const { mutate } = createTestClient(server)
       const muteUserMutation = gql`
-        mutation($id: ID!) {
+        mutation ($id: ID!) {
           muteUser(id: $id) {
             id
             name
@@ -310,7 +310,7 @@ describe('unmuteUser', () => {
     unmuteAction = (variables) => {
       const { mutate } = createTestClient(server)
       const unmuteUserMutation = gql`
-        mutation($id: ID!) {
+        mutation ($id: ID!) {
           unmuteUser(id: $id) {
             id
             name
