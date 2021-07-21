@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Fullstack and API tests with cypress and cucumber for ocelot.social",
   "author": "ocelot.social Community",
   "license": "MIT",
@@ -28,7 +28,7 @@
     "auto-changelog": "^2.2.1",
     "bcryptjs": "^2.4.3",
     "codecov": "^3.7.1",
-    "cross-env": "^7.0.2",
+    "cross-env": "^7.0.3",
     "cucumber": "^6.0.5",
     "cypress": "^7.0.1",
     "cypress-cucumber-preprocessor": "^2.2.1",
@@ -37,7 +37,7 @@
     "dotenv": "^8.2.0",
     "expect": "^25.3.0",
     "faker": "Marak/faker.js#master",
-    "graphql-request": "^1.8.2",
+    "graphql-request": "^2.0.0",
     "import": "^0.0.6",
     "jsonwebtoken": "^8.5.1",
     "mock-socket": "^9.0.3",
@@ -49,5 +49,6 @@
   },
   "resolutions": {
     "set-value": "^2.0.1"
-  }
+  },
+  "dependencies": {}
 }
