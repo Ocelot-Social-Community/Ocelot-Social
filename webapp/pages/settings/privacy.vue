@@ -52,6 +52,7 @@ export default {
           },
         })
       } catch (error) {
+        this.shoutsAllowed = !this.shoutsAllowed
         this.$toast.error(error.message)
       }
     },

@@ -21,8 +21,10 @@ describe('DonationInfo.vue', () => {
 
   const Wrapper = () => mount(DonationInfo, { mocks, localVue })
 
-  it('includes a link to the Human Connection donations website', () => {
-    expect(Wrapper().find('a').attributes('href')).toBe('https://human-connection.org/spenden/')
+  it('includes a link to the ocelot.social donations website', () => {
+    expect(Wrapper().find('a').attributes('href')).toBe(
+      'https://ocelot-social.herokuapp.com/donations',
+    )
   })
 
   it('displays a call to action button', () => {

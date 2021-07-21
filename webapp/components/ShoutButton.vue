@@ -10,7 +10,7 @@
     />
     <ds-space margin-bottom="xx-small" />
     <ds-text color="soft" class="shout-button-text">
-      <ds-heading style="display: inline;" tag="h3">{{ shoutedCount }}x</ds-heading>
+      <ds-heading style="display: inline" tag="h3">{{ shoutedCount }}x</ds-heading>
       {{ $t('shoutButton.shouted') }}
     </ds-text>
   </ds-space>

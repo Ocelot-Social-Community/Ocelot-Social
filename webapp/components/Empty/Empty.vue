@@ -5,7 +5,7 @@
         :src="iconPath"
         width="80"
         class="hc-empty-icon"
-        style="margin-bottom: 5px;"
+        style="margin-bottom: 5px"
         alt="Empty"
       />
       <br />

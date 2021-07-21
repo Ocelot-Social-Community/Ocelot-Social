@@ -2,6 +2,13 @@ import Vue from 'vue'
 import vuexI18n from 'vuex-i18n/dist/vuex-i18n.umd.js'
 import { isEmpty, find } from 'lodash'
 import locales from '~/locales'
+import htmlTranslations from '~/locales/html/'
+
+const registerTranslation = ({ Vue, locale }) => {
+  const translation = require(`~/locales/${locale}.json`)
+  translation.html = htmlTranslations[locale]
+  Vue.i18n.add(locale, translation)
+}
 
 /**
  * TODO: Refactor and simplify browser detection
@@ -53,9 +60,6 @@ export default ({ app, req, cookie, store }) => {
     },
   })
 
-  // register the fallback locales
-  Vue.i18n.add('en', require('~/locales/en.json'))
-
   let userLocale = 'en'
   const localeCookie = app.$cookies.get(key)
   /* const userSettings = store.getters['auth/userSettings']
@@ -80,8 +84,10 @@ export default ({ app, req, cookie, store }) => {
   const availableLocales = locales.filter((lang) => !!lang.enabled)
   const locale = find(availableLocales, ['code', userLocale]) ? userLocale : 'en'
 
+  // register the fallback locales
+  registerTranslation({ Vue, locale: 'en' })
   if (locale !== 'en') {
-    Vue.i18n.add(locale, require(`~/locales/${locale}.json`))
+    registerTranslation({ Vue, locale })
   }
 
   // Set the start locale to use

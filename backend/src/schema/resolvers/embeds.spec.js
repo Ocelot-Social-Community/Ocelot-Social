@@ -18,7 +18,10 @@ const HumanConnectionOrg = fs.readFileSync(
   path.join(__dirname, '../../../snapshots/embeds/HumanConnectionOrg.html'),
   'utf8',
 )
-const pr960 = fs.readFileSync(path.join(__dirname, '../../../snapshots/embeds/pr960.html'), 'utf8')
+const pr3934 = fs.readFileSync(
+  path.join(__dirname, '../../../snapshots/embeds/pr3934.html'),
+  'utf8',
+)
 const babyLovesCat = fs.readFileSync(
   path.join(__dirname, '../../../snapshots/embeds/babyLovesCat.html'),
   'utf8',
@@ -34,8 +37,7 @@ const babyLovesCatEmbedResponse = new Response(
     thumbnail_height: 360,
     provider_url: 'https://www.youtube.com/',
     thumbnail_width: 480,
-    html:
-      '<iframe width="480" height="270" src="https://www.youtube.com/embed/qkdXAtO40Fo?start=18&feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+    html: '<iframe width="480" height="270" src="https://www.youtube.com/embed/qkdXAtO40Fo?start=18&feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
     thumbnail_url: 'https://i.ytimg.com/vi/qkdXAtO40Fo/hqdefault.jpg',
     version: '1.0',
     author_name: 'Merkley Family',
@@ -54,7 +56,7 @@ describe('Query', () => {
         })
         const { query } = createTestClient(server)
         const embed = gql`
-          query($url: String!) {
+          query ($url: String!) {
             embed(url: $url) {
               type
               title
@@ -145,7 +147,7 @@ describe('Query', () => {
     describe('given a Github link', () => {
       beforeEach(() => {
         fetch
-          .mockReturnValueOnce(Promise.resolve(new Response(pr960)))
+          .mockReturnValueOnce(Promise.resolve(new Response(pr3934)))
           .mockReturnValueOnce(Promise.resolve(JSON.stringify({})))
         variables = { url: 'https://github.com/Human-Connection/Human-Connection/pull/960' }
       })
@@ -156,14 +158,14 @@ describe('Query', () => {
             embed: {
               type: 'link',
               title:
-                'Editor embeds merge in nitro embed by mattwr18 · Pull Request #960 · Human-Connection/Human-Connection',
-              author: 'Human-Connection',
+                'feat: [WIP] 🍰 Rebranding And White-Labeling by Mogge · Pull Request #3934 · Ocelot-Social-Community/Ocelot-Social',
+              author: 'Ocelot-Social-Community',
               publisher: 'GitHub',
               date: expect.any(String),
-              description: '🍰 Pullrequest Issues fixes #256',
-              url: 'https://github.com/Human-Connection/Human-Connection/pull/960',
-              image:
-                'https://repository-images.githubusercontent.com/112590397/52c9a000-7e11-11e9-899d-aaa55f3a3d72',
+              description: `🍰 Pullrequest
+Have all the information for the brand in separate config files. Set these defaults to ocelot.social`,
+              url: 'https://github.com/Ocelot-Social-Community/Ocelot-Social/pull/3934',
+              image: 'https://avatars3.githubusercontent.com/u/67983243?s=400&v=4',
               audio: null,
               video: null,
               lang: 'en',
@@ -201,8 +203,7 @@ describe('Query', () => {
               video: null,
               lang: 'de',
               sources: ['resource', 'oembed'],
-              html:
-                '<iframe width="480" height="270" src="https://www.youtube.com/embed/qkdXAtO40Fo?start=18&feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+              html: '<iframe width="480" height="270" src="https://www.youtube.com/embed/qkdXAtO40Fo?start=18&feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
             },
           },
           errors: undefined,

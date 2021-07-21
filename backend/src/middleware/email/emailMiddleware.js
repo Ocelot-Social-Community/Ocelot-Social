@@ -13,7 +13,7 @@ const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD
 
 let sendMail = () => {}
 if (!hasEmailConfig) {
-  if (process.env.NODE_ENV !== 'test') {
+  if (!CONFIG.TEST) {
     // eslint-disable-next-line no-console
     console.log('Warning: Email middleware will not try to send mails.')
   }
@@ -22,8 +22,8 @@ if (!hasEmailConfig) {
     const transporter = nodemailer.createTransport({
       host: CONFIG.SMTP_HOST,
       port: CONFIG.SMTP_PORT,
-      ignoreTLS: CONFIG.SMTP_IGNORE_TLS === 'true',
-      secure: false, // true for 465, false for other ports
+      ignoreTLS: CONFIG.SMTP_IGNORE_TLS,
+      secure: CONFIG.SMTP_SECURE, // true for 465, false for other ports
       auth: hasAuthData && {
         user: CONFIG.SMTP_USERNAME,
         pass: CONFIG.SMTP_PASSWORD,
@@ -43,9 +43,14 @@ if (!hasEmailConfig) {
 }
 
 const sendSignupMail = async (resolve, root, args, context, resolveInfo) => {
+  const { inviteCode } = args
   const response = await resolve(root, args, context, resolveInfo)
   const { email, nonce } = response
-  await sendMail(signupTemplate({ email, nonce }))
+  if (inviteCode) {
+    await sendMail(signupTemplate({ email, nonce, inviteCode }))
+  } else {
+    await sendMail(signupTemplate({ email, nonce }))
+  }
   delete response.nonce
   return response
 }
@@ -71,6 +76,5 @@ export default {
     AddEmailAddress: sendEmailVerificationMail,
     requestPasswordReset: sendPasswordResetMail,
     Signup: sendSignupMail,
-    SignupByInvitation: sendSignupMail,
   },
 }

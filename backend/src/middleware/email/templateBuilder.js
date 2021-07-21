@@ -1,16 +1,31 @@
 import mustache from 'mustache'
 import CONFIG from '../../config'
+import logosWebapp from '../../config/logos.js'
 
 import * as templates from './templates'
 
-const from = '"Human Connection" <info@human-connection.org>'
-const supportUrl = 'https://human-connection.org/en/contact'
+const from = CONFIG.EMAIL_DEFAULT_SENDER
+const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
 
-export const signupTemplate = ({ email, nonce }) => {
-  const subject = 'Willkommen, Bienvenue, Welcome to Human Connection!'
-  const actionUrl = new URL('/registration/create-user-account', CONFIG.CLIENT_URI)
-  actionUrl.searchParams.set('nonce', nonce)
+const defaultParams = {
+  supportUrl: CONFIG.SUPPORT_URL,
+  APPLICATION_NAME: CONFIG.APPLICATION_NAME,
+  ORGANIZATION_URL: CONFIG.ORGANIZATION_URL,
+  welcomeImageUrl,
+}
+
+export const signupTemplate = ({ email, nonce, inviteCode = null }) => {
+  const subject = `Willkommen, Bienvenue, Welcome to ${CONFIG.APPLICATION_NAME}!`
+  // dev format example: http://localhost:3000/registration?method=invite-mail&email=wolle.huss%40pjannto.com&nonce=64853
+  const actionUrl = new URL('/registration', CONFIG.CLIENT_URI)
   actionUrl.searchParams.set('email', email)
+  actionUrl.searchParams.set('nonce', nonce)
+  if (inviteCode) {
+    actionUrl.searchParams.set('inviteCode', inviteCode)
+    actionUrl.searchParams.set('method', 'invite-code')
+  } else {
+    actionUrl.searchParams.set('method', 'invite-mail')
+  }
 
   return {
     from,
@@ -18,7 +33,7 @@ export const signupTemplate = ({ email, nonce }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, nonce, supportUrl, subject },
+      { ...defaultParams, actionUrl, nonce, subject },
       { content: templates.signup },
     ),
   }
@@ -27,8 +42,8 @@ export const signupTemplate = ({ email, nonce }) => {
 export const emailVerificationTemplate = ({ email, nonce, name }) => {
   const subject = 'Neue E-Mail Adresse | New E-Mail Address'
   const actionUrl = new URL('/settings/my-email-address/verify', CONFIG.CLIENT_URI)
-  actionUrl.searchParams.set('nonce', nonce)
   actionUrl.searchParams.set('email', email)
+  actionUrl.searchParams.set('nonce', nonce)
 
   return {
     from,
@@ -36,7 +51,7 @@ export const emailVerificationTemplate = ({ email, nonce, name }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, name, nonce, supportUrl, subject },
+      { ...defaultParams, actionUrl, name, nonce, subject },
       { content: templates.emailVerification },
     ),
   }
@@ -54,7 +69,7 @@ export const resetPasswordTemplate = ({ email, nonce, name }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, name, nonce, supportUrl, subject },
+      { ...defaultParams, actionUrl, name, nonce, subject },
       { content: templates.passwordReset },
     ),
   }
@@ -70,7 +85,7 @@ export const wrongAccountTemplate = ({ email }) => {
     subject,
     html: mustache.render(
       templates.layout,
-      { actionUrl, supportUrl },
+      { ...defaultParams, actionUrl, supportUrl: CONFIG.SUPPORT_URL, welcomeImageUrl },
       { content: templates.wrongAccount },
     ),
   }

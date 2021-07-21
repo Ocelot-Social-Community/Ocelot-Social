@@ -20,7 +20,7 @@
         {{ $t('login.hello') }}
         <b>{{ userName }}</b>
         <template v-if="user.role !== 'user'">
-          <ds-text color="softer" size="small" style="margin-bottom: 0;">
+          <ds-text color="softer" size="small" style="margin-bottom: 0">
             {{ user.role | camelCase }}
           </ds-text>
         </template>
@@ -46,6 +46,7 @@
     </template>
   </dropdown>
 </template>
+
 <script>
 import { mapGetters } from 'vuex'
 import Dropdown from '~/components/Dropdown'
@@ -118,6 +119,7 @@ export default {
   },
 }
 </script>
+
 <style lang="scss">
 .avatar-menu {
   margin: $space-xxx-small 0px 0px $space-xx-small;

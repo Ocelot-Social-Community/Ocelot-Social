@@ -2,7 +2,9 @@
   <ds-container width="small" class="password-reset">
     <base-card>
       <template #imageColumn>
-        <img alt="Human Connection" src="/icon.png" class="image" />
+        <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
+          <logo logoType="passwordReset" />
+        </a>
       </template>
       <nuxt-child />
       <template #topMenu>
@@ -13,13 +15,23 @@
 </template>
 
 <script>
+import links from '~/constants/links.js'
+import metadata from '~/constants/metadata.js'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import Logo from '~/components/Logo/Logo'
 
 export default {
   components: {
     LocaleSwitch,
+    Logo,
   },
   layout: 'no-header',
+  data() {
+    return {
+      metadata,
+      links,
+    }
+  },
   asyncData({ store, redirect }) {
     if (store.getters['auth/isLoggedIn']) {
       redirect('/')

@@ -1,0 +1,18 @@
+type InviteCode {
+  code: ID!
+  createdAt: String!
+  generatedBy: User @relation(name: "GENERATED", direction: "IN")
+  redeemedBy: [User] @relation(name: "REDEEMED", direction: "IN")
+  expiresAt: String
+}
+
+
+type Mutation {
+  GenerateInviteCode(expiresAt: String = null): InviteCode
+}
+
+type Query {
+  MyInviteCodes: [InviteCode]
+  isValidInviteCode(code: ID!): Boolean
+  getInviteCode: InviteCode
+}

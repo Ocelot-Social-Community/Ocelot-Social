@@ -28,7 +28,6 @@
       </base-button>
       <ds-input
         v-if="!hasMore"
-        v-focus="true"
         :name="`${type}Filter`"
         :placeholder="filter"
         class="spacer-x-small"
