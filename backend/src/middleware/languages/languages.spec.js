@@ -29,7 +29,7 @@ afterAll(async () => {
 })
 
 const createPostMutation = gql`
-  mutation($title: String!, $content: String!, $categoryIds: [ID]) {
+  mutation ($title: String!, $content: String!, $categoryIds: [ID]) {
     CreatePost(title: $title, content: $content, categoryIds: $categoryIds) {
       language
     }

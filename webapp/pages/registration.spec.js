@@ -1,3 +1,4 @@
+import Vuex from 'vuex'
 import { config, mount } from '@vue/test-utils'
 import Registration from './registration.vue'
 import Vue from 'vue'
@@ -13,6 +14,10 @@ describe('Registration', () => {
   let wrapper
   let Wrapper
   let mocks
+  let asyncData
+  let store
+  let redirect
+  let isLoggedIn
 
   beforeEach(() => {
     mocks = {
@@ -25,10 +30,42 @@ describe('Registration', () => {
       },
       $env: {},
     }
+    asyncData = false
+    isLoggedIn = false
+    redirect = jest.fn()
   })
 
   describe('mount', () => {
-    Wrapper = () => {
+    Wrapper = async () => {
+      if (asyncData) {
+        store = new Vuex.Store({
+          getters: {
+            'auth/isLoggedIn': () => isLoggedIn,
+          },
+        })
+        const data = {
+          method: mocks,
+          overwriteSliderData: {
+            collectedInputData: {
+              inviteCode: null,
+              email: null,
+              emailSend: !!null,
+              nonce: null,
+            },
+          },
+          publicRegistration: false,
+          inviteRegistration: false,
+        }
+        const aData = await Registration.asyncData({
+          store,
+          redirect,
+        })
+        Registration.data = function () {
+          return { ...data, ...aData }
+        }
+      } else {
+        Registration.data = Registration.backupData ? Registration.backupData : Registration.data
+      }
       return mount(Registration, {
         mocks,
         localVue,
@@ -43,25 +80,25 @@ describe('Registration', () => {
         }
       })
 
-      it('no "method" query in URI show "RegistrationSlideNoPublic"', () => {
+      it('no "method" query in URI show "RegistrationSlideNoPublic"', async () => {
         mocks.$route.query = {}
-        wrapper = Wrapper()
+        wrapper = await Wrapper()
         expect(wrapper.find('.hc-empty').exists()).toBe(true)
         expect(wrapper.find('.enter-invite').exists()).toBe(false)
         expect(wrapper.find('.enter-email').exists()).toBe(false)
       })
 
       describe('"method=invite-mail" in URI show "RegistrationSlideNonce"', () => {
-        it('no "email" query in URI', () => {
+        it('no "email" query in URI', async () => {
           mocks.$route.query = { method: 'invite-mail' }
-          wrapper = Wrapper()
+          wrapper = await Wrapper()
           expect(wrapper.find('.enter-nonce').exists()).toBe(true)
         })
 
         describe('"email=user%40example.org" query in URI', () => {
-          it('have email displayed', () => {
+          it('have email displayed', async () => {
             mocks.$route.query = { method: 'invite-mail', email: 'user@example.org' }
-            wrapper = Wrapper()
+            wrapper = await Wrapper()
             expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
           })
 
@@ -71,7 +108,7 @@ describe('Registration', () => {
               email: 'user@example.org',
               nonce: '64835',
             }
-            wrapper = Wrapper()
+            wrapper = await Wrapper()
             await Vue.nextTick()
             const form = wrapper.find('.enter-nonce')
             expect(form.vm.formData.nonce).toEqual('64835')
@@ -80,15 +117,15 @@ describe('Registration', () => {
       })
 
       describe('"method=invite-code" in URI show "RegistrationSlideNoPublic"', () => {
-        it('no "inviteCode" query in URI', () => {
+        it('no "inviteCode" query in URI', async () => {
           mocks.$route.query = { method: 'invite-code' }
-          wrapper = Wrapper()
+          wrapper = await Wrapper()
           expect(wrapper.find('.hc-empty').exists()).toBe(true)
         })
 
-        it('"inviteCode=AAAAAA" query in URI', () => {
+        it('"inviteCode=AAAAAA" query in URI', async () => {
           mocks.$route.query = { method: 'invite-code', inviteCode: 'AAAAAA' }
-          wrapper = Wrapper()
+          wrapper = await Wrapper()
           expect(wrapper.find('.hc-empty').exists()).toBe(true)
         })
       })
@@ -102,24 +139,24 @@ describe('Registration', () => {
         }
       })
 
-      it('no "method" query in URI show "RegistrationSlideInvite"', () => {
+      it('no "method" query in URI show "RegistrationSlideInvite"', async () => {
         mocks.$route.query = {}
-        wrapper = Wrapper()
+        wrapper = await Wrapper()
         expect(wrapper.find('.enter-invite').exists()).toBe(true)
         expect(wrapper.find('.enter-email').exists()).toBe(false)
       })
 
       describe('"method=invite-mail" in URI show "RegistrationSlideNonce"', () => {
-        it('no "inviteCode" query in URI', () => {
+        it('no "inviteCode" query in URI', async () => {
           mocks.$route.query = { method: 'invite-mail' }
-          wrapper = Wrapper()
+          wrapper = await Wrapper()
           expect(wrapper.find('.enter-nonce').exists()).toBe(true)
         })
 
         describe('"email=user%40example.org" query in URI', () => {
-          it('have email displayed', () => {
+          it('have email displayed', async () => {
             mocks.$route.query = { method: 'invite-mail', email: 'user@example.org' }
-            wrapper = Wrapper()
+            wrapper = await Wrapper()
             expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
           })
 
@@ -129,7 +166,7 @@ describe('Registration', () => {
               email: 'user@example.org',
               nonce: '64835',
             }
-            wrapper = Wrapper()
+            wrapper = await Wrapper()
             await Vue.nextTick()
             const form = wrapper.find('.enter-nonce')
             expect(form.vm.formData.nonce).toEqual('64835')
@@ -138,15 +175,15 @@ describe('Registration', () => {
       })
 
       describe('"method=invite-code" in URI show "RegistrationSlideInvite"', () => {
-        it('no "inviteCode" query in URI', () => {
+        it('no "inviteCode" query in URI', async () => {
           mocks.$route.query = { method: 'invite-code' }
-          wrapper = Wrapper()
+          wrapper = await Wrapper()
           expect(wrapper.find('.enter-invite').exists()).toBe(true)
         })
 
         it('"inviteCode=AAAAAA" query in URI have invite code in input', async () => {
           mocks.$route.query = { method: 'invite-code', inviteCode: 'AAAAAA' }
-          wrapper = Wrapper()
+          wrapper = await Wrapper()
           await Vue.nextTick()
           const form = wrapper.find('.enter-invite')
           expect(form.vm.formData.inviteCode).toEqual('AAAAAA')
@@ -162,24 +199,24 @@ describe('Registration', () => {
         }
       })
 
-      it('no "method" query in URI show "RegistrationSlideEmail"', () => {
+      it('no "method" query in URI show "RegistrationSlideEmail"', async () => {
         mocks.$route.query = {}
-        wrapper = Wrapper()
+        wrapper = await Wrapper()
         expect(wrapper.find('.enter-email').exists()).toBe(true)
         expect(wrapper.find('.enter-invite').exists()).toBe(false)
       })
 
       describe('"method=invite-mail" in URI show "RegistrationSlideNonce"', () => {
-        it('no "inviteCode" query in URI', () => {
+        it('no "inviteCode" query in URI', async () => {
           mocks.$route.query = { method: 'invite-mail' }
-          wrapper = Wrapper()
+          wrapper = await Wrapper()
           expect(wrapper.find('.enter-nonce').exists()).toBe(true)
         })
 
         describe('"email=user%40example.org" query in URI', () => {
-          it('have email displayed', () => {
+          it('have email displayed', async () => {
             mocks.$route.query = { method: 'invite-mail', email: 'user@example.org' }
-            wrapper = Wrapper()
+            wrapper = await Wrapper()
             expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
           })
 
@@ -189,7 +226,7 @@ describe('Registration', () => {
               email: 'user@example.org',
               nonce: '64835',
             }
-            wrapper = Wrapper()
+            wrapper = await Wrapper()
             await Vue.nextTick()
             const form = wrapper.find('.enter-nonce')
             expect(form.vm.formData.nonce).toEqual('64835')
@@ -198,9 +235,9 @@ describe('Registration', () => {
       })
 
       describe('"method=invite-code" in URI show "RegistrationSlideEmail"', () => {
-        it('no "inviteCode" query in URI', () => {
+        it('no "inviteCode" query in URI', async () => {
           mocks.$route.query = { method: 'invite-code' }
-          wrapper = Wrapper()
+          wrapper = await Wrapper()
           expect(wrapper.find('.enter-email').exists()).toBe(true)
           expect(wrapper.find('.enter-invite').exists()).toBe(false)
         })
@@ -215,24 +252,24 @@ describe('Registration', () => {
         }
       })
 
-      it('no "method" query in URI show "RegistrationSlideEmail"', () => {
+      it('no "method" query in URI show "RegistrationSlideEmail"', async () => {
         mocks.$route.query = {}
-        wrapper = Wrapper()
+        wrapper = await Wrapper()
         expect(wrapper.find('.enter-email').exists()).toBe(true)
         expect(wrapper.find('.enter-invite').exists()).toBe(false)
       })
 
       describe('"method=invite-mail" in URI show "RegistrationSlideNonce"', () => {
-        it('no "inviteCode" query in URI', () => {
+        it('no "inviteCode" query in URI', async () => {
           mocks.$route.query = { method: 'invite-mail' }
-          wrapper = Wrapper()
+          wrapper = await Wrapper()
           expect(wrapper.find('.enter-nonce').exists()).toBe(true)
         })
 
         describe('"email=user%40example.org" query in URI', () => {
-          it('have email displayed', () => {
+          it('have email displayed', async () => {
             mocks.$route.query = { method: 'invite-mail', email: 'user@example.org' }
-            wrapper = Wrapper()
+            wrapper = await Wrapper()
             expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
           })
 
@@ -242,7 +279,7 @@ describe('Registration', () => {
               email: 'user@example.org',
               nonce: '64835',
             }
-            wrapper = Wrapper()
+            wrapper = await Wrapper()
             await Vue.nextTick()
             const form = wrapper.find('.enter-nonce')
             expect(form.vm.formData.nonce).toEqual('64835')
@@ -251,20 +288,39 @@ describe('Registration', () => {
       })
 
       describe('"method=invite-code" in URI show "RegistrationSlideInvite"', () => {
-        it('no "inviteCode" query in URI', () => {
+        it('no "inviteCode" query in URI', async () => {
           mocks.$route.query = { method: 'invite-code' }
-          wrapper = Wrapper()
+          wrapper = await Wrapper()
           expect(wrapper.find('.enter-invite').exists()).toBe(true)
         })
 
         it('"inviteCode=AAAAAA" query in URI have invite code in input', async () => {
           mocks.$route.query = { method: 'invite-code', inviteCode: 'AAAAAA' }
-          wrapper = Wrapper()
+          wrapper = await Wrapper()
           await Vue.nextTick()
           const form = wrapper.find('.enter-invite')
           expect(form.vm.formData.inviteCode).toEqual('AAAAAA')
         })
       })
+    })
+
+    it('renders', async () => {
+      wrapper = await Wrapper()
+      expect(wrapper.is('.login-form')).toBe(true)
+    })
+
+    // The asyncTests must go last
+    it('renders with asyncData and not loggedIn', async () => {
+      asyncData = true
+      wrapper = await Wrapper()
+      expect(redirect).not.toHaveBeenCalled()
+    })
+
+    it('renders with asyncData and loggedIn', async () => {
+      asyncData = true
+      isLoggedIn = true
+      wrapper = await Wrapper()
+      expect(redirect).toBeCalledWith('/')
     })
 
     // copied from webapp/components/Registration/Signup.spec.js as testing template
