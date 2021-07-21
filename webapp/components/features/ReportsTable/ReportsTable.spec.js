@@ -34,7 +34,7 @@ describe('ReportsTable', () => {
 
     describe('given no reports', () => {
       beforeEach(() => {
-        propsData = { ...propsData, reports: [] }
+        propsData = { ...propsData }
         wrapper = Wrapper()
       })
 
