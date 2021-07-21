@@ -6575,18 +6575,18 @@ cookie-signature@1.0.6:
   resolved "https://registry.yarnpkg.com/cookie-signature/-/cookie-signature-1.0.6.tgz#e303a882b342cc3ee8ca513a79999734dab3ae2c"
   integrity sha1-4wOogrNCzD7oylE6eZmXNNqzriw=
 
-cookie-universal-nuxt@~2.1.3:
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/cookie-universal-nuxt/-/cookie-universal-nuxt-2.1.3.tgz#f850df248c7225646554ea4255c696e69060e0e2"
-  integrity sha512-oiEwBZ3JWfXZbpukxFLHp2K7bUKRpA3XpzxXnmwtLECKECWfrf3ze4V9G18bK05ULvSHo2Ao/mVrlx0/TPkuRQ==
+cookie-universal-nuxt@~2.1.5:
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/cookie-universal-nuxt/-/cookie-universal-nuxt-2.1.5.tgz#669f2ff95b1bc1962c86edd69c954f60729e71e5"
+  integrity sha512-P0WCTKIyemWNtHi9lxrS5cxZmieOIEjt28B7Alu6cdSB9RqtUtpkqYyV9PRK6oJrT5eIPDYjHsJQlh6SUrFJOg==
   dependencies:
     "@types/cookie" "^0.3.3"
-    cookie-universal "^2.1.3"
+    cookie-universal "^2.1.5"
 
-cookie-universal@^2.1.3:
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/cookie-universal/-/cookie-universal-2.1.3.tgz#b5bb6fb32c7d1d631d5c94c58fae6e7709600044"
-  integrity sha512-9NTCd4DO0m+okpeCMejxWTGFIyPUL7qGye3HWfrgmQY67VET0xw9utYdscCmmrSerSDj2ntvqTQ86pw317al+g==
+cookie-universal@^2.1.5:
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/cookie-universal/-/cookie-universal-2.1.5.tgz#9a6cefbfb61c750a1b8ee2610bf71566bd719544"
+  integrity sha512-nqOOmEkovCQxNYGIyzhcwsmh4c7xnxe7RWdiYFOoml9MP4L32IlU3LdPC7r7nQEnnM+9Uxlk/UhtvBl5is6M/w==
   dependencies:
     "@types/cookie" "^0.3.3"
     cookie "^0.4.0"
