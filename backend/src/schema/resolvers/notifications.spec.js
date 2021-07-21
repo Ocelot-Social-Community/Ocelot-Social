@@ -139,7 +139,7 @@ describe('given some notifications', () => {
 
   describe('notifications', () => {
     const notificationQuery = gql`
-      query($read: Boolean, $orderBy: NotificationOrdering) {
+      query ($read: Boolean, $orderBy: NotificationOrdering) {
         notifications(read: $read, orderBy: $orderBy) {
           from {
             __typename
@@ -249,7 +249,7 @@ describe('given some notifications', () => {
           const deletePostAction = async () => {
             authenticatedUser = await author.toJson()
             const deletePostMutation = gql`
-              mutation($id: ID!) {
+              mutation ($id: ID!) {
                 DeletePost(id: $id) {
                   id
                   deleted
@@ -284,7 +284,7 @@ describe('given some notifications', () => {
 
   describe('markAsRead', () => {
     const markAsReadMutation = gql`
-      mutation($id: ID!) {
+      mutation ($id: ID!) {
         markAsRead(id: $id) {
           from {
             __typename

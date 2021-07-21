@@ -1,4 +1,4 @@
-# Human-Connection
+# ocelot.social
 
 [![Build Status](https://travis-ci.com/Human-Connection/Human-Connection.svg?branch=master)](https://travis-ci.com/Human-Connection/Human-Connection)
 [![Codecov Coverage](https://img.shields.io/codecov/c/github/Human-Connection/Human-Connection/master.svg?style=flat-square)](https://codecov.io/gh/Human-Connection/Human-Connection/)
@@ -6,26 +6,19 @@
 [![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discordapp.com/invite/DFSjPaX)
 [![Open Source Helpers](https://www.codetriage.com/human-connection/human-connection/badges/users.svg)](https://www.codetriage.com/human-connection/human-connection)
 
-Human Connection is a nonprofit social, action and knowledge network that connects information to action and promotes positive local and global change in all areas of life.
+ocelot.social is a nonprofit social, action and knowledge network that connects information to action and promotes positive local and global change in all areas of life.
 
 * **Social**: Interact with other people not just by commenting their posts, but by providing **Pro & Contra** arguments, give a **Versus** or ask them by integrated **Chat** or **Let's Talk**
 * **Knowledge**: Read articles about interesting topics and find related posts in the **More Info** tab or by **Filtering** based on **Categories** and **Tagging** or by using the **Fulltext Search**.
 * **Action**: Don't just read about how to make the world a better place, but come into **Action** by following provided suggestions on the **Action** tab provided by other people or **Organisations**.
 
- [![Human-Connection](.gitbook/assets/lets_get_together.png)](https://human-connection.org)
-
-**Technology Stack**
-
-* [VueJS](https://vuejs.org/)
-* [NuxtJS](https://nuxtjs.org/)
-* [GraphQL](https://graphql.org/)
-* [NodeJS](https://nodejs.org/en/)
-* [Neo4J](https://neo4j.com/)
-
+<p align="center">
+  <img src="webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%">
+</p>
 
 ## Live demo
 
-Try out our deployed [development environment](https://develop.human-connection.org/).
+__Try out our deployed [development environment](https://develop.human-connection.org/).__
 
 Logins:
 
@@ -35,27 +28,105 @@ Logins:
 | `moderator@example.org` | 1234 | moderator |
 | `admin@example.org` | 1234 | admin |
 
-## Documentation
+## Directory Layout
 
-Learn how to set up a local development environment in our [Docs](https://docs.human-connection.org/human-connection/) :mag_right:
+There are four important directories:
 
-## Translations
+* [Backend](./backend) runs on the server and is a middleware between database and frontend
+* [Frontend](./webapp) is a server-side-rendered and client-side-rendered web frontend
+* [Cypress](./cypress) contains end-to-end tests and executable feature specifications
 
-You can help translating the interface by joining us on [lokalise.co](https://lokalise.co/public/556252725c18dd752dd546.13222042/).
-Thank you lokalise for providing us with a premium account :raised_hands:.
+In order to setup the application and start to develop features you have to
+setup **frontend** and **backend**.
+
+There are two approaches:
+
+1. Local installation, which means you have to take care of dependencies yourself
+2. **Or** Install everything through Docker which takes care of dependencies for you
+
+## Installation
+
+### Clone the Repository
+
+Clone the repository, this will create a new folder called `Ocelot-Social`:
+
+Using HTTPS:
+
+```bash
+$ git clone https://github.com/Ocelot-Social-Community/Ocelot-Social.git
+```
+
+Using SSH:
+
+```bash
+$ git clone git@github.com:Ocelot-Social-Community/Ocelot-Social.git
+```
+
+Change into the new folder.
+
+```bash
+$ cd Ocelot-Social
+```
+
+### Docker Installation
+
+Docker is a software development container tool that combines software and its dependencies into one standardized unit that contains everything needed to run it. This helps us to avoid problems with dependencies and makes installation easier.
+
+#### General Installation of Docker
+
+There are [sevaral ways to install Docker CE](https://docs.docker.com/install/) on your computer or server.
+
+ * [install Docker Desktop on macOS](https://docs.docker.com/docker-for-mac/install/)
+ * [install Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/install/)
+ * [install Docker CE on Linux](https://docs.docker.com/install/)
+
+Check the correct Docker installation by checking the version before proceeding. E.g. we have the following versions:
+
+```bash
+$ docker --version
+Docker version 18.09.2
+$ docker-compose --version
+docker-compose version 1.23.2
+```
+
+#### Start Ocelot-Social via Docker-Compose
+
+For Development:
+
+```bash
+$ docker-compose up
+```
+
+For Production:
+
+```bash
+$ docker-compose -f docker-compose.yml up
+```
+
+This will start all required Docker containers
+
+## Deployment
+
+Deployment methods can be found in the [Ocelot-Social-Deploy-Rebranding](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding) repository.
+
+The only deployment method in this repository is `docker-compose` for development purposes as described above.
 
 ## Developer Chat
 
-Join our friendly open-source community on [Discord](https://discordapp.com/invite/DFSjPaX) :heart_eyes_cat:
+Join our friendly open-source community on [Discord](https://discord.gg/AJSX9DCSUA) :heart_eyes_cat:
 Just introduce yourself at `#introduce-yourself` and mention `@@Mentor` to get you onboard :neckbeard:
 Check out the [contribution guideline](./CONTRIBUTING.md), too!
 
-[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/0)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/0)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/1)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/1)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/2)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/2)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/3)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/3)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/4)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/4)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/5)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/5)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/6)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/6)[![](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/images/7)](https://sourcerer.io/fame/roschaefer/Human-Connection/Human-Connection/links/7)
+We give write permissions to every developer who asks for it. Just text us on
+[Discord](https://discord.gg/AJSX9DCSUA).
 
-## Open-Source Bounties
+## Technology Stack
 
-You can get a small financial compensation for your contribution :moneybag: See
-details in our [Contribution Guidelines](./CONTRIBUTING.md#open-source-bounties).
+* [VueJS](https://vuejs.org/)
+* [NuxtJS](https://nuxtjs.org/)
+* [GraphQL](https://graphql.org/)
+* [NodeJS](https://nodejs.org/en/)
+* [Neo4J](https://neo4j.com/)
 
 ## Attributions
 
@@ -66,4 +137,5 @@ Browser compatibility testing with [BrowserStack](https://www.browserstack.com/)
 <img alt="BrowserStack Logo" src=".gitbook/assets/browserstack-logo.svg" width="256">
 
 ## License
+
 See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).

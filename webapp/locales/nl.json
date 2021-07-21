@@ -52,7 +52,6 @@
     "letsTalk": "Laten we praten",
     "loading": "inlading",
     "loadMore": "meer laden",
-    "moreInfo": "Meer info",
     "name": "Naam",
     "organization": "Organisatie ::: Organisaties",
     "post": "Bericht ::: Berichten",
@@ -69,7 +68,7 @@
     "edit": "Bijdrage bewerken",
     "teaserImage": {
       "cropperConfirm": "Bevestigen",
-      "supportedFormats": "Voeg een afbeelding in met het bestandsformaat JPG, PNG of GIF"
+      "supportedFormats": "Voeg een afbeelding in met het bestandsformaat JPG, PNG of GIF!"
     }
   },
   "disable": {
@@ -166,7 +165,7 @@
     "director": "Directeur",
     "germany": "Duitsland",
     "imprint": "Afdruk",
-    "made": "Met &#10084; gemaakt",
+    "made": "Met ❤️ gemaakt",
     "register": "inschrijfnummer",
     "responsible": "Verantwoordelijk volgens § 55 Abs. 2 RStV (Duitsland).",
     "taxident": "Identificatienummer voor de belasting over de toegevoegde waarde overeenkomstig § 27 a Wet op de belasting over de toegevoegde waarde (Duitsland).",

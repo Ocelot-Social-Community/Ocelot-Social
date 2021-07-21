@@ -25,9 +25,15 @@ export default {
     }
   },
   methods: {
-    handleSuccess() {
+    async handleSuccess() {
       this.$i18n.set(this.user.locale || 'en')
-      this.$router.replace(this.$route.query.path || '/')
+
+      try {
+        await this.$router.replace(this.$route.query.path || '/')
+      } catch (err) {
+        // throw new Error(`Problem handling something: ${err}.`);
+        // TODO this is causing trouble - most likely due to double redirect on terms&conditions
+      }
     },
   },
 }

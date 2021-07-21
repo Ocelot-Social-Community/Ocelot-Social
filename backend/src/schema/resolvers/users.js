@@ -244,6 +244,31 @@ export default {
         session.close()
       }
     },
+    switchUserRole: async (object, args, context, resolveInfo) => {
+      const { role, id } = args
+
+      if (context.user.id === id) throw new Error('you-cannot-change-your-own-role')
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const switchUserRoleResponse = await transaction.run(
+          `
+            MATCH (user:User {id: $id})
+            SET user.role = $role
+            SET user.updatedAt = toString(datetime())
+            RETURN user {.*}
+          `,
+          { id, role },
+        )
+        const [user] = switchUserRoleResponse.records.map((record) => record.get('user'))
+        return user
+      })
+      try {
+        const user = await writeTxResultPromise
+        return user
+      } finally {
+        session.close()
+      }
+    },
   },
   User: {
     email: async (parent, params, context, resolveInfo) => {
@@ -293,6 +318,7 @@ export default {
         avatar: '-[:AVATAR_IMAGE]->(related:Image)',
         invitedBy: '<-[:INVITED]-(related:User)',
         location: '-[:IS_IN]->(related:Location)',
+        redeemedInviteCode: '-[:REDEEMED]->(related:InviteCode)',
       },
       hasMany: {
         followedBy: '<-[:FOLLOWS]-(related:User)',
@@ -304,6 +330,7 @@ export default {
         shouted: '-[:SHOUTED]->(related:Post)',
         categories: '-[:CATEGORIZED]->(related:Category)',
         badges: '<-[:REWARDED]-(related:Badge)',
+        inviteCodes: '-[:GENERATED]->(related:InviteCode)',
       },
     }),
   },

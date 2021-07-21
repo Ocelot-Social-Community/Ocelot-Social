@@ -51,6 +51,7 @@ export const postFragment = gql`
       url
       sensitive
       aspectRatio
+      type
     }
     author {
       ...user
@@ -66,6 +67,9 @@ export const postCountsFragment = gql`
     shoutedCount
     shoutedByCurrentUser
     emotionsCount
+    clickedCount
+    viewedTeaserCount
+    viewedTeaserByCurrentUser
   }
 `
 
@@ -73,12 +77,6 @@ export const tagsCategoriesAndPinnedFragment = gql`
   fragment tagsCategoriesAndPinned on Post {
     tags {
       id
-    }
-    categories {
-      id
-      slug
-      name
-      icon
     }
     pinnedBy {
       id
