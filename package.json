@@ -37,7 +37,7 @@
     "dotenv": "^8.2.0",
     "expect": "^25.3.0",
     "faker": "Marak/faker.js#master",
-    "graphql-request": "^1.8.2",
+    "graphql-request": "^2.0.0",
     "import": "^0.0.6",
     "jsonwebtoken": "^8.5.1",
     "mock-socket": "^9.0.3",
