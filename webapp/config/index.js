@@ -12,13 +12,12 @@ const environment = {
   PRODUCTION: process.env.NODE_ENV === 'production' || false,
   NUXT_BUILD: process.env.NUXT_BUILD || '.nuxt',
   STYLEGUIDE_DEV: process.env.STYLEGUIDE_DEV || false,
-  RELEASE: process.env.release,
 }
 
 const server = {
   GRAPHQL_URI: process.env.GRAPHQL_URI || 'http://localhost:4000',
   BACKEND_TOKEN: process.env.BACKEND_TOKEN || 'NULL',
-  WEBSOCKETS_URI: process.env.WEBSOCKETS_URI || 'ws://localhost:4000/graphql',
+  WEBSOCKETS_URI: process.env.WEBSOCKETS_URI || 'ws://localhost:3000/api/graphql',
 }
 
 const sentry = {
@@ -29,6 +28,8 @@ const sentry = {
 const options = {
   VERSION: process.env.VERSION || pkg.version,
   DESCRIPTION: process.env.DESCRIPTION || pkg.description,
+  PUBLIC_REGISTRATION: process.env.PUBLIC_REGISTRATION === 'true' || false,
+  INVITE_REGISTRATION: process.env.INVITE_REGISTRATION !== 'false', // default = true
   // Cookies
   COOKIE_EXPIRE_TIME: process.env.COOKIE_EXPIRE_TIME || 730, // Two years by default
   COOKIE_HTTPS_ONLY: process.env.COOKIE_HTTPS_ONLY || process.env.NODE_ENV === 'production', // ensure true in production if not set explicitly

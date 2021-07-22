@@ -185,6 +185,9 @@ export default {
           if (this.suggestionType === HASHTAG && this.query !== '') {
             this.selectItem({ id: this.query })
           }
+          if (this.suggestionType === MENTION && item) {
+            this.selectItem(item)
+          }
           return true
 
         default:
@@ -199,9 +202,14 @@ export default {
 
       const filteredList = items.filter((item) => {
         const itemString = item.slug || item.id
-        return itemString.toLowerCase().includes(query.toLowerCase())
+        return itemString.toLowerCase().startsWith(query.toLowerCase())
       })
-      return filteredList.slice(0, 15)
+      const sortedList = filteredList.sort((itemA, itemB) => {
+        const aString = itemA.slug || itemA.id
+        const bString = itemB.slug || itemB.id
+        return aString.length - bString.length
+      })
+      return sortedList.slice(0, 15)
     },
     sanitizeQuery(query) {
       if (this.suggestionType === HASHTAG) {

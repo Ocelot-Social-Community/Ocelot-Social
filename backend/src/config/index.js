@@ -7,9 +7,8 @@ if (require.resolve) {
   try {
     dotenv.config({ path: require.resolve('../../.env') })
   } catch (error) {
-    if (error.code === 'MODULE_NOT_FOUND') {
-      console.log('WARN: No `.env` file found in `/app` (docker) or `/backend` (no docker)') // eslint-disable-line no-console
-    } else {
+    // This error is thrown when the .env is not found
+    if (error.code !== 'MODULE_NOT_FOUND') {
       throw error
     }
   }
@@ -35,13 +34,14 @@ const required = {
 const server = {
   CLIENT_URI: env.CLIENT_URI || 'http://localhost:3000',
   GRAPHQL_URI: env.GRAPHQL_URI || 'http://localhost:4000',
+  JWT_EXPIRES: env.JWT_EXPIRES || '2y',
 }
 
 const smtp = {
   SMTP_HOST: env.SMTP_HOST,
   SMTP_PORT: env.SMTP_PORT,
-  SMTP_IGNORE_TLS: env.SMTP_IGNORE_TLS === 'true' || true,
-  SMTP_SECURE: env.SMTP_IGNORE_TLS === 'true' || false,
+  SMTP_IGNORE_TLS: env.SMTP_IGNORE_TLS !== 'false', // default = true
+  SMTP_SECURE: env.SMTP_SECURE === 'true',
   SMTP_USERNAME: env.SMTP_USERNAME,
   SMTP_PASSWORD: env.SMTP_PASSWORD,
 }
@@ -82,7 +82,8 @@ const options = {
   SUPPORT_URL: links.SUPPORT,
   APPLICATION_NAME: metadata.APPLICATION_NAME,
   ORGANIZATION_URL: links.ORGANIZATION,
-  PUBLIC_REGISTRATION: env.PUBLIC_REGISTRATION === 'true',
+  PUBLIC_REGISTRATION: env.PUBLIC_REGISTRATION === 'true' || false,
+  INVITE_REGISTRATION: env.INVITE_REGISTRATION !== 'false', // default = true
 }
 
 // Check if all required configs are present

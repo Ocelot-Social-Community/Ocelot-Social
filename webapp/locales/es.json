@@ -98,7 +98,6 @@
     "letsTalk": "Hablemos",
     "loading": "cargando",
     "loadMore": "cargar más",
-    "moreInfo": "Más información",
     "name": "Nombre",
     "organization": "Organización ::: Organizaciones",
     "post": "Mensaje ::: Mensajes",
@@ -116,16 +115,6 @@
     "versus": "Versus"
   },
   "components": {
-    "enter-nonce": {
-      "form": {
-        "description": "Abra su buzón de correo e introduzca el código que le enviamos.",
-        "next": "Continuar",
-        "nonce": "Introduzca el código",
-        "validations": {
-          "length": "debe tener exactamente 6 letras"
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "Error al cambiar la contraseña. ¿Posiblemente un código de seguridad incorrecto?",
@@ -148,18 +137,23 @@
         "success": "¡Su cuenta de usuario ha sido creada!",
         "title": "Crear una cuenta de usuario"
       },
+      "email-nonce": {
+        "form": {
+          "description": "Abra su buzón de correo e introduzca el código que le enviamos.",
+          "next": "Continuar",
+          "nonce": "Introduzca el código",
+          "validations": {
+            "length": "debe tener exactamente 5 letras"
+          }
+        }
+      },
       "signup": {
         "form": {
           "data-privacy": "He leido y entendido la declaración de protección de datos.",
           "description": "Para empezar, introduzca su dirección de correo electrónico:",
           "errors": {
-            "email-exists": "¡Ya hay una cuenta de usuario con esta dirección de correo electrónico!",
-            "invalid-invitation-token": "Parece que el código de invitación ya ha sido canjeado. Cada código sólo se puede utilizar una vez."
+            "email-exists": "¡Ya hay una cuenta de usuario con esta dirección de correo electrónico!"
           },
-          "invitation-code": "Su código de invitación es: <b>{code}</b>",
-          "minimum-age": "Tengo 18 años o más.",
-          "no-commercial": "No tengo intensiones comerciales y no represento una empresa u organización comercial.",
-          "no-political": "No estoy en la red en nombre de un partido o una organización política.",
           "submit": "Crear una cuenta",
           "success": "Se ha enviado un correo electrónico con un enlace de confirmación para el registro a <b>{email}</b>.",
           "terms-and-condition": "Estoy de acuerdo con los términos de uso."
@@ -424,14 +418,6 @@
       "pinnedSuccessfully": "¡Contribución anclado con éxito!",
       "unpin": "Desanclar contribución",
       "unpinnedSuccessfully": "¡Contribución desanclado con éxito!"
-    },
-    "moreInfo": {
-      "description": "Aquí puede encontrar más información sobre este tema.",
-      "name": "Más info",
-      "title": "Más información",
-      "titleOfCategoriesSection": "Categorías",
-      "titleOfHashtagsSection": "Hashtags",
-      "titleOfRelatedContributionsSection": "Contribuciones relacionadas"
     },
     "name": "Contribución",
     "pinned": "Anuncio",
@@ -708,7 +694,7 @@
     "faq": "Preguntas más frecuentes",
     "germany": "Alemania",
     "imprint": "Pie de imprenta",
-    "made": "Hecho con &#10084;",
+    "made": "Hecho con ❤️",
     "register": "Número de registro",
     "responsible": "Responsable según § 55 Abs. 2 RStV (Alemania)",
     "taxident": "Número de identificación del impuesto sobre el valor añadido según el § 27 a de la Ley del Impuesto sobre el Valor Añadido (Alemania)",
@@ -729,9 +715,7 @@
     }
   },
   "termsAndConditions": {
-    "agree": "¡Estoy de acuerdo!",
     "newTermsAndConditions": "Nuevos términos de uso",
-    "termsAndConditionsConfirmed": "He leído y acepto los términos de uso.",
     "termsAndConditionsNewConfirm": "He leído y acepto los nuevos términos de uso.",
     "termsAndConditionsNewConfirmText": "¡Por favor, lea los nuevos términos de uso ahora!"
   },
