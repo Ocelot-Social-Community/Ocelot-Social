@@ -145,7 +145,6 @@
     "letsTalk": "Vamos Conversar",
     "loading": "Carregando",
     "loadMore": "Carregar mais",
-    "moreInfo": "Mais informações",
     "name": "Nome",
     "organization": "Organização ::: Organizações",
     "post": "Postagem ::: Postagens",
@@ -163,16 +162,6 @@
     "versus": "Contra"
   },
   "components": {
-    "enter-nonce": {
-      "form": {
-        "description": "Abra a sua caixa de entrada e digite o código que lhe enviamos.",
-        "next": "Continue",
-        "nonce": "Digite seu código",
-        "validations": {
-          "length": "deve ter 6 caracteres"
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "A alteração da sua senha falhou. Talvez o código de segurança não estava correto?",
@@ -195,16 +184,23 @@
         "success": "A sua conta foi criada!",
         "title": "Criar uma conta de usuário"
       },
+      "email-nonce": {
+        "form": {
+          "description": "Abra a sua caixa de entrada e digite o código que lhe enviamos.",
+          "next": "Continue",
+          "nonce": "Digite seu código",
+          "validations": {
+            "length": "deve ter 5 caracteres"
+          }
+        }
+      },
       "signup": {
         "form": {
           "data-privacy": "Eu li e entendi o Política de Privacidade.",
           "description": "Para começar, digite seu endereço de e-mail:",
           "errors": {
-            "email-exists": "Já existe uma conta de usuário com este endereço de e-mail!",
-            "invalid-invitation-token": "Parece que o convite já foi usado. Os links para convites só podem ser usados uma vez."
+            "email-exists": "Já existe uma conta de usuário com este endereço de e-mail!"
           },
-          "invitation-code": "O seu código de convite é: <b>{code}</b>",
-          "minimum-age": "Tenho 18 anos ou mais.",
           "submit": "Criar uma conta",
           "success": "Um e-mail com um link para completar o seu registo foi enviado para <b>{email}</b>",
           "terms-and-condition": "Eu concordo com os Termos e condições."
@@ -253,7 +249,7 @@
     "success": "Salvo!",
     "teaserImage": {
       "cropperConfirm": "Confirmar",
-      "supportedFormats": "Insira uma imagem do formato JPG, PNG ou GIF"
+      "supportedFormats": "Insira uma imagem do formato JPG, PNG ou GIF!"
     },
     "title": "Título"
   },
@@ -399,14 +395,6 @@
       "pinnedSuccessfully": "Publicação fixada com sucesso!",
       "unpin": "Desafixar publicação",
       "unpinnedSuccessfully": "Publicação desafixada com sucesso!"
-    },
-    "moreInfo": {
-      "description": "Aqui você pode encontrar mais informações sobre este tópico.",
-      "name": "Mais informações",
-      "title": "Mais informações",
-      "titleOfCategoriesSection": "Categorias",
-      "titleOfHashtagsSection": "Hashtags",
-      "titleOfRelatedContributionsSection": "Publicações relacionadas"
     },
     "name": "Postar",
     "pinned": "Anúncio",
@@ -659,7 +647,7 @@
     "faq": "FAQ",
     "germany": "Alemanha",
     "imprint": "Impressão",
-    "made": "Feito com &#10084;",
+    "made": "Feito com ❤️",
     "register": "número de registo",
     "responsible": "Responsável segundo § 55 Abs. 2 RStV (Alemanha) ",
     "taxident": "Número de identificação do imposto sobre o valor acrescentado de acordo com o § 27 da Lei do Imposto sobre o Valor Acrescentado (Alemanha)",
@@ -680,9 +668,7 @@
     }
   },
   "termsAndConditions": {
-    "agree": "Eu concordo!",
     "newTermsAndConditions": "Novos Termos e Condições",
-    "termsAndConditionsConfirmed": "Eu li e confirmei os Terms and Conditions.",
     "termsAndConditionsNewConfirm": "Eu li e concordo com os novos termos de condições.",
     "termsAndConditionsNewConfirmText": "Por favor, leia os novos termos de uso agora!"
   },

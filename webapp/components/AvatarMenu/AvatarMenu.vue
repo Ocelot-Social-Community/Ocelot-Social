@@ -46,6 +46,7 @@
     </template>
   </dropdown>
 </template>
+
 <script>
 import { mapGetters } from 'vuex'
 import Dropdown from '~/components/Dropdown'
@@ -118,6 +119,7 @@ export default {
   },
 }
 </script>
+
 <style lang="scss">
 .avatar-menu {
   margin: $space-xxx-small 0px 0px $space-xx-small;

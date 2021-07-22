@@ -14,6 +14,8 @@ export const searchResults = [
     value: 'User Post by Jenny',
     shoutedCount: 0,
     commentsCount: 4,
+    clickedCount: 8,
+    viewedTeaserCount: 15,
     createdAt: '2019-11-13T03:03:16.155Z',
     author: {
       id: 'u3',
@@ -29,6 +31,8 @@ export const searchResults = [
     value: 'Eum quos est molestiae enim magni consequuntur sed commodi eos.',
     shoutedCount: 0,
     commentsCount: 0,
+    clickedCount: 9,
+    viewedTeaserCount: 2,
     createdAt: '2019-11-13T03:00:45.478Z',
     author: {
       id: 'u6',
@@ -44,6 +48,8 @@ export const searchResults = [
     value: 'This is post #7',
     shoutedCount: 1,
     commentsCount: 1,
+    clickedCount: 1,
+    viewedTeaserCount: 4,
     createdAt: '2019-11-13T03:00:23.098Z',
     author: {
       id: 'u6',
@@ -59,6 +65,8 @@ export const searchResults = [
     value: 'This is post #12',
     shoutedCount: 0,
     commentsCount: 12,
+    clickedCount: 14,
+    viewedTeaserCount: 58,
     createdAt: '2019-11-13T03:00:23.098Z',
     author: {
       id: 'u6',
@@ -112,7 +120,7 @@ export const searchResults = [
   },
 ]
 
-storiesOf('Search Field', module)
+storiesOf('SearchableInput', module)
   .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('test', () => ({
@@ -122,6 +130,6 @@ storiesOf('Search Field', module)
       searchResults,
     }),
     template: `
-      <searchable-input :options="searchResults" />
+      <searchable-input :loading="false" :options="searchResults" />
     `,
   }))

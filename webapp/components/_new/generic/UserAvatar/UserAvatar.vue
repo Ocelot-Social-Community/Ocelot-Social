@@ -1,9 +1,10 @@
 <template>
-  <div :class="['user-avatar', size && `--${this.size}`]">
+  <div :class="['user-avatar', size && `--${this.size}`, !isAvatar && '--no-image']">
+    <!-- '--no-image' is neccessary, because otherwise we still have a little unwanted boarder araund the image for images with white backgrounds -->
     <span class="initials">{{ userInitials }}</span>
     <base-icon v-if="isAnonymous" name="eye-slash" />
     <img
-      v-if="user && user.avatar"
+      v-if="isAvatar"
       :src="user.avatar | proxyApiUrl"
       class="image"
       :alt="user.name"
@@ -33,6 +34,10 @@ export default {
     isAnonymous() {
       return !this.user || !this.user.name || this.user.name.toLowerCase() === 'anonymous'
     },
+    isAvatar() {
+      // TODO may we could test as well if the image is reachable? otherwise the background gets white and the initails can not be read
+      return this.user && this.user.avatar
+    },
     userInitials() {
       if (this.isAnonymous) return ''
 
@@ -49,7 +54,7 @@ export default {
   width: $size-avatar-base;
   border-radius: 50%;
   overflow: hidden;
-  background-color: $color-primary-dark;
+  background-color: $background-color-base;
   color: $text-color-primary-inverse;
 
   &.--small {
@@ -61,6 +66,10 @@ export default {
     width: $size-avatar-large;
     height: $size-avatar-large;
     font-size: $font-size-xx-large;
+  }
+
+  &.--no-image {
+    background-color: $color-primary-dark;
   }
 
   > .initials,
@@ -77,6 +86,7 @@ export default {
     height: 100%;
     object-fit: cover;
     object-position: center;
+    background-color: $background-color-base;
   }
 }
 </style>

@@ -1,59 +1,65 @@
 version: "3.4"
 
 services:
+  ########################################################
+  # WEBAPP ###############################################
+  ########################################################
   webapp:
-    image: ocelotsocialnetwork/develop-webapp:build-and-test
+    image: ocelotsocialnetwork/webapp:development
     build:
-      context: webapp
-      target: build-and-test
-    volumes:
-      - ./webapp:/develop-webapp
+      target: development
     environment:
+      - NODE_ENV="development"
+      # - DEBUG=true
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
-      - PUBLIC_REGISTRATION=true
-    command: yarn run dev
     volumes:
-      - webapp_node_modules:/nitro-web/node_modules
+      # This makes sure the docker container has its own node modules.
+      # Therefore it is possible to have a different node version on the host machine
+      - webapp_node_modules:/app/node_modules
+      # bind the local folder to the docker to allow live reload
+      - ./webapp:/app
+  ########################################################
+  # BACKEND ##############################################
+  ########################################################
   backend:
-    image: ocelotsocialnetwork/develop-backend:build-and-test
+    image: ocelotsocialnetwork/backend:development
     build:
-      context: backend
-      target: build-and-test
-    volumes:
-      - ./backend:/develop-backend
-    command: yarn run dev
+      target: development
     environment:
-      - SMTP_HOST=mailserver
-      - SMTP_PORT=25
-      - SMTP_IGNORE_TLS=true
-      - "DEBUG=${DEBUG}"
-      - PUBLIC_REGISTRATION=false
+      - NODE_ENV="development"
+      - DEBUG=true
     volumes:
-      - backend_node_modules:/develop-backend/node_modules
-      - uploads:/develop-backend/public/uploads
+      # This makes sure the docker container has its own node modules.
+      # Therefore it is possible to have a different node version on the host machine
+      - backend_node_modules:/app/node_modules
+      # bind the local folder to the docker to allow live reload
+      - ./backend:/app
+  ########################################################
+  # NEO4J ################################################
+  ########################################################
   neo4j:
-    volumes:
-      - neo4j_data:/data
-  maintenance:
-    image: ocelotsocialnetwork/develop-maintenance:latest
-    build:
-      context: webapp
-      dockerfile: Dockerfile.maintenance
-    networks:
-      - hc-network
+    image: ocelotsocialnetwork/neo4j:development
     ports:
-      - 3503:80
+      # Also expose the neo4j query browser
+      - 7474:7474
+    networks:
+      # So we can access the neo4j query browser from our host machine
+      - external-net
+  ########################################################
+  # MAINTENANCE ##########################################
+  ########################################################
+  maintenance:
+    image: ocelotsocialnetwork/maintenance:development
+  ########################################################
+  # MAILSERVER TO FAKE SMTP ##############################
+  ########################################################
   mailserver:
     image: djfarrelly/maildev
     ports:
       - 1080:80
     networks:
-      - hc-network
-
-networks:
-  hc-network:
+      - external-net
+      
 volumes:
   webapp_node_modules:
   backend_node_modules:
-  neo4j_data:
-  uploads:

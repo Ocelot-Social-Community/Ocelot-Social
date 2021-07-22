@@ -11,7 +11,8 @@ let variables
 const driver = getDriver()
 const neode = getNeode()
 
-beforeAll(() => {
+beforeAll(async () => {
+  await cleanDatabase()
   const { server } = createServer({
     context: () => {
       return {
@@ -53,7 +54,7 @@ describe('slugifyMiddleware', () => {
   describe('CreatePost', () => {
     const categoryIds = ['cat9']
     const createPostMutation = gql`
-      mutation($title: String!, $content: String!, $categoryIds: [ID]!, $slug: String) {
+      mutation ($title: String!, $content: String!, $categoryIds: [ID]!, $slug: String) {
         CreatePost(title: $title, content: $content, categoryIds: $categoryIds, slug: $slug) {
           slug
         }
@@ -163,7 +164,7 @@ describe('slugifyMiddleware', () => {
 
   describe('SignupVerification', () => {
     const mutation = gql`
-      mutation(
+      mutation (
         $password: String!
         $email: String!
         $name: String!

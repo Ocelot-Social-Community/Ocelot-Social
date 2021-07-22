@@ -5,6 +5,8 @@
       <span class="counts">
         <counter-icon icon="comments" :count="option.commentsCount" soft />
         <counter-icon icon="bullhorn" :count="option.shoutedCount" soft />
+        <counter-icon icon="hand-pointer" :count="option.clickedCount" soft />
+        <counter-icon icon="eye" :count="option.viewedTeaserCount" soft />
       </span>
       {{ option.author.name | truncate(32) }} - {{ option.createdAt | dateTime('dd.MM.yyyy') }}
     </div>
