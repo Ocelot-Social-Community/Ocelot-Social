@@ -9,7 +9,7 @@ const driver = getDriver()
 let authenticatedUser, mutate, query, variables
 
 const updateUserMutation = gql`
-  mutation($id: ID!, $name: String!, $locationName: String) {
+  mutation ($id: ID!, $name: String!, $locationName: String) {
     UpdateUser(id: $id, name: $name, locationName: $locationName) {
       locationName
     }
@@ -17,7 +17,7 @@ const updateUserMutation = gql`
 `
 
 const queryLocations = gql`
-  query($place: String!, $lang: String!) {
+  query ($place: String!, $lang: String!) {
     queryLocations(place: $place, lang: $lang) {
       place_name
       id
@@ -114,10 +114,22 @@ describe('Location Service', () => {
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([
       { id: 'place.14094307404564380', place_name: 'Berlin, Germany' },
-      { id: 'place.15095411613564380', place_name: 'Berlin, Maryland, United States' },
-      { id: 'place.5225018734564380', place_name: 'Berlin, Connecticut, United States' },
-      { id: 'place.16922023226564380', place_name: 'Berlin, New Jersey, United States' },
-      { id: 'place.4035845612564380', place_name: 'Berlin Township, New Jersey, United States' },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin, Maryland, United States',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin, Connecticut, United States',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin, New Jersey, United States',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin Township, New Jersey, United States',
+      },
     ])
   })
 
@@ -128,11 +140,23 @@ describe('Location Service', () => {
     }
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([
-      { id: 'place.14094307404564380', place_name: 'Berlin, Deutschland' },
-      { id: 'place.15095411613564380', place_name: 'Berlin, Maryland, Vereinigte Staaten' },
-      { id: 'place.16922023226564380', place_name: 'Berlin, New Jersey, Vereinigte Staaten' },
-      { id: 'place.10735893248465990', place_name: 'Berlin Heights, Ohio, Vereinigte Staaten' },
-      { id: 'place.1165756679564380', place_name: 'Berlin, Massachusetts, Vereinigte Staaten' },
+      { id: expect.stringMatching(/^place\.[0-9]+$/), place_name: 'Berlin, Deutschland' },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin, Maryland, Vereinigte Staaten',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin, New Jersey, Vereinigte Staaten',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin Heights, Ohio, Vereinigte Staaten',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin, Massachusetts, Vereinigte Staaten',
+      },
     ])
   })
 

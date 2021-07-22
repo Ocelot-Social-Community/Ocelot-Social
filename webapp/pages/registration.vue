@@ -1,33 +1,34 @@
 <template>
-  <ds-container width="small">
-    <base-card>
-      <template #imageColumn>
-        <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
-          <img class="image" alt="Sign up" src="/img/custom/sign-up.svg" />
-        </a>
-      </template>
-      <nuxt-child />
-      <template #topMenu>
-        <locale-switch offset="5" />
-      </template>
-    </base-card>
-  </ds-container>
+  <registration-slider
+    :registrationType="registrationType.method"
+    :activePage="registrationType.activePage"
+    :overwriteSliderData="overwriteSliderData"
+  />
 </template>
 
 <script>
-import links from '~/constants/links.js'
-import metadata from '~/constants/metadata.js'
-import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import RegistrationSlider from '~/components/Registration/RegistrationSlider'
 
 export default {
-  components: {
-    LocaleSwitch,
-  },
   layout: 'no-header',
+  name: 'Registration',
+  components: {
+    RegistrationSlider,
+  },
   data() {
+    const { method = null, email = null, inviteCode = null, nonce = null } = this.$route.query
     return {
-      metadata,
-      links,
+      method,
+      overwriteSliderData: {
+        collectedInputData: {
+          inviteCode,
+          email,
+          emailSend: !!email,
+          nonce,
+        },
+      },
+      publicRegistration: this.$env.PUBLIC_REGISTRATION === true, // for 'false' in .env PUBLIC_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling
+      inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling
     }
   },
   asyncData({ store, redirect }) {
@@ -35,11 +36,37 @@ export default {
       redirect('/')
     }
   },
+  computed: {
+    registrationType() {
+      if (!this.method) {
+        return (
+          (this.publicRegistration && { method: 'public-registration', activePage: null }) ||
+          (this.inviteRegistration && { method: 'invite-code', activePage: null }) || {
+            method: 'no-public-registration',
+            activePage: null,
+          }
+        )
+      } else {
+        if (
+          this.method === 'invite-mail' ||
+          (this.method === 'invite-code' && this.inviteRegistration)
+        ) {
+          if (
+            this.method === 'invite-code' &&
+            this.overwriteSliderData.collectedInputData.inviteCode &&
+            this.overwriteSliderData.collectedInputData.nonce &&
+            this.overwriteSliderData.collectedInputData.email
+          ) {
+            return { method: this.method, activePage: 'enter-nonce' }
+          }
+          return { method: this.method, activePage: null }
+        }
+        return {
+          method: this.publicRegistration ? 'public-registration' : 'no-public-registration',
+          activePage: null,
+        }
+      }
+    },
+  },
 }
 </script>
-
-<style lang="scss">
-.image {
-  width: 100%;
-}
-</style>

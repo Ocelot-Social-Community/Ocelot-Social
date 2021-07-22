@@ -3,7 +3,7 @@
     <base-card>
       <template #imageColumn>
         <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
-          <img class="image" alt="Reset your password" src="/img/custom/password-reset.svg" />
+          <logo logoType="passwordReset" />
         </a>
       </template>
       <nuxt-child />
@@ -18,10 +18,12 @@
 import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import Logo from '~/components/Logo/Logo'
 
 export default {
   components: {
     LocaleSwitch,
+    Logo,
   },
   layout: 'no-header',
   data() {
