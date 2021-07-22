@@ -1,4 +1,5 @@
-import { v4 as uuid } from 'uuid'
 export default function generateNonce() {
-  return uuid().substring(0, 6)
+  return Array.from({ length: 5 }, (n = Math.floor(Math.random() * 10)) => {
+    return String.fromCharCode(n + 48)
+  }).join('')
 }

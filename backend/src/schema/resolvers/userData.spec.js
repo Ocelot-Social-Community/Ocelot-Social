@@ -39,7 +39,7 @@ afterAll(async () => {
 })
 
 const userDataQuery = gql`
-  query($id: ID!) {
+  query ($id: ID!) {
     userData(id: $id) {
       user {
         id
