@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ds-space>
+    <ds-space margin="small">
       <ds-heading tag="h2">{{ $t('site.termsAndConditions') }}</ds-heading>
     </ds-space>
     <ds-container>

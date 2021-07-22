@@ -126,21 +126,18 @@ describe('ChangePassword.vue', () => {
           })
         })
 
-        // TODO This is not a valid testcase - we have to decide if we catch the same password on clientside
-        /* describe('mutation rejects', () => {
+        describe('mutation rejects', () => {
           beforeEach(async () => {
             await wrapper.find('input#oldPassword').setValue('supersecret')
             await wrapper.find('input#password').setValue('supersecret')
             await wrapper.find('input#passwordConfirmation').setValue('supersecret')
+            await wrapper.find('form').trigger('submit')
           })
 
           it('displays error message', async () => {
-            await wrapper.find('form').trigger('submit')
-            await mocks.$apollo.mutate
-
             expect(mocks.$toast.error).toHaveBeenCalledWith('Ouch!')
           })
-        }) */
+        })
       })
     })
   })

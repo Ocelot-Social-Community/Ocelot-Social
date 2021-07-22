@@ -8,17 +8,17 @@
     @input-valid="handleInputValid"
   >
     <ds-input
-      :placeholder="$t('components.enter-nonce.form.nonce')"
+      :placeholder="$t('components.registration.email-nonce.form.nonce')"
       model="nonce"
       name="nonce"
       id="nonce"
       icon="question-circle"
     />
     <ds-text>
-      {{ $t('components.enter-nonce.form.description') }}
+      {{ $t('components.registration.email-nonce.form.description') }}
     </ds-text>
     <base-button :disabled="disabled" filled name="submit" type="submit">
-      {{ $t('components.enter-nonce.form.next') }}
+      {{ $t('components.registration.email-nonce.form.next') }}
     </base-button>
     <slot></slot>
   </ds-form>
@@ -37,10 +37,10 @@ export default {
       formSchema: {
         nonce: {
           type: 'string',
-          min: 6,
-          max: 6,
+          min: 5,
+          max: 5,
           required: true,
-          message: this.$t('components.enter-nonce.form.validations.length'),
+          message: this.$t('components.registration.email-nonce.form.validations.length'),
         },
       },
       disabled: true,
