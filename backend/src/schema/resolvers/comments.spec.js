@@ -36,7 +36,7 @@ afterEach(async () => {
 })
 
 const createCommentMutation = gql`
-  mutation($id: ID, $postId: ID!, $content: String!) {
+  mutation ($id: ID, $postId: ID!, $content: String!) {
     CreateComment(id: $id, postId: $postId, content: $content) {
       id
       content
@@ -128,7 +128,7 @@ describe('CreateComment', () => {
 
 describe('UpdateComment', () => {
   const updateCommentMutation = gql`
-    mutation($content: String!, $id: ID!) {
+    mutation ($content: String!, $id: ID!) {
       UpdateComment(content: $content, id: $id) {
         id
         content
@@ -220,7 +220,7 @@ describe('UpdateComment', () => {
 
 describe('DeleteComment', () => {
   const deleteCommentMutation = gql`
-    mutation($id: ID!) {
+    mutation ($id: ID!) {
       DeleteComment(id: $id) {
         id
         content

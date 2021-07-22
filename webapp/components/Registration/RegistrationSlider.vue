@@ -3,42 +3,32 @@
     <base-card>
       <template #imageColumn>
         <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
-          <img class="image" alt="Welcome" src="/img/custom/welcome.svg" />
+          <logo logoType="signup" />
         </a>
       </template>
 
       <component-slider :sliderData="sliderData">
-        <template #header>
-          <ds-heading size="h2">
-            {{ $t('components.registration.signup.title', metadata) }}
-          </ds-heading>
+        <template #no-public-registration>
+          <registration-slide-no-public :sliderData="sliderData" />
         </template>
 
-        <template v-if="['invite-code'].includes(registrationType)" #enter-invite>
-          <registration-item-enter-invite :sliderData="sliderData" />
+        <template #enter-invite>
+          <registration-slide-invite :sliderData="sliderData" />
         </template>
 
-        <template
-          v-if="['invite-code', 'public-registration'].includes(registrationType)"
-          #enter-email
-        >
-          <!-- Wolle !!! may create same source with 'webapp/pages/registration/signup.vue' -->
-          <!-- <signup v-if="publicRegistration" :invitation="false" @submit="handleSubmitted"> -->
-          <registration-item-enter-email :sliderData="sliderData" :invitation="false" />
+        <template #enter-email>
+          <registration-slide-email :sliderData="sliderData" :invitation="false" />
         </template>
 
-        <template
-          v-if="['invite-code', 'public-registration', 'invite-mail'].includes(registrationType)"
-          #enter-nonce
-        >
-          <registration-item-enter-nonce :sliderData="sliderData" />
+        <template #enter-nonce>
+          <registration-slide-nonce :sliderData="sliderData" />
         </template>
 
         <template #create-user-account>
-          <registration-item-create-user-account :sliderData="sliderData" />
+          <registration-slide-create :sliderData="sliderData" />
         </template>
 
-        <template #footer>
+        <template v-if="registrationType !== 'no-public-registration'" #footer>
           <ds-space margin-bottom="xxx-small" margin-top="small" centered>
             <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
           </ds-space>
@@ -57,93 +47,116 @@ import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
 import ComponentSlider from '~/components/ComponentSlider/ComponentSlider'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
-import RegistrationItemCreateUserAccount from './RegistrationItemCreateUserAccount'
-import RegistrationItemEnterEmail from '~/components/Registration/RegistrationItemEnterEmail'
-import RegistrationItemEnterInvite from './RegistrationItemEnterInvite'
-import RegistrationItemEnterNonce from './RegistrationItemEnterNonce'
+import Logo from '~/components/Logo/Logo'
+import RegistrationSlideCreate from './RegistrationSlideCreate'
+import RegistrationSlideEmail from './RegistrationSlideEmail'
+import RegistrationSlideInvite from './RegistrationSlideInvite'
+import RegistrationSlideNonce from './RegistrationSlideNonce'
+import RegistrationSlideNoPublic from './RegistrationSlideNoPublic'
 
 export default {
   name: 'RegistrationSlider',
   components: {
     ComponentSlider,
     LocaleSwitch,
-    RegistrationItemCreateUserAccount,
-    RegistrationItemEnterEmail,
-    RegistrationItemEnterInvite,
-    RegistrationItemEnterNonce,
+    Logo,
+    RegistrationSlideCreate,
+    RegistrationSlideEmail,
+    RegistrationSlideInvite,
+    RegistrationSlideNonce,
+    RegistrationSlideNoPublic,
   },
   props: {
     registrationType: { type: String, required: true },
     overwriteSliderData: { type: Object, default: () => {} },
+    activePage: { type: String, default: null, required: false },
   },
   data() {
-    const slidersPortfolio = [
-      {
+    const slidersPortfolio = {
+      noPublicRegistration: {
+        name: 'no-public-registration',
+        titleIdent: 'components.registration.no-public-registrstion.title',
+        validated: false,
+        data: { request: null, response: null },
+        button: {
+          titleIdent: 'site.back-to-login',
+          icon: null,
+          callback: this.buttonCallback,
+          sliderCallback: null, // optional set by slot
+        },
+      },
+      enterInvite: {
         name: 'enter-invite',
-        // title: this.$t('components.registration.create-user-account.title'),
-        title: 'Invitation', // Wolle
+        titleIdent: { id: 'components.registration.signup.title', data: metadata },
         validated: false,
         data: { request: null, response: { isValidInviteCode: false } },
         button: {
-          title: 'Next', // Wolle
+          titleIdent: 'components.registration.invite-code.buttonTitle',
           icon: 'arrow-right',
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
         },
       },
-      {
+      enterEmail: {
         name: 'enter-email',
-        title: 'E-Mail', // Wolle
+        titleIdent: 'components.registration.email.title',
         validated: false,
         data: { request: null, response: null },
         button: {
-          title: '', // set by slider component
-          icon: '', // set by slider component
+          titleIdent: 'components.registration.email.buttonTitle.send', // changed by slider component
+          icon: 'envelope', // changed by slider component
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
         },
       },
-      {
+      enterNonce: {
         name: 'enter-nonce',
-        title: 'E-Mail Confirmation', // Wolle
+        titleIdent: 'components.registration.email-nonce.title',
         validated: false,
-        data: { request: null, response: null },
+        data: { request: null, response: { VerifyNonce: false } },
         button: {
-          title: 'Confirm', // Wolle
+          titleIdent: 'components.registration.email-nonce.buttonTitle',
           icon: 'arrow-right',
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
         },
       },
-      {
+      createUserAccount: {
         name: 'create-user-account',
-        title: this.$t('components.registration.create-user-account.title'),
+        titleIdent: 'components.registration.create-user-account.title',
         validated: false,
         data: { request: null, response: null },
         button: {
-          // title: this.$t('actions.save'), // Wolle
-          title: 'Create', // Wolle
+          titleIdent: 'components.registration.create-user-account.buttonTitle',
           icon: 'check',
+          loading: false,
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
         },
       },
-    ]
+    }
     let sliders = []
     switch (this.registrationType) {
+      case 'no-public-registration':
+        sliders = [slidersPortfolio.noPublicRegistration]
+        break
       case 'invite-code':
         sliders = [
-          slidersPortfolio[0],
-          slidersPortfolio[1],
-          slidersPortfolio[2],
-          slidersPortfolio[3],
+          slidersPortfolio.enterInvite,
+          slidersPortfolio.enterEmail,
+          slidersPortfolio.enterNonce,
+          slidersPortfolio.createUserAccount,
         ]
         break
       case 'public-registration':
-        sliders = [slidersPortfolio[1], slidersPortfolio[2], slidersPortfolio[3]]
+        sliders = [
+          slidersPortfolio.enterEmail,
+          slidersPortfolio.enterNonce,
+          slidersPortfolio.createUserAccount,
+        ]
         break
       case 'invite-mail':
-        sliders = [slidersPortfolio[2], slidersPortfolio[3]]
+        sliders = [slidersPortfolio.enterNonce, slidersPortfolio.createUserAccount]
         break
     }
 
@@ -159,14 +172,11 @@ export default {
           name: null,
           password: null,
           passwordConfirmation: null,
-          about: null,
           termsAndConditionsConfirmed: null,
-          dataPrivacy: null,
-          minimumAge: null,
-          noCommercial: null,
-          noPolitical: null,
+          recieveCommunicationAsEmailsEtcConfirmed: null,
         },
-        sliderIndex: 0,
+        sliderIndex:
+          this.activePage === null ? 0 : sliders.findIndex((el) => el.name === this.activePage),
         sliders: sliders,
         sliderSelectorCallback: this.sliderSelectorCallback,
         setSliderValuesCallback: this.setSliderValuesCallback,
@@ -180,11 +190,15 @@ export default {
     },
   },
   methods: {
-    setSliderValuesCallback(isValid, { collectedInputData, sliderData, sliderSettings }) {
+    setSliderValuesCallback(
+      isValid = null,
+      { collectedInputData, sliderData, sliderSettings } = {},
+    ) {
       // all changes of 'this.sliders' has to be filled in from the top to be spread to the component slider and all slider components in the slot
 
-      this.sliderData.sliders[this.sliderIndex].validated = isValid
-
+      if (isValid !== null) {
+        this.sliderData.sliders[this.sliderIndex].validated = isValid
+      }
       if (collectedInputData) {
         this.sliderData.collectedInputData = {
           ...this.sliderData.collectedInputData,
@@ -204,14 +218,17 @@ export default {
         }
       }
       if (sliderSettings) {
-        const { buttonTitle, buttonIcon, buttonSliderCallback } = sliderSettings
-        if (buttonTitle) {
-          this.sliderData.sliders[this.sliderIndex].button.title = buttonTitle
+        const { buttonTitleIdent, buttonIcon, buttonLoading, buttonSliderCallback } = sliderSettings
+        if (buttonTitleIdent !== undefined) {
+          this.sliderData.sliders[this.sliderIndex].button.titleIdent = buttonTitleIdent
         }
-        if (buttonIcon) {
+        if (buttonIcon !== undefined) {
           this.sliderData.sliders[this.sliderIndex].button.icon = buttonIcon
         }
-        if (buttonSliderCallback) {
+        if (buttonLoading !== undefined) {
+          this.sliderData.sliders[this.sliderIndex].button.loading = buttonLoading
+        }
+        if (buttonSliderCallback !== undefined) {
           this.sliderData.sliders[this.sliderIndex].button.sliderCallback = buttonSliderCallback
         }
       }
@@ -221,6 +238,10 @@ export default {
 
       if (selectedIndex <= this.sliderIndex + 1 && selectedIndex < this.sliderData.sliders.length) {
         this.sliderData.sliderIndex = selectedIndex
+
+        if (this.sliderData.sliders[this.sliderIndex].button.loading !== undefined) {
+          this.sliderData.sliders[this.sliderIndex].button.loading = false
+        }
       }
     },
     buttonCallback(success) {
