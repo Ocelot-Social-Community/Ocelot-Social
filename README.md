@@ -12,11 +12,13 @@ ocelot.social is a nonprofit social, action and knowledge network that connects 
 * **Knowledge**: Read articles about interesting topics and find related posts in the **More Info** tab or by **Filtering** based on **Categories** and **Tagging** or by using the **Fulltext Search**.
 * **Action**: Don't just read about how to make the world a better place, but come into **Action** by following provided suggestions on the **Action** tab provided by other people or **Organisations**.
 
- [![Ocelot-Social](webapp/static/img/custom/welcome.svg)](https://ocelot.social)
+<p align="center">
+  <img src="webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%">
+</p>
 
 ## Live demo
 
-Try out our deployed [development environment](https://develop.human-connection.org/).
+__Try out our deployed [development environment](https://develop.human-connection.org/).__
 
 Logins:
 
@@ -29,9 +31,9 @@ Logins:
 ## Directory Layout
 
 There are four important directories:
+
 * [Backend](./backend) runs on the server and is a middleware between database and frontend
 * [Frontend](./webapp) is a server-side-rendered and client-side-rendered web frontend
-* [Deployment](./deployment) configuration for kubernetes
 * [Cypress](./cypress) contains end-to-end tests and executable feature specifications
 
 In order to setup the application and start to develop features you have to
@@ -45,16 +47,19 @@ There are two approaches:
 ## Installation
 
 ### Clone the Repository
+
 Clone the repository, this will create a new folder called `Ocelot-Social`:
 
 Using HTTPS:
+
 ```bash
 $ git clone https://github.com/Ocelot-Social-Community/Ocelot-Social.git
 ```
 
 Using SSH:
+
 ```bash
-$ git clone git@github.com:Human-Connection/Human-Connection.git
+$ git clone git@github.com:Ocelot-Social-Community/Ocelot-Social.git
 ```
 
 Change into the new folder.
@@ -87,25 +92,33 @@ docker-compose version 1.23.2
 #### Start Ocelot-Social via Docker-Compose
 
 For Development:
+
 ```bash
-docker-compose up
+$ docker-compose up
 ```
 
-For Production
+For Production:
+
 ```bash
-docker-compose -f docker-compose.yml up
+$ docker-compose -f docker-compose.yml up
 ```
 
 This will start all required Docker containers
 
+## Deployment
+
+Deployment methods can be found in the [Ocelot-Social-Deploy-Rebranding](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding) repository.
+
+The only deployment method in this repository is `docker-compose` for development purposes as described above.
+
 ## Developer Chat
 
-Join our friendly open-source community on [Discord](https://discordapp.com/invite/DFSjPaX) :heart_eyes_cat:
+Join our friendly open-source community on [Discord](https://discord.gg/AJSX9DCSUA) :heart_eyes_cat:
 Just introduce yourself at `#introduce-yourself` and mention `@@Mentor` to get you onboard :neckbeard:
 Check out the [contribution guideline](./CONTRIBUTING.md), too!
 
 We give write permissions to every developer who asks for it. Just text us on
-[Discord](https://discord.gg/6ub73U3).
+[Discord](https://discord.gg/AJSX9DCSUA).
 
 ## Technology Stack
 
@@ -124,4 +137,5 @@ Browser compatibility testing with [BrowserStack](https://www.browserstack.com/)
 <img alt="BrowserStack Logo" src=".gitbook/assets/browserstack-logo.svg" width="256">
 
 ## License
+
 See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
