@@ -9,7 +9,7 @@ const driver = getDriver()
 let authenticatedUser, mutate, query, variables
 
 const updateUserMutation = gql`
-  mutation($id: ID!, $name: String!, $locationName: String) {
+  mutation ($id: ID!, $name: String!, $locationName: String) {
     UpdateUser(id: $id, name: $name, locationName: $locationName) {
       locationName
     }
@@ -17,7 +17,7 @@ const updateUserMutation = gql`
 `
 
 const queryLocations = gql`
-  query($place: String!, $lang: String!) {
+  query ($place: String!, $lang: String!) {
     queryLocations(place: $place, lang: $lang) {
       place_name
       id

@@ -40,8 +40,8 @@ const server = {
 const smtp = {
   SMTP_HOST: env.SMTP_HOST,
   SMTP_PORT: env.SMTP_PORT,
-  SMTP_IGNORE_TLS: env.SMTP_IGNORE_TLS === 'true' || true,
-  SMTP_SECURE: env.SMTP_IGNORE_TLS === 'true' || false,
+  SMTP_IGNORE_TLS: env.SMTP_IGNORE_TLS !== 'false', // default = true
+  SMTP_SECURE: env.SMTP_SECURE === 'true',
   SMTP_USERNAME: env.SMTP_USERNAME,
   SMTP_PASSWORD: env.SMTP_PASSWORD,
 }
