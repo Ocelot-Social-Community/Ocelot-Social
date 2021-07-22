@@ -38,7 +38,9 @@ const searchPostsSetup = {
     __typename: labels(resource)[0],
     author: properties(author),
     commentsCount: toString(size(comments)),
-    shoutedCount: toString(size(shouter))
+    shoutedCount: toString(size(shouter)),
+    clickedCount: toString(resource.clickedCount),
+    viewedTeaserCount: toString(resource.viewedTeaserCount)
   }`,
   limit: 'LIMIT $limit',
 }

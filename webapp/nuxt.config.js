@@ -27,7 +27,7 @@ export default {
   },
 
   env: {
-    release: CONFIG.VERSION,
+    ...CONFIG,
     // pages which do NOT require a login
     publicPages: [
       'login',
@@ -35,9 +35,7 @@ export default {
       'password-reset-request',
       'password-reset-enter-nonce',
       'password-reset-change-password',
-      'registration-signup',
-      'registration-enter-nonce',
-      'registration-create-user-account',
+      'registration',
       'pages-slug',
       'terms-and-conditions',
       'code-of-conduct',
@@ -115,6 +113,7 @@ export default {
     { src: '~/plugins/izi-toast.js', ssr: false },
     { src: '~/plugins/vue-filters.js' },
     { src: '~/plugins/vue-infinite-loading.js', ssr: false },
+    { src: '~/plugins/vue-observe-visibility.js', ssr: false },
   ],
 
   router: {

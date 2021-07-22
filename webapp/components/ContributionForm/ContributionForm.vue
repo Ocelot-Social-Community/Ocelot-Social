@@ -19,6 +19,7 @@
             :class="[formData.imageBlurred && '--blur-image']"
             @addHeroImage="addHeroImage"
             @addImageAspectRatio="addImageAspectRatio"
+            @addImageType="addImageType"
           />
         </template>
         <div v-if="formData.image" class="blur-toggle">
@@ -84,7 +85,11 @@ export default {
   },
   data() {
     const { title, content, image } = this.contribution
-    const { sensitive: imageBlurred = false, aspectRatio: imageAspectRatio = null } = image || {}
+    const {
+      sensitive: imageBlurred = false,
+      aspectRatio: imageAspectRatio = null,
+      type: imageType = null,
+    } = image || {}
 
     return {
       links,
@@ -93,6 +98,7 @@ export default {
         content: content || '',
         image: image || null,
         imageAspectRatio,
+        imageType,
         imageBlurred,
       },
       formSchema: {
@@ -125,6 +131,7 @@ export default {
         if (this.imageUpload) {
           image.upload = this.imageUpload
           image.aspectRatio = this.formData.imageAspectRatio
+          image.type = this.formData.imageType
         }
       }
       this.loading = true
@@ -172,6 +179,9 @@ export default {
     },
     addImageAspectRatio(aspectRatio) {
       this.formData.imageAspectRatio = aspectRatio
+    },
+    addImageType(imageType) {
+      this.formData.imageType = imageType
     },
   },
   apollo: {

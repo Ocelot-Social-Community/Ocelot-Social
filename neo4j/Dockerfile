@@ -3,13 +3,16 @@
 ##################################################################################
 FROM neo4j:3.5.14 as community
 
-# ENVs (available in production aswell, can be overwritten by commandline or env file)
+# ENVs
 ## We Cannot do `$(date -u +'%Y-%m-%dT%H:%M:%SZ')` here so we use unix timestamp=0
-ENV BUILD_DATE="1970-01-01T00:00:00.00Z"
-## We cannot do $(yarn run version).${BUILD_NUMBER} here so we default to 0.0.0.0
-ENV BUILD_VERSION="0.0.0.0"
+ARG BBUILD_DATE="1970-01-01T00:00:00.00Z"
+ENV BUILD_DATE=$BBUILD_DATE
+## We cannot do $(yarn run version)-${BUILD_NUMBER} here so we default to 0.0.0-0
+ARG BBUILD_VERSION="0.0.0-0"
+ENV BUILD_VERSION=$BBUILD_VERSION
 ## We cannot do `$(git rev-parse --short HEAD)` here so we default to 0000000
-ENV BUILD_COMMIT="0000000"
+ARG BBUILD_COMMIT="0000000"
+ENV BUILD_COMMIT=$BBUILD_COMMIT
 
 # Labels
 LABEL org.label-schema.build-date="${BUILD_DATE}"

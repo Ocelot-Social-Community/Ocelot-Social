@@ -53,8 +53,8 @@ export async function mergeImage(resource, relationshipType, imageInput, opts = 
   if (!(existingImage || upload)) throw new UserInputError('Cannot find image for given resource')
   if (existingImage && upload) deleteImageFile(existingImage, deleteCallback)
   const url = await uploadImageFile(upload, uploadCallback)
-  const { alt, sensitive, aspectRatio } = imageInput
-  const image = { alt, sensitive, aspectRatio, url }
+  const { alt, sensitive, aspectRatio, type } = imageInput
+  const image = { alt, sensitive, aspectRatio, url, type }
   txResult = await transaction.run(
     `
     MATCH (resource {id: $resource.id})

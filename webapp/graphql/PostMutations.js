@@ -118,5 +118,12 @@ export default () => {
         }
       }
     `,
+    markTeaserAsViewed: gql`
+      mutation($id: ID!) {
+        markTeaserAsViewed(id: $id) {
+          id
+        }
+      }
+    `,
   }
 }

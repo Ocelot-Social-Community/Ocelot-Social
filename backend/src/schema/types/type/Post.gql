@@ -156,6 +156,14 @@ type Post {
       statement: "MATCH (this)<-[:SHOUTED]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1"
     )
 
+  clickedCount: Int!
+
+  viewedTeaserCount: Int!
+  viewedTeaserByCurrentUser: Boolean!
+    @cypher(
+      statement: "MATCH (this)<-[:VIEWED_TEASER]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1"
+    )
+  
   emotions: [EMOTED]
   emotionsCount: Int!
     @cypher(statement: "MATCH (this)<-[emoted:EMOTED]-(:User) RETURN COUNT(DISTINCT emoted)")
@@ -193,6 +201,7 @@ type Mutation {
   RemovePostEmotions(to: _PostInput!, data: _EMOTEDInput!): EMOTED
   pinPost(id: ID!): Post
   unpinPost(id: ID!): Post
+  markTeaserAsViewed(id: ID!): Post
 }
 
 type Query {

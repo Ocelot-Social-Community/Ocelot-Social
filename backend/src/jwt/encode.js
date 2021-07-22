@@ -5,7 +5,7 @@ import CONFIG from './../config'
 export default function encode(user) {
   const { id, name, slug } = user
   const token = jwt.sign({ id, name, slug }, CONFIG.JWT_SECRET, {
-    expiresIn: '1d',
+    expiresIn: CONFIG.JWT_EXPIRES,
     issuer: CONFIG.GRAPHQL_URI,
     audience: CONFIG.CLIENT_URI,
     subject: user.id.toString(),

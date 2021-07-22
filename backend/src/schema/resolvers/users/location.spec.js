@@ -9,7 +9,7 @@ const driver = getDriver()
 let authenticatedUser, mutate, query, variables
 
 const updateUserMutation = gql`
-  mutation($id: ID!, $name: String!, $locationName: String) {
+  mutation ($id: ID!, $name: String!, $locationName: String) {
     UpdateUser(id: $id, name: $name, locationName: $locationName) {
       locationName
     }
@@ -17,7 +17,7 @@ const updateUserMutation = gql`
 `
 
 const queryLocations = gql`
-  query($place: String!, $lang: String!) {
+  query ($place: String!, $lang: String!) {
     queryLocations(place: $place, lang: $lang) {
       place_name
       id
@@ -30,46 +30,46 @@ const newlyCreatedNodesWithLocales = [
     city: {
       id: expect.stringContaining('place'),
       type: 'place',
-      name: 'Hamburg',
-      nameEN: 'Hamburg',
-      nameDE: 'Hamburg',
-      namePT: 'Hamburg',
-      nameES: 'Hamburg',
-      nameFR: 'Hamburg',
-      nameIT: 'Hamburg',
-      nameRU: 'Хамбург',
-      nameNL: 'Hamburg',
-      namePL: 'Hamburg',
-      lng: -74.5763,
-      lat: 41.1534,
+      name: 'Welzheim',
+      nameEN: 'Welzheim',
+      nameDE: 'Welzheim',
+      namePT: 'Welzheim',
+      nameES: 'Welzheim',
+      nameFR: 'Welzheim',
+      nameIT: 'Welzheim',
+      nameRU: 'Вельцхайм',
+      nameNL: 'Welzheim',
+      namePL: 'Welzheim',
+      lng: 9.63444,
+      lat: 48.87472,
     },
     state: {
       id: expect.stringContaining('region'),
       type: 'region',
-      name: 'New Jersey',
-      nameEN: 'New Jersey',
-      nameDE: 'New Jersey',
-      namePT: 'Nova Jérsia',
-      nameES: 'Nueva Jersey',
-      nameFR: 'New Jersey',
-      nameIT: 'New Jersey',
-      nameRU: 'Нью-Джерси',
-      nameNL: 'New Jersey',
-      namePL: 'New Jersey',
+      name: 'Baden-Württemberg',
+      nameDE: 'Baden-Württemberg',
+      nameEN: 'Baden-Württemberg',
+      nameES: 'Baden-Wurtemberg',
+      nameFR: 'Bade-Wurtemberg',
+      nameIT: 'Baden-Württemberg',
+      nameNL: 'Baden-Württemberg',
+      namePL: 'Badenia-Wirtembergia',
+      namePT: 'Baden-Württemberg',
+      nameRU: 'Баден-Вюртемберг',
     },
     country: {
       id: expect.stringContaining('country'),
       type: 'country',
-      name: 'United States',
-      nameEN: 'United States',
-      nameDE: 'Vereinigte Staaten',
-      namePT: 'Estados Unidos',
-      nameES: 'Estados Unidos',
-      nameFR: 'États-Unis',
-      nameIT: "Stati Uniti d'America",
-      nameRU: 'Соединённые Штаты Америки',
-      nameNL: 'Verenigde Staten van Amerika',
-      namePL: 'Stany Zjednoczone',
+      name: 'Germany',
+      nameDE: 'Deutschland',
+      nameEN: 'Germany',
+      nameES: 'Alemania',
+      nameFR: 'Allemagne',
+      nameIT: 'Germania',
+      nameNL: 'Duitsland',
+      namePL: 'Niemcy',
+      namePT: 'Alemanha',
+      nameRU: 'Германия',
     },
   },
 ]
@@ -114,10 +114,22 @@ describe('Location Service', () => {
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([
       { id: 'place.14094307404564380', place_name: 'Berlin, Germany' },
-      { id: 'place.15095411613564380', place_name: 'Berlin, Maryland, United States' },
-      { id: 'place.5225018734564380', place_name: 'Berlin, Connecticut, United States' },
-      { id: 'place.16922023226564380', place_name: 'Berlin, New Jersey, United States' },
-      { id: 'place.4035845612564380', place_name: 'Berlin Township, New Jersey, United States' },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin, Maryland, United States',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin, Connecticut, United States',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin, New Jersey, United States',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin Township, New Jersey, United States',
+      },
     ])
   })
 
@@ -128,11 +140,23 @@ describe('Location Service', () => {
     }
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([
-      { id: 'place.14094307404564380', place_name: 'Berlin, Deutschland' },
-      { id: 'place.15095411613564380', place_name: 'Berlin, Maryland, Vereinigte Staaten' },
-      { id: 'place.16922023226564380', place_name: 'Berlin, New Jersey, Vereinigte Staaten' },
-      { id: 'place.10735893248465990', place_name: 'Berlin Heights, Ohio, Vereinigte Staaten' },
-      { id: 'place.1165756679564380', place_name: 'Berlin, Massachusetts, Vereinigte Staaten' },
+      { id: expect.stringMatching(/^place\.[0-9]+$/), place_name: 'Berlin, Deutschland' },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin, Maryland, Vereinigte Staaten',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin, New Jersey, Vereinigte Staaten',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin Heights, Ohio, Vereinigte Staaten',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9]+$/),
+        place_name: 'Berlin, Massachusetts, Vereinigte Staaten',
+      },
     ])
   })
 
@@ -170,7 +194,7 @@ describe('userMiddleware', () => {
         ...variables,
         id: 'updating-user',
         name: 'Updating user',
-        locationName: 'Hamburg, New Jersey, United States of America',
+        locationName: 'Welzheim, Baden-Württemberg, Germany',
       }
       await mutate({ mutation: updateUserMutation, variables })
       const locations = await neode.cypher(

@@ -15,6 +15,7 @@ import hashtags from './hashtags/hashtagsMiddleware'
 import email from './email/emailMiddleware'
 import sentry from './sentryMiddleware'
 import languages from './languages/languages'
+import userInteractions from './userInteractions'
 
 export default (schema) => {
   const middlewares = {
@@ -32,6 +33,7 @@ export default (schema) => {
     includedFields,
     orderBy,
     languages,
+    userInteractions,
   }
 
   let order = [
@@ -40,6 +42,7 @@ export default (schema) => {
     'xss',
     // 'activityPub', disabled temporarily
     'validation',
+    'userInteractions',
     'sluggify',
     'languages',
     'excerpt',

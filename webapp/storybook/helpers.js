@@ -81,6 +81,8 @@ const helpers = {
         slug: faker.lorem.slug(title),
         shoutedCount: faker.random.number(),
         commentsCount: faker.random.number(),
+        clickedCount: faker.random.number(),
+        viewedTeaserCount: faker.random.number(),
       }
     })
   },

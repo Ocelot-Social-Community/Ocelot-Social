@@ -1,6 +1,7 @@
 import { rule, shield, deny, allow, or } from 'graphql-shield'
 import { getNeode } from '../db/neo4j'
 import CONFIG from '../config'
+import { validateInviteCode } from '../schema/resolvers/transactions/inviteCodes'
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true
@@ -87,7 +88,14 @@ const noEmailFilter = rule({
   return !('email' in args)
 })
 
-const publicRegistration = rule()(() => !!CONFIG.PUBLIC_REGISTRATION)
+const publicRegistration = rule()(() => CONFIG.PUBLIC_REGISTRATION)
+
+const inviteRegistration = rule()(async (_parent, args, { user, driver }) => {
+  if (!CONFIG.INVITE_REGISTRATION) return false
+  const { inviteCode } = args
+  const session = driver.session()
+  return validateInviteCode(session, inviteCode)
+})
 
 // Permissions
 export default shield(
@@ -121,13 +129,15 @@ export default shield(
       userData: isAuthenticated,
       MyInviteCodes: isAuthenticated,
       isValidInviteCode: allow,
+      VerifyNonce: allow,
       queryLocations: isAuthenticated,
+      availableRoles: isAdmin,
+      getInviteCode: isAuthenticated, // and inviteRegistration
     },
     Mutation: {
       '*': deny,
       login: allow,
-      SignupByInvitation: allow,
-      Signup: or(publicRegistration, isAdmin),
+      Signup: or(publicRegistration, inviteRegistration, isAdmin),
       SignupVerification: allow,
       UpdateUser: onlyYourself,
       CreatePost: isAuthenticated,
@@ -166,6 +176,8 @@ export default shield(
       unpinPost: isAdmin,
       UpdateDonations: isAdmin,
       GenerateInviteCode: isAuthenticated,
+      switchUserRole: isAdmin,
+      markTeaserAsViewed: allow,
     },
     User: {
       email: or(isMyOwn, isAdmin),

@@ -63,6 +63,7 @@
         "placeholder": "e-mail, name or description"
       },
       "name": "Users",
+      "roleChanged": "Role changed successfully!",
       "table": {
         "columns": {
           "createdAt": "Created at",
@@ -101,7 +102,6 @@
     "letsTalk": "Let`s Talk",
     "loading": "loading",
     "loadMore": "load more",
-    "moreInfo": "More Info",
     "name": "Name",
     "organization": "Organization ::: Organizations",
     "post": "Post ::: Posts",
@@ -119,16 +119,6 @@
     "versus": "Versus"
   },
   "components": {
-    "enter-nonce": {
-      "form": {
-        "description": "Open your inbox and enter the code that we've sent to you.",
-        "next": "Continue",
-        "nonce": "Enter your code",
-        "validations": {
-          "length": "must be 6 characters long"
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "Changing your password failed. Maybe the security code was not correct?",
@@ -146,23 +136,68 @@
     },
     "registration": {
       "create-user-account": {
+        "buttonTitle": "Create",
         "error": "No user account could be created!",
         "help": " Maybe the confirmation was invalid? In case of problems, feel free to ask for help by sending us a mail to:",
+        "recieveCommunicationAsEmailsEtcConfirmed": "I also agree to receive e-mails and other forms of communication (e.g. push notifications).",
         "success": "Your account has been created!",
+        "termsAndCondsEtcConfirmed": "I have read, understand and agree to the following:",
         "title": "Create user account"
+      },
+      "email": {
+        "buttonTitle": {
+          "resend": "Resend e-mail",
+          "send": "Send e-mail",
+          "skipResend": "Skip resend"
+        },
+        "form": {
+          "sendEmailAgain": "Send e-mail again",
+          "success": "Verification e-mail send to <b>{email}</b>!"
+        },
+        "title": "E-Mail"
+      },
+      "email-display": {
+        "warningFormat": "⚠️ E-mail has wrong format!",
+        "warningUndef": "⚠️ No e-mail defined!",
+        "yourEmail": "Your e-mail address:"
+      },
+      "email-nonce": {
+        "buttonTitle": "Confirm",
+        "form": {
+          "description": "Open your inbox and enter the code that we've sent to you.",
+          "next": "Continue",
+          "nonce": "E-mail code: 32143",
+          "validations": {
+            "error": "Invalid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!",
+            "length": "must be 5 characters long",
+            "success": "Valid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!"
+          }
+        },
+        "title": "E-Mail Confirmation"
+      },
+      "invite-code": {
+        "buttonTitle": "Next",
+        "form": {
+          "description": "Enter the invitation code you received.",
+          "invite-code": "Invite code: ACJERB",
+          "next": "Continue",
+          "validations": {
+            "error": "Invalid invite code <b>{inviteCode}</b>!",
+            "length": "must be 6 characters long",
+            "success": "Valid invite code <b>{inviteCode}</b>!"
+          }
+        }
+      },
+      "no-public-registrstion": {
+        "title": "No Public Registration"
       },
       "signup": {
         "form": {
-          "data-privacy": "I have read and understood the <a href=\"/data-privacy\" target=\"_blank\"><ds-text bold color=\"primary\">Privacy Statement</ds-text></a>.",
+          "data-privacy": "I have read and understood the privacy statement.",
           "description": "To get started, you can register here for free:",
           "errors": {
-            "email-exists": "There is already a user account with this e-mail address!",
-            "invalid-invitation-token": "It looks like as if the invitation has been used already. Invitation links can only be used once."
+            "email-exists": "There is already a user account with this e-mail address!"
           },
-          "invitation-code": "Your invitation code is: <b>{code}</b>",
-          "minimum-age": "I'm 18 years or older.",
-          "no-commercial": "I have no commercial interests and I am not representing a company or any other commercial organisation on the network.",
-          "no-political": "I am not on behalf of a party or political organization in the network.",
           "submit": "Create an account",
           "success": "A mail with a link to complete your registration has been sent to <b>{email}</b>",
           "terms-and-condition": "I confirm to the  <a href=\"/terms-and-conditions\" target=\"_blank\"><ds-text bold color=\"primary\">Terms and conditions</ds-text></a>."
@@ -173,8 +208,10 @@
     }
   },
   "contribution": {
+    "amount-clicks": "{amount} clicks",
     "amount-comments": "{amount} comments",
     "amount-shouts": "{amount} recommendations",
+    "amount-views": "{amount} views",
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} of {max} categories selected"
     },
@@ -213,8 +250,10 @@
     "newPost": "Create a new Post",
     "success": "Saved!",
     "teaserImage": {
+      "cropImage": "Crop image",
       "cropperConfirm": "Confirm",
       "errors": {
+        "aspect-ratio-too-small": "This image is too high.",
         "unSupported-file-format": "Please upload an image of file format: JPG, JPEG, PNG or GIF!"
       },
       "supportedFormats": "Insert a picture of file format JPG, PNG or GIF"
@@ -274,6 +313,20 @@
       "addLetter": "Type a letter",
       "noHashtagsFound": "No hashtags found"
     },
+    "legend": {
+      "bold": "Bold",
+      "heading3": "Heading 3",
+      "heading4": "Heading 4",
+      "italic": "Italic",
+      "legendTitle": "Keyboard shortcuts and markdown code",
+      "link": "Link",
+      "orderedList": "Ordered list",
+      "paragraph": "Paragraph",
+      "quote": "Quote",
+      "ruler": "Ruler",
+      "underline": "Underline",
+      "unorderedList": "Unordered list"
+    },
     "mention": {
       "noUsersFound": "No users found"
     },
@@ -310,6 +363,12 @@
   "index": {
     "change-filter-settings": "Change your filter settings to get more results.",
     "no-results": "No contributions found."
+  },
+  "invite-codes": {
+    "copy-code": "Code:",
+    "copy-success": "Invite code copied to clipboard",
+    "not-available": "You have no valid invite code available!",
+    "your-code": "Copy your invite code to the clipboard:"
   },
   "login": {
     "email": "Your E-mail",
@@ -438,14 +497,6 @@
       "pinnedSuccessfully": "Post pinned successfully!",
       "unpin": "Unpin post",
       "unpinnedSuccessfully": "Post unpinned successfully!"
-    },
-    "moreInfo": {
-      "description": "Here you can find more information about this topic.",
-      "name": "More info",
-      "title": "More information",
-      "titleOfCategoriesSection": "Categories",
-      "titleOfHashtagsSection": "Hashtags",
-      "titleOfRelatedContributionsSection": "Related posts"
     },
     "name": "Post",
     "pinned": "Announcement",
@@ -734,7 +785,7 @@
     "faq": "FAQ",
     "germany": "Germany",
     "imprint": "Imprint",
-    "made": "Made with &#10084;",
+    "made": "Made with ❤️",
     "register": "Registry number",
     "responsible": "responsible for contents of this page (§ 55 Abs. 2 RStV)",
     "taxident": "USt-ID. according to §27a of the German Sales Tax Law:",
@@ -755,9 +806,7 @@
     }
   },
   "termsAndConditions": {
-    "agree": "I agree!",
     "newTermsAndConditions": "New Terms and Conditions",
-    "termsAndConditionsConfirmed": "I have read and confirmed the Terms and Conditions.",
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
   },

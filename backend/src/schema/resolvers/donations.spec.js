@@ -9,7 +9,7 @@ const instance = getNeode()
 const driver = getDriver()
 
 const updateDonationsMutation = gql`
-  mutation($goal: Int, $progress: Int) {
+  mutation ($goal: Int, $progress: Int) {
     UpdateDonations(goal: $goal, progress: $progress) {
       id
       goal
