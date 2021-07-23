@@ -22,5 +22,5 @@ export default async ({ store, env, route, redirect }) => {
     params.path = route.path
   }
 
-  return redirect('/registration/signup', params)
+  return redirect('/registration', params)
 }

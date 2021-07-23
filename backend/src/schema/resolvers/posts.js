@@ -76,7 +76,6 @@ export default {
   },
   Mutation: {
     CreatePost: async (_parent, params, context, _resolveInfo) => {
-      const { categoryIds } = params
       const { image: imageInput } = params
       delete params.categoryIds
       delete params.image
@@ -89,16 +88,14 @@ export default {
             SET post += $params
             SET post.createdAt = toString(datetime())
             SET post.updatedAt = toString(datetime())
+            SET post.clickedCount = 0
+            SET post.viewedTeaserCount = 0
             WITH post
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
-            WITH post
-            UNWIND $categoryIds AS categoryId
-            MATCH (category:Category {id: categoryId})
-            MERGE (post)-[:CATEGORIZED]->(category)
             RETURN post {.*}
           `,
-          { userId: context.user.id, categoryIds, params },
+          { userId: context.user.id, params },
         )
         const [post] = createPostTransactionResponse.records.map((record) => record.get('post'))
         if (imageInput) {
@@ -320,13 +317,38 @@ export default {
       }
       return unpinnedPost
     },
+    markTeaserAsViewed: async (_parent, params, context, _resolveInfo) => {
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const transactionResponse = await transaction.run(
+          `
+          MATCH (post:Post { id: $params.id })
+          MATCH (user:User { id: $userId })
+          MERGE (user)-[relation:VIEWED_TEASER { }]->(post)
+          ON CREATE
+          SET relation.createdAt = toString(datetime()),
+          post.viewedTeaserCount = post.viewedTeaserCount + 1
+          RETURN post
+        `,
+          { userId: context.user.id, params },
+        )
+        return transactionResponse.records.map((record) => record.get('post').properties)
+      })
+      try {
+        const [post] = await writeTxResultPromise
+        post.viewedTeaserCount = post.viewedTeaserCount.low
+        return post
+      } finally {
+        session.close()
+      }
+    },
   },
   Post: {
     ...Resolver('Post', {
       undefinedToNull: ['activityId', 'objectId', 'language', 'pinnedAt', 'pinned'],
       hasMany: {
         tags: '-[:TAGGED]->(related:Tag)',
-        categories: '-[:CATEGORIZED]->(related:Category)',
+        // categories: '-[:CATEGORIZED]->(related:Category)',
         comments: '<-[:COMMENTS]-(related:Comment)',
         shoutedBy: '<-[:SHOUTED]-(related:User)',
         emotions: '<-[related:EMOTED]',
@@ -346,6 +368,8 @@ export default {
       boolean: {
         shoutedByCurrentUser:
           'MATCH(this)<-[:SHOUTED]-(related:User {id: $cypherParams.currentUserId}) RETURN COUNT(related) >= 1',
+        viewedTeaserByCurrentUser:
+          'MATCH (this)<-[:VIEWED_TEASER]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1',
       },
     }),
     relatedContributions: async (parent, params, context, resolveInfo) => {

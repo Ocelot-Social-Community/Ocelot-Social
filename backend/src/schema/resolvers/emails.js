@@ -6,6 +6,27 @@ import Validator from 'neode/build/Services/Validator.js'
 import normalizeEmail from './helpers/normalizeEmail'
 
 export default {
+  Query: {
+    VerifyNonce: async (_parent, args, context, _resolveInfo) => {
+      const session = context.driver.session()
+      const readTxResultPromise = session.readTransaction(async (txc) => {
+        const result = await txc.run(
+          `
+            MATCH (email:EmailAddress {email: $email, nonce: $nonce})
+            RETURN count(email) > 0 AS result
+          `,
+          { email: args.email, nonce: args.nonce },
+        )
+        return result
+      })
+      try {
+        const txResult = await readTxResultPromise
+        return txResult.records[0].get('result')
+      } finally {
+        session.close()
+      }
+    },
+  },
   Mutation: {
     AddEmailAddress: async (_parent, args, context, _resolveInfo) => {
       let response
