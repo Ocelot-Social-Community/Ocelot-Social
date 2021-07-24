@@ -76,6 +76,22 @@ describe('ChangePassword ', () => {
             })
           })
         })
+
+        describe('password reset not successful', () => {
+          beforeEach(() => {
+            mocks.$apollo.mutate = jest.fn().mockRejectedValue({
+              message: 'Ouch!',
+            })
+            wrapper = Wrapper()
+            wrapper.find('input#password').setValue('supersecret')
+            wrapper.find('input#passwordConfirmation').setValue('supersecret')
+            wrapper.find('form').trigger('submit')
+          })
+
+          it('display a toast error', () => {
+            expect(mocks.$toast.error).toHaveBeenCalled()
+          })
+        })
       })
     })
   })

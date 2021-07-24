@@ -1,10 +1,11 @@
 import mustache from 'mustache'
 import CONFIG from '../../config'
+import logosWebapp from '../../config/logos.js'
 
 import * as templates from './templates'
 
 const from = CONFIG.EMAIL_DEFAULT_SENDER
-const welcomeImageUrl = new URL(`/img/custom/welcome.svg`, CONFIG.CLIENT_URI)
+const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
 
 const defaultParams = {
   supportUrl: CONFIG.SUPPORT_URL,

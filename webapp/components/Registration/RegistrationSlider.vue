@@ -3,7 +3,7 @@
     <base-card>
       <template #imageColumn>
         <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
-          <img class="image" alt="Welcome" src="/img/custom/welcome.svg" />
+          <logo logoType="signup" />
         </a>
       </template>
 
@@ -47,6 +47,7 @@ import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
 import ComponentSlider from '~/components/ComponentSlider/ComponentSlider'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import Logo from '~/components/Logo/Logo'
 import RegistrationSlideCreate from './RegistrationSlideCreate'
 import RegistrationSlideEmail from './RegistrationSlideEmail'
 import RegistrationSlideInvite from './RegistrationSlideInvite'
@@ -58,6 +59,7 @@ export default {
   components: {
     ComponentSlider,
     LocaleSwitch,
+    Logo,
     RegistrationSlideCreate,
     RegistrationSlideEmail,
     RegistrationSlideInvite,
