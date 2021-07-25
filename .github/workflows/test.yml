@@ -253,7 +253,6 @@ jobs:
       ##########################################################################
       # COVERAGE REPORT FRONTEND ################################################
       ##########################################################################
-      # TODO: Maybe remove this later on to avoid spam?
       #- name: frontend | Coverage report
       #  uses: romeovs/lcov-reporter-action@v0.2.21
       #  with:
@@ -268,7 +267,7 @@ jobs:
           report_name: Coverage Webapp
           type: lcov
           result_path: ./coverage/lcov.info
-          min_coverage: 52
+          min_coverage: 65
           token: ${{ github.token }}
 
   ##############################################################################
