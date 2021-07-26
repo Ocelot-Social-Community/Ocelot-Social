@@ -31,6 +31,7 @@ Logins:
 ## Directory Layout
 
 There are four important directories:
+
 * [Backend](./backend) runs on the server and is a middleware between database and frontend
 * [Frontend](./webapp) is a server-side-rendered and client-side-rendered web frontend
 * [Cypress](./cypress) contains end-to-end tests and executable feature specifications
@@ -46,16 +47,19 @@ There are two approaches:
 ## Installation
 
 ### Clone the Repository
+
 Clone the repository, this will create a new folder called `Ocelot-Social`:
 
 Using HTTPS:
+
 ```bash
 $ git clone https://github.com/Ocelot-Social-Community/Ocelot-Social.git
 ```
 
 Using SSH:
+
 ```bash
-$ git clone git@github.com:Human-Connection/Human-Connection.git
+$ git clone git@github.com:Ocelot-Social-Community/Ocelot-Social.git
 ```
 
 Change into the new folder.
@@ -88,13 +92,15 @@ docker-compose version 1.23.2
 #### Start Ocelot-Social via Docker-Compose
 
 For Development:
+
 ```bash
-docker-compose up
+$ docker-compose up
 ```
 
-For Production
+For Production:
+
 ```bash
-docker-compose -f docker-compose.yml up
+$ docker-compose -f docker-compose.yml up
 ```
 
 This will start all required Docker containers
@@ -107,12 +113,12 @@ The only deployment method in this repository is `docker-compose` for developmen
 
 ## Developer Chat
 
-Join our friendly open-source community on [Discord](https://discordapp.com/invite/DFSjPaX) :heart_eyes_cat:
+Join our friendly open-source community on [Discord](https://discord.gg/AJSX9DCSUA) :heart_eyes_cat:
 Just introduce yourself at `#introduce-yourself` and mention `@@Mentor` to get you onboard :neckbeard:
 Check out the [contribution guideline](./CONTRIBUTING.md), too!
 
 We give write permissions to every developer who asks for it. Just text us on
-[Discord](https://discord.gg/6ub73U3).
+[Discord](https://discord.gg/AJSX9DCSUA).
 
 ## Technology Stack
 
@@ -131,4 +137,5 @@ Browser compatibility testing with [BrowserStack](https://www.browserstack.com/)
 <img alt="BrowserStack Logo" src=".gitbook/assets/browserstack-logo.svg" width="256">
 
 ## License
+
 See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
