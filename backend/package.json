@@ -112,7 +112,7 @@
     "request": "~2.88.2",
     "sanitize-html": "~1.22.0",
     "slug": "~4.0.2",
-    "subscriptions-transport-ws": "^0.9.16",
+    "subscriptions-transport-ws": "^0.9.19",
     "trunc-html": "~1.1.2",
     "uuid": "~8.3.2",
     "validator": "^13.0.0",
