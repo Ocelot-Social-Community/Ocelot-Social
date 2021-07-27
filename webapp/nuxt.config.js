@@ -27,7 +27,7 @@ export default {
   },
 
   env: {
-    release: CONFIG.VERSION,
+    ...CONFIG,
     // pages which do NOT require a login
     publicPages: [
       'login',
@@ -35,15 +35,16 @@ export default {
       'password-reset-request',
       'password-reset-enter-nonce',
       'password-reset-change-password',
-      'registration-signup',
-      'registration-enter-nonce',
-      'registration-create-user-account',
+      'registration',
       'pages-slug',
+      'organization',
+      'support',
       'terms-and-conditions',
       'code-of-conduct',
       'changelog',
       'imprint',
       'data-privacy',
+      'faq',
     ],
     // pages to keep alive
     keepAlivePages: ['index'],

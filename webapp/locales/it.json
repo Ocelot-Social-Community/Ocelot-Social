@@ -105,7 +105,6 @@
     "letsTalk": "Discutiamo",
     "loading": "Caricamento in corso",
     "loadMore": "Caricare di più",
-    "moreInfo": "Ulteriori informazioni",
     "name": "Nome",
     "organization": "Organizzazione ::: Organizzazioni",
     "post": "Messaggio ::: Messaggi",
@@ -123,16 +122,6 @@
     "versus": "Verso"
   },
   "components": {
-    "enter-nonce": {
-      "form": {
-        "description": null,
-        "next": null,
-        "nonce": null,
-        "validations": {
-          "length": null
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "Modifica della password non riuscita. Forse il codice di sicurezza non era corretto?",
@@ -155,16 +144,23 @@
         "success": null,
         "title": null
       },
+      "email-nonce": {
+        "form": {
+          "description": null,
+          "next": null,
+          "nonce": null,
+          "validations": {
+            "length": null
+          }
+        }
+      },
       "signup": {
         "form": {
           "data-privacy": null,
           "description": null,
           "errors": {
-            "email-exists": null,
-            "invalid-invitation-token": "Sembra che l'invito sia già stato utilizzato. I link di invito possono essere utilizzati una sola volta."
+            "email-exists": null
           },
-          "invitation-code": null,
-          "minimum-age": null,
           "submit": null,
           "success": null,
           "terms-and-condition": null
@@ -363,14 +359,6 @@
       "pinnedSuccessfully": null,
       "unpin": null,
       "unpinnedSuccessfully": null
-    },
-    "moreInfo": {
-      "description": null,
-      "name": "Ulteriori informazioni",
-      "title": null,
-      "titleOfCategoriesSection": null,
-      "titleOfHashtagsSection": null,
-      "titleOfRelatedContributionsSection": null
     },
     "name": "Messaggio",
     "pinned": null,
@@ -624,7 +612,7 @@
     "faq": null,
     "germany": "Germania",
     "imprint": "Impressum",
-    "made": "Con &#10084; fatto",
+    "made": "Con ❤️ fatto",
     "register": "numero di registro",
     "responsible": "Responsabile ai sensi del § 55 Abs. 2 RStV (Germania)",
     "taxident": "Numero di identificazione dell'imposta sul valore aggiunto ai sensi del § 27 a Legge sull'imposta sul valore aggiunto (Germania)",
@@ -645,9 +633,7 @@
     }
   },
   "termsAndConditions": {
-    "agree": "Sono d'accordo!",
     "newTermsAndConditions": "Nuovi Termini e Condizioni",
-    "termsAndConditionsConfirmed": "Ho letto e confermato i Termini e condizioni.",
     "termsAndConditionsNewConfirm": "Ho letto e accetto le nuove condizioni generali di contratto.",
     "termsAndConditionsNewConfirmText": "Si prega di leggere le nuove condizioni d'uso ora!"
   },

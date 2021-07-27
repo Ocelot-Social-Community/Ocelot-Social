@@ -24,6 +24,7 @@ export default ({ app = {} }) => {
       }
       return accounting.formatNumber(value || 0, precision, thousands, decimals)
     },
+    // doesn't truncate in the middle of words
     truncate: (value = '', length = -1) => {
       if (!value || typeof value !== 'string' || value.length <= 0) {
         return ''
@@ -32,6 +33,19 @@ export default ({ app = {} }) => {
         return value
       }
       return trunc(value, length).html
+    },
+    // truncates in the middle of words
+    truncateStr: (value = '', length = -1) => {
+      if (!value || typeof value !== 'string' || value.length <= 0) {
+        return ''
+      }
+      if (length <= 0) {
+        return value
+      }
+      if (length < value.length) {
+        return value.substring(0, length) + '…'
+      }
+      return value
     },
     list: (value, glue = ', ', truncate = 0) => {
       if (!Array.isArray(value) || !value.length) {
