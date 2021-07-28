@@ -19,6 +19,7 @@ const postQuery = gql`
 
 beforeAll(async () => {
   await cleanDatabase()
+
   aUser = await Factory.build('user', {
     id: 'a-user',
   })

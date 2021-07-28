@@ -54,6 +54,7 @@ const reviewMutation = gql`
 describe('moderate resources', () => {
   beforeAll(async () => {
     await cleanDatabase()
+
     authenticatedUser = undefined
     const { server } = createServer({
       context: () => {
@@ -65,6 +66,10 @@ describe('moderate resources', () => {
       },
     })
     mutate = createTestClient(server).mutate
+  })
+
+  afterAll(async () => {
+    await cleanDatabase()
   })
 
   beforeEach(async () => {
@@ -104,6 +109,7 @@ describe('moderate resources', () => {
     )
   })
 
+  // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
   afterEach(async () => {
     await cleanDatabase()
   })
