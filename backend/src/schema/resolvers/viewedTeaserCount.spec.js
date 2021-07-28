@@ -13,6 +13,7 @@ let variables
 
 beforeAll(async () => {
   await cleanDatabase()
+
   const { server } = createServer({
     context: () => {
       return {

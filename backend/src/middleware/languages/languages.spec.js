@@ -12,6 +12,8 @@ const driver = getDriver()
 const neode = getNeode()
 
 beforeAll(async () => {
+  await cleanDatabase()
+
   const { server } = createServer({
     context: () => {
       return {
@@ -43,7 +45,6 @@ describe('languagesMiddleware', () => {
   }
 
   beforeAll(async () => {
-    await cleanDatabase()
     const user = await Factory.build('user')
     authenticatedUser = await user.toJson()
     await Factory.build('category', {
