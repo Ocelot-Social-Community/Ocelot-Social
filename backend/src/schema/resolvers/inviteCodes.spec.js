@@ -19,7 +19,6 @@ const generateInviteCodeMutation = gql`
     }
   }
 `
-
 const myInviteCodesQuery = gql`
   query {
     MyInviteCodes {
@@ -29,7 +28,6 @@ const myInviteCodesQuery = gql`
     }
   }
 `
-
 const isValidInviteCodeQuery = gql`
   query ($code: ID!) {
     isValidInviteCode(code: $code)
@@ -38,6 +36,7 @@ const isValidInviteCodeQuery = gql`
 
 beforeAll(async () => {
   await cleanDatabase()
+
   const { server } = createServer({
     context: () => {
       return {
