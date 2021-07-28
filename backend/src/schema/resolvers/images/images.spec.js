@@ -9,10 +9,22 @@ const uuid = '[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-
 let uploadCallback
 let deleteCallback
 
-beforeEach(async () => {
+beforeAll(async () => {
   await cleanDatabase()
+})
+
+afterAll(async () => {
+  await cleanDatabase()
+})
+
+beforeEach(async () => {
   uploadCallback = jest.fn(({ uniqueFilename }) => `/uploads/${uniqueFilename}`)
   deleteCallback = jest.fn()
+})
+
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
+afterEach(async () => {
+  await cleanDatabase()
 })
 
 describe('deleteImage', () => {

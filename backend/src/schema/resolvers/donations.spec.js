@@ -29,6 +29,14 @@ const donationsQuery = gql`
   }
 `
 
+beforeAll(async () => {
+  await cleanDatabase()
+})
+
+afterAll(async () => {
+  await cleanDatabase()
+})
+
 describe('donations', () => {
   let currentUser, newlyCreatedDonations
   beforeAll(async () => {
@@ -52,6 +60,7 @@ describe('donations', () => {
     newlyCreatedDonations = await Factory.build('donations')
   })
 
+  // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
   afterEach(async () => {
     await cleanDatabase()
   })
