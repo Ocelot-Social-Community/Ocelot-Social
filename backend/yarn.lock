@@ -1289,7 +1289,7 @@
     url-regex "~4.1.1"
     video-extensions "~1.1.0"
 
-"@metascraper/helpers@^5.11.6", "@metascraper/helpers@^5.11.8", "@metascraper/helpers@^5.14.22", "@metascraper/helpers@^5.14.26", "@metascraper/helpers@^5.23.0", "@metascraper/helpers@^5.23.1":
+"@metascraper/helpers@^5.11.8", "@metascraper/helpers@^5.14.22", "@metascraper/helpers@^5.14.26", "@metascraper/helpers@^5.23.0", "@metascraper/helpers@^5.23.1":
   version "5.23.1"
   resolved "https://registry.yarnpkg.com/@metascraper/helpers/-/helpers-5.23.1.tgz#f8fa40dd3e37fa1ac8596e48ed7ea73e2230ba46"
   integrity sha512-lOf9RViEqR+aNltjvf2arjxQ2SXvQZ63A9voLwDISAB4l6sOhOEkwRCL6YSS4blkcGe1KN9r/cTxgFEenU2egA==
@@ -7068,12 +7068,12 @@ metascraper-date@^5.11.8:
   dependencies:
     "@metascraper/helpers" "^5.11.8"
 
-metascraper-description@^5.11.6:
-  version "5.11.6"
-  resolved "https://registry.yarnpkg.com/metascraper-description/-/metascraper-description-5.11.6.tgz#515368b5ca88cb5fa1fd92c0946458795b03960f"
-  integrity sha512-rGD6hEWLHPlZ/091htCoFAJGft2oRDAaAoDcnafMdTBcuukBIpZ3QNOR3rYpliWHbpS8cwiX2Q9IawyqB4iK0g==
+metascraper-description@^5.23.1:
+  version "5.23.1"
+  resolved "https://registry.yarnpkg.com/metascraper-description/-/metascraper-description-5.23.1.tgz#f83df32a7dd095e1403700335bbb7c8025ed6a5f"
+  integrity sha512-fuZpnWXLf/l8XvCsgXXu5BjXAoryYQANN/qUarBs50O+5ZQWWvd40wb6jxkpD7rUBP7Dz6YFO44oICYz6TwT4g==
   dependencies:
-    "@metascraper/helpers" "^5.11.6"
+    "@metascraper/helpers" "^5.23.1"
 
 metascraper-image@^5.11.8:
   version "5.11.8"
@@ -7105,12 +7105,12 @@ metascraper-logo@^5.14.26:
   dependencies:
     "@metascraper/helpers" "^5.14.26"
 
-metascraper-publisher@^5.23.0:
-  version "5.23.0"
-  resolved "https://registry.yarnpkg.com/metascraper-publisher/-/metascraper-publisher-5.23.0.tgz#fa5e9e515e15a882dfe7ba399fd1692283989666"
-  integrity sha512-zV3Q4k03nmqBtXUUbVRD6MuzLhLxGllJd2bTVM5bRaHNqzkL44/DE1cdbbOws8UJ74BNkdE5nKbMMWe9h75yMw==
+metascraper-publisher@^5.23.1:
+  version "5.23.1"
+  resolved "https://registry.yarnpkg.com/metascraper-publisher/-/metascraper-publisher-5.23.1.tgz#e9bcef2eb7ba186df9666305accbc6d3b300b414"
+  integrity sha512-GHIhep854rDNGEo9khRMZ9UKthRh0mRBB99Dx6SNySUrpyf0XmMj16p2pFTk5tMiT8XL/Q330TqfmrZkC6CPgg==
   dependencies:
-    "@metascraper/helpers" "^5.23.0"
+    "@metascraper/helpers" "^5.23.1"
 
 metascraper-soundcloud@^5.23.0:
   version "5.23.0"
