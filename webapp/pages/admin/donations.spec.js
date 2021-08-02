@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import { mount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import Donations from './donations.vue'
@@ -15,7 +16,7 @@ describe('donations.vue', () => {
     then: jest.fn(),
     catch: jest.fn(),
   })
-  
+
   beforeEach(() => {
     mocks = {
       $t: jest.fn((string) => string),
@@ -117,7 +118,7 @@ describe('donations.vue', () => {
         // wrapper.find('[data-test="donations-goal"]').setValue('20000')
         wrapper.find('#donations-goal').setValue('20000')
         await wrapper.vm.$nextTick()
-        console.log(wrapper.find('#donations-goal').element.value)
+        // console.log(wrapper.find('#donations-goal').element.value)
         expect(wrapper.vm.formData.goal).toBe('20000')
       })
     })
@@ -126,8 +127,8 @@ describe('donations.vue', () => {
       it.skip('query is called', () => {
         expect(donationsQueryMock).toHaveBeenCalledTimes(1)
         expect(mocks.$apollo.queries.Donations.refetch).toHaveBeenCalledTimes(1)
-        // expect(mocks.$apollo.Donations.query().exists()).toBeTruthy()
-        console.log('mocks.$apollo: ', mocks.$apollo)
+        expect(mocks.$apollo.Donations.query().exists()).toBeTruthy()
+        // console.log('mocks.$apollo: ', mocks.$apollo)
       })
 
       it.skip('query result is displayed', () => {
@@ -142,11 +143,11 @@ describe('donations.vue', () => {
         beforeEach(() => {
           jest.clearAllMocks()
         })
-        
+
         it('calls mutation with default values once', () => {
           // TODO: Makes the warning: "UnhandledPromiseRejectionWarning: TypeError: Cannot read property 'error' of undefined"
           wrapper.find('.donations-info-button').trigger('submit')
-          //await flushPromises()
+          // await flushPromises()
           expect(donationsMutaionMock).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: false, goal: 15000, progress: 0 },
@@ -156,13 +157,13 @@ describe('donations.vue', () => {
 
         it('calls mutation with input values once', async () => {
           wrapper.find('#showDonations').trigger('click') // set to true
-          //wrapper.find('[data-test="donations-goal"]').setValue('20000')
+          // wrapper.find('[data-test="donations-goal"]').setValue('20000')
           wrapper.find('#donations-goal').setValue('20000')
           await wrapper.vm.$nextTick()
           // expect(wrapper.vm.formData.goal).toBe('20000')
           wrapper.find('.donations-info-button').trigger('submit')
           await wrapper.vm.$nextTick()
-          //await mocks.$apollo.mutate
+          // await mocks.$apollo.mutate
           await flushPromises()
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
