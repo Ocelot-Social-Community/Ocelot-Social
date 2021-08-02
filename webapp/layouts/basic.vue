@@ -10,7 +10,17 @@
             </a>
           </ds-flex-item>
           <ds-flex-item width="20%" style="flex-grow: 0">
-            <locale-switch class="topbar-locale-switch" placement="top" offset="16" />
+            <div
+              class="main-navigation-right"
+              style="flex-basis: auto"
+            >
+              <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
+              <template v-if="!isLoggedIn">
+                <client-only>
+                  <login-button placement="top" />
+                </client-only>
+              </template>
+            </div>
           </ds-flex-item>
         </ds-flex>
       </ds-container>
@@ -26,18 +36,26 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import seo from '~/mixins/seo'
 import Logo from '~/components/Logo/Logo'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
-import seo from '~/mixins/seo'
+import LoginButton from '~/components/LoginButton/LoginButton'
 import PageFooter from '~/components/PageFooter/PageFooter'
 
 export default {
   components: {
     Logo,
     LocaleSwitch,
+    LoginButton,
     PageFooter,
   },
   mixins: [seo],
+  computed: {
+    ...mapGetters({
+      isLoggedIn: 'auth/isLoggedIn',
+    }),
+  },
   methods: {
     redirectToRoot() {
       this.$router.replace('/')
@@ -45,3 +63,51 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+// Wolle .topbar-locale-switch {
+//   display: flex;
+//   margin-right: $space-xx-small;
+//   align-self: center;
+//   display: inline-flex;
+// }
+// .main-container {
+//   padding-top: 6rem;
+//   padding-bottom: 5rem;
+// }
+
+// .main-navigation-flex {
+//   align-items: center;
+// }
+
+// .main-navigation {
+//   a {
+//     color: $text-color-soft;
+//   }
+// }
+.main-navigation-right {
+  display: flex;
+  justify-content: flex-end;
+}
+.main-navigation-right .desktop-view {
+  float: right;
+}
+// Wolle .ds-flex-item.mobile-hamburger-menu {
+//   margin-left: auto;
+//   text-align: right;
+// }
+// @media only screen and (min-width: 730px) {
+//   .mobile-hamburger-menu {
+//     display: none;
+//   }
+// }
+// @media only screen and (max-width: 730px) {
+//   #nav-search-box,
+//   .main-navigation-right {
+//     margin: 10px 0px;
+//   }
+//   .hide-mobile-menu {
+//     display: none;
+//   }
+// }
+</style>

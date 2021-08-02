@@ -17,11 +17,10 @@ import links from '~/constants/links.js'
 import InternalPage from '~/components/_new/features/InternalPage/InternalPage.vue'
 
 export default {
+  layout: 'basic',
   components: {
     InternalPage,
   },
-  // Wolle 
-  layout: 'basic',
   data() {
     // Wolle console.log(links.ORGANIZATION)
     return { links }

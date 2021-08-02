@@ -34,7 +34,6 @@ export default {
       title: this.$t(this.pageParams.internalPage.headTitleIdent),
     }
   },
-  // layout: 'basic',
   // components: {
   //   Logo,
   // },
