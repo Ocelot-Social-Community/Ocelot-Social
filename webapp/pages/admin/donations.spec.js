@@ -157,14 +157,10 @@ describe('donations.vue', () => {
 
         it('calls mutation with input values once', async () => {
           wrapper.find('#showDonations').trigger('click') // set to true
-          // wrapper.find('[data-test="donations-goal"]').setValue('20000')
-          wrapper.find('#donations-goal').setValue('20000')
           await wrapper.vm.$nextTick()
-          // expect(wrapper.vm.formData.goal).toBe('20000')
+          wrapper.find('#donations-goal').setValue('20000')          
           wrapper.find('.donations-info-button').trigger('submit')
           await wrapper.vm.$nextTick()
-          // await mocks.$apollo.mutate
-          await flushPromises()
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: true, goal: 20000, progress: 0 },
