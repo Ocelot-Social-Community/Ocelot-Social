@@ -10,9 +10,11 @@ const ORGANIZATION = {
   internalLink: '/organization', // static, don't change! internal page in case no external is defined
   internalPage: {
     footerIdent: 'site.made', // localized string identifier
-    // Wolle headlineIdent: null, // on null default is used, on empty string it's hidden
-    headlineIdent: '', // localized string identifier. on null default is used, on empty string it's hidden
-    hasBaseCard: true,
+    headTitleIdent: 'site.made', // localized string identifier
+    // Wolle headlineIdent: 'site.made', // localized string identifier. on null it's hidden, on empty string default is used
+    headlineIdent: null, // localized string identifier. on null it's hidden, on empty string default is used
+    hasContainer: true,
+    hasBaseCard: true, // no baseCard without a container
     hasLoginInHeader: true,
   },
 }
@@ -26,7 +28,8 @@ const DONATE = {
   internalLink: '/donate', // static, don't change! internal page in case no external is defined
   internalPage: {
     footerIdent: 'site.donate', // localized string identifier
-    headlineIdent: null, // localized string identifier. on null default is used, on empty string it's hidden
+    headTitleIdent: 'site.donate', // localized string identifier
+    headlineIdent: null, // localized string identifier. on null it's hidden, on empty string default is used
     hasBaseCard: true,
     hasLoginInHeader: true,
   },
@@ -41,7 +44,8 @@ const IMPRINT = {
   internalLink: '/imprint', // static, don't change! internal page in case no external is defined
   internalPage: {
     footerIdent: 'site.imprint', // localized string identifier
-    headlineIdent: null, // localized string identifier. on null default is used, on empty string it's hidden
+    headTitleIdent: 'site.imprint', // localized string identifier
+    headlineIdent: null, // localized string identifier. on null it's hidden, on empty string default is used
     hasBaseCard: true,
     hasLoginInHeader: true,
   },
@@ -55,7 +59,8 @@ const TERMS_AND_CONDITIONS = {
   internalLink: '/terms-and-conditions', // static, don't change! internal page in case no external is defined
   internalPage: {
     footerIdent: 'site.termsAndConditions', // localized string identifier
-    headlineIdent: null, // localized string identifier. on null default is used, on empty string it's hidden
+    headTitleIdent: 'site.termsAndConditions', // localized string identifier
+    headlineIdent: null, // localized string identifier. on null it's hidden, on empty string default is used
     hasBaseCard: true,
     hasLoginInHeader: true,
   },
@@ -69,7 +74,8 @@ const CODE_OF_CONDUCT = {
   internalLink: '/code-of-conduct', // static, don't change! internal page in case no external is defined
   internalPage: {
     footerIdent: 'site.code-of-conduct', // localized string identifier
-    headlineIdent: null, // localized string identifier. on null default is used, on empty string it's hidden
+    headTitleIdent: 'site.code-of-conduct', // localized string identifier
+    headlineIdent: null, // localized string identifier. on null it's hidden, on empty string default is used
     hasBaseCard: true,
     hasLoginInHeader: true,
   },
@@ -83,7 +89,8 @@ const DATA_PRIVACY = {
   internalLink: '/data-privacy', // static, don't change! internal page in case no external is defined
   internalPage: {
     footerIdent: 'site.data-privacy', // localized string identifier
-    headlineIdent: null, // localized string identifier. on null default is used, on empty string it's hidden
+    headTitleIdent: 'site.data-privacy', // localized string identifier
+    headlineIdent: null, // localized string identifier. on null it's hidden, on empty string default is used
     hasBaseCard: true,
     hasLoginInHeader: true,
   },
@@ -98,8 +105,9 @@ const FAQ = {
   internalLink: '/faq', // static, don't change! internal page in case no external is defined
   internalPage: {
     footerIdent: 'site.faq', // localized string identifier
+    headTitleIdent: 'site.faq', // localized string identifier
     // Wolle headlineIdent: null, // on null default is used, on empty string it's hidden
-    headlineIdent: null, // localized string identifier. on null default is used, on empty string it's hidden
+    headlineIdent: null, // localized string identifier. on null it's hidden, on empty string default is used
     hasBaseCard: true,
     hasLoginInHeader: true,
   },

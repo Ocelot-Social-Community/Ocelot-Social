@@ -26,12 +26,12 @@
 </template>
 
 <script>
-import { isInternalPage } from '~/components/utils/InternalPages.js'
 import links from '~/constants/links.js'
+import { isInternalPage } from '~/components/utils/InternalPages.js'
 
 export default {
   data() {
-    return { isInternalPage, links, version: `v${this.$env.VERSION}` }
+    return { links, isInternalPage, version: `v${this.$env.VERSION}` }
   },
 }
 </script>
