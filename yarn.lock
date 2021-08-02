@@ -4448,15 +4448,28 @@ neo-async@^2.6.0:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.1.tgz#ac27ada66167fa8849a6addd837f6b189ad2081c"
   integrity sha512-iyam8fBuCUpWeKPGpaNMetEocMt364qkCsfL9JuhjXX6dRnguRVOfk2GZaDpPjcOKiiXCPINZC1GczQ7iTq3Zw==
 
-neo4j-driver@^4.0.2, neo4j-driver@^4.2.2:
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/neo4j-driver/-/neo4j-driver-4.2.3.tgz#238c98cef329ff0fb11f9884360c4ff4650b2409"
-  integrity sha512-HCJ7+J5V/5yhP+b6G2zTb7SKlAN/oLYaMkD8Bo8L9veScDtgDHBlbkbYEHf1YSAd67OfjZKeF9l84J8Kjdw91g==
+neo4j-driver-bolt-connection@^4.3.2:
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/neo4j-driver-bolt-connection/-/neo4j-driver-bolt-connection-4.3.2.tgz#5cce9f6b9275d97bc51106440c2f3c6ce4f1bc48"
+  integrity sha512-Jhgs5VDj0+xJsmnjl3ph9tddBR8SLfqOV9h3hAFdehGIXU1GvMBoamnsymgfWPrf1XF05I9QZK5TG+rPVlbvPg==
+  dependencies:
+    neo4j-driver-core "^4.3.2"
+    text-encoding-utf-8 "^1.0.2"
+
+neo4j-driver-core@^4.3.2:
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/neo4j-driver-core/-/neo4j-driver-core-4.3.2.tgz#18cdbf43a63b324914a56d1fec54acd41b1a01f3"
+  integrity sha512-RFQAnIz/osp63msghEU1yNKZJOpyu99Ch/DU15o+RvdYTgvReewWXoThadnCzqfcuCrNqAq2lMC3SxDO284aSw==
+
+neo4j-driver@^4.2.2, neo4j-driver@^4.3.2:
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/neo4j-driver/-/neo4j-driver-4.3.2.tgz#5f5fc91f5b2496f7eb7917a69d8a101c13af01bc"
+  integrity sha512-upU+EP3rEH029+2XBDG9GF406IILdckUx8D6oTyuIaH+La0aFI5Q8F52bXLDUVt9tmPx7GKO4kyb7EQSty4B9g==
   dependencies:
     "@babel/runtime" "^7.5.5"
+    neo4j-driver-bolt-connection "^4.3.2"
+    neo4j-driver-core "^4.3.2"
     rxjs "^6.6.3"
-    text-encoding-utf-8 "^1.0.2"
-    uri-js "^4.4.0"
 
 neode@^0.4.7:
   version "0.4.7"
@@ -5252,14 +5265,7 @@ rosie@^2.0.1:
   resolved "https://registry.yarnpkg.com/rosie/-/rosie-2.0.1.tgz#c250c4787ce450b72aa9eff26509f68589814fa2"
   integrity sha1-wlDEeHzkULcqqe/yZQn2hYmBT6I=
 
-rxjs@^6.3.3:
-  version "6.5.4"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.5.4.tgz#e0777fe0d184cec7872df147f303572d414e211c"
-  integrity sha512-naMQXcgEo3csAEGvw/NydRA0fuS2nDZJiw1YUWFKU7aPPAPGZEsD4Iimit96qwCieH6y614MCLYwdkrWx7z/7Q==
-  dependencies:
-    tslib "^1.9.0"
-
-rxjs@^6.6.3:
+rxjs@^6.3.3, rxjs@^6.6.3:
   version "6.6.7"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.6.7.tgz#90ac018acabf491bf65044235d5863c4dab804c9"
   integrity sha512-hTdwr+7yYNIT5n4AMYp85KA6yw2Va0FLa3Rguvbpa4W3I5xynaBZo41cM3XM+4Q6fRMj3sBYIR1VAmZMXYJvRQ==
@@ -6027,13 +6033,6 @@ upper-case@^1.0.3:
   integrity sha1-9rRQHC7EzdJrp4vnIilh3ndiFZg=
 
 uri-js@^4.2.2:
-  version "4.2.2"
-  resolved "https://registry.yarnpkg.com/uri-js/-/uri-js-4.2.2.tgz#94c540e1ff772956e2299507c010aea6c8838eb0"
-  integrity sha512-KY9Frmirql91X2Qgjry0Wd4Y+YTdrdZheS8TFwvkbLWf/G5KNJDCh6pKL5OZctEW4+0Baa5idK2ZQuELRwPznQ==
-  dependencies:
-    punycode "^2.1.0"
-
-uri-js@^4.4.0:
   version "4.4.1"
   resolved "https://registry.yarnpkg.com/uri-js/-/uri-js-4.4.1.tgz#9b1a52595225859e55f669d928f88c6c57f2a77e"
   integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==
