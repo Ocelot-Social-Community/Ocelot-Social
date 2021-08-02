@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import { mount } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
 import Donations from './donations.vue'
 
 const localVue = global.localVue
@@ -158,7 +157,7 @@ describe('donations.vue', () => {
         it('calls mutation with input values once', async () => {
           wrapper.find('#showDonations').trigger('click') // set to true
           await wrapper.vm.$nextTick()
-          wrapper.find('#donations-goal').setValue('20000')          
+          wrapper.find('#donations-goal').setValue('20000')
           wrapper.find('.donations-info-button').trigger('submit')
           await wrapper.vm.$nextTick()
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
