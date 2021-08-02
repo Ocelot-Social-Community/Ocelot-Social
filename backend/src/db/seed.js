@@ -137,93 +137,100 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       }),
     ])
 
-    const [peterLustig, bobDerBaumeister, jennyRostock, huey, dewey, louie, dagobert] =
-      await Promise.all([
-        Factory.build(
-          'user',
-          {
-            id: 'u1',
-            name: 'Peter Lustig',
-            slug: 'peter-lustig',
-            role: 'admin',
-          },
-          {
-            email: 'admin@example.org',
-          },
-        ),
-        Factory.build(
-          'user',
-          {
-            id: 'u2',
-            name: 'Bob der Baumeister',
-            slug: 'bob-der-baumeister',
-            role: 'moderator',
-          },
-          {
-            email: 'moderator@example.org',
-          },
-        ),
-        Factory.build(
-          'user',
-          {
-            id: 'u3',
-            name: 'Jenny Rostock',
-            slug: 'jenny-rostock',
-            role: 'user',
-          },
-          {
-            email: 'user@example.org',
-          },
-        ),
-        Factory.build(
-          'user',
-          {
-            id: 'u4',
-            name: 'Huey',
-            slug: 'huey',
-            role: 'user',
-          },
-          {
-            email: 'huey@example.org',
-          },
-        ),
-        Factory.build(
-          'user',
-          {
-            id: 'u5',
-            name: 'Dewey',
-            slug: 'dewey',
-            role: 'user',
-          },
-          {
-            email: 'dewey@example.org',
-          },
-        ),
-        Factory.build(
-          'user',
-          {
-            id: 'u6',
-            name: 'Louie',
-            slug: 'louie',
-            role: 'user',
-          },
-          {
-            email: 'louie@example.org',
-          },
-        ),
-        Factory.build(
-          'user',
-          {
-            id: 'u7',
-            name: 'Dagobert',
-            slug: 'dagobert',
-            role: 'user',
-          },
-          {
-            email: 'dagobert@example.org',
-          },
-        ),
-      ])
+    const [
+      peterLustig,
+      bobDerBaumeister,
+      jennyRostock,
+      huey,
+      dewey,
+      louie,
+      dagobert,
+    ] = await Promise.all([
+      Factory.build(
+        'user',
+        {
+          id: 'u1',
+          name: 'Peter Lustig',
+          slug: 'peter-lustig',
+          role: 'admin',
+        },
+        {
+          email: 'admin@example.org',
+        },
+      ),
+      Factory.build(
+        'user',
+        {
+          id: 'u2',
+          name: 'Bob der Baumeister',
+          slug: 'bob-der-baumeister',
+          role: 'moderator',
+        },
+        {
+          email: 'moderator@example.org',
+        },
+      ),
+      Factory.build(
+        'user',
+        {
+          id: 'u3',
+          name: 'Jenny Rostock',
+          slug: 'jenny-rostock',
+          role: 'user',
+        },
+        {
+          email: 'user@example.org',
+        },
+      ),
+      Factory.build(
+        'user',
+        {
+          id: 'u4',
+          name: 'Huey',
+          slug: 'huey',
+          role: 'user',
+        },
+        {
+          email: 'huey@example.org',
+        },
+      ),
+      Factory.build(
+        'user',
+        {
+          id: 'u5',
+          name: 'Dewey',
+          slug: 'dewey',
+          role: 'user',
+        },
+        {
+          email: 'dewey@example.org',
+        },
+      ),
+      Factory.build(
+        'user',
+        {
+          id: 'u6',
+          name: 'Louie',
+          slug: 'louie',
+          role: 'user',
+        },
+        {
+          email: 'louie@example.org',
+        },
+      ),
+      Factory.build(
+        'user',
+        {
+          id: 'u7',
+          name: 'Dagobert',
+          slug: 'dagobert',
+          role: 'user',
+        },
+        {
+          email: 'dagobert@example.org',
+        },
+      ),
+    ])
 
     await Promise.all([
       peterLustig.relateTo(Berlin, 'isIn'),
@@ -554,7 +561,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     const hashtagAndMention1 =
       'The new physics of <a class="hashtag" data-hashtag-id="QuantenFlussTheorie" href="/?hashtag=QuantenFlussTheorie">#QuantenFlussTheorie</a> can explain <a class="hashtag" data-hashtag-id="QuantumGravity" href="/?hashtag=QuantumGravity">#QuantumGravity</a>! <a class="mention" data-mention-id="u1" href="/profile/u1">@peter-lustig</a> got that already. ;-)'
     const createPostMutation = gql`
-      mutation ($id: ID, $title: String!, $content: String!, $categoryIds: [ID]) {
+      mutation($id: ID, $title: String!, $content: String!, $categoryIds: [ID]) {
         CreatePost(id: $id, title: $title, content: $content, categoryIds: $categoryIds) {
           id
         }
@@ -611,7 +618,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     const mentionInComment2 =
       'Did <a class="mention" data-mention-id="u1" href="/profile/u1">@peter-lustig</a> tell you?'
     const createCommentMutation = gql`
-      mutation ($id: ID, $postId: ID!, $content: String!) {
+      mutation($id: ID, $postId: ID!, $content: String!) {
         CreateComment(id: $id, postId: $postId, content: $content) {
           id
         }

@@ -37,7 +37,8 @@ const babyLovesCatEmbedResponse = new Response(
     thumbnail_height: 360,
     provider_url: 'https://www.youtube.com/',
     thumbnail_width: 480,
-    html: '<iframe width="480" height="270" src="https://www.youtube.com/embed/qkdXAtO40Fo?start=18&feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+    html:
+      '<iframe width="480" height="270" src="https://www.youtube.com/embed/qkdXAtO40Fo?start=18&feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
     thumbnail_url: 'https://i.ytimg.com/vi/qkdXAtO40Fo/hqdefault.jpg',
     version: '1.0',
     author_name: 'Merkley Family',
@@ -56,7 +57,7 @@ describe('Query', () => {
         })
         const { query } = createTestClient(server)
         const embed = gql`
-          query ($url: String!) {
+          query($url: String!) {
             embed(url: $url) {
               type
               title
@@ -203,7 +204,8 @@ Have all the information for the brand in separate config files. Set these defau
               video: null,
               lang: 'de',
               sources: ['resource', 'oembed'],
-              html: '<iframe width="480" height="270" src="https://www.youtube.com/embed/qkdXAtO40Fo?start=18&feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+              html:
+                '<iframe width="480" height="270" src="https://www.youtube.com/embed/qkdXAtO40Fo?start=18&feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
             },
           },
           errors: undefined,

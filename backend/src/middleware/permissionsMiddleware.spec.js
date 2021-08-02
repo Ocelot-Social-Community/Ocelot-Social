@@ -86,7 +86,7 @@ describe('authorization', () => {
 
     describe('access email address', () => {
       const userQuery = gql`
-        query ($name: String) {
+        query($name: String) {
           User(name: $name) {
             email
           }
@@ -171,7 +171,7 @@ describe('authorization', () => {
 
     describe('access Signup', () => {
       const signupMutation = gql`
-        mutation ($email: String!, $inviteCode: String) {
+        mutation($email: String!, $inviteCode: String) {
           Signup(email: $email, inviteCode: $inviteCode) {
             email
           }

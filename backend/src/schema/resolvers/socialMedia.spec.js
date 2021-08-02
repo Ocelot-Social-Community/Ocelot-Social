@@ -79,7 +79,7 @@ describe('SocialMedia', () => {
 
     beforeEach(() => {
       mutation = gql`
-        mutation ($url: String!) {
+        mutation($url: String!) {
           CreateSocialMedia(url: $url) {
             id
             url
@@ -140,7 +140,7 @@ describe('SocialMedia', () => {
     describe('ownedBy', () => {
       beforeEach(() => {
         mutation = gql`
-          mutation ($url: String!) {
+          mutation($url: String!) {
             CreateSocialMedia(url: $url) {
               url
               ownedBy {
@@ -171,7 +171,7 @@ describe('SocialMedia', () => {
       const socialMedia = await setUpSocialMedia()
 
       mutation = gql`
-        mutation ($id: ID!, $url: String!) {
+        mutation($id: ID!, $url: String!) {
           UpdateSocialMedia(id: $id, url: $url) {
             id
             url
@@ -234,7 +234,7 @@ describe('SocialMedia', () => {
       const socialMedia = await setUpSocialMedia()
 
       mutation = gql`
-        mutation ($id: ID!) {
+        mutation($id: ID!) {
           DeleteSocialMedia(id: $id) {
             id
             url

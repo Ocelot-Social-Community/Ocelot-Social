@@ -62,7 +62,7 @@ describe('passwordReset', () => {
 
     describe('requestPasswordReset', () => {
       const mutation = gql`
-        mutation ($email: String!) {
+        mutation($email: String!) {
           requestPasswordReset(email: $email)
         }
       `
@@ -123,7 +123,7 @@ describe('resetPassword', () => {
   }
 
   const mutation = gql`
-    mutation ($nonce: String!, $email: String!, $newPassword: String!) {
+    mutation($nonce: String!, $email: String!, $newPassword: String!) {
       resetPassword(nonce: $nonce, email: $email, newPassword: $newPassword)
     }
   `
@@ -203,7 +203,7 @@ describe('resetPassword', () => {
           it('updates password of the user', async () => {
             await mutate({ mutation, variables })
             const checkLoginMutation = gql`
-              mutation ($email: String!, $password: String!) {
+              mutation($email: String!, $password: String!) {
                 login(email: $email, password: $password)
               }
             `

@@ -10,7 +10,7 @@ const driver = getDriver()
 const neode = getNeode()
 
 const userDataQuery = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     userData(id: $id) {
       user {
         id

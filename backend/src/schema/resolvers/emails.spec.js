@@ -43,7 +43,7 @@ afterEach(async () => {
 
 describe('AddEmailAddress', () => {
   const mutation = gql`
-    mutation ($email: String!) {
+    mutation($email: String!) {
       AddEmailAddress(email: $email) {
         email
         verifiedAt
@@ -148,7 +148,7 @@ describe('AddEmailAddress', () => {
 
 describe('VerifyEmailAddress', () => {
   const mutation = gql`
-    mutation ($email: String!, $nonce: String!) {
+    mutation($email: String!, $nonce: String!) {
       VerifyEmailAddress(email: $email, nonce: $nonce) {
         email
         createdAt
@@ -315,7 +315,7 @@ describe('VerifyNonce', () => {
   })
 
   const verifyNonceQuery = gql`
-    query ($email: String!, $nonce: String!) {
+    query($email: String!, $nonce: String!) {
       VerifyNonce(email: $email, nonce: $nonce)
     }
   `

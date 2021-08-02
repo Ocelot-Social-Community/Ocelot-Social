@@ -33,7 +33,7 @@ afterAll(async () => {
 describe('count post teaser views', () => {
   let aUser, bUser
   const markTeaserAsViewed = gql`
-    mutation ($id: ID!) {
+    mutation($id: ID!) {
       markTeaserAsViewed(id: $id) {
         id
         viewedTeaserCount

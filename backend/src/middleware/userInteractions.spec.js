@@ -10,7 +10,7 @@ const driver = getDriver()
 const neode = getNeode()
 
 const postQuery = gql`
-  query ($id: ID) {
+  query($id: ID) {
     Post(id: $id) {
       clickedCount
     }

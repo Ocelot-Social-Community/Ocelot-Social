@@ -16,7 +16,7 @@ let user2
 let variables
 
 const mutationFollowUser = gql`
-  mutation ($id: ID!) {
+  mutation($id: ID!) {
     followUser(id: $id) {
       name
       followedBy {
@@ -28,7 +28,7 @@ const mutationFollowUser = gql`
   }
 `
 const mutationUnfollowUser = gql`
-  mutation ($id: ID!) {
+  mutation($id: ID!) {
     unfollowUser(id: $id) {
       name
       followedBy {
@@ -40,7 +40,7 @@ const mutationUnfollowUser = gql`
   }
 `
 const userQuery = gql`
-  query ($id: ID) {
+  query($id: ID) {
     User(id: $id) {
       followedBy {
         id

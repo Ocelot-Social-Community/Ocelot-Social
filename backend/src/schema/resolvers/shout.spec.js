@@ -9,17 +9,17 @@ const instance = getNeode()
 const driver = getDriver()
 
 const mutationShoutPost = gql`
-  mutation ($id: ID!) {
+  mutation($id: ID!) {
     shout(id: $id, type: Post)
   }
 `
 const mutationUnshoutPost = gql`
-  mutation ($id: ID!) {
+  mutation($id: ID!) {
     unshout(id: $id, type: Post)
   }
 `
 const queryPost = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     Post(id: $id) {
       id
       shoutedBy {

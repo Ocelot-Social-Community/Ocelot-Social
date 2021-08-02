@@ -82,7 +82,7 @@ describe('rewards', () => {
 
   describe('reward', () => {
     const rewardMutation = gql`
-      mutation ($from: ID!, $to: ID!) {
+      mutation($from: ID!, $to: ID!) {
         reward(badgeKey: $from, userId: $to) {
           id
           badges {
@@ -272,7 +272,7 @@ describe('rewards', () => {
     }
 
     const unrewardMutation = gql`
-      mutation ($from: ID!, $to: ID!) {
+      mutation($from: ID!, $to: ID!) {
         unreward(badgeKey: $from, userId: $to) {
           id
           badges {
