@@ -7,9 +7,11 @@
         :to="pageParams.internalLink"
         :data-test="pageParams.name + '-nuxt-link'"
       >
+        {{ pageParams.link }}
         {{ $t(pageParams.internalPage.footerIdent) }}
       </nuxt-link>
       <a v-else :href="pageParams.externalLink" target="_blank" :data-test="pageParams.name + '-link'">
+        {{ pageParams.link }}
         {{ $t(pageParams.internalPage.footerIdent) }}
       </a>
       <span class="division-line">-</span>

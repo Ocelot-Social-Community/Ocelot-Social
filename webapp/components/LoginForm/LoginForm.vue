@@ -6,7 +6,7 @@
     </blockquote>
     <base-card>
       <template #imageColumn>
-        <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
+        <a :href="links.ORGANIZATION.link" :title="$t('login.moreInfo', metadata)" target="_blank">
           <logo logoType="welcome" />
         </a>
       </template>

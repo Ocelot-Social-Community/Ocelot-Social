@@ -1,31 +1,38 @@
 // this file is duplicated in `backend/src/config/links.js` and `webapp/constants/links.js` and replaced on rebranding by https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/tree/master/branding/constants/
 
-const ORGANIZATION = {
-  name: 'organization',
+import { defaultInternalPagesSettings } from '~/components/utils/InternalPages.js'
 
-  // Wolle externalLink: 'https://ocelot.social',
-  externalLink: null, // if string is defined and not empty it's dominating
+const ORGANIZATION = {
+  ...defaultInternalPagesSettings.ORGANIZATION,
+  // Wolle name: 'organization',
+
+  // Wolle 
+  externalLink: 'https://ocelot.social',
+  // externalLink: null, // if string is defined and not empty it's dominating
 
   // in case internal page content is here 'webapp/locales/html/'
-  internalLink: '/organization', // static, don't change! internal page in case no external is defined
+  // Wolle internalLink: '/organization', // static, don't change! internal page in case no external is defined
   internalPage: {
+    ...defaultInternalPagesSettings.ORGANIZATION.internalPage,
+
     footerIdent: 'site.made', // localized string identifier
     headTitleIdent: 'site.made', // localized string identifier
     // Wolle headlineIdent: 'site.made', // localized string identifier. on null it's hidden, on empty string default is used
     headlineIdent: null, // localized string identifier. on null it's hidden, on empty string default is used
     hasContainer: true,
-    hasBaseCard: true, // no baseCard without a container
+    hasBaseCard: true,
     hasLoginInHeader: true,
   },
 }
 const DONATE = {
-  name: 'donate',
+  ...defaultInternalPagesSettings.DONATE,
+  // Wolle name: 'donate',
 
   // Wolle externalLink: 'https://ocelot-social.herokuapp.com/donations', // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
   externalLink: '', // if string is defined and not empty it's dominating
 
   // in case internal page content is here 'webapp/locales/html/'
-  internalLink: '/donate', // static, don't change! internal page in case no external is defined
+  // Wolle internalLink: '/donate', // static, don't change! internal page in case no external is defined
   internalPage: {
     footerIdent: 'site.donate', // localized string identifier
     headTitleIdent: 'site.donate', // localized string identifier
@@ -35,13 +42,14 @@ const DONATE = {
   },
 }
 const IMPRINT = {
-  name: 'imprint',
+  ...defaultInternalPagesSettings.IMPRINT,
+  // Wolle name: 'imprint',
 
   // Wolle externalLink: 'https://ocelot-social.herokuapp.com/imprint', // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
   externalLink: '', // if string is defined and not empty it's dominating
 
   // in case internal page content is here 'webapp/locales/html/'
-  internalLink: '/imprint', // static, don't change! internal page in case no external is defined
+  // Wolle internalLink: '/imprint', // static, don't change! internal page in case no external is defined
   internalPage: {
     footerIdent: 'site.imprint', // localized string identifier
     headTitleIdent: 'site.imprint', // localized string identifier
@@ -51,12 +59,13 @@ const IMPRINT = {
   },
 }
 const TERMS_AND_CONDITIONS = {
-  name: 'terms-and-conditions',
+  ...defaultInternalPagesSettings.TERMS_AND_CONDITIONS,
+  // Wolle name: 'terms-and-conditions',
 
   externalLink: null, // if string is defined and not empty it's dominating
 
   // in case internal page content is here 'webapp/locales/html/'
-  internalLink: '/terms-and-conditions', // static, don't change! internal page in case no external is defined
+  // Wolle internalLink: '/terms-and-conditions', // static, don't change! internal page in case no external is defined
   internalPage: {
     footerIdent: 'site.termsAndConditions', // localized string identifier
     headTitleIdent: 'site.termsAndConditions', // localized string identifier
@@ -66,12 +75,13 @@ const TERMS_AND_CONDITIONS = {
   },
 }
 const CODE_OF_CONDUCT = {
-  name: 'code-of-conduct',
+  ...defaultInternalPagesSettings.CODE_OF_CONDUCT,
+  // Wolle name: 'code-of-conduct',
 
   externalLink: null, // if string is defined and not empty it's dominating
 
   // in case internal page content is here 'webapp/locales/html/'
-  internalLink: '/code-of-conduct', // static, don't change! internal page in case no external is defined
+  // Wolle internalLink: '/code-of-conduct', // static, don't change! internal page in case no external is defined
   internalPage: {
     footerIdent: 'site.code-of-conduct', // localized string identifier
     headTitleIdent: 'site.code-of-conduct', // localized string identifier
@@ -81,12 +91,13 @@ const CODE_OF_CONDUCT = {
   },
 }
 const DATA_PRIVACY = {
-  name: 'data-privacy',
+  ...defaultInternalPagesSettings.DATA_PRIVACY,
+  // Wolle name: 'data-privacy',
 
   externalLink: null, // if string is defined and not empty it's dominating
 
   // in case internal page content is here 'webapp/locales/html/'
-  internalLink: '/data-privacy', // static, don't change! internal page in case no external is defined
+  // Wolle internalLink: '/data-privacy', // static, don't change! internal page in case no external is defined
   internalPage: {
     footerIdent: 'site.data-privacy', // localized string identifier
     headTitleIdent: 'site.data-privacy', // localized string identifier
@@ -96,13 +107,14 @@ const DATA_PRIVACY = {
   },
 }
 const FAQ = {
-  name: 'faq',
+  ...defaultInternalPagesSettings.FAQ,
+  // Wolle name: 'faq',
 
   // Wolle externalLink: 'https://ocelot.social',
   externalLink: null, // if string is defined and not empty it's dominating
 
   // in case internal page content is here 'webapp/locales/html/'
-  internalLink: '/faq', // static, don't change! internal page in case no external is defined
+  // Wolle internalLink: '/faq', // static, don't change! internal page in case no external is defined
   internalPage: {
     footerIdent: 'site.faq', // localized string identifier
     headTitleIdent: 'site.faq', // localized string identifier

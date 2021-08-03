@@ -2,7 +2,7 @@
   <section class="login-form">
     <base-card>
       <template #imageColumn>
-        <a :href="pageLink(links.ORGANIZATION)" :title="$t('login.moreInfo', metadata)" target="_blank">
+        <a :href="links.ORGANIZATION.link" :title="$t('login.moreInfo', metadata)" target="_blank">
           <logo logoType="signup" />
         </a>
       </template>
@@ -45,7 +45,6 @@
 <script>
 import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
-import { pageLink } from '~/components/utils/InternalPages.js'
 import ComponentSlider from '~/components/ComponentSlider/ComponentSlider'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
@@ -162,7 +161,6 @@ export default {
     }
 
     return {
-      pageLink,
       links,
       metadata,
       sliderData: {
