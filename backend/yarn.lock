@@ -1289,10 +1289,10 @@
     url-regex "~4.1.1"
     video-extensions "~1.1.0"
 
-"@metascraper/helpers@^5.11.8", "@metascraper/helpers@^5.14.22", "@metascraper/helpers@^5.14.26", "@metascraper/helpers@^5.23.0", "@metascraper/helpers@^5.23.1":
-  version "5.23.1"
-  resolved "https://registry.yarnpkg.com/@metascraper/helpers/-/helpers-5.23.1.tgz#f8fa40dd3e37fa1ac8596e48ed7ea73e2230ba46"
-  integrity sha512-lOf9RViEqR+aNltjvf2arjxQ2SXvQZ63A9voLwDISAB4l6sOhOEkwRCL6YSS4blkcGe1KN9r/cTxgFEenU2egA==
+"@metascraper/helpers@^5.11.8", "@metascraper/helpers@^5.14.22", "@metascraper/helpers@^5.14.26", "@metascraper/helpers@^5.23.0", "@metascraper/helpers@^5.23.1", "@metascraper/helpers@^5.24.0":
+  version "5.24.0"
+  resolved "https://registry.yarnpkg.com/@metascraper/helpers/-/helpers-5.24.0.tgz#4f6be2fc0c2dfae962b082198353fdfe79f92f1c"
+  integrity sha512-EB7CwUqA9OM9axOAKLVzhxr0Akh74ko/2ILy08qLPYvNXrsIs855H0fs6ala0+Jtzt3UFXsmH7Cvm4LsJNR2Qw==
   dependencies:
     audio-extensions "0.0.0"
     chrono-node "2.3.1"
@@ -1305,7 +1305,7 @@
     is-uri "~1.2.0"
     iso-639-3 "~2.2.0"
     isostring "0.0.1"
-    jsdom "~16.6.0"
+    jsdom "~16.7.0"
     lodash "~4.17.21"
     memoize-one "~5.2.1"
     microsoft-capitalize "~1.0.5"
@@ -6505,10 +6505,10 @@ jsdom@^15.2.1:
     ws "^7.0.0"
     xml-name-validator "^3.0.0"
 
-jsdom@~16.6.0:
-  version "16.6.0"
-  resolved "https://registry.yarnpkg.com/jsdom/-/jsdom-16.6.0.tgz#f79b3786682065492a3da6a60a4695da983805ac"
-  integrity sha512-Ty1vmF4NHJkolaEmdjtxTfSfkdb8Ywarwf63f+F8/mDD1uLSSWDxDuMiZxiPhwunLrn9LOSVItWj4bLYsLN3Dg==
+jsdom@~16.7.0:
+  version "16.7.0"
+  resolved "https://registry.yarnpkg.com/jsdom/-/jsdom-16.7.0.tgz#918ae71965424b197c819f8183a754e18977b710"
+  integrity sha512-u9Smc2G1USStM+s/x1ru5Sxrl6mPYCbByG1U/hUmqaVsm4tbNyS7CicOSRyuGQYZhTu0h84qkZZQ/I+dzizSVw==
   dependencies:
     abab "^2.0.5"
     acorn "^8.2.4"
@@ -6535,7 +6535,7 @@ jsdom@~16.6.0:
     whatwg-encoding "^1.0.5"
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.5.0"
-    ws "^7.4.5"
+    ws "^7.4.6"
     xml-name-validator "^3.0.0"
 
 jsesc@^2.5.1:
@@ -7105,12 +7105,12 @@ metascraper-logo@^5.14.26:
   dependencies:
     "@metascraper/helpers" "^5.14.26"
 
-metascraper-publisher@^5.23.0:
-  version "5.23.0"
-  resolved "https://registry.yarnpkg.com/metascraper-publisher/-/metascraper-publisher-5.23.0.tgz#fa5e9e515e15a882dfe7ba399fd1692283989666"
-  integrity sha512-zV3Q4k03nmqBtXUUbVRD6MuzLhLxGllJd2bTVM5bRaHNqzkL44/DE1cdbbOws8UJ74BNkdE5nKbMMWe9h75yMw==
+metascraper-publisher@^5.24.0:
+  version "5.24.0"
+  resolved "https://registry.yarnpkg.com/metascraper-publisher/-/metascraper-publisher-5.24.0.tgz#4d4251e155948af832c65561438288a2be0613c9"
+  integrity sha512-38qtE35L7++p97JsaxR3X+itvSqiT92oJE4ESvW2zMGEa4s2US+LwMMdGBIu0kb3OFAhe6h1pJhFQiowi9cunw==
   dependencies:
-    "@metascraper/helpers" "^5.23.0"
+    "@metascraper/helpers" "^5.24.0"
 
 metascraper-soundcloud@^5.23.0:
   version "5.23.0"
@@ -10560,7 +10560,7 @@ write@1.0.3:
   dependencies:
     mkdirp "^0.5.1"
 
-"ws@^5.2.0 || ^6.0.0 || ^7.0.0", ws@^7.0.0, ws@^7.4.5:
+"ws@^5.2.0 || ^6.0.0 || ^7.0.0", ws@^7.0.0, ws@^7.4.6:
   version "7.5.3"
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.3.tgz#160835b63c7d97bfab418fc1b8a9fced2ac01a74"
   integrity sha512-kQ/dHIzuLrS6Je9+uv81ueZomEwH0qVYstcAQ4/Z93K8zeko9gtAbttJWzoC5ukqXY1PpoouV3+VSOqEAFt5wg==
