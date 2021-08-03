@@ -2,16 +2,39 @@ export function isInternalPage(pageParams) {
   return noStringDefined(pageParams.externalLink)
 }
 
-export function noStringDefined(string) {
+function noStringDefined(string) {
   return !string || string === 0
 }
 
-export function pageLink(pageParams) {
+function pageLink(pageParams) {
   return isInternalPage(pageParams) ? pageParams.internalLink : pageParams.externalLink
 }
 
-export const defaultInternalPagesSettings = {
-  ORGANIZATION: {
+class PageParams {
+  constructor(pageParams) {
+    this.name = pageParams.name
+    this.externalLink = pageParams.externalLink
+    this.internalLink = pageParams.internalLink
+    this.internalPage = pageParams.internalPage
+  }
+
+  assign(assignPageParams) {
+    let pageParams = this
+    pageParams = {
+      ...pageParams,
+      ...assignPageParams,
+      internalPage: { ...pageParams.internalPage, ...assignPageParams.internalPage },
+    }
+    return pageParams
+  }
+
+  get link() {
+    return pageLink(this)
+  }
+}
+
+export const defaultPageParamsPages = {
+  ORGANIZATION: new PageParams({
     name: 'organization',
 
     externalLink: null, // if string is defined and not empty it's dominating
@@ -29,12 +52,8 @@ export const defaultInternalPagesSettings = {
       defaultHeadlineIdent: 'site.made',
       htmlIdent: 'html.organization',
     },
-
-    get link() {
-      return pageLink(this)
-    },
-  },
-  DONATE: {
+  }),
+  DONATE: new PageParams({
     name: 'donate',
 
     externalLink: null, // if string is defined and not empty it's dominating
@@ -52,12 +71,8 @@ export const defaultInternalPagesSettings = {
       defaultHeadlineIdent: 'site.donate',
       htmlIdent: 'html.donate',
     },
-
-    get link() {
-      return pageLink(this)
-    },
-  },
-  IMPRINT: {
+  }),
+  IMPRINT: new PageParams({
     name: 'imprint',
 
     externalLink: null, // if string is defined and not empty it's dominating
@@ -75,12 +90,8 @@ export const defaultInternalPagesSettings = {
       defaultHeadlineIdent: 'site.imprint',
       htmlIdent: 'html.imprint',
     },
-
-    get link() {
-      return pageLink(this)
-    },
-  },
-  TERMS_AND_CONDITIONS: {
+  }),
+  TERMS_AND_CONDITIONS: new PageParams({
     name: 'terms-and-conditions',
 
     externalLink: null, // if string is defined and not empty it's dominating
@@ -98,12 +109,8 @@ export const defaultInternalPagesSettings = {
       defaultHeadlineIdent: 'site.termsAndConditions',
       htmlIdent: 'html.termsAndConditions',
     },
-
-    get link() {
-      return pageLink(this)
-    },
-  },
-  CODE_OF_CONDUCT: {
+  }),
+  CODE_OF_CONDUCT: new PageParams({
     name: 'code-of-conduct',
 
     externalLink: null, // if string is defined and not empty it's dominating
@@ -121,12 +128,8 @@ export const defaultInternalPagesSettings = {
       defaultHeadlineIdent: 'site.code-of-conduct',
       htmlIdent: 'html.codeOfConduct',
     },
-
-    get link() {
-      return pageLink(this)
-    },
-  },
-  DATA_PRIVACY: {
+  }),
+  DATA_PRIVACY: new PageParams({
     name: 'data-privacy',
 
     externalLink: null, // if string is defined and not empty it's dominating
@@ -144,15 +147,10 @@ export const defaultInternalPagesSettings = {
       defaultHeadlineIdent: 'site.data-privacy',
       htmlIdent: 'html.dataPrivacy',
     },
-
-    get link() {
-      return pageLink(this)
-    },
-  },
-  FAQ: {
+  }),
+  FAQ: new PageParams({
     name: 'faq',
 
-    // Wolle externalLink: 'https://ocelot.social',
     externalLink: null, // if string is defined and not empty it's dominating
 
     // in case internal page content is here 'webapp/locales/html/'
@@ -168,9 +166,26 @@ export const defaultInternalPagesSettings = {
       defaultHeadlineIdent: 'site.faq',
       htmlIdent: 'html.faq',
     },
+  }),
+  SUPPORT: new PageParams({
+    name: 'support',
 
-    get link() {
-      return pageLink(this)
+    // ATTENTION: has to be defined even for internal page with full URL as example like 'https://staging.ocelot.social/support', because it is used in e-mails as well!
+    externalLink: 'https://ocelot.social',
+
+    // in case internal page content is here 'webapp/locales/html/'
+    // ATTENTION: example for internal support page: 'https://staging.ocelot.social/support'. set a full URL please, because it is used in e-mails as well!
+    internalLink: '/support', // static, don't change '*/support'! internal page in case no external is defined
+    internalPage: {
+      footerIdent: 'site.support', // localized string identifier
+      headTitleIdent: 'site.support', // localized string identifier
+      headlineIdent: 'site.support', // localized string identifier. on null it's hidden, on empty string default is used
+      hasContainer: true,
+      hasBaseCard: true,
+      hasLoginInHeader: true,
+
+      defaultHeadlineIdent: 'site.support',
+      htmlIdent: 'html.support',
     },
-  },
+  }),
 }

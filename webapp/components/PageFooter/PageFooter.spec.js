@@ -77,7 +77,9 @@ describe('PageFooter.vue', () => {
       })
 
       it('renders TERMS_AND_CONDITIONS as nuxt-link', () => {
-        expect(wrapper.find('span[data-test="terms-and-conditions-nuxt-link"]').exists()).toBeTruthy()
+        expect(
+          wrapper.find('span[data-test="terms-and-conditions-nuxt-link"]').exists(),
+        ).toBeTruthy()
       })
 
       it('renders CODE_OF_CONDUCT as nuxt-link', () => {
@@ -99,9 +101,18 @@ describe('PageFooter.vue', () => {
           ...linksDefault,
           ORGANIZATION: { ...linksDefault.ORGANIZATION, externalLink: 'https://ocelot.social' },
           IMPRINT: { ...linksDefault.IMPRINT, externalLink: 'https://ocelot.social/IMPRINT' },
-          TERMS_AND_CONDITIONS: { ...linksDefault.TERMS_AND_CONDITIONS, externalLink: 'https://ocelot.social/TERMS_AND_CONDITIONS' },
-          CODE_OF_CONDUCT: { ...linksDefault.CODE_OF_CONDUCT, externalLink: 'https://ocelot.social/CODE_OF_CONDUCT' },
-          DATA_PRIVACY: { ...linksDefault.DATA_PRIVACY, externalLink: 'https://ocelot.social/DATA_PRIVACY' },
+          TERMS_AND_CONDITIONS: {
+            ...linksDefault.TERMS_AND_CONDITIONS,
+            externalLink: 'https://ocelot.social/TERMS_AND_CONDITIONS',
+          },
+          CODE_OF_CONDUCT: {
+            ...linksDefault.CODE_OF_CONDUCT,
+            externalLink: 'https://ocelot.social/CODE_OF_CONDUCT',
+          },
+          DATA_PRIVACY: {
+            ...linksDefault.DATA_PRIVACY,
+            externalLink: 'https://ocelot.social/DATA_PRIVACY',
+          },
           FAQ: { ...linksDefault.FAQ, externalLink: 'https://ocelot.social/FAQ' },
         }
         wrapper = Wrapper()

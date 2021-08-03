@@ -1,21 +1,18 @@
 <template>
-  <div>
-    <ds-space margin="small">
-      <ds-heading tag="h2">{{ $t('site.imprint') }}</ds-heading>
-    </ds-space>
-    <ds-container>
-      <div v-html="$t('html.imprint')" />
-    </ds-container>
-  </div>
+  <internal-page :pageParams="links.IMPRINT" />
 </template>
 
 <script>
+import links from '~/constants/links.js'
+import InternalPage from '~/components/_new/features/InternalPage/InternalPage.vue'
+
 export default {
   layout: 'basic',
-  head() {
-    return {
-      title: this.$t('site.imprint'),
-    }
+  components: {
+    InternalPage,
+  },
+  data() {
+    return { links }
   },
 }
 </script>

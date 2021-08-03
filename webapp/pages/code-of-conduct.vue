@@ -1,21 +1,18 @@
 <template>
-  <div>
-    <ds-space margin="small">
-      <ds-heading tag="h2">{{ $t('site.code-of-conduct') }}</ds-heading>
-    </ds-space>
-    <ds-container>
-      <div v-html="$t('html.codeOfConduct')" />
-    </ds-container>
-  </div>
+  <internal-page :pageParams="links.CODE_OF_CONDUCT" />
 </template>
 
 <script>
+import links from '~/constants/links.js'
+import InternalPage from '~/components/_new/features/InternalPage/InternalPage.vue'
+
 export default {
   layout: 'basic',
-  head() {
-    return {
-      title: this.$t('site.code-of-conduct'),
-    }
+  components: {
+    InternalPage,
+  },
+  data() {
+    return { links }
   },
 }
 </script>

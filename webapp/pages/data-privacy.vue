@@ -1,21 +1,18 @@
 <template>
-  <div>
-    <ds-space margin="small">
-      <ds-heading tag="h2">{{ $t('site.data-privacy') }}</ds-heading>
-    </ds-space>
-    <ds-container>
-      <div v-html="$t('html.dataPrivacy')" />
-    </ds-container>
-  </div>
+  <internal-page :pageParams="links.DATA_PRIVACY" />
 </template>
 
 <script>
+import links from '~/constants/links.js'
+import InternalPage from '~/components/_new/features/InternalPage/InternalPage.vue'
+
 export default {
   layout: 'basic',
-  head() {
-    return {
-      title: this.$t('site.data-privacy'),
-    }
+  components: {
+    InternalPage,
+  },
+  data() {
+    return { links }
   },
 }
 </script>
