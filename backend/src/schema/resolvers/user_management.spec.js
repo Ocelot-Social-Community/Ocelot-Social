@@ -178,7 +178,7 @@ describe('currentUser', () => {
 
 describe('login', () => {
   const loginMutation = gql`
-    mutation($email: String!, $password: String!) {
+    mutation ($email: String!, $password: String!) {
       login(email: $email, password: $password)
     }
   `
@@ -294,7 +294,7 @@ describe('login', () => {
 
 describe('change password', () => {
   const changePasswordMutation = gql`
-    mutation($oldPassword: String!, $newPassword: String!) {
+    mutation ($oldPassword: String!, $newPassword: String!) {
       changePassword(oldPassword: $oldPassword, newPassword: $newPassword)
     }
   `

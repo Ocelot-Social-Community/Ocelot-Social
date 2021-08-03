@@ -38,7 +38,7 @@ describe('resolvers', () => {
     describe('custom mutation, not handled by neo4j-graphql-js', () => {
       let variables
       const updateUserMutation = gql`
-        mutation($id: ID!, $name: String) {
+        mutation ($id: ID!, $name: String) {
           UpdateUser(id: $id, name: $name) {
             name
             location {

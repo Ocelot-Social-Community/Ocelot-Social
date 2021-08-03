@@ -11,7 +11,7 @@ describe('file a report on a resource', () => {
   let authenticatedUser, currentUser, mutate, query, moderator, abusiveUser, otherReportingUser
   const categoryIds = ['cat9']
   const fileReportMutation = gql`
-    mutation($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
+    mutation ($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
       fileReport(
         resourceId: $resourceId
         reasonCategory: $reasonCategory
@@ -42,7 +42,7 @@ describe('file a report on a resource', () => {
     reasonDescription: 'Violates code of conduct !!!',
   }
   const reportsQuery = gql`
-    query($closed: Boolean) {
+    query ($closed: Boolean) {
       reports(orderBy: createdAt_desc, closed: $closed) {
         id
         createdAt
@@ -74,7 +74,7 @@ describe('file a report on a resource', () => {
     }
   `
   const reviewMutation = gql`
-    mutation($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
+    mutation ($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
       review(resourceId: $resourceId, disable: $disable, closed: $closed) {
         createdAt
         resource {

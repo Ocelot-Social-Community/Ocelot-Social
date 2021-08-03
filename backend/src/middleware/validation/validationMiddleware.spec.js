@@ -17,14 +17,14 @@ let authenticatedUser,
   commentingUser
 
 const createCommentMutation = gql`
-  mutation($id: ID, $postId: ID!, $content: String!) {
+  mutation ($id: ID, $postId: ID!, $content: String!) {
     CreateComment(id: $id, postId: $postId, content: $content) {
       id
     }
   }
 `
 const updateCommentMutation = gql`
-  mutation($content: String!, $id: ID!) {
+  mutation ($content: String!, $id: ID!) {
     UpdateComment(content: $content, id: $id) {
       id
     }
@@ -32,7 +32,7 @@ const updateCommentMutation = gql`
 `
 
 const reportMutation = gql`
-  mutation($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
+  mutation ($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
     fileReport(
       resourceId: $resourceId
       reasonCategory: $reasonCategory
@@ -43,7 +43,7 @@ const reportMutation = gql`
   }
 `
 const reviewMutation = gql`
-  mutation($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
+  mutation ($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
     review(resourceId: $resourceId, disable: $disable, closed: $closed) {
       createdAt
       updatedAt
@@ -51,7 +51,7 @@ const reviewMutation = gql`
   }
 `
 const updateUserMutation = gql`
-  mutation($id: ID!, $name: String) {
+  mutation ($id: ID!, $name: String) {
     UpdateUser(id: $id, name: $name) {
       name
     }

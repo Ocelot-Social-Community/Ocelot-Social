@@ -29,7 +29,7 @@ afterAll(async () => {
 })
 
 const searchQuery = gql`
-  query($query: String!) {
+  query ($query: String!) {
     searchResults(query: $query, limit: 5) {
       __typename
       ... on Post {
@@ -50,7 +50,7 @@ const searchQuery = gql`
 `
 
 const searchPostQuery = gql`
-  query($query: String!, $firstPosts: Int, $postsOffset: Int) {
+  query ($query: String!, $firstPosts: Int, $postsOffset: Int) {
     searchPosts(query: $query, firstPosts: $firstPosts, postsOffset: $postsOffset) {
       postCount
       posts {

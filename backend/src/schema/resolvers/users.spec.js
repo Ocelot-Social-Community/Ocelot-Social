@@ -17,7 +17,7 @@ const driver = getDriver()
 const neode = getNeode()
 
 const deleteUserMutation = gql`
-  mutation($id: ID!, $resource: [Deletable]) {
+  mutation ($id: ID!, $resource: [Deletable]) {
     DeleteUser(id: $id, resource: $resource) {
       id
       name
@@ -45,7 +45,7 @@ const deleteUserMutation = gql`
   }
 `
 const switchUserRoleMutation = gql`
-  mutation($role: UserGroup!, $id: ID!) {
+  mutation ($role: UserGroup!, $id: ID!) {
     switchUserRole(role: $role, id: $id) {
       name
       role
@@ -87,7 +87,7 @@ describe('User', () => {
 
     beforeEach(async () => {
       userQuery = gql`
-        query($email: String) {
+        query ($email: String) {
           User(email: $email) {
             name
           }
@@ -150,7 +150,7 @@ describe('UpdateUser', () => {
 
   beforeEach(async () => {
     updateUserMutation = gql`
-      mutation(
+      mutation (
         $id: ID!
         $name: String
         $termsAndConditionsAgreedVersion: String
