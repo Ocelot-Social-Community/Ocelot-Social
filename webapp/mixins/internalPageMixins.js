@@ -9,6 +9,11 @@ export function internalPageMixins(pageParams) {
     data() {
       return { pageParams }
     },
+    head() {
+      return {
+        title: this.$t(this.pageParams.internalPage.headTitleIdent),
+      }
+    },
     created() {
       if (!this.pageParams.isInternalPage) {
         // to avoid possible errors, because 'window' is only defined on browser side but not in NodeJS on client side. check for 'typeof window' is neccessary, because if it's not defined at all you can't check for 'window !== undefined' without the same error 'window is undefined'

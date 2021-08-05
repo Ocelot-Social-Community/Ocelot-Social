@@ -29,8 +29,8 @@ describe('PageFooter.vue', () => {
         wrapper = Wrapper()
       })
 
-      it('renders four links', () => {
-        expect(wrapper.findAll('a')).toHaveLength(4)
+      it('renders five links', () => {
+        expect(wrapper.findAll('a')).toHaveLength(5)
       })
 
       it('renders three nuxt-links', () => {
@@ -56,12 +56,12 @@ describe('PageFooter.vue', () => {
       beforeEach(async () => {
         const links = {
           ...linksDefault,
-          ORGANIZATION: { ...linksDefault.ORGANIZATION, externalLink: null },
-          IMPRINT: { ...linksDefault.IMPRINT, externalLink: null },
-          TERMS_AND_CONDITIONS: { ...linksDefault.TERMS_AND_CONDITIONS, externalLink: null },
-          CODE_OF_CONDUCT: { ...linksDefault.CODE_OF_CONDUCT, externalLink: null },
-          DATA_PRIVACY: { ...linksDefault.DATA_PRIVACY, externalLink: null },
-          FAQ: { ...linksDefault.FAQ, externalLink: null },
+          ORGANIZATION: linksDefault.ORGANIZATION.overwrite({ externalLink: null }),
+          IMPRINT: linksDefault.IMPRINT.overwrite({ externalLink: null }),
+          TERMS_AND_CONDITIONS: linksDefault.TERMS_AND_CONDITIONS.overwrite({ externalLink: null }),
+          CODE_OF_CONDUCT: linksDefault.CODE_OF_CONDUCT.overwrite({ externalLink: null }),
+          DATA_PRIVACY: linksDefault.DATA_PRIVACY.overwrite({ externalLink: null }),
+          FAQ: linksDefault.FAQ.overwrite({ externalLink: null }),
         }
         wrapper = Wrapper()
         wrapper.setData({ links })
@@ -99,21 +99,22 @@ describe('PageFooter.vue', () => {
       beforeEach(async () => {
         const links = {
           ...linksDefault,
-          ORGANIZATION: { ...linksDefault.ORGANIZATION, externalLink: 'https://ocelot.social' },
-          IMPRINT: { ...linksDefault.IMPRINT, externalLink: 'https://ocelot.social/IMPRINT' },
-          TERMS_AND_CONDITIONS: {
-            ...linksDefault.TERMS_AND_CONDITIONS,
+          ORGANIZATION: linksDefault.ORGANIZATION.overwrite({
+            externalLink: 'https://ocelot.social',
+          }),
+          IMPRINT: linksDefault.IMPRINT.overwrite({
+            externalLink: 'https://ocelot.social/IMPRINT',
+          }),
+          TERMS_AND_CONDITIONS: linksDefault.TERMS_AND_CONDITIONS.overwrite({
             externalLink: 'https://ocelot.social/TERMS_AND_CONDITIONS',
-          },
-          CODE_OF_CONDUCT: {
-            ...linksDefault.CODE_OF_CONDUCT,
+          }),
+          CODE_OF_CONDUCT: linksDefault.CODE_OF_CONDUCT.overwrite({
             externalLink: 'https://ocelot.social/CODE_OF_CONDUCT',
-          },
-          DATA_PRIVACY: {
-            ...linksDefault.DATA_PRIVACY,
+          }),
+          DATA_PRIVACY: linksDefault.DATA_PRIVACY.overwrite({
             externalLink: 'https://ocelot.social/DATA_PRIVACY',
-          },
-          FAQ: { ...linksDefault.FAQ, externalLink: 'https://ocelot.social/FAQ' },
+          }),
+          FAQ: linksDefault.FAQ.overwrite({ externalLink: 'https://ocelot.social/FAQ' }),
         }
         wrapper = Wrapper()
         wrapper.setData({ links })

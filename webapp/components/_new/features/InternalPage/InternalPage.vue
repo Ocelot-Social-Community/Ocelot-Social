@@ -27,11 +27,6 @@
 <script>
 export default {
   name: 'InternalPage',
-  head() {
-    return {
-      title: this.$t(this.pageParams.internalPage.headTitleIdent),
-    }
-  },
   props: {
     pageParams: { type: Object, required: true },
   },

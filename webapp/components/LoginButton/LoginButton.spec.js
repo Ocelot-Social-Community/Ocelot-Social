@@ -1,9 +1,9 @@
 import { config, mount } from '@vue/test-utils'
-import InviteButton from './InviteButton.vue'
+import LoginButton from './LoginButton.vue'
 
 config.stubs['v-popover'] = '<span><slot /></span>'
 
-describe('InviteButton.vue', () => {
+describe('LoginButton.vue', () => {
   let wrapper
   let mocks
   let propsData
@@ -22,7 +22,7 @@ describe('InviteButton.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(InviteButton, { mocks, propsData })
+      return mount(LoginButton, { mocks, propsData })
     }
 
     beforeEach(() => {
@@ -30,24 +30,12 @@ describe('InviteButton.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.contains('.invite-button')).toBe(true)
+      expect(wrapper.contains('.login-button')).toBe(true)
     })
 
     it('open popup', () => {
       wrapper.find('.base-button').trigger('click')
-      expect(wrapper.contains('.invite-button')).toBe(true)
-    })
-
-    it('invite codes not available', async () => {
-      wrapper.find('.base-button').trigger('click') // open popup
-      wrapper.find('.invite-button').trigger('click') // click copy button
-      expect(mocks.$t).toHaveBeenCalledWith('invite-codes.not-available')
-    })
-
-    it.skip('invite codes copied to clipboard', async () => {
-      wrapper.find('.base-button').trigger('click') // open popup
-      wrapper.find('.invite-button').trigger('click') // click copy button
-      expect(mocks.$t).toHaveBeenCalledWith('invite-codes.not-available')
+      expect(wrapper.contains('.login-button')).toBe(true)
     })
   })
 })
