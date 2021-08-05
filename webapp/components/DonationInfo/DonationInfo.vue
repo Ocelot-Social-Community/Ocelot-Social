@@ -1,7 +1,9 @@
 <template>
   <div class="donation-info">
     <progress-bar :title="title" :label="label" :goal="goal" :progress="progress" />
-    <base-button filled @click="redirectToPage(links.DONATE)">{{ $t('donations.donate-now') }}</base-button>
+    <base-button filled @click="redirectToPage(links.DONATE)">
+      {{ $t('donations.donate-now') }}
+    </base-button>
   </div>
 </template>
 

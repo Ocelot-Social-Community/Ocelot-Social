@@ -9,10 +9,21 @@
           <ds-flex-item :width="{ base: '100%', sm: 1, md: 1 }">
             <ds-space>
               <!-- Wolle -->
-              <a v-if="!links.ORGANIZATION.isInternalPage" :href="links.ORGANIZATION.link" :title="$t('login.moreInfo', metadata)" target="_blank">
+              <a
+                v-if="!links.ORGANIZATION.isInternalPage"
+                :href="links.ORGANIZATION.link"
+                :title="$t('login.moreInfo', metadata)"
+                target="_blank"
+              >
                 <img class="image" alt="Under maintenance" src="/img/custom/logo-squared.svg" />
               </a>
-              <img v-else class="image" alt="Under maintenance" src="/img/custom/logo-squared.svg" :title="$t('login.moreInfo', metadata)" />
+              <img
+                v-else
+                class="image"
+                alt="Under maintenance"
+                src="/img/custom/logo-squared.svg"
+                :title="$t('login.moreInfo', metadata)"
+              />
             </ds-space>
           </ds-flex-item>
           <ds-flex-item :width="{ base: '100%', sm: 1, md: 1 }">

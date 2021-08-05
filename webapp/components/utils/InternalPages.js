@@ -10,7 +10,7 @@ class PageParams {
   }
 
   overwrite(assignPageParams) {
-    let pageParams = this
+    const pageParams = this
     if (assignPageParams.name !== undefined) {
       pageParams.name = assignPageParams.name
     }

@@ -1,4 +1,3 @@
-
 import InternalPage from '~/components/_new/features/InternalPage/InternalPage.vue'
 
 export function internalPageMixins(pageParams) {

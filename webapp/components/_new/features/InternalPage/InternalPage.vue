@@ -2,11 +2,7 @@
   <div>
     <ds-space margin="small">
       <ds-heading v-if="pageParams.internalPage.headlineIdent !== null" tag="h2">
-        {{
-          $t(
-            pageParams.internalPage.headlineIdent,
-          )
-        }}
+        {{ $t(pageParams.internalPage.headlineIdent) }}
       </ds-heading>
     </ds-space>
     <ds-container v-if="pageParams.internalPage.hasContainer">
