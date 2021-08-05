@@ -3,14 +3,12 @@
 import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
-  // Wolle externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.made', // localized string identifier, if undefined default is used
     // headTitleIdent: 'site.made', // localized string identifier, if undefined default is used
     // headlineIdent: 'site.made', // localized string identifier, on null it's hidden, if undefined default is used
-    // Wolle
-    headlineIdent: null, // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
@@ -19,7 +17,7 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
 })
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
   // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  // Wolle externalLink: 'https://ocelot-social.herokuapp.com/donations', // if string is defined and not empty it's dominating
+  externalLink: 'https://ocelot-social.herokuapp.com/donations', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.donate', // localized string identifier, if undefined default is used
@@ -33,7 +31,7 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
 })
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
   // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  // Wolle externalLink: 'https://ocelot-social.herokuapp.com/imprint', // if string is defined and not empty it's dominating
+  externalLink: 'https://ocelot-social.herokuapp.com/imprint', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.imprint', // localized string identifier, if undefined default is used
@@ -85,7 +83,7 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
-  // Wolle externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
@@ -98,7 +96,7 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
   },
 })
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
-  // Wolle externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.support', // localized string identifier, if undefined default is used
@@ -112,8 +110,7 @@ const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
 })
 
 export default {
-  // Wolle LANDING_PAGE: '/login', // examples: '/login', '/registration', '/organization', or external 'https://ocelot.social'
-  LANDING_PAGE: '/organization', // examples: '/login', '/registration', '/organization', or external 'https://ocelot.social'
+  LANDING_PAGE: '/login', // examples: '/login', '/registration', '/organization', or external 'https://ocelot.social'
 
   // you can find and store templates for 👇🏼 at https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/tree/master/branding/templates/
 
