@@ -28,7 +28,7 @@ describe('terms-and-conditions.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('div')).toBe(true)
+      expect(wrapper.is('div')).toBeTruthy()
     })
 
     it('has correct <head> content', () => {
