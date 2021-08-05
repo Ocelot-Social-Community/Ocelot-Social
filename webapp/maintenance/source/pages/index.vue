@@ -8,9 +8,11 @@
         <ds-flex>
           <ds-flex-item :width="{ base: '100%', sm: 1, md: 1 }">
             <ds-space>
-              <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
+              <!-- Wolle -->
+              <a v-if="!links.ORGANIZATION.isInternalPage" :href="links.ORGANIZATION.link" :title="$t('login.moreInfo', metadata)" target="_blank">
                 <img class="image" alt="Under maintenance" src="/img/custom/logo-squared.svg" />
               </a>
+              <img v-else class="image" alt="Under maintenance" src="/img/custom/logo-squared.svg" :title="$t('login.moreInfo', metadata)" />
             </ds-space>
           </ds-flex-item>
           <ds-flex-item :width="{ base: '100%', sm: 1, md: 1 }">
@@ -45,7 +47,7 @@ export default {
     LocaleSwitch,
   },
   data() {
-    return { links, metadata, supportEmail: emails.SUPPORT }
+    return { links, metadata, supportEmail: emails.SUPPORT_EMAIL }
   },
 }
 </script>

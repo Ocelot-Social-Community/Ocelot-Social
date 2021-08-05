@@ -2,21 +2,9 @@
   <div id="footer" class="ds-footer">
     <!-- links to internal or external pages -->
     <span v-for="pageParams in links.FOOTER_LINK_LIST" :key="pageParams.name">
-      <nuxt-link
-        v-if="isInternalPage(pageParams)"
-        :to="pageParams.internalLink"
-        :data-test="pageParams.name + '-nuxt-link'"
-      >
+      <page-params-link :pageParams="pageParams">
         {{ $t(pageParams.internalPage.footerIdent) }}
-      </nuxt-link>
-      <a
-        v-else
-        :href="pageParams.externalLink"
-        target="_blank"
-        :data-test="pageParams.name + '-link'"
-      >
-        {{ $t(pageParams.internalPage.footerIdent) }}
-      </a>
+      </page-params-link>
       <span class="division-line">-</span>
     </span>
     <!-- version -->
@@ -32,11 +20,14 @@
 
 <script>
 import links from '~/constants/links.js'
-import { isInternalPage } from '~/components/utils/InternalPages.js'
+import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 
 export default {
+  components: {
+    PageParamsLink,
+  },
   data() {
-    return { links, isInternalPage, version: `v${this.$env.VERSION}` }
+    return { links, version: `v${this.$env.VERSION}` }
   },
 }
 </script>

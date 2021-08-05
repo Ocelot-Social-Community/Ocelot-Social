@@ -1,119 +1,113 @@
-// this file is duplicated in `backend/src/config/links.js` and `webapp/constants/links.js` and replaced on rebranding by https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/tree/master/branding/constants/
+// this file is replaced on rebranding by https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/tree/master/branding/constants/
 
 import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 
-const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.assign({
-  // Wolle externalLink: 'https://ocelot.social',
-  //
-  externalLink: null, // if string is defined and not empty it's dominating
+const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
+  // Wolle externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
 
-  // in case internal page content is here 'webapp/locales/html/'
   internalPage: {
-    footerIdent: 'site.made', // localized string identifier
-    headTitleIdent: 'site.made', // localized string identifier
-    // Wolle headlineIdent: '', // localized string identifier. on null it's hidden, on empty string default is used
-    headlineIdent: null, // localized string identifier. on null it's hidden, on empty string default is used
+    // footerIdent: 'site.made', // localized string identifier, if undefined default is used
+    // headTitleIdent: 'site.made', // localized string identifier, if undefined default is used
+    // headlineIdent: 'site.made', // localized string identifier, on null it's hidden, if undefined default is used
+    // Wolle
+    headlineIdent: null, // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
+    // in case internal page content is here 'webapp/locales/html/'
   },
 })
-const DONATE = defaultPageParamsPages.DONATE.assign({
-  // Wolle externalLink: 'https://ocelot-social.herokuapp.com/donations', // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  externalLink: '', // if string is defined and not empty it's dominating
+const DONATE = defaultPageParamsPages.DONATE.overwrite({
+  // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
+  // Wolle externalLink: 'https://ocelot-social.herokuapp.com/donations', // if string is defined and not empty it's dominating
 
-  // in case internal page content is here 'webapp/locales/html/'
   internalPage: {
-    footerIdent: 'site.donate', // localized string identifier
-    headTitleIdent: 'site.donate', // localized string identifier
-    headlineIdent: '', // localized string identifier. on null it's hidden, on empty string default is used
+    // footerIdent: 'site.donate', // localized string identifier, if undefined default is used
+    // headTitleIdent: 'site.donate', // localized string identifier, if undefined default is used
+    // headlineIdent: 'site.donate', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
+    // in case internal page content is here 'webapp/locales/html/'
   },
 })
-const IMPRINT = defaultPageParamsPages.IMPRINT.assign({
-  // Wolle externalLink: 'https://ocelot-social.herokuapp.com/imprint', // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  externalLink: '', // if string is defined and not empty it's dominating
+const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
+  // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
+  // Wolle externalLink: 'https://ocelot-social.herokuapp.com/imprint', // if string is defined and not empty it's dominating
 
-  // in case internal page content is here 'webapp/locales/html/'
   internalPage: {
-    footerIdent: 'site.imprint', // localized string identifier
-    headTitleIdent: 'site.imprint', // localized string identifier
-    headlineIdent: '', // localized string identifier. on null it's hidden, on empty string default is used
+    // footerIdent: 'site.imprint', // localized string identifier, if undefined default is used
+    // headTitleIdent: 'site.imprint', // localized string identifier, if undefined default is used
+    // headlineIdent: 'site.imprint', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
+    // in case internal page content is here 'webapp/locales/html/'
   },
 })
-const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.assign({
-  externalLink: null, // if string is defined and not empty it's dominating
+const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwrite({
+  // externalLink: null, // if string is defined and not empty it's dominating
 
-  // in case internal page content is here 'webapp/locales/html/'
   internalPage: {
-    footerIdent: 'site.termsAndConditions', // localized string identifier
-    headTitleIdent: 'site.termsAndConditions', // localized string identifier
-    headlineIdent: '', // localized string identifier. on null it's hidden, on empty string default is used
+    // footerIdent: 'site.termsAndConditions', // localized string identifier, if undefined default is used
+    // headTitleIdent: 'site.termsAndConditions', // localized string identifier, if undefined default is used
+    // headlineIdent: 'site.termsAndConditions', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
+    // in case internal page content is here 'webapp/locales/html/'
   },
 })
-const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.assign({
-  externalLink: null, // if string is defined and not empty it's dominating
+const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
+  // externalLink: null, // if string is defined and not empty it's dominating
 
-  // in case internal page content is here 'webapp/locales/html/'
   internalPage: {
-    footerIdent: 'site.code-of-conduct', // localized string identifier
-    headTitleIdent: 'site.code-of-conduct', // localized string identifier
-    headlineIdent: '', // localized string identifier. on null it's hidden, on empty string default is used
+    // footerIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
+    // headTitleIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
+    // headlineIdent: 'site.code-of-conduct', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
+    // in case internal page content is here 'webapp/locales/html/'
   },
 })
-const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.assign({
-  externalLink: null, // if string is defined and not empty it's dominating
+const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
+  // externalLink: null, // if string is defined and not empty it's dominating
 
-  // in case internal page content is here 'webapp/locales/html/'
   internalPage: {
-    footerIdent: 'site.data-privacy', // localized string identifier
-    headTitleIdent: 'site.data-privacy', // localized string identifier
-    headlineIdent: '', // localized string identifier. on null it's hidden, on empty string default is used
+    // footerIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
+    // headTitleIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
+    // headlineIdent: 'site.data-privacy', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
+    // in case internal page content is here 'webapp/locales/html/'
   },
 })
-const FAQ = defaultPageParamsPages.FAQ.assign({
-  // Wolle externalLink: 'https://ocelot.social',
-  externalLink: null, // if string is defined and not empty it's dominating
+const FAQ = defaultPageParamsPages.FAQ.overwrite({
+  // Wolle externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
 
-  // in case internal page content is here 'webapp/locales/html/'
   internalPage: {
-    footerIdent: 'site.faq', // localized string identifier
-    headTitleIdent: 'site.faq', // localized string identifier
-    // Wolle headlineIdent: '', // on null default is used, on empty string it's hidden
-    headlineIdent: '', // localized string identifier. on null it's hidden, on empty string default is used
+    // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
+    // headTitleIdent: 'site.faq', // localized string identifier, if undefined default is used
+    // headlineIdent: 'site.faq', // on null default is used, on empty string it's hidden
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
+    // in case internal page content is here 'webapp/locales/html/'
   },
 })
-const SUPPORT = defaultPageParamsPages.SUPPORT.assign({
-  // ATTENTION: has to be defined even for internal page with full URL as example like 'https://staging.ocelot.social/support', because it is used in e-mails as well!
-  // Wolle externalLink: 'https://ocelot.social',
-  externalLink: 'http://localhost:3000/support', // if string is defined and not empty it's dominating
+const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
+  // Wolle externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
 
-  // in case internal page content is here 'webapp/locales/html/'
   internalPage: {
-    footerIdent: 'site.support', // localized string identifier
-    headTitleIdent: 'site.support', // localized string identifier
-    // Wolle headlineIdent: '', // on null default is used, on empty string it's hidden
-    headlineIdent: '', // localized string identifier. on null it's hidden, on empty string default is used
+    // footerIdent: 'site.support', // localized string identifier, if undefined default is used
+    // headTitleIdent: 'site.support', // localized string identifier, if undefined default is used
+    // headlineIdent: 'site.support', // on null default is used, on empty string it's hidden
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
+    // in case internal page content is here 'webapp/locales/html/'
   },
 })
 

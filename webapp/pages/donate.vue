@@ -14,5 +14,10 @@ export default {
   data() {
     return { links }
   },
+  created() {
+    if (!this.links.DONATE.isInternalPage) {
+      window.location.href = this.links.DONATE.externalLink
+    }
+  },
 }
 </script>

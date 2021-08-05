@@ -2,9 +2,9 @@
   <ds-container width="small" class="password-reset">
     <base-card>
       <template #imageColumn>
-        <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
+        <page-params-link :pageParams="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)">
           <logo logoType="passwordReset" />
-        </a>
+        </page-params-link>
       </template>
       <nuxt-child />
       <template #topMenu>
@@ -19,11 +19,13 @@ import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
+import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 
 export default {
   components: {
     LocaleSwitch,
     Logo,
+    PageParamsLink,
   },
   layout: 'no-header',
   data() {

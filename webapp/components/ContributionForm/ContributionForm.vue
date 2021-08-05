@@ -25,10 +25,10 @@
         <div v-if="formData.image" class="blur-toggle">
           <label for="blur-img">{{ $t('contribution.inappropriatePicture') }}</label>
           <input type="checkbox" id="blur-img" v-model="formData.imageBlurred" />
-          <a :href="links.FAQ" target="_blank" class="link">
-            {{ $t('contribution.inappropriatePictureText') }}
+          <page-params-link class="link" :pageParams="links.FAQ">
+            {{ $t('contribution.inappropriatePicture') }}
             <base-icon name="question-circle" />
-          </a>
+          </page-params-link>
         </div>
         <ds-input
           model="title"
@@ -71,11 +71,13 @@ import HcEditor from '~/components/Editor/Editor'
 import PostMutations from '~/graphql/PostMutations.js'
 import ImageUploader from '~/components/ImageUploader/ImageUploader'
 import links from '~/constants/links.js'
+import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 
 export default {
   components: {
     HcEditor,
     ImageUploader,
+    PageParamsLink,
   },
   props: {
     contribution: {

@@ -4,9 +4,7 @@
       <ds-heading v-if="pageParams.internalPage.headlineIdent !== null" tag="h2">
         {{
           $t(
-            pageParams.internalPage.headlineIdent === ''
-              ? pageParams.internalPage.defaultHeadlineIdent
-              : pageParams.internalPage.headlineIdent,
+            pageParams.internalPage.headlineIdent,
           )
         }}
       </ds-heading>

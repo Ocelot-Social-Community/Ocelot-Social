@@ -142,7 +142,7 @@ export default {
     const passwordForm = PasswordForm({ translate: this.$t })
     return {
       links,
-      supportEmail: emails.SUPPORT,
+      supportEmail: emails.SUPPORT_EMAIL,
       formData: {
         name: '',
         ...passwordForm.formData,
