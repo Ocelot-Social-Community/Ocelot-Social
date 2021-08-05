@@ -1,18 +1,12 @@
 <template>
-  <internal-page :pageParams="links.FAQ" />
+  <internal-page :pageParams="pageParams" />
 </template>
 
 <script>
 import links from '~/constants/links.js'
-import InternalPage from '~/components/_new/features/InternalPage/InternalPage.vue'
+import { internalPageMixins } from '~/mixins/internalPageMixins'
 
 export default {
-  layout: 'basic',
-  components: {
-    InternalPage,
-  },
-  data() {
-    return { links }
-  },
+  mixins: [internalPageMixins(links.FAQ)],
 }
 </script>
