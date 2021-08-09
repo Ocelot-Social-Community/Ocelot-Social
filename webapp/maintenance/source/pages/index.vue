@@ -10,7 +10,7 @@
             <ds-space>
               <!-- QUESTION: could we have internal page or even all internal pages here as well with PageParamsLink by having the footer underneath? -->
               <!--   I tried this out, but only could get the nginx page displayed. I guees the there were nuxt errors, because the nuxt config file 'webapp/maintenance/source/nuxt.config.maintenance.js' would have to be refactored for that as well and may be the missing folder `components/_new/generic/` plays a role, see https://github.com/Ocelot-Social-Community/Ocelot-Social/pull/4619 -->
-              <!-- <page-params-link :pageParams="links.ORGANIZATION">
+              <!-- <page-params-link :pageParams="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)">
                 <logo type="maintenance" />
               </page-params-link> -->
               <!-- BUT: not the logo and not even the a-tag is working at the moment -->
