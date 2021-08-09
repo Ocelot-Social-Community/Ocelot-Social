@@ -34,7 +34,7 @@ class PageParams {
   redirectToPage(thisComponent) {
     if (this.isInternalPage) {
       thisComponent.$router.push(this.internalPage.pageRoute)
-    } else {
+    } else if (typeof window !== 'undefined') {
       window.location.href = this.externalLink
     }
   }
