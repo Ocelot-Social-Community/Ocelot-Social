@@ -53,7 +53,9 @@ import metadata from '~/constants/metadata.js'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 
 export default {
-  layout: 'blank',
+  // layout: 'blank',
+  // Wolle 
+  layout: 'no-header',
   components: {
     LocaleSwitch,
   },

@@ -59,7 +59,17 @@ RUN yarn install --production=false --frozen-lockfile --non-interactive
 COPY assets assets
 COPY components/LocaleSwitch/ components/LocaleSwitch
 COPY components/Dropdown.vue components/Dropdown.vue
-COPY layouts/blank.vue layouts/blank.vue
+# Wolle 
+COPY components/utils/InternalPages.js components/utils/InternalPages.js
+COPY components/PageFooter/PageFooter.vue components/PageFooter/PageFooter.vue
+COPY components/_new/features/PageParamsLink/PageParamsLink.vue components/_new/features/PageParamsLink/PageParamsLink.vue
+# Wolle COPY XXX XXX
+# Wolle COPY XXX XXX
+# Wolle COPY XXX XXX
+# Wolle COPY XXX XXX
+# Wolle COPY layouts/blank.vue layouts/blank.vue
+# Wolle
+COPY layouts/no-header.vue layouts/no-header.vue
 COPY locales locales
 COPY mixins mixins
 COPY plugins/i18n.js plugins/v-tooltip.js plugins/styleguide.js plugins/

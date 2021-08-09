@@ -9,87 +9,90 @@ services:
   ########################################################
   # WEBAPP ###############################################
   ########################################################
-  webapp:
-    image: ocelotsocialnetwork/webapp:latest
-    build:
-      context: ./webapp
-      target: production
-    networks:
-      - external-net
-    depends_on:
-      - backend
-    ports:
-      - 3000:3000
-      # Storybook: Todo externalize, its not working anyways
-      # - 3002:3002
-    environment:
-      # Envs used in Dockerfile
-      # - DOCKER_WORKDIR="/app"
-      # - PORT="3000"
-      - BUILD_DATE
-      - BUILD_VERSION
-      - BUILD_COMMIT
-      - NODE_ENV="production"
-      # Application only envs
-      - HOST=0.0.0.0 # This is nuxt specific, alternative value is HOST=webapp
-      - GRAPHQL_URI=http://backend:4000
-    env_file:
-      - ./webapp/.env
+  # Wolle
+  # webapp:
+  #   image: ocelotsocialnetwork/webapp:latest
+  #   build:
+  #     context: ./webapp
+  #     target: production
+  #   networks:
+  #     - external-net
+  #   depends_on:
+  #     - backend
+  #   ports:
+  #     - 3000:3000
+  #     # Storybook: Todo externalize, its not working anyways
+  #     # - 3002:3002
+  #   environment:
+  #     # Envs used in Dockerfile
+  #     # - DOCKER_WORKDIR="/app"
+  #     # - PORT="3000"
+  #     - BUILD_DATE
+  #     - BUILD_VERSION
+  #     - BUILD_COMMIT
+  #     - NODE_ENV="production"
+  #     # Application only envs
+  #     - HOST=0.0.0.0 # This is nuxt specific, alternative value is HOST=webapp
+  #     - GRAPHQL_URI=http://backend:4000
+  #   env_file:
+  #     - ./webapp/.env
   ########################################################
   # BACKEND ##############################################
   ########################################################
-  backend:
-    image: ocelotsocialnetwork/backend:latest
-    build:
-      context: ./backend
-      target: production
-    networks:
-      - external-net
-      - internal-net
-    depends_on:
-      - neo4j
-    ports:
-      - 4000:4000
-    volumes:
-      - backend_uploads:/app/public/uploads
-    environment:
-      # Envs used in Dockerfile
-      # - DOCKER_WORKDIR="/app"
-      # - PORT="4000"
-      - BUILD_DATE
-      - BUILD_VERSION
-      - BUILD_COMMIT
-      - NODE_ENV="production"
-      # Application only envs
-      - DEBUG=false
-      - NEO4J_URI=bolt://neo4j:7687
-      - GRAPHQL_URI=http://backend:4000
-      - CLIENT_URI=http://webapp:3000
-    env_file:
-      - ./backend/.env
+  # Wolle
+  # backend:
+  #   image: ocelotsocialnetwork/backend:latest
+  #   build:
+  #     context: ./backend
+  #     target: production
+  #   networks:
+  #     - external-net
+  #     - internal-net
+  #   depends_on:
+  #     - neo4j
+  #   ports:
+  #     - 4000:4000
+  #   volumes:
+  #     - backend_uploads:/app/public/uploads
+  #   environment:
+  #     # Envs used in Dockerfile
+  #     # - DOCKER_WORKDIR="/app"
+  #     # - PORT="4000"
+  #     - BUILD_DATE
+  #     - BUILD_VERSION
+  #     - BUILD_COMMIT
+  #     - NODE_ENV="production"
+  #     # Application only envs
+  #     - DEBUG=false
+  #     - NEO4J_URI=bolt://neo4j:7687
+  #     - GRAPHQL_URI=http://backend:4000
+  #     - CLIENT_URI=http://webapp:3000
+  #   env_file:
+  #     - ./backend/.env
   ########################################################
   # NEO4J ################################################
   ########################################################
-  neo4j:
-    image: ocelotsocialnetwork/neo4j:latest
-    build:
-      context: ./neo4j
-      # community edition 👆🏼, because we have no enterprise licence 👇🏼 at the moment
-      target: community
-    networks:
-      - internal-net
-    ports:
-      - 7687:7687
-    volumes:
-      - neo4j_data:/data
-    environment:
-      # TODO: This sounds scary for a production environment
-      - NEO4J_AUTH=none
-      - NEO4J_dbms_security_procedures_unrestricted=algo.*,apoc.*
-      # Uncomment following line for Neo4j Enterprise version instead of Community version
-      # TODO: clarify if that is the only thing needed to unlock the Enterprise version
-      # - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
-      # TODO: Remove the playground from production
+  # Wolle
+  # neo4j:
+  #   image: ocelotsocialnetwork/neo4j:latest
+  #   build:
+  #     context: ./neo4j
+  #     # community edition 👆🏼, because we have no enterprise licence 👇🏼 at the moment
+  #     target: community
+  #   networks:
+  #     - internal-net
+  #   ports:
+  #     - 7687:7687
+  #   volumes:
+  #     - neo4j_data:/data
+  #   environment:
+  #     # TODO: This sounds scary for a production environment
+  #     - NEO4J_AUTH=none
+  #     - NEO4J_dbms_security_procedures_unrestricted=algo.*,apoc.*
+  #     # Uncomment following line for Neo4j Enterprise version instead of Community version
+  #     # TODO: clarify if that is the only thing needed to unlock the Enterprise version
+  #     # - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+  #     # TODO: Remove the playground from production
   ########################################################
   # MAINTENANCE ##########################################
   ########################################################
@@ -109,6 +112,7 @@ networks:
   internal-net:
     internal: true
 
-volumes:
-  backend_uploads:
-  neo4j_data:
+  # Wolle
+# volumes:
+#   backend_uploads:
+#   neo4j_data:

@@ -1,14 +1,16 @@
 <template>
-  <nuxt-link
+  <!-- Wolle -->
+  <!-- <nuxt-link
     v-if="pageParams.isInternalPage"
     :to="pageParams.internalPage.pageRoute"
     :data-test="pageParams.name + '-nuxt-link'"
   >
     <slot />
-  </nuxt-link>
-  <a v-else :href="pageParams.externalLink" target="_blank" :data-test="pageParams.name + '-link'">
+  </nuxt-link> -->
+  <!-- <a v-else :href="pageParams.externalLink" target="_blank" :data-test="pageParams.name + '-link'"> -->
+  <!-- <a :href="pageParams.internalPage.pageRoute" target="_blank" :data-test="pageParams.name + '-link'"> -->
     <slot />
-  </a>
+  <!-- </a> -->
 </template>
 
 <script>
