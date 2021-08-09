@@ -8,22 +8,17 @@
         <ds-flex>
           <ds-flex-item :width="{ base: '100%', sm: 1, md: 1 }">
             <ds-space>
-              <!-- Wolle -->
-              <a
-                v-if="!links.ORGANIZATION.isInternalPage"
-                :href="links.ORGANIZATION.link"
+              <!-- this link works only for external pages -->
+              <!-- QUESTION: could we have internal page or even all internal pages here as well with PageParamsLink by having the footer underneath? -->
+              <!--   I tried this out, but only could get the nginx page displayed. I guees the there were nuxt errors, because the nuxt config file 'webapp/maintenance/source/nuxt.config.maintenance.js' would have to be refactored for that as well -->
+              <!-- BUT: not even the a-tag is working at the moment -->
+              <!-- <a
+                :href="emails.ORGANIZATION_LINK"
                 :title="$t('login.moreInfo', metadata)"
                 target="_blank"
-              >
-                <img class="image" alt="Under maintenance" src="/img/custom/logo-squared.svg" />
-              </a>
-              <img
-                v-else
-                class="image"
-                alt="Under maintenance"
-                src="/img/custom/logo-squared.svg"
-                :title="$t('login.moreInfo', metadata)"
-              />
+              > -->
+              <img class="image" alt="Under maintenance" src="/img/custom/logo-squared.svg" />
+              <!-- </a> -->
             </ds-space>
           </ds-flex-item>
           <ds-flex-item :width="{ base: '100%', sm: 1, md: 1 }">
@@ -48,7 +43,7 @@
 
 <script>
 import emails from '~/constants/emails.js'
-import links from '~/constants/links.js'
+// import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 
@@ -58,7 +53,8 @@ export default {
     LocaleSwitch,
   },
   data() {
-    return { links, metadata, supportEmail: emails.SUPPORT_EMAIL }
+    // return { links, metadata, supportEmail: emails.SUPPORT_EMAIL }
+    return { metadata, supportEmail: emails.SUPPORT_EMAIL }
   },
 }
 </script>
