@@ -11,13 +11,14 @@
               <!-- this link works only for external pages -->
               <!-- QUESTION: could we have internal page or even all internal pages here as well with PageParamsLink by having the footer underneath? -->
               <!--   I tried this out, but only could get the nginx page displayed. I guees the there were nuxt errors, because the nuxt config file 'webapp/maintenance/source/nuxt.config.maintenance.js' would have to be refactored for that as well -->
-              <!-- BUT: not even the a-tag is working at the moment -->
+              <!-- BUT: not the logo and not even the a-tag is working at the moment -->
               <!-- <a
                 :href="emails.ORGANIZATION_LINK"
                 :title="$t('login.moreInfo', metadata)"
                 target="_blank"
               > -->
               <img class="image" alt="Under maintenance" src="/img/custom/logo-squared.svg" />
+              <!-- <logo type="maintenance" /> -->
               <!-- </a> -->
             </ds-space>
           </ds-flex-item>
@@ -46,11 +47,13 @@ import emails from '~/constants/emails.js'
 // import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+// import Logo from '~/components/Logo/Logo'
 
 export default {
   layout: 'blank',
   components: {
     LocaleSwitch,
+    // Logo,
   },
   data() {
     // return { links, metadata, supportEmail: emails.SUPPORT_EMAIL }
