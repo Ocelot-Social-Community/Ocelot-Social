@@ -2,25 +2,63 @@ import extractMentionedUsers from './mentions/extractMentionedUsers'
 import { validateNotifyUsers } from '../validation/validationMiddleware'
 import { pubsub, NOTIFICATION_ADDED } from '../../server'
 
-const publishNotifications = async (...promises) => {
-  const notifications = await Promise.all(promises)
+const queryNotificationsEmails = async (context, notificationUserIds) => {
+  if (!(notificationUserIds && notificationUserIds.length)) return []
+  const userEmailCypher = `
+    MATCH (user: User)
+    // blocked users are filtered out from notifications already
+    WHERE user.id in $notificationUserIds
+    WITH user
+    MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
+    RETURN emailAddress {.email}
+  `
+  const session = context.driver.session()
+  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+    const emailAddressTransactionResponse = await transaction.run(userEmailCypher, {
+      notificationUserIds,
+    })
+    return emailAddressTransactionResponse.records.map((record) => record.get('emailAddress'))
+  })
+  try {
+    const emailAddresses = await writeTxResultPromise
+    return emailAddresses
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+}
+
+const sendNotificationEmails = async (notification, email) => {
+  // Wolle
+  console.log('sendNotificationEmails !!! notification.to.slug: ', notification.to.slug)
+  console.log('sendNotificationEmails !!! email: ', email)
+}
+
+const publishNotifications = async (context, promises) => {
+  let notifications = await Promise.all(promises)
+  notifications = notifications.flat()
+  // Wolle
+  console.log('notifications: ', notifications)
+  const notificationsEmailAddresses = await queryNotificationsEmails(context, notifications.map((notification) => notification.to.id))
+  // Wolle
+  console.log('notificationsEmailAddresses: ', notificationsEmailAddresses)
   notifications
-    .flat()
-    .forEach((notificationAdded) => {
+    .forEach((notificationAdded, index) => {
       pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
       // Wolle
-      // XXX send e-mails
+      // console.log('notificationAdded: ', notificationAdded)
+      sendNotificationEmails(notificationAdded, notificationsEmailAddresses[index].email)
     })
 }
 
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
   const idsOfUsers = extractMentionedUsers(args.content)
-  // Wolle console.log(context)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
-    await publishNotifications(
+    await publishNotifications(context, [
       notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
-    )
+    ])
   }
   return post
 }
@@ -31,10 +69,10 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
   idsOfUsers = idsOfUsers.filter((id) => id !== postAuthor.id)
-  await publishNotifications(
+  await publishNotifications(context, [
     notifyUsersOfMention('Comment', comment.id, idsOfUsers, 'mentioned_in_comment', context),
     notifyUsersOfComment('Comment', comment.id, postAuthor.id, 'commented_on_post', context),
-  )
+  ])
   return comment
 }
 
@@ -87,6 +125,10 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
     }
   }
   mentionedCypher += `
+    // Wolle remove !!!
+    // WITH notification, user, resource
+    // MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
+    // SET user.email = emailAddress.email
     WITH notification, user, resource,
     [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
     [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author)} ] AS posts
