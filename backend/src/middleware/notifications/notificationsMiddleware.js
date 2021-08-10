@@ -6,11 +6,16 @@ const publishNotifications = async (...promises) => {
   const notifications = await Promise.all(promises)
   notifications
     .flat()
-    .forEach((notificationAdded) => pubsub.publish(NOTIFICATION_ADDED, { notificationAdded }))
+    .forEach((notificationAdded) => {
+      pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
+      // Wolle
+      // XXX send e-mails
+    })
 }
 
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
   const idsOfUsers = extractMentionedUsers(args.content)
+  // Wolle console.log(context)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
     await publishNotifications(

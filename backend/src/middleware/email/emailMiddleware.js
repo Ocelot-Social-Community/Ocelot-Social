@@ -76,5 +76,10 @@ export default {
     AddEmailAddress: sendEmailVerificationMail,
     requestPasswordReset: sendPasswordResetMail,
     Signup: sendSignupMail,
+    // Wolle
+    // CreatePost: handleContentDataOfPost,
+    // UpdatePost: handleContentDataOfPost,
+    // CreateComment: handleContentDataOfComment,
+    // UpdateComment: handleContentDataOfComment,
   },
 }
