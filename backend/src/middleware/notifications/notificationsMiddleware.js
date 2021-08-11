@@ -1,6 +1,8 @@
+import { pubsub, NOTIFICATION_ADDED } from '../../server'
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 import { validateNotifyUsers } from '../validation/validationMiddleware'
-import { pubsub, NOTIFICATION_ADDED } from '../../server'
+import { sendMail } from '../helpers/email/sendMail'
+import { notificationTemplate } from '../helpers/email/templateBuilder'
 
 const queryNotificationsEmails = async (context, notificationUserIds) => {
   if (!(notificationUserIds && notificationUserIds.length)) return []
@@ -29,12 +31,6 @@ const queryNotificationsEmails = async (context, notificationUserIds) => {
   }
 }
 
-const sendNotificationEmails = async (notification, email) => {
-  // Wolle
-  console.log('sendNotificationEmails !!! notification.to.slug: ', notification.to.slug)
-  console.log('sendNotificationEmails !!! email: ', email)
-}
-
 const publishNotifications = async (context, promises) => {
   let notifications = await Promise.all(promises)
   notifications = notifications.flat()
@@ -48,10 +44,16 @@ const publishNotifications = async (context, promises) => {
   console.log('notificationsEmailAddresses: ', notificationsEmailAddresses)
   notifications.forEach((notificationAdded, index) => {
     pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
-    // Wolle
-    // console.log('notificationAdded: ', notificationAdded)
-    sendNotificationEmails(notificationAdded, notificationsEmailAddresses[index].email)
+    // Wolle await
+    sendMail(
+      notificationTemplate({
+        email: notificationsEmailAddresses[index].email,
+        notification: notificationAdded,
+      }),
+    )
   })
+  // Wolle
+  // return XXX successful?
 }
 
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {

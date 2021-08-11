@@ -3,6 +3,8 @@ import CONFIG from '../../../config'
 import logosWebapp from '../../../config/logos.js'
 
 import * as templates from './templates'
+import * as templatesEN from './templates/en'
+import * as templatesDE from './templates/de'
 
 const from = CONFIG.EMAIL_DEFAULT_SENDER
 const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
@@ -87,6 +89,36 @@ export const wrongAccountTemplate = ({ email }) => {
       templates.layout,
       { ...defaultParams, actionUrl, supportUrl: CONFIG.SUPPORT_URL, welcomeImageUrl },
       { content: templates.wrongAccount },
+    ),
+  }
+}
+
+export const notificationTemplate = ({ email, notification }) => {
+  const subject = `${CONFIG.APPLICATION_NAME} – Benachrichtigung | Notification`
+  const actionUrl = new URL('/notifications', CONFIG.CLIENT_URI)
+  // TODO Wolle language
+  let content
+  switch (notification.to.locale) {
+    case 'de':
+      content = templatesDE.notification
+      break
+    case 'en':
+      content = templatesEN.notification
+      break
+
+    default:
+      content = templatesEN.notification
+      break
+  }
+
+  return {
+    from,
+    to: email,
+    subject,
+    html: mustache.render(
+      templates.layout,
+      { ...defaultParams, actionUrl, supportUrl: /* Wolle */ CONFIG.SUPPORT_URL, welcomeImageUrl },
+      { content },
     ),
   }
 }

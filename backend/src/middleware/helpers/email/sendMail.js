@@ -14,10 +14,12 @@ let sendMailCallback = async (templateArgs) => {
 if (!hasEmailConfig) {
   if (!CONFIG.TEST) {
     // eslint-disable-next-line no-console
-    console.log('Warning: Email middleware will not try to send mails.') // Wolle
+    console.log('Warning: Middlewares will not try to send mails.') // Wolle
   }
 } else {
   sendMailCallback = async (templateArgs) => {
+    // Wolle
+    console.log('templateArgs: ', templateArgs)
     const transporter = nodemailer.createTransport({
       host: CONFIG.SMTP_HOST,
       port: CONFIG.SMTP_PORT,
