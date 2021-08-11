@@ -35,13 +35,13 @@ const publishNotifications = async (context, promises) => {
   let notifications = await Promise.all(promises)
   notifications = notifications.flat()
   // Wolle
-  console.log('notifications: ', notifications)
+  // console.log('notifications: ', notifications)
   const notificationsEmailAddresses = await queryNotificationsEmails(
     context,
     notifications.map((notification) => notification.to.id),
   )
   // Wolle
-  console.log('notificationsEmailAddresses: ', notificationsEmailAddresses)
+  // console.log('notificationsEmailAddresses: ', notificationsEmailAddresses)
   notifications.forEach((notificationAdded, index) => {
     pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
     // Wolle await

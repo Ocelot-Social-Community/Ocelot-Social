@@ -9,7 +9,7 @@ const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD
 // let sendMailCallback = async () => {}
 // Wolle
 let sendMailCallback = async (templateArgs) => {
-  console.log('templateArgs: ', templateArgs)
+  // console.log('templateArgs: ', templateArgs)
 }
 if (!hasEmailConfig) {
   if (!CONFIG.TEST) {
@@ -19,7 +19,7 @@ if (!hasEmailConfig) {
 } else {
   sendMailCallback = async (templateArgs) => {
     // Wolle
-    console.log('templateArgs: ', templateArgs)
+    // console.log('templateArgs: ', templateArgs)
     const transporter = nodemailer.createTransport({
       host: CONFIG.SMTP_HOST,
       port: CONFIG.SMTP_PORT,
