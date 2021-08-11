@@ -40,16 +40,18 @@ const publishNotifications = async (context, promises) => {
   notifications = notifications.flat()
   // Wolle
   console.log('notifications: ', notifications)
-  const notificationsEmailAddresses = await queryNotificationsEmails(context, notifications.map((notification) => notification.to.id))
+  const notificationsEmailAddresses = await queryNotificationsEmails(
+    context,
+    notifications.map((notification) => notification.to.id),
+  )
   // Wolle
   console.log('notificationsEmailAddresses: ', notificationsEmailAddresses)
-  notifications
-    .forEach((notificationAdded, index) => {
-      pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
-      // Wolle
-      // console.log('notificationAdded: ', notificationAdded)
-      sendNotificationEmails(notificationAdded, notificationsEmailAddresses[index].email)
-    })
+  notifications.forEach((notificationAdded, index) => {
+    pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
+    // Wolle
+    // console.log('notificationAdded: ', notificationAdded)
+    sendNotificationEmails(notificationAdded, notificationsEmailAddresses[index].email)
+  })
 }
 
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
@@ -125,10 +127,6 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
     }
   }
   mentionedCypher += `
-    // Wolle remove !!!
-    // WITH notification, user, resource
-    // MATCH (user)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
-    // SET user.email = emailAddress.email
     WITH notification, user, resource,
     [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
     [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author)} ] AS posts
