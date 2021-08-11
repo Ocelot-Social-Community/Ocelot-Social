@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import links from './links.js'
+import emails from './emails.js'
 import metadata from './metadata.js'
 
 // Load env file
@@ -79,9 +79,9 @@ const s3 = {
 
 const options = {
   EMAIL_DEFAULT_SENDER: env.EMAIL_DEFAULT_SENDER,
-  SUPPORT_URL: links.SUPPORT,
+  SUPPORT_URL: emails.SUPPORT_LINK,
   APPLICATION_NAME: metadata.APPLICATION_NAME,
-  ORGANIZATION_URL: links.ORGANIZATION,
+  ORGANIZATION_URL: emails.ORGANIZATION_LINK,
   PUBLIC_REGISTRATION: env.PUBLIC_REGISTRATION === 'true' || false,
   INVITE_REGISTRATION: env.INVITE_REGISTRATION !== 'false', // default = true
 }

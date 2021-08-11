@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import Organization from './organization.vue'
+import Donate from './donate.vue'
 import VueMeta from 'vue-meta'
 
 const localVue = global.localVue
@@ -10,7 +10,7 @@ const assignMock = jest.fn()
 delete window.location
 window.location = { assign: assignMock }
 
-describe('organization.vue', () => {
+describe('donate.vue', () => {
   let wrapper
   let mocks
 
@@ -22,7 +22,7 @@ describe('organization.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(Organization, {
+      return mount(Donate, {
         mocks,
         localVue,
       })
@@ -37,7 +37,7 @@ describe('organization.vue', () => {
     })
 
     it('has correct <head> content', () => {
-      expect(wrapper.vm.$metaInfo.title).toBe('site.made')
+      expect(wrapper.vm.$metaInfo.title).toBe('site.donate')
     })
   })
 })

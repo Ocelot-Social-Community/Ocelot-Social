@@ -6,9 +6,9 @@
     </blockquote>
     <base-card>
       <template #imageColumn>
-        <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
+        <page-params-link :pageParams="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)">
           <logo logoType="welcome" />
-        </a>
+        </page-params-link>
       </template>
       <h2 class="title">{{ $t('login.login') }}</h2>
       <form :disabled="pending" @submit.prevent="onSubmit">
@@ -54,6 +54,7 @@
 <script>
 import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
+import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
@@ -62,6 +63,7 @@ export default {
   components: {
     LocaleSwitch,
     Logo,
+    PageParamsLink,
     ShowPassword,
   },
   data() {

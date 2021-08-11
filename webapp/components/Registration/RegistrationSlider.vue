@@ -2,9 +2,9 @@
   <section class="login-form">
     <base-card>
       <template #imageColumn>
-        <a :href="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)" target="_blank">
+        <page-params-link :pageParams="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)">
           <logo logoType="signup" />
-        </a>
+        </page-params-link>
       </template>
 
       <component-slider :sliderData="sliderData">
@@ -48,6 +48,7 @@ import metadata from '~/constants/metadata.js'
 import ComponentSlider from '~/components/ComponentSlider/ComponentSlider'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
+import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import RegistrationSlideCreate from './RegistrationSlideCreate'
 import RegistrationSlideEmail from './RegistrationSlideEmail'
 import RegistrationSlideInvite from './RegistrationSlideInvite'
@@ -60,6 +61,7 @@ export default {
     ComponentSlider,
     LocaleSwitch,
     Logo,
+    PageParamsLink,
     RegistrationSlideCreate,
     RegistrationSlideEmail,
     RegistrationSlideInvite,
