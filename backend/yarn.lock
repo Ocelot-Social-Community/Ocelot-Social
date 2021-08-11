@@ -1289,10 +1289,10 @@
     url-regex "~4.1.1"
     video-extensions "~1.1.0"
 
-"@metascraper/helpers@^5.11.6", "@metascraper/helpers@^5.11.8", "@metascraper/helpers@^5.14.22", "@metascraper/helpers@^5.14.26", "@metascraper/helpers@^5.23.0":
-  version "5.23.0"
-  resolved "https://registry.yarnpkg.com/@metascraper/helpers/-/helpers-5.23.0.tgz#f7e5b0b489ca443b0a8883bd9ffe1a028874377d"
-  integrity sha512-dT2WL2ukZFRSz45O9RKpUgeo8ssyPVw7xPKJ0+JPU3IQcVVlcaNKfqXJmwVpHQc6FVz621zBOLyVMGDTAVXj9g==
+"@metascraper/helpers@^5.11.8", "@metascraper/helpers@^5.14.22", "@metascraper/helpers@^5.14.26", "@metascraper/helpers@^5.23.0", "@metascraper/helpers@^5.23.1":
+  version "5.23.1"
+  resolved "https://registry.yarnpkg.com/@metascraper/helpers/-/helpers-5.23.1.tgz#f8fa40dd3e37fa1ac8596e48ed7ea73e2230ba46"
+  integrity sha512-lOf9RViEqR+aNltjvf2arjxQ2SXvQZ63A9voLwDISAB4l6sOhOEkwRCL6YSS4blkcGe1KN9r/cTxgFEenU2egA==
   dependencies:
     audio-extensions "0.0.0"
     chrono-node "2.3.1"
@@ -1311,7 +1311,6 @@
     microsoft-capitalize "~1.0.5"
     mime-types "~2.1.31"
     normalize-url "~6.1.0"
-    parse-num "~1.0.0"
     smartquotes "~2.3.2"
     truncate "~2.1.0"
     url-regex-safe "~2.0.2"
@@ -7069,12 +7068,12 @@ metascraper-date@^5.11.8:
   dependencies:
     "@metascraper/helpers" "^5.11.8"
 
-metascraper-description@^5.11.6:
-  version "5.11.6"
-  resolved "https://registry.yarnpkg.com/metascraper-description/-/metascraper-description-5.11.6.tgz#515368b5ca88cb5fa1fd92c0946458795b03960f"
-  integrity sha512-rGD6hEWLHPlZ/091htCoFAJGft2oRDAaAoDcnafMdTBcuukBIpZ3QNOR3rYpliWHbpS8cwiX2Q9IawyqB4iK0g==
+metascraper-description@^5.23.1:
+  version "5.23.1"
+  resolved "https://registry.yarnpkg.com/metascraper-description/-/metascraper-description-5.23.1.tgz#f83df32a7dd095e1403700335bbb7c8025ed6a5f"
+  integrity sha512-fuZpnWXLf/l8XvCsgXXu5BjXAoryYQANN/qUarBs50O+5ZQWWvd40wb6jxkpD7rUBP7Dz6YFO44oICYz6TwT4g==
   dependencies:
-    "@metascraper/helpers" "^5.11.6"
+    "@metascraper/helpers" "^5.23.1"
 
 metascraper-image@^5.11.8:
   version "5.11.8"
@@ -7092,12 +7091,12 @@ metascraper-lang-detector@^4.10.2:
     franc "~4.0.0"
     iso-639-3 "~1.1.0"
 
-metascraper-lang@^5.11.8:
-  version "5.11.8"
-  resolved "https://registry.yarnpkg.com/metascraper-lang/-/metascraper-lang-5.11.8.tgz#a5ccbf6c647b1775a6a71d9da01a5c99a1b43a6f"
-  integrity sha512-40brNSRfbOXEjfrVGWlMZOiAWe/wmwwIn7Kv3yxkaOcYAr4iWYlYBwEXIqGt5mtGpPDd45kiv0NHS50vXGlTIw==
+metascraper-lang@^5.23.1:
+  version "5.23.1"
+  resolved "https://registry.yarnpkg.com/metascraper-lang/-/metascraper-lang-5.23.1.tgz#703a5858815f7c647eecd44b1b2f6bf2d291f8f6"
+  integrity sha512-VFJX9xrxWe0YLW7aDbUAUsOnNTv6RaJ7z/W+BrgtbJTvjIvWENvMBBbpWHh69B58Ih3VE607YTc0+wImGbe0yA==
   dependencies:
-    "@metascraper/helpers" "^5.11.8"
+    "@metascraper/helpers" "^5.23.1"
 
 metascraper-logo@^5.14.26:
   version "5.14.26"
@@ -8091,11 +8090,6 @@ parse-json@^4.0.0:
   dependencies:
     error-ex "^1.3.1"
     json-parse-better-errors "^1.0.1"
-
-parse-num@~1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/parse-num/-/parse-num-1.0.0.tgz#abd8b339c157a23d3ef87953ceb11f1dd08059d0"
-  integrity sha1-q9izOcFXoj0++HlTzrEfHdCAWdA=
 
 parse-passwd@^1.0.0:
   version "1.0.0"
