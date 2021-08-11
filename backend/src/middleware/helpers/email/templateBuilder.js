@@ -1,6 +1,6 @@
 import mustache from 'mustache'
-import CONFIG from '../../config'
-import logosWebapp from '../../config/logos.js'
+import CONFIG from '../../../config'
+import logosWebapp from '../../../config/logos.js'
 
 import * as templates from './templates'
 
