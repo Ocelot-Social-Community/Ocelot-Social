@@ -34,4 +34,3 @@ FROM nginx:alpine as branded
 COPY --from=build ./app/dist/ /usr/share/nginx/html/
 RUN rm /etc/nginx/conf.d/default.conf
 COPY --from=code ./app/maintenance/nginx/custom.conf /etc/nginx/conf.d/
-
