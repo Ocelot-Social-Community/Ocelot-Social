@@ -20,7 +20,7 @@ services:
       - HOST=0.0.0.0
       - GRAPHQL_URI=http://backend:4000
       - MAPBOX_TOKEN="pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g"
-      - WEBSOCKETS_URI=${WEBSOCKETS_URI}
+      # - WEBSOCKETS_URI=ws://backend:4000/graphql # is not working and not given in Docker YAML in main repo
       - PUBLIC_REGISTRATION=true
   ########################################################
   # BACKEND ##############################################
@@ -36,6 +36,8 @@ services:
       - neo4j
     ports:
       - 4000:4000
+    volumes:
+      - backend_uploads:/app/public/uploads
     environment:
       - NEO4J_URI=bolt://neo4j:7687
       - GRAPHQL_URI=http://backend:4000
@@ -58,6 +60,8 @@ services:
     image: ocelotsocialnetwork/neo4j:community
     networks:
       - test-network
+    volumes:
+      - neo4j_data:/data
     environment:
       - NEO4J_AUTH=none
       - NEO4J_dbms_security_procedures_unrestricted=algo.*,apoc.*
@@ -86,5 +90,10 @@ services:
       - 1080:80
     networks:
       - test-network
+
 networks:
   test-network:
+
+volumes:
+  backend_uploads:
+  neo4j_data:
