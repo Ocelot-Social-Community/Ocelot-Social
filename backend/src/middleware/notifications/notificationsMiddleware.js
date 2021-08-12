@@ -4,6 +4,7 @@ import { validateNotifyUsers } from '../validation/validationMiddleware'
 import { sendMail } from '../helpers/email/sendMail'
 import { notificationTemplate } from '../helpers/email/templateBuilder'
 
+// Wolle -> queryNotificationEmails
 const queryNotificationsEmails = async (context, notificationUserIds) => {
   if (!(notificationUserIds && notificationUserIds.length)) return []
   const userEmailCypher = `
