@@ -1,5 +1,5 @@
 <template>
-  <section class="login-form">
+  <section class="registration-slider">
     <base-card>
       <template #imageColumn>
         <page-params-link :pageParams="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)">
@@ -255,4 +255,10 @@ export default {
 }
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.registration-slider {
+  width: 80vw;
+  max-width: 620px;
+  margin: auto; 
+}
+</style>
