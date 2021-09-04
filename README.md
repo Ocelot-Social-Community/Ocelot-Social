@@ -74,7 +74,7 @@ Docker is a software development container tool that combines software and its d
 
 #### General Installation of Docker
 
-There are [sevaral ways to install Docker CE](https://docs.docker.com/install/) on your computer or server.
+There are [several ways to install Docker CE](https://docs.docker.com/install/) on your computer or server.
 
  * [install Docker Desktop on macOS](https://docs.docker.com/docker-for-mac/install/)
  * [install Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/install/)
