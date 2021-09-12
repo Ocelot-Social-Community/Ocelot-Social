@@ -115,7 +115,7 @@ export default {
 .login-form {
   width: 80vw;
   max-width: 620px;
-  margin: auto; 
+  margin: auto;
 
   .base-button {
     display: block;

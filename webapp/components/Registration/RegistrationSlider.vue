@@ -259,6 +259,6 @@ export default {
 .registration-slider {
   width: 80vw;
   max-width: 620px;
-  margin: auto; 
+  margin: auto;
 }
 </style>
