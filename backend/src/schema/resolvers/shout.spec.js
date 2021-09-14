@@ -31,7 +31,10 @@ const queryPost = gql`
 
 describe('shout and unshout posts', () => {
   let currentUser, postAuthor
-  beforeAll(() => {
+
+  beforeAll(async () => {
+    await cleanDatabase()
+
     authenticatedUser = undefined
     const { server } = createServer({
       context: () => {
@@ -45,6 +48,11 @@ describe('shout and unshout posts', () => {
     mutate = createTestClient(server).mutate
     query = createTestClient(server).query
   })
+
+  afterAll(async () => {
+    await cleanDatabase()
+  })
+
   beforeEach(async () => {
     currentUser = await Factory.build(
       'user',
@@ -70,6 +78,8 @@ describe('shout and unshout posts', () => {
       },
     )
   })
+
+  // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
   afterEach(async () => {
     await cleanDatabase()
   })

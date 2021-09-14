@@ -1613,14 +1613,13 @@ atob@^2.1.1:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-auto-changelog@^2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/auto-changelog/-/auto-changelog-2.2.1.tgz#a031fbf1dfe140dda2ec8c77a524031478a0e933"
-  integrity sha512-XlykJfZrXlWUAADBqGoN1elmntrRcx7oEymyYB3NRPEZxv0TfYHfivmwzejUMnwAdXKCgbQPo7GV5ULs3jwpfw==
+auto-changelog@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/auto-changelog/-/auto-changelog-2.3.0.tgz#08ab8b1840a5d804410f1d1a5d2c4b2df0d835e1"
+  integrity sha512-S2B+RtTgytsa7l5iFGBoWT9W9ylITT5JJ8OaMJ7nrwvnlRm1dSS2tghaYueDeInZZafOE+1llH3tUQjMDRVS1g==
   dependencies:
     commander "^5.0.0"
     handlebars "^4.7.3"
-    lodash.uniqby "^4.7.0"
     node-fetch "^2.6.0"
     parse-github-url "^1.0.2"
     semver "^6.3.0"
@@ -2609,7 +2608,7 @@ date-fns@^1.27.2:
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-1.30.1.tgz#2e71bf0b119153dbb4cc4e88d9ea5acfb50dc05c"
   integrity sha512-hBSVCvSmWC+QypYObzwGOd9wqdDpOt+0wl0KbU+R+uuZBS1jN8VsD1ss3irQDknRj5NvxiTF6oj/nDRnN/UQNw==
 
-date-fns@^2.22.1:
+date-fns@^2.23.0:
   version "2.23.0"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.23.0.tgz#4e886c941659af0cf7b30fafdd1eaa37e88788a9"
   integrity sha512-5ycpauovVyAk0kXNZz6ZoB9AYMZB4DObse7P3BPWmyEjXNORTI8EJ6X0uaSAq4sCHzM1uajzrkr6HnsLQpxGXA==
@@ -4164,11 +4163,6 @@ lodash.once@^4.0.0, lodash.once@^4.1.1:
   resolved "https://registry.yarnpkg.com/lodash.once/-/lodash.once-4.1.1.tgz#0dd3971213c7c56df880977d504c88fb471a97ac"
   integrity sha1-DdOXEhPHxW34gJd9UEyI+0cal6w=
 
-lodash.uniqby@^4.7.0:
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/lodash.uniqby/-/lodash.uniqby-4.7.0.tgz#d99c07a669e9e6d24e1362dfe266c67616af1302"
-  integrity sha1-2ZwHpmnp5tJOE2Lf4mbGdhavEwI=
-
 lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.19, lodash@^4.17.4:
   version "4.17.20"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
@@ -5448,12 +5442,10 @@ slice-ansi@0.0.4:
   resolved "https://registry.yarnpkg.com/slice-ansi/-/slice-ansi-0.0.4.tgz#edbf8903f66f7ce2f8eafd6ceed65e264c831b35"
   integrity sha1-7b+JA/ZvfOL46v1s7tZeJkyDGzU=
 
-slug@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/slug/-/slug-2.1.1.tgz#08df390d4b4d51bafb41ac0067c0c2dd70734ef2"
-  integrity sha512-yNGhDdS0DR0JyxnPC84qIx/Vd01RHVY4guJeBqBNdBoOLNWnzw5zkWJvxVSmsuUb92bikdnQFnw3PfGY8uZ82g==
-  dependencies:
-    unicode ">= 0.3.1"
+slug@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/slug/-/slug-5.1.0.tgz#8a7e30ca1c3a6dc40cf74e269750913a865edb0b"
+  integrity sha512-IS39jKR6m+puU8zWgH6ruwx1sfzFNJ6Ai5PKIlUqd0X8C3ca7PB49Cvm0uayqgEt1jgaojO2wWEsQJngnh7fDA==
 
 snapdragon-node@^2.0.1:
   version "2.1.1"
@@ -6027,11 +6019,6 @@ unicode-property-aliases-ecmascript@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/unicode-property-aliases-ecmascript/-/unicode-property-aliases-ecmascript-1.0.5.tgz#a9cc6cc7ce63a0a3023fc99e341b94431d405a57"
   integrity sha512-L5RAqCfXqAwR3RriF8pM0lU0w4Ryf/GgzONwi6KnL1taJQa7x1TCxdJnILX59WIGOwR57IVxn7Nej0fz1Ny6fw==
-
-"unicode@>= 0.3.1":
-  version "11.0.1"
-  resolved "https://registry.yarnpkg.com/unicode/-/unicode-11.0.1.tgz#735bd422ec75cf28d396eb224d535d168d5f1db6"
-  integrity sha512-+cHtykLb+eF1yrSLWTwcYBrqJkTfX7Quoyg7Juhe6uylF43ZbMdxMuSHNYlnyLT8T7POAvavgBthzUF9AIaQvQ==
 
 union-value@^1.0.0:
   version "1.0.0"

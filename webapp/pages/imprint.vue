@@ -1,21 +1,12 @@
 <template>
-  <div>
-    <ds-space margin="small">
-      <ds-heading tag="h2">{{ $t('site.imprint') }}</ds-heading>
-    </ds-space>
-    <ds-container>
-      <div v-html="$t('html.imprint')" />
-    </ds-container>
-  </div>
+  <internal-page :pageParams="pageParams" />
 </template>
 
 <script>
+import links from '~/constants/links.js'
+import { internalPageMixins } from '~/mixins/internalPageMixins'
+
 export default {
-  layout: 'basic',
-  head() {
-    return {
-      title: this.$t('site.imprint'),
-    }
-  },
+  mixins: [internalPageMixins(links.IMPRINT)],
 }
 </script>
