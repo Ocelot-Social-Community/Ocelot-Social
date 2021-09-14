@@ -79,7 +79,7 @@ export default {
   data() {
     const passwordForm = PasswordForm({ translate: this.$t })
     return {
-      supportEmail: emails.SUPPORT,
+      supportEmail: emails.SUPPORT_EMAIL,
       formData: {
         ...passwordForm.formData,
       },

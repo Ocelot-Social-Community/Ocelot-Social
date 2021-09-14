@@ -5,6 +5,11 @@ import VueMeta from 'vue-meta'
 const localVue = global.localVue
 localVue.use(VueMeta, { keyName: 'head' })
 
+// avoid: 'Error: Not implemented: navigation (except hash changes)', see https://stackoverflow.com/questions/54090231/how-to-fix-error-not-implemented-navigation-except-hash-changes
+const assignMock = jest.fn()
+delete window.location
+window.location = { assign: assignMock }
+
 describe('organization.vue', () => {
   let wrapper
   let mocks
@@ -28,7 +33,7 @@ describe('organization.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('div')).toBe(true)
+      expect(wrapper.is('div')).toBeTruthy()
     })
 
     it('has correct <head> content', () => {

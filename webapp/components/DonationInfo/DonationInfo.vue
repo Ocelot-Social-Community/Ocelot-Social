@@ -1,9 +1,9 @@
 <template>
   <div class="donation-info">
     <progress-bar :title="title" :label="label" :goal="goal" :progress="progress" />
-    <a target="_blank" :href="links.DONATE">
-      <base-button filled>{{ $t('donations.donate-now') }}</base-button>
-    </a>
+    <base-button filled @click="redirectToPage(links.DONATE)">
+      {{ $t('donations.donate-now') }}
+    </base-button>
   </div>
 </template>
 
@@ -34,6 +34,11 @@ export default {
         amount: this.progress.toLocaleString(this.$i18n.locale()),
         total: this.goal.toLocaleString(this.$i18n.locale()),
       })
+    },
+  },
+  methods: {
+    redirectToPage(pageParams) {
+      pageParams.redirectToPage(this)
     },
   },
   apollo: {

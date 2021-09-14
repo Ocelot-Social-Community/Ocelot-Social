@@ -27,7 +27,6 @@ const mutationFollowUser = gql`
     }
   }
 `
-
 const mutationUnfollowUser = gql`
   mutation ($id: ID!) {
     unfollowUser(id: $id) {
@@ -40,7 +39,6 @@ const mutationUnfollowUser = gql`
     }
   }
 `
-
 const userQuery = gql`
   query ($id: ID) {
     User(id: $id) {
@@ -54,6 +52,7 @@ const userQuery = gql`
 
 beforeAll(async () => {
   await cleanDatabase()
+
   const { server } = createServer({
     context: () => ({
       driver,
@@ -68,6 +67,10 @@ beforeAll(async () => {
   const testClient = createTestClient(server)
   query = testClient.query
   mutate = testClient.mutate
+})
+
+afterAll(async () => {
+  await cleanDatabase()
 })
 
 beforeEach(async () => {
@@ -98,6 +101,7 @@ beforeEach(async () => {
   variables = { id: user2.id }
 })
 
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })

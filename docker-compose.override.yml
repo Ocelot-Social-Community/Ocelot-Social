@@ -60,6 +60,11 @@ services:
     networks:
       - external-net
       
+# the following network from the main YAML gives the warning `WARNING: Some networks were defined but are not used by any service: internal-net` and should be removed
+#   but removing is not possible yet, it seems: https://github.com/docker/compose/issues/3729#issuecomment-623154878
+# networks:
+#   internal-net:
+
 volumes:
   webapp_node_modules:
   backend_node_modules:

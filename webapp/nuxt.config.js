@@ -45,6 +45,7 @@ export default {
       'imprint',
       'data-privacy',
       'faq',
+      'donate',
     ],
     // pages to keep alive
     keepAlivePages: ['index'],
