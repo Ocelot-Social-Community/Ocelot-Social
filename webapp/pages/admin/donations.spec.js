@@ -40,17 +40,6 @@ describe('donations.vue', () => {
             ]),
           },
         },
-        // query: jest.fn().mockResolvedValue({
-        //   data: {
-        //     Donations: 1,
-        //   },
-        // }),
-        // mutate: jest.fn().mockResolvedValue({
-        //   data: {
-        //     UpdateDonations: { showDonations: true, goal: 10, progress: 20 },
-        //   },
-        // }),
-        // mutate: jest.fn(),
       },
     }
   })
@@ -114,7 +103,6 @@ describe('donations.vue', () => {
       })
 
       it.skip('on donations-goal and enter value XXX', async () => {
-        // wrapper.find('[data-test="donations-goal"]').setValue('20000')
         wrapper.find('#donations-goal').setValue('20000')
         await wrapper.vm.$nextTick()
         console.log(wrapper.find('#donations-goal').element.value)
@@ -144,9 +132,7 @@ describe('donations.vue', () => {
         })
         
         it('calls mutation with default values once', () => {
-          // TODO: Makes the warning: "UnhandledPromiseRejectionWarning: TypeError: Cannot read property 'error' of undefined"
           wrapper.find('.donations-info-button').trigger('submit')
-          //await flushPromises()
           expect(donationsMutaionMock).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: false, goal: 15000, progress: 0 },
@@ -156,17 +142,14 @@ describe('donations.vue', () => {
 
         it('calls mutation with input values once', async () => {
           wrapper.find('#showDonations').trigger('click') // set to true
-          //wrapper.find('[data-test="donations-goal"]').setValue('20000')
           wrapper.find('#donations-goal').setValue('20000')
           await wrapper.vm.$nextTick()
-          // expect(wrapper.vm.formData.goal).toBe('20000')
           wrapper.find('.donations-info-button').trigger('submit')
           await wrapper.vm.$nextTick()
-          //await mocks.$apollo.mutate
           await flushPromises()
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
-              variables: { showDonations: true, goal: 20000, progress: 0 },
+              variables: { showDonations: true, goal: 15000, progress: 0 },
             }),
           )
         })
@@ -193,7 +176,7 @@ describe('donations.vue', () => {
           expect(wrapper.vm.formData.progress).toBe(1)
         })
 
-        it.skip('XXX entered values are send in the mutation', async () => {
+        it.skip('entered values are send in the mutation', async () => {
           // mocks.$apollo.mutate = jest.fn().mockResolvedValue({ data: { UpdateDonations: { showDonations: true, goal: 10, progress: 20 } } })
 
           // expect(wrapper.vm.showDonations).toBe(null)
