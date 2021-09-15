@@ -48,7 +48,6 @@ describe('DonationInfo.vue', () => {
       describe('given german locale', () => {
         beforeEach(() => {
           mocks.$i18n.locale = () => 'de'
-          wrapper = Wrapper()
         })
 
         // it looks to me that toLocaleString for some reason is not working as expected
