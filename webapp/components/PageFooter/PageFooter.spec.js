@@ -29,8 +29,8 @@ describe('PageFooter.vue', () => {
         wrapper = Wrapper()
       })
 
-      it('renders four links', () => {
-        expect(wrapper.findAll('a')).toHaveLength(4)
+      it('renders five links', () => {
+        expect(wrapper.findAll('a')).toHaveLength(5)
       })
 
       it('renders three nuxt-links', () => {
@@ -56,12 +56,12 @@ describe('PageFooter.vue', () => {
       beforeEach(async () => {
         const links = {
           ...linksDefault,
-          ORGANIZATION: null,
-          IMPRINT: null,
-          TERMS_AND_CONDITIONS: null,
-          CODE_OF_CONDUCT: null,
-          DATA_PRIVACY: null,
-          FAQ: null,
+          ORGANIZATION: linksDefault.ORGANIZATION.overwrite({ externalLink: null }),
+          IMPRINT: linksDefault.IMPRINT.overwrite({ externalLink: null }),
+          TERMS_AND_CONDITIONS: linksDefault.TERMS_AND_CONDITIONS.overwrite({ externalLink: null }),
+          CODE_OF_CONDUCT: linksDefault.CODE_OF_CONDUCT.overwrite({ externalLink: null }),
+          DATA_PRIVACY: linksDefault.DATA_PRIVACY.overwrite({ externalLink: null }),
+          FAQ: linksDefault.FAQ.overwrite({ externalLink: null }),
         }
         wrapper = Wrapper()
         wrapper.setData({ links })
@@ -77,15 +77,17 @@ describe('PageFooter.vue', () => {
       })
 
       it('renders TERMS_AND_CONDITIONS as nuxt-link', () => {
-        expect(wrapper.find('span[data-test="terms-nuxt-link"]').exists()).toBeTruthy()
+        expect(
+          wrapper.find('span[data-test="terms-and-conditions-nuxt-link"]').exists(),
+        ).toBeTruthy()
       })
 
       it('renders CODE_OF_CONDUCT as nuxt-link', () => {
-        expect(wrapper.find('span[data-test="code-nuxt-link"]').exists()).toBeTruthy()
+        expect(wrapper.find('span[data-test="code-of-conduct-nuxt-link"]').exists()).toBeTruthy()
       })
 
       it('renders DATA_PRIVACY as nuxt-link', () => {
-        expect(wrapper.find('span[data-test="data-nuxt-link"]').exists()).toBeTruthy()
+        expect(wrapper.find('span[data-test="data-privacy-nuxt-link"]').exists()).toBeTruthy()
       })
 
       it('renders FAQ as nuxt-link', () => {
@@ -97,12 +99,22 @@ describe('PageFooter.vue', () => {
       beforeEach(async () => {
         const links = {
           ...linksDefault,
-          ORGANIZATION: 'https://ocelot.social',
-          IMPRINT: 'https://ocelot.social/IMPRINT',
-          TERMS_AND_CONDITIONS: 'https://ocelot.social/TERMS_AND_CONDITIONS',
-          CODE_OF_CONDUCT: 'https://ocelot.social/CODE_OF_CONDUCT',
-          DATA_PRIVACY: 'https://ocelot.social/DATA_PRIVACY',
-          FAQ: 'https://ocelot.social/FAQ',
+          ORGANIZATION: linksDefault.ORGANIZATION.overwrite({
+            externalLink: 'https://ocelot.social',
+          }),
+          IMPRINT: linksDefault.IMPRINT.overwrite({
+            externalLink: 'https://ocelot.social/IMPRINT',
+          }),
+          TERMS_AND_CONDITIONS: linksDefault.TERMS_AND_CONDITIONS.overwrite({
+            externalLink: 'https://ocelot.social/TERMS_AND_CONDITIONS',
+          }),
+          CODE_OF_CONDUCT: linksDefault.CODE_OF_CONDUCT.overwrite({
+            externalLink: 'https://ocelot.social/CODE_OF_CONDUCT',
+          }),
+          DATA_PRIVACY: linksDefault.DATA_PRIVACY.overwrite({
+            externalLink: 'https://ocelot.social/DATA_PRIVACY',
+          }),
+          FAQ: linksDefault.FAQ.overwrite({ externalLink: 'https://ocelot.social/FAQ' }),
         }
         wrapper = Wrapper()
         wrapper.setData({ links })

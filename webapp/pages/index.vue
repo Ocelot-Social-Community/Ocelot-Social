@@ -5,11 +5,11 @@
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </ds-grid-item>
       <ds-grid-item :row-span="2" column-span="fullWidth" class="top-info-bar">
-        <!--<donation-info /> -->
+        <!-- <donation-info /> -->
         <div>
-          <a target="_blank" :href="links.DONATE">
-            <base-button filled>{{ $t('donations.donate-now') }}</base-button>
-          </a>
+          <base-button filled @click="redirectToPage(links.DONATE)">
+            {{ $t('donations.donate-now') }}
+          </base-button>
         </div>
         <div class="sorting-dropdown">
           <ds-select
@@ -171,6 +171,9 @@ export default {
     refetchPostList() {
       this.resetPostList()
       this.$apollo.queries.Post.refetch()
+    },
+    redirectToPage(pageParams) {
+      pageParams.redirectToPage(this)
     },
   },
   apollo: {
