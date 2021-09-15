@@ -154,7 +154,7 @@ export default {
           this.sliderData.setSliderValuesCallback(null, {
             sliderSettings: { buttonLoading: true },
           })
-          const response = await this.$apollo.mutate({ mutation: SignupMutation, variables }) // e-mail is send in emailMiddleware of backend
+          const response = await this.$apollo.mutate({ mutation: SignupMutation, variables }) // e-mail is send in loginMiddleware of backend
           this.sliderData.setSliderValuesCallback(null, {
             sliderData: { request: { variables }, response: response.data },
           })
