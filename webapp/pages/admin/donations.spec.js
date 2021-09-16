@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
+import Vue from 'vue'
 import Donations from './donations.vue'
 
 const localVue = global.localVue
@@ -15,7 +16,7 @@ describe('donations.vue', () => {
     then: jest.fn(),
     catch: jest.fn(),
   })
-  
+
   beforeEach(() => {
     mocks = {
       $t: jest.fn((string) => string),
@@ -105,7 +106,7 @@ describe('donations.vue', () => {
       it.skip('on donations-goal and enter value XXX', async () => {
         wrapper.find('#donations-goal').setValue('20000')
         await wrapper.vm.$nextTick()
-        console.log(wrapper.find('#donations-goal').element.value)
+        // console.log(wrapper.find('#donations-goal').element.value)
         expect(wrapper.vm.formData.goal).toBe('20000')
       })
     })
@@ -115,7 +116,7 @@ describe('donations.vue', () => {
         expect(donationsQueryMock).toHaveBeenCalledTimes(1)
         expect(mocks.$apollo.queries.Donations.refetch).toHaveBeenCalledTimes(1)
         // expect(mocks.$apollo.Donations.query().exists()).toBeTruthy()
-        console.log('mocks.$apollo: ', mocks.$apollo)
+        // console.log('mocks.$apollo: ', mocks.$apollo)
       })
 
       it.skip('query result is displayed', () => {
@@ -130,7 +131,7 @@ describe('donations.vue', () => {
         beforeEach(() => {
           jest.clearAllMocks()
         })
-        
+
         it('calls mutation with default values once', () => {
           wrapper.find('.donations-info-button').trigger('submit')
           expect(donationsMutaionMock).toHaveBeenCalledWith(
