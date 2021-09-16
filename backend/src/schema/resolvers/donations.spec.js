@@ -9,8 +9,8 @@ const instance = getNeode()
 const driver = getDriver()
 
 const updateDonationsMutation = gql`
-  mutation ($goal: Int, $progress: Int) {
-    UpdateDonations(goal: $goal, progress: $progress) {
+  mutation ($showDonations: Boolean, $goal: Int, $progress: Int) {
+    UpdateDonations(showDonations: $showDonations, goal: $goal, progress: $progress) {
       id
       showDonations
       goal
@@ -88,7 +88,8 @@ describe('donations', () => {
 
       it('returns the current Donations info', async () => {
         await expect(query({ query: donationsQuery, variables })).resolves.toMatchObject({
-          data: { Donations: [{ showDonations: true, goal: 15000, progress: 0 }] },
+          data: { Donations: { showDonations: true, goal: 15000, progress: 0 } },
+          errors: undefined,
         })
       })
     })
