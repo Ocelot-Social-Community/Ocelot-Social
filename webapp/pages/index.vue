@@ -5,7 +5,6 @@
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </ds-grid-item>
       <!-- donation info -->
-      <!-- Wolle test appearence or hiding -->
       <ds-grid-item v-if="showDonations" class="top-info-bar" :row-span="1" column-span="fullWidth">
         <donation-info :goal="goal" :progress="progress" />
       </ds-grid-item>
