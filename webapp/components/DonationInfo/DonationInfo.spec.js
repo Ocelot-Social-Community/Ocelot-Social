@@ -38,12 +38,6 @@ describe('DonationInfo.vue', () => {
       expect(wrapper.find('.base-button').text()).toBe('donations.donate-now')
     })
 
-    it('includes a link to the ocelot.social donations website', () => {
-      expect(wrapper.find('a').attributes('href')).toBe(
-        'https://ocelot-social.herokuapp.com/donations',
-      )
-    })
-
     describe('mount with data', () => {
       describe('given german locale', () => {
         beforeEach(() => {
