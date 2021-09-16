@@ -1,6 +1,6 @@
 # Network Specification
 
-Human Connection is a nonprofit social, action and knowledge network that connects information to action and promotes positive local and global change in all areas of life.
+ocelot.social is free and open-source social network code that connects information to action and promotes positive local and global change in all areas of life.
 
 * **Social**: Interact with other people not just by commenting their posts, but by providing **Pro & Contra** arguments, give a **Versus** or ask them by integrated **Chat** or **Let's Talk**
 * **Knowledge**: Read articles about interesting topics and find related posts in the **More Info** tab or by **Filtering** based on **Categories** and **Tagging** or by using the **Fulltext Search**.
@@ -84,6 +84,7 @@ The following features will be implemented. This gets done in three steps:
 * Upvote comments of others
 
 ### Notifications
+
 [Cucumber features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/notifications)
 
 * User @-mentionings
