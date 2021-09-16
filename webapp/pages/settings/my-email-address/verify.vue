@@ -60,7 +60,7 @@ export default {
   },
   data() {
     return {
-      supportEmail: emails.SUPPORT,
+      supportEmail: emails.SUPPORT_EMAIL,
     }
   },
   async asyncData(context) {

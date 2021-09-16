@@ -101,6 +101,7 @@ describe('file a report on a resource', () => {
 
   beforeAll(async () => {
     await cleanDatabase()
+
     const { server } = createServer({
       context: () => {
         return {
@@ -114,6 +115,11 @@ describe('file a report on a resource', () => {
     query = createTestClient(server).query
   })
 
+  afterAll(async () => {
+    await cleanDatabase()
+  })
+
+  // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
   afterEach(async () => {
     await cleanDatabase()
   })

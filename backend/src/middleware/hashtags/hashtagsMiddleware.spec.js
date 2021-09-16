@@ -30,7 +30,9 @@ const updatePostMutation = gql`
   }
 `
 
-beforeAll(() => {
+beforeAll(async () => {
+  await cleanDatabase()
+
   const createServerResult = createServer({
     context: () => {
       return {
@@ -44,6 +46,10 @@ beforeAll(() => {
   const createTestClientResult = createTestClient(server)
   query = createTestClientResult.query
   mutate = createTestClientResult.mutate
+})
+
+afterAll(async () => {
+  await cleanDatabase()
 })
 
 beforeEach(async () => {
@@ -66,6 +72,7 @@ beforeEach(async () => {
   })
 })
 
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
