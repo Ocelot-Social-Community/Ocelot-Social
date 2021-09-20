@@ -14,7 +14,7 @@ export async function up(next) {
     const donationId = uuid()
     await transaction.run(
       `
-        CREATE (donationInfo:Donations)
+        MERGE (donationInfo:Donations)
         SET donationInfo.id = $donationId
         SET donationInfo.createdAt = toString(datetime())
         SET donationInfo.updatedAt = donationInfo.createdAt
