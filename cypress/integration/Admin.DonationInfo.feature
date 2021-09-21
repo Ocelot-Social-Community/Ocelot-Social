@@ -1,7 +1,7 @@
 Feature: Admin sets donations info settings
   As an admin
-  I want to switch the donation info on and off and like I to change to donations goal and progress
-  In order to manage the foundings
+  I want to switch the donation info on and off and like to change to donations goal and progress
+  In order to manage the funds
 
   Background:
     Given the following "users" are in the database:

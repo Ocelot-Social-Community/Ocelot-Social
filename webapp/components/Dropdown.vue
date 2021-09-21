@@ -33,7 +33,7 @@ export default {
   data() {
     return {
       isPopoverOpen: false,
-      developperNoAutoClosing: false, // stops automatic closing of menu for developper purposes: default is 'false'
+      developerNoAutoClosing: false, // stops automatic closing of menu for developper purposes: default is 'false'
     }
   },
   computed: {
@@ -114,7 +114,7 @@ export default {
       }
     },
     popoveMouseLeave() {
-      if (this.developperNoAutoClosing) return
+      if (this.developerNoAutoClosing) return
       if (this.disabled) {
         return
       }
