@@ -4,7 +4,7 @@
 function join_by { local IFS="$1"; shift; echo "$*"; }
 
 # Arguments:
-CUR_JOB=$1
+CUR_JOB=$(expr $1 - 1)
 MAX_JOBS=$2
 
 # Features
