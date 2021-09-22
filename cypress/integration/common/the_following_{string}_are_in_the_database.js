@@ -18,17 +18,22 @@ Given("the following {string} are in the database:", (table,data) => {
     case "comments":
       data.hashes().forEach( entry => {
         cy.factory()
-          .build("comment",entry,entry);
+          .build("comment", entry, entry);
       })
       break
     case "users":
       data.hashes().forEach( entry => {
-        cy.factory().build("user",entry,entry);
+        cy.factory().build("user", entry, entry);
       });
       break
     case "tags":
       data.hashes().forEach( entry => {
         cy.factory().build("tag", entry, entry)
+      });
+      break
+    case "donations":
+      data.hashes().forEach( entry => {
+        cy.factory().build("donations", entry, entry)
       });
       break
   }
