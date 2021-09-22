@@ -740,8 +740,8 @@
     },
     "name": "Settings",
     "notifications": {
-      "send-email-notifications": "Send e-mail notifications",
       "name": "Notifications",
+      "send-email-notifications": "Send e-mail notifications",
       "success-update": "Notifications settings saved!"
     },
     "organizations": {
