@@ -35,26 +35,22 @@ const queryNotificationsEmails = async (context, notificationUserIds) => {
 const publishNotifications = async (context, promises) => {
   let notifications = await Promise.all(promises)
   notifications = notifications.flat()
-  // Wolle
-  // console.log('notifications: ', notifications)
   const notificationsEmailAddresses = await queryNotificationsEmails(
     context,
     notifications.map((notification) => notification.to.id),
   )
-  // Wolle
-  // console.log('notificationsEmailAddresses: ', notificationsEmailAddresses)
   notifications.forEach((notificationAdded, index) => {
     pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
-    // Wolle await
-    sendMail(
-      notificationTemplate({
-        email: notificationsEmailAddresses[index].email,
-        notification: notificationAdded,
-      }),
-    )
+    if (notificationAdded.to.sendNotificationEmails) {
+      // Wolle await
+      sendMail(
+        notificationTemplate({
+          email: notificationsEmailAddresses[index].email,
+          notification: notificationAdded,
+        }),
+      )
+    }
   })
-  // Wolle
-  // return XXX successful?
 }
 
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
