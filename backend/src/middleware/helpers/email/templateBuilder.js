@@ -126,9 +126,7 @@ export const notificationTemplate = ({ email, notification }) => {
   // Wolle console.log('subject: ', subject)
 
   // Wolle
-  // console.log(
-  //   mustache.render(templates.layout, renderParams, { content }),
-  // )
+  // console.log(mustache.render(templates.layout, renderParams, { content }))
 
   return {
     from,
