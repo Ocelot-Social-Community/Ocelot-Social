@@ -106,9 +106,8 @@ export const wrongAccountTemplate = ({ email }) => {
 }
 
 export const notificationTemplate = ({ email, notification }) => {
-  // TODO Wolle language
-  const subject = `${CONFIG.APPLICATION_NAME} – Benachrichtigung | Notification`
   const actionUrl = new URL('/notifications', CONFIG.CLIENT_URI)
+  const renderParams = { ...defaultParams, name: notification.to.name, actionUrl }
   let content
   switch (notification.to.locale) {
     case 'de':
@@ -122,24 +121,19 @@ export const notificationTemplate = ({ email, notification }) => {
       content = templatesEN.notification
       break
   }
+  const subjectUnrendered = content.split('\n')[0].split('"')[1]
+  const subject = mustache.render(subjectUnrendered, renderParams, {})
+  // Wolle console.log('subject: ', subject)
 
   // Wolle
   // console.log(
-  //   mustache.render(
-  //     templates.layout,
-  //     { ...defaultParams, name: notification.to.name, actionUrl },
-  //     { content },
-  //   ),
+  //   mustache.render(templates.layout, renderParams, { content }),
   // )
 
   return {
     from,
     to: email,
     subject,
-    html: mustache.render(
-      templates.layout,
-      { ...defaultParams, name: notification.to.name, actionUrl },
-      { content },
-    ),
+    html: mustache.render(templates.layout, renderParams, { content }),
   }
 }
