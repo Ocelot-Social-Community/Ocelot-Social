@@ -9,7 +9,7 @@ let sendMailCallback = async () => {}
 if (!hasEmailConfig) {
   if (!CONFIG.TEST) {
     // eslint-disable-next-line no-console
-    console.log('Warning: Middlewares will not try to send mails.') // Wolle
+    console.log('Warning: Middlewares will not try to send mails.')
   }
 } else {
   sendMailCallback = async (templateArgs) => {

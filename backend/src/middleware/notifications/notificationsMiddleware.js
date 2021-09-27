@@ -4,8 +4,7 @@ import { validateNotifyUsers } from '../validation/validationMiddleware'
 import { sendMail } from '../helpers/email/sendMail'
 import { notificationTemplate } from '../helpers/email/templateBuilder'
 
-// Wolle -> queryNotificationEmails
-const queryNotificationsEmails = async (context, notificationUserIds) => {
+const queryNotificationEmails = async (context, notificationUserIds) => {
   if (!(notificationUserIds && notificationUserIds.length)) return []
   const userEmailCypher = `
     MATCH (user: User)
@@ -35,7 +34,7 @@ const queryNotificationsEmails = async (context, notificationUserIds) => {
 const publishNotifications = async (context, promises) => {
   let notifications = await Promise.all(promises)
   notifications = notifications.flat()
-  const notificationsEmailAddresses = await queryNotificationsEmails(
+  const notificationsEmailAddresses = await queryNotificationEmails(
     context,
     notifications.map((notification) => notification.to.id),
   )

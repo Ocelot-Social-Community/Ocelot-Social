@@ -68,15 +68,6 @@ export const resetPasswordTemplate = ({ email, nonce, name }) => {
   actionUrl.searchParams.set('nonce', nonce)
   actionUrl.searchParams.set('email', email)
 
-  // Wolle
-  // console.log(
-  //   mustache.render(
-  //     templates.layout,
-  //     { ...defaultParams, englishHint, actionUrl, name, nonce, subject },
-  //     { content: templates.passwordReset },
-  //   ),
-  // )
-
   return {
     from,
     to: email,
@@ -123,10 +114,6 @@ export const notificationTemplate = ({ email, notification }) => {
   }
   const subjectUnrendered = content.split('\n')[0].split('"')[1]
   const subject = mustache.render(subjectUnrendered, renderParams, {})
-  // Wolle console.log('subject: ', subject)
-
-  // Wolle
-  // console.log(mustache.render(templates.layout, renderParams, { content }))
 
   return {
     from,
