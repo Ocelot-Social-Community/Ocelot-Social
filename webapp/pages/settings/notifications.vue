@@ -5,7 +5,9 @@
       <input id="send-email" type="checkbox" v-model="notifyByEmail" />
       <label for="send-email">{{ $t('settings.notifications.send-email-notifications') }}</label>
     </ds-space>
-    <base-button filled @click="submit" :disabled="disabled">{{ $t('actions.save') }}</base-button>
+    <base-button class="save-button" filled @click="submit" :disabled="disabled">
+      {{ $t('actions.save') }}
+    </base-button>
   </base-card>
 </template>
 
