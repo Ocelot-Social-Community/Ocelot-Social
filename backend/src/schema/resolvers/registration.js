@@ -91,9 +91,9 @@ const signupCypher = (inviteCode) => {
       SET user.role = 'user'
       SET user.createdAt = toString(datetime())
       SET user.updatedAt = toString(datetime())
-      SET user.allowEmbedIframes = FALSE
-      SET user.showShoutsPublicly = FALSE
-      SET user.sendNotificationEmails = TRUE
+      SET user.allowEmbedIframes = false
+      SET user.showShoutsPublicly = false
+      SET user.sendNotificationEmails = true
       SET email.verifiedAt = toString(datetime())
       RETURN user {.*}
     `

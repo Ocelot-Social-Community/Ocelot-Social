@@ -200,7 +200,7 @@ Factory.define('donations')
   .attr('id', uuid)
   .attr('showDonations', true)
   .attr('goal', 15000)
-  .attr('progress', 0)
+  .attr('progress', 7000)
   .after((buildObject, options) => {
     return neode.create('Donations', buildObject)
   })

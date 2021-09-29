@@ -88,7 +88,7 @@ describe('donations', () => {
 
       it('returns the current Donations info', async () => {
         await expect(query({ query: donationsQuery, variables })).resolves.toMatchObject({
-          data: { Donations: { showDonations: true, goal: 15000, progress: 0 } },
+          data: { Donations: { showDonations: true, goal: 15000, progress: 7000 } },
           errors: undefined,
         })
       })
