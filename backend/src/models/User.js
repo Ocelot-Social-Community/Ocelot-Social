@@ -153,6 +153,10 @@ export default {
     type: 'boolean',
     default: false,
   },
+  sendNotificationEmails: {
+    type: 'boolean',
+    default: true,
+  },
   locale: {
     type: 'string',
     allow: [null],

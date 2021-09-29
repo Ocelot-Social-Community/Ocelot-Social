@@ -41,6 +41,7 @@ export default (i18n) => {
           url
         }
         showShoutsPublicly
+        sendNotificationEmails
       }
     }
   `
@@ -224,6 +225,7 @@ export const updateUserMutation = () => {
       $about: String
       $allowEmbedIframes: Boolean
       $showShoutsPublicly: Boolean
+      $sendNotificationEmails: Boolean
       $termsAndConditionsAgreedVersion: String
       $avatar: ImageInput
     ) {
@@ -235,6 +237,7 @@ export const updateUserMutation = () => {
         about: $about
         allowEmbedIframes: $allowEmbedIframes
         showShoutsPublicly: $showShoutsPublicly
+        sendNotificationEmails: $sendNotificationEmails
         termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
         avatar: $avatar
       ) {
@@ -245,6 +248,7 @@ export const updateUserMutation = () => {
         about
         allowEmbedIframes
         showShoutsPublicly
+        sendNotificationEmails
         locale
         termsAndConditionsAgreedVersion
         avatar {
@@ -275,6 +279,7 @@ export const currentUserQuery = gql`
       locale
       allowEmbedIframes
       showShoutsPublicly
+      sendNotificationEmails
       termsAndConditionsAgreedVersion
       socialMedia {
         id

@@ -739,13 +739,18 @@
       "unmuted": "{name} is unmuted again"
     },
     "name": "Settings",
+    "notifications": {
+      "name": "Notifications",
+      "send-email-notifications": "Send e-mail notifications",
+      "success-update": "Notifications settings saved!"
+    },
     "organizations": {
       "name": "My Organizations"
     },
     "privacy": {
       "make-shouts-public": "Share articles I have shouted on my public profile",
       "name": "Privacy",
-      "success-update": "Privacy settings saved"
+      "success-update": "Privacy settings saved!"
     },
     "security": {
       "change-password": {

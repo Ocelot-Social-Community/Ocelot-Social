@@ -739,13 +739,18 @@
       "unmuted": "{name} ist nicht mehr stummgeschaltet"
     },
     "name": "Einstellungen",
+    "notifications": {
+      "name": "Benachrichtigungen",
+      "send-email-notifications": "Sende E-Mail-Benachrichtigungen",
+      "success-update": "Benachrichtigungs-Einstellungen gespeichert!"
+    },
     "organizations": {
       "name": "Meine Organisationen"
     },
     "privacy": {
       "make-shouts-public": "Teile von mir empfohlene Artikel öffentlich auf meinem Profil",
       "name": "Privatsphäre",
-      "success-update": "Privatsphäre-Einstellungen gespeichert"
+      "success-update": "Privatsphäre-Einstellungen gespeichert!"
     },
     "security": {
       "change-password": {

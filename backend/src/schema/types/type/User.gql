@@ -46,6 +46,7 @@ type User {
 
   allowEmbedIframes: Boolean
   showShoutsPublicly: Boolean
+  sendNotificationEmails: Boolean
   locale: String
   friends: [User]! @relation(name: "FRIENDS", direction: "BOTH")
   friendsCount: Int! @cypher(statement: "MATCH (this)<-[:FRIENDS]->(r:User) RETURN COUNT(DISTINCT r)")
@@ -207,6 +208,7 @@ type Mutation {
   termsAndConditionsAgreedAt: String
   allowEmbedIframes: Boolean
   showShoutsPublicly: Boolean
+  sendNotificationEmails: Boolean
   locale: String
   ): User
 
