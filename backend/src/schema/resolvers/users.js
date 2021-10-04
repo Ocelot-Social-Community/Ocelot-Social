@@ -290,6 +290,7 @@ export default {
         'termsAndConditionsAgreedAt',
         'allowEmbedIframes',
         'showShoutsPublicly',
+        'sendNotificationEmails',
         'locale',
       ],
       boolean: {

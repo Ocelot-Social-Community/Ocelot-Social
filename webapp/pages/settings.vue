@@ -52,6 +52,10 @@ export default {
           path: `/settings/embeds`,
         },
         {
+          name: this.$t('settings.notifications.name'),
+          path: '/settings/notifications',
+        },
+        {
           name: this.$t('settings.download.name'),
           path: `/settings/data-download`,
         },

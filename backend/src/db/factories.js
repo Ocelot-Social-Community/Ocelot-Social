@@ -70,6 +70,7 @@ Factory.define('basicUser')
     termsAndConditionsAgreedAt: '2019-08-01T10:47:19.212Z',
     allowEmbedIframes: false,
     showShoutsPublicly: false,
+    sendNotificationEmails: true,
     locale: 'en',
   })
   .attr('slug', ['slug', 'name'], (slug, name) => {
@@ -197,6 +198,7 @@ Factory.define('comment')
 
 Factory.define('donations')
   .attr('id', uuid)
+  .attr('showDonations', true)
   .attr('goal', 15000)
   .attr('progress', 0)
   .after((buildObject, options) => {

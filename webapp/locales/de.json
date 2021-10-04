@@ -30,6 +30,7 @@
       "goal": "Monatlich benötigte Spenden",
       "name": "Spendeninfo",
       "progress": "Bereits gesammelte Spenden",
+      "showDonationsCheckboxLabel": "Spendenfortschritt anzeigen",
       "successfulUpdate": "Spenden-Info erfolgreich aktualisiert!"
     },
     "hashtags": {
@@ -298,8 +299,7 @@
   },
   "donations": {
     "amount-of-total": "{amount} von {total} € erreicht",
-    "donate-now": "Jetzt spenden",
-    "donations-for": "Spenden für"
+    "donate-now": "Jetzt spenden"
   },
   "editor": {
     "embed": {
@@ -347,9 +347,20 @@
     "all": "Alle",
     "categories": "Themenkategorien",
     "emotions": "Emotionen",
-    "filter-by": "Filtern nach...",
+    "filter-by": "Filtern nach ...",
     "following": "Benutzern, denen ich folge",
-    "languages": "Sprachen"
+    "languages": "Sprachen",
+    "order": {
+      "newest": {
+        "hint": "Sortiere die Neuesten nach vorn",
+        "label": "Neueste zuerst"
+      },
+      "oldest": {
+        "hint": "Sortiere die Ältesten nach vorn",
+        "label": "Älteste zuerst"
+      }
+    },
+    "order-by": "Sortieren nach ..."
   },
   "followButton": {
     "follow": "Folgen",
@@ -728,13 +739,18 @@
       "unmuted": "{name} ist nicht mehr stummgeschaltet"
     },
     "name": "Einstellungen",
+    "notifications": {
+      "name": "Benachrichtigungen",
+      "send-email-notifications": "Sende E-Mail-Benachrichtigungen",
+      "success-update": "Benachrichtigungs-Einstellungen gespeichert!"
+    },
     "organizations": {
       "name": "Meine Organisationen"
     },
     "privacy": {
       "make-shouts-public": "Teile von mir empfohlene Artikel öffentlich auf meinem Profil",
       "name": "Privatsphäre",
-      "success-update": "Privatsphäre-Einstellungen gespeichert"
+      "success-update": "Privatsphäre-Einstellungen gespeichert!"
     },
     "security": {
       "change-password": {
@@ -781,6 +797,7 @@
     "contact": "Kontakt",
     "data-privacy": "Datenschutzerklärung",
     "director": "Geschäftsführer",
+    "donate": "Spenden",
     "error-occurred": "Ein Fehler ist aufgetreten.",
     "faq": "FAQ",
     "germany": "Deutschland",
@@ -793,18 +810,6 @@
     "termsAndConditions": "Nutzungsbedingungen",
     "thanks": "Danke!",
     "tribunal": "Registergericht"
-  },
-  "store": {
-    "posts": {
-      "orderBy": {
-        "newest": {
-          "label": "Neueste"
-        },
-        "oldest": {
-          "label": "Älteste"
-        }
-      }
-    }
   },
   "termsAndConditions": {
     "newTermsAndConditions": "Neue Nutzungsbedingungen",

@@ -12,7 +12,7 @@ import orderBy from './orderByMiddleware'
 import validation from './validation/validationMiddleware'
 import notifications from './notifications/notificationsMiddleware'
 import hashtags from './hashtags/hashtagsMiddleware'
-import email from './email/emailMiddleware'
+import login from './login/loginMiddleware'
 import sentry from './sentryMiddleware'
 import languages from './languages/languages'
 import userInteractions from './userInteractions'
@@ -26,7 +26,7 @@ export default (schema) => {
     validation,
     sluggify,
     excerpt,
-    email,
+    login,
     notifications,
     hashtags,
     softDelete,
@@ -46,7 +46,7 @@ export default (schema) => {
     'sluggify',
     'languages',
     'excerpt',
-    'email',
+    'login',
     'notifications',
     'hashtags',
     'softDelete',

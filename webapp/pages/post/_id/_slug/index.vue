@@ -80,7 +80,9 @@
           {{ $t('settings.blocked-users.explanation.commenting-disabled') }}
           <br />
           {{ $t('settings.blocked-users.explanation.commenting-explanation') }}
-          <a :href="links.FAQ" target="_blank">FAQ</a>
+          <page-params-link :pageParams="links.FAQ">
+            {{ $t('site.faq') }}
+          </page-params-link>
         </ds-placeholder>
       </ds-section>
     </base-card>
@@ -95,6 +97,7 @@ import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcShoutButton from '~/components/ShoutButton.vue'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentList from '~/components/CommentList/CommentList'
+import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import {
   postMenuModalsData,
   deletePostMutation,
@@ -111,13 +114,14 @@ export default {
     mode: 'out-in',
   },
   components: {
-    HcHashtag,
-    UserTeaser,
-    HcShoutButton,
     ContentMenu,
     CommentForm,
     CommentList,
     ContentViewer,
+    HcHashtag,
+    HcShoutButton,
+    PageParamsLink,
+    UserTeaser,
   },
   head() {
     return {

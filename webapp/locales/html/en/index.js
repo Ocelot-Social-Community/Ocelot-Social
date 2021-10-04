@@ -5,6 +5,7 @@ import codeOfConduct from './code-of-conduct.html'
 import dataPrivacy from './data-privacy.html'
 import faq from './faq.html'
 import imprint from './imprint.html'
+import donate from './donate.html'
 
 export default {
   organization,
@@ -14,4 +15,5 @@ export default {
   dataPrivacy,
   faq,
   imprint,
+  donate,
 }
