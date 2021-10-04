@@ -24,6 +24,7 @@
         data-test="donations-goal"
       />
       <ds-input
+        id="donations-progress"
         class="donations-data"
         model="progress"
         :label="$t('admin.donations.progress')"

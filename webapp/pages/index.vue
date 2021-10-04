@@ -82,7 +82,7 @@ export default {
     return {
       showDonations: true,
       goal: 15000,
-      progress: 0,
+      progress: 7000,
       posts: [],
       hasMore: true,
       // Initialize your apollo data

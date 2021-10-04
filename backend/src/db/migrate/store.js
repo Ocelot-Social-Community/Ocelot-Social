@@ -35,6 +35,9 @@ const createDefaultAdminUser = async (session) => {
            id: "${defaultAdmin.id}",
            slug: "${defaultAdmin.slug}",
            createdAt: toString(datetime()),
+           allowEmbedIframes: false,
+           showShoutsPublicly: false,
+           sendNotificationEmails: true,
            deleted: false,
            disabled: false
          })-[:PRIMARY_EMAIL]->(e)`,
