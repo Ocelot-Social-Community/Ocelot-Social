@@ -1,7 +1,7 @@
 {
   "name": "ocelot-social-branded",
-  "version": "1.0.5",
-  "ocelotDockerVersionTag": "1.0.5-153",
+  "version": "1.0.6",
+  "ocelotDockerVersionTag": "1.0.6-160",
   "dockerOrganisation": "ocelotsocialnetwork",
   "description": "ocelot.social Branded",
   "author": "ocelot.social Community",
