@@ -3,7 +3,7 @@
 import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
-  externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  // externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.made', // localized string identifier, if undefined default is used
@@ -17,7 +17,7 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
 })
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
   // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  externalLink: 'https://ocelot-social.herokuapp.com/donations', // if string is defined and not empty it's dominating
+  // externalLink: 'https://ocelot-social.herokuapp.com/donations', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.donate', // localized string identifier, if undefined default is used
@@ -31,7 +31,7 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
 })
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
   // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  externalLink: 'https://ocelot-social.herokuapp.com/imprint', // if string is defined and not empty it's dominating
+  // externalLink: 'https://ocelot-social.herokuapp.com/imprint', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.imprint', // localized string identifier, if undefined default is used
@@ -83,7 +83,7 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
-  externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  // externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
@@ -96,7 +96,7 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
   },
 })
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
-  externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  // externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.support', // localized string identifier, if undefined default is used
