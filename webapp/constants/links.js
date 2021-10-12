@@ -130,7 +130,7 @@ export default {
     DATA_PRIVACY,
     FAQ,
     DONATE,
+    SUPPORT,
     IMPRINT,
-    // SUPPORT,
   ],
 }
