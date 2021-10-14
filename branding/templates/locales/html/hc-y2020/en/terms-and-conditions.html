@@ -2,14 +2,12 @@
 
 <!-- template for the 'Terms And Conditions' from the old HC network. in the old repo you will find other languages as well -->
 
-<h2 class="headline">
+<h2 class="headline-h2">
   For the social network of {{ organization }}
 </h2>
-<br>
-<h3 class="headline">
+<h3 class="headline-h3">
   Terms of Service
 </h3>
-<br>
 <p class="paragraph">
   The following terms of use form the basis for the use of our network.
   When you register, you must accept them and we will inform you later about any changes that may take place.
@@ -17,21 +15,17 @@
   Place of jurisdiction is {{ organizationLocation }}.
   For details see our imprint: <a href="https://{{ networkURL }}/impressum/" target="_blank" >https://{{ networkURL }}/impressum/</a><br>
 </p>
-<br>
-<h3 class="headline">
+<h3 class="headline-h3">
   Use and License
 </h3>
-<br>
 <p class="paragraph">
   If any content you post to us is protected by intellectual property rights, you grant us a non-exclusive, transferable, sublicensable, worldwide license to use such content for posting to our network.
   This license expires when you delete your content or your entire account.
   Remember that others may share your content and we cannot delete it.<br>
 </p>
-<br>
-<h3 class="headline">
+<h3 class="headline-h3">
   Privacy Statement
 </h3>
-<br>
 <p class="paragraph">
   Our network is a social knowledge and action network.
   It is therefore particularly important to us that as much content as possible is publicly accessible.
@@ -43,20 +37,16 @@
   Part of the terms of service is our privacy statement, which informs you about the individual data processing operations in our network: <a href="https://{{ networkURL }}/data-privacy" target="_blank">https://{{ networkURL }}/data-privacy</a>.
   Our privacy statement is adapted to the legal situation and characteristics of our network and is always valid in the most current version.<br>
 </p>
-<br>
-<h3 class="headline">
+<h3 class="headline-h3">
   Code of Conduct
 </h3>
-<br>
 <p class="paragraph">
   Our code of conduct serves as a handbook for personal appearance and interaction with each other.
   Whoever is active as a user in the {{ networkName }} network, writes articles, comments or makes contact with other users, even outside the network, acknowledges these rules of conduct as binding. <a href="https://{{ networkURL }}/code-of-conduct" target="_blank">https://{{ networkURL }}/code-of-conduct</a><br>
 </p>
-<br>
-<h3 class="headline">
+<h3 class="headline-h3">
   Moderation
 </h3>
-<br>
 <p class="paragraph">
   Until our financial possibilities allow us to implement the community moderation system, we moderate with a simplified system and with our own or possibly volunteer staff.
   We train these moderators and for this reason only they make the appropriate decisions.
@@ -67,59 +57,81 @@
   Unfortunately, you and the person concerned will not receive any feedback from us at this time, but this is in the planning stage.
   Irrespective of this, we reserve the right to impose sanctions in principle for reasons that may not or not yet be listed in our Code of Conduct or these terms of service.<br>
 </p>
-<br>
-<h3 class="headline">
+<h3 class="headline-h3">
   Errors and Feedback
 </h3>
-<br>
 <p class="paragraph">
   We make every effort to keep our network and data secure and available.
   Each new release of the software goes through both automated and manual testing.
   However, unforeseen errors may occur. Therefore, we are grateful for any reported bugs.
   You are welcome to report any bugs you discover by emailing Support at <a href="https://{{ networkURL }}/support" target="_blank">https://{{ networkURL }}/support</a><br>
 </p>
-<br>
-<h3 class="headline">
+<h3 class="headline-h3">
   No Commercial Use
 </h3>
-<br>
 <p class="paragraph">
   The use of the {{ networkName }} Network is not permitted for commercial purposes.
   This includes, but is not limited to, advertising products with commercial intent, posting affiliate links, directly soliciting donations, or providing financial support for purposes that are not recognized as charitable for tax purposes.<br>
 </p>
-<br>
-<h3 class="headline">
+<h3 class="headline-h3">
   No Political Use
 </h3>
-<br>
 <p class="paragraph">
   User accounts of political parties or official user accounts of a political representative are not permitted.<br>
 </p>
-<br>
-<h3 class="headline">
+<h3 class="headline-h3">
   Help and Questions
 </h3>
-<br>
 <p class="paragraph">
   For help and questions we have compiled a comprehensive collection of frequently asked questions and answers (FAQ) for you. You can find them here: <a href="https://{{ networkURL }}/faq" target="_blank">https://{{ networkURL }}/faq</a><br>
 </p>
 <br>
 
 <style type="text/css">
-  .headline {
-    margin-top: 8px;
-    margin-bottom: 0px;
+  .headline-h2 {
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+
+  .headline-h3 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+  }
+
+  .headline-h4 {
+    margin-top: 16px;
+    margin-bottom: 8px;
   }
 
   .paragraph {
-    margin-top: 0px;
+    margin-top: 8px;
     margin-bottom: 8px;
   }
 
   .info-page-list {
     list-style-type: disc;
     margin-left: 14px;
-    margin-top: 0px;
-    margin-bottom: 8px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+
+  .info-page-table {
+    border: 1px solid #e0dede;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08),inset 0 0 0 1px rgba(255,255,255,.5);
+    max-width: 100%;
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+
+  .info-page-table thead {
+    background-color: #f0f0f0;
+  }
+
+  .info-page-table th,
+  .info-page-table td {
+    border: 1px solid #e0dede;
+    padding: 10px;
   }
 </style>
