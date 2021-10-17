@@ -98,7 +98,8 @@ export const wrongAccountTemplate = ({ email }) => {
 
 export const notificationTemplate = ({ email, notification }) => {
   const actionUrl = new URL('/notifications', CONFIG.CLIENT_URI)
-  const renderParams = { ...defaultParams, name: notification.to.name, actionUrl }
+  const settingsUrl = new URL('/settings/notifications', CONFIG.CLIENT_URI)
+  const renderParams = { ...defaultParams, name: notification.to.name, settingsUrl, actionUrl }
   let content
   switch (notification.to.locale) {
     case 'de':
