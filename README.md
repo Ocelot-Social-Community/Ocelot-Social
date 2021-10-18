@@ -6,27 +6,19 @@
 [![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discordapp.com/invite/DFSjPaX)
 [![Open Source Helpers](https://www.codetriage.com/human-connection/human-connection/badges/users.svg)](https://www.codetriage.com/human-connection/human-connection)
 
-ocelot.social is a nonprofit social, action and knowledge network that connects information to action and promotes positive local and global change in all areas of life.
+**ocelot.social** is open source program code that is freely available to run social networks. Its development is supported by a community of programmers and interested network operators.
 
-* **Social**: Interact with other people not just by commenting their posts, but by providing **Pro & Contra** arguments, give a **Versus** or ask them by integrated **Chat** or **Let's Talk**
-* **Knowledge**: Read articles about interesting topics and find related posts in the **More Info** tab or by **Filtering** based on **Categories** and **Tagging** or by using the **Fulltext Search**.
-* **Action**: Don't just read about how to make the world a better place, but come into **Action** by following provided suggestions on the **Action** tab provided by other people or **Organisations**.
+Our goal is to enable people to participate fairly and equally in online social networks. The equality of opportunity applies both to the fundamental equality of all people and to the possibility of letting their diverse voices be heard.
+
+We therefore consider it desirable that operators offer such networks so that people can choose where they want to be on the move.
+
+At the same time, it should be possible in the future to link these networks with each other (Fediverse), so that users can also connect with people from other networks - for example by making friends or following posts or other contributions.
+
+In other words, we are interested in a network of networks and in keeping the data as close as possible to the user and the operator they trusts.
 
 <p align="center">
   <img src="webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%">
 </p>
-
-## Live demo
-
-__Try out our deployed [development environment](https://develop.human-connection.org/).__
-
-Logins:
-
-| email | password | role |
-| :--- | :--- | :--- |
-| `user@example.org` | 1234 | user |
-| `moderator@example.org` | 1234 | moderator |
-| `admin@example.org` | 1234 | admin |
 
 ## Directory Layout
 
