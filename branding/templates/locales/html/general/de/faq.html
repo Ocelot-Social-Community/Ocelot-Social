@@ -2,62 +2,57 @@
 
 <!-- template for the 'FAQ' from the old HC network. in the old repo you will find other languages as well -->
 
-<h2 class="headline-h2">
-  Für das soziale Netzwerk {{ organization }}
-</h2>
-<h3 class="headline-h3">
-  Wie bediene ich dieses Netzwerk?
-</h3>
-<p class="paragraph">
-  Hier findest Du die
-  <a href="https://github.com/Ocelot-Social-Community/Ocelot-Social/wiki" target="_blank" >Bedienungsanleitung</a>.<br>
-</p>
-<br>
+<div class="info-page">
+  <h2>
+    Für das soziale Netzwerk {{ organization }}
+  </h2>
+  <h3>
+    Wie bediene ich dieses Netzwerk?
+  </h3>
+  <p>
+    Hier findest Du die
+    <a href="https://github.com/Ocelot-Social-Community/Ocelot-Social/wiki" target="_blank" >Bedienungsanleitung</a>.<br>
+  </p>
+  <br>
+</div>
 
 <style type="text/css">
-  .headline-h2 {
-    margin-top: 24px;
-    margin-bottom: 24px;
+  .info-page h2 {
+    margin: 24px 0;
   }
 
-  .headline-h3 {
-    margin-top: 24px;
-    margin-bottom: 16px;
+  .info-page h3 {
+    margin: 24px 0 16px 0;
   }
 
-  .headline-h4 {
-    margin-top: 16px;
-    margin-bottom: 8px;
+  .info-page h4 {
+    margin: 16px 0 8px 0;
   }
 
-  .paragraph {
-    margin-top: 8px;
-    margin-bottom: 8px;
+  .info-page p {
+    margin: 8px 0;
   }
 
-  .info-page-list {
+  .info-page ul {
     list-style-type: disc;
-    margin-left: 14px;
-    margin-top: 16px;
-    margin-bottom: 16px;
+    margin: 16px 0 16px 14px;
   }
 
-  .info-page-table {
+  .info-page table {
+    background-color: #fff;
     border: 1px solid #e0dede;
     border-collapse: collapse;
-    background-color: #fff;
     box-shadow: 0 1px 3px rgba(0,0,0,.08),inset 0 0 0 1px rgba(255,255,255,.5);
+    margin: 16px 0;
     max-width: 100%;
-    margin-top: 16px;
-    margin-bottom: 16px;
   }
 
-  .info-page-table thead {
+  .info-page table thead {
     background-color: #f0f0f0;
   }
 
-  .info-page-table th,
-  .info-page-table td {
+  .info-page table td,
+  .info-page table th {
     border: 1px solid #e0dede;
     padding: 10px;
   }
