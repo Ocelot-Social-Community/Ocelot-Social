@@ -135,8 +135,8 @@ For a full documentation see [SUMMERY](./SUMMARY.md).
 
 ## Contributing
 
-Choose an issue and leave a comment there. We will then invite you to join our volunteer team.
-To have the necessary permission to push directly to this repository, please accept our invitation to join our volunteer team via the email we send you.
+Choose an issue and leave a comment there. We will then invite you to join our volunteers team.
+To have the necessary permission to push directly to this repository, please accept our invitation to join our volunteers team via the email we send you.
 
 We are happy if you fork our repository, but we don't recommend it for development. You do not need a fork.
 
