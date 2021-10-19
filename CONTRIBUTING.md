@@ -34,7 +34,7 @@ Every pull request needs to:
 * pass all tests (linter, backend, webapp, code coverage, end-to-end)
 * be approved by at least 1 developer who is not the owner of the PR (when more than 10 files were changed it needs 2 approvals)
 
-## Open Source Contribution Flow
+## Contribution Flow For Open Source Contributors
 
 See [contributing in main README.md](/README.md#contributing)
 
