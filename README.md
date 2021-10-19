@@ -137,7 +137,7 @@ For a full documentation see [SUMMERY](./SUMMARY.md).
 
 We are happy if you fork our repository, but we don't recommend it for development. You do not need a fork.
 
-Clone this repository locally as [described above](#clone-the-repository), create your branch named `<output-number+description>`, add your code and push your branch to this repository. Then create a PR by comparing it to our `master`.
+Clone this repository locally as [described above](#clone-the-repository), create your branch named `<issue-number>-<description>`, add your code and push your branch to this repository. Then create a PR by comparing it to our `master`.
 
 Choose an issue and leave a comment there. We will then invite you to join our volunteer team.
 To have the necessary permission to push directly to this repository, please accept our invitation to join our volunteer team via the email we send you.
