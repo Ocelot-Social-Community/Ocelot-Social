@@ -1,10 +1,11 @@
 # Ocelot.Social
 
-[![Build Status](https://travis-ci.com/Human-Connection/Human-Connection.svg?branch=master)](https://travis-ci.com/Human-Connection/Human-Connection)
-[![Codecov Coverage](https://img.shields.io/codecov/c/github/Human-Connection/Human-Connection/master.svg?style=flat-square)](https://codecov.io/gh/Human-Connection/Human-Connection/)
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Human-Connection/Nitro-Backend/blob/backend/LICENSE.md)
-[![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discordapp.com/invite/DFSjPaX)
-[![Open Source Helpers](https://www.codetriage.com/human-connection/human-connection/badges/users.svg)](https://www.codetriage.com/human-connection/human-connection)
+[![Build Status Test](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test.yml/badge.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions)
+[![Build Status Publish](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/publish.yml/badge.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions)
+[![Codecov Coverage](https://img.shields.io/codecov/c/github/Ocelot-Social-Community/Ocelot-Social/master.svg?style=flat-square)](https://codecov.io/gh/Ocelot-Social-Community/Ocelot-Social/)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/LICENSE.md)
+[![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discord.gg/AJSX9DCSUA)
+[![Open Source Helpers](https://www.codetriage.com/Ocelot-Social-Community/Ocelot-Social/badges/users.svg)](https://www.codetriage.com/Ocelot-Social-Community/Ocelot-Social)
 
 **ocelot.social** is free and open source software program code that is freely available to run social networks. Its development is supported by a community of programmers and interested network operators.
 
