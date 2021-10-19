@@ -35,8 +35,8 @@ setup **frontend** and **backend**.
 
 There are two approaches:
 
-1. Local installation, which means you have to take care of dependencies yourself
-2. **Or** Install everything through Docker which takes care of dependencies for you
+1. [Local](#local-installation) installation, which means you have to take care of dependencies yourself.
+2. **Or** Install everything through [Docker](#docker-installation) which takes care of dependencies for you.
 
 ## Installation
 
