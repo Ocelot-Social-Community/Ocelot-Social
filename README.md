@@ -1,4 +1,4 @@
-# ocelot.social
+# Ocelot.Social
 
 [![Build Status](https://travis-ci.com/Human-Connection/Human-Connection.svg?branch=master)](https://travis-ci.com/Human-Connection/Human-Connection)
 [![Codecov Coverage](https://img.shields.io/codecov/c/github/Human-Connection/Human-Connection/master.svg?style=flat-square)](https://codecov.io/gh/Human-Connection/Human-Connection/)
@@ -83,21 +83,48 @@ docker-compose version 1.23.2
 
 #### Start Ocelot-Social via Docker-Compose
 
+Prepare ENVs once beforehand:
+
+```bash
+# in folder webapp/
+$ cp .env.template .env
+
+# in folder backend/
+$ cp .env.template .env
+```
+
 For Development:
 
 ```bash
+# in main folder
 $ docker-compose up
 ```
 
 For Production:
 
 ```bash
+# in main folder
 $ docker-compose -f docker-compose.yml up
 ```
 
-This will start all required Docker containers.
+This will start all required Docker containers.  
+Make sure your database is running on `http://localhost:7474/browser/`.
 
-To prepare everything once frontup see [backend README.md](./backend/README.md).  
+Prepare database once beforehand:
+
+```bash
+# in folder backend/
+yarn run db:migrate init
+```
+
+Then clear and seed database:
+
+```bash
+# in folder backend/
+$ yarn run db:reset && db:seed
+```
+
+For a closer description see [backend README.md](./backend/README.md).  
 For a full documentation see [SUMMERY](./SUMMARY.md).
 
 ### Local Installation
