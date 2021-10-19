@@ -156,7 +156,7 @@ We give write permissions to every developer who asks for it. Just text us on
 
 Deployment methods can be found in the [Ocelot-Social-Deploy-Rebranding](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding) repository.
 
-The only deployment method in this repository is `docker-compose` for development purposes as described above.
+The only deployment method in this repository for development purposes as described above is `docker-compose`.
 
 ## Technology Stack
 
