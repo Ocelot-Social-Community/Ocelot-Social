@@ -100,6 +100,9 @@ This will start all required Docker containers.
 To prepare everything once frontup see [backend README.md](./backend/README.md).  
 For a full documentation see [SUMMERY](./SUMMARY.md).
 
+### Local Installation
+
+For a full documentation see [SUMMERY](./SUMMARY.md).
 
 ## Deployment
 
