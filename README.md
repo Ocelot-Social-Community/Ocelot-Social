@@ -6,13 +6,13 @@
 [![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discordapp.com/invite/DFSjPaX)
 [![Open Source Helpers](https://www.codetriage.com/human-connection/human-connection/badges/users.svg)](https://www.codetriage.com/human-connection/human-connection)
 
-**ocelot.social** is open source program code that is freely available to run social networks. Its development is supported by a community of programmers and interested network operators.
+**ocelot.social** is free and open source software program code that is freely available to run social networks. Its development is supported by a community of programmers and interested network operators.
 
 Our goal is to enable people to participate fairly and equally in online social networks. The equality of opportunity applies both to the fundamental equality of all people and to the possibility of letting their diverse voices be heard.
 
 We therefore consider it desirable that operators offer such networks so that people can choose where they want to be on the move.
 
-At the same time, it should be possible in the future to link these networks with each other (Fediverse), so that users can also connect with people from other networks - for example by making friends or following posts or other contributions.
+At the same time, it should be possible in the future to link these networks with each other (ActivityPub, Fediverse), so that users can also connect with people from other networks - for example by making friends or following posts or other contributions.
 
 In other words, we are interested in a network of networks and in keeping the data as close as possible to the user and the operator they trusts.
 
@@ -95,7 +95,11 @@ For Production:
 $ docker-compose -f docker-compose.yml up
 ```
 
-This will start all required Docker containers
+This will start all required Docker containers.
+
+To prepare everything once frontup see [backend README.md](./backend/README.md).  
+For a full documentation see [SUMMERY](./SUMMARY.md).
+
 
 ## Deployment
 
