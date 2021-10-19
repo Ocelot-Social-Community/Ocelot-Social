@@ -24,7 +24,7 @@ In other words, we are interested in a network of networks and in keeping the da
 
 ## Directory Layout
 
-There are four important directories:
+There are three important directories:
 
 * [Backend](./backend) runs on the server and is a middleware between database and frontend
 * [Frontend](./webapp) is a server-side-rendered and client-side-rendered web frontend
