@@ -133,20 +133,30 @@ For a full documentation see [SUMMERY](./SUMMARY.md).
 
 For a full documentation see [SUMMERY](./SUMMARY.md).
 
+## Contributing
+
+We are happy if you fork our repository, but we don't recommend it for development. You do not need a fork.
+
+Clone this repository locally as [described above] (#clone-the-repository), create your branch named `<output-number+description>`, add your code and push your branch to this repository. Then create a PR by comparing it to our `master`.
+
+Choose an issue and leave a comment there. We will then invite you to join our volunteer team.
+To have the necessary permission to push directly to this repository, please accept our invitation to join our volunteer team via the email we send you.
+
+Check out our [contribution guideline](./CONTRIBUTING.md), too!
+
+### Developer Chat
+
+Join our friendly open-source community on [Discord](https://discord.gg/AJSX9DCSUA) :heart_eyes_cat:
+Just introduce yourself at `#introduce-yourself` and mention a mentor or `@@Mentor` to get you onboard :neckbeard:
+
+We give write permissions to every developer who asks for it. Just text us on
+[Discord](https://discord.gg/AJSX9DCSUA).
+
 ## Deployment
 
 Deployment methods can be found in the [Ocelot-Social-Deploy-Rebranding](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding) repository.
 
 The only deployment method in this repository is `docker-compose` for development purposes as described above.
-
-## Developer Chat
-
-Join our friendly open-source community on [Discord](https://discord.gg/AJSX9DCSUA) :heart_eyes_cat:
-Just introduce yourself at `#introduce-yourself` and mention `@@Mentor` to get you onboard :neckbeard:
-Check out the [contribution guideline](./CONTRIBUTING.md), too!
-
-We give write permissions to every developer who asks for it. Just text us on
-[Discord](https://discord.gg/AJSX9DCSUA).
 
 ## Technology Stack
 
