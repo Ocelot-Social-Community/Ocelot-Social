@@ -8,9 +8,9 @@
 
 [ocelot.social](https://ocelot.social) is free and open source software program code to run social networks. Its development is supported by a community of programmers and interested network operators.
 
-[!<p align="center">
-  <img src="webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%">
-</p>](https://ocelot.social)
+<p align="center">
+  <a href="https://ocelot.social"><img src="webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%"></a>
+</p>
 
 Our goal is to enable people to participate fairly and equally in online social networks. The equality of opportunity applies both to the fundamental equality of all people and to the possibility of letting their diverse voices be heard.
 
