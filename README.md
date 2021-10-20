@@ -2,13 +2,15 @@
 
 [![Build Status Test](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test.yml/badge.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions)
 [![Build Status Publish](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/publish.yml/badge.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions)
-[![codecov](https://codecov.io/gh/Ocelot-Social-Community/Ocelot-Social/branch/master/graph/badge.svg?token=1mdDSA53xt)](https://codecov.io/gh/Ocelot-Social-Community/Ocelot-Social)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/LICENSE.md)
 [![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discord.gg/AJSX9DCSUA)
 [![Open Source Helpers](https://www.codetriage.com/ocelot-social-community/ocelot-social/badges/users.svg)](https://www.codetriage.com/ocelot-social-community/ocelot-social)
-[![Open Source Helpers](https://www.codetriage.com/ocelot-social-community/ocelot-social-deploy-rebranding/badges/users.svg)](https://www.codetriage.com/ocelot-social-community/ocelot-social-deploy-rebranding)
 
-**ocelot.social** is free and open source software program code that is freely available to run social networks. Its development is supported by a community of programmers and interested network operators.
+[ocelot.social](https://ocelot.social) is free and open source software program code that is freely available to run social networks. Its development is supported by a community of programmers and interested network operators.
+
+<p align="center">
+  <img src="webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%">
+</p>
 
 Our goal is to enable people to participate fairly and equally in online social networks. The equality of opportunity applies both to the fundamental equality of all people and to the possibility of letting their diverse voices be heard.
 
@@ -17,10 +19,6 @@ We therefore consider it desirable that operators offer such networks so that pe
 At the same time, it should be possible in the future to link these networks with each other (ActivityPub, Fediverse), so that users can also connect with people from other networks - for example by making friends or following posts or other contributions.
 
 In other words, we are interested in a network of networks and in keeping the data as close as possible to the user and the operator they trusts.
-
-<p align="center">
-  <img src="webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%">
-</p>
 
 ## Directory Layout
 
