@@ -6,11 +6,11 @@
 [![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discord.gg/AJSX9DCSUA)
 [![Open Source Helpers](https://www.codetriage.com/ocelot-social-community/ocelot-social/badges/users.svg)](https://www.codetriage.com/ocelot-social-community/ocelot-social)
 
-[ocelot.social](https://ocelot.social) is free and open source software program code that is freely available to run social networks. Its development is supported by a community of programmers and interested network operators.
+[ocelot.social](https://ocelot.social) is free and open source software program code to run social networks. Its development is supported by a community of programmers and interested network operators.
 
-<p align="center">
+[!<p align="center">
   <img src="webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%">
-</p>
+</p>](https://ocelot.social)
 
 Our goal is to enable people to participate fairly and equally in online social networks. The equality of opportunity applies both to the fundamental equality of all people and to the possibility of letting their diverse voices be heard.
 
