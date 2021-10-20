@@ -140,6 +140,21 @@ We are happy if you fork our repository, but we don't recommend it for developme
 
 Clone this repository locally as [described above](#clone-the-repository), create your branch named `<issue-number>-<description>`, add your code and push your branch to this repository. Then create a PR by comparing it to our `master`.
 
+Please run the following commands before you push:
+
+```bash
+# in folder backend/
+$ yarn lint --fix
+$ yarn test
+```
+
+```bash
+# in folder webapp/
+$ yarn lint --fix
+$ yarn locales --fix
+$ yarn test
+```
+
 Check out our [contribution guideline](./CONTRIBUTING.md), too!
 
 ### Developer Chat
