@@ -129,7 +129,7 @@ For a full documentation see [SUMMARY](./SUMMARY.md).
 
 ### Local Installation
 
-For a full documentation see [SUMMERY](./SUMMARY.md).
+For a full documentation see [SUMMARY](./SUMMARY.md).
 
 ## Contributing
 
