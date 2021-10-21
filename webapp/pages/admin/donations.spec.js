@@ -1,5 +1,4 @@
 import { mount } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
 import Vue from 'vue'
 import Donations from './donations.vue'
 
@@ -143,14 +142,16 @@ describe('donations.vue', () => {
 
         it('calls mutation with input values once', async () => {
           wrapper.find('#showDonations').trigger('click') // set to true
+          await wrapper.vm.$nextTick()
           wrapper.find('#donations-goal').setValue('20000')
+          await wrapper.vm.$nextTick()
+          wrapper.find('#donations-progress').setValue('10000')
           await wrapper.vm.$nextTick()
           wrapper.find('.donations-info-button').trigger('submit')
           await wrapper.vm.$nextTick()
-          await flushPromises()
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
-              variables: { showDonations: true, goal: 15000, progress: 0 },
+              variables: { showDonations: true, goal: 20000, progress: 10000 },
             }),
           )
         })
@@ -161,7 +162,7 @@ describe('donations.vue', () => {
           expect(wrapper.vm.showDonations).toBe(false)
           // wrapper.find('.donations-info-button').trigger('submit')
           // await mocks.$apollo.mutate
-          // expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining({variables: { showDonations: false, goal: 15000, progress: 0 }}))
+          // expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining({variables: { showDonations: false, goal: 15000, progress: 7000 }}))
           // expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
         })
 
