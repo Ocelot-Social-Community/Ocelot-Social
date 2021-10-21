@@ -110,7 +110,7 @@ $ docker-compose -f docker-compose.yml up
 This will start all required Docker containers.  
 Make sure your database is running on `http://localhost:7474/browser/`.
 
-Prepare database once beforehand:
+Prepare database once before you start:
 
 ```bash
 # in folder backend/
