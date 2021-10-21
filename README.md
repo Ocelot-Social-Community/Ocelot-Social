@@ -160,7 +160,7 @@ Check out our [contribution guideline](./CONTRIBUTING.md), too!
 ### Developer Chat
 
 Join our friendly open-source community on [Discord](https://discord.gg/AJSX9DCSUA) :heart_eyes_cat:
-Just introduce yourself at `#introduce-yourself` and mention a mentor or `@@Mentor` to get you onboard :neckbeard:
+Just introduce yourself at `#introduce-yourself` and mention a mentor or `@@Mentors` to get you onboard :neckbeard:
 
 We give write permissions to every developer who asks for it. Just text us on
 [Discord](https://discord.gg/AJSX9DCSUA).
