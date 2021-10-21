@@ -134,7 +134,7 @@ For a full documentation see [SUMMARY](./SUMMARY.md).
 ## Contributing
 
 Choose an issue (consider our label [good-first-issue](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)) and leave a comment there. We will then invite you to join our volunteers team.
-To have the necessary permission to push directly to this repository, please accept our invitation to join our volunteers team via the email we send you.
+To have the necessary permission to push directly to this repository, please accept our invitation to join our volunteers team, you will receive via the email, Github will send you, once invited. If we did not invite you yet, please request an invitation via Discord.
 
 We are happy if you fork our repository, but we don't recommend it for development. You do not need a fork.
 
