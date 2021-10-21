@@ -125,7 +125,7 @@ $ yarn run db:reset && db:seed
 ```
 
 For a closer description see [backend README.md](./backend/README.md).  
-For a full documentation see [SUMMERY](./SUMMARY.md).
+For a full documentation see [SUMMARY](./SUMMARY.md).
 
 ### Local Installation
 
