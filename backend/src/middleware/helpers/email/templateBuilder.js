@@ -31,16 +31,13 @@ export const signupTemplate = ({ email, nonce, inviteCode = null }) => {
   } else {
     actionUrl.searchParams.set('method', 'invite-mail')
   }
+  const renderParams = { ...defaultParams, englishHint, actionUrl, nonce, subject }
 
   return {
     from,
     to: email,
     subject,
-    html: mustache.render(
-      templates.layout,
-      { ...defaultParams, englishHint, actionUrl, nonce, subject },
-      { content: templates.signup },
-    ),
+    html: mustache.render(templates.layout, renderParams, { content: templates.signup }),
   }
 }
 
@@ -49,16 +46,13 @@ export const emailVerificationTemplate = ({ email, nonce, name }) => {
   const actionUrl = new URL('/settings/my-email-address/verify', CONFIG.CLIENT_URI)
   actionUrl.searchParams.set('email', email)
   actionUrl.searchParams.set('nonce', nonce)
+  const renderParams = { ...defaultParams, englishHint, actionUrl, name, nonce, subject }
 
   return {
     from,
     to: email,
     subject,
-    html: mustache.render(
-      templates.layout,
-      { ...defaultParams, englishHint, actionUrl, name, nonce, subject },
-      { content: templates.emailVerification },
-    ),
+    html: mustache.render(templates.layout, renderParams, { content: templates.emailVerification }),
   }
 }
 
@@ -67,32 +61,26 @@ export const resetPasswordTemplate = ({ email, nonce, name }) => {
   const actionUrl = new URL('/password-reset/change-password', CONFIG.CLIENT_URI)
   actionUrl.searchParams.set('nonce', nonce)
   actionUrl.searchParams.set('email', email)
+  const renderParams = { ...defaultParams, englishHint, actionUrl, name, nonce, subject }
 
   return {
     from,
     to: email,
     subject,
-    html: mustache.render(
-      templates.layout,
-      { ...defaultParams, englishHint, actionUrl, name, nonce, subject },
-      { content: templates.passwordReset },
-    ),
+    html: mustache.render(templates.layout, renderParams, { content: templates.passwordReset }),
   }
 }
 
 export const wrongAccountTemplate = ({ email }) => {
   const subject = 'Falsche Mailadresse? | Wrong E-mail?'
   const actionUrl = new URL('/password-reset/request', CONFIG.CLIENT_URI)
+  const renderParams = { ...defaultParams, englishHint, actionUrl }
 
   return {
     from,
     to: email,
     subject,
-    html: mustache.render(
-      templates.layout,
-      { ...defaultParams, englishHint, actionUrl },
-      { content: templates.wrongAccount },
-    ),
+    html: mustache.render(templates.layout, renderParams, { content: templates.wrongAccount }),
   }
 }
 
