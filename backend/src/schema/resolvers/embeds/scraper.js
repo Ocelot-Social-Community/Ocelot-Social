@@ -29,7 +29,12 @@ const metascraper = Metascraper([
   // require('./rules/metascraper-embed')()
 ])
 
+import axios from 'axios'
+
+
+
 const fetchEmbed = async (url) => {
+  console.log("---------3 resolvers/embeds/scraper.js fetchEmbed")
   let endpointUrl = findProvider(url)
   if (!endpointUrl) return {}
   endpointUrl = new URL(endpointUrl)
@@ -37,6 +42,7 @@ const fetchEmbed = async (url) => {
   endpointUrl.searchParams.append('format', 'json')
   let json
   try {
+    console.log("--------- resolvers/embeds/scraper.js endpointUrl", endpointUrl)
     const response = await fetch(endpointUrl)
     json = await response.json()
   } catch (err) {
@@ -54,29 +60,83 @@ const fetchEmbed = async (url) => {
 }
 
 const fetchResource = async (url) => {
+  console.log("-----------2 backend/src/schema/resolvers/embeds/scraper.js fetchResource = async")
   const response = await fetch(url)
+  console.log(" ------------2.1  response")
+
   const html = await response.text()
+  //console.log("const html => ", html)
+ 
   const resource = await metascraper({ html, url })
   return {
     sources: ['resource'],
-    ...resource,
+    ...resource
   }
 }
 
 export default async function scrape(url) {
+  console.log("-----------1 backend/src/schema/resolvers/embeds/scraper.js scrape()", url)
+
   const [meta, embed] = await Promise.all([fetchResource(url), fetchEmbed(url)])
+
+  console.log("Object.keys(meta).length) => ", Object.keys(meta).length)
+  console.log("Object.keys(embed).length) => ", Object.keys(embed).length)
+   /*
+  if ( Object.keys(embed).length === 0 ) { 
+
+
+  const resAxios =  await axios.get(url)
+    .then(function (res) {
+      // handle success
+      console.log(" - ------------------------------ resAxios response")
+      console.log(res.headers['content-type']);
+      return res.headers['content-type']
+      
+      //console.log(response.headers);
+      
+    })
+    .catch(function (error) {
+      // handle error
+      console.log("resAxios error",error);
+    })
+
+    console.log(">>>>>>>>>>>>>>>> EMBED === '' ")
+    if (resAxios === 'audio/mpeg') { 
+      console.log(">>>>>>>>>>> IF MPEG ")
+    } else { 
+      console.log(">>>>>>>>>>> IF NOT A MPEG ")
+    }
+
+   }
+*/
+ 
+ 
+
+  
   const output = mergeWith(meta, embed, (objValue, srcValue) => {
+    console.log("------------ output objValue ", objValue);
+    console.log("------------ output  srcValue", srcValue);
     if (isArray(objValue)) {
       return objValue.concat(srcValue)
     }
   })
 
   if (isEmpty(output)) {
+    console.log("------------ NOT FOUND output");
     throw new ApolloError('Not found', 'NOT_FOUND')
   }
+  console.log("-----------5 backend/src/schema/resolvers/embeds/scraper.js retrun ")
 
-  return {
-    type: 'link',
-    ...output,
-  }
+  //if (res.headers['content-type'] === 'audio/mpeg'){
+  //  console.log("-----------1 SSSUUUCCEESSSSS")
+
+  //}else {
+    return {
+    
+      type: 'link',
+      ...output,
+    }
+  //}
+ 
+ 
 }

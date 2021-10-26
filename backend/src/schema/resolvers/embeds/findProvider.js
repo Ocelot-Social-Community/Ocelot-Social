@@ -13,6 +13,8 @@ oEmbedProvidersFile = oEmbedProvidersFile.replace(/\{format\}/g, 'json')
 const oEmbedProviders = JSON.parse(oEmbedProvidersFile)
 
 export default function (embedUrl) {
+  console.log("---------4  findProvider.js >  ",embedUrl)
+  
   for (const provider of oEmbedProviders) {
     for (const endpoint of provider.endpoints) {
       const { schemes = [], url } = endpoint
@@ -23,8 +25,12 @@ export default function (embedUrl) {
       const {
         endpoints: [{ url }],
       } = provider
+      console.log("--------- 4.1 Find Provider  RETURN URL >  ", url)
       return url
     }
   }
+  console.log("--------- 4.2 Find Provider  RETURN NULL>  ")
+
+  
   return null
 }

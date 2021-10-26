@@ -4,6 +4,7 @@ import { compileToFunctions } from 'vue-template-compiler'
 import Vue from 'vue'
 import EmbedComponent from '~/components/Embed/EmbedComponent'
 
+console.log('---- webapp/components/Editor/nodes/Embed.js CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC')
 Vue.component(EmbedComponent)
 const template = `<component :dataEmbedUrl="dataEmbedUrl" :embedData="embedData" :is="componentType" />`
 

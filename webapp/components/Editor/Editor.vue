@@ -130,6 +130,7 @@ export default {
         new History(),
       ],
       onUpdate: (e) => {
+        console.log('---- mounted onUpdate')
         clearTimeout(throttleInputEvent)
         throttleInputEvent = setTimeout(() => this.onUpdate(e), 300)
       },
@@ -241,6 +242,7 @@ export default {
       this.editor.focus()
     },
     onUpdate(e) {
+      console.log('---- Editor.vue onUpdate')
       const content = e.getHTML()
       this.$emit('input', content)
     },
@@ -248,6 +250,7 @@ export default {
       this.editor.commands.mention({ id: message.id, label: message.slug })
     },
     toggleLinkInput(attrs, element) {
+      console.log('----- Editor.vue toggleLinkInput')
       if (!this.isLinkInputActive && attrs && element) {
         this.$refs.linkInput.linkUrl = attrs.href
         this.isLinkInputActive = true
@@ -259,6 +262,7 @@ export default {
       }
     },
     setLinkUrl(url) {
+      console.log('------ Editor.vue setLinkUrl')
       const normalizedLinks = url ? linkify().match(url) : null
       const command = this.editor.commands.link
       if (normalizedLinks) {

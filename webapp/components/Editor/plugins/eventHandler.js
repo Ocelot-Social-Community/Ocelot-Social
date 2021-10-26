@@ -14,6 +14,9 @@ export default class EventHandler extends Extension {
             return text.trim()
           },
           transformPastedHTML(html) {
+            console.log(
+              '----- webapp/components/Editor/plugins/eventHandler.js transformPastedHTML',
+            )
             html = html
               // remove all tags with "space only"
               .replace(/<[a-z-]+>[\s]+<\/[a-z-]+>/gim, '')

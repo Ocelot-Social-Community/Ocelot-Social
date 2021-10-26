@@ -83,6 +83,7 @@ export default {
       currentUser: 'auth/user',
     }),
     embedHtml() {
+      console.log('--------- webapp/components/Embed/EmbedComponent.vue embedHtml')
       const { html = '' } = this.embedData
       return html
     },

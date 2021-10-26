@@ -8,7 +8,7 @@ Vue.component(EmbedComponent)
 const template = `<component :dataEmbedUrl="dataEmbedUrl" :embedData="embedData" :is="componentType" />`
 
 const compiledTemplate = compileToFunctions(template)
-
+console.log('----------0  webapp/components/Editor/nodes/LegacyEmbed.js')
 export default class Embed extends Node {
   get name() {
     return 'embed'
@@ -21,6 +21,7 @@ export default class Embed extends Node {
   }
 
   pasteRules({ type, schema }) {
+    console.log('---------- webapp/components/Editor/nodes/LegacyEmbed.js function  pasteRules')
     return [
       pasteRule(
         // source: https://stackoverflow.com/a/3809435

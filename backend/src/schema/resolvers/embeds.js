@@ -1,6 +1,10 @@
 import scrape from './embeds/scraper.js'
 import { undefinedToNullResolver } from './helpers/Resolver'
 
+
+console.log("----0- backend/src/schema/resolvers/embeds.js")
+
+
 export default {
   Query: {
     embed: async (object, { url }, context, resolveInfo) => {
