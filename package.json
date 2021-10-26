@@ -1,7 +1,7 @@
 {
   "name": "ocelot-social",
   "version": "1.0.6",
-  "description": "Fullstack and API tests with cypress and cucumber for ocelot.social",
+  "description": "Free and open source software program code available to run social networks.",
   "author": "ocelot.social Community",
   "license": "MIT",
   "private": false,
@@ -41,7 +41,7 @@
     "import": "^0.0.6",
     "jsonwebtoken": "^8.5.1",
     "mock-socket": "^9.0.3",
-    "neo4j-driver": "^4.0.2",
+    "neo4j-driver": "^4.3.4",
     "neode": "^0.4.7",
     "npm-run-all": "^4.1.5",
     "rosie": "^2.0.1",
