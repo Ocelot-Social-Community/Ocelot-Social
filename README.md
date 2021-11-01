@@ -110,18 +110,19 @@ $ docker-compose -f docker-compose.yml up
 This will start all required Docker containers.  
 Make sure your database is running on `http://localhost:7474/browser/`.
 
-Prepare database once before you start:
+Prepare database once before you start by running the following command in a second terminal:
 
 ```bash
-# in folder backend/
-yarn run db:migrate init
+# in main folder while docker-compose is up
+$ docker-compose exec backend yarn run db:migrate init
 ```
 
-Then clear and seed database:
+Then clear and seed database by running the following command as well in the second terminal:
 
 ```bash
-# in folder backend/
-$ yarn run db:reset && db:seed
+# in main folder while docker-compose is up
+$ docker-compose exec backend yarn run db:reset
+$ docker-compose exec backend yarn run db:seed
 ```
 
 For a closer description see [backend README.md](./backend/README.md).  
