@@ -60,6 +60,18 @@ Change into the new folder.
 $ cd Ocelot-Social
 ```
 
+### Login
+
+<!-- Try out our deployed [development environment](https://develop.human-connection.org/). -->
+
+Logins in the browser after the following installations:
+
+| email | password | role |
+| :--- | :--- | :--- |
+| `user@example.org` | 1234 | user |
+| `moderator@example.org` | 1234 | moderator |
+| `admin@example.org` | 1234 | admin |
+
 ### Docker Installation
 
 Docker is a software development container tool that combines software and its dependencies into one standardized unit that contains everything needed to run it. This helps us to avoid problems with dependencies and makes installation easier.
