@@ -60,6 +60,18 @@ Change into the new folder.
 $ cd Ocelot-Social
 ```
 
+### Login
+
+<!-- Try out our deployed [development environment](https://develop.human-connection.org/). -->
+
+Logins in the browser after the following installations:
+
+| email | password | role |
+| :--- | :--- | :--- |
+| `user@example.org` | 1234 | user |
+| `moderator@example.org` | 1234 | moderator |
+| `admin@example.org` | 1234 | admin |
+
 ### Docker Installation
 
 Docker is a software development container tool that combines software and its dependencies into one standardized unit that contains everything needed to run it. This helps us to avoid problems with dependencies and makes installation easier.
@@ -110,18 +122,19 @@ $ docker-compose -f docker-compose.yml up
 This will start all required Docker containers.  
 Make sure your database is running on `http://localhost:7474/browser/`.
 
-Prepare database once before you start:
+Prepare database once before you start by running the following command in a second terminal:
 
 ```bash
-# in folder backend/
-yarn run db:migrate init
+# in main folder while docker-compose is up
+$ docker-compose exec backend yarn run db:migrate init
 ```
 
-Then clear and seed database:
+Then clear and seed database by running the following command as well in the second terminal:
 
 ```bash
-# in folder backend/
-$ yarn run db:reset && db:seed
+# in main folder while docker-compose is up
+$ docker-compose exec backend yarn run db:reset
+$ docker-compose exec backend yarn run db:seed
 ```
 
 For a closer description see [backend README.md](./backend/README.md).  
