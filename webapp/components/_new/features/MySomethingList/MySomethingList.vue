@@ -16,12 +16,13 @@
           </ds-heading>
         </ds-space>
         <ds-space v-if="socialMediaLinks" margin-top="base" margin="base">
-          <ds-input
+          <!-- Wolle <ds-input
             id="editSocialMedia"
             model="socialMediaUrl"
             type="text"
             :placeholder="$t('settings.social-media.placeholder')"
-          />
+          /> -->
+          <slot name="edit-item" />
         </ds-space>
       </div>
       <div v-else>
@@ -87,17 +88,29 @@ import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'MySomethingList',
+  props: {
+    useFormData: {
+      type: Object,
+      default: () => ({}),
+    },
+    useFormSchema: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
   data() {
     return {
-      formData: {
-        socialMediaUrl: '',
-      },
-      formSchema: {
-        socialMediaUrl: {
-          type: 'url',
-          message: this.$t('common.validations.url'),
-        },
-      },
+      // Wolle formData: {
+      //   socialMediaUrl: '',
+      // },
+      // formSchema: {
+      //   socialMediaUrl: {
+      //     type: 'url',
+      //     message: this.$t('common.validations.url'),
+      //   },
+      // },
+      formData: this.useFormData,
+      formSchema: this.useFormSchema,
       disabled: true,
       editingLink: {},
     }
