@@ -1,40 +1,42 @@
 # CONTRIBUTING
 
-Thank you so much for thinking of contributing to the Human Connection project! It's awesome you're here, we really appreciate it. :-\)
+Thank you so much for thinking of contributing to the [ocelot.social](https://ocelot.social) project! It's awesome you're here, we really appreciate it. :-\)
 
 ## Getting Set Up
 
-Instructions for how to install all the necessary software and some code guidelines can be found in our main [Readme](/README.md) or in our [documentation](https://docs.human-connection.org/human-connection/).
+Instructions for how to install all the necessary software and some code guidelines can be found in our main [Readme](/README.md) or in our [documentation](/SUMMARY.md).
 
 To get you started we recommend that you join forces with a regular contributor. Please join [our Discord instance](https://discord.gg/AJSX9DCSUA) to chat with developers or just get in touch directly on an issue on either [Github](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues) or [Zenhub](https://app.zenhub.com/workspaces/ocelotsocial-5fb21ff922cb410015dd6535/board?filterLogic=any&repos=301151089):
 
-![](https://dl.dropbox.com/s/vbmcihkduy9dhko/Screenshot%202019-01-03%2015.50.11.png?dl=0)
-
-We also have regular pair programming sessions that you are very welcome to join! We feel this is often the best way to get to know both the project and the team. Most developers are also available for spontaneous sessions if the times listed below don't work for you – just ping us on Discord.
+We also can have pair programming sessions for you! We feel this is often the best way to get to know both the project and the team. Most developers are also available for spontaneous sessions.
 
 ## Development Flow
 
 We operate in two week sprints that are planned, estimated and prioritised on [Zenhub](https://app.zenhub.com/workspaces/ocelotsocial-5fb21ff922cb410015dd6535/board?filterLogic=any&repos=301151089). All issues are also linked to and synced with [Github](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues). Look for the `good first issue` label if you're not sure where to start!
 
-We try to discuss all questions directly related to a feature or bug in the respective issue, in order to preserve it for the future and for other developers. We use Discord for real-time communication.
+We try to discuss all questions directly related to a feature or bug in the respective issue, in order to preserve it for the future and for other developers. We use [Discord](https://discord.gg/AJSX9DCSUA) for real-time communication.
 
 This is how we solve bugs and implement features, step by step:
 
 1. We find an issue we want to work on, usually during the sprint planning but as an open source contributor this can happen at any time.
-2. We communicate with the team to see if the issue is still available. (When you comment on an issue but don't get an answer there within 1-2 days try to mention @Human-Connection/hc-dev-team to make sure we check in.)
+2. We communicate with the team to see if the issue is still available. (When you comment on an issue but don't get an answer there within 1-2 days try to mention @Ocelot-Social-Community/core-team to make sure we check in.)
 3. We make sure we understand the issue in detail – what problem is it solving and how should it be implemented?
 4. We assign ourselves to the issue and move it to `In Progress` on [Zenhub](https://app.zenhub.com/workspaces/ocelotsocial-5fb21ff922cb410015dd6535/board?filterLogic=any&repos=301151089).
 5. We start working on it in a `new branch` and open a `pull request` prefixed with `[WIP]` (work in progress) to which we regularly push our changes.
 6. When questions come up we clarify them with the team (directly in the issue on Github).
-7. When we are happy with our work and our PR is passing all tests we remove the `[WIP]` from the PR description and ask for reviews (if you're not sure who to ask there is @Human-Connection/hc-dev-team which pings all core developers).
+7. When we are happy with our work and our PR is passing all tests we remove the `[WIP]` from the PR description and ask for reviews (if you're not sure who to ask there is @Ocelot-Social-Community/core-team which pings all core developers).
 8. We then incorporate the suggestions from the reviews into our work and once it has been approved it can be merged into master!
 
 Every pull request needs to:
 
 * fix an issue (if there is something you want to work on but there is no issue for it, create one first and discuss it with the team)
 * include tests for the code that is added or changed
-* pass all tests (linter, backend, frontend, end-to-end)
+* pass all tests (linter, backend, webapp, code coverage, end-to-end)
 * be approved by at least 1 developer who is not the owner of the PR (when more than 10 files were changed it needs 2 approvals)
+
+## Contribution Flow For Open Source Contributors
+
+See [contributing in main README.md](/README.md#contributing)
 
 ## The Team
 
@@ -55,7 +57,7 @@ You can talk to our core team on [Discord](https://discord.gg/AJSX9DCSUA). And o
 
 ## Meetings and Pair Programming Sessions
 
-Times below refer to **German Time** – that's CET (GMT+1) in winter and CEST (GMT+2) in summer – because most Human Connection core team members are living in Germany.
+Times below refer to **German Time** – that's CET (GMT+1) in winter and CEST (GMT+2) in summer – because most ocelot.social Community core team members are living in Germany.
 
 Daily standup
 
@@ -109,12 +111,13 @@ We practise [collective code ownership](http://www.extremeprogramming.org/rules/
 * we avoid blocking because someone else isn't working, so we sometimes take over PRs from other developers
 * everyone should always push their code to branches so others can see it
 
-We believe in open source contributions as a learning experience – everyone is welcome to join our team of volunteers and to contribute to the project, no matter their background or level of experience.
+We believe in open source contributions as a learning experience – everyone is welcome to join our team of volunteers and to contribute to the project, no matter their background or level of experience. To support your learning experience we founded the charity association [busFaktor() e.V.](https://www.busfaktor.org/en).
 
 We use pair programming sessions as a tool for knowledge sharing. We can learn a lot from each other and only by sharing what we know and overcoming challenges together can we grow as a team and truly own this project collectively.
 
 As a volunteeer you have no commitment except your own self development and your awesomeness by contributing to this free and open-source software project. Cheers to you!
 
+<!--
 ## Open-Source Bounties
 
 There are so many good reasons to contribute to ocelot.social
@@ -145,3 +148,4 @@ us your invoice as .pdf file attached to an E-Mail once you are done.
 Our Open-Source bounty program is a work-in-progress. Based on our future
 experience we will make changes and improvements. So keep an eye on this
 contribution guide.
+-->

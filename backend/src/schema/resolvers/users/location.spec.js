@@ -135,7 +135,7 @@ describe('Location Service', () => {
       },
       {
         id: expect.stringMatching(/^place\.[0-9]+$/),
-        place_name: 'Berlin Township, New Jersey, United States',
+        place_name: 'Berlin Heights, Ohio, United States',
       },
     ])
   })

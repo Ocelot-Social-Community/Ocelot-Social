@@ -33,8 +33,8 @@ describe('PageFooter.vue', () => {
         expect(wrapper.findAll('a')).toHaveLength(5)
       })
 
-      it('renders three nuxt-links', () => {
-        expect(wrapper.findAll('.nuxt-link')).toHaveLength(3)
+      it('renders four nuxt-links', () => {
+        expect(wrapper.findAll('.nuxt-link')).toHaveLength(4)
       })
 
       it('renders version', () => {
