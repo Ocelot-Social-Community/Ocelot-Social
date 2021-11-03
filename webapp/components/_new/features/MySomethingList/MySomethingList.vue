@@ -1,0 +1,261 @@
+<template>
+  <base-card>
+    <ds-heading tag="h2" class="title">{{ $t('settings.social-media.name') }}</ds-heading>
+    <ds-form
+      v-model="formData"
+      :schema="formSchema"
+      @input="handleInput"
+      @input-valid="handleInputValid"
+      @submit="handleSubmitSocialMedia"
+    >
+      <div v-if="editingLink.id">
+        <!-- Wolle translation -->
+        <ds-space margin="base">
+          <ds-heading tag="h3" class="undertitle">
+            {{ /* $t('settings.social-media.name') */ 'Edit "' + editingLink.url + '"' }}
+          </ds-heading>
+        </ds-space>
+        <ds-space v-if="socialMediaLinks" margin-top="base" margin="base">
+          <ds-input
+            id="editSocialMedia"
+            model="socialMediaUrl"
+            type="text"
+            :placeholder="$t('settings.social-media.placeholder')"
+          />
+        </ds-space>
+      </div>
+      <div v-else>
+        <ds-space v-if="socialMediaLinks" margin-top="base" margin="small">
+          <ds-list>
+            <ds-list-item v-for="link in socialMediaLinks" :key="link.id" class="list-item--high">
+              <!-- Wolle remove template tag? -->
+              <template>
+                <!-- Wolle <a :href="link.url" target="_blank">
+                  <img :src="link.favicon" alt="Link:" height="16" width="16" />
+                  {{ link.url }}
+                </a> -->
+                <!-- Wolle <slot name="list-item" :link="link" data-test="item-slot" /> -->
+                <slot name="list-item" :link="link" />
+                <span class="divider">|</span>
+                <base-button
+                  icon="edit"
+                  circle
+                  ghost
+                  @click="handleEditSocialMedia(link)"
+                  :title="$t('actions.edit')"
+                  data-test="edit-button"
+                />
+                <base-button
+                  icon="trash"
+                  circle
+                  ghost
+                  @click="handleDeleteSocialMedia(link)"
+                  :title="$t('actions.delete')"
+                  data-test="delete-button"
+                />
+              </template>
+            </ds-list-item>
+          </ds-list>
+        </ds-space>
+      </div>
+
+      <ds-space margin-top="base">
+        <ds-input
+          v-if="!editingLink.id"
+          id="addSocialMedia"
+          model="socialMediaUrl"
+          type="text"
+          :placeholder="$t('settings.social-media.placeholder')"
+        />
+        <ds-space margin-top="base">
+          <base-button filled :disabled="disabled" type="submit">
+            {{ editingLink.id ? $t('actions.save') : $t('settings.social-media.submit') }}
+          </base-button>
+          <base-button v-if="editingLink.id" id="cancel" danger @click="handleCancel()">
+            {{ $t('actions.cancel') }}
+          </base-button>
+        </ds-space>
+      </ds-space>
+    </ds-form>
+  </base-card>
+</template>
+
+<script>
+import unionBy from 'lodash/unionBy'
+import gql from 'graphql-tag'
+import { mapGetters, mapMutations } from 'vuex'
+
+export default {
+  name: 'MySomethingList',
+  data() {
+    return {
+      formData: {
+        socialMediaUrl: '',
+      },
+      formSchema: {
+        socialMediaUrl: {
+          type: 'url',
+          message: this.$t('common.validations.url'),
+        },
+      },
+      disabled: true,
+      editingLink: {},
+    }
+  },
+  computed: {
+    ...mapGetters({
+      currentUser: 'auth/user',
+    }),
+    socialMediaLinks() {
+      const domainRegex = /^(?:https?:\/\/)?(?:[^@\n])?(?:www\.)?([^:/\n?]+)/g
+      const { socialMedia = [] } = this.currentUser
+      return socialMedia.map(({ id, url }) => {
+        const [domain] = url.match(domainRegex) || []
+        const favicon = domain ? `${domain}/favicon.ico` : null
+        return { id, url, favicon }
+      })
+    },
+  },
+  methods: {
+    ...mapMutations({
+      setCurrentUser: 'auth/SET_USER',
+    }),
+    handleCancel() {
+      this.editingLink = {}
+      this.formData.socialMediaUrl = ''
+      this.disabled = true
+    },
+    handleEditSocialMedia(link) {
+      this.editingLink = link
+      this.formData.socialMediaUrl = link.url
+    },
+    handleInput(data) {
+      this.disabled = true
+    },
+    handleInputValid(data) {
+      if (data.socialMediaUrl.length < 1) {
+        this.disabled = true
+      } else {
+        this.disabled = false
+      }
+    },
+    async handleDeleteSocialMedia(link) {
+      try {
+        await this.$apollo.mutate({
+          mutation: gql`
+            mutation($id: ID!) {
+              DeleteSocialMedia(id: $id) {
+                id
+                url
+              }
+            }
+          `,
+          variables: {
+            id: link.id,
+          },
+          update: (store, { data }) => {
+            const socialMedia = this.currentUser.socialMedia.filter(
+              (element) => element.id !== link.id,
+            )
+            this.setCurrentUser({
+              ...this.currentUser,
+              socialMedia,
+            })
+          },
+        })
+
+        this.$toast.success(this.$t('settings.social-media.successDelete'))
+      } catch (err) {
+        this.$toast.error(err.message)
+      }
+    },
+    async handleSubmitSocialMedia() {
+      const isEditing = !!this.editingLink.id
+      const url = this.formData.socialMediaUrl
+
+      const duplicateUrl = this.socialMediaLinks.find((link) => link.url === url)
+      if (duplicateUrl && duplicateUrl.id !== this.editingLink.id) {
+        return this.$toast.error(this.$t('settings.social-media.requireUnique'))
+      }
+
+      let mutation = gql`
+        mutation($url: String!) {
+          CreateSocialMedia(url: $url) {
+            id
+            url
+          }
+        }
+      `
+      const variables = { url }
+      let successMessage = this.$t('settings.social-media.successAdd')
+
+      if (isEditing) {
+        mutation = gql`
+          mutation($id: ID!, $url: String!) {
+            UpdateSocialMedia(id: $id, url: $url) {
+              id
+              url
+            }
+          }
+        `
+        variables.id = this.editingLink.id
+        successMessage = this.$t('settings.data.success')
+      }
+
+      try {
+        await this.$apollo.mutate({
+          mutation,
+          variables,
+          update: (store, { data }) => {
+            const newSocialMedia = isEditing ? data.UpdateSocialMedia : data.CreateSocialMedia
+            this.setCurrentUser({
+              ...this.currentUser,
+              socialMedia: unionBy([newSocialMedia], this.currentUser.socialMedia, 'id'),
+            })
+          },
+        })
+
+        this.$toast.success(successMessage)
+        this.formData.socialMediaUrl = ''
+        this.disabled = true
+        this.editingLink = {}
+      } catch (err) {
+        this.$toast.error(err.message)
+      }
+    },
+  },
+}
+</script>
+
+<style lang="scss" scope>
+// Wolle .title {
+//   font-size: $font-size-xx-large;
+//   margin-top: $space-small;
+//   // Wolle margin-bottom: $space-small;
+// }
+
+.undertitle {
+  font-size: $font-size-base;
+  // margin-top: $space-base;
+}
+
+.divider {
+  opacity: 0.4;
+  padding: 0 $space-small;
+}
+
+.icon-button {
+  cursor: pointer;
+}
+
+.list-item--high {
+  .ds-list-item-prefix {
+    align-self: center;
+  }
+
+  .ds-list-item-content {
+    display: flex;
+    align-items: center;
+  }
+}
+</style>
