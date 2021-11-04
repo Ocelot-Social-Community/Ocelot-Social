@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-// import flushPromises from 'flush-promises'
+import flushPromises from 'flush-promises'
 import MySocialMedia from './my-social-media.vue'
 import Vuex from 'vuex'
 import Vue from 'vue'
@@ -33,7 +33,7 @@ describe('my-social-media.vue', () => {
   })
 
   describe('mount', () => {
-    // let form, input, submitButton
+    // Wolle let form, input, submitButton
     let form, input
     const Wrapper = () => {
       const store = new Vuex.Store({
@@ -43,11 +43,13 @@ describe('my-social-media.vue', () => {
     }
 
     describe('adding social media link', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         wrapper = Wrapper()
         form = wrapper.find('form')
-        input = wrapper.find('input#addSocialMedia')
-        // submitButton = wrapper.find('button')
+        form.trigger('submit')
+        await Vue.nextTick()
+        input = wrapper.find('input#editSocialMedia')
+        // Wolle submitButton = wrapper.find('button')
       })
 
       it('requires the link to be a valid url', async () => {
@@ -57,44 +59,50 @@ describe('my-social-media.vue', () => {
         expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
       })
 
-      //   it('displays an error message when not saved successfully', async () => {
-      //     mocks.$apollo.mutate.mockRejectedValue({ message: 'Ouch!' })
-      //     input.setValue(newSocialMediaUrl)
-      //     form.trigger('submit')
-      //     await Vue.nextTick()
-      //     await flushPromises()
-      //     expect(mocks.$toast.error).toHaveBeenCalledTimes(1)
-      //   })
+      it('displays an error message when not saved successfully', async () => {
+        mocks.$apollo.mutate.mockRejectedValue({ message: 'Ouch!' })
+        input.setValue(newSocialMediaUrl)
+        form.trigger('submit')
+        await Vue.nextTick()
+        await flushPromises()
+        expect(mocks.$toast.error).toHaveBeenCalledTimes(1)
+      })
 
-      // describe('success', () => {
-      //   beforeEach(async () => {
-      //     mocks.$apollo.mutate.mockResolvedValue({
-      //       data: { CreateSocialMedia: { id: 's2', url: newSocialMediaUrl } },
-      //     })
-      //     input.setValue(newSocialMediaUrl)
-      //     form.trigger('submit')
-      //     await Vue.nextTick()
-      //   })
+      describe('success', () => {
+        beforeEach(async () => {
+          mocks.$apollo.mutate.mockResolvedValue({
+            data: { CreateSocialMedia: { id: 's2', url: newSocialMediaUrl } },
+          })
+          input.setValue(newSocialMediaUrl)
+          form.trigger('submit')
+          await Vue.nextTick()
+        })
 
-      //   it('sends the new url to the backend', () => {
-      //     const expected = expect.objectContaining({
-      //       variables: { url: newSocialMediaUrl },
-      //     })
+        it('sends the new url to the backend', () => {
+          const expected = expect.objectContaining({
+            variables: { url: newSocialMediaUrl },
+          })
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
+        })
 
-      //     expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
-      //   })
+        it('displays a success message', async () => {
+          await flushPromises()
+          expect(mocks.$toast.success).toHaveBeenCalledTimes(1)
+        })
 
-      //     it('displays a success message', async () => {
-      //       await flushPromises()
-      //       expect(mocks.$toast.success).toHaveBeenCalledTimes(1)
-      //     })
-
-      //     it('clears the form', async () => {
-      //       await flushPromises()
-      //       expect(input.value).toBe(undefined)
-      //       expect(submitButton.vm.$attrs.disabled).toBe(true)
-      //     })
-      // })
+        // Wolle it('clears the form', async () => {
+        //   await flushPromises()
+        //   expect(input.value).toBe(undefined)
+        //   expect(submitButton.vm.$attrs.disabled).toBe(true)
+        // })
+        it('switches back to list', async () => {
+          await flushPromises()
+          // Wolle expect(input.value).toBe(undefined)
+          // expect(submitButton.vm.$attrs.disabled).toBe(true)
+          const submitButton = wrapper.find('.base-button[data-test="add-save-button"]')
+          expect(submitButton.text()).not.toContain('settings.social-media.submit')
+        })
+      })
     })
 
     describe('given existing social media links', () => {
@@ -127,12 +135,14 @@ describe('my-social-media.vue', () => {
         // })
       })
 
-      // it('does not accept a duplicate url', async () => {
-      //   wrapper.find('input#addSocialMedia').setValue(socialMediaUrl)
-      //   form.trigger('submit')
-      //   await Vue.nextTick()
-      //   expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
-      // })
+      it('does not accept a duplicate url', async () => {
+        form.trigger('submit')
+        await Vue.nextTick()
+        wrapper.find('input#editSocialMedia').setValue(socialMediaUrl)
+        form.trigger('submit')
+        await Vue.nextTick()
+        expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+      })
 
       describe('editing social media link', () => {
         beforeEach(async () => {
@@ -142,13 +152,14 @@ describe('my-social-media.vue', () => {
           input = wrapper.find('input#editSocialMedia')
         })
 
-        //   it('disables adding new links while editing', () => {
-        //     const addInput = wrapper.find('input#addSocialMedia')
+        it('disables adding new links while editing', () => {
+          // Wolle  const addInput = wrapper.find('input#addSocialMedia')
+          //   expect(addInput.exists()).toBe(false)
+          const submitButton = wrapper.find('.base-button[data-test="add-save-button"]')
+          expect(submitButton.text()).not.toContain('settings.social-media.submit')
+        })
 
-        //     expect(addInput.exists()).toBe(false)
-        //   })
-
-        it.only('sends the new url to the backend', async () => {
+        it('sends the new url to the backend', async () => {
           const expected = expect.objectContaining({
             variables: { id: 's1', url: newSocialMediaUrl },
           })

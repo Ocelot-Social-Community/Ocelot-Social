@@ -8,11 +8,15 @@
       @input-valid="handleInputValid"
       @submit="handleSubmitSocialMedia"
     >
-      <div v-if="editingLink.id">
+      <div v-if="isEditing">
         <!-- Wolle translation -->
         <ds-space margin="base">
           <ds-heading tag="h3" class="undertitle">
-            {{ /* $t('settings.social-media.name') */ 'Edit "' + editingLink.url + '"' }}
+            {{
+              /* $t('settings.social-media.name') */ editingLink.id === ''
+                ? 'Add new one'
+                : 'Edit "' + editingLink.url + '"'
+            }}
           </ds-heading>
         </ds-space>
         <ds-space v-if="socialMediaLinks" margin-top="base" margin="base">
@@ -61,18 +65,23 @@
       </div>
 
       <ds-space margin-top="base">
-        <ds-input
-          v-if="!editingLink.id"
+        <!-- Wolle <ds-input
+          v-if="!isEditing"
           id="addSocialMedia"
           model="socialMediaUrl"
           type="text"
           :placeholder="$t('settings.social-media.placeholder')"
-        />
+        /> -->
         <ds-space margin-top="base">
-          <base-button filled :disabled="disabled" type="submit">
-            {{ editingLink.id ? $t('actions.save') : $t('settings.social-media.submit') }}
+          <base-button
+            filled
+            :disabled="!(!isEditing || (isEditing && !disabled))"
+            type="submit"
+            data-test="add-save-button"
+          >
+            {{ isEditing ? $t('actions.save') : $t('settings.social-media.submit') }}
           </base-button>
-          <base-button v-if="editingLink.id" id="cancel" danger @click="handleCancel()">
+          <base-button v-if="isEditing" id="cancel" danger @click="handleCancel()">
             {{ $t('actions.cancel') }}
           </base-button>
         </ds-space>
@@ -112,13 +121,19 @@ export default {
       formData: this.useFormData,
       formSchema: this.useFormSchema,
       disabled: true,
-      editingLink: {},
+      editingLink: null,
     }
   },
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+    isEditing() {
+      return this.editingLink !== null
+    },
+    isCreation() {
+      return this.editingLink !== null && this.editingLink.id === ''
+    },
     socialMediaLinks() {
       const domainRegex = /^(?:https?:\/\/)?(?:[^@\n])?(?:www\.)?([^:/\n?]+)/g
       const { socialMedia = [] } = this.currentUser
@@ -134,7 +149,7 @@ export default {
       setCurrentUser: 'auth/SET_USER',
     }),
     handleCancel() {
-      this.editingLink = {}
+      this.editingLink = null
       this.formData.socialMediaUrl = ''
       this.disabled = true
     },
@@ -183,57 +198,69 @@ export default {
       }
     },
     async handleSubmitSocialMedia() {
-      const isEditing = !!this.editingLink.id
-      const url = this.formData.socialMediaUrl
+      // Wolle const isEditing = (this.editingLink !== null)
+      if (!this.isEditing) {
+        // Wolle this.editingLink = { id: '', url: '' }
+        this.handleEditSocialMedia({ id: '', url: '' })
+      } else {
+        // Wolle const url = this.formData.socialMediaUrl
+        this.editingLink.url = this.formData.socialMediaUrl
 
-      const duplicateUrl = this.socialMediaLinks.find((link) => link.url === url)
-      if (duplicateUrl && duplicateUrl.id !== this.editingLink.id) {
-        return this.$toast.error(this.$t('settings.social-media.requireUnique'))
-      }
-
-      let mutation = gql`
-        mutation($url: String!) {
-          CreateSocialMedia(url: $url) {
-            id
-            url
-          }
+        const duplicateUrl = this.socialMediaLinks.find((link) => link.url === this.editingLink.url)
+        // Wolle console.log('duplicateUrl: ', duplicateUrl)
+        // console.log('this.isEditing: ', this.isEditing)
+        // console.log('this.editingLink: ', this.editingLink)
+        if (duplicateUrl && this.isEditing && duplicateUrl.id !== this.editingLink.id) {
+          return this.$toast.error(this.$t('settings.social-media.requireUnique'))
         }
-      `
-      const variables = { url }
-      let successMessage = this.$t('settings.social-media.successAdd')
 
-      if (isEditing) {
-        mutation = gql`
-          mutation($id: ID!, $url: String!) {
-            UpdateSocialMedia(id: $id, url: $url) {
-              id
-              url
+        let mutation, variables, successMessage
+        if (this.isCreation) {
+          mutation = gql`
+            mutation($url: String!) {
+              CreateSocialMedia(url: $url) {
+                id
+                url
+              }
             }
-          }
-        `
-        variables.id = this.editingLink.id
-        successMessage = this.$t('settings.data.success')
-      }
+          `
+          variables = { url: this.editingLink.url }
+          successMessage = this.$t('settings.social-media.successAdd')
+        } else {
+          mutation = gql`
+            mutation($id: ID!, $url: String!) {
+              UpdateSocialMedia(id: $id, url: $url) {
+                id
+                url
+              }
+            }
+          `
+          variables = { id: this.editingLink.id, url: this.editingLink.url }
+          successMessage = this.$t('settings.data.success')
+        }
 
-      try {
-        await this.$apollo.mutate({
-          mutation,
-          variables,
-          update: (store, { data }) => {
-            const newSocialMedia = isEditing ? data.UpdateSocialMedia : data.CreateSocialMedia
-            this.setCurrentUser({
-              ...this.currentUser,
-              socialMedia: unionBy([newSocialMedia], this.currentUser.socialMedia, 'id'),
-            })
-          },
-        })
+        try {
+          await this.$apollo.mutate({
+            mutation,
+            variables,
+            update: (_store, { data }) => {
+              const newSocialMedia = !this.isCreation
+                ? data.UpdateSocialMedia
+                : data.CreateSocialMedia
+              this.setCurrentUser({
+                ...this.currentUser,
+                socialMedia: unionBy([newSocialMedia], this.currentUser.socialMedia, 'id'),
+              })
+            },
+          })
 
-        this.$toast.success(successMessage)
-        this.formData.socialMediaUrl = ''
-        this.disabled = true
-        this.editingLink = {}
-      } catch (err) {
-        this.$toast.error(err.message)
+          this.$toast.success(successMessage)
+          this.formData.socialMediaUrl = ''
+          this.disabled = true
+          this.editingLink = null
+        } catch (err) {
+          this.$toast.error(err.message)
+        }
       }
     },
   },
