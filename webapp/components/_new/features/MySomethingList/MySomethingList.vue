@@ -106,6 +106,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    callbackEdit: {
+      type: Function,
+      default: () => {},
+    },
   },
   data() {
     return {
@@ -155,7 +159,9 @@ export default {
     },
     handleEditSocialMedia(link) {
       this.editingLink = link
-      this.formData.socialMediaUrl = link.url
+      // Wolle this.formData.socialMediaUrl = link.url
+      // Wolle this.$refs.socialMediaUrl.$el.focus()
+      this.callbackEdit(this, link)
     },
     handleInput(data) {
       this.disabled = true

@@ -1,5 +1,9 @@
 <template>
-  <my-something-list :useFormData="useFormData" :useFormSchema="useFormSchema">
+  <my-something-list
+    :useFormData="useFormData"
+    :useFormSchema="useFormSchema"
+    :callbackEdit="callbackEditSocialMedia"
+  >
     <template #list-item="{ link }">
       <social-media-list-item :link="link" />
     </template>
@@ -35,6 +39,19 @@ export default {
         },
       },
     }
+  },
+  methods: {
+    callbackEditSocialMedia(thisMySomethingList, link) {
+      // Wolle this.editingLink = link
+      thisMySomethingList.formData.socialMediaUrl = link.url
+      // thisMySomethingList.$refs.socialMediaUrl.$el.focus()
+      // !!! Check for existenz
+      // this.$scopedSlots.default()[0].context.$refs
+      // thisMySomethingList.$scopedSlots['edit-item']()[0].$el.focus()
+      // console.log(thisMySomethingList.$scopedSlots['edit-item']()[0].context.$refs)
+      // console.log(thisMySomethingList.$scopedSlots['edit-item']()[0].context.$refs)
+      // console.log(thisMySomethingList.$refs)
+    },
   },
 }
 </script>
