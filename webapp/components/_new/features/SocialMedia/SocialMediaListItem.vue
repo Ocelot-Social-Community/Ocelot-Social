@@ -1,7 +1,7 @@
 <template>
-  <a :href="link.url" target="_blank">
-    <img :src="link.favicon" alt="Link:" height="16" width="16" />
-    {{ link.url }}
+  <a :href="item.url" target="_blank">
+    <img :src="item.favicon" alt="Link:" height="16" width="16" />
+    {{ item.url }}
   </a>
 </template>
 
@@ -9,7 +9,7 @@
 export default {
   name: 'SocialMediaListItem',
   props: {
-    link: {
+    item: {
       type: Object,
       default: () => ({}),
     },

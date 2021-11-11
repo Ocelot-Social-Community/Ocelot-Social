@@ -1,20 +1,26 @@
 import { mount } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
+// Wolle import flushPromises from 'flush-promises'
 import MySomethingList from './MySomethingList.vue'
-import Vuex from 'vuex'
+// Wolle import Vuex from 'vuex'
 import Vue from 'vue'
 
 const localVue = global.localVue
 
 describe('MySomethingList.vue', () => {
   let wrapper
+  let propsData
   let data
   let mocks
-  let getters
-  const socialMediaUrl = 'https://freeradical.zone/@mattwr18'
+  // let getters
+  // Wolle const socialMediaUrl = 'https://freeradical.zone/@mattwr18'
   // const newSocialMediaUrl = 'https://twitter.com/mattwr18'
 
   beforeEach(() => {
+    propsData = {
+      useItems: [{ id: 'id', dummy: 'dummy' }],
+      namePropertyKey: 'dummy',
+      callbacks: { edit: jest.fn(), submit: jest.fn(), delete: jest.fn() },
+    }
     data = () => {
       return {}
     }
@@ -28,22 +34,32 @@ describe('MySomethingList.vue', () => {
         success: jest.fn(),
       },
     }
-    getters = {
-      'auth/user': () => {
-        return {}
-      },
-    }
+    // getters = {
+    //   'auth/user': () => {
+    //     return {}
+    //   },
+    // }
   })
 
   describe('mount', () => {
     // Wolle let form, input, slots, submitButton
-    let slots
+    let form, slots
     const Wrapper = () => {
-      const store = new Vuex.Store({
-        getters,
+      // const store = new Vuex.Store({
+      //   getters,
+      // })
+      slots = {
+        'list-item': '<div class="list-item"></div>',
+        'edit-item': '<div class="edit-item"></div>',
+      }
+      return mount(MySomethingList, {
+        propsData,
+        data,
+        // store,
+        mocks,
+        localVue,
+        slots,
       })
-      slots = { 'list-item': '<div class="list-item"></div>' }
-      return mount(MySomethingList, { data, store, mocks, localVue, slots })
     }
 
     // describe('adding social media link', () => {
@@ -108,11 +124,11 @@ describe('MySomethingList.vue', () => {
 
     describe('given existing social media links', () => {
       beforeEach(() => {
-        getters = {
-          'auth/user': () => ({
-            socialMedia: [{ id: 's1', url: socialMediaUrl }],
-          }),
-        }
+        // getters = {
+        //   'auth/user': () => ({
+        //     socialMedia: [{ id: 's1', url: socialMediaUrl }],
+        //   }),
+        // }
         // Wolle propsData = { editingLink: { id: 's1', url: socialMediaUrl } }
         // data = () => {
         //   return {
@@ -137,67 +153,56 @@ describe('MySomethingList.vue', () => {
         })
       })
 
-      // Wolle it('does not accept a duplicate url', async () => {
-      //   // wrapper.find('input#addSocialMedia').setValue(socialMediaUrl)
-      //   wrapper.find('input#editSocialMedia').setValue(socialMediaUrl)
-      //   form.trigger('submit')
-      //   await Vue.nextTick()
-      //   expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
-      // })
-
-      // describe('editing social media link', () => {
-      //   beforeEach(async () => {
-      //     const editButton = wrapper.find('.base-button[data-test="edit-button"]')
-      //     editButton.trigger('click')
-      //     await Vue.nextTick()
-      //     input = wrapper.find('input#editSocialMedia')
-      //   })
-
-      //   it('disables adding new links while editing', () => {
-      // const addInput = wrapper.find('input#addSocialMedia')
-      // wrapper.find('.base-button[data-test="add-save-button"]').text().
-      // expect(addInput.exists()).toBe(false)
-      //   const submitButton = wrapper.find('.base-button[data-test="add-save-button"]')
-      //   expect(submitButton.text()).not.toContain('settings.social-media.submit')
-      // })
-
-      // Wolle remove? or test here abstract? it('sends the new url to the backend', async () => {
-      //   const expected = expect.objectContaining({
-      //     variables: { id: 's1', url: newSocialMediaUrl },
-      //   })
-      //   input.setValue(newSocialMediaUrl)
-      //   form.trigger('submit')
-      //   await Vue.nextTick()
-      //   expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
-      // })
-
-      // it('allows the user to cancel editing', async () => {
-      //   const cancelButton = wrapper.find('button#cancel')
-      //   cancelButton.trigger('click')
-      //   await Vue.nextTick()
-      //   expect(wrapper.find('input#editSocialMedia').exists()).toBe(false)
-      // })
-      // })
-
-      describe('deleting social media link', () => {
+      describe('editing item', () => {
         beforeEach(async () => {
+          const editButton = wrapper.find('.base-button[data-test="edit-button"]')
+          editButton.trigger('click')
+          await Vue.nextTick()
+          // Wolle input = wrapper.find('input#editSocialMedia')
+        })
+
+        it('disables adding items while editing', () => {
+          const submitButton = wrapper.find('.base-button[data-test="add-save-button"]')
+          expect(submitButton.text()).not.toContain('settings.social-media.submit')
+        })
+
+        it('allows the user to cancel editing', async () => {
+          expect(wrapper.find('.edit-item').exists()).toBeTruthy()
+          const cancelButton = wrapper.find('button#cancel')
+          cancelButton.trigger('click')
+          await Vue.nextTick()
+          expect(wrapper.find('.edit-item').exists()).not.toBeTruthy()
+        })
+      })
+
+      describe('calls callback functions', () => {
+        it('call edit', async () => {
+          const editButton = wrapper.find('.base-button[data-test="edit-button"]')
+          editButton.trigger('click')
+          await Vue.nextTick()
+          const expectedItem = expect.objectContaining({ id: 'id', dummy: 'dummy' })
+          expect(propsData.callbacks.edit).toHaveBeenCalledTimes(1)
+          expect(propsData.callbacks.edit).toHaveBeenCalledWith(expect.any(Object), expectedItem)
+        })
+
+        it('call edit', async () => {
+          form = wrapper.find('form')
+          form.trigger('submit')
+          await Vue.nextTick()
+          form.trigger('submit')
+          await Vue.nextTick()
+          const expectedItem = expect.objectContaining({ id: '' })
+          expect(propsData.callbacks.edit).toHaveBeenCalledTimes(1)
+          expect(propsData.callbacks.edit).toHaveBeenCalledWith(expect.any(Object), expectedItem)
+        })
+
+        it('call delete', async () => {
           const deleteButton = wrapper.find('.base-button[data-test="delete-button"]')
           deleteButton.trigger('click')
           await Vue.nextTick()
-        })
-
-        it('sends the link id to the backend', () => {
-          const expected = expect.objectContaining({
-            variables: { id: 's1' },
-          })
-
-          expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
-        })
-
-        it('displays a success message', async () => {
-          await flushPromises()
-          expect(mocks.$toast.success).toHaveBeenCalledTimes(1)
+          const expectedItem = expect.objectContaining({ id: 'id', dummy: 'dummy' })
+          expect(propsData.callbacks.delete).toHaveBeenCalledTimes(1)
+          expect(propsData.callbacks.delete).toHaveBeenCalledWith(expect.any(Object), expectedItem)
         })
       })
     })

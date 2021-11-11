@@ -112,7 +112,6 @@ describe('my-social-media.vue', () => {
             socialMedia: [{ id: 's1', url: socialMediaUrl }],
           }),
         }
-
         wrapper = Wrapper()
         form = wrapper.find('form')
       })
@@ -152,13 +151,6 @@ describe('my-social-media.vue', () => {
           input = wrapper.find('input#editSocialMedia')
         })
 
-        it('disables adding new links while editing', () => {
-          // Wolle  const addInput = wrapper.find('input#addSocialMedia')
-          //   expect(addInput.exists()).toBe(false)
-          const submitButton = wrapper.find('.base-button[data-test="add-save-button"]')
-          expect(submitButton.text()).not.toContain('settings.social-media.submit')
-        })
-
         it('sends the new url to the backend', async () => {
           const expected = expect.objectContaining({
             variables: { id: 's1', url: newSocialMediaUrl },
@@ -168,36 +160,28 @@ describe('my-social-media.vue', () => {
           await Vue.nextTick()
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
         })
-
-        //   it('allows the user to cancel editing', async () => {
-        //     const cancelButton = wrapper.find('button#cancel')
-        //     cancelButton.trigger('click')
-        //     await Vue.nextTick()
-        //     expect(wrapper.find('input#editSocialMedia').exists()).toBe(false)
-        //   })
       })
 
-      // describe('deleting social media link', () => {
-      //   beforeEach(async () => {
-      //     const deleteButton = wrapper.find('.base-button[data-test="delete-button"]')
-      //     deleteButton.trigger('click')
-      //     await Vue.nextTick()
-      //   })
+      describe('deleting social media link', () => {
+        beforeEach(async () => {
+          const deleteButton = wrapper.find('.base-button[data-test="delete-button"]')
+          deleteButton.trigger('click')
+          await Vue.nextTick()
+        })
 
-      //   it('sends the link id to the backend', () => {
-      //     const expected = expect.objectContaining({
-      //       variables: { id: 's1' },
-      //     })
+        it('sends the link id to the backend', () => {
+          const expected = expect.objectContaining({
+            variables: { id: 's1' },
+          })
+          expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
+        })
 
-      //     expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
-      //     expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
-      //   })
-
-      //   it('displays a success message', async () => {
-      //     await flushPromises()
-      //     expect(mocks.$toast.success).toHaveBeenCalledTimes(1)
-      //   })
-      // })
+        it('displays a success message', async () => {
+          await flushPromises()
+          expect(mocks.$toast.success).toHaveBeenCalledTimes(1)
+        })
+      })
     })
   })
 })
