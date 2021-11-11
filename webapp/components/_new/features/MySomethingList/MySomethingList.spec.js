@@ -12,6 +12,7 @@ describe('MySomethingList.vue', () => {
 
   beforeEach(() => {
     propsData = {
+      useFormData: { dummy: '' },
       useItems: [{ id: 'id', dummy: 'dummy' }],
       namePropertyKey: 'dummy',
       callbacks: { edit: jest.fn(), submit: jest.fn(), delete: jest.fn() },
@@ -47,7 +48,7 @@ describe('MySomethingList.vue', () => {
       })
     }
 
-    describe('given existing social media links', () => {
+    describe('given existing item', () => {
       beforeEach(() => {
         wrapper = Wrapper()
       })
@@ -97,15 +98,15 @@ describe('MySomethingList.vue', () => {
           expect(propsData.callbacks.edit).toHaveBeenCalledWith(expect.any(Object), expectedItem)
         })
 
-        it('call edit', async () => {
+        it('call submit', async () => {
           form = wrapper.find('form')
           form.trigger('submit')
           await Vue.nextTick()
           form.trigger('submit')
           await Vue.nextTick()
           const expectedItem = expect.objectContaining({ id: '' })
-          expect(propsData.callbacks.edit).toHaveBeenCalledTimes(1)
-          expect(propsData.callbacks.edit).toHaveBeenCalledWith(expect.any(Object), expectedItem)
+          expect(propsData.callbacks.submit).toHaveBeenCalledTimes(1)
+          expect(propsData.callbacks.submit).toHaveBeenCalledWith(expect.any(Object), true, expectedItem, { dummy: '' })
         })
 
         it('call delete', async () => {
