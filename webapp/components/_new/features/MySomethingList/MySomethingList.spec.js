@@ -106,7 +106,12 @@ describe('MySomethingList.vue', () => {
           await Vue.nextTick()
           const expectedItem = expect.objectContaining({ id: '' })
           expect(propsData.callbacks.submit).toHaveBeenCalledTimes(1)
-          expect(propsData.callbacks.submit).toHaveBeenCalledWith(expect.any(Object), true, expectedItem, { dummy: '' })
+          expect(propsData.callbacks.submit).toHaveBeenCalledWith(
+            expect.any(Object),
+            true,
+            expectedItem,
+            { dummy: '' },
+          )
         })
 
         it('call delete', async () => {

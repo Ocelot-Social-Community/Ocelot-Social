@@ -773,6 +773,8 @@
       "name": "Security"
     },
     "social-media": {
+      "addNewTitle": "Add new link",
+      "editTitle": "Edit link \"{name}\"",
       "name": "Social media",
       "placeholder": "Your social media url",
       "requireUnique": "You added this url already",

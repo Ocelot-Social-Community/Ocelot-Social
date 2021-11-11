@@ -773,6 +773,8 @@
       "name": "Sicherheit"
     },
     "social-media": {
+      "addNewTitle": "Neuen Link hinzufügen",
+      "editTitle": "Link \"{name}\" ändern",
       "name": "Soziale Netzwerke",
       "placeholder": "Deine Webadresse des Sozialen Netzwerkes",
       "requireUnique": "Dieser Link existiert bereits",

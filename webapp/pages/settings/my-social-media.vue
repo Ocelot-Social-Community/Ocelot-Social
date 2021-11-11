@@ -8,6 +8,8 @@
       :defaultItem="{ url: '' }"
       :namePropertyKey="'url'"
       :callbacks="{
+        handleInput: () => {},
+        handleInputValid,
         edit: callbackEditSocialMedia,
         submit: handleSubmitSocialMedia,
         delete: callbackDeleteSocialMedia,
@@ -80,6 +82,13 @@ export default {
     ...mapMutations({
       setCurrentUser: 'auth/SET_USER',
     }),
+    handleInputValid(thisList, data) {
+      if (data.socialMediaUrl.length < 1) {
+        thisList.disabled = true
+      } else {
+        thisList.disabled = false
+      }
+    },
     callbackEditSocialMedia(thisList, link) {
       thisList.formData.socialMediaUrl = link.url
       // try to set focus on link edit field
@@ -162,11 +171,11 @@ export default {
             id: item.id,
           },
           update: (store, { data }) => {
-            const socialMedia = thisList.currentUser.socialMedia.filter(
+            const socialMedia = this.currentUser.socialMedia.filter(
               (element) => element.id !== item.id,
             )
-            thisList.setCurrentUser({
-              ...thisList.currentUser,
+            this.setCurrentUser({
+              ...this.currentUser,
               socialMedia,
             })
           },

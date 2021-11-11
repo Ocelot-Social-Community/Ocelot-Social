@@ -4,16 +4,15 @@
     :schema="formSchema"
     @input="handleInput"
     @input-valid="handleInputValid"
-    @submit="handleSubmitSocialMedia"
+    @submit="handleSubmitItem"
   >
     <div v-if="isEditing">
-      <!-- Wolle translation -->
       <ds-space margin="base">
         <ds-heading tag="h3" class="undertitle">
           {{
-            /* $t('settings.social-media.name') */ isCreation
-              ? 'Add new'
-              : 'Edit "' + editingItem[namePropertyKey] + '"'
+            isCreation
+              ? $t('settings.social-media.addNewTitle')
+              : $t('settings.social-media.editTitle', { name: editingItem[namePropertyKey] })
           }}
         </ds-heading>
       </ds-space>
@@ -25,7 +24,6 @@
       <ds-space v-if="items" margin-top="base" margin="small">
         <ds-list>
           <ds-list-item v-for="item in items" :key="item.id" class="list-item--high">
-            <!-- Wolle remove template tag? -->
             <template>
               <slot name="list-item" :item="item" />
               <span class="divider">|</span>
@@ -33,7 +31,7 @@
                 icon="edit"
                 circle
                 ghost
-                @click="handleEditSocialMedia(item)"
+                @click="handleEditItem(item)"
                 :title="$t('actions.edit')"
                 data-test="edit-button"
               />
@@ -41,7 +39,7 @@
                 icon="trash"
                 circle
                 ghost
-                @click="handleDeleteSocialMedia(item)"
+                @click="handleDeleteItem(item)"
                 :title="$t('actions.delete')"
                 data-test="delete-button"
               />
@@ -55,7 +53,8 @@
       <ds-space margin-top="base">
         <base-button
           filled
-          :disabled="!(!isEditing || (isEditing && !disabled))"
+          :disabled="loading || !(!isEditing || (isEditing && !disabled))"
+          :loading="loading"
           type="submit"
           data-test="add-save-button"
         >
@@ -95,7 +94,13 @@ export default {
     },
     callbacks: {
       type: Object,
-      default: () => ({ edit: () => {}, submit: () => {}, delete: () => {} }),
+      default: () => ({
+        handleInput: () => {},
+        handleInputValid: () => {},
+        edit: () => {},
+        submit: () => {},
+        delete: () => {},
+      }),
     },
   },
   data() {
@@ -104,6 +109,7 @@ export default {
       formSchema: this.useFormSchema,
       items: this.useItems,
       disabled: true,
+      loading: false,
       editingItem: null,
     }
   },
@@ -116,42 +122,41 @@ export default {
     },
   },
   watch: {
-    // can change by a parents callback and again given trough by bind from there
+    // can change by a parents callback and again given trough by v-bind from there
     useItems(newItems) {
       this.items = newItems
     },
   },
   methods: {
-    handleCancel() {
-      this.editingItem = null
-      this.disabled = true
-    },
-    handleEditSocialMedia(item) {
-      this.editingItem = item
-      this.callbacks.edit(this, item)
-    },
     handleInput(data) {
+      this.callbacks.handleInput(this, data)
       this.disabled = true
     },
     handleInputValid(data) {
-      if (data.socialMediaUrl.length < 1) {
-        this.disabled = true
-      } else {
-        this.disabled = false
-      }
+      this.callbacks.handleInputValid(this, data)
     },
-    async handleDeleteSocialMedia(item) {
-      await this.callbacks.delete(this, item)
+    handleEditItem(item) {
+      this.editingItem = item
+      this.callbacks.edit(this, item)
     },
-    async handleSubmitSocialMedia() {
+    async handleSubmitItem() {
       if (!this.isEditing) {
-        this.handleEditSocialMedia({ ...this.defaultItem, id: '' })
+        this.handleEditItem({ ...this.defaultItem, id: '' })
       } else {
+        this.loading = true
         if (await this.callbacks.submit(this, this.isCreation, this.editingItem, this.formData)) {
           this.disabled = true
           this.editingItem = null
         }
+        this.loading = false
       }
+    },
+    handleCancel() {
+      this.editingItem = null
+      this.disabled = true
+    },
+    async handleDeleteItem(item) {
+      await this.callbacks.delete(this, item)
     },
   },
 }
