@@ -33,7 +33,6 @@ describe('my-social-media.vue', () => {
   })
 
   describe('mount', () => {
-    // Wolle let form, input, submitButton
     let form, input
     const Wrapper = () => {
       const store = new Vuex.Store({
@@ -49,7 +48,6 @@ describe('my-social-media.vue', () => {
         form.trigger('submit')
         await Vue.nextTick()
         input = wrapper.find('input#editSocialMedia')
-        // Wolle submitButton = wrapper.find('button')
       })
 
       it('requires the link to be a valid url', async () => {
@@ -90,15 +88,8 @@ describe('my-social-media.vue', () => {
           expect(mocks.$toast.success).toHaveBeenCalledTimes(1)
         })
 
-        // Wolle it('clears the form', async () => {
-        //   await flushPromises()
-        //   expect(input.value).toBe(undefined)
-        //   expect(submitButton.vm.$attrs.disabled).toBe(true)
-        // })
         it('switches back to list', async () => {
           await flushPromises()
-          // Wolle expect(input.value).toBe(undefined)
-          // expect(submitButton.vm.$attrs.disabled).toBe(true)
           const submitButton = wrapper.find('.base-button[data-test="add-save-button"]')
           expect(submitButton.text()).not.toContain('settings.social-media.submit')
         })
@@ -124,14 +115,6 @@ describe('my-social-media.vue', () => {
         it('displays the url', () => {
           expect(wrapper.find(`a[href="${socialMediaUrl}"]`).exists()).toBe(true)
         })
-
-        // it('displays the edit button', () => {
-        //   expect(wrapper.find('.base-button[data-test="edit-button"]').exists()).toBe(true)
-        // })
-
-        // it('displays the delete button', () => {
-        //   expect(wrapper.find('.base-button[data-test="delete-button"]').exists()).toBe(true)
-        // })
       })
 
       it('does not accept a duplicate url', async () => {

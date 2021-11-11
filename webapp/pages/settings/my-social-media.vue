@@ -81,8 +81,8 @@ export default {
       setCurrentUser: 'auth/SET_USER',
     }),
     callbackEditSocialMedia(thisList, link) {
-      // Wolle this.editingLink = link
       thisList.formData.socialMediaUrl = link.url
+      // try to set focus on link edit field
       // thisList.$refs.socialMediaUrl.$el.focus()
       // !!! Check for existenz
       // this.$scopedSlots.default()[0].context.$refs
@@ -139,7 +139,6 @@ export default {
         })
 
         thisList.$toast.success(successMessage)
-        // Wolle ??? thisList.formData.socialMediaUrl = ''
 
         return true
       } catch (err) {
