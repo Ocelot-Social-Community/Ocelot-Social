@@ -41,7 +41,7 @@ export const signupTemplate = ({ email, variables: { nonce, inviteCode = null } 
   }
 }
 
-export const emailVerificationTemplate = ({ email, nonce, name }) => {
+export const emailVerificationTemplate = ({ email, variables: { nonce, name } }) => {
   const subject = 'Neue E-Mail Adresse | New E-Mail Address'
   const actionUrl = new URL('/settings/my-email-address/verify', CONFIG.CLIENT_URI)
   actionUrl.searchParams.set('email', email)
@@ -56,7 +56,7 @@ export const emailVerificationTemplate = ({ email, nonce, name }) => {
   }
 }
 
-export const resetPasswordTemplate = ({ email, nonce, name }) => {
+export const resetPasswordTemplate = ({ email, variables: { nonce, name } }) => {
   const subject = 'Neues Passwort | Reset Password'
   const actionUrl = new URL('/password-reset/change-password', CONFIG.CLIENT_URI)
   actionUrl.searchParams.set('nonce', nonce)
