@@ -9,9 +9,10 @@ import {
 } from './templateBuilder'
 
 const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
+const supportUrl = CONFIG.SUPPORT_URL
 let actionUrl, name, settingsUrl
 
-const signupTemplateData = (_locale) => ({
+const signupTemplateData = () => ({
   email: 'test@example.org',
   variables: {
     nonce: '12345',
@@ -26,7 +27,7 @@ const notificationTemplateData = (locale) => ({
     },
   },
 })
-const testEmailData = (emailTemplate, templateBuilder, templateData, _locale, individuals) => {
+const testEmailData = (emailTemplate, templateBuilder, templateData, individuals) => {
   if (!emailTemplate) {
     emailTemplate = templateBuilder(templateData)
   }
@@ -39,13 +40,18 @@ const testEmailData = (emailTemplate, templateBuilder, templateData, _locale, in
   if (individuals.name) {
     expect(emailTemplate.html).toEqual(expect.stringContaining(individuals.name))
   }
-  expect(emailTemplate.html).toEqual(expect.stringContaining(individuals.actionUrl.toString()))
+  if (individuals.actionUrl) {
+    expect(emailTemplate.html).toEqual(expect.stringContaining(individuals.actionUrl.toString()))
+  }
   expect(emailTemplate.html).toEqual(expect.stringContaining(CONFIG.ORGANIZATION_URL))
   expect(emailTemplate.html).toEqual(expect.stringContaining(CONFIG.APPLICATION_NAME))
   if (individuals.settingsUrl) {
     expect(emailTemplate.html).toEqual(expect.stringContaining(individuals.settingsUrl.toString()))
   }
   expect(emailTemplate.html).toEqual(expect.stringContaining(individuals.content))
+  if (individuals.supportUrl) {
+    expect(emailTemplate.html).toEqual(expect.stringContaining(individuals.supportUrl.toString()))
+  }
   return emailTemplate
 }
 
@@ -63,19 +69,19 @@ describe('templateBuilder', () => {
       it('e-mail is build with all data', () => {
         const actionUrl = new URL('/registration', CONFIG.CLIENT_URI)
         const theSignupTemplateData = signupTemplateData()
-
+        // locale: en
         let content = "Thank you for joining our cause – it's awesome to have you on board."
-        const emailTemplate = testEmailData(null, signupTemplate, theSignupTemplateData, 'en', {
+        const emailTemplate = testEmailData(null, signupTemplate, theSignupTemplateData, {
           actionUrl,
           content,
+          supportUrl,
         })
-
+        // locale: de
         content = 'Danke, dass Du dich angemeldet hast – wir freuen uns, Dich dabei zu haben.'
-        testEmailData(emailTemplate, signupTemplate, theSignupTemplateData, 'de', {
-          actionUrl,
+        testEmailData(emailTemplate, signupTemplate, theSignupTemplateData, {
           content,
         })
-
+        // test additional
         expect(emailTemplate.html).toEqual(
           expect.stringContaining(theSignupTemplateData.variables.nonce),
         )
@@ -106,7 +112,7 @@ describe('templateBuilder', () => {
       it('e-mail is build with all data', () => {
         const subject = `${CONFIG.APPLICATION_NAME} – Notification`
         const content = 'You received at least one notification. Click on this button to view them:'
-        testEmailData(null, notificationTemplate, notificationTemplateData('en'), 'en', {
+        testEmailData(null, notificationTemplate, notificationTemplateData('en'), {
           subject,
           actionUrl,
           name,
@@ -120,7 +126,7 @@ describe('templateBuilder', () => {
       it('e-mail is build with all data', async () => {
         const subject = `${CONFIG.APPLICATION_NAME} – Benachrichtigung`
         const content = `Du hast mindestens eine Benachrichtigung erhalten. Klick auf diesen Button, um sie anzusehen:`
-        testEmailData(null, notificationTemplate, notificationTemplateData('de'), 'de', {
+        testEmailData(null, notificationTemplate, notificationTemplateData('de'), {
           subject,
           actionUrl,
           name,
