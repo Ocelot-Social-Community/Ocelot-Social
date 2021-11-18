@@ -19,7 +19,7 @@ const defaultParams = {
 }
 const englishHint = 'English version below!'
 
-export const signupTemplate = ({ email, nonce, inviteCode = null }) => {
+export const signupTemplate = ({ email, variables: { nonce, inviteCode = null } }) => {
   const subject = `Willkommen, Bienvenue, Welcome to ${CONFIG.APPLICATION_NAME}!`
   // dev format example: http://localhost:3000/registration?method=invite-mail&email=wolle.huss%40pjannto.com&nonce=64853
   const actionUrl = new URL('/registration', CONFIG.CLIENT_URI)
@@ -84,7 +84,7 @@ export const wrongAccountTemplate = ({ email }) => {
   }
 }
 
-export const notificationTemplate = ({ email, notification }) => {
+export const notificationTemplate = ({ email, variables: { notification } }) => {
   const actionUrl = new URL('/notifications', CONFIG.CLIENT_URI)
   const settingsUrl = new URL('/settings/notifications', CONFIG.CLIENT_URI)
   const renderParams = { ...defaultParams, name: notification.to.name, settingsUrl, actionUrl }

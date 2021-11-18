@@ -118,7 +118,7 @@ describe('passwordReset', () => {
 
 describe('resetPassword', () => {
   const setup = async (options = {}) => {
-    const { email = 'user@example.org', issuedAt = new Date(), nonce = 'abcdef' } = options
+    const { email = 'user@example.org', issuedAt = new Date(), nonce = 'abcde' } = options
     await createPasswordReset({ driver, email, issuedAt, nonce })
   }
 
@@ -148,7 +148,7 @@ describe('resetPassword', () => {
     describe('invalid email', () => {
       it('resolves to false', async () => {
         await setup()
-        variables = { ...variables, email: 'non-existent@example.org', nonce: 'abcdef' }
+        variables = { ...variables, email: 'non-existent@example.org', nonce: 'abcde' }
         await expect(mutate({ mutation, variables })).resolves.toMatchObject({
           data: { resetPassword: false },
         })
@@ -177,7 +177,7 @@ describe('resetPassword', () => {
         beforeEach(() => {
           variables = {
             ...variables,
-            nonce: 'abcdef',
+            nonce: 'abcde',
           }
         })
 
