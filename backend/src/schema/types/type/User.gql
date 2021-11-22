@@ -19,47 +19,26 @@ enum _UserOrdering {
   locale_desc
 }
 
-type User {
+type User implements Profile {
+  # Profile interface properties begin
+  # a real type inheritance would be possible via: https://github.com/nicolasdao/graphql-s2s
+
   id: ID!
-  actorId: String
-  name: String
-  email: String! @cypher(statement: "MATCH (this)-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e.email")
   slug: String!
+  name: String
+  actorId: String
   avatar: Image @relation(name: "AVATAR_IMAGE", direction: "OUT")
   deleted: Boolean
   disabled: Boolean
-  role: UserGroup!
-  publicKey: String
-  invitedBy: User @relation(name: "INVITED", direction: "IN")
-  invited: [User] @relation(name: "INVITED", direction: "OUT")
-
   location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
   locationName: String
   about: String
   socialMedia: [SocialMedia]! @relation(name: "OWNED_BY", direction: "IN")
-
   createdAt: String
   updatedAt: String
 
-  termsAndConditionsAgreedVersion: String
-  termsAndConditionsAgreedAt: String
-
-  allowEmbedIframes: Boolean
-  showShoutsPublicly: Boolean
-  sendNotificationEmails: Boolean
-  locale: String
-  friends: [User]! @relation(name: "FRIENDS", direction: "BOTH")
-  friendsCount: Int! @cypher(statement: "MATCH (this)<-[:FRIENDS]->(r:User) RETURN COUNT(DISTINCT r)")
-
-  following: [User]! @relation(name: "FOLLOWS", direction: "OUT")
-  followingCount: Int! @cypher(statement: "MATCH (this)-[:FOLLOWS]->(r:User) RETURN COUNT(DISTINCT r)")
-
   followedBy: [User]! @relation(name: "FOLLOWS", direction: "IN")
   followedByCount: Int! @cypher(statement: "MATCH (this)<-[:FOLLOWS]-(r:User) RETURN COUNT(DISTINCT r)")
-
-  inviteCodes: [InviteCode] @relation(name: "GENERATED", direction: "OUT")
-  redeemedInviteCode: InviteCode @relation(name: "REDEEMED", direction: "OUT")
-
   # Is the currently logged in user following that user?
   followedByCurrentUser: Boolean! @cypher(
   statement: """
@@ -67,6 +46,31 @@ type User {
   RETURN COUNT(u) >= 1
   """
   )
+
+  # Profile interface properties end
+
+
+  email: String! @cypher(statement: "MATCH (this)-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e.email")
+  publicKey: String
+  role: UserGroup!
+  termsAndConditionsAgreedVersion: String
+  termsAndConditionsAgreedAt: String
+
+  invitedBy: User @relation(name: "INVITED", direction: "IN")
+  invited: [User] @relation(name: "INVITED", direction: "OUT")
+
+  locale: String
+  allowEmbedIframes: Boolean
+  showShoutsPublicly: Boolean
+  sendNotificationEmails: Boolean
+  friends: [User]! @relation(name: "FRIENDS", direction: "BOTH")
+  friendsCount: Int! @cypher(statement: "MATCH (this)<-[:FRIENDS]->(r:User) RETURN COUNT(DISTINCT r)")
+
+  following: [User]! @relation(name: "FOLLOWS", direction: "OUT")
+  followingCount: Int! @cypher(statement: "MATCH (this)-[:FOLLOWS]->(r:User) RETURN COUNT(DISTINCT r)")
+
+  inviteCodes: [InviteCode] @relation(name: "GENERATED", direction: "OUT")
+  redeemedInviteCode: InviteCode @relation(name: "REDEEMED", direction: "OUT")
 
   isBlocked: Boolean! @cypher(
   statement: """
@@ -88,11 +92,6 @@ type User {
   """
   )
   
-  # contributions: [WrittenPost]!
-  # contributions2(first: Int = 10, offset: Int = 0): [WrittenPost2]!
-  # @cypher(
-  # statement: "MATCH (this)-[w:WROTE]->(p:Post) RETURN p as Post, w.timestamp as timestamp"
-  # )
   contributions: [Post]! @relation(name: "WROTE", direction: "OUT")
   contributionsCount: Int! @cypher(
   statement: """

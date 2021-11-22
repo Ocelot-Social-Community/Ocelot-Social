@@ -1,0 +1,26 @@
+interface Profile {
+  id: ID!
+  slug: String!
+  name: String
+  actorId: String
+  avatar: Image @relation(name: "AVATAR_IMAGE", direction: "OUT")
+  deleted: Boolean
+  disabled: Boolean
+  location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
+  locationName: String
+  about: String
+  socialMedia: [SocialMedia]! @relation(name: "OWNED_BY", direction: "IN")
+  createdAt: String
+  updatedAt: String
+  # Wolle invited: [User] @relation(name: "INVITED", direction: "OUT")
+
+  followedBy: [User]! @relation(name: "FOLLOWS", direction: "IN")
+  followedByCount: Int! @cypher(statement: "MATCH (this)<-[:FOLLOWS]-(r:User) RETURN COUNT(DISTINCT r)")
+  # Is the currently logged in user following that user?
+  followedByCurrentUser: Boolean! @cypher(
+  statement: """
+  MATCH (this)<-[:FOLLOWS]-(u:User { id: $cypherParams.currentUserId})
+  RETURN COUNT(u) >= 1
+  """
+  )
+}

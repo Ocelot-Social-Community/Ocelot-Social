@@ -4,6 +4,7 @@ export default {
   Image: require('./Image.js').default,
   Badge: require('./Badge.js').default,
   User: require('./User.js').default,
+  Org: require('./Org.js').default,
   EmailAddress: require('./EmailAddress.js').default,
   UnverifiedEmailAddress: require('./UnverifiedEmailAddress.js').default,
   SocialMedia: require('./SocialMedia.js').default,
