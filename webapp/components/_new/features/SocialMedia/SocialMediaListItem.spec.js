@@ -18,12 +18,12 @@ describe('SocialMediaListItem.vue', () => {
 
     describe('given existing social media links', () => {
       beforeEach(() => {
-        propsData = { link: { id: 's1', url: socialMediaUrl, favicon: faviconUrl } }
+        propsData = { item: { id: 's1', url: socialMediaUrl, favicon: faviconUrl } }
 
         wrapper = Wrapper()
       })
 
-      describe('for each link it', () => {
+      describe('for each link item it', () => {
         it('displays the favicon', () => {
           expect(wrapper.find(`img[src="${faviconUrl}"]`).exists()).toBe(true)
         })

@@ -100,7 +100,7 @@ describe('my-social-media.vue', () => {
       beforeEach(() => {
         getters = {
           'auth/user': () => ({
-            socialMedia: [{ id: 's1', url: socialMediaUrl }],
+            socialMedia: [{ id: 's1', url: socialMediaUrl, favicon: faviconUrl }],
           }),
         }
         wrapper = Wrapper()
