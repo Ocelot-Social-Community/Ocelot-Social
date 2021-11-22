@@ -232,15 +232,6 @@ describe('templateBuilder', () => {
     })
   })
 
-  // describe('XXX', () => {
-  //   it('e-mail is build with all data', async () => {
-  //     XXX({
-  //         email: 'test@example.org',
-  //         XXX notification: notificationAdded,
-  //       })
-  //   })
-  // })
-
   describe('notificationTemplate', () => {
     beforeEach(() => {
       actionUrl = new URL('/notifications', CONFIG.CLIENT_URI).toString()
