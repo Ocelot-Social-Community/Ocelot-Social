@@ -20,6 +20,11 @@ At the same time, it should be possible in the future to link these networks wit
 
 In other words, we are interested in a network of networks and in keeping the data as close as possible to the user and the operator they trusts.
 
+## Introduction
+
+Have a look into our short video:
+[ocelot.social - GitHub - Developer Welcome - Tutorial (english)](https://www.youtube.com/watch?v=gZSL6KvBIiY&list=PLFMD5liPP01kbuReHxYXxv_1fI5rIgS1f&index=1)
+
 ## Directory Layout
 
 There are three important directories:
@@ -59,6 +64,18 @@ Change into the new folder.
 ```bash
 $ cd Ocelot-Social
 ```
+
+### Login
+
+<!-- Try out our deployed [development environment](https://develop.human-connection.org/). -->
+
+Logins in the browser after the following installations:
+
+| email | password | role |
+| :--- | :--- | :--- |
+| `user@example.org` | 1234 | user |
+| `moderator@example.org` | 1234 | moderator |
+| `admin@example.org` | 1234 | admin |
 
 ### Docker Installation
 
@@ -110,18 +127,19 @@ $ docker-compose -f docker-compose.yml up
 This will start all required Docker containers.  
 Make sure your database is running on `http://localhost:7474/browser/`.
 
-Prepare database once before you start:
+Prepare database once before you start by running the following command in a second terminal:
 
 ```bash
-# in folder backend/
-yarn run db:migrate init
+# in main folder while docker-compose is up
+$ docker-compose exec backend yarn run db:migrate init
 ```
 
-Then clear and seed database:
+Then clear and seed database by running the following command as well in the second terminal:
 
 ```bash
-# in folder backend/
-$ yarn run db:reset && db:seed
+# in main folder while docker-compose is up
+$ docker-compose exec backend yarn run db:reset
+$ docker-compose exec backend yarn run db:seed
 ```
 
 For a closer description see [backend README.md](./backend/README.md).  
@@ -178,6 +196,14 @@ The only deployment method in this repository for development purposes as descri
 * [GraphQL](https://graphql.org/)
 * [NodeJS](https://nodejs.org/en/)
 * [Neo4J](https://neo4j.com/)
+
+### For Testing
+
+* [Cypress](https://docs.cypress.io/)
+* [Storybook](https://storybook.js.org/)
+* [Jest](https://jestjs.io/)
+* [Vue Test Utils](https://vue-test-utils.vuejs.org/)
+* [ESLint](https://eslint.org/)
 
 ## Attributions
 
