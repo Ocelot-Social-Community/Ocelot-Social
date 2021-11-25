@@ -40,6 +40,10 @@ export default {
           path: `/settings/my-social-media`,
         },
         {
+          name: this.$t('settings.organizations.name'),
+          path: `/settings/my-organizations`
+        },
+        {
           name: this.$t('settings.muted-users.name'),
           path: `/settings/muted-users`,
         },
@@ -67,11 +71,6 @@ export default {
         /* {
             name: this.$t('settings.invites.name'),
             path: `/settings/invites`
-            }, */
-        // TODO implement
-        /* {
-            name: this.$t('settings.organizations.name'),
-            path: `/settings/my-organizations`
             }, */
         // TODO implement
         /* {

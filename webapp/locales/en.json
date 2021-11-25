@@ -745,7 +745,7 @@
       "success-update": "Notifications settings saved!"
     },
     "organizations": {
-      "name": "My Organizations"
+      "name": "Organizations"
     },
     "privacy": {
       "make-shouts-public": "Share articles I have shouted on my public profile",

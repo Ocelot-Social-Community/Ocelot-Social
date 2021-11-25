@@ -745,7 +745,7 @@
       "success-update": "Benachrichtigungs-Einstellungen gespeichert!"
     },
     "organizations": {
-      "name": "Meine Organisationen"
+      "name": "Organisationen"
     },
     "privacy": {
       "make-shouts-public": "Teile von mir empfohlene Artikel öffentlich auf meinem Profil",
@@ -775,7 +775,7 @@
     "social-media": {
       "addNewTitle": "Neuen Link hinzufügen",
       "editTitle": "Link \"{name}\" ändern",
-      "name": "Soziale Netzwerke",
+      "name": "Soziale Medien",
       "placeholder": "Deine Webadresse des Sozialen Netzwerkes",
       "requireUnique": "Dieser Link existiert bereits",
       "submit": "Link hinzufügen",
