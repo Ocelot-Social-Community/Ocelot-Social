@@ -1,8 +1,8 @@
 <template>
-  <ds-form v-model="form" :schema="formSchema" @submit="submit">
-    <template #default="{ errors }">
-      <base-card>
-        <h2 class="title">{{ $t('settings.data.name') }}</h2>
+  <base-card>
+    <h2 class="title">{{ $t('settings.data.name') }}</h2>
+    <ds-form v-model="form" :schema="formSchema" @submit="submit">
+      <template #default="{ errors }">
         <ds-input
           id="name"
           model="name"
@@ -34,9 +34,9 @@
         <base-button icon="check" :disabled="errors" type="submit" :loading="loadingData" filled>
           {{ $t('actions.save') }}
         </base-button>
-      </base-card>
-    </template>
-  </ds-form>
+      </template>
+    </ds-form>
+  </base-card>
 </template>
 
 <script>
