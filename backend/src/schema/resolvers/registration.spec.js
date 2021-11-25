@@ -179,7 +179,7 @@ describe('SignupVerification', () => {
     beforeEach(async () => {
       variables = {
         ...variables,
-        nonce: '123456',
+        nonce: '12345',
         name: 'John Doe',
         password: '123',
         email: 'john@example.org',
@@ -207,7 +207,7 @@ describe('SignupVerification', () => {
 
         describe('sending a valid nonce', () => {
           beforeEach(() => {
-            variables = { ...variables, nonce: '123456' }
+            variables = { ...variables, nonce: '12345' }
           })
 
           it('rejects', async () => {
@@ -222,7 +222,7 @@ describe('SignupVerification', () => {
         beforeEach(async () => {
           const args = {
             email: 'john@example.org',
-            nonce: '123456',
+            nonce: '12345',
           }
           await neode.model('EmailAddress').create(args)
         })

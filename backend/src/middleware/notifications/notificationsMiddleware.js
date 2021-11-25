@@ -41,7 +41,6 @@ const publishNotifications = async (context, promises) => {
   notifications.forEach((notificationAdded, index) => {
     pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
     if (notificationAdded.to.sendNotificationEmails) {
-      // Wolle await
       sendMail(
         notificationTemplate({
           email: notificationsEmailAddresses[index].email,
