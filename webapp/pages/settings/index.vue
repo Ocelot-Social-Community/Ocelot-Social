@@ -42,13 +42,13 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import UniqueSlugForm from '~/components/utils/UniqueSlugForm'
+// Wolle import UniqueSlugForm from '~/components/utils/UniqueSlugForm'
 import { updateUserMutation } from '~/graphql/User'
-import { queryLocations } from '~/graphql/location'
+// Wolle import { queryLocations } from '~/graphql/location'
 import ProfileCoreData from '~/components/_new/features/ProfileCoreData/ProfileCoreData'
 import { formSchemaProfileCoreData } from '~/components/_new/features/ProfileCoreData/ProfileCoreData'
 
-let timeout
+// Wolle let timeout
 
 export default {
   components: {
@@ -56,9 +56,9 @@ export default {
   },
   data() {
     return {
-      cities: [],
+      // Wolle cities: [],
       loadingData: false,
-      loadingGeo: false,
+      // loadingGeo: false,
       formData: {},
     }
   },
@@ -85,6 +85,8 @@ export default {
         return { name, slug, locationName, about }
       },
       set: function (formData) {
+        // Wolle
+        console.log('formData: ', formData)
         this.formData = formData
       },
     },
@@ -96,8 +98,14 @@ export default {
     async submit() {
       this.loadingData = true
       const { name, slug, about } = this.formData
+      // Wolle
+      console.log('name: ', name)
+      console.log('slug: ', slug)
+      console.log('about: ', about)
       let { locationName } = this.formData || this.currentUser
       locationName = locationName && (locationName.label || locationName)
+      // Wolle
+      console.log('locationName: ', locationName)
       try {
         await this.$apollo.mutate({
           mutation: updateUserMutation(),

@@ -64,9 +64,9 @@ export default {
   data() {
     return {
       cities: [],
-      loadingData: false,
+      // loadingData: false,
       loadingGeo: false,
-      formData: {},
+      // Wolle formData: {},
     }
   },
   computed: {

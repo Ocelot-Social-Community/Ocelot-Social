@@ -1,15 +1,21 @@
 import { mount } from '@vue/test-utils'
-import index from './index.vue'
 import Vuex from 'vuex'
+import flushPromises from 'flush-promises'
+import index from './index.vue'
+import ProfileCoreData from '~/components/_new/features/ProfileCoreData/ProfileCoreData'
 
 const localVue = global.localVue
 
 describe('index.vue', () => {
+  let data
   let store
   let mocks
   let getters
 
   beforeEach(() => {
+    data = () => {
+      return {}
+    }
     mocks = {
       $i18n: { locale: () => 'en' },
       $t: jest.fn(),
@@ -79,7 +85,7 @@ describe('index.vue', () => {
       store = new Vuex.Store({
         getters,
       })
-      return mount(index, { store, mocks, localVue, ...options })
+      return mount(index, { data, store, mocks, localVue, ...options })
     }
 
     beforeEach(() => {
@@ -156,20 +162,55 @@ describe('index.vue', () => {
       })
 
       describe('given a new location and hitting submit', () => {
-        it('calls updateUser mutation', async () => {
+        it.only('calls updateUser mutation', async () => {
+          // data = () => {
+          //   return {
+          //     cities: [
+          //       {
+          //         label: 'Berlin, Germany',
+          //         value: 'Berlin, Germany',
+          //         id: '1',
+          //       },
+          //     ],
+          //   }
+          // }
           const wrapper = Wrapper()
-          wrapper.setData({
-            cities: [
-              {
-                label: 'Berlin, Germany',
-                value: 'Berlin, Germany',
-                id: '1',
-              },
-            ],
-          })
           await wrapper.vm.$nextTick()
-          wrapper.find('.ds-select-option').trigger('click')
+          // console.log('wrapper.vm.cities: ', wrapper.vm.cities)
+          // console.log('wrapper.vm.cities[0].label: ', wrapper.vm.cities[0].label)
+          // Wolle wrapper.setData({
+          //   cities: [
+          //     {
+          //       label: 'Berlin, Germany',
+          //       value: 'Berlin, Germany',
+          //       id: '1',
+          //     },
+          //   ],
+          // })
+          // const wrapperProfileCoreData = wrapper.find(ProfileCoreData)
+          // wrapperProfileCoreData.setData({
+          //   cities: [
+          //     {
+          //       label: 'Berlin, Germany',
+          //       value: 'Berlin, Germany',
+          //       id: '1',
+          //     },
+          //   ],
+          // })
+          // await wrapper.vm.$nextTick()
+          // console.log(wrapperProfileCoreData.html())
+          // Wolle wrapper.find('.ds-select-option').trigger('click')
+          // wrapper.find('.ds-form').trigger('submit')
+          // wrapperProfileCoreData.find('.ds-select-option').trigger('click')
+          // wrapperProfileCoreData.find('.ds-select-wrap').trigger('click')
+          wrapper.find('.ds-select-wrap').trigger('click')
+          await wrapper.vm.$nextTick()
+          // wrapperProfileCoreData.setValue('Berlin, Germany')
+          wrapper.find('#city').setValue('Berlin, Germany')
+          await wrapper.vm.$nextTick()
           wrapper.find('.ds-form').trigger('submit')
+          await wrapper.vm.$nextTick()
+          await flushPromises()
 
           await expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({

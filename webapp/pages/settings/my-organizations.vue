@@ -19,7 +19,7 @@
         <organisation-list-item :item="item" />
       </template>
       <template #edit-item>
-        <edit-organisation />
+        <edit-organisation :org="org" />
       </template>
     </my-something-list>
   </base-card>
@@ -49,6 +49,12 @@ export default {
           type: 'url',
           message: this.$t('common.validations.url'),
         },
+      },
+      org: {
+        name: 'Name',
+        slug: 'slug',
+        locationName: 'Berlin, Germany',
+        about: 'About',
       },
     }
   },
