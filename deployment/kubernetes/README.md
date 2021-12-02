@@ -183,6 +183,17 @@ $ helm upgrade ocelot ./
 $ helm --kubeconfig=/../kubeconfig.yaml upgrade ocelot ./
 ```
 
+#### Rollback
+
+Run for a rollback, in case something went wrong:
+
+```bash
+# kubeconfig.yaml set globaly
+$ helm rollback ocelot
+# or kubeconfig.yaml in your repo, then adjust
+$ helm --kubeconfig=/../kubeconfig.yaml rollback ocelot
+```
+
 #### Uninstall
 
 Be aware that if you uninstall ocelot the formerly bound volumes become unbound. Those volumes contain all data from uploads and database. You have to manually free their reference in order to bind them again when reinstalling. Once unbound from their former container references they should automatically be rebound (considering the sizes did not change)
@@ -193,6 +204,10 @@ $ helm uninstall ocelot
 # or kubeconfig.yaml in your repo, then adjust
 $ helm --kubeconfig=/../kubeconfig.yaml uninstall ocelot
 ```
+
+## Backups
+
+You can and should do [backups](/deployment/kubernetes/Backup.md) with Kubernetes for sure.
 
 ## Error Reporting
 

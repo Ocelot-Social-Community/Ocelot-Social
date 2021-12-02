@@ -76,3 +76,9 @@ The IPs of the DigitalOcean machines are not necessarily stable, so the cluster'
 ## Deploy
 
 Yeah, you're done here. Back to [Deployment with Helm for Kubernetes](/deployment/kubernetes/README.md).
+
+## Backups On DigitalOcean
+
+You can and should do [backups](/deployment/kubernetes/Backup.md) with Kubernetes for sure.
+
+Additional to backup and copying the Neo4j database dump and the backend images you can do a volume snapshot on DigitalOcean at the moment you have the database in sleep mode.
