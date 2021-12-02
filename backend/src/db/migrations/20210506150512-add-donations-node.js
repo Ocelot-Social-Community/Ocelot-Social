@@ -19,8 +19,8 @@ export async function up(next) {
         SET donationInfo.createdAt = toString(datetime())
         SET donationInfo.updatedAt = donationInfo.createdAt
         SET donationInfo.showDonations = false
-        SET donationInfo.goal = 15000
-        SET donationInfo.progress = 1200
+        SET donationInfo.goal = 15000.0
+        SET donationInfo.progress = 1200.0
         RETURN donationInfo {.*}
       `,
       { donationId },
