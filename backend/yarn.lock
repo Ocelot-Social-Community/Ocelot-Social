@@ -230,10 +230,10 @@
   dependencies:
     "@babel/types" "^7.8.3"
 
-"@babel/helper-plugin-utils@^7.0.0", "@babel/helper-plugin-utils@^7.8.0", "@babel/helper-plugin-utils@^7.8.3":
-  version "7.8.3"
-  resolved "https://registry.yarnpkg.com/@babel/helper-plugin-utils/-/helper-plugin-utils-7.8.3.tgz#9ea293be19babc0f52ff8ca88b34c3611b208670"
-  integrity sha512-j+fq49Xds2smCUNYmEHF9kGNkhbet6yVIBp4e6oeQpH1RUs/Ir06xUKzDjDkGcaaokPiTNs2JBWHjaE4csUkZQ==
+"@babel/helper-plugin-utils@^7.0.0", "@babel/helper-plugin-utils@^7.16.7", "@babel/helper-plugin-utils@^7.8.0", "@babel/helper-plugin-utils@^7.8.3":
+  version "7.16.7"
+  resolved "https://registry.yarnpkg.com/@babel/helper-plugin-utils/-/helper-plugin-utils-7.16.7.tgz#aa3a8ab4c3cceff8e65eb9e73d87dc4ff320b2f5"
+  integrity sha512-Qg3Nk7ZxpgMrsox6HreY1ZNKdBq7K72tDSliA6dCl5f007jR4ne8iD5UzuNnCJH2xBf2BEEVGr+/OL6Gdp7RxA==
 
 "@babel/helper-regex@^7.8.3":
   version "7.8.3"
@@ -406,13 +406,13 @@
     "@babel/helper-plugin-utils" "^7.8.3"
     "@babel/plugin-syntax-optional-chaining" "^7.8.0"
 
-"@babel/plugin-proposal-throw-expressions@^7.8.3":
-  version "7.8.3"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-throw-expressions/-/plugin-proposal-throw-expressions-7.8.3.tgz#155f36ae40c2a88ae685c35e3220f8a0d426cf24"
-  integrity sha512-tH40s9JnoR+r45ZXKWW+PC5xzPQfVJix3pR1D8Ty5l9sn5NnrbZUzw8MtnNxu/Bz7p0imyeSYj9FQVccEymOEg==
+"@babel/plugin-proposal-throw-expressions@^7.16.7":
+  version "7.16.7"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-throw-expressions/-/plugin-proposal-throw-expressions-7.16.7.tgz#d3512286f634a06f7271abecce752e1655b9ab03"
+  integrity sha512-BbjL/uDt7c+OKA7k2YbZIPtOb6qmrzXPybjqrGreP8wMMzTPKjjiK+moqgpElsIXv1XHmlk9PQWdOHD5sL93KA==
   dependencies:
-    "@babel/helper-plugin-utils" "^7.8.3"
-    "@babel/plugin-syntax-throw-expressions" "^7.8.3"
+    "@babel/helper-plugin-utils" "^7.16.7"
+    "@babel/plugin-syntax-throw-expressions" "^7.16.7"
 
 "@babel/plugin-proposal-unicode-property-regex@^7.4.4", "@babel/plugin-proposal-unicode-property-regex@^7.8.3":
   version "7.8.8"
@@ -541,12 +541,12 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.8.0"
 
-"@babel/plugin-syntax-throw-expressions@^7.8.3":
-  version "7.8.3"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-throw-expressions/-/plugin-syntax-throw-expressions-7.8.3.tgz#c763bcf26d202ddb65f1299a29d63aad312adb54"
-  integrity sha512-Mv3shY1i7ZssY4OY+eLZJAmNCwqTcpv2qOKO9x6irELSygfKWVSMXk0igJsA9UhU4hOdw0qMGkjj9TAk4MqzwQ==
+"@babel/plugin-syntax-throw-expressions@^7.16.7":
+  version "7.16.7"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-throw-expressions/-/plugin-syntax-throw-expressions-7.16.7.tgz#5fd64f4d58d653499cc1077bb58594e18da5a514"
+  integrity sha512-6Kw78ssLHIADvVsqLOLLxuxH4SG55A2tqn0Og2tQQq6X/06HBWLClg6quL+oTfyeVEsPnFYTSECkajseotTnbA==
   dependencies:
-    "@babel/helper-plugin-utils" "^7.8.3"
+    "@babel/helper-plugin-utils" "^7.16.7"
 
 "@babel/plugin-syntax-top-level-await@^7.8.3":
   version "7.8.3"
