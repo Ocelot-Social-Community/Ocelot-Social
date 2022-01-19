@@ -29,7 +29,13 @@ export default ({ app, req, cookie, store }) => {
       return
     }
 
-    app.$cookies.set(key, newLocale)
+    const expires = new Date()
+    expires.setDate(expires.getDate() + app.$env.COOKIE_EXPIRE_TIME)
+    app.$cookies.set(key, newLocale, {
+      expires,
+      // maxAge: app.$env.COOKIE_EXPIRE_TIME * 60 * 60 * 24, // days to seconds
+      sameSite: 'lax',
+    })
     if (!app.$i18n.localeExists(newLocale)) {
       import(`~/locales/${newLocale}.json`).then((res) => {
         app.$i18n.add(newLocale, res.default)
