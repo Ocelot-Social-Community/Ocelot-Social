@@ -37,7 +37,7 @@ export default ({ app, req, cookie, store }) => {
     app.$cookies.set(key, newLocale, {
       expires,
       // maxAge: app.$env.COOKIE_EXPIRE_TIME * 60 * 60 * 24, // days to seconds
-      sameSite: 'lax',
+      sameSite: 'lax', // for the meaning see https://www.thinktecture.com/de/identity/samesite/samesite-in-a-nutshell/
     })
     if (!app.$i18n.localeExists(newLocale)) {
       import(`~/locales/${newLocale}.json`).then((res) => {
