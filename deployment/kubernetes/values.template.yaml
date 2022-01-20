@@ -3,6 +3,7 @@
 # change all the below if needed
 PUBLIC_REGISTRATION: false
 INVITE_REGISTRATION: false
+COOKIE_EXPIRE_TIME: 730 # days (730 days, two years is the default in main code)
 
 BACKEND:
   # change all the below if needed
