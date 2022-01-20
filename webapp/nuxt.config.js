@@ -201,6 +201,7 @@ export default {
       /** * A Boolean indicating if the cookie transmission requires a
        * secure protocol (https). Defaults to false. */
       secure: CONFIG.COOKIE_HTTPS_ONLY,
+      sameSite: 'lax',
     },
     // includeNodeModules: true, // optional, default: false (this includes graphql-tag for node_modules folder)
 
