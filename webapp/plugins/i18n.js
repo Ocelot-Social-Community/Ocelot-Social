@@ -22,7 +22,10 @@ export default ({ app, req, cookie, store }) => {
     if (process.server) return
 
     const newLocale = mutation.payload.locale
-    const currentLocale = await app.$cookies.get(key)
+    let currentLocale = await app.$cookies.get(key)
+    if (!currentLocale) {
+      currentLocale = navigator.language.split('-')[0] // get browser language
+    }
     const isDifferent = newLocale !== currentLocale
 
     if (!isDifferent) {
