@@ -30,7 +30,8 @@ export default ({ app, req, cookie, store }) => {
     }
     const isDifferent = newLocale !== currentLocale
 
-    if (isCookie && !isDifferent) { // cookie has to be set, otherwise Cypress test does not work
+    // cookie has to be set, otherwise Cypress test does not work
+    if (isCookie && !isDifferent) {
       return
     }
 
