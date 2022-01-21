@@ -22,13 +22,15 @@ export default ({ app, req, cookie, store }) => {
     if (process.server) return
 
     const newLocale = mutation.payload.locale
+    let isCookie = true
     let currentLocale = await app.$cookies.get(key)
     if (!currentLocale) {
+      isCookie = false
       currentLocale = navigator.language.split('-')[0] // get browser language
     }
     const isDifferent = newLocale !== currentLocale
 
-    if (!isDifferent) {
+    if (isCookie && !isDifferent) { // cookie has to be set, otherwise Cypress test does not work
       return
     }
 
