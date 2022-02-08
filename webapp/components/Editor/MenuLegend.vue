@@ -3,13 +3,14 @@
     <template #default="{ openMenu, closeMenu }">
       <slot name="button">
         <menu-bar-button
+          class="legend-question-button"
           icon="question-circle"
           circle
           ghost
-          class="legend-question-button"
-          @mouseover.native="openMenu()"
-          @mouseleave.native="closeMenu()"
+          :onClick="() => { openMenu() }"
         />
+          <!-- @mouseover.native="openMenu()"
+          @mouseleave.native="closeMenu()" -->
       </slot>
     </template>
     <template #popover="" class="legend">
