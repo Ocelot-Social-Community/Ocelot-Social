@@ -7,10 +7,13 @@
           icon="question-circle"
           circle
           ghost
-          :onClick="() => { openMenu() }"
+          :onClick="
+            () => {
+              isDropdownOpen ? closeMenu() : openMenu()
+              isDropdownOpen = !isDropdownOpen
+            }
+          "
         />
-          <!-- @mouseover.native="openMenu()"
-          @mouseleave.native="closeMenu()" -->
       </slot>
     </template>
     <template #popover="" class="legend">
@@ -61,6 +64,7 @@ export default {
         { iconName: 'quote-right', name: `editor.legend.quote`, shortcut: '> + space' },
         { iconName: 'minus', name: `editor.legend.ruler`, shortcut: '---' },
       ],
+      isDropdownOpen: false,
     }
   },
 }
