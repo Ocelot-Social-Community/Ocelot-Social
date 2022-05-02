@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid'
-import { faker } from '@faker-js/faker'
+import faker from 'faker'
 import slugify from 'slug'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
@@ -47,6 +47,7 @@ Factory.define('badge')
     return neode.create('Badge', buildObject)
   })
 
+console.log(faker)
 Factory.define('image')
   .attr('url', faker.image.unsplash.imageUrl)
   .attr('aspectRatio', 1.3333333333333333)
