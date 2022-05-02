@@ -963,7 +963,7 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@faker-js/faker@^4.1.0":
+"@faker-js/faker@4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-4.1.0.tgz#53f965b60ec929c8ae5e3c1977bfc00d0f7b7295"
   integrity sha512-PhF1yIVv8wupIFPSlL4gPz0z4RbOD9MLQHEMw5xoMrQ1J4rj76eivi0PwmW0K/puRPpHLE4gnrJ7AlTkgORhQA==

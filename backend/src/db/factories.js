@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import slugify from 'slug'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'

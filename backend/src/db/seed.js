@@ -1,4 +1,4 @@
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import sample from 'lodash/sample'
 import { createTestClient } from 'apollo-server-testing'
 import createServer from '../server'
