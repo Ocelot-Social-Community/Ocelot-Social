@@ -47,7 +47,6 @@ Factory.define('badge')
     return neode.create('Badge', buildObject)
   })
 
-console.log(faker)
 Factory.define('image')
   .attr('url', faker.image.unsplash.imageUrl)
   .attr('aspectRatio', 1.3333333333333333)
