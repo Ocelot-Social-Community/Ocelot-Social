@@ -1,12 +1,12 @@
 import { v4 as uuid } from 'uuid'
-// Wolle import faker from 'faker'
-const faker = require('@faker-js/faker')
 import slugify from 'slug'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
 import { getDriver, getNeode } from './neo4j'
 import CONFIG from '../config/index.js'
 import generateInviteCode from '../schema/resolvers/helpers/generateInviteCode.js'
+// import faker from 'faker' // this import is not working, why?
+const faker = require('@faker-js/faker')
 
 const neode = getNeode()
 
