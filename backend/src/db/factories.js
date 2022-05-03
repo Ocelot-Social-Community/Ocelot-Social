@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid'
-import faker from 'faker'
+// Wolle import faker from 'faker'
+const faker = require('@faker-js/faker')
 import slugify from 'slug'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
