@@ -1,10 +1,11 @@
-import faker from 'faker'
 import sample from 'lodash/sample'
 import { createTestClient } from 'apollo-server-testing'
 import createServer from '../server'
 import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
 import { gql } from '../helpers/jest'
+// import faker from 'faker' // this import is not working, why?
+const faker = require('@faker-js/faker')
 
 const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
