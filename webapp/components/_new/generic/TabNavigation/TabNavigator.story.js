@@ -8,9 +8,10 @@ import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 import helpers from '~/storybook/helpers'
-import faker from 'faker'
 import { post } from '~/components/PostTeaser/PostTeaser.story.js'
 import { user } from '~/components/UserTeaser/UserTeaser.story.js'
+// import faker from 'faker' // this import is not working, why?
+const faker = require('@faker-js/faker')
 
 helpers.init()
 
