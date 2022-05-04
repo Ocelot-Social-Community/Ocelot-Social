@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import faker from 'faker'
 import vuexI18n from 'vuex-i18n/dist/vuex-i18n.umd.js'
 import Styleguide from '@human-connection/styleguide'
 import Filters from '~/plugins/vue-filters'
@@ -8,8 +7,9 @@ import Directives from '~/plugins/vue-directives'
 import IziToast from '~/plugins/izi-toast'
 import layout from './layout.vue'
 import locales from '~/locales/index.js'
-
 import '~/plugins/v-tooltip'
+// import faker from 'faker' // this import is not working, why?
+const faker = require('@faker-js/faker')
 
 const helpers = {
   init(options = {}) {

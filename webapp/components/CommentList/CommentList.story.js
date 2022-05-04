@@ -2,7 +2,8 @@ import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
 import HcCommentList from './CommentList.vue'
 import helpers from '~/storybook/helpers'
-import faker from 'faker'
+// import faker from 'faker' // this import is not working, why?
+const faker = require('@faker-js/faker')
 
 helpers.init()
 
