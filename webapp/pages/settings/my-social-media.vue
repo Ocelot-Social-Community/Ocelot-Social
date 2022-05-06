@@ -7,6 +7,11 @@
       :useItems="socialMediaLinks"
       :defaultItem="{ url: '' }"
       :namePropertyKey="'url'"
+      :texts="{
+        addButton: $t('settings.social-media.submit'),
+        addNew: $t('settings.social-media.add-new-link'),
+        edit: $t('settings.social-media.edit-link'),
+      }"
       :callbacks="{
         handleInput: () => {},
         handleInputValid,

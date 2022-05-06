@@ -9,11 +9,7 @@
     <div v-if="isEditing">
       <ds-space margin="base">
         <ds-heading tag="h5">
-          {{
-            isCreation
-              ? $t('settings.social-media.addNewTitle')
-              : $t('settings.social-media.editTitle', { name: editingItem[namePropertyKey] })
-          }}
+          {{ isCreation ? texts.addNew : texts.edit + ' — ' + editingItem[namePropertyKey] }}
         </ds-heading>
       </ds-space>
       <ds-space v-if="items" margin-top="base">
@@ -58,7 +54,7 @@
           type="submit"
           data-test="add-save-button"
         >
-          {{ isEditing ? $t('actions.save') : $t('settings.social-media.submit') }}
+          {{ isEditing ? $t('actions.save') : texts.addButton }}
         </base-button>
         <base-button v-if="isEditing" id="cancel" danger @click="handleCancel()">
           {{ $t('actions.cancel') }}
@@ -72,24 +68,13 @@
 export default {
   name: 'MySomethingList',
   props: {
-    useFormData: {
+    useFormData: { type: Object, default: () => ({}) },
+    useFormSchema: { type: Object, default: () => ({}) },
+    useItems: { type: Array, default: () => [] },
+    defaultItem: { type: Object, default: () => ({}) },
+    namePropertyKey: { type: String, required: true }, // Wolle: still needed?
+    texts: {
       type: Object,
-      default: () => ({}),
-    },
-    useFormSchema: {
-      type: Object,
-      default: () => ({}),
-    },
-    useItems: {
-      type: Array,
-      default: () => [],
-    },
-    defaultItem: {
-      type: Object,
-      default: () => ({}),
-    },
-    namePropertyKey: {
-      type: String,
       required: true,
     },
     callbacks: {

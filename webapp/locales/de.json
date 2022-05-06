@@ -745,7 +745,10 @@
       "success-update": "Benachrichtigungs-Einstellungen gespeichert!"
     },
     "organizations": {
-      "name": "Organisationen"
+      "add-new-link": "Neue Organisation hinzufügen",
+      "edit-link": "Ändere die Einstellungen der Organisation",
+      "name": "Organisationen",
+      "submit": "Organisation hinzufügen"
     },
     "privacy": {
       "make-shouts-public": "Teile von mir empfohlene Artikel öffentlich auf meinem Profil",
@@ -773,8 +776,8 @@
       "name": "Sicherheit"
     },
     "social-media": {
-      "addNewTitle": "Neuen Link hinzufügen",
-      "editTitle": "Link \"{name}\" ändern",
+      "add-new-link": "Neuen Link hinzufügen",
+      "edit-link": "Ändere den Link",
       "name": "Soziale Medien",
       "placeholder": "Deine Webadresse des Sozialen Netzwerkes",
       "requireUnique": "Dieser Link existiert bereits",

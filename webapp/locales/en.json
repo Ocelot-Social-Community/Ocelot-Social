@@ -745,7 +745,10 @@
       "success-update": "Notifications settings saved!"
     },
     "organizations": {
-      "name": "Organizations"
+      "add-new-link": "Add new organization",
+      "edit-link": "Change settings of organization",
+      "name": "Organizations",
+      "submit": "Add organization"
     },
     "privacy": {
       "make-shouts-public": "Share articles I have shouted on my public profile",
@@ -773,8 +776,8 @@
       "name": "Security"
     },
     "social-media": {
-      "addNewTitle": "Add new link",
-      "editTitle": "Edit link \"{name}\"",
+      "add-new-link": "Add new link",
+      "edit-link": "Edit link",
       "name": "Social media",
       "placeholder": "Your social media url",
       "requireUnique": "You added this url already",

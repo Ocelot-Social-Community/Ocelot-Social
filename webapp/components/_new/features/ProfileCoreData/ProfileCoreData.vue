@@ -1,39 +1,39 @@
 <template>
   <!-- <ds-form v-model="form" :schema="formSchema" @submit="submit"> -->
-    <!-- <template #default="{ errors }"> -->
-    <div>
-      <ds-input
-        id="name"
-        model="name"
-        icon="user"
-        :label="$t('settings.data.labelName')"
-        :placeholder="$t('settings.data.namePlaceholder')"
-      />
-      <ds-input id="slug" model="slug" icon="at" :label="$t('settings.data.labelSlug')" />
-      <!-- eslint-disable vue/use-v-on-exact -->
-      <ds-select
-        id="city"
-        model="locationName"
-        icon="map-marker"
-        :options="cities"
-        :label="$t('settings.data.labelCity')"
-        :placeholder="$t('settings.data.labelCity')"
-        :loading="loadingGeo"
-        @input.native="handleCityInput"
-      />
-      <!-- eslint-enable vue/use-v-on-exact -->
-      <ds-input
-        id="about"
-        model="about"
-        type="textarea"
-        rows="3"
-        :label="$t('settings.data.labelBio')"
-        :placeholder="$t('settings.data.labelBio')"
-      />
-      <!-- <base-button icon="check" :disabled="errors" type="submit" :loading="loadingData" filled>
+  <!-- <template #default="{ errors }"> -->
+  <div>
+    <ds-input
+      id="name"
+      model="name"
+      icon="user"
+      :label="$t('settings.data.labelName')"
+      :placeholder="$t('settings.data.namePlaceholder')"
+    />
+    <ds-input id="slug" model="slug" icon="at" :label="$t('settings.data.labelSlug')" />
+    <!-- eslint-disable vue/use-v-on-exact -->
+    <ds-select
+      id="city"
+      model="locationName"
+      icon="map-marker"
+      :options="cities"
+      :label="$t('settings.data.labelCity')"
+      :placeholder="$t('settings.data.labelCity')"
+      :loading="loadingGeo"
+      @input.native="handleCityInput"
+    />
+    <!-- eslint-enable vue/use-v-on-exact -->
+    <ds-input
+      id="about"
+      model="about"
+      type="textarea"
+      rows="3"
+      :label="$t('settings.data.labelBio')"
+      :placeholder="$t('settings.data.labelBio')"
+    />
+    <!-- <base-button icon="check" :disabled="errors" type="submit" :loading="loadingData" filled>
         {{ $t('actions.save') }}
       </base-button> -->
-    </div>
+  </div>
   <!-- </ds-form> -->
 </template>
 
@@ -45,7 +45,7 @@ import { queryLocations } from '~/graphql/location'
 
 let timeout
 
-export function formSchemaProfileCoreData (thisParent) {
+export function formSchemaProfileCoreData(thisParent) {
   const uniqueSlugForm = UniqueSlugForm({
     apollo: thisParent.$apollo,
     currentUser: thisParent.currentUser,

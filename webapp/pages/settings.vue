@@ -41,7 +41,7 @@ export default {
         },
         {
           name: this.$t('settings.organizations.name'),
-          path: `/settings/my-organizations`
+          path: `/settings/my-organizations`,
         },
         {
           name: this.$t('settings.muted-users.name'),
