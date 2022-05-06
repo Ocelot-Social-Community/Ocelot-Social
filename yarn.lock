@@ -1248,6 +1248,11 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
+"@faker-js/faker@5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-5.1.0.tgz#cee1d77ada0d0dbbe77201d18b1ebabf432d9c0f"
+  integrity sha512-0VonSKh7fBCqvY+V2FLN2ZW4pR4ZtWJalWmwSaiaB7yK7y4qp8vDfuaq9QdLjf/cdZGx3M7Wc4Q+x4fZHxI21Q==
+
 "@hapi/address@2.x.x":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@hapi/address/-/address-2.0.0.tgz#9f05469c88cb2fd3dcd624776b54ee95c312126a"
@@ -3057,10 +3062,6 @@ extsprintf@^1.2.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
   integrity sha1-4mifjzVvrWLMplo6kcXfX5VRaS8=
-
-faker@Marak/faker.js#master:
-  version "5.1.0"
-  resolved "https://codeload.github.com/Marak/faker.js/tar.gz/91dc8a3372426bc691be56153b33e81a16459f49"
 
 fast-deep-equal@^2.0.1:
   version "2.0.1"
