@@ -57,7 +57,7 @@ const textsStandard = [
     isContaining: false,
     text: 'test@example.org',
   },
-  // is containing in html
+  // is contained in html
   welcomeImageUrl.toString(),
   CONFIG.ORGANIZATION_URL,
   CONFIG.APPLICATION_NAME,
@@ -95,9 +95,10 @@ describe('templateBuilder', () => {
         const subject = `Willkommen, Bienvenue, Welcome to ${CONFIG.APPLICATION_NAME}!`
         const actionUrl = new URL('/registration', CONFIG.CLIENT_URI).toString()
         const theSignupTemplateData = signupTemplateData()
-        // locale: en
-        let content = "Thank you for joining our cause – it's awesome to have you on board."
-        const emailTemplate = testEmailData(null, signupTemplate, theSignupTemplateData, [
+        const enContent = "Thank you for joining our cause – it's awesome to have you on board."
+        const deContent =
+          'Danke, dass Du dich angemeldet hast – wir freuen uns, Dich dabei zu haben.'
+        testEmailData(null, signupTemplate, theSignupTemplateData, [
           ...textsStandard,
           {
             templPropName: 'subject',
@@ -108,14 +109,9 @@ describe('templateBuilder', () => {
           actionUrl,
           theSignupTemplateData.variables.nonce,
           theSignupTemplateData.variables.inviteCode,
-          content,
+          enContent,
+          deContent,
           supportUrl,
-        ])
-        // locale: de
-        content = 'Danke, dass Du dich angemeldet hast – wir freuen uns, Dich dabei zu haben.'
-        testEmailData(emailTemplate, signupTemplate, theSignupTemplateData, [
-          // ...textsStandard, // tested at locale: en
-          content,
         ])
       })
     })
@@ -127,32 +123,22 @@ describe('templateBuilder', () => {
         const subject = 'Neue E-Mail Adresse | New E-Mail Address'
         const actionUrl = new URL('/settings/my-email-address/verify', CONFIG.CLIENT_URI).toString()
         const theEmailVerificationTemplateData = emailVerificationTemplateData()
-        // locale: en
-        let content = 'So, you want to change your e-mail? No problem!'
-        const emailTemplate = testEmailData(
-          null,
-          emailVerificationTemplate,
-          theEmailVerificationTemplateData,
-          [
-            ...textsStandard,
-            {
-              templPropName: 'subject',
-              isContaining: false,
-              text: subject,
-            },
-            englishHint,
-            actionUrl,
-            theEmailVerificationTemplateData.variables.nonce,
-            theEmailVerificationTemplateData.variables.name,
-            content,
-            supportUrl,
-          ],
-        )
-        // locale: de
-        content = 'Du möchtest also deine E-Mail ändern? Kein Problem!'
-        testEmailData(emailTemplate, emailVerificationTemplate, theEmailVerificationTemplateData, [
-          // ...textsStandard, // tested at locale: en
-          content,
+        const enContent = 'So, you want to change your e-mail? No problem!'
+        const deContent = 'Du möchtest also deine E-Mail ändern? Kein Problem!'
+        testEmailData(null, emailVerificationTemplate, theEmailVerificationTemplateData, [
+          ...textsStandard,
+          {
+            templPropName: 'subject',
+            isContaining: false,
+            text: subject,
+          },
+          englishHint,
+          actionUrl,
+          theEmailVerificationTemplateData.variables.nonce,
+          theEmailVerificationTemplateData.variables.name,
+          enContent,
+          deContent,
+          supportUrl,
         ])
       })
     })
@@ -164,32 +150,22 @@ describe('templateBuilder', () => {
         const subject = 'Neues Passwort | Reset Password'
         const actionUrl = new URL('/password-reset/change-password', CONFIG.CLIENT_URI).toString()
         const theResetPasswordTemplateData = resetPasswordTemplateData()
-        // locale: en
-        let content = 'So, you forgot your password? No problem!'
-        const emailTemplate = testEmailData(
-          null,
-          resetPasswordTemplate,
-          theResetPasswordTemplateData,
-          [
-            ...textsStandard,
-            {
-              templPropName: 'subject',
-              isContaining: false,
-              text: subject,
-            },
-            englishHint,
-            actionUrl,
-            theResetPasswordTemplateData.variables.nonce,
-            theResetPasswordTemplateData.variables.name,
-            content,
-            supportUrl,
-          ],
-        )
-        // locale: de
-        content = 'Du hast also dein Passwort vergessen? Kein Problem!'
-        testEmailData(emailTemplate, resetPasswordTemplate, theResetPasswordTemplateData, [
-          // ...textsStandard, // tested at locale: en
-          content,
+        const enContent = 'So, you forgot your password? No problem!'
+        const deContent = 'Du hast also dein Passwort vergessen? Kein Problem!'
+        testEmailData(null, resetPasswordTemplate, theResetPasswordTemplateData, [
+          ...textsStandard,
+          {
+            templPropName: 'subject',
+            isContaining: false,
+            text: subject,
+          },
+          englishHint,
+          actionUrl,
+          theResetPasswordTemplateData.variables.nonce,
+          theResetPasswordTemplateData.variables.name,
+          enContent,
+          deContent,
+          supportUrl,
         ])
       })
     })
@@ -201,32 +177,22 @@ describe('templateBuilder', () => {
         const subject = 'Falsche Mailadresse? | Wrong E-mail?'
         const actionUrl = new URL('/password-reset/request', CONFIG.CLIENT_URI).toString()
         const theWrongAccountTemplateData = wrongAccountTemplateData()
-        // locale: en
-        let content =
+        const enContent =
           "You requested a password reset but unfortunately we couldn't find an account associated with your e-mail address."
-        const emailTemplate = testEmailData(
-          null,
-          wrongAccountTemplate,
-          theWrongAccountTemplateData,
-          [
-            ...textsStandard,
-            {
-              templPropName: 'subject',
-              isContaining: false,
-              text: subject,
-            },
-            englishHint,
-            actionUrl,
-            content,
-            supportUrl,
-          ],
-        )
-        // locale: de
-        content =
+        const deContent =
           'Du hast bei uns ein neues Passwort angefordert – leider haben wir aber keinen Account mit Deiner E-Mailadresse gefunden.'
-        testEmailData(emailTemplate, wrongAccountTemplate, theWrongAccountTemplateData, [
-          // ...textsStandard, // tested at locale: en
-          content,
+        testEmailData(null, wrongAccountTemplate, theWrongAccountTemplateData, [
+          ...textsStandard,
+          {
+            templPropName: 'subject',
+            isContaining: false,
+            text: subject,
+          },
+          englishHint,
+          actionUrl,
+          enContent,
+          deContent,
+          supportUrl,
         ])
       })
     })
