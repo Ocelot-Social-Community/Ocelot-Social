@@ -1,3 +1,4 @@
+import faker from '@faker-js/faker'
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
 import HcEmpty from '~/components/Empty/Empty'
@@ -10,8 +11,6 @@ import HcHashtag from '~/components/Hashtag/Hashtag'
 import helpers from '~/storybook/helpers'
 import { post } from '~/components/PostTeaser/PostTeaser.story.js'
 import { user } from '~/components/UserTeaser/UserTeaser.story.js'
-// import faker from 'faker' // this import is not working, why?
-const faker = require('@faker-js/faker')
 
 helpers.init()
 
