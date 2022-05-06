@@ -8,7 +8,7 @@
   >
     <div v-if="isEditing">
       <ds-space margin="base">
-        <ds-heading tag="h3" class="undertitle">
+        <ds-heading tag="h5">
           {{
             isCreation
               ? $t('settings.social-media.addNewTitle')
@@ -16,12 +16,12 @@
           }}
         </ds-heading>
       </ds-space>
-      <ds-space v-if="items" margin-top="base" margin="base">
+      <ds-space v-if="items" margin-top="base">
         <slot name="edit-item" />
       </ds-space>
     </div>
     <div v-else>
-      <ds-space v-if="items" margin-top="base" margin="small">
+      <ds-space v-if="items" margin-top="base">
         <ds-list>
           <ds-list-item v-for="item in items" :key="item.id" class="list-item--high">
             <template>
@@ -163,10 +163,6 @@ export default {
 </script>
 
 <style lang="scss" scope>
-.undertitle {
-  font-size: $font-size-base;
-}
-
 .divider {
   opacity: 0.4;
   padding: 0 $space-small;

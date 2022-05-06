@@ -19,7 +19,6 @@ describe('SocialMediaListItem.vue', () => {
     describe('given existing social media links', () => {
       beforeEach(() => {
         propsData = { item: { id: 's1', url: socialMediaUrl, favicon: faviconUrl } }
-
         wrapper = Wrapper()
       })
 
