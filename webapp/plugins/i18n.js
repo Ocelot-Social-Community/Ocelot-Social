@@ -21,30 +21,30 @@ export default ({ app, req, cookie, store }) => {
   const changeHandler = async (mutation) => {
     if (process.server) return
 
-    const newLocale = mutation.payload.locale
-    let isCookie = true
-    let currentLocale = await app.$cookies.get(key)
-    if (!currentLocale) {
-      isCookie = false
-      currentLocale = navigator.language.split('-')[0] // get browser language
+    const localeInStore = mutation.payload.locale
+    let cookieExists = true
+    let localeInCookies = await app.$cookies.get(key)
+    if (!localeInCookies) {
+      cookieExists = false
+      localeInCookies = navigator.language.split('-')[0] // get browser language
     }
-    const isDifferent = newLocale !== currentLocale
+    const isLocaleStoreSameAsCookies = localeInStore === localeInCookies
 
     // cookie has to be set, otherwise Cypress test does not work
-    if (isCookie && !isDifferent) {
+    if (cookieExists && isLocaleStoreSameAsCookies) {
       return
     }
 
     const expires = new Date()
     expires.setDate(expires.getDate() + app.$env.COOKIE_EXPIRE_TIME)
-    app.$cookies.set(key, newLocale, {
+    app.$cookies.set(key, localeInStore, {
       expires,
       // maxAge: app.$env.COOKIE_EXPIRE_TIME * 60 * 60 * 24, // days to seconds
       sameSite: 'lax', // for the meaning see https://www.thinktecture.com/de/identity/samesite/samesite-in-a-nutshell/
     })
-    if (!app.$i18n.localeExists(newLocale)) {
-      import(`~/locales/${newLocale}.json`).then((res) => {
-        app.$i18n.add(newLocale, res.default)
+    if (!app.$i18n.localeExists(localeInStore)) {
+      import(`~/locales/${localeInStore}.json`).then((res) => {
+        app.$i18n.add(localeInStore, res.default)
       })
     }
 
@@ -54,7 +54,7 @@ export default ({ app, req, cookie, store }) => {
     if (user && user._id && token) {
       // TODO: SAVE LOCALE
       // store.dispatch('usersettings/patch', {
-      //   uiLanguage: newLocale
+      //   uiLanguage: localeInStore
       // }, { root: true })
     }
   }
