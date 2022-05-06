@@ -80,16 +80,16 @@ describe('MySomethingList.vue', () => {
         })
 
         it('allows the user to cancel editing', async () => {
-          expect(wrapper.find('.edit-item').exists()).toBeTruthy()
+          expect(wrapper.find('.edit-item').exists()).toBe(true)
           const cancelButton = wrapper.find('button#cancel')
           cancelButton.trigger('click')
           await Vue.nextTick()
-          expect(wrapper.find('.edit-item').exists()).not.toBeTruthy()
+          expect(wrapper.find('.edit-item').exists()).toBe(false)
         })
       })
 
       describe('calls callback functions', () => {
-        it('call edit', async () => {
+        it('calls edit', async () => {
           const editButton = wrapper.find('.base-button[data-test="edit-button"]')
           editButton.trigger('click')
           await Vue.nextTick()
@@ -98,7 +98,7 @@ describe('MySomethingList.vue', () => {
           expect(propsData.callbacks.edit).toHaveBeenCalledWith(expect.any(Object), expectedItem)
         })
 
-        it('call submit', async () => {
+        it('calls submit', async () => {
           form = wrapper.find('form')
           form.trigger('submit')
           await Vue.nextTick()
@@ -114,7 +114,7 @@ describe('MySomethingList.vue', () => {
           )
         })
 
-        it('call delete', async () => {
+        it('calls delete', async () => {
           const deleteButton = wrapper.find('.base-button[data-test="delete-button"]')
           deleteButton.trigger('click')
           await Vue.nextTick()
