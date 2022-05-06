@@ -38,8 +38,8 @@ const newlyCreatedNodesWithLocales = [
       nameRU: 'Вельцхайм',
       nameNL: 'Welzheim',
       namePL: 'Welzheim',
-      lng: 9.63444,
-      lat: 48.87472,
+      lng: 9.634741,
+      lat: 48.874924,
     },
     state: {
       id: expect.stringContaining('region'),

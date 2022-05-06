@@ -20,6 +20,11 @@ At the same time, it should be possible in the future to link these networks wit
 
 In other words, we are interested in a network of networks and in keeping the data as close as possible to the user and the operator they trusts.
 
+## Introduction
+
+Have a look into our short video:
+[ocelot.social - GitHub - Developer Welcome - Tutorial (english)](https://www.youtube.com/watch?v=gZSL6KvBIiY&list=PLFMD5liPP01kbuReHxYXxv_1fI5rIgS1f&index=1)
+
 ## Directory Layout
 
 There are three important directories:
@@ -191,6 +196,14 @@ The only deployment method in this repository for development purposes as descri
 * [GraphQL](https://graphql.org/)
 * [NodeJS](https://nodejs.org/en/)
 * [Neo4J](https://neo4j.com/)
+
+### For Testing
+
+* [Cypress](https://docs.cypress.io/)
+* [Storybook](https://storybook.js.org/)
+* [Jest](https://jestjs.io/)
+* [Vue Test Utils](https://vue-test-utils.vuejs.org/)
+* [ESLint](https://eslint.org/)
 
 ## Attributions
 

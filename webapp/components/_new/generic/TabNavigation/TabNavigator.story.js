@@ -1,3 +1,4 @@
+import faker from '@faker-js/faker'
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
 import HcEmpty from '~/components/Empty/Empty'
@@ -8,7 +9,6 @@ import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 import helpers from '~/storybook/helpers'
-import faker from 'faker'
 import { post } from '~/components/PostTeaser/PostTeaser.story.js'
 import { user } from '~/components/UserTeaser/UserTeaser.story.js'
 
