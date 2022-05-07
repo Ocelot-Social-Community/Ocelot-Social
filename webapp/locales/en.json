@@ -746,6 +746,11 @@
     },
     "organizations": {
       "add-new-link": "Add new organization",
+      "delete-modal": {
+        "confirm-button": "Delete",
+        "title": "Do you really want to delete your organization?",
+        "message": "Delete \"{name}\"."
+      },
       "edit-link": "Change settings of organization",
       "name": "Organizations",
       "submit": "Add organization"
@@ -777,6 +782,11 @@
     },
     "social-media": {
       "add-new-link": "Add new link",
+      "delete-modal": {
+        "confirm-button": "Delete",
+        "title": "Do you really want to delete your link?",
+        "message": "Delete \"{name}\"."
+      },
       "edit-link": "Edit link",
       "name": "Social media",
       "placeholder": "Your social media url",

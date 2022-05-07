@@ -63,6 +63,7 @@ export default {
       ]
     },
     modalData() {
+      // Wolle: shall that really be a funktion in a computed?
       return function (report) {
         const identStart =
           'moderation.reports.decideModal.' +

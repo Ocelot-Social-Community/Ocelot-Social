@@ -10,6 +10,14 @@
       :texts="{
         addButton: $t('settings.organizations.submit'),
         addNew: $t('settings.organizations.add-new-link'),
+        deleteModal: {
+          titleIdent: 'settings.organizations.delete-modal.title',
+          messageIdent: 'settings.organizations.delete-modal.message',
+          confirm: {
+            icon: 'trash',
+            buttonTextIdent: 'settings.organizations.delete-modal.confirm-button',
+          },
+        },
         edit: $t('settings.organizations.edit-link'),
       }"
       :callbacks="{

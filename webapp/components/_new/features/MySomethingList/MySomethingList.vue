@@ -65,6 +65,8 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
   name: 'MySomethingList',
   props: {
@@ -113,6 +115,9 @@ export default {
     },
   },
   methods: {
+    ...mapMutations({
+      commitModalData: 'modal/SET_OPEN',
+    }),
     handleInput(data) {
       this.callbacks.handleInput(this, data)
       this.disabled = true
@@ -140,8 +145,42 @@ export default {
       this.editingItem = null
       this.disabled = true
     },
-    async handleDeleteItem(item) {
-      await this.callbacks.delete(this, item)
+    handleDeleteItem(item) {
+      this.openModal(item)
+    },
+    openModal(item) {
+      this.commitModalData(this.modalData(item))
+    },
+    modalData(item) {
+      return {
+        name: 'confirm',
+        data: {
+          type: '',
+          resource: { id: '' },
+          modalData: {
+            titleIdent: this.texts.deleteModal.titleIdent,
+            messageIdent: this.texts.deleteModal.messageIdent,
+            messageParams: {
+              name: item[this.namePropertyKey],
+            },
+            buttons: {
+              confirm: {
+                danger: true,
+                icon: this.texts.deleteModal.confirm.icon,
+                textIdent: this.texts.deleteModal.confirm.buttonTextIdent,
+                callback: () => {
+                  this.callbacks.delete(this, item)
+                },
+              },
+              cancel: {
+                icon: 'close',
+                textIdent: 'actions.cancel',
+                callback: () => {},
+              },
+            },
+          },
+        },
+      }
     },
   },
 }

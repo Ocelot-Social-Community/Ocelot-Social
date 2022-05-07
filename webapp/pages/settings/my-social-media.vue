@@ -10,6 +10,14 @@
       :texts="{
         addButton: $t('settings.social-media.submit'),
         addNew: $t('settings.social-media.add-new-link'),
+        deleteModal: {
+          titleIdent: 'settings.social-media.delete-modal.title',
+          messageIdent: 'settings.social-media.delete-modal.message',
+          confirm: {
+            icon: 'trash',
+            buttonTextIdent: 'settings.social-media.delete-modal.confirm-button',
+          },
+        },
         edit: $t('settings.social-media.edit-link'),
       }"
       :callbacks="{
