@@ -15,6 +15,11 @@ describe('MySomethingList.vue', () => {
       useFormData: { dummy: '' },
       useItems: [{ id: 'id', dummy: 'dummy' }],
       namePropertyKey: 'dummy',
+      texts: {
+        addButton: 'add-button',
+        addNew: 'add-new-something',
+        edit: 'edit-something',
+      },
       callbacks: { edit: jest.fn(), submit: jest.fn(), delete: jest.fn() },
     }
     data = () => {
