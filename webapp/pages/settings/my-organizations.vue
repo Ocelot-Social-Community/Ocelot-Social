@@ -38,6 +38,31 @@ import MySomethingList from '~/components/_new/features/MySomethingList/MySometh
 import OrganisationListItem from '~/components/_new/features/OrganisationList/OrganisationListItem'
 import EditOrganisation from '~/components/_new/features/OrganisationList/EditOrganisation'
 
+const createSocialMediaMutation = gql`
+  mutation($url: String!) {
+    CreateSocialMedia(url: $url) {
+      id
+      url
+    }
+  }
+`
+const updateSocialMediaMutation = gql`
+  mutation($id: ID!, $url: String!) {
+    UpdateSocialMedia(id: $id, url: $url) {
+      id
+      url
+    }
+  }
+`
+const deleteSocialMediaMutation = gql`
+  mutation($id: ID!) {
+    DeleteSocialMedia(id: $id) {
+      id
+      url
+    }
+  }
+`
+
 export default {
   components: {
     MySomethingList,
@@ -119,25 +144,11 @@ export default {
 
       let mutation, variables, successMessage
       if (isCreation) {
-        mutation = gql`
-          mutation($url: String!) {
-            CreateSocialMedia(url: $url) {
-              id
-              url
-            }
-          }
-        `
+        mutation = createSocialMediaMutation
         variables = { url: item.url }
         successMessage = thisList.$t('settings.social-media.successAdd')
       } else {
-        mutation = gql`
-          mutation($id: ID!, $url: String!) {
-            UpdateSocialMedia(id: $id, url: $url) {
-              id
-              url
-            }
-          }
-        `
+        mutation = updateSocialMediaMutation
         variables = { id: item.id, url: item.url }
         successMessage = thisList.$t('settings.data.success')
       }
@@ -167,14 +178,7 @@ export default {
     async callbackDeleteSocialMedia(thisList, item) {
       try {
         await thisList.$apollo.mutate({
-          mutation: gql`
-            mutation($id: ID!) {
-              DeleteSocialMedia(id: $id) {
-                id
-                url
-              }
-            }
-          `,
+          mutation: deleteSocialMediaMutation,
           variables: {
             id: item.id,
           },
