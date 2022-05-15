@@ -11,6 +11,10 @@ export default class EventHandler extends Extension {
       new Plugin({
         props: {
           transformPastedText(text) {
+            // remove hashtag from d.tube url
+            if ( text.search(/d.tube/) > 0) {
+              text =  text.replace(/\/#!\//gim, '/') 
+            }
             return text.trim()
           },
           transformPastedHTML(html) {
