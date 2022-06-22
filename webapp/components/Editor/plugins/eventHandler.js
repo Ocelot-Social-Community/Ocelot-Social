@@ -11,7 +11,10 @@ export default class EventHandler extends Extension {
       new Plugin({
         props: {
           transformPastedText(text) {
-            // remove hashtag from d.tube url
+            /* remove hashtag from d.tube url
+             * hashtags in url general are not a problem because the following link work like expected: 
+             * http://www.nsosp.org/de/Quanten-Fluss-Theorie/index.php#OM:FrQFT:Home:Inhalt
+            */
             if ( text.search(/d.tube/) > 0) {
               text =  text.replace(/\/#!\//gim, '/') 
             }

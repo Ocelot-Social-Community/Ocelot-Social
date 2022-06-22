@@ -8,7 +8,7 @@ export default class Hashtag extends TipTapMention {
   get defaultOptions() {
     return {
       matcher: {
-        char: '#',
+        char: '=',
         allowSpaces: false,
         startOfLine: false,
       },
