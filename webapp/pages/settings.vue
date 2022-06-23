@@ -44,6 +44,10 @@ export default {
           path: `/settings/muted-users`,
         },
         {
+          name: this.$t('settings.wallet.name'),
+          path: `/settings/wallet`,
+        },
+        {
           name: this.$t('settings.blocked-users.name'),
           path: `/settings/blocked-users`,
         },

@@ -787,6 +787,10 @@
         "alreadyTaken": "Dieser Benutzername ist schon vergeben.",
         "regex": "Es sind nur Kleinbuchstaben, Zahlen, Unterstriche oder Bindestriche erlaubt."
       }
+    },
+    "wallet": {
+      "name": "Wallet verbinden",
+      "walletConnect": "Meine Wallet Verbinden"
     }
   },
   "shoutButton": {

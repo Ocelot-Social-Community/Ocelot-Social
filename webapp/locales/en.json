@@ -787,6 +787,10 @@
         "alreadyTaken": "This user name is already taken.",
         "regex": "Allowed characters are only lowercase letters, numbers, underscores and hyphens."
       }
+    },
+    "wallet": {
+      "name": "Connect wallet",
+      "walletConnect": "My Wallet Connect"
     }
   },
   "shoutButton": {
