@@ -1,6 +1,7 @@
 import Factory, { cleanDatabase } from '../../db/factories'
 import { gql } from '../../helpers/jest'
 import { getNeode, getDriver } from '../../db/neo4j'
+import CONSTANTS_REGISTRATION from './../../constants/registration'
 import createPasswordReset from './helpers/createPasswordReset'
 import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
@@ -109,7 +110,7 @@ describe('passwordReset', () => {
           const resets = await getAllPasswordResets()
           const [reset] = resets
           const { nonce } = reset.properties
-          expect(nonce).toHaveLength(6)
+          expect(nonce).toHaveLength(CONSTANTS_REGISTRATION.NONCE_LENGTH)
         })
       })
     })
@@ -118,7 +119,7 @@ describe('passwordReset', () => {
 
 describe('resetPassword', () => {
   const setup = async (options = {}) => {
-    const { email = 'user@example.org', issuedAt = new Date(), nonce = 'abcde' } = options
+    const { email = 'user@example.org', issuedAt = new Date(), nonce = '12345' } = options
     await createPasswordReset({ driver, email, issuedAt, nonce })
   }
 
@@ -148,7 +149,7 @@ describe('resetPassword', () => {
     describe('invalid email', () => {
       it('resolves to false', async () => {
         await setup()
-        variables = { ...variables, email: 'non-existent@example.org', nonce: 'abcde' }
+        variables = { ...variables, email: 'non-existent@example.org', nonce: '12345' }
         await expect(mutate({ mutation, variables })).resolves.toMatchObject({
           data: { resetPassword: false },
         })
@@ -162,7 +163,7 @@ describe('resetPassword', () => {
 
       describe('but invalid nonce', () => {
         beforeEach(() => {
-          variables = { ...variables, nonce: 'slkdjf' }
+          variables = { ...variables, nonce: 'slkdj' }
         })
 
         it('resolves to false', async () => {
@@ -177,7 +178,7 @@ describe('resetPassword', () => {
         beforeEach(() => {
           variables = {
             ...variables,
-            nonce: 'abcde',
+            nonce: '12345',
           }
         })
 

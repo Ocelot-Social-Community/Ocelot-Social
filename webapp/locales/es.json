@@ -143,7 +143,7 @@
           "next": "Continuar",
           "nonce": "Introduzca el código",
           "validations": {
-            "length": "debe tener exactamente 5 letras"
+            "length": "debe tener exactamente {nonceLength} letras"
           }
         }
       },

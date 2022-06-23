@@ -170,7 +170,7 @@
           "nonce": "E-mail code: 32143",
           "validations": {
             "error": "Invalid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!",
-            "length": "must be 5 characters long",
+            "length": "must be {nonceLength} characters long",
             "success": "Valid verification code <b>{nonce}</b> for e-mail <b>{email}</b>!"
           }
         },
@@ -184,7 +184,7 @@
           "next": "Continue",
           "validations": {
             "error": "Invalid invite code <b>{inviteCode}</b>!",
-            "length": "must be 6 characters long",
+            "length": "must be {inviteCodeLength} characters long",
             "success": "Valid invite code <b>{inviteCode}</b>!"
           }
         }
