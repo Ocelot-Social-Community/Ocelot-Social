@@ -71,7 +71,7 @@ export const resetPasswordTemplate = ({ email, variables: { nonce, name } }) => 
   }
 }
 
-export const wrongAccountTemplate = ({ email }) => {
+export const wrongAccountTemplate = ({ email, _variables = {} }) => {
   const subject = 'Falsche Mailadresse? | Wrong E-mail?'
   const actionUrl = new URL('/password-reset/request', CONFIG.CLIENT_URI)
   const renderParams = { ...defaultParams, englishHint, actionUrl }

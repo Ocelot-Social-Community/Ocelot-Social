@@ -23,14 +23,14 @@ const sendPasswordResetMail = async (resolve, root, args, context, resolveInfo) 
   const { email } = args
   const { email: userFound, nonce, name } = await resolve(root, args, context, resolveInfo)
   const template = userFound ? resetPasswordTemplate : wrongAccountTemplate
-  await sendMail(template({ email, nonce, name }))
+  await sendMail(template({ email, variables: { nonce, name } }))
   return true
 }
 
 const sendEmailVerificationMail = async (resolve, root, args, context, resolveInfo) => {
   const response = await resolve(root, args, context, resolveInfo)
   const { email, nonce, name } = response
-  await sendMail(emailVerificationTemplate({ email, nonce, name }))
+  await sendMail(emailVerificationTemplate({ email, variables: { nonce, name } }))
   delete response.nonce
   return response
 }
