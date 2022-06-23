@@ -195,7 +195,7 @@ describe('slugifyMiddleware', () => {
       variables = {
         ...variables,
         name: 'I am a user',
-        nonce: '123456',
+        nonce: '12345',
         password: 'yo',
         email: '123@example.org',
         termsAndConditionsAgreedVersion: '0.0.1',
@@ -206,7 +206,7 @@ describe('slugifyMiddleware', () => {
       beforeEach(async () => {
         await Factory.build('emailAddress', {
           email: '123@example.org',
-          nonce: '123456',
+          nonce: '12345',
           verifiedAt: null,
         })
       })

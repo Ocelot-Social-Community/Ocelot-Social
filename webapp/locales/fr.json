@@ -143,7 +143,7 @@
           "next": "Continuer",
           "nonce": "Entrez votre code",
           "validations": {
-            "length": "doit comporter 5 caractères"
+            "length": "doit comporter {nonceLength} caractères"
           }
         }
       },

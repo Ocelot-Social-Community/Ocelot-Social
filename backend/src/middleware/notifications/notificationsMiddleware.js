@@ -44,7 +44,7 @@ const publishNotifications = async (context, promises) => {
       sendMail(
         notificationTemplate({
           email: notificationsEmailAddresses[index].email,
-          notification: notificationAdded,
+          variables: { notification: notificationAdded },
         }),
       )
     }

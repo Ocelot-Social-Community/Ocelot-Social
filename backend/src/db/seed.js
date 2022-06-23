@@ -537,7 +537,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await Factory.build(
       'inviteCode',
       {
-        code: 'AAAAAA',
+        code: 'ABCDEF',
       },
       {
         generatedBy: jennyRostock,

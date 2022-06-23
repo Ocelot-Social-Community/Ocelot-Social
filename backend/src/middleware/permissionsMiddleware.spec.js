@@ -182,12 +182,12 @@ describe('authorization', () => {
         beforeEach(async () => {
           variables = {
             email: 'some@email.org',
-            inviteCode: 'AAAAAA',
+            inviteCode: 'ABCDEF',
           }
           CONFIG.INVITE_REGISTRATION = false
           CONFIG.PUBLIC_REGISTRATION = false
           await Factory.build('inviteCode', {
-            code: 'AAAAAA',
+            code: 'ABCDEF',
           })
         })
 
@@ -224,12 +224,12 @@ describe('authorization', () => {
         beforeEach(async () => {
           variables = {
             email: 'some@email.org',
-            inviteCode: 'AAAAAA',
+            inviteCode: 'ABCDEF',
           }
           CONFIG.INVITE_REGISTRATION = false
           CONFIG.PUBLIC_REGISTRATION = true
           await Factory.build('inviteCode', {
-            code: 'AAAAAA',
+            code: 'ABCDEF',
           })
         })
 
@@ -254,7 +254,7 @@ describe('authorization', () => {
           CONFIG.INVITE_REGISTRATION = true
           CONFIG.PUBLIC_REGISTRATION = false
           await Factory.build('inviteCode', {
-            code: 'AAAAAA',
+            code: 'ABCDEF',
           })
         })
 
@@ -262,7 +262,7 @@ describe('authorization', () => {
           beforeEach(async () => {
             variables = {
               email: 'some@email.org',
-              inviteCode: 'AAAAAA',
+              inviteCode: 'ABCDEF',
             }
             authenticatedUser = null
           })

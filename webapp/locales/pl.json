@@ -104,7 +104,7 @@
           "next": "Kontynuuj",
           "nonce": "Wprowadź swój kod",
           "validations": {
-            "length": "musi mieć długość 5 znaków."
+            "length": "musi mieć długość {nonceLength} znaków."
           }
         }
       }

@@ -158,7 +158,7 @@ describe('VerifyEmailAddress', () => {
   `
 
   beforeEach(() => {
-    variables = { ...variables, email: 'to-be-verified@example.org', nonce: '123456' }
+    variables = { ...variables, email: 'to-be-verified@example.org', nonce: '12345' }
   })
 
   describe('unauthenticated', () => {

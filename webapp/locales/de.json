@@ -170,7 +170,7 @@
           "nonce": "E-Mail-Code: 32143",
           "validations": {
             "error": "Ungültiger Bestätigungs-Code <b>{nonce}</b> für E-Mail <b>{email}</b>!",
-            "length": "muss genau 5 Buchstaben lang sein",
+            "length": "muss genau {nonceLength} Buchstaben lang sein",
             "success": "Gültiger Bestätigungs-Code <b>{nonce}</b> für E-Mail <b>{email}</b>!"
           }
         },
@@ -184,7 +184,7 @@
           "next": "Weiter",
           "validations": {
             "error": "Ungültiger Einladungs-Code <b>{inviteCode}</b>!",
-            "length": "muss genau 6 Buchstaben lang sein",
+            "length": "muss genau {inviteCodeLength} Buchstaben lang sein",
             "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!"
           }
         }
