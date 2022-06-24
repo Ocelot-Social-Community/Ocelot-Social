@@ -1,4 +1,5 @@
 import CONFIG from '../../../config'
+import { cleanHtml } from '../../../middleware/helpers/cleanHtml.js'
 import nodemailer from 'nodemailer'
 import { htmlToText } from 'nodemailer-html-to-text'
 
@@ -10,6 +11,27 @@ if (!hasEmailConfig) {
   if (!CONFIG.TEST) {
     // eslint-disable-next-line no-console
     console.log('Warning: Middlewares will not try to send mails.')
+    // TODO: disable e-mail logging on database seeding?
+    // TODO: implement general logging like 'log4js', see Gradido project: https://github.com/gradido/gradido/blob/master/backend/log4js-config.json
+    sendMailCallback = async (templateArgs) => {
+      // eslint-disable-next-line no-console
+      console.log('--- Send E-Mail ---')
+      // eslint-disable-next-line no-console
+      console.log('To: ' + templateArgs.to)
+      // eslint-disable-next-line no-console
+      console.log('From: ' + templateArgs.from)
+      // eslint-disable-next-line no-console
+      console.log('Subject: ' + templateArgs.subject)
+      // eslint-disable-next-line no-console
+      console.log('Content:')
+      // eslint-disable-next-line no-console
+      console.log(
+        cleanHtml(templateArgs.html, {
+          allowedTags: ['a'],
+          allowedAttributes: { a: ['href'] },
+        }).replace(/&amp;/g, '&'),
+      )
+    }
   }
 } else {
   sendMailCallback = async (templateArgs) => {

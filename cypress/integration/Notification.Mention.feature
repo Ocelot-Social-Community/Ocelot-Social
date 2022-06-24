@@ -5,9 +5,9 @@ Feature: Notification for a mention
 
   Background:
     Given the following "users" are in the database:
-      | slug              | email                | password | id       | name              | termsAndConditionsAgreedVersion |
-      | wolle-aus-hamburg | wolle@example.org    | 1234     | wolle    | Wolle aus Hamburg | 0.0.4                           |
-      | matt-rider        | matt@example.org     | 4321     | matt     | Matt Rider        | 0.0.4                           |
+      | slug              | email                | password | id       | name                 | termsAndConditionsAgreedVersion |
+      | wolle-aus-hamburg | wolle@example.org    | 1234     | wolle    | Wolfgang aus Hamburg | 0.0.4                           |
+      | matt-rider        | matt@example.org     | 4321     | matt     | Matt Rider           | 0.0.4                           |
 
   Scenario: Mention another user, re-login as this user and see notifications
     Given I am logged in as "wolle-aus-hamburg"
