@@ -26,7 +26,7 @@ if (!hasEmailConfig) {
       console.log('Content:')
       // eslint-disable-next-line no-console
       console.log(
-        cleanHtml(templateArgs.html, {
+        cleanHtml(templateArgs.html, 'dummyKey', {
           allowedTags: ['a'],
           allowedAttributes: { a: ['href'] },
         }).replace(/&amp;/g, '&'),

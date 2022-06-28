@@ -56,7 +56,7 @@ const standardSanitizeHtmlOptions = {
   },
 }
 
-export function cleanHtml(dirty, sanitizeHtmlOptions = standardSanitizeHtmlOptions) {
+export function cleanHtml(dirty, _key, sanitizeHtmlOptions = standardSanitizeHtmlOptions) {
   if (!dirty) {
     return dirty
   }
