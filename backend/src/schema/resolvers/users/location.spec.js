@@ -38,8 +38,8 @@ const newlyCreatedNodesWithLocales = [
       nameRU: 'Вельцхайм',
       nameNL: 'Welzheim',
       namePL: 'Welzheim',
-      lng: 9.63444,
-      lat: 48.87472,
+      lng: 9.634741,
+      lat: 48.874924,
     },
     state: {
       id: expect.stringContaining('region'),
@@ -119,25 +119,27 @@ describe('Location Service', () => {
       lang: 'en',
     }
     const result = await query({ query: queryLocations, variables })
-    expect(result.data.queryLocations).toEqual([
-      { id: 'place.14094307404564380', place_name: 'Berlin, Germany' },
-      {
-        id: expect.stringMatching(/^place\.[0-9]+$/),
-        place_name: 'Berlin, Maryland, United States',
-      },
-      {
-        id: expect.stringMatching(/^place\.[0-9]+$/),
-        place_name: 'Berlin, Connecticut, United States',
-      },
-      {
-        id: expect.stringMatching(/^place\.[0-9]+$/),
-        place_name: 'Berlin, New Jersey, United States',
-      },
-      {
-        id: expect.stringMatching(/^place\.[0-9]+$/),
-        place_name: 'Berlin Township, New Jersey, United States',
-      },
-    ])
+    expect(result.data.queryLocations).toEqual(
+      expect.arrayContaining([
+        { id: 'place.14094307404564380', place_name: 'Berlin, Germany' },
+        {
+          id: expect.stringMatching(/^place\.[0-9]+$/),
+          place_name: 'Berlin, Maryland, United States',
+        },
+        {
+          id: expect.stringMatching(/^place\.[0-9]+$/),
+          place_name: 'Berlin, Connecticut, United States',
+        },
+        {
+          id: expect.stringMatching(/^place\.[0-9]+$/),
+          place_name: 'Berlin, New Jersey, United States',
+        },
+        {
+          id: expect.stringMatching(/^place\.[0-9]+$/),
+          place_name: 'Berlin Heights, Ohio, United States',
+        },
+      ]),
+    )
   })
 
   it('query Location existing in different language', async () => {

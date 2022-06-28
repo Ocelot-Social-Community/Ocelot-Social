@@ -1,7 +1,7 @@
-import faker from 'faker'
 import sample from 'lodash/sample'
 import { createTestClient } from 'apollo-server-testing'
 import createServer from '../server'
+import faker from '@faker-js/faker'
 import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
 import { gql } from '../helpers/jest'
@@ -537,7 +537,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await Factory.build(
       'inviteCode',
       {
-        code: 'AAAAAA',
+        code: 'ABCDEF',
       },
       {
         generatedBy: jennyRostock,

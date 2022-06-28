@@ -123,8 +123,8 @@ describe('Registration', () => {
           expect(wrapper.find('.hc-empty').exists()).toBe(true)
         })
 
-        it('"inviteCode=AAAAAA" query in URI', async () => {
-          mocks.$route.query = { method: 'invite-code', inviteCode: 'AAAAAA' }
+        it('"inviteCode=ABCDEF" query in URI', async () => {
+          mocks.$route.query = { method: 'invite-code', inviteCode: 'ABCDEF' }
           wrapper = await Wrapper()
           expect(wrapper.find('.hc-empty').exists()).toBe(true)
         })
@@ -181,12 +181,12 @@ describe('Registration', () => {
           expect(wrapper.find('.enter-invite').exists()).toBe(true)
         })
 
-        it('"inviteCode=AAAAAA" query in URI have invite code in input', async () => {
-          mocks.$route.query = { method: 'invite-code', inviteCode: 'AAAAAA' }
+        it('"inviteCode=ABCDEF" query in URI have invite code in input', async () => {
+          mocks.$route.query = { method: 'invite-code', inviteCode: 'ABCDEF' }
           wrapper = await Wrapper()
           await Vue.nextTick()
           const form = wrapper.find('.enter-invite')
-          expect(form.vm.formData.inviteCode).toEqual('AAAAAA')
+          expect(form.vm.formData.inviteCode).toEqual('ABCDEF')
         })
       })
     })
@@ -294,12 +294,12 @@ describe('Registration', () => {
           expect(wrapper.find('.enter-invite').exists()).toBe(true)
         })
 
-        it('"inviteCode=AAAAAA" query in URI have invite code in input', async () => {
-          mocks.$route.query = { method: 'invite-code', inviteCode: 'AAAAAA' }
+        it('"inviteCode=ABCDEF" query in URI have invite code in input', async () => {
+          mocks.$route.query = { method: 'invite-code', inviteCode: 'ABCDEF' }
           wrapper = await Wrapper()
           await Vue.nextTick()
           const form = wrapper.find('.enter-invite')
-          expect(form.vm.formData.inviteCode).toEqual('AAAAAA')
+          expect(form.vm.formData.inviteCode).toEqual('ABCDEF')
         })
       })
     })

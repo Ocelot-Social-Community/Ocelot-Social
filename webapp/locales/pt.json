@@ -190,7 +190,7 @@
           "next": "Continue",
           "nonce": "Digite seu código",
           "validations": {
-            "length": "deve ter 5 caracteres"
+            "length": "deve ter {nonceLength} caracteres"
           }
         }
       },

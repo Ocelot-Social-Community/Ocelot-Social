@@ -3,12 +3,16 @@
     <template #default="{ openMenu, closeMenu }">
       <slot name="button">
         <menu-bar-button
+          class="legend-question-button"
           icon="question-circle"
           circle
           ghost
-          class="legend-question-button"
-          @mouseover.native="openMenu()"
-          @mouseleave.native="closeMenu()"
+          :onClick="
+            () => {
+              isDropdownOpen ? closeMenu() : openMenu()
+              isDropdownOpen = !isDropdownOpen
+            }
+          "
         />
       </slot>
     </template>
@@ -60,6 +64,7 @@ export default {
         { iconName: 'quote-right', name: `editor.legend.quote`, shortcut: '> + space' },
         { iconName: 'minus', name: `editor.legend.ruler`, shortcut: '---' },
       ],
+      isDropdownOpen: false,
     }
   },
 }

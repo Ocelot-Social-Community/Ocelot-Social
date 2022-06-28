@@ -3,6 +3,7 @@ import { getDriver } from '../../db/neo4j'
 import { gql } from '../../helpers/jest'
 import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
+import CONSTANTS_REGISTRATION from './../../constants/registration'
 
 let user
 let query
@@ -107,7 +108,11 @@ describe('inviteCodes', () => {
           errors: undefined,
           data: {
             GenerateInviteCode: {
-              code: expect.stringMatching(/^[0-9A-Z]{6,6}$/),
+              code: expect.stringMatching(
+                new RegExp(
+                  `^[0-9A-Z]{${CONSTANTS_REGISTRATION.INVITE_CODE_LENGTH},${CONSTANTS_REGISTRATION.INVITE_CODE_LENGTH}}$`,
+                ),
+              ),
               expiresAt: null,
               createdAt: expect.any(String),
             },
@@ -129,7 +134,11 @@ describe('inviteCodes', () => {
           errors: undefined,
           data: {
             GenerateInviteCode: {
-              code: expect.stringMatching(/^[0-9A-Z]{6,6}$/),
+              code: expect.stringMatching(
+                new RegExp(
+                  `^[0-9A-Z]{${CONSTANTS_REGISTRATION.INVITE_CODE_LENGTH},${CONSTANTS_REGISTRATION.INVITE_CODE_LENGTH}}$`,
+                ),
+              ),
               expiresAt: nextWeek.toISOString(),
               createdAt: expect.any(String),
             },

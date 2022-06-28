@@ -83,7 +83,7 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
-  // externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  // externalLink: null, // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
@@ -96,7 +96,7 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
   },
 })
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
-  // externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  // externalLink: null, // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.support', // localized string identifier, if undefined default is used
