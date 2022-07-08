@@ -18,7 +18,8 @@ On the right top you find the button `Create`. Click on it and choose `Kubernete
 - use the latest Kubernetes version
 - choose your datacenter region
 - name your node pool: e.g. `pool-<your-network-name>`
-- 2 `Basic node` with a total of 4GB and 2 shared CPUs are enough to start with
+- `2 Basic nodes` with a total of `4 GB` and `2 shared CPUs` are enough to start with
+- `2 Basic nodes` with a total of `8 GB` and `2 shared CPUs` are a bit more optimal for the beginning
 - no tags necessary
 - set your cluster name: e.g. `cluster-<your-network-name>`
 - select your project
