@@ -28,5 +28,6 @@ services:
   ########################################################
   # MAILSERVER TO FAKE SMTP ##############################
   ########################################################
-  mailserver:
-    platform: linux/amd64
+  # commented out, because otherwise override of production would error. and it seems unnecessary
+  # mailserver:
+  #   platform: linux/amd64
