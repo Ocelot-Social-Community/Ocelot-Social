@@ -10,7 +10,7 @@ services:
   # WEBAPP ###############################################
   ########################################################
   webapp:
-    # image: ocelotsocialnetwork/webapp:latest
+    image: ocelotsocialnetwork/webapp:local-production
     build:
       context: ./webapp
       target: production
@@ -40,7 +40,7 @@ services:
   # BACKEND ##############################################
   ########################################################
   backend:
-    # image: ocelotsocialnetwork/backend:latest
+    image: ocelotsocialnetwork/backend:local-production
     build:
       context: ./backend
       target: production
@@ -73,7 +73,7 @@ services:
   # NEO4J ################################################
   ########################################################
   neo4j:
-    # image: ocelotsocialnetwork/neo4j:latest
+    image: ocelotsocialnetwork/neo4j:local-production
     build:
       context: ./neo4j
       # community edition 👆🏼, because we have no enterprise licence 👇🏼 at the moment
@@ -97,7 +97,7 @@ services:
   # MAINTENANCE ##########################################
   ########################################################
   maintenance:
-    # image: ocelotsocialnetwork/maintenance:latest
+    image: ocelotsocialnetwork/maintenance:local-production
     build:
       # TODO: Separate from webapp, this must be independent
       context: ./webapp
