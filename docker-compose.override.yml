@@ -5,7 +5,7 @@ services:
   # WEBAPP ###############################################
   ########################################################
   webapp:
-    # image: ocelotsocialnetwork/webapp:development
+    image: ocelotsocialnetwork/webapp:local-development
     build:
       target: development
     environment:
@@ -23,7 +23,7 @@ services:
   # BACKEND ##############################################
   ########################################################
   backend:
-    # image: ocelotsocialnetwork/backend:development
+    image: ocelotsocialnetwork/backend:local-development
     build:
       target: development
     environment:
@@ -40,7 +40,7 @@ services:
   # NEO4J ################################################
   ########################################################
   neo4j:
-    # image: ocelotsocialnetwork/neo4j:development
+    image: ocelotsocialnetwork/neo4j:local-development
     ports:
       # Also expose the neo4j query browser
       - 7474:7474
@@ -51,8 +51,8 @@ services:
   ########################################################
   # MAINTENANCE ##########################################
   ########################################################
-  # maintenance:
-    # image: ocelotsocialnetwork/maintenance:development
+  maintenance:
+    image: ocelotsocialnetwork/maintenance:local-development
 
   ########################################################
   # MAILSERVER TO FAKE SMTP ##############################
