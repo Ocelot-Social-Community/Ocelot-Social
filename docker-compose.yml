@@ -77,7 +77,7 @@ services:
   ########################################################
   neo4j:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/neo4j:local-production
+    image: ocelotsocialnetwork/neo4j-community:local-production
     build:
       context: ./neo4j
       # community edition 👆🏼, because we have no enterprise licence 👇🏼 at the moment

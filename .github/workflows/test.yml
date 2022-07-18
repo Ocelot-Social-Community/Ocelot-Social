@@ -43,8 +43,8 @@ jobs:
       ##########################################################################
       - name: Neo4J | Build `community` image
         run: |
-          docker build --target community -t "ocelotsocialnetwork/neo4j:community" neo4j/
-          docker save "ocelotsocialnetwork/neo4j:community" > /tmp/neo4j.tar
+          docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
+          docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/neo4j.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
