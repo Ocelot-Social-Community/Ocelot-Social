@@ -13,6 +13,26 @@ To set the Docker platform environment variable in your terminal tab, run:
 $ export DOCKER_DEFAULT_PLATFORM=linux/amd64
 ```
 
+### Docker Compose Override File For Apple M1 Platform
+
+For Docker compose `up` or `build` commands, you can use our Apple M1 override file that specifies the M1 platform:
+
+```bash
+# in main folder
+
+# for development
+$ docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.apple-m1.override.yml up
+# clean db
+$ docker compose exec backend yarn db:reset
+# seed db
+$ docker compose exec backend yarn db:seed
+
+# for production
+$ docker compose -f docker-compose.yml -f docker-compose.apple-m1.override.yml up
+# init admin user
+$ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
+```
+
 ## Analysing Docker Builds
 
 To analyze a Docker build, there is a wonderful tool called [dive](https://github.com/wagoodman/dive). Please sponsor if you're using it!
