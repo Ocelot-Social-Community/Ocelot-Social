@@ -38,7 +38,7 @@ services:
   # NEO4J ################################################
   ########################################################
   neo4j:
-    image: ocelotsocialnetwork/neo4j:development
+    image: ocelotsocialnetwork/neo4j-community:development
     ports:
       # Also expose the neo4j query browser
       - 7474:7474
