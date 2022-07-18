@@ -1,11 +1,15 @@
 # This docker-compose file is just here for testing
+
 version: "3.4"
 
 services:
+
   ########################################################
   # WEBAPP ###############################################
   ########################################################
   webapp:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/webapp-branded:local-production
     build:
       dockerfile: docker/webapp.Dockerfile
       target: branded
@@ -22,10 +26,13 @@ services:
       - MAPBOX_TOKEN="pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g"
       # - WEBSOCKETS_URI=ws://backend:4000/graphql # is not working and not given in Docker YAML in main repo
       - PUBLIC_REGISTRATION=true
+
   ########################################################
   # BACKEND ##############################################
   ########################################################
   backend:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/backend-branded:local-production
     build:
       dockerfile: docker/backend.Dockerfile
       target: branded
@@ -53,11 +60,29 @@ services:
       - SMTP_HOST=mailserver
       - SMTP_PORT=25
       - SMTP_IGNORE_TLS=true
+
+  ########################################################
+  # MAINTENANCE ##########################################
+  ########################################################
+  maintenance:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/maintenance-branded:local-production
+    build:
+      # TODO: Separate from webapp, this must be independent
+      dockerfile: docker/maintenance.Dockerfile
+      target: branded
+      context: .
+    networks:
+      - test-network
+    ports:
+      - 3001:80
+
   ########################################################
   # NEO4J ################################################
   ########################################################
   neo4j:
-    image: ocelotsocialnetwork/neo4j:community
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/neo4j-community-branded:local-production
     networks:
       - test-network
     volumes:
@@ -68,19 +93,7 @@ services:
       - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
     ports:
       - 7687:7687
-  ########################################################
-  # MAINTENANCE ##########################################
-  ########################################################
-  maintenance:
-    build:
-      # TODO: Separate from webapp, this must be independent
-      dockerfile: docker/maintenance.Dockerfile
-      target: branded
-      context: .
-    networks:
-      - test-network
-    ports:
-      - 5000:80
+
   ########################################################
   # MAILSERVER TO FAKE SMTP ##############################
   ########################################################
