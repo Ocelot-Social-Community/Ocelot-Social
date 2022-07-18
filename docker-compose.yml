@@ -6,10 +6,12 @@
 version: "3.4"
 
 services:
+
   ########################################################
   # WEBAPP ###############################################
   ########################################################
   webapp:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/webapp:local-production
     build:
       context: ./webapp
@@ -40,6 +42,7 @@ services:
   # BACKEND ##############################################
   ########################################################
   backend:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/backend:local-production
     build:
       context: ./backend
@@ -73,6 +76,7 @@ services:
   # NEO4J ################################################
   ########################################################
   neo4j:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/neo4j:local-production
     build:
       context: ./neo4j
@@ -97,6 +101,7 @@ services:
   # MAINTENANCE ##########################################
   ########################################################
   maintenance:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/maintenance:local-production
     build:
       # TODO: Separate from webapp, this must be independent

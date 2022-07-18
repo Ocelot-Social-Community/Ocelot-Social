@@ -1,10 +1,12 @@
 version: "3.4"
 
 services:
+
   ########################################################
   # WEBAPP ###############################################
   ########################################################
   webapp:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/webapp:local-development
     build:
       target: development
@@ -23,6 +25,7 @@ services:
   # BACKEND ##############################################
   ########################################################
   backend:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/backend:local-development
     build:
       target: development
@@ -40,6 +43,7 @@ services:
   # NEO4J ################################################
   ########################################################
   neo4j:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/neo4j:local-development
     ports:
       # Also expose the neo4j query browser
@@ -52,6 +56,7 @@ services:
   # MAINTENANCE ##########################################
   ########################################################
   maintenance:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/maintenance:local-development
 
   ########################################################
