@@ -15,6 +15,7 @@
   * [End-to-end tests](cypress/README.md)
   * [Frontend tests](webapp/testing.md)
   * [Backend tests](backend/testing.md)
+* [Docker More Closely](DOCKER_MORE_CLOSELY.md)
 * [Deployment](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/blob/master/deployment/README.md)
 * [Contributing](CONTRIBUTING.md)
 * [Feature Specification](cypress/features.md)
