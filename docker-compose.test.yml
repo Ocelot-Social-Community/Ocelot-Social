@@ -27,7 +27,7 @@ services:
   # NEO4J ################################################
   ########################################################
   neo4j:
-    image: ocelotsocialnetwork/neo4j:community
+    image: ocelotsocialnetwork/neo4j-community:test
     #environment:
     #  - NEO4J_dbms_connector_bolt_enabled=true
     #  - NEO4J_dbms_connector_bolt_tls__level=OPTIONAL
