@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      # - 4451-new-deployment-with-base-and-code # for testing while developing
+      - 5065-automatic-deployment-to-stage.ocelot.social-on-push-to-master-branch # for testing while developing
 
 jobs:
   ##############################################################################
