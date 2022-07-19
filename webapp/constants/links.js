@@ -9,8 +9,8 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
     // footerIdent: 'site.made', // localized string identifier, if undefined default is used
     // headTitleIdent: 'site.made', // localized string identifier, if undefined default is used
     // headlineIdent: 'site.made', // localized string identifier, on null it's hidden, if undefined default is used
-    hasContainer: true,
-    hasBaseCard: true,
+    hasContainer: false,
+    hasBaseCard: false,
     hasLoginInHeader: true,
     // in case internal page content is here 'branding/locales/html/'
   },
