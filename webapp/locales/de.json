@@ -620,7 +620,7 @@
       "Tag": "Hashtag ::: Hashtags",
       "User": "Benutzer ::: Benutzer"
     },
-    "hint": "Wonach suchst Du?",
+    "hint": "Wonach suchst Du? Nutze !… für Beitrag, @… für Mitglied, #… für Hashtag",
     "no-results": "Keine Ergebnisse für \"{search}\" gefunden. Versuch' es mit einem anderen Begriff!",
     "page": "Seite",
     "placeholder": "Suchen",
