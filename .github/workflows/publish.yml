@@ -247,7 +247,7 @@ jobs:
         run: docker push --all-tags ocelotsocialnetwork/maintenance
 
   ##############################################################################
-  # JOB: KUBERNETES DEPLOY LATEST VERSION ######################################
+  # JOB: KUBERNETES DEPLOY ACTUAL/LATEST VERSION ######################################
   ##############################################################################
   kubernetes_deploy:
     # see example https://github.com/do-community/example-doctl-action
@@ -282,26 +282,35 @@ jobs:
       ##########################################################################
       # - name: Deploy 'latest' to DigitalOcean Kubernetes
       #   run: |
-      #     kubectl set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:latest
-      #     kubectl rollout restart deployment/ocelot-webapp
-      #     kubectl set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:latest
-      #     kubectl rollout restart deployment/ocelot-backend
-      #     kubectl set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:latest
-      #     kubectl rollout restart deployment/ocelot-backend
-      #     kubectl set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:latest
-      #     kubectl rollout restart deployment/ocelot-neo4j
+      #     kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:latest
+      #     kubectl -n default rollout restart deployment/ocelot-webapp
+      #     kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:latest
+      #     kubectl -n default rollout restart deployment/ocelot-backend
+      #     kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:latest
+      #     kubectl -n default rollout restart deployment/ocelot-maintenance
+      #     kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:latest
+      #     kubectl -n default rollout restart deployment/ocelot-neo4j
       - name: Deploy actual version '$BUILD_VERSION' to DigitalOcean Kubernetes
         run: |
-          kubectl set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:$BUILD_VERSION
-          kubectl set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:$BUILD_VERSION
-          kubectl set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:$BUILD_VERSION
-          kubectl set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:$BUILD_VERSION
-      # - name: Verify deployment
-      #   run: |
-      #     kubectl rollout status deployment/ocelot-webapp
-      #     kubectl rollout status deployment/ocelot-backend
-      #     kubectl rollout status deployment/ocelot-backend
-      #     kubectl rollout status deployment/ocelot-neo4j
+          kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:$BUILD_VERSION
+          kubectl -n default rollout restart deployment/ocelot-webapp
+          kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:$BUILD_VERSION
+          kubectl -n default rollout restart deployment/ocelot-backend
+          kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:$BUILD_VERSION
+          kubectl -n default rollout restart deployment/ocelot-maintenance
+          kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:$BUILD_VERSION
+          kubectl -n default rollout restart deployment/ocelot-neo4j
+      - name: Verify deployment
+        run: |
+          kubectl -n default rollout status deployment/ocelot-backend --timeout=240s
+          kubectl -n default rollout status deployment/ocelot-neo4j --timeout=240s
+          kubectl -n default rollout status deployment/ocelot-webapp --timeout=240s
+          kubectl -n default rollout status deployment/ocelot-maintenance --timeout=240s
+      - name: Reset and seed Neo4j database via backend for staging
+        # db cleaning is only possible if env 'PRODUCTION_DB_CLEAN_ALLOW=true' is set in deployment
+        run: |
+          kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "node dist/db/clean.js"
+          kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "node dist/db/seed.js"
 
   ##############################################################################
   # JOB: GITHUB TAG LATEST VERSION #############################################
