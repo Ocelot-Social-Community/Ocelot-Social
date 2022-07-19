@@ -537,7 +537,7 @@
       "Post": "Contribuciones",
       "User": "Usuarios"
     },
-    "hint": "¿Qué estás buscando?",
+    "hint": "¿Qué estás buscando? Utiliza !… para contribuciones, @… para usuarios, #… para hashtags.",
     "placeholder": "Buscar"
   },
   "settings": {

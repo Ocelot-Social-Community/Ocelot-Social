@@ -510,7 +510,7 @@
   },
   "search": {
     "failed": "Nada encontrado",
-    "hint": "O que você está buscando?",
+    "hint": "O que você está buscando? Use !... para postagens, @... para usuários, #... para hashtags.",
     "placeholder": "Buscar"
   },
   "settings": {

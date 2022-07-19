@@ -525,7 +525,7 @@
       "Post": "Posts",
       "User": "Utilisateurs"
     },
-    "hint": "Qu'est-ce que vous cherchez ?",
+    "hint": "Qu'est-ce que vous cherchez? Utiliser !… pour des posts, @… pour des membres, #… pour des hashtag.",
     "placeholder": "Rechercher"
   },
   "settings": {

@@ -131,6 +131,11 @@
       "type": "Gebruiker"
     }
   },
+  "search": {
+    "failed": "Niets gevonden",
+    "hint": "Waar zoekt u naar? Gebruik !... voor berichten, @... voor gebruikers, #... voor hashtags.",
+    "placeholder": "Zoeken"
+  },
   "settings": {
     "data": {
       "name": "Uw gegevens"
