@@ -3,7 +3,7 @@
 import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
-  externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  // externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.made', // localized string identifier, if undefined default is used
@@ -12,12 +12,12 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
   // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  externalLink: 'https://ocelot-social.herokuapp.com/donations', // if string is defined and not empty it's dominating
+  // externalLink: 'https://ocelot-social.herokuapp.com/donations', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.donate', // localized string identifier, if undefined default is used
@@ -26,12 +26,12 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
   // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  externalLink: 'https://ocelot-social.herokuapp.com/imprint', // if string is defined and not empty it's dominating
+  // externalLink: 'https://ocelot-social.herokuapp.com/imprint', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.imprint', // localized string identifier, if undefined default is used
@@ -40,7 +40,7 @@ const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwrite({
@@ -53,7 +53,7 @@ const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwri
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
@@ -66,7 +66,7 @@ const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
@@ -79,7 +79,7 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
@@ -92,11 +92,11 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
-  externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  // externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.support', // localized string identifier, if undefined default is used
@@ -105,7 +105,7 @@ const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 
@@ -130,7 +130,7 @@ export default {
     DATA_PRIVACY,
     FAQ,
     DONATE,
-    SUPPORT,
     IMPRINT,
+    SUPPORT,
   ],
 }
