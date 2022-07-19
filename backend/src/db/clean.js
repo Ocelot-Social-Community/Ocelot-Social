@@ -1,7 +1,7 @@
 import { cleanDatabase } from '../db/factories'
 import CONFIG from '../config'
 
-if (CONFIG.PRODUCTION) {
+if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot clean the database in production environment!`)
 }
 
