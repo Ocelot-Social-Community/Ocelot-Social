@@ -278,7 +278,7 @@
   },
   "search": {
     "failed": "Niczego nie znaleziono",
-    "hint": "Czego szukasz?",
+    "hint": "Czego szukasz? Użyj !... dla postów, @... dla użytkowników, #... dla hashtagów.",
     "placeholder": "Szukaj"
   },
   "settings": {

@@ -473,9 +473,9 @@
     }
   },
   "search": {
-    "failed": null,
-    "hint": null,
-    "placeholder": null
+    "failed": "Non è stato trovato nulla",
+    "hint": "Cosa state cercando? Usate !... per i post, @... per gli utenti, #... per gli hashtag.",
+    "placeholder": "Ricerca"
   },
   "settings": {
     "data": {
