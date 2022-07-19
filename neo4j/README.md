@@ -57,12 +57,48 @@ Here we describe some rarely used Cypher commands for Neo4j that are needed from
 
 ### Index And Contraint Commands
 
+If indexes or constraints are missing or not set correctly, the browser search will not work or the database seed for development will not work.
+
 The indexes and constraints of our database are set in `backend/src/db/migrate/store.js`.
 This is where the magic happens.
 
-If they are missing or not set correctly, the browser search will not work or the database seed for development will not work.
+It's called by our `prod:migrate init` command.
+This command initializes the Admin user and creates all necessary indexes and constraints in the Neo4j database.
 
-#### Show Indexes And Contraints
+***Calls in development***
+
+Locally without Docker:
+
+```bash
+# in backend folder
+$ yarn prod:migrate init
+```
+
+Locally with Docker:
+
+```bash
+# in main folder
+$ docker compose exec backend yarn prod:migrate init
+```
+
+***Calls in production***
+
+Locally with Docker:
+
+```bash
+# in main folder
+$ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
+```
+
+On a server with Kubernetes cluster:
+
+```bash
+# tested for one backend replica
+# !!! be aware of the kubectl context !!!
+$ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "yarn prod:migrate init"
+```
+
+***Cypher commands to show indexes and contraints***
 
 ```bash
 # in browser command line or cypher shell
@@ -77,7 +113,7 @@ $ CALL db.indexes();
 $ CALL db.constraints();
 ```
 
-#### Add And Drop Indexes And Contraints
+***Cypher commands to create and drop indexes and contraints***
 
 ```bash
 # in browser command line or cypher shell
@@ -86,6 +122,9 @@ $ CALL db.constraints();
 $ CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"]);
 $ CALL db.index.fulltext.createNodeIndex("user_fulltext_search",["User"],["name", "slug"]);
 $ CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"]);
+
+# drop an index
+$ DROP CONSTRAINT ON ( image:Image ) ASSERT image.url IS UNIQUE
 
 # drop all indexes and contraints
 $ CALL apoc.schema.assert({},{},true) YIELD label, key RETURN * ;
