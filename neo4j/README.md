@@ -7,7 +7,7 @@ database available. The community edition of Neo4J is Free and Open Source and
 we try our best to keep our application compatible with the community edition
 only.
 
-## Installation with Docker
+## Installation With Docker
 
 Run:
 
@@ -19,7 +19,7 @@ You can access Neo4J through [http://localhost:7474/](http://localhost:7474/)
 for an interactive cypher shell and a visualization of the graph.
 
 
-## Installation without Docker
+## Installation Without Docker
 
 Install the community edition of [Neo4j](https://neo4j.com/) along with the plugin
 [Apoc](https://github.com/neo4j-contrib/neo4j-apoc-procedures) on your system.
@@ -51,3 +51,42 @@ in `backend/.env`.
 
 Start Neo4J and confirm the database is running at [http://localhost:7474](http://localhost:7474).
 
+## Commands
+
+Here we describe some rarely used Cypher commands for Neo4j that are needed from time to time:
+
+### Index And Contraint Commands
+
+The indexes and constraints of our database are set in `backend/src/db/migrate/store.js`.
+This is where the magic happens.
+
+If they are missing or not set correctly, the browser search will not work or the database seed for development will not work.
+
+#### Show Indexes And Contraints
+
+```bash
+# in browser command line or cypher shell
+
+# show all indexes and contraints
+$ :schema
+
+# show all indexes
+$ CALL db.indexes();
+
+# show all contraints
+$ CALL db.constraints();
+```
+
+#### Add And Drop Indexes And Contraints
+
+```bash
+# in browser command line or cypher shell
+
+# create indexes
+$ CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"]);
+$ CALL db.index.fulltext.createNodeIndex("user_fulltext_search",["User"],["name", "slug"]);
+$ CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"]);
+
+# drop all indexes and contraints
+$ CALL apoc.schema.assert({},{},true) YIELD label, key RETURN * ;
+```
