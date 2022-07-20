@@ -54,6 +54,7 @@ services:
       - PRIVATE_KEY_PASSPHRASE=a7dsf78sadg87ad87sfagsadg78
       - EMAIL_SUPPORT=support@wir.social
       - EMAIL_DEFAULT_SENDER=info@wir.social
+      # - PRODUCTION_DB_CLEAN_ALLOW=false # only true for production environments on staging servers
       - PUBLIC_REGISTRATION=true
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
