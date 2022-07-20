@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - 5065-automatic-deployment-to-stage.ocelot.social-on-push-to-master-branch # for testing while developing
+      - 55-implement-PRODUCTION_DB_CLEAN_ALLOW-for-staging-production-evironments # for testing while developing
 
 jobs:
   ##############################################################################
