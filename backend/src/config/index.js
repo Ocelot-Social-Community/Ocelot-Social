@@ -22,6 +22,8 @@ const environment = {
   DEBUG: env.NODE_ENV !== 'production' && env.DEBUG,
   TEST: env.NODE_ENV === 'test',
   PRODUCTION: env.NODE_ENV === 'production',
+  // used for staging enviroments if 'PRODUCTION=true' and 'PRODUCTION_DB_CLEAN_ALLOW=true'
+  PRODUCTION_DB_CLEAN_ALLOW: env.PRODUCTION_DB_CLEAN_ALLOW === 'true' || false, // default = false
   DISABLED_MIDDLEWARES: (env.NODE_ENV !== 'production' && env.DISABLED_MIDDLEWARES) || false,
 }
 
