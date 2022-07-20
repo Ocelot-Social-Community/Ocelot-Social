@@ -1,5 +1,6 @@
 import sample from 'lodash/sample'
 import { createTestClient } from 'apollo-server-testing'
+import CONFIG from '../config'
 import createServer from '../server'
 import faker from '@faker-js/faker'
 import Factory from '../db/factories'
