@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social-backend",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "GraphQL Backend for ocelot.social",
   "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
   "author": "ocelot.social Community",
@@ -82,7 +82,7 @@
     "lodash": "~4.17.14",
     "merge-graphql-schemas": "^1.7.8",
     "metascraper": "^5.11.8",
-    "metascraper-audio": "^5.14.26",
+    "metascraper-audio": "^5.29.17",
     "metascraper-author": "^5.14.22",
     "metascraper-clearbit-logo": "^5.3.0",
     "metascraper-date": "^5.11.8",
