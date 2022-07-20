@@ -302,10 +302,10 @@ jobs:
           kubectl -n default rollout restart deployment/ocelot-neo4j
       - name: Verify deployment and wait for the pods of each deplyment to get ready for cleaning and seeding of the database
         run: |
-          kubectl -n default rollout status deployment/ocelot-backend --timeout=400s
-          kubectl -n default rollout status deployment/ocelot-neo4j --timeout=400s
-          kubectl -n default rollout status deployment/ocelot-maintenance --timeout=400s
-          kubectl -n default rollout status deployment/ocelot-webapp --timeout=400s
+          kubectl -n default rollout status deployment/ocelot-backend --timeout=600s
+          kubectl -n default rollout status deployment/ocelot-neo4j --timeout=600s
+          kubectl -n default rollout status deployment/ocelot-maintenance --timeout=600s
+          kubectl -n default rollout status deployment/ocelot-webapp --timeout=600s
       - name: Reset and seed Neo4j database via backend for staging
         # db cleaning and seeding is only possible in production if env 'PRODUCTION_DB_CLEAN_ALLOW=true' is set in deployment
         run: |
