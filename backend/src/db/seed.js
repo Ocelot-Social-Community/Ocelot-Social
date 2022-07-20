@@ -6,6 +6,10 @@ import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
 import { gql } from '../helpers/jest'
 
+if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
+  throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
+}
+
 const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
 /* eslint-disable no-multi-spaces */
