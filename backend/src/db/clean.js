@@ -1,8 +1,8 @@
-import { cleanDatabase } from '../db/factories'
 import CONFIG from '../config'
+import { cleanDatabase } from '../db/factories'
 
-if (CONFIG.PRODUCTION) {
-  throw new Error(`You cannot clean the database in production environment!`)
+if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
+  throw new Error(`You cannot clean the database in a non-staging and real production environment!`)
 }
 
 ;(async function () {
