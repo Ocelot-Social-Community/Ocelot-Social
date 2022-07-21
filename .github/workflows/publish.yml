@@ -303,6 +303,7 @@ jobs:
       # because this step 'kubectl -n default rollout status deployment/* --timeout=600s' does not work as expected
       #   and we need the pods to be up again for cleaning and seeding the Neo4j database and the backend.
       #   !!! this is not a perfect solution !!!
+      # deployments are regularely up again after 3 minutes and 10 seconds
       - name: Sleep for 4 minutes, means 240 seconds
         run: sleep 240s
         shell: bash
