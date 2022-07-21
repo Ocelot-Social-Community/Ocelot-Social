@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - 5093-fix-automatic-deployment # for testing while developing
+      # - 5093-fix-automatic-deployment # for testing while developing
 
 jobs:
   ##############################################################################
