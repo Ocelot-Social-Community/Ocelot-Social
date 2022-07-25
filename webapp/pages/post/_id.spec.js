@@ -18,6 +18,9 @@ describe('post/_id.vue', () => {
           slug: 'my-post',
         },
       },
+      $env: {
+        CATEGORIES_ACTIVE: false,
+      },
     }
   })
 
