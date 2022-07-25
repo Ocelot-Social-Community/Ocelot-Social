@@ -100,7 +100,6 @@ export default {
             SET post.clickedCount = 0
             SET post.viewedTeaserCount = 0
             WITH post
-            UNWIND $categoryIds AS categoryId
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
             ${categoriesCypher}
