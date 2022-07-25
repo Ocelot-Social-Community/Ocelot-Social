@@ -126,9 +126,9 @@ export default {
         imageBlurred: { required: false },
         categoryIds: {
           type: 'array',
-          required: true,
+          required: this.categoriesActive,
           validator: (_, value = []) => {
-            if (value.length === 0 || value.length > 3) {
+            if (this.categoriesActive && (value.length === 0 || value.length > 3)) {
               return [new Error(this.$t('common.validations.categories'))]
             }
             return []
