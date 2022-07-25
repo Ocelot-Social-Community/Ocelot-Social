@@ -5,6 +5,7 @@ import { UserInputError } from 'apollo-server'
 import { mergeImage, deleteImage } from './images/images'
 import Resolver from './helpers/Resolver'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
+import CONFIG from '../../config'
 
 const maintainPinnedPosts = (params) => {
   const pinnedPostFilter = { pinned: true }
@@ -76,12 +77,20 @@ export default {
   },
   Mutation: {
     CreatePost: async (_parent, params, context, _resolveInfo) => {
+      const { categoryIds } = params
       const { image: imageInput } = params
       delete params.categoryIds
       delete params.image
       params.id = params.id || uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const categoriesCypher =
+          CONFIG.CATEGORIES_ACTIVE && categoryIds
+            ? `WITH post
+              UNWIND $categoryIds AS categoryId
+              MATCH (category:Category {id: categoryId})
+              MERGE (post)-[:CATEGORIZED]->(category)`
+            : ''
         const createPostTransactionResponse = await transaction.run(
           `
             CREATE (post:Post)
@@ -91,11 +100,13 @@ export default {
             SET post.clickedCount = 0
             SET post.viewedTeaserCount = 0
             WITH post
+            UNWIND $categoryIds AS categoryId
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
+            ${categoriesCypher}
             RETURN post {.*}
           `,
-          { userId: context.user.id, params },
+          { userId: context.user.id, params, categoryIds },
         )
         const [post] = createPostTransactionResponse.records.map((record) => record.get('post'))
         if (imageInput) {
@@ -127,7 +138,7 @@ export default {
                                 WITH post
                               `
 
-      if (categoryIds && categoryIds.length) {
+      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
         const cypherDeletePreviousRelations = `
           MATCH (post:Post { id: $params.id })-[previousRelations:CATEGORIZED]->(category:Category)
           DELETE previousRelations
