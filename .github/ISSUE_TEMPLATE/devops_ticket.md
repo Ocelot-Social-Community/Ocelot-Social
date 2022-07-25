@@ -1,8 +1,10 @@
 ---
-name: 💥 DevOps Ticket
+name: "\U0001F4A5 DevOps Ticket"
 about: Help us manage our deployed app.
+title: "\U0001F4A5 [DevOps] XXX"
 labels: devops
-title: 💥 [DevOps]
+assignees: ''
+
 ---
 
 ## 💥 DevOps Ticket
