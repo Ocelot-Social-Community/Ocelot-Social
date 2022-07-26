@@ -73,7 +73,7 @@
     "graphql-middleware-sentry": "^3.2.1",
     "graphql-redis-subscriptions": "^2.2.1",
     "graphql-shield": "~7.2.2",
-    "graphql-tag": "~2.10.3",
+    "graphql-tag": "~2.12.6",
     "helmet": "~3.22.0",
     "ioredis": "^4.16.1",
     "jsonwebtoken": "~8.5.1",
