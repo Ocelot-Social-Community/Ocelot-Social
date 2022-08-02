@@ -41,10 +41,10 @@ export default {
     SweetalertIcon,
   },
   props: {
-    name: { type: String, default: '' },
-    type: { type: String, required: true },
+    name: { type: String, default: '' }, // only used for compatibility with the other modals in 'Modal.vue'
+    type: { type: String, required: true }, // only used for compatibility with the other modals in 'Modal.vue'
     modalData: { type: Object, required: true },
-    id: { type: String, required: true },
+    id: { type: String, required: true }, // only used for compatibility with the other modals in 'Modal.vue'
   },
   data() {
     return {
