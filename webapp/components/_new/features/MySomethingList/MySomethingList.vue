@@ -1,6 +1,11 @@
 <template>
-  <ds-form v-model="formData" :schema="formSchema" @input="handleInput" @input-valid="handleInputValid"
-    @submit="handleSubmitItem">
+  <ds-form
+    v-model="formData"
+    :schema="formSchema"
+    @input="handleInput"
+    @input-valid="handleInputValid"
+    @submit="handleSubmitItem"
+  >
     <div v-if="isEditing">
       <ds-space margin="base">
         <ds-heading tag="h5">
@@ -18,10 +23,22 @@
             <template>
               <slot name="list-item" :item="item" />
               <span class="divider">|</span>
-              <base-button icon="edit" circle ghost @click="handleEditItem(item)" :title="$t('actions.edit')"
-                data-test="edit-button" />
-              <base-button icon="trash" circle ghost @click="handleDeleteItem(item)" :title="$t('actions.delete')"
-                data-test="delete-button" />
+              <base-button
+                icon="edit"
+                circle
+                ghost
+                @click="handleEditItem(item)"
+                :title="$t('actions.edit')"
+                data-test="edit-button"
+              />
+              <base-button
+                icon="trash"
+                circle
+                ghost
+                @click="handleDeleteItem(item)"
+                :title="$t('actions.delete')"
+                data-test="delete-button"
+              />
             </template>
           </ds-list-item>
         </ds-list>
@@ -30,8 +47,13 @@
 
     <ds-space margin-top="base">
       <ds-space margin-top="base">
-        <base-button filled :disabled="loading || !(!isEditing || (isEditing && !disabled))" :loading="loading"
-          type="submit" data-test="add-save-button">
+        <base-button
+          filled
+          :disabled="loading || !(!isEditing || (isEditing && !disabled))"
+          :loading="loading"
+          type="submit"
+          data-test="add-save-button"
+        >
           {{ isEditing ? $t('actions.save') : texts.addButton }}
         </base-button>
         <base-button v-if="isEditing" id="cancel" danger @click="handleCancel()">
@@ -60,11 +82,11 @@ export default {
     callbacks: {
       type: Object,
       default: () => ({
-        handleInput: () => { },
-        handleInputValid: () => { },
-        edit: () => { },
-        submit: () => { },
-        delete: () => { },
+        handleInput: () => {},
+        handleInputValid: () => {},
+        edit: () => {},
+        submit: () => {},
+        delete: () => {},
       }),
     },
   },
@@ -153,7 +175,7 @@ export default {
               cancel: {
                 icon: 'close',
                 textIdent: 'actions.cancel',
-                callback: () => { },
+                callback: () => {},
               },
             },
           },

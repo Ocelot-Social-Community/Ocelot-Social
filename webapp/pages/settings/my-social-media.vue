@@ -1,8 +1,13 @@
 <template>
   <base-card>
     <ds-heading tag="h2" class="title">{{ $t('settings.social-media.name') }}</ds-heading>
-    <my-something-list :useFormData="useFormData" :useFormSchema="useFormSchema" :useItems="socialMediaLinks"
-      :defaultItem="{ url: '' }" :namePropertyKey="'url'" :texts="{
+    <my-something-list
+      :useFormData="useFormData"
+      :useFormSchema="useFormSchema"
+      :useItems="socialMediaLinks"
+      :defaultItem="{ url: '' }"
+      :namePropertyKey="'url'"
+      :texts="{
         addButton: $t('settings.social-media.submit'),
         addNew: $t('settings.social-media.add-new-link'),
         deleteModal: {
@@ -14,19 +19,25 @@
           },
         },
         edit: $t('settings.social-media.edit-link'),
-      }" :callbacks="{
-  handleInput: () => { },
-  handleInputValid,
-  edit: callbackEditSocialMedia,
-  submit: handleSubmitSocialMedia,
-  delete: callbackDeleteSocialMedia,
-}">
+      }"
+      :callbacks="{
+        handleInput: () => {},
+        handleInputValid,
+        edit: callbackEditSocialMedia,
+        submit: handleSubmitSocialMedia,
+        delete: callbackDeleteSocialMedia,
+      }"
+    >
       <template #list-item="{ item }">
         <social-media-list-item :item="item" />
       </template>
       <template #edit-item>
-        <ds-input id="editSocialMedia" model="socialMediaUrl" type="text"
-          :placeholder="$t('settings.social-media.placeholder')" />
+        <ds-input
+          id="editSocialMedia"
+          model="socialMediaUrl"
+          type="text"
+          :placeholder="$t('settings.social-media.placeholder')"
+        />
       </template>
     </my-something-list>
   </base-card>
