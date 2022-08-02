@@ -140,6 +140,7 @@ export default shield(
       Signup: or(publicRegistration, inviteRegistration, isAdmin),
       SignupVerification: allow,
       UpdateUser: onlyYourself,
+      CreateGroup: isAuthenticated,
       CreatePost: isAuthenticated,
       UpdatePost: isAuthor,
       DeletePost: isAuthor,

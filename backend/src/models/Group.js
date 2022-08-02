@@ -15,7 +15,8 @@ export default {
   wasSeeded: 'boolean', // Wolle: used or needed?
   locationName: { type: 'string', allow: [null] },
   about: { type: 'string', allow: [null, ''] }, // Wolle: null?
-  description: { type: 'string', allow: [null, ''] }, // Wolle: null? HTML with Tiptap, similar to post content
+  description: { type: 'string', allow: [null, ''] }, // Wolle: null? HTML with Tiptap, similar to post content, wie bei Posts "content: { type: 'string', disallow: [null], min: 3 },"?
+  descriptionExcerpt: { type: 'string', allow: [null] },
   // Wolle: followedBy: {
   //   type: 'relationship',
   //   relationship: 'FOLLOWS',
@@ -25,8 +26,14 @@ export default {
   //     createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
   //   },
   // },
+  owner: {
+    type: 'relationship',
+    relationship: 'OWNS',
+    target: 'User',
+    direction: 'in',
+  },
   // Wolle: correct this way?
-  members: { type: 'relationship', relationship: 'MEMBERS', target: 'User', direction: 'out' },
+  // members: { type: 'relationship', relationship: 'MEMBERS', target: 'User', direction: 'out' },
   // Wolle: needed? lastActiveAt: { type: 'string', isoDate: true },
   createdAt: {
     type: 'string',

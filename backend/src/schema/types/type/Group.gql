@@ -21,7 +21,7 @@ type Group {
   id: ID!
   name: String # title
   slug: String!
-  
+
   createdAt: String
   updatedAt: String
   deleted: Boolean
@@ -41,12 +41,14 @@ type Group {
   # Wolle: needed?
   socialMedia: [SocialMedia]! @relation(name: "OWNED_BY", direction: "IN")
 
+  owner: User @relation(name: "OWNS", direction: "IN")
+
   # Wolle: showShoutsPublicly: Boolean
   # Wolle: sendNotificationEmails: Boolean
   # Wolle: needed? locale: String
-  members: [User]! @relation(name: "MEMBERS", direction: "OUT")
-  membersCount: Int!
-    @cypher(statement: "MATCH (this)-[:MEMBERS]->(r:User) RETURN COUNT(DISTINCT r)")
+  # members: [User]! @relation(name: "MEMBERS", direction: "OUT")
+  # membersCount: Int!
+  #   @cypher(statement: "MATCH (this)-[:MEMBERS]->(r:User) RETURN COUNT(DISTINCT r)")
 
   # Wolle: followedBy: [User]! @relation(name: "FOLLOWS", direction: "IN")
   # Wolle: followedByCount: Int!
@@ -207,14 +209,14 @@ type Query {
 
 type Mutation {
   CreateGroup (
-    id: ID!
-    name: String
-    email: String
+    id: ID
+    name: String!
     slug: String
     avatar: ImageInput
     locationName: String
     about: String
     description: String
+    categoryIds: [ID]
     # Wolle: add group settings
     # Wolle:
     # showShoutsPublicly: Boolean
@@ -222,10 +224,9 @@ type Mutation {
     # locale: String
   ): Group
 
-  UpdateUser (
+  UpdateGroup (
     id: ID!
     name: String
-    email: String
     slug: String
     avatar: ImageInput
     locationName: String
