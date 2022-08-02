@@ -27,7 +27,7 @@ export default {
       return resolve(root, args, context, info)
     },
     CreateGroup: async (resolve, root, args, context, info) => {
-      args.slug = args.slug || (await uniqueSlug(args.title, isUniqueFor(context, 'Group')))
+      args.slug = args.slug || (await uniqueSlug(args.name, isUniqueFor(context, 'Group')))
       return resolve(root, args, context, info)
     },
     CreatePost: async (resolve, root, args, context, info) => {
