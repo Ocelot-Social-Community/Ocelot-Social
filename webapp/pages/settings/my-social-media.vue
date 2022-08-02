@@ -1,30 +1,32 @@
 <template>
   <base-card>
     <ds-heading tag="h2" class="title">{{ $t('settings.social-media.name') }}</ds-heading>
-    <my-something-list
-      :useFormData="useFormData"
-      :useFormSchema="useFormSchema"
-      :useItems="socialMediaLinks"
-      :defaultItem="{ url: '' }"
-      :namePropertyKey="'url'"
-      :callbacks="{
-        handleInput: () => {},
-        handleInputValid,
-        edit: callbackEditSocialMedia,
-        submit: handleSubmitSocialMedia,
-        delete: callbackDeleteSocialMedia,
-      }"
-    >
+    <my-something-list :useFormData="useFormData" :useFormSchema="useFormSchema" :useItems="socialMediaLinks"
+      :defaultItem="{ url: '' }" :namePropertyKey="'url'" :texts="{
+        addButton: $t('settings.social-media.submit'),
+        addNew: $t('settings.social-media.add-new-link'),
+        deleteModal: {
+          titleIdent: 'settings.social-media.delete-modal.title',
+          messageIdent: 'settings.social-media.delete-modal.message',
+          confirm: {
+            icon: 'trash',
+            buttonTextIdent: 'settings.social-media.delete-modal.confirm-button',
+          },
+        },
+        edit: $t('settings.social-media.edit-link'),
+      }" :callbacks="{
+  handleInput: () => { },
+  handleInputValid,
+  edit: callbackEditSocialMedia,
+  submit: handleSubmitSocialMedia,
+  delete: callbackDeleteSocialMedia,
+}">
       <template #list-item="{ item }">
         <social-media-list-item :item="item" />
       </template>
       <template #edit-item>
-        <ds-input
-          id="editSocialMedia"
-          model="socialMediaUrl"
-          type="text"
-          :placeholder="$t('settings.social-media.placeholder')"
-        />
+        <ds-input id="editSocialMedia" model="socialMediaUrl" type="text"
+          :placeholder="$t('settings.social-media.placeholder')" />
       </template>
     </my-something-list>
   </base-card>
@@ -36,6 +38,31 @@ import unionBy from 'lodash/unionBy'
 import gql from 'graphql-tag'
 import MySomethingList from '~/components/_new/features/MySomethingList/MySomethingList.vue'
 import SocialMediaListItem from '~/components/_new/features/SocialMedia/SocialMediaListItem.vue'
+
+const createSocialMediaMutation = gql`
+  mutation($url: String!) {
+    CreateSocialMedia(url: $url) {
+      id
+      url
+    }
+  }
+`
+const updateSocialMediaMutation = gql`
+  mutation($id: ID!, $url: String!) {
+    UpdateSocialMedia(id: $id, url: $url) {
+      id
+      url
+    }
+  }
+`
+const deleteSocialMediaMutation = gql`
+  mutation($id: ID!) {
+    DeleteSocialMedia(id: $id) {
+      id
+      url
+    }
+  }
+`
 
 export default {
   components: {
@@ -111,25 +138,11 @@ export default {
 
       let mutation, variables, successMessage
       if (isCreation) {
-        mutation = gql`
-          mutation($url: String!) {
-            CreateSocialMedia(url: $url) {
-              id
-              url
-            }
-          }
-        `
+        mutation = createSocialMediaMutation
         variables = { url: item.url }
         successMessage = thisList.$t('settings.social-media.successAdd')
       } else {
-        mutation = gql`
-          mutation($id: ID!, $url: String!) {
-            UpdateSocialMedia(id: $id, url: $url) {
-              id
-              url
-            }
-          }
-        `
+        mutation = updateSocialMediaMutation
         variables = { id: item.id, url: item.url }
         successMessage = thisList.$t('settings.data.success')
       }
@@ -159,14 +172,7 @@ export default {
     async callbackDeleteSocialMedia(thisList, item) {
       try {
         await thisList.$apollo.mutate({
-          mutation: gql`
-            mutation($id: ID!) {
-              DeleteSocialMedia(id: $id) {
-                id
-                url
-              }
-            }
-          `,
+          mutation: deleteSocialMediaMutation,
           variables: {
             id: item.id,
           },

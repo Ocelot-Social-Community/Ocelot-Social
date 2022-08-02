@@ -1,6 +1,7 @@
+import Vue from 'vue'
+import Vuex from 'vuex'
 import { mount } from '@vue/test-utils'
 import MySomethingList from './MySomethingList.vue'
-import Vue from 'vue'
 
 const localVue = global.localVue
 
@@ -9,12 +10,23 @@ describe('MySomethingList.vue', () => {
   let propsData
   let data
   let mocks
+  let mutations
 
   beforeEach(() => {
     propsData = {
       useFormData: { dummy: '' },
       useItems: [{ id: 'id', dummy: 'dummy' }],
       namePropertyKey: 'dummy',
+      texts: {
+        addButton: 'add-button',
+        addNew: 'add-new-something',
+        deleteModal: {
+          titleIdent: 'delete-modal.title',
+          messageIdent: 'delete-modal.message',
+          confirm: { icon: 'trash', buttonTextIdent: 'delete-modal.confirm-button' },
+        },
+        edit: 'edit-something',
+      },
       callbacks: { edit: jest.fn(), submit: jest.fn(), delete: jest.fn() },
     }
     data = () => {
@@ -30,6 +42,9 @@ describe('MySomethingList.vue', () => {
         success: jest.fn(),
       },
     }
+    mutations = {
+      'modal/SET_OPEN': jest.fn().mockResolvedValueOnce(),
+    }
   })
 
   describe('mount', () => {
@@ -39,12 +54,16 @@ describe('MySomethingList.vue', () => {
         'list-item': '<div class="list-item"></div>',
         'edit-item': '<div class="edit-item"></div>',
       }
+      const store = new Vuex.Store({
+        mutations,
+      })
       return mount(MySomethingList, {
         propsData,
         data,
         mocks,
         localVue,
         slots,
+        store,
       })
     }
 
@@ -114,13 +133,42 @@ describe('MySomethingList.vue', () => {
           )
         })
 
-        it('calls delete', async () => {
+        it('calls delete by committing "modal/SET_OPEN"', async () => {
           const deleteButton = wrapper.find('.base-button[data-test="delete-button"]')
           deleteButton.trigger('click')
           await Vue.nextTick()
-          const expectedItem = expect.objectContaining({ id: 'id', dummy: 'dummy' })
-          expect(propsData.callbacks.delete).toHaveBeenCalledTimes(1)
-          expect(propsData.callbacks.delete).toHaveBeenCalledWith(expect.any(Object), expectedItem)
+          const expectedModalData = expect.objectContaining({
+            name: 'confirm',
+            data: {
+              type: '',
+              resource: { id: '' },
+              modalData: {
+                titleIdent: 'delete-modal.title',
+                messageIdent: 'delete-modal.message',
+                messageParams: {
+                  name: 'dummy',
+                },
+                buttons: {
+                  confirm: {
+                    danger: true,
+                    icon: 'trash',
+                    textIdent: 'delete-modal.confirm-button',
+                    callback: expect.any(Function),
+                  },
+                  cancel: {
+                    icon: 'close',
+                    textIdent: 'actions.cancel',
+                    callback: expect.any(Function),
+                  },
+                },
+              },
+            },
+          })
+          expect(mutations['modal/SET_OPEN']).toHaveBeenCalledTimes(1)
+          expect(mutations['modal/SET_OPEN']).toHaveBeenCalledWith(
+            expect.any(Object),
+            expectedModalData,
+          )
         })
       })
     })

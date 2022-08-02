@@ -1,19 +1,10 @@
 <template>
-  <ds-form
-    v-model="formData"
-    :schema="formSchema"
-    @input="handleInput"
-    @input-valid="handleInputValid"
-    @submit="handleSubmitItem"
-  >
+  <ds-form v-model="formData" :schema="formSchema" @input="handleInput" @input-valid="handleInputValid"
+    @submit="handleSubmitItem">
     <div v-if="isEditing">
       <ds-space margin="base">
         <ds-heading tag="h5">
-          {{
-            isCreation
-              ? $t('settings.social-media.addNewTitle')
-              : $t('settings.social-media.editTitle', { name: editingItem[namePropertyKey] })
-          }}
+          {{ isCreation ? texts.addNew : texts.edit + ' — ' + editingItem[namePropertyKey] }}
         </ds-heading>
       </ds-space>
       <ds-space v-if="items" margin-top="base">
@@ -27,22 +18,10 @@
             <template>
               <slot name="list-item" :item="item" />
               <span class="divider">|</span>
-              <base-button
-                icon="edit"
-                circle
-                ghost
-                @click="handleEditItem(item)"
-                :title="$t('actions.edit')"
-                data-test="edit-button"
-              />
-              <base-button
-                icon="trash"
-                circle
-                ghost
-                @click="handleDeleteItem(item)"
-                :title="$t('actions.delete')"
-                data-test="delete-button"
-              />
+              <base-button icon="edit" circle ghost @click="handleEditItem(item)" :title="$t('actions.edit')"
+                data-test="edit-button" />
+              <base-button icon="trash" circle ghost @click="handleDeleteItem(item)" :title="$t('actions.delete')"
+                data-test="delete-button" />
             </template>
           </ds-list-item>
         </ds-list>
@@ -51,14 +30,9 @@
 
     <ds-space margin-top="base">
       <ds-space margin-top="base">
-        <base-button
-          filled
-          :disabled="loading || !(!isEditing || (isEditing && !disabled))"
-          :loading="loading"
-          type="submit"
-          data-test="add-save-button"
-        >
-          {{ isEditing ? $t('actions.save') : $t('settings.social-media.submit') }}
+        <base-button filled :disabled="loading || !(!isEditing || (isEditing && !disabled))" :loading="loading"
+          type="submit" data-test="add-save-button">
+          {{ isEditing ? $t('actions.save') : texts.addButton }}
         </base-button>
         <base-button v-if="isEditing" id="cancel" danger @click="handleCancel()">
           {{ $t('actions.cancel') }}
@@ -69,37 +43,28 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
   name: 'MySomethingList',
   props: {
-    useFormData: {
+    useFormData: { type: Object, default: () => ({}) },
+    useFormSchema: { type: Object, default: () => ({}) },
+    useItems: { type: Array, default: () => [] },
+    defaultItem: { type: Object, default: () => ({}) },
+    namePropertyKey: { type: String, required: true },
+    texts: {
       type: Object,
-      default: () => ({}),
-    },
-    useFormSchema: {
-      type: Object,
-      default: () => ({}),
-    },
-    useItems: {
-      type: Array,
-      default: () => [],
-    },
-    defaultItem: {
-      type: Object,
-      default: () => ({}),
-    },
-    namePropertyKey: {
-      type: String,
       required: true,
     },
     callbacks: {
       type: Object,
       default: () => ({
-        handleInput: () => {},
-        handleInputValid: () => {},
-        edit: () => {},
-        submit: () => {},
-        delete: () => {},
+        handleInput: () => { },
+        handleInputValid: () => { },
+        edit: () => { },
+        submit: () => { },
+        delete: () => { },
       }),
     },
   },
@@ -128,6 +93,9 @@ export default {
     },
   },
   methods: {
+    ...mapMutations({
+      commitModalData: 'modal/SET_OPEN',
+    }),
     handleInput(data) {
       this.callbacks.handleInput(this, data)
       this.disabled = true
@@ -155,8 +123,42 @@ export default {
       this.editingItem = null
       this.disabled = true
     },
-    async handleDeleteItem(item) {
-      await this.callbacks.delete(this, item)
+    handleDeleteItem(item) {
+      this.openModal(item)
+    },
+    openModal(item) {
+      this.commitModalData(this.modalData(item))
+    },
+    modalData(item) {
+      return {
+        name: 'confirm',
+        data: {
+          type: '',
+          resource: { id: '' },
+          modalData: {
+            titleIdent: this.texts.deleteModal.titleIdent,
+            messageIdent: this.texts.deleteModal.messageIdent,
+            messageParams: {
+              name: item[this.namePropertyKey],
+            },
+            buttons: {
+              confirm: {
+                danger: true,
+                icon: this.texts.deleteModal.confirm.icon,
+                textIdent: this.texts.deleteModal.confirm.buttonTextIdent,
+                callback: () => {
+                  this.callbacks.delete(this, item)
+                },
+              },
+              cancel: {
+                icon: 'close',
+                textIdent: 'actions.cancel',
+                callback: () => { },
+              },
+            },
+          },
+        },
+      }
     },
   },
 }
