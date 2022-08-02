@@ -776,8 +776,8 @@
       "add-new-link": "Neuen Link hinzufügen",
       "delete-modal": {
         "confirm-button": "Löschen",
-        "title": "Möchtest du wirklich deinen Link löschen?",
-        "message": "Lösche „{name}“."
+        "message": "Lösche „{name}“.",
+        "title": "Möchtest du wirklich deinen Link löschen?"
       },
       "edit-link": "Ändere den Link",
       "name": "Soziale Medien",
