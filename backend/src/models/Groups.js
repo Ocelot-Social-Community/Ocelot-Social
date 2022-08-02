@@ -26,16 +26,12 @@ export default {
   //   },
   // },
   // Wolle: correct this way?
-  members: { type: 'relationship',
-    relationship: 'MEMBERS',
-    target: 'User',
-    direction: 'out'
-  },
+  members: { type: 'relationship', relationship: 'MEMBERS', target: 'User', direction: 'out' },
   // Wolle: needed? lastActiveAt: { type: 'string', isoDate: true },
   createdAt: {
     type: 'string',
     isoDate: true,
-    default: () => new Date().toISOString()
+    default: () => new Date().toISOString(),
   },
   updatedAt: {
     type: 'string',
