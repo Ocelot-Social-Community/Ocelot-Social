@@ -24,40 +24,30 @@ export default {
     //   // params = await maintainPinnedPosts(params)
     //   return neo4jgraphql(object, params, context, resolveInfo)
     // },
-    // Group: async (object, params, context, resolveInfo) => {
-    //   // const { email } = params
-    //   const session = context.driver.session()
-    //   const readTxResultPromise = session.readTransaction(async (txc) => {
-    //     const result = await txc.run(
-    //       `
-    //         MATCH (user:User {id: $userId})-[:MEMBER_OF]->(group:Group)
-    //         RETURN properties(group) AS inviteCodes
-    //       `,
-    //       {
-    //         userId: context.user.id,
-    //       },
-    //     )
-    //     return result.records.map((record) => record.get('inviteCodes'))
-    //   })
-    //   if (email) {
-    //     try {
-    //       session = context.driver.session()
-    //       const readTxResult = await session.readTransaction((txc) => {
-    //         const result = txc.run(
-    //           `
-    //         MATCH (user:User)-[:PRIMARY_EMAIL]->(e:EmailAddress {email: $args.email})
-    //         RETURN user`,
-    //           { args },
-    //         )
-    //         return result
-    //       })
-    //       return readTxResult.records.map((r) => r.get('user').properties)
-    //     } finally {
-    //       session.close()
-    //     }
-    //   }
-    //   return neo4jgraphql(object, args, context, resolveInfo)
-    // },
+    Group: async (_object, _params, context, _resolveInfo) => {
+      const session = context.driver.session()
+      const readTxResultPromise = session.readTransaction(async (txc) => {
+        const result = await txc.run(
+          `
+            MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group)
+            RETURN group {.*, myRole: membership.role}
+          `,
+          {
+            userId: context.user.id,
+          },
+        )
+        const group = result.records.map((record) => record.get('group'))
+        return group
+      })
+      try {
+        const group = await readTxResultPromise
+        return group
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
   },
   Mutation: {
     CreateGroup: async (_parent, params, context, _resolveInfo) => {
@@ -100,10 +90,10 @@ export default {
       try {
         const group = await writeTxResultPromise
         return group
-      } catch (e) {
-        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
+      } catch (error) {
+        if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
           throw new UserInputError('Group with this slug already exists!')
-        throw new Error(e)
+        throw new Error(error)
       } finally {
         session.close()
       }

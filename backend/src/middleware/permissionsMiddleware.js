@@ -114,6 +114,7 @@ export default shield(
       reports: isModerator,
       statistics: allow,
       currentUser: allow,
+      Group: isAuthenticated,
       Post: allow,
       profilePagePosts: allow,
       Comment: allow,
