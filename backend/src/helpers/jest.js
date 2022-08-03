@@ -1,3 +1,6 @@
+// TODO: can be replaced with, which is no a fake:
+// import gql from 'graphql-tag'
+
 //* This is a fake ES2015 template string, just to benefit of syntax
 // highlighting of `gql` template strings in certain editors.
 export function gql(strings) {
