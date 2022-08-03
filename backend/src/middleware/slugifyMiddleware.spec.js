@@ -1,9 +1,12 @@
-import gql from 'graphql-tag'
 import { getNeode, getDriver } from '../db/neo4j'
 import createServer from '../server'
 import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../db/factories'
-import { createPostMutation, createGroupMutation, signupVerificationMutation } from '../db/graphql/mutations'
+import {
+  createPostMutation,
+  createGroupMutation,
+  signupVerificationMutation,
+} from '../db/graphql/mutations'
 
 let mutate
 let authenticatedUser
@@ -357,7 +360,7 @@ describe('slugifyMiddleware', () => {
           })
         })
       })
-      
+
       describe('if slug exists', () => {
         beforeEach(async () => {
           await Factory.build('user', {
