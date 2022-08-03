@@ -175,9 +175,9 @@ type Query {
     slug: String
     createdAt: String
     updatedAt: String
-    locationName: String
     about: String
     description: String
+    locationName: String
     first: Int
     offset: Int
     orderBy: [_GroupOrdering]
