@@ -18,63 +18,47 @@ import Resolver from './helpers/Resolver'
 // }
 
 export default {
-  // Wolle: Query: {
-  //   Post: async (object, params, context, resolveInfo) => {
-  //     params = await filterForMutedUsers(params, context)
-  //     params = await maintainPinnedPosts(params)
-  //     return neo4jgraphql(object, params, context, resolveInfo)
-  //   },
-  //   findPosts: async (object, params, context, resolveInfo) => {
-  //     params = await filterForMutedUsers(params, context)
-  //     return neo4jgraphql(object, params, context, resolveInfo)
-  //   },
-  //   profilePagePosts: async (object, params, context, resolveInfo) => {
-  //     params = await filterForMutedUsers(params, context)
-  //     return neo4jgraphql(object, params, context, resolveInfo)
-  //   },
-  //   PostsEmotionsCountByEmotion: async (object, params, context, resolveInfo) => {
-  //     const { postId, data } = params
-  //     const session = context.driver.session()
-  //     const readTxResultPromise = session.readTransaction(async (transaction) => {
-  //       const emotionsCountTransactionResponse = await transaction.run(
-  //         `
-  //           MATCH (post:Post {id: $postId})<-[emoted:EMOTED {emotion: $data.emotion}]-()
-  //           RETURN COUNT(DISTINCT emoted) as emotionsCount
-  //         `,
-  //         { postId, data },
-  //       )
-  //       return emotionsCountTransactionResponse.records.map(
-  //         (record) => record.get('emotionsCount').low,
-  //       )
-  //     })
-  //     try {
-  //       const [emotionsCount] = await readTxResultPromise
-  //       return emotionsCount
-  //     } finally {
-  //       session.close()
-  //     }
-  //   },
-  //   PostsEmotionsByCurrentUser: async (object, params, context, resolveInfo) => {
-  //     const { postId } = params
-  //     const session = context.driver.session()
-  //     const readTxResultPromise = session.readTransaction(async (transaction) => {
-  //       const emotionsTransactionResponse = await transaction.run(
-  //         `
-  //           MATCH (user:User {id: $userId})-[emoted:EMOTED]->(post:Post {id: $postId})
-  //           RETURN collect(emoted.emotion) as emotion
-  //         `,
-  //         { userId: context.user.id, postId },
-  //       )
-  //       return emotionsTransactionResponse.records.map((record) => record.get('emotion'))
-  //     })
-  //     try {
-  //       const [emotions] = await readTxResultPromise
-  //       return emotions
-  //     } finally {
-  //       session.close()
-  //     }
-  //   },
-  // },
+  Query: {
+    // Wolle: Post: async (object, params, context, resolveInfo) => {
+    //   params = await filterForMutedUsers(params, context)
+    //   // params = await maintainPinnedPosts(params)
+    //   return neo4jgraphql(object, params, context, resolveInfo)
+    // },
+    // Group: async (object, params, context, resolveInfo) => {
+    //   // const { email } = params
+    //   const session = context.driver.session()
+    //   const readTxResultPromise = session.readTransaction(async (txc) => {
+    //     const result = await txc.run(
+    //       `
+    //         MATCH (user:User {id: $userId})-[:MEMBER_OF]->(group:Group)
+    //         RETURN properties(group) AS inviteCodes
+    //       `,
+    //       {
+    //         userId: context.user.id,
+    //       },
+    //     )
+    //     return result.records.map((record) => record.get('inviteCodes'))
+    //   })
+    //   if (email) {
+    //     try {
+    //       session = context.driver.session()
+    //       const readTxResult = await session.readTransaction((txc) => {
+    //         const result = txc.run(
+    //           `
+    //         MATCH (user:User)-[:PRIMARY_EMAIL]->(e:EmailAddress {email: $args.email})
+    //         RETURN user`,
+    //           { args },
+    //         )
+    //         return result
+    //       })
+    //       return readTxResult.records.map((r) => r.get('user').properties)
+    //     } finally {
+    //       session.close()
+    //     }
+    //   }
+    //   return neo4jgraphql(object, args, context, resolveInfo)
+    // },
+  },
   Mutation: {
     CreateGroup: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds } = params
@@ -84,12 +68,14 @@ export default {
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const categoriesCypher =
           CONFIG.CATEGORIES_ACTIVE && categoryIds
-            ? `WITH group
-              UNWIND $categoryIds AS categoryId
-              MATCH (category:Category {id: categoryId})
-              MERGE (group)-[:CATEGORIZED]->(category)`
+            ? `
+                WITH group, membership
+                UNWIND $categoryIds AS categoryId
+                MATCH (category:Category {id: categoryId})
+                MERGE (group)-[:CATEGORIZED]->(category)
+              `
             : ''
-        const ownercreateGroupTransactionResponse = await transaction.run(
+        const ownerCreateGroupTransactionResponse = await transaction.run(
           `
             CREATE (group:Group)
             SET group += $params
@@ -97,14 +83,16 @@ export default {
             SET group.updatedAt = toString(datetime())
             WITH group
             MATCH (owner:User {id: $userId})
-            MERGE (group)<-[:OWNS]-(owner)
-            MERGE (group)<-[:ADMINISTERS]-(owner)
+            MERGE (owner)-[membership:MEMBER_OF]->(group)
+            SET membership.createdAt = toString(datetime())
+            SET membership.updatedAt = toString(datetime())
+            SET membership.role = 'owner'
             ${categoriesCypher}
-            RETURN group {.*}
+            RETURN group {.*, myRole: membership.role}
           `,
           { userId: context.user.id, categoryIds, params },
         )
-        const [group] = ownercreateGroupTransactionResponse.records.map((record) =>
+        const [group] = ownerCreateGroupTransactionResponse.records.map((record) =>
           record.get('group'),
         )
         return group
@@ -205,10 +193,10 @@ export default {
         // Wolle: tags: '-[:TAGGED]->(related:Tag)',
         categories: '-[:CATEGORIZED]->(related:Category)',
       },
-      hasOne: {
-        owner: '<-[:OWNS]-(related:User)',
-        // Wolle: image: '-[:HERO_IMAGE]->(related:Image)',
-      },
+      // hasOne: {
+      //   owner: '<-[:OWNS]-(related:User)',
+      //   // Wolle: image: '-[:HERO_IMAGE]->(related:Image)',
+      // },
       // Wolle: count: {
       //   contributionsCount:
       //     '-[:WROTE]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true',

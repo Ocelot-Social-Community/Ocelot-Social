@@ -292,9 +292,10 @@ describe('CreateGroup', () => {
         data: {
           CreateGroup: {
             name: 'The Best Group',
-            owner: {
-              name: 'TestUser',
-            },
+            myRole: 'owner',
+            // Wolle: owner: {
+            //   name: 'TestUser',
+            // },
           },
         },
         errors: undefined,

@@ -33,15 +33,17 @@ export default {
   groupType: { type: 'string', default: 'public' },
   actionRadius: { type: 'string', default: 'regional' },
 
+  myRole: { type: 'string', default: 'pending' },
+
   locationName: { type: 'string', allow: [null] },
 
   wasSeeded: 'boolean', // Wolle: used or needed?
-  owner: {
-    type: 'relationship',
-    relationship: 'OWNS',
-    target: 'User',
-    direction: 'in',
-  },
+  // Wolle: owner: {
+  //   type: 'relationship',
+  //   relationship: 'OWNS',
+  //   target: 'User',
+  //   direction: 'in',
+  // },
   // Wolle: followedBy: {
   //   type: 'relationship',
   //   relationship: 'FOLLOWS',

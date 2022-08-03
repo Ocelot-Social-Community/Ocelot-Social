@@ -30,9 +30,10 @@ export const createGroupMutation = gql`
       actionRadius
       disabled
       deleted
-      owner {
-        name
-      }
+      myRole
+      # Wolle: owner {
+      #   name
+      # }
     }
   }
 `

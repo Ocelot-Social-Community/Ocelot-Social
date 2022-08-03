@@ -39,10 +39,12 @@ type Group {
 
   categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
+  myRole: GroupMemberRole # if 'null' then the current user is no member
+
   # Wolle: needed?
   # socialMedia: [SocialMedia]! @relation(name: "OWNED_BY", direction: "IN")
 
-  owner: User @relation(name: "OWNS", direction: "IN")
+  # Wolle: owner: User @relation(name: "OWNS", direction: "IN")
 
   # Wolle: showShoutsPublicly: Boolean
   # Wolle: sendNotificationEmails: Boolean
@@ -129,9 +131,12 @@ input _GroupFilter {
   AND: [_GroupFilter!]
   OR: [_GroupFilter!]
   name_contains: String
+  slug_contains: String
   about_contains: String
   description_contains: String
-  slug_contains: String
+  groupType_in: [GroupType!]
+  actionRadius_in: [GroupActionRadius!]
+  myRole_in: [GroupMemberRole!]
   id: ID
   id_not: ID
   id_in: [ID!]
@@ -161,20 +166,18 @@ input _GroupFilter {
   # followedBy_none: _GroupFilter
   # followedBy_single: _GroupFilter
   # followedBy_every: _GroupFilter
-  # role_in: [UserRole!]
 }
 
 type Query {
   Group(
     id: ID
-    email: String # admins need to search for a user sometimes
     name: String
     slug: String
+    createdAt: String
+    updatedAt: String
     locationName: String
     about: String
     description: String
-    createdAt: String
-    updatedAt: String
     first: Int
     offset: Int
     orderBy: [_GroupOrdering]
