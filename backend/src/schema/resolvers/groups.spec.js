@@ -252,6 +252,9 @@ describe('CreateGroup', () => {
       name: 'The Best Group',
       slug: 'the-group',
       about: 'We will change the world!',
+      description: 'Some description',
+      groupType: 'public',
+      actionRadius: 'regional',
       categoryIds,
     }
   })
@@ -272,7 +275,6 @@ describe('CreateGroup', () => {
       const expected = {
         data: {
           CreateGroup: {
-            // Wolle: id: 'g589',
             name: 'The Best Group',
             slug: 'the-group',
             about: 'We will change the world!',

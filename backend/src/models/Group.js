@@ -4,19 +4,44 @@ export default {
   id: { type: 'string', primary: true, default: uuid }, // TODO: should be type: 'uuid' but simplified for our tests
   name: { type: 'string', disallow: [null], min: 3 },
   slug: { type: 'string', unique: 'true', regex: /^[a-z0-9_-]+$/, lowercase: true },
+
+  createdAt: {
+    type: 'string',
+    isoDate: true,
+    required: true,
+    default: () => new Date().toISOString(),
+  },
+  updatedAt: {
+    type: 'string',
+    isoDate: true,
+    required: true,
+    default: () => new Date().toISOString(),
+  },
+  deleted: { type: 'boolean', default: false },
+  disabled: { type: 'boolean', default: false },
+
   avatar: {
     type: 'relationship',
     relationship: 'AVATAR_IMAGE',
     target: 'Image',
     direction: 'out',
   },
-  deleted: { type: 'boolean', default: false },
-  disabled: { type: 'boolean', default: false },
-  wasSeeded: 'boolean', // Wolle: used or needed?
-  locationName: { type: 'string', allow: [null] },
-  about: { type: 'string', allow: [null, ''] }, // Wolle: null?
-  description: { type: 'string', allow: [null, ''] }, // Wolle: null? HTML with Tiptap, similar to post content, wie bei Posts "content: { type: 'string', disallow: [null], min: 3 },"?
+
+  about: { type: 'string', allow: [null, ''] },
+  description: { type: 'string', disallow: [null], min: 100 },
   descriptionExcerpt: { type: 'string', allow: [null] },
+  groupType: { type: 'string', default: 'public' },
+  actionRadius: { type: 'string', default: 'regional' },
+
+  locationName: { type: 'string', allow: [null] },
+
+  wasSeeded: 'boolean', // Wolle: used or needed?
+  owner: {
+    type: 'relationship',
+    relationship: 'OWNS',
+    target: 'User',
+    direction: 'in',
+  },
   // Wolle: followedBy: {
   //   type: 'relationship',
   //   relationship: 'FOLLOWS',
@@ -26,26 +51,9 @@ export default {
   //     createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
   //   },
   // },
-  owner: {
-    type: 'relationship',
-    relationship: 'OWNS',
-    target: 'User',
-    direction: 'in',
-  },
   // Wolle: correct this way?
   // members: { type: 'relationship', relationship: 'MEMBERS', target: 'User', direction: 'out' },
   // Wolle: needed? lastActiveAt: { type: 'string', isoDate: true },
-  createdAt: {
-    type: 'string',
-    isoDate: true,
-    default: () => new Date().toISOString(),
-  },
-  updatedAt: {
-    type: 'string',
-    isoDate: true,
-    required: true,
-    default: () => new Date().toISOString(),
-  },
   // Wolle: emoted: {
   //   type: 'relationships',
   //   relationship: 'EMOTED',

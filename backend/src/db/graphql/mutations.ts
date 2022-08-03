@@ -6,6 +6,9 @@ export const createGroupMutation = gql`
     $name: String!,
     $slug: String,
     $about: String,
+    $description: String!,
+    $groupType: GroupType!,
+    $actionRadius: GroupActionRadius!,
     $categoryIds: [ID]
   ) {
     CreateGroup(
@@ -13,12 +16,18 @@ export const createGroupMutation = gql`
       name: $name
       slug: $slug
       about: $about
+      description: $description
+      groupType: $groupType
+      actionRadius: $actionRadius
       categoryIds: $categoryIds
     ) {
       id
       name
       slug
       about
+      description
+      groupType
+      actionRadius
       disabled
       deleted
       owner {

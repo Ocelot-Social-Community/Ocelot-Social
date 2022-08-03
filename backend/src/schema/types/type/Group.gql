@@ -19,27 +19,28 @@ enum _GroupOrdering {
 
 type Group {
   id: ID!
-  name: String # title
+  name: String! # title
   slug: String!
 
-  createdAt: String
-  updatedAt: String
+  createdAt: String!
+  updatedAt: String!
   deleted: Boolean
   disabled: Boolean
 
   avatar: Image @relation(name: "AVATAR_IMAGE", direction: "OUT")
 
+  about: String # goal
+  description: String!
+  groupType: GroupType!
+  actionRadius: GroupActionRadius!
+
   location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
   locationName: String
-  about: String # goal
-  description: String
-  groupType: GroupType
-  actionRadius: GroupActionRadius
 
   categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
   # Wolle: needed?
-  socialMedia: [SocialMedia]! @relation(name: "OWNED_BY", direction: "IN")
+  # socialMedia: [SocialMedia]! @relation(name: "OWNED_BY", direction: "IN")
 
   owner: User @relation(name: "OWNS", direction: "IN")
 
@@ -213,10 +214,12 @@ type Mutation {
     name: String!
     slug: String
     avatar: ImageInput
-    locationName: String
     about: String
-    description: String
+    description: String!
+    groupType: GroupType!
+    actionRadius: GroupActionRadius!
     categoryIds: [ID]
+    locationName: String
   ): # Wolle: add group settings
   # Wolle:
   # showShoutsPublicly: Boolean

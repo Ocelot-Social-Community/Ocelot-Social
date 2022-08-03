@@ -69,6 +69,9 @@ describe('slugifyMiddleware', () => {
         ...variables,
         name: 'The Best Group',
         about: 'Some about',
+        description: 'Some description',
+        groupType: 'closed',
+        actionRadius: 'national',
         categoryIds,
       }
     })
@@ -83,7 +86,12 @@ describe('slugifyMiddleware', () => {
         ).resolves.toMatchObject({
           data: {
             CreateGroup: {
+              name: 'The Best Group',
               slug: 'the-best-group',
+              about: 'Some about',
+              description: 'Some description',
+              groupType: 'closed',
+              actionRadius: 'national',
             },
           },
         })
