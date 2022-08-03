@@ -58,6 +58,9 @@ describe('ContributionForm.vue', () => {
         back: jest.fn(),
         push: jest.fn(),
       },
+      $env: {
+        CATEGORIES_ACTIVE: false,
+      },
     }
     propsData = {}
   })
@@ -132,6 +135,7 @@ describe('ContributionForm.vue', () => {
             variables: {
               title: postTitle,
               content: postContent,
+              categoryIds: [],
               id: null,
               image: null,
             },
@@ -254,6 +258,7 @@ describe('ContributionForm.vue', () => {
             variables: {
               title: propsData.contribution.title,
               content: propsData.contribution.content,
+              categoryIds: [],
               id: propsData.contribution.id,
               image: {
                 sensitive: false,

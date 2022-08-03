@@ -24,6 +24,9 @@ describe('SearchResults', () => {
   beforeEach(() => {
     mocks = {
       $t: jest.fn(),
+      $env: {
+        CATEGORIES_ACTIVE: false,
+      },
     }
     getters = {
       'auth/user': () => {
