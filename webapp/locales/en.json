@@ -366,6 +366,9 @@
     "follow": "Follow",
     "following": "Following"
   },
+  "group": {
+    "newGroup":"Create a new Group"
+  },
   "hashtags-filter": {
     "clearSearch": "Clear search",
     "hashtag-search": "Searching for #{hashtag}",
