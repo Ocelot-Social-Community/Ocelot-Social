@@ -250,7 +250,7 @@ describe('CreateGroup', () => {
       ...variables,
       id: 'g589',
       name: 'The Best Group',
-      slug: 'the-best-group',
+      slug: 'the-group',
       about: 'We will change the world!',
       categoryIds,
     }
@@ -274,7 +274,7 @@ describe('CreateGroup', () => {
           CreateGroup: {
             // Wolle: id: 'g589',
             name: 'The Best Group',
-            slug: 'the-best-group',
+            slug: 'the-group',
             about: 'We will change the world!',
           },
         },
