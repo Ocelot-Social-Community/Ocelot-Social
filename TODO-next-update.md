@@ -2,6 +2,13 @@
 
 When you overtake this deploy and rebrand repo to your network you have to recognize the following changes and doings …
 
+## This Latest Version > 1.0.9 with 'ocelotDockerVersionTag' 1.0.9-199
+
+### PR –  chore: 🍰 Release v1.1.0 - Implement Categories Again #63
+
+- You have to add the `CATEGORIES_ACTIVE` from the `deployment/kubernetes/values.template.yaml` to your `deployment/kubernetes/values.yaml` and set it to your prevered value.
+- Make sure the correct categories are in your Neo4j database on the server.
+
 ## This Latest Version > 1.0.7 with 'ocelotDockerVersionTag' 1.0.7-171
 
 ### PR – feat: 🍰 Configure Cookie Expire Time #43
