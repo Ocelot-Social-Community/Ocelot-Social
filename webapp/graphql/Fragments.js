@@ -78,6 +78,12 @@ export const tagsCategoriesAndPinnedFragment = gql`
     tags {
       id
     }
+    categories {
+      id
+      slug
+      name
+      icon
+    }
     pinnedBy {
       id
       name
