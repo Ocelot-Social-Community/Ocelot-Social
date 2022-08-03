@@ -160,7 +160,7 @@ input _GroupFilter {
   # followedBy_none: _GroupFilter
   # followedBy_single: _GroupFilter
   # followedBy_every: _GroupFilter
-  # role_in: [UserGroup!]
+  # role_in: [UserRole!]
 }
 
 type Query {
@@ -183,7 +183,7 @@ type Query {
   availableGroupTypes: [GroupType]!
 
   # Wolle:
-  # availableRoles: [UserGroup]!
+  # availableRoles: [UserRole]!
   # mutedUsers: [User]
   # blockedUsers: [User]
   # isLoggedIn: Boolean!
@@ -208,7 +208,7 @@ type Query {
 # }
 
 type Mutation {
-  CreateGroup (
+  CreateGroup(
     id: ID
     name: String!
     slug: String
@@ -217,14 +217,14 @@ type Mutation {
     about: String
     description: String
     categoryIds: [ID]
-    # Wolle: add group settings
-    # Wolle:
-    # showShoutsPublicly: Boolean
-    # sendNotificationEmails: Boolean
-    # locale: String
-  ): Group
+  ): # Wolle: add group settings
+  # Wolle:
+  # showShoutsPublicly: Boolean
+  # sendNotificationEmails: Boolean
+  # locale: String
+  Group
 
-  UpdateGroup (
+  UpdateGroup(
     id: ID!
     name: String
     slug: String
@@ -232,11 +232,11 @@ type Mutation {
     locationName: String
     about: String
     description: String
-    # Wolle:
-    # showShoutsPublicly: Boolean
-    # sendNotificationEmails: Boolean
-    # locale: String
-  ): Group
+  ): # Wolle:
+  # showShoutsPublicly: Boolean
+  # sendNotificationEmails: Boolean
+  # locale: String
+  Group
 
   DeleteGroup(id: ID!): Group
 
@@ -246,5 +246,5 @@ type Mutation {
   # blockUser(id: ID!): User
   # unblockUser(id: ID!): User
 
-  # Wolle: switchUserRole(role: UserGroup!, id: ID!): User
+  # Wolle: switchUserRole(role: UserRole!, id: ID!): User
 }
