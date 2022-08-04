@@ -46,6 +46,7 @@ export const createGroupMutation = gql`
 
 export const groupQuery = gql`
   query (
+    $isMember: Boolean
     $id: ID,
     $name: String,
     $slug: String,
@@ -55,7 +56,7 @@ export const groupQuery = gql`
     $description: String,
     # $groupType: GroupType!,
     # $actionRadius: GroupActionRadius!,
-    $categoryIds: [ID]
+    # $categoryIds: [ID]
     $locationName: String
     $first: Int
     $offset: Int
@@ -63,6 +64,7 @@ export const groupQuery = gql`
     $filter: _GroupFilter
   ) {
     Group(
+      isMember: $isMember
       id: $id
       name: $name
       slug: $slug
@@ -72,8 +74,12 @@ export const groupQuery = gql`
       description: $description
       # groupType: $groupType
       # actionRadius: $actionRadius
-      categoryIds: $categoryIds
+      # categoryIds: $categoryIds
       locationName: $locationName
+      first: $first
+      offset: $offset
+      orderBy: $orderBy
+      filter: $filter
     ) {
       id
       name

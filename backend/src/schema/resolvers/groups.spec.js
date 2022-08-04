@@ -1,13 +1,13 @@
 import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../../db/factories'
-import { createGroupMutation } from '../../db/graphql/groups'
+import { createGroupMutation, groupQuery } from '../../db/graphql/groups'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
 
 const driver = getDriver()
 const neode = getNeode()
 
-// Wolle: let query
+let query
 let mutate
 let authenticatedUser
 let user
@@ -27,7 +27,7 @@ beforeAll(async () => {
       }
     },
   })
-  // Wolle: query = createTestClient(server).query
+  query = createTestClient(server).query
   mutate = createTestClient(server).mutate
 })
 
@@ -79,162 +79,276 @@ afterEach(async () => {
 })
 
 describe('Group', () => {
-  //   describe('can be filtered', () => {
-  //     let followedUser, happyPost, cryPost
-  //     beforeEach(async () => {
-  //       ;[followedUser] = await Promise.all([
-  //         Factory.build(
-  //           'user',
-  //           {
-  //             id: 'followed-by-me',
-  //             name: 'Followed User',
-  //           },
-  //           {
-  //             email: 'followed@example.org',
-  //             password: '1234',
-  //           },
-  //         ),
-  //       ])
-  //       ;[happyPost, cryPost] = await Promise.all([
-  //         Factory.build('post', { id: 'happy-post' }, { categoryIds: ['cat4'] }),
-  //         Factory.build('post', { id: 'cry-post' }, { categoryIds: ['cat15'] }),
-  //         Factory.build(
-  //           'post',
-  //           {
-  //             id: 'post-by-followed-user',
-  //           },
-  //           {
-  //             categoryIds: ['cat9'],
-  //             author: followedUser,
-  //           },
-  //         ),
-  //       ])
-  //     })
-  //     describe('no filter', () => {
-  //       it('returns all posts', async () => {
-  //         const postQueryNoFilters = gql`
-  //           query Post($filter: _PostFilter) {
-  //             Post(filter: $filter) {
-  //               id
-  //             }
-  //           }
-  //         `
-  //         const expected = [{ id: 'happy-post' }, { id: 'cry-post' }, { id: 'post-by-followed-user' }]
-  //         variables = { filter: {} }
-  //         await expect(query({ query: postQueryNoFilters, variables })).resolves.toMatchObject({
-  //           data: {
-  //             Post: expect.arrayContaining(expected),
-  //           },
-  //         })
-  //       })
-  //     })
-  //     /* it('by categories', async () => {
-  //       const postQueryFilteredByCategories = gql`
-  //         query Post($filter: _PostFilter) {
-  //           Post(filter: $filter) {
-  //             id
-  //             categories {
-  //               id
-  //             }
-  //           }
-  //         }
-  //       `
-  //       const expected = {
-  //         data: {
-  //           Post: [
-  //             {
-  //               id: 'post-by-followed-user',
-  //               categories: [{ id: 'cat9' }],
-  //             },
-  //           ],
-  //         },
-  //       }
-  //       variables = { ...variables, filter: { categories_some: { id_in: ['cat9'] } } }
-  //       await expect(
-  //         query({ query: postQueryFilteredByCategories, variables }),
-  //       ).resolves.toMatchObject(expected)
-  //     }) */
-  //     describe('by emotions', () => {
-  //       const postQueryFilteredByEmotions = gql`
-  //         query Post($filter: _PostFilter) {
-  //           Post(filter: $filter) {
-  //             id
-  //             emotions {
-  //               emotion
-  //             }
-  //           }
-  //         }
-  //       `
-  //       it('filters by single emotion', async () => {
-  //         const expected = {
-  //           data: {
-  //             Post: [
-  //               {
-  //                 id: 'happy-post',
-  //                 emotions: [{ emotion: 'happy' }],
-  //               },
-  //             ],
-  //           },
-  //         }
-  //         await user.relateTo(happyPost, 'emoted', { emotion: 'happy' })
-  //         variables = { ...variables, filter: { emotions_some: { emotion_in: ['happy'] } } }
-  //         await expect(
-  //           query({ query: postQueryFilteredByEmotions, variables }),
-  //         ).resolves.toMatchObject(expected)
-  //       })
-  //       it('filters by multiple emotions', async () => {
-  //         const expected = [
-  //           {
-  //             id: 'happy-post',
-  //             emotions: [{ emotion: 'happy' }],
-  //           },
-  //           {
-  //             id: 'cry-post',
-  //             emotions: [{ emotion: 'cry' }],
-  //           },
-  //         ]
-  //         await user.relateTo(happyPost, 'emoted', { emotion: 'happy' })
-  //         await user.relateTo(cryPost, 'emoted', { emotion: 'cry' })
-  //         variables = { ...variables, filter: { emotions_some: { emotion_in: ['happy', 'cry'] } } }
-  //         await expect(
-  //           query({ query: postQueryFilteredByEmotions, variables }),
-  //         ).resolves.toMatchObject({
-  //           data: {
-  //             Post: expect.arrayContaining(expected),
-  //           },
-  //           errors: undefined,
-  //         })
-  //       })
-  //     })
-  //     it('by followed-by', async () => {
-  //       const postQueryFilteredByUsersFollowed = gql`
-  //         query Post($filter: _PostFilter) {
-  //           Post(filter: $filter) {
-  //             id
-  //             author {
-  //               id
-  //               name
-  //             }
-  //           }
-  //         }
-  //       `
-  //       await user.relateTo(followedUser, 'following')
-  //       variables = { filter: { author: { followedBy_some: { id: 'current-user' } } } }
-  //       await expect(
-  //         query({ query: postQueryFilteredByUsersFollowed, variables }),
-  //       ).resolves.toMatchObject({
-  //         data: {
-  //           Post: [
-  //             {
-  //               id: 'post-by-followed-user',
-  //               author: { id: 'followed-by-me', name: 'Followed User' },
-  //             },
-  //           ],
-  //         },
-  //         errors: undefined,
-  //       })
-  //     })
-  //   })
+  describe('unauthenticated', () => {
+    it('throws authorization error', async () => {
+      const { errors } = await query({ query: groupQuery, variables: {} })
+      expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+    })
+  })
+
+  describe('authenticated', () => {
+    beforeEach(async () => {
+      authenticatedUser = await user.toJson()
+    })
+
+    let otherUser
+
+    beforeEach(async () => {
+      otherUser = await Factory.build(
+        'user',
+        {
+          id: 'other-user',
+          name: 'Other TestUser',
+        },
+        {
+          email: 'test2@example.org',
+          password: '1234',
+        },
+      )
+      authenticatedUser = await otherUser.toJson()
+      await mutate({
+        mutation: createGroupMutation,
+        variables: {
+          id: 'others-group',
+          name: 'Uninteresting Group',
+          about: 'We will change nothing!',
+          description: 'We love it like it is!?',
+          groupType: 'closed',
+          actionRadius: 'international',
+          categoryIds,
+        },
+      })
+      authenticatedUser = await user.toJson()
+      await mutate({
+        mutation: createGroupMutation,
+        variables: {
+          id: 'my-group',
+          name: 'The Best Group',
+          about: 'We will change the world!',
+          description: 'Some description',
+          groupType: 'public',
+          actionRadius: 'regional',
+          categoryIds,
+        },
+      })
+    })
+
+    describe('query can fetch', () => {
+      it('groups where user is member (or owner in this case)', async () => {
+        const expected = {
+          data: {
+            Group: [
+              {
+                id: 'my-group',
+                slug: 'the-best-group',
+                myRole: 'owner',
+              },
+            ],
+          },
+          errors: undefined,
+        }
+        await expect(
+          query({ query: groupQuery, variables: { isMember: true } }),
+        ).resolves.toMatchObject(expected)
+      })
+
+      it('groups where user is not(!) member', async () => {
+        const expected = {
+          data: {
+            Group: expect.arrayContaining([
+              expect.objectContaining({
+                id: 'others-group',
+                slug: 'uninteresting-group',
+                myRole: null,
+              }),
+            ]),
+          },
+          errors: undefined,
+        }
+        await expect(
+          query({ query: groupQuery, variables: { isMember: false } }),
+        ).resolves.toMatchObject(expected)
+      })
+
+      it('all groups', async () => {
+        const expected = {
+          data: {
+            Group: expect.arrayContaining([
+              expect.objectContaining({
+                id: 'my-group',
+                slug: 'the-best-group',
+                myRole: 'owner',
+              }),
+              expect.objectContaining({
+                id: 'others-group',
+                slug: 'uninteresting-group',
+                myRole: null,
+              }),
+            ]),
+          },
+          errors: undefined,
+        }
+        await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject(expected)
+      })
+    })
+
+    //   Wolle: describe('can be filtered', () => {
+    //     let followedUser, happyPost, cryPost
+    //     beforeEach(async () => {
+    //       ;[followedUser] = await Promise.all([
+    //         Factory.build(
+    //           'user',
+    //           {
+    //             id: 'followed-by-me',
+    //             name: 'Followed User',
+    //           },
+    //           {
+    //             email: 'followed@example.org',
+    //             password: '1234',
+    //           },
+    //         ),
+    //       ])
+    //       ;[happyPost, cryPost] = await Promise.all([
+    //         Factory.build('post', { id: 'happy-post' }, { categoryIds: ['cat4'] }),
+    //         Factory.build('post', { id: 'cry-post' }, { categoryIds: ['cat15'] }),
+    //         Factory.build(
+    //           'post',
+    //           {
+    //             id: 'post-by-followed-user',
+    //           },
+    //           {
+    //             categoryIds: ['cat9'],
+    //             author: followedUser,
+    //           },
+    //         ),
+    //       ])
+    //     })
+    //     describe('no filter', () => {
+    //       it('returns all posts', async () => {
+    //         const postQueryNoFilters = gql`
+    //           query Post($filter: _PostFilter) {
+    //             Post(filter: $filter) {
+    //               id
+    //             }
+    //           }
+    //         `
+    //         const expected = [{ id: 'happy-post' }, { id: 'cry-post' }, { id: 'post-by-followed-user' }]
+    //         variables = { filter: {} }
+    //         await expect(query({ query: postQueryNoFilters, variables })).resolves.toMatchObject({
+    //           data: {
+    //             Post: expect.arrayContaining(expected),
+    //           },
+    //         })
+    //       })
+    //     })
+    //     /* it('by categories', async () => {
+    //       const postQueryFilteredByCategories = gql`
+    //         query Post($filter: _PostFilter) {
+    //           Post(filter: $filter) {
+    //             id
+    //             categories {
+    //               id
+    //             }
+    //           }
+    //         }
+    //       `
+    //       const expected = {
+    //         data: {
+    //           Post: [
+    //             {
+    //               id: 'post-by-followed-user',
+    //               categories: [{ id: 'cat9' }],
+    //             },
+    //           ],
+    //         },
+    //       }
+    //       variables = { ...variables, filter: { categories_some: { id_in: ['cat9'] } } }
+    //       await expect(
+    //         query({ query: postQueryFilteredByCategories, variables }),
+    //       ).resolves.toMatchObject(expected)
+    //     }) */
+    //     describe('by emotions', () => {
+    //       const postQueryFilteredByEmotions = gql`
+    //         query Post($filter: _PostFilter) {
+    //           Post(filter: $filter) {
+    //             id
+    //             emotions {
+    //               emotion
+    //             }
+    //           }
+    //         }
+    //       `
+    //       it('filters by single emotion', async () => {
+    //         const expected = {
+    //           data: {
+    //             Post: [
+    //               {
+    //                 id: 'happy-post',
+    //                 emotions: [{ emotion: 'happy' }],
+    //               },
+    //             ],
+    //           },
+    //         }
+    //         await user.relateTo(happyPost, 'emoted', { emotion: 'happy' })
+    //         variables = { ...variables, filter: { emotions_some: { emotion_in: ['happy'] } } }
+    //         await expect(
+    //           query({ query: postQueryFilteredByEmotions, variables }),
+    //         ).resolves.toMatchObject(expected)
+    //       })
+    //       it('filters by multiple emotions', async () => {
+    //         const expected = [
+    //           {
+    //             id: 'happy-post',
+    //             emotions: [{ emotion: 'happy' }],
+    //           },
+    //           {
+    //             id: 'cry-post',
+    //             emotions: [{ emotion: 'cry' }],
+    //           },
+    //         ]
+    //         await user.relateTo(happyPost, 'emoted', { emotion: 'happy' })
+    //         await user.relateTo(cryPost, 'emoted', { emotion: 'cry' })
+    //         variables = { ...variables, filter: { emotions_some: { emotion_in: ['happy', 'cry'] } } }
+    //         await expect(
+    //           query({ query: postQueryFilteredByEmotions, variables }),
+    //         ).resolves.toMatchObject({
+    //           data: {
+    //             Post: expect.arrayContaining(expected),
+    //           },
+    //           errors: undefined,
+    //         })
+    //       })
+    //     })
+    //     it('by followed-by', async () => {
+    //       const postQueryFilteredByUsersFollowed = gql`
+    //         query Post($filter: _PostFilter) {
+    //           Post(filter: $filter) {
+    //             id
+    //             author {
+    //               id
+    //               name
+    //             }
+    //           }
+    //         }
+    //       `
+    //       await user.relateTo(followedUser, 'following')
+    //       variables = { filter: { author: { followedBy_some: { id: 'current-user' } } } }
+    //       await expect(
+    //         query({ query: postQueryFilteredByUsersFollowed, variables }),
+    //       ).resolves.toMatchObject({
+    //         data: {
+    //           Post: [
+    //             {
+    //               id: 'post-by-followed-user',
+    //               author: { id: 'followed-by-me', name: 'Followed User' },
+    //             },
+    //           ],
+    //         },
+    //         errors: undefined,
+    //       })
+    //     })
+    //   })
+  })
 })
 
 describe('CreateGroup', () => {

@@ -24,18 +24,34 @@ export default {
     //   // params = await maintainPinnedPosts(params)
     //   return neo4jgraphql(object, params, context, resolveInfo)
     // },
-    Group: async (_object, _params, context, _resolveInfo) => {
+    Group: async (_object, params, context, _resolveInfo) => {
+      const { isMember } = params
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
-        const result = await txc.run(
-          `
-            MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group)
+        let groupCypher
+        if (isMember === true) {
+          groupCypher = `
+            MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group:Group)
             RETURN group {.*, myRole: membership.role}
-          `,
-          {
-            userId: context.user.id,
-          },
-        )
+          `
+        } else {
+          if (isMember === false) {
+            groupCypher = `
+              MATCH (group:Group)
+              WHERE NOT (:User {id: $userId})-[:MEMBER_OF]->(group)
+              RETURN group {.*, myRole: NULL}
+            `
+          } else {
+            groupCypher = `
+              MATCH (group:Group)
+              OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
+              RETURN group {.*, myRole: membership.role}
+            `
+          }
+        }
+        const result = await txc.run(groupCypher, {
+          userId: context.user.id,
+        })
         const group = result.records.map((record) => record.get('group'))
         return group
       })

@@ -170,6 +170,7 @@ input _GroupFilter {
 
 type Query {
   Group(
+    isMember: Boolean # if 'undefined' or 'null' then all groups
     id: ID
     name: String
     slug: String
