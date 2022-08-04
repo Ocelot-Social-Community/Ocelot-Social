@@ -2,7 +2,7 @@
 
 When you overtake this deploy and rebrand repo to your network you have to recognize the following changes and doings …
 
-## This Latest Version > 1.0.9 with 'ocelotDockerVersionTag' 1.0.9-199
+## This Latest Version >= 1.1.0 with 'ocelotDockerVersionTag' 1.1.0-205
 
 ### PR –  chore: 🍰 Release v1.1.0 - Implement Categories Again #63
 
