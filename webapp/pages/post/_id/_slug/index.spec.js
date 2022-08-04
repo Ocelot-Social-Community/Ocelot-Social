@@ -72,6 +72,9 @@ describe('PostSlug', () => {
           query: jest.fn().mockResolvedValue({ data: { PostEmotionsCountByEmotion: {} } }),
         },
         $scrollTo: jest.fn(),
+        $env: {
+          CATEGORIES_ACTIVE: false,
+        },
       }
       stubs = {
         HcEditor: { render: () => {}, methods: { insertReply: jest.fn(() => null) } },
