@@ -1,9 +1,8 @@
 <template>
-<div>
- <h2>Neue Gruppe</h2>
-  
-  
-      <new-group-form style="padding-top: 30px"/>
+  <div>
+    <h2>Neue Gruppe</h2>
+
+    <new-group-form style="padding-top: 30px" />
   </div>
 </template>
 

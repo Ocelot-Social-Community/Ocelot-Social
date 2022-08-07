@@ -741,6 +741,9 @@
       "unmute": "Unmute user",
       "unmuted": "{name} is unmuted again"
     },
+    "groups": {
+      "name":"My Groups"
+    },
     "name": "Settings",
     "notifications": {
       "name": "Notifications",
