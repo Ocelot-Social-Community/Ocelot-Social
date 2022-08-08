@@ -1,8 +1,10 @@
 ---
-name: 🐛 Bug Report
+name: "\U0001F41B Bug Report"
 about: Create a report to help us to improve.
+title: "\U0001F41B [Bug] XXX"
 labels: bug
-title: 🐛 [Bug] 
+assignees: ''
+
 ---
 
 ## :bug: Bug Report

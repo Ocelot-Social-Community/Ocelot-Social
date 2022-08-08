@@ -1,0 +1,6 @@
+enum GroupActionRadius {
+  regional
+  national
+  continental
+  international
+}

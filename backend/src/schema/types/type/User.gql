@@ -156,19 +156,19 @@ input _UserFilter {
 
 type Query {
   User(
-  id: ID
-  email: String # admins need to search for a user sometimes
-  name: String
-  slug: String
-  role: UserGroup
-  locationName: String
-  about: String
-  createdAt: String
-  updatedAt: String
-  first: Int
-  offset: Int
-  orderBy: [_UserOrdering]
-  filter: _UserFilter
+    id: ID
+    email: String # admins need to search for a user sometimes
+    name: String
+    slug: String
+    role: UserGroup
+    locationName: String
+    about: String
+    createdAt: String
+    updatedAt: String
+    first: Int
+    offset: Int
+    orderBy: [_UserOrdering]
+    filter: _UserFilter
   ): [User]
 
   availableRoles: [UserGroup]! 
@@ -197,19 +197,19 @@ enum Deletable {
 
 type Mutation {
   UpdateUser (
-  id: ID!
-  name: String
-  email: String
-  slug: String
-  avatar: ImageInput
-  locationName: String
-  about: String
-  termsAndConditionsAgreedVersion: String
-  termsAndConditionsAgreedAt: String
-  allowEmbedIframes: Boolean
-  showShoutsPublicly: Boolean
-  sendNotificationEmails: Boolean
-  locale: String
+    id: ID!
+    name: String
+    email: String
+    slug: String
+    avatar: ImageInput
+    locationName: String
+    about: String
+    termsAndConditionsAgreedVersion: String
+    termsAndConditionsAgreedAt: String
+    allowEmbedIframes: Boolean
+    showShoutsPublicly: Boolean
+    sendNotificationEmails: Boolean
+    locale: String
   ): User
 
   DeleteUser(id: ID!, resource: [Deletable]): User
