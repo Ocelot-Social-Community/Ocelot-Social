@@ -1,12 +1,5 @@
 import LanguageDetect from 'languagedetect'
-import sanitizeHtml from 'sanitize-html'
-
-const removeHtmlTags = (input) => {
-  return sanitizeHtml(input, {
-    allowedTags: [],
-    allowedAttributes: {},
-  })
-}
+import { removeHtmlTags } from '../helpers/cleanHtml.js'
 
 const setPostLanguage = (text) => {
   const lngDetector = new LanguageDetect()

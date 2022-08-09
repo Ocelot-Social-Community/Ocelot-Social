@@ -13,6 +13,8 @@ let authenticatedUser
 let user
 
 const categoryIds = ['cat9', 'cat4', 'cat15']
+const descriptionAddition100 =
+  ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 let variables = {}
 
 beforeAll(async () => {
@@ -116,7 +118,7 @@ describe('Group', () => {
           id: 'others-group',
           name: 'Uninteresting Group',
           about: 'We will change nothing!',
-          description: 'We love it like it is!?',
+          description: 'We love it like it is!?' + descriptionAddition100,
           groupType: 'closed',
           actionRadius: 'international',
           categoryIds,
@@ -129,7 +131,7 @@ describe('Group', () => {
           id: 'my-group',
           name: 'The Best Group',
           about: 'We will change the world!',
-          description: 'Some description',
+          description: 'Some description' + descriptionAddition100,
           groupType: 'public',
           actionRadius: 'regional',
           categoryIds,
@@ -363,7 +365,7 @@ describe('CreateGroup', () => {
       name: 'The Best Group',
       slug: 'the-group',
       about: 'We will change the world!',
-      description: 'Some description',
+      description: 'Some description' + descriptionAddition100,
       groupType: 'public',
       actionRadius: 'regional',
       categoryIds,
@@ -421,6 +423,25 @@ describe('CreateGroup', () => {
       await expect(mutate({ mutation: createGroupMutation, variables })).resolves.toMatchObject(
         expected,
       )
+    })
+
+    describe('description', () => {
+      describe('length without HTML', () => {
+        describe('less then 100 chars', () => {
+          it('throws error: "To Less Categories!"', async () => {
+            const { errors } = await mutate({
+              mutation: createGroupMutation,
+              variables: {
+                ...variables,
+                description:
+                  '0123456789' +
+                  '<a href="https://domain.org/0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789">0123456789</a>',
+              },
+            })
+            expect(errors[0]).toHaveProperty('message', 'To Short Description!')
+          })
+        })
+      })
     })
 
     describe('categories', () => {

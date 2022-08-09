@@ -3,7 +3,9 @@ import { v4 as uuid } from 'uuid'
 // Wolle: import { isEmpty } from 'lodash'
 import { UserInputError } from 'apollo-server'
 import CONFIG from '../../config'
-import categories from '../../constants/categories'
+import { CATEGORIES_MIN, CATEGORIES_MAX } from '../../constants/categories'
+import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
+import { removeHtmlTags } from '../../middleware/helpers/cleanHtml.js'
 // Wolle: import { mergeImage, deleteImage } from './images/images'
 import Resolver from './helpers/Resolver'
 // Wolle: import { filterForMutedUsers } from './helpers/filterForMutedUsers'
@@ -70,11 +72,18 @@ export default {
     CreateGroup: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds } = params
       delete params.categoryIds
-      if (!categoryIds || categoryIds.length < categories.CATEGORIES_MIN) {
+      if (!categoryIds || categoryIds.length < CATEGORIES_MIN) {
         throw new UserInputError('To Less Categories!')
       }
-      if (categoryIds && categoryIds.length > categories.CATEGORIES_MAX) {
+      if (categoryIds && categoryIds.length > CATEGORIES_MAX) {
         throw new UserInputError('To Many Categories!')
+      }
+      if (
+        params.description === undefined ||
+        params.description === null ||
+        removeHtmlTags(params.description).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
+      ) {
+        throw new UserInputError('To Short Description!')
       }
       params.id = params.id || uuid()
       const session = context.driver.session()
