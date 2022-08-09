@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid'
 // Wolle: import { isEmpty } from 'lodash'
 import { UserInputError } from 'apollo-server'
 import CONFIG from '../../config'
+import categories from '../../constants/categories'
 // Wolle: import { mergeImage, deleteImage } from './images/images'
 import Resolver from './helpers/Resolver'
 // Wolle: import { filterForMutedUsers } from './helpers/filterForMutedUsers'
@@ -69,6 +70,12 @@ export default {
     CreateGroup: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds } = params
       delete params.categoryIds
+      if (!categoryIds || categoryIds.length < categories.CATEGORIES_MIN) {
+        throw new UserInputError('To Less Categories!')
+      }
+      if (categoryIds && categoryIds.length > categories.CATEGORIES_MAX) {
+        throw new UserInputError('To Many Categories!')
+      }
       params.id = params.id || uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {

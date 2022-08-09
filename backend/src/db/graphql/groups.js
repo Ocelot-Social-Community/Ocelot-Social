@@ -4,13 +4,13 @@ import gql from 'graphql-tag'
 
 export const createGroupMutation = gql`
   mutation (
-    $id: ID,
-    $name: String!,
-    $slug: String,
-    $about: String,
-    $description: String!,
-    $groupType: GroupType!,
-    $actionRadius: GroupActionRadius!,
+    $id: ID
+    $name: String!
+    $slug: String
+    $about: String
+    $description: String!
+    $groupType: GroupType!
+    $actionRadius: GroupActionRadius!
     $categoryIds: [ID]
   ) {
     CreateGroup(
@@ -47,13 +47,13 @@ export const createGroupMutation = gql`
 export const groupQuery = gql`
   query (
     $isMember: Boolean
-    $id: ID,
-    $name: String,
-    $slug: String,
+    $id: ID
+    $name: String
+    $slug: String
     $createdAt: String
     $updatedAt: String
-    $about: String,
-    $description: String,
+    $about: String
+    $description: String
     # $groupType: GroupType!,
     # $actionRadius: GroupActionRadius!,
     # $categoryIds: [ID]
@@ -93,6 +93,12 @@ export const groupQuery = gql`
       groupType
       actionRadius
       myRole
+      categories {
+        id
+        slug
+        name
+        icon
+      }
       # Wolle: owner {
       #   name
       # }
