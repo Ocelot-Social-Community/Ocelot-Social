@@ -1,8 +1,9 @@
 export default {
-    SHOW_HEADER_MENU: true,
-    MENU: [{
+  SHOW_HEADER_MENU: true,
+  MENU: [
+    {
       name: 'Themen',
-      path: '/#'
+      path: '/#',
     },
     {
       name: 'Gruppen',
@@ -10,13 +11,13 @@ export default {
       children: [
         {
           name: 'Gruppe 1',
-          path: '/#'
+          path: '/#',
         },
         {
           name: 'Gruppe 2',
-          path: '/#'
-        }
-      ]
+          path: '/#',
+        },
+      ],
     },
     {
       name: 'Über Yunite',
@@ -24,12 +25,13 @@ export default {
       children: [
         {
           name: 'Impressum',
-          path: '/#'
+          path: '/#',
         },
         {
           name: 'Yunite Team',
-          path: '/#'
-        }
-      ]
-    }]
-  }
+          path: '/#',
+        },
+      ],
+    },
+  ],
+}
