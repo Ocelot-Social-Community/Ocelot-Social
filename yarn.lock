@@ -1248,10 +1248,10 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
-"@faker-js/faker@5.1.0":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-5.1.0.tgz#cee1d77ada0d0dbbe77201d18b1ebabf432d9c0f"
-  integrity sha512-0VonSKh7fBCqvY+V2FLN2ZW4pR4ZtWJalWmwSaiaB7yK7y4qp8vDfuaq9QdLjf/cdZGx3M7Wc4Q+x4fZHxI21Q==
+"@faker-js/faker@7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-7.4.0.tgz#cac720d860a89d487b47e55e66a4fd114f1d3fe5"
+  integrity sha512-xDd3Tvkt2jgkx1LkuwwxpNBy/Oe+LkZBTwkgEFTiWpVSZgQ5sc/LenbHKRHbFl0dq/KFeeq/szyyPtpJRKY0fg==
 
 "@hapi/address@2.x.x":
   version "2.0.0"
