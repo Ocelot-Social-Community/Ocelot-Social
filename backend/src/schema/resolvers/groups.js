@@ -86,6 +86,7 @@ export default {
             SET group.updatedAt = toString(datetime())
             WITH group
             MATCH (owner:User {id: $userId})
+            MERGE (owner)-[:CREATED]->(group)
             MERGE (owner)-[membership:MEMBER_OF]->(group)
             SET membership.createdAt = toString(datetime())
             SET membership.updatedAt = toString(datetime())
