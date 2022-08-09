@@ -9,6 +9,7 @@
                 <logo logoType="header" />
               </nuxt-link>
             </ds-flex-item>
+            <header-menu />
             <ds-flex-item
               :width="{ base: '40%', sm: '40%', md: '40%', lg: '0%' }"
               class="mobile-hamburger-menu"
@@ -16,7 +17,7 @@
               <base-button icon="bars" @click="toggleMobileMenuView" circle />
             </ds-flex-item>
             <ds-flex-item
-              :width="{ base: '45%', sm: '45%', md: '45%', lg: '50%' }"
+              :width="{ base: '45%', sm: '45%', md: '45%', lg: show ? 'auto' : '50%' }"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
               style="flex-shrink: 0; flex-grow: 1"
               id="nav-search-box"
@@ -80,6 +81,8 @@
 
 <script>
 import Logo from '~/components/Logo/Logo'
+import HeaderMenu from '~/components/HeaderMenu/HeaderMenu.vue'
+import headerMenu from '../constants/headerMenu.js'
 import { mapGetters } from 'vuex'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
@@ -94,6 +97,7 @@ import InviteButton from '~/components/InviteButton/InviteButton'
 export default {
   components: {
     Logo,
+    HeaderMenu,
     LocaleSwitch,
     SearchField,
     Modal,
@@ -106,6 +110,7 @@ export default {
   mixins: [seo],
   data() {
     return {
+      show: headerMenu.SHOW_HEADER_MENU,
       mobileSearchVisible: false,
       toggleMobileMenu: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
