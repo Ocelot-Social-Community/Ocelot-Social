@@ -141,6 +141,14 @@ input _GroupFilter {
   id_not: ID
   id_in: [ID!]
   id_not_in: [ID!]
+  # categories: _CategoryFilter
+  # categories_not: _CategoryFilter
+  # categories_in: [_CategoryFilter!]
+  # categories_not_in: [_CategoryFilter!]
+  # categories_some: _CategoryFilter
+  # categories_none: _CategoryFilter
+  # categories_single: _CategoryFilter
+  # categories_every: _CategoryFilter
   # Wolle:
   # friends: _GroupFilter
   # friends_not: _GroupFilter
@@ -185,7 +193,11 @@ type Query {
     filter: _GroupFilter
   ): [Group]
 
-  availableGroupTypes: [GroupType]!
+  AvailableGroupTypes: [GroupType]!
+
+  AvailableGroupActionRadii: [GroupActionRadius]!
+
+  AvailableGroupMemberRoles: [GroupMemberRole]!
 
   # Wolle:
   # availableRoles: [UserRole]!
