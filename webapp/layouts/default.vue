@@ -4,7 +4,7 @@
       <ds-container class="main-navigation-container" style="padding: 10px 10px">
         <div>
           <ds-flex class="main-navigation-flex">
-            <ds-flex-item :width="{ base: '142px' }">
+            <ds-flex-item :width="{ base: '47px' }">
               <nuxt-link :to="{ name: 'index' }" v-scroll-to="'.main-navigation'">
                 <logo logoType="header" />
               </nuxt-link>
@@ -17,7 +17,7 @@
               <base-button icon="bars" @click="toggleMobileMenuView" circle />
             </ds-flex-item>
             <ds-flex-item
-              :width="{ base: '45%', sm: '45%', md: '45%', lg: show ? 'auto' : '50%' }"
+              :width="{ base: '45%', sm: '45%', md: show ? 'auto' : '45%', lg: show ? 'auto' : '50%' }"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
               style="flex-shrink: 0; flex-grow: 1"
               id="nav-search-box"
