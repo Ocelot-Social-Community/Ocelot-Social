@@ -45,7 +45,7 @@ const deleteUserMutation = gql`
   }
 `
 const switchUserRoleMutation = gql`
-  mutation ($role: UserGroup!, $id: ID!) {
+  mutation ($role: UserRole!, $id: ID!) {
     switchUserRole(role: $role, id: $id) {
       name
       role

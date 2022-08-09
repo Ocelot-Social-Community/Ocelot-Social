@@ -28,7 +28,7 @@ type User {
   avatar: Image @relation(name: "AVATAR_IMAGE", direction: "OUT")
   deleted: Boolean
   disabled: Boolean
-  role: UserGroup!
+  role: UserRole!
   publicKey: String
   invitedBy: User @relation(name: "INVITED", direction: "IN")
   invited: [User] @relation(name: "INVITED", direction: "OUT")
@@ -151,7 +151,7 @@ input _UserFilter {
   followedBy_none: _UserFilter
   followedBy_single: _UserFilter
   followedBy_every: _UserFilter
-  role_in: [UserGroup!]
+  role_in: [UserRole!]
 }
 
 type Query {
@@ -160,7 +160,7 @@ type Query {
     email: String # admins need to search for a user sometimes
     name: String
     slug: String
-    role: UserGroup
+    role: UserRole
     locationName: String
     about: String
     createdAt: String
@@ -171,7 +171,7 @@ type Query {
     filter: _UserFilter
   ): [User]
 
-  availableRoles: [UserGroup]! 
+  availableRoles: [UserRole]! 
   mutedUsers: [User]
   blockedUsers: [User]
   isLoggedIn: Boolean!
@@ -219,5 +219,5 @@ type Mutation {
   blockUser(id: ID!): User
   unblockUser(id: ID!): User
 
-  switchUserRole(role: UserGroup!, id: ID!): User
+  switchUserRole(role: UserRole!, id: ID!): User
 }
