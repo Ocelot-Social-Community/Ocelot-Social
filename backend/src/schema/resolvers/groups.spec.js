@@ -416,11 +416,33 @@ describe('CreateGroup', () => {
       )
     })
 
-    it('`disabled` and `deleted` default to `false`', async () => {
+    it('"disabled" and "deleted" default to "false"', async () => {
       const expected = { data: { CreateGroup: { disabled: false, deleted: false } } }
       await expect(mutate({ mutation: createGroupMutation, variables })).resolves.toMatchObject(
         expected,
       )
+    })
+
+    describe('categories', () => {
+      describe('not even one', () => {
+        it('throws error: "To Less Categories!"', async () => {
+          const { errors } = await mutate({
+            mutation: createGroupMutation,
+            variables: { ...variables, categoryIds: null },
+          })
+          expect(errors[0]).toHaveProperty('message', 'To Less Categories!')
+        })
+      })
+
+      describe('four', () => {
+        it('throws error: "To Many Categories!"', async () => {
+          const { errors } = await mutate({
+            mutation: createGroupMutation,
+            variables: { ...variables, categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'] },
+          })
+          expect(errors[0]).toHaveProperty('message', 'To Many Categories!')
+        })
+      })
     })
   })
 })
