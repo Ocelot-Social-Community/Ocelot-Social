@@ -38,109 +38,11 @@ export default {
   locationName: { type: 'string', allow: [null] },
 
   wasSeeded: 'boolean', // Wolle: used or needed?
-  // Wolle: owner: {
-  //   type: 'relationship',
-  //   relationship: 'OWNS',
-  //   target: 'User',
-  //   direction: 'in',
-  // },
-  // Wolle: followedBy: {
-  //   type: 'relationship',
-  //   relationship: 'FOLLOWS',
-  //   target: 'User',
-  //   direction: 'in',
-  //   properties: {
-  //     createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
-  //   },
-  // },
-  // Wolle: correct this way?
-  // members: { type: 'relationship', relationship: 'MEMBERS', target: 'User', direction: 'out' },
-  // Wolle: needed? lastActiveAt: { type: 'string', isoDate: true },
-  // Wolle: emoted: {
-  //   type: 'relationships',
-  //   relationship: 'EMOTED',
-  //   target: 'Post',
-  //   direction: 'out',
-  //   properties: {
-  //     emotion: {
-  //       type: 'string',
-  //       valid: ['happy', 'cry', 'surprised', 'angry', 'funny'],
-  //       invalid: [null],
-  //     },
-  //   },
-  //   eager: true,
-  //   cascade: true,
-  // },
-  // Wolle: blocked: {
-  //   type: 'relationship',
-  //   relationship: 'BLOCKED',
-  //   target: 'User',
-  //   direction: 'out',
-  //   properties: {
-  //     createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
-  //   },
-  // },
-  // Wolle: muted: {
-  //   type: 'relationship',
-  //   relationship: 'MUTED',
-  //   target: 'User',
-  //   direction: 'out',
-  //   properties: {
-  //     createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
-  //   },
-  // },
-  // Wolle: notifications: {
-  //   type: 'relationship',
-  //   relationship: 'NOTIFIED',
-  //   target: 'User',
-  //   direction: 'in',
-  // },
-  // Wolle inviteCodes: {
-  //   type: 'relationship',
-  //   relationship: 'GENERATED',
-  //   target: 'InviteCode',
-  //   direction: 'out',
-  // },
-  // Wolle: redeemedInviteCode: {
-  //   type: 'relationship',
-  //   relationship: 'REDEEMED',
-  //   target: 'InviteCode',
-  //   direction: 'out',
-  // },
-  // Wolle: shouted: {
-  //   type: 'relationship',
-  //   relationship: 'SHOUTED',
-  //   target: 'Post',
-  //   direction: 'out',
-  //   properties: {
-  //     createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
-  //   },
-  // },
+
   isIn: {
     type: 'relationship',
     relationship: 'IS_IN',
     target: 'Location',
     direction: 'out',
   },
-  // Wolle: pinned: {
-  //   type: 'relationship',
-  //   relationship: 'PINNED',
-  //   target: 'Post',
-  //   direction: 'out',
-  //   properties: {
-  //     createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
-  //   },
-  // },
-  // Wolle: showShoutsPublicly: {
-  //   type: 'boolean',
-  //   default: false,
-  // },
-  // Wolle: sendNotificationEmails: {
-  //   type: 'boolean',
-  //   default: true,
-  // },
-  // Wolle: locale: {
-  //   type: 'string',
-  //   allow: [null],
-  // },
 }
