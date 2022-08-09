@@ -17,7 +17,12 @@
               <base-button icon="bars" @click="toggleMobileMenuView" circle />
             </ds-flex-item>
             <ds-flex-item
-              :width="{ base: '45%', sm: '45%', md: show ? 'auto' : '45%', lg: show ? 'auto' : '50%' }"
+              :width="{
+                base: '45%',
+                sm: '45%',
+                md: show ? 'auto' : '45%',
+                lg: show ? 'auto' : '50%',
+              }"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
               style="flex-shrink: 0; flex-grow: 1"
               id="nav-search-box"
