@@ -36,8 +36,7 @@ export default {
         const result = await txc.run(groupCypher, {
           userId: context.user.id,
         })
-        const group = result.records.map((record) => record.get('group'))
-        return group
+        return result.records.map((record) => record.get('group'))
       })
       try {
         const group = await readTxResultPromise
