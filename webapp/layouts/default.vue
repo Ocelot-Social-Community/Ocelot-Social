@@ -40,7 +40,7 @@
               </client-only>
             </ds-flex-item>
             <ds-flex-item
-              style="background-color: white; flex-basis: auto"
+              style="flex-basis: auto"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             >
               <div

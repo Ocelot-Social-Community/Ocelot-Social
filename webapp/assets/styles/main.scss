@@ -1,4 +1,3 @@
-@import './imports/_branding.scss';
 @import './imports/_tooltip.scss';
 @import './imports/_toast.scss';
 
@@ -181,3 +180,5 @@ hr {
 .dropdown-arrow {
   font-size: $font-size-xx-small;
 }
+
+@import './imports/_branding.scss';

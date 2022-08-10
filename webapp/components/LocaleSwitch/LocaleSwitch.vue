@@ -117,7 +117,6 @@ export default {
   align-items: center;
   height: 100%;
   padding: $space-xx-small;
-  color: $text-color-soft;
 
   > .label {
     margin: 0 $space-xx-small;

@@ -2,6 +2,10 @@ export default {
   SHOW_HEADER_MENU: true,
   MENU: [
     {
+      name: 'Beiträge',
+      path: '/#',
+    },
+    {
       name: 'Themen',
       path: '/#',
     },
