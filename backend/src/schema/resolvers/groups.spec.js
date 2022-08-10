@@ -120,7 +120,7 @@ describe('Group', () => {
           about: 'We will change nothing!',
           description: 'We love it like it is!?' + descriptionAddition100,
           groupType: 'closed',
-          actionRadius: 'international',
+          actionRadius: 'global',
           categoryIds,
         },
       })
@@ -139,62 +139,68 @@ describe('Group', () => {
       })
     })
 
-    describe('can find', () => {
-      it('all', async () => {
-        const expected = {
-          data: {
-            Group: expect.arrayContaining([
-              expect.objectContaining({
-                id: 'my-group',
-                slug: 'the-best-group',
-                myRole: 'owner',
-              }),
-              expect.objectContaining({
-                id: 'others-group',
-                slug: 'uninteresting-group',
-                myRole: null,
-              }),
-            ]),
-          },
-          errors: undefined,
-        }
-        await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject(expected)
+    describe('query groups', () => {
+      describe('without any filters', () => {
+        it('finds all groups', async () => {
+          const expected = {
+            data: {
+              Group: expect.arrayContaining([
+                expect.objectContaining({
+                  id: 'my-group',
+                  slug: 'the-best-group',
+                  myRole: 'owner',
+                }),
+                expect.objectContaining({
+                  id: 'others-group',
+                  slug: 'uninteresting-group',
+                  myRole: null,
+                }),
+              ]),
+            },
+            errors: undefined,
+          }
+          await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject(expected)
+        })
       })
 
-      it('where user is member (or owner in this case)', async () => {
-        const expected = {
-          data: {
-            Group: [
-              {
-                id: 'my-group',
-                slug: 'the-best-group',
-                myRole: 'owner',
-              },
-            ],
-          },
-          errors: undefined,
-        }
-        await expect(
-          query({ query: groupQuery, variables: { isMember: true } }),
-        ).resolves.toMatchObject(expected)
+      describe('isMember = true', () => {
+        it('finds only groups where user is member', async () => {
+          const expected = {
+            data: {
+              Group: [
+                {
+                  id: 'my-group',
+                  slug: 'the-best-group',
+                  myRole: 'owner',
+                },
+              ],
+            },
+            errors: undefined,
+          }
+          await expect(
+            query({ query: groupQuery, variables: { isMember: true } }),
+          ).resolves.toMatchObject(expected)
+        })
       })
 
-      it('where user is not(!) member', async () => {
-        const expected = {
-          data: {
-            Group: expect.arrayContaining([
-              expect.objectContaining({
-                id: 'others-group',
-                slug: 'uninteresting-group',
-                myRole: null,
-              }),
-            ]),
-          },
-          errors: undefined,
-        }
-        await expect(
-          query({ query: groupQuery, variables: { isMember: false } }),
-        ).resolves.toMatchObject(expected)
+      describe('isMember = false', () => {
+        it('finds only groups where user is not(!) member', async () => {
+          const expected = {
+            data: {
+              Group: expect.arrayContaining([
+                expect.objectContaining({
+                  id: 'others-group',
+                  slug: 'uninteresting-group',
+                  myRole: null,
+                }),
+              ]),
+            },
+            errors: undefined,
+          }
+          await expect(
+            query({ query: groupQuery, variables: { isMember: false } }),
+          ).resolves.toMatchObject(expected)
+        })
       })
     })
   })
@@ -258,7 +264,7 @@ describe('CreateGroup', () => {
       )
     })
 
-    it('"disabled" and "deleted" default to "false"', async () => {
+    it('has "disabled" and "deleted" default to "false"', async () => {
       const expected = { data: { CreateGroup: { disabled: false, deleted: false } } }
       await expect(mutate({ mutation: createGroupMutation, variables })).resolves.toMatchObject(
         expected,
@@ -268,7 +274,7 @@ describe('CreateGroup', () => {
     describe('description', () => {
       describe('length without HTML', () => {
         describe('less then 100 chars', () => {
-          it('throws error: "To Less Categories!"', async () => {
+          it('throws error: "Too view categories!"', async () => {
             const { errors } = await mutate({
               mutation: createGroupMutation,
               variables: {
@@ -278,7 +284,7 @@ describe('CreateGroup', () => {
                   '<a href="https://domain.org/0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789">0123456789</a>',
               },
             })
-            expect(errors[0]).toHaveProperty('message', 'To Short Description!')
+            expect(errors[0]).toHaveProperty('message', 'Description too short!')
           })
         })
       })
@@ -286,22 +292,22 @@ describe('CreateGroup', () => {
 
     describe('categories', () => {
       describe('not even one', () => {
-        it('throws error: "To Less Categories!"', async () => {
+        it('throws error: "Too view categories!"', async () => {
           const { errors } = await mutate({
             mutation: createGroupMutation,
             variables: { ...variables, categoryIds: null },
           })
-          expect(errors[0]).toHaveProperty('message', 'To Less Categories!')
+          expect(errors[0]).toHaveProperty('message', 'Too view categories!')
         })
       })
 
       describe('four', () => {
-        it('throws error: "To Many Categories!"', async () => {
+        it('throws error: "Too many categories!"', async () => {
           const { errors } = await mutate({
             mutation: createGroupMutation,
             variables: { ...variables, categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'] },
           })
-          expect(errors[0]).toHaveProperty('message', 'To Many Categories!')
+          expect(errors[0]).toHaveProperty('message', 'Too many categories!')
         })
       })
     })

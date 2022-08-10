@@ -52,17 +52,17 @@ export default {
       const { categoryIds } = params
       delete params.categoryIds
       if (!categoryIds || categoryIds.length < CATEGORIES_MIN) {
-        throw new UserInputError('To Less Categories!')
+        throw new UserInputError('Too view categories!')
       }
       if (categoryIds && categoryIds.length > CATEGORIES_MAX) {
-        throw new UserInputError('To Many Categories!')
+        throw new UserInputError('Too many categories!')
       }
       if (
         params.description === undefined ||
         params.description === null ||
         removeHtmlTags(params.description).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
       ) {
-        throw new UserInputError('To Short Description!')
+        throw new UserInputError('Description too short!')
       }
       params.id = params.id || uuid()
       const session = context.driver.session()

@@ -37,8 +37,6 @@ export default {
 
   locationName: { type: 'string', allow: [null] },
 
-  wasSeeded: 'boolean', // Wolle: used or needed?
-
   isIn: {
     type: 'relationship',
     relationship: 'IS_IN',
