@@ -12,6 +12,8 @@ let variables
 
 const driver = getDriver()
 const neode = getNeode()
+const descriptionAddition100 =
+  ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -67,7 +69,7 @@ describe('slugifyMiddleware', () => {
         ...variables,
         name: 'The Best Group',
         about: 'Some about',
-        description: 'Some description',
+        description: 'Some description' + descriptionAddition100,
         groupType: 'closed',
         actionRadius: 'national',
         categoryIds,
@@ -87,7 +89,7 @@ describe('slugifyMiddleware', () => {
               name: 'The Best Group',
               slug: 'the-best-group',
               about: 'Some about',
-              description: 'Some description',
+              description: 'Some description' + descriptionAddition100,
               groupType: 'closed',
               actionRadius: 'national',
             },
