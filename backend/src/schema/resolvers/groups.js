@@ -39,8 +39,7 @@ export default {
         return result.records.map((record) => record.get('group'))
       })
       try {
-        const group = await readTxResultPromise
-        return group
+        return await readTxResultPromise
       } catch (error) {
         throw new Error(error)
       } finally {
