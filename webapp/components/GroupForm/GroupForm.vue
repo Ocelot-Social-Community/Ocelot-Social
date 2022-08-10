@@ -25,8 +25,8 @@
     
       </ds-form>
       <ds-space centered>
-        zurück
-      </ds-space>
+      <nuxt-link to="/my-groups">zurück</nuxt-link>
+    </ds-space>
     </ds-container>
   </div>
 </template>
@@ -35,6 +35,7 @@
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 
 export default {
+  name: 'GroupForm',
   components: {
     CategoriesSelect,
   },

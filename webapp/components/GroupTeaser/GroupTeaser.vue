@@ -1,7 +1,5 @@
 <template>
   <div class="group-teaser">
-    Group Teaser
-
     <ds-grid-item :row-span="2" column-span="fullWidth">
       <ds-space centered>
         <nuxt-link :to="{ name: 'group-create' }">
@@ -22,3 +20,10 @@
     </ds-grid-item>
   </div>
 </template>
+<script>
+ 
+export default  {
+    name: 'GroupTeaser',
+}
+</script>
+
