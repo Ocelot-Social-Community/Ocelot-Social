@@ -13,7 +13,7 @@ let authenticatedUser
 let user
 
 const categoryIds = ['cat9', 'cat4', 'cat15']
-const descriptionAddition100 =
+const descriptionAdditional100 =
   ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 let variables = {}
 
@@ -118,7 +118,7 @@ describe('Group', () => {
           id: 'others-group',
           name: 'Uninteresting Group',
           about: 'We will change nothing!',
-          description: 'We love it like it is!?' + descriptionAddition100,
+          description: 'We love it like it is!?' + descriptionAdditional100,
           groupType: 'closed',
           actionRadius: 'global',
           categoryIds,
@@ -131,7 +131,7 @@ describe('Group', () => {
           id: 'my-group',
           name: 'The Best Group',
           about: 'We will change the world!',
-          description: 'Some description' + descriptionAddition100,
+          description: 'Some description' + descriptionAdditional100,
           groupType: 'public',
           actionRadius: 'regional',
           categoryIds,
@@ -214,7 +214,7 @@ describe('CreateGroup', () => {
       name: 'The Best Group',
       slug: 'the-group',
       about: 'We will change the world!',
-      description: 'Some description' + descriptionAddition100,
+      description: 'Some description' + descriptionAdditional100,
       groupType: 'public',
       actionRadius: 'regional',
       categoryIds,

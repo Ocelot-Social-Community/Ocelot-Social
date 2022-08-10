@@ -12,7 +12,7 @@ let variables
 
 const driver = getDriver()
 const neode = getNeode()
-const descriptionAddition100 =
+const descriptionAdditional100 =
   ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 
 beforeAll(async () => {
@@ -69,7 +69,7 @@ describe('slugifyMiddleware', () => {
         ...variables,
         name: 'The Best Group',
         about: 'Some about',
-        description: 'Some description' + descriptionAddition100,
+        description: 'Some description' + descriptionAdditional100,
         groupType: 'closed',
         actionRadius: 'national',
         categoryIds,
@@ -89,7 +89,7 @@ describe('slugifyMiddleware', () => {
               name: 'The Best Group',
               slug: 'the-best-group',
               about: 'Some about',
-              description: 'Some description' + descriptionAddition100,
+              description: 'Some description' + descriptionAdditional100,
               groupType: 'closed',
               actionRadius: 'national',
             },
