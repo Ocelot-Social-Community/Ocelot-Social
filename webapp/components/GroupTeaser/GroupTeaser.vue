@@ -21,9 +21,7 @@
   </div>
 </template>
 <script>
- 
-export default  {
-    name: 'GroupTeaser',
+export default {
+  name: 'GroupTeaser',
 }
 </script>
-
