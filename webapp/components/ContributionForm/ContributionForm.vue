@@ -162,6 +162,7 @@ export default {
           image.aspectRatio = this.formData.imageAspectRatio
           image.type = this.formData.imageType
         }
+        console.log('image: ', image)
       }
       this.loading = true
       this.$apollo

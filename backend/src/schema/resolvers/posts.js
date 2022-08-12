@@ -79,6 +79,7 @@ export default {
     CreatePost: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds } = params
       const { image: imageInput } = params
+      console.log('imageInput: ', imageInput)
       delete params.categoryIds
       delete params.image
       params.id = params.id || uuid()
