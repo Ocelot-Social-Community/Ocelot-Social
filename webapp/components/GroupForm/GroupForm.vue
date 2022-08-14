@@ -14,9 +14,13 @@
 
         <ds-input v-model="form.description" label="Beschreibung" type="textarea" rows="3"></ds-input>
 
+        <categories-select 
+          v-model="form.categoryIds"
+          />
         <div>{{ form.name }}</div>
         <div>{{ form.status }}</div>
         <div>{{ form.description }}</div>
+        <div>{{ form.categoryIds }}</div>
 
         <ds-space margin-top="large">
           <ds-button @click.prevent="reset()">Reset form</ds-button>
@@ -39,19 +43,18 @@ export default {
     CategoriesSelect,
   },
   props:{
-    value: {
-      type: Object,
-       default: () => ({}),
-      required: true,
-    }
+    model: { type: String, required: true },
+    value: { type: String, default: '' },
   },
   data() {
     return {
+      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       form: {
         name: '',
         status: '',
         description: '',
         disable: false,
+        categoryIds: [],
       }
       
     }
