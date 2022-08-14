@@ -2,25 +2,25 @@
   <div>
     <ds-container>
       <ds-form @submit="submit">
-        <ds-input v-model="name" label="Gruppenname" placeholder="Your name ..."></ds-input>
+        <ds-input v-model="form.name" label="Gruppenname" placeholder="Your name ..."></ds-input>
 
         <ds-select
           icon="user"
-          v-model="status"
+          v-model="form.status"
           label="Status"
           :options="['offen', 'geschlossen', 'geheim']"
           placeholder="Status ..."
         ></ds-select>
 
-        <ds-input v-model="description" label="Beschreibung" type="textarea" rows="3"></ds-input>
+        <ds-input v-model="form.description" label="Beschreibung" type="textarea" rows="3"></ds-input>
 
-        <div>{{ name }}</div>
-        <div>{{ status }}</div>
-        <div>{{ description }}</div>
+        <div>{{ form.name }}</div>
+        <div>{{ form.status }}</div>
+        <div>{{ form.description }}</div>
 
         <ds-space margin-top="large">
           <ds-button @click.prevent="reset()">Reset form</ds-button>
-          <ds-button :disabled="disabled" icon="save" primary>Save group</ds-button>
+          <ds-button type="submit" :disabled="disabled" icon="save" primary>Save group</ds-button>
         </ds-space>
       </ds-form>
       <ds-space centered>
@@ -38,24 +38,33 @@ export default {
   components: {
     CategoriesSelect,
   },
+  props:{
+    value: {
+      type: Object,
+       default: () => ({}),
+      required: true,
+    }
+  },
   data() {
     return {
-      name: '',
-      status: '',
-      description: '',
-      disable: false,
+      form: {
+        name: '',
+        status: '',
+        description: '',
+        disable: false,
+      }
+      
     }
   },
 
   methods: {
     submit() {
-      console.log('handleSubmit')
-    },
-    handleSubmit() {
-      console.log('handleSubmit')
+       console.log('submit', this.form)
+      this.$emit('createGroup', this.form)
+     
     },
     reset() {
-      console.log('handleSubmit')
+      console.log('reset')
     },
   },
 }
