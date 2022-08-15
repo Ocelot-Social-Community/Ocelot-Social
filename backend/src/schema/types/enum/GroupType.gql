@@ -1,0 +1,5 @@
+enum GroupType {
+  public
+  closed
+  hidden
+}

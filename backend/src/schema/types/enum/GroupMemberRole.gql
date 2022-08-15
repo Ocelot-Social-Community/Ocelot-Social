@@ -1,0 +1,6 @@
+enum GroupMemberRole {
+  pending
+  usual
+  admin
+  owner
+}
