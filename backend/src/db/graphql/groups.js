@@ -35,9 +35,6 @@ export const createGroupMutation = gql`
       groupType
       actionRadius
       myRole
-      # Wolle: owner {
-      #   name
-      # }
     }
   }
 `
@@ -54,9 +51,6 @@ export const groupQuery = gql`
     $updatedAt: String
     $about: String
     $description: String
-    # $groupType: GroupType!,
-    # $actionRadius: GroupActionRadius!,
-    # $categoryIds: [ID]
     $locationName: String
     $first: Int
     $offset: Int
@@ -72,9 +66,6 @@ export const groupQuery = gql`
       updatedAt: $updatedAt
       about: $about
       description: $description
-      # groupType: $groupType
-      # actionRadius: $actionRadius
-      # categoryIds: $categoryIds
       locationName: $locationName
       first: $first
       offset: $offset
@@ -99,9 +90,6 @@ export const groupQuery = gql`
         name
         icon
       }
-      # Wolle: owner {
-      #   name
-      # }
     }
   }
 `

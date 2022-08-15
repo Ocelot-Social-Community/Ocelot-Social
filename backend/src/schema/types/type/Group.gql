@@ -13,8 +13,6 @@ enum _GroupOrdering {
   createdAt_desc
   updatedAt_asc
   updatedAt_desc
-  # Wolle: needed? locale_asc
-  # locale_desc
 }
 
 type Group {
@@ -40,90 +38,6 @@ type Group {
   categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
   myRole: GroupMemberRole # if 'null' then the current user is no member
-
-  # Wolle: needed?
-  # socialMedia: [SocialMedia]! @relation(name: "OWNED_BY", direction: "IN")
-
-  # Wolle: owner: User @relation(name: "OWNS", direction: "IN")
-
-  # Wolle: showShoutsPublicly: Boolean
-  # Wolle: sendNotificationEmails: Boolean
-  # Wolle: needed? locale: String
-  # members: [User]! @relation(name: "MEMBERS", direction: "OUT")
-  # membersCount: Int!
-  #   @cypher(statement: "MATCH (this)-[:MEMBERS]->(r:User) RETURN COUNT(DISTINCT r)")
-
-  # Wolle: followedBy: [User]! @relation(name: "FOLLOWS", direction: "IN")
-  # Wolle: followedByCount: Int!
-  #   @cypher(statement: "MATCH (this)<-[:FOLLOWS]-(r:User) RETURN COUNT(DISTINCT r)")
-
-  # Wolle: inviteCodes: [InviteCode] @relation(name: "GENERATED", direction: "OUT")
-  # Wolle: redeemedInviteCode: InviteCode @relation(name: "REDEEMED", direction: "OUT")
-
-  # Is the currently logged in user following that user?
-  # Wolle: followedByCurrentUser: Boolean!
-  #   @cypher(
-  #     statement: """
-  #     MATCH (this)<-[:FOLLOWS]-(u:User { id: $cypherParams.currentUserId})
-  #     RETURN COUNT(u) >= 1
-  #     """
-  #   )
-
-  # Wolle: isBlocked: Boolean!
-  #   @cypher(
-  #     statement: """
-  #     MATCH (this)<-[:BLOCKED]-(user:User {id: $cypherParams.currentUserId})
-  #     RETURN COUNT(user) >= 1
-  #     """
-  #   )
-  # Wolle: blocked: Boolean!
-  #   @cypher(
-  #     statement: """
-  #     MATCH (this)-[:BLOCKED]-(user:User {id: $cypherParams.currentUserId})
-  #     RETURN COUNT(user) >= 1
-  #     """
-  #   )
-
-  # Wolle: isMuted: Boolean!
-  #   @cypher(
-  #     statement: """
-  #     MATCH (this)<-[:MUTED]-(user:User { id: $cypherParams.currentUserId})
-  #     RETURN COUNT(user) >= 1
-  #     """
-  #   )
-
-  # contributions: [WrittenPost]!
-  # contributions2(first: Int = 10, offset: Int = 0): [WrittenPost2]!
-  # @cypher(
-  # statement: "MATCH (this)-[w:WROTE]->(p:Post) RETURN p as Post, w.timestamp as timestamp"
-  # )
-  # Wolle: needed?
-  # contributions: [Post]! @relation(name: "WROTE", direction: "OUT")
-  # contributionsCount: Int!
-  #   @cypher(
-  #     statement: """
-  #     MATCH (this)-[:WROTE]->(r:Post)
-  #     WHERE NOT r.deleted = true AND NOT r.disabled = true
-  #     RETURN COUNT(r)
-  #     """
-  #   )
-
-  # Wolle: comments: [Comment]! @relation(name: "WROTE", direction: "OUT")
-  # commentedCount: Int!
-  #   @cypher(
-  #     statement: "MATCH (this)-[:WROTE]->(:Comment)-[:COMMENTS]->(p:Post) WHERE NOT p.deleted = true AND NOT p.disabled = true RETURN COUNT(DISTINCT(p))"
-  #   )
-
-  # Wolle: shouted: [Post]! @relation(name: "SHOUTED", direction: "OUT")
-  # shoutedCount: Int!
-  #   @cypher(
-  #     statement: "MATCH (this)-[:SHOUTED]->(r:Post) WHERE NOT r.deleted = true AND NOT r.disabled = true RETURN COUNT(DISTINCT r)"
-  #   )
-
-  # Wolle: badges: [Badge]! @relation(name: "REWARDED", direction: "IN")
-  # badgesCount: Int! @cypher(statement: "MATCH (this)<-[:REWARDED]-(r:Badge) RETURN COUNT(r)")
-
-  # Wolle: emotions: [EMOTED]
 }
 
 
@@ -141,39 +55,6 @@ input _GroupFilter {
   id_not: ID
   id_in: [ID!]
   id_not_in: [ID!]
-  # categories: _CategoryFilter
-  # categories_not: _CategoryFilter
-  # categories_in: [_CategoryFilter!]
-  # categories_not_in: [_CategoryFilter!]
-  # categories_some: _CategoryFilter
-  # categories_none: _CategoryFilter
-  # categories_single: _CategoryFilter
-  # categories_every: _CategoryFilter
-  # Wolle:
-  # friends: _GroupFilter
-  # friends_not: _GroupFilter
-  # friends_in: [_GroupFilter!]
-  # friends_not_in: [_GroupFilter!]
-  # friends_some: _GroupFilter
-  # friends_none: _GroupFilter
-  # friends_single: _GroupFilter
-  # friends_every: _GroupFilter
-  # following: _GroupFilter
-  # following_not: _GroupFilter
-  # following_in: [_GroupFilter!]
-  # following_not_in: [_GroupFilter!]
-  # following_some: _GroupFilter
-  # following_none: _GroupFilter
-  # following_single: _GroupFilter
-  # following_every: _GroupFilter
-  # followedBy: _GroupFilter
-  # followedBy_not: _GroupFilter
-  # followedBy_in: [_GroupFilter!]
-  # followedBy_not_in: [_GroupFilter!]
-  # followedBy_some: _GroupFilter
-  # followedBy_none: _GroupFilter
-  # followedBy_single: _GroupFilter
-  # followedBy_every: _GroupFilter
 }
 
 type Query {
@@ -198,31 +79,7 @@ type Query {
   AvailableGroupActionRadii: [GroupActionRadius]!
 
   AvailableGroupMemberRoles: [GroupMemberRole]!
-
-  # Wolle:
-  # availableRoles: [UserRole]!
-  # mutedUsers: [User]
-  # blockedUsers: [User]
-  # isLoggedIn: Boolean!
-  # currentUser: User
-  # findUsers(query: String!,limit: Int = 10, filter: _GroupFilter): [User]!
-  #   @cypher(
-  #     statement: """
-  #     CALL db.index.fulltext.queryNodes('user_fulltext_search', $query)
-  #     YIELD node as post, score
-  #     MATCH (user)
-  #     WHERE score >= 0.2
-  #     AND NOT user.deleted = true AND NOT user.disabled = true
-  #     RETURN user
-  #     LIMIT $limit
-  #       """
-  #   )
 }
-
-# Wolle: enum Deletable {
-#   Post
-#   Comment
-# }
 
 type Mutation {
   CreateGroup(
@@ -236,12 +93,7 @@ type Mutation {
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
     locationName: String
-  ): # Wolle: add group settings
-  # Wolle:
-  # showShoutsPublicly: Boolean
-  # sendNotificationEmails: Boolean
-  # locale: String
-  Group
+  ): Group
 
   UpdateGroup(
     id: ID!
@@ -251,19 +103,7 @@ type Mutation {
     locationName: String
     about: String
     description: String
-  ): # Wolle:
-  # showShoutsPublicly: Boolean
-  # sendNotificationEmails: Boolean
-  # locale: String
-  Group
+  ): Group
 
   DeleteGroup(id: ID!): Group
-
-  # Wolle:
-  # muteUser(id: ID!): User
-  # unmuteUser(id: ID!): User
-  # blockUser(id: ID!): User
-  # unblockUser(id: ID!): User
-
-  # Wolle: switchUserRole(role: UserRole!, id: ID!): User
 }
