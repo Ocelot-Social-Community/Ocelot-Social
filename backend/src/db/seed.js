@@ -5,7 +5,9 @@ import createServer from '../server'
 import faker from '@faker-js/faker'
 import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
-import { gql } from '../helpers/jest'
+// import { createGroupMutation } from './graphql/groups'
+import { createPostMutation } from './graphql/posts'
+import { createCommentMutation } from './graphql/comments'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
@@ -558,13 +560,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       'See <a class="hashtag" data-hashtag-id="NaturphilosophieYoga" href="/?hashtag=NaturphilosophieYoga">#NaturphilosophieYoga</a>, it can really help you!'
     const hashtagAndMention1 =
       'The new physics of <a class="hashtag" data-hashtag-id="QuantenFlussTheorie" href="/?hashtag=QuantenFlussTheorie">#QuantenFlussTheorie</a> can explain <a class="hashtag" data-hashtag-id="QuantumGravity" href="/?hashtag=QuantumGravity">#QuantumGravity</a>! <a class="mention" data-mention-id="u1" href="/profile/u1">@peter-lustig</a> got that already. ;-)'
-    const createPostMutation = gql`
-      mutation ($id: ID, $title: String!, $content: String!, $categoryIds: [ID]) {
-        CreatePost(id: $id, title: $title, content: $content, categoryIds: $categoryIds) {
-          id
-        }
-      }
-    `
 
     await Promise.all([
       mutate({
@@ -615,13 +610,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       'I heard <a class="mention" data-mention-id="u3" href="/profile/u3">@jenny-rostock</a> has practiced it for 3 years now.'
     const mentionInComment2 =
       'Did <a class="mention" data-mention-id="u1" href="/profile/u1">@peter-lustig</a> tell you?'
-    const createCommentMutation = gql`
-      mutation ($id: ID, $postId: ID!, $content: String!) {
-        CreateComment(id: $id, postId: $postId, content: $content) {
-          id
-        }
-      }
-    `
     await Promise.all([
       mutate({
         mutation: createCommentMutation,
