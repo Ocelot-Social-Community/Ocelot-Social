@@ -51,10 +51,10 @@ export default {
     CreateGroup: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds } = params
       delete params.categoryIds
-      if (!categoryIds || categoryIds.length < CATEGORIES_MIN) {
+      if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
         throw new UserInputError('Too view categories!')
       }
-      if (categoryIds && categoryIds.length > CATEGORIES_MAX) {
+      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
         throw new UserInputError('Too many categories!')
       }
       if (
@@ -94,7 +94,7 @@ export default {
           `,
           { userId: context.user.id, categoryIds, params },
         )
-        const [group] = ownerCreateGroupTransactionResponse.records.map((record) =>
+        const [group] = await ownerCreateGroupTransactionResponse.records.map((record) =>
           record.get('group'),
         )
         return group
