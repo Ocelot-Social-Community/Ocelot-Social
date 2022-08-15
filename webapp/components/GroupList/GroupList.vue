@@ -10,8 +10,8 @@
             @click="deleteGroup(scope.row)"
           ></base-button>
         </template>
-         <template slot="name" slot-scope="scope">
-            <nuxt-link to="/group/g1/testgruppe" > {{ scope.row.name }}</nuxt-link>
+        <template slot="name" slot-scope="scope">
+          <nuxt-link to="/group/g1/testgruppe">{{ scope.row.name }}</nuxt-link>
         </template>
         <template slot="status" slot-scope="scope">
           <ds-tag :color="status">{{ scope.row.status }}</ds-tag>
@@ -26,7 +26,6 @@
           <nuxt-link :to="{ name: 'group-create' }">
             <ds-icon v-show="scope.row.owner" name="ellipsis-v"></ds-icon>
           </nuxt-link>
-         
         </template>
       </ds-table>
     </ds-container>

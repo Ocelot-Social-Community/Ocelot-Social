@@ -1,24 +1,21 @@
 <template>
   <div>
     <ds-container class="group-card">
+      {{ responseGroupListQuery }}
       <ds-space><h2>Group Card</h2></ds-space>
       <ds-grid>
         <ds-grid-item v-for="item in items" :key="item.id" :row-span="8">
-        <ds-placeholder>
-        <base-button
-            v-if="item.owner"
-            icon="trash"
-            @click="deleteGroup(item)"
-          ></base-button>
-          <nuxt-link to="/group/g1/testgruppe"> {{ item.name }}</nuxt-link> 
-          <base-button
-            v-if="!item.owner"
-            icon="close"
-            @click="unfollowGroup(item.row)"
-          ></base-button>
-          <nuxt-link :to="{ name: 'group-create' }">
-            <ds-icon v-show="item.owner" name="ellipsis-v"></ds-icon>
-          </nuxt-link>
+          <ds-placeholder>
+            <base-button v-if="item.owner" icon="trash" @click="deleteGroup(item)"></base-button>
+            <nuxt-link to="/group/g1/testgruppe">{{ item.name }}</nuxt-link>
+            <base-button
+              v-if="!item.owner"
+              icon="close"
+              @click="unfollowGroup(item.row)"
+            ></base-button>
+            <nuxt-link :to="{ name: 'group-create' }">
+              <ds-icon v-show="item.owner" name="ellipsis-v"></ds-icon>
+            </nuxt-link>
           </ds-placeholder>
         </ds-grid-item>
       </ds-grid>
@@ -30,6 +27,7 @@ export default {
   name: 'GroupList',
   props: {
     items: { type: Array, default: () => [] },
+    responseGroupListQuery: { type: Array, default: () => [] },
   },
   methods: {
     deleteGroup() {

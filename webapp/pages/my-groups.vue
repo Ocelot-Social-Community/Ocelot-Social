@@ -5,13 +5,14 @@
     <group-list :items="items" :fields="fields" />
     <br />
     <br />
-    <group-card :items="items" />
+    <group-card :items="items" :responseGroupListQuery="responseGroupListQuery" />
   </div>
 </template>
 <script>
 import GroupTeaser from '~/components/GroupTeaser/GroupTeaser.vue'
 import GroupList from '~/components/GroupList/GroupList.vue'
 import GroupCard from '~/components/GroupList/GroupCard.vue'
+import { groupQuery } from '~/graphql/groups.js'
 
 /*
  *
@@ -28,6 +29,7 @@ export default {
   },
   data() {
     return {
+      responseGroupListQuery: [],
       fields: ['delete', 'name', 'desc', 'status', 'edit'],
       items: [
         {
@@ -61,6 +63,23 @@ export default {
         },
       ],
     }
+  },
+  methods: {
+    async groupListQuery() {
+      try {
+        const response = await this.$apollo.query({
+          query: groupQuery,
+        })
+        this.responseGroupListQuery = response.data
+      } catch (error) {
+        this.responseGroupListQuery = []
+      } finally {
+        this.pending = false
+      }
+    },
+  },
+  created() {
+    this.groupListQuery()
   },
 }
 </script>

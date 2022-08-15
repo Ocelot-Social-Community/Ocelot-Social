@@ -1,6 +1,6 @@
 <template>
-<div>
+  <div>
     <ds-space />
-    Group Page 
-</div>    
+    Group Page
+  </div>
 </template>

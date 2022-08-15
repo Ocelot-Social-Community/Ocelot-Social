@@ -46,6 +46,7 @@ export default {
   },
   methods: {
     toggleCategory(id) {
+      console.log('toggleCategory', id)
       this.selectedCategoryIds = xor(this.selectedCategoryIds, [id])
       if (this.$parentForm) {
         this.$parentForm.update(this.model, this.selectedCategoryIds)
