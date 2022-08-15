@@ -5,7 +5,9 @@ import createServer from '../server'
 import faker from '@faker-js/faker'
 import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
-import { gql } from '../helpers/jest'
+import { createGroupMutation } from './graphql/groups'
+import { createPostMutation } from './graphql/posts'
+import { createCommentMutation } from './graphql/comments'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
@@ -381,6 +383,58 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       }),
     ])
 
+    // Create Groups
+
+    authenticatedUser = await peterLustig.toJson()
+    await Promise.all([
+      mutate({
+        mutation: createGroupMutation,
+        variables: {
+          id: 'g0',
+          name: 'Investigative Journalism',
+          about: 'Investigative journalists share ideas and insights and can collaborate.',
+          description: `<p class=""><em>English:</em></p><p class="">This group is hidden.</p><h3>What is our group for?</h3><p>This group was created to allow investigative journalists to share and collaborate.</p><h3>How does it work?</h3><p>Here you can internally share posts and comments about them.</p><p><br></p><p><em>Deutsch:</em></p><p class="">Diese Gruppe ist verborgen.</p><h3>Wofür ist unsere Gruppe?</h3><p class="">Diese Gruppe wurde geschaffen, um investigativen Journalisten den Austausch und die Zusammenarbeit zu ermöglichen.</p><h3>Wie funktioniert das?</h3><p class="">Hier könnt ihr euch intern über Beiträge und Kommentare zu ihnen austauschen.</p>`,
+          groupType: 'hidden',
+          actionRadius: 'global',
+          categoryIds: ['cat6', 'cat9', 'cat14'],
+        },
+      }),
+    ])
+
+    authenticatedUser = await jennyRostock.toJson()
+    await Promise.all([
+      mutate({
+        mutation: createGroupMutation,
+        variables: {
+          id: 'g1',
+          name: 'School For Citizens',
+          about: 'Our children shall receive education for life.',
+          description: `<p class=""><em>English</em></p><h3>Our goal</h3><p>Only those who enjoy learning and do not lose their curiosity can obtain a good education for life and continue to learn with joy throughout their lives.</p><h3>Curiosity</h3><p>For this we need a school that takes up the curiosity of the children, the people, and satisfies it through a lot of experience.</p><p><br></p><p><em>Deutsch</em></p><h3>Unser Ziel</h3><p class="">Nur wer Spaß am Lernen hat und seine Neugier nicht verliert, kann gute Bildung für's Leben erlangen und sein ganzes Leben mit Freude weiter lernen.</p><h3>Neugier</h3><p class="">Dazu benötigen wir eine Schule, die die Neugier der Kinder, der Menschen, aufnimmt und durch viel Erfahrung befriedigt.</p>`,
+          groupType: 'closed',
+          actionRadius: 'national',
+          categoryIds: ['cat7', 'cat9', 'cat16'],
+        },
+      }),
+    ])
+
+    authenticatedUser = await bobDerBaumeister.toJson()
+    await Promise.all([
+      mutate({
+        mutation: createGroupMutation,
+        variables: {
+          id: 'g2',
+          name: 'Yoga Practice',
+          about: 'We do yoga around the clock.',
+          description: `<h3>What Is yoga?</h3><p>Yoga is not just about practicing asanas. It's about how we do it.</p><p class="">And practicing asanas doesn't have to be yoga, it can be more athletic than yogic.</p><h3>What makes practicing asanas yogic?</h3><p class="">The important thing is:</p><ul><li><p>Use the exercises (consciously) for your personal development.</p></li></ul>`,
+          groupType: 'public',
+          actionRadius: 'interplanetary',
+          categoryIds: ['cat3', 'cat13', 'cat16'],
+        },
+      }),
+    ])
+
+    // Create Posts
+
     const [p0, p1, p3, p4, p5, p6, p9, p10, p11, p13, p14, p15] = await Promise.all([
       Factory.build(
         'post',
@@ -558,13 +612,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       'See <a class="hashtag" data-hashtag-id="NaturphilosophieYoga" href="/?hashtag=NaturphilosophieYoga">#NaturphilosophieYoga</a>, it can really help you!'
     const hashtagAndMention1 =
       'The new physics of <a class="hashtag" data-hashtag-id="QuantenFlussTheorie" href="/?hashtag=QuantenFlussTheorie">#QuantenFlussTheorie</a> can explain <a class="hashtag" data-hashtag-id="QuantumGravity" href="/?hashtag=QuantumGravity">#QuantumGravity</a>! <a class="mention" data-mention-id="u1" href="/profile/u1">@peter-lustig</a> got that already. ;-)'
-    const createPostMutation = gql`
-      mutation ($id: ID, $title: String!, $content: String!, $categoryIds: [ID]) {
-        CreatePost(id: $id, title: $title, content: $content, categoryIds: $categoryIds) {
-          id
-        }
-      }
-    `
 
     await Promise.all([
       mutate({
@@ -615,13 +662,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       'I heard <a class="mention" data-mention-id="u3" href="/profile/u3">@jenny-rostock</a> has practiced it for 3 years now.'
     const mentionInComment2 =
       'Did <a class="mention" data-mention-id="u1" href="/profile/u1">@peter-lustig</a> tell you?'
-    const createCommentMutation = gql`
-      mutation ($id: ID, $postId: ID!, $content: String!) {
-        CreateComment(id: $id, postId: $postId, content: $content) {
-          id
-        }
-      }
-    `
     await Promise.all([
       mutate({
         mutation: createCommentMutation,
