@@ -3,6 +3,7 @@ import Factory, { cleanDatabase } from '../../db/factories'
 import { createGroupMutation, groupQuery } from '../../db/graphql/groups'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
+import CONFIG from '../../config'
 
 const driver = getDriver()
 const neode = getNeode()
@@ -291,6 +292,10 @@ describe('CreateGroup', () => {
     })
 
     describe('categories', () => {
+      beforeEach(() => {
+        CONFIG.CATEGORIES_ACTIVE = true
+      })
+
       describe('not even one', () => {
         it('throws error: "Too view categories!"', async () => {
           const { errors } = await mutate({
