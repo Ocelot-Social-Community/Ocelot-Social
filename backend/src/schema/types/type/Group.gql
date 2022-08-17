@@ -74,6 +74,14 @@ type Query {
     filter: _GroupFilter
   ): [Group]
 
+  GroupMember(
+    id: ID
+    first: Int
+    offset: Int
+    orderBy: [_GroupOrdering]
+    filter: _GroupFilter
+  ): [User]
+
   AvailableGroupTypes: [GroupType]!
 
   AvailableGroupActionRadii: [GroupActionRadius]!

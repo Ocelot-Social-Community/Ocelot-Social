@@ -207,6 +207,128 @@ describe('Group', () => {
   })
 })
 
+describe('GroupMember', () => {
+  describe('unauthenticated', () => {
+    it('throws authorization error', async () => {
+      const { errors } = await query({ query: groupQuery, variables: {} })
+      expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+    })
+  })
+
+  describe('authenticated', () => {
+    beforeEach(async () => {
+      authenticatedUser = await user.toJson()
+    })
+
+    let otherUser
+
+    beforeEach(async () => {
+      otherUser = await Factory.build(
+        'user',
+        {
+          id: 'other-user',
+          name: 'Other TestUser',
+        },
+        {
+          email: 'test2@example.org',
+          password: '1234',
+        },
+      )
+      authenticatedUser = await otherUser.toJson()
+      await mutate({
+        mutation: createGroupMutation,
+        variables: {
+          id: 'others-group',
+          name: 'Uninteresting Group',
+          about: 'We will change nothing!',
+          description: 'We love it like it is!?' + descriptionAdditional100,
+          groupType: 'closed',
+          actionRadius: 'global',
+          categoryIds,
+        },
+      })
+      authenticatedUser = await user.toJson()
+      await mutate({
+        mutation: createGroupMutation,
+        variables: {
+          id: 'my-group',
+          name: 'The Best Group',
+          about: 'We will change the world!',
+          description: 'Some description' + descriptionAdditional100,
+          groupType: 'public',
+          actionRadius: 'regional',
+          categoryIds,
+        },
+      })
+    })
+
+    describe('query group members', () => {
+      describe('by owner', () => {
+        it.only('finds all members', async () => {
+          const expected = {
+            data: {
+              GroupMember: expect.arrayContaining([
+                expect.objectContaining({
+                  id: 'my-group',
+                  slug: 'the-best-group',
+                  myRole: 'owner',
+                }),
+                // Wolle: expect.objectContaining({
+                //   id: 'others-group',
+                //   slug: 'uninteresting-group',
+                //   myRole: null,
+                // }),
+              ]),
+            },
+            errors: undefined,
+          }
+          await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject(expected)
+        })
+      })
+
+      describe('isMember = true', () => {
+        it('finds only groups where user is member', async () => {
+          const expected = {
+            data: {
+              Group: [
+                {
+                  id: 'my-group',
+                  slug: 'the-best-group',
+                  myRole: 'owner',
+                },
+              ],
+            },
+            errors: undefined,
+          }
+          await expect(
+            query({ query: groupQuery, variables: { isMember: true } }),
+          ).resolves.toMatchObject(expected)
+        })
+      })
+
+      describe('isMember = false', () => {
+        it('finds only groups where user is not(!) member', async () => {
+          const expected = {
+            data: {
+              Group: expect.arrayContaining([
+                expect.objectContaining({
+                  id: 'others-group',
+                  slug: 'uninteresting-group',
+                  myRole: null,
+                }),
+              ]),
+            },
+            errors: undefined,
+          }
+          await expect(
+            query({ query: groupQuery, variables: { isMember: false } }),
+          ).resolves.toMatchObject(expected)
+        })
+      })
+    })
+  })
+})
+
 describe('CreateGroup', () => {
   beforeEach(() => {
     variables = {

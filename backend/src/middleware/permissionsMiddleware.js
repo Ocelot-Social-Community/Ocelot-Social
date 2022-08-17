@@ -52,6 +52,37 @@ const isMySocialMedia = rule({
   return socialMedia.ownedBy.node.id === user.id
 })
 
+const isAllowSeeingMembersOfGroup = rule({
+  cache: 'no_cache',
+})(async (_parent, args, { user, driver }) => {
+  if (!user) return false
+  const { id: groupId } = args
+  const session = driver.session()
+  const readTxPromise = session.readTransaction(async (transaction) => {
+    const transactionResponse = await transaction.run(
+      `
+        MATCH (group:Group {id: $groupId})
+        OPTIONAL MATCH (admin {id:User $userId})-[membership:MEMBER_OF]->(group)
+        WHERE membership.role IN ['admin', 'owner']
+        RETURN group, admin
+      `,
+      { groupId, userId: user.id },
+    )
+    return {
+      admin: transactionResponse.records.map((record) => record.get('admin')),
+      group: transactionResponse.records.map((record) => record.get('group')),
+    }
+  })
+  try {
+    const [{ admin, group }] = await readTxPromise
+    return group.groupType === 'public' || !!admin
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+})
+
 const isAuthor = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
@@ -115,6 +146,7 @@ export default shield(
       statistics: allow,
       currentUser: allow,
       Group: isAuthenticated,
+      GroupMember: isAllowSeeingMembersOfGroup,
       Post: allow,
       profilePagePosts: allow,
       Comment: allow,

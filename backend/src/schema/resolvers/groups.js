@@ -46,6 +46,28 @@ export default {
         session.close()
       }
     },
+    GroupMember: async (_object, params, context, _resolveInfo) => {
+      const { id: groupId } = params
+      const session = context.driver.session()
+      const readTxResultPromise = session.readTransaction(async (txc) => {
+        const groupMemberCypher = `
+          MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(:Group {id: $groupId})
+          RETURN user {.*, myRoleInGroup: membership.role}
+        `
+        const result = await txc.run(groupMemberCypher, {
+          groupId,
+          userId: context.user.id,
+        })
+        return result.records.map((record) => record.get('user'))
+      })
+      try {
+        return await readTxResultPromise
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
   },
   Mutation: {
     CreateGroup: async (_parent, params, context, _resolveInfo) => {
