@@ -71,15 +71,14 @@ type Query {
     first: Int
     offset: Int
     orderBy: [_GroupOrdering]
-    filter: _GroupFilter
   ): [Group]
 
   GroupMember(
-    id: ID
+    id: ID!
     first: Int
     offset: Int
-    orderBy: [_GroupOrdering]
-    filter: _GroupFilter
+    orderBy: [_UserOrdering]
+    filter: _UserFilter
   ): [User]
 
   AvailableGroupTypes: [GroupType]!
@@ -114,4 +113,9 @@ type Mutation {
   ): Group
 
   DeleteGroup(id: ID!): Group
+
+  EnterGroup(
+    id: ID!
+    userId: ID!
+  ): User
 }

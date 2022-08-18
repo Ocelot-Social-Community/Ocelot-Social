@@ -109,7 +109,7 @@ export default {
             MERGE (owner)-[:CREATED]->(group)
             MERGE (owner)-[membership:MEMBER_OF]->(group)
             SET membership.createdAt = toString(datetime())
-            SET membership.updatedAt = toString(datetime())
+            SET membership.updatedAt = membership.createdAt
             SET membership.role = 'owner'
             ${categoriesCypher}
             RETURN group {.*, myRole: membership.role}
@@ -122,11 +122,39 @@ export default {
         return group
       })
       try {
-        const group = await writeTxResultPromise
-        return group
+        return await writeTxResultPromise
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
           throw new UserInputError('Group with this slug already exists!')
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    EnterGroup: async (_parent, params, context, _resolveInfo) => {
+      const { id: groupId, userId } = params
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const enterGroupCypher = `
+          MATCH (member:User {id: $userId}), (group:Group {id: $groupId})
+          MERGE (member)-[membership:MEMBER_OF]->(group)
+          ON CREATE SET
+            membership.createdAt = toString(datetime()),
+            membership.updatedAt = membership.createdAt,
+            membership.role =
+              CASE WHEN group.groupType = 'public'
+                THEN 'usual'
+                ELSE 'pending'
+                END
+          RETURN member {.*, myRoleInGroup: membership.role}
+        `
+        const result = await transaction.run(enterGroupCypher, { groupId, userId })
+        const [member] = await result.records.map((record) => record.get('member'))
+        return member
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
         throw new Error(error)
       } finally {
         session.close()

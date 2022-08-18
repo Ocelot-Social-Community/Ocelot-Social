@@ -62,9 +62,9 @@ const isAllowSeeingMembersOfGroup = rule({
     const transactionResponse = await transaction.run(
       `
         MATCH (group:Group {id: $groupId})
-        OPTIONAL MATCH (admin {id:User $userId})-[membership:MEMBER_OF]->(group)
+        OPTIONAL MATCH (admin:User {id: $userId})-[membership:MEMBER_OF]->(group)
         WHERE membership.role IN ['admin', 'owner']
-        RETURN group, admin
+        RETURN group, admin {.*, myRoleInGroup: membership.role}
       `,
       { groupId, userId: user.id },
     )
@@ -174,6 +174,7 @@ export default shield(
       SignupVerification: allow,
       UpdateUser: onlyYourself,
       CreateGroup: isAuthenticated,
+      EnterGroup: isAuthenticated,
       CreatePost: isAuthenticated,
       UpdatePost: isAuthor,
       DeletePost: isAuthor,

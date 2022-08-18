@@ -1,6 +1,11 @@
 import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../../db/factories'
-import { createGroupMutation, groupQuery } from '../../db/graphql/groups'
+import {
+  createGroupMutation,
+  enterGroupMutation,
+  groupMemberQuery,
+  groupQuery,
+} from '../../db/graphql/groups'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
 import CONFIG from '../../config'
@@ -94,10 +99,6 @@ describe('Group', () => {
   })
 
   describe('authenticated', () => {
-    beforeEach(async () => {
-      authenticatedUser = await user.toJson()
-    })
-
     let otherUser
 
     beforeEach(async () => {
@@ -207,127 +208,127 @@ describe('Group', () => {
   })
 })
 
-describe('GroupMember', () => {
-  describe('unauthenticated', () => {
-    it('throws authorization error', async () => {
-      const { errors } = await query({ query: groupQuery, variables: {} })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
-    })
-  })
+// describe('GroupMember', () => {
+//   describe('unauthenticated', () => {
+//     it('throws authorization error', async () => {
+//       const { errors } = await query({ query: groupMemberQuery, variables: {} })
+//       expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+//     })
+//   })
 
-  describe('authenticated', () => {
-    beforeEach(async () => {
-      authenticatedUser = await user.toJson()
-    })
+//   describe('authenticated', () => {
+//     beforeEach(async () => {
+//       authenticatedUser = await user.toJson()
+//     })
 
-    let otherUser
+//     let otherUser
 
-    beforeEach(async () => {
-      otherUser = await Factory.build(
-        'user',
-        {
-          id: 'other-user',
-          name: 'Other TestUser',
-        },
-        {
-          email: 'test2@example.org',
-          password: '1234',
-        },
-      )
-      authenticatedUser = await otherUser.toJson()
-      await mutate({
-        mutation: createGroupMutation,
-        variables: {
-          id: 'others-group',
-          name: 'Uninteresting Group',
-          about: 'We will change nothing!',
-          description: 'We love it like it is!?' + descriptionAdditional100,
-          groupType: 'closed',
-          actionRadius: 'global',
-          categoryIds,
-        },
-      })
-      authenticatedUser = await user.toJson()
-      await mutate({
-        mutation: createGroupMutation,
-        variables: {
-          id: 'my-group',
-          name: 'The Best Group',
-          about: 'We will change the world!',
-          description: 'Some description' + descriptionAdditional100,
-          groupType: 'public',
-          actionRadius: 'regional',
-          categoryIds,
-        },
-      })
-    })
+//     beforeEach(async () => {
+//       otherUser = await Factory.build(
+//         'user',
+//         {
+//           id: 'other-user',
+//           name: 'Other TestUser',
+//         },
+//         {
+//           email: 'test2@example.org',
+//           password: '1234',
+//         },
+//       )
+//       authenticatedUser = await otherUser.toJson()
+//       await mutate({
+//         mutation: createGroupMutation,
+//         variables: {
+//           id: 'others-group',
+//           name: 'Uninteresting Group',
+//           about: 'We will change nothing!',
+//           description: 'We love it like it is!?' + descriptionAdditional100,
+//           groupType: 'closed',
+//           actionRadius: 'global',
+//           categoryIds,
+//         },
+//       })
+//       authenticatedUser = await user.toJson()
+//       await mutate({
+//         mutation: createGroupMutation,
+//         variables: {
+//           id: 'my-group',
+//           name: 'The Best Group',
+//           about: 'We will change the world!',
+//           description: 'Some description' + descriptionAdditional100,
+//           groupType: 'public',
+//           actionRadius: 'regional',
+//           categoryIds,
+//         },
+//       })
+//     })
 
-    describe('query group members', () => {
-      describe('by owner', () => {
-        it.only('finds all members', async () => {
-          const expected = {
-            data: {
-              GroupMember: expect.arrayContaining([
-                expect.objectContaining({
-                  id: 'my-group',
-                  slug: 'the-best-group',
-                  myRole: 'owner',
-                }),
-                // Wolle: expect.objectContaining({
-                //   id: 'others-group',
-                //   slug: 'uninteresting-group',
-                //   myRole: null,
-                // }),
-              ]),
-            },
-            errors: undefined,
-          }
-          await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject(expected)
-        })
-      })
+//     describe('query group members', () => {
+//       describe('by owner', () => {
+//         it.only('finds all members', async () => {
+//           const expected = {
+//             data: {
+//               GroupMember: expect.arrayContaining([
+//                 expect.objectContaining({
+//                   id: 'my-group',
+//                   slug: 'the-best-group',
+//                   myRole: 'owner',
+//                 }),
+//                 // Wolle: expect.objectContaining({
+//                 //   id: 'others-group',
+//                 //   slug: 'uninteresting-group',
+//                 //   myRole: null,
+//                 // }),
+//               ]),
+//             },
+//             errors: undefined,
+//           }
+//           await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject(expected)
+//         })
+//       })
 
-      describe('isMember = true', () => {
-        it('finds only groups where user is member', async () => {
-          const expected = {
-            data: {
-              Group: [
-                {
-                  id: 'my-group',
-                  slug: 'the-best-group',
-                  myRole: 'owner',
-                },
-              ],
-            },
-            errors: undefined,
-          }
-          await expect(
-            query({ query: groupQuery, variables: { isMember: true } }),
-          ).resolves.toMatchObject(expected)
-        })
-      })
+//       describe('isMember = true', () => {
+//         it('finds only groups where user is member', async () => {
+//           const expected = {
+//             data: {
+//               Group: [
+//                 {
+//                   id: 'my-group',
+//                   slug: 'the-best-group',
+//                   myRole: 'owner',
+//                 },
+//               ],
+//             },
+//             errors: undefined,
+//           }
+//           await expect(
+//             query({ query: groupQuery, variables: { isMember: true } }),
+//           ).resolves.toMatchObject(expected)
+//         })
+//       })
 
-      describe('isMember = false', () => {
-        it('finds only groups where user is not(!) member', async () => {
-          const expected = {
-            data: {
-              Group: expect.arrayContaining([
-                expect.objectContaining({
-                  id: 'others-group',
-                  slug: 'uninteresting-group',
-                  myRole: null,
-                }),
-              ]),
-            },
-            errors: undefined,
-          }
-          await expect(
-            query({ query: groupQuery, variables: { isMember: false } }),
-          ).resolves.toMatchObject(expected)
-        })
-      })
-    })
-  })
-})
+//       describe('isMember = false', () => {
+//         it('finds only groups where user is not(!) member', async () => {
+//           const expected = {
+//             data: {
+//               Group: expect.arrayContaining([
+//                 expect.objectContaining({
+//                   id: 'others-group',
+//                   slug: 'uninteresting-group',
+//                   myRole: null,
+//                 }),
+//               ]),
+//             },
+//             errors: undefined,
+//           }
+//           await expect(
+//             query({ query: groupQuery, variables: { isMember: false } }),
+//           ).resolves.toMatchObject(expected)
+//         })
+//       })
+//     })
+//   })
+// })
 
 describe('CreateGroup', () => {
   beforeEach(() => {
@@ -435,6 +436,244 @@ describe('CreateGroup', () => {
             variables: { ...variables, categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'] },
           })
           expect(errors[0]).toHaveProperty('message', 'Too many categories!')
+        })
+      })
+    })
+  })
+})
+
+describe('EnterGroup', () => {
+  describe('unauthenticated', () => {
+    it('throws authorization error', async () => {
+      variables = {
+        id: 'not-existing-group',
+        userId: 'current-user',
+      }
+      const { errors } = await mutate({ mutation: enterGroupMutation, variables })
+      expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+    })
+  })
+
+  describe('authenticated', () => {
+    let ownerOfClosedGroupUser
+    let ownerOfHiddenGroupUser
+
+    beforeEach(async () => {
+      ownerOfClosedGroupUser = await Factory.build(
+        'user',
+        {
+          id: 'owner-of-closed-group',
+          name: 'Owner Of Closed Group',
+        },
+        {
+          email: 'owner-of-closed-group@example.org',
+          password: '1234',
+        },
+      )
+      ownerOfHiddenGroupUser = await Factory.build(
+        'user',
+        {
+          id: 'owner-of-hidden-group',
+          name: 'Owner Of Hidden Group',
+        },
+        {
+          email: 'owner-of-hidden-group@example.org',
+          password: '1234',
+        },
+      )
+      authenticatedUser = await ownerOfClosedGroupUser.toJson()
+      await mutate({
+        mutation: createGroupMutation,
+        variables: {
+          id: 'closed-group',
+          name: 'Uninteresting Group',
+          about: 'We will change nothing!',
+          description: 'We love it like it is!?' + descriptionAdditional100,
+          groupType: 'closed',
+          actionRadius: 'national',
+          categoryIds,
+        },
+      })
+      authenticatedUser = await ownerOfHiddenGroupUser.toJson()
+      await mutate({
+        mutation: createGroupMutation,
+        variables: {
+          id: 'hidden-group',
+          name: 'Investigative Journalism Group',
+          about: 'We will change all.',
+          description: 'We research …' + descriptionAdditional100,
+          groupType: 'hidden',
+          actionRadius: 'global',
+          categoryIds,
+        },
+      })
+      authenticatedUser = await user.toJson()
+      await mutate({
+        mutation: createGroupMutation,
+        variables: {
+          id: 'public-group',
+          name: 'The Best Group',
+          about: 'We will change the world!',
+          description: 'Some description' + descriptionAdditional100,
+          groupType: 'public',
+          actionRadius: 'regional',
+          categoryIds,
+        },
+      })
+    })
+
+    describe('public group', () => {
+      describe('entered by "owner-of-closed-group"', () => {
+        it('has "usual" as membership role', async () => {
+          variables = {
+            id: 'public-group',
+            userId: 'owner-of-closed-group',
+          }
+          const expected = {
+            data: {
+              EnterGroup: {
+                id: 'owner-of-closed-group',
+                myRoleInGroup: 'usual',
+              },
+            },
+            errors: undefined,
+          }
+          await expect(
+            mutate({
+              mutation: enterGroupMutation,
+              variables,
+            }),
+          ).resolves.toMatchObject(expected)
+        })
+      })
+
+      describe('entered by its owner', () => {
+        describe('does not create additional "MEMBER_OF" relation and therefore', () => {
+          it('has still "owner" as membership role', async () => {
+            variables = {
+              id: 'public-group',
+              userId: 'current-user',
+            }
+            const expected = {
+              data: {
+                EnterGroup: {
+                  id: 'current-user',
+                  myRoleInGroup: 'owner',
+                },
+              },
+              errors: undefined,
+            }
+            await expect(
+              mutate({
+                mutation: enterGroupMutation,
+                variables,
+              }),
+            ).resolves.toMatchObject(expected)
+          })
+        })
+      })
+    })
+
+    describe('closed group', () => {
+      describe('entered by "current-user"', () => {
+        it('has "pending" as membership role', async () => {
+          variables = {
+            id: 'closed-group',
+            userId: 'current-user',
+          }
+          const expected = {
+            data: {
+              EnterGroup: {
+                id: 'current-user',
+                myRoleInGroup: 'pending',
+              },
+            },
+            errors: undefined,
+          }
+          await expect(
+            mutate({
+              mutation: enterGroupMutation,
+              variables,
+            }),
+          ).resolves.toMatchObject(expected)
+        })
+      })
+
+      describe('entered by its owner', () => {
+        describe('does not create additional "MEMBER_OF" relation and therefore', () => {
+          it('has still "owner" as membership role', async () => {
+            variables = {
+              id: 'closed-group',
+              userId: 'owner-of-closed-group',
+            }
+            const expected = {
+              data: {
+                EnterGroup: {
+                  id: 'owner-of-closed-group',
+                  myRoleInGroup: 'owner',
+                },
+              },
+              errors: undefined,
+            }
+            await expect(
+              mutate({
+                mutation: enterGroupMutation,
+                variables,
+              }),
+            ).resolves.toMatchObject(expected)
+          })
+        })
+      })
+    })
+
+    describe('hidden group', () => {
+      describe('entered by "owner-of-closed-group"', () => {
+        it('has "pending" as membership role', async () => {
+          variables = {
+            id: 'hidden-group',
+            userId: 'owner-of-closed-group',
+          }
+          const expected = {
+            data: {
+              EnterGroup: {
+                id: 'owner-of-closed-group',
+                myRoleInGroup: 'pending',
+              },
+            },
+            errors: undefined,
+          }
+          await expect(
+            mutate({
+              mutation: enterGroupMutation,
+              variables,
+            }),
+          ).resolves.toMatchObject(expected)
+        })
+      })
+
+      describe('entered by its owner', () => {
+        describe('does not create additional "MEMBER_OF" relation and therefore', () => {
+          it('has still "owner" as membership role', async () => {
+            variables = {
+              id: 'hidden-group',
+              userId: 'owner-of-hidden-group',
+            }
+            const expected = {
+              data: {
+                EnterGroup: {
+                  id: 'owner-of-hidden-group',
+                  myRoleInGroup: 'owner',
+                },
+              },
+              errors: undefined,
+            }
+            await expect(
+              mutate({
+                mutation: enterGroupMutation,
+                variables,
+              }),
+            ).resolves.toMatchObject(expected)
+          })
         })
       })
     })
