@@ -48,15 +48,15 @@ export default {
     },
     GroupMember: async (_object, params, context, _resolveInfo) => {
       const { id: groupId } = params
+      // Wolle: console.log('groupId: ', groupId)
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
         const groupMemberCypher = `
-          MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(:Group {id: $groupId})
+          MATCH (user:User)-[membership:MEMBER_OF]->(:Group {id: $groupId})
           RETURN user {.*, myRoleInGroup: membership.role}
         `
         const result = await txc.run(groupMemberCypher, {
           groupId,
-          userId: context.user.id,
         })
         return result.records.map((record) => record.get('user'))
       })

@@ -52,11 +52,13 @@ const isMySocialMedia = rule({
   return socialMedia.ownedBy.node.id === user.id
 })
 
-const isAllowSeeingMembersOfGroup = rule({
+const isAllowedSeeingMembersOfGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
   if (!user) return false
   const { id: groupId } = args
+  // Wolle: console.log('groupId: ', groupId)
+  // console.log('user.id: ', user.id)
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
@@ -64,19 +66,22 @@ const isAllowSeeingMembersOfGroup = rule({
         MATCH (group:Group {id: $groupId})
         OPTIONAL MATCH (admin:User {id: $userId})-[membership:MEMBER_OF]->(group)
         WHERE membership.role IN ['admin', 'owner']
-        RETURN group, admin {.*, myRoleInGroup: membership.role}
+        RETURN group {.*}, admin {.*, myRoleInGroup: membership.role}
       `,
       { groupId, userId: user.id },
     )
     return {
-      admin: transactionResponse.records.map((record) => record.get('admin')),
-      group: transactionResponse.records.map((record) => record.get('group')),
+      admin: transactionResponse.records.map((record) => record.get('admin'))[0],
+      group: transactionResponse.records.map((record) => record.get('group'))[0],
     }
   })
   try {
-    const [{ admin, group }] = await readTxPromise
+    const { admin, group } = await readTxPromise
+    // Wolle: console.log('admin: ', admin)
+    // console.log('group: ', group)
     return group.groupType === 'public' || !!admin
   } catch (error) {
+    // Wolle: console.log('error: ', error)
     throw new Error(error)
   } finally {
     session.close()
@@ -146,7 +151,7 @@ export default shield(
       statistics: allow,
       currentUser: allow,
       Group: isAuthenticated,
-      GroupMember: isAllowSeeingMembersOfGroup,
+      GroupMember: isAllowedSeeingMembersOfGroup,
       Post: allow,
       profilePagePosts: allow,
       Comment: allow,
