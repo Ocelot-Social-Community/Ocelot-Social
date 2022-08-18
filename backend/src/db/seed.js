@@ -5,7 +5,7 @@ import createServer from '../server'
 import faker from '@faker-js/faker'
 import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
-import { createGroupMutation } from './graphql/groups'
+import { createGroupMutation, enterGroupMutation } from './graphql/groups'
 import { createPostMutation } from './graphql/posts'
 import { createCommentMutation } from './graphql/comments'
 
@@ -400,6 +400,22 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
     ])
+    await Promise.all([
+      mutate({
+        mutation: enterGroupMutation,
+        variables: {
+          id: 'g0',
+          userId: 'u2',
+        },
+      }),
+      mutate({
+        mutation: enterGroupMutation,
+        variables: {
+          id: 'g0',
+          userId: 'u3',
+        },
+      }),
+    ])
 
     authenticatedUser = await jennyRostock.toJson()
     await Promise.all([
@@ -416,6 +432,36 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
     ])
+    await Promise.all([
+      mutate({
+        mutation: enterGroupMutation,
+        variables: {
+          id: 'g1',
+          userId: 'u1',
+        },
+      }),
+      mutate({
+        mutation: enterGroupMutation,
+        variables: {
+          id: 'g1',
+          userId: 'u5',
+        },
+      }),
+      mutate({
+        mutation: enterGroupMutation,
+        variables: {
+          id: 'g1',
+          userId: 'u6',
+        },
+      }),
+      mutate({
+        mutation: enterGroupMutation,
+        variables: {
+          id: 'g1',
+          userId: 'u7',
+        },
+      }),
+    ])
 
     authenticatedUser = await bobDerBaumeister.toJson()
     await Promise.all([
@@ -429,6 +475,36 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           groupType: 'public',
           actionRadius: 'interplanetary',
           categoryIds: ['cat3', 'cat13', 'cat16'],
+        },
+      }),
+    ])
+    await Promise.all([
+      mutate({
+        mutation: enterGroupMutation,
+        variables: {
+          id: 'g2',
+          userId: 'u4',
+        },
+      }),
+      mutate({
+        mutation: enterGroupMutation,
+        variables: {
+          id: 'g2',
+          userId: 'u5',
+        },
+      }),
+      mutate({
+        mutation: enterGroupMutation,
+        variables: {
+          id: 'g2',
+          userId: 'u6',
+        },
+      }),
+      mutate({
+        mutation: enterGroupMutation,
+        variables: {
+          id: 'g2',
+          userId: 'u7',
         },
       }),
     ])
