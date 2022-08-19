@@ -5,7 +5,7 @@ import createServer from '../server'
 import faker from '@faker-js/faker'
 import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
-import { createGroupMutation, enterGroupMutation } from './graphql/groups'
+import { createGroupMutation, joinGroupMutation } from './graphql/groups'
 import { createPostMutation } from './graphql/posts'
 import { createCommentMutation } from './graphql/comments'
 
@@ -402,14 +402,14 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     ])
     await Promise.all([
       mutate({
-        mutation: enterGroupMutation,
+        mutation: joinGroupMutation,
         variables: {
           id: 'g0',
           userId: 'u2',
         },
       }),
       mutate({
-        mutation: enterGroupMutation,
+        mutation: joinGroupMutation,
         variables: {
           id: 'g0',
           userId: 'u3',
@@ -434,28 +434,28 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     ])
     await Promise.all([
       mutate({
-        mutation: enterGroupMutation,
+        mutation: joinGroupMutation,
         variables: {
           id: 'g1',
           userId: 'u1',
         },
       }),
       mutate({
-        mutation: enterGroupMutation,
+        mutation: joinGroupMutation,
         variables: {
           id: 'g1',
           userId: 'u5',
         },
       }),
       mutate({
-        mutation: enterGroupMutation,
+        mutation: joinGroupMutation,
         variables: {
           id: 'g1',
           userId: 'u6',
         },
       }),
       mutate({
-        mutation: enterGroupMutation,
+        mutation: joinGroupMutation,
         variables: {
           id: 'g1',
           userId: 'u7',
@@ -480,28 +480,28 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     ])
     await Promise.all([
       mutate({
-        mutation: enterGroupMutation,
+        mutation: joinGroupMutation,
         variables: {
           id: 'g2',
           userId: 'u4',
         },
       }),
       mutate({
-        mutation: enterGroupMutation,
+        mutation: joinGroupMutation,
         variables: {
           id: 'g2',
           userId: 'u5',
         },
       }),
       mutate({
-        mutation: enterGroupMutation,
+        mutation: joinGroupMutation,
         variables: {
           id: 'g2',
           userId: 'u6',
         },
       }),
       mutate({
-        mutation: enterGroupMutation,
+        mutation: joinGroupMutation,
         variables: {
           id: 'g2',
           userId: 'u7',

@@ -64,22 +64,26 @@ const isAllowedSeeingMembersOfGroup = rule({
     const transactionResponse = await transaction.run(
       `
         MATCH (group:Group {id: $groupId})
-        OPTIONAL MATCH (admin:User {id: $userId})-[membership:MEMBER_OF]->(group)
-        WHERE membership.role IN ['admin', 'owner']
-        RETURN group {.*}, admin {.*, myRoleInGroup: membership.role}
+        OPTIONAL MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group)
+        RETURN group {.*}, member {.*, myRoleInGroup: membership.role}
       `,
       { groupId, userId: user.id },
     )
     return {
-      admin: transactionResponse.records.map((record) => record.get('admin'))[0],
+      member: transactionResponse.records.map((record) => record.get('member'))[0],
       group: transactionResponse.records.map((record) => record.get('group'))[0],
     }
   })
   try {
-    const { admin, group } = await readTxPromise
-    // Wolle: console.log('admin: ', admin)
+    const { member, group } = await readTxPromise
+    // Wolle: console.log('member: ', member)
     // console.log('group: ', group)
-    return group.groupType === 'public' || !!admin
+    return (
+      group.groupType === 'public' ||
+      (['closed', 'hidden'].includes(group.groupType) &&
+        !!member &&
+        ['usual', 'admin', 'owner'].includes(member.myRoleInGroup))
+    )
   } catch (error) {
     // Wolle: console.log('error: ', error)
     throw new Error(error)
@@ -179,7 +183,7 @@ export default shield(
       SignupVerification: allow,
       UpdateUser: onlyYourself,
       CreateGroup: isAuthenticated,
-      EnterGroup: isAuthenticated,
+      JoinGroup: isAuthenticated,
       CreatePost: isAuthenticated,
       UpdatePost: isAuthor,
       DeletePost: isAuthor,

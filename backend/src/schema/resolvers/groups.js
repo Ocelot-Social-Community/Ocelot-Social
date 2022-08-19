@@ -131,11 +131,11 @@ export default {
         session.close()
       }
     },
-    EnterGroup: async (_parent, params, context, _resolveInfo) => {
+    JoinGroup: async (_parent, params, context, _resolveInfo) => {
       const { id: groupId, userId } = params
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const enterGroupCypher = `
+        const joinGroupCypher = `
           MATCH (member:User {id: $userId}), (group:Group {id: $groupId})
           MERGE (member)-[membership:MEMBER_OF]->(group)
           ON CREATE SET
@@ -148,7 +148,7 @@ export default {
                 END
           RETURN member {.*, myRoleInGroup: membership.role}
         `
-        const result = await transaction.run(enterGroupCypher, { groupId, userId })
+        const result = await transaction.run(joinGroupCypher, { groupId, userId })
         const [member] = await result.records.map((record) => record.get('member'))
         return member
       })

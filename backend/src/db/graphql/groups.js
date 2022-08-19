@@ -39,9 +39,9 @@ export const createGroupMutation = gql`
   }
 `
 
-export const enterGroupMutation = gql`
+export const joinGroupMutation = gql`
   mutation ($id: ID!, $userId: ID!) {
-    EnterGroup(id: $id, userId: $userId) {
+    JoinGroup(id: $id, userId: $userId) {
       id
       name
       slug
