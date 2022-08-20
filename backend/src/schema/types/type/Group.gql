@@ -118,4 +118,10 @@ type Mutation {
     id: ID!
     userId: ID!
   ): User
+
+  SwitchGroupMemberRole(
+    id: ID!
+    userId: ID!
+    roleInGroup: GroupMemberRole!
+  ): User
 }

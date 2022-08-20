@@ -50,6 +50,17 @@ export const joinGroupMutation = gql`
   }
 `
 
+export const switchGroupMemberRoleMutation = gql`
+  mutation ($id: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
+    SwitchGroupMemberRole(id: $id, userId: $userId, roleInGroup: $roleInGroup) {
+      id
+      name
+      slug
+      myRoleInGroup
+    }
+  }
+`
+
 // ------ queries
 
 export const groupQuery = gql`

@@ -79,10 +79,82 @@ const isAllowedSeeingMembersOfGroup = rule({
     // Wolle: console.log('member: ', member)
     // console.log('group: ', group)
     return (
-      group.groupType === 'public' ||
-      (['closed', 'hidden'].includes(group.groupType) &&
-        !!member &&
-        ['usual', 'admin', 'owner'].includes(member.myRoleInGroup))
+      !!group &&
+      (group.groupType === 'public' ||
+        (['closed', 'hidden'].includes(group.groupType) &&
+          !!member &&
+          ['usual', 'admin', 'owner'].includes(member.myRoleInGroup)))
+    )
+  } catch (error) {
+    // Wolle: console.log('error: ', error)
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+})
+
+const isAllowedToSwitchGroupMemberRole = rule({
+  cache: 'no_cache',
+})(async (_parent, args, { user, driver }) => {
+  if (!user) return false
+  const adminId = user.id
+  const { id: groupId, userId, roleInGroup } = args
+  // Wolle:
+  // console.log('adminId: ', adminId)
+  // console.log('groupId: ', groupId)
+  // console.log('userId: ', userId)
+  // console.log('roleInGroup: ', roleInGroup)
+  const session = driver.session()
+  const readTxPromise = session.readTransaction(async (transaction) => {
+    const transactionResponse = await transaction.run(
+      `
+        MATCH (admin:User {id: $adminId})-[adminMembership:MEMBER_OF]->(group:Group {id: $groupId})<-[userMembership:MEMBER_OF]-(member:User {id: $userId})
+        RETURN group {.*}, admin {.*, myRoleInGroup: adminMembership.role}, member {.*, myRoleInGroup: userMembership.role}
+      `,
+      { groupId, adminId, userId },
+    )
+    // Wolle:
+    // console.log(
+    //   'transactionResponse: ',
+    //   transactionResponse,
+    // )
+    // console.log(
+    //   'transaction admins: ',
+    //   transactionResponse.records.map((record) => record.get('admin')),
+    // )
+    // console.log(
+    //   'transaction groups: ',
+    //   transactionResponse.records.map((record) => record.get('group')),
+    // )
+    // console.log(
+    //   'transaction members: ',
+    //   transactionResponse.records.map((record) => record.get('member')),
+    // )
+    return {
+      admin: transactionResponse.records.map((record) => record.get('admin'))[0],
+      group: transactionResponse.records.map((record) => record.get('group'))[0],
+      member: transactionResponse.records.map((record) => record.get('member'))[0],
+    }
+  })
+  try {
+    // Wolle:
+    // console.log('enter try !!!')
+    const { admin, group, member } = await readTxPromise
+    // Wolle:
+    // console.log('after !!!')
+    // console.log('admin: ', admin)
+    // console.log('group: ', group)
+    // console.log('member: ', member)
+    return (
+      !!group &&
+      !!admin &&
+      !!member &&
+      adminId !== userId &&
+      ((['admin'].includes(admin.myRoleInGroup) &&
+        !['owner'].includes(member.myRoleInGroup) &&
+        ['pending', 'usual', 'admin'].includes(roleInGroup)) ||
+        (['owner'].includes(admin.myRoleInGroup) &&
+          ['pending', 'usual', 'admin', 'owner'].includes(roleInGroup)))
     )
   } catch (error) {
     // Wolle: console.log('error: ', error)
@@ -118,7 +190,7 @@ const isAuthor = rule({
 
 const isDeletingOwnAccount = rule({
   cache: 'no_cache',
-})(async (parent, args, context, info) => {
+})(async (parent, args, context, _info) => {
   return context.user.id === args.id
 })
 
@@ -183,7 +255,8 @@ export default shield(
       SignupVerification: allow,
       UpdateUser: onlyYourself,
       CreateGroup: isAuthenticated,
-      JoinGroup: isAuthenticated,
+      JoinGroup: isAuthenticated, // Wolle: can not be correct
+      SwitchGroupMemberRole: isAllowedToSwitchGroupMemberRole,
       CreatePost: isAuthenticated,
       UpdatePost: isAuthor,
       DeletePost: isAuthor,
