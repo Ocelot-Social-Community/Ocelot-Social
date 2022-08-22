@@ -76,7 +76,7 @@ export const categories = [
   },
   {
     icon: 'desktop',
-    name: 'IT-and-media',
+    name: 'it-and-media',
     description:
       'Nachrichten, Manipulation, Datenschutz, Überwachung, Datenkraken, AI, Software, Apps',
   },
