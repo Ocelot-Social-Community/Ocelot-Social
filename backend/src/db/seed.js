@@ -6,6 +6,7 @@ import faker from '@faker-js/faker'
 import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
 import { gql } from '../helpers/jest'
+import { categories } from '../constants/categories'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
@@ -267,104 +268,15 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       dagobert.relateTo(louie, 'blocked'),
     ])
 
-    await Promise.all([
-      Factory.build('category', {
-        id: 'cat1',
-        name: 'Just For Fun',
-        slug: 'just-for-fun',
-        icon: 'smile',
+    await Promise.all(
+      categories.map(({ icon, name }, index) => {
+        Factory.build('category', {
+          id: `cat${index + 1}`,
+          slug: name,
+          icon,
+        })
       }),
-      Factory.build('category', {
-        id: 'cat2',
-        name: 'Happiness & Values',
-        slug: 'happiness-values',
-        icon: 'heart-o',
-      }),
-      Factory.build('category', {
-        id: 'cat3',
-        name: 'Health & Wellbeing',
-        slug: 'health-wellbeing',
-        icon: 'medkit',
-      }),
-      Factory.build('category', {
-        id: 'cat4',
-        name: 'Environment & Nature',
-        slug: 'environment-nature',
-        icon: 'tree',
-      }),
-      Factory.build('category', {
-        id: 'cat5',
-        name: 'Animal Protection',
-        slug: 'animal-protection',
-        icon: 'paw',
-      }),
-      Factory.build('category', {
-        id: 'cat6',
-        name: 'Human Rights & Justice',
-        slug: 'human-rights-justice',
-        icon: 'balance-scale',
-      }),
-      Factory.build('category', {
-        id: 'cat7',
-        name: 'Education & Sciences',
-        slug: 'education-sciences',
-        icon: 'graduation-cap',
-      }),
-      Factory.build('category', {
-        id: 'cat8',
-        name: 'Cooperation & Development',
-        slug: 'cooperation-development',
-        icon: 'users',
-      }),
-      Factory.build('category', {
-        id: 'cat9',
-        name: 'Democracy & Politics',
-        slug: 'democracy-politics',
-        icon: 'university',
-      }),
-      Factory.build('category', {
-        id: 'cat10',
-        name: 'Economy & Finances',
-        slug: 'economy-finances',
-        icon: 'money',
-      }),
-      Factory.build('category', {
-        id: 'cat11',
-        name: 'Energy & Technology',
-        slug: 'energy-technology',
-        icon: 'flash',
-      }),
-      Factory.build('category', {
-        id: 'cat12',
-        name: 'IT, Internet & Data Privacy',
-        slug: 'it-internet-data-privacy',
-        icon: 'mouse-pointer',
-      }),
-      Factory.build('category', {
-        id: 'cat13',
-        name: 'Art, Culture & Sport',
-        slug: 'art-culture-sport',
-        icon: 'paint-brush',
-      }),
-      Factory.build('category', {
-        id: 'cat14',
-        name: 'Freedom of Speech',
-        slug: 'freedom-of-speech',
-        icon: 'bullhorn',
-      }),
-      Factory.build('category', {
-        id: 'cat15',
-        name: 'Consumption & Sustainability',
-        slug: 'consumption-sustainability',
-        icon: 'shopping-cart',
-      }),
-      Factory.build('category', {
-        id: 'cat16',
-        name: 'Global Peace & Nonviolence',
-        slug: 'global-peace-nonviolence',
-        icon: 'angellist',
-      }),
-    ])
+    )
 
     const [environment, nature, democracy, freedom] = await Promise.all([
       Factory.build('tag', {
