@@ -55,6 +55,7 @@ const isMySocialMedia = rule({
 const isAllowedSeeingMembersOfGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
+  // Wolle: may have a look to 'isAuthenticated'
   if (!user) return false
   const { id: groupId } = args
   // Wolle: console.log('groupId: ', groupId)
@@ -96,6 +97,7 @@ const isAllowedSeeingMembersOfGroup = rule({
 const isAllowedToSwitchGroupMemberRole = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
+  // Wolle: may have a look to 'isAuthenticated'
   if (!user) return false
   const adminId = user.id
   const { id: groupId, userId, roleInGroup } = args

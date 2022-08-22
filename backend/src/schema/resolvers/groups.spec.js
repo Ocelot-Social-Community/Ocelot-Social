@@ -940,6 +940,19 @@ describe('GroupMember', () => {
         },
       )
       // create groups
+      authenticatedUser = await user.toJson()
+      await mutate({
+        mutation: createGroupMutation,
+        variables: {
+          id: 'public-group',
+          name: 'The Best Group',
+          about: 'We will change the world!',
+          description: 'Some description' + descriptionAdditional100,
+          groupType: 'public',
+          actionRadius: 'regional',
+          categoryIds,
+        },
+      })
       authenticatedUser = await ownerOfClosedGroupUser.toJson()
       await mutate({
         mutation: createGroupMutation,
@@ -966,20 +979,8 @@ describe('GroupMember', () => {
           categoryIds,
         },
       })
-      authenticatedUser = await user.toJson()
-      await mutate({
-        mutation: createGroupMutation,
-        variables: {
-          id: 'public-group',
-          name: 'The Best Group',
-          about: 'We will change the world!',
-          description: 'Some description' + descriptionAdditional100,
-          groupType: 'public',
-          actionRadius: 'regional',
-          categoryIds,
-        },
-      })
       // create additional memberships
+      // public-group
       await mutate({
         mutation: joinGroupMutation,
         variables: {
@@ -994,6 +995,7 @@ describe('GroupMember', () => {
           userId: 'owner-of-hidden-group',
         },
       })
+      // closed-group
       await mutate({
         mutation: joinGroupMutation,
         variables: {
@@ -1004,10 +1006,27 @@ describe('GroupMember', () => {
       await mutate({
         mutation: joinGroupMutation,
         variables: {
+          id: 'closed-group',
+          userId: 'owner-of-hidden-group',
+        },
+      })
+      // hidden-group
+      await mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          id: 'hidden-group',
+          userId: 'current-user',
+        },
+      })
+      await mutate({
+        mutation: joinGroupMutation,
+        variables: {
           id: 'hidden-group',
           userId: 'owner-of-closed-group',
         },
       })
+
+      authenticatedUser = await user.toJson()
     })
 
     describe('public group', () => {
@@ -1147,6 +1166,10 @@ describe('GroupMember', () => {
                     id: 'owner-of-closed-group',
                     myRoleInGroup: 'owner',
                   }),
+                  expect.objectContaining({
+                    id: 'owner-of-hidden-group',
+                    myRoleInGroup: 'pending',
+                  }),
                 ]),
               },
               errors: undefined,
@@ -1156,13 +1179,21 @@ describe('GroupMember', () => {
               variables,
             })
             expect(result).toMatchObject(expected)
-            expect(result.data.GroupMember.length).toBe(2)
+            expect(result.data.GroupMember.length).toBe(3)
           })
         })
 
-        // needs 'SwitchGroupMemberRole'
-        describe.skip('by usual member "owner-of-hidden-group"', () => {
+        describe('by usual member "owner-of-hidden-group"', () => {
           beforeEach(async () => {
+            authenticatedUser = await ownerOfClosedGroupUser.toJson()
+            await mutate({
+              mutation: switchGroupMemberRoleMutation,
+              variables: {
+                id: 'closed-group',
+                userId: 'owner-of-hidden-group',
+                roleInGroup: 'usual',
+              },
+            })
             authenticatedUser = await ownerOfHiddenGroupUser.toJson()
           })
 
@@ -1237,6 +1268,10 @@ describe('GroupMember', () => {
               data: {
                 GroupMember: expect.arrayContaining([
                   expect.objectContaining({
+                    id: 'current-user',
+                    myRoleInGroup: 'pending',
+                  }),
+                  expect.objectContaining({
                     id: 'owner-of-closed-group',
                     myRoleInGroup: 'pending',
                   }),
@@ -1253,13 +1288,21 @@ describe('GroupMember', () => {
               variables,
             })
             expect(result).toMatchObject(expected)
-            expect(result.data.GroupMember.length).toBe(2)
+            expect(result.data.GroupMember.length).toBe(3)
           })
         })
 
-        // needs 'SwitchGroupMemberRole'
-        describe.skip('by usual member "owner-of-closed-group"', () => {
+        describe('by usual member "owner-of-closed-group"', () => {
           beforeEach(async () => {
+            authenticatedUser = await ownerOfHiddenGroupUser.toJson()
+            await mutate({
+              mutation: switchGroupMemberRoleMutation,
+              variables: {
+                id: 'hidden-group',
+                userId: 'owner-of-closed-group',
+                roleInGroup: 'usual',
+              },
+            })
             authenticatedUser = await ownerOfClosedGroupUser.toJson()
           })
 
