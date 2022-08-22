@@ -343,6 +343,7 @@ describe('JoinGroup', () => {
     let ownerOfHiddenGroupUser
 
     beforeEach(async () => {
+      // create users
       ownerOfClosedGroupUser = await Factory.build(
         'user',
         {
@@ -365,6 +366,8 @@ describe('JoinGroup', () => {
           password: '1234',
         },
       )
+      // create groups
+      // public-group
       authenticatedUser = await ownerOfClosedGroupUser.toJson()
       await mutate({
         mutation: createGroupMutation,
@@ -634,6 +637,7 @@ describe('SwitchGroupMemberRole', () => {
             },
           )
           // create groups
+          // public-group
           authenticatedUser = await usualMemberUser.toJson()
           await mutate({
             mutation: createGroupMutation,
@@ -647,35 +651,6 @@ describe('SwitchGroupMemberRole', () => {
               categoryIds,
             },
           })
-          authenticatedUser = await ownerMemberUser.toJson()
-          await mutate({
-            mutation: createGroupMutation,
-            variables: {
-              id: 'closed-group',
-              name: 'Uninteresting Group',
-              about: 'We will change nothing!',
-              description: 'We love it like it is!?' + descriptionAdditional100,
-              groupType: 'closed',
-              actionRadius: 'national',
-              categoryIds,
-            },
-          })
-          authenticatedUser = await adminMemberUser.toJson()
-          await mutate({
-            mutation: createGroupMutation,
-            variables: {
-              id: 'hidden-group',
-              name: 'Investigative Journalism Group',
-              about: 'We will change all.',
-              description: 'We research …' + descriptionAdditional100,
-              groupType: 'hidden',
-              actionRadius: 'global',
-              categoryIds,
-            },
-          })
-          // create additional memberships
-          // public-group
-          authenticatedUser = await usualMemberUser.toJson()
           await mutate({
             mutation: joinGroupMutation,
             variables: {
@@ -692,6 +667,18 @@ describe('SwitchGroupMemberRole', () => {
           })
           // closed-group
           authenticatedUser = await ownerMemberUser.toJson()
+          await mutate({
+            mutation: createGroupMutation,
+            variables: {
+              id: 'closed-group',
+              name: 'Uninteresting Group',
+              about: 'We will change nothing!',
+              description: 'We love it like it is!?' + descriptionAdditional100,
+              groupType: 'closed',
+              actionRadius: 'national',
+              categoryIds,
+            },
+          })
           await mutate({
             mutation: joinGroupMutation,
             variables: {
@@ -716,6 +703,18 @@ describe('SwitchGroupMemberRole', () => {
           // hidden-group
           authenticatedUser = await adminMemberUser.toJson()
           await mutate({
+            mutation: createGroupMutation,
+            variables: {
+              id: 'hidden-group',
+              name: 'Investigative Journalism Group',
+              about: 'We will change all.',
+              description: 'We research …' + descriptionAdditional100,
+              groupType: 'hidden',
+              actionRadius: 'global',
+              categoryIds,
+            },
+          })
+          await mutate({
             mutation: joinGroupMutation,
             variables: {
               id: 'hidden-group',
@@ -729,6 +728,7 @@ describe('SwitchGroupMemberRole', () => {
               userId: 'second-owner-member-user',
             },
           })
+
           // Wolle
           // function sleep(ms) {
           //   return new Promise(resolve => setTimeout(resolve, ms));
@@ -940,6 +940,7 @@ describe('GroupMember', () => {
         },
       )
       // create groups
+      // public-group
       authenticatedUser = await user.toJson()
       await mutate({
         mutation: createGroupMutation,
@@ -953,34 +954,6 @@ describe('GroupMember', () => {
           categoryIds,
         },
       })
-      authenticatedUser = await ownerOfClosedGroupUser.toJson()
-      await mutate({
-        mutation: createGroupMutation,
-        variables: {
-          id: 'closed-group',
-          name: 'Uninteresting Group',
-          about: 'We will change nothing!',
-          description: 'We love it like it is!?' + descriptionAdditional100,
-          groupType: 'closed',
-          actionRadius: 'national',
-          categoryIds,
-        },
-      })
-      authenticatedUser = await ownerOfHiddenGroupUser.toJson()
-      await mutate({
-        mutation: createGroupMutation,
-        variables: {
-          id: 'hidden-group',
-          name: 'Investigative Journalism Group',
-          about: 'We will change all.',
-          description: 'We research …' + descriptionAdditional100,
-          groupType: 'hidden',
-          actionRadius: 'global',
-          categoryIds,
-        },
-      })
-      // create additional memberships
-      // public-group
       await mutate({
         mutation: joinGroupMutation,
         variables: {
@@ -996,6 +969,19 @@ describe('GroupMember', () => {
         },
       })
       // closed-group
+      authenticatedUser = await ownerOfClosedGroupUser.toJson()
+      await mutate({
+        mutation: createGroupMutation,
+        variables: {
+          id: 'closed-group',
+          name: 'Uninteresting Group',
+          about: 'We will change nothing!',
+          description: 'We love it like it is!?' + descriptionAdditional100,
+          groupType: 'closed',
+          actionRadius: 'national',
+          categoryIds,
+        },
+      })
       await mutate({
         mutation: joinGroupMutation,
         variables: {
@@ -1011,6 +997,19 @@ describe('GroupMember', () => {
         },
       })
       // hidden-group
+      authenticatedUser = await ownerOfHiddenGroupUser.toJson()
+      await mutate({
+        mutation: createGroupMutation,
+        variables: {
+          id: 'hidden-group',
+          name: 'Investigative Journalism Group',
+          about: 'We will change all.',
+          description: 'We research …' + descriptionAdditional100,
+          groupType: 'hidden',
+          actionRadius: 'global',
+          categoryIds,
+        },
+      })
       await mutate({
         mutation: joinGroupMutation,
         variables: {
