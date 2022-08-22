@@ -1273,6 +1273,9 @@ describe('in mode: building up', () => {
                     }),
                   ).resolves.toMatchObject(expected)
                 })
+
+                // the GQL mutation needs this fields in the result for testing
+                it.todo('has "updatedAt" newer as "createdAt"')
               })
             })
 
