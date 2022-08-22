@@ -1,6 +1,8 @@
 import { getDriver, getNeode } from '../../db/neo4j'
 import { hashSync } from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
+import { categories } from '../../constants/categories'
+import CONFIG from '../../config'
 
 const defaultAdmin = {
   email: 'admin@example.org',
@@ -8,6 +10,27 @@ const defaultAdmin = {
   name: 'admin',
   id: uuid(),
   slug: 'admin',
+}
+
+const createCategories = async (session) => {
+  const createCategoriesTxResultPromise = session.writeTransaction(async (txc) => {
+    categories.forEach(({ icon, name }, index) => {
+      const id = `cat${index + 1}`
+      txc.run(
+        `MERGE (c:Category {
+          icon: "${icon}",
+          slug: "${name}",
+          id: "${id}",
+          createdAt: toString(datetime())
+        })`,
+      )
+    })
+  })
+  try {
+    await createCategoriesTxResultPromise
+  } catch (error) {
+    console.log(`Error creating categories: ${error}`) // eslint-disable-line no-console
+  }
 }
 
 const createDefaultAdminUser = async (session) => {
@@ -58,6 +81,7 @@ class Store {
     const { driver } = neode
     const session = driver.session()
     await createDefaultAdminUser(session)
+    if (CONFIG.CATEGORIES_ACTIVE) await createCategories(session)
     const writeTxResultPromise = session.writeTransaction(async (txc) => {
       await txc.run('CALL apoc.schema.assert({},{},true)') // drop all indices
       return Promise.all(
