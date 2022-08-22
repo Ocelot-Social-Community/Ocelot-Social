@@ -273,6 +273,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         Factory.build('category', {
           id: `cat${index + 1}`,
           slug: name,
+          name,
           icon,
         })
       }),

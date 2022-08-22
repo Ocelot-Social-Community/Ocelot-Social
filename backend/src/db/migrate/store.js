@@ -20,6 +20,7 @@ const createCategories = async (session) => {
         `MERGE (c:Category {
           icon: "${icon}",
           slug: "${name}",
+          name: "${name}",
           id: "${id}",
           createdAt: toString(datetime())
         })`,
