@@ -582,15 +582,27 @@ describe('SwitchGroupMemberRole', () => {
 
   describe('authenticated', () => {
     describe('in building up mode', () => {
+      let pendingMemberUser
       let usualMemberUser
       let adminMemberUser
       let ownerMemberUser
-      // let secondOwnerMemberUser
+      let secondOwnerMemberUser
 
       beforeEach(async () => {
         // Wolle: change this to beforeAll?
         if (isSeedDb) {
           // create users
+          pendingMemberUser = await Factory.build(
+            'user',
+            {
+              id: 'pending-member-user',
+              name: 'Pending Member TestUser',
+            },
+            {
+              email: 'pending-member-user@example.org',
+              password: '1234',
+            },
+          )
           usualMemberUser = await Factory.build(
             'user',
             {
@@ -624,8 +636,7 @@ describe('SwitchGroupMemberRole', () => {
               password: '1234',
             },
           )
-          // secondOwnerMemberUser =
-          await Factory.build(
+          secondOwnerMemberUser = await Factory.build(
             'user',
             {
               id: 'second-owner-member-user',
@@ -677,6 +688,13 @@ describe('SwitchGroupMemberRole', () => {
               groupType: 'closed',
               actionRadius: 'national',
               categoryIds,
+            },
+          })
+          await mutate({
+            mutation: joinGroupMutation,
+            variables: {
+              id: 'closed-group',
+              userId: 'pending-member-user',
             },
           })
           await mutate({
@@ -752,50 +770,54 @@ describe('SwitchGroupMemberRole', () => {
           }
         })
 
-        describe('switch role', () => {
-          describe('of owner member "owner-member-user"', () => {
+        describe('give the members their prospective roles', () => {
+          describe('by owner "owner-member-user"', () => {
             beforeEach(async () => {
-              variables = {
-                ...variables,
-                userId: 'owner-member-user',
-              }
+              authenticatedUser = await ownerMemberUser.toJson()
             })
 
-            describe('by owner themself "owner-member-user"', () => {
+            describe('switch role of "usual-member-user"', () => {
               beforeEach(async () => {
-                authenticatedUser = await ownerMemberUser.toJson()
+                variables = {
+                  ...variables,
+                  userId: 'usual-member-user',
+                }
               })
 
-              describe('to admin', () => {
+              describe('to usual', () => {
                 beforeEach(async () => {
                   variables = {
                     ...variables,
-                    roleInGroup: 'admin',
+                    roleInGroup: 'usual',
                   }
                 })
 
-                it('throws authorization error', async () => {
-                  const { errors } = await mutate({
-                    mutation: switchGroupMemberRoleMutation,
-                    variables,
-                  })
-                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                it('has role usual', async () => {
+                  const expected = {
+                    data: {
+                      SwitchGroupMemberRole: {
+                        id: 'usual-member-user',
+                        myRoleInGroup: 'usual',
+                      },
+                    },
+                    errors: undefined,
+                  }
+                  await expect(
+                    mutate({
+                      mutation: switchGroupMemberRoleMutation,
+                      variables,
+                    }),
+                  ).resolves.toMatchObject(expected)
                 })
               })
             })
-          })
 
-          describe('of prospective admin member "admin-member-user"', () => {
-            beforeEach(async () => {
-              variables = {
-                ...variables,
-                userId: 'admin-member-user',
-              }
-            })
-
-            describe('by owner "owner-member-user"', () => {
+            describe('switch role of "admin-member-user"', () => {
               beforeEach(async () => {
-                authenticatedUser = await ownerMemberUser.toJson()
+                variables = {
+                  ...variables,
+                  userId: 'admin-member-user',
+                }
               })
 
               describe('to admin', () => {
@@ -836,9 +858,346 @@ describe('SwitchGroupMemberRole', () => {
               })
             })
 
-            describe('by still pending member "usual-member-user"', () => {
+            describe('switch role of "second-owner-member-user"', () => {
+              beforeEach(async () => {
+                variables = {
+                  ...variables,
+                  userId: 'second-owner-member-user',
+                }
+              })
+
+              describe('to owner', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'owner',
+                  }
+                })
+
+                it('has role owner', async () => {
+                  const expected = {
+                    data: {
+                      SwitchGroupMemberRole: {
+                        id: 'second-owner-member-user',
+                        myRoleInGroup: 'owner',
+                      },
+                    },
+                    errors: undefined,
+                  }
+                  await expect(
+                    mutate({
+                      mutation: switchGroupMemberRoleMutation,
+                      variables,
+                    }),
+                  ).resolves.toMatchObject(expected)
+                  // Wolle:
+                  // const groups = await query({ query: groupQuery, variables: {} })
+                  // console.log('groups.data.Group: ', groups.data.Group)
+                  // const groupMemberOfClosedGroup = await mutate({
+                  //   mutation: groupMemberQuery,
+                  //   variables: {
+                  //     id: 'closed-group',
+                  //   },
+                  // })
+                  // console.log('groupMemberOfClosedGroup.data.GroupMember: ', groupMemberOfClosedGroup.data.GroupMember)
+                })
+              })
+            })
+          })
+        })
+
+        describe('switch role', () => {
+          describe('of owner "owner-member-user"', () => {
+            beforeEach(async () => {
+              variables = {
+                ...variables,
+                userId: 'owner-member-user',
+              }
+            })
+
+            describe('by owner themself "owner-member-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await ownerMemberUser.toJson()
+              })
+
+              describe('to admin', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'admin',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+            })
+
+            // Wolle: shall this be possible for now?
+            // or shall only an owner who gave the second owner the owner role downgrade themself?
+            describe('by second owner "second-owner-member-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await secondOwnerMemberUser.toJson()
+              })
+
+              describe('to admin', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'admin',
+                  }
+                })
+
+                it('has role admin', async () => {
+                  const expected = {
+                    data: {
+                      SwitchGroupMemberRole: {
+                        id: 'owner-member-user',
+                        myRoleInGroup: 'admin',
+                      },
+                    },
+                    errors: undefined,
+                  }
+                  await expect(
+                    mutate({
+                      mutation: switchGroupMemberRoleMutation,
+                      variables,
+                    }),
+                  ).resolves.toMatchObject(expected)
+                })
+              })
+
+              describe('back to owner', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'owner',
+                  }
+                })
+
+                it('has role owner again', async () => {
+                  const expected = {
+                    data: {
+                      SwitchGroupMemberRole: {
+                        id: 'owner-member-user',
+                        myRoleInGroup: 'owner',
+                      },
+                    },
+                    errors: undefined,
+                  }
+                  await expect(
+                    mutate({
+                      mutation: switchGroupMemberRoleMutation,
+                      variables,
+                    }),
+                  ).resolves.toMatchObject(expected)
+                })
+              })
+            })
+
+            describe('by admin "admin-member-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await adminMemberUser.toJson()
+              })
+
+              describe('to admin', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'admin',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+            })
+
+            describe('by usual member "usual-member-user"', () => {
               beforeEach(async () => {
                 authenticatedUser = await usualMemberUser.toJson()
+              })
+
+              describe('to admin', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'admin',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+            })
+
+            describe('by still pending member "pending-member-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await pendingMemberUser.toJson()
+              })
+
+              describe('to admin', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'admin',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+            })
+          })
+
+          describe('of admin "admin-member-user"', () => {
+            beforeEach(async () => {
+              variables = {
+                ...variables,
+                userId: 'admin-member-user',
+              }
+            })
+
+            describe('by owner "owner-member-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await ownerMemberUser.toJson()
+              })
+
+              describe('to owner', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'owner',
+                  }
+                })
+
+                it('has role owner', async () => {
+                  const expected = {
+                    data: {
+                      SwitchGroupMemberRole: {
+                        id: 'admin-member-user',
+                        myRoleInGroup: 'owner',
+                      },
+                    },
+                    errors: undefined,
+                  }
+                  await expect(
+                    mutate({
+                      mutation: switchGroupMemberRoleMutation,
+                      variables,
+                    }),
+                  ).resolves.toMatchObject(expected)
+                })
+              })
+
+              describe('back to admin', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'admin',
+                  }
+                })
+
+                it('has role admin again', async () => {
+                  const expected = {
+                    data: {
+                      SwitchGroupMemberRole: {
+                        id: 'admin-member-user',
+                        myRoleInGroup: 'admin',
+                      },
+                    },
+                    errors: undefined,
+                  }
+                  await expect(
+                    mutate({
+                      mutation: switchGroupMemberRoleMutation,
+                      variables,
+                    }),
+                  ).resolves.toMatchObject(expected)
+                })
+              })
+            })
+
+            describe('by usual member "usual-member-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await usualMemberUser.toJson()
+              })
+
+              describe('upgrade to owner', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'owner',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+
+              describe('degrade to usual', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'usual',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+            })
+
+            describe('by still pending member "pending-member-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await pendingMemberUser.toJson()
+              })
+
+              describe('upgrade to owner', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'owner',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
               })
 
               describe('degrade to usual', () => {
@@ -864,11 +1223,355 @@ describe('SwitchGroupMemberRole', () => {
                 authenticatedUser = await user.toJson()
               })
 
+              describe('upgrade to owner', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'owner',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+
               describe('degrade to pending again', () => {
                 beforeEach(async () => {
                   variables = {
                     ...variables,
                     roleInGroup: 'pending',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+            })
+          })
+
+          describe('of usual member "usual-member-user"', () => {
+            beforeEach(async () => {
+              variables = {
+                ...variables,
+                userId: 'usual-member-user',
+              }
+            })
+
+            describe('by owner "owner-member-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await ownerMemberUser.toJson()
+              })
+
+              describe('to admin', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'admin',
+                  }
+                })
+
+                it('has role admin', async () => {
+                  const expected = {
+                    data: {
+                      SwitchGroupMemberRole: {
+                        id: 'usual-member-user',
+                        myRoleInGroup: 'admin',
+                      },
+                    },
+                    errors: undefined,
+                  }
+                  await expect(
+                    mutate({
+                      mutation: switchGroupMemberRoleMutation,
+                      variables,
+                    }),
+                  ).resolves.toMatchObject(expected)
+                })
+              })
+
+              describe('back to usual', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'usual',
+                  }
+                })
+
+                it('has role usual again', async () => {
+                  const expected = {
+                    data: {
+                      SwitchGroupMemberRole: {
+                        id: 'usual-member-user',
+                        myRoleInGroup: 'usual',
+                      },
+                    },
+                    errors: undefined,
+                  }
+                  await expect(
+                    mutate({
+                      mutation: switchGroupMemberRoleMutation,
+                      variables,
+                    }),
+                  ).resolves.toMatchObject(expected)
+                })
+              })
+            })
+
+            describe('by usual member "usual-member-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await usualMemberUser.toJson()
+              })
+
+              describe('upgrade to admin', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'admin',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+
+              describe('degrade to pending', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'pending',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+            })
+
+            describe('by still pending member "pending-member-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await pendingMemberUser.toJson()
+              })
+
+              describe('upgrade to admin', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'admin',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+
+              describe('degrade to pending', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'pending',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+            })
+
+            describe('by none member "current-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await user.toJson()
+              })
+
+              describe('upgrade to admin', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'admin',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+
+              describe('degrade to pending again', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'pending',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+            })
+          })
+
+          describe('of still pending member "pending-member-user"', () => {
+            beforeEach(async () => {
+              variables = {
+                ...variables,
+                userId: 'pending-member-user',
+              }
+            })
+
+            describe('by owner "owner-member-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await ownerMemberUser.toJson()
+              })
+
+              describe('to usual', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'usual',
+                  }
+                })
+
+                it('has role usual', async () => {
+                  const expected = {
+                    data: {
+                      SwitchGroupMemberRole: {
+                        id: 'pending-member-user',
+                        myRoleInGroup: 'usual',
+                      },
+                    },
+                    errors: undefined,
+                  }
+                  await expect(
+                    mutate({
+                      mutation: switchGroupMemberRoleMutation,
+                      variables,
+                    }),
+                  ).resolves.toMatchObject(expected)
+                })
+              })
+
+              describe('back to pending', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'pending',
+                  }
+                })
+
+                it('has role usual again', async () => {
+                  const expected = {
+                    data: {
+                      SwitchGroupMemberRole: {
+                        id: 'pending-member-user',
+                        myRoleInGroup: 'pending',
+                      },
+                    },
+                    errors: undefined,
+                  }
+                  await expect(
+                    mutate({
+                      mutation: switchGroupMemberRoleMutation,
+                      variables,
+                    }),
+                  ).resolves.toMatchObject(expected)
+                })
+              })
+            })
+
+            describe('by usual member "usual-member-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await usualMemberUser.toJson()
+              })
+
+              describe('upgrade to usual', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'usual',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+            })
+
+            describe('by still pending member "pending-member-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await pendingMemberUser.toJson()
+              })
+
+              describe('upgrade to usual', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'usual',
+                  }
+                })
+
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: switchGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                })
+              })
+            })
+
+            describe('by none member "current-user"', () => {
+              beforeEach(async () => {
+                authenticatedUser = await user.toJson()
+              })
+
+              describe('upgrade to usual', () => {
+                beforeEach(async () => {
+                  variables = {
+                    ...variables,
+                    roleInGroup: 'usual',
                   }
                 })
 

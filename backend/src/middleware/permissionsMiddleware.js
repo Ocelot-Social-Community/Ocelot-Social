@@ -152,6 +152,7 @@ const isAllowedToSwitchGroupMemberRole = rule({
       !!admin &&
       !!member &&
       adminId !== userId &&
+      // Wolle: member.myRoleInGroup === roleInGroup &&
       ((['admin'].includes(admin.myRoleInGroup) &&
         !['owner'].includes(member.myRoleInGroup) &&
         ['pending', 'usual', 'admin'].includes(roleInGroup)) ||
