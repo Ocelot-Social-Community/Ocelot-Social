@@ -7,3 +7,11 @@
 export function gql(strings) {
   return strings.join('')
 }
+
+// sometime we have to wait to check a db state by having a look into the db in a certain moment
+// or we wait a bit to check if we missed to set an await somewhere
+export function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+// usage – 4 seconds for example
+// await sleep(4 * 1000)
