@@ -286,7 +286,7 @@ export default shield(
       statistics: allow,
       currentUser: allow,
       Group: isAuthenticated,
-      GroupMember: isAllowedSeeingMembersOfGroup,
+      GroupMembers: isAllowedSeeingMembersOfGroup,
       Post: allow,
       profilePagePosts: allow,
       Comment: allow,

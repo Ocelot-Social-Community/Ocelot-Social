@@ -46,7 +46,7 @@ export default {
         session.close()
       }
     },
-    GroupMember: async (_object, params, context, _resolveInfo) => {
+    GroupMembers: async (_object, params, context, _resolveInfo) => {
       const { id: groupId } = params
       // Wolle: console.log('groupId: ', groupId)
       const session = context.driver.session()

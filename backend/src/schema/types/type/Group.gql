@@ -73,7 +73,7 @@ type Query {
     orderBy: [_GroupOrdering]
   ): [Group]
 
-  GroupMember(
+  GroupMembers(
     id: ID!
     first: Int
     offset: Int

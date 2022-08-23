@@ -4,7 +4,7 @@ import {
   createGroupMutation,
   joinGroupMutation,
   changeGroupMemberRoleMutation,
-  groupMemberQuery,
+  groupMembersQuery,
   groupQuery,
 } from '../../db/graphql/groups'
 import { getNeode, getDriver } from '../../db/neo4j'
@@ -499,7 +499,7 @@ describe('in mode: always clean db', () => {
               id: 'hidden-group',
               userId: 'owner-of-closed-group',
             }
-            const { errors } = await query({ query: groupMemberQuery, variables })
+            const { errors } = await query({ query: groupMembersQuery, variables })
             expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
           })
         })
@@ -533,7 +533,7 @@ describe('in mode: always clean db', () => {
 })
 
 describe('in mode: building up – separate for each resolver', () => {
-  describe('GroupMember', () => {
+  describe('GroupMembers', () => {
     beforeAll(async () => {
       await seedBasicsAndClearAuthentication()
     })
@@ -547,7 +547,7 @@ describe('in mode: building up – separate for each resolver', () => {
         variables = {
           id: 'not-existing-group',
         }
-        const { errors } = await query({ query: groupMemberQuery, variables })
+        const { errors } = await query({ query: groupMembersQuery, variables })
         expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
       })
     })
@@ -704,12 +704,12 @@ describe('in mode: building up – separate for each resolver', () => {
         // const groups = await query({ query: groupQuery, variables: {} })
         // console.log('groups.data.Group: ', groups.data.Group)
         // const groupMemberOfClosedGroup = await mutate({
-        //   mutation: groupMemberQuery,
+        //   mutation: groupMembersQuery,
         //   variables: {
         //     id: 'hidden-group',
         //   },
         // })
-        // console.log('groupMemberOfClosedGroup.data.GroupMember: ', groupMemberOfClosedGroup.data.GroupMember)
+        // console.log('groupMemberOfClosedGroup.data.GroupMembers: ', groupMemberOfClosedGroup.data.GroupMembers)
 
         authenticatedUser = null
       })
@@ -729,12 +729,12 @@ describe('in mode: building up – separate for each resolver', () => {
 
             it('finds all members', async () => {
               const result = await mutate({
-                mutation: groupMemberQuery,
+                mutation: groupMembersQuery,
                 variables,
               })
               expect(result).toMatchObject({
                 data: {
-                  GroupMember: expect.arrayContaining([
+                  GroupMembers: expect.arrayContaining([
                     expect.objectContaining({
                       id: 'current-user',
                       myRoleInGroup: 'owner',
@@ -751,7 +751,7 @@ describe('in mode: building up – separate for each resolver', () => {
                 },
                 errors: undefined,
               })
-              expect(result.data.GroupMember.length).toBe(3)
+              expect(result.data.GroupMembers.length).toBe(3)
             })
           })
 
@@ -762,12 +762,12 @@ describe('in mode: building up – separate for each resolver', () => {
 
             it('finds all members', async () => {
               const result = await mutate({
-                mutation: groupMemberQuery,
+                mutation: groupMembersQuery,
                 variables,
               })
               expect(result).toMatchObject({
                 data: {
-                  GroupMember: expect.arrayContaining([
+                  GroupMembers: expect.arrayContaining([
                     expect.objectContaining({
                       id: 'current-user',
                       myRoleInGroup: 'owner',
@@ -784,7 +784,7 @@ describe('in mode: building up – separate for each resolver', () => {
                 },
                 errors: undefined,
               })
-              expect(result.data.GroupMember.length).toBe(3)
+              expect(result.data.GroupMembers.length).toBe(3)
             })
           })
 
@@ -795,12 +795,12 @@ describe('in mode: building up – separate for each resolver', () => {
 
             it('finds all members', async () => {
               const result = await mutate({
-                mutation: groupMemberQuery,
+                mutation: groupMembersQuery,
                 variables,
               })
               expect(result).toMatchObject({
                 data: {
-                  GroupMember: expect.arrayContaining([
+                  GroupMembers: expect.arrayContaining([
                     expect.objectContaining({
                       id: 'current-user',
                       myRoleInGroup: 'owner',
@@ -817,7 +817,7 @@ describe('in mode: building up – separate for each resolver', () => {
                 },
                 errors: undefined,
               })
-              expect(result.data.GroupMember.length).toBe(3)
+              expect(result.data.GroupMembers.length).toBe(3)
             })
           })
         })
@@ -838,12 +838,12 @@ describe('in mode: building up – separate for each resolver', () => {
 
             it('finds all members', async () => {
               const result = await mutate({
-                mutation: groupMemberQuery,
+                mutation: groupMembersQuery,
                 variables,
               })
               expect(result).toMatchObject({
                 data: {
-                  GroupMember: expect.arrayContaining([
+                  GroupMembers: expect.arrayContaining([
                     expect.objectContaining({
                       id: 'current-user',
                       myRoleInGroup: 'pending',
@@ -860,7 +860,7 @@ describe('in mode: building up – separate for each resolver', () => {
                 },
                 errors: undefined,
               })
-              expect(result.data.GroupMember.length).toBe(3)
+              expect(result.data.GroupMembers.length).toBe(3)
             })
           })
 
@@ -880,12 +880,12 @@ describe('in mode: building up – separate for each resolver', () => {
 
             it('finds all members', async () => {
               const result = await mutate({
-                mutation: groupMemberQuery,
+                mutation: groupMembersQuery,
                 variables,
               })
               expect(result).toMatchObject({
                 data: {
-                  GroupMember: expect.arrayContaining([
+                  GroupMembers: expect.arrayContaining([
                     expect.objectContaining({
                       id: 'current-user',
                       myRoleInGroup: 'pending',
@@ -902,7 +902,7 @@ describe('in mode: building up – separate for each resolver', () => {
                 },
                 errors: undefined,
               })
-              expect(result.data.GroupMember.length).toBe(3)
+              expect(result.data.GroupMembers.length).toBe(3)
             })
           })
 
@@ -912,7 +912,7 @@ describe('in mode: building up – separate for each resolver', () => {
             })
 
             it('throws authorization error', async () => {
-              const { errors } = await query({ query: groupMemberQuery, variables })
+              const { errors } = await query({ query: groupMembersQuery, variables })
               expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
             })
           })
@@ -923,7 +923,7 @@ describe('in mode: building up – separate for each resolver', () => {
             })
 
             it('throws authorization error', async () => {
-              const { errors } = await query({ query: groupMemberQuery, variables })
+              const { errors } = await query({ query: groupMembersQuery, variables })
               expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
             })
           })
@@ -945,12 +945,12 @@ describe('in mode: building up – separate for each resolver', () => {
 
             it('finds all members', async () => {
               const result = await mutate({
-                mutation: groupMemberQuery,
+                mutation: groupMembersQuery,
                 variables,
               })
               expect(result).toMatchObject({
                 data: {
-                  GroupMember: expect.arrayContaining([
+                  GroupMembers: expect.arrayContaining([
                     expect.objectContaining({
                       id: 'pending-user',
                       myRoleInGroup: 'pending',
@@ -971,7 +971,7 @@ describe('in mode: building up – separate for each resolver', () => {
                 },
                 errors: undefined,
               })
-              expect(result.data.GroupMember.length).toBe(4)
+              expect(result.data.GroupMembers.length).toBe(4)
             })
           })
 
@@ -982,12 +982,12 @@ describe('in mode: building up – separate for each resolver', () => {
 
             it('finds all members', async () => {
               const result = await mutate({
-                mutation: groupMemberQuery,
+                mutation: groupMembersQuery,
                 variables,
               })
               expect(result).toMatchObject({
                 data: {
-                  GroupMember: expect.arrayContaining([
+                  GroupMembers: expect.arrayContaining([
                     expect.objectContaining({
                       id: 'pending-user',
                       myRoleInGroup: 'pending',
@@ -1008,7 +1008,7 @@ describe('in mode: building up – separate for each resolver', () => {
                 },
                 errors: undefined,
               })
-              expect(result.data.GroupMember.length).toBe(4)
+              expect(result.data.GroupMembers.length).toBe(4)
             })
           })
 
@@ -1019,12 +1019,12 @@ describe('in mode: building up – separate for each resolver', () => {
 
             it('finds all members', async () => {
               const result = await mutate({
-                mutation: groupMemberQuery,
+                mutation: groupMembersQuery,
                 variables,
               })
               expect(result).toMatchObject({
                 data: {
-                  GroupMember: expect.arrayContaining([
+                  GroupMembers: expect.arrayContaining([
                     expect.objectContaining({
                       id: 'pending-user',
                       myRoleInGroup: 'pending',
@@ -1045,7 +1045,7 @@ describe('in mode: building up – separate for each resolver', () => {
                 },
                 errors: undefined,
               })
-              expect(result.data.GroupMember.length).toBe(4)
+              expect(result.data.GroupMembers.length).toBe(4)
             })
           })
 
@@ -1055,7 +1055,7 @@ describe('in mode: building up – separate for each resolver', () => {
             })
 
             it('throws authorization error', async () => {
-              const { errors } = await query({ query: groupMemberQuery, variables })
+              const { errors } = await query({ query: groupMembersQuery, variables })
               expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
             })
           })
@@ -1066,7 +1066,7 @@ describe('in mode: building up – separate for each resolver', () => {
             })
 
             it('throws authorization error', async () => {
-              const { errors } = await query({ query: groupMemberQuery, variables })
+              const { errors } = await query({ query: groupMembersQuery, variables })
               expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
             })
           })
@@ -1323,12 +1323,12 @@ describe('in mode: building up – separate for each resolver', () => {
                   // const groups = await query({ query: groupQuery, variables: {} })
                   // console.log('groups.data.Group: ', groups.data.Group)
                   // const groupMemberOfClosedGroup = await mutate({
-                  //   mutation: groupMemberQuery,
+                  //   mutation: groupMembersQuery,
                   //   variables: {
                   //     id: 'closed-group',
                   //   },
                   // })
-                  // console.log('groupMemberOfClosedGroup.data.GroupMember: ', groupMemberOfClosedGroup.data.GroupMember)
+                  // console.log('groupMemberOfClosedGroup.data.GroupMembers: ', groupMemberOfClosedGroup.data.GroupMembers)
                   await expect(
                     mutate({
                       mutation: changeGroupMemberRoleMutation,

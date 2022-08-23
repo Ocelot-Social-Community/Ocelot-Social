@@ -116,9 +116,9 @@ export const groupQuery = gql`
   }
 `
 
-export const groupMemberQuery = gql`
+export const groupMembersQuery = gql`
   query ($id: ID!, $first: Int, $offset: Int, $orderBy: [_UserOrdering], $filter: _UserFilter) {
-    GroupMember(id: $id, first: $first, offset: $offset, orderBy: $orderBy, filter: $filter) {
+    GroupMembers(id: $id, first: $first, offset: $offset, orderBy: $orderBy, filter: $filter) {
       id
       name
       slug
