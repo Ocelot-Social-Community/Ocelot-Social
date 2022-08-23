@@ -57,8 +57,6 @@ const isAllowedSeeingMembersOfGroup = rule({
 })(async (_parent, args, { user, driver }) => {
   if (!(user && user.id)) return false
   const { id: groupId } = args
-  // Wolle: console.log('groupId: ', groupId)
-  // console.log('user.id: ', user.id)
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
@@ -76,8 +74,6 @@ const isAllowedSeeingMembersOfGroup = rule({
   })
   try {
     const { member, group } = await readTxPromise
-    // Wolle: console.log('member: ', member)
-    // console.log('group: ', group)
     return (
       !!group &&
       (group.groupType === 'public' ||
@@ -86,7 +82,6 @@ const isAllowedSeeingMembersOfGroup = rule({
           ['usual', 'admin', 'owner'].includes(member.myRoleInGroup)))
     )
   } catch (error) {
-    // Wolle: console.log('error: ', error)
     throw new Error(error)
   } finally {
     session.close()
@@ -100,12 +95,6 @@ const isAllowedToChangeGroupMemberRole = rule({
   const adminId = user.id
   const { groupId, userId, roleInGroup } = args
   if (adminId === userId) return false
-  // Wolle:
-  // console.log('isAllowedToChangeGroupMemberRole !!!')
-  // console.log('adminId: ', adminId)
-  // console.log('groupId: ', groupId)
-  // console.log('userId: ', userId)
-  // console.log('roleInGroup: ', roleInGroup)
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
@@ -116,23 +105,6 @@ const isAllowedToChangeGroupMemberRole = rule({
       `,
       { groupId, adminId, userId },
     )
-    // Wolle:
-    // console.log(
-    //   'transactionResponse: ',
-    //   transactionResponse,
-    // )
-    // console.log(
-    //   'transaction admins: ',
-    //   transactionResponse.records.map((record) => record.get('admin')),
-    // )
-    // console.log(
-    //   'transaction groups: ',
-    //   transactionResponse.records.map((record) => record.get('group')),
-    // )
-    // console.log(
-    //   'transaction members: ',
-    //   transactionResponse.records.map((record) => record.get('member')),
-    // )
     return {
       admin: transactionResponse.records.map((record) => record.get('admin'))[0],
       group: transactionResponse.records.map((record) => record.get('group'))[0],
@@ -140,14 +112,7 @@ const isAllowedToChangeGroupMemberRole = rule({
     }
   })
   try {
-    // Wolle:
-    // console.log('enter try !!!')
     const { admin, group, member } = await readTxPromise
-    // Wolle:
-    // console.log('after !!!')
-    // console.log('admin: ', admin)
-    // console.log('group: ', group)
-    // console.log('member: ', member)
     return (
       !!group &&
       !!admin &&
@@ -160,8 +125,6 @@ const isAllowedToChangeGroupMemberRole = rule({
           ['pending', 'usual', 'admin', 'owner'].includes(roleInGroup)))
     )
   } catch (error) {
-    // Wolle:
-    // console.log('error: ', error)
     throw new Error(error)
   } finally {
     session.close()
@@ -173,11 +136,6 @@ const isAllowedToJoinGroup = rule({
 })(async (_parent, args, { user, driver }) => {
   if (!(user && user.id)) return false
   const { groupId, userId } = args
-  // Wolle:
-  // console.log('adminId: ', adminId)
-  // console.log('groupId: ', groupId)
-  // console.log('userId: ', userId)
-  // console.log('roleInGroup: ', roleInGroup)
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
@@ -188,35 +146,15 @@ const isAllowedToJoinGroup = rule({
       `,
       { groupId, userId },
     )
-    // Wolle:
-    // console.log(
-    //   'transactionResponse: ',
-    //   transactionResponse,
-    // )
-    // console.log(
-    //   'transaction groups: ',
-    //   transactionResponse.records.map((record) => record.get('group')),
-    // )
-    // console.log(
-    //   'transaction members: ',
-    //   transactionResponse.records.map((record) => record.get('member')),
-    // )
     return {
       group: transactionResponse.records.map((record) => record.get('group'))[0],
       member: transactionResponse.records.map((record) => record.get('member'))[0],
     }
   })
   try {
-    // Wolle:
-    // console.log('enter try !!!')
     const { group, member } = await readTxPromise
-    // Wolle:
-    // console.log('after !!!')
-    // console.log('group: ', group)
-    // console.log('member: ', member)
     return !!group && (group.groupType !== 'hidden' || (!!member && !!member.myRoleInGroup))
   } catch (error) {
-    // Wolle: console.log('error: ', error)
     throw new Error(error)
   } finally {
     session.close()

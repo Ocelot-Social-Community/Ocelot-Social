@@ -48,7 +48,6 @@ export default {
     },
     GroupMembers: async (_object, params, context, _resolveInfo) => {
       const { id: groupId } = params
-      // Wolle: console.log('groupId: ', groupId)
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
         const groupMemberCypher = `
@@ -160,11 +159,6 @@ export default {
     },
     ChangeGroupMemberRole: async (_parent, params, context, _resolveInfo) => {
       const { groupId, userId, roleInGroup } = params
-      // Wolle
-      // console.log('ChangeGroupMemberRole !!!')
-      // console.log('groupId: ', groupId)
-      // console.log('userId: ', userId)
-      // console.log('roleInGroup: ', roleInGroup)
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const joinGroupCypher = `
@@ -180,8 +174,6 @@ export default {
         `
         const result = await transaction.run(joinGroupCypher, { groupId, userId, roleInGroup })
         const [member] = await result.records.map((record) => record.get('member'))
-        // Wolle
-        // console.log('member: ', member)
         return member
       })
       try {

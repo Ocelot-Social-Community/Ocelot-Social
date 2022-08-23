@@ -728,16 +728,6 @@ describe('in mode', () => {
               roleInGroup: 'admin',
             },
           })
-          // Wolle:
-          // const groups = await query({ query: groupQuery, variables: {} })
-          // console.log('groups.data.Group: ', groups.data.Group)
-          // const groupMemberOfClosedGroup = await mutate({
-          //   mutation: groupMembersQuery,
-          //   variables: {
-          //     id: 'hidden-group',
-          //   },
-          // })
-          // console.log('groupMemberOfClosedGroup.data.GroupMembers: ', groupMemberOfClosedGroup.data.GroupMembers)
 
           authenticatedUser = null
         })
@@ -1340,16 +1330,6 @@ describe('in mode', () => {
                   })
 
                   it('has role admin', async () => {
-                    // Wolle:
-                    // const groups = await query({ query: groupQuery, variables: {} })
-                    // console.log('groups.data.Group: ', groups.data.Group)
-                    // const groupMemberOfClosedGroup = await mutate({
-                    //   mutation: groupMembersQuery,
-                    //   variables: {
-                    //     id: 'closed-group',
-                    //   },
-                    // })
-                    // console.log('groupMemberOfClosedGroup.data.GroupMembers: ', groupMemberOfClosedGroup.data.GroupMembers)
                     await expect(
                       mutate({
                         mutation: changeGroupMemberRoleMutation,
