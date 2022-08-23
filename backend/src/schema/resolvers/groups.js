@@ -160,7 +160,7 @@ export default {
         session.close()
       }
     },
-    SwitchGroupMemberRole: async (_parent, params, context, _resolveInfo) => {
+    ChangeGroupMemberRole: async (_parent, params, context, _resolveInfo) => {
       const { id: groupId, userId, roleInGroup } = params
       // Wolle
       // console.log('groupId: ', groupId)

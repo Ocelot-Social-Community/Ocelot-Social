@@ -8,7 +8,7 @@ import { getNeode, getDriver } from '../db/neo4j'
 import {
   createGroupMutation,
   joinGroupMutation,
-  switchGroupMemberRoleMutation,
+  changeGroupMemberRoleMutation,
 } from './graphql/groups'
 import { createPostMutation } from './graphql/posts'
 import { createCommentMutation } from './graphql/comments'
@@ -436,7 +436,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     ])
     await Promise.all([
       mutate({
-        mutation: switchGroupMemberRoleMutation,
+        mutation: changeGroupMemberRoleMutation,
         variables: {
           id: 'g0',
           userId: 'u2',
@@ -444,7 +444,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: switchGroupMemberRoleMutation,
+        mutation: changeGroupMemberRoleMutation,
         variables: {
           id: 'g0',
           userId: 'u4',
@@ -452,7 +452,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: switchGroupMemberRoleMutation,
+        mutation: changeGroupMemberRoleMutation,
         variables: {
           id: 'g0',
           userId: 'u3',
@@ -515,7 +515,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     ])
     await Promise.all([
       mutate({
-        mutation: switchGroupMemberRoleMutation,
+        mutation: changeGroupMemberRoleMutation,
         variables: {
           id: 'g0',
           userId: 'u1',
@@ -523,7 +523,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: switchGroupMemberRoleMutation,
+        mutation: changeGroupMemberRoleMutation,
         variables: {
           id: 'g0',
           userId: 'u2',
@@ -531,7 +531,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: switchGroupMemberRoleMutation,
+        mutation: changeGroupMemberRoleMutation,
         variables: {
           id: 'g0',
           userId: 'u5',
@@ -539,7 +539,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: switchGroupMemberRoleMutation,
+        mutation: changeGroupMemberRoleMutation,
         variables: {
           id: 'g0',
           userId: 'u6',
@@ -595,7 +595,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     ])
     await Promise.all([
       mutate({
-        mutation: switchGroupMemberRoleMutation,
+        mutation: changeGroupMemberRoleMutation,
         variables: {
           id: 'g0',
           userId: 'u4',
@@ -603,7 +603,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: switchGroupMemberRoleMutation,
+        mutation: changeGroupMemberRoleMutation,
         variables: {
           id: 'g0',
           userId: 'u5',
@@ -611,7 +611,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: switchGroupMemberRoleMutation,
+        mutation: changeGroupMemberRoleMutation,
         variables: {
           id: 'g0',
           userId: 'u6',

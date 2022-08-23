@@ -259,7 +259,7 @@ export default shield(
       UpdateUser: onlyYourself,
       CreateGroup: isAuthenticated,
       JoinGroup: isAuthenticated, // Wolle: can not be correct
-      SwitchGroupMemberRole: isAllowedToSwitchGroupMemberRole,
+      ChangeGroupMemberRole: isAllowedToSwitchGroupMemberRole,
       CreatePost: isAuthenticated,
       UpdatePost: isAuthor,
       DeletePost: isAuthor,
