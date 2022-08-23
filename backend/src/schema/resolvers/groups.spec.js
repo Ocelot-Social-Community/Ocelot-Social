@@ -122,34 +122,40 @@ describe('in mode', () => {
         })
 
         it('creates a group', async () => {
-          await expect(mutate({ mutation: createGroupMutation, variables })).resolves.toMatchObject({
-            data: {
-              CreateGroup: {
-                name: 'The Best Group',
-                slug: 'the-group',
-                about: 'We will change the world!',
+          await expect(mutate({ mutation: createGroupMutation, variables })).resolves.toMatchObject(
+            {
+              data: {
+                CreateGroup: {
+                  name: 'The Best Group',
+                  slug: 'the-group',
+                  about: 'We will change the world!',
+                },
               },
+              errors: undefined,
             },
-            errors: undefined,
-          })
+          )
         })
 
         it('assigns the authenticated user as owner', async () => {
-          await expect(mutate({ mutation: createGroupMutation, variables })).resolves.toMatchObject({
-            data: {
-              CreateGroup: {
-                name: 'The Best Group',
-                myRole: 'owner',
+          await expect(mutate({ mutation: createGroupMutation, variables })).resolves.toMatchObject(
+            {
+              data: {
+                CreateGroup: {
+                  name: 'The Best Group',
+                  myRole: 'owner',
+                },
               },
+              errors: undefined,
             },
-            errors: undefined,
-          })
+          )
         })
 
         it('has "disabled" and "deleted" default to "false"', async () => {
-          await expect(mutate({ mutation: createGroupMutation, variables })).resolves.toMatchObject({
-            data: { CreateGroup: { disabled: false, deleted: false } },
-          })
+          await expect(mutate({ mutation: createGroupMutation, variables })).resolves.toMatchObject(
+            {
+              data: { CreateGroup: { disabled: false, deleted: false } },
+            },
+          )
         })
 
         describe('description', () => {
@@ -313,8 +319,18 @@ describe('in mode', () => {
         })
       })
     })
+  })
 
+  describe('building up – clean db after each resolver', () => {
     describe('JoinGroup', () => {
+      beforeAll(async () => {
+        await seedBasicsAndClearAuthentication()
+      })
+
+      afterAll(async () => {
+        await cleanDatabase()
+      })
+
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await mutate({
@@ -332,7 +348,7 @@ describe('in mode', () => {
         let ownerOfClosedGroupUser
         let ownerOfHiddenGroupUser
 
-        beforeEach(async () => {
+        beforeAll(async () => {
           // create users
           ownerOfClosedGroupUser = await Factory.build(
             'user',
@@ -535,9 +551,7 @@ describe('in mode', () => {
         })
       })
     })
-  })
 
-  describe('building up – clean db after each resolver', () => {
     describe('GroupMembers', () => {
       beforeAll(async () => {
         await seedBasicsAndClearAuthentication()
