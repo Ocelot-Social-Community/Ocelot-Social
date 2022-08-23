@@ -31,8 +31,7 @@ const { server } = createServer({
     }
   },
 })
-const { query } = createTestClient(server)
-const { mutate } = createTestClient(server)
+const { mutate, query } = createTestClient(server)
 
 const seedBasicsAndClearAuthentication = async () => {
   variables = {}
