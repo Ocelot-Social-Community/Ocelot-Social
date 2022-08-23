@@ -101,6 +101,7 @@ const isAllowedToChangeGroupMemberRole = rule({
   const { id: groupId, userId, roleInGroup } = args
   if (adminId === userId) return false
   // Wolle:
+  // console.log('isAllowedToChangeGroupMemberRole !!!')
   // console.log('adminId: ', adminId)
   // console.log('groupId: ', groupId)
   // console.log('userId: ', userId)
@@ -109,7 +110,8 @@ const isAllowedToChangeGroupMemberRole = rule({
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
       `
-        MATCH (admin:User {id: $adminId})-[adminMembership:MEMBER_OF]->(group:Group {id: $groupId})<-[userMembership:MEMBER_OF]-(member:User {id: $userId})
+        MATCH (admin:User {id: $adminId})-[adminMembership:MEMBER_OF]->(group:Group {id: $groupId})
+        OPTIONAL MATCH (group)<-[userMembership:MEMBER_OF]-(member:User {id: $userId})
         RETURN group {.*}, admin {.*, myRoleInGroup: adminMembership.role}, member {.*, myRoleInGroup: userMembership.role}
       `,
       { groupId, adminId, userId },
@@ -149,14 +151,70 @@ const isAllowedToChangeGroupMemberRole = rule({
     return (
       !!group &&
       !!admin &&
-      !!member &&
-      // Wolle: member.myRoleInGroup === roleInGroup &&
+      (!member ||
+        (!!member &&
+          (member.myRoleInGroup === roleInGroup || !['owner'].includes(member.myRoleInGroup)))) &&
       ((['admin'].includes(admin.myRoleInGroup) &&
-        !['owner'].includes(member.myRoleInGroup) &&
         ['pending', 'usual', 'admin'].includes(roleInGroup)) ||
         (['owner'].includes(admin.myRoleInGroup) &&
           ['pending', 'usual', 'admin', 'owner'].includes(roleInGroup)))
     )
+  } catch (error) {
+    // Wolle:
+    // console.log('error: ', error)
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+})
+
+const isAllowedToJoinGroup = rule({
+  cache: 'no_cache',
+})(async (_parent, args, { user, driver }) => {
+  if (!(user && user.id)) return false
+  const { id: groupId, userId } = args
+  // Wolle:
+  // console.log('adminId: ', adminId)
+  // console.log('groupId: ', groupId)
+  // console.log('userId: ', userId)
+  // console.log('roleInGroup: ', roleInGroup)
+  const session = driver.session()
+  const readTxPromise = session.readTransaction(async (transaction) => {
+    const transactionResponse = await transaction.run(
+      `
+        MATCH (group:Group {id: $groupId})
+        OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(member:User {id: $userId})
+        RETURN group {.*}, member {.*, myRoleInGroup: membership.role}
+      `,
+      { groupId, userId },
+    )
+    // Wolle:
+    // console.log(
+    //   'transactionResponse: ',
+    //   transactionResponse,
+    // )
+    // console.log(
+    //   'transaction groups: ',
+    //   transactionResponse.records.map((record) => record.get('group')),
+    // )
+    // console.log(
+    //   'transaction members: ',
+    //   transactionResponse.records.map((record) => record.get('member')),
+    // )
+    return {
+      group: transactionResponse.records.map((record) => record.get('group'))[0],
+      member: transactionResponse.records.map((record) => record.get('member'))[0],
+    }
+  })
+  try {
+    // Wolle:
+    // console.log('enter try !!!')
+    const { group, member } = await readTxPromise
+    // Wolle:
+    // console.log('after !!!')
+    // console.log('group: ', group)
+    // console.log('member: ', member)
+    return !!group && (group.groupType !== 'hidden' || (!!member && !!member.myRoleInGroup))
   } catch (error) {
     // Wolle: console.log('error: ', error)
     throw new Error(error)
@@ -256,7 +314,7 @@ export default shield(
       SignupVerification: allow,
       UpdateUser: onlyYourself,
       CreateGroup: isAuthenticated,
-      JoinGroup: isAuthenticated, // Wolle: can not be correct
+      JoinGroup: isAllowedToJoinGroup,
       ChangeGroupMemberRole: isAllowedToChangeGroupMemberRole,
       CreatePost: isAuthenticated,
       UpdatePost: isAuthor,

@@ -410,7 +410,7 @@ describe('in mode: always clean db', () => {
       })
 
       describe('public group', () => {
-        describe('entered by "owner-of-closed-group"', () => {
+        describe('joined by "owner-of-closed-group"', () => {
           it('has "usual" as membership role', async () => {
             variables = {
               id: 'public-group',
@@ -434,7 +434,7 @@ describe('in mode: always clean db', () => {
           })
         })
 
-        describe('entered by its owner', () => {
+        describe('joined by its owner', () => {
           describe('does not create additional "MEMBER_OF" relation and therefore', () => {
             it('has still "owner" as membership role', async () => {
               variables = {
@@ -462,7 +462,7 @@ describe('in mode: always clean db', () => {
       })
 
       describe('closed group', () => {
-        describe('entered by "current-user"', () => {
+        describe('joined by "current-user"', () => {
           it('has "pending" as membership role', async () => {
             variables = {
               id: 'closed-group',
@@ -486,7 +486,7 @@ describe('in mode: always clean db', () => {
           })
         })
 
-        describe('entered by its owner', () => {
+        describe('joined by its owner', () => {
           describe('does not create additional "MEMBER_OF" relation and therefore', () => {
             it('has still "owner" as membership role', async () => {
               variables = {
@@ -514,31 +514,18 @@ describe('in mode: always clean db', () => {
       })
 
       describe('hidden group', () => {
-        describe('entered by "owner-of-closed-group"', () => {
-          it('has "pending" as membership role', async () => {
+        describe('joined by "owner-of-closed-group"', () => {
+          it('throws authorization error', async () => {
             variables = {
               id: 'hidden-group',
               userId: 'owner-of-closed-group',
             }
-            const expected = {
-              data: {
-                JoinGroup: {
-                  id: 'owner-of-closed-group',
-                  myRoleInGroup: 'pending',
-                },
-              },
-              errors: undefined,
-            }
-            await expect(
-              mutate({
-                mutation: joinGroupMutation,
-                variables,
-              }),
-            ).resolves.toMatchObject(expected)
+            const { errors } = await query({ query: groupMemberQuery, variables })
+            expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
           })
         })
 
-        describe('entered by its owner', () => {
+        describe('joined by its owner', () => {
           describe('does not create additional "MEMBER_OF" relation and therefore', () => {
             it('has still "owner" as membership role', async () => {
               variables = {
@@ -566,8 +553,18 @@ describe('in mode: always clean db', () => {
       })
     })
   })
+})
 
+describe('in mode: building up – separate for each resolver', () => {
   describe('GroupMember', () => {
+    beforeAll(async () => {
+      await seedBasicsAndClearAuthentication()
+    })
+
+    afterAll(async () => {
+      await cleanDatabase()
+    })
+
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         variables = {
@@ -580,10 +577,11 @@ describe('in mode: always clean db', () => {
 
     describe('authenticated', () => {
       let otherUser
+      let pendingUser
       let ownerOfClosedGroupUser
       let ownerOfHiddenGroupUser
 
-      beforeEach(async () => {
+      beforeAll(async () => {
         // create users
         otherUser = await Factory.build(
           'user',
@@ -592,7 +590,18 @@ describe('in mode: always clean db', () => {
             name: 'Other TestUser',
           },
           {
-            email: 'test2@example.org',
+            email: 'other-user@example.org',
+            password: '1234',
+          },
+        )
+        pendingUser = await Factory.build(
+          'user',
+          {
+            id: 'pending-user',
+            name: 'Pending TestUser',
+          },
+          {
+            email: 'pending@example.org',
             password: '1234',
           },
         )
@@ -689,22 +698,43 @@ describe('in mode: always clean db', () => {
             categoryIds,
           },
         })
+        // 'JoinGroup' mutation does not work in hidden groups so we join them by 'ChangeGroupMemberRole' through the owner
         await mutate({
-          mutation: joinGroupMutation,
+          mutation: changeGroupMemberRoleMutation,
+          variables: {
+            id: 'hidden-group',
+            userId: 'pending-user',
+            roleInGroup: 'pending',
+          },
+        })
+        await mutate({
+          mutation: changeGroupMemberRoleMutation,
           variables: {
             id: 'hidden-group',
             userId: 'current-user',
+            roleInGroup: 'usual',
           },
         })
         await mutate({
-          mutation: joinGroupMutation,
+          mutation: changeGroupMemberRoleMutation,
           variables: {
             id: 'hidden-group',
             userId: 'owner-of-closed-group',
+            roleInGroup: 'admin',
           },
         })
+        // Wolle:
+        // const groups = await query({ query: groupQuery, variables: {} })
+        // console.log('groups.data.Group: ', groups.data.Group)
+        // const groupMemberOfClosedGroup = await mutate({
+        //   mutation: groupMemberQuery,
+        //   variables: {
+        //     id: 'hidden-group',
+        //   },
+        // })
+        // console.log('groupMemberOfClosedGroup.data.GroupMember: ', groupMemberOfClosedGroup.data.GroupMember)
 
-        authenticatedUser = await user.toJson()
+        authenticatedUser = null
       })
 
       describe('public group', () => {
@@ -946,12 +976,16 @@ describe('in mode: always clean db', () => {
                 data: {
                   GroupMember: expect.arrayContaining([
                     expect.objectContaining({
-                      id: 'current-user',
+                      id: 'pending-user',
                       myRoleInGroup: 'pending',
                     }),
                     expect.objectContaining({
+                      id: 'current-user',
+                      myRoleInGroup: 'usual',
+                    }),
+                    expect.objectContaining({
                       id: 'owner-of-closed-group',
-                      myRoleInGroup: 'pending',
+                      myRoleInGroup: 'admin',
                     }),
                     expect.objectContaining({
                       id: 'owner-of-hidden-group',
@@ -966,21 +1000,50 @@ describe('in mode: always clean db', () => {
                 variables,
               })
               expect(result).toMatchObject(expected)
-              expect(result.data.GroupMember.length).toBe(3)
+              expect(result.data.GroupMember.length).toBe(4)
             })
           })
 
-          describe('by usual member "owner-of-closed-group"', () => {
+          describe('by usual member "current-user"', () => {
             beforeEach(async () => {
-              authenticatedUser = await ownerOfHiddenGroupUser.toJson()
-              await mutate({
-                mutation: changeGroupMemberRoleMutation,
-                variables: {
-                  id: 'hidden-group',
-                  userId: 'owner-of-closed-group',
-                  roleInGroup: 'usual',
+              authenticatedUser = await user.toJson()
+            })
+
+            it('finds all members', async () => {
+              const expected = {
+                data: {
+                  GroupMember: expect.arrayContaining([
+                    expect.objectContaining({
+                      id: 'pending-user',
+                      myRoleInGroup: 'pending',
+                    }),
+                    expect.objectContaining({
+                      id: 'current-user',
+                      myRoleInGroup: 'usual',
+                    }),
+                    expect.objectContaining({
+                      id: 'owner-of-closed-group',
+                      myRoleInGroup: 'admin',
+                    }),
+                    expect.objectContaining({
+                      id: 'owner-of-hidden-group',
+                      myRoleInGroup: 'owner',
+                    }),
+                  ]),
                 },
+                errors: undefined,
+              }
+              const result = await mutate({
+                mutation: groupMemberQuery,
+                variables,
               })
+              expect(result).toMatchObject(expected)
+              expect(result.data.GroupMember.length).toBe(4)
+            })
+          })
+
+          describe('by admin member "owner-of-closed-group"', () => {
+            beforeEach(async () => {
               authenticatedUser = await ownerOfClosedGroupUser.toJson()
             })
 
@@ -989,12 +1052,16 @@ describe('in mode: always clean db', () => {
                 data: {
                   GroupMember: expect.arrayContaining([
                     expect.objectContaining({
-                      id: 'current-user',
+                      id: 'pending-user',
                       myRoleInGroup: 'pending',
                     }),
                     expect.objectContaining({
-                      id: 'owner-of-closed-group',
+                      id: 'current-user',
                       myRoleInGroup: 'usual',
+                    }),
+                    expect.objectContaining({
+                      id: 'owner-of-closed-group',
+                      myRoleInGroup: 'admin',
                     }),
                     expect.objectContaining({
                       id: 'owner-of-hidden-group',
@@ -1009,13 +1076,13 @@ describe('in mode: always clean db', () => {
                 variables,
               })
               expect(result).toMatchObject(expected)
-              expect(result.data.GroupMember.length).toBe(3)
+              expect(result.data.GroupMember.length).toBe(4)
             })
           })
 
-          describe('by pending member "current-user"', () => {
+          describe('by pending member "pending-user"', () => {
             beforeEach(async () => {
-              authenticatedUser = await user.toJson()
+              authenticatedUser = await pendingUser.toJson()
             })
 
             it('throws authorization error', async () => {
@@ -1038,16 +1105,6 @@ describe('in mode: always clean db', () => {
       })
     })
   })
-})
-
-describe('in mode: building up', () => {
-  beforeAll(async () => {
-    await seedBasicsAndClearAuthentication()
-  })
-
-  afterAll(async () => {
-    await cleanDatabase()
-  })
 
   describe('ChangeGroupMemberRole', () => {
     let pendingMemberUser
@@ -1057,6 +1114,7 @@ describe('in mode: building up', () => {
     let secondOwnerMemberUser
 
     beforeAll(async () => {
+      await seedBasicsAndClearAuthentication()
       // create users
       pendingMemberUser = await Factory.build(
         'user',
@@ -1156,34 +1214,6 @@ describe('in mode: building up', () => {
           categoryIds,
         },
       })
-      await mutate({
-        mutation: joinGroupMutation,
-        variables: {
-          id: 'closed-group',
-          userId: 'pending-member-user',
-        },
-      })
-      await mutate({
-        mutation: joinGroupMutation,
-        variables: {
-          id: 'closed-group',
-          userId: 'usual-member-user',
-        },
-      })
-      await mutate({
-        mutation: joinGroupMutation,
-        variables: {
-          id: 'closed-group',
-          userId: 'admin-member-user',
-        },
-      })
-      await mutate({
-        mutation: joinGroupMutation,
-        variables: {
-          id: 'closed-group',
-          userId: 'second-owner-member-user',
-        },
-      })
       // hidden-group
       authenticatedUser = await adminMemberUser.toJson()
       await mutate({
@@ -1198,20 +1228,45 @@ describe('in mode: building up', () => {
           categoryIds,
         },
       })
+      // 'JoinGroup' mutation does not work in hidden groups so we join them by 'ChangeGroupMemberRole' through the owner
       await mutate({
-        mutation: joinGroupMutation,
+        mutation: changeGroupMemberRoleMutation,
         variables: {
           id: 'hidden-group',
           userId: 'admin-member-user',
+          roleInGroup: 'usual',
         },
       })
       await mutate({
-        mutation: joinGroupMutation,
+        mutation: changeGroupMemberRoleMutation,
         variables: {
           id: 'hidden-group',
           userId: 'second-owner-member-user',
+          roleInGroup: 'usual',
         },
       })
+      await mutate({
+        mutation: changeGroupMemberRoleMutation,
+        variables: {
+          id: 'hidden-group',
+          userId: 'admin-member-user',
+          roleInGroup: 'usual',
+        },
+      })
+      await mutate({
+        mutation: changeGroupMemberRoleMutation,
+        variables: {
+          id: 'hidden-group',
+          userId: 'second-owner-member-user',
+          roleInGroup: 'usual',
+        },
+      })
+
+      authenticatedUser = null
+    })
+
+    afterAll(async () => {
+      await cleanDatabase()
     })
 
     describe('unauthenticated', () => {
@@ -1234,13 +1289,13 @@ describe('in mode: building up', () => {
           }
         })
 
-        describe('give the members their prospective roles', () => {
+        describe('join the members and give them their prospective roles', () => {
           describe('by owner "owner-member-user"', () => {
             beforeEach(async () => {
               authenticatedUser = await ownerMemberUser.toJson()
             })
 
-            describe('switch role of "usual-member-user"', () => {
+            describe('for "usual-member-user"', () => {
               beforeEach(async () => {
                 variables = {
                   ...variables,
@@ -1248,7 +1303,7 @@ describe('in mode: building up', () => {
                 }
               })
 
-              describe('to usual', () => {
+              describe('as usual', () => {
                 beforeEach(async () => {
                   variables = {
                     ...variables,
@@ -1279,7 +1334,7 @@ describe('in mode: building up', () => {
               })
             })
 
-            describe('switch role of "admin-member-user"', () => {
+            describe('for "admin-member-user"', () => {
               beforeEach(async () => {
                 variables = {
                   ...variables,
@@ -1287,7 +1342,7 @@ describe('in mode: building up', () => {
                 }
               })
 
-              describe('to admin', () => {
+              describe('as admin', () => {
                 beforeEach(async () => {
                   variables = {
                     ...variables,
@@ -1325,7 +1380,7 @@ describe('in mode: building up', () => {
               })
             })
 
-            describe('switch role of "second-owner-member-user"', () => {
+            describe('for "second-owner-member-user"', () => {
               beforeEach(async () => {
                 variables = {
                   ...variables,
@@ -1333,7 +1388,7 @@ describe('in mode: building up', () => {
                 }
               })
 
-              describe('to owner', () => {
+              describe('as owner', () => {
                 beforeEach(async () => {
                   variables = {
                     ...variables,
@@ -1395,8 +1450,9 @@ describe('in mode: building up', () => {
               })
             })
 
-            // Wolle: shall this be possible for now?
-            // or shall only an owner who gave the second owner the owner role downgrade themself?
+            // shall this be possible in the future?
+            // or shall only an owner who gave the second owner the owner role downgrade themself for savety?
+            // otherwise the first owner who downgrades the other one has the victory over the group!
             describe('by second owner "second-owner-member-user"', () => {
               beforeEach(async () => {
                 authenticatedUser = await secondOwnerMemberUser.toJson()
@@ -1410,26 +1466,16 @@ describe('in mode: building up', () => {
                   }
                 })
 
-                it('has role admin', async () => {
-                  const expected = {
-                    data: {
-                      ChangeGroupMemberRole: {
-                        id: 'owner-member-user',
-                        myRoleInGroup: 'admin',
-                      },
-                    },
-                    errors: undefined,
-                  }
-                  await expect(
-                    mutate({
-                      mutation: changeGroupMemberRoleMutation,
-                      variables,
-                    }),
-                  ).resolves.toMatchObject(expected)
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: changeGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
                 })
               })
 
-              describe('back to owner', () => {
+              describe('to same role owner', () => {
                 beforeEach(async () => {
                   variables = {
                     ...variables,
@@ -1437,7 +1483,7 @@ describe('in mode: building up', () => {
                   }
                 })
 
-                it('has role owner again', async () => {
+                it('has role owner still', async () => {
                   const expected = {
                     data: {
                       ChangeGroupMemberRole: {
@@ -1575,22 +1621,12 @@ describe('in mode: building up', () => {
                   }
                 })
 
-                it('has role admin again', async () => {
-                  const expected = {
-                    data: {
-                      ChangeGroupMemberRole: {
-                        id: 'admin-member-user',
-                        myRoleInGroup: 'admin',
-                      },
-                    },
-                    errors: undefined,
-                  }
-                  await expect(
-                    mutate({
-                      mutation: changeGroupMemberRoleMutation,
-                      variables,
-                    }),
-                  ).resolves.toMatchObject(expected)
+                it('throws authorization error', async () => {
+                  const { errors } = await mutate({
+                    mutation: changeGroupMemberRoleMutation,
+                    variables,
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
                 })
               })
             })

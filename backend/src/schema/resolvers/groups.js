@@ -163,20 +163,28 @@ export default {
     ChangeGroupMemberRole: async (_parent, params, context, _resolveInfo) => {
       const { id: groupId, userId, roleInGroup } = params
       // Wolle
+      // console.log('ChangeGroupMemberRole !!!')
       // console.log('groupId: ', groupId)
-      // console.log('userId: ', groupId)
-      // console.log('roleInGroup: ', groupId)
+      // console.log('userId: ', userId)
+      // console.log('roleInGroup: ', roleInGroup)
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const joinGroupCypher = `
-          MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
-          SET
+          MATCH (member:User {id: $userId}), (group:Group {id: $groupId})
+          MERGE (member)-[membership:MEMBER_OF]->(group)
+          ON CREATE SET
+            membership.createdAt = toString(datetime()),
+            membership.updatedAt = membership.createdAt,
+            membership.role = $roleInGroup
+          ON MATCH SET
             membership.updatedAt = toString(datetime()),
             membership.role = $roleInGroup
           RETURN member {.*, myRoleInGroup: membership.role}
         `
         const result = await transaction.run(joinGroupCypher, { groupId, userId, roleInGroup })
         const [member] = await result.records.map((record) => record.get('member'))
+        // Wolle
+        // console.log('member: ', member)
         return member
       })
       try {
