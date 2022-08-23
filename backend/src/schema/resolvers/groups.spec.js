@@ -204,8 +204,18 @@ describe('in mode', () => {
         })
       })
     })
+  })
 
+  describe('building up – clean db after each resolver', () => {
     describe('Group', () => {
+      beforeAll(async () => {
+        await seedBasicsAndClearAuthentication()
+      })
+
+      afterAll(async () => {
+        await cleanDatabase()
+      })
+
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await query({ query: groupQuery, variables: {} })
@@ -216,7 +226,7 @@ describe('in mode', () => {
       describe('authenticated', () => {
         let otherUser
 
-        beforeEach(async () => {
+        beforeAll(async () => {
           otherUser = await Factory.build(
             'user',
             {
@@ -319,9 +329,7 @@ describe('in mode', () => {
         })
       })
     })
-  })
 
-  describe('building up – clean db after each resolver', () => {
     describe('JoinGroup', () => {
       beforeAll(async () => {
         await seedBasicsAndClearAuthentication()
