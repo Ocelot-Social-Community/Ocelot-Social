@@ -659,10 +659,11 @@ describe('in mode: building up – separate for each resolver', () => {
           },
         })
         await mutate({
-          mutation: joinGroupMutation,
+          mutation: changeGroupMemberRoleMutation,
           variables: {
             groupId: 'closed-group',
             userId: 'owner-of-hidden-group',
+            roleInGroup: 'usual',
           },
         })
         // hidden-group
@@ -683,7 +684,7 @@ describe('in mode: building up – separate for each resolver', () => {
         await mutate({
           mutation: changeGroupMemberRoleMutation,
           variables: {
-            id: 'hidden-group',
+            groupId: 'hidden-group',
             userId: 'pending-user',
             roleInGroup: 'pending',
           },
@@ -691,7 +692,7 @@ describe('in mode: building up – separate for each resolver', () => {
         await mutate({
           mutation: changeGroupMemberRoleMutation,
           variables: {
-            id: 'hidden-group',
+            groupId: 'hidden-group',
             userId: 'current-user',
             roleInGroup: 'usual',
           },
@@ -699,7 +700,7 @@ describe('in mode: building up – separate for each resolver', () => {
         await mutate({
           mutation: changeGroupMemberRoleMutation,
           variables: {
-            id: 'hidden-group',
+            groupId: 'hidden-group',
             userId: 'owner-of-closed-group',
             roleInGroup: 'admin',
           },
@@ -858,7 +859,7 @@ describe('in mode: building up – separate for each resolver', () => {
                     }),
                     expect.objectContaining({
                       id: 'owner-of-hidden-group',
-                      myRoleInGroup: 'pending',
+                      myRoleInGroup: 'usual',
                     }),
                   ]),
                 },
@@ -870,15 +871,6 @@ describe('in mode: building up – separate for each resolver', () => {
 
           describe('by usual member "owner-of-hidden-group"', () => {
             beforeEach(async () => {
-              authenticatedUser = await ownerOfClosedGroupUser.toJson()
-              await mutate({
-                mutation: changeGroupMemberRoleMutation,
-                variables: {
-                  id: 'closed-group',
-                  userId: 'owner-of-hidden-group',
-                  roleInGroup: 'usual',
-                },
-              })
               authenticatedUser = await ownerOfHiddenGroupUser.toJson()
             })
 
@@ -1205,7 +1197,7 @@ describe('in mode: building up – separate for each resolver', () => {
       await mutate({
         mutation: changeGroupMemberRoleMutation,
         variables: {
-          id: 'hidden-group',
+          groupId: 'hidden-group',
           userId: 'admin-member-user',
           roleInGroup: 'usual',
         },
@@ -1213,7 +1205,7 @@ describe('in mode: building up – separate for each resolver', () => {
       await mutate({
         mutation: changeGroupMemberRoleMutation,
         variables: {
-          id: 'hidden-group',
+          groupId: 'hidden-group',
           userId: 'second-owner-member-user',
           roleInGroup: 'usual',
         },
@@ -1221,7 +1213,7 @@ describe('in mode: building up – separate for each resolver', () => {
       await mutate({
         mutation: changeGroupMemberRoleMutation,
         variables: {
-          id: 'hidden-group',
+          groupId: 'hidden-group',
           userId: 'admin-member-user',
           roleInGroup: 'usual',
         },
@@ -1229,7 +1221,7 @@ describe('in mode: building up – separate for each resolver', () => {
       await mutate({
         mutation: changeGroupMemberRoleMutation,
         variables: {
-          id: 'hidden-group',
+          groupId: 'hidden-group',
           userId: 'second-owner-member-user',
           roleInGroup: 'usual',
         },
@@ -1244,12 +1236,14 @@ describe('in mode: building up – separate for each resolver', () => {
 
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
-        variables = {
-          id: 'not-existing-group',
-          userId: 'current-user',
-          roleInGroup: 'pending',
-        }
-        const { errors } = await mutate({ mutation: changeGroupMemberRoleMutation, variables })
+        const { errors } = await mutate({
+          mutation: changeGroupMemberRoleMutation,
+          variables: {
+            groupId: 'not-existing-group',
+            userId: 'current-user',
+            roleInGroup: 'pending',
+          },
+        })
         expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
       })
     })
@@ -1258,7 +1252,7 @@ describe('in mode: building up – separate for each resolver', () => {
       describe('in all group types – here "closed-group" for example', () => {
         beforeEach(async () => {
           variables = {
-            id: 'closed-group',
+            groupId: 'closed-group',
           }
         })
 

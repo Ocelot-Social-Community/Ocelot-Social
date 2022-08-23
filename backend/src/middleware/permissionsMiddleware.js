@@ -98,7 +98,7 @@ const isAllowedToChangeGroupMemberRole = rule({
 })(async (_parent, args, { user, driver }) => {
   if (!(user && user.id)) return false
   const adminId = user.id
-  const { id: groupId, userId, roleInGroup } = args
+  const { groupId, userId, roleInGroup } = args
   if (adminId === userId) return false
   // Wolle:
   // console.log('isAllowedToChangeGroupMemberRole !!!')

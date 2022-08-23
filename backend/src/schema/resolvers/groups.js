@@ -159,7 +159,7 @@ export default {
       }
     },
     ChangeGroupMemberRole: async (_parent, params, context, _resolveInfo) => {
-      const { id: groupId, userId, roleInGroup } = params
+      const { groupId, userId, roleInGroup } = params
       // Wolle
       // console.log('ChangeGroupMemberRole !!!')
       // console.log('groupId: ', groupId)
