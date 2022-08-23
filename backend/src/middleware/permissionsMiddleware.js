@@ -55,8 +55,7 @@ const isMySocialMedia = rule({
 const isAllowedSeeingMembersOfGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  // Wolle: may have a look to 'isAuthenticated'
-  if (!user) return false
+  if (!(user && user.id)) return false
   const { id: groupId } = args
   // Wolle: console.log('groupId: ', groupId)
   // console.log('user.id: ', user.id)
@@ -94,13 +93,13 @@ const isAllowedSeeingMembersOfGroup = rule({
   }
 })
 
-const isAllowedToSwitchGroupMemberRole = rule({
+const isAllowedToChangeGroupMemberRole = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  // Wolle: may have a look to 'isAuthenticated'
-  if (!user) return false
+  if (!(user && user.id)) return false
   const adminId = user.id
   const { id: groupId, userId, roleInGroup } = args
+  if (adminId === userId) return false
   // Wolle:
   // console.log('adminId: ', adminId)
   // console.log('groupId: ', groupId)
@@ -151,7 +150,6 @@ const isAllowedToSwitchGroupMemberRole = rule({
       !!group &&
       !!admin &&
       !!member &&
-      adminId !== userId &&
       // Wolle: member.myRoleInGroup === roleInGroup &&
       ((['admin'].includes(admin.myRoleInGroup) &&
         !['owner'].includes(member.myRoleInGroup) &&
@@ -259,7 +257,7 @@ export default shield(
       UpdateUser: onlyYourself,
       CreateGroup: isAuthenticated,
       JoinGroup: isAuthenticated, // Wolle: can not be correct
-      ChangeGroupMemberRole: isAllowedToSwitchGroupMemberRole,
+      ChangeGroupMemberRole: isAllowedToChangeGroupMemberRole,
       CreatePost: isAuthenticated,
       UpdatePost: isAuthor,
       DeletePost: isAuthor,
