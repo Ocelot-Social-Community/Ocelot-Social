@@ -40,8 +40,8 @@ export const createGroupMutation = gql`
 `
 
 export const joinGroupMutation = gql`
-  mutation ($id: ID!, $userId: ID!) {
-    JoinGroup(id: $id, userId: $userId) {
+  mutation ($groupId: ID!, $userId: ID!) {
+    JoinGroup(groupId: $groupId, userId: $userId) {
       id
       name
       slug

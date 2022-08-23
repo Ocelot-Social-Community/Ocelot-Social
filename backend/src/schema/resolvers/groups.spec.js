@@ -316,11 +316,13 @@ describe('in mode: always clean db', () => {
   describe('JoinGroup', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
-        variables = {
-          id: 'not-existing-group',
-          userId: 'current-user',
-        }
-        const { errors } = await mutate({ mutation: joinGroupMutation, variables })
+        const { errors } = await mutate({
+          mutation: joinGroupMutation,
+          variables: {
+            groupId: 'not-existing-group',
+            userId: 'current-user',
+          },
+        })
         expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
       })
     })
@@ -403,7 +405,7 @@ describe('in mode: always clean db', () => {
               mutate({
                 mutation: joinGroupMutation,
                 variables: {
-                  id: 'public-group',
+                  groupId: 'public-group',
                   userId: 'owner-of-closed-group',
                 },
               }),
@@ -426,7 +428,7 @@ describe('in mode: always clean db', () => {
                 mutate({
                   mutation: joinGroupMutation,
                   variables: {
-                    id: 'public-group',
+                    groupId: 'public-group',
                     userId: 'current-user',
                   },
                 }),
@@ -451,7 +453,7 @@ describe('in mode: always clean db', () => {
               mutate({
                 mutation: joinGroupMutation,
                 variables: {
-                  id: 'closed-group',
+                  groupId: 'closed-group',
                   userId: 'current-user',
                 },
               }),
@@ -474,7 +476,7 @@ describe('in mode: always clean db', () => {
                 mutate({
                   mutation: joinGroupMutation,
                   variables: {
-                    id: 'closed-group',
+                    groupId: 'closed-group',
                     userId: 'owner-of-closed-group',
                   },
                 }),
@@ -495,11 +497,13 @@ describe('in mode: always clean db', () => {
       describe('hidden group', () => {
         describe('joined by "owner-of-closed-group"', () => {
           it('throws authorization error', async () => {
-            variables = {
-              id: 'hidden-group',
-              userId: 'owner-of-closed-group',
-            }
-            const { errors } = await query({ query: groupMembersQuery, variables })
+            const { errors } = await query({
+              query: joinGroupMutation,
+              variables: {
+                groupId: 'hidden-group',
+                userId: 'owner-of-closed-group',
+              },
+            })
             expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
           })
         })
@@ -511,7 +515,7 @@ describe('in mode: always clean db', () => {
                 mutate({
                   mutation: joinGroupMutation,
                   variables: {
-                    id: 'hidden-group',
+                    groupId: 'hidden-group',
                     userId: 'owner-of-hidden-group',
                   },
                 }),
@@ -622,14 +626,14 @@ describe('in mode: building up – separate for each resolver', () => {
         await mutate({
           mutation: joinGroupMutation,
           variables: {
-            id: 'public-group',
+            groupId: 'public-group',
             userId: 'owner-of-closed-group',
           },
         })
         await mutate({
           mutation: joinGroupMutation,
           variables: {
-            id: 'public-group',
+            groupId: 'public-group',
             userId: 'owner-of-hidden-group',
           },
         })
@@ -650,14 +654,14 @@ describe('in mode: building up – separate for each resolver', () => {
         await mutate({
           mutation: joinGroupMutation,
           variables: {
-            id: 'closed-group',
+            groupId: 'closed-group',
             userId: 'current-user',
           },
         })
         await mutate({
           mutation: joinGroupMutation,
           variables: {
-            id: 'closed-group',
+            groupId: 'closed-group',
             userId: 'owner-of-hidden-group',
           },
         })
@@ -1158,14 +1162,14 @@ describe('in mode: building up – separate for each resolver', () => {
       await mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'public-group',
+          groupId: 'public-group',
           userId: 'owner-of-closed-group',
         },
       })
       await mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'public-group',
+          groupId: 'public-group',
           userId: 'owner-of-hidden-group',
         },
       })

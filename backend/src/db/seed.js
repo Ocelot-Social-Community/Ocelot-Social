@@ -408,28 +408,28 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'g0',
+          groupId: 'g0',
           userId: 'u2',
         },
       }),
       mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'g0',
+          groupId: 'g0',
           userId: 'u3',
         },
       }),
       mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'g0',
+          groupId: 'g0',
           userId: 'u4',
         },
       }),
       mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'g0',
+          groupId: 'g0',
           userId: 'u6',
         },
       }),
@@ -480,35 +480,35 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'g1',
+          groupId: 'g1',
           userId: 'u1',
         },
       }),
       mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'g1',
+          groupId: 'g1',
           userId: 'u2',
         },
       }),
       mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'g1',
+          groupId: 'g1',
           userId: 'u5',
         },
       }),
       mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'g1',
+          groupId: 'g1',
           userId: 'u6',
         },
       }),
       mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'g1',
+          groupId: 'g1',
           userId: 'u7',
         },
       }),
@@ -567,28 +567,28 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'g2',
+          groupId: 'g2',
           userId: 'u4',
         },
       }),
       mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'g2',
+          groupId: 'g2',
           userId: 'u5',
         },
       }),
       mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'g2',
+          groupId: 'g2',
           userId: 'u6',
         },
       }),
       mutate({
         mutation: joinGroupMutation,
         variables: {
-          id: 'g2',
+          groupId: 'g2',
           userId: 'u7',
         },
       }),

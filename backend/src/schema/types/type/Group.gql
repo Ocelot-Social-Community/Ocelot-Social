@@ -115,7 +115,7 @@ type Mutation {
   DeleteGroup(id: ID!): Group
 
   JoinGroup(
-    id: ID!
+    groupId: ID!
     userId: ID!
   ): User
 

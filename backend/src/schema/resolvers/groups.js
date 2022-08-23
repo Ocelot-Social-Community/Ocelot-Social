@@ -131,7 +131,7 @@ export default {
       }
     },
     JoinGroup: async (_parent, params, context, _resolveInfo) => {
-      const { id: groupId, userId } = params
+      const { groupId, userId } = params
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const joinGroupCypher = `

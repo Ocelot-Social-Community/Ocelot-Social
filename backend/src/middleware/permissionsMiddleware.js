@@ -172,7 +172,7 @@ const isAllowedToJoinGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
   if (!(user && user.id)) return false
-  const { id: groupId, userId } = args
+  const { groupId, userId } = args
   // Wolle:
   // console.log('adminId: ', adminId)
   // console.log('groupId: ', groupId)
