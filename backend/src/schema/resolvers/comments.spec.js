@@ -88,7 +88,7 @@ describe('CreateComment', () => {
       variables = {
         ...variables,
         postId: 'p1',
-        content: "I'm Not Authorized to comment",
+        content: "I'm not authorized to comment",
       }
       const { errors } = await mutate({ mutation: createCommentMutation, variables })
       expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
