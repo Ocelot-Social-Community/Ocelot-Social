@@ -75,7 +75,7 @@
     "apollo-client": "~2.6.8",
     "cookie-universal-nuxt": "~2.1.5",
     "cropperjs": "^1.5.5",
-    "cross-env": "~7.0.2",
+    "cross-env": "~7.0.3",
     "date-fns": "2.22.1",
     "express": "~4.17.1",
     "graphql": "~14.7.0",
