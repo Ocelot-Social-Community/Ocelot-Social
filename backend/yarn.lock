@@ -7541,17 +7541,7 @@ neo4j-driver-core@^4.3.4:
   resolved "https://registry.yarnpkg.com/neo4j-driver-core/-/neo4j-driver-core-4.3.4.tgz#b445a4fbf94dce8441075099bd6ac3133c1cf5ee"
   integrity sha512-3tn3j6IRUNlpXeehZ9Xv7dLTZPB4a7APaoJ+xhQyMmYQO3ujDM4RFHc0pZcG+GokmaltT5pUCIPTDYx6ODdhcA==
 
-neo4j-driver@^4.0.1, neo4j-driver@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/neo4j-driver/-/neo4j-driver-4.0.2.tgz#78de3b91e91572bcbd9d2e02554322fe1ab399ea"
-  integrity sha512-xQN4BZZsweaNNac7FDYAV6f/JybghwY3lk4fwblS8V5KQ+DBMPe4Pthh672mp+wEYZGyzPalq5CfpcBrWaZ4Gw==
-  dependencies:
-    "@babel/runtime" "^7.5.5"
-    rxjs "^6.5.2"
-    text-encoding-utf-8 "^1.0.2"
-    uri-js "^4.2.2"
-
-neo4j-driver@^4.2.2:
+neo4j-driver@^4.0.1, neo4j-driver@^4.0.2, neo4j-driver@^4.2.2:
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/neo4j-driver/-/neo4j-driver-4.3.4.tgz#a54f0562f868ee94dff7509df74e3eb2c1f95a85"
   integrity sha512-AGrsFFqnoZv4KhJdmKt4mOBV5mnxmV3+/t8KJTOM68jQuEWoy+RlmAaRRaCSU4eY586OFN/R8lg9MrJpZdSFjw==
@@ -7574,10 +7564,10 @@ neo4j-graphql-js@^2.11.5:
     lodash "^4.17.15"
     neo4j-driver "^4.0.1"
 
-neode@^0.4.7:
-  version "0.4.7"
-  resolved "https://registry.yarnpkg.com/neode/-/neode-0.4.7.tgz#033007b57a2ee167e9ee5537493086db08d005eb"
-  integrity sha512-YXlc187JRpeKCBcUIkY6nimXXG+Tvlopfe71/FPno2THrwmYt5mm0RPHZ+mXF2O1Xg6zvjKvOpCpDz2vHBfroQ==
+neode@^0.4.8:
+  version "0.4.8"
+  resolved "https://registry.yarnpkg.com/neode/-/neode-0.4.8.tgz#0889b4fc7f1bf0b470b01fa5b8870373b5d47ad6"
+  integrity sha512-pb91NfCOg4Fj5o+98H+S2XYC+ByQfbdhwcc1UVuzuUQ0Ezzj+jWz8NmKWU8ZfCH6l4plk71yDAPd2eTwpt+Xvg==
   dependencies:
     "@hapi/joi" "^15.1.1"
     dotenv "^4.0.0"
@@ -8990,7 +8980,7 @@ run-parallel@^1.1.9:
   resolved "https://registry.yarnpkg.com/run-parallel/-/run-parallel-1.1.9.tgz#c9dd3a7cf9f4b2c4b6244e173a6ed866e61dd679"
   integrity sha512-DEqnSRTDw/Tc3FXf49zedI638Z9onwUotBMiUFKmrO2sdFKIbXamXGQ3Axd4qgphxKB4kw/qP1w5kTxnfU1B9Q==
 
-rxjs@^6.4.0, rxjs@^6.5.2, rxjs@^6.5.4:
+rxjs@^6.4.0, rxjs@^6.5.4:
   version "6.5.4"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.5.4.tgz#e0777fe0d184cec7872df147f303572d414e211c"
   integrity sha512-naMQXcgEo3csAEGvw/NydRA0fuS2nDZJiw1YUWFKU7aPPAPGZEsD4Iimit96qwCieH6y614MCLYwdkrWx7z/7Q==
