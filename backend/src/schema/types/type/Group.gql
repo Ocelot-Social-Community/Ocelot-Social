@@ -59,7 +59,7 @@ input _GroupFilter {
 
 type Query {
   Group(
-    isMember: Boolean # if 'undefined' or 'null' then all groups
+    isMember: Boolean # if 'undefined' or 'null' then get all groups
     id: ID
     name: String
     slug: String
@@ -81,11 +81,11 @@ type Query {
     filter: _UserFilter
   ): [User]
 
-  AvailableGroupTypes: [GroupType]!
+  # AvailableGroupTypes: [GroupType]!
 
-  AvailableGroupActionRadii: [GroupActionRadius]!
+  # AvailableGroupActionRadii: [GroupActionRadius]!
 
-  AvailableGroupMemberRoles: [GroupMemberRole]!
+  # AvailableGroupMemberRoles: [GroupMemberRole]!
 }
 
 type Mutation {
@@ -102,17 +102,17 @@ type Mutation {
     locationName: String
   ): Group
 
-  UpdateGroup(
-    id: ID!
-    name: String
-    slug: String
-    avatar: ImageInput
-    locationName: String
-    about: String
-    description: String
-  ): Group
+  # UpdateGroup(
+  #   id: ID!
+  #   name: String
+  #   slug: String
+  #   avatar: ImageInput
+  #   locationName: String
+  #   about: String
+  #   description: String
+  # ): Group
 
-  DeleteGroup(id: ID!): Group
+  # DeleteGroup(id: ID!): Group
 
   JoinGroup(
     groupId: ID!
