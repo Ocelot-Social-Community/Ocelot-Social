@@ -101,7 +101,7 @@ describe('User', () => {
 
     it('is forbidden', async () => {
       await expect(query({ query: userQuery, variables })).resolves.toMatchObject({
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
       })
     })
 
@@ -207,7 +207,7 @@ describe('UpdateUser', () => {
 
     it('is not allowed to change other user accounts', async () => {
       const { errors } = await mutate({ mutation: updateUserMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -500,7 +500,7 @@ describe('switch user role', () => {
         expect.objectContaining({
           errors: [
             expect.objectContaining({
-              message: 'Not Authorised!',
+              message: 'Not Authorized!',
             }),
           ],
         }),

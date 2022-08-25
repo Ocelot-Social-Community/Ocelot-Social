@@ -310,8 +310,8 @@ describe('change password', () => {
   })
 
   describe('unauthenticated', () => {
-    it('throws "Not Authorised!"', async () => {
-      await respondsWith({ errors: [{ message: 'Not Authorised!' }] })
+    it('throws "Not Authorized!"', async () => {
+      await respondsWith({ errors: [{ message: 'Not Authorized!' }] })
     })
   })
 
