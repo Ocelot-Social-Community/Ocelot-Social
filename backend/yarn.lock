@@ -4253,10 +4253,10 @@ eslint-plugin-node@~11.1.0:
     resolve "^1.10.1"
     semver "^6.1.0"
 
-eslint-plugin-prettier@~3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-3.1.2.tgz#432e5a667666ab84ce72f945c72f77d996a5c9ba"
-  integrity sha512-GlolCC9y3XZfv3RQfwGew7NnuFDKsfI4lbvRK+PIIo23SFH+LemGs4cKwzAaRa+Mdb+lQO/STaIayno8T5sJJA==
+eslint-plugin-prettier@~3.4.1:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-3.4.1.tgz#e9ddb200efb6f3d05ffe83b1665a716af4a387e5"
+  integrity sha512-htg25EUYUeIhKHXjOinK4BgCcDwtLHjqaxCDsMy5nbnUMkKFvIhMVCp+5GFUXQ4Nr8lBsPqtGAqBenbpFqAA2g==
   dependencies:
     prettier-linter-helpers "^1.0.0"
 
@@ -9262,10 +9262,10 @@ slug@^0.9.2:
   dependencies:
     unicode ">= 0.3.1"
 
-slug@~4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/slug/-/slug-4.0.2.tgz#35a62b4e71582778ac08bb30a1bf439fd0a43ea7"
-  integrity sha512-c5XbWkwxHU13gAdSvBHQgnGy2sxv/REMz0ugcM0SOSBCO/N4wfU0TDBC3pgdOwVGjZwGnLBTRljXzdVYE+KYNw==
+slug@~6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/slug/-/slug-6.0.0.tgz#39637b32e5a873bc692812a630842880499ed6c9"
+  integrity sha512-0MpNLyCSUSf0G1nAZmp9gY1cvesPP35a1Live25vZ23gWQ5SAopF0N+0hk9KI4ytNuTebJrHGNrgTnxboofcSg==
 
 smart-buffer@^4.1.0:
   version "4.1.0"
