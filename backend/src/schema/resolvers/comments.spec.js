@@ -107,14 +107,14 @@ describe('CreateComment', () => {
         variables = {
           ...variables,
           postId: 'p1',
-          content: "I'm authorised to comment",
+          content: "I'm authorized to comment",
         }
       })
 
       it('creates a comment', async () => {
         await expect(mutate({ mutation: createCommentMutation, variables })).resolves.toMatchObject(
           {
-            data: { CreateComment: { content: "I'm authorised to comment" } },
+            data: { CreateComment: { content: "I'm authorized to comment" } },
             errors: undefined,
           },
         )
