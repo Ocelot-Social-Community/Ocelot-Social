@@ -89,7 +89,7 @@ describe('Group', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       const { errors } = await query({ query: groupQuery, variables: {} })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -225,7 +225,7 @@ describe('CreateGroup', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: createGroupMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
