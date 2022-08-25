@@ -1,4 +1,4 @@
-## 🍰 Pullrequest
+## 🍰 Pull Request
 <!-- Describe the Pullrequest. Use Screenshots if possible. -->
 
 ### Issues
