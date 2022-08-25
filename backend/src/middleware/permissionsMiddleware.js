@@ -302,5 +302,6 @@ export default shield(
     debug,
     allowExternalErrors,
     fallbackRule: allow,
+    fallbackError: Error('Not Authorized!'),
   },
 )

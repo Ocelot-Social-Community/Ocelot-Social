@@ -102,7 +102,7 @@ describe('authorization', () => {
           await expect(
             query({ query: userQuery, variables: { name: 'Owner' } }),
           ).resolves.toMatchObject({
-            errors: [{ message: 'Not Authorised!' }],
+            errors: [{ message: 'Not Authorized!' }],
             data: { User: [null] },
           })
         })
@@ -132,7 +132,7 @@ describe('authorization', () => {
             await expect(
               query({ query: userQuery, variables: { name: 'Owner' } }),
             ).resolves.toMatchObject({
-              errors: [{ message: 'Not Authorised!' }],
+              errors: [{ message: 'Not Authorized!' }],
               data: { User: [null] },
             })
           })
@@ -147,7 +147,7 @@ describe('authorization', () => {
             await expect(
               query({ query: userQuery, variables: { name: 'Owner' } }),
             ).resolves.toMatchObject({
-              errors: [{ message: 'Not Authorised!' }],
+              errors: [{ message: 'Not Authorized!' }],
               data: { User: [null] },
             })
           })
@@ -198,7 +198,7 @@ describe('authorization', () => {
 
           it('denies permission', async () => {
             await expect(mutate({ mutation: signupMutation, variables })).resolves.toMatchObject({
-              errors: [{ message: 'Not Authorised!' }],
+              errors: [{ message: 'Not Authorized!' }],
               data: { Signup: null },
             })
           })
@@ -288,7 +288,7 @@ describe('authorization', () => {
 
           it('denies permission', async () => {
             await expect(mutate({ mutation: signupMutation, variables })).resolves.toMatchObject({
-              errors: [{ message: 'Not Authorised!' }],
+              errors: [{ message: 'Not Authorized!' }],
               data: { Signup: null },
             })
           })
