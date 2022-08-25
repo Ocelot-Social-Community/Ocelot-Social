@@ -94,7 +94,7 @@ describe('SocialMedia', () => {
         const user = null
         const result = await socialMediaAction(user, mutation, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -186,7 +186,7 @@ describe('SocialMedia', () => {
         const user = null
         const result = await socialMediaAction(user, mutation, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -195,7 +195,7 @@ describe('SocialMedia', () => {
         const user = someUser
         const result = await socialMediaAction(user, mutation, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -222,7 +222,7 @@ describe('SocialMedia', () => {
         variables.id = 'some-id'
         const result = await socialMediaAction(user, mutation, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
   })
@@ -249,7 +249,7 @@ describe('SocialMedia', () => {
         const user = null
         const result = await socialMediaAction(user, mutation, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -258,7 +258,7 @@ describe('SocialMedia', () => {
         const user = someUser
         const result = await socialMediaAction(user, mutation, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 

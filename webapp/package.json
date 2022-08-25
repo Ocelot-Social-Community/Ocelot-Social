@@ -75,7 +75,7 @@
     "apollo-client": "~2.6.8",
     "cookie-universal-nuxt": "~2.1.5",
     "cropperjs": "^1.5.5",
-    "cross-env": "~7.0.2",
+    "cross-env": "~7.0.3",
     "date-fns": "2.22.1",
     "express": "~4.17.1",
     "graphql": "~14.7.0",
@@ -99,7 +99,7 @@
     "vue-izitoast": "^1.2.1",
     "vue-observe-visibility": "^1.0.0",
     "vue-scrollto": "^2.20.0",
-    "vue-sweetalert-icons": "~4.3.0",
+    "vue-sweetalert-icons": "~4.3.1",
     "vuex-i18n": "~1.13.1",
     "xregexp": "^4.3.0",
     "zxcvbn": "^4.4.2"

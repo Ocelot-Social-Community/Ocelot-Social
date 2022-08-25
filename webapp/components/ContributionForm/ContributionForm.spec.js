@@ -202,7 +202,7 @@ describe('ContributionForm.vue', () => {
         beforeEach(async () => {
           jest.useFakeTimers()
           mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({
-            message: 'Not Authorised!',
+            message: 'Not Authorized!',
           })
           wrapper = Wrapper()
           postTitleInput = wrapper.find('.ds-input')
@@ -213,7 +213,7 @@ describe('ContributionForm.vue', () => {
         it('shows an error toaster when apollo mutation rejects', async () => {
           await wrapper.find('form').trigger('submit')
           await mocks.$apollo.mutate
-          await expect(mocks.$toast.error).toHaveBeenCalledWith('Not Authorised!')
+          await expect(mocks.$toast.error).toHaveBeenCalledWith('Not Authorized!')
         })
       })
     })
