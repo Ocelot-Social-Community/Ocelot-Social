@@ -72,7 +72,7 @@ describe('donations', () => {
       it('throws authorization error', async () => {
         authenticatedUser = undefined
         await expect(query({ query: donationsQuery, variables })).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -106,7 +106,7 @@ describe('donations', () => {
         await expect(
           mutate({ mutation: updateDonationsMutation, variables }),
         ).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -126,7 +126,7 @@ describe('donations', () => {
             mutate({ mutation: updateDonationsMutation, variables }),
           ).resolves.toMatchObject({
             data: { UpdateDonations: null },
-            errors: [{ message: 'Not Authorised!' }],
+            errors: [{ message: 'Not Authorized!' }],
           })
         })
       })
@@ -145,7 +145,7 @@ describe('donations', () => {
             mutate({ mutation: updateDonationsMutation, variables }),
           ).resolves.toMatchObject({
             data: { UpdateDonations: null },
-            errors: [{ message: 'Not Authorised!' }],
+            errors: [{ message: 'Not Authorized!' }],
           })
         })
       })

@@ -29,7 +29,7 @@ describe('DeleteData.vue', () => {
               },
             },
           })
-          .mockRejectedValue({ message: 'Not authorised!' }),
+          .mockRejectedValue({ message: 'Not Authorized!' }),
       },
       $toast: {
         error: jest.fn(),
@@ -180,7 +180,7 @@ describe('DeleteData.vue', () => {
         // second submission causes mutation to reject
         await deleteAccountBtn.trigger('click')
         await mocks.$apollo.mutate
-        expect(mocks.$toast.error).toHaveBeenCalledWith('Not authorised!')
+        expect(mocks.$toast.error).toHaveBeenCalledWith('Not Authorized!')
       })
     })
   })
