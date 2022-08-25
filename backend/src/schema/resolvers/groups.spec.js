@@ -112,7 +112,7 @@ describe('in mode', () => {
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await mutate({ mutation: createGroupMutation, variables })
-          expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+          expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
 
@@ -219,7 +219,7 @@ describe('in mode', () => {
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await query({ query: groupQuery, variables: {} })
-          expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+          expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
 
@@ -348,7 +348,7 @@ describe('in mode', () => {
               userId: 'current-user',
             },
           })
-          expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+          expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
 
@@ -529,7 +529,7 @@ describe('in mode', () => {
                   userId: 'owner-of-closed-group',
                 },
               })
-              expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+              expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
             })
           })
 
@@ -575,7 +575,7 @@ describe('in mode', () => {
             id: 'not-existing-group',
           }
           const { errors } = await query({ query: groupMembersQuery, variables })
-          expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+          expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
 
@@ -922,7 +922,7 @@ describe('in mode', () => {
 
               it('throws authorization error', async () => {
                 const { errors } = await query({ query: groupMembersQuery, variables })
-                expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
 
@@ -933,7 +933,7 @@ describe('in mode', () => {
 
               it('throws authorization error', async () => {
                 const { errors } = await query({ query: groupMembersQuery, variables })
-                expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
           })
@@ -1065,7 +1065,7 @@ describe('in mode', () => {
 
               it('throws authorization error', async () => {
                 const { errors } = await query({ query: groupMembersQuery, variables })
-                expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
 
@@ -1076,7 +1076,7 @@ describe('in mode', () => {
 
               it('throws authorization error', async () => {
                 const { errors } = await query({ query: groupMembersQuery, variables })
-                expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
           })
@@ -1257,7 +1257,7 @@ describe('in mode', () => {
               roleInGroup: 'pending',
             },
           })
-          expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+          expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
 
@@ -1412,7 +1412,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1438,7 +1438,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -1487,7 +1487,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1510,7 +1510,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1533,7 +1533,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1591,7 +1591,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1614,7 +1614,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -1631,7 +1631,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1654,7 +1654,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -1671,7 +1671,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1694,7 +1694,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -1711,7 +1711,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1801,7 +1801,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -1818,7 +1818,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1841,7 +1841,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -1858,7 +1858,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1881,7 +1881,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -1898,7 +1898,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1988,7 +1988,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -2011,7 +2011,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -2034,7 +2034,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation,
                       variables,
                     })
-                    expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+                    expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
