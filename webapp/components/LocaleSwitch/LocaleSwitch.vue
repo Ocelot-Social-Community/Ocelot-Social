@@ -82,7 +82,7 @@ export default {
       try {
         await this.$apollo.mutate({
           mutation: gql`
-            mutation($id: ID!, $locale: String) {
+            mutation ($id: ID!, $locale: String) {
               UpdateUser(id: $id, locale: $locale) {
                 id
                 locale
