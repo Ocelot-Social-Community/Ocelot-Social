@@ -8,9 +8,9 @@
           style="position: relative; height: auto; overflow: visible"
         >
           <avatar-uploader v-if="myProfile" :profile="user">
-            <user-avatar :user="user" class="profile-page-avatar" size="large"></user-avatar>
+            <profile-avatar :user="user" class="profile-page-avatar" size="large"></profile-avatar>
           </avatar-uploader>
-          <user-avatar v-else :user="user" class="profile-page-avatar" size="large" />
+          <profile-avatar v-else :user="user" class="profile-page-avatar" size="large" />
           <!-- Menu -->
           <client-only>
             <content-menu
@@ -179,7 +179,7 @@ import FollowList from '~/components/features/FollowList/FollowList'
 import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
-import UserAvatar from '~/components/_new/generic/UserAvatar/UserAvatar'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
@@ -206,7 +206,7 @@ export default {
     HcCountTo,
     HcBadges,
     HcEmpty,
-    UserAvatar,
+    ProfileAvatar,
     ContentMenu,
     AvatarUploader,
     MasonryGrid,

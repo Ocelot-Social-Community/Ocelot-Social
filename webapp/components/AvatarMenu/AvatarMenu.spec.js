@@ -42,7 +42,7 @@ describe('AvatarMenu.vue', () => {
       wrapper = Wrapper()
     })
 
-    it('renders the UserAvatar component', () => {
+    it('renders the ProfileAvatar component', () => {
       wrapper.find('.avatar-menu-trigger').trigger('click')
       expect(wrapper.find('.profile-avatar').exists()).toBe(true)
     })

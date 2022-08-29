@@ -1,10 +1,10 @@
 import { mount } from '@vue/test-utils'
-import UserAvatar from './UserAvatar'
+import ProfileAvatar from './ProfileAvatar'
 import BaseIcon from '~/components/_new/generic/BaseIcon/BaseIcon'
 
 const localVue = global.localVue
 
-describe('UserAvatar', () => {
+describe('ProfileAvatar', () => {
   let propsData, wrapper
   beforeEach(() => {
     propsData = {}
@@ -12,7 +12,7 @@ describe('UserAvatar', () => {
   })
 
   const Wrapper = () => {
-    return mount(UserAvatar, { propsData, localVue })
+    return mount(ProfileAvatar, { propsData, localVue })
   }
 
   it('renders no image', () => {
