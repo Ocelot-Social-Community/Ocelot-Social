@@ -9,7 +9,7 @@ import PersistentLinks from '~/mixins/persistentLinks.js'
 const options = {
   queryId: gql`
     query($idOrSlug: ID) {
-      User(id: $idOrSlug) {
+      Group(id: $idOrSlug) {
         id
         slug
       }
@@ -17,14 +17,14 @@ const options = {
   `,
   querySlug: gql`
     query($idOrSlug: String) {
-      User(slug: $idOrSlug) {
+      Group(slug: $idOrSlug) {
         id
         slug
       }
     }
   `,
-  message: 'error-pages.profile-not-found',
-  path: 'profile',
+  message: 'error-pages.group-not-found',
+  path: 'group',
 }
 const persistentLinks = PersistentLinks(options)
 

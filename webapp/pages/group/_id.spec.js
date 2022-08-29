@@ -5,7 +5,7 @@ const localVue = global.localVue
 
 config.stubs['nuxt-child'] = '<span class="nuxt-child"><slot /></span>'
 
-describe('Profile _id.vue', () => {
+describe('Group profile _id.vue', () => {
   let wrapper
   let Wrapper
   let mocks
