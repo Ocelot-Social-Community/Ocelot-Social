@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
 export const AddEmailAddressMutation = gql`
-  mutation($email: String!) {
+  mutation ($email: String!) {
     AddEmailAddress(email: $email) {
       email
       createdAt
@@ -10,7 +10,7 @@ export const AddEmailAddressMutation = gql`
 `
 
 export const VerifyEmailAddressMutation = gql`
-  mutation($email: String!, $nonce: String!) {
+  mutation ($email: String!, $nonce: String!) {
     VerifyEmailAddress(email: $email, nonce: $nonce) {
       email
       verifiedAt
