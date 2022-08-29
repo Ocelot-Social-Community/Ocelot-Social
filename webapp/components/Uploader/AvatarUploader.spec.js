@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils'
 import Vue from 'vue'
-import Upload from '.'
+import AvatarUploader from './AvatarUploader'
 
 const localVue = global.localVue
 
-describe('Upload', () => {
+describe('AvatarUploader', () => {
   let wrapper
 
   const mocks = {
@@ -33,7 +33,7 @@ describe('Upload', () => {
 
   beforeEach(() => {
     jest.useFakeTimers()
-    wrapper = shallowMount(Upload, { localVue, propsData, mocks })
+    wrapper = shallowMount(AvatarUploader, { localVue, propsData, mocks })
   })
 
   afterEach(() => {

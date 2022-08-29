@@ -7,9 +7,9 @@
           :class="{ 'disabled-content': user.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
-          <hc-upload v-if="myProfile" :user="user">
+          <avatar-uploader v-if="myProfile" :user="user">
             <user-avatar :user="user" class="profile-avatar" size="large"></user-avatar>
-          </hc-upload>
+          </avatar-uploader>
           <user-avatar v-else :user="user" class="profile-avatar" size="large" />
           <!-- Menu -->
           <client-only>
@@ -178,7 +178,7 @@ import HcBadges from '~/components/Badges.vue'
 import FollowList from '~/components/features/FollowList/FollowList'
 import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import HcUpload from '~/components/Upload'
+import AvatarUploader from '~/components/Uploader/AvatarUploader'
 import UserAvatar from '~/components/_new/generic/UserAvatar/UserAvatar'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
@@ -208,7 +208,7 @@ export default {
     HcEmpty,
     UserAvatar,
     ContentMenu,
-    HcUpload,
+    AvatarUploader,
     MasonryGrid,
     MasonryGridItem,
     FollowList,

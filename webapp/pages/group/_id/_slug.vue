@@ -7,10 +7,10 @@
           :class="{ 'disabled-content': group.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
-          <!-- Wolle: <hc-upload v-if="isMyGroup" :user="user"> -->
-          <hc-upload v-if="isMyGroup" :user="group">
+          <!-- Wolle: <avatar-uploader v-if="isMyGroup" :user="user"> -->
+          <avatar-uploader v-if="isMyGroup" :user="group">
             <!-- Wolle: <user-avatar :user="user" class="profile-avatar" size="large"></user-avatar> -->
-          </hc-upload>
+          </avatar-uploader>
           <!-- Wolle: <user-avatar v-else :user="user" class="profile-avatar" size="large" /> -->
           <!-- Menu -->
           <!-- Wolle: <client-only>
@@ -181,7 +181,7 @@ import HcBadges from '~/components/Badges.vue'
 import FollowList from '~/components/features/FollowList/FollowList'
 import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import HcUpload from '~/components/Upload'
+import AvatarUploader from '~/components/Uploader/AvatarUploader'
 import UserAvatar from '~/components/_new/generic/UserAvatar/UserAvatar'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
@@ -212,7 +212,7 @@ export default {
     HcEmpty,
     UserAvatar,
     ContentMenu,
-    HcUpload,
+    AvatarUploader,
     MasonryGrid,
     MasonryGridItem,
     FollowList,
