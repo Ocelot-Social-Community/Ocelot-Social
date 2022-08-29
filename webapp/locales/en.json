@@ -517,6 +517,9 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Upload successful!"
+    },
     "commented": "Commented",
     "follow": "Follow",
     "followers": "Followers",
@@ -820,10 +823,5 @@
     "newTermsAndConditions": "New Terms and Conditions",
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Upload successful!"
-    }
   }
 }

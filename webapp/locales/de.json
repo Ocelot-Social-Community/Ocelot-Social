@@ -517,6 +517,9 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Erfolgreich hochgeladen!"
+    },
     "commented": "Kommentiert",
     "follow": "Folgen",
     "followers": "Folgen",
@@ -820,10 +823,5 @@
     "newTermsAndConditions": "Neue Nutzungsbedingungen",
     "termsAndConditionsNewConfirm": "Ich habe die neuen Nutzungsbedingungen durchgelesen und stimme zu.",
     "termsAndConditionsNewConfirmText": "Bitte lies Dir die neuen Nutzungsbedingungen jetzt durch!"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Erfolgreich hochgeladen!"
-    }
   }
 }

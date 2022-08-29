@@ -7,8 +7,7 @@
           :class="{ 'disabled-content': group.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
-          <!-- Wolle: <avatar-uploader v-if="isMyGroup" :user="user"> -->
-          <avatar-uploader v-if="isMyGroup" :user="group">
+          <avatar-uploader v-if="isMyGroup" :profile="group">
             <!-- Wolle: <user-avatar :user="user" class="profile-avatar" size="large"></user-avatar> -->
           </avatar-uploader>
           <!-- Wolle: <user-avatar v-else :user="user" class="profile-avatar" size="large" /> -->

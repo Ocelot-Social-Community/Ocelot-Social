@@ -26,7 +26,7 @@ describe('AvatarUploader', () => {
   }
 
   const propsData = {
-    user: {
+    profile: {
       avatar: { url: '/api/generic.jpg' },
     },
   }

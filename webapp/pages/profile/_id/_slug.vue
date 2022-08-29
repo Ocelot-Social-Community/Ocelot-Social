@@ -7,7 +7,7 @@
           :class="{ 'disabled-content': user.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
-          <avatar-uploader v-if="myProfile" :user="user">
+          <avatar-uploader v-if="myProfile" :profile="user">
             <user-avatar :user="user" class="profile-avatar" size="large"></user-avatar>
           </avatar-uploader>
           <user-avatar v-else :user="user" class="profile-avatar" size="large" />
