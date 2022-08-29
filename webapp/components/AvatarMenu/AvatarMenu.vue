@@ -130,7 +130,7 @@ export default {
   align-items: center;
   padding-left: $space-xx-small;
 
-  > .user-avatar {
+  > .profile-avatar {
     margin-right: $space-xx-small;
   }
 }

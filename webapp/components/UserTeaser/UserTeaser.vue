@@ -88,7 +88,7 @@ export default {
   display: flex;
   flex-wrap: nowrap;
 
-  > .user-avatar {
+  > .profile-avatar {
     flex-shrink: 0;
   }
 

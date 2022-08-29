@@ -1,10 +1,10 @@
 import { mount } from '@vue/test-utils'
-import UserAvatar from './UserAvatar.vue'
+import UserAvatar from './UserAvatar'
 import BaseIcon from '~/components/_new/generic/BaseIcon/BaseIcon'
 
 const localVue = global.localVue
 
-describe('UserAvatar.vue', () => {
+describe('UserAvatar', () => {
   let propsData, wrapper
   beforeEach(() => {
     propsData = {}

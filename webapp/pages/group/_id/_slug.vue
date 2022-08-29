@@ -427,7 +427,7 @@ export default {
 </script>
 
 <style lang="scss">
-.profile-page-avatar.user-avatar {
+.profile-page-avatar.profile-avatar {
   margin: auto;
   margin-top: -60px;
 }
