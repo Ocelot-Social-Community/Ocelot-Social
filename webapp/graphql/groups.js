@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 // ------ mutations
 
 export const createGroupMutation = gql`
-  mutation(
+  mutation (
     $id: ID
     $name: String!
     $slug: String
@@ -42,7 +42,7 @@ export const createGroupMutation = gql`
 // ------ queries
 
 export const groupQuery = gql`
-  query(
+  query (
     $isMember: Boolean
     $id: ID
     $name: String
