@@ -9,25 +9,26 @@ import Resolver from './helpers/Resolver'
 export default {
   Query: {
     Group: async (_object, params, context, _resolveInfo) => {
-      const { isMember } = params
+      const { id: groupId, isMember } = params
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
+        const groupIdCypher = groupId ? ` {id: "${groupId}"}` : ''
         let groupCypher
         if (isMember === true) {
           groupCypher = `
-            MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group:Group)
+            MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group:Group${groupIdCypher})
             RETURN group {.*, myRole: membership.role}
           `
         } else {
           if (isMember === false) {
             groupCypher = `
-              MATCH (group:Group)
+              MATCH (group:Group${groupIdCypher})
               WHERE NOT (:User {id: $userId})-[:MEMBER_OF]->(group)
               RETURN group {.*, myRole: NULL}
             `
           } else {
             groupCypher = `
-              MATCH (group:Group)
+              MATCH (group:Group${groupIdCypher})
               OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
               RETURN group {.*, myRole: membership.role}
             `
