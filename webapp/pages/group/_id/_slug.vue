@@ -8,9 +8,9 @@
           style="position: relative; height: auto; overflow: visible"
         >
           <avatar-uploader v-if="isMyGroup" :profile="group">
-            <!-- Wolle: <user-avatar :user="user" class="profile-avatar" size="large"></user-avatar> -->
+            <!-- Wolle: <user-avatar :user="user" class="profile-page-avatar" size="large"></user-avatar> -->
           </avatar-uploader>
-          <!-- Wolle: <user-avatar v-else :user="user" class="profile-avatar" size="large" /> -->
+          <!-- Wolle: <user-avatar v-else :user="user" class="profile-page-avatar" size="large" /> -->
           <!-- Menu -->
           <!-- Wolle: <client-only>
             <content-menu
@@ -427,7 +427,7 @@ export default {
 </script>
 
 <style lang="scss">
-.profile-avatar.user-avatar {
+.profile-page-avatar.user-avatar {
   margin: auto;
   margin-top: -60px;
 }

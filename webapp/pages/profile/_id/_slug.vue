@@ -8,9 +8,9 @@
           style="position: relative; height: auto; overflow: visible"
         >
           <avatar-uploader v-if="myProfile" :profile="user">
-            <user-avatar :user="user" class="profile-avatar" size="large"></user-avatar>
+            <user-avatar :user="user" class="profile-page-avatar" size="large"></user-avatar>
           </avatar-uploader>
-          <user-avatar v-else :user="user" class="profile-avatar" size="large" />
+          <user-avatar v-else :user="user" class="profile-page-avatar" size="large" />
           <!-- Menu -->
           <client-only>
             <content-menu
@@ -417,7 +417,7 @@ export default {
 </script>
 
 <style lang="scss">
-.profile-avatar.user-avatar {
+.profile-page-avatar.user-avatar {
   margin: auto;
   margin-top: -60px;
 }
