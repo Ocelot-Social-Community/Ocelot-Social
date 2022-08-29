@@ -39,7 +39,7 @@
               {{ user.location.name }}
             </ds-text> -->
             <ds-text align="center" color="soft" size="small">
-              {{ $t('profile.memberSince') }} {{ group.createdAt | date('MMMM yyyy') }}
+              {{ $t('profile.groupSince') }} {{ group.createdAt | date('MMMM yyyy') }}
             </ds-text>
           </ds-space>
           <!-- Wolle: <ds-space v-if="user.badges && user.badges.length" margin="x-small">
@@ -83,7 +83,9 @@
           <template v-if="group.about">
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
-              <ds-text color="soft" size="small" class="hyphenate-text">{{ group.about }}</ds-text>
+              <ds-text color="soft" size="small" class="hyphenate-text">
+                {{ $t('profile.groupGoal') }} {{ group.about }}
+              </ds-text>
             </ds-space>
           </template>
         </base-card>

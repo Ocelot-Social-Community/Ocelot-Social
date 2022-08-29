@@ -521,6 +521,8 @@
     "follow": "Folgen",
     "followers": "Folgen",
     "following": "Folge Ich",
+    "groupGoal": "Ziel:",
+    "groupSince": "Gründung",
     "invites": {
       "description": "Zur Einladung die E-Mail-Adresse hier eintragen.",
       "emailPlaceholder": "E-Mail-Adresse für die Einladung",
