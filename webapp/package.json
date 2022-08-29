@@ -73,7 +73,7 @@
     "accounting": "~0.4.1",
     "apollo-cache-inmemory": "~1.6.6",
     "apollo-client": "~2.6.8",
-    "cookie-universal-nuxt": "~2.1.5",
+    "cookie-universal-nuxt": "~2.2.2",
     "cropperjs": "^1.5.5",
     "cross-env": "~7.0.3",
     "date-fns": "2.22.1",
