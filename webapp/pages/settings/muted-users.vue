@@ -25,7 +25,7 @@
               params: { id: scope.row.id, slug: scope.row.slug },
             }"
           >
-            <profile-avatar :user="scope.row" size="small" />
+            <profile-avatar :profile="scope.row" size="small" />
           </nuxt-link>
         </template>
         <template #name="scope">

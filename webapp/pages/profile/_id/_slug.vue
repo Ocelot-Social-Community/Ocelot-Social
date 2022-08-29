@@ -8,9 +8,9 @@
           style="position: relative; height: auto; overflow: visible"
         >
           <avatar-uploader v-if="myProfile" :profile="user">
-            <profile-avatar :user="user" class="profile-page-avatar" size="large"></profile-avatar>
+            <profile-avatar :profile="user" class="profile-page-avatar" size="large" />
           </avatar-uploader>
-          <profile-avatar v-else :user="user" class="profile-page-avatar" size="large" />
+          <profile-avatar v-else :profile="user" class="profile-page-avatar" size="large" />
           <!-- Menu -->
           <client-only>
             <content-menu
