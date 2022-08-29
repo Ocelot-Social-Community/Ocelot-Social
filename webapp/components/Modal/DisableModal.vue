@@ -53,7 +53,7 @@ export default {
         // await this.modalData.buttons.confirm.callback()
         await this.$apollo.mutate({
           mutation: gql`
-            mutation($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
+            mutation ($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
               review(resourceId: $resourceId, disable: $disable, closed: $closed) {
                 disable
               }
