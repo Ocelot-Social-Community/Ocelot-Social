@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 export const reportsListQuery = () => {
   // no limit for the moment like before: "reports(first: 20, orderBy: createdAt_desc)"
   return gql`
-    query(
+    query (
       $orderBy: ReportOrdering
       $first: Int
       $offset: Int
@@ -94,7 +94,7 @@ export const reportsListQuery = () => {
 
 export const reportMutation = () => {
   return gql`
-    mutation($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
+    mutation ($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
       fileReport(
         resourceId: $resourceId
         reasonCategory: $reasonCategory
@@ -108,7 +108,7 @@ export const reportMutation = () => {
 
 export const reviewMutation = () => {
   return gql`
-    mutation($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
+    mutation ($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
       review(resourceId: $resourceId, disable: $disable, closed: $closed) {
         disable
       }

@@ -4,7 +4,7 @@ export default (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return {
     CreateComment: gql`
-      mutation($postId: ID!, $content: String!) {
+      mutation ($postId: ID!, $content: String!) {
         CreateComment(postId: $postId, content: $content) {
           id
           contentExcerpt
@@ -36,7 +36,7 @@ export default (i18n) => {
       }
     `,
     UpdateComment: gql`
-      mutation($content: String!, $id: ID!) {
+      mutation ($content: String!, $id: ID!) {
         UpdateComment(content: $content, id: $id) {
           id
           contentExcerpt

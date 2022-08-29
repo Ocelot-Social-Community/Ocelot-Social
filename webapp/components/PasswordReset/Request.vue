@@ -85,7 +85,7 @@ export default {
     },
     async handleSubmit() {
       const mutation = gql`
-        mutation($email: String!) {
+        mutation ($email: String!) {
           requestPasswordReset(email: $email)
         }
       `

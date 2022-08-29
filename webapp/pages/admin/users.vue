@@ -139,7 +139,7 @@ export default {
     User: {
       query() {
         return gql`
-          query($filter: _UserFilter, $first: Int, $offset: Int, $email: String) {
+          query ($filter: _UserFilter, $first: Int, $offset: Int, $email: String) {
             User(
               email: $email
               filter: $filter
