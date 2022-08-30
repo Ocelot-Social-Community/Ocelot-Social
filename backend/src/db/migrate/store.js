@@ -29,6 +29,7 @@ const createCategories = async (session) => {
   })
   try {
     await createCategoriesTxResultPromise
+    console.log('Successfully created categories!') // eslint-disable-line no-console
   } catch (error) {
     console.log(`Error creating categories: ${error}`) // eslint-disable-line no-console
   }
