@@ -5,7 +5,11 @@ import createServer from '../server'
 import faker from '@faker-js/faker'
 import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
-import { createGroupMutation } from './graphql/groups'
+import {
+  createGroupMutation,
+  joinGroupMutation,
+  changeGroupMemberRoleMutation,
+} from './graphql/groups'
 import { createPostMutation } from './graphql/posts'
 import { createCommentMutation } from './graphql/comments'
 
@@ -400,6 +404,62 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
     ])
+    await Promise.all([
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u2',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u3',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u4',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u6',
+        },
+      }),
+    ])
+    await Promise.all([
+      mutate({
+        mutation: changeGroupMemberRoleMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u2',
+          roleInGroup: 'usual',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u4',
+          roleInGroup: 'admin',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u3',
+          roleInGroup: 'owner',
+        },
+      }),
+    ])
 
     authenticatedUser = await jennyRostock.toJson()
     await Promise.all([
@@ -416,6 +476,77 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
     ])
+    await Promise.all([
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g1',
+          userId: 'u1',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g1',
+          userId: 'u2',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g1',
+          userId: 'u5',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g1',
+          userId: 'u6',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g1',
+          userId: 'u7',
+        },
+      }),
+    ])
+    await Promise.all([
+      mutate({
+        mutation: changeGroupMemberRoleMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u1',
+          roleInGroup: 'usual',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u2',
+          roleInGroup: 'usual',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u5',
+          roleInGroup: 'admin',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u6',
+          roleInGroup: 'owner',
+        },
+      }),
+    ])
 
     authenticatedUser = await bobDerBaumeister.toJson()
     await Promise.all([
@@ -429,6 +560,62 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           groupType: 'public',
           actionRadius: 'interplanetary',
           categoryIds: ['cat3', 'cat13', 'cat16'],
+        },
+      }),
+    ])
+    await Promise.all([
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g2',
+          userId: 'u4',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g2',
+          userId: 'u5',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g2',
+          userId: 'u6',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g2',
+          userId: 'u7',
+        },
+      }),
+    ])
+    await Promise.all([
+      mutate({
+        mutation: changeGroupMemberRoleMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u4',
+          roleInGroup: 'usual',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u5',
+          roleInGroup: 'usual',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation,
+        variables: {
+          groupId: 'g0',
+          userId: 'u6',
+          roleInGroup: 'usual',
         },
       }),
     ])

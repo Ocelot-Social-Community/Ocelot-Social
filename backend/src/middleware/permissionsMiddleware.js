@@ -52,6 +52,115 @@ const isMySocialMedia = rule({
   return socialMedia.ownedBy.node.id === user.id
 })
 
+const isAllowedSeeingMembersOfGroup = rule({
+  cache: 'no_cache',
+})(async (_parent, args, { user, driver }) => {
+  if (!(user && user.id)) return false
+  const { id: groupId } = args
+  const session = driver.session()
+  const readTxPromise = session.readTransaction(async (transaction) => {
+    const transactionResponse = await transaction.run(
+      `
+        MATCH (group:Group {id: $groupId})
+        OPTIONAL MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group)
+        RETURN group {.*}, member {.*, myRoleInGroup: membership.role}
+      `,
+      { groupId, userId: user.id },
+    )
+    return {
+      member: transactionResponse.records.map((record) => record.get('member'))[0],
+      group: transactionResponse.records.map((record) => record.get('group'))[0],
+    }
+  })
+  try {
+    const { member, group } = await readTxPromise
+    return (
+      !!group &&
+      (group.groupType === 'public' ||
+        (['closed', 'hidden'].includes(group.groupType) &&
+          !!member &&
+          ['usual', 'admin', 'owner'].includes(member.myRoleInGroup)))
+    )
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+})
+
+const isAllowedToChangeGroupMemberRole = rule({
+  cache: 'no_cache',
+})(async (_parent, args, { user, driver }) => {
+  if (!(user && user.id)) return false
+  const adminId = user.id
+  const { groupId, userId, roleInGroup } = args
+  if (adminId === userId) return false
+  const session = driver.session()
+  const readTxPromise = session.readTransaction(async (transaction) => {
+    const transactionResponse = await transaction.run(
+      `
+        MATCH (admin:User {id: $adminId})-[adminMembership:MEMBER_OF]->(group:Group {id: $groupId})
+        OPTIONAL MATCH (group)<-[userMembership:MEMBER_OF]-(member:User {id: $userId})
+        RETURN group {.*}, admin {.*, myRoleInGroup: adminMembership.role}, member {.*, myRoleInGroup: userMembership.role}
+      `,
+      { groupId, adminId, userId },
+    )
+    return {
+      admin: transactionResponse.records.map((record) => record.get('admin'))[0],
+      group: transactionResponse.records.map((record) => record.get('group'))[0],
+      member: transactionResponse.records.map((record) => record.get('member'))[0],
+    }
+  })
+  try {
+    const { admin, group, member } = await readTxPromise
+    return (
+      !!group &&
+      !!admin &&
+      (!member ||
+        (!!member &&
+          (member.myRoleInGroup === roleInGroup || !['owner'].includes(member.myRoleInGroup)))) &&
+      ((['admin'].includes(admin.myRoleInGroup) &&
+        ['pending', 'usual', 'admin'].includes(roleInGroup)) ||
+        (['owner'].includes(admin.myRoleInGroup) &&
+          ['pending', 'usual', 'admin', 'owner'].includes(roleInGroup)))
+    )
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+})
+
+const isAllowedToJoinGroup = rule({
+  cache: 'no_cache',
+})(async (_parent, args, { user, driver }) => {
+  if (!(user && user.id)) return false
+  const { groupId, userId } = args
+  const session = driver.session()
+  const readTxPromise = session.readTransaction(async (transaction) => {
+    const transactionResponse = await transaction.run(
+      `
+        MATCH (group:Group {id: $groupId})
+        OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(member:User {id: $userId})
+        RETURN group {.*}, member {.*, myRoleInGroup: membership.role}
+      `,
+      { groupId, userId },
+    )
+    return {
+      group: transactionResponse.records.map((record) => record.get('group'))[0],
+      member: transactionResponse.records.map((record) => record.get('member'))[0],
+    }
+  })
+  try {
+    const { group, member } = await readTxPromise
+    return !!group && (group.groupType !== 'hidden' || (!!member && !!member.myRoleInGroup))
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+})
+
 const isAuthor = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
@@ -78,7 +187,7 @@ const isAuthor = rule({
 
 const isDeletingOwnAccount = rule({
   cache: 'no_cache',
-})(async (parent, args, context, info) => {
+})(async (parent, args, context, _info) => {
   return context.user.id === args.id
 })
 
@@ -115,6 +224,7 @@ export default shield(
       statistics: allow,
       currentUser: allow,
       Group: isAuthenticated,
+      GroupMembers: isAllowedSeeingMembersOfGroup,
       Post: allow,
       profilePagePosts: allow,
       Comment: allow,
@@ -142,6 +252,8 @@ export default shield(
       SignupVerification: allow,
       UpdateUser: onlyYourself,
       CreateGroup: isAuthenticated,
+      JoinGroup: isAllowedToJoinGroup,
+      ChangeGroupMemberRole: isAllowedToChangeGroupMemberRole,
       CreatePost: isAuthenticated,
       UpdatePost: isAuthor,
       DeletePost: isAuthor,
