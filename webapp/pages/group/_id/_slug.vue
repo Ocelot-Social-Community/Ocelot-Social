@@ -7,17 +7,17 @@
           :class="{ 'disabled-content': group.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
-          <avatar-uploader v-if="isMyGroup" :profile="group">
-            <!-- Wolle: <profile-avatar :profile="user" class="profile-page-avatar" size="large" /> -->
+          <avatar-uploader v-if="isGroupOwner" :profile="group">
+            <profile-avatar :profile="group" class="profile-page-avatar" size="large" />
           </avatar-uploader>
-          <!-- Wolle: <profile-avatar v-else :profile="user" class="profile-page-avatar" size="large" /> -->
+          <profile-avatar v-else :profile="group" class="profile-page-avatar" size="large" />
           <!-- Menu -->
           <!-- Wolle: <client-only>
             <content-menu
               placement="bottom-end"
               resource-type="user"
               :resource="user"
-              :is-owner="isMyGroup"
+              :is-owner="isGroupOwner"
               class="user-content-menu"
               @mute="muteUser"
               @unmute="unmuteUser"
@@ -64,7 +64,7 @@
               </client-only> -->
             </ds-flex-item>
           </ds-flex>
-          <!-- Wolle: <div v-if="!isMyGroup" class="action-buttons">
+          <!-- Wolle: <div v-if="!isGroupMember" class="action-buttons">
             <base-button v-if="user.isBlocked" @click="unblockUser(user)">
               {{ $t('settings.blocked-users.unblock') }}
             </base-button>
@@ -118,7 +118,7 @@
             <ds-space centered>
               <nuxt-link :to="{ name: 'post-create' }">
                 <base-button
-                  v-if="isMyGroup"
+                  v-if="isGroupMember"
                   v-tooltip="{
                     content: $t('contribution.newPost'),
                     placement: 'left',
@@ -239,7 +239,10 @@ export default {
     }
   },
   computed: {
-    isMyGroup() {
+    isGroupOwner() {
+      return this.group.myRole === 'owner'
+    },
+    isGroupMember() {
       return this.group.myRole
     },
     group() {
