@@ -39,6 +39,44 @@ export const createGroupMutation = gql`
   }
 `
 
+export const updateGroupMutation = gql`
+  mutation (
+    $id: ID!
+    $name: String
+    $slug: String
+    $avatar: ImageInput
+    $about: String
+    $description: String
+    $actionRadius: GroupActionRadius
+    $categoryIds: [ID]
+  ) {
+    UpdateGroup(
+      id: $id
+      name: $name
+      slug: $slug
+      avatar: $avatar
+      about: $about
+      description: $description
+      actionRadius: $actionRadius
+      categoryIds: $categoryIds
+    ) {
+      id
+      name
+      slug
+      avatar
+      createdAt
+      updatedAt
+      disabled
+      deleted
+      about
+      description
+      groupType
+      actionRadius
+      myRole
+    }
+  }
+`
+
 // ------ queries
 
 export const groupQuery = gql`
