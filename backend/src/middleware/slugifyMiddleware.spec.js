@@ -189,7 +189,7 @@ describe('slugifyMiddleware', () => {
     })
   })
 
-  describe('UpdateGroup', () => {
+  describe.only('UpdateGroup', () => {
     beforeEach(() => {
       variables = {
         ...variables,
@@ -200,6 +200,10 @@ describe('slugifyMiddleware', () => {
         actionRadius: 'national',
         categoryIds,
       }
+      await mutate({
+        mutation: createGroupMutation,
+        variables,
+      })
     })
 
     describe('if slug not exists', () => {
