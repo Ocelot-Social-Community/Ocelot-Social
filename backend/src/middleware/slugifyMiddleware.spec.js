@@ -190,7 +190,7 @@ describe('slugifyMiddleware', () => {
   })
 
   describe.only('UpdateGroup', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       variables = {
         ...variables,
         name: 'The Best Group',
