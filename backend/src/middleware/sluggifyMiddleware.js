@@ -31,6 +31,7 @@ export default {
       return resolve(root, args, context, info)
     },
     UpdateGroup: async (resolve, root, args, context, info) => {
+      console.log('sluggifyMiddleware - UpdateGroup !!!')
       args.slug = args.slug || (await uniqueSlug(args.name, isUniqueFor(context, 'Group')))
       return resolve(root, args, context, info)
     },

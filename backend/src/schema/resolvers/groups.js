@@ -33,10 +33,10 @@ export default {
             `
           }
         }
-        const result = await txc.run(groupCypher, {
+        const transactionResponse = await txc.run(groupCypher, {
           userId: context.user.id,
         })
-        return result.records.map((record) => record.get('group'))
+        return transactionResponse.records.map((record) => record.get('group'))
       })
       try {
         return await readTxResultPromise
@@ -54,10 +54,10 @@ export default {
           MATCH (user:User)-[membership:MEMBER_OF]->(:Group {id: $groupId})
           RETURN user {.*, myRoleInGroup: membership.role}
         `
-        const result = await txc.run(groupMemberCypher, {
+        const transactionResponse = await txc.run(groupMemberCypher, {
           groupId,
         })
-        return result.records.map((record) => record.get('user'))
+        return transactionResponse.records.map((record) => record.get('user'))
       })
       try {
         return await readTxResultPromise
@@ -131,6 +131,72 @@ export default {
         session.close()
       }
     },
+    UpdateGroup: async (_parent, params, context, _resolveInfo) => {
+      console.log('UpdateGroup !!!')
+      const { categoryIds } = params
+      const { id: groupId } = params
+      console.log('categoryIds: ', categoryIds)
+      console.log('groupId: ', groupId)
+      delete params.categoryIds
+      if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
+        throw new UserInputError('Too view categories!')
+      }
+      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
+        throw new UserInputError('Too many categories!')
+      }
+      if (
+        params.description === undefined ||
+        params.description === null ||
+        removeHtmlTags(params.description).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
+      ) {
+        throw new UserInputError('Description too short!')
+      }
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        let updateGroupCypher = `
+          MATCH (group:Group {id: $groupId})
+          SET group += $params
+          SET group.updatedAt = toString(datetime())
+          WITH group
+        `
+        if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
+          const cypherDeletePreviousRelations = `
+            MATCH (group:Group {id: $groupId})-[previousRelations:CATEGORIZED]->(category:Category)
+            DELETE previousRelations
+            RETURN group, category
+            `
+          await session.writeTransaction((transaction) => {
+            return transaction.run(cypherDeletePreviousRelations, { groupId })
+          })
+          updateGroupCypher += `
+            UNWIND $categoryIds AS categoryId
+            MATCH (category:Category {id: categoryId})
+            MERGE (group)-[:CATEGORIZED]->(category)
+            WITH group
+            OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
+            WITH group, membership # Wolle: is not needed in my eyes
+          `
+        }
+        updateGroupCypher += `RETURN group {.*, myRole: membership.role}`
+        const transactionResponse = await transaction.run(updateGroupCypher, {
+          groupId,
+          userId: context.user.id,
+          categoryIds,
+          params,
+        })
+        const [group] = await transactionResponse.records.map((record) => record.get('group'))
+        return group
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
+          throw new UserInputError('Group with this slug already exists!')
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
     JoinGroup: async (_parent, params, context, _resolveInfo) => {
       const { groupId, userId } = params
       const session = context.driver.session()
@@ -148,8 +214,8 @@ export default {
                 END
           RETURN member {.*, myRoleInGroup: membership.role}
         `
-        const result = await transaction.run(joinGroupCypher, { groupId, userId })
-        const [member] = await result.records.map((record) => record.get('member'))
+        const transactionResponse = await transaction.run(joinGroupCypher, { groupId, userId })
+        const [member] = await transactionResponse.records.map((record) => record.get('member'))
         return member
       })
       try {
@@ -176,8 +242,12 @@ export default {
             membership.role = $roleInGroup
           RETURN member {.*, myRoleInGroup: membership.role}
         `
-        const result = await transaction.run(joinGroupCypher, { groupId, userId, roleInGroup })
-        const [member] = await result.records.map((record) => record.get('member'))
+        const transactionResponse = await transaction.run(joinGroupCypher, {
+          groupId,
+          userId,
+          roleInGroup,
+        })
+        const [member] = await transactionResponse.records.map((record) => record.get('member'))
         return member
       })
       try {

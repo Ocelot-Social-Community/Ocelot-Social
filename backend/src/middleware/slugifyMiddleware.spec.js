@@ -2,7 +2,8 @@ import { getNeode, getDriver } from '../db/neo4j'
 import createServer from '../server'
 import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../db/factories'
-import { createGroupMutation } from '../db/graphql/groups'
+import { sleep } from '../helpers/jest.js'
+import { createGroupMutation, updateGroupMutation } from '../db/graphql/groups'
 import { createPostMutation } from '../db/graphql/posts'
 import { signupVerificationMutation } from '../db/graphql/authentications'
 
@@ -189,101 +190,61 @@ describe('slugifyMiddleware', () => {
     })
   })
 
-  describe.only('UpdateGroup', () => {
+  describe('UpdateGroup', () => {
     beforeEach(async () => {
       variables = {
         ...variables,
-        name: 'The Best Group',
+        name: 'Pre-Existing Group',
+        slug: 'pre-existing-group',
         about: 'Some about',
         description: 'Some description' + descriptionAdditional100,
         groupType: 'closed',
         actionRadius: 'national',
         categoryIds,
       }
+      console.log('createGroupMutation: ', createGroupMutation)
       await mutate({
         mutation: createGroupMutation,
         variables,
       })
+      // Wolle: console.log('sleep !!!')
+      // await sleep(4 * 1000)
     })
 
-    describe('if slug not exists', () => {
-      it('generates a slug based on name', async () => {
-        await expect(
-          mutate({
-            mutation: createGroupMutation,
-            variables,
-          }),
-        ).resolves.toMatchObject({
-          data: {
-            CreateGroup: {
-              name: 'The Best Group',
-              slug: 'the-best-group',
-              about: 'Some about',
-              description: 'Some description' + descriptionAdditional100,
-              groupType: 'closed',
-              actionRadius: 'national',
+    describe('if group exists', () => {
+      describe('if new slug not(!) exists', () => {
+        it.only('has the new slug', async () => {
+          console.log('updateGroupMutation: ', updateGroupMutation)
+          await expect(
+            mutate({
+              mutation: updateGroupMutation,
+              variables: {
+                ...variables,
+                slug: 'my-best-group',
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              UpdateGroup: {
+                name: 'The Best Group',
+                slug: 'my-best-group',
+                about: 'Some about',
+                description: 'Some description' + descriptionAdditional100,
+                groupType: 'closed',
+                actionRadius: 'national',
+                myRole: 'owner',
+              },
             },
-          },
+          })
         })
       })
 
-      it('generates a slug based on given slug', async () => {
-        await expect(
-          mutate({
-            mutation: createGroupMutation,
-            variables: {
-              ...variables,
-              slug: 'the-group',
-            },
-          }),
-        ).resolves.toMatchObject({
-          data: {
-            CreateGroup: {
-              slug: 'the-group',
-            },
-          },
-        })
-      })
-    })
-
-    describe('if slug exists', () => {
-      beforeEach(async () => {
-        await mutate({
-          mutation: createGroupMutation,
-          variables: {
-            ...variables,
-            name: 'Pre-Existing Group',
-            slug: 'pre-existing-group',
-            about: 'As an about',
-          },
-        })
-      })
-
-      it('chooses another slug', async () => {
-        await expect(
-          mutate({
-            mutation: createGroupMutation,
-            variables: {
-              ...variables,
-              name: 'Pre-Existing Group',
-              about: 'As an about',
-            },
-          }),
-        ).resolves.toMatchObject({
-          data: {
-            CreateGroup: {
-              slug: 'pre-existing-group-1',
-            },
-          },
-        })
-      })
-
-      describe('but if the client specifies a slug', () => {
-        it('rejects CreateGroup', async (done) => {
+      describe('if new slug exists', () => {
+        it('rejects UpdateGroup', async (done) => {
           try {
             await expect(
               mutate({
-                mutation: createGroupMutation,
+                mutation: updateGroupMutation,
                 variables: {
                   ...variables,
                   name: 'Pre-Existing Group',
@@ -442,6 +403,8 @@ describe('slugifyMiddleware', () => {
       })
     })
   })
+
+  it.todo('UpdatePost')
 
   describe('SignupVerification', () => {
     beforeEach(() => {

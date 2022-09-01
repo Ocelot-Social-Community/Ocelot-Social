@@ -102,15 +102,15 @@ type Mutation {
     locationName: String
   ): Group
 
-  # UpdateGroup(
-  #   id: ID!
-  #   name: String
-  #   slug: String
-  #   avatar: ImageInput
-  #   locationName: String
-  #   about: String
-  #   description: String
-  # ): Group
+  UpdateGroup(
+    id: ID!
+    name: String
+    slug: String
+    avatar: ImageInput
+    locationName: String
+    about: String
+    description: String
+  ): Group
 
   # DeleteGroup(id: ID!): Group
 

@@ -55,9 +55,12 @@ const isMySocialMedia = rule({
 const isAllowedToChangeGroupSettings = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
+  console.log('isAllowedToChangeGroupSettings !!!')
   if (!(user && user.id)) return false
   const ownerId = user.id
   const { id: groupId } = args
+  console.log('ownerId: ', ownerId)
+  console.log('groupId: ', groupId)
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
