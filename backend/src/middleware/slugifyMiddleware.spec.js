@@ -2,7 +2,6 @@ import { getNeode, getDriver } from '../db/neo4j'
 import createServer from '../server'
 import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../db/factories'
-import { sleep } from '../helpers/jest.js'
 import { createGroupMutation, updateGroupMutation } from '../db/graphql/groups'
 import { createPostMutation } from '../db/graphql/posts'
 import { signupVerificationMutation } from '../db/graphql/authentications'
@@ -191,35 +190,32 @@ describe('slugifyMiddleware', () => {
   })
 
   describe('UpdateGroup', () => {
+    let createGroupResult
+
     beforeEach(async () => {
-      variables = {
-        ...variables,
-        name: 'Pre-Existing Group',
-        slug: 'pre-existing-group',
-        about: 'Some about',
-        description: 'Some description' + descriptionAdditional100,
-        groupType: 'closed',
-        actionRadius: 'national',
-        categoryIds,
-      }
-      console.log('createGroupMutation: ', createGroupMutation)
-      await mutate({
+      createGroupResult = await mutate({
         mutation: createGroupMutation,
-        variables,
+        variables: {
+          name: 'The Best Group',
+          slug: 'the-best-group',
+          about: 'Some about',
+          description: 'Some description' + descriptionAdditional100,
+          groupType: 'closed',
+          actionRadius: 'national',
+          categoryIds,
+        },
       })
-      // Wolle: console.log('sleep !!!')
-      // await sleep(4 * 1000)
     })
 
     describe('if group exists', () => {
       describe('if new slug not(!) exists', () => {
-        it.only('has the new slug', async () => {
-          console.log('updateGroupMutation: ', updateGroupMutation)
+        it('has the new slug', async () => {
+          // Wolle: console.log('createGroupResult: ', createGroupResult)
           await expect(
             mutate({
               mutation: updateGroupMutation,
               variables: {
-                ...variables,
+                id: createGroupResult.data.CreateGroup.id,
                 slug: 'my-best-group',
               },
             }),
@@ -239,16 +235,26 @@ describe('slugifyMiddleware', () => {
         })
       })
 
-      describe('if new slug exists', () => {
+      describe('if new slug exists in another group', () => {
         it('rejects UpdateGroup', async (done) => {
+          await mutate({
+            mutation: createGroupMutation,
+            variables: {
+              name: 'Pre-Existing Group',
+              slug: 'pre-existing-group',
+              about: 'Some about',
+              description: 'Some description' + descriptionAdditional100,
+              groupType: 'closed',
+              actionRadius: 'national',
+              categoryIds,
+            },
+          })
           try {
             await expect(
               mutate({
                 mutation: updateGroupMutation,
                 variables: {
-                  ...variables,
-                  name: 'Pre-Existing Group',
-                  about: 'As an about',
+                  id: createGroupResult.data.CreateGroup.id,
                   slug: 'pre-existing-group',
                 },
               }),

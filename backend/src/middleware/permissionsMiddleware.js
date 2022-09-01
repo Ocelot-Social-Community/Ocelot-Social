@@ -55,18 +55,18 @@ const isMySocialMedia = rule({
 const isAllowedToChangeGroupSettings = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  console.log('isAllowedToChangeGroupSettings !!!')
+  // Wolle: console.log('isAllowedToChangeGroupSettings !!!')
   if (!(user && user.id)) return false
   const ownerId = user.id
   const { id: groupId } = args
-  console.log('ownerId: ', ownerId)
-  console.log('groupId: ', groupId)
+  // Wolle: console.log('ownerId: ', ownerId)
+  // Wolle: console.log('groupId: ', groupId)
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
       `
-        MATCH (owner:User {id: $ownerId})-[adminMembership:MEMBER_OF]->(group:Group {id: $groupId})
-        RETURN group {.*}, owner {.*, myRoleInGroup: adminMembership.role}
+        MATCH (owner:User {id: $ownerId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
+        RETURN group {.*}, owner {.*, myRoleInGroup: membership.role}
       `,
       { groupId, ownerId },
     )
@@ -77,6 +77,8 @@ const isAllowedToChangeGroupSettings = rule({
   })
   try {
     const { owner, group } = await readTxPromise
+    // Wolle: console.log('owner: ', owner)
+    // Wolle: console.log('group: ', group)
     return !!group && !!owner && ['owner'].includes(owner.myRoleInGroup)
   } catch (error) {
     throw new Error(error)

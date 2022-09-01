@@ -132,21 +132,22 @@ export default {
       }
     },
     UpdateGroup: async (_parent, params, context, _resolveInfo) => {
-      console.log('UpdateGroup !!!')
+      // Wolle: console.log('UpdateGroup !!!')
       const { categoryIds } = params
       const { id: groupId } = params
-      console.log('categoryIds: ', categoryIds)
-      console.log('groupId: ', groupId)
+      // Wolle: console.log('categoryIds: ', categoryIds)
+      // Wolle: console.log('groupId: ', groupId)
       delete params.categoryIds
-      if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
-        throw new UserInputError('Too view categories!')
-      }
-      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
-        throw new UserInputError('Too many categories!')
+      if (CONFIG.CATEGORIES_ACTIVE && categoryIds) {
+        if (categoryIds.length < CATEGORIES_MIN) {
+          throw new UserInputError('Too view categories!')
+        }
+        if (categoryIds.length > CATEGORIES_MAX) {
+          throw new UserInputError('Too many categories!')
+        }
       }
       if (
-        params.description === undefined ||
-        params.description === null ||
+        params.description &&
         removeHtmlTags(params.description).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
       ) {
         throw new UserInputError('Description too short!')
@@ -164,7 +165,7 @@ export default {
             MATCH (group:Group {id: $groupId})-[previousRelations:CATEGORIZED]->(category:Category)
             DELETE previousRelations
             RETURN group, category
-            `
+          `
           await session.writeTransaction((transaction) => {
             return transaction.run(cypherDeletePreviousRelations, { groupId })
           })
@@ -173,11 +174,13 @@ export default {
             MATCH (category:Category {id: categoryId})
             MERGE (group)-[:CATEGORIZED]->(category)
             WITH group
-            OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
-            WITH group, membership # Wolle: is not needed in my eyes
           `
         }
-        updateGroupCypher += `RETURN group {.*, myRole: membership.role}`
+        updateGroupCypher += `
+          OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
+          RETURN group {.*, myRole: membership.role}
+        `
+        // Wolle: console.log('updateGroupCypher: ', updateGroupCypher)
         const transactionResponse = await transaction.run(updateGroupCypher, {
           groupId,
           userId: context.user.id,

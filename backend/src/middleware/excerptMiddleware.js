@@ -8,7 +8,6 @@ export default {
       return resolve(root, args, context, info)
     },
     UpdateGroup: async (resolve, root, args, context, info) => {
-      console.log('excerptMiddleware - UpdateGroup !!!')
       args.descriptionExcerpt = trunc(args.description, DESCRIPTION_EXCERPT_HTML_LENGTH).html
       return resolve(root, args, context, info)
     },

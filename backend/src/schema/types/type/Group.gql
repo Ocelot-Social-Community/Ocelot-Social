@@ -106,10 +106,12 @@ type Mutation {
     id: ID!
     name: String
     slug: String
-    avatar: ImageInput
-    locationName: String
     about: String
     description: String
+    actionRadius: GroupActionRadius
+    categoryIds: [ID]
+    avatar: ImageInput
+    locationName: String
   ): Group
 
   # DeleteGroup(id: ID!): Group
