@@ -2,6 +2,7 @@ import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../../db/factories'
 import {
   createGroupMutation,
+  updateGroupMutation,
   joinGroupMutation,
   changeGroupMemberRoleMutation,
   groupMembersQuery,
@@ -2037,6 +2038,135 @@ describe('in mode', () => {
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
+              })
+            })
+          })
+        })
+      })
+    })
+
+    describe('UpdateGroup', () => {
+      beforeAll(async () => {
+        await seedBasicsAndClearAuthentication()
+      })
+
+      afterAll(async () => {
+        await cleanDatabase()
+      })
+
+      describe('unauthenticated', () => {
+        it.only('throws authorization error', async () => {
+          const { errors } = await mutate({
+            query: updateGroupMutation,
+            variables: {
+              id: 'my-group',
+              slug: 'my-best-group',
+            },
+          })
+          expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+        })
+      })
+
+      describe('authenticated', () => {
+        let otherUser
+
+        beforeAll(async () => {
+          otherUser = await Factory.build(
+            'user',
+            {
+              id: 'other-user',
+              name: 'Other TestUser',
+            },
+            {
+              email: 'test2@example.org',
+              password: '1234',
+            },
+          )
+          authenticatedUser = await otherUser.toJson()
+          await mutate({
+            mutation: createGroupMutation,
+            variables: {
+              id: 'others-group',
+              name: 'Uninteresting Group',
+              about: 'We will change nothing!',
+              description: 'We love it like it is!?' + descriptionAdditional100,
+              groupType: 'closed',
+              actionRadius: 'global',
+              categoryIds,
+            },
+          })
+          authenticatedUser = await user.toJson()
+          await mutate({
+            mutation: createGroupMutation,
+            variables: {
+              id: 'my-group',
+              name: 'The Best Group',
+              about: 'We will change the world!',
+              description: 'Some description' + descriptionAdditional100,
+              groupType: 'public',
+              actionRadius: 'regional',
+              categoryIds,
+            },
+          })
+        })
+
+        describe('query groups', () => {
+          describe('without any filters', () => {
+            it('finds all groups', async () => {
+              await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject({
+                data: {
+                  Group: expect.arrayContaining([
+                    expect.objectContaining({
+                      id: 'my-group',
+                      slug: 'the-best-group',
+                      myRole: 'owner',
+                    }),
+                    expect.objectContaining({
+                      id: 'others-group',
+                      slug: 'uninteresting-group',
+                      myRole: null,
+                    }),
+                  ]),
+                },
+                errors: undefined,
+              })
+            })
+          })
+
+          describe('isMember = true', () => {
+            it('finds only groups where user is member', async () => {
+              await expect(
+                query({ query: groupQuery, variables: { isMember: true } }),
+              ).resolves.toMatchObject({
+                data: {
+                  Group: [
+                    {
+                      id: 'my-group',
+                      slug: 'the-best-group',
+                      myRole: 'owner',
+                    },
+                  ],
+                },
+                errors: undefined,
+              })
+            })
+          })
+
+          describe('isMember = false', () => {
+            it('finds only groups where user is not(!) member', async () => {
+              await expect(
+                query({ query: groupQuery, variables: { isMember: false } }),
+              ).resolves.toMatchObject({
+                data: {
+                  Group: expect.arrayContaining([
+                    expect.objectContaining({
+                      id: 'others-group',
+                      slug: 'uninteresting-group',
+                      myRole: null,
+                    }),
+                  ]),
+                },
+                errors: undefined,
               })
             })
           })
