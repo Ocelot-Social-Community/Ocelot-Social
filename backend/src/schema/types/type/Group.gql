@@ -100,7 +100,7 @@ type Mutation {
     description: String!
     groupType: GroupType!
     actionRadius: GroupActionRadius!
-    categoryIds: [ID] # test this as result
+    categoryIds: [ID]
     avatar: ImageInput # test this as result
     locationName: String # test this as result
   ): Group
@@ -113,7 +113,7 @@ type Mutation {
     description: String
     # groupType: GroupType # is not possible at the moment and has to be discussed. may be in the stronger direction: public → closed → hidden
     actionRadius: GroupActionRadius
-    categoryIds: [ID] # test this as result
+    categoryIds: [ID]
     avatar: ImageInput # test this as result
     locationName: String # test this as result
   ): Group
