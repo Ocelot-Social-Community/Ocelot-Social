@@ -67,6 +67,9 @@ type Query {
     updatedAt: String
     about: String
     description: String
+    # groupType: GroupType # test this
+    # actionRadius: GroupActionRadius # test this
+    # avatar: ImageInput # test this
     locationName: String
     first: Int
     offset: Int
@@ -93,13 +96,13 @@ type Mutation {
     id: ID
     name: String!
     slug: String
-    avatar: ImageInput
     about: String
     description: String!
     groupType: GroupType!
     actionRadius: GroupActionRadius!
-    categoryIds: [ID]
-    locationName: String
+    categoryIds: [ID] # test this as result
+    avatar: ImageInput # test this as result
+    locationName: String # test this as result
   ): Group
 
   UpdateGroup(
@@ -108,10 +111,11 @@ type Mutation {
     slug: String
     about: String
     description: String
+    # groupType: GroupType # is not possible at the moment and has to be discussed. may be in the stronger direction: public → closed → hidden
     actionRadius: GroupActionRadius
-    categoryIds: [ID]
-    avatar: ImageInput
-    locationName: String
+    categoryIds: [ID] # test this as result
+    avatar: ImageInput # test this as result
+    locationName: String # test this as result
   ): Group
 
   # DeleteGroup(id: ID!): Group
