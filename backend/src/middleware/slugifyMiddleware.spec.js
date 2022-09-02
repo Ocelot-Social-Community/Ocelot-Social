@@ -209,34 +209,61 @@ describe('slugifyMiddleware', () => {
 
     describe('if group exists', () => {
       describe('if new slug not(!) exists', () => {
-        it('has the new slug', async () => {
-          // Wolle: console.log('createGroupResult: ', createGroupResult)
-          await expect(
-            mutate({
-              mutation: updateGroupMutation,
-              variables: {
-                id: createGroupResult.data.CreateGroup.id,
-                slug: 'my-best-group',
+        describe('setting slug by group name', () => {
+          it('has the new slug', async () => {
+            await expect(
+              mutate({
+                mutation: updateGroupMutation,
+                variables: {
+                  id: createGroupResult.data.CreateGroup.id,
+                  name: 'My Best Group',
+                },
+              }),
+            ).resolves.toMatchObject({
+              data: {
+                UpdateGroup: {
+                  name: 'My Best Group',
+                  slug: 'my-best-group',
+                  about: 'Some about',
+                  description: 'Some description' + descriptionAdditional100,
+                  groupType: 'closed',
+                  actionRadius: 'national',
+                  myRole: 'owner',
+                },
               },
-            }),
-          ).resolves.toMatchObject({
-            data: {
-              UpdateGroup: {
-                name: 'The Best Group',
-                slug: 'my-best-group',
-                about: 'Some about',
-                description: 'Some description' + descriptionAdditional100,
-                groupType: 'closed',
-                actionRadius: 'national',
-                myRole: 'owner',
+            })
+          })
+        })
+
+        describe('setting slug explicitly', () => {
+          it('has the new slug', async () => {
+            await expect(
+              mutate({
+                mutation: updateGroupMutation,
+                variables: {
+                  id: createGroupResult.data.CreateGroup.id,
+                  slug: 'my-best-group',
+                },
+              }),
+            ).resolves.toMatchObject({
+              data: {
+                UpdateGroup: {
+                  name: 'The Best Group',
+                  slug: 'my-best-group',
+                  about: 'Some about',
+                  description: 'Some description' + descriptionAdditional100,
+                  groupType: 'closed',
+                  actionRadius: 'national',
+                  myRole: 'owner',
+                },
               },
-            },
+            })
           })
         })
       })
 
       describe('if new slug exists in another group', () => {
-        it('rejects UpdateGroup', async (done) => {
+        beforeEach(async () => {
           await mutate({
             mutation: createGroupMutation,
             variables: {
@@ -249,39 +276,70 @@ describe('slugifyMiddleware', () => {
               categoryIds,
             },
           })
-          try {
+        })
+
+        describe('setting slug by group name', () => {
+          it('has unique slug "*-1"', async () => {
             await expect(
               mutate({
                 mutation: updateGroupMutation,
                 variables: {
                   id: createGroupResult.data.CreateGroup.id,
-                  slug: 'pre-existing-group',
+                  name: 'Pre-Existing Group',
                 },
               }),
             ).resolves.toMatchObject({
-              errors: [
-                {
-                  message: 'Group with this slug already exists!',
+              data: {
+                UpdateGroup: {
+                  name: 'Pre-Existing Group',
+                  slug: 'pre-existing-group-1',
+                  about: 'Some about',
+                  description: 'Some description' + descriptionAdditional100,
+                  groupType: 'closed',
+                  actionRadius: 'national',
+                  myRole: 'owner',
                 },
-              ],
+              },
             })
-            done()
-          } catch (error) {
-            throw new Error(`
-              ${error}
+          })
+        })
 
-              Probably your database has no unique constraints!
+        describe('setting slug explicitly', () => {
+          it('rejects UpdateGroup', async (done) => {
+            try {
+              await expect(
+                mutate({
+                  mutation: updateGroupMutation,
+                  variables: {
+                    id: createGroupResult.data.CreateGroup.id,
+                    slug: 'pre-existing-group',
+                  },
+                }),
+              ).resolves.toMatchObject({
+                errors: [
+                  {
+                    message: 'Group with this slug already exists!',
+                  },
+                ],
+              })
+              done()
+            } catch (error) {
+              throw new Error(`
+                ${error}
 
-              To see all constraints go to http://localhost:7474/browser/ and
-              paste the following:
-              \`\`\`
-                CALL db.constraints();
-              \`\`\`
+                Probably your database has no unique constraints!
 
-              Learn how to setup the database here:
-              https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/backend/README.md#database-indices-and-constraints
-            `)
-          }
+                To see all constraints go to http://localhost:7474/browser/ and
+                paste the following:
+                \`\`\`
+                  CALL db.constraints();
+                \`\`\`
+
+                Learn how to setup the database here:
+                https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/backend/README.md#database-indices-and-constraints
+              `)
+            }
+          })
         })
       })
     })
