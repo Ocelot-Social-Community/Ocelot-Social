@@ -17,7 +17,7 @@
         <ds-select
           icon="user"
           v-model="formData.status"
-          label="Status"
+          label="Sichtbarkeit"
           :options="['offen', 'geschlossen', 'geheim']"
           placeholder="Status ..."
         ></ds-select>

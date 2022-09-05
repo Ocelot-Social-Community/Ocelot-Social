@@ -2,10 +2,10 @@
   <div>
     <div>my groups</div>
     <group-teaser />
-    <group-list :items="items" :fields="fields" />
+    <group-list :items="responseGroupListQuery" :fields="fields" />
     <br />
     <br />
-    <group-card :items="items" :responseGroupListQuery="responseGroupListQuery" />
+    <group-card :items="responseGroupListQuery" />
   </div>
 </template>
 <script>
@@ -30,38 +30,7 @@ export default {
   data() {
     return {
       responseGroupListQuery: [],
-      fields: ['delete', 'name', 'desc', 'status', 'edit'],
-      items: [
-        {
-          id: 0,
-          name: 'Rengar',
-          desc: 'Rengar Jungler Rengar Jungler Rengar Jungler Rengar Jungler Rengar Jungler ',
-          status: 'open',
-          owner: true,
-        },
-        {
-          id: 1,
-          name: 'Renekton',
-          desc:
-            'Renekton Toplaner Renekton Toplaner Renekton Toplaner Renekton Toplaner Renekton Toplaner ',
-          status: 'open',
-          owner: false,
-        },
-        {
-          id: 2,
-          name: 'Twitch',
-          desc: 'Twitch ADC',
-          status: 'close',
-          owner: true,
-        },
-        {
-          id: 3,
-          name: 'Blitz',
-          desc: 'Blitz Support',
-          status: 'hidden',
-          owner: true,
-        },
-      ],
+      fields: ['delete', 'name', 'about', 'categories', 'edit'],
     }
   },
   methods: {
@@ -70,7 +39,7 @@ export default {
         const response = await this.$apollo.query({
           query: groupQuery,
         })
-        this.responseGroupListQuery = response.data
+        this.responseGroupListQuery = response.data.Group
       } catch (error) {
         this.responseGroupListQuery = []
       } finally {

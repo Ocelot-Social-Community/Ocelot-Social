@@ -2,6 +2,7 @@
   <div>
     <ds-container class="group-list">
       <ds-space><h2>Group List</h2></ds-space>
+      {{items}}
       <ds-table :data="items" :fields="fields">
         <template slot="delete" slot-scope="scope">
           <base-button
@@ -13,8 +14,8 @@
         <template slot="name" slot-scope="scope">
           <nuxt-link to="/group/g1/testgruppe">{{ scope.row.name }}</nuxt-link>
         </template>
-        <template slot="status" slot-scope="scope">
-          <ds-tag :color="status">{{ scope.row.status }}</ds-tag>
+        <template slot="categories" slot-scope="scope">
+          <ds-tag v-for="categorie in categories" :key="categorie.id" :color="status">{{ categorie.name }}</ds-tag>
         </template>
         <template slot="edit" slot-scope="scope">
           <base-button
@@ -46,12 +47,6 @@ export default {
       alert('unfollow group')
     },
   },
-  computed: {
-    status(state) {
-      console.log(state)
-      // if (scope === 'hidden') return 'danger'
-      return 'inverse'
-    },
-  },
+  computed: {},
 }
 </script>
