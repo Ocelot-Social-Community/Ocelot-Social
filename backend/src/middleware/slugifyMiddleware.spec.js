@@ -6,7 +6,6 @@ import { createGroupMutation } from '../db/graphql/groups'
 import { createPostMutation } from '../db/graphql/posts'
 import { signupVerificationMutation } from '../db/graphql/authentications'
 
-let mutate
 let authenticatedUser
 let variables
 
@@ -15,19 +14,20 @@ const neode = getNeode()
 const descriptionAdditional100 =
   ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 
+const { server } = createServer({
+  context: () => {
+    return {
+      driver,
+      neode,
+      user: authenticatedUser,
+    }
+  },
+})
+
+const { mutate } = createTestClient(server)
+
 beforeAll(async () => {
   await cleanDatabase()
-
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-      }
-    },
-  })
-  mutate = createTestClient(server).mutate
 })
 
 afterAll(async () => {

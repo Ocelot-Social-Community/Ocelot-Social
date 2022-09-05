@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import CONFIG from './../../config'
 import Factory, { cleanDatabase } from '../../db/factories'
 import { gql } from '../../helpers/jest'
+import { loginMutation } from '../../db/graphql/userManagement'
 import { createTestClient } from 'apollo-server-testing'
 import createServer, { context } from '../../server'
 import encode from '../../jwt/encode'
@@ -177,12 +178,6 @@ describe('currentUser', () => {
 })
 
 describe('login', () => {
-  const loginMutation = gql`
-    mutation ($email: String!, $password: String!) {
-      login(email: $email, password: $password)
-    }
-  `
-
   const respondsWith = async (expected) => {
     await expect(mutate({ mutation: loginMutation, variables })).resolves.toMatchObject(expected)
   }
@@ -310,8 +305,8 @@ describe('change password', () => {
   })
 
   describe('unauthenticated', () => {
-    it('throws "Not Authorised!"', async () => {
-      await respondsWith({ errors: [{ message: 'Not Authorised!' }] })
+    it('throws "Not Authorized!"', async () => {
+      await respondsWith({ errors: [{ message: 'Not Authorized!' }] })
     })
   })
 

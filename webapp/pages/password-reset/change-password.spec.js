@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils'
-import changePassword from './change-password.vue'
+import changePassword from './change-password'
 
 const localVue = global.localVue
 
-describe('enter-nonce.vue', () => {
+describe('change-password', () => {
   let wrapper
   let mocks
 

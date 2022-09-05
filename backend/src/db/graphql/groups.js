@@ -39,6 +39,28 @@ export const createGroupMutation = gql`
   }
 `
 
+export const joinGroupMutation = gql`
+  mutation ($groupId: ID!, $userId: ID!) {
+    JoinGroup(groupId: $groupId, userId: $userId) {
+      id
+      name
+      slug
+      myRoleInGroup
+    }
+  }
+`
+
+export const changeGroupMemberRoleMutation = gql`
+  mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
+    ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
+      id
+      name
+      slug
+      myRoleInGroup
+    }
+  }
+`
+
 // ------ queries
 
 export const groupQuery = gql`
@@ -90,6 +112,17 @@ export const groupQuery = gql`
         name
         icon
       }
+    }
+  }
+`
+
+export const groupMembersQuery = gql`
+  query ($id: ID!, $first: Int, $offset: Int, $orderBy: [_UserOrdering], $filter: _UserFilter) {
+    GroupMembers(id: $id, first: $first, offset: $offset, orderBy: $orderBy, filter: $filter) {
+      id
+      name
+      slug
+      myRoleInGroup
     }
   }
 `

@@ -46,15 +46,36 @@ export default {
         session.close()
       }
     },
+    GroupMembers: async (_object, params, context, _resolveInfo) => {
+      const { id: groupId } = params
+      const session = context.driver.session()
+      const readTxResultPromise = session.readTransaction(async (txc) => {
+        const groupMemberCypher = `
+          MATCH (user:User)-[membership:MEMBER_OF]->(:Group {id: $groupId})
+          RETURN user {.*, myRoleInGroup: membership.role}
+        `
+        const result = await txc.run(groupMemberCypher, {
+          groupId,
+        })
+        return result.records.map((record) => record.get('user'))
+      })
+      try {
+        return await readTxResultPromise
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
   },
   Mutation: {
     CreateGroup: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds } = params
       delete params.categoryIds
-      if (!categoryIds || categoryIds.length < CATEGORIES_MIN) {
+      if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
         throw new UserInputError('Too view categories!')
       }
-      if (categoryIds && categoryIds.length > CATEGORIES_MAX) {
+      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
         throw new UserInputError('Too many categories!')
       }
       if (
@@ -86,25 +107,82 @@ export default {
             MATCH (owner:User {id: $userId})
             MERGE (owner)-[:CREATED]->(group)
             MERGE (owner)-[membership:MEMBER_OF]->(group)
-            SET membership.createdAt = toString(datetime())
-            SET membership.updatedAt = toString(datetime())
-            SET membership.role = 'owner'
+            SET
+              membership.createdAt = toString(datetime()),
+              membership.updatedAt = null,
+              membership.role = 'owner'
             ${categoriesCypher}
             RETURN group {.*, myRole: membership.role}
           `,
           { userId: context.user.id, categoryIds, params },
         )
-        const [group] = ownerCreateGroupTransactionResponse.records.map((record) =>
+        const [group] = await ownerCreateGroupTransactionResponse.records.map((record) =>
           record.get('group'),
         )
         return group
       })
       try {
-        const group = await writeTxResultPromise
-        return group
+        return await writeTxResultPromise
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
           throw new UserInputError('Group with this slug already exists!')
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    JoinGroup: async (_parent, params, context, _resolveInfo) => {
+      const { groupId, userId } = params
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const joinGroupCypher = `
+          MATCH (member:User {id: $userId}), (group:Group {id: $groupId})
+          MERGE (member)-[membership:MEMBER_OF]->(group)
+          ON CREATE SET
+            membership.createdAt = toString(datetime()),
+            membership.updatedAt = null,
+            membership.role =
+              CASE WHEN group.groupType = 'public'
+                THEN 'usual'
+                ELSE 'pending'
+                END
+          RETURN member {.*, myRoleInGroup: membership.role}
+        `
+        const result = await transaction.run(joinGroupCypher, { groupId, userId })
+        const [member] = await result.records.map((record) => record.get('member'))
+        return member
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    ChangeGroupMemberRole: async (_parent, params, context, _resolveInfo) => {
+      const { groupId, userId, roleInGroup } = params
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const joinGroupCypher = `
+          MATCH (member:User {id: $userId}), (group:Group {id: $groupId})
+          MERGE (member)-[membership:MEMBER_OF]->(group)
+          ON CREATE SET
+            membership.createdAt = toString(datetime()),
+            membership.updatedAt = null,
+            membership.role = $roleInGroup
+          ON MATCH SET
+            membership.updatedAt = toString(datetime()),
+            membership.role = $roleInGroup
+          RETURN member {.*, myRoleInGroup: membership.role}
+        `
+        const result = await transaction.run(joinGroupCypher, { groupId, userId, roleInGroup })
+        const [member] = await result.records.map((record) => record.get('member'))
+        return member
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
         throw new Error(error)
       } finally {
         session.close()
