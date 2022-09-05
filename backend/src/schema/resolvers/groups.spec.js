@@ -329,6 +329,42 @@ describe('in mode', () => {
                 errors: undefined,
               })
             })
+
+            describe('categories', () => {
+              beforeEach(() => {
+                CONFIG.CATEGORIES_ACTIVE = true
+              })
+
+              it('has set categories', async () => {
+                await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject({
+                  data: {
+                    Group: expect.arrayContaining([
+                      expect.objectContaining({
+                        id: 'my-group',
+                        slug: 'the-best-group',
+                        categories: expect.arrayContaining([
+                          expect.objectContaining({ id: 'cat4' }),
+                          expect.objectContaining({ id: 'cat9' }),
+                          expect.objectContaining({ id: 'cat15' }),
+                        ]),
+                        myRole: 'owner',
+                      }),
+                      expect.objectContaining({
+                        id: 'others-group',
+                        slug: 'uninteresting-group',
+                        categories: expect.arrayContaining([
+                          expect.objectContaining({ id: 'cat4' }),
+                          expect.objectContaining({ id: 'cat9' }),
+                          expect.objectContaining({ id: 'cat15' }),
+                        ]),
+                        myRole: null,
+                      }),
+                    ]),
+                  },
+                  errors: undefined,
+                })
+              })
+            })
           })
 
           describe("id = 'my-group'", () => {

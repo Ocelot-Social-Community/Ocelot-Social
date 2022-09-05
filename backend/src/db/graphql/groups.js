@@ -163,12 +163,13 @@ export const groupQuery = gql`
       actionRadius
       myRole
       categories {
-        # test this as result
         id
         slug
         name
         icon
       }
+      # avatar # test this as result
+      # locationName # test this as result
     }
   }
 `
