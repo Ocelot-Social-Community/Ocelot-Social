@@ -286,7 +286,6 @@ export default {
           { id },
         )
       })
-
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const saveCategorySettingsResponse = await transaction.run(
           `
