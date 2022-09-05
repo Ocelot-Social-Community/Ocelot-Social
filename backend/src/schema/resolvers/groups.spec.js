@@ -166,7 +166,7 @@ describe('in mode', () => {
         describe('description', () => {
           describe('length without HTML', () => {
             describe('less then 100 chars', () => {
-              it('throws error: "Too view categories!"', async () => {
+              it('throws error: "Description too short!"', async () => {
                 const { errors } = await mutate({
                   mutation: createGroupMutation,
                   variables: {
@@ -2211,7 +2211,7 @@ describe('in mode', () => {
             describe('description', () => {
               describe('length without HTML', () => {
                 describe('less then 100 chars', () => {
-                  it('throws error: "Too view categories!"', async () => {
+                  it('throws error: "Description too short!"', async () => {
                     const { errors } = await mutate({
                       mutation: updateGroupMutation,
                       variables: {

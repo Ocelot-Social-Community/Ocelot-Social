@@ -37,7 +37,6 @@ export const createGroupMutation = gql`
       groupType
       actionRadius
       categories {
-        # test this as result
         id
         slug
         name
@@ -84,7 +83,6 @@ export const updateGroupMutation = gql`
       groupType
       actionRadius
       categories {
-        # test this as result
         id
         slug
         name
