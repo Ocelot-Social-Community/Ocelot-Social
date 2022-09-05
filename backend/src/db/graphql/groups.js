@@ -12,6 +12,7 @@ export const createGroupMutation = gql`
     $groupType: GroupType!
     $actionRadius: GroupActionRadius!
     $categoryIds: [ID]
+    $locationName: String
   ) {
     CreateGroup(
       id: $id
@@ -22,6 +23,7 @@ export const createGroupMutation = gql`
       groupType: $groupType
       actionRadius: $actionRadius
       categoryIds: $categoryIds
+      locationName: $locationName
     ) {
       id
       name
@@ -34,7 +36,83 @@ export const createGroupMutation = gql`
       description
       groupType
       actionRadius
+      categories {
+        id
+        slug
+        name
+        icon
+      }
+      # locationName # test this as result
       myRole
+    }
+  }
+`
+
+export const updateGroupMutation = gql`
+  mutation (
+    $id: ID!
+    $name: String
+    $slug: String
+    $about: String
+    $description: String
+    $actionRadius: GroupActionRadius
+    $categoryIds: [ID]
+    $avatar: ImageInput
+    $locationName: String
+  ) {
+    UpdateGroup(
+      id: $id
+      name: $name
+      slug: $slug
+      about: $about
+      description: $description
+      actionRadius: $actionRadius
+      categoryIds: $categoryIds
+      avatar: $avatar
+      locationName: $locationName
+    ) {
+      id
+      name
+      slug
+      createdAt
+      updatedAt
+      disabled
+      deleted
+      about
+      description
+      groupType
+      actionRadius
+      categories {
+        id
+        slug
+        name
+        icon
+      }
+      # avatar # test this as result
+      # locationName # test this as result
+      myRole
+    }
+  }
+`
+
+export const joinGroupMutation = gql`
+  mutation ($groupId: ID!, $userId: ID!) {
+    JoinGroup(groupId: $groupId, userId: $userId) {
+      id
+      name
+      slug
+      myRoleInGroup
+    }
+  }
+`
+
+export const changeGroupMemberRoleMutation = gql`
+  mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
+    ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
+      id
+      name
+      slug
+      myRoleInGroup
     }
   }
 `
@@ -90,6 +168,19 @@ export const groupQuery = gql`
         name
         icon
       }
+      # avatar # test this as result
+      # locationName # test this as result
+    }
+  }
+`
+
+export const groupMembersQuery = gql`
+  query ($id: ID!, $first: Int, $offset: Int, $orderBy: [_UserOrdering], $filter: _UserFilter) {
+    GroupMembers(id: $id, first: $first, offset: $offset, orderBy: $orderBy, filter: $filter) {
+      id
+      name
+      slug
+      myRoleInGroup
     }
   }
 `

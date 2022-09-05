@@ -114,6 +114,8 @@ type User {
   badgesCount: Int! @cypher(statement: "MATCH (this)<-[:REWARDED]-(r:Badge) RETURN COUNT(r)")
 
   emotions: [EMOTED]
+
+  myRoleInGroup: GroupMemberRole
 }
 
 

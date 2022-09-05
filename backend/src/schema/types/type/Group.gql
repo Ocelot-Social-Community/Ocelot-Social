@@ -59,7 +59,7 @@ input _GroupFilter {
 
 type Query {
   Group(
-    isMember: Boolean # if 'undefined' or 'null' then all groups
+    isMember: Boolean # if 'undefined' or 'null' then get all groups
     id: ID
     name: String
     slug: String
@@ -67,18 +67,28 @@ type Query {
     updatedAt: String
     about: String
     description: String
+    # groupType: GroupType # test this
+    # actionRadius: GroupActionRadius # test this
+    # avatar: ImageInput # test this
     locationName: String
     first: Int
     offset: Int
     orderBy: [_GroupOrdering]
-    filter: _GroupFilter
   ): [Group]
 
-  AvailableGroupTypes: [GroupType]!
+  GroupMembers(
+    id: ID!
+    first: Int
+    offset: Int
+    orderBy: [_UserOrdering]
+    filter: _UserFilter
+  ): [User]
 
-  AvailableGroupActionRadii: [GroupActionRadius]!
+  # AvailableGroupTypes: [GroupType]!
 
-  AvailableGroupMemberRoles: [GroupMemberRole]!
+  # AvailableGroupActionRadii: [GroupActionRadius]!
+
+  # AvailableGroupMemberRoles: [GroupMemberRole]!
 }
 
 type Mutation {
@@ -86,24 +96,38 @@ type Mutation {
     id: ID
     name: String!
     slug: String
-    avatar: ImageInput
     about: String
     description: String!
     groupType: GroupType!
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
-    locationName: String
+    # avatar: ImageInput # a group can not be created with an avatar
+    locationName: String # test this as result
   ): Group
 
   UpdateGroup(
     id: ID!
     name: String
     slug: String
-    avatar: ImageInput
-    locationName: String
     about: String
     description: String
+    # groupType: GroupType # is not possible at the moment and has to be discussed. may be in the stronger direction: public → closed → hidden
+    actionRadius: GroupActionRadius
+    categoryIds: [ID]
+    avatar: ImageInput # test this as result
+    locationName: String # test this as result
   ): Group
 
-  DeleteGroup(id: ID!): Group
+  # DeleteGroup(id: ID!): Group
+
+  JoinGroup(
+    groupId: ID!
+    userId: ID!
+  ): User
+
+  ChangeGroupMemberRole(
+    groupId: ID!
+    userId: ID!
+    roleInGroup: GroupMemberRole!
+  ): User
 }
