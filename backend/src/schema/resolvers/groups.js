@@ -5,6 +5,7 @@ import { CATEGORIES_MIN, CATEGORIES_MAX } from '../../constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
 import { removeHtmlTags } from '../../middleware/helpers/cleanHtml.js'
 import Resolver from './helpers/Resolver'
+import { mergeImage } from './images/images'
 
 export default {
   Query: {
@@ -135,7 +136,7 @@ export default {
     UpdateGroup: async (_parent, params, context, _resolveInfo) => {
       // Wolle: console.log('UpdateGroup !!!')
       const { categoryIds } = params
-      const { id: groupId } = params
+      const { id: groupId, avatar: avatarInput } = params
       // Wolle: console.log('categoryIds: ', categoryIds)
       // Wolle: console.log('groupId: ', groupId)
       delete params.categoryIds
@@ -191,6 +192,9 @@ export default {
           params,
         })
         const [group] = await transactionResponse.records.map((record) => record.get('group'))
+        if (avatarInput) {
+          await mergeImage(group, 'AVATAR_IMAGE', avatarInput, { transaction })
+        }
         return group
       })
       try {

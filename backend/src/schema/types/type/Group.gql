@@ -101,7 +101,7 @@ type Mutation {
     groupType: GroupType!
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
-    avatar: ImageInput # test this as result
+    # avatar: ImageInput # a group can not be created with an avatar
     locationName: String # test this as result
   ): Group
 

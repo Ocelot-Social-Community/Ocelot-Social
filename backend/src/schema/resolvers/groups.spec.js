@@ -17,6 +17,7 @@ const neode = getNeode()
 
 let authenticatedUser
 let user
+// Wolle: let groupAvartar
 
 const categoryIds = ['cat9', 'cat4', 'cat15']
 const descriptionAdditional100 =
@@ -73,6 +74,9 @@ const seedBasicsAndClearAuthentication = async () => {
       icon: 'paw',
     }),
   ])
+  // Wolle: groupAvartar = await Factory.build('image', {
+  //   url: 'https://s3.amazonaws.com/uifaces/faces/twitter/jimmuirhead/128.jpg',
+  // })
   authenticatedUser = null
 }
 
@@ -107,7 +111,6 @@ describe('in mode', () => {
           groupType: 'public',
           actionRadius: 'regional',
           categoryIds,
-          // avatar, // test this as result
           // locationName, // test this as result
         }
       })
@@ -132,6 +135,9 @@ describe('in mode', () => {
                   name: 'The Best Group',
                   slug: 'the-group',
                   about: 'We will change the world!',
+                  description: 'Some description' + descriptionAdditional100,
+                  groupType: 'public',
+                  actionRadius: 'regional',
                 },
               },
               errors: undefined,

@@ -12,7 +12,6 @@ export const createGroupMutation = gql`
     $groupType: GroupType!
     $actionRadius: GroupActionRadius!
     $categoryIds: [ID]
-    $avatar: ImageInput
     $locationName: String
   ) {
     CreateGroup(
@@ -24,7 +23,6 @@ export const createGroupMutation = gql`
       groupType: $groupType
       actionRadius: $actionRadius
       categoryIds: $categoryIds
-      avatar: $avatar
       locationName: $locationName
     ) {
       id
@@ -45,7 +43,6 @@ export const createGroupMutation = gql`
         name
         icon
       }
-      # avatar # test this as result
       # locationName # test this as result
       myRole
     }
@@ -68,11 +65,11 @@ export const updateGroupMutation = gql`
       id: $id
       name: $name
       slug: $slug
-      avatar: $avatar
       about: $about
       description: $description
       actionRadius: $actionRadius
       categoryIds: $categoryIds
+      avatar: $avatar
       locationName: $locationName
     ) {
       id
