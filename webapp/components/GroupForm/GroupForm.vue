@@ -18,9 +18,15 @@
           icon="user"
           v-model="formData.status"
           label="Sichtbarkeit"
-          :options="['offen', 'geschlossen', 'geheim']"
+          :options="['public', 'close', 'hidden']"
           placeholder="Status ..."
         ></ds-select>
+
+        <ds-input
+          v-model="formData.about"
+          label="Kurzbeschreibung"
+          rows="3"
+        ></ds-input>
 
         <ds-input
           v-model="formData.description"
@@ -28,6 +34,14 @@
           type="textarea"
           rows="3"
         ></ds-input>
+
+        <ds-select
+          icon="card"
+          v-model="formData.radius"
+          label="Radius"
+          :options="['local', 'regional', 'global']"
+          placeholder="Radius ..."
+        ></ds-select>
 
         <categories-select
           v-if="categoriesActive"
@@ -72,20 +86,24 @@ export default {
     },
   },
   data() {
-    const { name, status, description, categories } = this.group
+    const { name, status, about, description, radius, categories } = this.group
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
       formData: {
         name: name || '',
         status: status || '',
+        about: about || '',
         description: description || '',
+        radius: radius || '',
         categoryIds: categories ? categories.map((category) => category.id) : [],
       },
       formSchema: {
         name: { required: true, min: 3, max: 100 },
-        description: { required: true },
         status: { required: true },
+        about: { required: true },
+        description: { required: true },
+        radius: { required: true },
         categoryIds: {
           type: 'array',
           required: this.categoriesActive,

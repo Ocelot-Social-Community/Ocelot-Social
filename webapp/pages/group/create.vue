@@ -28,17 +28,19 @@ export default {
   },
   methods: {
     async createGroup(form) {
+      console.log("createGroup", form)
+      console.log("createGroup form.categoryIds", form.categoryIds)
+      console.log("createGroup form.radius", form.radius)
       try {
         await this.$apollo.mutate({
           mutation: createGroupMutation,
           variables: {
-            name: 'Gruppenname',
-            about: 'About',
-            description:
-              'Description Description Description Description Description Description Description Description Description Description Description Description ',
-            groupType: 'public',
-            actionRadius: 'regional',
-            categoryIds: ['cat15', 'cat5', 'cat1'],
+            name: form.name,
+            about: form.about,
+            description: form.description,
+            groupType: form.status,
+            actionRadius: form.radius,
+            categoryIds: form.formData.categoryIds,
           },
           update: (_, { data: { createGroupData } }) => {
             // const { sendNotificationEmails } = createGroup
