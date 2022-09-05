@@ -55,12 +55,9 @@ const isMySocialMedia = rule({
 const isAllowedToChangeGroupSettings = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  // Wolle: console.log('isAllowedToChangeGroupSettings !!!')
   if (!(user && user.id)) return false
   const ownerId = user.id
   const { id: groupId } = args
-  // Wolle: console.log('ownerId: ', ownerId)
-  // Wolle: console.log('groupId: ', groupId)
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
@@ -77,8 +74,6 @@ const isAllowedToChangeGroupSettings = rule({
   })
   try {
     const { owner, group } = await readTxPromise
-    // Wolle: console.log('owner: ', owner)
-    // Wolle: console.log('group: ', group)
     return !!group && !!owner && ['owner'].includes(owner.myRoleInGroup)
   } catch (error) {
     throw new Error(error)

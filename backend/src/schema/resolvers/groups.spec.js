@@ -17,7 +17,6 @@ const neode = getNeode()
 
 let authenticatedUser
 let user
-// Wolle: let groupAvartar
 
 const categoryIds = ['cat9', 'cat4', 'cat15']
 const descriptionAdditional100 =
@@ -74,9 +73,6 @@ const seedBasicsAndClearAuthentication = async () => {
       icon: 'paw',
     }),
   ])
-  // Wolle: groupAvartar = await Factory.build('image', {
-  //   url: 'https://s3.amazonaws.com/uifaces/faces/twitter/jimmuirhead/128.jpg',
-  // })
   authenticatedUser = null
 }
 

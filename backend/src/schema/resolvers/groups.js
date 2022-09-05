@@ -134,11 +134,8 @@ export default {
       }
     },
     UpdateGroup: async (_parent, params, context, _resolveInfo) => {
-      // Wolle: console.log('UpdateGroup !!!')
       const { categoryIds } = params
       const { id: groupId, avatar: avatarInput } = params
-      // Wolle: console.log('categoryIds: ', categoryIds)
-      // Wolle: console.log('groupId: ', groupId)
       delete params.categoryIds
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds) {
         if (categoryIds.length < CATEGORIES_MIN) {
@@ -184,7 +181,6 @@ export default {
           OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
           RETURN group {.*, myRole: membership.role}
         `
-        // Wolle: console.log('updateGroupCypher: ', updateGroupCypher)
         const transactionResponse = await transaction.run(updateGroupCypher, {
           groupId,
           userId: context.user.id,
