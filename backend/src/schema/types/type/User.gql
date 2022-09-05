@@ -220,4 +220,6 @@ type Mutation {
   unblockUser(id: ID!): User
 
   switchUserRole(role: UserRole!, id: ID!): User
+
+  saveCategorySettings(activeCategories: [String]): Boolean
 }
