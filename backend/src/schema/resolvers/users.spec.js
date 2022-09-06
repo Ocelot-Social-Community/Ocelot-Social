@@ -553,7 +553,7 @@ describe('switch user role', () => {
 })
 
 describe('save category settings', () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     await Promise.all(
       categories.map(({ icon, name }, index) => {
         Factory.build('category', {
@@ -599,6 +599,16 @@ describe('save category settings', () => {
       authenticatedUser = await user.toJson()
     })
 
+    const userQuery = gql`
+      query ($id: ID) {
+        User(id: $id) {
+          activeCategories {
+            id
+          }
+        }
+      }
+    `
+
     describe('no categories saved', () => {
       it('returns true for active categories mutation', async () => {
         await expect(mutate({ mutation: saveCategorySettings, variables })).resolves.toEqual(
@@ -613,17 +623,7 @@ describe('save category settings', () => {
           await mutate({ mutation: saveCategorySettings, variables })
         })
 
-        it.skip('returns the active categories when user is queried', async () => {
-          const userQuery = gql`
-            query ($id: ID) {
-              User(id: $id) {
-                activeCategories {
-                  id
-                }
-              }
-            }
-          `
-
+        it('returns the active categories when user is queried', async () => {
           await expect(
             query({ query: userQuery, variables: { id: authenticatedUser.id } }),
           ).resolves.toEqual(
@@ -635,6 +635,54 @@ describe('save category settings', () => {
                       { id: 'cat1' },
                       { id: 'cat3' },
                       { id: 'cat5' },
+                    ]),
+                  },
+                ],
+              },
+            }),
+          )
+        })
+      })
+    })
+
+    describe('categories already saved', () => {
+      beforeEach(async () => {
+        variables = {
+          activeCategories: ['cat1', 'cat3', 'cat5'],
+        }
+        await mutate({ mutation: saveCategorySettings, variables })
+        variables = {
+          activeCategories: ['cat10', 'cat11', 'cat12', 'cat8', 'cat9'],
+        }
+      })
+
+      it('returns true', async () => {
+        await expect(mutate({ mutation: saveCategorySettings, variables })).resolves.toEqual(
+          expect.objectContaining({
+            data: { saveCategorySettings: true },
+          }),
+        )
+      })
+
+      describe('query for user', () => {
+        beforeEach(async () => {
+          await mutate({ mutation: saveCategorySettings, variables })
+        })
+
+        it('returns the new active categories when user is queried', async () => {
+          await expect(
+            query({ query: userQuery, variables: { id: authenticatedUser.id } }),
+          ).resolves.toEqual(
+            expect.objectContaining({
+              data: {
+                User: [
+                  {
+                    activeCategories: expect.arrayContaining([
+                      { id: 'cat10' },
+                      { id: 'cat11' },
+                      { id: 'cat12' },
+                      { id: 'cat8' },
+                      { id: 'cat9' },
                     ]),
                   },
                 ],
