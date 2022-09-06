@@ -363,7 +363,11 @@
         "label": "Oldest first"
       }
     },
-    "order-by": "Order by ..."
+    "order-by": "Order by ...",
+    "save": {
+      "error": "Failed saving topic settings",
+      "success": "Topics saved!"
+    }
   },
   "followButton": {
     "follow": "Follow",
