@@ -2218,7 +2218,7 @@ describe('in mode', () => {
                   mutation: updateGroupMutation,
                   variables: {
                     id: 'my-group',
-                    name: 'The New Group For Our Coutry',
+                    name: 'The New Group For Our Country',
                     about: 'We will change the land!',
                     description: 'Some country relevant description' + descriptionAdditional100,
                     actionRadius: 'national',
@@ -2230,8 +2230,8 @@ describe('in mode', () => {
                 data: {
                   UpdateGroup: {
                     id: 'my-group',
-                    name: 'The New Group For Our Coutry',
-                    slug: 'the-new-group-for-our-coutry', // changing the slug is tested in the slugifyMiddleware
+                    name: 'The New Group For Our Country',
+                    slug: 'the-new-group-for-our-country', // changing the slug is tested in the slugifyMiddleware
                     about: 'We will change the land!',
                     description: 'Some country relevant description' + descriptionAdditional100,
                     actionRadius: 'national',
@@ -2331,7 +2331,7 @@ describe('in mode', () => {
                 mutation: updateGroupMutation,
                 variables: {
                   id: 'my-group',
-                  name: 'The New Group For Our Coutry',
+                  name: 'The New Group For Our Country',
                   about: 'We will change the land!',
                   description: 'Some country relevant description' + descriptionAdditional100,
                   actionRadius: 'national',
