@@ -370,7 +370,7 @@
     "following": "Folge Ich"
   },
   "group": {
-    "newGroup":"Erstelle eine neue Gruppe"
+    "newGroup": "Erstelle eine neue Gruppe"
   },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",
@@ -720,6 +720,9 @@
         }
       }
     },
+    "groups": {
+      "name": "Meine Gruppen"
+    },
     "invites": {
       "name": "Einladungen"
     },
@@ -743,9 +746,6 @@
       "name": "Stummgeschaltete Benutzer",
       "unmute": "Stummschaltung aufheben",
       "unmuted": "{name} ist nicht mehr stummgeschaltet"
-    },
-    "groups": {
-      "name":"Meine Gruppen"
     },
     "name": "Einstellungen",
     "notifications": {

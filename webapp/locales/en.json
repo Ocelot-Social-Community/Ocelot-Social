@@ -370,7 +370,7 @@
     "following": "Following"
   },
   "group": {
-    "newGroup":"Create a new Group"
+    "newGroup": "Create a new Group"
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",
@@ -720,6 +720,9 @@
         }
       }
     },
+    "groups": {
+      "name": "My Groups"
+    },
     "invites": {
       "name": "Invites"
     },
@@ -743,9 +746,6 @@
       "name": "Muted users",
       "unmute": "Unmute user",
       "unmuted": "{name} is unmuted again"
-    },
-    "groups": {
-      "name":"My Groups"
     },
     "name": "Settings",
     "notifications": {
