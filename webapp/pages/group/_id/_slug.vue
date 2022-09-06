@@ -7,7 +7,7 @@
           :class="{ 'disabled-content': group.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
-          <avatar-uploader v-if="isGroupOwner" :profile="group">
+          <avatar-uploader v-if="isGroupOwner" :profile="group" :updateMutation="updateGroupMutation">
             <profile-avatar :profile="group" class="profile-page-avatar" size="large" />
           </avatar-uploader>
           <profile-avatar v-else :profile="group" class="profile-page-avatar" size="large" />
@@ -187,6 +187,7 @@ import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { groupQuery } from '~/graphql/groups'
+import { updateGroupMutation } from '~/graphql/groups.js'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 import UpdateQuery from '~/components/utils/UpdateQuery'
@@ -236,6 +237,7 @@ export default {
       followedByCountStartValue: 0,
       followedByCount: 7,
       followingCount: 7,
+      updateGroupMutation,
     }
   },
   computed: {
@@ -413,7 +415,7 @@ export default {
     // },
     Group: {
       query() {
-        // Wolle: return groupQuery(this.$i18n) // language will be needed for lacations
+        // Wolle: return groupQuery(this.$i18n) // language will be needed for locations
         return groupQuery
       },
       variables() {

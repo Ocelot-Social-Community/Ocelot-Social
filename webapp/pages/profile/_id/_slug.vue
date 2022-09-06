@@ -7,7 +7,7 @@
           :class="{ 'disabled-content': user.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
-          <avatar-uploader v-if="myProfile" :profile="user">
+          <avatar-uploader v-if="myProfile" :profile="user" :updateMutation="updateUserMutation">
             <profile-avatar :profile="user" class="profile-page-avatar" size="large" />
           </avatar-uploader>
           <profile-avatar v-else :profile="user" class="profile-page-avatar" size="large" />
@@ -185,6 +185,7 @@ import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import UserQuery from '~/graphql/User'
+import { updateUserMutation } from '~/graphql/User.js'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 import UpdateQuery from '~/components/utils/UpdateQuery'
@@ -232,6 +233,7 @@ export default {
       followedByCountStartValue: 0,
       followedByCount: 7,
       followingCount: 7,
+      updateUserMutation: updateUserMutation(),
     }
   },
   computed: {

@@ -21,7 +21,6 @@
 </template>
 <script>
 import vueDropzone from 'nuxt-dropzone'
-import { updateUserMutation } from '~/graphql/User.js'
 
 export default {
   name: 'AvatarUploader',
@@ -29,7 +28,8 @@ export default {
     vueDropzone,
   },
   props: {
-    profile: { type: Object, default: null },
+    profile: { type: Object, required: true },
+    updateMutation: { type: Object, required: true },
   },
   data() {
     return {
@@ -69,7 +69,7 @@ export default {
       const avatarUpload = file[0]
       this.$apollo
         .mutate({
-          mutation: updateUserMutation(),
+          mutation: this.updateMutation,
           variables: {
             avatar: {
               upload: avatarUpload,

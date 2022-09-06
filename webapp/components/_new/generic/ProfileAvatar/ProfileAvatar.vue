@@ -1,7 +1,7 @@
 <template>
   <div :class="['profile-avatar', size && `--${this.size}`, !isAvatar && '--no-image']">
     <!-- '--no-image' is neccessary, because otherwise we still have a little unwanted boarder araund the image for images with white backgrounds -->
-    <span class="initials">{{ userInitials }}</span>
+    <span class="initials">{{ profileInitials }}</span>
     <base-icon v-if="isAnonymous" name="eye-slash" />
     <img
       v-if="isAvatar"
@@ -38,7 +38,7 @@ export default {
       // TODO may we could test as well if the image is reachable? otherwise the background gets white and the initails can not be read
       return this.profile && this.profile.avatar
     },
-    userInitials() {
+    profileInitials() {
       if (this.isAnonymous) return ''
 
       return this.profile.name.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
