@@ -16,6 +16,13 @@
               <base-button icon="bars" @click="toggleMobileMenuView" circle />
             </ds-flex-item>
             <ds-flex-item
+              v-if="categoriesActive && isLoggedIn"
+              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+              style="flex-grow: 0; flex-basis: auto"
+            >
+              <categories-menu></categories-menu>
+            </ds-flex-item>
+            <ds-flex-item
               :width="{ base: '45%', sm: '45%', md: '45%', lg: '50%' }"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
               style="flex-shrink: 0; flex-grow: 1"
@@ -90,6 +97,7 @@ import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import PageFooter from '~/components/PageFooter/PageFooter'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import InviteButton from '~/components/InviteButton/InviteButton'
+import CategoriesMenu from '~/components/FilterMenu/CategoriesMenu.vue'
 
 export default {
   components: {
@@ -102,6 +110,7 @@ export default {
     FilterMenu,
     PageFooter,
     InviteButton,
+    CategoriesMenu,
   },
   mixins: [seo],
   data() {
@@ -109,6 +118,7 @@ export default {
       mobileSearchVisible: false,
       toggleMobileMenu: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
+      categoriesActive: this.$env.CATEGORIES_ACTIVE,
     }
   },
   computed: {
