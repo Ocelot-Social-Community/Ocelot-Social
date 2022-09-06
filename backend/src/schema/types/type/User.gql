@@ -114,6 +114,14 @@ type User {
   badgesCount: Int! @cypher(statement: "MATCH (this)<-[:REWARDED]-(r:Badge) RETURN COUNT(r)")
 
   emotions: [EMOTED]
+
+  activeCategories: [Category] @cypher(
+  statement: """
+  MATCH (category:Category)
+  WHERE NOT ((this)-[:NOT_INTERESTED_IN]->(category))
+  RETURN category
+  """
+  )
 }
 
 
@@ -220,4 +228,6 @@ type Mutation {
   unblockUser(id: ID!): User
 
   switchUserRole(role: UserRole!, id: ID!): User
+
+  saveCategorySettings(activeCategories: [String]): Boolean
 }
