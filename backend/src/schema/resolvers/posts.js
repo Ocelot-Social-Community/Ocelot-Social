@@ -131,11 +131,11 @@ export default {
       delete params.image
       const session = context.driver.session()
       let updatePostCypher = `
-                                MATCH (post:Post {id: $params.id})
-                                SET post += $params
-                                SET post.updatedAt = toString(datetime())
-                                WITH post
-                              `
+        MATCH (post:Post {id: $params.id})
+        SET post += $params
+        SET post.updatedAt = toString(datetime())
+        WITH post
+      `
 
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
         const cypherDeletePreviousRelations = `

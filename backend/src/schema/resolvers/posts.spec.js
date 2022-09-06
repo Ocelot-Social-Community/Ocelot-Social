@@ -368,7 +368,7 @@ describe('UpdatePost', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
-      expect(mutate({ mutation: updatePostMutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: updatePostMutation, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
         data: { UpdatePost: null },
       })

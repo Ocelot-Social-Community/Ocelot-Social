@@ -52,6 +52,36 @@ const isMySocialMedia = rule({
   return socialMedia.ownedBy.node.id === user.id
 })
 
+const isAllowedToChangeGroupSettings = rule({
+  cache: 'no_cache',
+})(async (_parent, args, { user, driver }) => {
+  if (!(user && user.id)) return false
+  const ownerId = user.id
+  const { id: groupId } = args
+  const session = driver.session()
+  const readTxPromise = session.readTransaction(async (transaction) => {
+    const transactionResponse = await transaction.run(
+      `
+        MATCH (owner:User {id: $ownerId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
+        RETURN group {.*}, owner {.*, myRoleInGroup: membership.role}
+      `,
+      { groupId, ownerId },
+    )
+    return {
+      owner: transactionResponse.records.map((record) => record.get('owner'))[0],
+      group: transactionResponse.records.map((record) => record.get('group'))[0],
+    }
+  })
+  try {
+    const { owner, group } = await readTxPromise
+    return !!group && !!owner && ['owner'].includes(owner.myRoleInGroup)
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+})
+
 const isAllowedSeeingMembersOfGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
@@ -252,6 +282,7 @@ export default shield(
       SignupVerification: allow,
       UpdateUser: onlyYourself,
       CreateGroup: isAuthenticated,
+      UpdateGroup: isAllowedToChangeGroupSettings,
       JoinGroup: isAllowedToJoinGroup,
       ChangeGroupMemberRole: isAllowedToChangeGroupMemberRole,
       CreatePost: isAuthenticated,

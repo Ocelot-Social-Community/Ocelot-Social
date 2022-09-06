@@ -2,6 +2,7 @@ import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../../db/factories'
 import {
   createGroupMutation,
+  updateGroupMutation,
   joinGroupMutation,
   changeGroupMemberRoleMutation,
   groupMembersQuery,
@@ -106,6 +107,7 @@ describe('in mode', () => {
           groupType: 'public',
           actionRadius: 'regional',
           categoryIds,
+          // locationName, // test this as result
         }
       })
 
@@ -129,6 +131,9 @@ describe('in mode', () => {
                   name: 'The Best Group',
                   slug: 'the-group',
                   about: 'We will change the world!',
+                  description: 'Some description' + descriptionAdditional100,
+                  groupType: 'public',
+                  actionRadius: 'regional',
                 },
               },
               errors: undefined,
@@ -161,7 +166,7 @@ describe('in mode', () => {
         describe('description', () => {
           describe('length without HTML', () => {
             describe('less then 100 chars', () => {
-              it('throws error: "Too view categories!"', async () => {
+              it('throws error: "Description too short!"', async () => {
                 const { errors } = await mutate({
                   mutation: createGroupMutation,
                   variables: {
@@ -182,13 +187,50 @@ describe('in mode', () => {
             CONFIG.CATEGORIES_ACTIVE = true
           })
 
-          describe('not even one', () => {
-            it('throws error: "Too view categories!"', async () => {
-              const { errors } = await mutate({
-                mutation: createGroupMutation,
-                variables: { ...variables, categoryIds: null },
+          describe('with matching amount of categories', () => {
+            it('has new categories', async () => {
+              await expect(
+                mutate({
+                  mutation: createGroupMutation,
+                  variables: {
+                    ...variables,
+                    categoryIds: ['cat4', 'cat27'],
+                  },
+                }),
+              ).resolves.toMatchObject({
+                data: {
+                  CreateGroup: {
+                    categories: expect.arrayContaining([
+                      expect.objectContaining({ id: 'cat4' }),
+                      expect.objectContaining({ id: 'cat27' }),
+                    ]),
+                    myRole: 'owner',
+                  },
+                },
+                errors: undefined,
               })
-              expect(errors[0]).toHaveProperty('message', 'Too view categories!')
+            })
+          })
+
+          describe('not even one', () => {
+            describe('by "categoryIds: null"', () => {
+              it('throws error: "Too view categories!"', async () => {
+                const { errors } = await mutate({
+                  mutation: createGroupMutation,
+                  variables: { ...variables, categoryIds: null },
+                })
+                expect(errors[0]).toHaveProperty('message', 'Too view categories!')
+              })
+            })
+
+            describe('by "categoryIds: []"', () => {
+              it('throws error: "Too view categories!"', async () => {
+                const { errors } = await mutate({
+                  mutation: createGroupMutation,
+                  variables: { ...variables, categoryIds: [] },
+                })
+                expect(errors[0]).toHaveProperty('message', 'Too view categories!')
+              })
             })
           })
 
@@ -283,6 +325,61 @@ describe('in mode', () => {
                       myRole: null,
                     }),
                   ]),
+                },
+                errors: undefined,
+              })
+            })
+
+            describe('categories', () => {
+              beforeEach(() => {
+                CONFIG.CATEGORIES_ACTIVE = true
+              })
+
+              it('has set categories', async () => {
+                await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject({
+                  data: {
+                    Group: expect.arrayContaining([
+                      expect.objectContaining({
+                        id: 'my-group',
+                        slug: 'the-best-group',
+                        categories: expect.arrayContaining([
+                          expect.objectContaining({ id: 'cat4' }),
+                          expect.objectContaining({ id: 'cat9' }),
+                          expect.objectContaining({ id: 'cat15' }),
+                        ]),
+                        myRole: 'owner',
+                      }),
+                      expect.objectContaining({
+                        id: 'others-group',
+                        slug: 'uninteresting-group',
+                        categories: expect.arrayContaining([
+                          expect.objectContaining({ id: 'cat4' }),
+                          expect.objectContaining({ id: 'cat9' }),
+                          expect.objectContaining({ id: 'cat15' }),
+                        ]),
+                        myRole: null,
+                      }),
+                    ]),
+                  },
+                  errors: undefined,
+                })
+              })
+            })
+          })
+
+          describe("id = 'my-group'", () => {
+            it('finds only the group with this id', async () => {
+              await expect(
+                query({ query: groupQuery, variables: { id: 'my-group' } }),
+              ).resolves.toMatchObject({
+                data: {
+                  Group: [
+                    expect.objectContaining({
+                      id: 'my-group',
+                      slug: 'the-best-group',
+                      myRole: 'owner',
+                    }),
+                  ],
                 },
                 errors: undefined,
               })
@@ -2038,6 +2135,212 @@ describe('in mode', () => {
                   })
                 })
               })
+            })
+          })
+        })
+      })
+    })
+
+    describe('UpdateGroup', () => {
+      beforeAll(async () => {
+        await seedBasicsAndClearAuthentication()
+      })
+
+      afterAll(async () => {
+        await cleanDatabase()
+      })
+
+      describe('unauthenticated', () => {
+        it('throws authorization error', async () => {
+          const { errors } = await mutate({
+            query: updateGroupMutation,
+            variables: {
+              id: 'my-group',
+              slug: 'my-best-group',
+            },
+          })
+          expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+        })
+      })
+
+      describe('authenticated', () => {
+        let otherUser
+
+        beforeAll(async () => {
+          otherUser = await Factory.build(
+            'user',
+            {
+              id: 'other-user',
+              name: 'Other TestUser',
+            },
+            {
+              email: 'test2@example.org',
+              password: '1234',
+            },
+          )
+          authenticatedUser = await otherUser.toJson()
+          await mutate({
+            mutation: createGroupMutation,
+            variables: {
+              id: 'others-group',
+              name: 'Uninteresting Group',
+              about: 'We will change nothing!',
+              description: 'We love it like it is!?' + descriptionAdditional100,
+              groupType: 'closed',
+              actionRadius: 'global',
+              categoryIds,
+            },
+          })
+          authenticatedUser = await user.toJson()
+          await mutate({
+            mutation: createGroupMutation,
+            variables: {
+              id: 'my-group',
+              name: 'The Best Group',
+              about: 'We will change the world!',
+              description: 'Some description' + descriptionAdditional100,
+              groupType: 'public',
+              actionRadius: 'regional',
+              categoryIds,
+            },
+          })
+        })
+
+        describe('change group settings', () => {
+          describe('as owner', () => {
+            beforeEach(async () => {
+              authenticatedUser = await user.toJson()
+            })
+
+            it('has set the settings', async () => {
+              await expect(
+                mutate({
+                  mutation: updateGroupMutation,
+                  variables: {
+                    id: 'my-group',
+                    name: 'The New Group For Our Country',
+                    about: 'We will change the land!',
+                    description: 'Some country relevant description' + descriptionAdditional100,
+                    actionRadius: 'national',
+                    // avatar, // test this as result
+                    // locationName, // test this as result
+                  },
+                }),
+              ).resolves.toMatchObject({
+                data: {
+                  UpdateGroup: {
+                    id: 'my-group',
+                    name: 'The New Group For Our Country',
+                    slug: 'the-new-group-for-our-country', // changing the slug is tested in the slugifyMiddleware
+                    about: 'We will change the land!',
+                    description: 'Some country relevant description' + descriptionAdditional100,
+                    actionRadius: 'national',
+                    // avatar, // test this as result
+                    // locationName, // test this as result
+                    myRole: 'owner',
+                  },
+                },
+                errors: undefined,
+              })
+            })
+
+            describe('description', () => {
+              describe('length without HTML', () => {
+                describe('less then 100 chars', () => {
+                  it('throws error: "Description too short!"', async () => {
+                    const { errors } = await mutate({
+                      mutation: updateGroupMutation,
+                      variables: {
+                        id: 'my-group',
+                        description:
+                          '0123456789' +
+                          '<a href="https://domain.org/0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789">0123456789</a>',
+                      },
+                    })
+                    expect(errors[0]).toHaveProperty('message', 'Description too short!')
+                  })
+                })
+              })
+            })
+
+            describe('categories', () => {
+              beforeEach(async () => {
+                CONFIG.CATEGORIES_ACTIVE = true
+              })
+
+              describe('with matching amount of categories', () => {
+                it('has new categories', async () => {
+                  await expect(
+                    mutate({
+                      mutation: updateGroupMutation,
+                      variables: {
+                        id: 'my-group',
+                        categoryIds: ['cat4', 'cat27'],
+                      },
+                    }),
+                  ).resolves.toMatchObject({
+                    data: {
+                      UpdateGroup: {
+                        id: 'my-group',
+                        categories: expect.arrayContaining([
+                          expect.objectContaining({ id: 'cat4' }),
+                          expect.objectContaining({ id: 'cat27' }),
+                        ]),
+                        myRole: 'owner',
+                      },
+                    },
+                    errors: undefined,
+                  })
+                })
+              })
+
+              describe('not even one', () => {
+                describe('by "categoryIds: []"', () => {
+                  it('throws error: "Too view categories!"', async () => {
+                    const { errors } = await mutate({
+                      mutation: updateGroupMutation,
+                      variables: {
+                        id: 'my-group',
+                        categoryIds: [],
+                      },
+                    })
+                    expect(errors[0]).toHaveProperty('message', 'Too view categories!')
+                  })
+                })
+              })
+
+              describe('four', () => {
+                it('throws error: "Too many categories!"', async () => {
+                  const { errors } = await mutate({
+                    mutation: updateGroupMutation,
+                    variables: {
+                      id: 'my-group',
+                      categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'],
+                    },
+                  })
+                  expect(errors[0]).toHaveProperty('message', 'Too many categories!')
+                })
+              })
+            })
+          })
+
+          describe('as no(!) owner', () => {
+            it('throws authorization error', async () => {
+              authenticatedUser = await otherUser.toJson()
+              const { errors } = await mutate({
+                mutation: updateGroupMutation,
+                variables: {
+                  id: 'my-group',
+                  name: 'The New Group For Our Country',
+                  about: 'We will change the land!',
+                  description: 'Some country relevant description' + descriptionAdditional100,
+                  actionRadius: 'national',
+                  categoryIds: ['cat4', 'cat27'], // test this as result
+                  // avatar, // test this as result
+                  // locationName, // test this as result
+                },
+              })
+              expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
             })
           })
         })
