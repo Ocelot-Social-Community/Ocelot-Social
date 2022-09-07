@@ -285,6 +285,7 @@ export const currentUserQuery = gql`
         id
         url
       }
+      activeCategories
     }
   }
 `
