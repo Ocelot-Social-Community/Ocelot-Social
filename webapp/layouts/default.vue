@@ -20,7 +20,9 @@
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
               style="flex-grow: 0; flex-basis: auto"
             >
-              <categories-menu></categories-menu>
+              <client-only>
+                <categories-menu></categories-menu>
+              </client-only>
             </ds-flex-item>
             <ds-flex-item
               :width="{ base: '45%', sm: '45%', md: '45%', lg: '50%' }"
