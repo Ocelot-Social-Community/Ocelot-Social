@@ -21,16 +21,21 @@ export default {
           `
             MATCH (user:User {id: $id})
             OPTIONAL MATCH (category:Category) WHERE NOT ((user)-[:NOT_INTERESTED_IN]->(category))
-            WITH user, [(user)<-[:OWNED_BY]-(medium:SocialMedia) | properties(medium) ] as media, category
-            RETURN user {.*, socialMedia: media, activeCategories: collect(category.id) } as user
+            OPTIONAL MATCH (cats:Category)
+            WITH user, [(user)<-[:OWNED_BY]-(medium:SocialMedia) | properties(medium) ] AS media, category, toString(COUNT(cats)) AS categoryCount
+            RETURN user {.*, socialMedia: media, activeCategories: collect(category.id) } AS user, categoryCount
           `,
           { id: user.id },
         )
-        log(result)
-        return result.records.map((record) => record.get('user'))
+        const [categoryCount] = result.records.map((record) => record.get('categoryCount'))
+        const [currentUser] = result.records.map((record) => record.get('user'))
+        // frontend expects empty array when all categories are selected
+        if (currentUser.activeCategories.length === parseInt(categoryCount))
+          currentUser.activeCategories = []
+        return currentUser
       })
       try {
-        const [currentUser] = await currentUserTransactionPromise
+        const currentUser = await currentUserTransactionPromise
         return currentUser
       } finally {
         session.close()

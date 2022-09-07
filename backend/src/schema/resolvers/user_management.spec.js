@@ -189,9 +189,12 @@ describe('currentUser', () => {
           )
         })
 
-        it('returns all categories', async () => {
-          const result = await query({ query: currentUserQuery, variables })
-          expect(result.data.currentUser.activeCategories).toHaveLength(categories.length)
+        it('returns empty array for all categories', async () => {
+          await respondsWith({
+            data: {
+              currentUser: expect.objectContaining({ activeCategories: [] }),
+            },
+          })
         })
 
         describe('with categories saved for current user', () => {
