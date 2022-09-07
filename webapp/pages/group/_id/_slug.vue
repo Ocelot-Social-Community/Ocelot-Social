@@ -7,7 +7,11 @@
           :class="{ 'disabled-content': group.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
-          <avatar-uploader v-if="isGroupOwner" :profile="group" :updateMutation="updateGroupMutation">
+          <avatar-uploader
+            v-if="isGroupOwner"
+            :profile="group"
+            :updateMutation="updateGroupMutation"
+          >
             <profile-avatar :profile="group" class="profile-page-avatar" size="large" />
           </avatar-uploader>
           <profile-avatar v-else :profile="group" class="profile-page-avatar" size="large" />
@@ -41,9 +45,6 @@
               {{ $t('profile.groupSince') }} {{ group.createdAt | date('MMMM yyyy') }}
             </ds-text>
           </ds-space>
-          <!-- Wolle: <ds-space v-if="user.badges && user.badges.length" margin="x-small">
-            <hc-badges :badges="user.badges" />
-          </ds-space> -->
           <ds-flex>
             <ds-flex-item>
               <!-- Wolle: <client-only>
@@ -64,8 +65,8 @@
               </client-only> -->
             </ds-flex-item>
           </ds-flex>
-          <!-- Wolle: <div v-if="!isGroupMember" class="action-buttons">
-            <base-button v-if="user.isBlocked" @click="unblockUser(user)">
+          <div v-if="!isGroupMember" class="action-buttons">
+            <!-- Wolle: <base-button v-if="user.isBlocked" @click="unblockUser(user)">
               {{ $t('settings.blocked-users.unblock') }}
             </base-button>
             <base-button v-if="user.isMuted" @click="unmuteUser(user)">
@@ -77,8 +78,28 @@
               :is-followed="user.followedByCurrentUser"
               @optimistic="optimisticFollow"
               @update="updateFollow"
+            /> -->
+            <hc-follow-button
+              v-if="!user.isMuted && !user.isBlocked"
+              :follow-id="user.id"
+              :is-followed="user.followedByCurrentUser"
+              @optimistic="optimisticFollow"
+              @update="updateFollow"
             />
-          </div> -->
+            <base-button
+              class="track-button"
+              :disabled="disabled || !followId"
+              :loading="loading"
+              :icon="icon"
+              :filled="isFollowed && !hovered"
+              :danger="isFollowed && hovered"
+              @mouseenter.native="onHover"
+              @mouseleave.native="hovered = false"
+              @click.prevent="toggle"
+            >
+              {{ label }}
+            </base-button>
+          </div>
           <template v-if="group.about">
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
