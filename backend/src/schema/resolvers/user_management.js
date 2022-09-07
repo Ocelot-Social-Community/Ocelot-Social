@@ -20,8 +20,9 @@ export default {
         const result = await transaction.run(
           `
             MATCH (user:User {id: $id})
-            WITH user, [(user)<-[:OWNED_BY]-(medium:SocialMedia) | properties(medium) ] as media
-            RETURN user {.*, socialMedia: media } as user
+            MATCH (category:Category) WHERE NOT ((user)-[:NOT_INTERESTED_IN]->(category))
+            WITH user, [(user)<-[:OWNED_BY]-(medium:SocialMedia) | properties(medium) ] as media, category
+            RETURN user {.*, socialMedia: media, activeCategories: collect(category.id) } as user
           `,
           { id: user.id },
         )
