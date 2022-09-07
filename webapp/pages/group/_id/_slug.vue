@@ -16,7 +16,7 @@
           </avatar-uploader>
           <profile-avatar v-else :profile="group" class="profile-page-avatar" size="large" />
           <!-- Menu -->
-          <!-- Wolle: <client-only>
+          <!-- <client-only>
             <content-menu
               placement="bottom-end"
               resource-type="user"
@@ -37,7 +37,7 @@
             <ds-text align="center" color="soft">
               {{ groupSlug }}
             </ds-text>
-            <!-- Wolle: <ds-text v-if="user.location" align="center" color="soft" size="small">
+            <!-- <ds-text v-if="user.location" align="center" color="soft" size="small">
               <base-icon name="map-marker" />
               {{ user.location.name }}
             </ds-text> -->
@@ -47,7 +47,7 @@
           </ds-space>
           <ds-flex>
             <ds-flex-item>
-              <!-- Wolle: <client-only>
+              <!-- <client-only>
                 <ds-number :label="$t('profile.followers')">
                   <hc-count-to
                     slot="count"
@@ -58,7 +58,7 @@
               </client-only> -->
             </ds-flex-item>
             <ds-flex-item>
-              <!-- Wolle: <client-only>
+              <!-- <client-only>
                 <ds-number :label="$t('profile.following')">
                   <hc-count-to slot="count" :end-val="user.followingCount" />
                 </ds-number>
@@ -66,7 +66,7 @@
             </ds-flex-item>
           </ds-flex>
           <div v-if="!isGroupMember" class="action-buttons">
-            <!-- Wolle: <base-button v-if="user.isBlocked" @click="unblockUser(user)">
+            <!-- <base-button v-if="user.isBlocked" @click="unblockUser(user)">
               {{ $t('settings.blocked-users.unblock') }}
             </base-button>
             <base-button v-if="user.isMuted" @click="unmuteUser(user)">
@@ -79,26 +79,6 @@
               @optimistic="optimisticFollow"
               @update="updateFollow"
             /> -->
-            <hc-follow-button
-              v-if="!user.isMuted && !user.isBlocked"
-              :follow-id="user.id"
-              :is-followed="user.followedByCurrentUser"
-              @optimistic="optimisticFollow"
-              @update="updateFollow"
-            />
-            <base-button
-              class="track-button"
-              :disabled="disabled || !followId"
-              :loading="loading"
-              :icon="icon"
-              :filled="isFollowed && !hovered"
-              :danger="isFollowed && hovered"
-              @mouseenter.native="onHover"
-              @mouseleave.native="hovered = false"
-              @click.prevent="toggle"
-            >
-              {{ label }}
-            </base-button>
           </div>
           <template v-if="group.about">
             <hr />
@@ -113,7 +93,7 @@
         <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
           {{ $t('profile.network.title') }}
         </ds-heading>
-        <!-- Wolle: <follow-list
+        <!-- <follow-list
           :loading="$apollo.loading"
           :user="user"
           type="followedBy"
@@ -126,13 +106,13 @@
           type="following"
           @fetchAllConnections="fetchAllConnections"
         /> -->
-        <!-- Wolle: <social-media :user-name="groupName" :user="user" /> -->
+        <!-- <social-media :user-name="groupName" :user="user" /> -->
       </ds-flex-item>
 
       <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
         <masonry-grid>
           <!-- TapNavigation -->
-          <!-- Wolle: <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" /> -->
+          <!-- <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" /> -->
 
           <!-- feed -->
           <ds-grid-item :row-span="2" column-span="fullWidth">
@@ -183,7 +163,7 @@
             </ds-grid-item>
           </template>
         </masonry-grid>
-        <!-- Wolle: <client-only>
+        <!-- <client-only>
           <infinite-loading v-if="hasMore" @infinite="showMoreContributions" />
         </client-only> -->
       </ds-flex-item>
@@ -195,26 +175,25 @@
 import uniqBy from 'lodash/uniqBy'
 import postListActions from '~/mixins/postListActions'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
-import HcFollowButton from '~/components/FollowButton.vue'
-import HcCountTo from '~/components/CountTo.vue'
-import HcBadges from '~/components/Badges.vue'
-import FollowList from '~/components/features/FollowList/FollowList'
+// import HcFollowButton from '~/components/FollowButton.vue'
+// import HcCountTo from '~/components/CountTo.vue'
+// import HcBadges from '~/components/Badges.vue'
+// import FollowList from '~/components/features/FollowList/FollowList'
 import HcEmpty from '~/components/Empty/Empty'
-import ContentMenu from '~/components/ContentMenu/ContentMenu'
+// import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
-import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
-import { profilePagePosts } from '~/graphql/PostQuery'
+// import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
+// import { profilePagePosts } from '~/graphql/PostQuery'
 import { groupQuery } from '~/graphql/groups'
 import { updateGroupMutation } from '~/graphql/groups.js'
-import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
-import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
-import UpdateQuery from '~/components/utils/UpdateQuery'
-import SocialMedia from '~/components/SocialMedia/SocialMedia'
+// import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
+// import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
+// import UpdateQuery from '~/components/utils/UpdateQuery'
+// import SocialMedia from '~/components/SocialMedia/SocialMedia'
 
-// Wolle:
 // const tabToFilterMapping = ({ tab, id }) => {
 //   return {
 //     post: { author: { id } },
@@ -225,19 +204,19 @@ import SocialMedia from '~/components/SocialMedia/SocialMedia'
 
 export default {
   components: {
-    SocialMedia,
+    // SocialMedia,
     PostTeaser,
-    HcFollowButton,
-    HcCountTo,
-    HcBadges,
+    // HcFollowButton,
+    // HcCountTo,
+    // HcBadges,
     HcEmpty,
     ProfileAvatar,
-    ContentMenu,
+    // ContentMenu,
     AvatarUploader,
     MasonryGrid,
     MasonryGridItem,
-    FollowList,
-    TabNavigation,
+    // FollowList,
+    // TabNavigation,
   },
   mixins: [postListActions],
   transition: {
@@ -245,7 +224,6 @@ export default {
     mode: 'out-in',
   },
   data() {
-    // Wolle:
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     return {
       Group: [],
@@ -254,7 +232,7 @@ export default {
       offset: 0,
       pageSize: 6,
       tabActive: 'post',
-      // Wolle: filter,
+      // filter,
       followedByCountStartValue: 0,
       followedByCount: 7,
       followingCount: 7,
@@ -303,7 +281,7 @@ export default {
     // },
   },
   methods: {
-    // Wolle: handleTab(tab) {
+    // handleTab(tab) {
     //   if (this.tabActive !== tab) {
     //     this.tabActive = tab
     //     this.filter = tabToFilterMapping({ tab, id: this.$route.params.id })
@@ -313,7 +291,6 @@ export default {
     uniq(items, field = 'id') {
       return uniqBy(items, field)
     },
-    // Wolle:
     // showMoreContributions($state) {
     //   const { profilePagePosts: PostQuery } = this.$apollo.queries
     //   if (!PostQuery) return // seems this can be undefined on subpages
@@ -386,7 +363,6 @@ export default {
     //     },
     //   })
     // },
-    // Wolle:
     // optimisticFollow({ followedByCurrentUser }) {
     //   /*
     //    * Note: followedByCountStartValue is updated to avoid counting from 0 when follow/unfollow
@@ -402,21 +378,18 @@ export default {
     //   }
     //   this.user.followedByCurrentUser = followedByCurrentUser
     // },
-    // Wolle:
     // updateFollow({ followedByCurrentUser, followedBy, followedByCount }) {
     //   this.followedByCountStartValue = this.user.followedByCount
     //   this.user.followedByCount = followedByCount
     //   this.user.followedByCurrentUser = followedByCurrentUser
     //   this.user.followedBy = followedBy
     // },
-    // Wolle:
     // fetchAllConnections(type) {
     //   if (type === 'following') this.followingCount = Infinity
     //   if (type === 'followedBy') this.followedByCount = Infinity
     // },
   },
   apollo: {
-    // Wolle:
     // profilePagePosts: {
     //   query() {
     //     return profilePagePosts(this.$i18n)
@@ -436,7 +409,7 @@ export default {
     // },
     Group: {
       query() {
-        // Wolle: return groupQuery(this.$i18n) // language will be needed for locations
+        // return groupQuery(this.$i18n) // language will be needed for locations
         return groupQuery
       },
       variables() {
