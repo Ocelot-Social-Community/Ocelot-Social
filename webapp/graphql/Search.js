@@ -5,7 +5,7 @@ export const searchQuery = gql`
   ${userFragment}
   ${postFragment}
 
-  query ($query: String!) {
+  query($query: String!) {
     searchResults(query: $query, limit: 5) {
       __typename
       ... on Post {
@@ -33,7 +33,7 @@ export const searchPosts = gql`
   ${postFragment}
   ${tagsCategoriesAndPinnedFragment}
 
-  query ($query: String!, $firstPosts: Int, $postsOffset: Int) {
+  query($query: String!, $firstPosts: Int, $postsOffset: Int) {
     searchPosts(query: $query, firstPosts: $firstPosts, postsOffset: $postsOffset) {
       postCount
       posts {
@@ -55,7 +55,7 @@ export const searchPosts = gql`
 export const searchUsers = gql`
   ${userFragment}
 
-  query ($query: String!, $firstUsers: Int, $usersOffset: Int) {
+  query($query: String!, $firstUsers: Int, $usersOffset: Int) {
     searchUsers(query: $query, firstUsers: $firstUsers, usersOffset: $usersOffset) {
       userCount
       users {
@@ -67,7 +67,7 @@ export const searchUsers = gql`
 `
 
 export const searchHashtags = gql`
-  query ($query: String!, $firstHashtags: Int, $hashtagsOffset: Int) {
+  query($query: String!, $firstHashtags: Int, $hashtagsOffset: Int) {
     searchHashtags(query: $query, firstHashtags: $firstHashtags, hashtagsOffset: $hashtagsOffset) {
       hashtagCount
       hashtags {

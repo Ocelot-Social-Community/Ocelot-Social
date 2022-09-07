@@ -19,7 +19,7 @@ import PersistentLinks from '~/mixins/persistentLinks.js'
 
 const options = {
   queryId: gql`
-    query ($idOrSlug: ID) {
+    query($idOrSlug: ID) {
       Post(id: $idOrSlug) {
         id
         slug
@@ -27,7 +27,7 @@ const options = {
     }
   `,
   querySlug: gql`
-    query ($idOrSlug: String) {
+    query($idOrSlug: String) {
       Post(slug: $idOrSlug) {
         id
         slug
