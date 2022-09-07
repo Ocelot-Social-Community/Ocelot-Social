@@ -1,5 +1,5 @@
 <template>
-  <dropdown ref="menu" placement="top-start" :offset="8" class="filter-menu">
+  <dropdown ref="category-menu" placement="top-start" :offset="8" class="category-menu">
     <base-button
       slot="default"
       :filled="filterActive"
@@ -10,7 +10,7 @@
       <ds-text uppercase>{{ $t('admin.categories.name') }}</ds-text>
     </base-button>
     <template slot="popover">
-      <div class="filter-menu-options">
+      <div class="category-menu-options">
         <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
         <categories-filter v-if="categoriesActive" />
       </div>
@@ -47,7 +47,7 @@ export default {
 </script>
 
 <style lang="scss">
-.filter-menu-options {
+.category-menu-options {
   max-width: $size-max-width-filter-menu;
   padding: $space-small $space-x-small;
 
