@@ -3,6 +3,7 @@ import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { currentUserQuery } from '~/graphql/User'
 import Cookie from 'universal-cookie'
 import metadata from '~/constants/metadata'
+import { mutations as postMutations } from './posts.js'
 
 const cookies = new Cookie()
 
@@ -16,6 +17,9 @@ export const state = () => {
 
 export const mutations = {
   SET_USER(state, user) {
+    if (user.activeCategories) {
+      console.log(user.activeCategories)
+    }
     state.user = user || null
   },
   SET_TOKEN(state, token) {
