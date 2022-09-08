@@ -4,7 +4,7 @@ import ContributionForm from './ContributionForm.vue'
 import Vuex from 'vuex'
 import PostMutations from '~/graphql/PostMutations.js'
 
-import ImageUploader from '~/components/ImageUploader/ImageUploader'
+import ImageUploader from '~/components/Uploader/ImageUploader'
 import MutationObserver from 'mutation-observer'
 
 global.MutationObserver = MutationObserver

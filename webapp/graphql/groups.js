@@ -12,6 +12,7 @@ export const createGroupMutation = gql`
     $groupType: GroupType!
     $actionRadius: GroupActionRadius!
     $categoryIds: [ID]
+    $locationName: String
   ) {
     CreateGroup(
       id: $id
@@ -22,6 +23,7 @@ export const createGroupMutation = gql`
       groupType: $groupType
       actionRadius: $actionRadius
       categoryIds: $categoryIds
+      locationName: $locationName
     ) {
       id
       name
@@ -34,6 +36,13 @@ export const createGroupMutation = gql`
       description
       groupType
       actionRadius
+      categories {
+        id
+        slug
+        name
+        icon
+      }
+      # locationName # test this as result
       myRole
     }
   }
@@ -86,6 +95,28 @@ export const updateGroupMutation = gql`
   }
 `
 
+export const joinGroupMutation = gql`
+  mutation ($groupId: ID!, $userId: ID!) {
+    JoinGroup(groupId: $groupId, userId: $userId) {
+      id
+      name
+      slug
+      myRoleInGroup
+    }
+  }
+`
+
+export const changeGroupMemberRoleMutation = gql`
+  mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
+    ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
+      id
+      name
+      slug
+      myRoleInGroup
+    }
+  }
+`
+
 // ------ queries
 
 export const groupQuery = gql`
@@ -130,15 +161,37 @@ export const groupQuery = gql`
       description
       groupType
       actionRadius
+<<<<<<< HEAD
       myRole
+=======
+>>>>>>> 5059-epic-groups
       categories {
         id
         slug
         name
         icon
       }
+<<<<<<< HEAD
       # avatar # test this as result
       # locationName # test this as result
+=======
+      avatar {
+        url
+      }
+      # locationName # test this as result
+      myRole
+    }
+  }
+`
+
+export const groupMembersQuery = gql`
+  query ($id: ID!, $first: Int, $offset: Int, $orderBy: [_UserOrdering], $filter: _UserFilter) {
+    GroupMembers(id: $id, first: $first, offset: $offset, orderBy: $orderBy, filter: $filter) {
+      id
+      name
+      slug
+      myRoleInGroup
+>>>>>>> 5059-epic-groups
     }
   }
 `

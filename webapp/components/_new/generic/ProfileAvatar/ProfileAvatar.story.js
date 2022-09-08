@@ -1,7 +1,7 @@
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
 import StoryRouter from 'storybook-vue-router'
-import UserAvatar from '~/components/_new/generic/UserAvatar/UserAvatar'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import helpers from '~/storybook/helpers'
 import { user } from '~/components/UserTeaser/UserTeaser.story.js'
 import imageFile from './storybook/critical-avatar-white-background.png'
@@ -22,56 +22,56 @@ const userWithAvatar = {
   name: 'Jochen Image',
   avatar: { url: imageFile },
 }
-storiesOf('UserAvatar', module)
+storiesOf('ProfileAvatar', module)
   .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .addDecorator(StoryRouter())
   .add('normal, with image', () => ({
-    components: { UserAvatar },
+    components: { ProfileAvatar },
     data: () => ({
       user: userWithAvatar,
     }),
-    template: '<user-avatar :user="user" />',
+    template: '<profile-avatar :profile="user" />',
   }))
   .add('normal without image, anonymous user', () => ({
-    components: { UserAvatar },
+    components: { ProfileAvatar },
     data: () => ({
       user: anonymousUser,
     }),
-    template: '<user-avatar :user="user" />',
+    template: '<profile-avatar :profile="user" />',
   }))
   .add('normal without image, user initials', () => ({
-    components: { UserAvatar },
+    components: { ProfileAvatar },
     data: () => ({
       user: userWithoutAvatar,
     }),
-    template: '<user-avatar :user="user" />',
+    template: '<profile-avatar :profile="user" />',
   }))
   .add('small, with image', () => ({
-    components: { UserAvatar },
+    components: { ProfileAvatar },
     data: () => ({
       user: userWithAvatar,
     }),
-    template: '<user-avatar :user="user" size="small"/>',
+    template: '<profile-avatar :profile="user" size="small"/>',
   }))
   .add('small', () => ({
-    components: { UserAvatar },
+    components: { ProfileAvatar },
     data: () => ({
       user: userWithoutAvatar,
     }),
-    template: '<user-avatar :user="user" size="small"/>',
+    template: '<profile-avatar :profile="user" size="small"/>',
   }))
   .add('large, with image', () => ({
-    components: { UserAvatar },
+    components: { ProfileAvatar },
     data: () => ({
       user: userWithAvatar,
     }),
-    template: '<user-avatar :user="user" size="large"/>',
+    template: '<profile-avatar :profile="user" size="large"/>',
   }))
   .add('large', () => ({
-    components: { UserAvatar },
+    components: { ProfileAvatar },
     data: () => ({
       user: userWithoutAvatar,
     }),
-    template: '<user-avatar :user="user" size="large"/>',
+    template: '<profile-avatar :profile="user" size="large"/>',
   }))

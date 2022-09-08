@@ -336,15 +336,16 @@
     "placeholder": "Leave your inspirational thoughts …"
   },
   "error-pages": {
-    "403-default": "Not authorized to this page",
-    "404-default": "This page could not be found",
-    "500-default": "Internal Server Error",
-    "503-default": "Service Unavailable",
-    "back-to-index": "Back to index page",
-    "cannot-edit-post": "This post cannot be edited",
-    "default": "An error occurred",
-    "post-not-found": "This post could not be found",
-    "profile-not-found": "This profile could not be found"
+    "403-default": "Not authorized to this page!",
+    "404-default": "This page could not be found!",
+    "500-default": "Internal Server Error!",
+    "503-default": "Service Unavailable!",
+    "back-to-index": "Back to index page!",
+    "cannot-edit-post": "This post cannot be edited!",
+    "default": "An error occurred!",
+    "group-not-found": "This group profile could not be found!",
+    "post-not-found": "This post could not be found!",
+    "profile-not-found": "This profile could not be found!"
   },
   "filter-menu": {
     "all": "All",
@@ -526,10 +527,15 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Upload successful!"
+    },
     "commented": "Commented",
     "follow": "Follow",
     "followers": "Followers",
     "following": "Following",
+    "groupGoal": "Goal:",
+    "groupSince": "Foundation",
     "invites": {
       "description": "Enter their e-mail address for invitation.",
       "emailPlaceholder": "E-mail to invite",
@@ -828,10 +834,5 @@
     "newTermsAndConditions": "New Terms and Conditions",
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Upload successful!"
-    }
   }
 }

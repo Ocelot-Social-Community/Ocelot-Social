@@ -137,6 +137,7 @@ export default {
       const { categoryIds } = params
       const { id: groupId, avatar: avatarInput } = params
       delete params.categoryIds
+      delete params.avatar
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds) {
         if (categoryIds.length < CATEGORIES_MIN) {
           throw new UserInputError('Too view categories!')
@@ -269,6 +270,9 @@ export default {
     ...Resolver('Group', {
       hasMany: {
         categories: '-[:CATEGORIZED]->(related:Category)',
+      },
+      hasOne: {
+        avatar: '-[:AVATAR_IMAGE]->(related:Image)',
       },
     }),
   },

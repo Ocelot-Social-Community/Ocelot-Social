@@ -100,6 +100,9 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": null
+    },
     "follow": "Volgen",
     "followers": "Volgelingen",
     "following": "Volgt",

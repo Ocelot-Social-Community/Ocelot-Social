@@ -7,10 +7,10 @@
           :class="{ 'disabled-content': user.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
-          <hc-upload v-if="myProfile" :user="user">
-            <user-avatar :user="user" class="profile-avatar" size="large"></user-avatar>
-          </hc-upload>
-          <user-avatar v-else :user="user" class="profile-avatar" size="large" />
+          <avatar-uploader v-if="myProfile" :profile="user" :updateMutation="updateUserMutation">
+            <profile-avatar :profile="user" class="profile-page-avatar" size="large" />
+          </avatar-uploader>
+          <profile-avatar v-else :profile="user" class="profile-page-avatar" size="large" />
           <!-- Menu -->
           <client-only>
             <content-menu
@@ -178,13 +178,14 @@ import HcBadges from '~/components/Badges.vue'
 import FollowList from '~/components/features/FollowList/FollowList'
 import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import HcUpload from '~/components/Upload'
-import UserAvatar from '~/components/_new/generic/UserAvatar/UserAvatar'
+import AvatarUploader from '~/components/Uploader/AvatarUploader'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import UserQuery from '~/graphql/User'
+import { updateUserMutation } from '~/graphql/User.js'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 import UpdateQuery from '~/components/utils/UpdateQuery'
@@ -206,9 +207,9 @@ export default {
     HcCountTo,
     HcBadges,
     HcEmpty,
-    UserAvatar,
+    ProfileAvatar,
     ContentMenu,
-    HcUpload,
+    AvatarUploader,
     MasonryGrid,
     MasonryGridItem,
     FollowList,
@@ -232,6 +233,7 @@ export default {
       followedByCountStartValue: 0,
       followedByCount: 7,
       followingCount: 7,
+      updateUserMutation: updateUserMutation(),
     }
   },
   computed: {
@@ -417,7 +419,7 @@ export default {
 </script>
 
 <style lang="scss">
-.profile-avatar.user-avatar {
+.profile-page-avatar.profile-avatar {
   margin: auto;
   margin-top: -60px;
 }
