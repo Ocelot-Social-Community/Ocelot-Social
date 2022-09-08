@@ -2,7 +2,6 @@
   <div>
     <ds-container class="group-list">
       <ds-space><h2>Group List</h2></ds-space>
-      {{items}}
       <ds-table :data="items" :fields="fields">
         <template slot="delete" slot-scope="scope">
           <base-button
@@ -12,21 +11,30 @@
           ></base-button>
         </template>
         <template slot="name" slot-scope="scope">
-          <nuxt-link to="/group/g1/testgruppe">{{ scope.row.name }}</nuxt-link>
+          <nuxt-link :to="`/group/g1/${scope.row.name}`">{{ scope.row.name }}</nuxt-link>
+          <small>{{scope.row}}</small>
         </template>
         <template slot="categories" slot-scope="scope">
-          <ds-tag v-for="categorie in categories" :key="categorie.id" :color="status">{{ categorie.name }}</ds-tag>
+          <ds-tag v-for="categorie in scope.row.categories" :key="categorie.id" color="primary">{{ categorie.name }}</ds-tag>
         </template>
         <template slot="edit" slot-scope="scope">
           <base-button
             v-if="!scope.row.owner"
-            icon="close"
-            @click="unfollowGroup(scope.row)"
+            icon="edit"
+            @click="editGroup(scope.row)"
           ></base-button>
 
           <nuxt-link :to="{ name: 'group-create' }">
             <ds-icon v-show="scope.row.owner" name="ellipsis-v"></ds-icon>
           </nuxt-link>
+        </template>
+        <template slot="unfollow" slot-scope="scope">
+          <base-button
+          :disabled="!scope.row.owner ? 'disable' : false"
+            v-if="!scope.row.owner"
+            icon="close"
+            @click="unfollowGroup(scope.row)"
+          ></base-button>
         </template>
       </ds-table>
     </ds-container>
@@ -40,6 +48,10 @@ export default {
     fields: { type: Array, default: () => [] },
   },
   methods: {
+    editGroup(formData) {
+      console.log('GroupListedit group', formData)
+      this.$router.push({ path: `/group/edit/${formData.id}` })
+    },
     deleteGroup() {
       alert('delete group')
     },

@@ -37,12 +37,5 @@ export default {
       alert('unfollow group')
     },
   },
-  computed: {
-    status(state) {
-      console.log(state)
-      // if (scope === 'hidden') return 'danger'
-      return 'inverse'
-    },
-  },
 }
 </script>

@@ -370,7 +370,11 @@
     "following": "Following"
   },
   "group": {
-    "newGroup": "Create a new Group"
+    "newGroup": "Create a new Group",
+    "group-created": "The group was created.",
+    "group-updated": "The group data has been changed.",
+    "save":"Create new group",
+    "update":"Save change"
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",
@@ -720,9 +724,7 @@
         }
       }
     },
-    "groups": {
-      "name": "My Groups"
-    },
+    "myGroups": "My Groups",
     "invites": {
       "name": "Invites"
     },

@@ -39,10 +39,57 @@ export const createGroupMutation = gql`
   }
 `
 
+export const updateGroupMutation = gql`
+  mutation (
+    $id: ID!
+    $name: String
+    $slug: String
+    $about: String
+    $description: String
+    $actionRadius: GroupActionRadius
+    $categoryIds: [ID]
+    $avatar: ImageInput
+    $locationName: String
+  ) {
+    UpdateGroup(
+      id: $id
+      name: $name
+      slug: $slug
+      about: $about
+      description: $description
+      actionRadius: $actionRadius
+      categoryIds: $categoryIds
+      avatar: $avatar
+      locationName: $locationName
+    ) {
+      id
+      name
+      slug
+      createdAt
+      updatedAt
+      disabled
+      deleted
+      about
+      description
+      groupType
+      actionRadius
+      categories {
+        id
+        slug
+        name
+        icon
+      }
+      # avatar # test this as result
+      # locationName # test this as result
+      myRole
+    }
+  }
+`
+
 // ------ queries
 
 export const groupQuery = gql`
-  query(
+  query (
     $isMember: Boolean
     $id: ID
     $name: String
@@ -90,6 +137,8 @@ export const groupQuery = gql`
         name
         icon
       }
+      # avatar # test this as result
+      # locationName # test this as result
     }
   }
 `

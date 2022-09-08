@@ -9,9 +9,9 @@
   </div>
 </template>
 <script>
-import GroupTeaser from '~/components/GroupTeaser/GroupTeaser.vue'
-import GroupList from '~/components/GroupList/GroupList.vue'
-import GroupCard from '~/components/GroupList/GroupCard.vue'
+import GroupTeaser from '~/components/Group/GroupTeaser.vue'
+import GroupList from '~/components/Group/GroupList.vue'
+import GroupCard from '~/components/Group/GroupCard.vue'
 import { groupQuery } from '~/graphql/groups.js'
 
 /*
@@ -30,7 +30,7 @@ export default {
   data() {
     return {
       responseGroupListQuery: [],
-      fields: ['delete', 'name', 'about', 'categories', 'edit'],
+      fields: ['delete', 'name', 'about', 'categories', 'edit', 'unfollow'],
     }
   },
   methods: {

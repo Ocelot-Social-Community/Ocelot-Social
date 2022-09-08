@@ -40,8 +40,8 @@ export default {
           path: `/settings/my-social-media`,
         },
         {
-          name: this.$t('settings.groups.name'),
-          path: `/my-groups`,
+          name: this.$t('settings.myGroups'),
+          path: `/group/my-groups`,
         },
         {
           name: this.$t('settings.muted-users.name'),

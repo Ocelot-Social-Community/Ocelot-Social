@@ -1,6 +1,7 @@
 <template>
   <div>
     <ds-container>
+      update: {{update}}
       <ds-form
         class="group-form"
         ref="groupForm"
@@ -16,7 +17,7 @@
 
         <ds-select
           icon="user"
-          v-model="formData.status"
+          v-model="formData.groupType"
           label="Sichtbarkeit"
           :options="['public', 'close', 'hidden']"
           placeholder="Status ..."
@@ -37,7 +38,7 @@
 
         <ds-select
           icon="card"
-          v-model="formData.radius"
+          v-model="formData.actionRadius"
           label="Radius"
           :options="['local', 'regional', 'global']"
           placeholder="Radius ..."
@@ -60,12 +61,12 @@
             :disabled="disabled"
             primary
           >
-            save
+            {{update ? $t('group.update') : $t('group.save')}}
           </ds-button>
         </ds-space>
       </ds-form>
       <ds-space centered>
-        <nuxt-link to="/my-groups">zurück</nuxt-link>
+        <nuxt-link to="/group/my-groups">zurück</nuxt-link>
       </ds-space>
     </ds-container>
   </div>
@@ -80,30 +81,36 @@ export default {
     CategoriesSelect,
   },
   props: {
+    update: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     group: {
       type: Object,
+      required: false,
       default: () => ({}),
     },
   },
   data() {
-    const { name, status, about, description, radius, categories } = this.group
+    const { name, groupType, about, description, actionRadius, categories } = this.groupData
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
       formData: {
         name: name || '',
-        status: status || '',
+        groupType: groupType || '',
         about: about || '',
         description: description || '',
-        radius: radius || '',
+        actionRadius: actionRadius || '',
         categoryIds: categories ? categories.map((category) => category.id) : [],
       },
       formSchema: {
         name: { required: true, min: 3, max: 100 },
-        status: { required: true },
+        groupType: { required: true },
         about: { required: true },
         description: { required: true },
-        radius: { required: true },
+        actionRadius: { required: true },
         categoryIds: {
           type: 'array',
           required: this.categoriesActive,
@@ -121,7 +128,7 @@ export default {
   methods: {
     submit() {
       console.log('submit', this.formData)
-      this.$emit('createGroup', this.formData)
+      this.update ? this.$emit('updateGroup', this.formData) : this.$emit('createGroup', this.formData)
     },
     reset() {
       console.log('reset')

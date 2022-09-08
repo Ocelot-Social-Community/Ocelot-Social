@@ -370,7 +370,11 @@
     "following": "Folge Ich"
   },
   "group": {
-    "newGroup": "Erstelle eine neue Gruppe"
+    "newGroup": "Erstelle eine neue Gruppe",
+    "group-created": "Die Gruppe wurde angelegt.",
+    "group-updated": "Die Gruppendaten wurden geändert.",
+    "save":"neue Gruppe anlegen",
+    "update":"Änderung speichern"
   },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",
@@ -720,9 +724,7 @@
         }
       }
     },
-    "groups": {
-      "name": "Meine Gruppen"
-    },
+    "myGroups": "Meine Gruppen",
     "invites": {
       "name": "Einladungen"
     },

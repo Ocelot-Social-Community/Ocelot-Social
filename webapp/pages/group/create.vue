@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h2>Create Groupe</h2>
     <ds-flex :width="{ base: '100%' }" gutter="base">
       <ds-flex-item :width="{ base: '100%', md: 5 }">
         <group-form @createGroup="createGroup" />
@@ -12,8 +13,8 @@
 </template>
 
 <script>
-import GroupForm from '~/components/GroupForm/GroupForm'
-import GroupMember from '~/components/GroupMember/GroupMember.vue'
+import GroupForm from '~/components/Group/GroupForm'
+import GroupMember from '~/components/Group/GroupMember'
 import { createGroupMutation } from '~/graphql/groups.js'
 
 export default {
@@ -28,9 +29,6 @@ export default {
   },
   methods: {
     async createGroup(form) {
-      console.log("createGroup", form)
-      console.log("createGroup form.categoryIds", form.categoryIds)
-      console.log("createGroup form.radius", form.radius)
       try {
         await this.$apollo.mutate({
           mutation: createGroupMutation,
@@ -38,8 +36,8 @@ export default {
             name: form.name,
             about: form.about,
             description: form.description,
-            groupType: form.status,
-            actionRadius: form.radius,
+            groupType: form.groupType,
+            actionRadius: form.actionRadius,
             categoryIds: form.formData.categoryIds,
           },
           update: (_, { data: { createGroupData } }) => {
@@ -48,7 +46,7 @@ export default {
             //   ...this.createGroup,
             //   sendNotificationEmails,
             // })
-            this.$toast.success(this.$t('settings.notifications.success-update'))
+            this.$toast.success(this.$t('group.group-created'))
           },
         })
       } catch (error) {
