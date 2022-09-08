@@ -5,7 +5,7 @@ Then("I should see my comment", () => {
     .should("contain", "Ocelot.social rocks")
     .get(".user-teaser span.slug")
     .should("contain", "@peter-pan") // specific enough
-    .get(".user-avatar img")
+    .get(".profile-avatar img")
     .should("have.attr", "src")
     .and("contain", 'https://') // some url
     .get(".user-teaser > .info > .text")

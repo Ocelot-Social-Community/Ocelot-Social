@@ -83,7 +83,7 @@ import { mapGetters } from 'vuex'
 import HcEditor from '~/components/Editor/Editor'
 import PostMutations from '~/graphql/PostMutations.js'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
-import ImageUploader from '~/components/ImageUploader/ImageUploader'
+import ImageUploader from '~/components/Uploader/ImageUploader'
 import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 

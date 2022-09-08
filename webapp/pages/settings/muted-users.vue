@@ -25,7 +25,7 @@
               params: { id: scope.row.id, slug: scope.row.slug },
             }"
           >
-            <user-avatar :user="scope.row" size="small" />
+            <profile-avatar :profile="scope.row" size="small" />
           </nuxt-link>
         </template>
         <template #name="scope">
@@ -71,11 +71,11 @@
 
 <script>
 import { mutedUsers, unmuteUser } from '~/graphql/settings/MutedUsers'
-import UserAvatar from '~/components/_new/generic/UserAvatar/UserAvatar'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 
 export default {
   components: {
-    UserAvatar,
+    ProfileAvatar,
   },
   data() {
     return {

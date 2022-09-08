@@ -1,11 +1,11 @@
 <template>
   <div class="user-teaser" v-if="displayAnonymous">
-    <user-avatar v-if="showAvatar" size="small" />
+    <profile-avatar v-if="showAvatar" size="small" />
     <span class="info anonymous">{{ $t('profile.userAnonym') }}</span>
   </div>
   <div v-else :class="[{ 'disabled-content': user.disabled }]" placement="top-start">
     <nuxt-link :to="userLink" :class="['user-teaser']">
-      <user-avatar v-if="showAvatar" :user="user" size="small" />
+      <profile-avatar v-if="showAvatar" :profile="user" size="small" />
       <div class="info">
         <span class="text">
           <span class="slug">{{ userSlug }}</span>
@@ -26,13 +26,13 @@
 import { mapGetters } from 'vuex'
 
 import HcRelativeDateTime from '~/components/RelativeDateTime'
-import UserAvatar from '~/components/_new/generic/UserAvatar/UserAvatar'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 
 export default {
   name: 'UserTeaser',
   components: {
     HcRelativeDateTime,
-    UserAvatar,
+    ProfileAvatar,
   },
   props: {
     user: { type: Object, default: null },
@@ -88,7 +88,7 @@ export default {
   display: flex;
   flex-wrap: nowrap;
 
-  > .user-avatar {
+  > .profile-avatar {
     flex-shrink: 0;
   }
 

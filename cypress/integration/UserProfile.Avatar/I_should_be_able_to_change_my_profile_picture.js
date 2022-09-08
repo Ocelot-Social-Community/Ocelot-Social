@@ -9,7 +9,7 @@ Then("I should be able to change my profile picture", () => {
       { subjectType: "drag-n-drop", force: true }
     );
   });
-  cy.get(".profile-avatar img")
+  cy.get(".profile-page-avatar img")
     .should("have.attr", "src")
     .and("contains", "onourjourney");
   cy.contains(".iziToast-message", "Upload successful")

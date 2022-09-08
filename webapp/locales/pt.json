@@ -412,6 +412,9 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Carregado com sucesso!"
+    },
     "commented": "Comentou",
     "follow": "Seguir",
     "followers": "Seguidores",
@@ -668,10 +671,5 @@
     "newTermsAndConditions": "Novos Termos e Condições",
     "termsAndConditionsNewConfirm": "Eu li e concordo com os novos termos de condições.",
     "termsAndConditionsNewConfirmText": "Por favor, leia os novos termos de uso agora!"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Carregado com sucesso!"
-    }
   }
 }

@@ -208,6 +208,9 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Przesłano pomyślnie"
+    },
     "commented": "Skomentuj",
     "follow": "Obserwuj",
     "followers": "Obserwujący",
@@ -356,10 +359,5 @@
     "taxident": "Numer identyfikacyjny podatku od wartości dodanej zgodnie z § 27 a Ustawa o podatku od wartości dodanej (Niemcy)",
     "termsAc": "Warunki użytkowania",
     "tribunal": "sąd rejestrowy"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Przesłano pomyślnie"
-    }
   }
 }
