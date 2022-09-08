@@ -47,7 +47,7 @@
     "@babel/register": "^7.9.0",
     "@hapi/joi": "^17.1.1",
     "@sentry/node": "^5.15.4",
-    "apollo-cache-inmemory": "~1.6.5",
+    "apollo-cache-inmemory": "~1.6.6",
     "apollo-client": "~2.6.8",
     "apollo-link-context": "~1.0.20",
     "apollo-link-http": "~1.5.17",
