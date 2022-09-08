@@ -10,7 +10,7 @@ export const categories = [
     description: 'Bauen, Lebensgemeinschaften, Tiny Houses, Gemüsegarten',
   },
   {
-    icon: 'enrgy',
+    icon: 'energy',
     name: 'energy',
     description: 'Öl, Gas, Kohle, Wind, Wasserkraft, Biogas, Atomenergie, ...',
   },
