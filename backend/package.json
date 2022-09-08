@@ -120,7 +120,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "5.1.0",
-    "apollo-server-testing": "~2.11.0",
+    "apollo-server-testing": "~2.25.3",
     "chai": "~4.2.0",
     "cucumber": "~6.0.5",
     "eslint": "~6.8.0",
