@@ -11,7 +11,7 @@
   "admin": {
     "categories": {
       "categoryName": "Name",
-      "name": "Kategorien",
+      "name": "Themen",
       "postCount": "Beiträge"
     },
     "dashboard": {
@@ -98,7 +98,7 @@
     }
   },
   "common": {
-    "category": "Kategorie ::: Kategorien",
+    "category": "Thema ::: Themen",
     "comment": "Kommentar ::: Kommentare",
     "letsTalk": "Miteinander reden",
     "loading": "wird geladen",
@@ -113,7 +113,7 @@
     "takeAction": "Aktiv werden",
     "user": "Benutzer ::: Benutzer",
     "validations": {
-      "categories": "es müssen eine bis drei Kategorien ausgewählt werden",
+      "categories": "es müssen eine bis drei Themen ausgewählt werden",
       "email": "muss eine gültige E-Mail-Adresse sein",
       "url": "muss eine gültige URL sein"
     },
@@ -214,7 +214,7 @@
     "amount-shouts": "{amount} recommendations",
     "amount-views": "{amount} views",
     "categories": {
-      "infoSelectedNoOfMaxCategories": "{chosen} von {max} Kategorien ausgewählt"
+      "infoSelectedNoOfMaxCategories": "{chosen} von {max} Themen ausgewählt"
     },
     "category": {
       "name": {
@@ -349,7 +349,7 @@
   },
   "filter-menu": {
     "all": "Alle",
-    "categories": "Themenkategorien",
+    "categories": "Themen",
     "emotions": "Emotionen",
     "filter-by": "Filtern nach ...",
     "following": "Benutzern, denen ich folge",
@@ -471,7 +471,7 @@
       "noDecision": "Keine Entscheidung!",
       "numberOfUsers": "{count} Nutzern",
       "previousDecision": "Vorherige Entscheidung:",
-      "reasonCategory": "Kategorie",
+      "reasonCategory": "Thema",
       "reasonDescription": "Beschreibung",
       "reportedOn": "Datum",
       "status": "Aktueller Status",
@@ -593,8 +593,8 @@
     },
     "reason": {
       "category": {
-        "invalid": "Bitte wähle eine gültige Kategorie aus",
-        "label": "Wähle eine Kategorie:",
+        "invalid": "Bitte wähle ein gültiges Thema aus",
+        "label": "Wähle ein Thema:",
         "options": {
           "advert_products_services_commercial": "Bewerben von Produkten und Dienstleistungen mit kommerzieller Absicht.",
           "criminal_behavior_violation_german_law": "Strafbares Verhalten bzw. Verstoß gegen deutsches Recht.",
@@ -605,7 +605,7 @@
           "other": "Andere …",
           "pornographic_content_links": "Das Senden oder Verlinken eindeutig pornografischen Materials."
         },
-        "placeholder": "Kategorie …"
+        "placeholder": "Thema …"
       },
       "description": {
         "label": "Bitte erkläre: Warum möchtest Du dies melden?",

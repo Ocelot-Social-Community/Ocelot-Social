@@ -115,6 +115,14 @@ type User {
 
   emotions: [EMOTED]
 
+  activeCategories: [Category] @cypher(
+  statement: """
+  MATCH (category:Category)
+  WHERE NOT ((this)-[:NOT_INTERESTED_IN]->(category))
+  RETURN category
+  """
+  )
+
   myRoleInGroup: GroupMemberRole
 }
 
@@ -222,4 +230,6 @@ type Mutation {
   unblockUser(id: ID!): User
 
   switchUserRole(role: UserRole!, id: ID!): User
+
+  saveCategorySettings(activeCategories: [String]): Boolean
 }
