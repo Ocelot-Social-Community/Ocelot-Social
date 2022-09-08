@@ -468,13 +468,13 @@ describe('in mode', () => {
                   })
                   expect(result).toMatchObject({
                     data: {
-                      Group: [
+                      Group: expect.arrayContaining([
                         expect.objectContaining({
                           id: 'third-hidden-group',
                           slug: 'third-investigative-journalism-group',
                           myRole: 'usual',
                         }),
-                      ],
+                      ]),
                     },
                     errors: undefined,
                   })
@@ -508,18 +508,18 @@ describe('in mode', () => {
                 const result = await query({ query: groupQuery, variables: { isMember: true } })
                 expect(result).toMatchObject({
                   data: {
-                    Group: [
-                      {
+                    Group: expect.arrayContaining([
+                      expect.objectContaining({
                         id: 'my-group',
                         slug: 'the-best-group',
                         myRole: 'owner',
-                      },
-                      {
+                      }),
+                      expect.objectContaining({
                         id: 'third-hidden-group',
                         slug: 'third-investigative-journalism-group',
                         myRole: 'usual',
-                      },
-                    ],
+                      }),
+                    ]),
                   },
                   errors: undefined,
                 })
