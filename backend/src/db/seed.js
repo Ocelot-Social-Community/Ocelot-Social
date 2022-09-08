@@ -329,13 +329,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         mutation: joinGroupMutation,
         variables: {
           groupId: 'g0',
-          userId: 'u3',
-        },
-      }),
-      mutate({
-        mutation: joinGroupMutation,
-        variables: {
-          groupId: 'g0',
           userId: 'u4',
         },
       }),
@@ -362,14 +355,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           groupId: 'g0',
           userId: 'u4',
           roleInGroup: 'admin',
-        },
-      }),
-      mutate({
-        mutation: changeGroupMemberRoleMutation,
-        variables: {
-          groupId: 'g0',
-          userId: 'u3',
-          roleInGroup: 'owner',
         },
       }),
     ])
@@ -430,7 +415,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       mutate({
         mutation: changeGroupMemberRoleMutation,
         variables: {
-          groupId: 'g0',
+          groupId: 'g1',
           userId: 'u1',
           roleInGroup: 'usual',
         },
@@ -438,15 +423,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       mutate({
         mutation: changeGroupMemberRoleMutation,
         variables: {
-          groupId: 'g0',
-          userId: 'u2',
-          roleInGroup: 'usual',
-        },
-      }),
-      mutate({
-        mutation: changeGroupMemberRoleMutation,
-        variables: {
-          groupId: 'g0',
+          groupId: 'g1',
           userId: 'u5',
           roleInGroup: 'admin',
         },
@@ -454,7 +431,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       mutate({
         mutation: changeGroupMemberRoleMutation,
         variables: {
-          groupId: 'g0',
+          groupId: 'g1',
           userId: 'u6',
           roleInGroup: 'owner',
         },
@@ -477,6 +454,13 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       }),
     ])
     await Promise.all([
+      mutate({
+        mutation: joinGroupMutation,
+        variables: {
+          groupId: 'g2',
+          userId: 'u3',
+        },
+      }),
       mutate({
         mutation: joinGroupMutation,
         variables: {
@@ -510,7 +494,15 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       mutate({
         mutation: changeGroupMemberRoleMutation,
         variables: {
-          groupId: 'g0',
+          groupId: 'g2',
+          userId: 'u3',
+          roleInGroup: 'pending',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation,
+        variables: {
+          groupId: 'g2',
           userId: 'u4',
           roleInGroup: 'usual',
         },
@@ -518,7 +510,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       mutate({
         mutation: changeGroupMemberRoleMutation,
         variables: {
-          groupId: 'g0',
+          groupId: 'g2',
           userId: 'u5',
           roleInGroup: 'usual',
         },
@@ -526,7 +518,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       mutate({
         mutation: changeGroupMemberRoleMutation,
         variables: {
-          groupId: 'g0',
+          groupId: 'g2',
           userId: 'u6',
           roleInGroup: 'usual',
         },
