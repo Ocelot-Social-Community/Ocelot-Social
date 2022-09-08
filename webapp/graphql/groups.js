@@ -161,20 +161,12 @@ export const groupQuery = gql`
       description
       groupType
       actionRadius
-<<<<<<< HEAD
-      myRole
-=======
->>>>>>> 5059-epic-groups
       categories {
         id
         slug
         name
         icon
       }
-<<<<<<< HEAD
-      # avatar # test this as result
-      # locationName # test this as result
-=======
       avatar {
         url
       }
@@ -191,7 +183,6 @@ export const groupMembersQuery = gql`
       name
       slug
       myRoleInGroup
->>>>>>> 5059-epic-groups
     }
   }
 `
