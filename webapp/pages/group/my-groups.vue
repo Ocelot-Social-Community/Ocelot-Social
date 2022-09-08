@@ -16,8 +16,9 @@ import { groupQuery } from '~/graphql/groups.js'
 
 /*
  *
- * gruppen status: { open, close, hidden }
- *
+ * groupType: { public, closed, hidden }
+ * myRole: { pending,   usual,   admin,   owner }
+ * actionRadius { regional, national, continental,  global,   interplanetary
  *
  */
 export default {

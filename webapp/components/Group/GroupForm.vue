@@ -1,7 +1,7 @@
 <template>
   <div>
     <ds-container>
-      update: {{update}}
+      update: {{ update }}
       <ds-form
         class="group-form"
         ref="groupForm"
@@ -23,11 +23,7 @@
           placeholder="Status ..."
         ></ds-select>
 
-        <ds-input
-          v-model="formData.about"
-          label="Kurzbeschreibung"
-          rows="3"
-        ></ds-input>
+        <ds-input v-model="formData.about" label="Kurzbeschreibung" rows="3"></ds-input>
 
         <ds-input
           v-model="formData.description"
@@ -61,7 +57,7 @@
             :disabled="disabled"
             primary
           >
-            {{update ? $t('group.update') : $t('group.save')}}
+            {{ update ? $t('group.update') : $t('group.save') }}
           </ds-button>
         </ds-space>
       </ds-form>
@@ -93,7 +89,7 @@ export default {
     },
   },
   data() {
-    const { name, groupType, about, description, actionRadius, categories } = this.groupData
+    const { name, groupType, about, description, actionRadius, categories } = this.group
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
@@ -128,7 +124,9 @@ export default {
   methods: {
     submit() {
       console.log('submit', this.formData)
-      this.update ? this.$emit('updateGroup', this.formData) : this.$emit('createGroup', this.formData)
+      this.update
+        ? this.$emit('updateGroup', this.formData)
+        : this.$emit('createGroup', this.formData)
     },
     reset() {
       console.log('reset')

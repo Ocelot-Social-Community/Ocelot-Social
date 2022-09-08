@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 // ------ mutations
 
 export const createGroupMutation = gql`
-  mutation(
+  mutation (
     $id: ID
     $name: String!
     $slug: String

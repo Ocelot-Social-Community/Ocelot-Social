@@ -1,16 +1,16 @@
 <template>
   <ds-flex gutter="small">
-      {{$router}}
-      <ds-flex-item :width="{ base: '100%', md: '200px' }">
-        <ds-menu :routes="routes" :is-exact="() => true" />
-      </ds-flex-item>
-      <ds-flex-item :width="{ base: '100%', md: 1 }">
-        {{group}}
-        <transition name="slide-up" appear>
-            <group-form @updateGroup="updateGroup" :group="group" :update="true"/>
-        </transition>
-      </ds-flex-item>
-    </ds-flex>
+    {{ $router }}
+    <ds-flex-item :width="{ base: '100%', md: '200px' }">
+      <ds-menu :routes="routes" :is-exact="() => true" />
+    </ds-flex-item>
+    <ds-flex-item :width="{ base: '100%', md: 1 }">
+      {{ group }}
+      <transition name="slide-up" appear>
+        <group-form @updateGroup="updateGroup" :group="group" :update="true" />
+      </transition>
+    </ds-flex-item>
+  </ds-flex>
 </template>
 
 <script>
@@ -41,16 +41,14 @@ export default {
           name: 'invite link',
           path: ``,
         },
-      ]},
+      ]
+    },
     ...mapGetters({
       user: 'auth/user',
     }),
-    
   },
   data() {
-      return {
-          groupData: {},
-      }
+    return {}
   },
   async asyncData(context) {
     console.log('asyncData start')
@@ -70,21 +68,22 @@ export default {
     })
     console.log('asyncData group', group)
     console.log('asyncData id', id)
+    console.log('asyncData group.myRole', group.myRole)
     if (group.myRole !== 'owner') {
       error({ statusCode: 403, message: 'NONONNNO' })
     }
-    return { group } 
+    return { group }
   },
   methods: {
-  async updateGroup(form, context) {
-    const {
-      params: { id },
-    } = context
+    async updateGroup(form, context) {
+      const {
+        params: { id },
+      } = context
       try {
         await this.$apollo.mutate({
           mutation: updateGroupMutation,
           variables: {
-            id: params,
+            id: id,
             name: form.name,
             about: form.about,
             description: form.description,
@@ -107,6 +106,6 @@ export default {
         this.$toast.error(error.message)
       }
     },
-},
+  },
 }
 </script>
