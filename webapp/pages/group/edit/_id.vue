@@ -1,11 +1,9 @@
 <template>
   <ds-flex gutter="small">
-    {{ $router }}
     <ds-flex-item :width="{ base: '100%', md: '200px' }">
       <ds-menu :routes="routes" :is-exact="() => true" />
     </ds-flex-item>
     <ds-flex-item :width="{ base: '100%', md: 1 }">
-      {{ group }}
       <transition name="slide-up" appear>
         <group-form @updateGroup="updateGroup" :group="group" :update="true" />
       </transition>
@@ -47,9 +45,6 @@ export default {
       user: 'auth/user',
     }),
   },
-  data() {
-    return {}
-  },
   async asyncData(context) {
     console.log('asyncData start')
     const {
@@ -75,23 +70,12 @@ export default {
     return { group }
   },
   methods: {
-    async updateGroup(form, context) {
-      const {
-        params: { id },
-      } = context
+    async updateGroup(value) {
+        console.log('updateGroup form', value)
       try {
         await this.$apollo.mutate({
           mutation: updateGroupMutation,
-          variables: {
-            id: id,
-            name: form.name,
-            about: form.about,
-            description: form.description,
-            // groupType: form.groupType,
-            actionRadius: form.actionRadius,
-            categoryIds: form.categoryIds,
-            // locationName: ''
-          },
+          variables: value,
           update: (_, { data: { updateGroupData } }) => {
             // const { sendNotificationEmails } = createGroup
             // this.setCreateGroup({

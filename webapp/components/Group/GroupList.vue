@@ -55,7 +55,6 @@ export default {
   },
   methods: {
     editGroup(formData) {
-      console.log('GroupListedit group', formData)
       this.$router.push({ path: `/group/edit/${formData.id}` })
     },
     deleteGroup() {

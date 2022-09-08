@@ -2,6 +2,8 @@
   <div>
     <ds-container>
       update: {{ update }}
+    <br />
+      this group: {{this.group}}
       <ds-form
         class="group-form"
         ref="groupForm"
@@ -89,6 +91,7 @@ export default {
     },
   },
   data() {
+    console.log('GroupForm group', this.group)
     const { name, groupType, about, description, actionRadius, categories } = this.group
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
@@ -123,9 +126,10 @@ export default {
 
   methods: {
     submit() {
-      console.log('submit', this.formData)
+      console.log('submit', this.formData) 
+      const { name, about, description, actionRadius, categoryIds } = this.formData
       this.update
-        ? this.$emit('updateGroup', this.formData)
+        ? this.$emit('updateGroup', { name, about, description, actionRadius, categoryIds, id: this.group.id })
         : this.$emit('createGroup', this.formData)
     },
     reset() {
