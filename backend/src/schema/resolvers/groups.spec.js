@@ -267,6 +267,7 @@ describe('in mode', () => {
 
       describe('authenticated', () => {
         let otherUser
+        let ownerOfHiddenGroupUser
 
         beforeAll(async () => {
           otherUser = await Factory.build(
@@ -276,7 +277,18 @@ describe('in mode', () => {
               name: 'Other TestUser',
             },
             {
-              email: 'test2@example.org',
+              email: 'other-user@example.org',
+              password: '1234',
+            },
+          )
+          ownerOfHiddenGroupUser = await Factory.build(
+            'user',
+            {
+              id: 'owner-of-hidden-group',
+              name: 'Owner Of Hidden Group',
+            },
+            {
+              email: 'owner-of-hidden-group@example.org',
               password: '1234',
             },
           )
@@ -291,6 +303,59 @@ describe('in mode', () => {
               groupType: 'closed',
               actionRadius: 'global',
               categoryIds,
+            },
+          })
+          authenticatedUser = await ownerOfHiddenGroupUser.toJson()
+          await mutate({
+            mutation: createGroupMutation,
+            variables: {
+              id: 'hidden-group',
+              name: 'Investigative Journalism Group',
+              about: 'We will change all.',
+              description: 'We research …' + descriptionAdditional100,
+              groupType: 'hidden',
+              actionRadius: 'global',
+              categoryIds,
+            },
+          })
+          await mutate({
+            mutation: createGroupMutation,
+            variables: {
+              id: 'second-hidden-group',
+              name: 'Second Investigative Journalism Group',
+              about: 'We will change all.',
+              description: 'We research …' + descriptionAdditional100,
+              groupType: 'hidden',
+              actionRadius: 'global',
+              categoryIds,
+            },
+          })
+          await mutate({
+            mutation: changeGroupMemberRoleMutation,
+            variables: {
+              groupId: 'second-hidden-group',
+              userId: 'current-user',
+              roleInGroup: 'pending',
+            },
+          })
+          await mutate({
+            mutation: createGroupMutation,
+            variables: {
+              id: 'third-hidden-group',
+              name: 'Third Investigative Journalism Group',
+              about: 'We will change all.',
+              description: 'We research …' + descriptionAdditional100,
+              groupType: 'hidden',
+              actionRadius: 'global',
+              categoryIds,
+            },
+          })
+          await mutate({
+            mutation: changeGroupMemberRoleMutation,
+            variables: {
+              groupId: 'third-hidden-group',
+              userId: 'current-user',
+              roleInGroup: 'usual',
             },
           })
           authenticatedUser = await user.toJson()
@@ -309,117 +374,175 @@ describe('in mode', () => {
         })
 
         describe('query groups', () => {
-          describe('without any filters', () => {
-            it('finds all groups', async () => {
-              await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject({
-                data: {
-                  Group: expect.arrayContaining([
-                    expect.objectContaining({
-                      id: 'my-group',
-                      slug: 'the-best-group',
-                      myRole: 'owner',
-                    }),
-                    expect.objectContaining({
-                      id: 'others-group',
-                      slug: 'uninteresting-group',
-                      myRole: null,
-                    }),
-                  ]),
-                },
-                errors: undefined,
-              })
-            })
-
-            describe('categories', () => {
-              beforeEach(() => {
-                CONFIG.CATEGORIES_ACTIVE = true
-              })
-
-              it('has set categories', async () => {
-                await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject({
+          describe('in general finds only listed groups – no hidden groups where user is none or pending member', () => {
+            describe('without any filters', () => {
+              it('finds all listed groups', async () => {
+                const result = await query({ query: groupQuery, variables: {} })
+                expect(result).toMatchObject({
                   data: {
                     Group: expect.arrayContaining([
                       expect.objectContaining({
                         id: 'my-group',
                         slug: 'the-best-group',
-                        categories: expect.arrayContaining([
-                          expect.objectContaining({ id: 'cat4' }),
-                          expect.objectContaining({ id: 'cat9' }),
-                          expect.objectContaining({ id: 'cat15' }),
-                        ]),
                         myRole: 'owner',
                       }),
                       expect.objectContaining({
                         id: 'others-group',
                         slug: 'uninteresting-group',
-                        categories: expect.arrayContaining([
-                          expect.objectContaining({ id: 'cat4' }),
-                          expect.objectContaining({ id: 'cat9' }),
-                          expect.objectContaining({ id: 'cat15' }),
-                        ]),
+                        myRole: null,
+                      }),
+                      expect.objectContaining({
+                        id: 'third-hidden-group',
+                        slug: 'third-investigative-journalism-group',
+                        myRole: 'usual',
+                      }),
+                    ]),
+                  },
+                  errors: undefined,
+                })
+                expect(result.data.Group.length).toBe(3)
+              })
+
+              describe('categories', () => {
+                beforeEach(() => {
+                  CONFIG.CATEGORIES_ACTIVE = true
+                })
+
+                it('has set categories', async () => {
+                  await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject({
+                    data: {
+                      Group: expect.arrayContaining([
+                        expect.objectContaining({
+                          id: 'my-group',
+                          slug: 'the-best-group',
+                          categories: expect.arrayContaining([
+                            expect.objectContaining({ id: 'cat4' }),
+                            expect.objectContaining({ id: 'cat9' }),
+                            expect.objectContaining({ id: 'cat15' }),
+                          ]),
+                          myRole: 'owner',
+                        }),
+                        expect.objectContaining({
+                          id: 'others-group',
+                          slug: 'uninteresting-group',
+                          categories: expect.arrayContaining([
+                            expect.objectContaining({ id: 'cat4' }),
+                            expect.objectContaining({ id: 'cat9' }),
+                            expect.objectContaining({ id: 'cat15' }),
+                          ]),
+                          myRole: null,
+                        }),
+                      ]),
+                    },
+                    errors: undefined,
+                  })
+                })
+              })
+            })
+
+            describe('with given id', () => {
+              describe("id = 'my-group'", () => {
+                it('finds only the listed group with this id', async () => {
+                  const result = await query({ query: groupQuery, variables: { id: 'my-group' } })
+                  expect(result).toMatchObject({
+                    data: {
+                      Group: [
+                        expect.objectContaining({
+                          id: 'my-group',
+                          slug: 'the-best-group',
+                          myRole: 'owner',
+                        }),
+                      ],
+                    },
+                    errors: undefined,
+                  })
+                  expect(result.data.Group.length).toBe(1)
+                })
+              })
+
+              describe("id = 'third-hidden-group'", () => {
+                it("finds only the hidden group where I'm 'usual' member", async () => {
+                  const result = await query({
+                    query: groupQuery,
+                    variables: { id: 'third-hidden-group' },
+                  })
+                  expect(result).toMatchObject({
+                    data: {
+                      Group: expect.arrayContaining([
+                        expect.objectContaining({
+                          id: 'third-hidden-group',
+                          slug: 'third-investigative-journalism-group',
+                          myRole: 'usual',
+                        }),
+                      ]),
+                    },
+                    errors: undefined,
+                  })
+                  expect(result.data.Group.length).toBe(1)
+                })
+              })
+
+              describe("id = 'second-hidden-group'", () => {
+                it("finds no hidden group where I'm 'pending' member", async () => {
+                  const result = await query({
+                    query: groupQuery,
+                    variables: { id: 'second-hidden-group' },
+                  })
+                  expect(result.data.Group.length).toBe(0)
+                })
+              })
+
+              describe("id = 'hidden-group'", () => {
+                it("finds no hidden group where I'm not(!) a member at all", async () => {
+                  const result = await query({
+                    query: groupQuery,
+                    variables: { id: 'hidden-group' },
+                  })
+                  expect(result.data.Group.length).toBe(0)
+                })
+              })
+            })
+
+            describe('isMember = true', () => {
+              it('finds only listed groups where user is member', async () => {
+                const result = await query({ query: groupQuery, variables: { isMember: true } })
+                expect(result).toMatchObject({
+                  data: {
+                    Group: expect.arrayContaining([
+                      expect.objectContaining({
+                        id: 'my-group',
+                        slug: 'the-best-group',
+                        myRole: 'owner',
+                      }),
+                      expect.objectContaining({
+                        id: 'third-hidden-group',
+                        slug: 'third-investigative-journalism-group',
+                        myRole: 'usual',
+                      }),
+                    ]),
+                  },
+                  errors: undefined,
+                })
+                expect(result.data.Group.length).toBe(2)
+              })
+            })
+
+            describe('isMember = false', () => {
+              it('finds only listed groups where user is not(!) member', async () => {
+                const result = await query({ query: groupQuery, variables: { isMember: false } })
+                expect(result).toMatchObject({
+                  data: {
+                    Group: expect.arrayContaining([
+                      expect.objectContaining({
+                        id: 'others-group',
+                        slug: 'uninteresting-group',
                         myRole: null,
                       }),
                     ]),
                   },
                   errors: undefined,
                 })
-              })
-            })
-          })
-
-          describe("id = 'my-group'", () => {
-            it('finds only the group with this id', async () => {
-              await expect(
-                query({ query: groupQuery, variables: { id: 'my-group' } }),
-              ).resolves.toMatchObject({
-                data: {
-                  Group: [
-                    expect.objectContaining({
-                      id: 'my-group',
-                      slug: 'the-best-group',
-                      myRole: 'owner',
-                    }),
-                  ],
-                },
-                errors: undefined,
-              })
-            })
-          })
-
-          describe('isMember = true', () => {
-            it('finds only groups where user is member', async () => {
-              await expect(
-                query({ query: groupQuery, variables: { isMember: true } }),
-              ).resolves.toMatchObject({
-                data: {
-                  Group: [
-                    {
-                      id: 'my-group',
-                      slug: 'the-best-group',
-                      myRole: 'owner',
-                    },
-                  ],
-                },
-                errors: undefined,
-              })
-            })
-          })
-
-          describe('isMember = false', () => {
-            it('finds only groups where user is not(!) member', async () => {
-              await expect(
-                query({ query: groupQuery, variables: { isMember: false } }),
-              ).resolves.toMatchObject({
-                data: {
-                  Group: expect.arrayContaining([
-                    expect.objectContaining({
-                      id: 'others-group',
-                      slug: 'uninteresting-group',
-                      myRole: null,
-                    }),
-                  ]),
-                },
-                errors: undefined,
+                expect(result.data.Group.length).toBe(1)
               })
             })
           })
