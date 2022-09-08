@@ -5108,12 +5108,12 @@ graphql-middleware-sentry@^3.2.1:
   resolved "https://registry.yarnpkg.com/graphql-middleware-sentry/-/graphql-middleware-sentry-3.2.1.tgz#b5653d78903d655cf4212a602cfa6e26689cda07"
   integrity sha512-lAwmHwsyey1db6scQg32javmqAFifabhqPIr0SUzx46O4kvjQlLZZn7KrRT12XDwgW7i6goAotdSPl9Fq+TBrQ==
 
-graphql-middleware@~4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/graphql-middleware/-/graphql-middleware-4.0.2.tgz#eb589bf428e1795e48cd6a3cfeeba0807b996ebd"
-  integrity sha512-ESVDvMXeN00S1BNsjNS18uExcR16J8zbT31CuKcpyeBa7IMbidG0Pnqnu5P1wKkJLmPmKOfCljWlhXpD/Fawqg==
+graphql-middleware@~4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/graphql-middleware/-/graphql-middleware-4.0.3.tgz#37fcf10ac95b71d8f1064b2cfef902d327f40846"
+  integrity sha512-qKN3vLNd2fzaUczxQTR7WIB05L+b1xHLHRP5cdK9yboRckqTrFsW2Ot2rKqmXRwxaNCLJD7WEeg1ggdPSpGstg==
   dependencies:
-    graphql-tools "^4.0.5"
+    graphql-tools "^4.0.8"
 
 graphql-redis-subscriptions@^2.2.1:
   version "2.2.1"
@@ -5159,7 +5159,7 @@ graphql-tools@5.0.0:
     tslib "^1.11.1"
     uuid "^7.0.3"
 
-graphql-tools@^4.0.0, graphql-tools@^4.0.4, graphql-tools@^4.0.5:
+graphql-tools@^4.0.0, graphql-tools@^4.0.4, graphql-tools@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/graphql-tools/-/graphql-tools-4.0.8.tgz#e7fb9f0d43408fb0878ba66b522ce871bafe9d30"
   integrity sha512-MW+ioleBrwhRjalKjYaLQbr+920pHBgy9vM/n47sswtns8+96sRn5M/G+J1eu7IMeKWiN/9p6tmwCHU7552VJg==
