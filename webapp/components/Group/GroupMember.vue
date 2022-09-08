@@ -1,14 +1,5 @@
 <template>
   <div>
-    <div>
-      <ds-space><h3>Link zur Gruppe</h3></ds-space>
-      <ds-space>
-        <ds-copy-field>Copy Link for Invite Member please!</ds-copy-field>
-      </ds-space>
-    </div>
-    <br />
-    <hr />
-    <br />
     <ds-space><h3>Members</h3></ds-space>
     <ds-table :data="tableData" :fields="tableFields">
       <template slot="avatar">

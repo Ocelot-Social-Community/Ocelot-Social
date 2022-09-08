@@ -1,52 +1,72 @@
 <template>
-  <ds-flex gutter="small">
-    <ds-flex-item :width="{ base: '100%', md: '200px' }">
-      <ds-menu :routes="routes" :is-exact="() => true" />
-    </ds-flex-item>
-    <ds-flex-item :width="{ base: '100%', md: 1 }">
-      <transition name="slide-up" appear>
-        <group-form @updateGroup="updateGroup" :group="group" :update="true" />
-      </transition>
-    </ds-flex-item>
-  </ds-flex>
+  <div>
+    <ds-page-title heading="Group Setting"></ds-page-title>
+    <ds-flex gutter="small">
+      <ds-flex-item :width="{ base: '100%', md: '200px' }">
+        <ds-list>
+          <ds-list-item>
+            <div @click="menu = 'default'">
+              <ds-text :color="menu === 'default' ? 'primary' : ''" Group data>Group Data</ds-text>
+            </div>
+          </ds-list-item>
+          <ds-list-item>
+            <div @click="menu = 'members'">
+              <ds-text :color="menu === 'members' ? 'primary' : ''" Group data>Members</ds-text>
+            </div>
+          </ds-list-item>
+          <ds-list-item>
+            <div @click="menu = 'socialMedia'">
+              <ds-text :color="menu === 'socialMedia' ? 'primary' : ''" Group data>
+                Social Media
+              </ds-text>
+            </div>
+          </ds-list-item>
+          <ds-list-item>
+            <div @click="menu = 'links'">
+              <ds-text :color="menu === 'links' ? 'primary' : ''" Group data>Links</ds-text>
+            </div>
+          </ds-list-item>
+        </ds-list>
+      </ds-flex-item>
+      <ds-flex-item :width="{ base: '100%', md: 1 }">
+        <group-form
+          v-show="menu === 'default'"
+          @updateGroup="updateGroup"
+          :group="group"
+          :update="true"
+        />
+        <group-member v-show="menu === 'members'" />
+        <div v-show="menu === 'socialMedia'">Social Media</div>
+        <group-link v-show="menu === 'links'" />
+      </ds-flex-item>
+    </ds-flex>
+  </div>
 </template>
 
 <script>
 import GroupForm from '~/components/Group/GroupForm'
+import GroupMember from '~/components/Group/GroupMember'
+import GroupLink from '~/components/Group/GroupLink'
 import { groupQuery, updateGroupMutation } from '~/graphql/groups.js'
 import { mapGetters } from 'vuex'
 
 export default {
   components: {
     GroupForm,
+    GroupMember,
+    GroupLink,
+  },
+  data() {
+    return {
+      menu: 'default',
+    }
   },
   computed: {
-    routes() {
-      return [
-        {
-          name: 'default',
-          path: ``,
-        },
-        {
-          name: 'members',
-          path: ``,
-        },
-        {
-          name: 'social media',
-          path: ``,
-        },
-        {
-          name: 'invite link',
-          path: ``,
-        },
-      ]
-    },
     ...mapGetters({
       user: 'auth/user',
     }),
   },
   async asyncData(context) {
-    console.log('asyncData start')
     const {
       app,
       error,
@@ -61,9 +81,6 @@ export default {
       query: groupQuery,
       variables: { id },
     })
-    console.log('asyncData group', group)
-    console.log('asyncData id', id)
-    console.log('asyncData group.myRole', group.myRole)
     if (group.myRole !== 'owner') {
       error({ statusCode: 403, message: 'NONONNNO' })
     }
@@ -71,7 +88,6 @@ export default {
   },
   methods: {
     async updateGroup(value) {
-        console.log('updateGroup form', value)
       try {
         await this.$apollo.mutate({
           mutation: updateGroupMutation,

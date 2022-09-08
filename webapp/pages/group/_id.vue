@@ -8,7 +8,7 @@ import PersistentLinks from '~/mixins/persistentLinks.js'
 
 const options = {
   queryId: gql`
-    query ($idOrSlug: ID) {
+    query($idOrSlug: ID) {
       Group(id: $idOrSlug) {
         id
         slug
@@ -16,7 +16,7 @@ const options = {
     }
   `,
   querySlug: gql`
-    query ($idOrSlug: String) {
+    query($idOrSlug: String) {
       Group(slug: $idOrSlug) {
         id
         slug

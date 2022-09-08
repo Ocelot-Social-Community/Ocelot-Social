@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 // ------ mutations
 
 export const createGroupMutation = gql`
-  mutation (
+  mutation(
     $id: ID
     $name: String!
     $slug: String
@@ -49,7 +49,7 @@ export const createGroupMutation = gql`
 `
 
 export const updateGroupMutation = gql`
-  mutation (
+  mutation(
     $id: ID!
     $name: String
     $slug: String
@@ -96,7 +96,7 @@ export const updateGroupMutation = gql`
 `
 
 export const joinGroupMutation = gql`
-  mutation ($groupId: ID!, $userId: ID!) {
+  mutation($groupId: ID!, $userId: ID!) {
     JoinGroup(groupId: $groupId, userId: $userId) {
       id
       name
@@ -107,7 +107,7 @@ export const joinGroupMutation = gql`
 `
 
 export const changeGroupMemberRoleMutation = gql`
-  mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
+  mutation($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
     ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
       id
       name
@@ -120,7 +120,7 @@ export const changeGroupMemberRoleMutation = gql`
 // ------ queries
 
 export const groupQuery = gql`
-  query (
+  query(
     $isMember: Boolean
     $id: ID
     $name: String
@@ -177,7 +177,7 @@ export const groupQuery = gql`
 `
 
 export const groupMembersQuery = gql`
-  query ($id: ID!, $first: Int, $offset: Int, $orderBy: [_UserOrdering], $filter: _UserFilter) {
+  query($id: ID!, $first: Int, $offset: Int, $orderBy: [_UserOrdering], $filter: _UserFilter) {
     GroupMembers(id: $id, first: $first, offset: $offset, orderBy: $orderBy, filter: $filter) {
       id
       name
