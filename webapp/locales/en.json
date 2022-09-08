@@ -365,7 +365,7 @@
     },
     "order-by": "Order by ...",
     "save": {
-      "error": "Failed saving topic settings",
+      "error": "Failed saving topic settings!",
       "success": "Topics saved!"
     }
   },
