@@ -98,7 +98,7 @@
     "metascraper-video": "^5.11.8",
     "metascraper-youtube": "^5.23.0",
     "migrate": "^1.7.0",
-    "mime-types": "^2.1.26",
+    "mime-types": "^2.1.35",
     "minimatch": "^3.0.4",
     "mustache": "^4.2.0",
     "neo4j-driver": "^4.0.2",
