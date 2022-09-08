@@ -365,7 +365,7 @@
     },
     "order-by": "Sortieren nach ...",
     "save": {
-      "error": "Themen konnten nicht gespeichert werden",
+      "error": "Themen konnten nicht gespeichert werden!",
       "success": "Themen gespeichert!"
     }
   },
