@@ -73,8 +73,8 @@ describe('LoginForm', () => {
         describe('no categories saved', () => {
           it('resets the categories', async () => {
             await fillIn(Wrapper())
-            expect(storeMocks.actions['auth/login']).toBeCalled()
             expect(storeMocks.mutations['posts/RESET_CATEGORIES']).toBeCalled()
+            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).not.toBeCalled()
           })
         })
 
@@ -82,7 +82,7 @@ describe('LoginForm', () => {
           it('sets the categories', async () => {
             authUserMock.mockReturnValue({ activeCategories: ['cat1', 'cat9', 'cat12'] })
             await fillIn(Wrapper())
-            expect(storeMocks.actions['auth/login']).toBeCalled()
+            expect(storeMocks.mutations['posts/RESET_CATEGORIES']).toBeCalled()
             expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toBeCalledTimes(3)
             expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toBeCalledWith({}, 'cat1')
             expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toBeCalledWith({}, 'cat9')

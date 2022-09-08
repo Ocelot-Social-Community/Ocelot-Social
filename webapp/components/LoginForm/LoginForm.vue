@@ -99,12 +99,11 @@ export default {
       try {
         await this.$store.dispatch('auth/login', { email, password })
         if (this.currentUser && this.currentUser.activeCategories) {
+          this.resetCategories()
           if (this.currentUser.activeCategories.length > 0) {
             this.currentUser.activeCategories.forEach((categoryId) => {
               this.toggleCategory(categoryId)
             })
-          } else {
-            this.resetCategories()
           }
         }
         this.$toast.success(this.$t('login.success'))
