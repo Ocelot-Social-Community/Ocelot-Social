@@ -18,19 +18,25 @@ export default {
         if (isMember === true) {
           groupCypher = `
             MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group:Group${groupIdCypher})
+            WITH group, membership
+            WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
             RETURN group {.*, myRole: membership.role}
           `
         } else {
           if (isMember === false) {
             groupCypher = `
               MATCH (group:Group${groupIdCypher})
-              WHERE NOT (:User {id: $userId})-[:MEMBER_OF]->(group)
+              WHERE (NOT (:User {id: $userId})-[:MEMBER_OF]->(group))
+              WITH group
+              WHERE group.groupType IN ['public', 'closed']
               RETURN group {.*, myRole: NULL}
             `
           } else {
             groupCypher = `
               MATCH (group:Group${groupIdCypher})
               OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
+              WITH group, membership
+              WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
               RETURN group {.*, myRole: membership.role}
             `
           }

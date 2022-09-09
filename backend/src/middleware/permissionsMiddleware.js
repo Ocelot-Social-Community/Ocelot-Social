@@ -323,6 +323,7 @@ export default shield(
       GenerateInviteCode: isAuthenticated,
       switchUserRole: isAdmin,
       markTeaserAsViewed: allow,
+      saveCategorySettings: isAuthenticated,
     },
     User: {
       email: or(isMyOwn, isAdmin),

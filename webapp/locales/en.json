@@ -11,7 +11,7 @@
   "admin": {
     "categories": {
       "categoryName": "Name",
-      "name": "Categories",
+      "name": "Topics",
       "postCount": "Posts"
     },
     "dashboard": {
@@ -98,7 +98,7 @@
     }
   },
   "common": {
-    "category": "Category ::: Categories",
+    "category": "Topic ::: Topics",
     "comment": "Comment ::: Comments",
     "letsTalk": "Let`s Talk",
     "loading": "loading",
@@ -113,7 +113,7 @@
     "takeAction": "Take Action",
     "user": "User ::: Users",
     "validations": {
-      "categories": "at least one and at most three categories must be selected",
+      "categories": "at least one and at most three topics must be selected",
       "email": "must be a valid e-mail address",
       "url": "must be a valid URL"
     },
@@ -214,7 +214,7 @@
     "amount-shouts": "{amount} recommendations",
     "amount-views": "{amount} views",
     "categories": {
-      "infoSelectedNoOfMaxCategories": "{chosen} of {max} categories selected"
+      "infoSelectedNoOfMaxCategories": "{chosen} of {max} topics selected"
     },
     "category": {
       "name": {
@@ -349,7 +349,7 @@
   },
   "filter-menu": {
     "all": "All",
-    "categories": "Categories of Content",
+    "categories": "Topics",
     "emotions": "Emotions",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
@@ -478,7 +478,7 @@
       "noDecision": "No decision!",
       "numberOfUsers": "{count} users",
       "previousDecision": "Previous decision:",
-      "reasonCategory": "Category",
+      "reasonCategory": "Topic",
       "reasonDescription": "Description",
       "reportedOn": "Date",
       "status": "Current status",
@@ -600,8 +600,8 @@
     },
     "reason": {
       "category": {
-        "invalid": "Please select a valid category",
-        "label": "Select a category:",
+        "invalid": "Please select a valid topic",
+        "label": "Select a topic:",
         "options": {
           "advert_products_services_commercial": "Advertising products and services with commercial intent.",
           "criminal_behavior_violation_german_law": "Criminal behavior or violation of German law.",
@@ -612,7 +612,7 @@
           "other": "Other …",
           "pornographic_content_links": "Posting or linking of clearly pornographic material."
         },
-        "placeholder": "Category …"
+        "placeholder": "Topic …"
       },
       "description": {
         "label": "Please explain: Why you like to report this?",
