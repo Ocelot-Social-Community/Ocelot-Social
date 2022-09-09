@@ -1,7 +1,7 @@
 <template>
   <div>
     <ds-space><h3>Members</h3></ds-space>
-    <ds-table :data="tableData" :fields="tableFields">
+    <ds-table :data="GroupMembers" :fields="tableFields">
       <template slot="avatar">
         <ds-avatar online size="small" name="Hans Peter"></ds-avatar>
       </template>
@@ -20,7 +20,7 @@ export default {
   data() {
     return {
       tableFields: ['avatar', 'name', 'type', 'loves', 'edit'],
-      tableData: [
+      GroupMembers: [
         {
           name: 'Rengar',
           type: 'Jungler',

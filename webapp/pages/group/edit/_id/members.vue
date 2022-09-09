@@ -1,56 +1,16 @@
 <template>
-  <div>
-    <ds-space><h3>Members</h3></ds-space>
-    <ds-table :data="tableData" :fields="tableFields">
-      <template slot="avatar">
-        <ds-avatar online size="small" name="Hans Peter"></ds-avatar>
-      </template>
-      <template slot="loves" slot-scope="scope">
-        {{ scope.row.name }} loves {{ scope.row.loves }}
-      </template>
-      <template slot="edit" slot-scope="scope">
-        <ds-button size="small" @click="deleteRow(scope.row)">delete</ds-button>
-      </template>
-    </ds-table>
-  </div>
-</template>
-<script>
+    <div>
+      <ds-container>
+        <group-member />
+      </ds-container>
+    </div>
+  </template>
+  
+  <script>
+  import GroupMember from '~/components/Group/GroupMember'
 export default {
-  name: 'GroupMember',
-  data() {
-    return {
-      tableFields: ['avatar', 'name', 'type', 'loves', 'edit'],
-      tableData: [
-        {
-          name: 'Rengar',
-          type: 'Jungler',
-          loves: 'Hide and seek',
-        },
-        {
-          name: 'Renekton',
-          type: 'Toplaner',
-          loves: 'Slice and dice',
-        },
-        {
-          name: 'Twitch',
-          type: 'ADC',
-          loves: 'Spray and pray',
-        },
-        {
-          name: 'Blitz',
-          type: 'Support',
-          loves: 'Hook you up',
-        },
-      ],
+    components: {
+        GroupMember,
     }
-  },
-  methods: {
-    deleteRow(row) {
-      const index = this.tableData.indexOf(row)
-      if (index > -1) {
-        this.tableData.splice(index, 1)
-      }
-    },
-  },
 }
 </script>
