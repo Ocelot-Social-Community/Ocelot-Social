@@ -29,21 +29,15 @@ export default {
   },
   methods: {
     async createGroup(value) {
+      const { name, about, description, groupType, actionRadius, categoryIds } = value
+      const variables = { name, about, description, groupType, actionRadius, categoryIds }
       try {
         await this.$apollo.mutate({
           mutation: createGroupMutation,
-          variables: value,
-          update: (_, { data: { createGroupData } }) => {
-            // const { sendNotificationEmails } = createGroup
-            // this.setCreateGroup({
-            //   ...this.createGroup,
-            //   sendNotificationEmails,
-            // })
-            this.$toast.success(this.$t('group.group-created'))
-          },
+          variables,
         })
+        this.$toast.success(this.$t('group.group-created'))
       } catch (error) {
-        // this.notifyByEmail = !this.notifyByEmail
         this.$toast.error(error.message)
       }
     },

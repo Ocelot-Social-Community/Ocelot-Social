@@ -35,13 +35,12 @@
           icon="card"
           v-model="formData.actionRadius"
           label="Radius"
-          :options="['local', 'regional', 'global']"
+          :options="['regional', 'national', 'continental', 'global']"
           placeholder="Radius ..."
         ></ds-select>
-
         <categories-select
           v-if="categoriesActive"
-          model="formData.categoryIds"
+          model="categoryIds"
           :existingCategoryIds="formData.categoryIds"
         />
 
@@ -60,7 +59,7 @@
           </ds-button>
         </ds-space>
       </ds-form>
-      <ds-space centered>
+      <ds-space centered v-show="!update">
         <nuxt-link to="/group/my-groups">zurück</nuxt-link>
       </ds-space>
     </ds-container>

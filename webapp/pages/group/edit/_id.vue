@@ -7,15 +7,18 @@
       </ds-flex-item>
       <ds-flex-item :width="{ base: '100%', md: 1 }">
         <transition name="slide-up" appear>
-          <nuxt-child :group="group" :update="true" @updateGroup="updateGroup" />
+          <nuxt-child :group="group" />
         </transition>
       </ds-flex-item>
     </ds-flex>
+    <ds-space centered>
+        <nuxt-link to="/group/my-groups">zurück</nuxt-link>
+      </ds-space>
   </div>
 </template>
 
 <script>
-import { groupQuery, updateGroupMutation } from '~/graphql/groups.js'
+import { groupQuery } from '~/graphql/groups.js'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -55,27 +58,6 @@ export default {
       error({ statusCode: 403, message: 'NONONNNO' })
     }
     return { group }
-  },
-  methods: {
-    async updateGroup(value) {
-      try {
-        await this.$apollo.mutate({
-          mutation: updateGroupMutation,
-          variables: value,
-          update: (_, { data: { updateGroupData } }) => {
-            // const { sendNotificationEmails } = createGroup
-            // this.setCreateGroup({
-            //   ...this.createGroup,
-            //   sendNotificationEmails,
-            // })
-            this.$toast.success(this.$t('group.group-updated'))
-          },
-        })
-      } catch (error) {
-        // this.notifyByEmail = !this.notifyByEmail
-        this.$toast.error(error.message)
-      }
-    },
   },
 }
 </script>
