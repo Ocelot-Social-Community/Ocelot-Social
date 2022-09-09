@@ -372,7 +372,7 @@
   },
   "group": {
     "newGroup": "Create a new Group",
-    "group-created": "The group was created.",
+    "group-created": "The group was created!",
     "group-updated": "The group data has been changed.",
     "save":"Create new group",
     "update":"Save change"
