@@ -29,11 +29,11 @@ export default {
     routes() {
       return [
         {
-          name: 'formular',
+          name: 'General',
           path: `/group/edit/${this.group.id}`,
         },
         {
-          name: 'members',
+          name: 'Members',
           path: `/group/edit/${this.group.id}/members`,
         },
       ]
