@@ -26,7 +26,7 @@ export default {
     routes() {
       return [
         {
-          name: 'formular',
+          name: 'General',
           path: `/group/edit/${this.group.id}`,
         },
         {
