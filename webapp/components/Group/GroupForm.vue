@@ -123,23 +123,20 @@ export default {
   methods: {
     submit() {
       const { name, about, description, groupType, actionRadius, categoryIds } = this.formData
+      const variables = {
+        name,
+        about,
+        description,
+        groupType,
+        actionRadius,
+        categoryIds,
+      }
       this.update
         ? this.$emit('updateGroup', {
-            name,
-            about,
-            description,
-            actionRadius,
-            categoryIds,
+            ...variables,
             id: this.group.id,
           })
-        : this.$emit('createGroup', {
-            name,
-            about,
-            description,
-            groupType,
-            actionRadius,
-            categoryIds,
-          })
+        : this.$emit('createGroup', variables)
     },
     reset() {
       alert('reset')
