@@ -11,7 +11,6 @@
         </transition>
       </ds-flex-item>
     </ds-flex>
-   
   </div>
 </template>
 
@@ -20,22 +19,22 @@ import { groupQuery, updateGroupMutation } from '~/graphql/groups.js'
 import { mapGetters } from 'vuex'
 
 export default {
-
   computed: {
     ...mapGetters({
       user: 'auth/user',
     }),
     routes() {
       return [
-      {
-            name: 'formular',
-            path: `/group/edit/${this.group.id}`
-          },
-          {
-            name: 'members',
-            path: `/group/edit/${this.group.id}/members`
-          },
-    ]},
+        {
+          name: 'formular',
+          path: `/group/edit/${this.group.id}`,
+        },
+        {
+          name: 'members',
+          path: `/group/edit/${this.group.id}/members`,
+        },
+      ]
+    },
   },
   async asyncData(context) {
     const {
