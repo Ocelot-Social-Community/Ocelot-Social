@@ -61,16 +61,7 @@ type Query {
   Group(
     isMember: Boolean # if 'undefined' or 'null' then get all groups
     id: ID
-    name: String
     slug: String
-    createdAt: String
-    updatedAt: String
-    about: String
-    description: String
-    # groupType: GroupType # test this
-    # actionRadius: GroupActionRadius # test this
-    # avatar: ImageInput # test this
-    locationName: String
     first: Int
     offset: Int
     orderBy: [_GroupOrdering]

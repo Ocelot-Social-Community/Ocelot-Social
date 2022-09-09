@@ -123,13 +123,7 @@ export const groupQuery = gql`
   query (
     $isMember: Boolean
     $id: ID
-    $name: String
     $slug: String
-    $createdAt: String
-    $updatedAt: String
-    $about: String
-    $description: String
-    $locationName: String
     $first: Int
     $offset: Int
     $orderBy: [_GroupOrdering]
@@ -138,13 +132,7 @@ export const groupQuery = gql`
     Group(
       isMember: $isMember
       id: $id
-      name: $name
       slug: $slug
-      createdAt: $createdAt
-      updatedAt: $updatedAt
-      about: $about
-      description: $description
-      locationName: $locationName
       first: $first
       offset: $offset
       orderBy: $orderBy

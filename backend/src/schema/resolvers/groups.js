@@ -10,14 +10,26 @@ import { mergeImage } from './images/images'
 export default {
   Query: {
     Group: async (_object, params, context, _resolveInfo) => {
-      const { id: groupId, isMember } = params
+      const { isMember, id, slug } = params
+      const matchParams = { id, slug }
+      Object.keys(matchParams).forEach((key) => {
+        if ([undefined, null].includes(matchParams[key])) {
+          delete matchParams[key]
+        }
+      })
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
-        const groupIdCypher = groupId ? ` {id: "${groupId}"}` : ''
+        const matchParamsEntries = Object.entries(matchParams)
+        let groupMatchParamsCypher = ''
+        matchParamsEntries.forEach((ele, index) => {
+          groupMatchParamsCypher += index === 0 ? ' {' : ''
+          groupMatchParamsCypher += `${ele[0]}: "${ele[1]}"`
+          groupMatchParamsCypher += index < matchParamsEntries.length - 1 ? ', ' : '}'
+        })
         let groupCypher
         if (isMember === true) {
           groupCypher = `
-            MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group:Group${groupIdCypher})
+            MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group:Group${groupMatchParamsCypher})
             WITH group, membership
             WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
             RETURN group {.*, myRole: membership.role}
@@ -25,7 +37,7 @@ export default {
         } else {
           if (isMember === false) {
             groupCypher = `
-              MATCH (group:Group${groupIdCypher})
+              MATCH (group:Group${groupMatchParamsCypher})
               WHERE (NOT (:User {id: $userId})-[:MEMBER_OF]->(group))
               WITH group
               WHERE group.groupType IN ['public', 'closed']
@@ -33,7 +45,7 @@ export default {
             `
           } else {
             groupCypher = `
-              MATCH (group:Group${groupIdCypher})
+              MATCH (group:Group${groupMatchParamsCypher})
               OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
               WITH group, membership
               WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
