@@ -41,7 +41,7 @@ export default {
         },
         {
           name: this.$t('settings.myGroups'),
-          path: `/group/my-groups`,
+          path: `/my-groups`,
         },
         {
           name: this.$t('settings.muted-users.name'),

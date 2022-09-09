@@ -12,8 +12,8 @@
       </ds-flex-item>
     </ds-flex>
     <ds-space centered>
-        <nuxt-link to="/group/my-groups">zurück</nuxt-link>
-      </ds-space>
+      <nuxt-link to="/group/my-groups">zurück</nuxt-link>
+    </ds-space>
   </div>
 </template>
 

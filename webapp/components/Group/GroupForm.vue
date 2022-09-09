@@ -68,6 +68,8 @@
 
 <script>
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
+import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
+import { NAME_LENGTH_MIN, NAME_LENGTH_MAX } from '~/constants/groups.js'
 
 export default {
   name: 'GroupForm',
@@ -100,7 +102,7 @@ export default {
         categoryIds: categories ? categories.map((category) => category.id) : [],
       },
       formSchema: {
-        name: { required: true, min: 3, max: 100 },
+        name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
         groupType: { required: true },
         about: { required: true },
         description: { required: true },
@@ -109,7 +111,7 @@ export default {
           type: 'array',
           required: this.categoriesActive,
           validator: (_, value = []) => {
-            if (this.categoriesActive && (value.length === 0 || value.length > 3)) {
+            if (this.categoriesActive && (value.length < CATEGORIES_MIN || value.length > CATEGORIES_MAX)) {
               return [new Error(this.$t('common.validations.categories'))]
             }
             return []
