@@ -119,7 +119,6 @@ export default {
       },
     }
   },
-
   methods: {
     submit() {
       const { name, about, description, groupType, actionRadius, categoryIds } = this.formData
