@@ -111,7 +111,10 @@ export default {
           type: 'array',
           required: this.categoriesActive,
           validator: (_, value = []) => {
-            if (this.categoriesActive && (value.length < CATEGORIES_MIN || value.length > CATEGORIES_MAX)) {
+            if (
+              this.categoriesActive &&
+              (value.length < CATEGORIES_MIN || value.length > CATEGORIES_MAX)
+            ) {
               return [new Error(this.$t('common.validations.categories'))]
             }
             return []
