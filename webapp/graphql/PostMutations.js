@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 export default () => {
   return {
     CreatePost: gql`
-      mutation($title: String!, $content: String!, $categoryIds: [ID], $image: ImageInput) {
+      mutation ($title: String!, $content: String!, $categoryIds: [ID], $image: ImageInput) {
         CreatePost(title: $title, content: $content, categoryIds: $categoryIds, image: $image) {
           title
           slug
@@ -18,7 +18,7 @@ export default () => {
       }
     `,
     UpdatePost: gql`
-      mutation(
+      mutation (
         $id: ID!
         $title: String!
         $content: String!
@@ -52,14 +52,14 @@ export default () => {
       }
     `,
     DeletePost: gql`
-      mutation($id: ID!) {
+      mutation ($id: ID!) {
         DeletePost(id: $id) {
           id
         }
       }
     `,
     AddPostEmotionsMutation: gql`
-      mutation($to: _PostInput!, $data: _EMOTEDInput!) {
+      mutation ($to: _PostInput!, $data: _EMOTEDInput!) {
         AddPostEmotions(to: $to, data: $data) {
           emotion
           from {
@@ -72,7 +72,7 @@ export default () => {
       }
     `,
     RemovePostEmotionsMutation: gql`
-      mutation($to: _PostInput!, $data: _EMOTEDInput!) {
+      mutation ($to: _PostInput!, $data: _EMOTEDInput!) {
         RemovePostEmotions(to: $to, data: $data) {
           emotion
           from {
@@ -85,7 +85,7 @@ export default () => {
       }
     `,
     pinPost: gql`
-      mutation($id: ID!) {
+      mutation ($id: ID!) {
         pinPost(id: $id) {
           id
           title
@@ -102,7 +102,7 @@ export default () => {
       }
     `,
     unpinPost: gql`
-      mutation($id: ID!) {
+      mutation ($id: ID!) {
         unpinPost(id: $id) {
           id
           title
@@ -119,7 +119,7 @@ export default () => {
       }
     `,
     markTeaserAsViewed: gql`
-      mutation($id: ID!) {
+      mutation ($id: ID!) {
         markTeaserAsViewed(id: $id) {
           id
         }
