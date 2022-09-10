@@ -18,7 +18,7 @@
           icon="user"
           v-model="formData.groupType"
           label="Sichtbarkeit"
-          :options="['public', 'close', 'hidden']"
+          :options="['public', 'closed', 'hidden']"
           placeholder="Status ..."
         ></ds-select>
 
