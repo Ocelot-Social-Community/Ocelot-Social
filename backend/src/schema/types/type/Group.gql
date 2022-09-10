@@ -62,17 +62,18 @@ type Query {
     isMember: Boolean # if 'undefined' or 'null' then get all groups
     id: ID
     slug: String
-    first: Int
-    offset: Int
-    orderBy: [_GroupOrdering]
+    # first: Int # not implemented yet
+    # offset: Int # not implemented yet
+    # orderBy: [_GroupOrdering] # not implemented yet
+    # filter: _GroupFilter # not implemented yet
   ): [Group]
 
   GroupMembers(
     id: ID!
-    first: Int
-    offset: Int
-    orderBy: [_UserOrdering]
-    filter: _UserFilter
+    # first: Int # not implemented yet
+    # offset: Int # not implemented yet
+    # orderBy: [_UserOrdering] # not implemented yet
+    # filter: _UserFilter # not implemented yet
   ): [User]
 
   # AvailableGroupTypes: [GroupType]!
