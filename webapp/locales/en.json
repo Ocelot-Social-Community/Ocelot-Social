@@ -371,11 +371,11 @@
     "following": "Following"
   },
   "group": {
-    "newGroup": "Create a new Group",
     "group-created": "The group was created!",
     "group-updated": "The group data has been changed.",
-    "save":"Create new group",
-    "update":"Save change"
+    "newGroup": "Create a new Group",
+    "save": "Create new group",
+    "update": "Save change"
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",
@@ -730,7 +730,6 @@
         }
       }
     },
-    "myGroups": "My Groups",
     "invites": {
       "name": "Invites"
     },
@@ -755,6 +754,7 @@
       "unmute": "Unmute user",
       "unmuted": "{name} is unmuted again"
     },
+    "myGroups": "My Groups",
     "name": "Settings",
     "notifications": {
       "name": "Notifications",
