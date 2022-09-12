@@ -49,7 +49,11 @@
             <ds-flex-item>
               <client-only>
                 <ds-number :label="$t('group.membersCount')">
-                  <count-to slot="count" :start-val="0" :end-val="groupMembers.length" />
+                  <count-to
+                    slot="count"
+                    :start-val="membersCountStartValue"
+                    :end-val="groupMembers.length"
+                  />
                 </ds-number>
               </client-only>
             </ds-flex-item>
@@ -72,7 +76,7 @@
               </client-only>
             </ds-flex-item> -->
           </ds-flex>
-          <div v-if="!isGroupMember" class="action-buttons">
+          <div class="action-buttons">
             <!-- <base-button v-if="user.isBlocked" @click="unblockUser(user)">
               {{ $t('settings.blocked-users.unblock') }}
             </base-button>
@@ -86,6 +90,15 @@
               @optimistic="optimisticFollow"
               @update="updateFollow"
             /> -->
+            <join-leave-button
+              :groupId="group ? group.id : ''"
+              :userId="currentUser.id"
+              :isMember="isGroupMember"
+              @optimistic="optimisticJoinLeave"
+              @update="updateJoinLeave"
+            />
+            <!-- implement:
+              v-if="!user.isMuted && !user.isBlocked" -->
           </div>
           <template v-if="group.about">
             <hr />
@@ -200,8 +213,9 @@ import AvatarUploader from '~/components/Uploader/AvatarUploader'
 // import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import CountTo from '~/components/CountTo.vue'
 import Empty from '~/components/Empty/Empty'
-// import FollowButton from '~/components/FollowButton.vue'
+// import FollowButton from '~/components/Button/FollowButton'
 // import FollowList from '~/components/features/ProfileList/FollowList'
+import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
@@ -226,6 +240,7 @@ export default {
     Empty,
     // FollowButton,
     // FollowList,
+    JoinLeaveButton,
     PostTeaser,
     ProfileAvatar,
     ProfileList,
@@ -253,22 +268,26 @@ export default {
       // followedByCountStartValue: 0,
       // followedByCount: 7,
       // followingCount: 7,
-      membersCount: Infinity,
+      membersCountStartValue: 0,
+      membersCountToLoad: Infinity,
       updateGroupMutation,
     }
   },
   computed: {
+    currentUser() {
+      return this.$store.getters['auth/user']
+    },
     group() {
-      return this.Group ? this.Group[0] : {}
+      return this.Group[0] ? this.Group[0] : {}
     },
     groupMembers() {
       return this.GroupMembers ? this.GroupMembers : []
     },
     isGroupOwner() {
-      return this.group.myRole === 'owner'
+      return this.group ? this.group.myRole === 'owner' : false
     },
     isGroupMember() {
-      return this.group.myRole
+      return this.group ? !!this.group.myRole : false
     },
     groupName() {
       const { name } = this.group || {}
@@ -405,8 +424,32 @@ export default {
     //   this.user.followedByCurrentUser = followedByCurrentUser
     //   this.user.followedBy = followedBy
     // },
+    optimisticJoinLeave({ joinedByCurrentUser }) {
+      /*
+       * Note: "membersCountStartValue" is updated to avoid counting from 0 when join/leave
+       */
+      this.membersCountStartValue = this.GroupMembers.length
+      if (joinedByCurrentUser) {
+        // this.membersCountToLoad++
+        this.GroupMembers = [this.currentUser, ...this.GroupMembers]
+      } else {
+        // this.membersCountToLoad--
+        this.GroupMembers = this.GroupMembers.filter((user) => user.id !== this.currentUser.id)
+      }
+    },
+    updateJoinLeave({ myRoleInGroup }) {
+      this.Group = [{ ...this.Group[0], myRole: myRoleInGroup }] // if we assign it directly "this.group" will not be updated
+      const currentUserInGroupMembers = this.GroupMembers.find(
+        (user) => user.id === this.currentUser.id,
+      )
+      if (currentUserInGroupMembers) {
+        currentUserInGroupMembers.myRoleInGroup = myRoleInGroup
+      } else {
+        this.$apollo.queries.GroupMembers.refetch()
+      }
+    },
     fetchAllMembers() {
-      this.membersCount = Infinity
+      this.membersCountToLoad = Infinity
     },
   },
   apollo: {

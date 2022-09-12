@@ -335,6 +335,10 @@
   "group": {
     "foundation": null,
     "goal": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null
+    },
     "membersCount": null,
     "membersListTitle": null
   },

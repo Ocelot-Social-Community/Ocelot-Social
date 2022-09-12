@@ -172,7 +172,7 @@
 import uniqBy from 'lodash/uniqBy'
 import postListActions from '~/mixins/postListActions'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
-import HcFollowButton from '~/components/FollowButton.vue'
+import HcFollowButton from '~/components/Button/FollowButton'
 import HcCountTo from '~/components/CountTo.vue'
 import HcBadges from '~/components/Badges.vue'
 import FollowList, { followListVisibleCount } from '~/components/features/ProfileList/FollowList'

@@ -373,6 +373,10 @@
   "group": {
     "foundation": "Foundation",
     "goal": "Goal:",
+    "joinLeaveButton": {
+      "iAmMember": "I'm a member",
+      "join": "Join"
+    },
     "membersCount": "Members",
     "membersListTitle": "Group Members"
   },
