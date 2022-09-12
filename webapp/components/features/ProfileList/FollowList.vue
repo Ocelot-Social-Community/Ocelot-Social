@@ -3,10 +3,10 @@
     :uniqueName="`${type}Filter`"
     :title="$filters.truncate(userName, 15) + ' ' + $t(`profile.network.${type}`)"
     :titleNobody="$filters.truncate(userName, 15) + ' ' + $t(`profile.network.${type}Nobody`)"
-    :allConnectionsCount="allConnectionsCount"
-    :connections="connections"
+    :allProfilesCount="allConnectionsCount"
+    :profiles="connections"
     :loading="loading"
-    @fetchAllConnections="$emit('fetchAllConnections', type)"
+    @fetchAllProfiles="$emit('fetchAllConnections', type)"
   />
 </template>
 

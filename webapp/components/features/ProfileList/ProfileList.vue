@@ -1,6 +1,6 @@
 <template>
-  <base-card class="follow-list">
-    <template v-if="connections && connections.length">
+  <base-card class="profile-list">
+    <template v-if="profiles && profiles.length">
       <h5 class="title spacer-x-small">
         {{ title }}
       </h5>
@@ -18,11 +18,11 @@
         :loading="loading"
         class="spacer-x-small"
         size="small"
-        @click="$emit('fetchAllConnections')"
+        @click="$emit('fetchAllProfiles')"
       >
         {{
           $t('profile.network.andMore', {
-            number: allConnectionsCount - connections.length,
+            number: allProfilesCount - profiles.length,
           })
         }}
       </base-button>
@@ -53,8 +53,8 @@ export default {
     uniqueName: { type: String, required: true },
     title: { type: String, required: true },
     titleNobody: { type: String, required: true },
-    allConnectionsCount: { type: Number, required: true },
-    connections: { type: Array, required: true },
+    allProfilesCount: { type: Number, required: true },
+    profiles: { type: Array, required: true },
     type: { type: String, default: 'following' },
     loading: { type: Boolean, default: false },
   },
@@ -65,14 +65,14 @@ export default {
   },
   computed: {
     hasMore() {
-      return this.allConnectionsCount > this.connections.length
+      return this.allProfilesCount > this.profiles.length
     },
     connectionsClass() {
-      return `connections${this.hasMore ? '' : ' --overflow'}`
+      return `profiles${this.hasMore ? '' : ' --overflow'}`
     },
     filteredConnections() {
       if (!this.filter) {
-        return this.connections
+        return this.profiles
       }
 
       // @example
@@ -83,7 +83,7 @@ export default {
         'i',
       )
 
-      const fuzzyScores = this.connections
+      const fuzzyScores = this.profiles
         .map((user) => {
           const match = user.name.match(fuzzyExpression)
 
@@ -116,7 +116,7 @@ export default {
 </script>
 
 <style lang="scss">
-.follow-list {
+.profile-list {
   display: flex;
   flex-direction: column;
   position: relative;
@@ -127,7 +127,7 @@ export default {
     font-size: $font-size-base;
   }
 
-  .connections {
+  .profiles {
     height: $size-height-connections;
     padding: $space-none;
     list-style-type: none;
