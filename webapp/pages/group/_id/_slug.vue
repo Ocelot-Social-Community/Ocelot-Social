@@ -101,7 +101,7 @@
           {{ $t('profile.network.title') }}
         </ds-heading>
         <profile-list
-          :uniqueName="`grouMembersFilter`"
+          :uniqueName="`groupMembersFilter`"
           :title="$t('group.membersListTitle')"
           :allProfilesCount="groupMembers.length"
           :profiles="groupMembers"
