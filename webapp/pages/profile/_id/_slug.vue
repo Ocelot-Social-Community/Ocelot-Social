@@ -175,7 +175,8 @@ import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import HcFollowButton from '~/components/FollowButton.vue'
 import HcCountTo from '~/components/CountTo.vue'
 import HcBadges from '~/components/Badges.vue'
-import FollowList from '~/components/features/ProfileList/FollowList'
+import FollowList, { followListVisibleCount } from '~/components/features/ProfileList/FollowList'
+
 import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
@@ -231,8 +232,8 @@ export default {
       tabActive: 'post',
       filter,
       followedByCountStartValue: 0,
-      followedByCount: 7,
-      followingCount: 7,
+      followedByCount: followListVisibleCount,
+      followingCount: followListVisibleCount,
       updateUserMutation: updateUserMutation(),
     }
   },

@@ -1,10 +1,10 @@
 <template>
   <base-card class="profile-list">
-    <template v-if="profiles && profiles.length">
+    <template v-if="profiles.length">
       <h5 class="title spacer-x-small">
         {{ title }}
       </h5>
-      <ul :class="connectionsClass">
+      <ul :class="profilesClass">
         <li
           v-for="connection in filteredConnections"
           :key="connection.id"
@@ -13,6 +13,15 @@
           <user-teaser :user="connection" />
         </li>
       </ul>
+      <ds-input
+        v-if="isMoreAsVisible"
+        :name="uniqueName"
+        :placeholder="filter"
+        class="spacer-x-small"
+        icon="filter"
+        size="small"
+        @input.native="setFilter"
+      />
       <base-button
         v-if="hasMore"
         :loading="loading"
@@ -26,15 +35,6 @@
           })
         }}
       </base-button>
-      <ds-input
-        v-if="!hasMore"
-        :name="uniqueName"
-        :placeholder="filter"
-        class="spacer-x-small"
-        icon="filter"
-        size="small"
-        @input.native="setFilter"
-      />
     </template>
     <p v-else-if="titleNobody" class="nobody-message">{{ titleNobody }}</p>
   </base-card>
@@ -43,6 +43,8 @@
 <script>
 import { escape } from 'xregexp/xregexp-all.js'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
+
+export const profileListVisibleCount = 7
 
 export default {
   name: 'ProfileList',
@@ -55,11 +57,11 @@ export default {
     titleNobody: { type: String, default: null },
     allProfilesCount: { type: Number, required: true },
     profiles: { type: Array, required: true },
-    type: { type: String, default: 'following' },
     loading: { type: Boolean, default: false },
   },
   data() {
     return {
+      profileListVisibleCount,
       filter: null,
     }
   },
@@ -67,8 +69,11 @@ export default {
     hasMore() {
       return this.allProfilesCount > this.profiles.length
     },
-    connectionsClass() {
-      return `profiles${this.hasMore ? '' : ' --overflow'}`
+    isMoreAsVisible() {
+      return this.profiles.length > this.profileListVisibleCount
+    },
+    profilesClass() {
+      return `profiles${this.isMoreAsVisible ? ' --overflow' : ''}`
     },
     filteredConnections() {
       if (!this.filter) {

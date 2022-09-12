@@ -11,7 +11,9 @@
 </template>
 
 <script>
-import ProfileList from '~/components/features/ProfileList/ProfileList'
+import ProfileList, { profileListVisibleCount } from '~/components/features/ProfileList/ProfileList'
+
+export const followListVisibleCount = profileListVisibleCount
 
 export default {
   name: 'FollowerList',

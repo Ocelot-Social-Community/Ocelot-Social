@@ -100,6 +100,7 @@
         <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
           {{ $t('profile.network.title') }}
         </ds-heading>
+        <!-- Group members list -->
         <profile-list
           :uniqueName="`groupMembersFilter`"
           :title="$t('group.membersListTitle')"
