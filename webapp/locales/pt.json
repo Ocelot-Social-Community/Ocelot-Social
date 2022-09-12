@@ -332,6 +332,11 @@
     "follow": "Seguir",
     "following": "Seguindo"
   },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "membersListTitle": null
+  },
   "hashtags-filter": {
     "clearSearch": "Limpar pesquisa",
     "hashtag-search": "Procurando por #{hashtag}",

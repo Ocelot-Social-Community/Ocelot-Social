@@ -294,6 +294,11 @@
     "follow": null,
     "following": null
   },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "membersListTitle": null
+  },
   "hashtags-filter": {
     "clearSearch": null,
     "hashtag-search": null,

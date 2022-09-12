@@ -311,6 +311,11 @@
     "follow": "Подписаться",
     "following": "Вы подписаны"
   },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "membersListTitle": null
+  },
   "hashtags-filter": {
     "clearSearch": "Очистить поиск",
     "hashtag-search": "Поиск по #{hashtag}",

@@ -166,6 +166,11 @@
     "follow": "naśladować",
     "following": "w skutek"
   },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "membersListTitle": null
+  },
   "hashtags-filter": {
     "title": "Twoja bańka filtrująca"
   },

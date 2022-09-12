@@ -82,6 +82,11 @@
     "follow": "Volgen",
     "following": "Volgt"
   },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "membersListTitle": null
+  },
   "login": {
     "email": "Uw E-mail",
     "hello": "Hallo",

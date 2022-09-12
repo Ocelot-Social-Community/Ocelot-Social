@@ -370,6 +370,11 @@
     "follow": "Folgen",
     "following": "Folge Ich"
   },
+  "group": {
+    "foundation": "Gründung",
+    "goal": "Ziel:",
+    "membersListTitle": "Gruppenmitglieder"
+  },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",
     "hashtag-search": "Suche nach #{hashtag}",
@@ -527,8 +532,6 @@
     "follow": "Folgen",
     "followers": "Folgen",
     "following": "Folge Ich",
-    "groupGoal": "Ziel:",
-    "groupSince": "Gründung",
     "invites": {
       "description": "Zur Einladung die E-Mail-Adresse hier eintragen.",
       "emailPlaceholder": "E-Mail-Adresse für die Einladung",

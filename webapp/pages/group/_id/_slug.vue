@@ -42,7 +42,7 @@
               {{ user.location.name }}
             </ds-text> -->
             <ds-text align="center" color="soft" size="small">
-              {{ $t('profile.groupSince') }} {{ group.createdAt | date('MMMM yyyy') }}
+              {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
             </ds-text>
           </ds-space>
           <ds-flex>
@@ -84,7 +84,7 @@
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
               <ds-text color="soft" size="small" class="hyphenate-text">
-                {{ $t('profile.groupGoal') }} {{ group.about }}
+                {{ $t('group.goal') }} {{ group.about }}
               </ds-text>
             </ds-space>
           </template>
@@ -93,7 +93,16 @@
         <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
           {{ $t('profile.network.title') }}
         </ds-heading>
-        <!-- <follow-list
+        <profile-list
+          :uniqueName="`grouMembersFilter`"
+          :title="$t('group.membersListTitle')"
+          :allProfilesCount="groupMembers.length"
+          :profiles="groupMembers"
+          :loading="$apollo.loading"
+          @fetchAllProfiles="fetchAllMembers"
+        />
+        <!-- <ds-space />
+        <follow-list
           :loading="$apollo.loading"
           :user="user"
           type="followedBy"
@@ -178,7 +187,7 @@ import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 // import HcFollowButton from '~/components/FollowButton.vue'
 // import HcCountTo from '~/components/CountTo.vue'
 // import HcBadges from '~/components/Badges.vue'
-// import FollowList from '~/components/features/FollowList/FollowList'
+import FollowList from '~/components/features/ProfileList/FollowList'
 import HcEmpty from '~/components/Empty/Empty'
 // import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
@@ -187,12 +196,12 @@ import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 // import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 // import { profilePagePosts } from '~/graphql/PostQuery'
-import { groupQuery } from '~/graphql/groups'
-import { updateGroupMutation } from '~/graphql/groups.js'
+import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
 // import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 // import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 // import UpdateQuery from '~/components/utils/UpdateQuery'
 // import SocialMedia from '~/components/SocialMedia/SocialMedia'
+import ProfileList from '~/components/features/ProfileList/ProfileList'
 
 // const tabToFilterMapping = ({ tab, id }) => {
 //   return {
@@ -211,11 +220,12 @@ export default {
     // HcBadges,
     HcEmpty,
     ProfileAvatar,
+    ProfileList,
     // ContentMenu,
     AvatarUploader,
     MasonryGrid,
     MasonryGridItem,
-    // FollowList,
+    FollowList,
     // TabNavigation,
   },
   mixins: [postListActions],
@@ -227,27 +237,33 @@ export default {
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     return {
       Group: [],
+      GroupMembers: [],
       posts: [],
-      hasMore: true,
-      offset: 0,
-      pageSize: 6,
-      tabActive: 'post',
+      // hasMore: true,
+      // offset: 0,
+      // pageSize: 6,
+      // tabActive: 'post',
       // filter,
-      followedByCountStartValue: 0,
-      followedByCount: 7,
-      followingCount: 7,
+      // followedByCountStartValue: 0,
+      // followedByCount: 7,
+      // followingCount: 7,
+      membersCount: Infinity,
       updateGroupMutation,
     }
   },
   computed: {
+    group() {
+      return this.Group ? this.Group[0] : {}
+    },
+    groupMembers() {
+      console.log('this.GroupMembers: ', this.GroupMembers)
+      return this.GroupMembers ? this.GroupMembers : []
+    },
     isGroupOwner() {
       return this.group.myRole === 'owner'
     },
     isGroupMember() {
       return this.group.myRole
-    },
-    group() {
-      return this.Group ? this.Group[0] : {}
     },
     groupName() {
       const { name } = this.group || {}
@@ -384,10 +400,9 @@ export default {
     //   this.user.followedByCurrentUser = followedByCurrentUser
     //   this.user.followedBy = followedBy
     // },
-    // fetchAllConnections(type) {
-    //   if (type === 'following') this.followingCount = Infinity
-    //   if (type === 'followedBy') this.followedByCount = Infinity
-    // },
+    fetchAllMembers() {
+      this.membersCount = Infinity
+    },
   },
   apollo: {
     // profilePagePosts: {
@@ -417,6 +432,17 @@ export default {
           id: this.$route.params.id,
           // followedByCount: this.followedByCount,
           // followingCount: this.followingCount,
+        }
+      },
+      fetchPolicy: 'cache-and-network',
+    },
+    GroupMembers: {
+      query() {
+        return groupMembersQuery
+      },
+      variables() {
+        return {
+          id: this.$route.params.id,
         }
       },
       fetchPolicy: 'cache-and-network',
