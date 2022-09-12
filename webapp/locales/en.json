@@ -370,6 +370,13 @@
     "follow": "Follow",
     "following": "Following"
   },
+  "group": {
+    "group-created": "The group was created!",
+    "group-updated": "The group data has been changed.",
+    "newGroup": "Create a new Group",
+    "save": "Create new group",
+    "update": "Save change"
+  },
   "hashtags-filter": {
     "clearSearch": "Clear search",
     "hashtag-search": "Searching for #{hashtag}",
@@ -747,6 +754,7 @@
       "unmute": "Unmute user",
       "unmuted": "{name} is unmuted again"
     },
+    "myGroups": "My Groups",
     "name": "Settings",
     "notifications": {
       "name": "Notifications",
