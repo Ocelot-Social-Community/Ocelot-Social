@@ -36,7 +36,7 @@
         @input.native="setFilter"
       />
     </template>
-    <p v-else class="nobody-message">{{ titleNobody }}</p>
+    <p v-else-if="titleNobody" class="nobody-message">{{ titleNobody }}</p>
   </base-card>
 </template>
 
@@ -52,7 +52,7 @@ export default {
   props: {
     uniqueName: { type: String, required: true },
     title: { type: String, required: true },
-    titleNobody: { type: String, required: true },
+    titleNobody: { type: String, default: null },
     allProfilesCount: { type: Number, required: true },
     profiles: { type: Array, required: true },
     type: { type: String, default: 'following' },
