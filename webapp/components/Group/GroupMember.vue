@@ -66,7 +66,7 @@ export default {
           mutation: changeGroupMemberRoleMutation,
           variables: { groupId: this.groupId, userId: id, roleInGroup: value },
         })
-        // this.$toast.success(this.$t('group.group-updated'))
+        this.$toast.success('Die Rolle wurde auf ('+value+') geändert!')
       } catch (error) {
         this.$toast.error(error.message)
       }
