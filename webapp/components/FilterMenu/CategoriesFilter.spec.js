@@ -15,8 +15,19 @@ describe('CategoriesFilter.vue', () => {
     'posts/filteredCategoryIds': jest.fn(() => []),
   }
 
+  const apolloMutationMock = jest.fn().mockResolvedValue({
+    data: { saveCategorySettings: true },
+  })
+
   const mocks = {
     $t: jest.fn((string) => string),
+    $apollo: {
+      mutate: apolloMutationMock,
+    },
+    $toast: {
+      success: jest.fn(),
+      error: jest.fn(),
+    },
   }
 
   const Wrapper = () => {
@@ -74,6 +85,15 @@ describe('CategoriesFilter.vue', () => {
         const allCategoriesButton = wrapper.find('.categories-filter .sidebar .base-button')
         allCategoriesButton.trigger('click')
         expect(mutations['posts/RESET_CATEGORIES']).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('save categories', () => {
+      it('calls the API', async () => {
+        wrapper = await Wrapper()
+        const saveButton = wrapper.findAll('.categories-filter .sidebar .base-button').at(1)
+        saveButton.trigger('click')
+        expect(apolloMutationMock).toBeCalled()
       })
     })
   })
