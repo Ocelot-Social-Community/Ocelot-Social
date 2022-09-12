@@ -85,6 +85,7 @@
   "group": {
     "foundation": null,
     "goal": null,
+    "membersCount": null,
     "membersListTitle": null
   },
   "login": {

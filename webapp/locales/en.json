@@ -373,6 +373,7 @@
   "group": {
     "foundation": "Foundation",
     "goal": "Goal:",
+    "membersCount": "Members",
     "membersListTitle": "Group Members"
   },
   "hashtags-filter": {

@@ -47,23 +47,30 @@
           </ds-space>
           <ds-flex>
             <ds-flex-item>
-              <!-- <client-only>
+              <client-only>
+                <ds-number :label="$t('group.membersCount')">
+                  <count-to slot="count" :start-val="0" :end-val="groupMembers.length" />
+                </ds-number>
+              </client-only>
+            </ds-flex-item>
+            <!-- <ds-flex-item>
+              <client-only>
                 <ds-number :label="$t('profile.followers')">
-                  <hc-count-to
+                  <count-to
                     slot="count"
                     :start-val="followedByCountStartValue"
                     :end-val="user.followedByCount"
                   />
                 </ds-number>
-              </client-only> -->
-            </ds-flex-item>
-            <ds-flex-item>
-              <!-- <client-only>
+              </client-only>
+            </ds-flex-item> -->
+            <!-- <ds-flex-item>
+              <client-only>
                 <ds-number :label="$t('profile.following')">
-                  <hc-count-to slot="count" :end-val="user.followingCount" />
+                  <count-to slot="count" :end-val="user.followingCount" />
                 </ds-number>
-              </client-only> -->
-            </ds-flex-item>
+              </client-only>
+            </ds-flex-item> -->
           </ds-flex>
           <div v-if="!isGroupMember" class="action-buttons">
             <!-- <base-button v-if="user.isBlocked" @click="unblockUser(user)">
@@ -72,7 +79,7 @@
             <base-button v-if="user.isMuted" @click="unmuteUser(user)">
               {{ $t('settings.muted-users.unmute') }}
             </base-button>
-            <hc-follow-button
+            <follow-button
               v-if="!user.isMuted && !user.isBlocked"
               :follow-id="user.id"
               :is-followed="user.followedByCurrentUser"
@@ -168,7 +175,7 @@
           </template>
           <template v-else>
             <ds-grid-item column-span="fullWidth">
-              <hc-empty margin="xx-large" icon="file" />
+              <empty margin="xx-large" icon="file" />
             </ds-grid-item>
           </template>
         </masonry-grid>
@@ -182,26 +189,25 @@
 
 <script>
 import uniqBy from 'lodash/uniqBy'
-import postListActions from '~/mixins/postListActions'
-import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
-// import HcFollowButton from '~/components/FollowButton.vue'
-// import HcCountTo from '~/components/CountTo.vue'
-// import HcBadges from '~/components/Badges.vue'
-import FollowList from '~/components/features/ProfileList/FollowList'
-import HcEmpty from '~/components/Empty/Empty'
-// import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import AvatarUploader from '~/components/Uploader/AvatarUploader'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
-import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
-import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
-// import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 // import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
 // import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 // import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 // import UpdateQuery from '~/components/utils/UpdateQuery'
-// import SocialMedia from '~/components/SocialMedia/SocialMedia'
+import postListActions from '~/mixins/postListActions'
+import AvatarUploader from '~/components/Uploader/AvatarUploader'
+// import ContentMenu from '~/components/ContentMenu/ContentMenu'
+import CountTo from '~/components/CountTo.vue'
+import Empty from '~/components/Empty/Empty'
+// import FollowButton from '~/components/FollowButton.vue'
+// import FollowList from '~/components/features/ProfileList/FollowList'
+import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
+import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
+import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import ProfileList from '~/components/features/ProfileList/ProfileList'
+// import SocialMedia from '~/components/SocialMedia/SocialMedia'
+// import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 
 // const tabToFilterMapping = ({ tab, id }) => {
 //   return {
@@ -213,19 +219,18 @@ import ProfileList from '~/components/features/ProfileList/ProfileList'
 
 export default {
   components: {
-    // SocialMedia,
+    AvatarUploader,
+    // ContentMenu,
+    CountTo,
+    Empty,
+    // FollowButton,
+    // FollowList,
     PostTeaser,
-    // HcFollowButton,
-    // HcCountTo,
-    // HcBadges,
-    HcEmpty,
     ProfileAvatar,
     ProfileList,
-    // ContentMenu,
-    AvatarUploader,
     MasonryGrid,
     MasonryGridItem,
-    FollowList,
+    // SocialMedia,
     // TabNavigation,
   },
   mixins: [postListActions],
@@ -256,7 +261,6 @@ export default {
       return this.Group ? this.Group[0] : {}
     },
     groupMembers() {
-      console.log('this.GroupMembers: ', this.GroupMembers)
       return this.GroupMembers ? this.GroupMembers : []
     },
     isGroupOwner() {
