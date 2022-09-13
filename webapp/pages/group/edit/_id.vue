@@ -1,9 +1,9 @@
 <template>
   <div>
-
+  <ds-section>
     <h1 class="ds-heading ds-heading-h1">{{group.name}}</h1>
-    <div class="">Group Setting</div>
-    
+    <div class="">Group Setting</div></ds-section>
+  <ds-space margin="large" >
     <ds-flex gutter="small">
       <ds-flex-item :width="{ base: '100%', md: '200px' }">
         <ds-menu :routes="routes" :is-exact="() => true" />
@@ -14,6 +14,7 @@
         </transition>
       </ds-flex-item>
     </ds-flex>
+  </ds-space>
     <ds-space centered>
       <nuxt-link to="/my-groups">zurück</nuxt-link>
     </ds-space>

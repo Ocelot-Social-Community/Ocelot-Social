@@ -13,8 +13,13 @@
             </ds-space>
           </div>
           <ds-space margin-top="small">
-            <ds-chip :color="item.groupType === 'public' ? 'primary' : 'warning'">{{item.groupType}}</ds-chip>
-            <ds-chip v-for="category in item.categories" :key="category.name"><ds-icon :name="category.icon"></ds-icon> {{category.name}}</ds-chip>
+            <ds-chip v-if="item.groupType === 'public'" color="primary">{{item.groupType}}</ds-chip>
+            <ds-chip v-if="item.groupType === 'hidden'" color="warning">{{item.groupType}}</ds-chip>
+            <ds-chip v-if="item.groupType === 'closed'" color="danger">{{item.groupType}}</ds-chip>
+            <ds-chip v-for="category in item.categories" :key="category.name">
+              <ds-icon :name="category.icon"></ds-icon> 
+              {{category.name}}
+            </ds-chip>
           </ds-space>
         </ds-space>
       </ds-flex-item>

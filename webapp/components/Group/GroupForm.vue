@@ -53,7 +53,7 @@
             type="submit"
             @click.prevent="submit()"
             icon="save"
-            :disabled="disabled"
+            :disabled="update ? submitDisableEdit : submitDisable"
             primary
           >
             {{ update ? $t('group.update') : $t('group.save') }}
@@ -61,7 +61,7 @@
         </ds-space>
       </ds-form>
       <ds-space centered v-show="!update">
-        <nuxt-link to="/group/my-groups">zurück</nuxt-link>
+        <nuxt-link to="/my-groups">zurück</nuxt-link>
       </ds-space>
     </ds-container>
   </div>
@@ -147,5 +147,52 @@ export default {
       alert('reset')
     },
   },
+  computed: {
+    submitDisable() {
+      if (
+        this.formData.name !== ''
+        && this.formData.groupType !== ''
+        && this.formData.about !== ''
+        && this.formData.description !== ''
+        && this.formData.actionRadius !== ''
+        && this.formData.categoryIds.length > 0
+        ) {
+        return false
+      }
+      return true
+    },
+    submitDisableEdit() {
+       
+      if (
+        this.formData.name !== this.group.name
+        || this.formData.groupType !== this.group.groupType
+        || this.formData.about !== this.group.about
+        || this.formData.description !== this.group.description
+        || this.formData.actionRadius !== this.group.actionRadius
+        || this.formData.categoryIds.length === 0
+        || !this.sameCategories
+        ) {
+        return false
+      }
+      return true
+    },
+    sameCategories(){
+      let formDataCategories = this.formData.categoryIds.map((categoryIds) => categoryIds)
+      let groupDataCategories = this.group.categories.map((category) => category.id)
+      let result
+      let each = true
+
+      if (formDataCategories.length !== groupDataCategories.length) return false
+
+      if (JSON.stringify(formDataCategories) !== JSON.stringify(groupDataCategories)) {
+        formDataCategories.forEach(element => {
+          result = groupDataCategories.filter(groupCategorieId => groupCategorieId === element)
+          if (result.length === 0) each = false
+        })
+        return each
+      }
+      return true
+    }
+  }
 }
 </script>
