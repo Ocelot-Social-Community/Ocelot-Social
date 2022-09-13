@@ -94,6 +94,8 @@
               :groupId="group && group.id ? group.id : ''"
               :userId="currentUser.id"
               :isMember="isGroupMember"
+              :disabled="isGroupOwner"
+              :loading="$apollo.loading"
               @optimistic="optimisticJoinLeave"
               @update="updateJoinLeave"
             />

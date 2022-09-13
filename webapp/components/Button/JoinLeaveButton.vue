@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { joinGroupMutation } from '~/graphql/groups'
+import { joinGroupMutation, leaveGroupMutation } from '~/graphql/groups'
 
 export default {
   name: 'JoinLeaveButton',
@@ -23,11 +23,11 @@ export default {
     groupId: { type: String, required: true },
     userId: { type: String, required: true },
     isMember: { type: Boolean, required: true },
+    disabled: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false },
   },
   data() {
     return {
-      disabled: false,
-      loading: false,
       hovered: false,
     }
   },
@@ -61,7 +61,7 @@ export default {
     },
     async toggle() {
       const join = !this.isMember
-      const mutation = join ? joinGroupMutation : null // Wolle: implement "leaveGroupMutation"
+      const mutation = join ? joinGroupMutation : leaveGroupMutation
 
       this.hovered = false
       const optimisticResult = { joinedByCurrentUser: join }
@@ -72,7 +72,7 @@ export default {
           mutation,
           variables: { groupId: this.groupId, userId: this.userId },
         })
-        const joinedGroup = join ? data.JoinGroup : { myRoleInGroup: null } // Wolle: implement "leaveGroupMutation"
+        const joinedGroup = join ? data.JoinGroup : data.LeaveGroup
         this.$emit('update', joinedGroup)
       } catch (error) {
         optimisticResult.joinedByCurrentUser = !join
