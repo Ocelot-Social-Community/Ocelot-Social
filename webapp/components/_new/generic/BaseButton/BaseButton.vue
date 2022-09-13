@@ -46,7 +46,7 @@ export default {
       type: String,
       default: 'regular',
       validator(value) {
-        return value.match(/(small|regular)/)
+        return value.match(/(small|regular|large)/)
       },
     },
     type: {
@@ -66,6 +66,7 @@ export default {
       if (this.danger) buttonClass += ' --danger'
       if (this.loading) buttonClass += ' --loading'
       if (this.size === 'small') buttonClass += ' --small'
+      if (this.size === 'large') buttonClass += ' --large'
 
       if (this.filled) buttonClass += ' --filled'
       else if (this.ghost) buttonClass += ' --ghost'
@@ -120,6 +121,15 @@ export default {
 
     &.--circle {
       width: $size-button-small;
+    }
+  }
+
+  &.--large {
+    height: $size-button-large;
+    font-size: $font-size-large;
+
+    &.--circle {
+      width: $size-button-large;
     }
   }
 
