@@ -246,3 +246,50 @@ support, try this [helm chart](https://github.com/helm/charts/tree/master/stable
 
 On our kubernetes cluster we get "mult-attach" errors for persistent volumes.
 Apparently DigitalOcean's kubernetes clusters do not fulfill the requirements.
+
+## Kubernetes Commands (Without Helm) To Deploy New Docker Images To A Kubernetes Cluster
+
+### Deploy A Version
+
+```bash
+# !!! be aware of the correct kube context !!!
+$ kubectl config get-contexts
+
+# deploy version '$BUILD_VERSION'
+# !!! 'latest' is not recommended on production !!!
+
+# for easyness set env
+$ export BUILD_VERSION=1.0.8-48-ocelot.social1.0.8-184 # example
+# check this with
+$ echo $BUILD_VERSION
+1.0.8-48-ocelot.social1.0.8-184
+
+# deploy actual version '$BUILD_VERSION' to Kubernetes cluster
+$ kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:$BUILD_VERSION
+$ kubectl -n default rollout restart deployment/ocelot-webapp
+$ kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:$BUILD_VERSION
+$ kubectl -n default rollout restart deployment/ocelot-backend
+$ kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:$BUILD_VERSION
+$ kubectl -n default rollout restart deployment/ocelot-maintenance
+$ kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:$BUILD_VERSION
+$ kubectl -n default rollout restart deployment/ocelot-neo4j
+# verify deployment and wait for the pods of each deployment to get ready for cleaning and seeding of the database
+$ kubectl -n default rollout status deployment/ocelot-webapp --timeout=240s
+$ kubectl -n default rollout status deployment/ocelot-maintenance --timeout=240s
+$ kubectl -n default rollout status deployment/ocelot-backend --timeout=240s
+$ kubectl -n default rollout status deployment/ocelot-neo4j --timeout=240s
+```
+
+### Staging – Clean And Seed Neo4j Database
+
+***ATTENTION:*** Cleaning and seeding of our Neo4j database is only possible in production if env `PRODUCTION_DB_CLEAN_ALLOW=true` is set in our deployment.
+
+```bash
+# !!! be aware of the correct kube context !!!
+$ kubectl config get-contexts
+
+# reset and seed Neo4j database via backend for staging
+$ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "node --experimental-repl-await dist/db/clean.js && node --experimental-repl-await dist/db/seed.js"
+
+
+```
