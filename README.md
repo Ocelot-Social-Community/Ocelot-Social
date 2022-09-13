@@ -31,8 +31,6 @@ Logins:
 | `moderator@example.org` | 1234 | moderator |
 | `admin@example.org` | 1234 | admin |
 
-Deployed networks can be found [here](#list-of-deployed-networks).
-
 ## Usage
 
 Fork this repository to configure and rebrand it for your own [ocelot.social](https://github.com/Ocelot-Social-Community/Ocelot-Social) network.
@@ -129,20 +127,6 @@ Browser compatibility testing with [BrowserStack](https://www.browserstack.com/)
 
 <img alt="BrowserStack Logo" src=".gitbook/assets/browserstack-logo.svg" width="256">
 -->
-
-## List Of Deployed Networks
-
-You may need an invitation to access a network.
-
-### More Likely To Try
-
-- [wir.social](https://wir.social)
-
-### Others
-
-- [freilernen.social](https://freilernen.social)
-- [helfa.social](https://helfa.social)
-- [sender.fm](https://sender.fm)
 
 ## License
 
