@@ -1,6 +1,9 @@
 <template>
   <div>
-    <ds-page-title heading="Group Setting"></ds-page-title>
+
+    <h1 class="ds-heading ds-heading-h1">{{group.name}}</h1>
+    <div class="">Group Setting</div>
+    
     <ds-flex gutter="small">
       <ds-flex-item :width="{ base: '100%', md: '200px' }">
         <ds-menu :routes="routes" :is-exact="() => true" />
@@ -12,7 +15,7 @@
       </ds-flex-item>
     </ds-flex>
     <ds-space centered>
-      <nuxt-link to="/group/my-groups">zurück</nuxt-link>
+      <nuxt-link to="/my-groups">zurück</nuxt-link>
     </ds-space>
   </div>
 </template>

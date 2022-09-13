@@ -1,18 +1,22 @@
 <template>
   <div>
     <ds-space><h3>Members</h3></ds-space>
+    <base-card>
     <ds-table :data="responseGroupMembersQuery" :fields="tableFields" condensed>
       <template slot="avatar">
         <ds-avatar online size="small" :name="responseGroupMembersQuery.name"></ds-avatar>
       </template>
       <template slot="myRoleInGroup" slot-scope="scope">
-        <ds-select
-          v-if="scope.row.myRoleInGroup !== 'owner'"
+        <select
+        v-if="scope.row.myRoleInGroup !== 'owner'"
           :options="['usual', 'admin']"
-          v-model="scope.row.myRoleInGroup"
-          :value="scope.row.myRoleInGroup"
-          @input="changeMemberRole(scope.row.id, scope.row.myRoleInGroup)"
-        ></ds-select>
+          :value="`${scope.row.myRoleInGroup}`"
+          v-on:change="changeMemberRole(scope.row.id, $event)"
+            > 
+            <option v-for="value in ['usual', 'admin']" :key="value">
+                {{ value }}
+            </option>
+          </select> 
       </template>
       <template slot="edit" slot-scope="scope">
         <ds-button
@@ -24,6 +28,7 @@
         </ds-button>
       </template>
     </ds-table>
+  </base-card>
     <ds-modal
       v-if="isOpen"
       v-model="isOpen"
@@ -60,13 +65,14 @@ export default {
     }
   },
   methods: {
-    async changeMemberRole(id, value) {
+    async changeMemberRole(id, event) {
+      const newRole = event.target.value
       try {
         await this.$apollo.mutate({
           mutation: changeGroupMemberRoleMutation,
-          variables: { groupId: this.groupId, userId: id, roleInGroup: value },
+          variables: { groupId: this.groupId, userId: id, roleInGroup: newRole },
         })
-        this.$toast.success('Die Rolle wurde auf ('+value+') geändert!')
+        this.$toast.success('Die Rolle wurde auf ('+newRole+') geändert!')
       } catch (error) {
         this.$toast.error(error.message)
       }

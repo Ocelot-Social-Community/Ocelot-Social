@@ -1,7 +1,6 @@
 <template>
   <div>
     <ds-container class="group-card">
-      <ds-page-title heading="Groups"></ds-page-title>
       <ds-card v-for="item in items" :key="item.id" space="xx-small">
         <nuxt-link :to="`/group/${item.id}`">{{ item.name }}</nuxt-link>
         {{ item.categories ? item.categories.map((category) => category.name) : [] }}

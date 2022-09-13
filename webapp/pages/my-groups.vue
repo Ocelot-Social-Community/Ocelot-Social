@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>my groups</div>
+    <h1 class="ds-heading ds-heading-h1">My Groups</h1>
     <group-teaser />
     <br />
     <br />
