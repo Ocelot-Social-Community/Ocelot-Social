@@ -438,7 +438,7 @@ export default {
       }
     },
     updateJoinLeave({ myRoleInGroup }) {
-      this.Group = [{ ...this.Group[0], myRole: myRoleInGroup }] // if we assign it directly "this.group" will not be updated
+      this.Group[0].myRole = myRoleInGroup
       const currentUserInGroupMembers = this.GroupMembers.find(
         (user) => user.id === this.currentUser.id,
       )
