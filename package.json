@@ -2,7 +2,7 @@
   "name": "yunite.net",
   "version": "1.0.8",
   "ocelotDockerVersionTag": "1.0.8-182",
-  "dockerOrganisation": "XXX",
+  "dockerOrganisation": "tirokk",
   "description": "yunite.net Branded",
   "author": "yunite.net Community",
   "license": "MIT",
