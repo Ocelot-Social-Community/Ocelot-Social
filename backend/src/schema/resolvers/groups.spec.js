@@ -4,6 +4,7 @@ import {
   createGroupMutation,
   updateGroupMutation,
   joinGroupMutation,
+  leaveGroupMutation,
   changeGroupMemberRoleMutation,
   groupMembersQuery,
   groupQuery,
@@ -17,6 +18,12 @@ const neode = getNeode()
 
 let authenticatedUser
 let user
+let noMemberUser
+let pendingMemberUser
+let usualMemberUser
+let adminMemberUser
+let ownerMemberUser
+let secondOwnerMemberUser
 
 const categoryIds = ['cat9', 'cat4', 'cat15']
 const descriptionAdditional100 =
@@ -73,6 +80,169 @@ const seedBasicsAndClearAuthentication = async () => {
       icon: 'paw',
     }),
   ])
+  authenticatedUser = null
+}
+
+const seedComplexScenarioAndClearAuthentication = async () => {
+  await seedBasicsAndClearAuthentication()
+  // create users
+  noMemberUser = await Factory.build(
+    'user',
+    {
+      id: 'none-member-user',
+      name: 'None Member TestUser',
+    },
+    {
+      email: 'none-member-user@example.org',
+      password: '1234',
+    },
+  )
+  pendingMemberUser = await Factory.build(
+    'user',
+    {
+      id: 'pending-member-user',
+      name: 'Pending Member TestUser',
+    },
+    {
+      email: 'pending-member-user@example.org',
+      password: '1234',
+    },
+  )
+  usualMemberUser = await Factory.build(
+    'user',
+    {
+      id: 'usual-member-user',
+      name: 'Usual Member TestUser',
+    },
+    {
+      email: 'usual-member-user@example.org',
+      password: '1234',
+    },
+  )
+  adminMemberUser = await Factory.build(
+    'user',
+    {
+      id: 'admin-member-user',
+      name: 'Admin Member TestUser',
+    },
+    {
+      email: 'admin-member-user@example.org',
+      password: '1234',
+    },
+  )
+  ownerMemberUser = await Factory.build(
+    'user',
+    {
+      id: 'owner-member-user',
+      name: 'Owner Member TestUser',
+    },
+    {
+      email: 'owner-member-user@example.org',
+      password: '1234',
+    },
+  )
+  secondOwnerMemberUser = await Factory.build(
+    'user',
+    {
+      id: 'second-owner-member-user',
+      name: 'Second Owner Member TestUser',
+    },
+    {
+      email: 'second-owner-member-user@example.org',
+      password: '1234',
+    },
+  )
+  // create groups
+  // public-group
+  authenticatedUser = await usualMemberUser.toJson()
+  await mutate({
+    mutation: createGroupMutation,
+    variables: {
+      id: 'public-group',
+      name: 'The Best Group',
+      about: 'We will change the world!',
+      description: 'Some description' + descriptionAdditional100,
+      groupType: 'public',
+      actionRadius: 'regional',
+      categoryIds,
+    },
+  })
+  await mutate({
+    mutation: joinGroupMutation,
+    variables: {
+      groupId: 'public-group',
+      userId: 'owner-of-closed-group',
+    },
+  })
+  await mutate({
+    mutation: joinGroupMutation,
+    variables: {
+      groupId: 'public-group',
+      userId: 'owner-of-hidden-group',
+    },
+  })
+  // closed-group
+  authenticatedUser = await ownerMemberUser.toJson()
+  await mutate({
+    mutation: createGroupMutation,
+    variables: {
+      id: 'closed-group',
+      name: 'Uninteresting Group',
+      about: 'We will change nothing!',
+      description: 'We love it like it is!?' + descriptionAdditional100,
+      groupType: 'closed',
+      actionRadius: 'national',
+      categoryIds,
+    },
+  })
+  // hidden-group
+  authenticatedUser = await adminMemberUser.toJson()
+  await mutate({
+    mutation: createGroupMutation,
+    variables: {
+      id: 'hidden-group',
+      name: 'Investigative Journalism Group',
+      about: 'We will change all.',
+      description: 'We research …' + descriptionAdditional100,
+      groupType: 'hidden',
+      actionRadius: 'global',
+      categoryIds,
+    },
+  })
+  // 'JoinGroup' mutation does not work in hidden groups so we join them by 'ChangeGroupMemberRole' through the owner
+  await mutate({
+    mutation: changeGroupMemberRoleMutation,
+    variables: {
+      groupId: 'hidden-group',
+      userId: 'admin-member-user',
+      roleInGroup: 'usual',
+    },
+  })
+  await mutate({
+    mutation: changeGroupMemberRoleMutation,
+    variables: {
+      groupId: 'hidden-group',
+      userId: 'second-owner-member-user',
+      roleInGroup: 'usual',
+    },
+  })
+  await mutate({
+    mutation: changeGroupMemberRoleMutation,
+    variables: {
+      groupId: 'hidden-group',
+      userId: 'admin-member-user',
+      roleInGroup: 'usual',
+    },
+  })
+  await mutate({
+    mutation: changeGroupMemberRoleMutation,
+    variables: {
+      groupId: 'hidden-group',
+      userId: 'second-owner-member-user',
+      roleInGroup: 'usual',
+    },
+  })
+
   authenticatedUser = null
 }
 
@@ -1371,162 +1541,8 @@ describe('in mode', () => {
     })
 
     describe('ChangeGroupMemberRole', () => {
-      let pendingMemberUser
-      let usualMemberUser
-      let adminMemberUser
-      let ownerMemberUser
-      let secondOwnerMemberUser
-
       beforeAll(async () => {
-        await seedBasicsAndClearAuthentication()
-        // create users
-        pendingMemberUser = await Factory.build(
-          'user',
-          {
-            id: 'pending-member-user',
-            name: 'Pending Member TestUser',
-          },
-          {
-            email: 'pending-member-user@example.org',
-            password: '1234',
-          },
-        )
-        usualMemberUser = await Factory.build(
-          'user',
-          {
-            id: 'usual-member-user',
-            name: 'Usual Member TestUser',
-          },
-          {
-            email: 'usual-member-user@example.org',
-            password: '1234',
-          },
-        )
-        adminMemberUser = await Factory.build(
-          'user',
-          {
-            id: 'admin-member-user',
-            name: 'Admin Member TestUser',
-          },
-          {
-            email: 'admin-member-user@example.org',
-            password: '1234',
-          },
-        )
-        ownerMemberUser = await Factory.build(
-          'user',
-          {
-            id: 'owner-member-user',
-            name: 'Owner Member TestUser',
-          },
-          {
-            email: 'owner-member-user@example.org',
-            password: '1234',
-          },
-        )
-        secondOwnerMemberUser = await Factory.build(
-          'user',
-          {
-            id: 'second-owner-member-user',
-            name: 'Second Owner Member TestUser',
-          },
-          {
-            email: 'second-owner-member-user@example.org',
-            password: '1234',
-          },
-        )
-        // create groups
-        // public-group
-        authenticatedUser = await usualMemberUser.toJson()
-        await mutate({
-          mutation: createGroupMutation,
-          variables: {
-            id: 'public-group',
-            name: 'The Best Group',
-            about: 'We will change the world!',
-            description: 'Some description' + descriptionAdditional100,
-            groupType: 'public',
-            actionRadius: 'regional',
-            categoryIds,
-          },
-        })
-        await mutate({
-          mutation: joinGroupMutation,
-          variables: {
-            groupId: 'public-group',
-            userId: 'owner-of-closed-group',
-          },
-        })
-        await mutate({
-          mutation: joinGroupMutation,
-          variables: {
-            groupId: 'public-group',
-            userId: 'owner-of-hidden-group',
-          },
-        })
-        // closed-group
-        authenticatedUser = await ownerMemberUser.toJson()
-        await mutate({
-          mutation: createGroupMutation,
-          variables: {
-            id: 'closed-group',
-            name: 'Uninteresting Group',
-            about: 'We will change nothing!',
-            description: 'We love it like it is!?' + descriptionAdditional100,
-            groupType: 'closed',
-            actionRadius: 'national',
-            categoryIds,
-          },
-        })
-        // hidden-group
-        authenticatedUser = await adminMemberUser.toJson()
-        await mutate({
-          mutation: createGroupMutation,
-          variables: {
-            id: 'hidden-group',
-            name: 'Investigative Journalism Group',
-            about: 'We will change all.',
-            description: 'We research …' + descriptionAdditional100,
-            groupType: 'hidden',
-            actionRadius: 'global',
-            categoryIds,
-          },
-        })
-        // 'JoinGroup' mutation does not work in hidden groups so we join them by 'ChangeGroupMemberRole' through the owner
-        await mutate({
-          mutation: changeGroupMemberRoleMutation,
-          variables: {
-            groupId: 'hidden-group',
-            userId: 'admin-member-user',
-            roleInGroup: 'usual',
-          },
-        })
-        await mutate({
-          mutation: changeGroupMemberRoleMutation,
-          variables: {
-            groupId: 'hidden-group',
-            userId: 'second-owner-member-user',
-            roleInGroup: 'usual',
-          },
-        })
-        await mutate({
-          mutation: changeGroupMemberRoleMutation,
-          variables: {
-            groupId: 'hidden-group',
-            userId: 'admin-member-user',
-            roleInGroup: 'usual',
-          },
-        })
-        await mutate({
-          mutation: changeGroupMemberRoleMutation,
-          variables: {
-            groupId: 'hidden-group',
-            userId: 'second-owner-member-user',
-            roleInGroup: 'usual',
-          },
-        })
-
-        authenticatedUser = null
+        await seedComplexScenarioAndClearAuthentication()
       })
 
       afterAll(async () => {
@@ -2323,6 +2339,241 @@ describe('in mode', () => {
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
+              })
+            })
+          })
+        })
+      })
+    })
+
+    describe('LeaveGroup', () => {
+      beforeAll(async () => {
+        await seedComplexScenarioAndClearAuthentication()
+        // closed-group
+        authenticatedUser = await ownerMemberUser.toJson()
+        await mutate({
+          mutation: changeGroupMemberRoleMutation,
+          variables: {
+            groupId: 'closed-group',
+            userId: 'pending-member-user',
+            roleInGroup: 'pending',
+          },
+        })
+        await mutate({
+          mutation: changeGroupMemberRoleMutation,
+          variables: {
+            groupId: 'closed-group',
+            userId: 'usual-member-user',
+            roleInGroup: 'usual',
+          },
+        })
+        await mutate({
+          mutation: changeGroupMemberRoleMutation,
+          variables: {
+            groupId: 'closed-group',
+            userId: 'admin-member-user',
+            roleInGroup: 'admin',
+          },
+        })
+        await mutate({
+          mutation: changeGroupMemberRoleMutation,
+          variables: {
+            groupId: 'closed-group',
+            userId: 'second-owner-member-user',
+            roleInGroup: 'owner',
+          },
+        })
+
+        authenticatedUser = null
+      })
+
+      afterAll(async () => {
+        await cleanDatabase()
+      })
+
+      describe('unauthenticated', () => {
+        it('throws authorization error', async () => {
+          const { errors } = await mutate({
+            mutation: leaveGroupMutation,
+            variables: {
+              groupId: 'not-existing-group',
+              userId: 'current-user',
+            },
+          })
+          expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+        })
+      })
+
+      describe('authenticated', () => {
+        describe('in all group types', () => {
+          describe('here "closed-group" for example', () => {
+            const memberInGroup = async (userId, groupId) => {
+              const result = await query({
+                query: groupMembersQuery,
+                variables: {
+                  id: groupId,
+                },
+              })
+              return result.data && result.data.GroupMembers
+                ? !!result.data.GroupMembers.find((member) => member.id === userId)
+                : null
+            }
+
+            beforeEach(async () => {
+              authenticatedUser = null
+              variables = {
+                groupId: 'closed-group',
+              }
+            })
+
+            describe('left by "pending-member-user"', () => {
+              it('has "null" as membership role, was in the group, and left the group', async () => {
+                authenticatedUser = await ownerMemberUser.toJson()
+                expect(await memberInGroup('pending-member-user', 'closed-group')).toBe(true)
+                authenticatedUser = await pendingMemberUser.toJson()
+                await expect(
+                  mutate({
+                    mutation: leaveGroupMutation,
+                    variables: {
+                      ...variables,
+                      userId: 'pending-member-user',
+                    },
+                  }),
+                ).resolves.toMatchObject({
+                  data: {
+                    LeaveGroup: {
+                      id: 'pending-member-user',
+                      myRoleInGroup: null,
+                    },
+                  },
+                  errors: undefined,
+                })
+                authenticatedUser = await ownerMemberUser.toJson()
+                expect(await memberInGroup('pending-member-user', 'closed-group')).toBe(false)
+              })
+            })
+
+            describe('left by "usual-member-user"', () => {
+              it('has "null" as membership role, was in the group, and left the group', async () => {
+                authenticatedUser = await ownerMemberUser.toJson()
+                expect(await memberInGroup('usual-member-user', 'closed-group')).toBe(true)
+                authenticatedUser = await usualMemberUser.toJson()
+                await expect(
+                  mutate({
+                    mutation: leaveGroupMutation,
+                    variables: {
+                      ...variables,
+                      userId: 'usual-member-user',
+                    },
+                  }),
+                ).resolves.toMatchObject({
+                  data: {
+                    LeaveGroup: {
+                      id: 'usual-member-user',
+                      myRoleInGroup: null,
+                    },
+                  },
+                  errors: undefined,
+                })
+                authenticatedUser = await ownerMemberUser.toJson()
+                expect(await memberInGroup('usual-member-user', 'closed-group')).toBe(false)
+              })
+            })
+
+            describe('left by "admin-member-user"', () => {
+              it('has "null" as membership role, was in the group, and left the group', async () => {
+                authenticatedUser = await ownerMemberUser.toJson()
+                expect(await memberInGroup('admin-member-user', 'closed-group')).toBe(true)
+                authenticatedUser = await adminMemberUser.toJson()
+                await expect(
+                  mutate({
+                    mutation: leaveGroupMutation,
+                    variables: {
+                      ...variables,
+                      userId: 'admin-member-user',
+                    },
+                  }),
+                ).resolves.toMatchObject({
+                  data: {
+                    LeaveGroup: {
+                      id: 'admin-member-user',
+                      myRoleInGroup: null,
+                    },
+                  },
+                  errors: undefined,
+                })
+                authenticatedUser = await ownerMemberUser.toJson()
+                expect(await memberInGroup('admin-member-user', 'closed-group')).toBe(false)
+              })
+            })
+
+            describe('left by "owner-member-user"', () => {
+              it('throws authorization error', async () => {
+                authenticatedUser = await ownerMemberUser.toJson()
+                const { errors } = await mutate({
+                  mutation: leaveGroupMutation,
+                  variables: {
+                    ...variables,
+                    userId: 'owner-member-user',
+                  },
+                })
+                expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+              })
+            })
+
+            describe('left by "second-owner-member-user"', () => {
+              it('throws authorization error', async () => {
+                authenticatedUser = await secondOwnerMemberUser.toJson()
+                const { errors } = await mutate({
+                  mutation: leaveGroupMutation,
+                  variables: {
+                    ...variables,
+                    userId: 'second-owner-member-user',
+                  },
+                })
+                expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+              })
+            })
+
+            describe('left by "none-member-user"', () => {
+              it('throws authorization error', async () => {
+                authenticatedUser = await noMemberUser.toJson()
+                const { errors } = await mutate({
+                  mutation: leaveGroupMutation,
+                  variables: {
+                    ...variables,
+                    userId: 'none-member-user',
+                  },
+                })
+                expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+              })
+            })
+
+            describe('as "owner-member-user" try to leave member "usual-member-user"', () => {
+              it('throws authorization error', async () => {
+                authenticatedUser = await ownerMemberUser.toJson()
+                const { errors } = await mutate({
+                  mutation: leaveGroupMutation,
+                  variables: {
+                    ...variables,
+                    userId: 'usual-member-user',
+                  },
+                })
+                expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+              })
+            })
+
+            describe('as "usual-member-user" try to leave member "admin-member-user"', () => {
+              it('throws authorization error', async () => {
+                authenticatedUser = await usualMemberUser.toJson()
+                const { errors } = await mutate({
+                  mutation: leaveGroupMutation,
+                  variables: {
+                    ...variables,
+                    userId: 'admin-member-user',
+                  },
+                })
+                expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
           })
