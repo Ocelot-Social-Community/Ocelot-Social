@@ -371,14 +371,35 @@
     "following": "Folge Ich"
   },
   "group": {
+    "actionRadii": {
+      "continental": "Kontinentale Gruppe",
+      "global": "Globale Gruppe",
+      "interplanetary": "Interplanetare Gruppe",
+      "national": "Nationale Gruppe",
+      "regional": "Regionale Gruppe"
+    },
+    "actionRadius": "Aktionsradius",
     "foundation": "Gründung",
-    "goal": "Ziel:",
+    "goal": "Ziel der Gruppe",
     "joinLeaveButton": {
       "iAmMember": "Bin Mitglied",
       "join": "Beitreten"
     },
     "membersCount": "Mitglieder",
-    "membersListTitle": "Gruppenmitglieder"
+    "membersListTitle": "Gruppenmitglieder",
+    "role": "Deine Rolle in der Gruppe",
+    "roles": {
+      "admin": "Administrator",
+      "owner": "Inhaber",
+      "pending": "Ausstehendes Mitglied",
+      "usual": "Einfaches Mitglied"
+    },
+    "type": "Gruppentyp",
+    "types": {
+      "closed": "Geschlossene Gruppe",
+      "hidden": "Versteckte Gruppe",
+      "public": "Öffentliche Gruppe"
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",

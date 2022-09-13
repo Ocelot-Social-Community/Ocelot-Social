@@ -102,11 +102,44 @@
             <!-- implement:
               v-if="!user.isMuted && !user.isBlocked" -->
           </div>
+          <hr />
+          <ds-space margin-top="small" margin-bottom="small">
+            <ds-text
+              v-if="isGroupMember"
+              class="centered-text hyphenate-text"
+              color="soft"
+              size="small"
+            >
+              <div class="describing-text">
+                {{ $t('group.role') }}
+              </div>
+              <br />
+              <ds-chip color="primary">{{ $t('group.roles.' + group.myRole) }}</ds-chip>
+            </ds-text>
+            <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+              <div class="describing-text">
+                {{ $t('group.type') }}
+              </div>
+              <br />
+              <ds-chip color="primary">{{ $t('group.types.' + group.groupType) }}</ds-chip>
+            </ds-text>
+            <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+              <div class="describing-text">
+                {{ $t('group.actionRadius') }}
+              </div>
+              <br />
+              <ds-chip color="primary">{{ $t('group.actionRadii.' + group.actionRadius) }}</ds-chip>
+            </ds-text>
+          </ds-space>
           <template v-if="group.about">
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
-              <ds-text color="soft" size="small" class="hyphenate-text">
-                {{ $t('group.goal') }} {{ group.about }}
+              <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+                <div class="describing-text">
+                  {{ $t('group.goal') }}
+                </div>
+                <br />
+                <ds-chip>{{ group.about }}</ds-chip>
               </ds-text>
             </ds-space>
           </template>
@@ -524,5 +557,11 @@ export default {
     width: 100%;
     margin-bottom: $space-x-small;
   }
+}
+.centered-text {
+  text-align: center;
+}
+.describing-text {
+  margin-bottom: -12px;
 }
 </style>

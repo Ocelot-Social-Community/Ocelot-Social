@@ -371,14 +371,35 @@
     "following": "Following"
   },
   "group": {
+    "actionRadii": {
+      "continental": "Continental Group",
+      "global": "Global Group",
+      "interplanetary": "Interplanetary Group",
+      "national": "National Group",
+      "regional": "Regional Group"
+    },
+    "actionRadius": "Action radius",
     "foundation": "Foundation",
-    "goal": "Goal:",
+    "goal": "Goal of group",
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
       "join": "Join"
     },
     "membersCount": "Members",
-    "membersListTitle": "Group Members"
+    "membersListTitle": "Group Members",
+    "role": "Your role in the group",
+    "roles": {
+      "admin": "Administrator",
+      "owner": "Owner",
+      "pending": "Pending Member",
+      "usual": "Simple Member"
+    },
+    "type": "Group type",
+    "types": {
+      "closed": "Closed Group",
+      "hidden": "Hidden Group",
+      "public": "Public Group"
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",
