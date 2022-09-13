@@ -1202,8 +1202,8 @@ describe('in mode', () => {
               })
 
               it('finds all members', async () => {
-                const result = await mutate({
-                  mutation: groupMembersQuery,
+                const result = await query({
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1235,8 +1235,8 @@ describe('in mode', () => {
               })
 
               it('finds all members', async () => {
-                const result = await mutate({
-                  mutation: groupMembersQuery,
+                const result = await query({
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1268,8 +1268,8 @@ describe('in mode', () => {
               })
 
               it('finds all members', async () => {
-                const result = await mutate({
-                  mutation: groupMembersQuery,
+                const result = await query({
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1311,8 +1311,8 @@ describe('in mode', () => {
               })
 
               it('finds all members', async () => {
-                const result = await mutate({
-                  mutation: groupMembersQuery,
+                const result = await query({
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1344,8 +1344,8 @@ describe('in mode', () => {
               })
 
               it('finds all members', async () => {
-                const result = await mutate({
-                  mutation: groupMembersQuery,
+                const result = await query({
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1409,8 +1409,8 @@ describe('in mode', () => {
               })
 
               it('finds all members', async () => {
-                const result = await mutate({
-                  mutation: groupMembersQuery,
+                const result = await query({
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1446,8 +1446,8 @@ describe('in mode', () => {
               })
 
               it('finds all members', async () => {
-                const result = await mutate({
-                  mutation: groupMembersQuery,
+                const result = await query({
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1483,8 +1483,8 @@ describe('in mode', () => {
               })
 
               it('finds all members', async () => {
-                const result = await mutate({
-                  mutation: groupMembersQuery,
+                const result = await query({
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
