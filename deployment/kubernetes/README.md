@@ -19,15 +19,40 @@ Besides the `values.template.yaml` file we provide a `nginx.values.template.yaml
 
 ## Installation
 
-Due to the many limitations of Helm you still have to do several manual steps. Those occur before you run the actual *ocelot.social* Helm chart. Obviously it is expected of you to have `helm` and `kubectl` installed. For DigitalOcean you might require `doctl` aswell.
+Due to the many limitations of Helm you still have to do several manual steps.
+Those occur before you run the actual *ocelot.social* Helm chart.
+Obviously it is expected of you to have `helm` and `kubectl` installed.
+For the cert-manager you may need `cmctl`, see below.
+For DigitalOcean you may also need `doctl`.
+
+Install:
+
+- [kubectl v1.24.1](https://kubernetes.io/docs/tasks/tools/)
+- [doctl v1.78.0](https://docs.digitalocean.com/reference/doctl/how-to/install/)
+- [cmctl v1.8.2](https://cert-manager.io/docs/usage/cmctl/#installation)
+- [helm v3.9.0](https://helm.sh/docs/intro/install/)
+
 
 ### Cert Manager (https)
 
-Please refer to [cert-manager.io docs](https://cert-manager.io/docs/installation/kubernetes/) for more details.
+Please refer to [cert-manager.io docs](https://cert-manager.io/docs/installation/) for more details.
 
 ***ATTENTION:*** *Be with the Terminal in your repository in the folder of this README.*
 
-#### 1. Create Namespace
+We have three ways to install the cert-manager, purely via `kubectl`, via `cmctl`, or with `helm`.
+
+We recommend using `helm` because then we do not mix the installation methods.
+Please have a look here:
+
+- [Installing with Helm](https://cert-manager.io/docs/installation/helm/#installing-with-helm)
+
+Our Helm installation is optimized for cert-manager version `v1.9.1` and `kubectl` version `"v1.24.2`.
+
+Please search here for cert-manager versions that are compatible with your `kubectl` version on the cluster and on the client: [cert-manager Supported Releases](https://cert-manager.io/docs/installation/supported-releases/#supported-releases).
+
+***ATTENTION:*** *When uninstalling cert-manager, be sure to use the same method as for installation! Otherwise, we could end up in a broken state, see [Uninstall](https://cert-manager.io/docs/installation/kubectl/#uninstalling).*
+
+<!-- #### 1. Create Namespace
 
 ```bash
 # kubeconfig.yaml set globaly
@@ -54,19 +79,19 @@ $ helm repo update
 # kubeconfig.yaml set globaly
 $ helm install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-  --version v1.1.0 \
+  --version v1.9.1 \
   --set installCRDs=true
 # or kubeconfig.yaml in your repo, then adjust
 $ helm --kubeconfig=/../kubeconfig.yaml \
   install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-  --version v1.1.0 \
+  --version v1.9.1 \
   --set installCRDs=true
-```
+``` -->
 
 ### Ingress-Nginx
 
-#### 1. Add Helm repository and update
+#### 1. Add Helm repository for `ingress-nginx` and update
 
 ```bash
 $ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
@@ -108,7 +133,7 @@ You will need an API token, which you can generate in the control panel at <http
 $ doctl kubernetes cluster list
 ```
 
-Fill in the `CLUSTER_UUID` and `your-domain`:
+Fill in the `CLUSTER_UUID` and `your-domain`. The latter with hyphens `-` instead of dots `.`:
 
 ```bash
 # without doctl context
@@ -139,7 +164,7 @@ $ doctl compute firewall get <ID> --context <context-name>
 This chart is only necessary (recommended is more precise) if you run DigitalOcean without load balancer.
 You need to generate an access token with read + write for the `dns.values.yaml` at <https://cloud.digitalocean.com/account/api/tokens> and fill it in.
 
-#### 1. Add Helm repository and update
+#### 1. Add Helm repository for `binami` and update
 
 ```bash
 $ helm repo add bitnami https://charts.bitnami.com/bitnami
