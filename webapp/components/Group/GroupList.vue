@@ -1,11 +1,25 @@
 <template>
   <div>
     <ds-container class="group-card">
-      <ds-card v-for="item in items" :key="item.id" space="xx-small">
-        <nuxt-link :to="`/group/${item.id}`">{{ item.name }}</nuxt-link>
-        {{ item.categories ? item.categories.map((category) => category.name) : [] }}
-        <div>{{ item }}</div>
-        <ds-space>
+      <ds-flex v-for="item in items" :key="item.id" class="border-bottom">
+      <ds-flex-item width="80%" centered>
+        <ds-space margin="large">
+          <nuxt-link :to="`/group/${item.id}`">
+            <ds-text size="x-large">{{ item.name }}</ds-text>
+          </nuxt-link>
+          <div>
+            <ds-space margin-top="small">
+              {{ item.about }}
+            </ds-space>
+          </div>
+          <ds-space margin-top="small">
+            <ds-chip :color="item.groupType === 'public' ? 'primary' : 'warning'">{{item.groupType}}</ds-chip>
+            <ds-chip v-for="category in item.categories" :key="category.name"><ds-icon :name="category.icon"></ds-icon> {{category.name}}</ds-chip>
+          </ds-space>
+        </ds-space>
+      </ds-flex-item>
+      <ds-flex-item width="20%" centered>
+        
           <base-button
             v-if="item.myRole === 'owner'"
             icon="trash"
@@ -31,8 +45,9 @@
             icon="plus"
             @click="addMemeberToGroup(item)"
           ></base-button>
-        </ds-space>
-      </ds-card>
+        
+      </ds-flex-item>
+    </ds-flex>
     </ds-container>
   </div>
 </template>
@@ -61,3 +76,10 @@ export default {
   },
 }
 </script>
+<style scoped>
+.border-bottom {
+  border-bottom: 1px solid #17b53f;
+  background-color: rgb(255, 255, 255);
+  padding-left: 20px;
+}
+</style>

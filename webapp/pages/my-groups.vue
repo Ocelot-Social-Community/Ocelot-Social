@@ -4,19 +4,19 @@
     <group-teaser />
     <br />
     <br />
-    <group-card :items="responseGroupListQuery" />
+    <group-list :items="responseGroupListQuery" />
   </div>
 </template>
 <script>
 import GroupTeaser from '~/components/Group/GroupTeaser.vue'
-import GroupCard from '~/components/Group/GroupCard.vue'
+import GroupList from '~/components/Group/GroupList.vue'
 import { groupQuery } from '~/graphql/groups.js'
 
 export default {
   name: 'MyGroups',
   components: {
     GroupTeaser,
-    GroupCard,
+    GroupList,
   },
   data() {
     return {

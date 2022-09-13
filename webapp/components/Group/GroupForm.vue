@@ -31,6 +31,7 @@
           rows="3"
         ></ds-input>
 
+        <ds-space margin-top="large">
         <ds-select
           icon="card"
           v-model="formData.actionRadius"
@@ -38,14 +39,14 @@
           :options="['regional', 'national', 'continental', 'global']"
           placeholder="Radius ..."
         ></ds-select>
+      </ds-space>
+        <ds-space margin-top="large">
         <categories-select
           v-if="categoriesActive"
           model="categoryIds"
           :existingCategoryIds="formData.categoryIds"
         />
-
-        <div>{{ formData }}</div>
-
+      </ds-space>  
         <ds-space margin-top="large">
           <ds-button @click.prevent="reset()">Reset form</ds-button>
           <ds-button
