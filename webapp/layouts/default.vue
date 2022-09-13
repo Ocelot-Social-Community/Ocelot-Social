@@ -105,7 +105,6 @@ import InviteButton from '~/components/InviteButton/InviteButton'
 import CategoriesMenu from '~/components/FilterMenu/CategoriesMenu.vue'
 import GroupButton from '~/components/Group/GroupButton.vue'
 
-
 export default {
   components: {
     Logo,

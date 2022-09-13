@@ -42,7 +42,7 @@ export default {
   props: {
     placement: { type: String, default: 'top-end' },
     resource: { type: Object, required: true },
-    isOwner: { type: String, default: false },
+    isOwner: { type: String, default: null },
     resourceType: {
       type: String,
       required: true,
@@ -54,42 +54,41 @@ export default {
   computed: {
     routes() {
       const routes = []
- 
- 
+
       if (this.resourceType === 'group') {
         if (this.isOwner === 'owner') {
           routes.push({
-              label: 'Settings',
-              path: `/group/edit/${this.resource.id}`,
-              icon: 'edit',
-            })
+            label: 'Settings',
+            path: `/group/edit/${this.resource.id}`,
+            icon: 'edit',
+          })
         }
         if (this.isOwner === 'usual') {
           routes.push({
-              label: 'Unfollowing',
-              callback: () => {
+            label: 'Unfollowing',
+            callback: () => {
               this.unfollowGroup(this.resource)
             },
-              icon: 'minus',
-            })
+            icon: 'minus',
+          })
         }
         if (this.isOwner === 'pending') {
           routes.push({
-              label: 'Unfollowing',
-              callback: () => {
+            label: 'Unfollowing',
+            callback: () => {
               this.removePending(this.resource)
             },
-              icon: 'minus',
-            })
+            icon: 'minus',
+          })
         }
         if (this.isOwner === null) {
           routes.push({
-              label: 'Following',
-              callback: () => {
+            label: 'Following',
+            callback: () => {
               this.addMemeberToGroup(this.resource)
             },
-              icon: 'plus',
-            })
+            icon: 'plus',
+          })
         }
       }
 

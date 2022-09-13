@@ -1,20 +1,22 @@
 <template>
-  <div><ds-section>
-    <h1 class="ds-heading ds-heading-h1">My Groups</h1>
-    <nuxt-link :to="{ name: 'group-create' }">
-          <base-button
-            v-tooltip="{
-              content: $t('group.newGroup'),
-              placement: 'left',
-              delay: { show: 500 },
-            }"
-            :path="{ name: 'group-create' }"
-            class="profile-post-add-button"
-            icon="plus"
-            circle
-            filled
-          />
-        </nuxt-link></ds-section>
+  <div>
+    <ds-section>
+      <h1 class="ds-heading ds-heading-h1">My Groups</h1>
+      <nuxt-link :to="{ name: 'group-create' }">
+        <base-button
+          v-tooltip="{
+            content: $t('group.newGroup'),
+            placement: 'left',
+            delay: { show: 500 },
+          }"
+          :path="{ name: 'group-create' }"
+          class="profile-post-add-button"
+          icon="plus"
+          circle
+          filled
+        />
+      </nuxt-link>
+    </ds-section>
     <br />
     <br />
     <group-list :items="responseGroupListQuery" />

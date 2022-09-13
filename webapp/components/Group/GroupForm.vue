@@ -32,21 +32,21 @@
         ></ds-input>
 
         <ds-space margin-top="large">
-        <ds-select
-          icon="card"
-          v-model="formData.actionRadius"
-          label="Radius"
-          :options="['regional', 'national', 'continental', 'global']"
-          placeholder="Radius ..."
-        ></ds-select>
-      </ds-space>
+          <ds-select
+            icon="card"
+            v-model="formData.actionRadius"
+            label="Radius"
+            :options="['regional', 'national', 'continental', 'global']"
+            placeholder="Radius ..."
+          ></ds-select>
+        </ds-space>
         <ds-space margin-top="large">
-        <categories-select
-          v-if="categoriesActive"
-          model="categoryIds"
-          :existingCategoryIds="formData.categoryIds"
-        />
-      </ds-space>  
+          <categories-select
+            v-if="categoriesActive"
+            model="categoryIds"
+            :existingCategoryIds="formData.categoryIds"
+          />
+        </ds-space>
         <ds-space margin-top="large">
           <ds-button @click.prevent="reset()">Reset form</ds-button>
           <ds-button
@@ -150,49 +150,48 @@ export default {
   computed: {
     submitDisable() {
       if (
-        this.formData.name !== ''
-        && this.formData.groupType !== ''
-        && this.formData.about !== ''
-        && this.formData.description !== ''
-        && this.formData.actionRadius !== ''
-        && this.formData.categoryIds.length > 0
-        ) {
+        this.formData.name !== '' &&
+        this.formData.groupType !== '' &&
+        this.formData.about !== '' &&
+        this.formData.description !== '' &&
+        this.formData.actionRadius !== '' &&
+        this.formData.categoryIds.length > 0
+      ) {
         return false
       }
       return true
     },
     submitDisableEdit() {
-       
       if (
-        this.formData.name !== this.group.name
-        || this.formData.groupType !== this.group.groupType
-        || this.formData.about !== this.group.about
-        || this.formData.description !== this.group.description
-        || this.formData.actionRadius !== this.group.actionRadius
-        || this.formData.categoryIds.length === 0
-        || !this.sameCategories
-        ) {
+        this.formData.name !== this.group.name ||
+        this.formData.groupType !== this.group.groupType ||
+        this.formData.about !== this.group.about ||
+        this.formData.description !== this.group.description ||
+        this.formData.actionRadius !== this.group.actionRadius ||
+        this.formData.categoryIds.length === 0 ||
+        !this.sameCategories
+      ) {
         return false
       }
       return true
     },
-    sameCategories(){
-      let formDataCategories = this.formData.categoryIds.map((categoryIds) => categoryIds)
-      let groupDataCategories = this.group.categories.map((category) => category.id)
+    sameCategories() {
+      const formDataCategories = this.formData.categoryIds.map((categoryIds) => categoryIds)
+      const groupDataCategories = this.group.categories.map((category) => category.id)
       let result
       let each = true
 
       if (formDataCategories.length !== groupDataCategories.length) return false
 
       if (JSON.stringify(formDataCategories) !== JSON.stringify(groupDataCategories)) {
-        formDataCategories.forEach(element => {
-          result = groupDataCategories.filter(groupCategorieId => groupCategorieId === element)
+        formDataCategories.forEach((element) => {
+          result = groupDataCategories.filter((groupCategorieId) => groupCategorieId === element)
           if (result.length === 0) each = false
         })
         return each
       }
       return true
-    }
-  }
+    },
+  },
 }
 </script>

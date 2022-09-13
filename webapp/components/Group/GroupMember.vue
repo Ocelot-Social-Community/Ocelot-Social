@@ -2,33 +2,33 @@
   <div>
     <ds-space><h3>Members</h3></ds-space>
     <base-card>
-    <ds-table :data="responseGroupMembersQuery" :fields="tableFields" condensed>
-      <template slot="avatar">
-        <ds-avatar online size="small" :name="responseGroupMembersQuery.name"></ds-avatar>
-      </template>
-      <template slot="myRoleInGroup" slot-scope="scope">
-        <select
-        v-if="scope.row.myRoleInGroup !== 'owner'"
-          :options="['usual', 'admin']"
-          :value="`${scope.row.myRoleInGroup}`"
-          v-on:change="changeMemberRole(scope.row.id, $event)"
-            > 
+      <ds-table :data="responseGroupMembersQuery" :fields="tableFields" condensed>
+        <template slot="avatar">
+          <ds-avatar online size="small" :name="responseGroupMembersQuery.name"></ds-avatar>
+        </template>
+        <template slot="myRoleInGroup" slot-scope="scope">
+          <select
+            v-if="scope.row.myRoleInGroup !== 'owner'"
+            :options="['usual', 'admin']"
+            :value="`${scope.row.myRoleInGroup}`"
+            v-on:change="changeMemberRole(scope.row.id, $event)"
+          >
             <option v-for="value in ['usual', 'admin']" :key="value">
-                {{ value }}
+              {{ value }}
             </option>
-          </select> 
-      </template>
-      <template slot="edit" slot-scope="scope">
-        <ds-button
-          v-if="scope.row.myRoleInGroup !== 'owner'"
-          size="small"
-          @click="openModal(scope.row)"
-        >
-          delete
-        </ds-button>
-      </template>
-    </ds-table>
-  </base-card>
+          </select>
+        </template>
+        <template slot="edit" slot-scope="scope">
+          <ds-button
+            v-if="scope.row.myRoleInGroup !== 'owner'"
+            size="small"
+            @click="openModal(scope.row)"
+          >
+            delete
+          </ds-button>
+        </template>
+      </ds-table>
+    </base-card>
     <ds-modal
       v-if="isOpen"
       v-model="isOpen"
@@ -72,7 +72,7 @@ export default {
           mutation: changeGroupMemberRoleMutation,
           variables: { groupId: this.groupId, userId: id, roleInGroup: newRole },
         })
-        this.$toast.success('Die Rolle wurde auf ('+newRole+') geändert!')
+        this.$toast.success('Die Rolle wurde auf (' + newRole + ') geändert!')
       } catch (error) {
         this.$toast.error(error.message)
       }
