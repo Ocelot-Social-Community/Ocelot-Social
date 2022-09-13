@@ -289,6 +289,11 @@ export default {
     name: 'slide-up',
     mode: 'out-in',
   },
+  head() {
+    return {
+      title: this.groupName,
+    }
+  },
   data() {
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     return {
