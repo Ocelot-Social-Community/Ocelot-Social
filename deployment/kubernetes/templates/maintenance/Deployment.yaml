@@ -26,7 +26,7 @@ spec:
         rollme: {{ randAlphaNum 5 | quote }}
     spec:
       containers:
-      - name: maintenance
+      - name: container-{{ .Release.Name }}-maintenance
         image: "{{ .Values.MAINTENANCE.DOCKER_IMAGE_REPO }}:{{ .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.MAINTENANCE.DOCKER_IMAGE_PULL_POLICY }}
         envFrom:
