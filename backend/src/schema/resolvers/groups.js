@@ -251,6 +251,27 @@ export default {
         session.close()
       }
     },
+    LeaveGroup: async (_parent, params, context, _resolveInfo) => {
+      const { groupId, userId } = params
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const leaveGroupCypher = `
+          MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
+          DELETE membership
+          RETURN member {.*, myRoleInGroup: NULL}
+        `
+        const transactionResponse = await transaction.run(leaveGroupCypher, { groupId, userId })
+        const [member] = await transactionResponse.records.map((record) => record.get('member'))
+        return member
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
     ChangeGroupMemberRole: async (_parent, params, context, _resolveInfo) => {
       const { groupId, userId, roleInGroup } = params
       const session = context.driver.session()

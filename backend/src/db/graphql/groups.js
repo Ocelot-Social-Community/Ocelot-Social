@@ -106,6 +106,17 @@ export const joinGroupMutation = gql`
   }
 `
 
+export const leaveGroupMutation = gql`
+  mutation ($groupId: ID!, $userId: ID!) {
+    LeaveGroup(groupId: $groupId, userId: $userId) {
+      id
+      name
+      slug
+      myRoleInGroup
+    }
+  }
+`
+
 export const changeGroupMemberRoleMutation = gql`
   mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
     ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
