@@ -374,6 +374,13 @@
     "follow": "Folgen",
     "following": "Folge Ich"
   },
+  "group": {
+    "group-created": "Die Gruppe wurde angelegt!",
+    "group-updated": "Die Gruppendaten wurden geändert!",
+    "newGroup": "Erstelle eine neue Gruppe",
+    "save": "Neue Gruppe anlegen",
+    "update": "Änderung speichern"
+  },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",
     "hashtag-search": "Suche nach #{hashtag}",
@@ -751,6 +758,7 @@
       "unmute": "Stummschaltung aufheben",
       "unmuted": "{name} ist nicht mehr stummgeschaltet"
     },
+    "myGroups": "Meine Gruppen",
     "name": "Einstellungen",
     "notifications": {
       "name": "Benachrichtigungen",
