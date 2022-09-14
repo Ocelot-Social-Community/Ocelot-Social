@@ -1,59 +1,49 @@
 <template>
-  <div>
     <ds-container class="group-card">
       <ds-space>
-        <div @click="onlyOwnerGroups(true)" ref="myGruops">show only my groups</div>
-        <div @click="onlyOwnerGroups(false)" ref="allGruops" hidden>show all groups</div>
+        <div @click="onlyOwnerGroups(true)" ref="myGruops"><ds-button >show only my groups</ds-button ></div>
+        <div @click="onlyOwnerGroups(false)" ref="allGruops" hidden><ds-button >show all groups</ds-button ></div>
       </ds-space>
-      <ds-flex
-        v-for="item in items"
-        :key="item.id"
-        class="border-bottom"
-        :ref="item.myRole === null ? 'null' : item.myRole"
-      >
-        <ds-flex-item width="90%" centered>
-          {{ item.myRole }}
-          <ds-space margin="large">
-            <nuxt-link :to="`/group/${item.id}`">
-              <ds-text size="x-large">{{ item.name }}</ds-text>
-            </nuxt-link>
-
-            <ds-chip v-if="item.groupType === 'public'" color="primary">
-              {{ item.groupType }}
-            </ds-chip>
-            <ds-chip v-if="item.groupType === 'hidden'" color="warning">
-              {{ item.groupType }}
-            </ds-chip>
-            <ds-chip v-if="item.groupType === 'closed'" color="danger">
-              {{ item.groupType }}
-            </ds-chip>
-            <ds-chip v-if="item.myRole === 'owner'" color="inverse">{{ item.myRole }}</ds-chip>
-            <ds-chip v-if="item.myRole === 'usual' || item.myRole === 'pending'">
-              {{ item.myRole }}
-            </ds-chip>
-
-            <div>
+      <ds-space margin-bottom="small" v-for="item in items" :key="item.id"> 
+        <ds-card  :ref="item.myRole === null ? 'null' : item.myRole">
+          <ds-flex>
+            <ds-flex-item width="90%" centered>
+              <ds-space margin="large">
+              <nuxt-link :to="`/group/${item.id}`">
+                <ds-text size="x-large">{{ item.name }}</ds-text>
+              </nuxt-link> 
+              <ds-text size="small">
+                {{ item.groupType }}
+                <ds-chip v-if="item.myRole === 'owner'" color="inverse">{{ item.myRole }}</ds-chip>
+                <ds-chip v-if="item.myRole === 'usual' || item.myRole === 'pending'">
+                  {{ item.myRole }}
+                </ds-chip>
+              </ds-text>
               <ds-space margin-top="small">
-                {{ item.about }}
+                <ds-text bold>{{ item.about }}</ds-text> 
               </ds-space>
-            </div>
-            <ds-space margin-top="small">
-              <ds-chip v-for="category in item.categories" :key="category.name">
+              <ds-space margin-top="small">
+                {{ item.description }}
+              </ds-space>
+              <ds-space margin-top="small">
+                <ds-chip v-for="category in item.categories" :key="category.name">
                 <ds-icon :name="category.icon"></ds-icon>
-                {{ category.name }}
-              </ds-chip>
+                  {{ category.name }}
+                </ds-chip>
+              </ds-space>
             </ds-space>
-          </ds-space>
-        </ds-flex-item>
-        <ds-flex-item width="10%" centered>
-          <group-menu resource-type="group" :resource="item" :isOwner="item.myRole" />
-        </ds-flex-item>
-      </ds-flex>
-    </ds-container>
-  </div>
+          </ds-flex-item>
+          <ds-flex-item width="10%" centered>
+            <group-menu resource-type="group" :resource="item" :isOwner="item.myRole" @joinGroup="joinGroup"/>
+          </ds-flex-item>
+        </ds-flex>
+      </ds-card>
+    </ds-space>
+  </ds-container>
 </template>
 <script>
 import GroupMenu from '~/components/Group/GroupMenu'
+import { joinGroupMutation } from '~/graphql/groups.js'
 
 export default {
   name: 'GroupList',
@@ -76,9 +66,24 @@ export default {
     unfollowGroup() {
       alert('unfollow group')
     },
-    addMemeberToGroup() {
+    async joinGroup(value) {
       alert('addMemeberToGroup group')
+      console.log(value)
+      console.log(this.$store.getters['auth/user'].id)
+
+      const { id } = value
+      const variables = { groupId: id, userId: this.$store.getters['auth/user'].id }
+      try {
+         await this.$apollo.mutate({
+           mutation: joinGroupMutation,
+           variables,
+         })
+        this.$toast.success(this.$t('group.group-created'))
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
     },
+   
     onlyOwnerGroups(bool) {
       this.$refs.myGruops.hidden = bool
       this.$refs.allGruops.hidden = !bool

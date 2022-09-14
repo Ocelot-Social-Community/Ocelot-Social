@@ -16,6 +16,7 @@
       <div class="group-menu-popover">
         <ds-menu :routes="routes">
           <template #menuitem="item">
+            {{item.parents}}
             <ds-menu-item
               :route="item.route"
               :parents="item.parents"
@@ -40,7 +41,7 @@ export default {
     Dropdown,
   },
   props: {
-    placement: { type: String, default: 'top-end' },
+    placement: { type: String, default: 'bottom-end' },
     resource: { type: Object, required: true },
     isOwner: { type: String, default: null },
     resourceType: {
@@ -67,7 +68,7 @@ export default {
           routes.push({
             label: 'Unfollowing',
             callback: () => {
-              this.unfollowGroup(this.resource)
+              // this.$emit('join-group', this.resource)
             },
             icon: 'minus',
           })
@@ -76,7 +77,7 @@ export default {
           routes.push({
             label: 'Unfollowing',
             callback: () => {
-              this.removePending(this.resource)
+              // this.removePending(this.resource)
             },
             icon: 'minus',
           })
@@ -85,7 +86,7 @@ export default {
           routes.push({
             label: 'Following',
             callback: () => {
-              this.addMemeberToGroup(this.resource)
+                this.$emit('joinGroup', this.resource)
             },
             icon: 'plus',
           })
