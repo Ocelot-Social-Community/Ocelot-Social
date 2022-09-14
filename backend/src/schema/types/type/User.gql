@@ -115,11 +115,11 @@ type User {
 
   emotions: [EMOTED]
 
-  activeCategories: [Category] @cypher(
+  activeCategories: [String] @cypher(
   statement: """
   MATCH (category:Category)
   WHERE NOT ((this)-[:NOT_INTERESTED_IN]->(category))
-  RETURN category
+  RETURN collect(category.id)
   """
   )
 

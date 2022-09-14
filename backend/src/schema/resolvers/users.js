@@ -286,6 +286,10 @@ export default {
           { id },
         )
       })
+
+      // frontend gives [] when all categories are selected (default)
+      if (activeCategories.length === 0) return true
+
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const saveCategorySettingsResponse = await transaction.run(
           `
