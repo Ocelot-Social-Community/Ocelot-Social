@@ -68,19 +68,17 @@ export default {
       const mutation = join ? joinGroupMutation : leaveGroupMutation
 
       this.hovered = false
-      const optimisticResult = { joinedByCurrentUser: join }
-      this.$emit('optimistic', optimisticResult)
+      this.$emit('prepare', join)
 
       try {
         const { data } = await this.$apollo.mutate({
           mutation,
           variables: { groupId: this.groupId, userId: this.userId },
         })
-        const joinedGroup = join ? data.JoinGroup : data.LeaveGroup
-        this.$emit('update', joinedGroup)
+        const joinedLeftGroupResult = join ? data.JoinGroup : data.LeaveGroup
+        this.$emit('update', joinedLeftGroupResult)
       } catch (error) {
-        optimisticResult.joinedByCurrentUser = !join
-        this.$emit('optimistic', optimisticResult)
+        this.$toast.error(error.message)
       }
     },
   },

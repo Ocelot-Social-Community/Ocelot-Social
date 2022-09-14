@@ -96,7 +96,7 @@
               :isMember="isGroupMember"
               :disabled="isGroupOwner"
               :loading="$apollo.loading"
-              @optimistic="optimisticJoinLeave"
+              @prepare="prepareJoinLeave"
               @update="updateJoinLeave"
             />
             <!-- implement:
@@ -457,31 +457,13 @@ export default {
     //   this.user.followedByCurrentUser = followedByCurrentUser
     //   this.user.followedBy = followedBy
     // },
-    optimisticJoinLeave({ joinedByCurrentUser }) {
-      /*
-       * Note: "membersCountStartValue" is updated to avoid counting from 0 when join/leave
-       */
-      let members
+    prepareJoinLeave() {
+      // "membersCountStartValue" is updated to avoid counting from 0 when join/leave
       this.membersCountStartValue = this.GroupMembers.length
-      if (joinedByCurrentUser) {
-        // this.membersCountToLoad++
-        members = [this.currentUser, ...this.GroupMembers]
-      } else {
-        // this.membersCountToLoad--
-        members = this.GroupMembers.filter((user) => user.id !== this.currentUser.id)
-      }
-      this.GroupMembers = members
     },
     updateJoinLeave({ myRoleInGroup }) {
       this.Group[0].myRole = myRoleInGroup
-      const currentUserInGroupMembers = this.GroupMembers.find(
-        (user) => user.id === this.currentUser.id,
-      )
-      if (currentUserInGroupMembers) {
-        currentUserInGroupMembers.myRoleInGroup = myRoleInGroup
-      } else {
-        this.$apollo.queries.GroupMembers.refetch()
-      }
+      this.$apollo.queries.GroupMembers.refetch()
     },
     fetchAllMembers() {
       this.membersCountToLoad = Infinity
