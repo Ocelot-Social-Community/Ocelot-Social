@@ -104,43 +104,36 @@
           </div>
           <hr />
           <ds-space margin-top="small" margin-bottom="small">
-            <ds-text
-              v-if="isGroupMember"
-              class="centered-text hyphenate-text"
-              color="soft"
-              size="small"
-            >
-              <div class="describing-text">
+            <template v-if="isGroupMember">
+              <ds-text class="centered-text hyphenate-text" color="soft" size="small">
                 {{ $t('group.role') }}
+              </ds-text>
+              <div class="chip" align="center">
+                <ds-chip color="primary">{{ $t('group.roles.' + group.myRole) }}</ds-chip>
               </div>
-              <br />
-              <ds-chip color="primary">{{ $t('group.roles.' + group.myRole) }}</ds-chip>
-            </ds-text>
+            </template>
             <ds-text class="centered-text hyphenate-text" color="soft" size="small">
-              <div class="describing-text">
-                {{ $t('group.type') }}
-              </div>
-              <br />
+              {{ $t('group.type') }}
+            </ds-text>
+            <div class="chip" align="center">
               <ds-chip color="primary">{{ $t('group.types.' + group.groupType) }}</ds-chip>
-            </ds-text>
+            </div>
             <ds-text class="centered-text hyphenate-text" color="soft" size="small">
-              <div class="describing-text">
-                {{ $t('group.actionRadius') }}
-              </div>
-              <br />
-              <ds-chip color="primary">{{ $t('group.actionRadii.' + group.actionRadius) }}</ds-chip>
+              {{ $t('group.actionRadius') }}
             </ds-text>
+            <div class="chip" align="center">
+              <ds-chip color="primary">{{ $t('group.actionRadii.' + group.actionRadius) }}</ds-chip>
+            </div>
           </ds-space>
           <template v-if="group.about">
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
               <ds-text class="centered-text hyphenate-text" color="soft" size="small">
-                <div class="describing-text">
-                  {{ $t('group.goal') }}
-                </div>
-                <br />
-                <ds-chip>{{ group.about }}</ds-chip>
+                {{ $t('group.goal') }}
               </ds-text>
+              <div class="chip" align="center">
+                <ds-chip>{{ group.about }}</ds-chip>
+              </div>
             </ds-space>
           </template>
         </base-card>
@@ -468,14 +461,16 @@ export default {
       /*
        * Note: "membersCountStartValue" is updated to avoid counting from 0 when join/leave
        */
+      let members
       this.membersCountStartValue = this.GroupMembers.length
       if (joinedByCurrentUser) {
         // this.membersCountToLoad++
-        this.GroupMembers = [this.currentUser, ...this.GroupMembers]
+        members = [this.currentUser, ...this.GroupMembers]
       } else {
         // this.membersCountToLoad--
-        this.GroupMembers = this.GroupMembers.filter((user) => user.id !== this.currentUser.id)
+        members = this.GroupMembers.filter((user) => user.id !== this.currentUser.id)
       }
+      this.GroupMembers = members
     },
     updateJoinLeave({ myRoleInGroup }) {
       this.Group[0].myRole = myRoleInGroup
@@ -565,8 +560,9 @@ export default {
 }
 .centered-text {
   text-align: center;
+  margin-bottom: $space-xxx-small;
 }
-.describing-text {
-  margin-bottom: -12px;
+.chip {
+  margin-bottom: $space-x-small;
 }
 </style>

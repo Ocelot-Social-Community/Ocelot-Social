@@ -176,7 +176,6 @@ import HcFollowButton from '~/components/Button/FollowButton'
 import HcCountTo from '~/components/CountTo.vue'
 import HcBadges from '~/components/Badges.vue'
 import FollowList, { followListVisibleCount } from '~/components/features/ProfileList/FollowList'
-
 import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
