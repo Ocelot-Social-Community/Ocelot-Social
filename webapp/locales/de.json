@@ -364,7 +364,11 @@
         "label": "Älteste zuerst"
       }
     },
-    "order-by": "Sortieren nach ..."
+    "order-by": "Sortieren nach ...",
+    "save": {
+      "error": "Themen konnten nicht gespeichert werden!",
+      "success": "Themen gespeichert!"
+    }
   },
   "followButton": {
     "follow": "Folgen",
@@ -381,6 +385,8 @@
     "actionRadius": "Aktionsradius",
     "foundation": "Gründung",
     "goal": "Ziel der Gruppe",
+    "group-created": "Die Gruppe wurde angelegt!",
+    "group-updated": "Die Gruppendaten wurden geändert!",
     "joinLeaveButton": {
       "iAmMember": "Bin Mitglied",
       "join": "Beitreten"
@@ -392,6 +398,7 @@
     },
     "membersCount": "Mitglieder",
     "membersListTitle": "Gruppenmitglieder",
+    "newGroup": "Erstelle eine neue Gruppe",
     "role": "Deine Rolle in der Gruppe",
     "roles": {
       "admin": "Administrator",
@@ -399,12 +406,14 @@
       "pending": "Ausstehendes Mitglied",
       "usual": "Einfaches Mitglied"
     },
+    "save": "Neue Gruppe anlegen",
     "type": "Gruppentyp",
     "types": {
       "closed": "Geschlossene Gruppe",
       "hidden": "Versteckte Gruppe",
       "public": "Öffentliche Gruppe"
-    }
+    },
+    "update": "Änderung speichern"
   },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",
@@ -781,6 +790,7 @@
       "unmute": "Stummschaltung aufheben",
       "unmuted": "{name} ist nicht mehr stummgeschaltet"
     },
+    "myGroups": "Meine Gruppen",
     "name": "Einstellungen",
     "notifications": {
       "name": "Benachrichtigungen",

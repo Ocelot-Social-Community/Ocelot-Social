@@ -364,7 +364,11 @@
         "label": "Oldest first"
       }
     },
-    "order-by": "Order by ..."
+    "order-by": "Order by ...",
+    "save": {
+      "error": "Failed saving topic settings!",
+      "success": "Topics saved!"
+    }
   },
   "followButton": {
     "follow": "Follow",
@@ -381,6 +385,8 @@
     "actionRadius": "Action radius",
     "foundation": "Foundation",
     "goal": "Goal of group",
+    "group-created": "The group was created!",
+    "group-updated": "The group data has been changed.",
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
       "join": "Join"
@@ -392,6 +398,7 @@
     },
     "membersCount": "Members",
     "membersListTitle": "Group Members",
+    "newGroup": "Create a new Group",
     "role": "Your role in the group",
     "roles": {
       "admin": "Administrator",
@@ -399,12 +406,14 @@
       "pending": "Pending Member",
       "usual": "Simple Member"
     },
+    "save": "Create new group",
     "type": "Group type",
     "types": {
       "closed": "Closed Group",
       "hidden": "Hidden Group",
       "public": "Public Group"
-    }
+    },
+    "update": "Save change"
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",
@@ -781,6 +790,7 @@
       "unmute": "Unmute user",
       "unmuted": "{name} is unmuted again"
     },
+    "myGroups": "My Groups",
     "name": "Settings",
     "notifications": {
       "name": "Notifications",

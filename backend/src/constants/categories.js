@@ -4,7 +4,7 @@ export const CATEGORIES_MAX = 3
 
 export const categories = [
   {
-    icon: 'users',
+    icon: 'networking',
     name: 'networking',
     description: 'Kooperation, Aktionsbündnisse, Solidarität, Hilfe',
   },
@@ -14,12 +14,12 @@ export const categories = [
     description: 'Bauen, Lebensgemeinschaften, Tiny Houses, Gemüsegarten',
   },
   {
-    icon: 'lightbulb',
+    icon: 'energy',
     name: 'energy',
     description: 'Öl, Gas, Kohle, Wind, Wasserkraft, Biogas, Atomenergie, ...',
   },
   {
-    icon: 'smile',
+    icon: 'psyche',
     name: 'psyche',
     description: 'Seele, Gefühle, Glück',
   },
@@ -34,7 +34,7 @@ export const categories = [
     description: 'Menschenrechte, Gesetze, Verordnungen',
   },
   {
-    icon: 'money',
+    icon: 'finance',
     name: 'finance',
     description: 'Geld, Finanzsystem, Alternativwährungen, ...',
   },
@@ -44,7 +44,7 @@ export const categories = [
     description: 'Familie, Pädagogik, Schule, Prägung',
   },
   {
-    icon: 'suitcase',
+    icon: 'mobility',
     name: 'mobility',
     description: 'Reise, Verkehr, Elektromobilität',
   },
@@ -54,48 +54,48 @@ export const categories = [
     description: 'Handel, Konsum, Marketing, Lebensmittel, Lieferketten, ...',
   },
   {
-    icon: 'angellist',
+    icon: 'peace',
     name: 'peace',
     description: 'Krieg, Militär, soziale Verteidigung, Waffen, Cyberattacken',
   },
   {
-    icon: 'university',
+    icon: 'politics',
     name: 'politics',
     description: 'Demokratie, Mitbestimmung, Wahlen, Korruption, Parteien',
   },
   {
-    icon: 'tree',
+    icon: 'nature',
     name: 'nature',
     description: 'Tiere, Pflanzen, Landwirtschaft, Ökologie, Artenvielfalt',
   },
   {
-    icon: 'graduation-cap',
+    icon: 'science',
     name: 'science',
     description: 'Bildung, Hochschule, Publikationen, ...',
   },
   {
-    icon: 'medkit',
+    icon: 'health',
     name: 'health',
     description: 'Medizin, Ernährung, WHO, Impfungen, Schadstoffe, ...',
   },
   {
-    icon: 'desktop',
+    icon: 'media',
     name: 'it-and-media',
     description:
       'Nachrichten, Manipulation, Datenschutz, Überwachung, Datenkraken, AI, Software, Apps',
   },
   {
-    icon: 'heart-o',
+    icon: 'spirituality',
     name: 'spirituality',
     description: 'Religion, Werte, Ethik',
   },
   {
-    icon: 'music',
+    icon: 'culture',
     name: 'culture',
     description: 'Kunst, Theater, Musik, Fotografie, Film',
   },
   {
-    icon: 'ellipsis-h',
+    icon: 'miscellaneous',
     name: 'miscellaneous',
     description: '',
   },

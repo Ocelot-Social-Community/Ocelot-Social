@@ -4,7 +4,10 @@ import CONFIG from '../../config'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '../../constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
 import { removeHtmlTags } from '../../middleware/helpers/cleanHtml.js'
-import Resolver from './helpers/Resolver'
+import Resolver, {
+  removeUndefinedNullValuesFromObject,
+  convertObjectToCypherMapLiteral,
+} from './helpers/Resolver'
 import { mergeImage } from './images/images'
 
 export default {
@@ -12,20 +15,10 @@ export default {
     Group: async (_object, params, context, _resolveInfo) => {
       const { isMember, id, slug } = params
       const matchParams = { id, slug }
-      Object.keys(matchParams).forEach((key) => {
-        if ([undefined, null].includes(matchParams[key])) {
-          delete matchParams[key]
-        }
-      })
+      removeUndefinedNullValuesFromObject(matchParams)
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
-        const matchParamsEntries = Object.entries(matchParams)
-        let groupMatchParamsCypher = ''
-        matchParamsEntries.forEach((ele, index) => {
-          groupMatchParamsCypher += index === 0 ? ' {' : ''
-          groupMatchParamsCypher += `${ele[0]}: "${ele[1]}"`
-          groupMatchParamsCypher += index < matchParamsEntries.length - 1 ? ', ' : '}'
-        })
+        const groupMatchParamsCypher = convertObjectToCypherMapLiteral(matchParams)
         let groupCypher
         if (isMember === true) {
           groupCypher = `
