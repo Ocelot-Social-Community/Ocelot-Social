@@ -18,7 +18,7 @@ export default {
       removeUndefinedNullValuesFromObject(matchParams)
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
-        const groupMatchParamsCypher = convertObjectToCypherMapLiteral(matchParams)
+        const groupMatchParamsCypher = convertObjectToCypherMapLiteral(matchParams, true)
         let groupCypher
         if (isMember === true) {
           groupCypher = `
