@@ -2,7 +2,7 @@
   <base-button
     class="track-button"
     :disabled="disabled"
-    :loading="loading"
+    :loading="localLoading"
     :icon="icon"
     :filled="isMember && !hovered"
     :danger="isMember && hovered"
@@ -28,6 +28,7 @@ export default {
   },
   data() {
     return {
+      localLoading: this.loading,
       hovered: false,
     }
   },
@@ -49,13 +50,16 @@ export default {
   },
   watch: {
     isMember() {
-      this.loading = false
+      this.localLoading = false
       this.hovered = false
+    },
+    loading() {
+      this.localLoading = this.loading
     },
   },
   methods: {
     onHover() {
-      if (!this.disabled && !this.loading) {
+      if (!this.disabled && !this.localLoading) {
         this.hovered = true
       }
     },
