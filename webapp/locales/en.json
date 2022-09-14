@@ -385,6 +385,11 @@
       "iAmMember": "I'm a member",
       "join": "Join"
     },
+    "leaveModal": {
+      "confirmButton": "Leave",
+      "message": "Leaving a group may be irreversible!<br>Leave group <b>“{name}”</b>!",
+      "title": "Do you really want to leave the group?"
+    },
     "membersCount": "Members",
     "membersListTitle": "Group Members",
     "role": "Your role in the group",

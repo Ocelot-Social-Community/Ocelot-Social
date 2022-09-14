@@ -91,7 +91,7 @@
               @update="updateFollow"
             /> -->
             <join-leave-button
-              :groupId="group && group.id ? group.id : ''"
+              :group="group || {}"
               :userId="currentUser.id"
               :isMember="isGroupMember"
               :disabled="isGroupOwner"

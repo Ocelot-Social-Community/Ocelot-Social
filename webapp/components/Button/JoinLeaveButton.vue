@@ -15,12 +15,13 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 import { joinGroupMutation, leaveGroupMutation } from '~/graphql/groups'
 
 export default {
   name: 'JoinLeaveButton',
   props: {
-    groupId: { type: String, required: true },
+    group: { type: Object, required: true },
     userId: { type: String, required: true },
     isMember: { type: Boolean, required: true },
     disabled: { type: Boolean, default: false },
@@ -58,12 +59,54 @@ export default {
     },
   },
   methods: {
+    ...mapMutations({
+      commitModalData: 'modal/SET_OPEN',
+    }),
     onHover() {
       if (!this.disabled && !this.localLoading) {
         this.hovered = true
       }
     },
-    async toggle() {
+    toggle() {
+      if (this.isMember) {
+        this.openLeaveModal()
+      } else {
+        this.joinLeave()
+      }
+    },
+    openLeaveModal() {
+      this.commitModalData(this.leaveModalData())
+    },
+    leaveModalData() {
+      return {
+        name: 'confirm',
+        data: {
+          type: '',
+          resource: { id: '' },
+          modalData: {
+            titleIdent: 'group.leaveModal.title',
+            messageIdent: 'group.leaveModal.message',
+            messageParams: {
+              name: this.group.name,
+            },
+            buttons: {
+              confirm: {
+                danger: true,
+                icon: 'sign-out',
+                textIdent: 'group.leaveModal.confirmButton',
+                callback: this.joinLeave,
+              },
+              cancel: {
+                icon: 'close',
+                textIdent: 'actions.cancel',
+                callback: () => {},
+              },
+            },
+          },
+        },
+      }
+    },
+    async joinLeave() {
       const join = !this.isMember
       const mutation = join ? joinGroupMutation : leaveGroupMutation
 
@@ -73,7 +116,7 @@ export default {
       try {
         const { data } = await this.$apollo.mutate({
           mutation,
-          variables: { groupId: this.groupId, userId: this.userId },
+          variables: { groupId: this.group.id, userId: this.userId },
         })
         const joinedLeftGroupResult = join ? data.JoinGroup : data.LeaveGroup
         this.$emit('update', joinedLeftGroupResult)
