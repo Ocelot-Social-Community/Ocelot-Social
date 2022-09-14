@@ -364,7 +364,11 @@
         "label": "Älteste zuerst"
       }
     },
-    "order-by": "Sortieren nach ..."
+    "order-by": "Sortieren nach ...",
+    "save": {
+      "error": "Themen konnten nicht gespeichert werden!",
+      "success": "Themen gespeichert!"
+    }
   },
   "followButton": {
     "follow": "Folgen",

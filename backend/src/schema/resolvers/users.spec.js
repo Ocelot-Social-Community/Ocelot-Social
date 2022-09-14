@@ -602,9 +602,7 @@ describe('save category settings', () => {
     const userQuery = gql`
       query ($id: ID) {
         User(id: $id) {
-          activeCategories {
-            id
-          }
+          activeCategories
         }
       }
     `
@@ -631,11 +629,7 @@ describe('save category settings', () => {
               data: {
                 User: [
                   {
-                    activeCategories: expect.arrayContaining([
-                      { id: 'cat1' },
-                      { id: 'cat3' },
-                      { id: 'cat5' },
-                    ]),
+                    activeCategories: expect.arrayContaining(['cat1', 'cat3', 'cat5']),
                   },
                 ],
               },
@@ -678,11 +672,11 @@ describe('save category settings', () => {
                 User: [
                   {
                     activeCategories: expect.arrayContaining([
-                      { id: 'cat10' },
-                      { id: 'cat11' },
-                      { id: 'cat12' },
-                      { id: 'cat8' },
-                      { id: 'cat9' },
+                      'cat10',
+                      'cat11',
+                      'cat12',
+                      'cat8',
+                      'cat9',
                     ]),
                   },
                 ],
