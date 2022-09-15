@@ -30,6 +30,10 @@
                 <ds-icon :name="category.icon"></ds-icon>
                   {{ category.name }}
                 </ds-chip>
+                <ds-space margin="x-small">
+                  <div v-if="item.locationName">{{ item.locationName }}</div>
+                  <div v-if="item.actionRadius">{{ item.actionRadius }}</div>
+                </ds-space>
               </ds-space>
             </ds-space>
           </ds-flex-item>
@@ -54,23 +58,10 @@ export default {
     items: { type: Array, default: () => [] },
   },
   methods: {
-    removePending() {
-      alert('removePending group')
-    },
     editGroup(item) {
       this.$router.push({ path: `/group/edit/${item.id}` })
     },
-    deleteGroup() {
-      alert('delete group')
-    },
-    unfollowGroup() {
-      alert('unfollow group')
-    },
     async joinGroup(value) {
-      alert('addMemeberToGroup group')
-      console.log(value)
-      console.log(this.$store.getters['auth/user'].id)
-
       const { id } = value
       const variables = { groupId: id, userId: this.$store.getters['auth/user'].id }
       try {

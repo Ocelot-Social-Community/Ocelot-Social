@@ -29,6 +29,8 @@ export default {
   },
   methods: {
     async createGroup(value) {
+      console.log('createGroup')
+      console.log(value)
       const { name, about, description, groupType, actionRadius, locationName, categoryIds } = value
       const variables = { name, about, description, groupType, actionRadius, locationName, categoryIds }
       try {
