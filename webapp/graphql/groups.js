@@ -80,6 +80,7 @@ export const updateGroupMutation = gql`
       deleted
       about
       description
+      descriptionExcerpt
       groupType
       actionRadius
       categories {
@@ -142,6 +143,7 @@ export const groupQuery = gql`
       deleted
       about
       description
+      descriptionExcerpt
       groupType
       actionRadius
       categories {

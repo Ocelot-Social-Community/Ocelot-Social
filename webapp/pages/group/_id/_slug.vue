@@ -178,31 +178,36 @@
       </ds-flex-item>
 
       <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
+        <!-- Group description -->
+        <ds-space>
+          <base-card class="group-description">
+            <!-- TODO: replace editor content with tiptap render view -->
+            <!-- eslint-disable vue/no-v-html -->
+            <div class="content hyphenate-text" v-html="groupDescriptionExcerpt" />
+            <!-- eslint-enable vue/no-v-html -->
+          </base-card>
+        </ds-space>
+        <ds-space v-if="isGroupMemberNonePending" centered>
+          <nuxt-link :to="{ name: 'post-create' }">
+            <base-button
+              v-tooltip="{
+                content: $t('contribution.newPost'),
+                placement: 'left',
+                delay: { show: 500 },
+              }"
+              :path="{ name: 'post-create' }"
+              class="profile-post-add-button"
+              icon="plus"
+              circle
+              filled
+            />
+          </nuxt-link>
+        </ds-space>
         <masonry-grid>
           <!-- TapNavigation -->
           <!-- <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" /> -->
 
-          <!-- feed -->
-          <ds-grid-item :row-span="2" column-span="fullWidth">
-            <ds-space centered>
-              <nuxt-link :to="{ name: 'post-create' }">
-                <base-button
-                  v-if="isGroupMember"
-                  v-tooltip="{
-                    content: $t('contribution.newPost'),
-                    placement: 'left',
-                    delay: { show: 500 },
-                  }"
-                  :path="{ name: 'post-create' }"
-                  class="profile-post-add-button"
-                  icon="plus"
-                  circle
-                  filled
-                />
-              </nuxt-link>
-            </ds-space>
-          </ds-grid-item>
-
+          <!-- Group post feed -->
           <template v-if="posts && posts.length">
             <masonry-grid-item
               v-for="post in posts"
@@ -332,6 +337,9 @@ export default {
     isGroupMember() {
       return this.group ? !!this.group.myRole : false
     },
+    isGroupMemberNonePending() {
+      return this.group ? ['usual', 'admin', 'owner'].includes(this.group.myRole) : false
+    },
     groupName() {
       const { name } = this.group || {}
       return name || this.$t('profile.userAnonym')
@@ -339,6 +347,9 @@ export default {
     groupSlug() {
       const { slug } = this.group || {}
       return slug && `@${slug}`
+    },
+    groupDescriptionExcerpt() {
+      return this.group ? this.$filters.removeLinks(this.group.descriptionExcerpt) : ''
     },
     // tabOptions() {
     //   return [
@@ -556,5 +567,41 @@ export default {
 }
 .chip {
   margin-bottom: $space-x-small;
+}
+.group-description > .base-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  > .content {
+    flex-grow: 1;
+    margin-bottom: $space-small;
+  }
+
+  // Wolle: > .footer {
+  //   display: flex;
+  //   justify-content: space-between;
+  //   align-items: center;
+
+  //   > .categories-placeholder {
+  //     flex-grow: 1;
+  //   }
+
+  //   > .counter-icon {
+  //     display: block;
+  //     margin-right: $space-small;
+  //     opacity: $opacity-disabled;
+  //   }
+
+  //   > .content-menu {
+  //     position: relative;
+  //     z-index: $z-index-post-teaser-link;
+  //   }
+
+  //   .ds-tag {
+  //     margin: 0;
+  //     margin-right: $space-xx-small;
+  //   }
+  // }
 }
 </style>
