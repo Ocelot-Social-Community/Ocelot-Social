@@ -503,6 +503,72 @@ describe('in mode', () => {
               })
             })
 
+            describe('with given slug', () => {
+              describe("slug = 'the-best-group'", () => {
+                it('finds only the listed group with this slug', async () => {
+                  const result = await query({
+                    query: groupQuery,
+                    variables: { slug: 'the-best-group' },
+                  })
+                  expect(result).toMatchObject({
+                    data: {
+                      Group: [
+                        expect.objectContaining({
+                          id: 'my-group',
+                          slug: 'the-best-group',
+                          myRole: 'owner',
+                        }),
+                      ],
+                    },
+                    errors: undefined,
+                  })
+                  expect(result.data.Group.length).toBe(1)
+                })
+              })
+
+              describe("slug = 'third-investigative-journalism-group'", () => {
+                it("finds only the hidden group where I'm 'usual' member", async () => {
+                  const result = await query({
+                    query: groupQuery,
+                    variables: { slug: 'third-investigative-journalism-group' },
+                  })
+                  expect(result).toMatchObject({
+                    data: {
+                      Group: expect.arrayContaining([
+                        expect.objectContaining({
+                          id: 'third-hidden-group',
+                          slug: 'third-investigative-journalism-group',
+                          myRole: 'usual',
+                        }),
+                      ]),
+                    },
+                    errors: undefined,
+                  })
+                  expect(result.data.Group.length).toBe(1)
+                })
+              })
+
+              describe("slug = 'second-investigative-journalism-group'", () => {
+                it("finds no hidden group where I'm 'pending' member", async () => {
+                  const result = await query({
+                    query: groupQuery,
+                    variables: { slug: 'second-investigative-journalism-group' },
+                  })
+                  expect(result.data.Group.length).toBe(0)
+                })
+              })
+
+              describe("slug = 'investigative-journalism-group'", () => {
+                it("finds no hidden group where I'm not(!) a member at all", async () => {
+                  const result = await query({
+                    query: groupQuery,
+                    variables: { slug: 'investigative-journalism-group' },
+                  })
+                  expect(result.data.Group.length).toBe(0)
+                })
+              })
+            })
+
             describe('isMember = true', () => {
               it('finds only listed groups where user is member', async () => {
                 const result = await query({ query: groupQuery, variables: { isMember: true } })
