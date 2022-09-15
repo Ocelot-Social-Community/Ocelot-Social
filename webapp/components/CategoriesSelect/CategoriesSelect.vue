@@ -12,7 +12,7 @@
       v-tooltip="{
         content: $t(`contribution.category.description.${category.slug}`),
         placement: 'bottom-start',
-        delay: { show: 500 },
+        delay: { show: 1500 },
       }"
     >
       {{ $t(`contribution.category.name.${category.slug}`) }}
