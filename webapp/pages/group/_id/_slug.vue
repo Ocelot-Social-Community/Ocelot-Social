@@ -31,21 +31,26 @@
             />
           </client-only> -->
           <ds-space margin="small">
+            <!-- Group name -->
             <ds-heading tag="h3" align="center" no-margin>
               {{ groupName }}
             </ds-heading>
+            <!-- Group slug -->
             <ds-text align="center" color="soft">
               {{ groupSlug }}
             </ds-text>
+            <!-- Group location -->
             <!-- <ds-text v-if="user.location" align="center" color="soft" size="small">
               <base-icon name="map-marker" />
               {{ user.location.name }}
             </ds-text> -->
+            <!-- Group created at -->
             <ds-text align="center" color="soft" size="small">
               {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
             </ds-text>
           </ds-space>
           <ds-flex>
+            <!-- Group members count -->
             <ds-flex-item>
               <client-only>
                 <ds-number :label="$t('group.membersCount')">
@@ -90,6 +95,7 @@
               @optimistic="optimisticFollow"
               @update="updateFollow"
             /> -->
+            <!-- Group join / leave -->
             <join-leave-button
               :group="group || {}"
               :userId="currentUser.id"
@@ -104,6 +110,7 @@
           </div>
           <hr />
           <ds-space margin-top="small" margin-bottom="small">
+            <!-- Group my role in group -->
             <template v-if="isGroupMember">
               <ds-text class="centered-text hyphenate-text" color="soft" size="small">
                 {{ $t('group.role') }}
@@ -112,12 +119,14 @@
                 <ds-chip color="primary">{{ $t('group.roles.' + group.myRole) }}</ds-chip>
               </div>
             </template>
+            <!-- Group type -->
             <ds-text class="centered-text hyphenate-text" color="soft" size="small">
               {{ $t('group.type') }}
             </ds-text>
             <div class="chip" align="center">
               <ds-chip color="primary">{{ $t('group.types.' + group.groupType) }}</ds-chip>
             </div>
+            <!-- Group action radius -->
             <ds-text class="centered-text hyphenate-text" color="soft" size="small">
               {{ $t('group.actionRadius') }}
             </ds-text>
@@ -127,6 +136,7 @@
           </ds-space>
           <template v-if="group.about">
             <hr />
+            <!-- Group goal -->
             <ds-space margin-top="small" margin-bottom="small">
               <ds-text class="centered-text hyphenate-text" color="soft" size="small">
                 {{ $t('group.goal') }}
