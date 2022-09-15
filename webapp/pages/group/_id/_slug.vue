@@ -189,8 +189,22 @@
           <base-card class="group-description">
             <!-- TODO: replace editor content with tiptap render view -->
             <!-- eslint-disable vue/no-v-html -->
-            <div class="content hyphenate-text" v-html="groupDescriptionExcerpt" />
+            <div
+              v-if="isDescriptionCollapsed"
+              class="content hyphenate-text"
+              v-html="groupDescriptionExcerpt"
+            />
+            <content-viewer v-else class="content hyphenate-text" :content="group.description" />
             <!-- eslint-enable vue/no-v-html -->
+            <base-button
+              class="collaps"
+              size="small"
+              ghost
+              @click="isDescriptionCollapsed = !isDescriptionCollapsed"
+            >
+              <!-- Wolle: locales, full description -->
+              {{ isDescriptionCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
+            </base-button>
           </base-card>
         </ds-space>
         <ds-space v-if="isGroupMemberNonePending" centered>
@@ -260,6 +274,7 @@ import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/gr
 import postListActions from '~/mixins/postListActions'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
 // import ContentMenu from '~/components/ContentMenu/ContentMenu'
+import ContentViewer from '~/components/Editor/ContentViewer'
 import CountTo from '~/components/CountTo.vue'
 import Empty from '~/components/Empty/Empty'
 // import FollowButton from '~/components/Button/FollowButton'
@@ -285,6 +300,7 @@ export default {
   components: {
     AvatarUploader,
     // ContentMenu,
+    ContentViewer,
     CountTo,
     Empty,
     // FollowButton,
@@ -325,6 +341,7 @@ export default {
       membersCountStartValue: 0,
       membersCountToLoad: Infinity,
       updateGroupMutation,
+      isDescriptionCollapsed: true,
     }
   },
   computed: {
@@ -609,5 +626,8 @@ export default {
   //     margin-right: $space-xx-small;
   //   }
   // }
+}
+.collaps {
+  float: right;
 }
 </style>
