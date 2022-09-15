@@ -23,7 +23,7 @@
                 <ds-text bold>{{ item.about }}</ds-text> 
               </ds-space>
               <ds-space margin-top="small">
-                {{ item.description }}
+               <div v-html="item.descriptionExcerpt"></div>
               </ds-space>
               <ds-space margin-top="small">
                 <ds-chip v-for="category in item.categories" :key="category.name">
@@ -34,7 +34,7 @@
             </ds-space>
           </ds-flex-item>
           <ds-flex-item width="10%" centered>
-            <group-menu resource-type="group" :resource="item" :isOwner="item.myRole" @joinGroup="joinGroup"/>
+            <group-menu v-if="item.myRole === 'owner'" resource-type="group" :resource="item" :isOwner="item.myRole" @joinGroup="joinGroup"/>
           </ds-flex-item>
         </ds-flex>
       </ds-card>

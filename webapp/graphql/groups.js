@@ -42,7 +42,7 @@ export const createGroupMutation = gql`
         name
         icon
       }
-      # locationName # test this as result
+      locationName # test this as result
       myRole
     }
   }
@@ -170,6 +170,7 @@ export const groupQuery = gql`
       deleted
       about
       description
+      descriptionExcerpt
       groupType
       actionRadius
       categories {
@@ -181,7 +182,7 @@ export const groupQuery = gql`
       avatar {
         url
       }
-      # locationName # test this as result
+      locationName # test this as result
       myRole
     }
   }

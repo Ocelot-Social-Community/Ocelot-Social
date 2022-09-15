@@ -29,6 +29,7 @@ type Group {
 
   about: String # goal
   description: String!
+  descriptionExcerpt: String!
   groupType: GroupType!
   actionRadius: GroupActionRadius!
 

@@ -159,6 +159,7 @@ export const groupQuery = gql`
       deleted
       about
       description
+      descriptionExcerpt
       groupType
       actionRadius
       categories {
