@@ -116,7 +116,9 @@
                 {{ $t('group.role') }}
               </ds-text>
               <div class="chip" align="center">
-                <ds-chip color="primary">{{ $t('group.roles.' + group.myRole) }}</ds-chip>
+                <ds-chip color="primary">
+                  {{ group ? $t('group.roles.' + group.myRole) : '' }}
+                </ds-chip>
               </div>
             </template>
             <!-- Group type -->
@@ -124,14 +126,18 @@
               {{ $t('group.type') }}
             </ds-text>
             <div class="chip" align="center">
-              <ds-chip color="primary">{{ $t('group.types.' + group.groupType) }}</ds-chip>
+              <ds-chip color="primary">
+                {{ group ? $t('group.types.' + group.groupType) : '' }}
+              </ds-chip>
             </div>
             <!-- Group action radius -->
             <ds-text class="centered-text hyphenate-text" color="soft" size="small">
               {{ $t('group.actionRadius') }}
             </ds-text>
             <div class="chip" align="center">
-              <ds-chip color="primary">{{ $t('group.actionRadii.' + group.actionRadius) }}</ds-chip>
+              <ds-chip color="primary">
+                {{ group ? $t('group.actionRadii.' + group.actionRadius) : '' }}
+              </ds-chip>
             </div>
           </ds-space>
           <template v-if="group.about">
@@ -142,7 +148,7 @@
                 {{ $t('group.goal') }}
               </ds-text>
               <div class="chip" align="center">
-                <ds-chip>{{ group.about }}</ds-chip>
+                <ds-chip>{{ group ? group.about : '' }}</ds-chip>
               </div>
             </ds-space>
           </template>
