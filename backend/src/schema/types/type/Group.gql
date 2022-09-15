@@ -117,6 +117,11 @@ type Mutation {
     userId: ID!
   ): User
 
+  LeaveGroup(
+    groupId: ID!
+    userId: ID!
+  ): User
+
   ChangeGroupMemberRole(
     groupId: ID!
     userId: ID!

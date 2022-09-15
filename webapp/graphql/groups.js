@@ -106,6 +106,17 @@ export const joinGroupMutation = gql`
   }
 `
 
+export const leaveGroupMutation = gql`
+  mutation ($groupId: ID!, $userId: ID!) {
+    LeaveGroup(groupId: $groupId, userId: $userId) {
+      id
+      name
+      slug
+      myRoleInGroup
+    }
+  }
+`
+
 export const changeGroupMemberRoleMutation = gql`
   mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
     ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
@@ -149,8 +160,8 @@ export const groupQuery = gql`
 `
 
 export const groupMembersQuery = gql`
-  query ($id: ID!, $first: Int, $offset: Int, $orderBy: [_UserOrdering], $filter: _UserFilter) {
-    GroupMembers(id: $id, first: $first, offset: $offset, orderBy: $orderBy, filter: $filter) {
+  query ($id: ID!) {
+    GroupMembers(id: $id) {
       id
       name
       slug
