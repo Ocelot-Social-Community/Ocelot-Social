@@ -277,7 +277,7 @@ describe('in mode', () => {
           groupType: 'public',
           actionRadius: 'regional',
           categoryIds,
-          // locationName, // test this as result
+          locationName: 'Hamburg, Germany',
         }
       })
 
@@ -304,6 +304,12 @@ describe('in mode', () => {
                   description: 'Some description' + descriptionAdditional100,
                   groupType: 'public',
                   actionRadius: 'regional',
+                  locationName: 'Hamburg, Germany',
+                  location: expect.objectContaining({
+                    name: 'Hamburg',
+                    nameDE: 'Hamburg',
+                    nameEN: 'Hamburg',
+                  }),
                 },
               },
               errors: undefined,
@@ -539,6 +545,7 @@ describe('in mode', () => {
               groupType: 'public',
               actionRadius: 'regional',
               categoryIds,
+              locationName: 'Hamburg, Germany',
             },
           })
         })
@@ -554,6 +561,12 @@ describe('in mode', () => {
                       expect.objectContaining({
                         id: 'my-group',
                         slug: 'the-best-group',
+                        locationName: 'Hamburg, Germany',
+                        location: expect.objectContaining({
+                          name: 'Hamburg',
+                          nameDE: 'Hamburg',
+                          nameEN: 'Hamburg',
+                        }),
                         myRole: 'owner',
                       }),
                       expect.objectContaining({
@@ -2642,6 +2655,7 @@ describe('in mode', () => {
               groupType: 'public',
               actionRadius: 'regional',
               categoryIds,
+              locationName: 'Hamburg, Germany',
             },
           })
         })
@@ -2663,7 +2677,7 @@ describe('in mode', () => {
                     description: 'Some country relevant description' + descriptionAdditional100,
                     actionRadius: 'national',
                     // avatar, // test this as result
-                    // locationName, // test this as result
+                    locationName: 'Berlin, Germany',
                   },
                 }),
               ).resolves.toMatchObject({
@@ -2676,7 +2690,12 @@ describe('in mode', () => {
                     description: 'Some country relevant description' + descriptionAdditional100,
                     actionRadius: 'national',
                     // avatar, // test this as result
-                    // locationName, // test this as result
+                    locationName: 'Berlin, Germany',
+                    location: expect.objectContaining({
+                      name: 'Berlin',
+                      nameDE: 'Berlin',
+                      nameEN: 'Berlin',
+                    }),
                     myRole: 'owner',
                   },
                 },

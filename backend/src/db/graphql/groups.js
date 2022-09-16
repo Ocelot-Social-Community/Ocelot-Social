@@ -42,7 +42,12 @@ export const createGroupMutation = gql`
         name
         icon
       }
-      # locationName # test this as result
+      locationName
+      location {
+        name
+        nameDE
+        nameEN
+      }
       myRole
     }
   }
@@ -89,7 +94,12 @@ export const updateGroupMutation = gql`
         icon
       }
       # avatar # test this as result
-      # locationName # test this as result
+      locationName
+      location {
+        name
+        nameDE
+        nameEN
+      }
       myRole
     }
   }
@@ -154,7 +164,12 @@ export const groupQuery = gql`
       avatar {
         url
       }
-      # locationName # test this as result
+      locationName
+      location {
+        name
+        nameDE
+        nameEN
+      }
       myRole
     }
   }
