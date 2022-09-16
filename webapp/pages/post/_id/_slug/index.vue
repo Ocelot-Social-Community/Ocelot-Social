@@ -46,7 +46,6 @@
       <content-viewer class="content hyphenate-text" :content="post.content" />
       <!-- Categories -->
       <div v-if="categoriesActive" class="categories">
-        <!-- eslint-enable vue/no-v-html -->
         <ds-space margin="xx-large" />
         <ds-space margin="xx-small" />
         <hc-category
