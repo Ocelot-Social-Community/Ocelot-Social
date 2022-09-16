@@ -33,7 +33,6 @@
             v-tooltip="{
               content: $t(`contribution.category.name.${category.slug}`),
               placement: 'bottom-start',
-              delay: { show: 500 },
             }"
             :icon="category.icon"
           />

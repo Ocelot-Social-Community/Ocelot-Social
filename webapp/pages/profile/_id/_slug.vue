@@ -120,7 +120,6 @@
                   v-tooltip="{
                     content: $t('contribution.newPost'),
                     placement: 'left',
-                    delay: { show: 500 },
                   }"
                   :path="{ name: 'post-create' }"
                   class="profile-post-add-button"

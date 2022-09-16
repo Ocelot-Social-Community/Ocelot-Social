@@ -7,7 +7,6 @@
             v-tooltip="{
               content: $t('group.newGroup'),
               placement: 'left',
-              delay: { show: 500 },
             }"
             :path="{ name: 'group-create' }"
             class="profile-post-add-button"
