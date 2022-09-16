@@ -137,7 +137,7 @@ export default {
       })
       try {
         const group = await writeTxResultPromise
-        await createOrUpdateLocations(params.id, params.locationName, session)
+        await createOrUpdateLocations(params.id, 'Group', params.locationName, session)
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
@@ -210,7 +210,7 @@ export default {
       })
       try {
         const group = await writeTxResultPromise
-        await createOrUpdateLocations(params.id, params.locationName, session)
+        await createOrUpdateLocations(params.id, 'Group', params.locationName, session)
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')

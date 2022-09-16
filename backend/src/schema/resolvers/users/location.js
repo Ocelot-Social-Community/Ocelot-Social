@@ -62,7 +62,7 @@ const createLocation = async (session, mapboxData) => {
   })
 }
 
-const createOrUpdateLocations = async (userId, locationName, session) => {
+const createOrUpdateLocations = async (nodeId, nodeLabel, locationName, session) => {
   if (isEmpty(locationName)) {
     return
   }
@@ -121,18 +121,19 @@ const createOrUpdateLocations = async (userId, locationName, session) => {
       parent = ctx
     })
   }
-  // delete all current locations from user and add new location
+  // delete all current locations from node and add new location
   await session.writeTransaction((transaction) => {
     return transaction.run(
       `
-          MATCH (user:User {id: $userId})-[relationship:IS_IN]->(location:Location)
-          DETACH DELETE relationship
-          WITH user
-          MATCH (location:Location {id: $locationId})
-          MERGE (user)-[:IS_IN]->(location)
-          RETURN location.id, user.id
-        `,
-      { userId: userId, locationId: data.id },
+        MATCH (node:${nodeLabel} {id: $nodeId})
+        OPTIONAL MATCH (node)-[relationship:IS_IN]->(:Location)
+        DELETE relationship
+        WITH node
+        MATCH (location:Location {id: $locationId})
+        MERGE (node)-[:IS_IN]->(location)
+        RETURN location.id, node.id
+      `,
+      { nodeId, locationId: data.id },
     )
   })
 }

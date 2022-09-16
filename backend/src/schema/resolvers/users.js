@@ -169,7 +169,7 @@ export default {
       })
       try {
         const user = await writeTxResultPromise
-        await createOrUpdateLocations(params.id, params.locationName, session)
+        await createOrUpdateLocations(params.id, 'User', params.locationName, session)
         return user
       } catch (error) {
         throw new UserInputError(error.message)
