@@ -53,6 +53,10 @@
           :key="category.id"
           :icon="category.icon"
           :name="$t(`contribution.category.name.${category.slug}`)"
+          v-tooltip="{
+            content: $t(`contribution.category.name.${category.slug}`),
+            placement: 'bottom-start',
+          }"
         />
       </div>
       <ds-space margin-bottom="small" />
