@@ -496,7 +496,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         variables: {
           groupId: 'g2',
           userId: 'u3',
-          roleInGroup: 'pending',
+          roleInGroup: 'usual',
         },
       }),
       mutate({
@@ -504,7 +504,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         variables: {
           groupId: 'g2',
           userId: 'u4',
-          roleInGroup: 'usual',
+          roleInGroup: 'pending',
         },
       }),
       mutate({
@@ -512,7 +512,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         variables: {
           groupId: 'g2',
           userId: 'u5',
-          roleInGroup: 'usual',
+          roleInGroup: 'admin',
         },
       }),
       mutate({
