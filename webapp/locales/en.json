@@ -383,6 +383,7 @@
       "regional": "Regional Group"
     },
     "actionRadius": "Action radius",
+    "categories": "Topic ::: Topics",
     "foundation": "Foundation",
     "goal": "Goal of group",
     "group-created": "The group was created!",
@@ -396,7 +397,7 @@
       "message": "Leaving a group may be irreversible!<br>Leave group <b>“{name}”</b>!",
       "title": "Do you really want to leave the group?"
     },
-    "membersCount": "Members",
+    "membersCount": "Member ::: Members",
     "membersListTitle": "Group Members",
     "newGroup": "Create a new Group",
     "role": "Your role in the group",

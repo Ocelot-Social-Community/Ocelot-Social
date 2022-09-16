@@ -53,7 +53,7 @@
             <!-- Group members count -->
             <ds-flex-item>
               <client-only>
-                <ds-number :label="$t('group.membersCount')">
+                <ds-number :label="$t('group.membersCount', {}, groupMembers.length)">
                   <count-to
                     slot="count"
                     :start-val="membersCountStartValue"
@@ -117,7 +117,7 @@
               </ds-text>
               <div class="chip" align="center">
                 <ds-chip color="primary">
-                  {{ group ? $t('group.roles.' + group.myRole) : '' }}
+                  {{ group && group.myRole ? $t('group.roles.' + group.myRole) : '' }}
                 </ds-chip>
               </div>
             </template>
@@ -127,7 +127,7 @@
             </ds-text>
             <div class="chip" align="center">
               <ds-chip color="primary">
-                {{ group ? $t('group.types.' + group.groupType) : '' }}
+                {{ group && group.groupType ? $t('group.types.' + group.groupType) : '' }}
               </ds-chip>
             </div>
             <!-- Group action radius -->
@@ -136,22 +136,46 @@
             </ds-text>
             <div class="chip" align="center">
               <ds-chip color="primary">
-                {{ group ? $t('group.actionRadii.' + group.actionRadius) : '' }}
+                {{
+                  group && group.actionRadius ? $t('group.actionRadii.' + group.actionRadius) : ''
+                }}
               </ds-chip>
             </div>
           </ds-space>
-          <template v-if="group.about">
-            <hr />
+          <hr v-if="(group && group.about) || categoriesActive" />
+          <ds-space margin-top="small" margin-bottom="small">
             <!-- Group goal -->
-            <ds-space margin-top="small" margin-bottom="small">
+            <template v-if="group && group.about">
               <ds-text class="centered-text hyphenate-text" color="soft" size="small">
                 {{ $t('group.goal') }}
               </ds-text>
               <div class="chip" align="center">
                 <ds-chip>{{ group ? group.about : '' }}</ds-chip>
               </div>
-            </ds-space>
-          </template>
+            </template>
+            <!-- Group categories -->
+            <template v-if="categoriesActive">
+              <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+                {{
+                  $t(
+                    'group.categories',
+                    {},
+                    group && group.categories ? group.categories.length : 0,
+                  )
+                }}
+              </ds-text>
+              <div class="categories">
+                <ds-space margin="xx-large" />
+                <ds-space margin="xx-small" />
+                <!-- <hc-category
+                  v-for="category in post.categories"
+                  :key="category.id"
+                  :icon="category.icon"
+                  :name="$t(`contribution.category.name.${category.slug}`)"
+                /> -->
+              </div>
+            </template>
+          </ds-space>
         </base-card>
         <ds-space />
         <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
@@ -327,6 +351,7 @@ export default {
   data() {
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     return {
+      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       Group: [],
       GroupMembers: [],
       posts: [],
