@@ -9,6 +9,7 @@ import Resolver, {
   convertObjectToCypherMapLiteral,
 } from './helpers/Resolver'
 import { mergeImage } from './images/images'
+import createOrUpdateLocations from './users/location'
 
 export default {
   Query: {
@@ -135,7 +136,9 @@ export default {
         return group
       })
       try {
-        return await writeTxResultPromise
+        const group = await writeTxResultPromise
+        await createOrUpdateLocations(params.id, params.locationName, session)
+        return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
           throw new UserInputError('Group with this slug already exists!')
@@ -206,7 +209,9 @@ export default {
         return group
       })
       try {
-        return await writeTxResultPromise
+        const group = await writeTxResultPromise
+        await createOrUpdateLocations(params.id, params.locationName, session)
+        return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
           throw new UserInputError('Group with this slug already exists!')
@@ -300,11 +305,13 @@ export default {
   },
   Group: {
     ...Resolver('Group', {
+      undefinedToNull: ['deleted', 'disabled', 'locationName', 'about'],
       hasMany: {
         categories: '-[:CATEGORIZED]->(related:Category)',
       },
       hasOne: {
         avatar: '-[:AVATAR_IMAGE]->(related:Image)',
+        location: '-[:IS_IN]->(related:Location)',
       },
     }),
   },
