@@ -217,6 +217,27 @@
       "infoSelectedNoOfMaxCategories": "{chosen} of {max} topics selected"
     },
     "category": {
+      "description": {
+        "body-and-excercise": "Sports, yoga, massage, relaxation",
+        "children": "Family, education, school, imprinting",
+        "culture": "Art, theatre, music, photography, film",
+        "economy": "Trade, consumption, marketing, supply chains",
+        "energy": "Oil, gas, coal, wind, hydrodynamic power, biogas, atomic energy",
+        "finance": "Money, financial system, alternative currencies",
+        "health": "Medicine, nutrition, WHO, vaccination, harmful substances",
+        "home": "Construction, communities, tiny houses, kitchen garden",
+        "it-and-media": "News, manipulation, privacy, control, data leeches, AI, software, apps",
+        "law": "Human rights, laws, decrees",
+        "miscellaneous": "Miscellaneous",
+        "mobility": "Travel, traffic, electric mobility",
+        "nature": "Animals, plants, agriculture, ecologu, biodiversity",
+        "networking": "Cooperation, action alliances, solidarity, help",
+        "peace": "War, military, social defence, arms, cyber attacks",
+        "politics": "Democracy, participation, elections, corruption, parties",
+        "psyche": "Soul, feelings, happiness",
+        "science": "Education, university, publications",
+        "spirituality": "Religion, values, ethics"
+      },
       "name": {
         "body-and-excercise": "Body & Excercise",
         "children": "Children",

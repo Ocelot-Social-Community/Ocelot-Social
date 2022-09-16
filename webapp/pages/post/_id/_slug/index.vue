@@ -54,7 +54,7 @@
           :icon="category.icon"
           :name="$t(`contribution.category.name.${category.slug}`)"
           v-tooltip="{
-            content: $t(`contribution.category.name.${category.slug}`),
+            content: $t(`contribution.category.description.${category.slug}`),
             placement: 'bottom-start',
           }"
         />
