@@ -51,7 +51,7 @@ export default {
         Group: [group],
       },
     } = await client.query({
-      query: groupQuery,
+      query: groupQuery(this.$i18n),
       variables: { id },
     })
     if (group.myRole !== 'owner') {

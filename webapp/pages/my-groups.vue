@@ -27,7 +27,7 @@ export default {
     async groupListQuery() {
       try {
         const response = await this.$apollo.query({
-          query: groupQuery,
+          query: groupQuery(this.$i18n),
         })
         this.responseGroupListQuery = response.data.Group
       } catch (error) {

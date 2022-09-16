@@ -40,10 +40,10 @@
               {{ groupSlug }}
             </ds-text>
             <!-- Group location -->
-            <!-- <ds-text v-if="user.location" align="center" color="soft" size="small">
+            <ds-text v-if="group && group.location" align="center" color="soft" size="small">
               <base-icon name="map-marker" />
-              {{ user.location.name }}
-            </ds-text> -->
+              {{ group && group.location ? group.location.name : '' }}
+            </ds-text>
             <!-- Group created at -->
             <ds-text align="center" color="soft" size="small">
               {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
@@ -141,6 +141,7 @@
                 }}
               </ds-chip>
             </div>
+            <ds-space margin="x-small" />
           </ds-space>
           <!-- Group categories -->
           <template v-if="categoriesActive">
@@ -155,8 +156,13 @@
                   )
                 }}
               </ds-text>
+              <ds-space margin="xx-small" />
               <div class="categories">
-                <div v-for="category in group.categories" :key="category.id" align="center">
+                <div
+                  v-for="(category, index) in group.categories"
+                  :key="category.id"
+                  align="center"
+                >
                   <category
                     :icon="category.icon"
                     :name="$t(`contribution.category.name.${category.slug}`)"
@@ -165,7 +171,7 @@
                       placement: 'bottom-start',
                     }"
                   />
-                  <ds-space margin="xxx-small" />
+                  <ds-space v-if="index < group.categories.length - 1" margin="xxx-small" />
                 </div>
               </div>
             </ds-space>
@@ -177,6 +183,7 @@
               <ds-text class="centered-text hyphenate-text" color="soft" size="small">
                 {{ $t('group.goal') }}
               </ds-text>
+              <ds-space margin="xx-small" />
               <div class="chip" align="center">
                 <ds-chip>{{ group ? group.about : '' }}</ds-chip>
               </div>
@@ -564,8 +571,7 @@ export default {
     // },
     Group: {
       query() {
-        // return groupQuery(this.$i18n) // language will be needed for locations
-        return groupQuery
+        return groupQuery(this.$i18n)
       },
       variables() {
         return {

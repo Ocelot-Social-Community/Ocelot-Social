@@ -131,35 +131,41 @@ export const changeGroupMemberRoleMutation = gql`
 
 // ------ queries
 
-export const groupQuery = gql`
-  query ($isMember: Boolean, $id: ID, $slug: String) {
-    Group(isMember: $isMember, id: $id, slug: $slug) {
-      id
-      name
-      slug
-      createdAt
-      updatedAt
-      disabled
-      deleted
-      about
-      description
-      descriptionExcerpt
-      groupType
-      actionRadius
-      categories {
+export const groupQuery = (i18n) => {
+  const lang = i18n.locale().toUpperCase()
+  return gql`
+    query ($isMember: Boolean, $id: ID, $slug: String) {
+      Group(isMember: $isMember, id: $id, slug: $slug) {
         id
-        slug
         name
-        icon
+        slug
+        createdAt
+        updatedAt
+        disabled
+        deleted
+        about
+        description
+        descriptionExcerpt
+        groupType
+        actionRadius
+        categories {
+          id
+          slug
+          name
+          icon
+        }
+        avatar {
+          url
+        }
+        locationName
+        location {
+          name: name${lang}
+        }
+        myRole
       }
-      avatar {
-        url
-      }
-      locationName # test this as result
-      myRole
     }
-  }
-`
+  `
+}
 
 export const groupMembersQuery = gql`
   query ($id: ID!) {
