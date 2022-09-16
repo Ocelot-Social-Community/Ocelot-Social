@@ -314,6 +314,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           groupType: 'hidden',
           actionRadius: 'global',
           categoryIds: ['cat6', 'cat12', 'cat16'],
+          locationName: 'Hamburg, Germany',
         },
       }),
     ])
@@ -371,6 +372,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           groupType: 'closed',
           actionRadius: 'national',
           categoryIds: ['cat8', 'cat14'],
+          locationName: 'France',
         },
       }),
     ])
