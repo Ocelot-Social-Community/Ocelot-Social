@@ -142,19 +142,10 @@
               </ds-chip>
             </div>
           </ds-space>
-          <hr v-if="(group && group.about) || categoriesActive" />
-          <ds-space margin-top="small" margin-bottom="small">
-            <!-- Group goal -->
-            <template v-if="group && group.about">
-              <ds-text class="centered-text hyphenate-text" color="soft" size="small">
-                {{ $t('group.goal') }}
-              </ds-text>
-              <div class="chip" align="center">
-                <ds-chip>{{ group ? group.about : '' }}</ds-chip>
-              </div>
-            </template>
-            <!-- Group categories -->
-            <template v-if="categoriesActive">
+          <!-- Group categories -->
+          <template v-if="categoriesActive">
+            <hr />
+            <ds-space margin-top="small" margin-bottom="small">
               <ds-text class="centered-text hyphenate-text" color="soft" size="small">
                 {{
                   $t(
@@ -165,17 +156,32 @@
                 }}
               </ds-text>
               <div class="categories">
-                <ds-space margin="xx-large" />
-                <ds-space margin="xx-small" />
-                <!-- <hc-category
-                  v-for="category in post.categories"
-                  :key="category.id"
-                  :icon="category.icon"
-                  :name="$t(`contribution.category.name.${category.slug}`)"
-                /> -->
+                <div v-for="category in group.categories" :key="category.id" align="center">
+                  <category
+                    :icon="category.icon"
+                    :name="$t(`contribution.category.name.${category.slug}`)"
+                    v-tooltip="{
+                      content: $t(`contribution.category.name.${category.slug}`),
+                      placement: 'bottom-start',
+                    }"
+                  />
+                  <ds-space margin="xxx-small" />
+                </div>
               </div>
-            </template>
-          </ds-space>
+            </ds-space>
+          </template>
+          <!-- Group goal -->
+          <template v-if="group && group.about">
+            <hr />
+            <ds-space margin-top="small" margin-bottom="small">
+              <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+                {{ $t('group.goal') }}
+              </ds-text>
+              <div class="chip" align="center">
+                <ds-chip>{{ group ? group.about : '' }}</ds-chip>
+              </div>
+            </ds-space>
+          </template>
         </base-card>
         <ds-space />
         <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
@@ -226,7 +232,6 @@
               ghost
               @click="isDescriptionCollapsed = !isDescriptionCollapsed"
             >
-              <!-- Wolle: locales, full description -->
               {{ isDescriptionCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
             </base-button>
           </base-card>
@@ -237,7 +242,6 @@
               v-tooltip="{
                 content: $t('contribution.newPost'),
                 placement: 'left',
-                delay: { show: 500 },
               }"
               :path="{ name: 'post-create' }"
               class="profile-post-add-button"
@@ -297,6 +301,7 @@ import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/gr
 // import UpdateQuery from '~/components/utils/UpdateQuery'
 import postListActions from '~/mixins/postListActions'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
+import Category from '~/components/Category'
 // import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CountTo from '~/components/CountTo.vue'
@@ -323,6 +328,7 @@ import ProfileList from '~/components/features/ProfileList/ProfileList'
 export default {
   components: {
     AvatarUploader,
+    Category,
     // ContentMenu,
     ContentViewer,
     CountTo,
