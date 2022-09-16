@@ -17,6 +17,11 @@
           :filled="filteredCategoryIds.includes(category.id)"
           :label="$t(`contribution.category.name.${category.slug}`)"
           @click="toggleCategory(category.id)"
+          v-tooltip="{
+            content: $t(`contribution.category.description.${category.slug}`),
+            placement: 'bottom-start',
+            delay: { show: 1500 },
+          }"
         />
       </li>
     </template>
