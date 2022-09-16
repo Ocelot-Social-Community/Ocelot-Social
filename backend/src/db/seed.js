@@ -313,7 +313,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           description: `<p class=""><em>English:</em></p><p class="">This group is hidden.</p><h3>What is our group for?</h3><p>This group was created to allow investigative journalists to share and collaborate.</p><h3>How does it work?</h3><p>Here you can internally share posts and comments about them.</p><p><br></p><p><em>Deutsch:</em></p><p class="">Diese Gruppe ist verborgen.</p><h3>Wofür ist unsere Gruppe?</h3><p class="">Diese Gruppe wurde geschaffen, um investigativen Journalisten den Austausch und die Zusammenarbeit zu ermöglichen.</p><h3>Wie funktioniert das?</h3><p class="">Hier könnt ihr euch intern über Beiträge und Kommentare zu ihnen austauschen.</p>`,
           groupType: 'hidden',
           actionRadius: 'global',
-          categoryIds: ['cat6', 'cat9', 'cat14'],
+          categoryIds: ['cat6', 'cat12', 'cat16'],
         },
       }),
     ])
@@ -370,7 +370,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           description: `<p class=""><em>English</em></p><h3>Our goal</h3><p>Only those who enjoy learning and do not lose their curiosity can obtain a good education for life and continue to learn with joy throughout their lives.</p><h3>Curiosity</h3><p>For this we need a school that takes up the curiosity of the children, the people, and satisfies it through a lot of experience.</p><p><br></p><p><em>Deutsch</em></p><h3>Unser Ziel</h3><p class="">Nur wer Spaß am Lernen hat und seine Neugier nicht verliert, kann gute Bildung für's Leben erlangen und sein ganzes Leben mit Freude weiter lernen.</p><h3>Neugier</h3><p class="">Dazu benötigen wir eine Schule, die die Neugier der Kinder, der Menschen, aufnimmt und durch viel Erfahrung befriedigt.</p>`,
           groupType: 'closed',
           actionRadius: 'national',
-          categoryIds: ['cat7', 'cat9', 'cat16'],
+          categoryIds: ['cat8', 'cat14'],
         },
       }),
     ])
@@ -449,7 +449,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           description: `<h3>What Is yoga?</h3><p>Yoga is not just about practicing asanas. It's about how we do it.</p><p class="">And practicing asanas doesn't have to be yoga, it can be more athletic than yogic.</p><h3>What makes practicing asanas yogic?</h3><p class="">The important thing is:</p><ul><li><p>Use the exercises (consciously) for your personal development.</p></li></ul>`,
           groupType: 'public',
           actionRadius: 'interplanetary',
-          categoryIds: ['cat3', 'cat13', 'cat16'],
+          categoryIds: ['cat4', 'cat5', 'cat17'],
         },
       }),
     ])
