@@ -9,7 +9,7 @@ import Resolver, {
   convertObjectToCypherMapLiteral,
 } from './helpers/Resolver'
 import { mergeImage } from './images/images'
-import createOrUpdateLocations from './users/location'
+import { createOrUpdateLocations } from './users/location'
 
 export default {
   Query: {
@@ -137,7 +137,7 @@ export default {
       })
       try {
         const group = await writeTxResultPromise
-        await createOrUpdateLocations(params.id, 'Group', params.locationName, session)
+        await createOrUpdateLocations('Group', params.id, params.locationName, session)
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
@@ -210,7 +210,7 @@ export default {
       })
       try {
         const group = await writeTxResultPromise
-        await createOrUpdateLocations(params.id, 'Group', params.locationName, session)
+        await createOrUpdateLocations('Group', params.id, params.locationName, session)
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')

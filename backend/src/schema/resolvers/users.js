@@ -4,7 +4,7 @@ import { UserInputError, ForbiddenError } from 'apollo-server'
 import { mergeImage, deleteImage } from './images/images'
 import Resolver from './helpers/Resolver'
 import log from './helpers/databaseLogger'
-import createOrUpdateLocations from './users/location'
+import { createOrUpdateLocations } from './users/location'
 
 const neode = getNeode()
 
@@ -169,7 +169,7 @@ export default {
       })
       try {
         const user = await writeTxResultPromise
-        await createOrUpdateLocations(params.id, 'User', params.locationName, session)
+        await createOrUpdateLocations('User', params.id, params.locationName, session)
         return user
       } catch (error) {
         throw new UserInputError(error.message)

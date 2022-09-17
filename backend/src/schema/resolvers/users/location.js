@@ -62,7 +62,7 @@ const createLocation = async (session, mapboxData) => {
   })
 }
 
-const createOrUpdateLocations = async (nodeId, nodeLabel, locationName, session) => {
+export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, session) => {
   if (isEmpty(locationName)) {
     return
   }
@@ -148,5 +148,3 @@ export const queryLocations = async ({ place, lang }) => {
   }
   return res.features
 }
-
-export default createOrUpdateLocations
