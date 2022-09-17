@@ -12,7 +12,7 @@ export const createGroupMutation = gql`
     $groupType: GroupType!
     $actionRadius: GroupActionRadius!
     $categoryIds: [ID]
-    $locationName: String
+    $locationName: String # empty string '' sets it to null
   ) {
     CreateGroup(
       id: $id
@@ -63,7 +63,7 @@ export const updateGroupMutation = gql`
     $actionRadius: GroupActionRadius
     $categoryIds: [ID]
     $avatar: ImageInput
-    $locationName: String
+    $locationName: String # empty string '' sets it to null
   ) {
     UpdateGroup(
       id: $id

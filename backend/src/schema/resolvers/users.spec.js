@@ -161,7 +161,7 @@ describe('UpdateUser', () => {
         $id: ID!
         $name: String
         $termsAndConditionsAgreedVersion: String
-        $locationName: String
+        $locationName: String # empty string '' sets it to null
       ) {
         UpdateUser(
           id: $id

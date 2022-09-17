@@ -553,7 +553,7 @@ describe('in mode', () => {
         describe('query groups', () => {
           describe('in general finds only listed groups – no hidden groups where user is none or pending member', () => {
             describe('without any filters', () => {
-              it('finds all listed groups', async () => {
+              it('finds all listed groups – including the set locations', async () => {
                 const result = await query({ query: groupQuery, variables: {} })
                 expect(result).toMatchObject({
                   data: {
@@ -572,12 +572,16 @@ describe('in mode', () => {
                       expect.objectContaining({
                         id: 'others-group',
                         slug: 'uninteresting-group',
+                        locationName: null,
+                        location: null,
                         myRole: null,
                       }),
                       expect.objectContaining({
                         id: 'third-hidden-group',
                         slug: 'third-investigative-journalism-group',
                         myRole: 'usual',
+                        locationName: null,
+                        location: null,
                       }),
                     ]),
                   },
@@ -2617,21 +2621,32 @@ describe('in mode', () => {
       })
 
       describe('authenticated', () => {
-        let otherUser
+        let noMemberUser
 
         beforeAll(async () => {
-          otherUser = await Factory.build(
+          noMemberUser = await Factory.build(
             'user',
             {
-              id: 'other-user',
-              name: 'Other TestUser',
+              id: 'none-member-user',
+              name: 'None Member TestUser',
             },
             {
-              email: 'test2@example.org',
+              email: 'none-member-user@example.org',
               password: '1234',
             },
           )
-          authenticatedUser = await otherUser.toJson()
+          usualMemberUser = await Factory.build(
+            'user',
+            {
+              id: 'usual-member-user',
+              name: 'Usual Member TestUser',
+            },
+            {
+              email: 'usual-member-user@example.org',
+              password: '1234',
+            },
+          )
+          authenticatedUser = await noMemberUser.toJson()
           await mutate({
             mutation: createGroupMutation,
             variables: {
@@ -2655,7 +2670,15 @@ describe('in mode', () => {
               groupType: 'public',
               actionRadius: 'regional',
               categoryIds,
-              locationName: 'Hamburg, Germany',
+              locationName: 'Berlin, Germany',
+            },
+          })
+          await mutate({
+            mutation: changeGroupMemberRoleMutation,
+            variables: {
+              groupId: 'my-group',
+              userId: 'usual-member-user',
+              roleInGroup: 'usual',
             },
           })
         })
@@ -2666,40 +2689,190 @@ describe('in mode', () => {
               authenticatedUser = await user.toJson()
             })
 
-            it('has set the settings', async () => {
-              await expect(
-                mutate({
-                  mutation: updateGroupMutation,
-                  variables: {
-                    id: 'my-group',
-                    name: 'The New Group For Our Country',
-                    about: 'We will change the land!',
-                    description: 'Some country relevant description' + descriptionAdditional100,
-                    actionRadius: 'national',
-                    // avatar, // test this as result
-                    locationName: 'Berlin, Germany',
+            describe('all standard settings – excluding location', () => {
+              it('has updated the settings', async () => {
+                await expect(
+                  mutate({
+                    mutation: updateGroupMutation,
+                    variables: {
+                      id: 'my-group',
+                      name: 'The New Group For Our Country',
+                      about: 'We will change the land!',
+                      description: 'Some country relevant description' + descriptionAdditional100,
+                      actionRadius: 'national',
+                      // avatar, // test this as result
+                    },
+                  }),
+                ).resolves.toMatchObject({
+                  data: {
+                    UpdateGroup: {
+                      id: 'my-group',
+                      name: 'The New Group For Our Country',
+                      slug: 'the-new-group-for-our-country', // changing the slug is tested in the slugifyMiddleware
+                      about: 'We will change the land!',
+                      description: 'Some country relevant description' + descriptionAdditional100,
+                      actionRadius: 'national',
+                      // avatar, // test this as result
+                      myRole: 'owner',
+                    },
                   },
-                }),
-              ).resolves.toMatchObject({
-                data: {
-                  UpdateGroup: {
-                    id: 'my-group',
-                    name: 'The New Group For Our Country',
-                    slug: 'the-new-group-for-our-country', // changing the slug is tested in the slugifyMiddleware
-                    about: 'We will change the land!',
-                    description: 'Some country relevant description' + descriptionAdditional100,
-                    actionRadius: 'national',
-                    // avatar, // test this as result
-                    locationName: 'Berlin, Germany',
-                    location: expect.objectContaining({
-                      name: 'Berlin',
-                      nameDE: 'Berlin',
-                      nameEN: 'Berlin',
+                  errors: undefined,
+                })
+              })
+            })
+
+            describe('location', () => {
+              describe('"locationName" is undefined – shall not change location', () => {
+                it('has left locaton unchanged as "Berlin"', async () => {
+                  await expect(
+                    mutate({
+                      mutation: updateGroupMutation,
+                      variables: {
+                        id: 'my-group',
+                      },
                     }),
-                    myRole: 'owner',
-                  },
-                },
-                errors: undefined,
+                  ).resolves.toMatchObject({
+                    data: {
+                      UpdateGroup: {
+                        id: 'my-group',
+                        locationName: 'Berlin, Germany',
+                        location: expect.objectContaining({
+                          name: 'Berlin',
+                          nameDE: 'Berlin',
+                          nameEN: 'Berlin',
+                        }),
+                        myRole: 'owner',
+                      },
+                    },
+                    errors: undefined,
+                  })
+                })
+              })
+
+              describe('"locationName" is null – shall change location "Berlin" to unset location', () => {
+                it('has updated the location to unset location', async () => {
+                  await expect(
+                    mutate({
+                      mutation: updateGroupMutation,
+                      variables: {
+                        id: 'my-group',
+                        // avatar, // test this as result
+                        locationName: null,
+                      },
+                    }),
+                  ).resolves.toMatchObject({
+                    data: {
+                      UpdateGroup: {
+                        id: 'my-group',
+                        locationName: null,
+                        location: null,
+                        myRole: 'owner',
+                      },
+                    },
+                    errors: undefined,
+                  })
+                })
+              })
+
+              describe('change unset location to "Paris"', () => {
+                it('has updated the location to "Paris"', async () => {
+                  await expect(
+                    mutate({
+                      mutation: updateGroupMutation,
+                      variables: {
+                        id: 'my-group',
+                        // avatar, // test this as result
+                        locationName: 'Paris, France',
+                      },
+                    }),
+                  ).resolves.toMatchObject({
+                    data: {
+                      UpdateGroup: {
+                        id: 'my-group',
+                        name: 'The New Group For Our Country',
+                        slug: 'the-new-group-for-our-country', // changing the slug is tested in the slugifyMiddleware
+                        about: 'We will change the land!',
+                        description: 'Some country relevant description' + descriptionAdditional100,
+                        actionRadius: 'national',
+                        // avatar, // test this as result
+                        locationName: 'Paris, France',
+                        location: expect.objectContaining({
+                          name: 'Paris',
+                          nameDE: 'Paris',
+                          nameEN: 'Paris',
+                        }),
+                        myRole: 'owner',
+                      },
+                    },
+                    errors: undefined,
+                  })
+                })
+              })
+
+              describe('change location "Paris" to "Hamburg"', () => {
+                it('has updated the location to "Hamburg"', async () => {
+                  await expect(
+                    mutate({
+                      mutation: updateGroupMutation,
+                      variables: {
+                        id: 'my-group',
+                        // avatar, // test this as result
+                        locationName: 'Hamburg, Germany',
+                      },
+                    }),
+                  ).resolves.toMatchObject({
+                    data: {
+                      UpdateGroup: {
+                        id: 'my-group',
+                        name: 'The New Group For Our Country',
+                        slug: 'the-new-group-for-our-country', // changing the slug is tested in the slugifyMiddleware
+                        about: 'We will change the land!',
+                        description: 'Some country relevant description' + descriptionAdditional100,
+                        actionRadius: 'national',
+                        // avatar, // test this as result
+                        locationName: 'Hamburg, Germany',
+                        location: expect.objectContaining({
+                          name: 'Hamburg',
+                          nameDE: 'Hamburg',
+                          nameEN: 'Hamburg',
+                        }),
+                        myRole: 'owner',
+                      },
+                    },
+                    errors: undefined,
+                  })
+                })
+              })
+
+              describe('"locationName" is empty string – shall change location "Hamburg" to unset location ', () => {
+                it('has updated the location to unset', async () => {
+                  await expect(
+                    mutate({
+                      mutation: updateGroupMutation,
+                      variables: {
+                        id: 'my-group',
+                        // avatar, // test this as result
+                        locationName: '', // empty string '' sets it to null
+                      },
+                    }),
+                  ).resolves.toMatchObject({
+                    data: {
+                      UpdateGroup: {
+                        id: 'my-group',
+                        name: 'The New Group For Our Country',
+                        slug: 'the-new-group-for-our-country', // changing the slug is tested in the slugifyMiddleware
+                        about: 'We will change the land!',
+                        description: 'Some country relevant description' + descriptionAdditional100,
+                        actionRadius: 'national',
+                        // avatar, // test this as result
+                        locationName: null,
+                        location: null,
+                        myRole: 'owner',
+                      },
+                    },
+                    errors: undefined,
+                  })
+                })
               })
             })
 
@@ -2783,9 +2956,9 @@ describe('in mode', () => {
             })
           })
 
-          describe('as no(!) owner', () => {
+          describe('as "usual-member-user" member, no(!) owner', () => {
             it('throws authorization error', async () => {
-              authenticatedUser = await otherUser.toJson()
+              authenticatedUser = await usualMemberUser.toJson()
               const { errors } = await mutate({
                 mutation: updateGroupMutation,
                 variables: {
@@ -2794,9 +2967,25 @@ describe('in mode', () => {
                   about: 'We will change the land!',
                   description: 'Some country relevant description' + descriptionAdditional100,
                   actionRadius: 'national',
-                  categoryIds: ['cat4', 'cat27'], // test this as result
-                  // avatar, // test this as result
-                  // locationName, // test this as result
+                  categoryIds: ['cat4', 'cat27'],
+                },
+              })
+              expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+            })
+          })
+
+          describe('as "none-member-user"', () => {
+            it('throws authorization error', async () => {
+              authenticatedUser = await noMemberUser.toJson()
+              const { errors } = await mutate({
+                mutation: updateGroupMutation,
+                variables: {
+                  id: 'my-group',
+                  name: 'The New Group For Our Country',
+                  about: 'We will change the land!',
+                  description: 'Some country relevant description' + descriptionAdditional100,
+                  actionRadius: 'national',
+                  categoryIds: ['cat4', 'cat27'],
                 },
               })
               expect(errors[0]).toHaveProperty('message', 'Not Authorized!')

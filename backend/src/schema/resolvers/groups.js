@@ -149,9 +149,11 @@ export default {
     },
     UpdateGroup: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds } = params
-      const { id: groupId, avatar: avatarInput } = params
       delete params.categoryIds
+      const { id: groupId, avatar: avatarInput } = params
       delete params.avatar
+      params.locationName = params.locationName === '' ? null : params.locationName
+
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds) {
         if (categoryIds.length < CATEGORIES_MIN) {
           throw new UserInputError('Too view categories!')
@@ -210,7 +212,10 @@ export default {
       })
       try {
         const group = await writeTxResultPromise
-        await createOrUpdateLocations('Group', params.id, params.locationName, session)
+        // TODO: put in a middleware, see "UpdateUser"
+        if (params.locationName !== undefined) {
+          await createOrUpdateLocations('Group', params.id, params.locationName, session)
+        }
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')

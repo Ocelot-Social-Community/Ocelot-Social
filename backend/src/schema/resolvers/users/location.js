@@ -1,6 +1,5 @@
 import request from 'request'
 import { UserInputError } from 'apollo-server'
-import isEmpty from 'lodash/isEmpty'
 import Debug from 'debug'
 import asyncForEach from '../../../helpers/asyncForEach'
 import CONFIG from '../../../config'
@@ -63,64 +62,70 @@ const createLocation = async (session, mapboxData) => {
 }
 
 export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, session) => {
-  if (isEmpty(locationName)) {
-    return
-  }
-  const res = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-      locationName,
-    )}.json?access_token=${CONFIG.MAPBOX_TOKEN}&types=region,place,country&language=${locales.join(
-      ',',
-    )}`,
-  )
+  let locationId
 
-  debug(res)
+  if (locationName !== null) {
+    const res = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+        locationName,
+      )}.json?access_token=${
+        CONFIG.MAPBOX_TOKEN
+      }&types=region,place,country&language=${locales.join(',')}`,
+    )
 
-  if (!res || !res.features || !res.features[0]) {
-    throw new UserInputError('locationName is invalid')
-  }
+    debug(res)
 
-  let data
-
-  res.features.forEach((item) => {
-    if (item.matching_place_name === locationName) {
-      data = item
+    if (!res || !res.features || !res.features[0]) {
+      throw new UserInputError('locationName is invalid')
     }
-  })
-  if (!data) {
-    data = res.features[0]
-  }
 
-  if (!data || !data.place_type || !data.place_type.length) {
-    throw new UserInputError('locationName is invalid')
-  }
+    let data
 
-  if (data.place_type.length > 1) {
-    data.id = 'region.' + data.id.split('.')[1]
-  }
-  await createLocation(session, data)
-
-  let parent = data
-
-  if (data.context) {
-    await asyncForEach(data.context, async (ctx) => {
-      await createLocation(session, ctx)
-      await session.writeTransaction((transaction) => {
-        return transaction.run(
-          `
-              MATCH (parent:Location {id: $parentId}), (child:Location {id: $childId})
-              MERGE (child)<-[:IS_IN]-(parent)
-              RETURN child.id, parent.id
-            `,
-          {
-            parentId: parent.id,
-            childId: ctx.id,
-          },
-        )
-      })
-      parent = ctx
+    res.features.forEach((item) => {
+      if (item.matching_place_name === locationName) {
+        data = item
+      }
     })
+    if (!data) {
+      data = res.features[0]
+    }
+
+    if (!data || !data.place_type || !data.place_type.length) {
+      throw new UserInputError('locationName is invalid')
+    }
+
+    if (data.place_type.length > 1) {
+      data.id = 'region.' + data.id.split('.')[1]
+    }
+    await createLocation(session, data)
+
+    let parent = data
+
+    if (data.context) {
+      await asyncForEach(data.context, async (ctx) => {
+        await createLocation(session, ctx)
+        await session.writeTransaction((transaction) => {
+          return transaction.run(
+            `
+                MATCH (parent:Location {id: $parentId}), (child:Location {id: $childId})
+                MERGE (child)<-[:IS_IN]-(parent)
+                RETURN child.id, parent.id
+              `,
+            {
+              parentId: parent.id,
+              childId: ctx.id,
+            },
+          )
+        })
+        parent = ctx
+      })
+    }
+
+    locationId = data.id
+  } else {
+    locationId = 'non-existent-id'
   }
+
   // delete all current locations from node and add new location
   await session.writeTransaction((transaction) => {
     return transaction.run(
@@ -133,7 +138,7 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
         MERGE (node)-[:IS_IN]->(location)
         RETURN location.id, node.id
       `,
-      { nodeId, locationId: data.id },
+      { nodeId, locationId },
     )
   })
 }
