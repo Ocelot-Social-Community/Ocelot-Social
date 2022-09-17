@@ -2756,7 +2756,6 @@ describe('in mode', () => {
                       mutation: updateGroupMutation,
                       variables: {
                         id: 'my-group',
-                        // avatar, // test this as result
                         locationName: null,
                       },
                     }),
@@ -2781,7 +2780,6 @@ describe('in mode', () => {
                       mutation: updateGroupMutation,
                       variables: {
                         id: 'my-group',
-                        // avatar, // test this as result
                         locationName: 'Paris, France',
                       },
                     }),
@@ -2789,12 +2787,6 @@ describe('in mode', () => {
                     data: {
                       UpdateGroup: {
                         id: 'my-group',
-                        name: 'The New Group For Our Country',
-                        slug: 'the-new-group-for-our-country', // changing the slug is tested in the slugifyMiddleware
-                        about: 'We will change the land!',
-                        description: 'Some country relevant description' + descriptionAdditional100,
-                        actionRadius: 'national',
-                        // avatar, // test this as result
                         locationName: 'Paris, France',
                         location: expect.objectContaining({
                           name: 'Paris',
@@ -2816,7 +2808,6 @@ describe('in mode', () => {
                       mutation: updateGroupMutation,
                       variables: {
                         id: 'my-group',
-                        // avatar, // test this as result
                         locationName: 'Hamburg, Germany',
                       },
                     }),
@@ -2824,12 +2815,6 @@ describe('in mode', () => {
                     data: {
                       UpdateGroup: {
                         id: 'my-group',
-                        name: 'The New Group For Our Country',
-                        slug: 'the-new-group-for-our-country', // changing the slug is tested in the slugifyMiddleware
-                        about: 'We will change the land!',
-                        description: 'Some country relevant description' + descriptionAdditional100,
-                        actionRadius: 'national',
-                        // avatar, // test this as result
                         locationName: 'Hamburg, Germany',
                         location: expect.objectContaining({
                           name: 'Hamburg',
@@ -2851,7 +2836,6 @@ describe('in mode', () => {
                       mutation: updateGroupMutation,
                       variables: {
                         id: 'my-group',
-                        // avatar, // test this as result
                         locationName: '', // empty string '' sets it to null
                       },
                     }),
@@ -2859,12 +2843,6 @@ describe('in mode', () => {
                     data: {
                       UpdateGroup: {
                         id: 'my-group',
-                        name: 'The New Group For Our Country',
-                        slug: 'the-new-group-for-our-country', // changing the slug is tested in the slugifyMiddleware
-                        about: 'We will change the land!',
-                        description: 'Some country relevant description' + descriptionAdditional100,
-                        actionRadius: 'national',
-                        // avatar, // test this as result
                         locationName: null,
                         location: null,
                         myRole: 'owner',
