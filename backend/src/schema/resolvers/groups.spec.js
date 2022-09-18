@@ -211,7 +211,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
   })
   // 'JoinGroup' mutation does not work in hidden groups so we join them by 'ChangeGroupMemberRole' through the owner
   await mutate({
-    mutation: changeGroupMemberRoleMutation,
+    mutation: changeGroupMemberRoleMutation(),
     variables: {
       groupId: 'hidden-group',
       userId: 'admin-member-user',
@@ -219,7 +219,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
     },
   })
   await mutate({
-    mutation: changeGroupMemberRoleMutation,
+    mutation: changeGroupMemberRoleMutation(),
     variables: {
       groupId: 'hidden-group',
       userId: 'second-owner-member-user',
@@ -227,7 +227,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
     },
   })
   await mutate({
-    mutation: changeGroupMemberRoleMutation,
+    mutation: changeGroupMemberRoleMutation(),
     variables: {
       groupId: 'hidden-group',
       userId: 'admin-member-user',
@@ -235,7 +235,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
     },
   })
   await mutate({
-    mutation: changeGroupMemberRoleMutation,
+    mutation: changeGroupMemberRoleMutation(),
     variables: {
       groupId: 'hidden-group',
       userId: 'second-owner-member-user',
@@ -436,7 +436,7 @@ describe('in mode', () => {
 
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
-          const { errors } = await query({ query: groupQuery, variables: {} })
+          const { errors } = await query({ query: groupQuery(), variables: {} })
           expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
@@ -507,7 +507,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: changeGroupMemberRoleMutation,
+            mutation: changeGroupMemberRoleMutation(),
             variables: {
               groupId: 'second-hidden-group',
               userId: 'current-user',
@@ -527,7 +527,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: changeGroupMemberRoleMutation,
+            mutation: changeGroupMemberRoleMutation(),
             variables: {
               groupId: 'third-hidden-group',
               userId: 'current-user',
@@ -554,7 +554,7 @@ describe('in mode', () => {
           describe('in general finds only listed groups – no hidden groups where user is none or pending member', () => {
             describe('without any filters', () => {
               it('finds all listed groups – including the set locations', async () => {
-                const result = await query({ query: groupQuery, variables: {} })
+                const result = await query({ query: groupQuery(), variables: {} })
                 expect(result).toMatchObject({
                   data: {
                     Group: expect.arrayContaining([
@@ -596,7 +596,9 @@ describe('in mode', () => {
                 })
 
                 it('has set categories', async () => {
-                  await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject({
+                  await expect(
+                    query({ query: groupQuery(), variables: {} }),
+                  ).resolves.toMatchObject({
                     data: {
                       Group: expect.arrayContaining([
                         expect.objectContaining({
@@ -630,7 +632,7 @@ describe('in mode', () => {
             describe('with given id', () => {
               describe("id = 'my-group'", () => {
                 it('finds only the listed group with this id', async () => {
-                  const result = await query({ query: groupQuery, variables: { id: 'my-group' } })
+                  const result = await query({ query: groupQuery(), variables: { id: 'my-group' } })
                   expect(result).toMatchObject({
                     data: {
                       Group: [
@@ -650,7 +652,7 @@ describe('in mode', () => {
               describe("id = 'third-hidden-group'", () => {
                 it("finds only the hidden group where I'm 'usual' member", async () => {
                   const result = await query({
-                    query: groupQuery,
+                    query: groupQuery(),
                     variables: { id: 'third-hidden-group' },
                   })
                   expect(result).toMatchObject({
@@ -672,7 +674,7 @@ describe('in mode', () => {
               describe("id = 'second-hidden-group'", () => {
                 it("finds no hidden group where I'm 'pending' member", async () => {
                   const result = await query({
-                    query: groupQuery,
+                    query: groupQuery(),
                     variables: { id: 'second-hidden-group' },
                   })
                   expect(result.data.Group.length).toBe(0)
@@ -682,7 +684,7 @@ describe('in mode', () => {
               describe("id = 'hidden-group'", () => {
                 it("finds no hidden group where I'm not(!) a member at all", async () => {
                   const result = await query({
-                    query: groupQuery,
+                    query: groupQuery(),
                     variables: { id: 'hidden-group' },
                   })
                   expect(result.data.Group.length).toBe(0)
@@ -694,7 +696,7 @@ describe('in mode', () => {
               describe("slug = 'the-best-group'", () => {
                 it('finds only the listed group with this slug', async () => {
                   const result = await query({
-                    query: groupQuery,
+                    query: groupQuery(),
                     variables: { slug: 'the-best-group' },
                   })
                   expect(result).toMatchObject({
@@ -716,7 +718,7 @@ describe('in mode', () => {
               describe("slug = 'third-investigative-journalism-group'", () => {
                 it("finds only the hidden group where I'm 'usual' member", async () => {
                   const result = await query({
-                    query: groupQuery,
+                    query: groupQuery(),
                     variables: { slug: 'third-investigative-journalism-group' },
                   })
                   expect(result).toMatchObject({
@@ -738,7 +740,7 @@ describe('in mode', () => {
               describe("slug = 'second-investigative-journalism-group'", () => {
                 it("finds no hidden group where I'm 'pending' member", async () => {
                   const result = await query({
-                    query: groupQuery,
+                    query: groupQuery(),
                     variables: { slug: 'second-investigative-journalism-group' },
                   })
                   expect(result.data.Group.length).toBe(0)
@@ -748,7 +750,7 @@ describe('in mode', () => {
               describe("slug = 'investigative-journalism-group'", () => {
                 it("finds no hidden group where I'm not(!) a member at all", async () => {
                   const result = await query({
-                    query: groupQuery,
+                    query: groupQuery(),
                     variables: { slug: 'investigative-journalism-group' },
                   })
                   expect(result.data.Group.length).toBe(0)
@@ -758,7 +760,7 @@ describe('in mode', () => {
 
             describe('isMember = true', () => {
               it('finds only listed groups where user is member', async () => {
-                const result = await query({ query: groupQuery, variables: { isMember: true } })
+                const result = await query({ query: groupQuery(), variables: { isMember: true } })
                 expect(result).toMatchObject({
                   data: {
                     Group: expect.arrayContaining([
@@ -782,7 +784,7 @@ describe('in mode', () => {
 
             describe('isMember = false', () => {
               it('finds only listed groups where user is not(!) member', async () => {
-                const result = await query({ query: groupQuery, variables: { isMember: false } })
+                const result = await query({ query: groupQuery(), variables: { isMember: false } })
                 expect(result).toMatchObject({
                   data: {
                     Group: expect.arrayContaining([
@@ -1155,7 +1157,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: changeGroupMemberRoleMutation,
+            mutation: changeGroupMemberRoleMutation(),
             variables: {
               groupId: 'closed-group',
               userId: 'owner-of-hidden-group',
@@ -1178,7 +1180,7 @@ describe('in mode', () => {
           })
           // 'JoinGroup' mutation does not work in hidden groups so we join them by 'ChangeGroupMemberRole' through the owner
           await mutate({
-            mutation: changeGroupMemberRoleMutation,
+            mutation: changeGroupMemberRoleMutation(),
             variables: {
               groupId: 'hidden-group',
               userId: 'pending-user',
@@ -1186,7 +1188,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: changeGroupMemberRoleMutation,
+            mutation: changeGroupMemberRoleMutation(),
             variables: {
               groupId: 'hidden-group',
               userId: 'current-user',
@@ -1194,7 +1196,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: changeGroupMemberRoleMutation,
+            mutation: changeGroupMemberRoleMutation(),
             variables: {
               groupId: 'hidden-group',
               userId: 'owner-of-closed-group',
@@ -1569,7 +1571,7 @@ describe('in mode', () => {
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await mutate({
-            mutation: changeGroupMemberRoleMutation,
+            mutation: changeGroupMemberRoleMutation(),
             variables: {
               groupId: 'not-existing-group',
               userId: 'current-user',
@@ -1613,7 +1615,7 @@ describe('in mode', () => {
                   it('has role usual', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation,
+                        mutation: changeGroupMemberRoleMutation(),
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -1651,7 +1653,7 @@ describe('in mode', () => {
                   it('has role admin', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation,
+                        mutation: changeGroupMemberRoleMutation(),
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -1686,7 +1688,7 @@ describe('in mode', () => {
                   it('has role owner', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation,
+                        mutation: changeGroupMemberRoleMutation(),
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -1728,7 +1730,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1754,7 +1756,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1772,7 +1774,7 @@ describe('in mode', () => {
                   it('has role owner still', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation,
+                        mutation: changeGroupMemberRoleMutation(),
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -1803,7 +1805,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1826,7 +1828,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1849,7 +1851,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1882,7 +1884,7 @@ describe('in mode', () => {
                   it('has role owner', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation,
+                        mutation: changeGroupMemberRoleMutation(),
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -1907,7 +1909,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1930,7 +1932,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1947,7 +1949,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1970,7 +1972,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1987,7 +1989,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2010,7 +2012,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2027,7 +2029,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2060,7 +2062,7 @@ describe('in mode', () => {
                   it('has role admin', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation,
+                        mutation: changeGroupMemberRoleMutation(),
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -2086,7 +2088,7 @@ describe('in mode', () => {
                   it('has role usual again', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation,
+                        mutation: changeGroupMemberRoleMutation(),
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -2117,7 +2119,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2134,7 +2136,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2157,7 +2159,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2174,7 +2176,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2197,7 +2199,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2214,7 +2216,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2247,7 +2249,7 @@ describe('in mode', () => {
                   it('has role usual', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation,
+                        mutation: changeGroupMemberRoleMutation(),
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -2273,7 +2275,7 @@ describe('in mode', () => {
                   it('has role usual again', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation,
+                        mutation: changeGroupMemberRoleMutation(),
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -2304,7 +2306,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2327,7 +2329,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2350,7 +2352,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation,
+                      mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
                     expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2369,7 +2371,7 @@ describe('in mode', () => {
         // closed-group
         authenticatedUser = await ownerMemberUser.toJson()
         await mutate({
-          mutation: changeGroupMemberRoleMutation,
+          mutation: changeGroupMemberRoleMutation(),
           variables: {
             groupId: 'closed-group',
             userId: 'pending-member-user',
@@ -2377,7 +2379,7 @@ describe('in mode', () => {
           },
         })
         await mutate({
-          mutation: changeGroupMemberRoleMutation,
+          mutation: changeGroupMemberRoleMutation(),
           variables: {
             groupId: 'closed-group',
             userId: 'usual-member-user',
@@ -2385,7 +2387,7 @@ describe('in mode', () => {
           },
         })
         await mutate({
-          mutation: changeGroupMemberRoleMutation,
+          mutation: changeGroupMemberRoleMutation(),
           variables: {
             groupId: 'closed-group',
             userId: 'admin-member-user',
@@ -2393,7 +2395,7 @@ describe('in mode', () => {
           },
         })
         await mutate({
-          mutation: changeGroupMemberRoleMutation,
+          mutation: changeGroupMemberRoleMutation(),
           variables: {
             groupId: 'closed-group',
             userId: 'second-owner-member-user',
@@ -2674,7 +2676,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: changeGroupMemberRoleMutation,
+            mutation: changeGroupMemberRoleMutation(),
             variables: {
               groupId: 'my-group',
               userId: 'usual-member-user',

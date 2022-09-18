@@ -35,6 +35,7 @@ export const createGroupMutation = () => {
         deleted
         about
         description
+        # descriptionExcerpt  # test this as result
         groupType
         actionRadius
         categories {
@@ -88,6 +89,7 @@ export const updateGroupMutation = () => {
         deleted
         about
         description
+        # descriptionExcerpt  # test this as result
         groupType
         actionRadius
         categories {
@@ -135,53 +137,57 @@ export const leaveGroupMutation = () => {
   `
 }
 
-export const changeGroupMemberRoleMutation = gql`
-  mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
-    ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
-      id
-      name
-      slug
-      myRoleInGroup
+export const changeGroupMemberRoleMutation = () => {
+  return gql`
+    mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
+      ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
+        id
+        name
+        slug
+        myRoleInGroup
+      }
     }
-  }
-`
+  `
+}
 
 // ------ queries
 
-export const groupQuery = gql`
-  query ($isMember: Boolean, $id: ID, $slug: String) {
-    Group(isMember: $isMember, id: $id, slug: $slug) {
-      id
-      name
-      slug
-      createdAt
-      updatedAt
-      disabled
-      deleted
-      about
-      description
-      # descriptionExcerpt  # test this as result
-      groupType
-      actionRadius
-      categories {
+export const groupQuery = () => {
+  return gql`
+    query ($isMember: Boolean, $id: ID, $slug: String) {
+      Group(isMember: $isMember, id: $id, slug: $slug) {
         id
+        name
         slug
-        name
-        icon
+        createdAt
+        updatedAt
+        disabled
+        deleted
+        about
+        description
+        # descriptionExcerpt  # test this as result
+        groupType
+        actionRadius
+        categories {
+          id
+          slug
+          name
+          icon
+        }
+        avatar {
+          url
+        }
+        locationName
+        location {
+          name
+          nameDE
+          nameEN
+        }
+        myRole
       }
-      avatar {
-        url
-      }
-      locationName
-      location {
-        name
-        nameDE
-        nameEN
-      }
-      myRole
     }
-  }
-`
+  `
+}
 
 export const groupMembersQuery = gql`
   query ($id: ID!) {

@@ -35,6 +35,7 @@ export const createGroupMutation = () => {
         deleted
         about
         description
+        # descriptionExcerpt  # test this as result
         groupType
         actionRadius
         categories {
@@ -83,7 +84,7 @@ export const updateGroupMutation = () => {
         deleted
         about
         description
-        descriptionExcerpt
+        descriptionExcerpt # test this as result
         groupType
         actionRadius
         categories {
@@ -126,16 +127,18 @@ export const leaveGroupMutation = () => {
   `
 }
 
-export const changeGroupMemberRoleMutation = gql`
-  mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
-    ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
-      id
-      name
-      slug
-      myRoleInGroup
+export const changeGroupMemberRoleMutation = () => {
+  return gql`
+    mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
+      ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
+        id
+        name
+        slug
+        myRoleInGroup
+      }
     }
-  }
-`
+  `
+}
 
 // ------ queries
 
@@ -153,7 +156,7 @@ export const groupQuery = (i18n) => {
         deleted
         about
         description
-        descriptionExcerpt
+        descriptionExcerpt  # test this as result
         groupType
         actionRadius
         categories {
