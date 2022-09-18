@@ -237,7 +237,7 @@ export default {
       followedByCountStartValue: 0,
       followedByCount: followListVisibleCount,
       followingCount: followListVisibleCount,
-      updateUserMutation: updateUserMutation(),
+      updateUserMutation,
     }
   },
   computed: {

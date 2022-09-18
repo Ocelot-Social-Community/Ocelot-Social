@@ -2610,7 +2610,7 @@ describe('in mode', () => {
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await mutate({
-            query: updateGroupMutation,
+            mutation: updateGroupMutation(),
             variables: {
               id: 'my-group',
               slug: 'my-best-group',
@@ -2693,7 +2693,7 @@ describe('in mode', () => {
               it('has updated the settings', async () => {
                 await expect(
                   mutate({
-                    mutation: updateGroupMutation,
+                    mutation: updateGroupMutation(),
                     variables: {
                       id: 'my-group',
                       name: 'The New Group For Our Country',
@@ -2726,7 +2726,7 @@ describe('in mode', () => {
                 it('has left locaton unchanged as "Berlin"', async () => {
                   await expect(
                     mutate({
-                      mutation: updateGroupMutation,
+                      mutation: updateGroupMutation(),
                       variables: {
                         id: 'my-group',
                       },
@@ -2753,7 +2753,7 @@ describe('in mode', () => {
                 it('has updated the location to unset location', async () => {
                   await expect(
                     mutate({
-                      mutation: updateGroupMutation,
+                      mutation: updateGroupMutation(),
                       variables: {
                         id: 'my-group',
                         locationName: null,
@@ -2777,7 +2777,7 @@ describe('in mode', () => {
                 it('has updated the location to "Paris"', async () => {
                   await expect(
                     mutate({
-                      mutation: updateGroupMutation,
+                      mutation: updateGroupMutation(),
                       variables: {
                         id: 'my-group',
                         locationName: 'Paris, France',
@@ -2805,7 +2805,7 @@ describe('in mode', () => {
                 it('has updated the location to "Hamburg"', async () => {
                   await expect(
                     mutate({
-                      mutation: updateGroupMutation,
+                      mutation: updateGroupMutation(),
                       variables: {
                         id: 'my-group',
                         locationName: 'Hamburg, Germany',
@@ -2833,7 +2833,7 @@ describe('in mode', () => {
                 it('has updated the location to unset', async () => {
                   await expect(
                     mutate({
-                      mutation: updateGroupMutation,
+                      mutation: updateGroupMutation(),
                       variables: {
                         id: 'my-group',
                         locationName: '', // empty string '' sets it to null
@@ -2859,7 +2859,7 @@ describe('in mode', () => {
                 describe('less then 100 chars', () => {
                   it('throws error: "Description too short!"', async () => {
                     const { errors } = await mutate({
-                      mutation: updateGroupMutation,
+                      mutation: updateGroupMutation(),
                       variables: {
                         id: 'my-group',
                         description:
@@ -2882,7 +2882,7 @@ describe('in mode', () => {
                 it('has new categories', async () => {
                   await expect(
                     mutate({
-                      mutation: updateGroupMutation,
+                      mutation: updateGroupMutation(),
                       variables: {
                         id: 'my-group',
                         categoryIds: ['cat4', 'cat27'],
@@ -2908,7 +2908,7 @@ describe('in mode', () => {
                 describe('by "categoryIds: []"', () => {
                   it('throws error: "Too view categories!"', async () => {
                     const { errors } = await mutate({
-                      mutation: updateGroupMutation,
+                      mutation: updateGroupMutation(),
                       variables: {
                         id: 'my-group',
                         categoryIds: [],
@@ -2922,7 +2922,7 @@ describe('in mode', () => {
               describe('four', () => {
                 it('throws error: "Too many categories!"', async () => {
                   const { errors } = await mutate({
-                    mutation: updateGroupMutation,
+                    mutation: updateGroupMutation(),
                     variables: {
                       id: 'my-group',
                       categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'],
@@ -2938,7 +2938,7 @@ describe('in mode', () => {
             it('throws authorization error', async () => {
               authenticatedUser = await usualMemberUser.toJson()
               const { errors } = await mutate({
-                mutation: updateGroupMutation,
+                mutation: updateGroupMutation(),
                 variables: {
                   id: 'my-group',
                   name: 'The New Group For Our Country',
@@ -2956,7 +2956,7 @@ describe('in mode', () => {
             it('throws authorization error', async () => {
               authenticatedUser = await noMemberUser.toJson()
               const { errors } = await mutate({
-                mutation: updateGroupMutation,
+                mutation: updateGroupMutation(),
                 variables: {
                   id: 'my-group',
                   name: 'The New Group For Our Country',

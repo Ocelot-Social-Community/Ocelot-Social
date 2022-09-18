@@ -86,6 +86,7 @@ export default {
     CreateGroup: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds } = params
       delete params.categoryIds
+      params.locationName = params.locationName === '' ? null : params.locationName
       if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
         throw new UserInputError('Too view categories!')
       }
@@ -137,6 +138,7 @@ export default {
       })
       try {
         const group = await writeTxResultPromise
+        // TODO: put in a middleware, see "UpdateGroup", "UpdateUser"
         await createOrUpdateLocations('Group', params.id, params.locationName, session)
         return group
       } catch (error) {
@@ -212,10 +214,8 @@ export default {
       })
       try {
         const group = await writeTxResultPromise
-        // TODO: put in a middleware, see "UpdateUser"
-        if (params.locationName !== undefined) {
-          await createOrUpdateLocations('Group', params.id, params.locationName, session)
-        }
+        // TODO: put in a middleware, see "CreateGroup", "UpdateUser"
+        await createOrUpdateLocations('Group', params.id, params.locationName, session)
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')

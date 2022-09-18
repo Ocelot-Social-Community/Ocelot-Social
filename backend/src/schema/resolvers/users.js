@@ -170,10 +170,8 @@ export default {
       })
       try {
         const user = await writeTxResultPromise
-        // TODO: put in a middleware, see "CreateGroup, UpdateGroup"
-        if (params.locationName !== undefined) {
-          await createOrUpdateLocations('User', params.id, params.locationName, session)
-        }
+        // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
+        await createOrUpdateLocations('User', params.id, params.locationName, session)
         return user
       } catch (error) {
         throw new UserInputError(error.message)

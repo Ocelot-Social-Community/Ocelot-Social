@@ -62,6 +62,8 @@ const createLocation = async (session, mapboxData) => {
 }
 
 export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, session) => {
+  if (locationName === undefined) return
+
   let locationId
 
   if (locationName !== null) {

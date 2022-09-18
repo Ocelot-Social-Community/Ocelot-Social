@@ -50,53 +50,55 @@ export const createGroupMutation = () => {
   `
 }
 
-export const updateGroupMutation = gql`
-  mutation (
-    $id: ID!
-    $name: String
-    $slug: String
-    $about: String
-    $description: String
-    $actionRadius: GroupActionRadius
-    $categoryIds: [ID]
-    $avatar: ImageInput
-    $locationName: String # empty string '' sets it to null
-  ) {
-    UpdateGroup(
-      id: $id
-      name: $name
-      slug: $slug
-      about: $about
-      description: $description
-      actionRadius: $actionRadius
-      categoryIds: $categoryIds
-      avatar: $avatar
-      locationName: $locationName
+export const updateGroupMutation = () => {
+  return gql`
+    mutation (
+      $id: ID!
+      $name: String
+      $slug: String
+      $about: String
+      $description: String
+      $actionRadius: GroupActionRadius
+      $categoryIds: [ID]
+      $avatar: ImageInput
+      $locationName: String # empty string '' sets it to null
     ) {
-      id
-      name
-      slug
-      createdAt
-      updatedAt
-      disabled
-      deleted
-      about
-      description
-      descriptionExcerpt
-      groupType
-      actionRadius
-      categories {
+      UpdateGroup(
+        id: $id
+        name: $name
+        slug: $slug
+        about: $about
+        description: $description
+        actionRadius: $actionRadius
+        categoryIds: $categoryIds
+        avatar: $avatar
+        locationName: $locationName
+      ) {
         id
-        slug
         name
-        icon
+        slug
+        createdAt
+        updatedAt
+        disabled
+        deleted
+        about
+        description
+        descriptionExcerpt
+        groupType
+        actionRadius
+        categories {
+          id
+          slug
+          name
+          icon
+        }
+        # avatar # test this as result
+        locationName # test this as result
+        myRole
       }
-      # avatar # test this as result
-      locationName # test this as result
-      myRole
     }
-  }
-`
+  `
+}
 
 export const joinGroupMutation = gql`
   mutation ($groupId: ID!, $userId: ID!) {
