@@ -2411,7 +2411,7 @@ describe('in mode', () => {
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await mutate({
-            mutation: leaveGroupMutation,
+            mutation: leaveGroupMutation(),
             variables: {
               groupId: 'not-existing-group',
               userId: 'current-user',
@@ -2450,7 +2450,7 @@ describe('in mode', () => {
                 authenticatedUser = await pendingMemberUser.toJson()
                 await expect(
                   mutate({
-                    mutation: leaveGroupMutation,
+                    mutation: leaveGroupMutation(),
                     variables: {
                       ...variables,
                       userId: 'pending-member-user',
@@ -2477,7 +2477,7 @@ describe('in mode', () => {
                 authenticatedUser = await usualMemberUser.toJson()
                 await expect(
                   mutate({
-                    mutation: leaveGroupMutation,
+                    mutation: leaveGroupMutation(),
                     variables: {
                       ...variables,
                       userId: 'usual-member-user',
@@ -2504,7 +2504,7 @@ describe('in mode', () => {
                 authenticatedUser = await adminMemberUser.toJson()
                 await expect(
                   mutate({
-                    mutation: leaveGroupMutation,
+                    mutation: leaveGroupMutation(),
                     variables: {
                       ...variables,
                       userId: 'admin-member-user',
@@ -2528,7 +2528,7 @@ describe('in mode', () => {
               it('throws authorization error', async () => {
                 authenticatedUser = await ownerMemberUser.toJson()
                 const { errors } = await mutate({
-                  mutation: leaveGroupMutation,
+                  mutation: leaveGroupMutation(),
                   variables: {
                     ...variables,
                     userId: 'owner-member-user',
@@ -2542,7 +2542,7 @@ describe('in mode', () => {
               it('throws authorization error', async () => {
                 authenticatedUser = await secondOwnerMemberUser.toJson()
                 const { errors } = await mutate({
-                  mutation: leaveGroupMutation,
+                  mutation: leaveGroupMutation(),
                   variables: {
                     ...variables,
                     userId: 'second-owner-member-user',
@@ -2556,7 +2556,7 @@ describe('in mode', () => {
               it('throws authorization error', async () => {
                 authenticatedUser = await noMemberUser.toJson()
                 const { errors } = await mutate({
-                  mutation: leaveGroupMutation,
+                  mutation: leaveGroupMutation(),
                   variables: {
                     ...variables,
                     userId: 'none-member-user',
@@ -2570,7 +2570,7 @@ describe('in mode', () => {
               it('throws authorization error', async () => {
                 authenticatedUser = await ownerMemberUser.toJson()
                 const { errors } = await mutate({
-                  mutation: leaveGroupMutation,
+                  mutation: leaveGroupMutation(),
                   variables: {
                     ...variables,
                     userId: 'usual-member-user',
@@ -2584,7 +2584,7 @@ describe('in mode', () => {
               it('throws authorization error', async () => {
                 authenticatedUser = await usualMemberUser.toJson()
                 const { errors } = await mutate({
-                  mutation: leaveGroupMutation,
+                  mutation: leaveGroupMutation(),
                   variables: {
                     ...variables,
                     userId: 'admin-member-user',

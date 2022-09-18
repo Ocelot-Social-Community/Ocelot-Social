@@ -113,16 +113,18 @@ export const joinGroupMutation = () => {
   `
 }
 
-export const leaveGroupMutation = gql`
-  mutation ($groupId: ID!, $userId: ID!) {
-    LeaveGroup(groupId: $groupId, userId: $userId) {
-      id
-      name
-      slug
-      myRoleInGroup
+export const leaveGroupMutation = () => {
+  return gql`
+    mutation ($groupId: ID!, $userId: ID!) {
+      LeaveGroup(groupId: $groupId, userId: $userId) {
+        id
+        name
+        slug
+        myRoleInGroup
+      }
     }
-  }
-`
+  `
+}
 
 export const changeGroupMemberRoleMutation = gql`
   mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {

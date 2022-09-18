@@ -108,7 +108,7 @@ export default {
     },
     async joinLeave() {
       const join = !this.isMember
-      const mutation = join ? joinGroupMutation() : leaveGroupMutation
+      const mutation = join ? joinGroupMutation() : leaveGroupMutation()
 
       this.hovered = false
       this.$emit('prepare', join)
