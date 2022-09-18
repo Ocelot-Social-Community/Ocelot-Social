@@ -305,7 +305,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     authenticatedUser = await peterLustig.toJson()
     await Promise.all([
       mutate({
-        mutation: createGroupMutation,
+        mutation: createGroupMutation(),
         variables: {
           id: 'g0',
           name: 'Investigative Journalism',
@@ -363,7 +363,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     authenticatedUser = await jennyRostock.toJson()
     await Promise.all([
       mutate({
-        mutation: createGroupMutation,
+        mutation: createGroupMutation(),
         variables: {
           id: 'g1',
           name: 'School For Citizens',
@@ -443,7 +443,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     authenticatedUser = await bobDerBaumeister.toJson()
     await Promise.all([
       mutate({
-        mutation: createGroupMutation,
+        mutation: createGroupMutation(),
         variables: {
           id: 'g2',
           name: 'Yoga Practice',

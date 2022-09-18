@@ -2,51 +2,53 @@ import gql from 'graphql-tag'
 
 // ------ mutations
 
-export const createGroupMutation = gql`
-  mutation (
-    $id: ID
-    $name: String!
-    $slug: String
-    $about: String
-    $description: String!
-    $groupType: GroupType!
-    $actionRadius: GroupActionRadius!
-    $categoryIds: [ID]
-    $locationName: String # empty string '' sets it to null
-  ) {
-    CreateGroup(
-      id: $id
-      name: $name
-      slug: $slug
-      about: $about
-      description: $description
-      groupType: $groupType
-      actionRadius: $actionRadius
-      categoryIds: $categoryIds
-      locationName: $locationName
+export const createGroupMutation = () => {
+  return gql`
+    mutation (
+      $id: ID
+      $name: String!
+      $slug: String
+      $about: String
+      $description: String!
+      $groupType: GroupType!
+      $actionRadius: GroupActionRadius!
+      $categoryIds: [ID]
+      $locationName: String # empty string '' sets it to null
     ) {
-      id
-      name
-      slug
-      createdAt
-      updatedAt
-      disabled
-      deleted
-      about
-      description
-      groupType
-      actionRadius
-      categories {
+      CreateGroup(
+        id: $id
+        name: $name
+        slug: $slug
+        about: $about
+        description: $description
+        groupType: $groupType
+        actionRadius: $actionRadius
+        categoryIds: $categoryIds
+        locationName: $locationName
+      ) {
         id
-        slug
         name
-        icon
+        slug
+        createdAt
+        updatedAt
+        disabled
+        deleted
+        about
+        description
+        groupType
+        actionRadius
+        categories {
+          id
+          slug
+          name
+          icon
+        }
+        locationName # test this as result
+        myRole
       }
-      locationName # test this as result
-      myRole
     }
-  }
-`
+  `
+}
 
 export const updateGroupMutation = gql`
   mutation (

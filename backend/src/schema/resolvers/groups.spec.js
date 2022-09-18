@@ -156,7 +156,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
   // public-group
   authenticatedUser = await usualMemberUser.toJson()
   await mutate({
-    mutation: createGroupMutation,
+    mutation: createGroupMutation(),
     variables: {
       id: 'public-group',
       name: 'The Best Group',
@@ -184,7 +184,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
   // closed-group
   authenticatedUser = await ownerMemberUser.toJson()
   await mutate({
-    mutation: createGroupMutation,
+    mutation: createGroupMutation(),
     variables: {
       id: 'closed-group',
       name: 'Uninteresting Group',
@@ -198,7 +198,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
   // hidden-group
   authenticatedUser = await adminMemberUser.toJson()
   await mutate({
-    mutation: createGroupMutation,
+    mutation: createGroupMutation(),
     variables: {
       id: 'hidden-group',
       name: 'Investigative Journalism Group',
@@ -283,7 +283,7 @@ describe('in mode', () => {
 
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
-          const { errors } = await mutate({ mutation: createGroupMutation, variables })
+          const { errors } = await mutate({ mutation: createGroupMutation(), variables })
           expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
@@ -294,49 +294,49 @@ describe('in mode', () => {
         })
 
         it('creates a group', async () => {
-          await expect(mutate({ mutation: createGroupMutation, variables })).resolves.toMatchObject(
-            {
-              data: {
-                CreateGroup: {
-                  name: 'The Best Group',
-                  slug: 'the-group',
-                  about: 'We will change the world!',
-                  description: 'Some description' + descriptionAdditional100,
-                  groupType: 'public',
-                  actionRadius: 'regional',
-                  locationName: 'Hamburg, Germany',
-                  location: expect.objectContaining({
-                    name: 'Hamburg',
-                    nameDE: 'Hamburg',
-                    nameEN: 'Hamburg',
-                  }),
-                },
+          await expect(
+            mutate({ mutation: createGroupMutation(), variables }),
+          ).resolves.toMatchObject({
+            data: {
+              CreateGroup: {
+                name: 'The Best Group',
+                slug: 'the-group',
+                about: 'We will change the world!',
+                description: 'Some description' + descriptionAdditional100,
+                groupType: 'public',
+                actionRadius: 'regional',
+                locationName: 'Hamburg, Germany',
+                location: expect.objectContaining({
+                  name: 'Hamburg',
+                  nameDE: 'Hamburg',
+                  nameEN: 'Hamburg',
+                }),
               },
-              errors: undefined,
             },
-          )
+            errors: undefined,
+          })
         })
 
         it('assigns the authenticated user as owner', async () => {
-          await expect(mutate({ mutation: createGroupMutation, variables })).resolves.toMatchObject(
-            {
-              data: {
-                CreateGroup: {
-                  name: 'The Best Group',
-                  myRole: 'owner',
-                },
+          await expect(
+            mutate({ mutation: createGroupMutation(), variables }),
+          ).resolves.toMatchObject({
+            data: {
+              CreateGroup: {
+                name: 'The Best Group',
+                myRole: 'owner',
               },
-              errors: undefined,
             },
-          )
+            errors: undefined,
+          })
         })
 
         it('has "disabled" and "deleted" default to "false"', async () => {
-          await expect(mutate({ mutation: createGroupMutation, variables })).resolves.toMatchObject(
-            {
-              data: { CreateGroup: { disabled: false, deleted: false } },
-            },
-          )
+          await expect(
+            mutate({ mutation: createGroupMutation(), variables }),
+          ).resolves.toMatchObject({
+            data: { CreateGroup: { disabled: false, deleted: false } },
+          })
         })
 
         describe('description', () => {
@@ -344,7 +344,7 @@ describe('in mode', () => {
             describe('less then 100 chars', () => {
               it('throws error: "Description too short!"', async () => {
                 const { errors } = await mutate({
-                  mutation: createGroupMutation,
+                  mutation: createGroupMutation(),
                   variables: {
                     ...variables,
                     description:
@@ -367,7 +367,7 @@ describe('in mode', () => {
             it('has new categories', async () => {
               await expect(
                 mutate({
-                  mutation: createGroupMutation,
+                  mutation: createGroupMutation(),
                   variables: {
                     ...variables,
                     categoryIds: ['cat4', 'cat27'],
@@ -392,7 +392,7 @@ describe('in mode', () => {
             describe('by "categoryIds: null"', () => {
               it('throws error: "Too view categories!"', async () => {
                 const { errors } = await mutate({
-                  mutation: createGroupMutation,
+                  mutation: createGroupMutation(),
                   variables: { ...variables, categoryIds: null },
                 })
                 expect(errors[0]).toHaveProperty('message', 'Too view categories!')
@@ -402,7 +402,7 @@ describe('in mode', () => {
             describe('by "categoryIds: []"', () => {
               it('throws error: "Too view categories!"', async () => {
                 const { errors } = await mutate({
-                  mutation: createGroupMutation,
+                  mutation: createGroupMutation(),
                   variables: { ...variables, categoryIds: [] },
                 })
                 expect(errors[0]).toHaveProperty('message', 'Too view categories!')
@@ -413,7 +413,7 @@ describe('in mode', () => {
           describe('four', () => {
             it('throws error: "Too many categories!"', async () => {
               const { errors } = await mutate({
-                mutation: createGroupMutation,
+                mutation: createGroupMutation(),
                 variables: { ...variables, categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'] },
               })
               expect(errors[0]).toHaveProperty('message', 'Too many categories!')
@@ -470,7 +470,7 @@ describe('in mode', () => {
           )
           authenticatedUser = await otherUser.toJson()
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               id: 'others-group',
               name: 'Uninteresting Group',
@@ -483,7 +483,7 @@ describe('in mode', () => {
           })
           authenticatedUser = await ownerOfHiddenGroupUser.toJson()
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               id: 'hidden-group',
               name: 'Investigative Journalism Group',
@@ -495,7 +495,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               id: 'second-hidden-group',
               name: 'Second Investigative Journalism Group',
@@ -515,7 +515,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               id: 'third-hidden-group',
               name: 'Third Investigative Journalism Group',
@@ -536,7 +536,7 @@ describe('in mode', () => {
           })
           authenticatedUser = await user.toJson()
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               id: 'my-group',
               name: 'The Best Group',
@@ -857,7 +857,7 @@ describe('in mode', () => {
           // public-group
           authenticatedUser = await ownerOfClosedGroupUser.toJson()
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               id: 'closed-group',
               name: 'Uninteresting Group',
@@ -870,7 +870,7 @@ describe('in mode', () => {
           })
           authenticatedUser = await ownerOfHiddenGroupUser.toJson()
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               id: 'hidden-group',
               name: 'Investigative Journalism Group',
@@ -883,7 +883,7 @@ describe('in mode', () => {
           })
           authenticatedUser = await user.toJson()
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               id: 'public-group',
               name: 'The Best Group',
@@ -1108,7 +1108,7 @@ describe('in mode', () => {
           // public-group
           authenticatedUser = await user.toJson()
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               id: 'public-group',
               name: 'The Best Group',
@@ -1136,7 +1136,7 @@ describe('in mode', () => {
           // closed-group
           authenticatedUser = await ownerOfClosedGroupUser.toJson()
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               id: 'closed-group',
               name: 'Uninteresting Group',
@@ -1165,7 +1165,7 @@ describe('in mode', () => {
           // hidden-group
           authenticatedUser = await ownerOfHiddenGroupUser.toJson()
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               id: 'hidden-group',
               name: 'Investigative Journalism Group',
@@ -2648,7 +2648,7 @@ describe('in mode', () => {
           )
           authenticatedUser = await noMemberUser.toJson()
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               id: 'others-group',
               name: 'Uninteresting Group',
@@ -2661,7 +2661,7 @@ describe('in mode', () => {
           })
           authenticatedUser = await user.toJson()
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               id: 'my-group',
               name: 'The Best Group',

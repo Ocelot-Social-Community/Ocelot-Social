@@ -79,7 +79,7 @@ describe('slugifyMiddleware', () => {
       it('generates a slug based on name', async () => {
         await expect(
           mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables,
           }),
         ).resolves.toMatchObject({
@@ -99,7 +99,7 @@ describe('slugifyMiddleware', () => {
       it('generates a slug based on given slug', async () => {
         await expect(
           mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               ...variables,
               slug: 'the-group',
@@ -118,7 +118,7 @@ describe('slugifyMiddleware', () => {
     describe('if slug exists', () => {
       beforeEach(async () => {
         await mutate({
-          mutation: createGroupMutation,
+          mutation: createGroupMutation(),
           variables: {
             ...variables,
             name: 'Pre-Existing Group',
@@ -131,7 +131,7 @@ describe('slugifyMiddleware', () => {
       it('chooses another slug', async () => {
         await expect(
           mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               ...variables,
               name: 'Pre-Existing Group',
@@ -152,7 +152,7 @@ describe('slugifyMiddleware', () => {
           try {
             await expect(
               mutate({
-                mutation: createGroupMutation,
+                mutation: createGroupMutation(),
                 variables: {
                   ...variables,
                   name: 'Pre-Existing Group',
@@ -194,7 +194,7 @@ describe('slugifyMiddleware', () => {
 
     beforeEach(async () => {
       createGroupResult = await mutate({
-        mutation: createGroupMutation,
+        mutation: createGroupMutation(),
         variables: {
           name: 'The Best Group',
           slug: 'the-best-group',
@@ -265,7 +265,7 @@ describe('slugifyMiddleware', () => {
       describe('if new slug exists in another group', () => {
         beforeEach(async () => {
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               name: 'Pre-Existing Group',
               slug: 'pre-existing-group',
