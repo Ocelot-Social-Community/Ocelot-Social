@@ -320,21 +320,21 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     ])
     await Promise.all([
       mutate({
-        mutation: joinGroupMutation,
+        mutation: joinGroupMutation(),
         variables: {
           groupId: 'g0',
           userId: 'u2',
         },
       }),
       mutate({
-        mutation: joinGroupMutation,
+        mutation: joinGroupMutation(),
         variables: {
           groupId: 'g0',
           userId: 'u4',
         },
       }),
       mutate({
-        mutation: joinGroupMutation,
+        mutation: joinGroupMutation(),
         variables: {
           groupId: 'g0',
           userId: 'u6',
@@ -378,35 +378,35 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     ])
     await Promise.all([
       mutate({
-        mutation: joinGroupMutation,
+        mutation: joinGroupMutation(),
         variables: {
           groupId: 'g1',
           userId: 'u1',
         },
       }),
       mutate({
-        mutation: joinGroupMutation,
+        mutation: joinGroupMutation(),
         variables: {
           groupId: 'g1',
           userId: 'u2',
         },
       }),
       mutate({
-        mutation: joinGroupMutation,
+        mutation: joinGroupMutation(),
         variables: {
           groupId: 'g1',
           userId: 'u5',
         },
       }),
       mutate({
-        mutation: joinGroupMutation,
+        mutation: joinGroupMutation(),
         variables: {
           groupId: 'g1',
           userId: 'u6',
         },
       }),
       mutate({
-        mutation: joinGroupMutation,
+        mutation: joinGroupMutation(),
         variables: {
           groupId: 'g1',
           userId: 'u7',
@@ -457,35 +457,35 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     ])
     await Promise.all([
       mutate({
-        mutation: joinGroupMutation,
+        mutation: joinGroupMutation(),
         variables: {
           groupId: 'g2',
           userId: 'u3',
         },
       }),
       mutate({
-        mutation: joinGroupMutation,
+        mutation: joinGroupMutation(),
         variables: {
           groupId: 'g2',
           userId: 'u4',
         },
       }),
       mutate({
-        mutation: joinGroupMutation,
+        mutation: joinGroupMutation(),
         variables: {
           groupId: 'g2',
           userId: 'u5',
         },
       }),
       mutate({
-        mutation: joinGroupMutation,
+        mutation: joinGroupMutation(),
         variables: {
           groupId: 'g2',
           userId: 'u6',
         },
       }),
       mutate({
-        mutation: joinGroupMutation,
+        mutation: joinGroupMutation(),
         variables: {
           groupId: 'g2',
           userId: 'u7',

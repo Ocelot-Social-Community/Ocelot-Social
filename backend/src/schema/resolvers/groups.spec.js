@@ -168,14 +168,14 @@ const seedComplexScenarioAndClearAuthentication = async () => {
     },
   })
   await mutate({
-    mutation: joinGroupMutation,
+    mutation: joinGroupMutation(),
     variables: {
       groupId: 'public-group',
       userId: 'owner-of-closed-group',
     },
   })
   await mutate({
-    mutation: joinGroupMutation,
+    mutation: joinGroupMutation(),
     variables: {
       groupId: 'public-group',
       userId: 'owner-of-hidden-group',
@@ -815,7 +815,7 @@ describe('in mode', () => {
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await mutate({
-            mutation: joinGroupMutation,
+            mutation: joinGroupMutation(),
             variables: {
               groupId: 'not-existing-group',
               userId: 'current-user',
@@ -901,7 +901,7 @@ describe('in mode', () => {
             it('has "usual" as membership role', async () => {
               await expect(
                 mutate({
-                  mutation: joinGroupMutation,
+                  mutation: joinGroupMutation(),
                   variables: {
                     groupId: 'public-group',
                     userId: 'owner-of-closed-group',
@@ -924,7 +924,7 @@ describe('in mode', () => {
               it('has still "owner" as membership role', async () => {
                 await expect(
                   mutate({
-                    mutation: joinGroupMutation,
+                    mutation: joinGroupMutation(),
                     variables: {
                       groupId: 'public-group',
                       userId: 'current-user',
@@ -949,7 +949,7 @@ describe('in mode', () => {
             it('has "pending" as membership role', async () => {
               await expect(
                 mutate({
-                  mutation: joinGroupMutation,
+                  mutation: joinGroupMutation(),
                   variables: {
                     groupId: 'closed-group',
                     userId: 'current-user',
@@ -972,7 +972,7 @@ describe('in mode', () => {
               it('has still "owner" as membership role', async () => {
                 await expect(
                   mutate({
-                    mutation: joinGroupMutation,
+                    mutation: joinGroupMutation(),
                     variables: {
                       groupId: 'closed-group',
                       userId: 'owner-of-closed-group',
@@ -996,7 +996,7 @@ describe('in mode', () => {
           describe('joined by "owner-of-closed-group"', () => {
             it('throws authorization error', async () => {
               const { errors } = await query({
-                query: joinGroupMutation,
+                query: joinGroupMutation(),
                 variables: {
                   groupId: 'hidden-group',
                   userId: 'owner-of-closed-group',
@@ -1011,7 +1011,7 @@ describe('in mode', () => {
               it('has still "owner" as membership role', async () => {
                 await expect(
                   mutate({
-                    mutation: joinGroupMutation,
+                    mutation: joinGroupMutation(),
                     variables: {
                       groupId: 'hidden-group',
                       userId: 'owner-of-hidden-group',
@@ -1120,14 +1120,14 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: joinGroupMutation,
+            mutation: joinGroupMutation(),
             variables: {
               groupId: 'public-group',
               userId: 'owner-of-closed-group',
             },
           })
           await mutate({
-            mutation: joinGroupMutation,
+            mutation: joinGroupMutation(),
             variables: {
               groupId: 'public-group',
               userId: 'owner-of-hidden-group',
@@ -1148,7 +1148,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: joinGroupMutation,
+            mutation: joinGroupMutation(),
             variables: {
               groupId: 'closed-group',
               userId: 'current-user',
