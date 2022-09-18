@@ -580,16 +580,22 @@ export default {
           // followingCount: this.followingCount,
         }
       },
+      error(error) {
+        this.$toast.error(error.message)
+      },
       fetchPolicy: 'cache-and-network',
     },
     GroupMembers: {
       query() {
-        return groupMembersQuery
+        return groupMembersQuery()
       },
       variables() {
         return {
           id: this.$route.params.id,
         }
+      },
+      error(error) {
+        this.$toast.error(error.message)
       },
       fetchPolicy: 'cache-and-network',
     },

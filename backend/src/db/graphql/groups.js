@@ -189,13 +189,15 @@ export const groupQuery = () => {
   `
 }
 
-export const groupMembersQuery = gql`
-  query ($id: ID!) {
-    GroupMembers(id: $id) {
-      id
-      name
-      slug
-      myRoleInGroup
+export const groupMembersQuery = () => {
+  return gql`
+    query ($id: ID!) {
+      GroupMembers(id: $id) {
+        id
+        name
+        slug
+        myRoleInGroup
+      }
     }
-  }
-`
+  `
+}
