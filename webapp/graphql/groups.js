@@ -143,7 +143,7 @@ export const changeGroupMemberRoleMutation = () => {
 // ------ queries
 
 export const groupQuery = (i18n) => {
-  const lang = i18n.locale().toUpperCase()
+  const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
   return gql`
     query ($isMember: Boolean, $id: ID, $slug: String) {
       Group(isMember: $isMember, id: $id, slug: $slug) {

@@ -60,7 +60,7 @@
         </ds-space>
       </ds-form>
       <ds-space centered v-show="!update">
-        <nuxt-link to="/group/my-groups">zurück</nuxt-link>
+        <nuxt-link to="/my-groups">zurück</nuxt-link>
       </ds-space>
     </ds-container>
   </div>

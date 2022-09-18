@@ -12,7 +12,7 @@
       </ds-flex-item>
     </ds-flex>
     <ds-space centered>
-      <nuxt-link to="/group/my-groups">zurück</nuxt-link>
+      <nuxt-link to="/my-groups">zurück</nuxt-link>
     </ds-space>
   </div>
 </template>
@@ -51,7 +51,7 @@ export default {
         Group: [group],
       },
     } = await client.query({
-      query: groupQuery(this.$i18n),
+      query: groupQuery(), // "this.$i18n" is undefined here, so we use default lang
       variables: { id },
     })
     if (group.myRole !== 'owner') {
