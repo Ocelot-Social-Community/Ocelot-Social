@@ -35,7 +35,7 @@ export const createGroupMutation = () => {
         deleted
         about
         description
-        # descriptionExcerpt  # test this as result
+        descriptionExcerpt
         groupType
         actionRadius
         categories {
@@ -44,7 +44,7 @@ export const createGroupMutation = () => {
           name
           icon
         }
-        locationName # test this as result
+        locationName
         myRole
       }
     }
@@ -84,7 +84,7 @@ export const updateGroupMutation = () => {
         deleted
         about
         description
-        descriptionExcerpt # test this as result
+        descriptionExcerpt
         groupType
         actionRadius
         categories {
@@ -94,7 +94,7 @@ export const updateGroupMutation = () => {
           icon
         }
         # avatar # test this as result
-        locationName # test this as result
+        locationName
         myRole
       }
     }
@@ -156,7 +156,7 @@ export const groupQuery = (i18n) => {
         deleted
         about
         description
-        descriptionExcerpt  # test this as result
+        descriptionExcerpt
         groupType
         actionRadius
         categories {

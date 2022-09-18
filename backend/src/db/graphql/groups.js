@@ -35,7 +35,7 @@ export const createGroupMutation = () => {
         deleted
         about
         description
-        # descriptionExcerpt  # test this as result
+        descriptionExcerpt
         groupType
         actionRadius
         categories {
@@ -89,7 +89,7 @@ export const updateGroupMutation = () => {
         deleted
         about
         description
-        # descriptionExcerpt  # test this as result
+        descriptionExcerpt
         groupType
         actionRadius
         categories {
@@ -165,7 +165,7 @@ export const groupQuery = () => {
         deleted
         about
         description
-        # descriptionExcerpt  # test this as result
+        descriptionExcerpt
         groupType
         actionRadius
         categories {
