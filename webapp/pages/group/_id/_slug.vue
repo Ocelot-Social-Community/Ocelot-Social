@@ -563,7 +563,11 @@ export default {
     },
     updateJoinLeave({ myRoleInGroup }) {
       this.Group[0].myRole = myRoleInGroup
-      this.$apollo.queries.GroupMembers.refetch()
+      if (this.isAllowedSeeingGroupMembers) {
+        this.$apollo.queries.GroupMembers.refetch()
+      } else {
+        this.GroupMembers = []
+      }
     },
     fetchAllMembers() {
       this.membersCountToLoad = Infinity
