@@ -668,32 +668,6 @@ export default {
     flex-grow: 1;
     margin-bottom: $space-small;
   }
-
-  // Wolle: > .footer {
-  //   display: flex;
-  //   justify-content: space-between;
-  //   align-items: center;
-
-  //   > .categories-placeholder {
-  //     flex-grow: 1;
-  //   }
-
-  //   > .counter-icon {
-  //     display: block;
-  //     margin-right: $space-small;
-  //     opacity: $opacity-disabled;
-  //   }
-
-  //   > .content-menu {
-  //     position: relative;
-  //     z-index: $z-index-post-teaser-link;
-  //   }
-
-  //   .ds-tag {
-  //     margin: 0;
-  //     margin-right: $space-xx-small;
-  //   }
-  // }
 }
 .collaps {
   float: right;
