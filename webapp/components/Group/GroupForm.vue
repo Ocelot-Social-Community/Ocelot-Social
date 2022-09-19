@@ -11,30 +11,30 @@
       >
         <ds-input
           v-model="formData.name"
-          label="Gruppenname"
-          placeholder="Your name ..."
+          :label="$t('group.group-name')"
+          :placeholder="`${$t('group.group-name')}…` "
         ></ds-input>
 
         <ds-input
           v-if="update"
           v-model="formData.slug"
-          label="Slug"
-          placeholder="Your name ..."
+          :label="$t('users.table.columns.slug')"
+          :placeholder="`${$t('group.group-name')}…` "
         ></ds-input>
 
         <ds-select
           icon="user"
           v-model="formData.groupType"
-          label="Sichtbarkeit"
+          :label="$t('group.visibility')"
           :options="['public', 'closed', 'hidden']"
           placeholder="Status ..."
         ></ds-select>
 
-        <ds-input v-model="formData.about" label="Kurzbeschreibung" rows="3"></ds-input>
+        <ds-input v-model="formData.about" :label="$t('group.short-description')" rows="3"></ds-input>
 
         <ds-input
           v-model="formData.description"
-          label="Beschreibung"
+          :label="$t('group.long-description')"
           type="textarea"
           rows="3"
         ></ds-input>
@@ -54,9 +54,9 @@
           <ds-select
             icon="card"
             v-model="formData.actionRadius"
-            label="Radius"
+            :label="$t('group.radius')"
             :options="['regional', 'national', 'continental', 'global']"
-            placeholder="Radius ..."
+            :placeholder="`${$t('group.radius')} …`"
           ></ds-select>
         </ds-space>
         <ds-space margin-top="large">
@@ -67,7 +67,7 @@
           />
         </ds-space>
         <ds-space margin-top="large">
-          <ds-button @click.prevent="reset()">Reset form</ds-button>
+          <ds-button @click.prevent="reset()">{{ $t('group.reset-form') }}</ds-button>
           <ds-button
             type="submit"
             @click.prevent="submit()"
@@ -80,7 +80,7 @@
         </ds-space>
       </ds-form>
       <ds-space centered v-show="!update">
-        <nuxt-link to="/my-groups">zurück</nuxt-link>
+        <nuxt-link to="/my-groups">{{$t('group.back')}}</nuxt-link>
       </ds-space>
     </ds-container>
   </div>

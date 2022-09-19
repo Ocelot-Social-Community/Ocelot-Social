@@ -59,14 +59,14 @@ export default {
       if (this.resourceType === 'group') {
         if (this.isOwner === 'owner') {
           routes.push({
-            label: 'Settings',
+            label: $t('admin.settings.name'),
             path: `/group/edit/${this.resource.id}`,
             icon: 'edit',
           })
         }
         if (this.isOwner === 'usual') {
           routes.push({
-            label: 'Unfollowing',
+            label: $t('group.unfollowing'),
             callback: () => {
               // this.$emit('join-group', this.resource)
             },
@@ -75,7 +75,7 @@ export default {
         }
         if (this.isOwner === 'pending') {
           routes.push({
-            label: 'Unfollowing',
+            label: $t('group.unfollowing'),
             callback: () => {
               // this.removePending(this.resource)
             },
@@ -84,7 +84,7 @@ export default {
         }
         if (this.isOwner === null) {
           routes.push({
-            label: 'Following',
+            label: $t('group.follow'),
             callback: () => {
                 this.$emit('joinGroup', this.resource)
             },

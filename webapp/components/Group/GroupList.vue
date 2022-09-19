@@ -1,8 +1,8 @@
 <template>
     <ds-container class="group-card">
       <ds-space>
-        <div @click="onlyOwnerGroups(true)" ref="myGruops"><ds-button >show only my groups</ds-button ></div>
-        <div @click="onlyOwnerGroups(false)" ref="allGruops" hidden><ds-button >show all groups</ds-button ></div>
+        <div @click="onlyOwnerGroups(true)" ref="myGruops"><ds-button >{{$t('group.show-my-created-groups')}}</ds-button ></div>
+        <div @click="onlyOwnerGroups(false)" ref="allGruops" hidden><ds-button >{{$t('group.show-all-my-groups')}}</ds-button ></div>
       </ds-space>
       <ds-space margin-bottom="small" v-for="item in items" :key="item.id"> 
         <ds-card  :ref="item.myRole === null ? 'null' : item.myRole">

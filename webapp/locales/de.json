@@ -371,11 +371,28 @@
     "following": "Folge Ich"
   },
   "group": {
+    "group-name":"Gruppenname",
+    "myGroups": "Meine Gruppen",
     "group-created": "Die Gruppe wurde angelegt!",
     "group-updated": "Die Gruppendaten wurden geändert!",
     "newGroup": "Erstelle eine neue Gruppe",
     "save": "Neue Gruppe anlegen",
-    "update": "Änderung speichern"
+    "update": "Änderung speichern",
+    "show-my-created-groups":"Meine angelegten Gruppen anzeigen",
+    "show-all-my-groups":"Alle meine Gruppen anzeigen",
+    "visibility":"Sichtbarkeit",
+    "short-description":"Kurzbeschreibung",
+    "long-description":"Beschreibung",
+    "radius":"Radius",
+    "reset-form":"Formular zurücksetzen",
+    "back":"zurück",
+    "unfollowing":"Nicht mehr folgen",
+    "follow":"Folge",
+    "settings":"Gruppeneinstellungen",
+    "general":"Allgemein",
+    "members":"Mitglieder",
+    "removemember":"Mitglied entfernen",
+    "change-member-role":"Die Rolle wurde auf ({role}) geändert!"
   },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",
@@ -754,7 +771,6 @@
       "unmute": "Stummschaltung aufheben",
       "unmuted": "{name} ist nicht mehr stummgeschaltet"
     },
-    "myGroups": "Meine Gruppen",
     "name": "Einstellungen",
     "notifications": {
       "name": "Benachrichtigungen",

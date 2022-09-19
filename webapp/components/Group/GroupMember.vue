@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ds-space><h3>Members</h3></ds-space>
+    <ds-space><h3>{{$t('group.members')}}</h3></ds-space>
     <base-card>
       <ds-table :data="responseGroupMembersQuery" :fields="tableFields" condensed>
         <template slot="avatar">
@@ -32,12 +32,12 @@
     <ds-modal
       v-if="isOpen"
       v-model="isOpen"
-      title="delete member ?"
+      :title="`${$t('group.remove-member')} ?`"
       force
       extended
-      confirm-label="delete member"
+      :confirm-label="$t('group.remove-member')"
       @confirm="deleteMember(memberId)"
-      cancel-label="Please not"
+      :cancel-label="$t('actions.cancel')"
     />
   </div>
 </template>
@@ -72,7 +72,7 @@ export default {
           mutation: changeGroupMemberRoleMutation,
           variables: { groupId: this.groupId, userId: id, roleInGroup: newRole },
         })
-        this.$toast.success('Die Rolle wurde auf (' + newRole + ') geändert!')
+        this.$toast.success(this.$t('group.change-member-role', {role: newRole}))
       } catch (error) {
         this.$toast.error(error.message)
       }
