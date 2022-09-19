@@ -420,6 +420,7 @@
     },
     "membersCount": "Member ::: Members",
     "membersListTitle": "Group Members",
+    "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
     "newGroup": "Create a new Group",
     "role": "Your role in the group",
     "roles": {

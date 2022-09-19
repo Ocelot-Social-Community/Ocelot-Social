@@ -49,9 +49,9 @@
               {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
             </ds-text>
           </ds-space>
-          <ds-flex>
+          <ds-flex v-if="isAllowedSeeingGroupMembers">
             <!-- Group members count -->
-            <ds-flex-item>
+            <ds-flex-item v-if="isAllowedSeeingGroupMembers">
               <client-only>
                 <ds-number :label="$t('group.membersCount', {}, groupMembers.length)">
                   <count-to
@@ -198,6 +198,11 @@
         <profile-list
           :uniqueName="`groupMembersFilter`"
           :title="$t('group.membersListTitle')"
+          :titleNobody="
+            !isAllowedSeeingGroupMembers
+              ? $t('group.membersListTitleNotAllowedSeeingGroupMembers')
+              : null
+          "
           :allProfilesCount="groupMembers.length"
           :profiles="groupMembers"
           :loading="$apollo.loading"
@@ -367,6 +372,7 @@ export default {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       Group: [],
       GroupMembers: [],
+      loadGroupMembers: false,
       posts: [],
       // hasMore: true,
       // offset: 0,
@@ -389,18 +395,6 @@ export default {
     group() {
       return this.Group[0] ? this.Group[0] : {}
     },
-    groupMembers() {
-      return this.GroupMembers ? this.GroupMembers : []
-    },
-    isGroupOwner() {
-      return this.group ? this.group.myRole === 'owner' : false
-    },
-    isGroupMember() {
-      return this.group ? !!this.group.myRole : false
-    },
-    isGroupMemberNonePending() {
-      return this.group ? ['usual', 'admin', 'owner'].includes(this.group.myRole) : false
-    },
     groupName() {
       const { name } = this.group || {}
       return name || this.$t('profile.userAnonym')
@@ -411,6 +405,25 @@ export default {
     },
     groupDescriptionExcerpt() {
       return this.group ? this.$filters.removeLinks(this.group.descriptionExcerpt) : ''
+    },
+    isGroupOwner() {
+      return this.group ? this.group.myRole === 'owner' : false
+    },
+    isGroupMember() {
+      return this.group ? !!this.group.myRole : false
+    },
+    isGroupMemberNonePending() {
+      return this.group ? ['usual', 'admin', 'owner'].includes(this.group.myRole) : false
+    },
+    groupMembers() {
+      return this.GroupMembers ? this.GroupMembers : []
+    },
+    isAllowedSeeingGroupMembers() {
+      return (
+        this.group &&
+        (this.group.groupType === 'public' ||
+          (['closed', 'hidden'].includes(this.group.groupType) && this.isGroupMemberNonePending))
+      )
     },
     // tabOptions() {
     //   return [
@@ -434,6 +447,11 @@ export default {
     //     },
     //   ]
     // },
+  },
+  watch: {
+    isAllowedSeeingGroupMembers(to, _from) {
+      this.loadGroupMembers = to
+    },
   },
   methods: {
     // handleTab(tab) {
@@ -593,6 +611,9 @@ export default {
         return {
           id: this.$route.params.id,
         }
+      },
+      skip() {
+        return !this.loadGroupMembers
       },
       error(error) {
         this.$toast.error(error.message)
