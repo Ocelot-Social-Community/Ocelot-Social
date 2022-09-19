@@ -16,7 +16,7 @@
       <div class="group-menu-popover">
         <ds-menu :routes="routes">
           <template #menuitem="item">
-            {{item.parents}}
+            {{ item.parents }}
             <ds-menu-item
               :route="item.route"
               :parents="item.parents"
@@ -59,14 +59,14 @@ export default {
       if (this.resourceType === 'group') {
         if (this.isOwner === 'owner') {
           routes.push({
-            label: $t('admin.settings.name'),
+            label: this.$t('admin.settings.name'),
             path: `/group/edit/${this.resource.id}`,
             icon: 'edit',
           })
         }
         if (this.isOwner === 'usual') {
           routes.push({
-            label: $t('group.unfollowing'),
+            label: this.$t('group.unfollowing'),
             callback: () => {
               // this.$emit('join-group', this.resource)
             },
@@ -75,7 +75,7 @@ export default {
         }
         if (this.isOwner === 'pending') {
           routes.push({
-            label: $t('group.unfollowing'),
+            label: this.$t('group.unfollowing'),
             callback: () => {
               // this.removePending(this.resource)
             },
@@ -84,9 +84,9 @@ export default {
         }
         if (this.isOwner === null) {
           routes.push({
-            label: $t('group.follow'),
+            label: this.$t('group.follow'),
             callback: () => {
-                this.$emit('joinGroup', this.resource)
+              this.$emit('joinGroup', this.resource)
             },
             icon: 'plus',
           })

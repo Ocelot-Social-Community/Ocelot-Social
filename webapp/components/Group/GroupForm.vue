@@ -12,14 +12,14 @@
         <ds-input
           v-model="formData.name"
           :label="$t('group.group-name')"
-          :placeholder="`${$t('group.group-name')}…` "
+          :placeholder="`${$t('group.group-name')}…`"
         ></ds-input>
 
         <ds-input
           v-if="update"
           v-model="formData.slug"
           :label="$t('users.table.columns.slug')"
-          :placeholder="`${$t('group.group-name')}…` "
+          :placeholder="`${$t('group.group-name')}…`"
         ></ds-input>
 
         <ds-select
@@ -30,7 +30,11 @@
           placeholder="Status ..."
         ></ds-select>
 
-        <ds-input v-model="formData.about" :label="$t('group.short-description')" rows="3"></ds-input>
+        <ds-input
+          v-model="formData.about"
+          :label="$t('group.short-description')"
+          rows="3"
+        ></ds-input>
 
         <ds-input
           v-model="formData.description"
@@ -40,15 +44,15 @@
         ></ds-input>
         <ds-space margin-top="large">
           <ds-select
-          id="city"
-          v-model="formData.locationName"
-          icon="map-marker"
-          :options="cities"
-          :label="$t('settings.data.labelCity')"
-          :placeholder="$t('settings.data.labelCity')"
-          :loading="loadingGeo"
-          @input.native="handleCityInput"
-        />
+            id="city"
+            v-model="formData.locationName"
+            icon="map-marker"
+            :options="cities"
+            :label="$t('settings.data.labelCity')"
+            :placeholder="$t('settings.data.labelCity')"
+            :loading="loadingGeo"
+            @input.native="handleCityInput"
+          />
         </ds-space>
         <ds-space margin-top="large">
           <ds-select
@@ -80,7 +84,7 @@
         </ds-space>
       </ds-form>
       <ds-space centered v-show="!update">
-        <nuxt-link to="/my-groups">{{$t('group.back')}}</nuxt-link>
+        <nuxt-link to="/my-groups">{{ $t('group.back') }}</nuxt-link>
       </ds-space>
     </ds-container>
   </div>
@@ -112,7 +116,8 @@ export default {
     },
   },
   data() {
-    const { name, slug, groupType, about, description, actionRadius, locationName, categories } = this.group
+    const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
+      this.group
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
@@ -155,7 +160,8 @@ export default {
 
   methods: {
     submit() {
-      const { name, about, description, groupType, actionRadius, locationName, categoryIds } = this.formData
+      const { name, about, description, groupType, actionRadius, locationName, categoryIds } =
+        this.formData
       const variables = {
         name,
         about,

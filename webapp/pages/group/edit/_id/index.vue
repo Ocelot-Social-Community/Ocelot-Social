@@ -23,8 +23,18 @@ export default {
   },
   methods: {
     async updateGroup(value) {
-      const { id, name, about, description, groupType, actionRadius, locationName, categoryIds } = value
-      const variables = { id, name, about, description, groupType, actionRadius, locationName, categoryIds }
+      const { id, name, about, description, groupType, actionRadius, locationName, categoryIds } =
+        value
+      const variables = {
+        id,
+        name,
+        about,
+        description,
+        groupType,
+        actionRadius,
+        locationName,
+        categoryIds,
+      }
       try {
         await this.$apollo.mutate({
           mutation: updateGroupMutation,

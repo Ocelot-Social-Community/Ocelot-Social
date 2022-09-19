@@ -1,7 +1,7 @@
 <template>
   <div>
     <ds-section>
-      <h1 class="ds-heading ds-heading-h1">{{$t('group.myGroups')}}</h1>
+      <h1 class="ds-heading ds-heading-h1">{{ $t('group.myGroups') }}</h1>
       <nuxt-link :to="{ name: 'group-create' }">
         <base-button
           v-tooltip="{

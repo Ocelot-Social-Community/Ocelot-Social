@@ -1,6 +1,8 @@
 <template>
   <div>
-    <ds-space><h3>{{$t('group.members')}}</h3></ds-space>
+    <ds-space>
+      <h3>{{ $t('group.members') }}</h3>
+    </ds-space>
     <base-card>
       <ds-table :data="responseGroupMembersQuery" :fields="tableFields" condensed>
         <template slot="avatar">
@@ -72,7 +74,7 @@ export default {
           mutation: changeGroupMemberRoleMutation,
           variables: { groupId: this.groupId, userId: id, roleInGroup: newRole },
         })
-        this.$toast.success(this.$t('group.change-member-role', {role: newRole}))
+        this.$toast.success(this.$t('group.change-member-role', { role: newRole }))
       } catch (error) {
         this.$toast.error(error.message)
       }

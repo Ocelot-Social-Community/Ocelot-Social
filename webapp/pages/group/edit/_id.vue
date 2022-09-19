@@ -2,7 +2,7 @@
   <div>
     <ds-section>
       <h1 class="ds-heading ds-heading-h1">{{ group.name }}</h1>
-      <div class="">{{$t('group.settings')}}</div>
+      <div class="">{{ $t('group.settings') }}</div>
     </ds-section>
     <ds-space margin="large">
       <ds-flex gutter="small">
@@ -17,7 +17,7 @@
       </ds-flex>
     </ds-space>
     <ds-space centered>
-      <nuxt-link to="/my-groups">{{$t('group.back')}}</nuxt-link>
+      <nuxt-link to="/my-groups">{{ $t('group.back') }}</nuxt-link>
     </ds-space>
   </div>
 </template>
@@ -34,11 +34,11 @@ export default {
     routes() {
       return [
         {
-          name: $t('group.general'), 
+          name: this.$t('group.general'),
           path: `/group/edit/${this.group.id}`,
         },
         {
-          name: $t('group.members'),
+          name: this.$t('group.members'),
           path: `/group/edit/${this.group.id}/members`,
         },
       ]

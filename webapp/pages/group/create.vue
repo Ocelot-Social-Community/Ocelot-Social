@@ -1,7 +1,7 @@
 <template>
   <div>
     <ds-section>
-      <h1 class="ds-heading ds-heading-h1">{{$t('group.newGroup')}}Create New Groupe</h1>
+      <h1 class="ds-heading ds-heading-h1">{{ $t('group.newGroup') }}Create New Groupe</h1>
     </ds-section>
     <ds-space margin="large">
       <ds-flex :width="{ base: '100%' }" gutter="base">
@@ -29,10 +29,16 @@ export default {
   },
   methods: {
     async createGroup(value) {
-      console.log('createGroup')
-      console.log(value)
       const { name, about, description, groupType, actionRadius, locationName, categoryIds } = value
-      const variables = { name, about, description, groupType, actionRadius, locationName, categoryIds }
+      const variables = {
+        name,
+        about,
+        description,
+        groupType,
+        actionRadius,
+        locationName,
+        categoryIds,
+      }
       try {
         await this.$apollo.mutate({
           mutation: createGroupMutation,
