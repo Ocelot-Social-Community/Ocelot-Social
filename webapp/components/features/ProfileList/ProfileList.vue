@@ -1,10 +1,10 @@
 <template>
-  <base-card class="follow-list">
-    <template v-if="connections && connections.length">
+  <base-card class="profile-list">
+    <template v-if="profiles.length">
       <h5 class="title spacer-x-small">
-        {{ userName | truncate(15) }} {{ $t(`profile.network.${type}`) }}
+        {{ title }}
       </h5>
-      <ul :class="connectionsClass">
+      <ul :class="profilesClass">
         <li
           v-for="connection in filteredConnections"
           :key="connection.id"
@@ -13,30 +13,30 @@
           <user-teaser :user="connection" />
         </li>
       </ul>
-      <base-button
-        v-if="hasMore"
-        :loading="loading"
-        class="spacer-x-small"
-        size="small"
-        @click="$emit('fetchAllConnections', type)"
-      >
-        {{
-          $t('profile.network.andMore', {
-            number: allConnectionsCount - connections.length,
-          })
-        }}
-      </base-button>
       <ds-input
-        v-if="!hasMore"
-        :name="`${type}Filter`"
+        v-if="isMoreAsVisible"
+        :name="uniqueName"
         :placeholder="filter"
         class="spacer-x-small"
         icon="filter"
         size="small"
         @input.native="setFilter"
       />
+      <base-button
+        v-if="hasMore"
+        :loading="loading"
+        class="spacer-x-small"
+        size="small"
+        @click="$emit('fetchAllProfiles')"
+      >
+        {{
+          $t('profile.network.andMore', {
+            number: allProfilesCount - profiles.length,
+          })
+        }}
+      </base-button>
     </template>
-    <p v-else class="nobody-message">{{ userName }} {{ $t(`profile.network.${type}Nobody`) }}</p>
+    <p v-else-if="titleNobody" class="nobody-message">{{ titleNobody }}</p>
   </base-card>
 </template>
 
@@ -44,41 +44,40 @@
 import { escape } from 'xregexp/xregexp-all.js'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 
+export const profileListVisibleCount = 7
+
 export default {
-  name: 'FollowerList',
+  name: 'ProfileList',
   components: {
     UserTeaser,
   },
   props: {
-    user: { type: Object, default: null },
-    type: { type: String, default: 'following' },
+    uniqueName: { type: String, required: true },
+    title: { type: String, required: true },
+    titleNobody: { type: String, default: null },
+    allProfilesCount: { type: Number, required: true },
+    profiles: { type: Array, required: true },
     loading: { type: Boolean, default: false },
   },
   data() {
     return {
+      profileListVisibleCount,
       filter: null,
     }
   },
   computed: {
-    userName() {
-      const { name } = this.user || {}
-      return name || this.$t('profile.userAnonym')
-    },
-    allConnectionsCount() {
-      return this.user[`${this.type}Count`]
-    },
-    connections() {
-      return this.user[this.type]
-    },
     hasMore() {
-      return this.allConnectionsCount > this.connections.length
+      return this.allProfilesCount > this.profiles.length
     },
-    connectionsClass() {
-      return `connections${this.hasMore ? '' : ' --overflow'}`
+    isMoreAsVisible() {
+      return this.profiles.length > this.profileListVisibleCount
+    },
+    profilesClass() {
+      return `profiles${this.isMoreAsVisible ? ' --overflow' : ''}`
     },
     filteredConnections() {
       if (!this.filter) {
-        return this.connections
+        return this.profiles
       }
 
       // @example
@@ -89,7 +88,7 @@ export default {
         'i',
       )
 
-      const fuzzyScores = this.connections
+      const fuzzyScores = this.profiles
         .map((user) => {
           const match = user.name.match(fuzzyExpression)
 
@@ -122,7 +121,7 @@ export default {
 </script>
 
 <style lang="scss">
-.follow-list {
+.profile-list {
   display: flex;
   flex-direction: column;
   position: relative;
@@ -133,7 +132,7 @@ export default {
     font-size: $font-size-base;
   }
 
-  .connections {
+  .profiles {
     height: $size-height-connections;
     padding: $space-none;
     list-style-type: none;

@@ -4,21 +4,26 @@ import CONFIG from '../../config'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '../../constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
 import { removeHtmlTags } from '../../middleware/helpers/cleanHtml.js'
-import Resolver from './helpers/Resolver'
+import Resolver, {
+  removeUndefinedNullValuesFromObject,
+  convertObjectToCypherMapLiteral,
+} from './helpers/Resolver'
 import { mergeImage } from './images/images'
 import createOrUpdateLocations from './users/location'
 
 export default {
   Query: {
     Group: async (_object, params, context, _resolveInfo) => {
-      const { id: groupId, isMember } = params
+      const { isMember, id, slug } = params
+      const matchParams = { id, slug }
+      removeUndefinedNullValuesFromObject(matchParams)
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
-        const groupIdCypher = groupId ? ` {id: "${groupId}"}` : ''
+        const groupMatchParamsCypher = convertObjectToCypherMapLiteral(matchParams, true)
         let groupCypher
         if (isMember === true) {
           groupCypher = `
-            MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group:Group${groupIdCypher})
+            MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group:Group${groupMatchParamsCypher})
             WITH group, membership
             WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
             RETURN group {.*, myRole: membership.role}
@@ -26,7 +31,7 @@ export default {
         } else {
           if (isMember === false) {
             groupCypher = `
-              MATCH (group:Group${groupIdCypher})
+              MATCH (group:Group${groupMatchParamsCypher})
               WHERE (NOT (:User {id: $userId})-[:MEMBER_OF]->(group))
               WITH group
               WHERE group.groupType IN ['public', 'closed']
@@ -34,7 +39,7 @@ export default {
             `
           } else {
             groupCypher = `
-              MATCH (group:Group${groupIdCypher})
+              MATCH (group:Group${groupMatchParamsCypher})
               OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
               WITH group, membership
               WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
@@ -233,6 +238,27 @@ export default {
           RETURN member {.*, myRoleInGroup: membership.role}
         `
         const transactionResponse = await transaction.run(joinGroupCypher, { groupId, userId })
+        const [member] = await transactionResponse.records.map((record) => record.get('member'))
+        return member
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    LeaveGroup: async (_parent, params, context, _resolveInfo) => {
+      const { groupId, userId } = params
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const leaveGroupCypher = `
+          MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
+          DELETE membership
+          RETURN member {.*, myRoleInGroup: NULL}
+        `
+        const transactionResponse = await transaction.run(leaveGroupCypher, { groupId, userId })
         const [member] = await transactionResponse.records.map((record) => record.get('member'))
         return member
       })

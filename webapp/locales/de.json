@@ -364,7 +364,11 @@
         "label": "Älteste zuerst"
       }
     },
-    "order-by": "Sortieren nach ..."
+    "order-by": "Sortieren nach ...",
+    "save": {
+      "error": "Themen konnten nicht gespeichert werden!",
+      "success": "Themen gespeichert!"
+    }
   },
   "followButton": {
     "follow": "Folgen",
@@ -375,6 +379,16 @@
     "change-member-role": "Die Rolle wurde auf ({role}) geändert!",
     "follow": "Folge",
     "general": "Allgemein",
+    "actionRadii": {
+      "continental": "Kontinentale Gruppe",
+      "global": "Globale Gruppe",
+      "interplanetary": "Interplanetare Gruppe",
+      "national": "Nationale Gruppe",
+      "regional": "Regionale Gruppe"
+    },
+    "actionRadius": "Aktionsradius",
+    "foundation": "Gründung",
+    "goal": "Ziel der Gruppe",
     "group-created": "Die Gruppe wurde angelegt!",
     "group-name": "Gruppenname",
     "group-updated": "Die Gruppendaten wurden geändert!",
@@ -393,6 +407,33 @@
     "unfollowing": "Nicht mehr folgen",
     "update": "Änderung speichern",
     "visibility": "Sichtbarkeit"
+    "joinLeaveButton": {
+      "iAmMember": "Bin Mitglied",
+      "join": "Beitreten"
+    },
+    "leaveModal": {
+      "confirmButton": "Verlassen",
+      "message": "Eine Gruppe zu verlassen ist möglicherweise nicht rückgängig zu machen!<br>Gruppe <b>„{name}“</b> verlassen!",
+      "title": "Möchtest du wirklich die Gruppe verlassen?"
+    },
+    "membersCount": "Mitglieder",
+    "membersListTitle": "Gruppenmitglieder",
+    "newGroup": "Erstelle eine neue Gruppe",
+    "role": "Deine Rolle in der Gruppe",
+    "roles": {
+      "admin": "Administrator",
+      "owner": "Inhaber",
+      "pending": "Ausstehendes Mitglied",
+      "usual": "Einfaches Mitglied"
+    },
+    "save": "Neue Gruppe anlegen",
+    "type": "Gruppentyp",
+    "types": {
+      "closed": "Geschlossene Gruppe",
+      "hidden": "Versteckte Gruppe",
+      "public": "Öffentliche Gruppe"
+    },
+    "update": "Änderung speichern"
   },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",
@@ -551,8 +592,6 @@
     "follow": "Folgen",
     "followers": "Folgen",
     "following": "Folge Ich",
-    "groupGoal": "Ziel:",
-    "groupSince": "Gründung",
     "invites": {
       "description": "Zur Einladung die E-Mail-Adresse hier eintragen.",
       "emailPlaceholder": "E-Mail-Adresse für die Einladung",

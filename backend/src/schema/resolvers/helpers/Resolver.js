@@ -121,3 +121,25 @@ export default function Resolver(type, options = {}) {
   }
   return result
 }
+
+export const removeUndefinedNullValuesFromObject = (obj) => {
+  Object.keys(obj).forEach((key) => {
+    if ([undefined, null].includes(obj[key])) {
+      delete obj[key]
+    }
+  })
+}
+
+export const convertObjectToCypherMapLiteral = (params, addSpaceInfrontIfMapIsNotEmpty = false) => {
+  // I have found no other way yet. maybe "apoc.convert.fromJsonMap(key)" can help, but couldn't get it how, see: https://stackoverflow.com/questions/43217823/neo4j-cypher-inline-conversion-of-string-to-a-map
+  // result looks like: '{id: "g0", slug: "yoga"}'
+  const paramsEntries = Object.entries(params)
+  let mapLiteral = ''
+  paramsEntries.forEach((ele, index) => {
+    mapLiteral += index === 0 ? '{' : ''
+    mapLiteral += `${ele[0]}: "${ele[1]}"`
+    mapLiteral += index < paramsEntries.length - 1 ? ', ' : '}'
+  })
+  mapLiteral = (addSpaceInfrontIfMapIsNotEmpty && mapLiteral.length > 0 ? ' ' : '') + mapLiteral
+  return mapLiteral
+}

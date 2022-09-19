@@ -172,10 +172,10 @@
 import uniqBy from 'lodash/uniqBy'
 import postListActions from '~/mixins/postListActions'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
-import HcFollowButton from '~/components/FollowButton.vue'
+import HcFollowButton from '~/components/Button/FollowButton'
 import HcCountTo from '~/components/CountTo.vue'
 import HcBadges from '~/components/Badges.vue'
-import FollowList from '~/components/features/FollowList/FollowList'
+import FollowList, { followListVisibleCount } from '~/components/features/ProfileList/FollowList'
 import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
@@ -220,6 +220,11 @@ export default {
     name: 'slide-up',
     mode: 'out-in',
   },
+  head() {
+    return {
+      title: this.userName,
+    }
+  },
   data() {
     const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     return {
@@ -231,8 +236,8 @@ export default {
       tabActive: 'post',
       filter,
       followedByCountStartValue: 0,
-      followedByCount: 7,
-      followingCount: 7,
+      followedByCount: followListVisibleCount,
+      followingCount: followListVisibleCount,
       updateUserMutation: updateUserMutation(),
     }
   },

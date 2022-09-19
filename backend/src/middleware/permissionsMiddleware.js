@@ -191,6 +191,36 @@ const isAllowedToJoinGroup = rule({
   }
 })
 
+const isAllowedToLeaveGroup = rule({
+  cache: 'no_cache',
+})(async (_parent, args, { user, driver }) => {
+  if (!(user && user.id)) return false
+  const { groupId, userId } = args
+  if (user.id !== userId) return false
+  const session = driver.session()
+  const readTxPromise = session.readTransaction(async (transaction) => {
+    const transactionResponse = await transaction.run(
+      `
+        MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
+        RETURN group {.*}, member {.*, myRoleInGroup: membership.role}
+      `,
+      { groupId, userId },
+    )
+    return {
+      group: transactionResponse.records.map((record) => record.get('group'))[0],
+      member: transactionResponse.records.map((record) => record.get('member'))[0],
+    }
+  })
+  try {
+    const { group, member } = await readTxPromise
+    return !!group && !!member && !!member.myRoleInGroup && member.myRoleInGroup !== 'owner'
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+})
+
 const isAuthor = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
@@ -284,6 +314,7 @@ export default shield(
       CreateGroup: isAuthenticated,
       UpdateGroup: isAllowedToChangeGroupSettings,
       JoinGroup: isAllowedToJoinGroup,
+      LeaveGroup: isAllowedToLeaveGroup,
       ChangeGroupMemberRole: isAllowedToChangeGroupMemberRole,
       CreatePost: isAuthenticated,
       UpdatePost: isAuthor,

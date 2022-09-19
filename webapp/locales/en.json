@@ -364,7 +364,11 @@
         "label": "Oldest first"
       }
     },
-    "order-by": "Order by ..."
+    "order-by": "Order by ...",
+    "save": {
+      "error": "Failed saving topic settings!",
+      "success": "Topics saved!"
+    }
   },
   "followButton": {
     "follow": "Follow",
@@ -375,6 +379,16 @@
     "change-member-role": "The role has been changed to ({role})!",
     "follow": "Follow",
     "general": "General",
+    "actionRadii": {
+      "continental": "Continental Group",
+      "global": "Global Group",
+      "interplanetary": "Interplanetary Group",
+      "national": "National Group",
+      "regional": "Regional Group"
+    },
+    "actionRadius": "Action radius",
+    "foundation": "Foundation",
+    "goal": "Goal of group",
     "group-created": "The group was created!",
     "group-name": "Group name",
     "group-updated": "The group data has been changed.",
@@ -393,6 +407,33 @@
     "unfollowing": "unfollowing",
     "update": "Save change",
     "visibility": "Visibility"
+    "joinLeaveButton": {
+      "iAmMember": "I'm a member",
+      "join": "Join"
+    },
+    "leaveModal": {
+      "confirmButton": "Leave",
+      "message": "Leaving a group may be irreversible!<br>Leave group <b>“{name}”</b>!",
+      "title": "Do you really want to leave the group?"
+    },
+    "membersCount": "Members",
+    "membersListTitle": "Group Members",
+    "newGroup": "Create a new Group",
+    "role": "Your role in the group",
+    "roles": {
+      "admin": "Administrator",
+      "owner": "Owner",
+      "pending": "Pending Member",
+      "usual": "Simple Member"
+    },
+    "save": "Create new group",
+    "type": "Group type",
+    "types": {
+      "closed": "Closed Group",
+      "hidden": "Hidden Group",
+      "public": "Public Group"
+    },
+    "update": "Save change"
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",
@@ -551,8 +592,6 @@
     "follow": "Follow",
     "followers": "Followers",
     "following": "Following",
-    "groupGoal": "Goal:",
-    "groupSince": "Foundation",
     "invites": {
       "description": "Enter their e-mail address for invitation.",
       "emailPlaceholder": "E-mail to invite",

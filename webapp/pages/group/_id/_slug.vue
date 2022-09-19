@@ -42,50 +42,98 @@
               {{ user.location.name }}
             </ds-text> -->
             <ds-text align="center" color="soft" size="small">
-              {{ $t('profile.groupSince') }} {{ group.createdAt | date('MMMM yyyy') }}
+              {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
             </ds-text>
           </ds-space>
           <ds-flex>
             <ds-flex-item>
-              <!-- <client-only>
+              <client-only>
+                <ds-number :label="$t('group.membersCount')">
+                  <count-to
+                    slot="count"
+                    :start-val="membersCountStartValue"
+                    :end-val="groupMembers.length"
+                  />
+                </ds-number>
+              </client-only>
+            </ds-flex-item>
+            <!-- <ds-flex-item>
+              <client-only>
                 <ds-number :label="$t('profile.followers')">
-                  <hc-count-to
+                  <count-to
                     slot="count"
                     :start-val="followedByCountStartValue"
                     :end-val="user.followedByCount"
                   />
                 </ds-number>
-              </client-only> -->
-            </ds-flex-item>
-            <ds-flex-item>
-              <!-- <client-only>
+              </client-only>
+            </ds-flex-item> -->
+            <!-- <ds-flex-item>
+              <client-only>
                 <ds-number :label="$t('profile.following')">
-                  <hc-count-to slot="count" :end-val="user.followingCount" />
+                  <count-to slot="count" :end-val="user.followingCount" />
                 </ds-number>
-              </client-only> -->
-            </ds-flex-item>
+              </client-only>
+            </ds-flex-item> -->
           </ds-flex>
-          <div v-if="!isGroupMember" class="action-buttons">
+          <div class="action-buttons">
             <!-- <base-button v-if="user.isBlocked" @click="unblockUser(user)">
               {{ $t('settings.blocked-users.unblock') }}
             </base-button>
             <base-button v-if="user.isMuted" @click="unmuteUser(user)">
               {{ $t('settings.muted-users.unmute') }}
             </base-button>
-            <hc-follow-button
+            <follow-button
               v-if="!user.isMuted && !user.isBlocked"
               :follow-id="user.id"
               :is-followed="user.followedByCurrentUser"
               @optimistic="optimisticFollow"
               @update="updateFollow"
             /> -->
+            <join-leave-button
+              :group="group || {}"
+              :userId="currentUser.id"
+              :isMember="isGroupMember"
+              :disabled="isGroupOwner"
+              :loading="$apollo.loading"
+              @prepare="prepareJoinLeave"
+              @update="updateJoinLeave"
+            />
+            <!-- implement:
+              v-if="!user.isMuted && !user.isBlocked" -->
           </div>
+          <hr />
+          <ds-space margin-top="small" margin-bottom="small">
+            <template v-if="isGroupMember">
+              <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+                {{ $t('group.role') }}
+              </ds-text>
+              <div class="chip" align="center">
+                <ds-chip color="primary">{{ $t('group.roles.' + group.myRole) }}</ds-chip>
+              </div>
+            </template>
+            <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+              {{ $t('group.type') }}
+            </ds-text>
+            <div class="chip" align="center">
+              <ds-chip color="primary">{{ $t('group.types.' + group.groupType) }}</ds-chip>
+            </div>
+            <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+              {{ $t('group.actionRadius') }}
+            </ds-text>
+            <div class="chip" align="center">
+              <ds-chip color="primary">{{ $t('group.actionRadii.' + group.actionRadius) }}</ds-chip>
+            </div>
+          </ds-space>
           <template v-if="group.about">
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
-              <ds-text color="soft" size="small" class="hyphenate-text">
-                {{ $t('profile.groupGoal') }} {{ group.about }}
+              <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+                {{ $t('group.goal') }}
               </ds-text>
+              <div class="chip" align="center">
+                <ds-chip>{{ group.about }}</ds-chip>
+              </div>
             </ds-space>
           </template>
         </base-card>
@@ -93,7 +141,17 @@
         <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
           {{ $t('profile.network.title') }}
         </ds-heading>
-        <!-- <follow-list
+        <!-- Group members list -->
+        <profile-list
+          :uniqueName="`groupMembersFilter`"
+          :title="$t('group.membersListTitle')"
+          :allProfilesCount="groupMembers.length"
+          :profiles="groupMembers"
+          :loading="$apollo.loading"
+          @fetchAllProfiles="fetchAllMembers"
+        />
+        <!-- <ds-space />
+        <follow-list
           :loading="$apollo.loading"
           :user="user"
           type="followedBy"
@@ -159,7 +217,7 @@
           </template>
           <template v-else>
             <ds-grid-item column-span="fullWidth">
-              <hc-empty margin="xx-large" icon="file" />
+              <empty margin="xx-large" icon="file" />
             </ds-grid-item>
           </template>
         </masonry-grid>
@@ -173,26 +231,26 @@
 
 <script>
 import uniqBy from 'lodash/uniqBy'
-import postListActions from '~/mixins/postListActions'
-import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
-// import HcFollowButton from '~/components/FollowButton.vue'
-// import HcCountTo from '~/components/CountTo.vue'
-// import HcBadges from '~/components/Badges.vue'
-// import FollowList from '~/components/features/FollowList/FollowList'
-import HcEmpty from '~/components/Empty/Empty'
-// import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import AvatarUploader from '~/components/Uploader/AvatarUploader'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
-import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
-import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
-// import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 // import { profilePagePosts } from '~/graphql/PostQuery'
-import { groupQuery } from '~/graphql/groups'
-import { updateGroupMutation } from '~/graphql/groups.js'
+import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
 // import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 // import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 // import UpdateQuery from '~/components/utils/UpdateQuery'
+import postListActions from '~/mixins/postListActions'
+import AvatarUploader from '~/components/Uploader/AvatarUploader'
+// import ContentMenu from '~/components/ContentMenu/ContentMenu'
+import CountTo from '~/components/CountTo.vue'
+import Empty from '~/components/Empty/Empty'
+// import FollowButton from '~/components/Button/FollowButton'
+// import FollowList from '~/components/features/ProfileList/FollowList'
+import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
+import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
+import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
+import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import ProfileList from '~/components/features/ProfileList/ProfileList'
 // import SocialMedia from '~/components/SocialMedia/SocialMedia'
+// import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 
 // const tabToFilterMapping = ({ tab, id }) => {
 //   return {
@@ -204,18 +262,19 @@ import { updateGroupMutation } from '~/graphql/groups.js'
 
 export default {
   components: {
-    // SocialMedia,
-    PostTeaser,
-    // HcFollowButton,
-    // HcCountTo,
-    // HcBadges,
-    HcEmpty,
-    ProfileAvatar,
-    // ContentMenu,
     AvatarUploader,
+    // ContentMenu,
+    CountTo,
+    Empty,
+    // FollowButton,
+    // FollowList,
+    JoinLeaveButton,
+    PostTeaser,
+    ProfileAvatar,
+    ProfileList,
     MasonryGrid,
     MasonryGridItem,
-    // FollowList,
+    // SocialMedia,
     // TabNavigation,
   },
   mixins: [postListActions],
@@ -223,31 +282,45 @@ export default {
     name: 'slide-up',
     mode: 'out-in',
   },
+  head() {
+    return {
+      title: this.groupName,
+    }
+  },
   data() {
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     return {
       Group: [],
+      GroupMembers: [],
       posts: [],
-      hasMore: true,
-      offset: 0,
-      pageSize: 6,
-      tabActive: 'post',
+      // hasMore: true,
+      // offset: 0,
+      // pageSize: 6,
+      // tabActive: 'post',
       // filter,
-      followedByCountStartValue: 0,
-      followedByCount: 7,
-      followingCount: 7,
+      // followedByCountStartValue: 0,
+      // followedByCount: 7,
+      // followingCount: 7,
+      membersCountStartValue: 0,
+      membersCountToLoad: Infinity,
       updateGroupMutation,
     }
   },
   computed: {
-    isGroupOwner() {
-      return this.group.myRole === 'owner'
-    },
-    isGroupMember() {
-      return this.group.myRole
+    currentUser() {
+      return this.$store.getters['auth/user']
     },
     group() {
-      return this.Group ? this.Group[0] : {}
+      return this.Group[0] ? this.Group[0] : {}
+    },
+    groupMembers() {
+      return this.GroupMembers ? this.GroupMembers : []
+    },
+    isGroupOwner() {
+      return this.group ? this.group.myRole === 'owner' : false
+    },
+    isGroupMember() {
+      return this.group ? !!this.group.myRole : false
     },
     groupName() {
       const { name } = this.group || {}
@@ -384,10 +457,17 @@ export default {
     //   this.user.followedByCurrentUser = followedByCurrentUser
     //   this.user.followedBy = followedBy
     // },
-    // fetchAllConnections(type) {
-    //   if (type === 'following') this.followingCount = Infinity
-    //   if (type === 'followedBy') this.followedByCount = Infinity
-    // },
+    prepareJoinLeave() {
+      // "membersCountStartValue" is updated to avoid counting from 0 when join/leave
+      this.membersCountStartValue = this.GroupMembers.length
+    },
+    updateJoinLeave({ myRoleInGroup }) {
+      this.Group[0].myRole = myRoleInGroup
+      this.$apollo.queries.GroupMembers.refetch()
+    },
+    fetchAllMembers() {
+      this.membersCountToLoad = Infinity
+    },
   },
   apollo: {
     // profilePagePosts: {
@@ -421,6 +501,17 @@ export default {
       },
       fetchPolicy: 'cache-and-network',
     },
+    GroupMembers: {
+      query() {
+        return groupMembersQuery
+      },
+      variables() {
+        return {
+          id: this.$route.params.id,
+        }
+      },
+      fetchPolicy: 'cache-and-network',
+    },
   },
 }
 </script>
@@ -448,5 +539,12 @@ export default {
     width: 100%;
     margin-bottom: $space-x-small;
   }
+}
+.centered-text {
+  text-align: center;
+  margin-bottom: $space-xxx-small;
+}
+.chip {
+  margin-bottom: $space-x-small;
 }
 </style>

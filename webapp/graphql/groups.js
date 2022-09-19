@@ -131,36 +131,8 @@ export const changeGroupMemberRoleMutation = gql`
 // ------ queries
 
 export const groupQuery = gql`
-  query (
-    $isMember: Boolean
-    $id: ID
-    $name: String
-    $slug: String
-    $createdAt: String
-    $updatedAt: String
-    $about: String
-    $description: String
-    $locationName: String
-    $first: Int
-    $offset: Int
-    $orderBy: [_GroupOrdering]
-    $filter: _GroupFilter
-  ) {
-    Group(
-      isMember: $isMember
-      id: $id
-      name: $name
-      slug: $slug
-      createdAt: $createdAt
-      updatedAt: $updatedAt
-      about: $about
-      description: $description
-      locationName: $locationName
-      first: $first
-      offset: $offset
-      orderBy: $orderBy
-      filter: $filter
-    ) {
+  query ($isMember: Boolean, $id: ID, $slug: String) {
+    Group(isMember: $isMember, id: $id, slug: $slug) {
       id
       name
       slug
@@ -189,8 +161,8 @@ export const groupQuery = gql`
 `
 
 export const groupMembersQuery = gql`
-  query ($id: ID!, $first: Int, $offset: Int, $orderBy: [_UserOrdering], $filter: _UserFilter) {
-    GroupMembers(id: $id, first: $first, offset: $offset, orderBy: $orderBy, filter: $filter) {
+  query ($id: ID!) {
+    GroupMembers(id: $id) {
       id
       name
       slug
