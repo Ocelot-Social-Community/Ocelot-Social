@@ -1,7 +1,7 @@
 <template>
   <button
     :class="buttonClass"
-    :disabled="loading"
+    :disabled="disabled || loading"
     :type="type"
     @click.capture="(event) => $emit('click', event)"
   >
@@ -55,6 +55,10 @@ export default {
       validator(value) {
         return value.match(/(button|submit)/)
       },
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
