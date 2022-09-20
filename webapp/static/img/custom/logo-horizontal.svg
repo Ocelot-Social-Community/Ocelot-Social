@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="50%" height="50%" viewBox="0 0 260 260" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(8.96552,0,0,8.66667,4.31479,8.5043)">
-        <circle cx="14.019" cy="14.019" r="14.019" style="fill:none;"/>
-        <clipPath id="_clip1">
-            <circle cx="14.019" cy="14.019" r="14.019"/>
-        </clipPath>
-        <g clip-path="url(#_clip1)">
-            <g id="Hintergrund" transform="matrix(1,0,0,1,-0.481265,-0.981265)">
-                <use xlink:href="#_Image2" x="0" y="0" width="29px" height="30px"/>
+<svg width="100%" height="100%" viewBox="0 0 260 260" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1.36926,0,0,1.36926,-11.7457,-11.7457)">
+        <circle cx="103.5" cy="103.5" r="94.4" style="fill:rgb(184,255,0);"/>
+        <g>
+            <g>
+                <path d="M138,37.5L115,116.8L115,143.8L91.9,143.8L91.9,116.8L68.9,37.5L92.3,37.5L103.5,87.3L114.7,37.5L138,37.5Z" style="fill:rgb(110,139,135);fill-rule:nonzero;"/>
+            </g>
+            <g>
+                <rect x="91.9" y="149.9" width="23.2" height="19.6" style="fill:rgb(110,139,135);fill-rule:nonzero;"/>
             </g>
         </g>
     </g>
-    <defs>
-        <image id="_Image2" width="29px" height="30px" xlink:href="data:image/png;base64,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"/>
-    </defs>
 </svg>

@@ -1,20 +1,20 @@
 .main-navigation {
-    background-color: #748885;
+    background-color: #6e8b87;
 }
 .main-navigation .ds-menu-item-link {
-    color: #c8fc4f;;
+    color: #a6ff00;
 }
 
 .main-navigation .ds-menu-item-link:hover {
-    color: #f2f2f1;;
+    color: #f2f2f1;
 }
 
 .main-navigation .locale-menu {
-    color: #c8fc4f;;
+    color: #a6ff00;
 }
 
 .base-button {
-    color: #c8fc4f;
+    color: #a6ff00;
 }
 
 .header-menu {
@@ -22,4 +22,13 @@
 }
 .ds-menu-item-link {
     color: antiquewhite;
+}
+.ds-menu-item-link.router-link-exact-active {
+    color: #a6ff00;
+    background-color: #faf9fa;
+    border-left: 2px solid #a6ff00;
+}
+
+.ds-menu-item-navbar.ds-menu-item-show-submenu.ds-menu-item-level-0>.ds-menu-item-link {
+    color: #ffffff;
 }
