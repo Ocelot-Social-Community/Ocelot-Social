@@ -44,7 +44,7 @@ export default {
   box-shadow: 0px -6px 12px -4px rgba(0, 0, 0, 0.1);
 }
 .ds-footer a {
-  color: #6e8b87
+  color: #6e8b87;
 }
 .division-line {
   margin-left: 0.2rem;
