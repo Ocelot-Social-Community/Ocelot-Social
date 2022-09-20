@@ -57,7 +57,7 @@ const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwri
   },
 })
 const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
-  // externalLink: null, // if string is defined and not empty it's dominating
+  externalLink: 'https://yunite.org/ueber-yunite/unsere-werte/', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
@@ -83,7 +83,7 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
-  // externalLink: null, // if string is defined and not empty it's dominating
+  externalLink: 'https://yunite.org/ueber-yunite/faq-hilfe/', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
@@ -126,9 +126,9 @@ export default {
   FOOTER_LINK_LIST: [
     ORGANIZATION,
     // TERMS_AND_CONDITIONS,
-    // CODE_OF_CONDUCT,
+    CODE_OF_CONDUCT,
     DATA_PRIVACY,
-    // FAQ,
+    FAQ,
     // DONATE,
     // SUPPORT,
     IMPRINT,
