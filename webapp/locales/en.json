@@ -11,7 +11,7 @@
   "admin": {
     "categories": {
       "categoryName": "Name",
-      "name": "Categories",
+      "name": "Topics",
       "postCount": "Posts"
     },
     "dashboard": {
@@ -98,7 +98,7 @@
     }
   },
   "common": {
-    "category": "Category ::: Categories",
+    "category": "Topic ::: Topics",
     "comment": "Comment ::: Comments",
     "letsTalk": "Let`s Talk",
     "loading": "loading",
@@ -113,7 +113,7 @@
     "takeAction": "Take Action",
     "user": "User ::: Users",
     "validations": {
-      "categories": "at least one and at most three categories must be selected",
+      "categories": "at least one and at most three topics must be selected",
       "email": "must be a valid e-mail address",
       "url": "must be a valid URL"
     },
@@ -214,26 +214,50 @@
     "amount-shouts": "{amount} recommendations",
     "amount-views": "{amount} views",
     "categories": {
-      "infoSelectedNoOfMaxCategories": "{chosen} of {max} categories selected"
+      "infoSelectedNoOfMaxCategories": "{chosen} of {max} topics selected"
     },
     "category": {
+      "description": {
+        "body-and-excercise": "Sports, yoga, massage, relaxation",
+        "children": "Family, education, school, imprinting",
+        "culture": "Art, theatre, music, photography, film",
+        "economy": "Trade, consumption, marketing, supply chains",
+        "energy": "Oil, gas, coal, wind, hydrodynamic power, biogas, atomic energy",
+        "finance": "Money, financial system, alternative currencies",
+        "health": "Medicine, nutrition, WHO, vaccination, harmful substances",
+        "home": "Construction, communities, tiny houses, kitchen garden",
+        "it-and-media": "News, manipulation, privacy, control, data leeches, AI, software, apps",
+        "law": "Human rights, laws, decrees",
+        "miscellaneous": "Miscellaneous",
+        "mobility": "Travel, traffic, electric mobility",
+        "nature": "Animals, plants, agriculture, ecologu, biodiversity",
+        "networking": "Cooperation, action alliances, solidarity, help",
+        "peace": "War, military, social defence, arms, cyber attacks",
+        "politics": "Democracy, participation, elections, corruption, parties",
+        "psyche": "Soul, feelings, happiness",
+        "science": "Education, university, publications",
+        "spirituality": "Religion, values, ethics"
+      },
       "name": {
-        "animal-protection": "Animal Protection",
-        "art-culture-sport": "Art, Culture, & Sport",
-        "consumption-sustainability": "Consumption & Sustainability",
-        "cooperation-development": "Cooperation & Development",
-        "democracy-politics": "Democracy & Politics",
-        "economy-finances": "Economy & Finances",
-        "education-sciences": "Education & Sciences",
-        "energy-technology": "Energy & Technology",
-        "environment-nature": "Environment & Nature",
-        "freedom-of-speech": "Freedom of Speech",
-        "global-peace-nonviolence": "Global Peace & Nonviolence",
-        "happiness-values": "Happiness & Values",
-        "health-wellbeing": "Health & Wellbeing",
-        "human-rights-justice": "Human Rights & Justice",
-        "it-internet-data-privacy": "IT, Internet & Data Privacy",
-        "just-for-fun": "Just for Fun"
+        "body-and-excercise": "Body & Excercise",
+        "children": "Children",
+        "culture": "Culture",
+        "economy": "Economy",
+        "energy": "Energy",
+        "finance": "Finance",
+        "health": "Health",
+        "home": "Home",
+        "it-and-media": "IT & Media",
+        "law": "Law",
+        "miscellaneous": "Miscellaneous",
+        "mobility": "Mobility",
+        "nature": "Nature",
+        "networking": "Networking",
+        "peace": "Peace",
+        "politics": "Politics",
+        "psyche": "Psyche",
+        "science": "Science",
+        "spirituality": "Spirituality"
       }
     },
     "emotions-label": {
@@ -345,7 +369,7 @@
   },
   "filter-menu": {
     "all": "All",
-    "categories": "Categories of Content",
+    "categories": "Topics",
     "emotions": "Emotions",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
@@ -360,7 +384,11 @@
         "label": "Oldest first"
       }
     },
-    "order-by": "Order by ..."
+    "order-by": "Order by ...",
+    "save": {
+      "error": "Failed saving topic settings!",
+      "success": "Topics saved!"
+    }
   },
   "followButton": {
     "follow": "Follow",
@@ -467,7 +495,7 @@
       "noDecision": "No decision!",
       "numberOfUsers": "{count} users",
       "previousDecision": "Previous decision:",
-      "reasonCategory": "Category",
+      "reasonCategory": "Topic",
       "reasonDescription": "Description",
       "reportedOn": "Date",
       "status": "Current status",
@@ -584,8 +612,8 @@
     },
     "reason": {
       "category": {
-        "invalid": "Please select a valid category",
-        "label": "Select a category:",
+        "invalid": "Please select a valid topic",
+        "label": "Select a topic:",
         "options": {
           "advert_products_services_commercial": "Advertising products and services with commercial intent.",
           "criminal_behavior_violation_german_law": "Criminal behavior or violation of German law.",
@@ -596,7 +624,7 @@
           "other": "Other …",
           "pornographic_content_links": "Posting or linking of clearly pornographic material."
         },
-        "placeholder": "Category …"
+        "placeholder": "Topic …"
       },
       "description": {
         "label": "Please explain: Why you like to report this?",

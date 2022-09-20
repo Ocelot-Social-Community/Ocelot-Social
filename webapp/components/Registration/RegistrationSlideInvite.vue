@@ -25,7 +25,7 @@ import gql from 'graphql-tag'
 import CONSTANTS_REGISTRATION from './../../constants/registration'
 
 export const isValidInviteCodeQuery = gql`
-  query($code: ID!) {
+  query ($code: ID!) {
     isValidInviteCode(code: $code)
   }
 `

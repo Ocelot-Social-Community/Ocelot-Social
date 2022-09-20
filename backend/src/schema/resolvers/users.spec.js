@@ -3,6 +3,7 @@ import { gql } from '../../helpers/jest'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
+import { categories } from '../../constants/categories'
 
 const categoryIds = ['cat9']
 let user
@@ -56,6 +57,12 @@ const switchUserRoleMutation = gql`
   }
 `
 
+const saveCategorySettings = gql`
+  mutation ($activeCategories: [String]) {
+    saveCategorySettings(activeCategories: $activeCategories)
+  }
+`
+
 beforeAll(async () => {
   await cleanDatabase()
 
@@ -101,7 +108,7 @@ describe('User', () => {
 
     it('is forbidden', async () => {
       await expect(query({ query: userQuery, variables })).resolves.toMatchObject({
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
       })
     })
 
@@ -207,7 +214,7 @@ describe('UpdateUser', () => {
 
     it('is not allowed to change other user accounts', async () => {
       const { errors } = await mutate({ mutation: updateUserMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -500,7 +507,7 @@ describe('switch user role', () => {
         expect.objectContaining({
           errors: [
             expect.objectContaining({
-              message: 'Not Authorised!',
+              message: 'Not Authorized!',
             }),
           ],
         }),
@@ -541,6 +548,143 @@ describe('switch user role', () => {
           ],
         }),
       )
+    })
+  })
+})
+
+describe('save category settings', () => {
+  beforeEach(async () => {
+    await Promise.all(
+      categories.map(({ icon, name }, index) => {
+        Factory.build('category', {
+          id: `cat${index + 1}`,
+          slug: name,
+          name,
+          icon,
+        })
+      }),
+    )
+  })
+
+  beforeEach(async () => {
+    user = await Factory.build('user', {
+      id: 'user',
+      role: 'user',
+    })
+    variables = {
+      activeCategories: ['cat1', 'cat3', 'cat5'],
+    }
+  })
+
+  describe('not authenticated', () => {
+    beforeEach(async () => {
+      authenticatedUser = undefined
+    })
+
+    it('throws an error', async () => {
+      await expect(mutate({ mutation: saveCategorySettings, variables })).resolves.toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'Not Authorized!',
+            }),
+          ],
+        }),
+      )
+    })
+  })
+
+  describe('authenticated', () => {
+    beforeEach(async () => {
+      authenticatedUser = await user.toJson()
+    })
+
+    const userQuery = gql`
+      query ($id: ID) {
+        User(id: $id) {
+          activeCategories
+        }
+      }
+    `
+
+    describe('no categories saved', () => {
+      it('returns true for active categories mutation', async () => {
+        await expect(mutate({ mutation: saveCategorySettings, variables })).resolves.toEqual(
+          expect.objectContaining({
+            data: { saveCategorySettings: true },
+          }),
+        )
+      })
+
+      describe('query for user', () => {
+        beforeEach(async () => {
+          await mutate({ mutation: saveCategorySettings, variables })
+        })
+
+        it('returns the active categories when user is queried', async () => {
+          await expect(
+            query({ query: userQuery, variables: { id: authenticatedUser.id } }),
+          ).resolves.toEqual(
+            expect.objectContaining({
+              data: {
+                User: [
+                  {
+                    activeCategories: expect.arrayContaining(['cat1', 'cat3', 'cat5']),
+                  },
+                ],
+              },
+            }),
+          )
+        })
+      })
+    })
+
+    describe('categories already saved', () => {
+      beforeEach(async () => {
+        variables = {
+          activeCategories: ['cat1', 'cat3', 'cat5'],
+        }
+        await mutate({ mutation: saveCategorySettings, variables })
+        variables = {
+          activeCategories: ['cat10', 'cat11', 'cat12', 'cat8', 'cat9'],
+        }
+      })
+
+      it('returns true', async () => {
+        await expect(mutate({ mutation: saveCategorySettings, variables })).resolves.toEqual(
+          expect.objectContaining({
+            data: { saveCategorySettings: true },
+          }),
+        )
+      })
+
+      describe('query for user', () => {
+        beforeEach(async () => {
+          await mutate({ mutation: saveCategorySettings, variables })
+        })
+
+        it('returns the new active categories when user is queried', async () => {
+          await expect(
+            query({ query: userQuery, variables: { id: authenticatedUser.id } }),
+          ).resolves.toEqual(
+            expect.objectContaining({
+              data: {
+                User: [
+                  {
+                    activeCategories: expect.arrayContaining([
+                      'cat10',
+                      'cat11',
+                      'cat12',
+                      'cat8',
+                      'cat9',
+                    ]),
+                  },
+                ],
+              },
+            }),
+          )
+        })
+      })
     })
   })
 })

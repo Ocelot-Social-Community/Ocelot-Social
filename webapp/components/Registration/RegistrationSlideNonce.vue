@@ -30,7 +30,7 @@ import CONSTANTS_REGISTRATION from './../../constants/registration'
 import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 
 export const verifyNonceQuery = gql`
-  query($email: String!, $nonce: String!) {
+  query ($email: String!, $nonce: String!) {
     VerifyNonce(email: $email, nonce: $nonce)
   }
 `

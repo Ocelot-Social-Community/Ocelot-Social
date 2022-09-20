@@ -90,7 +90,7 @@ describe('shout and unshout posts', () => {
         variables = { id: 'post-to-shout-id' }
         authenticatedUser = undefined
         await expect(mutate({ mutation: mutationShoutPost, variables })).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -165,7 +165,7 @@ describe('shout and unshout posts', () => {
         authenticatedUser = undefined
         variables = { id: 'post-to-shout-id' }
         await expect(mutate({ mutation: mutationUnshoutPost, variables })).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
