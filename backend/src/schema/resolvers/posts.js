@@ -117,7 +117,7 @@ export default {
             : ''
         const groupCypher = groupId
           ? `WITH post MATCH (group:Group { id: $groupId })
-              MERGE (post)-[:IN]-(group)`
+              MERGE (post)-[:IN]->(group)`
           : ''
         const createPostTransactionResponse = await transaction.run(
           `
