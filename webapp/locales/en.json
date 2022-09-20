@@ -375,10 +375,6 @@
     "following": "Following"
   },
   "group": {
-    "back": "back",
-    "change-member-role": "The role has been changed to ({role})!",
-    "follow": "Follow",
-    "general": "General",
     "actionRadii": {
       "continental": "Continental Group",
       "global": "Global Group",
@@ -387,26 +383,15 @@
       "regional": "Regional Group"
     },
     "actionRadius": "Action radius",
+    "back": "back",
+    "change-member-role": "The role has been changed to ({role})!",
+    "follow": "Follow",
     "foundation": "Foundation",
+    "general": "General",
     "goal": "Goal of group",
     "group-created": "The group was created!",
     "group-name": "Group name",
     "group-updated": "The group data has been changed.",
-    "long-description": "Description",
-    "members": "Members",
-    "myGroups": "My Groups",
-    "newGroup": "Create a new Group",
-    "radius": "Radius",
-    "remove-member": "Remove member",
-    "reset-form": "Reset form",
-    "save": "Create new group",
-    "settings": "Group Settings",
-    "short-description": "Short description",
-    "show-all-my-groups": "show all groups",
-    "show-my-created-groups": "show only my groups",
-    "unfollowing": "unfollowing",
-    "update": "Save change",
-    "visibility": "Visibility"
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
       "join": "Join"
@@ -416,9 +401,15 @@
       "message": "Leaving a group may be irreversible!<br>Leave group <b>“{name}”</b>!",
       "title": "Do you really want to leave the group?"
     },
+    "long-description": "Description",
+    "members": "Members",
     "membersCount": "Members",
     "membersListTitle": "Group Members",
+    "myGroups": "My Groups",
     "newGroup": "Create a new Group",
+    "radius": "Radius",
+    "remove-member": "Remove member",
+    "reset-form": "Reset form",
     "role": "Your role in the group",
     "roles": {
       "admin": "Administrator",
@@ -427,13 +418,19 @@
       "usual": "Simple Member"
     },
     "save": "Create new group",
+    "settings": "Group Settings",
+    "short-description": "Short description",
+    "show-all-my-groups": "show all groups",
+    "show-my-created-groups": "show only my groups",
     "type": "Group type",
     "types": {
       "closed": "Closed Group",
       "hidden": "Hidden Group",
       "public": "Public Group"
     },
-    "update": "Save change"
+    "unfollowing": "unfollowing",
+    "update": "Save change",
+    "visibility": "Visibility"
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",
