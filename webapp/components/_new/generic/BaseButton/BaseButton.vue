@@ -79,7 +79,6 @@ export default {
 <style lang="scss">
 @import '~/assets/_new/styles/mixins/buttonStates.scss';
 
-
 .base-button {
   @include buttonStates;
   display: inline-flex;

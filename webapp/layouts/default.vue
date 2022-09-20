@@ -4,19 +4,25 @@
       <ds-container class="main-navigation-container" style="padding: 10px 10px">
         <div>
           <ds-flex class="main-navigation-flex">
-            <ds-flex-item :width="{ base: '47px' }" style="margin-right:20px">
-              <nuxt-link :to="{ name: 'index' }" v-scroll-to="'.main-navigation'" >
-                <logo logoType="header"/>
+            <ds-flex-item :width="{ base: '47px' }" style="margin-right: 20px">
+              <nuxt-link :to="{ name: 'index' }" v-scroll-to="'.main-navigation'">
+                <logo logoType="header" />
               </nuxt-link>
             </ds-flex-item>
 
-            <ds-flex-item v-for="item in menu" :key="item.name" :class="{ 'hide-mobile-menu': !toggleMobileMenu }" :width="{ base: 'auto' }" style="margin-right:20px">
-              <a v-if="item.url" :href="item.url" target="_blank" >
+            <ds-flex-item
+              v-for="item in menu"
+              :key="item.name"
+              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+              :width="{ base: 'auto' }"
+              style="margin-right: 20px"
+            >
+              <a v-if="item.url" :href="item.url" target="_blank">
                 <ds-text size="large" bold>
                   {{ item.name }}
                 </ds-text>
               </a>
-              <nuxt-link v-else :to="item.path" >
+              <nuxt-link v-else :to="item.path">
                 <ds-text size="large" bold>
                   {{ item.name }}
                 </ds-text>
@@ -25,9 +31,9 @@
             <ds-flex-item
               v-if="categoriesActive && isLoggedIn"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-              style="flex-grow: 0; flex-basis: auto; margin-right: 20px;"
+              style="flex-grow: 0; flex-basis: auto; margin-right: 20px"
             >
-               <client-only>
+              <client-only>
                 <categories-menu></categories-menu>
               </client-only>
             </ds-flex-item>

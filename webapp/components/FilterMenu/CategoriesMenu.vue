@@ -9,7 +9,7 @@
       @click.prevent="toggleMenu()"
     >
       <ds-text bold size="large">{{ $t('admin.categories.name') }}</ds-text>
-  </a>
+    </a>
     <template slot="popover">
       <div class="category-menu-options">
         <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
