@@ -62,7 +62,7 @@ describe('GroupProfileSlug', () => {
       id: 'g2',
       name: 'Yoga Practice',
       slug: 'yoga-practice',
-      about: 'We do yoga around the clock.',
+      about: null,
       description: `<h3>What Is yoga?</h3><p>Yoga is not just about practicing asanas. It's about how we do it.</p><p class="">And practicing asanas doesn't have to be yoga, it can be more athletic than yogic.</p><h3>What makes practicing asanas yogic?</h3><p class="">The important thing is:</p><ul><li><p>Use the exercises (consciously) for your personal development.</p></li></ul>`,
       descriptionExcerpt: `<h3>What Is yoga?</h3><p>Yoga is not just about practicing asanas. It's about how we do it.</p><p>And practicing asanas doesn't have to be yoga, it can be more athletic than yogic.</p><h3>What makes practicing asanas yogic?</h3><p>The important thing is:</p><ul><li><p>Use the exercises …</p></li></ul>`,
       groupType: 'public',
@@ -133,7 +133,7 @@ describe('GroupProfileSlug', () => {
       id: 'g0',
       name: 'Investigative Journalism',
       slug: 'investigative-journalism',
-      about: null,
+      about: 'Investigative journalists share ideas and insights and can collaborate.',
       description: `<p class=""><em>English:</em></p><p class="">This group is hidden.</p><h3>What is our group for?</h3><p>This group was created to allow investigative journalists to share and collaborate.</p><h3>How does it work?</h3><p>Here you can internally share posts and comments about them.</p><p><br></p><p><em>Deutsch:</em></p><p class="">Diese Gruppe ist verborgen.</p><h3>Wofür ist unsere Gruppe?</h3><p class="">Diese Gruppe wurde geschaffen, um investigativen Journalisten den Austausch und die Zusammenarbeit zu ermöglichen.</p><h3>Wie funktioniert das?</h3><p class="">Hier könnt ihr euch intern über Beiträge und Kommentare zu ihnen austauschen.</p>`,
       descriptionExcerpt:
         '<p><em>English:</em></p><p>This group is hidden.</p><h3>What is our group for?</h3><p>This group was created to allow investigative journalists to share and collaborate.</p><h3>How does it work?</h3><p>Here you can internally share posts and comments about them.</p><p><br/></p><p><em>Deutsch:</em></p><p>Diese Gruppe ist verborgen.</p><h3>…</h3>',
@@ -213,6 +213,7 @@ describe('GroupProfileSlug', () => {
             mocks.$store = {
               getters: {
                 'auth/user': peterLustig,
+                'auth/isModerator': () => false,
               },
             }
             wrapper = Wrapper()
@@ -223,6 +224,7 @@ describe('GroupProfileSlug', () => {
                   myRole: 'owner',
                 },
               ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             })
           })
 
@@ -242,7 +244,7 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('@yoga-practice')
           })
 
-          describe('displays no(!) group location, because is "null"', () => {
+          describe('displays no(!) group location – because is "null"', () => {
             it('has no(!) group location icon "map-marker"', () => {
               expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(false)
             })
@@ -283,9 +285,73 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('contribution.category.name.spirituality')
           })
 
-          it('has group goal', () => {
-            expect(wrapper.text()).toContain('group.goal')
-            expect(wrapper.text()).toContain('We do yoga around the clock.')
+          it('has no(!) group goal – because is "null"', () => {
+            expect(wrapper.text()).not.toContain('group.goal')
+          })
+
+          it('has ProfileList with members', () => {
+            const profileList = wrapper.find('.profile-list')
+            expect(profileList.exists()).toBe(true)
+            expect(profileList.text()).toContain('group.membersListTitle')
+            expect(profileList.text()).not.toContain(
+              'group.membersListTitleNotAllowedSeeingGroupMembers',
+            )
+            expect(profileList.text()).toContain('Peter Lustig')
+            expect(profileList.text()).toContain('Jenny Rostock')
+            expect(profileList.text()).toContain('Bob der Baumeister')
+            expect(profileList.text()).toContain('Huey')
+          })
+
+          describe('displays description – here as well the functionallity', () => {
+            let groupDescriptionBaseCard
+
+            beforeEach(async () => {
+              groupDescriptionBaseCard = wrapper.find('.group-description')
+            })
+
+            it('has description BaseCard', () => {
+              expect(groupDescriptionBaseCard.exists()).toBe(true)
+            })
+
+            describe('displays descriptionExcerpt first', () => {
+              it('has descriptionExcerpt', () => {
+                expect(groupDescriptionBaseCard.text()).toContain(
+                  `What Is yoga?Yoga is not just about practicing asanas. It's about how we do it.And practicing asanas doesn't have to be yoga, it can be more athletic than yogic.What makes practicing asanas yogic?The important thing is:Use the exercises …`,
+                )
+              })
+
+              it('has "show more" button', () => {
+                expect(wrapper.vm.isDescriptionCollapsed).toBe(true)
+                expect(groupDescriptionBaseCard.text()).toContain('comment.show.more')
+              })
+            })
+
+            describe('after "show more" click displays full description', () => {
+              beforeEach(async () => {
+                await groupDescriptionBaseCard.find('.collaps-button').trigger('click')
+                await wrapper.vm.$nextTick()
+              })
+
+              it('has full description', () => {
+                // test if end of full description is visible
+                expect(groupDescriptionBaseCard.text()).toContain(
+                  `Use the exercises (consciously) for your personal development.`,
+                )
+              })
+
+              it('has "show less" button', () => {
+                expect(wrapper.vm.isDescriptionCollapsed).toBe(false)
+                expect(groupDescriptionBaseCard.text()).toContain('comment.show.less')
+              })
+            })
+          })
+
+          it('has profile post add button', () => {
+            expect(wrapper.find('.profile-post-add-button').exists()).toBe(true)
+          })
+
+          it('has empty post list', () => {
+            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
           })
         })
 
@@ -294,6 +360,7 @@ describe('GroupProfileSlug', () => {
             mocks.$store = {
               getters: {
                 'auth/user': jennyRostock,
+                'auth/isModerator': () => false,
               },
             }
             wrapper = Wrapper()
@@ -304,6 +371,7 @@ describe('GroupProfileSlug', () => {
                   myRole: 'usual',
                 },
               ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             })
           })
 
@@ -323,7 +391,7 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('@yoga-practice')
           })
 
-          describe('displays no(!) group location, because is "null"', () => {
+          describe('displays no(!) group location – because is "null"', () => {
             it('has no(!) group location icon "map-marker"', () => {
               expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(false)
             })
@@ -364,9 +432,33 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('contribution.category.name.spirituality')
           })
 
-          it('has group goal', () => {
-            expect(wrapper.text()).toContain('group.goal')
-            expect(wrapper.text()).toContain('We do yoga around the clock.')
+          it('has no(!) group goal – because is "null"', () => {
+            expect(wrapper.text()).not.toContain('group.goal')
+          })
+
+          it('has ProfileList with members', () => {
+            const profileList = wrapper.find('.profile-list')
+            expect(profileList.exists()).toBe(true)
+            expect(profileList.text()).toContain('group.membersListTitle')
+            expect(profileList.text()).not.toContain(
+              'group.membersListTitleNotAllowedSeeingGroupMembers',
+            )
+            expect(profileList.text()).toContain('Peter Lustig')
+            expect(profileList.text()).toContain('Jenny Rostock')
+            expect(profileList.text()).toContain('Bob der Baumeister')
+            expect(profileList.text()).toContain('Huey')
+          })
+
+          it('has description BaseCard', () => {
+            expect(wrapper.find('.group-description').exists()).toBe(true)
+          })
+
+          it('has profile post add button', () => {
+            expect(wrapper.find('.profile-post-add-button').exists()).toBe(true)
+          })
+
+          it('has empty post list', () => {
+            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
           })
         })
 
@@ -375,6 +467,7 @@ describe('GroupProfileSlug', () => {
             mocks.$store = {
               getters: {
                 'auth/user': bobDerBaumeister,
+                'auth/isModerator': () => false,
               },
             }
             wrapper = Wrapper()
@@ -385,6 +478,7 @@ describe('GroupProfileSlug', () => {
                   myRole: 'pending',
                 },
               ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             })
           })
 
@@ -404,7 +498,7 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('@yoga-practice')
           })
 
-          describe('displays no(!) group location, because is "null"', () => {
+          describe('displays no(!) group location – because is "null"', () => {
             it('has no(!) group location icon "map-marker"', () => {
               expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(false)
             })
@@ -445,9 +539,33 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('contribution.category.name.spirituality')
           })
 
-          it('has group goal', () => {
-            expect(wrapper.text()).toContain('group.goal')
-            expect(wrapper.text()).toContain('We do yoga around the clock.')
+          it('has no(!) group goal – because is "null"', () => {
+            expect(wrapper.text()).not.toContain('group.goal')
+          })
+
+          it('has ProfileList with members', () => {
+            const profileList = wrapper.find('.profile-list')
+            expect(profileList.exists()).toBe(true)
+            expect(profileList.text()).toContain('group.membersListTitle')
+            expect(profileList.text()).not.toContain(
+              'group.membersListTitleNotAllowedSeeingGroupMembers',
+            )
+            expect(profileList.text()).toContain('Peter Lustig')
+            expect(profileList.text()).toContain('Jenny Rostock')
+            expect(profileList.text()).toContain('Bob der Baumeister')
+            expect(profileList.text()).toContain('Huey')
+          })
+
+          it('has description BaseCard', () => {
+            expect(wrapper.find('.group-description').exists()).toBe(true)
+          })
+
+          it('has no(!) profile post add button', () => {
+            expect(wrapper.find('.profile-post-add-button').exists()).toBe(false)
+          })
+
+          it('has empty post list', () => {
+            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
           })
         })
 
@@ -456,6 +574,7 @@ describe('GroupProfileSlug', () => {
             mocks.$store = {
               getters: {
                 'auth/user': huey,
+                'auth/isModerator': () => false,
               },
             }
             wrapper = Wrapper()
@@ -466,6 +585,7 @@ describe('GroupProfileSlug', () => {
                   myRole: null,
                 },
               ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             })
           })
 
@@ -485,7 +605,7 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('@yoga-practice')
           })
 
-          describe('displays no(!) group location, because is "null"', () => {
+          describe('displays no(!) group location – because is "null"', () => {
             it('has no(!) group location icon "map-marker"', () => {
               expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(false)
             })
@@ -526,9 +646,33 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('contribution.category.name.spirituality')
           })
 
-          it('has group goal', () => {
-            expect(wrapper.text()).toContain('group.goal')
-            expect(wrapper.text()).toContain('We do yoga around the clock.')
+          it('has no(!) group goal – because is "null"', () => {
+            expect(wrapper.text()).not.toContain('group.goal')
+          })
+
+          it('has ProfileList with members', () => {
+            const profileList = wrapper.find('.profile-list')
+            expect(profileList.exists()).toBe(true)
+            expect(profileList.text()).toContain('group.membersListTitle')
+            expect(profileList.text()).not.toContain(
+              'group.membersListTitleNotAllowedSeeingGroupMembers',
+            )
+            expect(profileList.text()).toContain('Peter Lustig')
+            expect(profileList.text()).toContain('Jenny Rostock')
+            expect(profileList.text()).toContain('Bob der Baumeister')
+            expect(profileList.text()).toContain('Huey')
+          })
+
+          it('has description BaseCard', () => {
+            expect(wrapper.find('.group-description').exists()).toBe(true)
+          })
+
+          it('has no(!) profile post add button', () => {
+            expect(wrapper.find('.profile-post-add-button').exists()).toBe(false)
+          })
+
+          it('has empty post list', () => {
+            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
           })
         })
       })
@@ -541,6 +685,7 @@ describe('GroupProfileSlug', () => {
             mocks.$store = {
               getters: {
                 'auth/user': peterLustig,
+                'auth/isModerator': () => false,
               },
             }
             wrapper = Wrapper()
@@ -551,6 +696,7 @@ describe('GroupProfileSlug', () => {
                   myRole: 'owner',
                 },
               ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             })
           })
 
@@ -618,6 +764,31 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('group.goal')
             expect(wrapper.text()).toContain('Our children shall receive education for life.')
           })
+
+          it('has ProfileList with members', () => {
+            const profileList = wrapper.find('.profile-list')
+            expect(profileList.exists()).toBe(true)
+            expect(profileList.text()).toContain('group.membersListTitle')
+            expect(profileList.text()).not.toContain(
+              'group.membersListTitleNotAllowedSeeingGroupMembers',
+            )
+            expect(profileList.text()).toContain('Peter Lustig')
+            expect(profileList.text()).toContain('Jenny Rostock')
+            expect(profileList.text()).toContain('Bob der Baumeister')
+            expect(profileList.text()).toContain('Huey')
+          })
+
+          it('has description BaseCard', () => {
+            expect(wrapper.find('.group-description').exists()).toBe(true)
+          })
+
+          it('has profile post add button', () => {
+            expect(wrapper.find('.profile-post-add-button').exists()).toBe(true)
+          })
+
+          it('has empty post list', () => {
+            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
+          })
         })
 
         describe('as usual member – "jenny-rostock"', () => {
@@ -625,6 +796,7 @@ describe('GroupProfileSlug', () => {
             mocks.$store = {
               getters: {
                 'auth/user': jennyRostock,
+                'auth/isModerator': () => false,
               },
             }
             wrapper = Wrapper()
@@ -635,6 +807,7 @@ describe('GroupProfileSlug', () => {
                   myRole: 'usual',
                 },
               ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             })
           })
 
@@ -702,6 +875,31 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('group.goal')
             expect(wrapper.text()).toContain('Our children shall receive education for life.')
           })
+
+          it('has ProfileList with members', () => {
+            const profileList = wrapper.find('.profile-list')
+            expect(profileList.exists()).toBe(true)
+            expect(profileList.text()).toContain('group.membersListTitle')
+            expect(profileList.text()).not.toContain(
+              'group.membersListTitleNotAllowedSeeingGroupMembers',
+            )
+            expect(profileList.text()).toContain('Peter Lustig')
+            expect(profileList.text()).toContain('Jenny Rostock')
+            expect(profileList.text()).toContain('Bob der Baumeister')
+            expect(profileList.text()).toContain('Huey')
+          })
+
+          it('has description BaseCard', () => {
+            expect(wrapper.find('.group-description').exists()).toBe(true)
+          })
+
+          it('has profile post add button', () => {
+            expect(wrapper.find('.profile-post-add-button').exists()).toBe(true)
+          })
+
+          it('has empty post list', () => {
+            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
+          })
         })
 
         describe('as pending member – "bob-der-baumeister"', () => {
@@ -709,6 +907,7 @@ describe('GroupProfileSlug', () => {
             mocks.$store = {
               getters: {
                 'auth/user': bobDerBaumeister,
+                'auth/isModerator': () => false,
               },
             }
             wrapper = Wrapper()
@@ -719,6 +918,7 @@ describe('GroupProfileSlug', () => {
                   myRole: 'pending',
                 },
               ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             })
           })
 
@@ -786,6 +986,31 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('group.goal')
             expect(wrapper.text()).toContain('Our children shall receive education for life.')
           })
+
+          it('has ProfileList without(!) members', () => {
+            const profileList = wrapper.find('.profile-list')
+            expect(profileList.exists()).toBe(true)
+            // expect(profileList.text()).not.toContain('group.membersListTitle') // does not work, because is part of 'group.membersListTitleNotAllowedSeeingGroupMembers'
+            expect(profileList.text()).toContain(
+              'group.membersListTitleNotAllowedSeeingGroupMembers',
+            )
+            expect(profileList.text()).not.toContain('Peter Lustig')
+            expect(profileList.text()).not.toContain('Jenny Rostock')
+            expect(profileList.text()).not.toContain('Bob der Baumeister')
+            expect(profileList.text()).not.toContain('Huey')
+          })
+
+          it('has description BaseCard', () => {
+            expect(wrapper.find('.group-description').exists()).toBe(true)
+          })
+
+          it('has no(!) profile post add button', () => {
+            expect(wrapper.find('.profile-post-add-button').exists()).toBe(false)
+          })
+
+          it('has empty post list', () => {
+            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
+          })
         })
 
         describe('as none(!) member – "huey"', () => {
@@ -793,6 +1018,7 @@ describe('GroupProfileSlug', () => {
             mocks.$store = {
               getters: {
                 'auth/user': huey,
+                'auth/isModerator': () => false,
               },
             }
             wrapper = Wrapper()
@@ -803,6 +1029,7 @@ describe('GroupProfileSlug', () => {
                   myRole: null,
                 },
               ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             })
           })
 
@@ -870,6 +1097,31 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('group.goal')
             expect(wrapper.text()).toContain('Our children shall receive education for life.')
           })
+
+          it('has ProfileList without(!) members', () => {
+            const profileList = wrapper.find('.profile-list')
+            expect(profileList.exists()).toBe(true)
+            // expect(profileList.text()).not.toContain('group.membersListTitle') // does not work, because is part of 'group.membersListTitleNotAllowedSeeingGroupMembers'
+            expect(profileList.text()).toContain(
+              'group.membersListTitleNotAllowedSeeingGroupMembers',
+            )
+            expect(profileList.text()).not.toContain('Peter Lustig')
+            expect(profileList.text()).not.toContain('Jenny Rostock')
+            expect(profileList.text()).not.toContain('Bob der Baumeister')
+            expect(profileList.text()).not.toContain('Huey')
+          })
+
+          it('has description BaseCard', () => {
+            expect(wrapper.find('.group-description').exists()).toBe(true)
+          })
+
+          it('has no(!) profile post add button', () => {
+            expect(wrapper.find('.profile-post-add-button').exists()).toBe(false)
+          })
+
+          it('has empty post list', () => {
+            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
+          })
         })
       })
     })
@@ -881,6 +1133,7 @@ describe('GroupProfileSlug', () => {
             mocks.$store = {
               getters: {
                 'auth/user': peterLustig,
+                'auth/isModerator': () => false,
               },
             }
             wrapper = Wrapper()
@@ -891,6 +1144,7 @@ describe('GroupProfileSlug', () => {
                   myRole: 'owner',
                 },
               ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             })
           })
 
@@ -954,6 +1208,38 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('contribution.category.name.politics')
             expect(wrapper.text()).toContain('contribution.category.name.it-and-media')
           })
+
+          it('has group goal', () => {
+            expect(wrapper.text()).toContain('group.goal')
+            expect(wrapper.text()).toContain(
+              'Investigative journalists share ideas and insights and can collaborate.',
+            )
+          })
+
+          it('has ProfileList with members', () => {
+            const profileList = wrapper.find('.profile-list')
+            expect(profileList.exists()).toBe(true)
+            expect(profileList.text()).toContain('group.membersListTitle')
+            expect(profileList.text()).not.toContain(
+              'group.membersListTitleNotAllowedSeeingGroupMembers',
+            )
+            expect(profileList.text()).toContain('Peter Lustig')
+            expect(profileList.text()).toContain('Jenny Rostock')
+            expect(profileList.text()).toContain('Bob der Baumeister')
+            expect(profileList.text()).toContain('Huey')
+          })
+
+          it('has description BaseCard', () => {
+            expect(wrapper.find('.group-description').exists()).toBe(true)
+          })
+
+          it('has profile post add button', () => {
+            expect(wrapper.find('.profile-post-add-button').exists()).toBe(true)
+          })
+
+          it('has empty post list', () => {
+            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
+          })
         })
 
         describe('as usual member – "jenny-rostock"', () => {
@@ -961,6 +1247,7 @@ describe('GroupProfileSlug', () => {
             mocks.$store = {
               getters: {
                 'auth/user': jennyRostock,
+                'auth/isModerator': () => false,
               },
             }
             wrapper = Wrapper()
@@ -971,6 +1258,7 @@ describe('GroupProfileSlug', () => {
                   myRole: 'usual',
                 },
               ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             })
           })
 
@@ -1034,6 +1322,38 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).toContain('contribution.category.name.politics')
             expect(wrapper.text()).toContain('contribution.category.name.it-and-media')
           })
+
+          it('has group goal', () => {
+            expect(wrapper.text()).toContain('group.goal')
+            expect(wrapper.text()).toContain(
+              'Investigative journalists share ideas and insights and can collaborate.',
+            )
+          })
+
+          it('has ProfileList with members', () => {
+            const profileList = wrapper.find('.profile-list')
+            expect(profileList.exists()).toBe(true)
+            expect(profileList.text()).toContain('group.membersListTitle')
+            expect(profileList.text()).not.toContain(
+              'group.membersListTitleNotAllowedSeeingGroupMembers',
+            )
+            expect(profileList.text()).toContain('Peter Lustig')
+            expect(profileList.text()).toContain('Jenny Rostock')
+            expect(profileList.text()).toContain('Bob der Baumeister')
+            expect(profileList.text()).toContain('Huey')
+          })
+
+          it('has description BaseCard', () => {
+            expect(wrapper.find('.group-description').exists()).toBe(true)
+          })
+
+          it('has profile post add button', () => {
+            expect(wrapper.find('.profile-post-add-button').exists()).toBe(true)
+          })
+
+          it('has empty post list', () => {
+            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
+          })
         })
 
         describe('as pending member – "bob-der-baumeister"', () => {
@@ -1041,6 +1361,7 @@ describe('GroupProfileSlug', () => {
             mocks.$store = {
               getters: {
                 'auth/user': bobDerBaumeister,
+                'auth/isModerator': () => false,
               },
             }
             wrapper = Wrapper()
@@ -1051,6 +1372,7 @@ describe('GroupProfileSlug', () => {
                   myRole: 'pending',
                 },
               ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             })
           })
 
@@ -1066,7 +1388,7 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(false)
           })
 
-          it('has not(!) group slug', () => {
+          it('has no(!) group slug', () => {
             expect(wrapper.text()).not.toContain('@investigative-journalism')
           })
 
@@ -1113,6 +1435,27 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).not.toContain('contribution.category.name.politics')
             expect(wrapper.text()).not.toContain('contribution.category.name.it-and-media')
           })
+
+          it('has no(!) group goal', () => {
+            expect(wrapper.text()).not.toContain('group.goal')
+          })
+
+          it('has not(!) ProfileList', () => {
+            const profileList = wrapper.find('.profile-list')
+            expect(profileList.exists()).toBe(false)
+          })
+
+          it('has not(!) description BaseCard', () => {
+            expect(wrapper.find('.group-description').exists()).toBe(false)
+          })
+
+          it('has no(!) profile post add button', () => {
+            expect(wrapper.find('.profile-post-add-button').exists()).toBe(false)
+          })
+
+          it('has no(!) empty post list', () => {
+            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(false)
+          })
         })
 
         describe('as none(!) member – "huey"', () => {
@@ -1120,6 +1463,7 @@ describe('GroupProfileSlug', () => {
             mocks.$store = {
               getters: {
                 'auth/user': huey,
+                'auth/isModerator': () => false,
               },
             }
             wrapper = Wrapper()
@@ -1130,6 +1474,7 @@ describe('GroupProfileSlug', () => {
                   myRole: null,
                 },
               ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             })
           })
 
@@ -1145,7 +1490,7 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(false)
           })
 
-          it('has not(!) group slug', () => {
+          it('has no(!) group slug', () => {
             expect(wrapper.text()).not.toContain('@investigative-journalism')
           })
 
@@ -1191,6 +1536,27 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.text()).not.toContain('contribution.category.name.law')
             expect(wrapper.text()).not.toContain('contribution.category.name.politics')
             expect(wrapper.text()).not.toContain('contribution.category.name.it-and-media')
+          })
+
+          it('has no(!) group goal', () => {
+            expect(wrapper.text()).not.toContain('group.goal')
+          })
+
+          it('has not(!) ProfileList', () => {
+            const profileList = wrapper.find('.profile-list')
+            expect(profileList.exists()).toBe(false)
+          })
+
+          it('has not(!) description BaseCard', () => {
+            expect(wrapper.find('.group-description').exists()).toBe(false)
+          })
+
+          it('has no(!) profile post add button', () => {
+            expect(wrapper.find('.profile-post-add-button').exists()).toBe(false)
+          })
+
+          it('has no(!) empty post list', () => {
+            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(false)
           })
         })
       })

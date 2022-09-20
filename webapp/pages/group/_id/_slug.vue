@@ -203,8 +203,8 @@
               ? $t('group.membersListTitleNotAllowedSeeingGroupMembers')
               : null
           "
-          :allProfilesCount="groupMembers.length"
-          :profiles="groupMembers"
+          :allProfilesCount="isAllowedSeeingGroupMembers ? groupMembers.length : 0"
+          :profiles="isAllowedSeeingGroupMembers ? groupMembers : []"
           :loading="$apollo.loading"
           @fetchAllProfiles="fetchAllMembers"
         />
@@ -239,7 +239,7 @@
             <content-viewer v-else class="content hyphenate-text" :content="group.description" />
             <!-- eslint-enable vue/no-v-html -->
             <base-button
-              class="collaps"
+              class="collaps-button"
               size="small"
               ghost
               @click="isDescriptionCollapsed = !isDescriptionCollapsed"
@@ -251,15 +251,15 @@
         <ds-space v-if="isGroupMemberNonePending" centered>
           <nuxt-link :to="{ name: 'post-create' }">
             <base-button
+              class="profile-post-add-button"
+              :path="{ name: 'post-create' }"
+              icon="plus"
+              circle
+              filled
               v-tooltip="{
                 content: $t('contribution.newPost'),
                 placement: 'left',
               }"
-              :path="{ name: 'post-create' }"
-              class="profile-post-add-button"
-              icon="plus"
-              circle
-              filled
             />
           </nuxt-link>
         </ds-space>
@@ -292,7 +292,7 @@
           </template>
           <template v-else>
             <ds-grid-item column-span="fullWidth">
-              <empty margin="xx-large" icon="file" />
+              <empty margin="xx-large" icon="file" data-test="icon-empty" />
             </ds-grid-item>
           </template>
         </masonry-grid>
@@ -673,7 +673,7 @@ export default {
     margin-bottom: $space-small;
   }
 }
-.collaps {
+.collaps-button {
   float: right;
 }
 </style>
