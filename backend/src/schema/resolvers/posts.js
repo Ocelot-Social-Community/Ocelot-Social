@@ -77,10 +77,11 @@ export default {
   },
   Mutation: {
     CreatePost: async (_parent, params, context, _resolveInfo) => {
-      const { categoryIds } = params
+      const { categoryIds, groupId } = params
       const { image: imageInput } = params
       delete params.categoryIds
       delete params.image
+      delete params.groupId
       params.id = params.id || uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -91,6 +92,10 @@ export default {
               MATCH (category:Category {id: categoryId})
               MERGE (post)-[:CATEGORIZED]->(category)`
             : ''
+        const groupCypher = groupId
+          ? `WITH post MATCH (group:Group { id: $groupId })
+              MERGE (post)-[:IN]-(group)`
+          : ''
         const createPostTransactionResponse = await transaction.run(
           `
             CREATE (post:Post)
@@ -103,9 +108,10 @@ export default {
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
             ${categoriesCypher}
+            ${groupCypher}
             RETURN post {.*}
           `,
-          { userId: context.user.id, params, categoryIds },
+          { userId: context.user.id, params, categoryIds, groupId },
         )
         const [post] = createPostTransactionResponse.records.map((record) => record.get('post'))
         if (imageInput) {
@@ -367,6 +373,7 @@ export default {
         author: '<-[:WROTE]-(related:User)',
         pinnedBy: '<-[:PINNED]-(related:User)',
         image: '-[:HERO_IMAGE]->(related:Image)',
+        group: '-[:IN]->(related:Group)',
       },
       count: {
         commentsCount:
