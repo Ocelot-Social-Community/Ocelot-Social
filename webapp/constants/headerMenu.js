@@ -5,27 +5,32 @@ export default {
       name: 'Beiträge',
       path: '/#',
     },
-    {
-      name: 'Themen',
-      path: '/#',
-    },
-    {
-      name: 'Gruppen',
-      path: '/#',
-    },
+    // {
+    // name: 'Themen',
+    // path: '/#',
+    // },
+    // {
+    //   name: 'Gruppen',
+    //   path: '/#',
+    // },
     {
       name: 'Über Yunite',
       path: '/#',
-      children: [
-        {
-          name: 'Impressum',
-          path: '/#',
-        },
-        {
-          name: 'Yunite Team',
-          path: '/#',
-        },
-      ],
+      url: 'https://yunite.org',
+      // children: [
+      // {
+      // name: 'Impressum',
+      // path: '/#',
+      // },
+      // {
+      // name: 'Yunite Team',
+      // path: '/#',
+      // },
+      // ],
     },
+    // {
+    //   name: 'Topic',
+    //   path: '/#',
+    // },
   ],
 }

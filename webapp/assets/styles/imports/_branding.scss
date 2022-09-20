@@ -4,9 +4,15 @@
 .main-navigation .ds-menu-item-link {
     color: #a6ff00;
 }
-
 .main-navigation .ds-menu-item-link:hover {
     color: #f2f2f1;
+}
+
+.main-navigation a {
+    color: #a6ff00;
+}
+.main-navigation a:hover {
+    color: #ffffff;
 }
 
 .main-navigation .locale-menu {
@@ -17,14 +23,11 @@
     color: #a6ff00;
 }
 
-.header-menu {
-    // background-color: #748885;
-}
 .ds-menu-item-link {
     color: antiquewhite;
 }
 .ds-menu-item-link.router-link-exact-active {
-    color: #a6ff00;
+    color: #6a8ee1;
     background-color: #faf9fa;
     border-left: 2px solid #a6ff00;
 }

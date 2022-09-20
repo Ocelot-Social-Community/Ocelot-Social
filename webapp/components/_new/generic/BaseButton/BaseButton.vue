@@ -79,6 +79,7 @@ export default {
 <style lang="scss">
 @import '~/assets/_new/styles/mixins/buttonStates.scss';
 
+
 .base-button {
   @include buttonStates;
   display: inline-flex;
@@ -141,4 +142,5 @@ export default {
     color: $color-neutral-100;
   }
 }
+@import '~/assets/styles/imports/_branding.scss';
 </style>

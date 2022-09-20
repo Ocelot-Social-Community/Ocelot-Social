@@ -1,6 +1,21 @@
 <template>
-  <div class="header-menu">
-    <ds-menu v-if="show" :routes="menu" navbar style="margin-right: 20px"></ds-menu>
+  <div class="display-flex">
+    <!-- <ds-flex v-if="show"> -->
+
+    <ds-flex-item v-for="item in menu" :key="item.name">
+      <a v-if="item.url" :href="item.url" target="_blank" class="margin-x">
+        <ds-text size="large" bold>
+          {{ item.name }}
+        </ds-text>
+      </a>
+      <nuxt-link v-else :to="item.path" class="margin-x">
+        <ds-text size="large" bold>
+          {{ item.name }}
+        </ds-text>
+      </nuxt-link>
+    </ds-flex-item>
+
+    <!-- </ds-flex> -->
   </div>
 </template>
 <script>
@@ -16,3 +31,13 @@ export default {
   },
 }
 </script>
+<style lang="scss">
+.display-flex {
+  display: flex;
+}
+.margin-x {
+  margin-left: $space-small;
+  margin-right: $space-small;
+  white-space: nowrap;
+}
+</style>
