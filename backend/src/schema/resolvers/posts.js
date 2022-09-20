@@ -17,19 +17,42 @@ const maintainPinnedPosts = (params) => {
   return params
 }
 
+const postAccessFilter = (params) => {
+  const groupFilter = {
+    group: {
+      OR: [{ groupType_in: 'public' }, { myRole_in: ['usual', 'admin', 'owner'] }],
+    },
+  }
+  if (isEmpty(params.filter)) {
+    params.filter = { OR: [groupFilter, {}] }
+  } else {
+    if (isEmpty(params.filter.group)) {
+      params.filter = { OR: [groupFilter, { ...params.filter }] }
+    } else {
+      params.filter.group = {
+        AND: [{ ...groupFilter.group }, { ...params.filter.group }],
+      }
+    }
+  }
+  return params
+}
+
 export default {
   Query: {
     Post: async (object, params, context, resolveInfo) => {
       params = await filterForMutedUsers(params, context)
       params = await maintainPinnedPosts(params)
+      params = await postAccessFilter(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
     findPosts: async (object, params, context, resolveInfo) => {
       params = await filterForMutedUsers(params, context)
+      params = await postAccessFilter(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
     profilePagePosts: async (object, params, context, resolveInfo) => {
       params = await filterForMutedUsers(params, context)
+      params = await postAccessFilter(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
     PostsEmotionsCountByEmotion: async (object, params, context, resolveInfo) => {
