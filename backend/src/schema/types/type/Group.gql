@@ -38,6 +38,8 @@ type Group {
   categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
   myRole: GroupMemberRole # if 'null' then the current user is no member
+
+  posts: [Post] @relation(name: "IN", direction: "IN")
 }
 
 
