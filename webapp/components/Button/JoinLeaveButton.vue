@@ -1,6 +1,6 @@
 <template>
   <base-button
-    class="track-button"
+    class="join-leave-button"
     :disabled="disabled"
     :loading="localLoading"
     :icon="icon"
@@ -129,7 +129,7 @@ export default {
 </script>
 
 <style lang="scss">
-.track-button {
+.join-leave-button {
   display: block;
   width: 100%;
 }

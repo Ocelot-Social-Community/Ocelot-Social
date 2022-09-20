@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="avatar-uploader">
     <vue-dropzone
       id="customdropzone"
       :key="avatarUrl"

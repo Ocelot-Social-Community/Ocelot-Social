@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="isGroupVisible">
     <ds-space />
     <ds-flex v-if="group" :width="{ base: '100%' }" gutter="base">
       <ds-flex-item :width="{ base: '100%', sm: 2, md: 2, lg: 1 }">
@@ -41,7 +41,7 @@
             </ds-text>
             <!-- Group location -->
             <ds-text v-if="group && group.location" align="center" color="soft" size="small">
-              <base-icon name="map-marker" />
+              <base-icon name="map-marker" data-test="map-marker" />
               {{ group && group.location ? group.location.name : '' }}
             </ds-text>
             <!-- Group created at -->
@@ -196,7 +196,7 @@
         </ds-heading>
         <!-- Group members list -->
         <profile-list
-          :uniqueName="`groupMembersFilter`"
+          :uniqueName="'groupMembersFilter'"
           :title="$t('group.membersListTitle')"
           :titleNobody="
             !isAllowedSeeingGroupMembers
@@ -393,7 +393,7 @@ export default {
       return this.$store.getters['auth/user']
     },
     group() {
-      return this.Group[0] ? this.Group[0] : {}
+      return this.Group && this.Group[0] ? this.Group[0] : {}
     },
     groupName() {
       const { name } = this.group || {}
@@ -404,6 +404,7 @@ export default {
       return slug && `@${slug}`
     },
     groupDescriptionExcerpt() {
+      // Wolle: console.log('groupDescriptionExcerpt: ', this.group ? this.$filters.removeLinks(this.group.descriptionExcerpt) : '')
       return this.group ? this.$filters.removeLinks(this.group.descriptionExcerpt) : ''
     },
     isGroupOwner() {
@@ -414,6 +415,9 @@ export default {
     },
     isGroupMemberNonePending() {
       return this.group ? ['usual', 'admin', 'owner'].includes(this.group.myRole) : false
+    },
+    isGroupVisible() {
+      return this.group && !(this.group.groupType === 'hidden' && !this.isGroupMemberNonePending)
     },
     groupMembers() {
       return this.GroupMembers ? this.GroupMembers : []

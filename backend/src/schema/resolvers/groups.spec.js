@@ -56,16 +56,16 @@ const seedBasicsAndClearAuthentication = async () => {
   )
   await Promise.all([
     neode.create('Category', {
-      id: 'cat9',
-      name: 'Democracy & Politics',
-      slug: 'democracy-politics',
-      icon: 'university',
-    }),
-    neode.create('Category', {
       id: 'cat4',
       name: 'Environment & Nature',
       slug: 'environment-nature',
       icon: 'tree',
+    }),
+    neode.create('Category', {
+      id: 'cat9',
+      name: 'Democracy & Politics',
+      slug: 'democracy-politics',
+      icon: 'university',
     }),
     neode.create('Category', {
       id: 'cat15',
