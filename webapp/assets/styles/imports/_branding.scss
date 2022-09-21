@@ -1,37 +1,21 @@
-.main-navigation {
-    background-color: #6e8b87;
-}
-.main-navigation .ds-menu-item-link {
-    color: #a6ff00;
-}
-.main-navigation .ds-menu-item-link:hover {
-    color: #f2f2f1;
-}
+
+$color-primary: #6e8b87;
+$color-primary-light: #a6ff00;
+
+$color-header-background: $color-primary;
+$color-footer-background: $color-primary-light;
 
 .main-navigation a {
-    color: #a6ff00;
+    color: $color-primary-light;
 }
 .main-navigation a:hover {
-    color: #ffffff;
+    color: $color-neutral-100;
 }
 
 .main-navigation .locale-menu {
-    color: #a6ff00;
+    color: $color-primary-light;
 }
 
-.base-button {
-    color: #a6ff00;
-}
-
-.ds-menu-item-link {
-    color: antiquewhite;
-}
-.ds-menu-item-link.router-link-exact-active {
-    color: #6a8ee1;
-    background-color: #faf9fa;
-    border-left: 2px solid #a6ff00;
-}
-
-.ds-menu-item-navbar.ds-menu-item-show-submenu.ds-menu-item-level-0>.ds-menu-item-link {
-    color: #ffffff;
+.main-navigation  .base-button {
+    color: $color-primary-light;
 }

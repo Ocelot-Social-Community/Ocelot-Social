@@ -168,6 +168,9 @@ export default {
 </script>
 
 <style lang="scss">
+.main-navigation {
+  background-color: $color-header-background;
+}
 .margin-right-20 {
   margin-right: 20px;
 }

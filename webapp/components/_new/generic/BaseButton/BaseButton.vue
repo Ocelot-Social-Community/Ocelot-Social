@@ -141,5 +141,4 @@ export default {
     color: $color-neutral-100;
   }
 }
-@import '~/assets/styles/imports/_branding.scss';
 </style>
