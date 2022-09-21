@@ -57,7 +57,7 @@ export default {
       },
     },
     disabled: {
-      type: Boolean,
+      // type: Boolean, // makes some errors that an Object was passed instead a Boolean and could not find how to solve in a acceptable time
       default: false,
     },
   },
