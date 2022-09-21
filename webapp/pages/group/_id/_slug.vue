@@ -404,7 +404,6 @@ export default {
       return slug && `@${slug}`
     },
     groupDescriptionExcerpt() {
-      // Wolle: console.log('groupDescriptionExcerpt: ', this.group ? this.$filters.removeLinks(this.group.descriptionExcerpt) : '')
       return this.group ? this.$filters.removeLinks(this.group.descriptionExcerpt) : ''
     },
     isGroupOwner() {

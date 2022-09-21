@@ -67,7 +67,6 @@ describe('GroupProfileSlug', () => {
       descriptionExcerpt: `<h3>What Is yoga?</h3><p>Yoga is not just about practicing asanas. It's about how we do it.</p><p>And practicing asanas doesn't have to be yoga, it can be more athletic than yogic.</p><h3>What makes practicing asanas yogic?</h3><p>The important thing is:</p><ul><li><p>Use the exercises …</p></li></ul>`,
       groupType: 'public',
       actionRadius: 'interplanetary',
-      // Wolle: categoryIds: ['cat4', 'cat5', 'cat17'],
       categories: [
         {
           id: 'cat4',
@@ -104,7 +103,6 @@ describe('GroupProfileSlug', () => {
       descriptionExcerpt: `<p><em>English</em></p><h3>Our goal</h3><p>Only those who enjoy learning and do not lose their curiosity can obtain a good education for life and continue to learn with joy throughout their lives.</p><h3>Curiosity</h3><p>For this we need a school that takes up the curiosity of the children, …</p>`,
       groupType: 'closed',
       actionRadius: 'national',
-      // Wolle: categoryIds: ['cat8', 'cat14'],
       categories: [
         {
           id: 'cat8',
@@ -139,7 +137,6 @@ describe('GroupProfileSlug', () => {
         '<p><em>English:</em></p><p>This group is hidden.</p><h3>What is our group for?</h3><p>This group was created to allow investigative journalists to share and collaborate.</p><h3>How does it work?</h3><p>Here you can internally share posts and comments about them.</p><p><br/></p><p><em>Deutsch:</em></p><p>Diese Gruppe ist verborgen.</p><h3>…</h3>',
       groupType: 'hidden',
       actionRadius: 'global',
-      // Wolle: categoryIds: ['cat6', 'cat12', 'cat16'],
       categories: [
         {
           id: 'cat6',
