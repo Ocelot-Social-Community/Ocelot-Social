@@ -31,9 +31,8 @@
             v-for="category in post.categories"
             :key="category.id"
             v-tooltip="{
-              content: $t(`contribution.category.name.${category.slug}`),
+              content: $t(`contribution.category.description.${category.slug}`),
               placement: 'bottom-start',
-              delay: { show: 1500 },
             }"
             :icon="category.icon"
           />

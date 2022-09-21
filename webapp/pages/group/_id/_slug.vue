@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="isGroupVisible">
     <ds-space />
     <ds-flex v-if="group" :width="{ base: '100%' }" gutter="base">
       <ds-flex-item :width="{ base: '100%', sm: 2, md: 2, lg: 1 }">
@@ -31,24 +31,29 @@
             />
           </client-only> -->
           <ds-space margin="small">
+            <!-- Group name -->
             <ds-heading tag="h3" align="center" no-margin>
               {{ groupName }}
             </ds-heading>
+            <!-- Group slug -->
             <ds-text align="center" color="soft">
               {{ groupSlug }}
             </ds-text>
-            <!-- <ds-text v-if="user.location" align="center" color="soft" size="small">
-              <base-icon name="map-marker" />
-              {{ user.location.name }}
-            </ds-text> -->
+            <!-- Group location -->
+            <ds-text v-if="group && group.location" align="center" color="soft" size="small">
+              <base-icon name="map-marker" data-test="map-marker" />
+              {{ group && group.location ? group.location.name : '' }}
+            </ds-text>
+            <!-- Group created at -->
             <ds-text align="center" color="soft" size="small">
               {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
             </ds-text>
           </ds-space>
-          <ds-flex>
-            <ds-flex-item>
+          <ds-flex v-if="isAllowedSeeingGroupMembers">
+            <!-- Group members count -->
+            <ds-flex-item v-if="isAllowedSeeingGroupMembers">
               <client-only>
-                <ds-number :label="$t('group.membersCount')">
+                <ds-number :label="$t('group.membersCount', {}, groupMembers.length)">
                   <count-to
                     slot="count"
                     :start-val="membersCountStartValue"
@@ -90,6 +95,7 @@
               @optimistic="optimisticFollow"
               @update="updateFollow"
             /> -->
+            <!-- Group join / leave -->
             <join-leave-button
               :group="group || {}"
               :userId="currentUser.id"
@@ -104,35 +110,82 @@
           </div>
           <hr />
           <ds-space margin-top="small" margin-bottom="small">
+            <!-- Group my role in group -->
             <template v-if="isGroupMember">
               <ds-text class="centered-text hyphenate-text" color="soft" size="small">
                 {{ $t('group.role') }}
               </ds-text>
               <div class="chip" align="center">
-                <ds-chip color="primary">{{ $t('group.roles.' + group.myRole) }}</ds-chip>
+                <ds-chip color="primary">
+                  {{ group && group.myRole ? $t('group.roles.' + group.myRole) : '' }}
+                </ds-chip>
               </div>
             </template>
+            <!-- Group type -->
             <ds-text class="centered-text hyphenate-text" color="soft" size="small">
               {{ $t('group.type') }}
             </ds-text>
             <div class="chip" align="center">
-              <ds-chip color="primary">{{ $t('group.types.' + group.groupType) }}</ds-chip>
+              <ds-chip color="primary">
+                {{ group && group.groupType ? $t('group.types.' + group.groupType) : '' }}
+              </ds-chip>
             </div>
+            <!-- Group action radius -->
             <ds-text class="centered-text hyphenate-text" color="soft" size="small">
               {{ $t('group.actionRadius') }}
             </ds-text>
             <div class="chip" align="center">
-              <ds-chip color="primary">{{ $t('group.actionRadii.' + group.actionRadius) }}</ds-chip>
+              <ds-chip color="primary">
+                {{
+                  group && group.actionRadius ? $t('group.actionRadii.' + group.actionRadius) : ''
+                }}
+              </ds-chip>
             </div>
+            <ds-space margin="x-small" />
           </ds-space>
-          <template v-if="group.about">
+          <!-- Group categories -->
+          <template v-if="categoriesActive">
+            <hr />
+            <ds-space margin-top="small" margin-bottom="small">
+              <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+                {{
+                  $t(
+                    'group.categories',
+                    {},
+                    group && group.categories ? group.categories.length : 0,
+                  )
+                }}
+              </ds-text>
+              <ds-space margin="xx-small" />
+              <div class="categories">
+                <div
+                  v-for="(category, index) in group.categories"
+                  :key="category.id"
+                  align="center"
+                >
+                  <category
+                    :icon="category.icon"
+                    :name="$t(`contribution.category.name.${category.slug}`)"
+                    v-tooltip="{
+                      content: $t(`contribution.category.description.${category.slug}`),
+                      placement: 'bottom-start',
+                    }"
+                  />
+                  <ds-space v-if="index < group.categories.length - 1" margin="xxx-small" />
+                </div>
+              </div>
+            </ds-space>
+          </template>
+          <!-- Group goal -->
+          <template v-if="group && group.about">
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
               <ds-text class="centered-text hyphenate-text" color="soft" size="small">
                 {{ $t('group.goal') }}
               </ds-text>
+              <ds-space margin="xx-small" />
               <div class="chip" align="center">
-                <ds-chip>{{ group.about }}</ds-chip>
+                <ds-chip>{{ group ? group.about : '' }}</ds-chip>
               </div>
             </ds-space>
           </template>
@@ -143,10 +196,15 @@
         </ds-heading>
         <!-- Group members list -->
         <profile-list
-          :uniqueName="`groupMembersFilter`"
+          :uniqueName="'groupMembersFilter'"
           :title="$t('group.membersListTitle')"
-          :allProfilesCount="groupMembers.length"
-          :profiles="groupMembers"
+          :titleNobody="
+            !isAllowedSeeingGroupMembers
+              ? $t('group.membersListTitleNotAllowedSeeingGroupMembers')
+              : null
+          "
+          :allProfilesCount="isAllowedSeeingGroupMembers ? groupMembers.length : 0"
+          :profiles="isAllowedSeeingGroupMembers ? groupMembers : []"
           :loading="$apollo.loading"
           @fetchAllProfiles="fetchAllMembers"
         />
@@ -168,31 +226,48 @@
       </ds-flex-item>
 
       <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
+        <!-- Group description -->
+        <ds-space>
+          <base-card class="group-description">
+            <!-- TODO: replace editor content with tiptap render view -->
+            <!-- eslint-disable vue/no-v-html -->
+            <div
+              v-if="isDescriptionCollapsed"
+              class="content hyphenate-text"
+              v-html="groupDescriptionExcerpt"
+            />
+            <content-viewer v-else class="content hyphenate-text" :content="group.description" />
+            <!-- eslint-enable vue/no-v-html -->
+            <base-button
+              class="collaps-button"
+              size="small"
+              ghost
+              @click="isDescriptionCollapsed = !isDescriptionCollapsed"
+            >
+              {{ isDescriptionCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
+            </base-button>
+          </base-card>
+        </ds-space>
+        <ds-space v-if="isGroupMemberNonePending" centered>
+          <nuxt-link :to="{ name: 'post-create' }">
+            <base-button
+              class="profile-post-add-button"
+              :path="{ name: 'post-create' }"
+              icon="plus"
+              circle
+              filled
+              v-tooltip="{
+                content: $t('contribution.newPost'),
+                placement: 'left',
+              }"
+            />
+          </nuxt-link>
+        </ds-space>
         <masonry-grid>
           <!-- TapNavigation -->
           <!-- <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" /> -->
 
-          <!-- feed -->
-          <ds-grid-item :row-span="2" column-span="fullWidth">
-            <ds-space centered>
-              <nuxt-link :to="{ name: 'post-create' }">
-                <base-button
-                  v-if="isGroupMember"
-                  v-tooltip="{
-                    content: $t('contribution.newPost'),
-                    placement: 'left',
-                    delay: { show: 500 },
-                  }"
-                  :path="{ name: 'post-create' }"
-                  class="profile-post-add-button"
-                  icon="plus"
-                  circle
-                  filled
-                />
-              </nuxt-link>
-            </ds-space>
-          </ds-grid-item>
-
+          <!-- Group post feed -->
           <template v-if="posts && posts.length">
             <masonry-grid-item
               v-for="post in posts"
@@ -217,7 +292,7 @@
           </template>
           <template v-else>
             <ds-grid-item column-span="fullWidth">
-              <empty margin="xx-large" icon="file" />
+              <empty margin="xx-large" icon="file" data-test="icon-empty" />
             </ds-grid-item>
           </template>
         </masonry-grid>
@@ -238,7 +313,9 @@ import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/gr
 // import UpdateQuery from '~/components/utils/UpdateQuery'
 import postListActions from '~/mixins/postListActions'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
+import Category from '~/components/Category'
 // import ContentMenu from '~/components/ContentMenu/ContentMenu'
+import ContentViewer from '~/components/Editor/ContentViewer'
 import CountTo from '~/components/CountTo.vue'
 import Empty from '~/components/Empty/Empty'
 // import FollowButton from '~/components/Button/FollowButton'
@@ -263,7 +340,9 @@ import ProfileList from '~/components/features/ProfileList/ProfileList'
 export default {
   components: {
     AvatarUploader,
+    Category,
     // ContentMenu,
+    ContentViewer,
     CountTo,
     Empty,
     // FollowButton,
@@ -290,8 +369,10 @@ export default {
   data() {
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     return {
+      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       Group: [],
       GroupMembers: [],
+      loadGroupMembers: false,
       posts: [],
       // hasMore: true,
       // offset: 0,
@@ -304,6 +385,7 @@ export default {
       membersCountStartValue: 0,
       membersCountToLoad: Infinity,
       updateGroupMutation,
+      isDescriptionCollapsed: true,
     }
   },
   computed: {
@@ -311,16 +393,7 @@ export default {
       return this.$store.getters['auth/user']
     },
     group() {
-      return this.Group[0] ? this.Group[0] : {}
-    },
-    groupMembers() {
-      return this.GroupMembers ? this.GroupMembers : []
-    },
-    isGroupOwner() {
-      return this.group ? this.group.myRole === 'owner' : false
-    },
-    isGroupMember() {
-      return this.group ? !!this.group.myRole : false
+      return this.Group && this.Group[0] ? this.Group[0] : {}
     },
     groupName() {
       const { name } = this.group || {}
@@ -329,6 +402,31 @@ export default {
     groupSlug() {
       const { slug } = this.group || {}
       return slug && `@${slug}`
+    },
+    groupDescriptionExcerpt() {
+      return this.group ? this.$filters.removeLinks(this.group.descriptionExcerpt) : ''
+    },
+    isGroupOwner() {
+      return this.group ? this.group.myRole === 'owner' : false
+    },
+    isGroupMember() {
+      return this.group ? !!this.group.myRole : false
+    },
+    isGroupMemberNonePending() {
+      return this.group ? ['usual', 'admin', 'owner'].includes(this.group.myRole) : false
+    },
+    isGroupVisible() {
+      return this.group && !(this.group.groupType === 'hidden' && !this.isGroupMemberNonePending)
+    },
+    groupMembers() {
+      return this.GroupMembers ? this.GroupMembers : []
+    },
+    isAllowedSeeingGroupMembers() {
+      return (
+        this.group &&
+        (this.group.groupType === 'public' ||
+          (['closed', 'hidden'].includes(this.group.groupType) && this.isGroupMemberNonePending))
+      )
     },
     // tabOptions() {
     //   return [
@@ -352,6 +450,11 @@ export default {
     //     },
     //   ]
     // },
+  },
+  watch: {
+    isAllowedSeeingGroupMembers(to, _from) {
+      this.loadGroupMembers = to
+    },
   },
   methods: {
     // handleTab(tab) {
@@ -463,7 +566,11 @@ export default {
     },
     updateJoinLeave({ myRoleInGroup }) {
       this.Group[0].myRole = myRoleInGroup
-      this.$apollo.queries.GroupMembers.refetch()
+      if (this.isAllowedSeeingGroupMembers) {
+        this.$apollo.queries.GroupMembers.refetch()
+      } else {
+        this.GroupMembers = []
+      }
     },
     fetchAllMembers() {
       this.membersCountToLoad = Infinity
@@ -489,8 +596,7 @@ export default {
     // },
     Group: {
       query() {
-        // return groupQuery(this.$i18n) // language will be needed for locations
-        return groupQuery
+        return groupQuery(this.$i18n)
       },
       variables() {
         return {
@@ -499,16 +605,25 @@ export default {
           // followingCount: this.followingCount,
         }
       },
+      error(error) {
+        this.$toast.error(error.message)
+      },
       fetchPolicy: 'cache-and-network',
     },
     GroupMembers: {
       query() {
-        return groupMembersQuery
+        return groupMembersQuery()
       },
       variables() {
         return {
           id: this.$route.params.id,
         }
+      },
+      skip() {
+        return !this.loadGroupMembers
+      },
+      error(error) {
+        this.$toast.error(error.message)
       },
       fetchPolicy: 'cache-and-network',
     },
@@ -546,5 +661,18 @@ export default {
 }
 .chip {
   margin-bottom: $space-x-small;
+}
+.group-description > .base-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  > .content {
+    flex-grow: 1;
+    margin-bottom: $space-small;
+  }
+}
+.collaps-button {
+  float: right;
 }
 </style>

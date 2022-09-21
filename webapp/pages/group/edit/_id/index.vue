@@ -27,7 +27,7 @@ export default {
       const variables = { id, name, about, description, groupType, actionRadius, categoryIds }
       try {
         await this.$apollo.mutate({
-          mutation: updateGroupMutation,
+          mutation: updateGroupMutation(),
           variables,
         })
         this.$toast.success(this.$t('group.group-updated'))

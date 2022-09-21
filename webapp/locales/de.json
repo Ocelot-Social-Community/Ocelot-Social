@@ -404,6 +404,7 @@
       "regional": "Regionale Gruppe"
     },
     "actionRadius": "Aktionsradius",
+    "categories": "Thema ::: Themen",
     "foundation": "Gründung",
     "goal": "Ziel der Gruppe",
     "group-created": "Die Gruppe wurde angelegt!",
@@ -417,8 +418,9 @@
       "message": "Eine Gruppe zu verlassen ist möglicherweise nicht rückgängig zu machen!<br>Gruppe <b>„{name}“</b> verlassen!",
       "title": "Möchtest du wirklich die Gruppe verlassen?"
     },
-    "membersCount": "Mitglieder",
+    "membersCount": "Mitglied ::: Mitglieder",
     "membersListTitle": "Gruppenmitglieder",
+    "membersListTitleNotAllowedSeeingGroupMembers": "Gruppenmitglieder unsichtbar",
     "newGroup": "Erstelle eine neue Gruppe",
     "role": "Deine Rolle in der Gruppe",
     "roles": {

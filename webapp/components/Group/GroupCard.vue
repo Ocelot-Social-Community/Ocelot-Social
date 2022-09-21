@@ -37,7 +37,8 @@
     </ds-container>
   </div>
 </template>
-<script lang="ts">
+
+<script>
 export default {
   name: 'GroupList',
   props: {

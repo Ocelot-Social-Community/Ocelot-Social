@@ -51,6 +51,7 @@ beforeEach(async () => {
   await Factory.build('category', {
     id: 'cat9',
     name: 'Democracy & Politics',
+    slug: 'democracy-politics',
     icon: 'university',
   })
   authenticatedUser = await admin.toJson()
@@ -79,7 +80,7 @@ describe('slugifyMiddleware', () => {
       it('generates a slug based on name', async () => {
         await expect(
           mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables,
           }),
         ).resolves.toMatchObject({
@@ -93,13 +94,14 @@ describe('slugifyMiddleware', () => {
               actionRadius: 'national',
             },
           },
+          errors: undefined,
         })
       })
 
       it('generates a slug based on given slug', async () => {
         await expect(
           mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               ...variables,
               slug: 'the-group',
@@ -111,6 +113,7 @@ describe('slugifyMiddleware', () => {
               slug: 'the-group',
             },
           },
+          errors: undefined,
         })
       })
     })
@@ -118,7 +121,7 @@ describe('slugifyMiddleware', () => {
     describe('if slug exists', () => {
       beforeEach(async () => {
         await mutate({
-          mutation: createGroupMutation,
+          mutation: createGroupMutation(),
           variables: {
             ...variables,
             name: 'Pre-Existing Group',
@@ -131,7 +134,7 @@ describe('slugifyMiddleware', () => {
       it('chooses another slug', async () => {
         await expect(
           mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               ...variables,
               name: 'Pre-Existing Group',
@@ -144,6 +147,7 @@ describe('slugifyMiddleware', () => {
               slug: 'pre-existing-group-1',
             },
           },
+          errors: undefined,
         })
       })
 
@@ -152,7 +156,7 @@ describe('slugifyMiddleware', () => {
           try {
             await expect(
               mutate({
-                mutation: createGroupMutation,
+                mutation: createGroupMutation(),
                 variables: {
                   ...variables,
                   name: 'Pre-Existing Group',
@@ -194,7 +198,7 @@ describe('slugifyMiddleware', () => {
 
     beforeEach(async () => {
       createGroupResult = await mutate({
-        mutation: createGroupMutation,
+        mutation: createGroupMutation(),
         variables: {
           name: 'The Best Group',
           slug: 'the-best-group',
@@ -213,7 +217,7 @@ describe('slugifyMiddleware', () => {
           it('has the new slug', async () => {
             await expect(
               mutate({
-                mutation: updateGroupMutation,
+                mutation: updateGroupMutation(),
                 variables: {
                   id: createGroupResult.data.CreateGroup.id,
                   name: 'My Best Group',
@@ -231,6 +235,7 @@ describe('slugifyMiddleware', () => {
                   myRole: 'owner',
                 },
               },
+              errors: undefined,
             })
           })
         })
@@ -239,7 +244,7 @@ describe('slugifyMiddleware', () => {
           it('has the new slug', async () => {
             await expect(
               mutate({
-                mutation: updateGroupMutation,
+                mutation: updateGroupMutation(),
                 variables: {
                   id: createGroupResult.data.CreateGroup.id,
                   slug: 'my-best-group',
@@ -257,6 +262,7 @@ describe('slugifyMiddleware', () => {
                   myRole: 'owner',
                 },
               },
+              errors: undefined,
             })
           })
         })
@@ -265,7 +271,7 @@ describe('slugifyMiddleware', () => {
       describe('if new slug exists in another group', () => {
         beforeEach(async () => {
           await mutate({
-            mutation: createGroupMutation,
+            mutation: createGroupMutation(),
             variables: {
               name: 'Pre-Existing Group',
               slug: 'pre-existing-group',
@@ -282,7 +288,7 @@ describe('slugifyMiddleware', () => {
           it('has unique slug "*-1"', async () => {
             await expect(
               mutate({
-                mutation: updateGroupMutation,
+                mutation: updateGroupMutation(),
                 variables: {
                   id: createGroupResult.data.CreateGroup.id,
                   name: 'Pre-Existing Group',
@@ -300,6 +306,7 @@ describe('slugifyMiddleware', () => {
                   myRole: 'owner',
                 },
               },
+              errors: undefined,
             })
           })
         })
@@ -309,7 +316,7 @@ describe('slugifyMiddleware', () => {
             try {
               await expect(
                 mutate({
-                  mutation: updateGroupMutation,
+                  mutation: updateGroupMutation(),
                   variables: {
                     id: createGroupResult.data.CreateGroup.id,
                     slug: 'pre-existing-group',
@@ -368,6 +375,7 @@ describe('slugifyMiddleware', () => {
               slug: 'i-am-a-brand-new-post',
             },
           },
+          errors: undefined,
         })
       })
 
@@ -386,6 +394,7 @@ describe('slugifyMiddleware', () => {
               slug: 'the-post',
             },
           },
+          errors: undefined,
         })
       })
     })
@@ -422,6 +431,7 @@ describe('slugifyMiddleware', () => {
               slug: 'pre-existing-post-1',
             },
           },
+          errors: undefined,
         })
       })
 
@@ -504,6 +514,7 @@ describe('slugifyMiddleware', () => {
                 slug: 'i-am-a-user',
               },
             },
+            errors: undefined,
           })
         })
 
@@ -522,6 +533,7 @@ describe('slugifyMiddleware', () => {
                 slug: 'the-user',
               },
             },
+            errors: undefined,
           })
         })
       })
@@ -546,6 +558,7 @@ describe('slugifyMiddleware', () => {
                 slug: 'i-am-a-user-1',
               },
             },
+            errors: undefined,
           })
         })
 
