@@ -356,3 +356,22 @@ $media-query-x-large: (min-width: 1200px);
 /** 
  * @tokens Background Images
  */
+
+/** 
+ * @tokens Header Color
+ */
+
+$color-header-background: $color-neutral-100;
+
+/** 
+ * @tokens Footer Color
+ */
+
+$color-footer-background: $color-neutral-100;
+$color-footer-link: $color-primary;
+
+/** 
+ * @tokens Locale Menu Color
+ */
+
+$color-locale-menu: $text-color-soft;
