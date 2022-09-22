@@ -302,6 +302,7 @@ export default {
     ...Resolver('Group', {
       hasMany: {
         categories: '-[:CATEGORIZED]->(related:Category)',
+        posts: '<-[:IN]-(related:Post)',
       },
       hasOne: {
         avatar: '-[:AVATAR_IMAGE]->(related:Image)',

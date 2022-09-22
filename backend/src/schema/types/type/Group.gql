@@ -40,6 +40,13 @@ type Group {
   myRole: GroupMemberRole # if 'null' then the current user is no member
 
   posts: [Post] @relation(name: "IN", direction: "IN")
+  memberIds: [String] @cypher(
+    statement: """
+    MATCH (this)<-[membership:MEMBER_OF]-(member:User)
+    WHERE membership.role IN ['usual', 'admin', 'owner']
+    RETURN collect(member.id)
+    """
+  )
 }
 
 
@@ -53,6 +60,7 @@ input _GroupFilter {
   groupType_in: [GroupType!]
   actionRadius_in: [GroupActionRadius!]
   myRole_in: [GroupMemberRole!]
+  memberIds_includes: String
   id: ID
   id_not: ID
   id_in: [ID!]
