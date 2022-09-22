@@ -4,7 +4,7 @@
       <ds-container class="main-navigation-container" style="padding: 10px 10px">
         <div>
           <ds-flex class="main-navigation-flex">
-            <ds-flex-item :width="{ base: '47px' }" style="margin-right: 20px">
+            <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
               <nuxt-link :to="{ name: 'index' }" v-scroll-to="'.main-navigation'">
                 <logo logoType="header" />
               </nuxt-link>
@@ -47,8 +47,8 @@
               :width="{
                 base: '45%',
                 sm: '45%',
-                md: show ? 'auto' : '45%',
-                lg: show ? 'auto' : '50%',
+                md: isHeaderMenu ? 'auto' : '45%',
+                lg: isHeaderMenu ? 'auto' : '50%',
               }"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
               style="flex-shrink: 0; flex-grow: 1"
@@ -113,6 +113,7 @@
 
 <script>
 import Logo from '~/components/Logo/Logo'
+import LOGOS from '../constants/logos.js'
 import headerMenu from '../constants/headerMenu.js'
 import { mapGetters } from 'vuex'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
@@ -142,7 +143,8 @@ export default {
   mixins: [seo],
   data() {
     return {
-      show: headerMenu.SHOW_HEADER_MENU,
+      LOGOS,
+      isHeaderMenu: headerMenu.MENU.length > 0,
       menu: headerMenu.MENU,
       mobileSearchVisible: false,
       toggleMobileMenu: false,
