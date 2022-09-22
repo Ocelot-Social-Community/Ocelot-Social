@@ -1,13 +1,6 @@
 <template>
   <dropdown ref="category-menu" placement="top-start" :offset="8" class="category-menu">
-    <a
-      href="#"
-      slot="default"
-      :filled="filterActive"
-      :ghost="!filterActive"
-      slot-scope="{ toggleMenu }"
-      @click.prevent="toggleMenu()"
-    >
+    <a href="#" slot="default" slot-scope="{ toggleMenu }" @click.prevent="toggleMenu()">
       <ds-text bold size="large">{{ $t('admin.categories.name') }}</ds-text>
     </a>
     <template slot="popover">
@@ -41,6 +34,7 @@ export default {
   },
   computed: {
     ...mapGetters({
+      // TODO: implement visibility of active filter later on
       filterActive: 'posts/isActive',
     }),
   },
