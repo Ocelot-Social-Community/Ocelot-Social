@@ -1,4 +1,4 @@
-import { rule, shield, deny, allow, or } from 'graphql-shield'
+import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 import { getNeode } from '../db/neo4j'
 import CONFIG from '../config'
 import { validateInviteCode } from '../schema/resolvers/transactions/inviteCodes'
@@ -221,6 +221,34 @@ const isAllowedToLeaveGroup = rule({
   }
 })
 
+const isMemberOfGroup = rule({
+  cache: 'no_cache',
+})(async (_parent, args, { user, driver }) => {
+  if (!(user && user.id)) return false
+  const { groupId } = args
+  if (!groupId) return true
+  const userId = user.id
+  const session = driver.session()
+  const readTxPromise = session.readTransaction(async (transaction) => {
+    const transactionResponse = await transaction.run(
+      `
+        MATCH (User {id: $userId})-[membership:MEMBER_OF]->(Group {id: $groupId})
+        RETURN membership.role AS role
+      `,
+      { groupId, userId },
+    )
+    return transactionResponse.records.map((record) => record.get('role'))[0]
+  })
+  try {
+    const role = await readTxPromise
+    return ['usual', 'admin', 'owner'].includes(role)
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+})
+
 const isAuthor = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
@@ -316,7 +344,7 @@ export default shield(
       JoinGroup: isAllowedToJoinGroup,
       LeaveGroup: isAllowedToLeaveGroup,
       ChangeGroupMemberRole: isAllowedToChangeGroupMemberRole,
-      CreatePost: isAuthenticated,
+      CreatePost: and(isAuthenticated, isMemberOfGroup),
       UpdatePost: isAuthor,
       DeletePost: isAuthor,
       fileReport: isAuthenticated,
