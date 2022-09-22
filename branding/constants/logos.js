@@ -2,6 +2,7 @@
 // this are the paths in the webapp
 export default {
   LOGO_HEADER_PATH: '/img/custom/logo-horizontal.svg',
+  LOGO_HEADER_WIDTH: '130px',
   LOGO_SIGNUP_PATH: '/img/custom/logo-squared.svg',
   LOGO_WELCOME_PATH: '/img/custom/logo-squared.svg',
   LOGO_LOGOUT_PATH: '/img/custom/logo-squared.svg',
