@@ -32,7 +32,7 @@
 
         <ds-input
           v-model="formData.about"
-          :label="$t('group.short-description')"
+          :label="$t('group.goal')"
           rows="3"
         ></ds-input>
 
