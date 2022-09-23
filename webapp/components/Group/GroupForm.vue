@@ -19,7 +19,7 @@
           v-if="update"
           v-model="formData.slug"
           :label="$t('users.table.columns.slug')"
-          :placeholder="`${$t('group.group-name')}…`"
+          :placeholder="`${$t('group.groupName')}…`"
         ></ds-input>
 
         <ds-select
