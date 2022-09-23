@@ -11,34 +11,34 @@
       >
         <ds-input
           v-model="formData.name"
-          :label="$t('group.group-name')"
-          :placeholder="`${$t('group.group-name')}…`"
+          :label="$t('group.groupName')"
+          :placeholder="`${$t('group.groupName')}…`"
         ></ds-input>
 
         <ds-input
           v-if="update"
           v-model="formData.slug"
           :label="$t('users.table.columns.slug')"
-          :placeholder="`${$t('group.group-name')}…`"
+          :placeholder="`${$t('group.groupName')}…`"
         ></ds-input>
 
         <ds-select
           icon="user"
           v-model="formData.groupType"
-          :label="$t('group.visibility')"
+          :label="$t('group.type')"
           :options="['public', 'closed', 'hidden']"
           placeholder="Status ..."
         ></ds-select>
 
         <ds-input
           v-model="formData.about"
-          :label="$t('group.short-description')"
+          :label="$t('group.goal')"
           rows="3"
         ></ds-input>
 
         <ds-input
           v-model="formData.description"
-          :label="$t('group.long-description')"
+          :label="$t('group.description')"
           type="textarea"
           rows="3"
         ></ds-input>
@@ -58,9 +58,9 @@
           <ds-select
             icon="card"
             v-model="formData.actionRadius"
-            :label="$t('group.radius')"
+            :label="$t('group.actionRadius')"
             :options="['regional', 'national', 'continental', 'global']"
-            :placeholder="`${$t('group.radius')} …`"
+            :placeholder="`${$t('group.actionRadius')} …`"
           ></ds-select>
         </ds-space>
         <ds-space margin-top="large">

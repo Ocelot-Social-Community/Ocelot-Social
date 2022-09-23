@@ -84,7 +84,6 @@ export default {
         this.$toast.error(error.message)
       }
     },
-
     onlyOwnerGroups(bool) {
       this.$refs.myGruops.hidden = bool
       this.$refs.allGruops.hidden = !bool
