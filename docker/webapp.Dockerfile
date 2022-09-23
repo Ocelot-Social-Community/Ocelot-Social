@@ -13,6 +13,7 @@ FROM $APP_IMAGE_CODE as code
 COPY branding/static/ static/
 COPY branding/constants/ constants/
 COPY branding/locales/ locales/
+COPY branding/assets/styles/imports/ assets/styles/imports/
 
 ##################################################################################
 # BUILD ##########################################################################
@@ -41,6 +42,7 @@ COPY --from=build ${DOCKER_WORKDIR}/config/ ./config/
 COPY --from=build ${DOCKER_WORKDIR}/constants ./constants
 COPY --from=build ${DOCKER_WORKDIR}/static ./static
 COPY --from=build ${DOCKER_WORKDIR}/locales ./locales
+COPY --from=build ${DOCKER_WORKDIR}/assets/styles/imports ./assets/styles/imports
 # Copy package.json for script definitions (lock file should not be needed)
 COPY --from=build ${DOCKER_WORKDIR}/package.json ./package.json
 

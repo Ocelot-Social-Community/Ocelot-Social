@@ -3,7 +3,7 @@
 import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
-  externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  externalLink: 'https://yunite.org', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.made', // localized string identifier, if undefined default is used
@@ -12,12 +12,12 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'branding/locales/html/'
+    // in case internal page content is here 'webapp/locales/html/'
   },
 })
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
   // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  externalLink: 'https://ocelot-social.herokuapp.com/donations', // if string is defined and not empty it's dominating
+  externalLink: 'https://yunite.org/brand-guidelines/', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.donate', // localized string identifier, if undefined default is used
@@ -31,7 +31,7 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
 })
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
   // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  externalLink: 'https://ocelot-social.herokuapp.com/imprint', // if string is defined and not empty it's dominating
+  externalLink: 'https://yunite.org/impressum/', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.imprint', // localized string identifier, if undefined default is used
@@ -57,7 +57,7 @@ const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwri
   },
 })
 const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
-  // externalLink: null, // if string is defined and not empty it's dominating
+  externalLink: 'https://yunite.org/ueber-yunite/unsere-werte/', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
@@ -70,7 +70,7 @@ const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
   },
 })
 const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
-  // externalLink: null, // if string is defined and not empty it's dominating
+  externalLink: 'https://yunite.org/datenschutz/', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
@@ -83,7 +83,7 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
-  // externalLink: null, // if string is defined and not empty it's dominating
+  externalLink: 'https://yunite.org/ueber-yunite/faq-hilfe/', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
@@ -96,7 +96,7 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
   },
 })
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
-  externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  // externalLink: '', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.support', // localized string identifier, if undefined default is used
@@ -125,12 +125,12 @@ export default {
 
   FOOTER_LINK_LIST: [
     ORGANIZATION,
-    TERMS_AND_CONDITIONS,
+    // TERMS_AND_CONDITIONS,
     CODE_OF_CONDUCT,
     DATA_PRIVACY,
     FAQ,
-    DONATE,
+    // DONATE,
+    // SUPPORT,
     IMPRINT,
-    SUPPORT,
   ],
 }
