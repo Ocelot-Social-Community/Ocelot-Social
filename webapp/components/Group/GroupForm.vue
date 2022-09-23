@@ -58,9 +58,9 @@
           <ds-select
             icon="card"
             v-model="formData.actionRadius"
-            :label="$t('group.radius')"
+            :label="$t('group.actionRadius')"
             :options="['regional', 'national', 'continental', 'global']"
-            :placeholder="`${$t('group.radius')} …`"
+            :placeholder="`${$t('group.actionRadius')} …`"
           ></ds-select>
         </ds-space>
         <ds-space margin-top="large">
