@@ -25,7 +25,7 @@
         <ds-select
           icon="user"
           v-model="formData.groupType"
-          :label="$t('group.visibility')"
+          :label="$t('group.type')"
           :options="['public', 'closed', 'hidden']"
           placeholder="Status ..."
         ></ds-select>
