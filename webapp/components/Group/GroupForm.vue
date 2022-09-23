@@ -11,8 +11,8 @@
       >
         <ds-input
           v-model="formData.name"
-          :label="$t('group.group-name')"
-          :placeholder="`${$t('group.group-name')}…`"
+          :label="$t('group.groupName')"
+          :placeholder="`${$t('group.groupName')}…`"
         ></ds-input>
 
         <ds-input
