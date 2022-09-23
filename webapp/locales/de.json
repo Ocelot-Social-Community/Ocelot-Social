@@ -389,9 +389,9 @@
     "foundation": "Gründung",
     "general": "Allgemein",
     "goal": "Ziel der Gruppe",
-    "groupCreated": "Die Gruppe wurde angelegt!",
     "group-name": "Gruppenname",
     "group-updated": "Die Gruppendaten wurden geändert!",
+    "groupCreated": "Die Gruppe wurde angelegt!",
     "joinLeaveButton": {
       "iAmMember": "Bin Mitglied",
       "join": "Beitreten"
