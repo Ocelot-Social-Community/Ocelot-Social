@@ -30,11 +30,7 @@
           placeholder="Status ..."
         ></ds-select>
 
-        <ds-input
-          v-model="formData.about"
-          :label="$t('group.goal')"
-          rows="3"
-        ></ds-input>
+        <ds-input v-model="formData.about" :label="$t('group.goal')" rows="3"></ds-input>
 
         <ds-input
           v-model="formData.description"
