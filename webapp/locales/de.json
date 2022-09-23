@@ -384,7 +384,7 @@
     },
     "actionRadius": "Aktionsradius",
     "back": "zurück",
-    "change-member-role": "Die Rolle wurde auf ({role}) geändert!",
+    "change-member-role": "Die Rolle wurde auf „{role}“ geändert!",
     "follow": "Folge",
     "foundation": "Gründung",
     "general": "Allgemein",
