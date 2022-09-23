@@ -79,7 +79,7 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
