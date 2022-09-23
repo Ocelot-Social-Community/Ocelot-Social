@@ -136,7 +136,7 @@ export default {
         return group
       })
       try {
-        const group =  await writeTxResultPromise
+        const group = await writeTxResultPromise
         await createOrUpdateLocations(params.id, params.locationName, session)
         return group
       } catch (error) {
@@ -209,7 +209,7 @@ export default {
         return group
       })
       try {
-        const group =  await writeTxResultPromise
+        const group = await writeTxResultPromise
         await createOrUpdateLocations(params.id, params.locationName, session)
         return group
       } catch (error) {
@@ -305,12 +305,7 @@ export default {
   },
   Group: {
     ...Resolver('Group', {
-      undefinedToNull: [
-        'deleted',
-        'disabled',
-        'locationName',
-        'about',
-      ],
+      undefinedToNull: ['deleted', 'disabled', 'locationName', 'about'],
       hasMany: {
         categories: '-[:CATEGORIZED]->(related:Category)',
       },
