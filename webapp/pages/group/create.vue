@@ -1,7 +1,7 @@
 <template>
   <div>
     <ds-section>
-      <h1 class="ds-heading ds-heading-h1">{{ $t('group.newGroup') }}Create New Groupe</h1>
+      <h1 class="ds-heading ds-heading-h1">{{ $t('group.newGroup') }}</h1>
     </ds-section>
     <ds-space margin="large">
       <ds-flex :width="{ base: '100%' }" gutter="base">
@@ -44,7 +44,7 @@ export default {
           mutation: createGroupMutation,
           variables,
         })
-        this.$toast.success(this.$t('group.group-created'))
+        this.$toast.success(this.$t('group.groupCreated'))
       } catch (error) {
         this.$toast.error(error.message)
       }

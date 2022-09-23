@@ -34,10 +34,10 @@
     <ds-modal
       v-if="isOpen"
       v-model="isOpen"
-      :title="`${$t('group.remove-member')} ?`"
+      :title="`${$t('group.removeMember')} ?`"
       force
       extended
-      :confirm-label="$t('group.remove-member')"
+      :confirm-label="$t('group.removeMember')"
       @confirm="deleteMember(memberId)"
       :cancel-label="$t('actions.cancel')"
     />
@@ -74,7 +74,7 @@ export default {
           mutation: changeGroupMemberRoleMutation,
           variables: { groupId: this.groupId, userId: id, roleInGroup: newRole },
         })
-        this.$toast.success(this.$t('group.change-member-role', { role: newRole }))
+        this.$toast.success(this.$t('group.changeMemberRole', { role: newRole }))
       } catch (error) {
         this.$toast.error(error.message)
       }

@@ -2,10 +2,10 @@
   <ds-container class="group-card">
     <ds-space>
       <div @click="onlyOwnerGroups(true)" ref="myGruops">
-        <ds-button>{{ $t('group.show-my-created-groups') }}</ds-button>
+        <ds-button>{{ $t('group.showMyCreatedGroups') }}</ds-button>
       </div>
       <div @click="onlyOwnerGroups(false)" ref="allGruops" hidden>
-        <ds-button>{{ $t('group.show-all-my-groups') }}</ds-button>
+        <ds-button>{{ $t('group.showAllMyGroups') }}</ds-button>
       </div>
     </ds-space>
     <ds-space margin-bottom="small" v-for="item in items" :key="item.id">
@@ -23,7 +23,7 @@
                   {{ item.myRole }}
                 </ds-chip>
               </ds-text>
-              <ds-space margin-top="small">
+              <ds-space v-if="item.about" margin-top="small">
                 <ds-text bold>{{ item.about }}</ds-text>
               </ds-space>
               <ds-space margin-top="small">
@@ -79,7 +79,7 @@ export default {
           mutation: joinGroupMutation,
           variables,
         })
-        this.$toast.success(this.$t('group.group-created'))
+        this.$toast.success(this.$t('group.groupCreated'))
       } catch (error) {
         this.$toast.error(error.message)
       }

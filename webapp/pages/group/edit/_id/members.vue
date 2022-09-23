@@ -32,8 +32,8 @@ export default {
           variables: { id: this.group.id },
         })
         this.responseGroupMembersQuery = response.data.GroupMembers
-      } catch (error) {
-        this.responseGroupMembersQuery = []
+      } catch (err) {
+        this.$toast.error(err.message)
       } finally {
         this.pending = false
       }
