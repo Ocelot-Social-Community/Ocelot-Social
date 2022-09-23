@@ -54,6 +54,11 @@
           :key="category.id"
           :icon="category.icon"
           :name="$t(`contribution.category.name.${category.slug}`)"
+          v-tooltip="{
+            content: $t(`contribution.category.description.${category.slug}`),
+            placement: 'bottom-start',
+            delay: { show: 1500 },
+          }"
         />
       </div>
       <ds-space margin-bottom="small" />
