@@ -23,7 +23,7 @@
   </div>
 </template>
 <script>
-import GroupList from '~/components/Group/GroupList.vue'
+import GroupList from '~/components/Group/GroupList'
 import { groupQuery } from '~/graphql/groups.js'
 
 export default {
