@@ -38,7 +38,7 @@
 
         <ds-input
           v-model="formData.description"
-          :label="$t('group.long-description')"
+          :label="$t('group.description')"
           type="textarea"
           rows="3"
         ></ds-input>
