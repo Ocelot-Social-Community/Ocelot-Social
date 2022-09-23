@@ -76,7 +76,7 @@ export default {
       const variables = { groupId: id, userId: this.$store.getters['auth/user'].id }
       try {
         await this.$apollo.mutate({
-          mutation: joinGroupMutation,
+          mutation: joinGroupMutation(),
           variables,
         })
         this.$toast.success(this.$t('group.groupCreated'))

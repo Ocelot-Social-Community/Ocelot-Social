@@ -9,7 +9,7 @@ import Resolver, {
   convertObjectToCypherMapLiteral,
 } from './helpers/Resolver'
 import { mergeImage } from './images/images'
-import createOrUpdateLocations from './users/location'
+import { createOrUpdateLocations } from './users/location'
 
 export default {
   Query: {
@@ -86,6 +86,7 @@ export default {
     CreateGroup: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds } = params
       delete params.categoryIds
+      params.locationName = params.locationName === '' ? null : params.locationName
       if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
         throw new UserInputError('Too view categories!')
       }
@@ -137,7 +138,8 @@ export default {
       })
       try {
         const group = await writeTxResultPromise
-        await createOrUpdateLocations(params.id, params.locationName, session)
+        // TODO: put in a middleware, see "UpdateGroup", "UpdateUser"
+        await createOrUpdateLocations('Group', params.id, params.locationName, session)
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
@@ -149,9 +151,11 @@ export default {
     },
     UpdateGroup: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds } = params
-      const { id: groupId, avatar: avatarInput } = params
       delete params.categoryIds
+      const { id: groupId, avatar: avatarInput } = params
       delete params.avatar
+      params.locationName = params.locationName === '' ? null : params.locationName
+
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds) {
         if (categoryIds.length < CATEGORIES_MIN) {
           throw new UserInputError('Too view categories!')
@@ -210,7 +214,8 @@ export default {
       })
       try {
         const group = await writeTxResultPromise
-        await createOrUpdateLocations(params.id, params.locationName, session)
+        // TODO: put in a middleware, see "CreateGroup", "UpdateUser"
+        await createOrUpdateLocations('Group', params.id, params.locationName, session)
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')

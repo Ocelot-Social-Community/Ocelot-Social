@@ -28,7 +28,7 @@ export default {
     async groupMembersQueryList() {
       try {
         const response = await this.$apollo.query({
-          query: groupMembersQuery,
+          query: groupMembersQuery(),
           variables: { id: this.group.id },
         })
         this.responseGroupMembersQuery = response.data.GroupMembers

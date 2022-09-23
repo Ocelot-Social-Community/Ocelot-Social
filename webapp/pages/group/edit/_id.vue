@@ -56,7 +56,7 @@ export default {
         Group: [group],
       },
     } = await client.query({
-      query: groupQuery,
+      query: groupQuery(), // "this.$i18n" is undefined here, so we use default lang
       variables: { id },
     })
     if (group.myRole !== 'owner') {

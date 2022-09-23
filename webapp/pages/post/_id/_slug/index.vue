@@ -46,7 +46,6 @@
       <content-viewer class="content hyphenate-text" :content="post.content" />
       <!-- Categories -->
       <div v-if="categoriesActive" class="categories">
-        <!-- eslint-enable vue/no-v-html -->
         <ds-space margin="xx-large" />
         <ds-space margin="xx-small" />
         <hc-category
@@ -57,7 +56,6 @@
           v-tooltip="{
             content: $t(`contribution.category.description.${category.slug}`),
             placement: 'bottom-start',
-            delay: { show: 1500 },
           }"
         />
       </div>

@@ -71,7 +71,7 @@ export default {
       const newRole = event.target.value
       try {
         await this.$apollo.mutate({
-          mutation: changeGroupMemberRoleMutation,
+          mutation: changeGroupMemberRoleMutation(),
           variables: { groupId: this.groupId, userId: id, roleInGroup: newRole },
         })
         this.$toast.success(this.$t('group.changeMemberRole', { role: newRole }))

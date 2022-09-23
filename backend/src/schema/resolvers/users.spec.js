@@ -161,7 +161,7 @@ describe('UpdateUser', () => {
         $id: ID!
         $name: String
         $termsAndConditionsAgreedVersion: String
-        $locationName: String
+        $locationName: String # empty string '' sets it to null
       ) {
         UpdateUser(
           id: $id
@@ -174,6 +174,11 @@ describe('UpdateUser', () => {
           termsAndConditionsAgreedVersion
           termsAndConditionsAgreedAt
           locationName
+          location {
+            name
+            nameDE
+            nameEN
+          }
         }
       }
     `
@@ -289,11 +294,39 @@ describe('UpdateUser', () => {
       expect(errors[0]).toHaveProperty('message', 'Invalid version format!')
     })
 
-    it('supports updating location', async () => {
-      variables = { ...variables, locationName: 'Hamburg, New Jersey, United States' }
-      await expect(mutate({ mutation: updateUserMutation, variables })).resolves.toMatchObject({
-        data: { UpdateUser: { locationName: 'Hamburg, New Jersey, United States' } },
-        errors: undefined,
+    describe('supports updating location', () => {
+      describe('change location to "Hamburg, New Jersey, United States"', () => {
+        it('has updated location to  "Hamburg, New Jersey, United States"', async () => {
+          variables = { ...variables, locationName: 'Hamburg, New Jersey, United States' }
+          await expect(mutate({ mutation: updateUserMutation, variables })).resolves.toMatchObject({
+            data: {
+              UpdateUser: {
+                locationName: 'Hamburg, New Jersey, United States',
+                location: expect.objectContaining({
+                  name: 'Hamburg',
+                  nameDE: 'Hamburg',
+                  nameEN: 'Hamburg',
+                }),
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('change location to unset location', () => {
+        it('has updated location to  unset location', async () => {
+          variables = { ...variables, locationName: '' }
+          await expect(mutate({ mutation: updateUserMutation, variables })).resolves.toMatchObject({
+            data: {
+              UpdateUser: {
+                locationName: null,
+                location: null,
+              },
+            },
+            errors: undefined,
+          })
+        })
       })
     })
   })

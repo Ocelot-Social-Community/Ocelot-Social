@@ -41,7 +41,7 @@ export default {
       }
       try {
         await this.$apollo.mutate({
-          mutation: createGroupMutation,
+          mutation: createGroupMutation(),
           variables,
         })
         this.$toast.success(this.$t('group.groupCreated'))
