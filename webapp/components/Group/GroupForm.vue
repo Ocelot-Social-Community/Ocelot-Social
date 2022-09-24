@@ -14,7 +14,6 @@
         v-model="formData.name"
         :placeholder="`${$t('group.name')} …`"
       ></ds-input>
-
       <!-- Wolle: Why update here? -->
       <ds-input
         v-if="update"
@@ -23,7 +22,7 @@
         icon="at"
         :placeholder="`${$t('group.labelSlug')} …`"
       ></ds-input>
-
+      <!-- Wolle: translate options -->
       <ds-select
         :label="$t('group.type')"
         v-model="formData.groupType"
@@ -31,9 +30,7 @@
         icon="user"
         :placeholder="$t('group.type') + ' …'"
       ></ds-select>
-
       <ds-input v-model="formData.about" :label="$t('group.goal')" rows="3"></ds-input>
-
       <ds-input
         :label="$t('group.description')"
         v-model="formData.description"
@@ -41,6 +38,7 @@
         rows="3"
       ></ds-input>
       <ds-space margin-top="large">
+        <!-- Wolle: translate options -->
         <ds-select
           :label="$t('group.actionRadius')"
           v-model="formData.actionRadius"
