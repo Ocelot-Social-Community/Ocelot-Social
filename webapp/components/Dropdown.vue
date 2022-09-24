@@ -8,7 +8,7 @@
     :offset="offset"
   >
     <slot :toggleMenu="toggleMenu" :openMenu="openMenu" :closeMenu="closeMenu" :isOpen="isOpen" />
-    <div slot="popover" @mouseover="popoverMouseEnter" @mouseleave="popoveMouseLeave">
+    <div slot="popover" @mouseover="popoverMouseEnter" @mouseleave="popoverMouseLeave">
       <slot
         name="popover"
         :toggleMenu="toggleMenu"
@@ -97,7 +97,7 @@ export default {
       }
       this.clearTimeouts()
       if (useTimeout === true) {
-        this.popoveMouseLeave()
+        this.popoverMouseLeave()
       } else {
         this.isPopoverOpen = false
       }
@@ -113,7 +113,7 @@ export default {
         }, 500)
       }
     },
-    popoveMouseLeave() {
+    popoverMouseLeave() {
       if (this.developerNoAutoClosing) return
       if (this.disabled) {
         return
