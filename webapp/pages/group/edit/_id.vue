@@ -1,24 +1,27 @@
 <template>
   <div>
-    <ds-section>
-      <h1 class="ds-heading ds-heading-h1">{{ group.name }}</h1>
-      <div class="">{{ $t('group.settings') }}</div>
-    </ds-section>
-    <ds-space margin="large">
-      <ds-flex gutter="small">
-        <ds-flex-item :width="{ base: '100%', md: '200px' }">
-          <ds-menu :routes="routes" :is-exact="() => true" />
-        </ds-flex-item>
-        <ds-flex-item :width="{ base: '100%', md: 1 }">
-          <transition name="slide-up" appear>
-            <nuxt-child :group="group" />
-          </transition>
-        </ds-flex-item>
-      </ds-flex>
+    <ds-space margin="small">
+      <ds-heading tag="h1">{{ $t('group.editGroupSettings.title') }}</ds-heading>
+      <ds-heading tag="h2">
+        {{ $t('group.editGroupSettings.groupName', { name: group.name }) }}
+      </ds-heading>
     </ds-space>
-    <ds-space centered>
+    <ds-space margin="large" />
+    <!-- Wolle: <ds-space margin="large"> -->
+    <ds-flex gutter="small">
+      <ds-flex-item :width="{ base: '100%', md: '200px' }">
+        <ds-menu :routes="routes" :is-exact="() => true" />
+      </ds-flex-item>
+      <ds-flex-item :width="{ base: '100%', md: 1 }">
+        <transition name="slide-up" appear>
+          <nuxt-child :group="group" />
+        </transition>
+      </ds-flex-item>
+    </ds-flex>
+    <!-- Wolle: </ds-space> -->
+    <!-- Wolle: <ds-space centered>
       <nuxt-link to="/my-groups">{{ $t('group.back') }}</nuxt-link>
-    </ds-space>
+    </ds-space> -->
   </div>
 </template>
 

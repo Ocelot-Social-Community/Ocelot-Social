@@ -1,8 +1,10 @@
 <template>
   <div>
-    <ds-container>
+    <base-card>
+      <ds-heading tag="h3">{{ $t('group.general') }}</ds-heading>
+      <ds-space margin="large" />
       <group-form :group="group" :update="true" @updateGroup="updateGroup" />
-    </ds-container>
+    </base-card>
   </div>
 </template>
 

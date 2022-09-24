@@ -1,27 +1,33 @@
 <template>
   <div>
-    <ds-section>
-      <h1 class="ds-heading ds-heading-h1">{{ $t('group.myGroups') }}</h1>
-      <nuxt-link :to="{ name: 'group-create' }">
-        <base-button
-          v-tooltip="{
-            content: $t('group.newGroup'),
-            placement: 'left',
-            delay: { show: 500 },
-          }"
-          :path="{ name: 'group-create' }"
-          class="profile-post-add-button"
-          icon="plus"
-          circle
-          filled
-        />
-      </nuxt-link>
-    </ds-section>
-    <br />
-    <br />
-    <group-list :items="responseGroupListQuery" />
+    <ds-space margin="small">
+      <ds-heading tag="h1">{{ $t('group.myGroups') }}</ds-heading>
+    </ds-space>
+    <ds-space margin="large" />
+    <ds-container>
+      <!-- create group -->
+      <ds-space centered>
+        <!-- Wolle: <client-only> -->
+        <nuxt-link :to="{ name: 'group-create' }">
+          <base-button
+            class="group-add-button"
+            icon="plus"
+            circle
+            filled
+            v-tooltip="{
+              content: $t('group.createNewGroup.tooltip'),
+              placement: 'left',
+            }"
+          />
+        </nuxt-link>
+        <!-- Wolle: </client-only> -->
+      </ds-space>
+      <!-- group list -->
+      <group-list :items="myGroups" />
+    </ds-container>
   </div>
 </template>
+
 <script>
 import GroupList from '~/components/Group/GroupList'
 import { groupQuery } from '~/graphql/groups.js'
@@ -33,26 +39,56 @@ export default {
   },
   data() {
     return {
-      responseGroupListQuery: [],
+      Group: [],
     }
   },
-  methods: {
-    async groupListQuery() {
-      try {
-        const response = await this.$apollo.query({
-          query: groupQuery(this.$i18n),
-        })
-        this.responseGroupListQuery = response.data.Group
-      } catch (error) {
-        this.responseGroupListQuery = []
-        this.$toast.error(error.message)
-      } finally {
-        this.pending = false
-      }
+  computed: {
+    myGroups() {
+      return this.Group ? this.Group : []
     },
   },
-  created() {
-    this.groupListQuery()
+  methods: {
+    // Wolle: async groupListQuery() {
+    //   try {
+    //     const response = await this.$apollo.query({
+    //       query: groupQuery(this.$i18n),
+    //       variables: { isMember: true },
+    //     })
+    //     this.Group = response.data.Group
+    //   } catch (error) {
+    //     this.Group = []
+    //     this.$toast.error(error.message)
+    //   } finally {
+    //     this.pending = false
+    //   }
+    // },
+  },
+  // Wolle: remove
+  // created() {
+  //   this.groupListQuery()
+  // },
+  apollo: {
+    Group: {
+      query() {
+        return groupQuery(this.$i18n)
+      },
+      variables() {
+        return {
+          isMember: true,
+        }
+      },
+      error(error) {
+        this.Group = []
+        this.$toast.error(error.message)
+      },
+      fetchPolicy: 'cache-and-network',
+    },
   },
 }
 </script>
+
+<style lang="scss">
+.group-add-button {
+  box-shadow: $box-shadow-x-large;
+}
+</style>

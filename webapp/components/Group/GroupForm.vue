@@ -1,88 +1,90 @@
 <template>
   <div>
-    <div v-if="update">add: slug, location, tiptap editor in description</div>
-    <ds-container>
-      <ds-form
-        class="group-form"
-        ref="groupForm"
-        v-model="formData"
-        :schema="formSchema"
-        @submit="submit"
-      >
-        <ds-input
-          v-model="formData.name"
-          :label="$t('group.groupName')"
-          :placeholder="`${$t('group.groupName')}…`"
-        ></ds-input>
+    <!-- Wolle: <div v-if="update">add: slug, location, tiptap editor in description</div> -->
+    <!-- Wolle: <ds-container> -->
+    <ds-form
+      class="group-form"
+      ref="groupForm"
+      v-model="formData"
+      :schema="formSchema"
+      @submit="submit"
+    >
+      <ds-input
+        :label="$t('group.name')"
+        v-model="formData.name"
+        :placeholder="`${$t('group.name')} …`"
+      ></ds-input>
 
-        <ds-input
-          v-if="update"
-          v-model="formData.slug"
-          :label="$t('users.table.columns.slug')"
-          :placeholder="`${$t('group.groupName')}…`"
-        ></ds-input>
+      <!-- Wolle: Why update here? -->
+      <ds-input
+        v-if="update"
+        :label="$t('group.labelSlug')"
+        v-model="formData.slug"
+        icon="at"
+        :placeholder="`${$t('group.labelSlug')} …`"
+      ></ds-input>
 
+      <ds-select
+        :label="$t('group.type')"
+        v-model="formData.groupType"
+        :options="['public', 'closed', 'hidden']"
+        icon="user"
+        :placeholder="$t('group.type') + ' …'"
+      ></ds-select>
+
+      <ds-input v-model="formData.about" :label="$t('group.goal')" rows="3"></ds-input>
+
+      <ds-input
+        :label="$t('group.description')"
+        v-model="formData.description"
+        type="textarea"
+        rows="3"
+      ></ds-input>
+      <ds-space margin-top="large">
         <ds-select
-          icon="user"
-          v-model="formData.groupType"
-          :label="$t('group.type')"
-          :options="['public', 'closed', 'hidden']"
-          placeholder="Status ..."
+          :label="$t('group.actionRadius')"
+          v-model="formData.actionRadius"
+          :options="['regional', 'national', 'continental', 'global']"
+          icon="globe"
+          :placeholder="`${$t('group.actionRadius')} …`"
         ></ds-select>
-
-        <ds-input v-model="formData.about" :label="$t('group.goal')" rows="3"></ds-input>
-
-        <ds-input
-          v-model="formData.description"
-          :label="$t('group.description')"
-          type="textarea"
-          rows="3"
-        ></ds-input>
-        <ds-space margin-top="large">
-          <ds-select
-            id="city"
-            v-model="formData.locationName"
-            icon="map-marker"
-            :options="cities"
-            :label="$t('settings.data.labelCity')"
-            :placeholder="$t('settings.data.labelCity')"
-            :loading="loadingGeo"
-            @input.native="handleCityInput"
-          />
-        </ds-space>
-        <ds-space margin-top="large">
-          <ds-select
-            icon="card"
-            v-model="formData.actionRadius"
-            :label="$t('group.actionRadius')"
-            :options="['regional', 'national', 'continental', 'global']"
-            :placeholder="`${$t('group.actionRadius')} …`"
-          ></ds-select>
-        </ds-space>
-        <ds-space margin-top="large">
-          <categories-select
-            v-if="categoriesActive"
-            model="categoryIds"
-            :existingCategoryIds="formData.categoryIds"
-          />
-        </ds-space>
-        <ds-space margin-top="large">
-          <ds-button @click.prevent="reset()">{{ $t('group.reset-form') }}</ds-button>
-          <ds-button
-            type="submit"
-            @click.prevent="submit()"
-            icon="save"
-            :disabled="update ? submitDisableEdit : submitDisable"
-            primary
-          >
-            {{ update ? $t('group.update') : $t('group.save') }}
-          </ds-button>
-        </ds-space>
-      </ds-form>
-      <ds-space centered v-show="!update">
-        <nuxt-link to="/my-groups">{{ $t('group.back') }}</nuxt-link>
+        <ds-select
+          id="city"
+          :label="$t('settings.data.labelCity')"
+          v-model="formData.locationName"
+          :options="cities"
+          icon="map-marker"
+          :placeholder="$t('settings.data.labelCity') + ' …'"
+          :loading="loadingGeo"
+          @input.native="handleCityInput"
+        />
       </ds-space>
-    </ds-container>
+      <ds-space margin-top="large">
+        <categories-select
+          v-if="categoriesActive"
+          model="categoryIds"
+          :existingCategoryIds="formData.categoryIds"
+        />
+      </ds-space>
+      <ds-space margin-top="large">
+        <nuxt-link to="/my-groups">
+          <ds-button>{{ $t('actions.cancel') }}</ds-button>
+        </nuxt-link>
+        <ds-button
+          type="submit"
+          icon="save"
+          :disabled="update ? submitDisableEdit : submitDisable"
+          primary
+          @click.prevent="submit()"
+        >
+          {{ update ? $t('group.update') : $t('group.save') }}
+        </ds-button>
+      </ds-space>
+    </ds-form>
+    <!-- Wolle: <ds-space centered v-show="!update">
+        <nuxt-link to="/my-groups">{{ $t('group.back') }}</nuxt-link>
+      </ds-space> -->
+    <!-- Wolle: </ds-container> -->
   </div>
 </template>
 
@@ -153,7 +155,6 @@ export default {
       },
     }
   },
-
   methods: {
     submit() {
       const { name, about, description, groupType, actionRadius, locationName, categoryIds } =
@@ -210,9 +211,6 @@ export default {
 
       this.cities = this.processLocationsResult(res)
       this.loadingGeo = false
-    },
-    reset() {
-      alert('reset')
     },
   },
   computed: {

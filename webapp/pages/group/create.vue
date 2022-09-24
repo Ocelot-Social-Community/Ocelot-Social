@@ -1,16 +1,23 @@
 <template>
   <div>
-    <ds-section>
-      <h1 class="ds-heading ds-heading-h1">{{ $t('group.newGroup') }}</h1>
-    </ds-section>
-    <ds-space margin="large">
-      <ds-flex :width="{ base: '100%' }" gutter="base">
-        <ds-flex-item :width="{ base: '100%', md: 5 }">
-          <group-form @createGroup="createGroup" />
-        </ds-flex-item>
-        <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
-      </ds-flex>
+    <ds-space margin="small">
+      <ds-heading tag="h1">{{ $t('group.createNewGroup.title') }}</ds-heading>
     </ds-space>
+    <ds-space margin="large" />
+    <ds-container>
+      <base-card>
+        <ds-space margin="large">
+          <ds-flex :width="{ base: '100%' }" gutter="base">
+            <ds-flex-item :width="{ base: '100%', md: 5 }">
+              <ds-container>
+                <group-form @createGroup="createGroup" />
+              </ds-container>
+            </ds-flex-item>
+            <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
+          </ds-flex>
+        </ds-space>
+      </base-card>
+    </ds-container>
   </div>
 </template>
 
@@ -45,6 +52,8 @@ export default {
           variables,
         })
         this.$toast.success(this.$t('group.groupCreated'))
+        this.$router.history.push('/my-groups')
+        // Wolle: refetch groups on '/my-groups'
       } catch (error) {
         this.$toast.error(error.message)
       }

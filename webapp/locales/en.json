@@ -406,33 +406,47 @@
     "actionRadius": "Action radius",
     "back": "back",
     "categories": "Topic ::: Topics",
-    "change-member-role": "The role has been changed to “{role}”!",
+    "changeMemberRole": "The role has been changed to “{role}”!",
+    "createNewGroup": {
+      "title": "Create A New Group",
+      "tooltip": "Create a new group"
+    },
+    "description": "Description",
+    "editGroupSettings": {
+      "groupName": "Settings Of “{name}”",
+      "title": "Edit My Group"
+    },
     "follow": "Follow",
     "foundation": "Foundation",
     "general": "General",
     "goal": "Goal of group",
-    "group-name": "Group name",
     "group-updated": "The group data has been changed.",
     "groupCreated": "The group was created!",
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
       "join": "Join"
     },
+    "labelSlug": "Unique group name",
     "leaveModal": {
       "confirmButton": "Leave",
       "message": "Leaving a group may be irreversible!<br>Leave group <b>“{name}”</b>!",
       "title": "Do you really want to leave the group?"
     },
-    "long-description": "Description",
     "members": "Members",
+    "membersAdministrationList": {
+      "avatar": "Avatar",
+      "name": "Name",
+      "roleInGroup": "Role",
+      "slug": "Unique name"
+    },
     "membersCount": "Member ::: Members",
     "membersListTitle": "Group Members",
     "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
     "myGroups": "My Groups",
-    "newGroup": "Create a new Group",
+    "name": "Group name",
     "radius": "Radius",
     "removeMember": "Remove member",
-    "reset-form": "Reset form",
+    "removeMemberButton": "Remove",
     "role": "Your role in the group",
     "roles": {
       "admin": "Administrator",
@@ -441,8 +455,6 @@
       "usual": "Simple Member"
     },
     "save": "Create new group",
-    "settings": "Group Settings",
-    "short-description": "Short description",
     "showAllMyGroups": "show all groups",
     "showMyCreatedGroups": "show only my groups",
     "type": "Group type",

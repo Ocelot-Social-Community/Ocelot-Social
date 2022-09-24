@@ -406,33 +406,47 @@
     "actionRadius": "Aktionsradius",
     "back": "zurück",
     "categories": "Thema ::: Themen",
-    "change-member-role": "Die Rolle wurde auf „{role}“ geändert!",
+    "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
+    "createNewGroup": {
+      "title": "Erstelle eine neue Gruppe",
+      "tooltip": "Erstelle eine neue Gruppe"
+    },
+    "description": "Beschreibung",
+    "editGroupSettings": {
+      "groupName": "Einstellungen für „{name}“",
+      "title": "Meine Gruppe ändern"
+    },
     "follow": "Folge",
     "foundation": "Gründung",
     "general": "Allgemein",
     "goal": "Ziel der Gruppe",
-    "group-name": "Gruppenname",
     "group-updated": "Die Gruppendaten wurden geändert!",
     "groupCreated": "Die Gruppe wurde angelegt!",
     "joinLeaveButton": {
       "iAmMember": "Bin Mitglied",
       "join": "Beitreten"
     },
+    "labelSlug": "Eindeutiger Gruppenname",
     "leaveModal": {
       "confirmButton": "Verlassen",
       "message": "Eine Gruppe zu verlassen ist möglicherweise nicht rückgängig zu machen!<br>Gruppe <b>„{name}“</b> verlassen!",
       "title": "Möchtest du wirklich die Gruppe verlassen?"
     },
-    "long-description": "Beschreibung",
     "members": "Mitglieder",
+    "membersAdministrationList": {
+      "avatar": "Avatar",
+      "name": "Name",
+      "roleInGroup": "Rolle",
+      "slug": "Eindeutiger Name"
+    },
     "membersCount": "Mitglied ::: Mitglieder",
     "membersListTitle": "Gruppenmitglieder",
     "membersListTitleNotAllowedSeeingGroupMembers": "Gruppenmitglieder unsichtbar",
     "myGroups": "Meine Gruppen",
-    "newGroup": "Erstelle eine neue Gruppe",
+    "name": "Gruppenname",
     "radius": "Radius",
-    "removeMember": "Mitglied entfernen",
-    "reset-form": "Formular zurücksetzen",
+    "removeMember": "Mitglied aus der Gruppe entfernen?",
+    "removeMemberButton": "Entfernen",
     "role": "Deine Rolle in der Gruppe",
     "roles": {
       "admin": "Administrator",
@@ -441,8 +455,6 @@
       "usual": "Einfaches Mitglied"
     },
     "save": "Neue Gruppe anlegen",
-    "settings": "Gruppeneinstellungen",
-    "short-description": "Kurzbeschreibung",
     "showAllMyGroups": "Alle meine Gruppen anzeigen",
     "showMyCreatedGroups": "Meine angelegten Gruppen anzeigen",
     "type": "Gruppentyp",

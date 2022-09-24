@@ -1,15 +1,17 @@
 <template>
-  <ds-container class="group-card">
-    <ds-space>
+  <div>
+    <!-- Wolle: <ds-container class="group-card"> -->
+    <!-- Wolle: <ds-space>
       <div @click="onlyOwnerGroups(true)" ref="myGruops">
         <ds-button>{{ $t('group.showMyCreatedGroups') }}</ds-button>
       </div>
       <div @click="onlyOwnerGroups(false)" ref="allGruops" hidden>
         <ds-button>{{ $t('group.showAllMyGroups') }}</ds-button>
       </div>
-    </ds-space>
+    </ds-space> -->
     <ds-space margin-bottom="small" v-for="item in items" :key="item.id">
-      <ds-card :ref="item.myRole === null ? 'null' : item.myRole">
+      <!-- Wolle: <ds-card :ref="item.myRole === null ? 'null' : item.myRole"> -->
+      <ds-card>
         <ds-flex>
           <ds-flex-item width="90%" centered>
             <ds-space margin="large">
@@ -53,7 +55,8 @@
         </ds-flex>
       </ds-card>
     </ds-space>
-  </ds-container>
+    <!-- Wolle: </ds-container> -->
+  </div>
 </template>
 <script>
 import GroupMenu from '~/components/Group/GroupMenu'
@@ -84,28 +87,28 @@ export default {
         this.$toast.error(error.message)
       }
     },
-    onlyOwnerGroups(bool) {
-      this.$refs.myGruops.hidden = bool
-      this.$refs.allGruops.hidden = !bool
+    // Wolle: onlyOwnerGroups(bool) {
+    //   this.$refs.myGruops.hidden = bool
+    //   this.$refs.allGruops.hidden = !bool
 
-      if (this.$refs.usual) {
-        this.$refs.usual.forEach((element) => {
-          element.$el.hidden = bool
-        })
-      }
+    //   if (this.$refs.usual) {
+    //     this.$refs.usual.forEach((element) => {
+    //       element.$el.hidden = bool
+    //     })
+    //   }
 
-      if (this.$refs.null) {
-        this.$refs.null.forEach((element) => {
-          element.$el.hidden = bool
-        })
-      }
+    //   if (this.$refs.null) {
+    //     this.$refs.null.forEach((element) => {
+    //       element.$el.hidden = bool
+    //     })
+    //   }
 
-      if (this.$refs.pending) {
-        this.$refs.pending.forEach((element) => {
-          element.$el.hidden = bool
-        })
-      }
-    },
+    //   if (this.$refs.pending) {
+    //     this.$refs.pending.forEach((element) => {
+    //       element.$el.hidden = bool
+    //     })
+    //   }
+    // },
   },
 }
 </script>

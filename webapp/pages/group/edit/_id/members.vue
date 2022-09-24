@@ -1,6 +1,10 @@
 <template>
   <div>
-    <group-member :responseGroupMembersQuery="responseGroupMembersQuery" :groupId="group.id" />
+    <base-card>
+      <ds-heading tag="h3">{{ $t('group.members') }}</ds-heading>
+      <ds-space margin="large" />
+      <group-member :groupId="group.id" :groupMembers="responseGroupMembersQuery" />
+    </base-card>
   </div>
 </template>
 
