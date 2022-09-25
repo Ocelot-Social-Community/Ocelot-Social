@@ -47,26 +47,6 @@ export default {
       return this.Group ? this.Group : []
     },
   },
-  methods: {
-    // Wolle: async groupListQuery() {
-    //   try {
-    //     const response = await this.$apollo.query({
-    //       query: groupQuery(this.$i18n),
-    //       variables: { isMember: true },
-    //     })
-    //     this.Group = response.data.Group
-    //   } catch (error) {
-    //     this.Group = []
-    //     this.$toast.error(error.message)
-    //   } finally {
-    //     this.pending = false
-    //   }
-    // },
-  },
-  // Wolle: remove
-  // created() {
-  //   this.groupListQuery()
-  // },
   apollo: {
     Group: {
       query() {
