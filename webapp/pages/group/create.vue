@@ -54,6 +54,7 @@ export default {
         this.$toast.success(this.$t('group.groupCreated'))
         this.$router.history.push('/my-groups')
         // Wolle: refetch groups on '/my-groups'
+        // seems to work of its own now, because of implementation of vue apollo queries in '/my-groups'
       } catch (error) {
         this.$toast.error(error.message)
       }
