@@ -3,7 +3,7 @@
     <base-card>
       <ds-heading tag="h3">{{ $t('group.members') }}</ds-heading>
       <ds-space margin="large" />
-      <group-member :groupId="group.id" :groupMembers="responseGroupMembersQuery" />
+      <group-member :groupId="group.id" :groupMembers="groupMembers" />
     </base-card>
   </div>
 </template>
@@ -19,32 +19,35 @@ export default {
   props: {
     group: {
       type: Object,
-      required: false,
-      default: () => {},
+      required: true,
     },
   },
   data() {
     return {
-      responseGroupMembersQuery: [],
+      GroupMembers: [],
     }
   },
-  methods: {
-    async groupMembersQueryList() {
-      try {
-        const response = await this.$apollo.query({
-          query: groupMembersQuery(),
-          variables: { id: this.group.id },
-        })
-        this.responseGroupMembersQuery = response.data.GroupMembers
-      } catch (err) {
-        this.$toast.error(err.message)
-      } finally {
-        this.pending = false
-      }
+  computed: {
+    groupMembers() {
+      return this.GroupMembers ? this.GroupMembers : []
     },
   },
-  created() {
-    this.groupMembersQueryList()
+  apollo: {
+    GroupMembers: {
+      query() {
+        return groupMembersQuery()
+      },
+      variables() {
+        return {
+          id: this.group.id,
+        }
+      },
+      error(error) {
+        this.GroupMembers = []
+        this.$toast.error(error.message)
+      },
+      fetchPolicy: 'cache-and-network',
+    },
   },
 }
 </script>
