@@ -288,7 +288,7 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 cluster-stage-ocelot-social
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 cluster-stage-yunite-me
       ##########################################################################
       # Deploy new Docker images to DigitalOcean Kubernetes cluster ############
       ##########################################################################
