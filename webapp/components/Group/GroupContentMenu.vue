@@ -3,12 +3,11 @@
     <template #default="{ toggleMenu }">
       <slot name="button" :toggleMenu="toggleMenu">
         <base-button
-          data-test="group-menu-button"
           icon="ellipsis-v"
-          size="large"
+          size="small"
           circle
-          ghost
           @click.prevent="toggleMenu()"
+          data-test="group-menu-button"
         />
       </slot>
     </template>
@@ -36,7 +35,7 @@
 import Dropdown from '~/components/Dropdown'
 
 export default {
-  name: 'ContentMenu',
+  name: 'GroupContentMenu',
   components: {
     Dropdown,
   },

@@ -1,7 +1,5 @@
 <template>
   <div>
-    <!-- Wolle: <div v-if="update">add: slug, location, tiptap editor in description</div> -->
-    <!-- Wolle: <ds-container> -->
     <ds-form
       class="group-form"
       ref="groupForm"
@@ -97,6 +95,8 @@
           :loading="loadingGeo"
           @input.native="handleCityInput"
         />
+        <!-- TODO: implement clear button -->
+        <!-- <base-button icon="close" circle ghost size="small" :disabled="formData.locationName.length === 0" @click="clear" /> -->
       </ds-space>
       <ds-space margin-top="large">
         <categories-select
@@ -198,50 +198,39 @@ export default {
   },
   computed: {
     submitDisable() {
-      if (
-        this.formData.name !== '' &&
-        this.formData.groupType !== '' &&
-        this.formData.about !== '' &&
-        this.formData.description !== '' &&
-        this.formData.actionRadius !== '' &&
-        this.formData.locationName !== '' &&
-        this.formData.categoryIds.length > 0
-      ) {
-        return false
-      }
-      return true
+      return (
+        this.formData.name === '' ||
+        this.formData.groupType === '' ||
+        // this.formData.about === '' || // not mandatory
+        this.formData.description === '' ||
+        this.formData.actionRadius === '' ||
+        // this.formData.locationName === '' || // not mandatory
+        this.formData.categoryIds.length === 0
+      )
     },
     submitDisableEdit() {
-      if (
-        this.formData.name !== this.group.name ||
-        this.formData.groupType !== this.group.groupType ||
-        this.formData.about !== this.group.about ||
-        this.formData.description !== this.group.description ||
-        this.formData.actionRadius !== this.group.actionRadius ||
-        this.formData.locationName !== this.group.locationName ||
-        this.formData.categoryIds.length === 0 ||
-        !this.sameCategories
-      ) {
-        return false
-      }
-      return true
+      return (
+        this.formData.name === this.group.name &&
+        this.formData.slug === this.group.slug &&
+        // this.formData.groupType === this.group.groupType && // can not be changed for now
+        this.formData.about === this.group.about &&
+        this.formData.description === this.group.description &&
+        this.formData.actionRadius === this.group.actionRadius &&
+        this.formData.locationName === (this.group.locationName ? this.group.locationName : '') &&
+        this.sameCategories
+      )
     },
     sameCategories() {
-      const formDataCategories = this.formData.categoryIds.map((categoryIds) => categoryIds)
-      const groupDataCategories = this.group.categories.map((category) => category.id)
-      let result
-      let each = true
+      const formDataCategories = this.formData.categoryIds.map((id) => id).sort()
+      const groupDataCategories = this.group.categories.map((category) => category.id).sort()
+      let equal = true
 
       if (formDataCategories.length !== groupDataCategories.length) return false
 
-      if (JSON.stringify(formDataCategories) !== JSON.stringify(groupDataCategories)) {
-        formDataCategories.forEach((element) => {
-          result = groupDataCategories.filter((groupCategorieId) => groupCategorieId === element)
-          if (result.length === 0) each = false
-        })
-        return each
-      }
-      return true
+      formDataCategories.forEach((id, index) => {
+        equal = equal && id === groupDataCategories[index]
+      })
+      return equal
     },
   },
   methods: {
@@ -311,7 +300,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .select-label {
   margin-bottom: 3pt;
   color: $text-color-soft;

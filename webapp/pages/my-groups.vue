@@ -7,11 +7,11 @@
     <ds-container>
       <!-- create group -->
       <ds-space centered>
-        <!-- Wolle: <client-only> -->
         <nuxt-link :to="{ name: 'group-create' }">
           <base-button
             class="group-add-button"
             icon="plus"
+            size="large"
             circle
             filled
             v-tooltip="{
@@ -20,10 +20,9 @@
             }"
           />
         </nuxt-link>
-        <!-- Wolle: </client-only> -->
       </ds-space>
       <!-- group list -->
-      <group-list :items="myGroups" />
+      <group-list :groups="myGroups" />
     </ds-container>
   </div>
 </template>

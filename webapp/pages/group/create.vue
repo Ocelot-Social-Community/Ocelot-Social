@@ -46,15 +46,23 @@ export default {
         locationName,
         categoryIds,
       }
+      let responseId, responseSlug
       try {
         await this.$apollo.mutate({
           mutation: createGroupMutation(),
           variables,
+          update: (_store, { data }) => {
+            const { id: groupId, slug: groupSlug } = data.CreateGroup
+            responseId = groupId
+            responseSlug = groupSlug
+          },
         })
         this.$toast.success(this.$t('group.groupCreated'))
-        this.$router.history.push('/my-groups')
-        // Wolle: refetch groups on '/my-groups'
-        // seems to work of its own now, because of implementation of vue apollo queries in '/my-groups'
+        // this.$router.history.push('/my-groups')
+        this.$router.history.push({
+          name: 'group-id-slug',
+          params: { id: responseId, slug: responseSlug },
+        })
       } catch (error) {
         this.$toast.error(error.message)
       }
