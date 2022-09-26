@@ -315,7 +315,7 @@ jobs:
           kubectl -n default rollout restart deployment/ocelot-backend
           kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=${DOCKER_ORGANISATION}/maintenance-groups-branded:${BUILD_VERSION}
           kubectl -n default rollout restart deployment/ocelot-maintenance
-          kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=${DOCKER_ORGANISATION}/neo4j-community:${BUILD_VERSION}
+          kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=${DOCKER_ORGANISATION}/neo4j-community-branded:${BUILD_VERSION}
           kubectl -n default rollout restart deployment/ocelot-neo4j
       # because this step 'kubectl -n default rollout status deployment/* --timeout=600s' does not work as expected
       #   and we need the pods to be up again for cleaning and seeding the Neo4j database and the backend.
