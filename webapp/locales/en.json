@@ -404,9 +404,11 @@
       "regional": "Regional Group"
     },
     "actionRadius": "Action radius",
-    "back": "back",
     "categories": "Topic ::: Topics",
     "changeMemberRole": "The role has been changed to “{role}”!",
+    "contentMenu": {
+      "visitGroupPage": "Show group"
+    },
     "createNewGroup": {
       "title": "Create A New Group",
       "tooltip": "Create a new group"
@@ -420,7 +422,6 @@
     "foundation": "Foundation",
     "general": "General",
     "goal": "Goal of group",
-    "group-updated": "The group data has been changed.",
     "groupCreated": "The group was created!",
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
@@ -455,17 +456,14 @@
       "usual": "Simple Member"
     },
     "save": "Create new group",
-    "showAllMyGroups": "show all groups",
-    "showMyCreatedGroups": "show only my groups",
     "type": "Group type",
     "types": {
       "closed": "Closed Group",
       "hidden": "Hidden Group",
       "public": "Public Group"
     },
-    "unfollowing": "unfollowing",
     "update": "Save change",
-    "visibility": "Visibility"
+    "updatedGroup": "The group data has been changed."
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",

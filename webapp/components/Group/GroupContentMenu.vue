@@ -42,7 +42,7 @@ export default {
   props: {
     placement: { type: String, default: 'bottom-end' },
     resource: { type: Object, required: true },
-    isOwner: { type: String, default: null },
+    group: { type: Object, required: true },
     resourceType: {
       type: String,
       required: true,
@@ -56,38 +56,17 @@ export default {
       const routes = []
 
       if (this.resourceType === 'group') {
-        if (this.isOwner === 'owner') {
+        routes.push({
+          label: this.$t('group.contentMenu.visitGroupPage'),
+          icon: 'home',
+          name: 'group-id-slug',
+          params: { id: this.group.id, slug: this.group.slug },
+        })
+        if (this.group.myRole === 'owner') {
           routes.push({
             label: this.$t('admin.settings.name'),
             path: `/group/edit/${this.resource.id}`,
             icon: 'edit',
-          })
-        }
-        if (this.isOwner === 'usual') {
-          routes.push({
-            label: this.$t('group.unfollowing'),
-            callback: () => {
-              // this.$emit('join-group', this.resource)
-            },
-            icon: 'minus',
-          })
-        }
-        if (this.isOwner === 'pending') {
-          routes.push({
-            label: this.$t('group.unfollowing'),
-            callback: () => {
-              // this.removePending(this.resource)
-            },
-            icon: 'minus',
-          })
-        }
-        if (this.isOwner === null) {
-          routes.push({
-            label: this.$t('group.follow'),
-            callback: () => {
-              this.$emit('joinGroup', this.resource)
-            },
-            icon: 'plus',
           })
         }
       }

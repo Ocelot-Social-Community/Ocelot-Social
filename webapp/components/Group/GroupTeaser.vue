@@ -58,13 +58,7 @@
         <div v-else class="categories-placeholder"></div>
         <!-- group context menu -->
         <client-only>
-          <group-content-menu
-            v-if="group.myRole === 'owner'"
-            resource-type="group"
-            :resource="group"
-            :isOwner="group.myRole"
-            @joinGroup="joinGroup"
-          />
+          <group-content-menu resource-type="group" :resource="group" :group="group" />
         </client-only>
       </footer>
       <footer class="footer">
@@ -85,7 +79,6 @@
 <script>
 import Category from '~/components/Category'
 import GroupContentMenu from '~/components/Group/GroupContentMenu'
-import { joinGroupMutation } from '~/graphql/groups.js'
 
 export default {
   name: 'GroupTeaser',
@@ -111,24 +104,6 @@ export default {
   computed: {
     descriptionExcerpt() {
       return this.$filters.removeLinks(this.group.descriptionExcerpt)
-    },
-  },
-  methods: {
-    editGroup(group) {
-      this.$router.push({ path: `/group/edit/${group.id}` })
-    },
-    async joinGroup(value) {
-      const { id } = value
-      const variables = { groupId: id, userId: this.$store.getters['auth/user'].id }
-      try {
-        await this.$apollo.mutate({
-          mutation: joinGroupMutation(),
-          variables,
-        })
-        this.$toast.success(this.$t('group.groupCreated'))
-      } catch (error) {
-        this.$toast.error(error.message)
-      }
     },
   },
 }

@@ -42,10 +42,6 @@ export default {
           name: this.$t('settings.social-media.name'),
           path: `/settings/my-social-media`,
         },
-        // Wolle: {
-        //   name: this.$t('settings.myGroups'),
-        //   path: `/my-groups`,
-        // },
         {
           name: this.$t('settings.muted-users.name'),
           path: `/settings/muted-users`,

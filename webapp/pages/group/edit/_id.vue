@@ -17,10 +17,6 @@
         </transition>
       </ds-flex-item>
     </ds-flex>
-    <!-- Wolle: </ds-space> -->
-    <!-- Wolle: <ds-space centered>
-      <nuxt-link to="/my-groups">{{ $t('group.back') }}</nuxt-link>
-    </ds-space> -->
   </div>
 </template>
 

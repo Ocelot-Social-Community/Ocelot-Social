@@ -46,11 +46,18 @@
           {{ $t(`group.types.${groupType}`) }}
         </option>
       </select>
+      <!-- goal -->
+      <ds-input
+        :label="$t('group.goal')"
+        v-model="formData.about"
+        :placeholder="$t('group.goal') + ' …'"
+        rows="3"
+      ></ds-input>
       <!-- description -->
-      <ds-input v-model="formData.about" :label="$t('group.goal')" rows="3"></ds-input>
       <ds-input
         :label="$t('group.description')"
         v-model="formData.description"
+        :placeholder="$t('group.description') + ' …'"
         type="textarea"
         rows="3"
       ></ds-input>
@@ -120,10 +127,6 @@
         </ds-button>
       </ds-space>
     </ds-form>
-    <!-- Wolle: <ds-space centered v-show="!update">
-        <nuxt-link to="/my-groups">{{ $t('group.back') }}</nuxt-link>
-      </ds-space> -->
-    <!-- Wolle: </ds-container> -->
   </div>
 </template>
 
