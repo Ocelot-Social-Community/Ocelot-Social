@@ -304,11 +304,11 @@ jobs:
       #     kubectl -n default rollout restart deployment/ocelot-neo4j
       - name: Deploy actual version '$BUILD_VERSION' to DigitalOcean Kubernetes
         run: |
-          kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=${DOCKER_ORGANISATION}/webapp-groups:$BUILD_VERSION
+          kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=${DOCKER_ORGANISATION}/webapp-groups-branded:$BUILD_VERSION
           kubectl -n default rollout restart deployment/ocelot-webapp
-          kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=${DOCKER_ORGANISATION}/backend-groups:$BUILD_VERSION
+          kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=${DOCKER_ORGANISATION}/backend-groups-branded:$BUILD_VERSION
           kubectl -n default rollout restart deployment/ocelot-backend
-          kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=${DOCKER_ORGANISATION}/maintenance-groups:$BUILD_VERSION
+          kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=${DOCKER_ORGANISATION}/maintenance-groups-branded:$BUILD_VERSION
           kubectl -n default rollout restart deployment/ocelot-maintenance
           kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=${DOCKER_ORGANISATION}/neo4j-community:$BUILD_VERSION
           kubectl -n default rollout restart deployment/ocelot-neo4j
