@@ -89,6 +89,9 @@
                     </client-only>
                   </div>
                   <client-only>
+                    <group-button />
+                  </client-only>
+                  <client-only>
                     <avatar-menu placement="top" />
                   </client-only>
                 </template>
@@ -125,7 +128,8 @@ import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import PageFooter from '~/components/PageFooter/PageFooter'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import InviteButton from '~/components/InviteButton/InviteButton'
-import CategoriesMenu from '~/components/FilterMenu/CategoriesMenu.vue'
+import CategoriesMenu from '~/components/FilterMenu/CategoriesMenu'
+import GroupButton from '~/components/Group/GroupButton'
 
 export default {
   components: {
@@ -139,6 +143,7 @@ export default {
     PageFooter,
     InviteButton,
     CategoriesMenu,
+    GroupButton,
   },
   mixins: [seo],
   data() {
