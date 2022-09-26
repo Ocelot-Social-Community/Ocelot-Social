@@ -274,6 +274,8 @@ jobs:
       ##########################################################################
       # SET ENVS ###############################################################
       ##########################################################################
+      - name: ENV - DOCKER_ORGANISATION
+        run: echo "DOCKER_ORGANISATION=$(node -p -e "require('./package.json').dockerOrganisation")" >> $GITHUB_ENV
       - name: ENV - VERSION
         run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
       - name: ENV - BUILD_VERSION
@@ -302,13 +304,13 @@ jobs:
       #     kubectl -n default rollout restart deployment/ocelot-neo4j
       - name: Deploy actual version '$BUILD_VERSION' to DigitalOcean Kubernetes
         run: |
-          kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp-groups:$BUILD_VERSION
+          kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=${DOCKER_ORGANISATION}/webapp-groups:$BUILD_VERSION
           kubectl -n default rollout restart deployment/ocelot-webapp
-          kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend-groups:$BUILD_VERSION
+          kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=${DOCKER_ORGANISATION}/backend-groups:$BUILD_VERSION
           kubectl -n default rollout restart deployment/ocelot-backend
-          kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance-groups:$BUILD_VERSION
+          kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=${DOCKER_ORGANISATION}/maintenance-groups:$BUILD_VERSION
           kubectl -n default rollout restart deployment/ocelot-maintenance
-          kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:$BUILD_VERSION
+          kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=${DOCKER_ORGANISATION}/neo4j-community:$BUILD_VERSION
           kubectl -n default rollout restart deployment/ocelot-neo4j
       # because this step 'kubectl -n default rollout status deployment/* --timeout=600s' does not work as expected
       #   and we need the pods to be up again for cleaning and seeding the Neo4j database and the backend.
