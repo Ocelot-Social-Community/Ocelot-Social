@@ -4,10 +4,9 @@ import GroupContentMenu from './GroupContentMenu.vue'
 const localVue = global.localVue
 
 const propsData = {
-    resource: {},
-    group: {},
-    resourceType: 'group',
-
+  resource: {},
+  group: {},
+  resourceType: 'group',
 }
 
 describe('GroupContentMenu', () => {

@@ -6,8 +6,8 @@ const localVue = global.localVue
 config.stubs['nuxt-link'] = '<span><slot /></span>'
 
 const propsData = {
-    update: false,
-    group: {},
+  update: false,
+  group: {},
 }
 
 describe('GroupForm', () => {
