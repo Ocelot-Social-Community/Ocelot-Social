@@ -53,10 +53,8 @@ export default {
   computed: {
     routes() {
       const routes = []
-      console.log('resource: ', this.resource)
 
       if (this.resourceType === 'group') {
-        console.log('this.resourceType: ', this.resourceType)
         routes.push({
           label: this.$t('group.contentMenu.visitGroupPage'),
           icon: 'home',

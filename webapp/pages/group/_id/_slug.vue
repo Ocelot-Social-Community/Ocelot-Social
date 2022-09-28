@@ -24,7 +24,7 @@
               class="group-content-menu"
             />
             <!-- TODO: implement later on -->
-              <!-- @mute="muteUser"
+            <!-- @mute="muteUser"
               @unmute="unmuteUser"
               @block="blockUser"
               @unblock="unblockUser"
