@@ -48,8 +48,6 @@
           :existingCategoryIds="formData.categoryIds"
         />
 
-        <div>{{ formData }}</div>
-
         <ds-space margin-top="large">
           <ds-button @click.prevent="reset()">Reset form</ds-button>
           <ds-button
