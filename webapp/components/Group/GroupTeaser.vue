@@ -78,7 +78,7 @@
 
 <script>
 import Category from '~/components/Category'
-import GroupContentMenu from '~/components/Group/GroupContentMenu'
+import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 
 export default {
   name: 'GroupTeaser',
