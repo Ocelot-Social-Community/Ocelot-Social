@@ -58,12 +58,7 @@
         <div v-else class="categories-placeholder"></div>
         <!-- group context menu -->
         <client-only>
-          <group-content-menu
-            :usage="'groupProfile'"
-            :resourceType="'group'"
-            :resource="group"
-            :group="group"
-          />
+          <group-content-menu :usage="'groupTeaser'" :group="group || {}" placement="bottom-end" />
         </client-only>
       </footer>
       <footer class="footer">

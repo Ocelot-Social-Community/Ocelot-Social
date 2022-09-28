@@ -47,34 +47,27 @@ export default {
         return value.match(/(groupTeaser|groupProfile)/)
       },
     },
-    resource: { type: Object, required: true },
-    resourceType: {
-      type: String,
-      required: true,
-      validator: (value) => {
-        return value.match(/(group)/)
-      },
-    },
+    group: { type: Object, required: true },
     placement: { type: String, default: 'bottom-end' },
   },
   computed: {
     routes() {
       const routes = []
 
-      if (this.resourceType === 'group') {
+      if (this.usage !== 'groupProfile') {
         routes.push({
           label: this.$t('group.contentMenu.visitGroupPage'),
           icon: 'home',
           name: 'group-id-slug',
-          params: { id: this.resource.id, slug: this.resource.slug },
+          params: { id: this.group.id, slug: this.group.slug },
         })
-        if (this.resource.myRole === 'owner') {
-          routes.push({
-            label: this.$t('admin.settings.name'),
-            path: `/group/edit/${this.resource.id}`,
-            icon: 'edit',
-          })
-        }
+      }
+      if (this.group.myRole === 'owner') {
+        routes.push({
+          label: this.$t('admin.settings.name'),
+          path: `/group/edit/${this.group.id}`,
+          icon: 'edit',
+        })
       }
 
       return routes

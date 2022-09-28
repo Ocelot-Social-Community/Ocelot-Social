@@ -18,10 +18,10 @@
           <!-- Menu -->
           <client-only>
             <group-content-menu
+              v-if="isGroupOwner"
               class="group-content-menu"
               :usage="'groupProfile'"
-              :resourceType="'group'"
-              :resource="group || {}"
+              :group="group || {}"
               placement="bottom-end"
             />
             <!-- TODO: implement later on -->
