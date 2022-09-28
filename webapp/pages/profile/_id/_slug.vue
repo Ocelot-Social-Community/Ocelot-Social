@@ -31,6 +31,7 @@
               {{ userName }}
             </ds-heading>
             <ds-text align="center" color="soft">
+              <base-icon name="at" />
               {{ userSlug }}
             </ds-text>
             <ds-text v-if="user.location" align="center" color="soft" size="small">
@@ -253,7 +254,7 @@ export default {
     },
     userSlug() {
       const { slug } = this.user || {}
-      return slug && `@${slug}`
+      return slug
     },
     tabOptions() {
       return [

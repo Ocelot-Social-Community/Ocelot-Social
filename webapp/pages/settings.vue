@@ -1,6 +1,9 @@
 <template>
   <div>
-    <ds-heading tag="h1">{{ $t('settings.name') }}</ds-heading>
+    <ds-space margin="small">
+      <ds-heading tag="h1">{{ $t('settings.name') }}</ds-heading>
+    </ds-space>
+    <ds-space margin="large" />
     <ds-flex gutter="small">
       <ds-flex-item :width="{ base: '100%', md: '200px' }">
         <ds-menu :routes="routes" :is-exact="() => true" />
@@ -38,10 +41,6 @@ export default {
         {
           name: this.$t('settings.social-media.name'),
           path: `/settings/my-social-media`,
-        },
-        {
-          name: this.$t('settings.myGroups'),
-          path: `/my-groups`,
         },
         {
           name: this.$t('settings.muted-users.name'),
