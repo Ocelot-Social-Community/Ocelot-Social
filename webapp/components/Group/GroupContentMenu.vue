@@ -1,5 +1,5 @@
 <template>
-  <dropdown class="group-menu" :placement="placement" offset="5">
+  <dropdown class="group-content-menu" :placement="placement" offset="5">
     <template #default="{ toggleMenu }">
       <slot name="button" :toggleMenu="toggleMenu">
         <base-button
@@ -42,7 +42,6 @@ export default {
   props: {
     placement: { type: String, default: 'bottom-end' },
     resource: { type: Object, required: true },
-    group: { type: Object, required: true },
     resourceType: {
       type: String,
       required: true,
@@ -54,15 +53,17 @@ export default {
   computed: {
     routes() {
       const routes = []
+      console.log('resource: ', this.resource)
 
       if (this.resourceType === 'group') {
+        console.log('this.resourceType: ', this.resourceType)
         routes.push({
           label: this.$t('group.contentMenu.visitGroupPage'),
           icon: 'home',
           name: 'group-id-slug',
-          params: { id: this.group.id, slug: this.group.slug },
+          params: { id: this.resource.id, slug: this.resource.slug },
         })
-        if (this.group.myRole === 'owner') {
+        if (this.resource.myRole === 'owner') {
           routes.push({
             label: this.$t('admin.settings.name'),
             path: `/group/edit/${this.resource.id}`,
