@@ -470,6 +470,12 @@
     "hashtag-search": "Searching for #{hashtag}",
     "title": "Your filter bubble"
   },
+  "header": {
+    "avatarMenu": {
+      "myGroups": "My groups",
+      "myProfile": "My profile"
+    }
+  },
   "index": {
     "change-filter-settings": "Change your filter settings to get more results.",
     "no-results": "No contributions found."
@@ -628,7 +634,6 @@
       "title": "Invite somebody to {APPLICATION_NAME}!"
     },
     "memberSince": "Member since",
-    "name": "My Profile",
     "network": {
       "andMore": "and {number} more …",
       "followedBy": "is followed by:",

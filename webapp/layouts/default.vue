@@ -88,6 +88,9 @@
                       <invite-button placement="top" />
                     </client-only>
                   </div>
+                  <client-only v-if="SHOW_GROUP_BUTTON_IN_HEADER">
+                    <group-button />
+                  </client-only>
                   <client-only>
                     <group-button />
                   </client-only>
@@ -115,21 +118,22 @@
 </template>
 
 <script>
-import Logo from '~/components/Logo/Logo'
-import LOGOS from '../constants/logos.js'
-import headerMenu from '../constants/headerMenu.js'
 import { mapGetters } from 'vuex'
+import Logo from '~/components/Logo/Logo'
+import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
+import headerMenu from '~/constants/headerMenu.js'
+import LOGOS from '~/constants/logos.js'
+import seo from '~/mixins/seo'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
 import Modal from '~/components/Modal'
-import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
-import seo from '~/mixins/seo'
-import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
-import PageFooter from '~/components/PageFooter/PageFooter'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
+import CategoriesMenu from '~/components/FilterMenu/CategoriesMenu'
+import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
+import GroupButton from '~/components/Group/GroupButton'
 import InviteButton from '~/components/InviteButton/InviteButton'
-import CategoriesMenu from '~/components/FilterMenu/CategoriesMenu.vue'
-import GroupButton from '~/components/Group/GroupButton.vue'
+import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
+import PageFooter from '~/components/PageFooter/PageFooter'
 
 export default {
   components: {
@@ -149,6 +153,7 @@ export default {
   data() {
     return {
       LOGOS,
+      SHOW_GROUP_BUTTON_IN_HEADER,
       isHeaderMenu: headerMenu.MENU.length > 0,
       menu: headerMenu.MENU,
       mobileSearchVisible: false,
