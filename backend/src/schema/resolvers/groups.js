@@ -87,12 +87,15 @@ export default {
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
+      // TODO: move to 'backend/src/middleware/validation/validationMiddleware.js'
       if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
         throw new UserInputError('Too view categories!')
       }
+      // TODO: move to 'backend/src/middleware/validation/validationMiddleware.js'
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
         throw new UserInputError('Too many categories!')
       }
+      // TODO: move to 'backend/src/middleware/validation/validationMiddleware.js'
       if (
         params.description === undefined ||
         params.description === null ||
