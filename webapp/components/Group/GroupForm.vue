@@ -7,18 +7,21 @@
       :schema="formSchema"
       @submit="submit"
     >
+    <template #default="{ errors }">
       <ds-input
         :label="$t('group.name')"
         v-model="formData.name"
         :placeholder="`${$t('group.name')} …`"
       ></ds-input>
-      <ds-input
-        v-if="update"
-        :label="$t('group.labelSlug')"
-        v-model="formData.slug"
-        icon="at"
-        :placeholder="`${$t('group.labelSlug')} …`"
-      ></ds-input>
+      <ds-space margin-top="large">
+        <ds-input
+          v-if="update"
+          :label="$t('group.labelSlug')"
+          v-model="formData.slug"
+          icon="at"
+          :placeholder="`${$t('group.labelSlug')} …`"
+        ></ds-input>
+      </ds-space>
       <!-- groupType -->
       <!-- TODO: change it has to be implemented later -->
       <!-- TODO: move 'ds-select' from styleguide to main code and implement missen translation etc. functionality -->
@@ -31,29 +34,37 @@
         icon="user"
         :placeholder="$t('group.type') + ' …'"
       ></ds-select> -->
-      <ds-text class="select-label">
-        {{ $t('group.type') }}
-      </ds-text>
-      <ds-icon class="select-icon" name="user" />
-      <select
-        class="select"
-        :options="groupTypeOptions"
-        :value="formData.groupType"
-        :disabled="update"
-        @change="changeGroupType($event)"
-      >
-        <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
-          {{ $t(`group.types.${groupType}`) }}
-        </option>
-      </select>
+      <ds-space margin-top="large">
+        <ds-text class="select-label">
+          {{ $t('group.type') }}
+        </ds-text>
+        <!-- <ds-icon class="select-icon" name="user" /> -->
+        <select
+          class="select ds-input"
+          :options="groupTypeOptions"
+          :value="formData.groupType"
+          :disabled="update"
+          @change="changeGroupType($event)"
+        >
+          <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
+            {{ $t(`group.types.${groupType}`) }}
+          </option>
+        </select>
+      </ds-space>
       <!-- goal -->
-      <ds-input
-        :label="$t('group.goal')"
-        v-model="formData.about"
-        :placeholder="$t('group.goal') + ' …'"
-        rows="3"
-      ></ds-input>
+      <ds-space margin-top="large"> 
+        <ds-input
+          :label="$t('group.goal')"
+          v-model="formData.about"
+          :placeholder="$t('group.goal') + ' …'"
+          rows="3"
+        ></ds-input>
+      </ds-space>
       <!-- description -->
+      <ds-space margin-top="large">
+      <ds-text class="select-label">
+        {{ $t('group.description') }}
+      </ds-text>
       <hc-editor
           :users="null"
           :value="formData.description"
@@ -64,6 +75,7 @@
           {{ `${contentLength} / ${descriptionMin}` }}
           <base-icon v-if="errors && errors.content" name="warning" />
         </ds-chip>
+        </ds-space>
       <ds-space margin-top="large">
         <!-- actionRadius -->
         <!-- TODO: move 'ds-select' from styleguide to main code and implement missen translation etc. functionality -->
@@ -79,9 +91,9 @@
         <ds-text class="select-label">
           {{ $t('group.actionRadius') }}
         </ds-text>
-        <ds-icon class="select-icon" name="globe" />
+        <!-- <ds-icon class="select-icon" name="globe" /> -->
         <select
-          class="select"
+          class="select ds-input"
           :options="actionRadiusOptions"
           :value="formData.actionRadius"
           @change="changeActionRadius($event)"
@@ -91,10 +103,12 @@
             :key="actionRadius"
             :value="actionRadius"
           >
-            {{ $t(`group.actionRadii.${actionRadius}`) }}
+            {{ $t(`group.actionRadii.${actionRadius}`)  }}
           </option>
         </select>
+      </ds-space>
         <!-- location -->
+        <ds-space margin-top="large">
         <ds-select
           id="city"
           :label="$t('settings.data.labelCity')"
@@ -129,6 +143,7 @@
           {{ update ? $t('group.update') : $t('group.save') }}
         </ds-button>
       </ds-space>
+    </template>
     </ds-form>
   </div>
 </template>
@@ -167,8 +182,17 @@ export default {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
       descriptionMin: 50,
-      groupTypeOptions: ['public', 'closed', 'hidden'],
-      actionRadiusOptions: ['regional', 'national', 'continental', 'global'],
+      groupTypeOptions: [
+        'public', 
+        'closed', 
+        'hidden'
+      ],
+      actionRadiusOptions: [ 
+        'regional',
+        'national',
+        'continental',
+        'global'
+      ],
       loadingGeo: false,
       cities: [],
       formData: {
@@ -317,16 +341,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.select-label {
-  margin-bottom: 3pt;
-  color: $text-color-soft;
+
+
+.ds-input {
+    -webkit-appearance: auto;
+    -moz-appearance: auto;
+    appearance: auto;
 }
-.select-icon {
-  margin-right: 4pt;
-  color: $text-color-disabled;
-}
-.select {
-  margin-bottom: $space-small;
-  color: $text-color-base;
-}
+
 </style>
