@@ -7,136 +7,134 @@
       :schema="formSchema"
       @submit="submit"
     >
-    <template #default="{ errors }">
-      <!-- Group Name -->
-      <ds-input
-        :label="$t('group.name')"
-        v-model="formData.name"
-        :placeholder="`${$t('group.name')} …`"
-      ></ds-input>
-
-      <!-- Group Slug -->
-      <ds-space margin-top="large">
+      <template #default="{ errors }">
+        <!-- Group Name -->
         <ds-input
-          v-if="update"
-          :label="$t('group.labelSlug')"
-          v-model="formData.slug"
-          icon="at"
-          :placeholder="`${$t('group.labelSlug')} …`"
+          :label="$t('group.name')"
+          v-model="formData.name"
+          :placeholder="`${$t('group.name')} …`"
         ></ds-input>
-      </ds-space>
 
-      <!-- groupType -->
-      <ds-space margin-top="large">
-        <ds-text class="select-label">
-          {{ $t('group.type') }}
-        </ds-text>
-        <select
-          class="select ds-input appearance--auto"
-          :options="groupTypeOptions"
-          :value="formData.groupType"
-          :disabled="update"
-          @change="changeGroupType($event)"
-        >
-          <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
-            {{ $t(`group.types.${groupType}`) }}
-          </option>
-        </select>
-      </ds-space>
-
-      <!-- goal -->
-      <ds-space margin-top="large"> 
-        <ds-input
-          :label="$t('group.goal')"
-          v-model="formData.about"
-          :placeholder="$t('group.goal') + ' …'"
-          rows="3"
-        ></ds-input>
-      </ds-space>
-
-      <!-- description -->
-      <ds-space margin-top="large">
-      <ds-text class="select-label">
-        {{ $t('group.description') }}
-      </ds-text>
-      <hc-editor
-          :users="null"
-          :value="formData.description"
-          :hashtags="null"
-          @input="updateEditorDescription"
-        />
-        <ds-chip size="base" :color="errors && errors.content && 'danger'">
-          {{ `${contentLength} / ${descriptionMin}` }}
-          <base-icon v-if="errors && errors.content" name="warning" />
-        </ds-chip>
+        <!-- Group Slug -->
+        <ds-space margin-top="large">
+          <ds-input
+            v-if="update"
+            :label="$t('group.labelSlug')"
+            v-model="formData.slug"
+            icon="at"
+            :placeholder="`${$t('group.labelSlug')} …`"
+          ></ds-input>
         </ds-space>
-      <ds-space margin-top="large">
 
-        <!-- actionRadius -->
-        <ds-text class="select-label">
-          {{ $t('group.actionRadius') }}
-        </ds-text>
-        <select
-          class="select ds-input appearance--auto"
-          :options="actionRadiusOptions"
-          :value="formData.actionRadius"
-          @change="changeActionRadius($event)"
-        >
-          <option
-            v-for="actionRadius in actionRadiusOptions"
-            :key="actionRadius"
-            :value="actionRadius"
+        <!-- groupType -->
+        <ds-space margin-top="large">
+          <ds-text class="select-label">
+            {{ $t('group.type') }}
+          </ds-text>
+          <select
+            class="select ds-input appearance--auto"
+            :options="groupTypeOptions"
+            :value="formData.groupType"
+            :disabled="update"
+            @change="changeGroupType($event)"
           >
-            {{ $t(`group.actionRadii.${actionRadius}`)  }}
-          </option>
-        </select>
-      </ds-space>
+            <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
+              {{ $t(`group.types.${groupType}`) }}
+            </option>
+          </select>
+        </ds-space>
+
+        <!-- goal -->
+        <ds-space margin-top="large">
+          <ds-input
+            :label="$t('group.goal')"
+            v-model="formData.about"
+            :placeholder="$t('group.goal') + ' …'"
+            rows="3"
+          ></ds-input>
+        </ds-space>
+
+        <!-- description -->
+        <ds-space margin-top="large">
+          <ds-text class="select-label">
+            {{ $t('group.description') }}
+          </ds-text>
+          <hc-editor
+            :users="null"
+            :value="formData.description"
+            :hashtags="null"
+            @input="updateEditorDescription"
+          />
+          <ds-chip size="base" :color="errors && errors.content && 'danger'">
+            {{ `${contentLength} / ${descriptionMin}` }}
+            <base-icon v-if="errors && errors.content" name="warning" />
+          </ds-chip>
+        </ds-space>
+        <ds-space margin-top="large">
+          <!-- actionRadius -->
+          <ds-text class="select-label">
+            {{ $t('group.actionRadius') }}
+          </ds-text>
+          <select
+            class="select ds-input appearance--auto"
+            :options="actionRadiusOptions"
+            :value="formData.actionRadius"
+            @change="changeActionRadius($event)"
+          >
+            <option
+              v-for="actionRadius in actionRadiusOptions"
+              :key="actionRadius"
+              :value="actionRadius"
+            >
+              {{ $t(`group.actionRadii.${actionRadius}`) }}
+            </option>
+          </select>
+        </ds-space>
 
         <!-- location -->
         <ds-space margin-top="large">
-        <ds-select
-          id="city"
-          :label="$t('settings.data.labelCity')"
-          v-model="formData.locationName"
-          :options="cities"
-          icon="map-marker"
-          :icon-right="null"
-          :placeholder="$t('settings.data.labelCity') + ' …'"
-          :loading="loadingGeo"
-          @input.native="handleCityInput"
-
-        />
-        <base-button 
-          v-if="formData.locationName !== ''" 
-          icon="close"  
-          ghost 
-          size="small" 
-          @click="formData.locationName = ''"
-          style="position:relative; display: inline-block; right: -93%; top: -45px">
-        </base-button>
-      </ds-space>
-      <ds-space margin-top="large">
-        <categories-select
-          v-if="categoriesActive"
-          model="categoryIds"
-          :existingCategoryIds="formData.categoryIds"
-        />
-      </ds-space>
-      <ds-space margin-top="large">
-        <nuxt-link to="/my-groups">
-          <ds-button>{{ $t('actions.cancel') }}</ds-button>
-        </nuxt-link>
-        <ds-button
-          type="submit"
-          icon="save"
-          :disabled="update ? submitDisableEdit : submitDisable"
-          primary
-          @click.prevent="submit()"
-        >
-          {{ update ? $t('group.update') : $t('group.save') }}
-        </ds-button>
-      </ds-space>
-    </template>
+          <ds-select
+            id="city"
+            :label="$t('settings.data.labelCity')"
+            v-model="formData.locationName"
+            :options="cities"
+            icon="map-marker"
+            :icon-right="null"
+            :placeholder="$t('settings.data.labelCity') + ' …'"
+            :loading="loadingGeo"
+            @input.native="handleCityInput"
+          />
+          <base-button
+            v-if="formData.locationName !== ''"
+            icon="close"
+            ghost
+            size="small"
+            @click="formData.locationName = ''"
+            style="position: relative; display: inline-block; right: -93%; top: -45px"
+          ></base-button>
+        </ds-space>
+        <ds-space margin-top="large">
+          <categories-select
+            v-if="categoriesActive"
+            model="categoryIds"
+            :existingCategoryIds="formData.categoryIds"
+          />
+        </ds-space>
+        <ds-space margin-top="large">
+          <nuxt-link to="/my-groups">
+            <ds-button>{{ $t('actions.cancel') }}</ds-button>
+          </nuxt-link>
+          <ds-button
+            type="submit"
+            icon="save"
+            :disabled="update ? submitDisableEdit : submitDisable"
+            primary
+            @click.prevent="submit()"
+          >
+            {{ update ? $t('group.update') : $t('group.save') }}
+          </ds-button>
+        </ds-space>
+      </template>
     </ds-form>
   </div>
 </template>
@@ -175,17 +173,8 @@ export default {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
       descriptionMin: 50,
-      groupTypeOptions: [
-        'public', 
-        'closed', 
-        'hidden'
-      ],
-      actionRadiusOptions: [ 
-        'regional',
-        'national',
-        'continental',
-        'global'
-      ],
+      groupTypeOptions: ['public', 'closed', 'hidden'],
+      actionRadiusOptions: ['regional', 'national', 'continental', 'global'],
       loadingGeo: false,
       cities: [],
       formData: {
@@ -223,7 +212,6 @@ export default {
     }
   },
   computed: {
-
     contentLength() {
       return this.$filters.removeHtml(this.formData.description).length
     },
@@ -334,12 +322,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-
 .appearance--auto {
-    -webkit-appearance: auto;
-    -moz-appearance: auto;
-    appearance: auto;
+  -webkit-appearance: auto;
+  -moz-appearance: auto;
+  appearance: auto;
 }
-
 </style>
