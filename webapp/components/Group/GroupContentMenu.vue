@@ -40,7 +40,13 @@ export default {
     Dropdown,
   },
   props: {
-    placement: { type: String, default: 'bottom-end' },
+    usage: {
+      type: String,
+      required: true,
+      validator: (value) => {
+        return value.match(/(groupTeaser|groupProfile)/)
+      },
+    },
     resource: { type: Object, required: true },
     resourceType: {
       type: String,
@@ -49,6 +55,7 @@ export default {
         return value.match(/(group)/)
       },
     },
+    placement: { type: String, default: 'bottom-end' },
   },
   computed: {
     routes() {
