@@ -142,7 +142,7 @@
 <script>
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
-import { NAME_LENGTH_MIN, NAME_LENGTH_MAX } from '~/constants/groups.js'
+import { GROUPNAME_MIN_LENGTH, GROUPNAME_MAX_LENGTH } from '~/constants/groups.js'
 import HcEditor from '~/components/Editor/Editor'
 import { queryLocations } from '~/graphql/location'
 
@@ -188,7 +188,7 @@ export default {
         categoryIds: categories ? categories.map((category) => category.id) : [],
       },
       formSchema: {
-        name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
+        name: { required: true, min: GROUPNAME_MIN_LENGTH, max: GROUPNAME_MAX_LENGTH },
         slug: { required: false },
         groupType: { required: true },
         about: { required: true },
