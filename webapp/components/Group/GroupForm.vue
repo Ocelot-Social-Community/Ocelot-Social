@@ -8,11 +8,14 @@
       @submit="submit"
     >
     <template #default="{ errors }">
+      <!-- Group Name -->
       <ds-input
         :label="$t('group.name')"
         v-model="formData.name"
         :placeholder="`${$t('group.name')} …`"
       ></ds-input>
+
+      <!-- Group Slug -->
       <ds-space margin-top="large">
         <ds-input
           v-if="update"
@@ -22,25 +25,14 @@
           :placeholder="`${$t('group.labelSlug')} …`"
         ></ds-input>
       </ds-space>
+
       <!-- groupType -->
-      <!-- TODO: change it has to be implemented later -->
-      <!-- TODO: move 'ds-select' from styleguide to main code and implement missen translation etc. functionality -->
-      <!-- <ds-select
-        id="groupType"
-        :label="$t('group.type')"
-        :v-model="formData.groupType"
-        :label-prop="'label'"
-        :options="groupTypeOptions"
-        icon="user"
-        :placeholder="$t('group.type') + ' …'"
-      ></ds-select> -->
       <ds-space margin-top="large">
         <ds-text class="select-label">
           {{ $t('group.type') }}
         </ds-text>
-        <!-- <ds-icon class="select-icon" name="user" /> -->
         <select
-          class="select ds-input"
+          class="select ds-input appearance--auto"
           :options="groupTypeOptions"
           :value="formData.groupType"
           :disabled="update"
@@ -51,6 +43,7 @@
           </option>
         </select>
       </ds-space>
+
       <!-- goal -->
       <ds-space margin-top="large"> 
         <ds-input
@@ -60,6 +53,7 @@
           rows="3"
         ></ds-input>
       </ds-space>
+
       <!-- description -->
       <ds-space margin-top="large">
       <ds-text class="select-label">
@@ -77,23 +71,13 @@
         </ds-chip>
         </ds-space>
       <ds-space margin-top="large">
+
         <!-- actionRadius -->
-        <!-- TODO: move 'ds-select' from styleguide to main code and implement missen translation etc. functionality -->
-        <!-- <ds-select
-          id="actionRadius"
-          :label="$t('group.actionRadius')"
-          v-model="formData"
-          model="actionRadius"
-          :options="['regional', 'national', 'continental', 'global']"
-          icon="globe"
-          :placeholder="`${$t('group.actionRadius')} …`"
-        ></ds-select> -->
         <ds-text class="select-label">
           {{ $t('group.actionRadius') }}
         </ds-text>
-        <!-- <ds-icon class="select-icon" name="globe" /> -->
         <select
-          class="select ds-input"
+          class="select ds-input appearance--auto"
           :options="actionRadiusOptions"
           :value="formData.actionRadius"
           @change="changeActionRadius($event)"
@@ -107,6 +91,7 @@
           </option>
         </select>
       </ds-space>
+
         <!-- location -->
         <ds-space margin-top="large">
         <ds-select
@@ -115,12 +100,20 @@
           v-model="formData.locationName"
           :options="cities"
           icon="map-marker"
+          :icon-right="null"
           :placeholder="$t('settings.data.labelCity') + ' …'"
           :loading="loadingGeo"
           @input.native="handleCityInput"
+
         />
-        <!-- TODO: implement clear button -->
-        <!-- <base-button icon="close" circle ghost size="small" :disabled="formData.locationName.length === 0" @click="clear" /> -->
+        <base-button 
+          v-if="formData.locationName !== ''" 
+          icon="close"  
+          ghost 
+          size="small" 
+          @click="formData.locationName = ''"
+          style="position:relative; display: inline-block; right: -93%; top: -45px">
+        </base-button>
       </ds-space>
       <ds-space margin-top="large">
         <categories-select
@@ -343,7 +336,7 @@ export default {
 <style lang="scss" scoped>
 
 
-.ds-input {
+.appearance--auto {
     -webkit-appearance: auto;
     -moz-appearance: auto;
     appearance: auto;
