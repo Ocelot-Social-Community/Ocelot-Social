@@ -443,6 +443,12 @@
     "hashtag-search": "Suche nach #{hashtag}",
     "title": "Deine Filterblase"
   },
+  "header": {
+    "avatarMenu": {
+      "myGroups": "Mein Gruppen",
+      "myProfile": "Mein Profil"
+    }
+  },
   "index": {
     "change-filter-settings": "Verändere die Filter-Einstellungen, um mehr Ergebnisse zu erhalten.",
     "no-results": "Keine Beiträge gefunden."
@@ -601,7 +607,6 @@
       "title": "Lade jemanden zu {APPLICATION_NAME} ein!"
     },
     "memberSince": "Mitglied seit",
-    "name": "Mein Profil",
     "network": {
       "andMore": "und {number} weitere …",
       "followedBy": "wird gefolgt von:",

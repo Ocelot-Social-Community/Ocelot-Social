@@ -72,9 +72,14 @@ export default {
       }
       const routes = [
         {
-          name: this.$t('profile.name'),
+          name: this.$t('header.avatarMenu.myProfile'),
           path: `/profile/${this.user.id}/${this.user.slug}`,
           icon: 'user',
+        },
+        {
+          name: this.$t('header.avatarMenu.myGroups'),
+          path: '/my-groups',
+          icon: 'users',
         },
         {
           name: this.$t('notifications.pageLink'),
