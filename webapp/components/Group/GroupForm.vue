@@ -24,12 +24,16 @@
 
         <ds-input v-model="formData.about" label="Kurzbeschreibung" rows="3"></ds-input>
 
-        <ds-input
-          v-model="formData.description"
-          label="Beschreibung"
-          type="textarea"
-          rows="3"
-        ></ds-input>
+        <hc-editor
+          :users="null"
+          :value="formData.description"
+          :hashtags="null"
+          @input="updateEditorDescription"
+        />
+        <ds-chip size="base" :color="errors && errors.content && 'danger'">
+          {{ `${contentLength} / ${descriptionMin}` }}
+          <base-icon v-if="errors && errors.content" name="warning" />
+        </ds-chip>
 
         <ds-select
           icon="card"
@@ -70,11 +74,13 @@
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import { NAME_LENGTH_MIN, NAME_LENGTH_MAX } from '~/constants/groups.js'
+import HcEditor from '~/components/Editor/Editor'
 
 export default {
   name: 'GroupForm',
   components: {
     CategoriesSelect,
+    HcEditor,
   },
   props: {
     update: {
@@ -93,6 +99,7 @@ export default {
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
+      descriptionMin: 50,
       formData: {
         name: name || '',
         groupType: groupType || '',
@@ -123,8 +130,15 @@ export default {
       },
     }
   },
-
+  computed: {
+    contentLength() {
+      return this.$filters.removeHtml(this.formData.description).length
+    },
+  },
   methods: {
+    updateEditorDescription(value) {
+      this.$refs.groupForm.update('description', value)
+    },
     submit() {
       const { name, about, description, groupType, actionRadius, categoryIds } = this.formData
       const variables = {
