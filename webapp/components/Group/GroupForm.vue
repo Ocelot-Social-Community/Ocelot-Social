@@ -7,133 +7,183 @@
       :schema="formSchema"
       @submit="submit"
     >
-      <template #default="{ errors }">
-        <!-- Group Name -->
-        <ds-input
-          :label="$t('group.name')"
-          v-model="formData.name"
-          :placeholder="`${$t('group.name')} …`"
-        ></ds-input>
-
-        <!-- Group Slug -->
-        <ds-space margin-top="large">
+      <template #default>
+        <base-card>
+          <!-- Group Name -->
           <ds-input
-            v-if="update"
-            :label="$t('group.labelSlug')"
-            v-model="formData.slug"
-            icon="at"
-            :placeholder="`${$t('group.labelSlug')} …`"
-          ></ds-input>
-        </ds-space>
-
-        <!-- groupType -->
-        <ds-space margin-top="large">
-          <ds-text class="select-label">
-            {{ $t('group.type') }}
-          </ds-text>
-          <select
-            class="select ds-input appearance--auto"
-            :options="groupTypeOptions"
-            :value="formData.groupType"
-            :disabled="update"
-            @change="changeGroupType($event)"
-          >
-            <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
-              {{ $t(`group.types.${groupType}`) }}
-            </option>
-          </select>
-        </ds-space>
-
-        <!-- goal -->
-        <ds-space margin-top="large">
-          <ds-input
-            :label="$t('group.goal')"
-            v-model="formData.about"
-            :placeholder="$t('group.goal') + ' …'"
-            rows="3"
-          ></ds-input>
-        </ds-space>
-
-        <!-- description -->
-        <ds-space margin-top="large">
-          <ds-text class="select-label">
-            {{ $t('group.description') }}
-          </ds-text>
-          <hc-editor
-            :users="null"
-            :value="formData.description"
-            :hashtags="null"
-            @input="updateEditorDescription"
+            :label="$t('group.name')"
+            v-model="formData.name"
+            :placeholder="`${$t('group.name')} …`"
           />
-          <ds-chip size="base" :color="errors && errors.content && 'danger'">
-            {{ `${contentLength} / ${descriptionMin}` }}
-            <base-icon v-if="errors && errors.content" name="warning" />
-          </ds-chip>
-        </ds-space>
-        <ds-space margin-top="large">
-          <!-- actionRadius -->
-          <ds-text class="select-label">
-            {{ $t('group.actionRadius') }}
-          </ds-text>
-          <select
-            class="select ds-input appearance--auto"
-            :options="actionRadiusOptions"
-            :value="formData.actionRadius"
-            @change="changeActionRadius($event)"
-          >
-            <option
-              v-for="actionRadius in actionRadiusOptions"
-              :key="actionRadius"
-              :value="actionRadius"
+          <ds-text align="right">
+          <ds-chip 
+            size="base" 
+            :color="formData.name.length < formSchema.name.min ? '' : 'success' && formData.name.length > formSchema.name.max ? 'danger' : 'success'">
+              {{ `${formData.name.length} / ${formSchema.name.max}` }}
+              <base-icon 
+              v-if="formData.name.length > formSchema.name.max" 
+              name="warning" />
+            </ds-chip>
+             </ds-text>
+ 
+          <!-- Group Slug -->
+          <ds-space margin-top="large">
+            <ds-input
+              v-if="update"
+              :label="$t('group.labelSlug')"
+              v-model="formData.slug"
+              icon="at"
+              :placeholder="`${$t('group.labelSlug')} …`"
+            ></ds-input>
+          </ds-space>
+
+          <!-- groupType -->
+          <ds-space margin-top="large">
+            <ds-text class="select-label">
+              {{ $t('group.type') }}
+            </ds-text>
+            <select
+              class="select ds-input appearance--auto"
+              :options="groupTypeOptions"
+              :value="formData.groupType"
+              :disabled="update"
+              @change="changeGroupType($event)"
             >
-              {{ $t(`group.actionRadii.${actionRadius}`) }}
-            </option>
-          </select>
-        </ds-space>
+              <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
+                {{ $t(`group.types.${groupType}`) }}
+              </option>
+            </select>
+            <ds-text align="right"> 
+            <ds-chip 
+            size="base" 
+            :color="formData.groupType === '' ? '' : 'success'">
+              <base-icon 
+              :name="formData.groupType === '' ? 'warning' : 'check'" />
+            </ds-chip></ds-text>
+          </ds-space>
+         
+          <!-- goal -->
+          <ds-space margin-top="large">
+            <ds-input
+              :label="$t('group.goal')"
+              v-model="formData.about"
+              :placeholder="$t('group.goal') + ' …'"
+              rows="3"
+            />
+            <ds-text align="right">
+            <ds-chip 
+            size="base" 
+            :color="formData.about.length < formSchema.about.min ? '' : 'success' && formData.about.length > formSchema.about.max ? 'danger' : 'success' ">
+              {{ `${formData.about.length} / ${formSchema.about.max}` }}
+              <base-icon 
+              v-if="formData.about.length > formSchema.about.max" 
+              name="warning" />
+            </ds-chip></ds-text>
+          </ds-space>
 
-        <!-- location -->
-        <ds-space margin-top="large">
-          <ds-select
-            id="city"
-            :label="$t('settings.data.labelCity')"
-            v-model="formData.locationName"
-            :options="cities"
-            icon="map-marker"
-            :icon-right="null"
-            :placeholder="$t('settings.data.labelCity') + ' …'"
-            :loading="loadingGeo"
-            @input.native="handleCityInput"
-          />
-          <base-button
-            v-if="formData.locationName !== ''"
-            icon="close"
-            ghost
-            size="small"
-            @click="formData.locationName = ''"
-            style="position: relative; display: inline-block; right: -93%; top: -45px"
-          ></base-button>
-        </ds-space>
-        <ds-space margin-top="large">
-          <categories-select
-            v-if="categoriesActive"
-            model="categoryIds"
-            :existingCategoryIds="formData.categoryIds"
-          />
-        </ds-space>
-        <ds-space margin-top="large">
-          <nuxt-link to="/my-groups">
-            <ds-button>{{ $t('actions.cancel') }}</ds-button>
-          </nuxt-link>
-          <ds-button
-            type="submit"
-            icon="save"
-            :disabled="update ? submitDisableEdit : submitDisable"
-            primary
-            @click.prevent="submit()"
-          >
-            {{ update ? $t('group.update') : $t('group.save') }}
-          </ds-button>
-        </ds-space>
+          <!-- description -->
+          <ds-space margin-top="large">
+            <ds-text class="select-label">
+              {{ $t('group.description') }}
+            </ds-text>
+            <hc-editor
+              :users="null"
+              :value="formData.description"
+              :hashtags="null"
+              @input="updateEditorDescription"
+            />
+            <ds-text align="right">
+            <ds-chip 
+            size="base" 
+            :color="contentLength < formSchema.description.min ? '' : 'success' && contentLength > formSchema.description.max ? 'danger' : 'success'">
+              {{ `${contentLength} / ${formSchema.description.max}` }}
+              <base-icon 
+              v-if="contentLength > formSchema.description.max" 
+              name="warning" />
+            </ds-chip></ds-text>
+          </ds-space>
+
+          <!-- actionRadius -->
+          <ds-space margin-top="large">
+            <ds-text class="select-label">
+              {{ $t('group.actionRadius') }}
+            </ds-text>
+            <select
+              class="select ds-input appearance--auto"
+              :options="actionRadiusOptions"
+              :value="formData.actionRadius"
+              @change="changeActionRadius($event)"
+            >
+              <option
+                v-for="actionRadius in actionRadiusOptions"
+                :key="actionRadius"
+                :value="actionRadius"
+              >
+                {{ $t(`group.actionRadii.${actionRadius}`) }}
+              </option>
+            </select>
+            <ds-text align="right">
+            <ds-chip 
+            size="base" 
+            :color="formData.actionRadius === '' ? '' : 'success'">
+              <base-icon 
+              :name="formData.actionRadius === '' ? 'warning' : 'check'" />
+            </ds-chip></ds-text>
+          </ds-space>
+
+          <!-- location -->
+          <ds-space margin-top="large">
+            <ds-select
+              id="city"
+              :label="$t('settings.data.labelCity')"
+              v-model="formData.locationName"
+              :options="cities"
+              icon="map-marker"
+              :icon-right="null"
+              :placeholder="$t('settings.data.labelCity') + ' …'"
+              :loading="loadingGeo"
+              @input.native="handleCityInput"
+            />
+            <base-button
+              v-if="formData.locationName !== ''"
+              icon="close"
+              ghost
+              size="small"
+              @click="formData.locationName = ''"
+              style="position: relative; display: inline-block; right: -93%; top: -45px"
+            ></base-button>
+          </ds-space>
+          <ds-space margin-top="large">
+            <categories-select
+              v-if="categoriesActive"
+              model="categoryIds"
+              :existingCategoryIds="formData.categoryIds"
+            />
+            <ds-text align="right">
+            <ds-chip 
+            size="base" 
+            :color="formData.categoryIds.length < 1 ? '' : 'success'">
+            {{ formData.categoryIds.length }} / 3
+              <base-icon 
+              v-if="formData.categoryIds.length < 1" 
+              name="warning" />
+            </ds-chip></ds-text>
+          </ds-space>
+          <ds-space margin-top="large">
+            <nuxt-link to="/my-groups">
+              <ds-button>{{ $t('actions.cancel') }}</ds-button>
+            </nuxt-link>
+            <ds-button
+              type="submit"
+              icon="save"
+              :disabled="update ? submitDisableEdit : submitDisable"
+              primary
+              @click.prevent="submit()"
+            >
+              {{ update ? $t('group.update') : $t('group.save') }}
+            </ds-button>
+          </ds-space>
+        </base-card>
       </template>
     </ds-form>
   </div>
@@ -191,8 +241,8 @@ export default {
         name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
         slug: { required: false },
         groupType: { required: true },
-        about: { required: true },
-        description: { required: true },
+        about: { required: true, min: NAME_LENGTH_MIN, max: 150 },
+        description: { required: true, min: NAME_LENGTH_MIN, max: 500 },
         actionRadius: { required: true },
         locationName: { required: false },
         categoryIds: {
@@ -238,6 +288,7 @@ export default {
         this.sameCategories
       )
     },
+    
     sameCategories() {
       const formDataCategories = this.formData.categoryIds.map((id) => id).sort()
       const groupDataCategories = this.group.categories.map((category) => category.id).sort()
@@ -321,10 +372,18 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .appearance--auto {
   -webkit-appearance: auto;
   -moz-appearance: auto;
   appearance: auto;
 }
-</style>
+
+
+  ds-chip {
+    position: absolute;
+    right: 0px;
+       
+    }
+  </style>
+  
