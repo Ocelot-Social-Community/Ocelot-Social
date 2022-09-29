@@ -92,9 +92,6 @@
                     <group-button />
                   </client-only>
                   <client-only>
-                    <group-button />
-                  </client-only>
-                  <client-only>
                     <avatar-menu placement="top" />
                   </client-only>
                 </template>
