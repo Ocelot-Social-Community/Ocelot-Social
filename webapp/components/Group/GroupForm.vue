@@ -16,16 +16,21 @@
             :placeholder="`${$t('group.name')} …`"
           />
           <ds-text align="right">
-          <ds-chip 
-            size="base" 
-            :color="formData.name.length < formSchema.name.min ? '' : 'success' && formData.name.length > formSchema.name.max ? 'danger' : 'success'">
+            <ds-chip
+              size="base"
+              :color="
+                formData.name.length < formSchema.name.min
+                  ? ''
+                  : 'success' && formData.name.length > formSchema.name.max
+                  ? 'danger'
+                  : 'success'
+              "
+            >
               {{ `${formData.name.length} / ${formSchema.name.max}` }}
-              <base-icon 
-              v-if="formData.name.length > formSchema.name.max" 
-              name="warning" />
+              <base-icon v-if="formData.name.length > formSchema.name.max" name="warning" />
             </ds-chip>
-             </ds-text>
- 
+          </ds-text>
+
           <!-- Group Slug -->
           <ds-space margin-top="large">
             <ds-input
@@ -53,32 +58,36 @@
                 {{ $t(`group.types.${groupType}`) }}
               </option>
             </select>
-            <ds-text align="right"> 
-            <ds-chip 
-            size="base" 
-            :color="formData.groupType === '' ? '' : 'success'">
-              <base-icon 
-              :name="formData.groupType === '' ? 'warning' : 'check'" />
-            </ds-chip></ds-text>
+            <ds-text align="right">
+              <ds-chip size="base" :color="formData.groupType === '' ? '' : 'success'">
+                <base-icon :name="formData.groupType === '' ? 'warning' : 'check'" />
+              </ds-chip>
+            </ds-text>
           </ds-space>
-         
+
           <!-- goal -->
           <ds-space margin-top="large">
             <ds-input
               :label="$t('group.goal')"
-              v-model="formData.about"
+              v-model="formData.goal"
               :placeholder="$t('group.goal') + ' …'"
               rows="3"
             />
             <ds-text align="right">
-            <ds-chip 
-            size="base" 
-            :color="formData.about.length < formSchema.about.min ? '' : 'success' && formData.about.length > formSchema.about.max ? 'danger' : 'success' ">
-              {{ `${formData.about.length} / ${formSchema.about.max}` }}
-              <base-icon 
-              v-if="formData.about.length > formSchema.about.max" 
-              name="warning" />
-            </ds-chip></ds-text>
+              <ds-chip
+                size="base"
+                :color="
+                  formData.goal.length < formSchema.goal.min
+                    ? ''
+                    : 'success' && formData.goal.length > formSchema.goal.max
+                    ? 'danger'
+                    : 'success'
+                "
+              >
+                {{ `${formData.goal.length} / ${formSchema.goal.max}` }}
+                <base-icon v-if="formData.goal.length > formSchema.goal.max" name="warning" />
+              </ds-chip>
+            </ds-text>
           </ds-space>
 
           <!-- description -->
@@ -93,14 +102,20 @@
               @input="updateEditorDescription"
             />
             <ds-text align="right">
-            <ds-chip 
-            size="base" 
-            :color="contentLength < formSchema.description.min ? '' : 'success' && contentLength > formSchema.description.max ? 'danger' : 'success'">
-              {{ `${contentLength} / ${formSchema.description.max}` }}
-              <base-icon 
-              v-if="contentLength > formSchema.description.max" 
-              name="warning" />
-            </ds-chip></ds-text>
+              <ds-chip
+                size="base"
+                :color="
+                  descriptionLength < formSchema.description.min
+                    ? ''
+                    : 'success' && descriptionLength > formSchema.description.max
+                    ? 'danger'
+                    : 'success'
+                "
+              >
+                {{ `${descriptionLength} / ${formSchema.description.max}` }}
+                <base-icon v-if="descriptionLength > formSchema.description.max" name="warning" />
+              </ds-chip>
+            </ds-text>
           </ds-space>
 
           <!-- actionRadius -->
@@ -123,12 +138,10 @@
               </option>
             </select>
             <ds-text align="right">
-            <ds-chip 
-            size="base" 
-            :color="formData.actionRadius === '' ? '' : 'success'">
-              <base-icon 
-              :name="formData.actionRadius === '' ? 'warning' : 'check'" />
-            </ds-chip></ds-text>
+              <ds-chip size="base" :color="formData.actionRadius === '' ? '' : 'success'">
+                <base-icon :name="formData.actionRadius === '' ? 'warning' : 'check'" />
+              </ds-chip>
+            </ds-text>
           </ds-space>
 
           <!-- location -->
@@ -160,15 +173,15 @@
               :existingCategoryIds="formData.categoryIds"
             />
             <ds-text align="right">
-            <ds-chip 
-            size="base" 
-            :color="formData.categoryIds.length < 1 ? '' : 'success'">
-            {{ formData.categoryIds.length }} / 3
-              <base-icon 
-              v-if="formData.categoryIds.length < 1" 
-              name="warning" />
-            </ds-chip></ds-text>
+              <ds-chip size="base" :color="formData.categoryIds.length < 1 ? '' : 'success'">
+                {{ formData.categoryIds.length }} / 3
+                <base-icon v-if="formData.categoryIds.length < 1" name="warning" />
+              </ds-chip>
+            </ds-text>
           </ds-space>
+          submitDisable: {{submitDisable}}
+          <br />
+          submitDisableEdit: {{submitDisableEdit}}
           <ds-space margin-top="large">
             <nuxt-link to="/my-groups">
               <ds-button>{{ $t('actions.cancel') }}</ds-button>
@@ -217,7 +230,7 @@ export default {
     },
   },
   data() {
-    const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
+    const { name, slug, groupType, goal, description, actionRadius, locationName, categories } =
       this.group
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
@@ -231,7 +244,7 @@ export default {
         name: name || '',
         slug: slug || '',
         groupType: groupType || '',
-        about: about || '',
+        goal: goal || '',
         description: description || '',
         locationName: locationName || '',
         actionRadius: actionRadius || '',
@@ -241,8 +254,8 @@ export default {
         name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
         slug: { required: false },
         groupType: { required: true },
-        about: { required: true, min: NAME_LENGTH_MIN, max: 150 },
-        description: { required: true, min: NAME_LENGTH_MIN, max: 500 },
+        goal: { required: true, min: NAME_LENGTH_MIN, max: 150 },
+        description: { required: true, min: NAME_LENGTH_MIN, max: 2000 },
         actionRadius: { required: true },
         locationName: { required: false },
         categoryIds: {
@@ -262,33 +275,36 @@ export default {
     }
   },
   computed: {
-    contentLength() {
+    descriptionLength() {
       return this.$filters.removeHtml(this.formData.description).length
     },
     submitDisable() {
       return (
-        this.formData.name === '' ||
+        this.formData.name.length < this.formSchema.name.min ||
+        this.formData.name.length > this.formSchema.name.max ||
         this.formData.groupType === '' ||
-        // this.formData.about === '' || // not mandatory
-        this.formData.description === '' ||
+        this.formData.goal.length > this.formSchema.goal.max || // not mandatory
+        this.descriptionLength < this.formSchema.description.min ||
+        this.descriptionLength > this.formSchema.description.max ||
         this.formData.actionRadius === '' ||
         // this.formData.locationName === '' || // not mandatory
         this.formData.categoryIds.length === 0
       )
     },
     submitDisableEdit() {
+      if ( this.submitDisable ) return this.submitDisable
       return (
         this.formData.name === this.group.name &&
         this.formData.slug === this.group.slug &&
         // this.formData.groupType === this.group.groupType && // can not be changed for now
-        this.formData.about === this.group.about &&
+        this.formData.goal === this.group.goal &&
         this.formData.description === this.group.description &&
         this.formData.actionRadius === this.group.actionRadius &&
         this.formData.locationName === (this.group.locationName ? this.group.locationName : '') &&
-        this.sameCategories
+        this.sameCategories 
       )
     },
-    
+
     sameCategories() {
       const formDataCategories = this.formData.categoryIds.map((id) => id).sort()
       const groupDataCategories = this.group.categories.map((category) => category.id).sort()
@@ -307,11 +323,11 @@ export default {
       this.$refs.groupForm.update('description', value)
     },
     submit() {
-      const { name, about, description, groupType, actionRadius, locationName, categoryIds } =
+      const { name, goal, description, groupType, actionRadius, locationName, categoryIds } =
         this.formData
       const variables = {
         name,
-        about,
+        goal,
         description,
         groupType,
         actionRadius,
@@ -379,11 +395,8 @@ export default {
   appearance: auto;
 }
 
-
-  ds-chip {
-    position: absolute;
-    right: 0px;
-       
-    }
-  </style>
-  
+ds-chip {
+  position: absolute;
+  right: 0px;
+}
+</style>
