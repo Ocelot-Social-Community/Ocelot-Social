@@ -179,9 +179,9 @@
               </ds-chip>
             </ds-text>
           </ds-space>
-          submitDisable: {{submitDisable}}
+          submitDisable: {{ submitDisable }}
           <br />
-          submitDisableEdit: {{submitDisableEdit}}
+          submitDisableEdit: {{ submitDisableEdit }}
           <ds-space margin-top="large">
             <nuxt-link to="/my-groups">
               <ds-button>{{ $t('actions.cancel') }}</ds-button>
@@ -292,7 +292,7 @@ export default {
       )
     },
     submitDisableEdit() {
-      if ( this.submitDisable ) return this.submitDisable
+      if (this.submitDisable) return this.submitDisable
       return (
         this.formData.name === this.group.name &&
         this.formData.slug === this.group.slug &&
@@ -301,7 +301,7 @@ export default {
         this.formData.description === this.group.description &&
         this.formData.actionRadius === this.group.actionRadius &&
         this.formData.locationName === (this.group.locationName ? this.group.locationName : '') &&
-        this.sameCategories 
+        this.sameCategories
       )
     },
 
