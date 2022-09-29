@@ -76,16 +76,10 @@
             <ds-text align="right">
               <ds-chip
                 size="base"
-                :color="
-                  formData.goal.length < formSchema.goal.min
-                    ? ''
-                    : 'success' && formData.goal.length > formSchema.goal.max
-                    ? 'danger'
-                    : 'success'
-                "
+                :color="formData.goal.length < formSchema.goal.min ? '' : 'success'"
               >
-                {{ `${formData.goal.length} / ${formSchema.goal.max}` }}
-                <base-icon v-if="formData.goal.length > formSchema.goal.max" name="warning" />
+                {{ `${formData.goal.length} / ${formSchema.goal.min}` }}
+                <base-icon v-if="formData.goal.length < formSchema.goal.min" name="warning" />
               </ds-chip>
             </ds-text>
           </ds-space>
@@ -104,16 +98,10 @@
             <ds-text align="right">
               <ds-chip
                 size="base"
-                :color="
-                  descriptionLength < formSchema.description.min
-                    ? ''
-                    : 'success' && descriptionLength > formSchema.description.max
-                    ? 'danger'
-                    : 'success'
-                "
+                :color="descriptionLength >= formSchema.description.min ? 'success' : ''"
               >
-                {{ `${descriptionLength} / ${formSchema.description.max}` }}
-                <base-icon v-if="descriptionLength > formSchema.description.max" name="warning" />
+                {{ `${descriptionLength} / ${formSchema.description.min}` }}
+                <base-icon v-if="descriptionLength < formSchema.description.min" name="warning" />
               </ds-chip>
             </ds-text>
           </ds-space>
@@ -179,9 +167,6 @@
               </ds-chip>
             </ds-text>
           </ds-space>
-          submitDisable: {{ submitDisable }}
-          <br />
-          submitDisableEdit: {{ submitDisableEdit }}
           <ds-space margin-top="large">
             <nuxt-link to="/my-groups">
               <ds-button>{{ $t('actions.cancel') }}</ds-button>
@@ -205,7 +190,11 @@
 <script>
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
-import { NAME_LENGTH_MIN, NAME_LENGTH_MAX } from '~/constants/groups.js'
+import {
+  NAME_LENGTH_MIN,
+  NAME_LENGTH_MAX,
+  DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
+} from '~/constants/groups.js'
 import HcEditor from '~/components/Editor/Editor'
 import { queryLocations } from '~/graphql/location'
 
@@ -254,8 +243,8 @@ export default {
         name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
         slug: { required: false },
         groupType: { required: true },
-        goal: { required: true, min: NAME_LENGTH_MIN, max: 150 },
-        description: { required: true, min: NAME_LENGTH_MIN, max: 2000 },
+        goal: { required: true, min: NAME_LENGTH_MIN },
+        description: { required: true, min: DESCRIPTION_WITHOUT_HTML_LENGTH_MIN },
         actionRadius: { required: true },
         locationName: { required: false },
         categoryIds: {
@@ -281,11 +270,9 @@ export default {
     submitDisable() {
       return (
         this.formData.name.length < this.formSchema.name.min ||
-        this.formData.name.length > this.formSchema.name.max ||
         this.formData.groupType === '' ||
         this.formData.goal.length > this.formSchema.goal.max || // not mandatory
         this.descriptionLength < this.formSchema.description.min ||
-        this.descriptionLength > this.formSchema.description.max ||
         this.formData.actionRadius === '' ||
         // this.formData.locationName === '' || // not mandatory
         this.formData.categoryIds.length === 0
@@ -331,7 +318,7 @@ export default {
         description,
         groupType,
         actionRadius,
-        locationName: locationName.label,
+        locationName: locationName.label ? locationName.label : '',
         categoryIds,
       }
       this.update
