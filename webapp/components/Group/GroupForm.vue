@@ -193,6 +193,7 @@ import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import {
   NAME_LENGTH_MIN,
   NAME_LENGTH_MAX,
+  GOAL_LENGTH_MIN,
   DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
 } from '~/constants/groups.js'
 import HcEditor from '~/components/Editor/Editor'
@@ -243,7 +244,7 @@ export default {
         name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
         slug: { required: false },
         groupType: { required: true },
-        goal: { required: true, min: NAME_LENGTH_MIN },
+        goal: { required: true, min: GOAL_LENGTH_MIN },
         description: { required: true, min: DESCRIPTION_WITHOUT_HTML_LENGTH_MIN },
         actionRadius: { required: true },
         locationName: { required: false },
@@ -271,7 +272,7 @@ export default {
       return (
         this.formData.name.length < this.formSchema.name.min ||
         this.formData.groupType === '' ||
-        this.formData.goal.length > this.formSchema.goal.max || // not mandatory
+        this.formData.goal.length < this.formSchema.goal.min || // not mandatory
         this.descriptionLength < this.formSchema.description.min ||
         this.formData.actionRadius === '' ||
         // this.formData.locationName === '' || // not mandatory
