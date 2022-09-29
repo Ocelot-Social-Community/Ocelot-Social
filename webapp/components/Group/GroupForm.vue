@@ -20,7 +20,7 @@
               size="base"
               :color="
                 formData.name.length < formSchema.name.min
-                  ? ''
+                  ? 'medium'
                   : 'success' && formData.name.length > formSchema.name.max
                   ? 'danger'
                   : 'success'
@@ -59,7 +59,7 @@
               </option>
             </select>
             <ds-text align="right">
-              <ds-chip size="base" :color="formData.groupType === '' ? '' : 'success'">
+              <ds-chip size="base" :color="formData.groupType === '' ? 'medium' : 'success'">
                 <base-icon :name="formData.groupType === '' ? 'warning' : 'check'" />
               </ds-chip>
             </ds-text>
@@ -76,7 +76,7 @@
             <ds-text align="right">
               <ds-chip
                 size="base"
-                :color="formData.goal.length < formSchema.goal.min ? '' : 'success'"
+                :color="formData.goal.length < formSchema.goal.min ? 'medium' : 'success'"
               >
                 {{ `${formData.goal.length} / ${formSchema.goal.min}` }}
                 <base-icon v-if="formData.goal.length < formSchema.goal.min" name="warning" />
@@ -98,7 +98,7 @@
             <ds-text align="right">
               <ds-chip
                 size="base"
-                :color="descriptionLength >= formSchema.description.min ? 'success' : ''"
+                :color="descriptionLength >= formSchema.description.min ? 'success' : 'medium'"
               >
                 {{ `${descriptionLength} / ${formSchema.description.min}` }}
                 <base-icon v-if="descriptionLength < formSchema.description.min" name="warning" />
@@ -126,7 +126,7 @@
               </option>
             </select>
             <ds-text align="right">
-              <ds-chip size="base" :color="formData.actionRadius === '' ? '' : 'success'">
+              <ds-chip size="base" :color="formData.actionRadius === '' ? 'medium' : 'success'">
                 <base-icon :name="formData.actionRadius === '' ? 'warning' : 'check'" />
               </ds-chip>
             </ds-text>
@@ -161,7 +161,7 @@
               :existingCategoryIds="formData.categoryIds"
             />
             <ds-text align="right">
-              <ds-chip size="base" :color="formData.categoryIds.length < 1 ? '' : 'success'">
+              <ds-chip size="base" :color="formData.categoryIds.length < 1 ? 'medium' : 'success'">
                 {{ formData.categoryIds.length }} / 3
                 <base-icon v-if="formData.categoryIds.length < 1" name="warning" />
               </ds-chip>
