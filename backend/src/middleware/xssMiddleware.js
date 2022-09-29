@@ -4,8 +4,8 @@ import { cleanHtml } from '../middleware/helpers/cleanHtml.js'
 const fields = [
   'content',
   'contentExcerpt',
-  'description', // TODO: test this
-  'descriptionExcerpt', // TODO: test this
+  'groupDescription', // TODO: test this
+  'groupDescriptionExcerpt', // TODO: test this
   'reasonDescription',
 ]
 

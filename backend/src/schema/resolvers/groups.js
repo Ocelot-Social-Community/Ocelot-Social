@@ -97,9 +97,9 @@ export default {
       }
       // TODO: move to 'backend/src/middleware/validation/validationMiddleware.js'
       if (
-        params.description === undefined ||
-        params.description === null ||
-        removeHtmlTags(params.description).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
+        params.groupDescription === undefined ||
+        params.groupDescription === null ||
+        removeHtmlTags(params.groupDescription).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
       ) {
         throw new UserInputError('Description too short!')
       }
@@ -168,8 +168,8 @@ export default {
         }
       }
       if (
-        params.description &&
-        removeHtmlTags(params.description).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
+        params.groupDescription &&
+        removeHtmlTags(params.groupDescription).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
       ) {
         throw new UserInputError('Description too short!')
       }

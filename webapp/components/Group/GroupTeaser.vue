@@ -27,7 +27,7 @@
       </div>
       <!-- TODO: replace editor content with tiptap render view -->
       <!-- eslint-disable-next-line vue/no-v-html -->
-      <div class="content hyphenate-text" v-html="descriptionExcerpt" />
+      <div class="content hyphenate-text" v-html="groupDescriptionExcerpt" />
       <footer class="footer">
         <div>
           <!-- group my role in group -->
@@ -102,8 +102,8 @@ export default {
     }
   },
   computed: {
-    descriptionExcerpt() {
-      return this.$filters.removeLinks(this.group.descriptionExcerpt)
+    groupDescriptionExcerpt() {
+      return this.$filters.removeLinks(this.group.groupDescriptionExcerpt)
     },
   },
 }

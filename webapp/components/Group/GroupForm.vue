@@ -54,14 +54,14 @@
           ></ds-input>
         </ds-space>
 
-        <!-- description -->
+        <!-- groupDescription -->
         <ds-space margin-top="large">
           <ds-text class="select-label">
             {{ $t('group.description') }}
           </ds-text>
           <hc-editor
             :users="null"
-            :value="formData.description"
+            :value="formData.groupDescription"
             :hashtags="null"
             @input="updateEditorDescription"
           />
@@ -167,8 +167,16 @@ export default {
     },
   },
   data() {
-    const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
-      this.group
+    const {
+      name,
+      slug,
+      groupType,
+      about,
+      groupDescription,
+      actionRadius,
+      locationName,
+      categories,
+    } = this.group
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
@@ -182,7 +190,7 @@ export default {
         slug: slug || '',
         groupType: groupType || '',
         about: about || '',
-        description: description || '',
+        groupDescription: groupDescription || '',
         locationName: locationName || '',
         actionRadius: actionRadius || '',
         categoryIds: categories ? categories.map((category) => category.id) : [],
@@ -192,7 +200,7 @@ export default {
         slug: { required: false },
         groupType: { required: true },
         about: { required: true },
-        description: { required: true },
+        groupDescription: { required: true },
         actionRadius: { required: true },
         locationName: { required: false },
         categoryIds: {
@@ -213,14 +221,14 @@ export default {
   },
   computed: {
     contentLength() {
-      return this.$filters.removeHtml(this.formData.description).length
+      return this.$filters.removeHtml(this.formData.groupDescription).length
     },
     submitDisable() {
       return (
         this.formData.name === '' ||
         this.formData.groupType === '' ||
         // this.formData.about === '' || // not mandatory
-        this.formData.description === '' ||
+        this.formData.groupDescription === '' ||
         this.formData.actionRadius === '' ||
         // this.formData.locationName === '' || // not mandatory
         this.formData.categoryIds.length === 0
@@ -232,7 +240,7 @@ export default {
         this.formData.slug === this.group.slug &&
         // this.formData.groupType === this.group.groupType && // can not be changed for now
         this.formData.about === this.group.about &&
-        this.formData.description === this.group.description &&
+        this.formData.groupDescription === this.group.groupDescription &&
         this.formData.actionRadius === this.group.actionRadius &&
         this.formData.locationName === (this.group.locationName ? this.group.locationName : '') &&
         this.sameCategories
@@ -253,15 +261,15 @@ export default {
   },
   methods: {
     updateEditorDescription(value) {
-      this.$refs.groupForm.update('description', value)
+      this.$refs.groupForm.update('groupDescription', value)
     },
     submit() {
-      const { name, about, description, groupType, actionRadius, locationName, categoryIds } =
+      const { name, about, groupDescription, groupType, actionRadius, locationName, categoryIds } =
         this.formData
       const variables = {
         name,
         about,
-        description,
+        groupDescription,
         groupType,
         actionRadius,
         locationName: locationName.label,

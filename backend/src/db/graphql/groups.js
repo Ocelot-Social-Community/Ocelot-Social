@@ -9,7 +9,7 @@ export const createGroupMutation = () => {
       $name: String!
       $slug: String
       $about: String
-      $description: String!
+      $groupDescription: String!
       $groupType: GroupType!
       $actionRadius: GroupActionRadius!
       $categoryIds: [ID]
@@ -20,7 +20,7 @@ export const createGroupMutation = () => {
         name: $name
         slug: $slug
         about: $about
-        description: $description
+        groupDescription: $groupDescription
         groupType: $groupType
         actionRadius: $actionRadius
         categoryIds: $categoryIds
@@ -34,8 +34,8 @@ export const createGroupMutation = () => {
         disabled
         deleted
         about
-        description
-        descriptionExcerpt
+        groupDescription
+        groupDescriptionExcerpt
         groupType
         actionRadius
         categories {
@@ -63,7 +63,7 @@ export const updateGroupMutation = () => {
       $name: String
       $slug: String
       $about: String
-      $description: String
+      $groupDescription: String
       $actionRadius: GroupActionRadius
       $categoryIds: [ID]
       $avatar: ImageInput
@@ -74,7 +74,7 @@ export const updateGroupMutation = () => {
         name: $name
         slug: $slug
         about: $about
-        description: $description
+        groupDescription: $groupDescription
         actionRadius: $actionRadius
         categoryIds: $categoryIds
         avatar: $avatar
@@ -88,8 +88,8 @@ export const updateGroupMutation = () => {
         disabled
         deleted
         about
-        description
-        descriptionExcerpt
+        groupDescription
+        groupDescriptionExcerpt
         groupType
         actionRadius
         categories {
@@ -164,8 +164,8 @@ export const groupQuery = () => {
         disabled
         deleted
         about
-        description
-        descriptionExcerpt
+        groupDescription
+        groupDescriptionExcerpt
         groupType
         actionRadius
         categories {
