@@ -9,9 +9,9 @@ import {
   createGroupMutation,
   joinGroupMutation,
   changeGroupMemberRoleMutation,
-} from './graphql/groups'
-import { createPostMutation } from './graphql/posts'
-import { createCommentMutation } from './graphql/comments'
+} from '../graphql/groups'
+import { createPostMutation } from '../graphql/posts'
+import { createCommentMutation } from '../graphql/comments'
 import { categories } from '../constants/categories'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {

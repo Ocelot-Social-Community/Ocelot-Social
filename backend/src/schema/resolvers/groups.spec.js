@@ -8,7 +8,7 @@ import {
   changeGroupMemberRoleMutation,
   groupMembersQuery,
   groupQuery,
-} from '../../db/graphql/groups'
+} from '../../graphql/groups'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
 import CONFIG from '../../config'
