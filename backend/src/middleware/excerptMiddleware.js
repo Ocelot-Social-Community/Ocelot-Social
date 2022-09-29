@@ -1,19 +1,19 @@
 import trunc from 'trunc-html'
-import { DESCRIPTION_EXCERPT_HTML_LENGTH } from '../constants/groups'
+import { GROUPDESCRIPTION_EXCERPT_HTML_LENGTH } from '../constants/groups'
 
 export default {
   Mutation: {
     CreateGroup: async (resolve, root, args, context, info) => {
       args.groupDescriptionExcerpt = trunc(
         args.groupDescription,
-        DESCRIPTION_EXCERPT_HTML_LENGTH,
+        GROUPDESCRIPTION_EXCERPT_HTML_LENGTH,
       ).html
       return resolve(root, args, context, info)
     },
     UpdateGroup: async (resolve, root, args, context, info) => {
       args.groupDescriptionExcerpt = trunc(
         args.groupDescription,
-        DESCRIPTION_EXCERPT_HTML_LENGTH,
+        GROUPDESCRIPTION_EXCERPT_HTML_LENGTH,
       ).html
       return resolve(root, args, context, info)
     },
