@@ -67,12 +67,6 @@
               name="goal"
               rows="3"
             />
-            <ds-text align="right">
-              <ds-chip size="base" :color="errors && errors.goal && 'danger'">
-                {{ `${formData.goal.length} / ${formSchema.goal.min}` }}
-                <base-icon v-if="errors && errors.goal" name="warning" />
-              </ds-chip>
-            </ds-text>
           </ds-space>
 
           <!-- description -->
@@ -80,7 +74,7 @@
             <ds-text class="select-label">
               {{ $t('group.description') }}
             </ds-text>
-            <hc-editor
+            <editor
               :users="null"
               :value="formData.description"
               :hashtags="null"
@@ -183,10 +177,9 @@ import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import {
   NAME_LENGTH_MIN,
   NAME_LENGTH_MAX,
-  GOAL_LENGTH_MIN,
   DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
 } from '~/constants/groups.js'
-import HcEditor from '~/components/Editor/Editor'
+import Editor from '~/components/Editor/Editor'
 import { queryLocations } from '~/graphql/location'
 
 let timeout
@@ -195,7 +188,7 @@ export default {
   name: 'GroupForm',
   components: {
     CategoriesSelect,
-    HcEditor,
+    Editor,
   },
   props: {
     update: {
@@ -234,7 +227,7 @@ export default {
         name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
         slug: { required: false, min: NAME_LENGTH_MIN },
         groupType: { required: true },
-        goal: { required: false, min: GOAL_LENGTH_MIN },
+        goal: { required: false },
         description: { required: true, min: DESCRIPTION_WITHOUT_HTML_LENGTH_MIN },
         actionRadius: { required: true },
         locationName: { required: false },
