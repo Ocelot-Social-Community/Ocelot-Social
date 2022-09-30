@@ -1,45 +1,73 @@
 <template>
   <div>
-    <div>my groups</div>
-    <group-teaser />
-    <br />
-    <br />
-    <group-card :items="responseGroupListQuery" />
+    <ds-space margin="small">
+      <ds-heading tag="h1">{{ $t('group.myGroups') }}</ds-heading>
+    </ds-space>
+    <ds-space margin="large" />
+    <ds-container>
+      <!-- create group -->
+      <ds-space centered>
+        <nuxt-link :to="{ name: 'group-create' }">
+          <base-button
+            class="group-add-button"
+            icon="plus"
+            size="large"
+            circle
+            filled
+            v-tooltip="{
+              content: $t('group.createNewGroup.tooltip'),
+              placement: 'left',
+            }"
+          />
+        </nuxt-link>
+      </ds-space>
+      <!-- group list -->
+      <group-list :groups="myGroups" />
+    </ds-container>
   </div>
 </template>
+
 <script>
-import GroupTeaser from '~/components/Group/GroupTeaser.vue'
-import GroupCard from '~/components/Group/GroupCard.vue'
+import GroupList from '~/components/Group/GroupList'
 import { groupQuery } from '~/graphql/groups.js'
 
 export default {
   name: 'MyGroups',
   components: {
-    GroupTeaser,
-    GroupCard,
+    GroupList,
   },
   data() {
     return {
-      responseGroupListQuery: [],
+      Group: [],
     }
   },
-  methods: {
-    async groupListQuery() {
-      try {
-        const response = await this.$apollo.query({
-          query: groupQuery(this.$i18n),
-        })
-        this.responseGroupListQuery = response.data.Group
-      } catch (error) {
-        this.responseGroupListQuery = []
-        this.$toast.error(error.message)
-      } finally {
-        this.pending = false
-      }
+  computed: {
+    myGroups() {
+      return this.Group ? this.Group : []
     },
   },
-  created() {
-    this.groupListQuery()
+  apollo: {
+    Group: {
+      query() {
+        return groupQuery(this.$i18n)
+      },
+      variables() {
+        return {
+          isMember: true,
+        }
+      },
+      error(error) {
+        this.Group = []
+        this.$toast.error(error.message)
+      },
+      fetchPolicy: 'cache-and-network',
+    },
   },
 }
 </script>
+
+<style lang="scss">
+.group-add-button {
+  box-shadow: $box-shadow-x-large;
+}
+</style>

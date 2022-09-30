@@ -31,26 +31,27 @@
             />
           </client-only> -->
           <ds-space margin="small">
-            <!-- Group name -->
+            <!-- group name -->
             <ds-heading tag="h3" align="center" no-margin>
               {{ groupName }}
             </ds-heading>
-            <!-- Group slug -->
+            <!-- group slug -->
             <ds-text align="center" color="soft">
+              <base-icon name="at" data-test="at" />
               {{ groupSlug }}
             </ds-text>
-            <!-- Group location -->
+            <!-- group location -->
             <ds-text v-if="group && group.location" align="center" color="soft" size="small">
               <base-icon name="map-marker" data-test="map-marker" />
               {{ group && group.location ? group.location.name : '' }}
             </ds-text>
-            <!-- Group created at -->
+            <!-- group created at -->
             <ds-text align="center" color="soft" size="small">
               {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
             </ds-text>
           </ds-space>
           <ds-flex v-if="isAllowedSeeingGroupMembers">
-            <!-- Group members count -->
+            <!-- group members count -->
             <ds-flex-item v-if="isAllowedSeeingGroupMembers">
               <client-only>
                 <ds-number :label="$t('group.membersCount', {}, groupMembers.length)">
@@ -110,7 +111,7 @@
           </div>
           <hr />
           <ds-space margin-top="small" margin-bottom="small">
-            <!-- Group my role in group -->
+            <!-- group my role in group -->
             <template v-if="isGroupMember">
               <ds-text class="centered-text hyphenate-text" color="soft" size="small">
                 {{ $t('group.role') }}
@@ -121,7 +122,7 @@
                 </ds-chip>
               </div>
             </template>
-            <!-- Group type -->
+            <!-- group type -->
             <ds-text class="centered-text hyphenate-text" color="soft" size="small">
               {{ $t('group.type') }}
             </ds-text>
@@ -130,7 +131,7 @@
                 {{ group && group.groupType ? $t('group.types.' + group.groupType) : '' }}
               </ds-chip>
             </div>
-            <!-- Group action radius -->
+            <!-- group action radius -->
             <ds-text class="centered-text hyphenate-text" color="soft" size="small">
               {{ $t('group.actionRadius') }}
             </ds-text>
@@ -143,7 +144,7 @@
             </div>
             <ds-space margin="x-small" />
           </ds-space>
-          <!-- Group categories -->
+          <!-- group categories -->
           <template v-if="categoriesActive">
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
@@ -176,7 +177,7 @@
               </div>
             </ds-space>
           </template>
-          <!-- Group goal -->
+          <!-- group goal -->
           <template v-if="group && group.about">
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
@@ -230,14 +231,13 @@
         <ds-space>
           <base-card class="group-description">
             <!-- TODO: replace editor content with tiptap render view -->
-            <!-- eslint-disable vue/no-v-html -->
+            <!-- eslint-disable-next-line vue/no-v-html -->
             <div
               v-if="isDescriptionCollapsed"
               class="content hyphenate-text"
               v-html="groupDescriptionExcerpt"
             />
             <content-viewer v-else class="content hyphenate-text" :content="group.description" />
-            <!-- eslint-enable vue/no-v-html -->
             <base-button
               class="collaps-button"
               size="small"
@@ -401,7 +401,7 @@ export default {
     },
     groupSlug() {
       const { slug } = this.group || {}
-      return slug && `@${slug}`
+      return slug
     },
     groupDescriptionExcerpt() {
       return this.group ? this.$filters.removeLinks(this.group.descriptionExcerpt) : ''

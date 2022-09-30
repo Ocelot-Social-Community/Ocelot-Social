@@ -1,56 +1,148 @@
 <template>
   <div>
-    <ds-space><h3>Members</h3></ds-space>
-    <ds-table :data="GroupMembers" :fields="tableFields">
-      <template slot="avatar">
-        <ds-avatar online size="small" name="Hans Peter"></ds-avatar>
+    <ds-table :fields="tableFields" :data="groupMembers" condensed>
+      <template #avatar="scope">
+        <nuxt-link
+          :to="{
+            name: 'profile-id-slug',
+            params: { id: scope.row.id, slug: scope.row.slug },
+          }"
+        >
+          <ds-avatar online size="small" :name="scope.row.name"></ds-avatar>
+        </nuxt-link>
       </template>
-      <template slot="loves" slot-scope="scope">
-        {{ scope.row.name }} loves {{ scope.row.loves }}
+      <template #name="scope">
+        <nuxt-link
+          :to="{
+            name: 'profile-id-slug',
+            params: { id: scope.row.id, slug: scope.row.slug },
+          }"
+        >
+          <ds-text>
+            <b>{{ scope.row.name | truncate(20) }}</b>
+          </ds-text>
+        </nuxt-link>
       </template>
-      <template slot="edit" slot-scope="scope">
-        <ds-button size="small" @click="deleteRow(scope.row)">delete</ds-button>
+      <template #slug="scope">
+        <nuxt-link
+          :to="{
+            name: 'profile-id-slug',
+            params: { id: scope.row.id, slug: scope.row.slug },
+          }"
+        >
+          <ds-text>
+            <b>{{ `@${scope.row.slug}` | truncate(20) }}</b>
+          </ds-text>
+        </nuxt-link>
+      </template>
+      <template #roleInGroup="scope">
+        <select
+          v-if="scope.row.myRoleInGroup !== 'owner'"
+          :options="['pending', 'usual', 'admin', 'owner']"
+          :value="`${scope.row.myRoleInGroup}`"
+          @change="changeMemberRole(scope.row.id, $event)"
+        >
+          <option v-for="role in ['pending', 'usual', 'admin', 'owner']" :key="role" :value="role">
+            {{ $t(`group.roles.${role}`) }}
+          </option>
+        </select>
+        <ds-chip v-else color="primary">
+          {{ $t(`group.roles.${scope.row.myRoleInGroup}`) }}
+        </ds-chip>
+      </template>
+      <template #edit="scope">
+        <ds-button size="small" primary :disabled="true" @click="openModal(scope.row)">
+          <!-- TODO: implement removal of group members -->
+          <!--           :disabled="scope.row.myRoleInGroup === 'owner'"
+ -->
+          {{ $t('group.removeMemberButton') }}
+        </ds-button>
       </template>
     </ds-table>
+    <!-- TODO: implement removal of group members -->
+    <!-- TODO: change to ocelot.social modal -->
+    <!-- <ds-modal
+      v-if="isOpen"
+      v-model="isOpen"
+      :title="`${$t('group.removeMember')}`"
+      force
+      extended
+      :confirm-label="$t('group.removeMember')"
+      :cancel-label="$t('actions.cancel')"
+      @confirm="deleteMember(memberId)"
+    /> -->
   </div>
 </template>
 <script>
+import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
+
 export default {
   name: 'GroupMember',
+  props: {
+    groupId: {
+      type: String,
+      required: true,
+    },
+    groupMembers: {
+      type: Array,
+      required: false,
+    },
+  },
   data() {
     return {
-      tableFields: ['avatar', 'name', 'type', 'loves', 'edit'],
-      GroupMembers: [
-        {
-          name: 'Rengar',
-          type: 'Jungler',
-          loves: 'Hide and seek',
-        },
-        {
-          name: 'Renekton',
-          type: 'Toplaner',
-          loves: 'Slice and dice',
-        },
-        {
-          name: 'Twitch',
-          type: 'ADC',
-          loves: 'Spray and pray',
-        },
-        {
-          name: 'Blitz',
-          type: 'Support',
-          loves: 'Hook you up',
-        },
-      ],
+      isOpen: false,
+      memberId: null,
     }
   },
-  methods: {
-    deleteRow(row) {
-      const index = this.tableData.indexOf(row)
-      if (index > -1) {
-        this.tableData.splice(index, 1)
+  computed: {
+    tableFields() {
+      return {
+        avatar: {
+          label: this.$t('group.membersAdministrationList.avatar'),
+          align: 'left',
+        },
+        name: {
+          label: this.$t('group.membersAdministrationList.name'),
+          align: 'left',
+        },
+        slug: {
+          label: this.$t('group.membersAdministrationList.slug'),
+          align: 'left',
+        },
+        roleInGroup: {
+          label: this.$t('group.membersAdministrationList.roleInGroup'),
+          align: 'left',
+        },
+        edit: {
+          label: '',
+          align: 'left',
+        },
       }
     },
+  },
+  methods: {
+    async changeMemberRole(id, event) {
+      const newRole = event.target.value
+      try {
+        await this.$apollo.mutate({
+          mutation: changeGroupMemberRoleMutation(),
+          variables: { groupId: this.groupId, userId: id, roleInGroup: newRole },
+        })
+        this.$toast.success(
+          this.$t('group.changeMemberRole', { role: this.$t(`group.roles.${newRole}`) }),
+        )
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
+    // TODO: implement removal of group members
+    // openModal(row) {
+    //   this.isOpen = true
+    //   this.memberId = row.id
+    // },
+    // deleteMember(id) {
+    //   alert('deleteMember: ' + id)
+    // },
   },
 }
 </script>
