@@ -5,6 +5,10 @@ export default {
       path: '/#',
     },
     {
+      name: 'Gruppen',
+      path: '/my-groups',
+    },
+    {
       name: 'Über Yunite',
       url: 'https://yunite.org',
     },
