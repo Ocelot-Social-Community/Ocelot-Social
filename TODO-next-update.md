@@ -2,11 +2,17 @@
 
 When you overtake this deploy and rebrand repo to your network you have to recognize the following changes and doings …
 
+## This Latest Version >= 1.1.1 with 'ocelotDockerVersionTag' 1.1.1-231
+
+### Yunite Deployment/Rebranding PR –  chore: 🍰 Release v1.1.1-231 - New Group Features #14
+
+- You have to add the file `webapp/constants/groups.js` as `branding/constants/groups.js` which should include `SHOW_GROUP_BUTTON_IN_HEADER` set to your needs.
+
 ## This Latest Version >= 1.1.0 with 'ocelotDockerVersionTag' 1.1.0-205
 
 ### Deployment/Rebranding PR –  chore: 🍰 Release v1.1.0 - Implement Categories Again #63
 
-- You have to add the `CATEGORIES_ACTIVE` from the `deployment/kubernetes/values.template.yaml` to your `deployment/kubernetes/values.yaml` and set it to your prevered value.
+- You have to add the `CATEGORIES_ACTIVE` from the `deployment/kubernetes/values.template.yaml` to your `deployment/kubernetes/values.yaml` and set it to your preferred value.
 - Make sure the correct categories are in your Neo4j database on the server.
 
 ## Version >= 1.0.9 with 'ocelotDockerVersionTag' 1.0.9-199
