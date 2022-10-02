@@ -12,7 +12,7 @@
           <!-- Group Name -->
           <ds-input
             :label="$t('group.name')"
-            v-model="formData.name"
+            model="name"
             name="name"
             autofocus
             :placeholder="`${$t('group.name')} …`"
@@ -29,7 +29,7 @@
             <ds-input
               v-if="update"
               :label="$t('group.labelSlug')"
-              v-model="formData.slug"
+              model="slug"
               icon="at"
               :placeholder="`${$t('group.labelSlug')} …`"
             ></ds-input>
@@ -40,20 +40,23 @@
             <ds-text class="select-label">
               {{ $t('group.type') }}
             </ds-text>
+            {{formData.groupType}}
             <select
               class="select ds-input appearance--auto"
-              :options="groupTypeOptions"
+               
               :value="formData.groupType"
               :disabled="update"
+              model="groupType"
               name="groupType"
+              @change="changeGroupType($event)"
             >
               <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
                 {{ $t(`group.types.${groupType}`) }}
               </option>
             </select>
             <ds-text align="right">
-              <ds-chip size="base" :color="errors && errors.groupType && 'danger'">
-                <base-icon v-if="errors && errors.groupType" name="warning" />
+              <ds-chip size="base" :color="formData.groupType === '' ? 'danger' : 'medium'">
+                <base-icon v-if="formData.groupType === ''" name="warning" />
               </ds-chip>
             </ds-text>
           </ds-space>
@@ -78,6 +81,7 @@
               :users="null"
               :value="formData.description"
               :hashtags="null"
+              model="description"
               name="description"
               @input="updateEditorDescription"
             />
@@ -98,19 +102,21 @@
               class="select ds-input appearance--auto"
               :options="actionRadiusOptions"
               :value="formData.actionRadius"
+              @change="changeActionRadius($event)"
             >
               <option
                 v-for="actionRadius in actionRadiusOptions"
                 :key="actionRadius"
                 :value="actionRadius"
+                model="actionRadius"
                 name="actionRadius"
               >
                 {{ $t(`group.actionRadii.${actionRadius}`) }}
               </option>
             </select>
             <ds-text align="right">
-              <ds-chip size="base" :color="errors && errors.actionRadius && 'danger'">
-                <base-icon v-if="errors && errors.actionRadius" name="warning" />
+              <ds-chip size="base" :color="formData.actionRadius === '' ? 'danger' : 'medium'">
+                <base-icon v-if="formData.actionRadius === ''" name="warning" />
               </ds-chip>
             </ds-text>
           </ds-space>
@@ -253,6 +259,12 @@ export default {
     },
   },
   methods: {
+    changeGroupType(e) {
+       this.formData.groupType = e.target.value
+    },
+    changeActionRadius(e) {
+      this.formData.actionRadius = e.target.value
+    },
     updateEditorDescription(value) {
       this.$refs.groupForm.update('description', value)
     },
