@@ -40,10 +40,9 @@
             <ds-text class="select-label">
               {{ $t('group.type') }}
             </ds-text>
-            {{formData.groupType}}
+            {{ formData.groupType }}
             <select
               class="select ds-input appearance--auto"
-               
               :value="formData.groupType"
               :disabled="update"
               model="groupType"
@@ -260,7 +259,7 @@ export default {
   },
   methods: {
     changeGroupType(e) {
-       this.formData.groupType = e.target.value
+      this.formData.groupType = e.target.value
     },
     changeActionRadius(e) {
       this.formData.actionRadius = e.target.value
