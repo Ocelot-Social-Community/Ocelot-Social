@@ -4,7 +4,7 @@ import ConfirmModal from './Modal/ConfirmModal.vue'
 import DisableModal from './Modal/DisableModal.vue'
 import ReportModal from './Modal/ReportModal.vue'
 import Vuex from 'vuex'
-import { getters, mutations } from '../store/modal'
+import { getters, mutations } from '../../store/modal'
 import Vue from 'vue'
 
 const localVue = global.localVue
