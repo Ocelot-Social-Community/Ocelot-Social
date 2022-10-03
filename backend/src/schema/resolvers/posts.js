@@ -112,6 +112,29 @@ export default {
       params.id = params.id || uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        let groupCypher = ''
+        if (groupId) {
+          groupCypher = `
+            WITH post MATCH (group:Group { id: $groupId })
+            MERGE (post)-[:IN]->(group)`
+          const groupTypeResponse = await transaction.run(
+            `
+            MATCH (group:Group { id: $groupId }) RETURN group.groupType AS groupType`,
+            { groupId },
+          )
+          const [groupType] = groupTypeResponse.records.map((record) => record.get('groupType'))
+          if (groupType !== 'public')
+            groupCypher += `
+             WITH post, group
+             MATCH (user:User)-[membership:MEMBER_OF]->(group)
+               WHERE group.groupType IN ['closed', 'hidden']
+                 AND membership.role IN ['usual', 'admin', 'owner']
+             WITH post, collect(user.id) AS userIds
+             OPTIONAL MATCH path =(blocked:User) WHERE NOT blocked.id IN userIds 
+             FOREACH (user IN nodes(path) |
+               MERGE (user)-[:CANNOT_SEE]->(post)
+             )`
+        }
         const categoriesCypher =
           CONFIG.CATEGORIES_ACTIVE && categoryIds
             ? `WITH post
@@ -119,10 +142,6 @@ export default {
               MATCH (category:Category {id: categoryId})
               MERGE (post)-[:CATEGORIZED]->(category)`
             : ''
-        const groupCypher = groupId
-          ? `WITH post MATCH (group:Group { id: $groupId })
-              MERGE (post)-[:IN]->(group)`
-          : ''
         const createPostTransactionResponse = await transaction.run(
           `
             CREATE (post:Post)
