@@ -288,13 +288,13 @@
   "delete": {
     "cancel": "Cancel",
     "comment": {
-      "message": "Do you really want to delete the comment \"<b>{name}</b>\"?",
+      "message": "Do you really want to delete the comment <b>“{name}”</b>?",
       "success": "Comment successfully deleted!",
       "title": "Delete Comment",
       "type": "Comment"
     },
     "contribution": {
-      "message": "Do you really want to delete the post \"<b>{name}</b>\"?",
+      "message": "Do you really want to delete the post <b>“{name}”</b>?",
       "success": "Post successfully deleted!",
       "title": "Delete Post",
       "type": "Contribution"
@@ -304,19 +304,19 @@
   "disable": {
     "cancel": "Cancel",
     "comment": {
-      "message": "Do you really want to disable the comment from \"<b>{name}</b>\"?",
+      "message": "Do you really want to disable the comment from <b>“{name}”</b>?",
       "title": "Disable Comment",
       "type": "Comment"
     },
     "contribution": {
-      "message": "Do you really want to disable the contribution \"<b>{name}</b>\"?",
+      "message": "Do you really want to disable the contribution <b>“{name}”</b>?",
       "title": "Disable Contribution",
       "type": "Contribution"
     },
     "submit": "Disable",
     "success": "Disabled successfully!",
     "user": {
-      "message": "Do you really want to disable the user \"<b>{name}</b>\"?",
+      "message": "Do you really want to disable the user <b>“{name}”</b>?",
       "title": "Disable User",
       "type": "User"
     }
@@ -522,32 +522,32 @@
         "cancel": "Cancel",
         "Comment": {
           "disable": {
-            "message": "Do you really want to let the comment \"<b>{name}</b>\" stay <b>disabled</b>?",
+            "message": "Do you really want to let the comment <b>“{name}”</b> stay <b>disabled</b>?",
             "title": "Finally Disable Comment"
           },
           "enable": {
-            "message": "Do you really want to let the comment \"<b>{name}</b>\" stay <b>enabled</b>?",
+            "message": "Do you really want to let the comment <b>“{name}”</b> stay <b>enabled</b>?",
             "title": "Finally Enable Comment"
           }
         },
         "Post": {
           "disable": {
-            "message": "Do you really want to let the post \"<b>{name}</b>\" stay <b>disabled</b>?",
+            "message": "Do you really want to let the post <b>“{name}”</b> stay <b>disabled</b>?",
             "title": "Finally Disable Post"
           },
           "enable": {
-            "message": "Do you really want to let the post \"<b>{name}</b>\" stay <b>enabled</b>?",
+            "message": "Do you really want to let the post <b>“{name}”</b> stay <b>enabled</b>?",
             "title": "Finally Enable Post"
           }
         },
         "submit": "Confirm decision",
         "User": {
           "disable": {
-            "message": "Do you really want to let the user \"<b>{name}</b>\" stay <b>disabled</b>?",
+            "message": "Do you really want to let the user <b>“{name}”</b> stay <b>disabled</b>?",
             "title": "Finally Disable User"
           },
           "enable": {
-            "message": "Do you really want to let the user \"<b>{name}</b>\" stay <b>enabled</b>?",
+            "message": "Do you really want to let the user <b>“{name}”</b> stay <b>enabled</b>?",
             "title": "Finally Enable User"
           }
         }
@@ -656,13 +656,13 @@
     "cancel": "Cancel",
     "comment": {
       "error": "You have already reported the comment!",
-      "message": "Do you really want to release the comment from \"<b>{name}</b>\"?",
+      "message": "Do you really want to release the comment from <b>“{name}”</b>?",
       "title": "Release Comment",
       "type": "Comment"
     },
     "contribution": {
       "error": "You have already reported the contribution!!",
-      "message": "Do you really want to release the contribution \"<b>{name}</b>\"?",
+      "message": "Do you really want to release the contribution <b>“{name}”</b>?",
       "title": "Release Contribution",
       "type": "Contribution"
     },
@@ -670,7 +670,7 @@
     "success": "Released successfully!",
     "user": {
       "error": "You already reported the user!",
-      "message": "Do you really want to release the user \"<b>{name}</b>\"?",
+      "message": "Do you really want to release the user <b>“{name}”</b>?",
       "title": "Release User",
       "type": "User"
     }
@@ -679,15 +679,21 @@
     "cancel": "Cancel",
     "comment": {
       "error": "You have already reported the comment!",
-      "message": "Do you really want to report the comment from \"<b>{name}</b>\"?",
+      "message": "Do you really want to report the comment from <b>“{name}”</b>?",
       "title": "Report Comment",
       "type": "Comment"
     },
     "contribution": {
       "error": "You have already reported the contribution!",
-      "message": "Do you really want to report the contribution \"<b>{name}</b>\"?",
+      "message": "Do you really want to report the contribution <b>“{name}”</b>?",
       "title": "Report Post",
       "type": "Contribution"
+    },
+    "group": {
+      "error": "You have already reported the group!",
+      "message": "Do you really want to report the group <b>“{name}”</b>?",
+      "title": "Report Group",
+      "type": "Group"
     },
     "reason": {
       "category": {
@@ -697,7 +703,7 @@
           "advert_products_services_commercial": "Advertising products and services with commercial intent.",
           "criminal_behavior_violation_german_law": "Criminal behavior or violation of German law.",
           "discrimination_etc": "Discriminatory posts, comments, utterances or insults.",
-          "doxing": "The disclosure of others' personal information without their consent or threat there of (\"doxing\").",
+          "doxing": "The disclosure of others' personal information without their consent or threat there of (“doxing”).",
           "glorific_trivia_of_cruel_inhuman_acts": "Glorification or trivialization of cruel or inhuman acts of violence.",
           "intentional_intimidation_stalking_persecution": "Intentional intimidation, stalking or persecution.",
           "other": "Other …",
@@ -714,7 +720,7 @@
     "success": "Thanks for reporting!",
     "user": {
       "error": "You already reported the user!",
-      "message": "Do you really want to report the user \"<b>{name}</b>\"?",
+      "message": "Do you really want to report the user <b>“{name}”</b>?",
       "title": "Report User",
       "type": "User"
     }
@@ -728,7 +734,7 @@
       "User": "User ::: Users"
     },
     "hint": "What are you searching for? Use !… for posts, @… for users, #… for hashtags.",
-    "no-results": "No results found for \"{search}\". Try a different search term!",
+    "no-results": "No results found for “{search}”. Try a different search term!",
     "page": "Page",
     "placeholder": "Search",
     "results": "result found ::: results found",
@@ -881,7 +887,7 @@
     },
     "social-media": {
       "addNewTitle": "Add new link",
-      "editTitle": "Edit link \"{name}\"",
+      "editTitle": "Edit link “{name}”",
       "name": "Social media",
       "placeholder": "Your social media url",
       "requireUnique": "You added this url already",

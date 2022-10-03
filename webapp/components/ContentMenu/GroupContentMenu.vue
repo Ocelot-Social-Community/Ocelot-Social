@@ -62,15 +62,30 @@ export default {
           params: { id: this.group.id, slug: this.group.slug },
         })
       }
-      if (this.group.myRole === 'owner') {
+      if (this.isOwner) {
         routes.push({
           label: this.$t('admin.settings.name'),
           path: `/group/edit/${this.group.id}`,
           icon: 'edit',
         })
       }
+      if (!this.isOwner) {
+        routes.push({
+          label: this.$t(`report.${this.resourceType}.title`),
+          callback: () => {
+            this.openModal('report')
+          },
+          icon: 'flag',
+        })
+      }
 
       return routes
+    },
+    isOwner() {
+      return this.group.myRole === 'owner'
+    },
+    resourceType() {
+      return 'group'
     },
   },
   methods: {
@@ -81,6 +96,16 @@ export default {
         this.$router.push(route)
       }
       toggleMenu()
+    },
+    openModal(dialog, modalDataName = null) {
+      this.$store.commit('modal/SET_OPEN', {
+        name: dialog,
+        data: {
+          type: this.resourceType,
+          resource: this.group,
+          modalData: modalDataName ? this.modalsData[modalDataName] : {},
+        },
+      })
     },
   },
 }

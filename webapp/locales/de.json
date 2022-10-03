@@ -288,13 +288,13 @@
   "delete": {
     "cancel": "Abbrechen",
     "comment": {
-      "message": "Bist Du sicher, dass Du den Kommentar „<b>{name}</b>“ löschen möchtest?",
+      "message": "Bist Du sicher, dass Du den Kommentar <b>„{name}“</b> löschen möchtest?",
       "success": "Kommentar erfolgreich gelöscht!",
       "title": "Lösche Kommentar",
       "type": "Kommentar"
     },
     "contribution": {
-      "message": "Bist Du sicher, dass Du den Beitrag „<b>{name}</b>“ löschen möchtest?",
+      "message": "Bist Du sicher, dass Du den Beitrag <b>„{name}“</b> löschen möchtest?",
       "success": "Beitrag erfolgreich gelöscht!",
       "title": "Lösche Beitrag",
       "type": "Beitrag"
@@ -304,19 +304,19 @@
   "disable": {
     "cancel": "Abbrechen",
     "comment": {
-      "message": "Bist Du sicher, dass Du den Kommentar „<b>{name}</b>“ deaktivieren möchtest?",
+      "message": "Bist Du sicher, dass Du den Kommentar <b>„{name}“</b> deaktivieren möchtest?",
       "title": "Kommentar sperren",
       "type": "Kommentar"
     },
     "contribution": {
-      "message": "Bist Du sicher, dass Du den Beitrag von „<b>{name}</b>“ deaktivieren möchtest?",
+      "message": "Bist Du sicher, dass Du den Beitrag von <b>„{name}“</b> deaktivieren möchtest?",
       "title": "Beitrag sperren",
       "type": "Beitrag"
     },
     "submit": "Deaktivieren",
     "success": "Erfolgreich deaktiviert",
     "user": {
-      "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ sperren möchtest?",
+      "message": "Bist Du sicher, dass Du den Nutzer <b>„{name}“</b> sperren möchtest?",
       "title": "Nutzer sperren",
       "type": "Nutzer"
     }
@@ -522,32 +522,32 @@
         "cancel": "Abbruch",
         "Comment": {
           "disable": {
-            "message": "Möchtest Du den Kommentar „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
+            "message": "Möchtest Du den Kommentar <b>„{name}“</b> wirklich <b>gesperrt</b> lassen?",
             "title": "Sperre den Kommentar abschließend"
           },
           "enable": {
-            "message": "Möchtest Du den Kommentar „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
+            "message": "Möchtest Du den Kommentar <b>„{name}“</b> wirklich <b>entsperrt</b> lassen?",
             "title": "Entsperre den Kommentar abschließend"
           }
         },
         "Post": {
           "disable": {
-            "message": "Möchtest Du den Beitrag „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
+            "message": "Möchtest Du den Beitrag <b>„{name}“</b> wirklich <b>gesperrt</b> lassen?",
             "title": "Sperre den Beitrag abschließend"
           },
           "enable": {
-            "message": "Möchtest Du den Beitrag „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
+            "message": "Möchtest Du den Beitrag <b>„{name}“</b> wirklich <b>entsperrt</b> lassen?",
             "title": "Entsperre den Beitrag abschließend"
           }
         },
         "submit": "Bestätige Entscheidung",
         "User": {
           "disable": {
-            "message": "Möchtest Du den Benutzer „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
+            "message": "Möchtest Du den Benutzer <b>„{name}“</b> wirklich <b>gesperrt</b> lassen?",
             "title": "Sperre den Benutzer abschließend"
           },
           "enable": {
-            "message": "Möchtest Du den Benutzer „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
+            "message": "Möchtest Du den Benutzer <b>„{name}“</b> wirklich <b>entsperrt</b> lassen?",
             "title": "Entsperre den Benutzer abschließend"
           }
         }
@@ -656,13 +656,13 @@
     "cancel": "Abbrechen",
     "comment": {
       "error": "Den Kommentar hast Du schon gemeldet!",
-      "message": "Bist Du sicher, dass Du den Kommentar „<b>{name}</b>“ freigeben möchtest?",
+      "message": "Bist Du sicher, dass Du den Kommentar <b>„{name}“</b> freigeben möchtest?",
       "title": "Kommentar freigeben",
       "type": "Kommentar"
     },
     "contribution": {
       "error": "Den Beitrag hast Du schon gemeldet!",
-      "message": "Bist Du sicher, dass Du den Beitrag „<b>{name}</b>“ freigeben möchtest?",
+      "message": "Bist Du sicher, dass Du den Beitrag <b>„{name}“</b> freigeben möchtest?",
       "title": "Beitrag freigeben",
       "type": "Beitrag"
     },
@@ -670,7 +670,7 @@
     "success": "Erfolgreich freigegeben!",
     "user": {
       "error": "Den Benutzer hast Du schon gemeldet!",
-      "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ freigeben möchtest?",
+      "message": "Bist Du sicher, dass Du den Nutzer <b>„{name}“</b> freigeben möchtest?",
       "title": "Nutzer freigeben",
       "type": "Nutzer"
     }
@@ -679,15 +679,21 @@
     "cancel": "Abbrechen",
     "comment": {
       "error": "Du hast den Kommentar bereits gemeldet!",
-      "message": "Bist Du sicher, dass Du den Kommentar von „<b>{name}</b>“ melden möchtest?",
+      "message": "Bist Du sicher, dass Du den Kommentar von <b>„{name}“</b> melden möchtest?",
       "title": "Kommentar melden",
       "type": "Kommentar"
     },
     "contribution": {
       "error": "Du hast den Beitrag bereits gemeldet!",
-      "message": "Bist Du sicher, dass Du den Beitrag „<b>{name}</b>“ melden möchtest?",
+      "message": "Bist Du sicher, dass Du den Beitrag <b>„{name}“</b> melden möchtest?",
       "title": "Beitrag melden",
       "type": "Beitrag"
+    },
+    "group": {
+      "error": "Du hast die Gruppe bereits gemeldet!",
+      "message": "Bist Du sicher, dass Du die Gruppe <b>„{name}“</b> melden möchtest?",
+      "title": "Gruppe melden",
+      "type": "Gruppe"
     },
     "reason": {
       "category": {
@@ -714,7 +720,7 @@
     "success": "Vielen Dank für diese Meldung!",
     "user": {
       "error": "Du hast den Benutzer bereits gemeldet!",
-      "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ melden möchtest?",
+      "message": "Bist Du sicher, dass Du den Nutzer <b>„{name}“</b> melden möchtest?",
       "title": "Nutzer melden",
       "type": "Nutzer"
     }
