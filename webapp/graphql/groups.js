@@ -2,170 +2,191 @@ import gql from 'graphql-tag'
 
 // ------ mutations
 
-export const createGroupMutation = gql`
-  mutation (
-    $id: ID
-    $name: String!
-    $slug: String
-    $about: String
-    $description: String!
-    $groupType: GroupType!
-    $actionRadius: GroupActionRadius!
-    $categoryIds: [ID]
-    $locationName: String
-  ) {
-    CreateGroup(
-      id: $id
-      name: $name
-      slug: $slug
-      about: $about
-      description: $description
-      groupType: $groupType
-      actionRadius: $actionRadius
-      categoryIds: $categoryIds
-      locationName: $locationName
+export const createGroupMutation = () => {
+  return gql`
+    mutation (
+      $id: ID
+      $name: String!
+      $slug: String
+      $about: String
+      $description: String!
+      $groupType: GroupType!
+      $actionRadius: GroupActionRadius!
+      $categoryIds: [ID]
+      $locationName: String # empty string '' sets it to null
     ) {
-      id
-      name
-      slug
-      createdAt
-      updatedAt
-      disabled
-      deleted
-      about
-      description
-      groupType
-      actionRadius
-      categories {
+      CreateGroup(
+        id: $id
+        name: $name
+        slug: $slug
+        about: $about
+        description: $description
+        groupType: $groupType
+        actionRadius: $actionRadius
+        categoryIds: $categoryIds
+        locationName: $locationName
+      ) {
         id
-        slug
         name
-        icon
+        slug
+        createdAt
+        updatedAt
+        disabled
+        deleted
+        about
+        description
+        descriptionExcerpt
+        groupType
+        actionRadius
+        categories {
+          id
+          slug
+          name
+          icon
+        }
+        locationName
+        myRole
       }
-      # locationName # test this as result
-      myRole
     }
-  }
-`
+  `
+}
 
-export const updateGroupMutation = gql`
-  mutation (
-    $id: ID!
-    $name: String
-    $slug: String
-    $about: String
-    $description: String
-    $actionRadius: GroupActionRadius
-    $categoryIds: [ID]
-    $avatar: ImageInput
-    $locationName: String
-  ) {
-    UpdateGroup(
-      id: $id
-      name: $name
-      slug: $slug
-      about: $about
-      description: $description
-      actionRadius: $actionRadius
-      categoryIds: $categoryIds
-      avatar: $avatar
-      locationName: $locationName
+export const updateGroupMutation = () => {
+  return gql`
+    mutation (
+      $id: ID!
+      $name: String
+      $slug: String
+      $about: String
+      $description: String
+      $actionRadius: GroupActionRadius
+      $categoryIds: [ID]
+      $avatar: ImageInput
+      $locationName: String # empty string '' sets it to null
     ) {
-      id
-      name
-      slug
-      createdAt
-      updatedAt
-      disabled
-      deleted
-      about
-      description
-      groupType
-      actionRadius
-      categories {
+      UpdateGroup(
+        id: $id
+        name: $name
+        slug: $slug
+        about: $about
+        description: $description
+        actionRadius: $actionRadius
+        categoryIds: $categoryIds
+        avatar: $avatar
+        locationName: $locationName
+      ) {
         id
-        slug
         name
-        icon
+        slug
+        createdAt
+        updatedAt
+        disabled
+        deleted
+        about
+        description
+        descriptionExcerpt
+        groupType
+        actionRadius
+        categories {
+          id
+          slug
+          name
+          icon
+        }
+        # avatar # test this as result
+        locationName
+        myRole
       }
-      # avatar # test this as result
-      # locationName # test this as result
-      myRole
     }
-  }
-`
+  `
+}
 
-export const joinGroupMutation = gql`
-  mutation ($groupId: ID!, $userId: ID!) {
-    JoinGroup(groupId: $groupId, userId: $userId) {
-      id
-      name
-      slug
-      myRoleInGroup
+export const joinGroupMutation = () => {
+  return gql`
+    mutation ($groupId: ID!, $userId: ID!) {
+      JoinGroup(groupId: $groupId, userId: $userId) {
+        id
+        name
+        slug
+        myRoleInGroup
+      }
     }
-  }
-`
+  `
+}
 
-export const leaveGroupMutation = gql`
-  mutation ($groupId: ID!, $userId: ID!) {
-    LeaveGroup(groupId: $groupId, userId: $userId) {
-      id
-      name
-      slug
-      myRoleInGroup
+export const leaveGroupMutation = () => {
+  return gql`
+    mutation ($groupId: ID!, $userId: ID!) {
+      LeaveGroup(groupId: $groupId, userId: $userId) {
+        id
+        name
+        slug
+        myRoleInGroup
+      }
     }
-  }
-`
+  `
+}
 
-export const changeGroupMemberRoleMutation = gql`
-  mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
-    ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
-      id
-      name
-      slug
-      myRoleInGroup
+export const changeGroupMemberRoleMutation = () => {
+  return gql`
+    mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
+      ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
+        id
+        name
+        slug
+        myRoleInGroup
+      }
     }
-  }
-`
+  `
+}
 
 // ------ queries
 
-export const groupQuery = gql`
-  query ($isMember: Boolean, $id: ID, $slug: String) {
-    Group(isMember: $isMember, id: $id, slug: $slug) {
-      id
-      name
-      slug
-      createdAt
-      updatedAt
-      disabled
-      deleted
-      about
-      description
-      groupType
-      actionRadius
-      categories {
+export const groupQuery = (i18n) => {
+  const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
+  return gql`
+    query ($isMember: Boolean, $id: ID, $slug: String) {
+      Group(isMember: $isMember, id: $id, slug: $slug) {
         id
-        slug
         name
-        icon
+        slug
+        createdAt
+        updatedAt
+        disabled
+        deleted
+        about
+        description
+        descriptionExcerpt
+        groupType
+        actionRadius
+        categories {
+          id
+          slug
+          name
+          icon
+        }
+        avatar {
+          url
+        }
+        locationName
+        location {
+          name: name${lang}
+        }
+        myRole
       }
-      avatar {
-        url
-      }
-      # locationName # test this as result
-      myRole
     }
-  }
-`
+  `
+}
 
-export const groupMembersQuery = gql`
-  query ($id: ID!) {
-    GroupMembers(id: $id) {
-      id
-      name
-      slug
-      myRoleInGroup
+export const groupMembersQuery = () => {
+  return gql`
+    query ($id: ID!) {
+      GroupMembers(id: $id) {
+        id
+        name
+        slug
+        myRoleInGroup
+      }
     }
-  }
-`
+  `
+}

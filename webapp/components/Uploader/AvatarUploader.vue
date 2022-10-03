@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="avatar-uploader">
     <vue-dropzone
       id="customdropzone"
       :key="avatarUrl"
@@ -29,7 +29,7 @@ export default {
   },
   props: {
     profile: { type: Object, required: true },
-    updateMutation: { type: Object, required: true },
+    updateMutation: { type: Function, required: true },
   },
   data() {
     return {
@@ -69,7 +69,7 @@ export default {
       const avatarUpload = file[0]
       this.$apollo
         .mutate({
-          mutation: this.updateMutation,
+          mutation: this.updateMutation(),
           variables: {
             avatar: {
               upload: avatarUpload,

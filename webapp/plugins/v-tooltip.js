@@ -3,7 +3,7 @@ import VTooltip from 'v-tooltip'
 
 Vue.use(VTooltip, {
   defaultDelay: {
-    show: 500,
+    show: 750,
     hide: 50,
   },
   defaultOffset: 2,

@@ -9,6 +9,10 @@
       :disabled="isDisabled(category.id)"
       :icon="category.icon"
       size="small"
+      v-tooltip="{
+        content: $t(`contribution.category.description.${category.slug}`),
+        placement: 'bottom-start',
+      }"
     >
       {{ $t(`contribution.category.name.${category.slug}`) }}
     </base-button>

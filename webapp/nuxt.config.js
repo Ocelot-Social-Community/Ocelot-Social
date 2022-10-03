@@ -91,13 +91,21 @@ export default {
   /*
    ** Global CSS
    */
-  css: ['~assets/_new/styles/resets.scss', '~assets/styles/main.scss'],
+  css: [
+    '~assets/_new/styles/resets.scss',
+    '~assets/styles/main.scss',
+    '~assets/styles/imports/_branding.scss',
+  ],
 
   /*
    ** Global processed styles
    */
   styleResources: {
-    scss: [styleguideStyles, '~assets/_new/styles/tokens.scss'],
+    scss: [
+      styleguideStyles,
+      '~assets/_new/styles/tokens.scss',
+      '~assets/styles/imports/_branding.scss',
+    ],
   },
 
   /*

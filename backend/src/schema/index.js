@@ -20,6 +20,7 @@ export default makeAugmentedSchema({
         'FILED',
         'REVIEWED',
         'Report',
+        'Group',
       ],
     },
     mutation: false,

@@ -19,9 +19,8 @@
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
       <!-- TODO: replace editor content with tiptap render view -->
-      <!-- eslint-disable vue/no-v-html -->
+      <!-- eslint-disable-next-line vue/no-v-html -->
       <div class="content hyphenate-text" v-html="excerpt" />
-      <!-- eslint-enable vue/no-v-html -->
       <footer
         class="footer"
         v-observe-visibility="(isVisible, entry) => visibilityChanged(isVisible, entry, post.id)"
@@ -31,9 +30,8 @@
             v-for="category in post.categories"
             :key="category.id"
             v-tooltip="{
-              content: $t(`contribution.category.name.${category.slug}`),
+              content: $t(`contribution.category.description.${category.slug}`),
               placement: 'bottom-start',
-              delay: { show: 500 },
             }"
             :icon="category.icon"
           />

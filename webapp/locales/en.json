@@ -217,6 +217,27 @@
       "infoSelectedNoOfMaxCategories": "{chosen} of {max} topics selected"
     },
     "category": {
+      "description": {
+        "body-and-excercise": "Sports, yoga, massage, relaxation",
+        "children": "Family, education, school, imprinting",
+        "culture": "Art, theatre, music, photography, film",
+        "economy": "Trade, consumption, marketing, supply chains",
+        "energy": "Oil, gas, coal, wind, hydrodynamic power, biogas, atomic energy",
+        "finance": "Money, financial system, alternative currencies",
+        "health": "Medicine, nutrition, WHO, vaccination, harmful substances",
+        "home": "Construction, communities, tiny houses, kitchen garden",
+        "it-and-media": "News, manipulation, privacy, control, data leeches, AI, software, apps",
+        "law": "Human rights, laws, decrees",
+        "miscellaneous": "Miscellaneous",
+        "mobility": "Travel, traffic, electric mobility",
+        "nature": "Animals, plants, agriculture, ecologu, biodiversity",
+        "networking": "Cooperation, action alliances, solidarity, help",
+        "peace": "War, military, social defence, arms, cyber attacks",
+        "politics": "Democracy, participation, elections, corruption, parties",
+        "psyche": "Soul, feelings, happiness",
+        "science": "Education, university, publications",
+        "spirituality": "Religion, values, ethics"
+      },
       "name": {
         "body-and-excercise": "Body & Excercise",
         "children": "Children",
@@ -383,22 +404,50 @@
       "regional": "Regional Group"
     },
     "actionRadius": "Action radius",
+    "categories": "Topic ::: Topics",
+    "changeMemberRole": "The role has been changed to “{role}”!",
+    "contentMenu": {
+      "visitGroupPage": "Show group"
+    },
+    "createNewGroup": {
+      "title": "Create A New Group",
+      "tooltip": "Create a new group"
+    },
+    "description": "Description",
+    "editGroupSettings": {
+      "groupName": "Settings Of “{name}”",
+      "title": "Edit My Group"
+    },
+    "follow": "Follow",
     "foundation": "Foundation",
+    "general": "General",
     "goal": "Goal of group",
-    "group-created": "The group was created!",
-    "group-updated": "The group data has been changed.",
+    "groupCreated": "The group was created!",
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
       "join": "Join"
     },
+    "labelSlug": "Unique group name",
     "leaveModal": {
       "confirmButton": "Leave",
       "message": "Leaving a group may be irreversible!<br>Leave group <b>“{name}”</b>!",
       "title": "Do you really want to leave the group?"
     },
-    "membersCount": "Members",
+    "members": "Members",
+    "membersAdministrationList": {
+      "avatar": "Avatar",
+      "name": "Name",
+      "roleInGroup": "Role",
+      "slug": "Unique name"
+    },
+    "membersCount": "Member ::: Members",
     "membersListTitle": "Group Members",
-    "newGroup": "Create a new Group",
+    "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
+    "myGroups": "My Groups",
+    "name": "Group name",
+    "radius": "Radius",
+    "removeMember": "Remove member",
+    "removeMemberButton": "Remove",
     "role": "Your role in the group",
     "roles": {
       "admin": "Administrator",
@@ -413,12 +462,19 @@
       "hidden": "Hidden Group",
       "public": "Public Group"
     },
-    "update": "Save change"
+    "update": "Save change",
+    "updatedGroup": "The group data has been changed."
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",
     "hashtag-search": "Searching for #{hashtag}",
     "title": "Your filter bubble"
+  },
+  "header": {
+    "avatarMenu": {
+      "myGroups": "My groups",
+      "myProfile": "My profile"
+    }
   },
   "index": {
     "change-filter-settings": "Change your filter settings to get more results.",
@@ -578,7 +634,6 @@
       "title": "Invite somebody to {APPLICATION_NAME}!"
     },
     "memberSince": "Member since",
-    "name": "My Profile",
     "network": {
       "andMore": "and {number} more …",
       "followedBy": "is followed by:",
@@ -790,7 +845,6 @@
       "unmute": "Unmute user",
       "unmuted": "{name} is unmuted again"
     },
-    "myGroups": "My Groups",
     "name": "Settings",
     "notifications": {
       "name": "Notifications",

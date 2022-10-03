@@ -33,8 +33,8 @@ type User {
   invitedBy: User @relation(name: "INVITED", direction: "IN")
   invited: [User] @relation(name: "INVITED", direction: "OUT")
 
-  location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
   locationName: String
+  location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
   about: String
   socialMedia: [SocialMedia]! @relation(name: "OWNED_BY", direction: "IN")
 
@@ -212,7 +212,7 @@ type Mutation {
     email: String
     slug: String
     avatar: ImageInput
-    locationName: String
+    locationName: String # empty string '' sets it to null
     about: String
     termsAndConditionsAgreedVersion: String
     termsAndConditionsAgreedAt: String

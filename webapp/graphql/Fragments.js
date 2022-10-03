@@ -12,6 +12,7 @@ export const userFragment = gql`
     deleted
   }
 `
+
 export const locationAndBadgesFragment = (lang) => gql`
   fragment locationAndBadges on User {
     location {

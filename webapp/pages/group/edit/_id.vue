@@ -1,6 +1,12 @@
 <template>
   <div>
-    <ds-page-title heading="Group Setting"></ds-page-title>
+    <ds-space margin="small">
+      <ds-heading tag="h1">{{ $t('group.editGroupSettings.title') }}</ds-heading>
+      <ds-heading tag="h2">
+        {{ $t('group.editGroupSettings.groupName', { name: group.name }) }}
+      </ds-heading>
+    </ds-space>
+    <ds-space margin="large" />
     <ds-flex gutter="small">
       <ds-flex-item :width="{ base: '100%', md: '200px' }">
         <ds-menu :routes="routes" :is-exact="() => true" />
@@ -11,9 +17,6 @@
         </transition>
       </ds-flex-item>
     </ds-flex>
-    <ds-space centered>
-      <nuxt-link to="/group/my-groups">zurück</nuxt-link>
-    </ds-space>
   </div>
 </template>
 
@@ -29,11 +32,11 @@ export default {
     routes() {
       return [
         {
-          name: 'General',
+          name: this.$t('group.general'),
           path: `/group/edit/${this.group.id}`,
         },
         {
-          name: 'Members',
+          name: this.$t('group.members'),
           path: `/group/edit/${this.group.id}/members`,
         },
       ]
@@ -51,7 +54,7 @@ export default {
         Group: [group],
       },
     } = await client.query({
-      query: groupQuery,
+      query: groupQuery(), // "this.$i18n" is undefined here, so we use default lang
       variables: { id },
     })
     if (group.myRole !== 'owner') {

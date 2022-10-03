@@ -29,6 +29,7 @@ describe('AvatarUploader', () => {
     profile: {
       avatar: { url: '/api/generic.jpg' },
     },
+    updateMutation: jest.fn(),
   }
 
   beforeEach(() => {
@@ -40,7 +41,7 @@ describe('AvatarUploader', () => {
     jest.clearAllMocks()
   })
 
-  it('sends a the UpdateUser mutation when vddrop is called', () => {
+  it('sends the UpdateUser mutation when vddrop is called', () => {
     wrapper.vm.vddrop([{ filename: 'avatar.jpg' }])
     expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
   })

@@ -1,6 +1,6 @@
 <template>
   <base-button
-    class="track-button"
+    class="join-leave-button"
     :disabled="disabled"
     :loading="localLoading"
     :icon="icon"
@@ -108,7 +108,7 @@ export default {
     },
     async joinLeave() {
       const join = !this.isMember
-      const mutation = join ? joinGroupMutation : leaveGroupMutation
+      const mutation = join ? joinGroupMutation() : leaveGroupMutation()
 
       this.hovered = false
       this.$emit('prepare', join)
@@ -129,7 +129,7 @@ export default {
 </script>
 
 <style lang="scss">
-.track-button {
+.join-leave-button {
   display: block;
   width: 100%;
 }

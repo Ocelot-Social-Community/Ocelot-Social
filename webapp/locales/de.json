@@ -217,6 +217,27 @@
       "infoSelectedNoOfMaxCategories": "{chosen} von {max} Themen ausgewählt"
     },
     "category": {
+      "description": {
+        "body-and-excercise": "Sport, Yoga, Massage, Tanzen, Entspannung",
+        "children": "Familie, Pädagogik, Schule, Prägung",
+        "culture": "Kunst, Theater, Musik, Fotografie, Film",
+        "economy": "Handel, Konsum, Marketing, Lieferketten",
+        "energy": "Öl, Gas, Kohle, Wind, Wasserkraft, Biogas, Atomenergie",
+        "finance": "Geld, Finanzsystem, Alternativwährungen",
+        "health": "Medizin, Ernährung, WHO, Impfungen, Schadstoffe",
+        "home": "Bauen, Lebensgemeinschaften, Tiny Houses, Gemüsegarten",
+        "it-and-media": "Nachrichten, Manipulation, Datenschutz, Überwachung, Datenkraken, KI, Software, Apps",
+        "law": "Menschenrechte, Gesetze, Verordnungen",
+        "miscellaneous": "Sonstiges",
+        "mobility": "Reise, Verkehr, Elektromobilität",
+        "nature": "Tiere, Pflanzen, Landwirtschaft, Ökologie, Artenvielfalt",
+        "networking": "Kooperation, Aktionsbündnisse, Solidarität, Hilfe",
+        "peace": "Krieg, Militär, soziale Verteidigung, Waffen, Cyberattacken",
+        "politics": "Demokratie, Mitbestimmung, Wahlen, Korruption, Parteien",
+        "psyche": "Seele, Gefühle, Glück",
+        "science": "Bildung, Hochschule, Publikationen",
+        "spirituality": "Religion, Werte, Ethik"
+      },
       "name": {
         "body-and-excercise": "Körper & Bewegung",
         "children": "Kinder",
@@ -383,22 +404,50 @@
       "regional": "Regionale Gruppe"
     },
     "actionRadius": "Aktionsradius",
+    "categories": "Thema ::: Themen",
+    "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
+    "contentMenu": {
+      "visitGroupPage": "Gruppe anzeigen"
+    },
+    "createNewGroup": {
+      "title": "Erstelle eine neue Gruppe",
+      "tooltip": "Erstelle eine neue Gruppe"
+    },
+    "description": "Beschreibung",
+    "editGroupSettings": {
+      "groupName": "Einstellungen für „{name}“",
+      "title": "Meine Gruppe ändern"
+    },
+    "follow": "Folge",
     "foundation": "Gründung",
+    "general": "Allgemein",
     "goal": "Ziel der Gruppe",
-    "group-created": "Die Gruppe wurde angelegt!",
-    "group-updated": "Die Gruppendaten wurden geändert!",
+    "groupCreated": "Die Gruppe wurde angelegt!",
     "joinLeaveButton": {
       "iAmMember": "Bin Mitglied",
       "join": "Beitreten"
     },
+    "labelSlug": "Eindeutiger Gruppenname",
     "leaveModal": {
       "confirmButton": "Verlassen",
       "message": "Eine Gruppe zu verlassen ist möglicherweise nicht rückgängig zu machen!<br>Gruppe <b>„{name}“</b> verlassen!",
       "title": "Möchtest du wirklich die Gruppe verlassen?"
     },
-    "membersCount": "Mitglieder",
+    "members": "Mitglieder",
+    "membersAdministrationList": {
+      "avatar": "Avatar",
+      "name": "Name",
+      "roleInGroup": "Rolle",
+      "slug": "Eindeutiger Name"
+    },
+    "membersCount": "Mitglied ::: Mitglieder",
     "membersListTitle": "Gruppenmitglieder",
-    "newGroup": "Erstelle eine neue Gruppe",
+    "membersListTitleNotAllowedSeeingGroupMembers": "Gruppenmitglieder unsichtbar",
+    "myGroups": "Meine Gruppen",
+    "name": "Gruppenname",
+    "radius": "Radius",
+    "removeMember": "Mitglied aus der Gruppe entfernen?",
+    "removeMemberButton": "Entfernen",
     "role": "Deine Rolle in der Gruppe",
     "roles": {
       "admin": "Administrator",
@@ -413,12 +462,19 @@
       "hidden": "Versteckte Gruppe",
       "public": "Öffentliche Gruppe"
     },
-    "update": "Änderung speichern"
+    "update": "Änderung speichern",
+    "updatedGroup": "Die Gruppendaten wurden geändert!"
   },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",
     "hashtag-search": "Suche nach #{hashtag}",
     "title": "Deine Filterblase"
+  },
+  "header": {
+    "avatarMenu": {
+      "myGroups": "Mein Gruppen",
+      "myProfile": "Mein Profil"
+    }
   },
   "index": {
     "change-filter-settings": "Verändere die Filter-Einstellungen, um mehr Ergebnisse zu erhalten.",
@@ -578,7 +634,6 @@
       "title": "Lade jemanden zu {APPLICATION_NAME} ein!"
     },
     "memberSince": "Mitglied seit",
-    "name": "Mein Profil",
     "network": {
       "andMore": "und {number} weitere …",
       "followedBy": "wird gefolgt von:",
@@ -790,7 +845,6 @@
       "unmute": "Stummschaltung aufheben",
       "unmuted": "{name} ist nicht mehr stummgeschaltet"
     },
-    "myGroups": "Meine Gruppen",
     "name": "Einstellungen",
     "notifications": {
       "name": "Benachrichtigungen",

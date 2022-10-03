@@ -29,11 +29,12 @@ type Group {
 
   about: String # goal
   description: String!
+  descriptionExcerpt: String!
   groupType: GroupType!
   actionRadius: GroupActionRadius!
 
-  location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
   locationName: String
+  location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
 
   categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
@@ -104,7 +105,7 @@ type Mutation {
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
     # avatar: ImageInput # a group can not be created with an avatar
-    locationName: String # test this as result
+    locationName: String # empty string '' sets it to null
   ): Group
 
   UpdateGroup(
@@ -117,7 +118,7 @@ type Mutation {
     actionRadius: GroupActionRadius
     categoryIds: [ID]
     avatar: ImageInput # test this as result
-    locationName: String # test this as result
+    locationName: String # empty string '' sets it to null
   ): Group
 
   # DeleteGroup(id: ID!): Group

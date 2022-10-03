@@ -4,10 +4,38 @@
       <ds-container class="main-navigation-container" style="padding: 10px 10px">
         <div>
           <ds-flex class="main-navigation-flex">
-            <ds-flex-item :width="{ base: '142px' }">
+            <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
               <nuxt-link :to="{ name: 'index' }" v-scroll-to="'.main-navigation'">
                 <logo logoType="header" />
               </nuxt-link>
+            </ds-flex-item>
+
+            <ds-flex-item
+              v-for="item in menu"
+              :key="item.name"
+              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+              :width="{ base: 'auto' }"
+              style="margin-right: 20px"
+            >
+              <a v-if="item.url" :href="item.url" target="_blank">
+                <ds-text size="large" bold>
+                  {{ item.name }}
+                </ds-text>
+              </a>
+              <nuxt-link v-else :to="item.path">
+                <ds-text size="large" bold>
+                  {{ item.name }}
+                </ds-text>
+              </nuxt-link>
+            </ds-flex-item>
+            <ds-flex-item
+              v-if="categoriesActive && isLoggedIn"
+              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+              style="flex-grow: 0; flex-basis: auto; margin-right: 20px"
+            >
+              <client-only>
+                <categories-menu></categories-menu>
+              </client-only>
             </ds-flex-item>
             <ds-flex-item
               :width="{ base: '40%', sm: '40%', md: '40%', lg: '0%' }"
@@ -16,16 +44,12 @@
               <base-button icon="bars" @click="toggleMobileMenuView" circle />
             </ds-flex-item>
             <ds-flex-item
-              v-if="categoriesActive && isLoggedIn"
-              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-              style="flex-grow: 0; flex-basis: auto"
-            >
-              <client-only>
-                <categories-menu></categories-menu>
-              </client-only>
-            </ds-flex-item>
-            <ds-flex-item
-              :width="{ base: '45%', sm: '45%', md: '45%', lg: '50%' }"
+              :width="{
+                base: '45%',
+                sm: '45%',
+                md: isHeaderMenu ? 'auto' : '45%',
+                lg: isHeaderMenu ? 'auto' : '50%',
+              }"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
               style="flex-shrink: 0; flex-grow: 1"
               id="nav-search-box"
@@ -43,7 +67,7 @@
               </client-only>
             </ds-flex-item>
             <ds-flex-item
-              style="background-color: white; flex-basis: auto"
+              style="flex-basis: auto"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             >
               <div
@@ -64,6 +88,9 @@
                       <invite-button placement="top" />
                     </client-only>
                   </div>
+                  <client-only v-if="SHOW_GROUP_BUTTON_IN_HEADER">
+                    <group-button />
+                  </client-only>
                   <client-only>
                     <avatar-menu placement="top" />
                   </client-only>
@@ -88,18 +115,22 @@
 </template>
 
 <script>
-import Logo from '~/components/Logo/Logo'
 import { mapGetters } from 'vuex'
+import Logo from '~/components/Logo/Logo'
+import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
+import headerMenu from '~/constants/headerMenu.js'
+import LOGOS from '~/constants/logos.js'
+import seo from '~/mixins/seo'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
 import Modal from '~/components/Modal'
-import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
-import seo from '~/mixins/seo'
-import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
-import PageFooter from '~/components/PageFooter/PageFooter'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
+import CategoriesMenu from '~/components/FilterMenu/CategoriesMenu'
+import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
+import GroupButton from '~/components/Group/GroupButton'
 import InviteButton from '~/components/InviteButton/InviteButton'
-import CategoriesMenu from '~/components/FilterMenu/CategoriesMenu.vue'
+import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
+import PageFooter from '~/components/PageFooter/PageFooter'
 
 export default {
   components: {
@@ -113,10 +144,15 @@ export default {
     PageFooter,
     InviteButton,
     CategoriesMenu,
+    GroupButton,
   },
   mixins: [seo],
   data() {
     return {
+      LOGOS,
+      SHOW_GROUP_BUTTON_IN_HEADER,
+      isHeaderMenu: headerMenu.MENU.length > 0,
+      menu: headerMenu.MENU,
       mobileSearchVisible: false,
       toggleMobileMenu: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
@@ -141,6 +177,17 @@ export default {
 </script>
 
 <style lang="scss">
+.main-navigation {
+  background-color: $color-header-background;
+}
+.margin-right-20 {
+  margin-right: 20px;
+}
+.margin-x {
+  margin-left: 20px;
+  margin-right: 20px;
+  white-space: nowrap;
+}
 .topbar-locale-switch {
   display: flex;
   margin-right: $space-xx-small;
@@ -156,11 +203,6 @@ export default {
   align-items: center;
 }
 
-.main-navigation {
-  a {
-    color: $text-color-soft;
-  }
-}
 .main-navigation-right {
   display: flex;
   justify-content: flex-end;

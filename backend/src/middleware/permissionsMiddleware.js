@@ -82,7 +82,7 @@ const isAllowedToChangeGroupSettings = rule({
   }
 })
 
-const isAllowedSeeingMembersOfGroup = rule({
+const isAllowedSeeingGroupMembers = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
   if (!(user && user.id)) return false
@@ -312,7 +312,7 @@ export default shield(
       statistics: allow,
       currentUser: allow,
       Group: isAuthenticated,
-      GroupMembers: isAllowedSeeingMembersOfGroup,
+      GroupMembers: isAllowedSeeingGroupMembers,
       Post: allow,
       profilePagePosts: allow,
       Comment: allow,

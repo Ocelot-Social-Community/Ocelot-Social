@@ -31,6 +31,7 @@
               {{ userName }}
             </ds-heading>
             <ds-text align="center" color="soft">
+              <base-icon name="at" />
               {{ userSlug }}
             </ds-text>
             <ds-text v-if="user.location" align="center" color="soft" size="small">
@@ -120,7 +121,6 @@
                   v-tooltip="{
                     content: $t('contribution.newPost'),
                     placement: 'left',
-                    delay: { show: 500 },
                   }"
                   :path="{ name: 'post-create' }"
                   class="profile-post-add-button"
@@ -238,7 +238,7 @@ export default {
       followedByCountStartValue: 0,
       followedByCount: followListVisibleCount,
       followingCount: followListVisibleCount,
-      updateUserMutation: updateUserMutation(),
+      updateUserMutation,
     }
   },
   computed: {
@@ -254,7 +254,7 @@ export default {
     },
     userSlug() {
       const { slug } = this.user || {}
-      return slug && `@${slug}`
+      return slug
     },
     tabOptions() {
       return [
