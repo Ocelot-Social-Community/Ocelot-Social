@@ -88,7 +88,7 @@ describe('Posts in Groups', () => {
 
     authenticatedUser = await publicUser.toJson()
     await mutate({
-      mutation: createGroupMutation,
+      mutation: createGroupMutation(),
       variables: {
         id: 'public-group',
         name: 'The Public Group',
@@ -99,7 +99,7 @@ describe('Posts in Groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation,
+      mutation: changeGroupMemberRoleMutation(),
       variables: {
         groupId: 'public-group',
         userId: 'pending-user',
@@ -107,7 +107,7 @@ describe('Posts in Groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation,
+      mutation: changeGroupMemberRoleMutation(),
       variables: {
         groupId: 'public-group',
         userId: 'all-groups-user',
@@ -116,7 +116,7 @@ describe('Posts in Groups', () => {
     })
     authenticatedUser = await closedUser.toJson()
     await mutate({
-      mutation: createGroupMutation,
+      mutation: createGroupMutation(),
       variables: {
         id: 'closed-group',
         name: 'The Closed Group',
@@ -127,7 +127,7 @@ describe('Posts in Groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation,
+      mutation: changeGroupMemberRoleMutation(),
       variables: {
         groupId: 'closed-group',
         userId: 'pending-user',
@@ -135,7 +135,7 @@ describe('Posts in Groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation,
+      mutation: changeGroupMemberRoleMutation(),
       variables: {
         groupId: 'closed-group',
         userId: 'all-groups-user',
@@ -144,7 +144,7 @@ describe('Posts in Groups', () => {
     })
     authenticatedUser = await hiddenUser.toJson()
     await mutate({
-      mutation: createGroupMutation,
+      mutation: createGroupMutation(),
       variables: {
         id: 'hidden-group',
         name: 'The Hidden Group',
@@ -155,7 +155,7 @@ describe('Posts in Groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation,
+      mutation: changeGroupMemberRoleMutation(),
       variables: {
         groupId: 'hidden-group',
         userId: 'pending-user',
@@ -163,7 +163,7 @@ describe('Posts in Groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation,
+      mutation: changeGroupMemberRoleMutation(),
       variables: {
         groupId: 'hidden-group',
         userId: 'all-groups-user',
@@ -181,7 +181,7 @@ describe('Posts in Groups', () => {
       it('throws an error for public groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: createPostMutation(),
             variables: {
               id: 'p2',
               title: 'A post to a pubic group',
@@ -197,7 +197,7 @@ describe('Posts in Groups', () => {
       it('throws an error for closed groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: createPostMutation(),
             variables: {
               id: 'p2',
               title: 'A post to a closed group',
@@ -213,7 +213,7 @@ describe('Posts in Groups', () => {
       it('throws an error for hidden groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: createPostMutation(),
             variables: {
               id: 'p2',
               title: 'A post to a closed group',
@@ -235,7 +235,7 @@ describe('Posts in Groups', () => {
       it('throws an error for public groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: createPostMutation(),
             variables: {
               id: 'p2',
               title: 'A post to a pubic group',
@@ -251,7 +251,7 @@ describe('Posts in Groups', () => {
       it('throws an error for closed groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: createPostMutation(),
             variables: {
               id: 'p2',
               title: 'A post to a closed group',
@@ -267,7 +267,7 @@ describe('Posts in Groups', () => {
       it('throws an error for hidden groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: createPostMutation(),
             variables: {
               id: 'p2',
               title: 'A post to a closed group',
@@ -289,7 +289,7 @@ describe('Posts in Groups', () => {
       it('creates a post for public groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: createPostMutation(),
             variables: {
               id: 'post-to-public-group',
               title: 'A post to a public group',
@@ -312,7 +312,7 @@ describe('Posts in Groups', () => {
       it('creates a post for closed groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: createPostMutation(),
             variables: {
               id: 'post-to-closed-group',
               title: 'A post to a closed group',
@@ -335,7 +335,7 @@ describe('Posts in Groups', () => {
       it('creates a post for hidden groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: createPostMutation(),
             variables: {
               id: 'post-to-hidden-group',
               title: 'A post to a hidden group',
