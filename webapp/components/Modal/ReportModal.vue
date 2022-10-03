@@ -6,6 +6,7 @@
       </ds-flex>
     </transition>
 
+    <ds-space margin="small" />
     <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-html="message" />
     <ds-radio
