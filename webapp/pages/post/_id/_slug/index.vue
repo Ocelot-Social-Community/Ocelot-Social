@@ -44,6 +44,24 @@
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
       <ds-space margin-bottom="small" />
       <content-viewer class="content hyphenate-text" :content="post.content" />
+      <!-- Categories -->
+      <div v-if="categoriesActive" class="categories">
+        <!-- eslint-enable vue/no-v-html -->
+        <ds-space margin="xx-large" />
+        <ds-space margin="xx-small" />
+        <hc-category
+          v-for="category in post.categories"
+          :key="category.id"
+          :icon="category.icon"
+          :name="$t(`contribution.category.name.${category.slug}`)"
+          v-tooltip="{
+            content: $t(`contribution.category.description.${category.slug}`),
+            placement: 'bottom-start',
+            delay: { show: 1500 },
+          }"
+        />
+      </div>
+      <ds-space margin-bottom="small" />
       <!-- Tags -->
       <div v-if="post.tags && post.tags.length" class="tags">
         <ds-space margin="xx-small" />
@@ -91,6 +109,7 @@
 
 <script>
 import ContentViewer from '~/components/Editor/ContentViewer'
+import HcCategory from '~/components/Category'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
@@ -118,6 +137,7 @@ export default {
     CommentForm,
     CommentList,
     ContentViewer,
+    HcCategory,
     HcHashtag,
     HcShoutButton,
     PageParamsLink,
@@ -138,6 +158,7 @@ export default {
       blurred: false,
       blocked: null,
       postAuthor: null,
+      categoriesActive: this.$env.CATEGORIES_ACTIVE,
     }
   },
   mounted() {
@@ -171,12 +192,12 @@ export default {
     heroImageStyle() {
       /*  Return false when image property is not present or is not a number
           so no unnecessary css variables are set.
-      */
+        */
 
       if (!this.post.image || typeof this.post.image.aspectRatio !== 'number') return false
       /*  Return the aspect ratio as a css variable. Later to be used when calculating
           the height with respect to the width.
-      */
+        */
       return {
         '--hero-image-aspect-ratio': 1.0 / this.post.image.aspectRatio,
       }
@@ -253,12 +274,12 @@ export default {
     /*  The padding top makes sure the correct height is set (according to the
         hero image aspect ratio) before the hero image loads so
         the autoscroll works correctly when following a comment link. 
-    */
+      */
 
     padding-top: calc(var(--hero-image-aspect-ratio) * (100% + 48px));
     /*  Letting the image fill the container, since the container
         is the one determining height
-    */
+      */
     > .image {
       position: absolute;
       top: 0;

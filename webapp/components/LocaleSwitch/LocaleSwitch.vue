@@ -82,7 +82,7 @@ export default {
       try {
         await this.$apollo.mutate({
           mutation: gql`
-            mutation($id: ID!, $locale: String) {
+            mutation ($id: ID!, $locale: String) {
               UpdateUser(id: $id, locale: $locale) {
                 id
                 locale
@@ -117,7 +117,7 @@ export default {
   align-items: center;
   height: 100%;
   padding: $space-xx-small;
-  color: $text-color-soft;
+  color: $color-locale-menu;
 
   > .label {
     margin: 0 $space-xx-small;

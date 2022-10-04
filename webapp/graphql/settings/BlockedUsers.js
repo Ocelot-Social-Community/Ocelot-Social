@@ -20,7 +20,7 @@ export const blockedUsers = () => {
 
 export const blockUser = () => {
   return gql`
-    mutation($id: ID!) {
+    mutation ($id: ID!) {
       blockUser(id: $id) {
         id
         name
@@ -33,7 +33,7 @@ export const blockUser = () => {
 
 export const unblockUser = () => {
   return gql`
-    mutation($id: ID!) {
+    mutation ($id: ID!) {
       unblockUser(id: $id) {
         id
         name

@@ -117,7 +117,7 @@ describe('follow', () => {
             variables,
           }),
         ).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
           data: { followUser: null },
         })
       })
@@ -191,7 +191,7 @@ describe('follow', () => {
         authenticatedUser = null
         await expect(mutate({ mutation: mutationUnfollowUser, variables })).resolves.toMatchObject({
           data: { unfollowUser: null },
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })

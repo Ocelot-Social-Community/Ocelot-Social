@@ -1,4 +1,4 @@
-enum UserGroup {
+enum UserRole {
   admin
   moderator
   user

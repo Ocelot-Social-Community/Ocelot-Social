@@ -130,7 +130,7 @@ describe('file a report on a resource', () => {
         authenticatedUser = null
         await expect(mutate({ mutation: fileReportMutation, variables })).resolves.toMatchObject({
           data: { fileReport: null },
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -729,7 +729,7 @@ describe('file a report on a resource', () => {
         authenticatedUser = null
         expect(query({ query: reportsQuery })).resolves.toMatchObject({
           data: { reports: null },
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -739,7 +739,7 @@ describe('file a report on a resource', () => {
         authenticatedUser = await currentUser.toJson()
         expect(query({ query: reportsQuery })).resolves.toMatchObject({
           data: { reports: null },
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
 

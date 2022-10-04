@@ -10,7 +10,7 @@ export const FetchAllRoles = () => {
 
 export const updateUserRole = (role, id) => {
   return gql`
-    mutation($role: UserGroup!, $id: ID!) {
+    mutation ($role: UserRole!, $id: ID!) {
       switchUserRole(role: $role, id: $id) {
         name
         role

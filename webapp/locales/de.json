@@ -11,7 +11,7 @@
   "admin": {
     "categories": {
       "categoryName": "Name",
-      "name": "Kategorien",
+      "name": "Themen",
       "postCount": "Beiträge"
     },
     "dashboard": {
@@ -98,7 +98,7 @@
     }
   },
   "common": {
-    "category": "Kategorie ::: Kategorien",
+    "category": "Thema ::: Themen",
     "comment": "Kommentar ::: Kommentare",
     "letsTalk": "Miteinander reden",
     "loading": "wird geladen",
@@ -113,7 +113,7 @@
     "takeAction": "Aktiv werden",
     "user": "Benutzer ::: Benutzer",
     "validations": {
-      "categories": "es müssen eine bis drei Kategorien ausgewählt werden",
+      "categories": "es müssen eine bis drei Themen ausgewählt werden",
       "email": "muss eine gültige E-Mail-Adresse sein",
       "url": "muss eine gültige URL sein"
     },
@@ -214,26 +214,50 @@
     "amount-shouts": "{amount} recommendations",
     "amount-views": "{amount} views",
     "categories": {
-      "infoSelectedNoOfMaxCategories": "{chosen} von {max} Kategorien ausgewählt"
+      "infoSelectedNoOfMaxCategories": "{chosen} von {max} Themen ausgewählt"
     },
     "category": {
+      "description": {
+        "body-and-excercise": "Sport, Yoga, Massage, Tanzen, Entspannung",
+        "children": "Familie, Pädagogik, Schule, Prägung",
+        "culture": "Kunst, Theater, Musik, Fotografie, Film",
+        "economy": "Handel, Konsum, Marketing, Lieferketten",
+        "energy": "Öl, Gas, Kohle, Wind, Wasserkraft, Biogas, Atomenergie",
+        "finance": "Geld, Finanzsystem, Alternativwährungen",
+        "health": "Medizin, Ernährung, WHO, Impfungen, Schadstoffe",
+        "home": "Bauen, Lebensgemeinschaften, Tiny Houses, Gemüsegarten",
+        "it-and-media": "Nachrichten, Manipulation, Datenschutz, Überwachung, Datenkraken, KI, Software, Apps",
+        "law": "Menschenrechte, Gesetze, Verordnungen",
+        "miscellaneous": "Sonstiges",
+        "mobility": "Reise, Verkehr, Elektromobilität",
+        "nature": "Tiere, Pflanzen, Landwirtschaft, Ökologie, Artenvielfalt",
+        "networking": "Kooperation, Aktionsbündnisse, Solidarität, Hilfe",
+        "peace": "Krieg, Militär, soziale Verteidigung, Waffen, Cyberattacken",
+        "politics": "Demokratie, Mitbestimmung, Wahlen, Korruption, Parteien",
+        "psyche": "Seele, Gefühle, Glück",
+        "science": "Bildung, Hochschule, Publikationen",
+        "spirituality": "Religion, Werte, Ethik"
+      },
       "name": {
-        "animal-protection": "Schutz der Tiere",
-        "art-culture-sport": "Kunst, Kultur & Sport",
-        "consumption-sustainability": "Verbrauch & Nachhaltigkeit",
-        "cooperation-development": "Zusammenarbeit & Entwicklung",
-        "democracy-politics": "Demokratie & Politik",
-        "economy-finances": "Wirtschaft & Finanzen",
-        "education-sciences": "Bildung & Wissenschaft",
-        "energy-technology": "Energie & Technologie",
-        "environment-nature": "Umwelt & Natur",
-        "freedom-of-speech": "Redefreiheit",
-        "global-peace-nonviolence": "Globaler Frieden & Gewaltlosigkeit",
-        "happiness-values": "Glück & Werte",
-        "health-wellbeing": "Gesundheit & Wohlbefinden",
-        "human-rights-justice": "Menschenrechte & Gerechtigkeit",
-        "it-internet-data-privacy": "IT, Internet & Datenschutz",
-        "just-for-fun": "Nur zum Spaß"
+        "body-and-excercise": "Körper & Bewegung",
+        "children": "Kinder",
+        "culture": "Kultur",
+        "economy": "Wirtschaft",
+        "energy": "Energie",
+        "finance": "Finanzen",
+        "health": "Gesundheit",
+        "home": "Wohnen",
+        "it-and-media": "IT & Medien",
+        "law": "Recht",
+        "miscellaneous": "Sonstiges",
+        "mobility": "Mobilität",
+        "nature": "Natur",
+        "networking": "Vernetzung",
+        "peace": "Frieden",
+        "politics": "Politik",
+        "psyche": "Psyche",
+        "science": "Wissenschaft",
+        "spirituality": "Spiritualität"
       }
     },
     "emotions-label": {
@@ -345,7 +369,7 @@
   },
   "filter-menu": {
     "all": "Alle",
-    "categories": "Themenkategorien",
+    "categories": "Themen",
     "emotions": "Emotionen",
     "filter-by": "Filtern nach ...",
     "following": "Benutzern, denen ich folge",
@@ -360,7 +384,11 @@
         "label": "Älteste zuerst"
       }
     },
-    "order-by": "Sortieren nach ..."
+    "order-by": "Sortieren nach ...",
+    "save": {
+      "error": "Themen konnten nicht gespeichert werden!",
+      "success": "Themen gespeichert!"
+    }
   },
   "followButton": {
     "follow": "Folgen",
@@ -467,7 +495,7 @@
       "noDecision": "Keine Entscheidung!",
       "numberOfUsers": "{count} Nutzern",
       "previousDecision": "Vorherige Entscheidung:",
-      "reasonCategory": "Kategorie",
+      "reasonCategory": "Thema",
       "reasonDescription": "Beschreibung",
       "reportedOn": "Datum",
       "status": "Aktueller Status",
@@ -584,8 +612,8 @@
     },
     "reason": {
       "category": {
-        "invalid": "Bitte wähle eine gültige Kategorie aus",
-        "label": "Wähle eine Kategorie:",
+        "invalid": "Bitte wähle ein gültiges Thema aus",
+        "label": "Wähle ein Thema:",
         "options": {
           "advert_products_services_commercial": "Bewerben von Produkten und Dienstleistungen mit kommerzieller Absicht.",
           "criminal_behavior_violation_german_law": "Strafbares Verhalten bzw. Verstoß gegen deutsches Recht.",
@@ -596,7 +624,7 @@
           "other": "Andere …",
           "pornographic_content_links": "Das Senden oder Verlinken eindeutig pornografischen Materials."
         },
-        "placeholder": "Kategorie …"
+        "placeholder": "Thema …"
       },
       "description": {
         "label": "Bitte erkläre: Warum möchtest Du dies melden?",

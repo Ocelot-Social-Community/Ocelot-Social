@@ -34,6 +34,9 @@ describe('post/_id.vue', () => {
             }),
           },
         },
+        $env: {
+          CATEGORIES_ACTIVE: false,
+        },
       }
       store = new Vuex.Store({
         getters: {
