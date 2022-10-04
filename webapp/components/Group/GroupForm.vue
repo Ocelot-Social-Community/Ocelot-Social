@@ -17,15 +17,12 @@
             autofocus
             :placeholder="`${$t('group.name')} …`"
           />
-          <ds-text align="right">
             <ds-chip size="base" :color="errors && errors.name && 'danger'">
-              {{ `${formData.name.length} / ${formSchema.name.max}` }}
+              {{ `${formData.name.length} / ${formSchema.name.min}–${formSchema.name.max}` }}
               <base-icon v-if="errors && errors.name" name="warning" />
             </ds-chip>
-          </ds-text>
-
+      
           <!-- Group Slug -->
-          <ds-space margin-top="large">
             <ds-input
               v-if="update"
               :label="$t('group.labelSlug')"
@@ -33,14 +30,13 @@
               icon="at"
               :placeholder="`${$t('group.labelSlug')} …`"
             ></ds-input>
-          </ds-space>
 
           <!-- groupType -->
-          <ds-space margin-top="large">
             <ds-text class="select-label">
               {{ $t('group.type') }}
             </ds-text>
-            {{ formData.groupType }}
+            <!-- TODO: change it has to be implemented later -->
+            <!-- TODO: move 'ds-select' from styleguide to main code and implement missen translation etc. functionality -->
             <select
               class="select ds-input appearance--auto"
               :value="formData.groupType"
@@ -53,26 +49,23 @@
                 {{ $t(`group.types.${groupType}`) }}
               </option>
             </select>
-            <ds-text align="right">
-              <ds-chip size="base" :color="formData.groupType === '' ? 'danger' : 'medium'">
-                <base-icon v-if="formData.groupType === ''" name="warning" />
-              </ds-chip>
-            </ds-text>
-          </ds-space>
+            <ds-chip v-if="formData.groupType === ''" size="base" :color="formData.groupType === '' ? 'danger' : 'medium'">
+              <base-icon v-if="formData.groupType === ''" name="warning" />
+            </ds-chip>
+      
 
           <!-- goal -->
-          <ds-space margin-top="large">
             <ds-input
               :label="$t('group.goal')"
-              v-model="formData.goal"
+              v-model="formData.about"
               :placeholder="$t('group.goal') + ' …'"
-              name="goal"
+              name="about"
               rows="3"
             />
-          </ds-space>
 
-          <!-- description -->
-          <ds-space margin-top="large">
+            <ds-space margin-top="small" />
+
+            <!-- description -->
             <ds-text class="select-label">
               {{ $t('group.description') }}
             </ds-text>
@@ -84,19 +77,17 @@
               name="description"
               @input="updateEditorDescription"
             />
-            <ds-text align="right">
-              <ds-chip size="base" :color="errors && errors.description && 'danger'">
-                {{ `${descriptionLength} / ${formSchema.description.min}` }}
-                <base-icon v-if="errors && errors.description" name="warning" />
-              </ds-chip>
-            </ds-text>
-          </ds-space>
+            <ds-chip size="base" :color="errors && errors.description && 'danger'">
+              {{ `${descriptionLength} / ${formSchema.description.min}` }}
+              <base-icon v-if="errors && errors.description" name="warning" />
+            </ds-chip>
 
           <!-- actionRadius -->
-          <ds-space margin-top="large">
             <ds-text class="select-label">
               {{ $t('group.actionRadius') }}
             </ds-text>
+            <!-- TODO: change it has to be implemented later -->
+            <!-- TODO: move 'ds-select' from styleguide to main code and implement missen translation etc. functionality -->
             <select
               class="select ds-input appearance--auto"
               :options="actionRadiusOptions"
@@ -113,15 +104,11 @@
                 {{ $t(`group.actionRadii.${actionRadius}`) }}
               </option>
             </select>
-            <ds-text align="right">
-              <ds-chip size="base" :color="formData.actionRadius === '' ? 'danger' : 'medium'">
-                <base-icon v-if="formData.actionRadius === ''" name="warning" />
-              </ds-chip>
-            </ds-text>
-          </ds-space>
+            <ds-chip v-if="formData.actionRadius === ''" size="base" :color="formData.actionRadius === '' ? 'danger' : 'medium'">
+              <base-icon v-if="formData.actionRadius === ''" name="warning" />
+            </ds-chip>
 
           <!-- location -->
-          <ds-space margin-top="large">
             <ds-select
               id="city"
               :label="$t('settings.data.labelCity')"
@@ -141,10 +128,11 @@
               @click="formData.locationName = ''"
               style="position: relative; display: inline-block; right: -93%; top: -45px"
             ></base-button>
-          </ds-space>
 
-          <!-- category -->
-          <ds-space margin-top="large">
+
+            <ds-space margin-top="small" />
+
+            <!-- category -->
             <categories-select
               v-if="categoriesActive"
               model="categoryIds"
@@ -161,7 +149,8 @@
                 <base-icon v-if="errors && errors.categoryIds" name="warning" />
               </ds-chip>
             </ds-text>
-          </ds-space>
+
+            <!-- Submit -->
           <ds-space margin-top="large">
             <nuxt-link to="/my-groups">
               <ds-button>{{ $t('actions.cancel') }}</ds-button>
@@ -208,7 +197,7 @@ export default {
     },
   },
   data() {
-    const { name, slug, groupType, goal, description, actionRadius, locationName, categories } =
+    const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
       this.group
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
@@ -222,7 +211,7 @@ export default {
         name: name || '',
         slug: slug || '',
         groupType: groupType || '',
-        goal: goal || '',
+        about: about || '',
         description: description || '',
         locationName: locationName || '',
         actionRadius: actionRadius || '',
@@ -232,7 +221,7 @@ export default {
         name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
         slug: { required: false, min: NAME_LENGTH_MIN },
         groupType: { required: true },
-        goal: { required: false },
+        about: { required: false },
         description: { required: true, min: DESCRIPTION_WITHOUT_HTML_LENGTH_MIN },
         actionRadius: { required: true },
         locationName: { required: false },
@@ -268,11 +257,11 @@ export default {
       this.$refs.groupForm.update('description', value)
     },
     submit() {
-      const { name, goal, description, groupType, actionRadius, locationName, categoryIds } =
+      const { name, about, description, groupType, actionRadius, locationName, categoryIds } =
         this.formData
       const variables = {
         name,
-        goal,
+        about,
         description,
         groupType,
         actionRadius,
@@ -333,9 +322,39 @@ export default {
   -moz-appearance: auto;
   appearance: auto;
 }
+.select-label {
+  margin-bottom: 0;
+  padding-bottom: 4px;
+    color: #70677e;
+    font-size: 1rem;
+}
 
-ds-chip {
-  position: absolute;
-  right: 0px;
+.textarea-label {
+  padding-bottom: 14px;
+}
+
+.group-form > .base-card {
+  display: flex;
+  flex-direction: column;
+
+  > .ds-form-item {
+    margin: 0;
+  }
+
+  > .ds-chip {
+    align-self: flex-end;
+    margin: $space-xx-small 0 $space-base;
+    cursor: default;
+  }
+
+  > .select-field {
+    align-self: flex-end;
+  }
+
+  > .buttons {
+    align-self: flex-end;
+    margin-top: $space-base;
+  }
+
 }
 </style>
