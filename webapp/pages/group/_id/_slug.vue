@@ -16,20 +16,21 @@
           </avatar-uploader>
           <profile-avatar v-else :profile="group" class="profile-page-avatar" size="large" />
           <!-- Menu -->
-          <!-- <client-only>
-            <content-menu
+          <client-only>
+            <group-content-menu
+              v-if="isGroupOwner"
+              class="group-content-menu"
+              :usage="'groupProfile'"
+              :group="group || {}"
               placement="bottom-end"
-              resource-type="user"
-              :resource="user"
-              :is-owner="isGroupOwner"
-              class="user-content-menu"
-              @mute="muteUser"
+            />
+            <!-- TODO: implement later on -->
+            <!-- @mute="muteUser"
               @unmute="unmuteUser"
               @block="blockUser"
               @unblock="unblockUser"
-              @delete="deleteUser"
-            />
-          </client-only> -->
+              @delete="deleteUser" -->
+          </client-only>
           <ds-space margin="small">
             <!-- group name -->
             <ds-heading tag="h3" align="center" no-margin>
@@ -314,12 +315,12 @@ import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/gr
 import postListActions from '~/mixins/postListActions'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
 import Category from '~/components/Category'
-// import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CountTo from '~/components/CountTo.vue'
 import Empty from '~/components/Empty/Empty'
 // import FollowButton from '~/components/Button/FollowButton'
 // import FollowList from '~/components/features/ProfileList/FollowList'
+import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
@@ -341,12 +342,12 @@ export default {
   components: {
     AvatarUploader,
     Category,
-    // ContentMenu,
     ContentViewer,
     CountTo,
     Empty,
     // FollowButton,
     // FollowList,
+    GroupContentMenu,
     JoinLeaveButton,
     PostTeaser,
     ProfileAvatar,
@@ -636,8 +637,8 @@ export default {
   margin: auto;
   margin-top: -60px;
 }
-.page-name-profile-id-slug {
-  .ds-flex-item:first-child .content-menu {
+.page-name-group-id-slug {
+  .ds-flex-item:first-child .group-content-menu {
     position: absolute;
     top: $space-x-small;
     right: $space-x-small;

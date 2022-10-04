@@ -1,9 +1,12 @@
-import { mount } from '@vue/test-utils'
+import { config, mount } from '@vue/test-utils'
 import GroupContentMenu from './GroupContentMenu.vue'
 
 const localVue = global.localVue
 
+config.stubs['router-link'] = '<span><slot /></span>'
+
 const propsData = {
+  usage: 'groupTeaser',
   resource: {},
   group: {},
   resourceType: 'group',
@@ -29,7 +32,7 @@ describe('GroupContentMenu', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.findAll('.group-menu')).toHaveLength(1)
+      expect(wrapper.findAll('.group-content-menu')).toHaveLength(1)
     })
   })
 })
