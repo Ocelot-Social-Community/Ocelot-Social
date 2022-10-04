@@ -5,6 +5,7 @@ import { UserInputError } from 'apollo-server'
 import { mergeImage, deleteImage } from './images/images'
 import Resolver from './helpers/Resolver'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
+import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import CONFIG from '../../config'
 
 const maintainPinnedPosts = (params) => {
@@ -17,46 +18,22 @@ const maintainPinnedPosts = (params) => {
   return params
 }
 
-const postAccessFilter = (params, user) => {
-  const { id } = user
-  const groupFilter = {
-    group: {
-      OR: [{ groupType_in: 'public' }, { memberIds_includes: id }],
-    },
-  }
-  if (isEmpty(params.filter)) {
-    params.filter = groupFilter
-  } else {
-    if (isEmpty(params.filter.group)) {
-      // console.log(params.filter)
-      params.filter = { AND: [groupFilter, { ...params.filter }] }
-      // console.log(params.filter)
-    } else {
-      params.filter.group = {
-        AND: [{ ...groupFilter.group }, { ...params.filter.group }],
-      }
-    }
-  }
-  // console.log(params.filter.group)
-  return params
-}
-
 export default {
   Query: {
     Post: async (object, params, context, resolveInfo) => {
+      params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
       params = await maintainPinnedPosts(params)
-      params = await postAccessFilter(params, context.user)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
     findPosts: async (object, params, context, resolveInfo) => {
+      params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
-      params = await postAccessFilter(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
     profilePagePosts: async (object, params, context, resolveInfo) => {
+      params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
-      params = await postAccessFilter(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
     PostsEmotionsCountByEmotion: async (object, params, context, resolveInfo) => {
