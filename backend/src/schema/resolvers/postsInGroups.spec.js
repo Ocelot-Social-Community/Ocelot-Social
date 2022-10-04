@@ -359,6 +359,51 @@ describe('Posts in Groups', () => {
 
   describe('visibility of posts', () => {
     describe('query post by ID', () => {
+      describe('without authentication', () => {
+        beforeEach(async () => {
+          authenticatedUser = null
+        })
+
+        it('shows a post of the public group', async () => {
+          await expect(
+            query({ query: postQuery(), variables: { id: 'post-to-public-group' } }),
+          ).resolves.toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+
+        it('does not show a post of a closed group', async () => {
+          await expect(
+            query({ query: postQuery(), variables: { id: 'post-to-closed-group' } }),
+          ).resolves.toMatchObject({
+            data: {
+              Post: [],
+            },
+            errors: undefined,
+          })
+        })
+
+        it('does not show a post of a hidden group', async () => {
+          await expect(
+            query({ query: postQuery(), variables: { id: 'post-to-hidden-group' } }),
+          ).resolves.toMatchObject({
+            data: {
+              Post: [],
+            },
+            errors: undefined,
+          })
+        })
+      })
+
       describe('without membership of group', () => {
         beforeEach(async () => {
           authenticatedUser = await anyUser.toJson()
