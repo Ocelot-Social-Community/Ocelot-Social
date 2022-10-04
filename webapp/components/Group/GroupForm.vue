@@ -7,6 +7,7 @@
       :schema="formSchema"
       @submit="submit"
     >
+      <!-- "errors" is only working if you use a submit event on the form -->
       <template #default="{ errors }">
         <base-card>
           <!-- Group Name -->
