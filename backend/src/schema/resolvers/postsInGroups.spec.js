@@ -7,6 +7,7 @@ import { createPostMutation, postQuery } from '../../db/graphql/posts'
 // eslint-disable-next-line no-unused-vars
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
 import CONFIG from '../../config'
+import { signupVerificationMutation } from '../../db/graphql/authentications'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
@@ -29,6 +30,7 @@ let publicUser
 let closedUser
 let hiddenUser
 let authenticatedUser
+let newUser
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -404,9 +406,120 @@ describe('Posts in Groups', () => {
         })
       })
 
+      describe('as new user', () => {
+        beforeAll(async () => {
+          await Factory.build('emailAddress', {
+            email: 'new-user@example.org',
+            nonce: '12345',
+            verifiedAt: null,
+          })
+          const result = await mutate({
+            mutation: signupVerificationMutation,
+            variables: {
+              name: 'New User',
+              slug: 'new-user',
+              nonce: '12345',
+              password: '1234',
+              about: 'I am a new user!',
+              email: 'new-user@example.org',
+              termsAndConditionsAgreedVersion: '0.0.1',
+            },
+          })
+          newUser = result.data.SignupVerification
+        })
+
+        beforeEach(async () => {
+          authenticatedUser = newUser
+        })
+
+        it('shows a post of the public group', async () => {
+          await expect(
+            query({ query: postQuery(), variables: { id: 'post-to-public-group' } }),
+          ).resolves.toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+
+        it('does not show a post of a closed group', async () => {
+          await expect(
+            query({ query: postQuery(), variables: { id: 'post-to-closed-group' } }),
+          ).resolves.toMatchObject({
+            data: {
+              Post: [],
+            },
+            errors: undefined,
+          })
+        })
+
+        it('does not show a post of a hidden group', async () => {
+          await expect(
+            query({ query: postQuery(), variables: { id: 'post-to-hidden-group' } }),
+          ).resolves.toMatchObject({
+            data: {
+              Post: [],
+            },
+            errors: undefined,
+          })
+        })
+      })
+
       describe('without membership of group', () => {
         beforeEach(async () => {
           authenticatedUser = await anyUser.toJson()
+        })
+
+        it('shows a post of the public group', async () => {
+          await expect(
+            query({ query: postQuery(), variables: { id: 'post-to-public-group' } }),
+          ).resolves.toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+
+        it('does not show a post of a closed group', async () => {
+          await expect(
+            query({ query: postQuery(), variables: { id: 'post-to-closed-group' } }),
+          ).resolves.toMatchObject({
+            data: {
+              Post: [],
+            },
+            errors: undefined,
+          })
+        })
+
+        it('does not show a post of a hidden group', async () => {
+          await expect(
+            query({ query: postQuery(), variables: { id: 'post-to-hidden-group' } }),
+          ).resolves.toMatchObject({
+            data: {
+              Post: [],
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('with pending membership of group', () => {
+        beforeEach(async () => {
+          authenticatedUser = await pendingUser.toJson()
         })
 
         it('shows a post of the public group', async () => {
