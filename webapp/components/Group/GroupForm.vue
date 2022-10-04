@@ -17,140 +17,146 @@
             autofocus
             :placeholder="`${$t('group.name')} …`"
           />
-            <ds-chip size="base" :color="errors && errors.name && 'danger'">
-              {{ `${formData.name.length} / ${formSchema.name.min}–${formSchema.name.max}` }}
-              <base-icon v-if="errors && errors.name" name="warning" />
-            </ds-chip>
-      
+          <ds-chip size="base" :color="errors && errors.name && 'danger'">
+            {{ `${formData.name.length} / ${formSchema.name.min}–${formSchema.name.max}` }}
+            <base-icon v-if="errors && errors.name" name="warning" />
+          </ds-chip>
+
           <!-- Group Slug -->
-            <ds-input
-              v-if="update"
-              :label="$t('group.labelSlug')"
-              model="slug"
-              icon="at"
-              :placeholder="`${$t('group.labelSlug')} …`"
-            ></ds-input>
+          <ds-input
+            v-if="update"
+            :label="$t('group.labelSlug')"
+            model="slug"
+            icon="at"
+            :placeholder="`${$t('group.labelSlug')} …`"
+          ></ds-input>
 
           <!-- groupType -->
-            <ds-text class="select-label">
-              {{ $t('group.type') }}
-            </ds-text>
-            <!-- TODO: change it has to be implemented later -->
-            <!-- TODO: move 'ds-select' from styleguide to main code and implement missen translation etc. functionality -->
-            <select
-              class="select ds-input appearance--auto"
-              :value="formData.groupType"
-              :disabled="update"
-              model="groupType"
-              name="groupType"
-              @change="changeGroupType($event)"
-            >
-              <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
-                {{ $t(`group.types.${groupType}`) }}
-              </option>
-            </select>
-            <ds-chip v-if="formData.groupType === ''" size="base" :color="formData.groupType === '' ? 'danger' : 'medium'">
-              <base-icon v-if="formData.groupType === ''" name="warning" />
-            </ds-chip>
-      
+          <ds-text class="select-label">
+            {{ $t('group.type') }}
+          </ds-text>
+          <!-- TODO: change it has to be implemented later -->
+          <!-- TODO: move 'ds-select' from styleguide to main code and implement missen translation etc. functionality -->
+          <select
+            class="select ds-input appearance--auto"
+            :value="formData.groupType"
+            :disabled="update"
+            model="groupType"
+            name="groupType"
+            @change="changeGroupType($event)"
+          >
+            <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
+              {{ $t(`group.types.${groupType}`) }}
+            </option>
+          </select>
+          <ds-chip
+            v-if="formData.groupType === ''"
+            size="base"
+            :color="formData.groupType === '' ? 'danger' : 'medium'"
+          >
+            <base-icon v-if="formData.groupType === ''" name="warning" />
+          </ds-chip>
 
           <!-- goal -->
-            <ds-input
-              :label="$t('group.goal')"
-              v-model="formData.about"
-              :placeholder="$t('group.goal') + ' …'"
-              name="about"
-              rows="3"
-            />
+          <ds-input
+            :label="$t('group.goal')"
+            v-model="formData.about"
+            :placeholder="$t('group.goal') + ' …'"
+            name="about"
+            rows="3"
+          />
 
-            <ds-space margin-top="small" />
+          <ds-space margin-top="small" />
 
-            <!-- description -->
-            <ds-text class="select-label">
-              {{ $t('group.description') }}
-            </ds-text>
-            <editor
-              :users="null"
-              :value="formData.description"
-              :hashtags="null"
-              model="description"
-              name="description"
-              @input="updateEditorDescription"
-            />
-            <ds-chip size="base" :color="errors && errors.description && 'danger'">
-              {{ `${descriptionLength} / ${formSchema.description.min}` }}
-              <base-icon v-if="errors && errors.description" name="warning" />
-            </ds-chip>
+          <!-- description -->
+          <ds-text class="select-label">
+            {{ $t('group.description') }}
+          </ds-text>
+          <editor
+            :users="null"
+            :value="formData.description"
+            :hashtags="null"
+            model="description"
+            name="description"
+            @input="updateEditorDescription"
+          />
+          <ds-chip size="base" :color="errors && errors.description && 'danger'">
+            {{ `${descriptionLength} / ${formSchema.description.min}` }}
+            <base-icon v-if="errors && errors.description" name="warning" />
+          </ds-chip>
 
           <!-- actionRadius -->
-            <ds-text class="select-label">
-              {{ $t('group.actionRadius') }}
-            </ds-text>
-            <!-- TODO: change it has to be implemented later -->
-            <!-- TODO: move 'ds-select' from styleguide to main code and implement missen translation etc. functionality -->
-            <select
-              class="select ds-input appearance--auto"
-              :options="actionRadiusOptions"
-              :value="formData.actionRadius"
-              @change="changeActionRadius($event)"
+          <ds-text class="select-label">
+            {{ $t('group.actionRadius') }}
+          </ds-text>
+          <!-- TODO: change it has to be implemented later -->
+          <!-- TODO: move 'ds-select' from styleguide to main code and implement missen translation etc. functionality -->
+          <select
+            class="select ds-input appearance--auto"
+            :options="actionRadiusOptions"
+            :value="formData.actionRadius"
+            @change="changeActionRadius($event)"
+          >
+            <option
+              v-for="actionRadius in actionRadiusOptions"
+              :key="actionRadius"
+              :value="actionRadius"
+              model="actionRadius"
+              name="actionRadius"
             >
-              <option
-                v-for="actionRadius in actionRadiusOptions"
-                :key="actionRadius"
-                :value="actionRadius"
-                model="actionRadius"
-                name="actionRadius"
-              >
-                {{ $t(`group.actionRadii.${actionRadius}`) }}
-              </option>
-            </select>
-            <ds-chip v-if="formData.actionRadius === ''" size="base" :color="formData.actionRadius === '' ? 'danger' : 'medium'">
-              <base-icon v-if="formData.actionRadius === ''" name="warning" />
-            </ds-chip>
+              {{ $t(`group.actionRadii.${actionRadius}`) }}
+            </option>
+          </select>
+          <ds-chip
+            v-if="formData.actionRadius === ''"
+            size="base"
+            :color="formData.actionRadius === '' ? 'danger' : 'medium'"
+          >
+            <base-icon v-if="formData.actionRadius === ''" name="warning" />
+          </ds-chip>
 
           <!-- location -->
-            <ds-select
-              id="city"
-              :label="$t('settings.data.labelCity')"
-              v-model="formData.locationName"
-              :options="cities"
-              icon="map-marker"
-              :icon-right="null"
-              :placeholder="$t('settings.data.labelCity') + ' …'"
-              :loading="loadingGeo"
-              @input.native="handleCityInput"
-            />
-            <base-button
-              v-if="formData.locationName !== ''"
-              icon="close"
-              ghost
-              size="small"
-              @click="formData.locationName = ''"
-              style="position: relative; display: inline-block; right: -93%; top: -45px"
-            ></base-button>
+          <ds-select
+            id="city"
+            :label="$t('settings.data.labelCity')"
+            v-model="formData.locationName"
+            :options="cities"
+            icon="map-marker"
+            :icon-right="null"
+            :placeholder="$t('settings.data.labelCity') + ' …'"
+            :loading="loadingGeo"
+            @input.native="handleCityInput"
+          />
+          <base-button
+            v-if="formData.locationName !== ''"
+            icon="close"
+            ghost
+            size="small"
+            @click="formData.locationName = ''"
+            style="position: relative; display: inline-block; right: -93%; top: -45px"
+          ></base-button>
 
+          <ds-space margin-top="small" />
 
-            <ds-space margin-top="small" />
-
-            <!-- category -->
-            <categories-select
+          <!-- category -->
+          <categories-select
+            v-if="categoriesActive"
+            model="categoryIds"
+            name="categoryIds"
+            :existingCategoryIds="formData.categoryIds"
+          />
+          <ds-text align="right">
+            <ds-chip
               v-if="categoriesActive"
-              model="categoryIds"
-              name="categoryIds"
-              :existingCategoryIds="formData.categoryIds"
-            />
-            <ds-text align="right">
-              <ds-chip
-                v-if="categoriesActive"
-                size="base"
-                :color="errors && errors.categoryIds && 'danger'"
-              >
-                {{ formData.categoryIds.length }} / 3
-                <base-icon v-if="errors && errors.categoryIds" name="warning" />
-              </ds-chip>
-            </ds-text>
+              size="base"
+              :color="errors && errors.categoryIds && 'danger'"
+            >
+              {{ formData.categoryIds.length }} / 3
+              <base-icon v-if="errors && errors.categoryIds" name="warning" />
+            </ds-chip>
+          </ds-text>
 
-            <!-- Submit -->
+          <!-- Submit -->
           <ds-space margin-top="large">
             <nuxt-link to="/my-groups">
               <ds-button>{{ $t('actions.cancel') }}</ds-button>
@@ -325,8 +331,8 @@ export default {
 .select-label {
   margin-bottom: 0;
   padding-bottom: 4px;
-    color: #70677e;
-    font-size: 1rem;
+  color: #70677e;
+  font-size: 1rem;
 }
 
 .textarea-label {
@@ -355,6 +361,5 @@ export default {
     align-self: flex-end;
     margin-top: $space-base;
   }
-
 }
 </style>
