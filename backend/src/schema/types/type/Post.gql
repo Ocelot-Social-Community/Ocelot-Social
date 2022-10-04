@@ -170,7 +170,6 @@ type Post {
     @cypher(statement: "MATCH (this)<-[emoted:EMOTED]-(:User) RETURN COUNT(DISTINCT emoted)")
 
   group: Group @relation(name: "IN", direction: "OUT")
-  notVisibleFor: [User]! @cypher("MATCH (this)<-[:CANNOT_SEE]-(user:User) RETURN user")
 }
 
 input _PostInput {
