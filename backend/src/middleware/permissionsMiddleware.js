@@ -299,10 +299,10 @@ export default shield(
   {
     Query: {
       '*': deny,
-      searchResults: allow,
-      searchPosts: allow,
-      searchUsers: allow,
-      searchHashtags: allow,
+      searchResults: isAuthenticated,
+      searchPosts: isAuthenticated,
+      searchUsers: isAuthenticated,
+      searchHashtags: isAuthenticated,
       embed: allow,
       Category: allow,
       Tag: allow,
