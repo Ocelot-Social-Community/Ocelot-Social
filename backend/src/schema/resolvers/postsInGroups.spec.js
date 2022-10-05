@@ -12,6 +12,7 @@ import {
   postQuery,
   filterPosts,
   profilePagePosts,
+  searchPosts,
 } from '../../db/graphql/posts'
 // eslint-disable-next-line no-unused-vars
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
@@ -940,6 +941,192 @@ describe('Posts in Groups', () => {
               ]),
             },
             errors: undefined,
+          })
+        })
+      })
+
+      describe('searchPosts', () => {
+        describe('without authentication', () => {
+          beforeEach(async () => {
+            authenticatedUser = null
+          })
+
+          it('finds nothing', async () => {
+            const result = await query({
+              query: searchPosts(),
+              variables: {
+                query: 'post',
+                postsOffset: 0,
+                firstPosts: 25,
+              },
+            })
+            expect(result.data.searchPosts.posts).toHaveLength(0)
+            expect(result).toMatchObject({
+              data: {
+                searchPosts: {
+                  postCount: 0,
+                  posts: [],
+                },
+              },
+            })
+          })
+        })
+
+        describe('as new user', () => {
+          beforeEach(async () => {
+            authenticatedUser = newUser
+          })
+
+          it('finds the post of the public group and the post without group', async () => {
+            const result = await query({
+              query: searchPosts(),
+              variables: {
+                query: 'post',
+                postsOffset: 0,
+                firstPosts: 25,
+              },
+            })
+            expect(result.data.searchPosts.posts).toHaveLength(2)
+            expect(result).toMatchObject({
+              data: {
+                searchPosts: {
+                  postCount: 2,
+                  posts: expect.arrayContaining([
+                    {
+                      id: 'post-to-public-group',
+                      title: 'A post to a public group',
+                      content: 'I am posting into a public group as a member of the group',
+                    },
+                    {
+                      id: 'post-without-group',
+                      title: 'A post without a group',
+                      content: 'As a new user, I do not belong to a group yet.',
+                    },
+                  ]),
+                },
+              },
+            })
+          })
+        })
+
+        describe('without membership of group', () => {
+          beforeEach(async () => {
+            authenticatedUser = await anyUser.toJson()
+          })
+
+          it('finds the post of the public group and the post without group', async () => {
+            const result = await query({
+              query: searchPosts(),
+              variables: {
+                query: 'post',
+                postsOffset: 0,
+                firstPosts: 25,
+              },
+            })
+            expect(result.data.searchPosts.posts).toHaveLength(2)
+            expect(result).toMatchObject({
+              data: {
+                searchPosts: {
+                  postCount: 2,
+                  posts: expect.arrayContaining([
+                    {
+                      id: 'post-to-public-group',
+                      title: 'A post to a public group',
+                      content: 'I am posting into a public group as a member of the group',
+                    },
+                    {
+                      id: 'post-without-group',
+                      title: 'A post without a group',
+                      content: 'As a new user, I do not belong to a group yet.',
+                    },
+                  ]),
+                },
+              },
+            })
+          })
+        })
+
+        describe('with pending membership of group', () => {
+          beforeEach(async () => {
+            authenticatedUser = await pendingUser.toJson()
+          })
+
+          it('finds the post of the public group and the post without group', async () => {
+            const result = await query({
+              query: searchPosts(),
+              variables: {
+                query: 'post',
+                postsOffset: 0,
+                firstPosts: 25,
+              },
+            })
+            expect(result.data.searchPosts.posts).toHaveLength(2)
+            expect(result).toMatchObject({
+              data: {
+                searchPosts: {
+                  postCount: 2,
+                  posts: expect.arrayContaining([
+                    {
+                      id: 'post-to-public-group',
+                      title: 'A post to a public group',
+                      content: 'I am posting into a public group as a member of the group',
+                    },
+                    {
+                      id: 'post-without-group',
+                      title: 'A post without a group',
+                      content: 'As a new user, I do not belong to a group yet.',
+                    },
+                  ]),
+                },
+              },
+            })
+          })
+        })
+
+        describe('as member of group', () => {
+          beforeEach(async () => {
+            authenticatedUser = await allGroupsUser.toJson()
+          })
+
+          it('finds all posts', async () => {
+            const result = await query({
+              query: searchPosts(),
+              variables: {
+                query: 'post',
+                postsOffset: 0,
+                firstPosts: 25,
+              },
+            })
+            expect(result.data.searchPosts.posts).toHaveLength(4)
+            expect(result).toMatchObject({
+              data: {
+                searchPosts: {
+                  postCount: 4,
+                  posts: expect.arrayContaining([
+                    {
+                      id: 'post-to-public-group',
+                      title: 'A post to a public group',
+                      content: 'I am posting into a public group as a member of the group',
+                    },
+                    {
+                      id: 'post-without-group',
+                      title: 'A post without a group',
+                      content: 'As a new user, I do not belong to a group yet.',
+                    },
+                    {
+                      id: 'post-to-closed-group',
+                      title: 'A post to a closed group',
+                      content: 'I am posting into a closed group as a member of the group',
+                    },
+                    {
+                      id: 'post-to-hidden-group',
+                      title: 'A post to a hidden group',
+                      content: 'I am posting into a hidden group as a member of the group',
+                    },
+                  ]),
+                },
+              },
+            })
           })
         })
       })

@@ -119,7 +119,8 @@ export default {
   Query: {
     searchPosts: async (_parent, args, context, _resolveInfo) => {
       const { query, postsOffset, firstPosts } = args
-      const { id: userId } = context.user
+      let userId = null
+      if (context.user) userId = context.user.id
       return {
         postCount: getSearchResults(
           context,
@@ -179,7 +180,8 @@ export default {
     },
     searchResults: async (_parent, args, context, _resolveInfo) => {
       const { query, limit } = args
-      const { id: userId } = context.user
+      let userId = null
+      if (context.user) userId = context.user.id
 
       const searchType = query.replace(/^([!@#]?).*$/, '$1')
       const searchString = query.replace(/^([!@#])/, '')
