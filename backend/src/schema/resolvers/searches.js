@@ -23,12 +23,15 @@ const postWhereClause = `WHERE score >= 0.0
   AND NOT (
     author.deleted = true OR author.disabled = true
     OR resource.deleted = true OR resource.disabled = true
-    OR (:User {id: $userId})-[:MUTED]->(author)
-  )`
+  ) AND block IS NULL AND restriction IS NULL`
 
 const searchPostsSetup = {
   fulltextIndex: 'post_fulltext_search',
-  match: 'MATCH (resource:Post)<-[:WROTE]-(author:User)',
+  match: `MATCH (resource:Post)<-[:WROTE]-(author:User)
+          MATCH (user:User {id: $userId})
+          OPTIONAL MATCH (user)-[block:MUTED]->(author)
+          OPTIONAL MATCH (user)-[restriction:CANNOT_SEE]->(resource)
+          WITH user, resource, author, block, restriction`,
   whereClause: postWhereClause,
   withClause: `WITH resource, author,
   [(resource)<-[:COMMENTS]-(comment:Comment) | comment] AS comments,
@@ -117,7 +120,6 @@ export default {
     searchPosts: async (_parent, args, context, _resolveInfo) => {
       const { query, postsOffset, firstPosts } = args
       const { id: userId } = context.user
-
       return {
         postCount: getSearchResults(
           context,
