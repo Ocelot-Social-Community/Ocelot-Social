@@ -260,9 +260,12 @@ export default {
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const leaveGroupCypher = `
           MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
+          OPTIONAL MATCH (post:Post)-[:IN]->(group)
+          MERGE (member)-[:CANNOT_SEE]->(post)
           DELETE membership
           RETURN member {.*, myRoleInGroup: NULL}
         `
+
         const transactionResponse = await transaction.run(leaveGroupCypher, { groupId, userId })
         const [member] = await transactionResponse.records.map((record) => record.get('member'))
         return member
@@ -279,8 +282,21 @@ export default {
       const { groupId, userId, roleInGroup } = params
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        let postRestrictionCypher = ''
+        if (['owner', 'admin', 'usual'].includes(roleInGroup)) {
+          postRestrictionCypher = `
+            OPTIONAL MATCH (member)-[restriction:CANNOT_SEE]->(post:Post)-[:IN]->(group)
+            DELETE restriction`
+        } else {
+          // user becomes pending member
+          postRestrictionCypher = `
+            OPTIONAL MATCH (post:Post)-[:IN]->(group)
+            MERGE (member)-[:CANNOT_SEE]->(post)`
+        }
+
         const joinGroupCypher = `
           MATCH (member:User {id: $userId}), (group:Group {id: $groupId})
+          ${postRestrictionCypher}
           MERGE (member)-[membership:MEMBER_OF]->(group)
           ON CREATE SET
             membership.createdAt = toString(datetime()),
@@ -291,6 +307,7 @@ export default {
             membership.role = $roleInGroup
           RETURN member {.*, myRoleInGroup: membership.role}
         `
+
         const transactionResponse = await transaction.run(joinGroupCypher, {
           groupId,
           userId,

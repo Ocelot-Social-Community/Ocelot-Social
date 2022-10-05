@@ -2,7 +2,11 @@ import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../../db/factories'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
-import { createGroupMutation, changeGroupMemberRoleMutation } from '../../db/graphql/groups'
+import {
+  createGroupMutation,
+  changeGroupMemberRoleMutation,
+  leaveGroupMutation,
+} from '../../db/graphql/groups'
 import {
   createPostMutation,
   postQuery,
@@ -913,6 +917,366 @@ describe('Posts in Groups', () => {
           expect(result).toMatchObject({
             data: {
               profilePagePosts: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'As a new user, I do not belong to a group yet.',
+                },
+                {
+                  id: 'post-to-closed-group',
+                  title: 'A post to a closed group',
+                  content: 'I am posting into a closed group as a member of the group',
+                },
+                {
+                  id: 'post-to-hidden-group',
+                  title: 'A post to a hidden group',
+                  content: 'I am posting into a hidden group as a member of the group',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+    })
+  })
+
+  describe('changes of group membership', () => {
+    describe('pending member becomes usual member', () => {
+      describe('of closed group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await closedUser.toJson()
+          await mutate({
+            mutation: changeGroupMemberRoleMutation(),
+            variables: {
+              groupId: 'closed-group',
+              userId: 'pending-user',
+              roleInGroup: 'usual',
+            },
+          })
+        })
+
+        beforeEach(async () => {
+          authenticatedUser = await pendingUser.toJson()
+        })
+
+        it('shows the posts of the closed group', async () => {
+          const result = await query({ query: filterPosts(), variables: {} })
+          expect(result.data.Post).toHaveLength(3)
+          expect(result).toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'As a new user, I do not belong to a group yet.',
+                },
+                {
+                  id: 'post-to-closed-group',
+                  title: 'A post to a closed group',
+                  content: 'I am posting into a closed group as a member of the group',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('of hidden group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await hiddenUser.toJson()
+          await mutate({
+            mutation: changeGroupMemberRoleMutation(),
+            variables: {
+              groupId: 'hidden-group',
+              userId: 'pending-user',
+              roleInGroup: 'usual',
+            },
+          })
+        })
+
+        beforeEach(async () => {
+          authenticatedUser = await pendingUser.toJson()
+        })
+
+        it('shows all the posts', async () => {
+          const result = await query({ query: filterPosts(), variables: {} })
+          expect(result.data.Post).toHaveLength(4)
+          expect(result).toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'As a new user, I do not belong to a group yet.',
+                },
+                {
+                  id: 'post-to-closed-group',
+                  title: 'A post to a closed group',
+                  content: 'I am posting into a closed group as a member of the group',
+                },
+                {
+                  id: 'post-to-hidden-group',
+                  title: 'A post to a hidden group',
+                  content: 'I am posting into a hidden group as a member of the group',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+    })
+
+    describe('usual member becomes pending', () => {
+      describe('of closed group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await closedUser.toJson()
+          await mutate({
+            mutation: changeGroupMemberRoleMutation(),
+            variables: {
+              groupId: 'closed-group',
+              userId: 'pending-user',
+              roleInGroup: 'pending',
+            },
+          })
+        })
+
+        beforeEach(async () => {
+          authenticatedUser = await pendingUser.toJson()
+        })
+
+        it('does not shows the posts of the closed group anymore', async () => {
+          const result = await query({ query: filterPosts(), variables: {} })
+          expect(result.data.Post).toHaveLength(3)
+          expect(result).toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'As a new user, I do not belong to a group yet.',
+                },
+                {
+                  id: 'post-to-hidden-group',
+                  title: 'A post to a hidden group',
+                  content: 'I am posting into a hidden group as a member of the group',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('of hidden group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await hiddenUser.toJson()
+          await mutate({
+            mutation: changeGroupMemberRoleMutation(),
+            variables: {
+              groupId: 'hidden-group',
+              userId: 'pending-user',
+              roleInGroup: 'pending',
+            },
+          })
+        })
+
+        beforeEach(async () => {
+          authenticatedUser = await pendingUser.toJson()
+        })
+
+        it('shows only the public posts', async () => {
+          const result = await query({ query: filterPosts(), variables: {} })
+          expect(result.data.Post).toHaveLength(2)
+          expect(result).toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'As a new user, I do not belong to a group yet.',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+    })
+
+    describe('usual member leaves', () => {
+      describe('closed group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await allGroupsUser.toJson()
+          await mutate({
+            mutation: leaveGroupMutation(),
+            variables: {
+              groupId: 'closed-group',
+              userId: 'all-groups-user',
+            },
+          })
+        })
+
+        it('does not shows the posts of the closed group anymore', async () => {
+          const result = await query({ query: filterPosts(), variables: {} })
+          expect(result.data.Post).toHaveLength(3)
+          expect(result).toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'As a new user, I do not belong to a group yet.',
+                },
+                {
+                  id: 'post-to-hidden-group',
+                  title: 'A post to a hidden group',
+                  content: 'I am posting into a hidden group as a member of the group',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('hidden group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await allGroupsUser.toJson()
+          await mutate({
+            mutation: leaveGroupMutation(),
+            variables: {
+              groupId: 'hidden-group',
+              userId: 'all-groups-user',
+            },
+          })
+        })
+
+        it('does only show the public posts', async () => {
+          const result = await query({ query: filterPosts(), variables: {} })
+          expect(result.data.Post).toHaveLength(2)
+          expect(result).toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'As a new user, I do not belong to a group yet.',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+    })
+
+    describe('any user joins', () => {
+      describe('closed group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await closedUser.toJson()
+          await mutate({
+            mutation: changeGroupMemberRoleMutation(),
+            variables: {
+              groupId: 'closed-group',
+              userId: 'all-groups-user',
+              roleInGroup: 'usual',
+            },
+          })
+        })
+
+        beforeEach(async () => {
+          authenticatedUser = await allGroupsUser.toJson()
+        })
+
+        it('does not shows the posts of the closed group', async () => {
+          const result = await query({ query: filterPosts(), variables: {} })
+          expect(result.data.Post).toHaveLength(3)
+          expect(result).toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'As a new user, I do not belong to a group yet.',
+                },
+                {
+                  id: 'post-to-closed-group',
+                  title: 'A post to a closed group',
+                  content: 'I am posting into a closed group as a member of the group',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('hidden group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await hiddenUser.toJson()
+          await mutate({
+            mutation: changeGroupMemberRoleMutation(),
+            variables: {
+              groupId: 'hidden-group',
+              userId: 'all-groups-user',
+              roleInGroup: 'usual',
+            },
+          })
+        })
+
+        beforeEach(async () => {
+          authenticatedUser = await allGroupsUser.toJson()
+        })
+
+        it('shows all posts', async () => {
+          const result = await query({ query: filterPosts(), variables: {} })
+          expect(result.data.Post).toHaveLength(4)
+          expect(result).toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
                 {
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
