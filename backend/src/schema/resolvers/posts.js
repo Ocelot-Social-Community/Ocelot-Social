@@ -26,11 +26,6 @@ export default {
       params = await maintainPinnedPosts(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
-    findPosts: async (object, params, context, resolveInfo) => {
-      params = await filterInvisiblePosts(params, context)
-      params = await filterForMutedUsers(params, context)
-      return neo4jgraphql(object, params, context, resolveInfo)
-    },
     profilePagePosts: async (object, params, context, resolveInfo) => {
       params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)

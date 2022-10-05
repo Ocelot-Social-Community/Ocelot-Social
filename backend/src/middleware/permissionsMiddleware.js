@@ -299,8 +299,6 @@ export default shield(
   {
     Query: {
       '*': deny,
-      findPosts: allow,
-      findUsers: allow,
       searchResults: allow,
       searchPosts: allow,
       searchUsers: allow,
