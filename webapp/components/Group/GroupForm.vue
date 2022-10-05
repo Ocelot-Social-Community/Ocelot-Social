@@ -207,7 +207,6 @@ export default {
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
-      descriptionMin: 50,
       groupTypeOptions: ['public', 'closed', 'hidden'],
       actionRadiusOptions: ['regional', 'national', 'continental', 'global'],
       loadingGeo: false,
