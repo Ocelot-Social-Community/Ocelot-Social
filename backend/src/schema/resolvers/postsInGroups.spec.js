@@ -3,7 +3,12 @@ import Factory, { cleanDatabase } from '../../db/factories'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
 import { createGroupMutation, changeGroupMemberRoleMutation } from '../../db/graphql/groups'
-import { createPostMutation, postQuery, filterPosts } from '../../db/graphql/posts'
+import {
+  createPostMutation,
+  postQuery,
+  filterPosts,
+  profilePagePosts,
+} from '../../db/graphql/posts'
 // eslint-disable-next-line no-unused-vars
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
 import CONFIG from '../../config'
@@ -756,6 +761,158 @@ describe('Posts in Groups', () => {
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'As a new user, I do not belong to a group yet.',
+                },
+                {
+                  id: 'post-to-closed-group',
+                  title: 'A post to a closed group',
+                  content: 'I am posting into a closed group as a member of the group',
+                },
+                {
+                  id: 'post-to-hidden-group',
+                  title: 'A post to a hidden group',
+                  content: 'I am posting into a hidden group as a member of the group',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+    })
+
+    describe('profile page posts', () => {
+      describe('without authentication', () => {
+        beforeEach(async () => {
+          authenticatedUser = null
+        })
+
+        it('shows a the post of the public group and the post without group', async () => {
+          const result = await query({ query: profilePagePosts(), variables: {} })
+          expect(result.data.profilePagePosts).toHaveLength(2)
+          expect(result).toMatchObject({
+            data: {
+              profilePagePosts: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'As a new user, I do not belong to a group yet.',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('as new user', () => {
+        beforeEach(async () => {
+          authenticatedUser = newUser
+        })
+
+        it('shows a the post of the public group and the post without group', async () => {
+          const result = await query({ query: profilePagePosts(), variables: {} })
+          expect(result.data.profilePagePosts).toHaveLength(2)
+          expect(result).toMatchObject({
+            data: {
+              profilePagePosts: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'As a new user, I do not belong to a group yet.',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('without membership of group', () => {
+        beforeEach(async () => {
+          authenticatedUser = await anyUser.toJson()
+        })
+
+        it('shows a the post of the public group and the post without group', async () => {
+          const result = await query({ query: profilePagePosts(), variables: {} })
+          expect(result.data.profilePagePosts).toHaveLength(2)
+          expect(result).toMatchObject({
+            data: {
+              profilePagePosts: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'As a new user, I do not belong to a group yet.',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('with pending membership of group', () => {
+        beforeEach(async () => {
+          authenticatedUser = await pendingUser.toJson()
+        })
+
+        it('shows a the post of the public group and the post without group', async () => {
+          const result = await query({ query: profilePagePosts(), variables: {} })
+          expect(result.data.profilePagePosts).toHaveLength(2)
+          expect(result).toMatchObject({
+            data: {
+              profilePagePosts: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'As a new user, I do not belong to a group yet.',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('as member of group', () => {
+        beforeEach(async () => {
+          authenticatedUser = await allGroupsUser.toJson()
+        })
+
+        it('shows all posts', async () => {
+          const result = await query({ query: profilePagePosts(), variables: {} })
+          expect(result.data.profilePagePosts).toHaveLength(4)
+          expect(result).toMatchObject({
+            data: {
+              profilePagePosts: expect.arrayContaining([
                 {
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
