@@ -260,9 +260,10 @@ export default {
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const leaveGroupCypher = `
           MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
-          OPTIONAL MATCH (post:Post)-[:IN]->(group)
-          MERGE (member)-[:CANNOT_SEE]->(post)
           DELETE membership
+          WITH member, group
+          FOREACH (post IN [(p:Post)-[:IN]->(group) | p] |
+            MERGE (member)-[:CANNOT_SEE]->(post))
           RETURN member {.*, myRoleInGroup: NULL}
         `
 
@@ -285,18 +286,20 @@ export default {
         let postRestrictionCypher = ''
         if (['owner', 'admin', 'usual'].includes(roleInGroup)) {
           postRestrictionCypher = `
-            OPTIONAL MATCH (member)-[restriction:CANNOT_SEE]->(post:Post)-[:IN]->(group)
-            DELETE restriction`
+            WITH group, member, membership
+            FOREACH (restriction IN [(member)-[r:CANNOT_SEE]->(:Post)-[:IN]->(group) | r] |
+              DELETE restriction)`
         } else {
           // user becomes pending member
           postRestrictionCypher = `
-            OPTIONAL MATCH (post:Post)-[:IN]->(group)
-            MERGE (member)-[:CANNOT_SEE]->(post)`
+            WITH group, member, membership
+            FOREACH (post IN [(p:Post)-[:IN]->(group) | p] |
+              MERGE (member)-[:CANNOT_SEE]->(post))`
         }
 
         const joinGroupCypher = `
-          MATCH (member:User {id: $userId}), (group:Group {id: $groupId})
-          ${postRestrictionCypher}
+          MATCH (member:User {id: $userId})
+          MATCH (group:Group {id: $groupId})
           MERGE (member)-[membership:MEMBER_OF]->(group)
           ON CREATE SET
             membership.createdAt = toString(datetime()),
@@ -305,6 +308,7 @@ export default {
           ON MATCH SET
             membership.updatedAt = toString(datetime()),
             membership.role = $roleInGroup
+          ${postRestrictionCypher}
           RETURN member {.*, myRoleInGroup: membership.role}
         `
 
