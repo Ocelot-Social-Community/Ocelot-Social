@@ -31,6 +31,8 @@
           :placeholder="`${$t('group.labelSlug')} …`"
         ></ds-input>
 
+        <ds-space v-if="update" margin-top="small" />
+
         <!-- groupType -->
         <ds-text class="select-label">
           {{ $t('group.type') }}
