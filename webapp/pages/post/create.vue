@@ -26,8 +26,6 @@ export default {
   },
   data() {
     const { groupId = null } = this.$route.query
-    // Wolle: console.log('groupId: ', groupId)
-    // Wolle: check if the user can post in this group. if not … ?
     return {
       groupId,
     }

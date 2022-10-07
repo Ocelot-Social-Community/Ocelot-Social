@@ -35,14 +35,14 @@ export default () => {
         $title: String!
         $content: String!
         $image: ImageInput
-        $categoryIds: [ID] # Wolle: $groupId: ID
+        $categoryIds: [ID]
       ) {
         UpdatePost(
           id: $id
           title: $title
           content: $content
           image: $image
-          categoryIds: $categoryIds # Wolle: groupId: $groupId
+          categoryIds: $categoryIds
         ) {
           id
           title

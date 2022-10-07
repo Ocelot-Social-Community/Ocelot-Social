@@ -168,14 +168,6 @@ export default {
         }
       }
       this.loading = true
-      // Wolle: console.log('variables: ', {
-      //   title,
-      //   content,
-      //   categoryIds,
-      //   id: this.contribution.id || null,
-      //   image,
-      //   groupId: this.groupId,
-      // })
       this.$apollo
         .mutate({
           mutation: this.contribution.id ? PostMutations().UpdatePost : PostMutations().CreatePost,
