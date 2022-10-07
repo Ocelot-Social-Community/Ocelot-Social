@@ -295,9 +295,9 @@
             </ds-grid-item>
           </template>
         </masonry-grid>
-        <!-- <client-only>
+        <client-only>
           <infinite-loading v-if="hasMore" @infinite="showMoreContributions" />
-        </client-only> -->
+        </client-only>
       </ds-flex-item>
     </ds-flex>
   </div>
@@ -305,11 +305,11 @@
 
 <script>
 import uniqBy from 'lodash/uniqBy'
-// import { profilePagePosts } from '~/graphql/PostQuery'
+import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
 // import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 // import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
-// import UpdateQuery from '~/components/utils/UpdateQuery'
+import UpdateQuery from '~/components/utils/UpdateQuery'
 import postListActions from '~/mixins/postListActions'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
 import Category from '~/components/Category'
@@ -367,15 +367,16 @@ export default {
   },
   data() {
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
+    const filter = { group: { id: this.$route.params.id } }
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       loadGroupMembers: false,
       posts: [],
-      // hasMore: true,
-      // offset: 0,
-      // pageSize: 6,
+      hasMore: true,
+      offset: 0,
+      pageSize: 6,
       // tabActive: 'post',
-      // filter,
+      filter,
       // followedByCountStartValue: 0,
       // followedByCount: 7,
       // followingCount: 7,
@@ -464,30 +465,30 @@ export default {
     uniq(items, field = 'id') {
       return uniqBy(items, field)
     },
-    // showMoreContributions($state) {
-    //   const { profilePagePosts: PostQuery } = this.$apollo.queries
-    //   if (!PostQuery) return // seems this can be undefined on subpages
-    //   this.offset += this.pageSize
+    showMoreContributions($state) {
+      const { profilePagePosts: PostQuery } = this.$apollo.queries
+      if (!PostQuery) return // seems this can be undefined on subpages
+      this.offset += this.pageSize
 
-    //   PostQuery.fetchMore({
-    //     variables: {
-    //       offset: this.offset,
-    //       filter: this.filter,
-    //       first: this.pageSize,
-    //       orderBy: 'createdAt_desc',
-    //     },
-    //     updateQuery: UpdateQuery(this, { $state, pageKey: 'profilePagePosts' }),
-    //   })
-    // },
-    // resetPostList() {
-    //   this.offset = 0
-    //   this.posts = []
-    //   this.hasMore = true
-    // },
-    // refetchPostList() {
-    //   this.resetPostList()
-    //   this.$apollo.queries.profilePagePosts.refetch()
-    // },
+      PostQuery.fetchMore({
+        variables: {
+          offset: this.offset,
+          filter: this.filter,
+          first: this.pageSize,
+          orderBy: 'createdAt_desc',
+        },
+        updateQuery: UpdateQuery(this, { $state, pageKey: 'profilePagePosts' }),
+      })
+    },
+    resetPostList() {
+      this.offset = 0
+      this.posts = []
+      this.hasMore = true
+    },
+    refetchPostList() {
+      this.resetPostList()
+      this.$apollo.queries.profilePagePosts.refetch()
+    },
     // async muteUser(user) {
     //   try {
     //     await this.$apollo.mutate({ mutation: muteUser(), variables: { id: user.id } })
@@ -574,23 +575,23 @@ export default {
     },
   },
   apollo: {
-    // profilePagePosts: {
-    //   query() {
-    //     return profilePagePosts(this.$i18n)
-    //   },
-    //   variables() {
-    //     return {
-    //       filter: this.filter,
-    //       first: this.pageSize,
-    //       offset: 0,
-    //       orderBy: 'createdAt_desc',
-    //     }
-    //   },
-    //   update({ profilePagePosts }) {
-    //     this.posts = profilePagePosts
-    //   },
-    //   fetchPolicy: 'cache-and-network',
-    // },
+    profilePagePosts: {
+      query() {
+        return profilePagePosts(this.$i18n)
+      },
+      variables() {
+        return {
+          filter: this.filter,
+          first: this.pageSize,
+          offset: 0,
+          orderBy: 'createdAt_desc',
+        }
+      },
+      update({ profilePagePosts }) {
+        this.posts = profilePagePosts
+      },
+      fetchPolicy: 'cache-and-network',
+    },
     Group: {
       query() {
         return groupQuery(this.$i18n)
