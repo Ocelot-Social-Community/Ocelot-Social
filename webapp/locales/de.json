@@ -612,6 +612,12 @@
       "title": "Erstelle einen neuen Beitrag"
     },
     "edited": "bearbeitet",
+    "editPost": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Bearbeite deinen Beitrag"
+    },
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
@@ -624,6 +630,12 @@
     "pinned": "Meldung",
     "takeAction": {
       "name": "Aktiv werden"
+    },
+    "viewPost": {
+      "forGroup": {
+        "title": "In der Gruppe „{name}“"
+      },
+      "title": "Beitrag"
     }
   },
   "profile": {
