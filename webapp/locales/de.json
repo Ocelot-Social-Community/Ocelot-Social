@@ -605,6 +605,12 @@
       "submitted": "Kommentar gesendet",
       "updated": "Änderungen gespeichert"
     },
+    "createNewPost": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Erstelle einen neuen Beitrag"
+    },
     "edited": "bearbeitet",
     "menu": {
       "delete": "Beitrag löschen",

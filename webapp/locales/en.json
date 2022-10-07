@@ -605,6 +605,12 @@
       "submitted": "Comment submitted!",
       "updated": "Changes saved!"
     },
+    "createNewPost": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Create A New Post"
+    },
     "edited": "edited",
     "menu": {
       "delete": "Delete post",

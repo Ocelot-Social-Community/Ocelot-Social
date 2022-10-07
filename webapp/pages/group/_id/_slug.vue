@@ -249,10 +249,9 @@
           </base-card>
         </ds-space>
         <ds-space v-if="isGroupMemberNonePending" centered>
-          <nuxt-link :to="{ name: 'post-create' }">
+          <nuxt-link :to="{ name: 'post-create', query: { groupId: group.id } }">
             <base-button
               class="profile-post-add-button"
-              :path="{ name: 'post-create' }"
               icon="plus"
               circle
               filled
@@ -370,8 +369,6 @@ export default {
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
-      Group: [],
-      GroupMembers: [],
       loadGroupMembers: false,
       posts: [],
       // hasMore: true,

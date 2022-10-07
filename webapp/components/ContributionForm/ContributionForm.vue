@@ -99,6 +99,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    groupId: {
+      type: String,
+      default: () => null,
+    },
   },
   data() {
     const { title, content, image, categories } = this.contribution
@@ -164,6 +168,14 @@ export default {
         }
       }
       this.loading = true
+      // Wolle: console.log('variables: ', {
+      //   title,
+      //   content,
+      //   categoryIds,
+      //   id: this.contribution.id || null,
+      //   image,
+      //   groupId: this.groupId,
+      // })
       this.$apollo
         .mutate({
           mutation: this.contribution.id ? PostMutations().UpdatePost : PostMutations().CreatePost,
@@ -173,6 +185,7 @@ export default {
             categoryIds,
             id: this.contribution.id || null,
             image,
+            groupId: this.groupId,
           },
         })
         .then(({ data }) => {
