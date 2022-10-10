@@ -287,17 +287,16 @@ export default {
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         let postRestrictionCypher = ''
-        if (['owner', 'admin', 'usual'].includes(roleInGroup)) {
-          postRestrictionCypher = `
-            WITH group, member, membership
-            FOREACH (restriction IN [(member)-[r:CANNOT_SEE]->(:Post)-[:IN]->(group) | r] |
-              DELETE restriction)`
-        } else {
-          // user becomes pending member
+        if (roleInGroup === 'pending') {
           postRestrictionCypher = `
             WITH group, member, membership
             FOREACH (post IN [(p:Post)-[:IN]->(group) | p] |
               MERGE (member)-[:CANNOT_SEE]->(post))`
+        } else {
+          postRestrictionCypher = `
+            WITH group, member, membership
+            FOREACH (restriction IN [(member)-[r:CANNOT_SEE]->(:Post)-[:IN]->(group) | r] |
+              DELETE restriction)`
         }
 
         const joinGroupCypher = `
