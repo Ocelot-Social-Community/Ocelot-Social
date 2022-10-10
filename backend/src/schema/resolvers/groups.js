@@ -262,7 +262,10 @@ export default {
           MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
           DELETE membership
           WITH member, group
-          FOREACH (post IN [(p:Post)-[:IN]->(group) | p] |
+          OPTIONAL MATCH (p:Post)-[:IN]->(group)
+          WHERE NOT group.groupType = 'public' 
+          WITH member, group, collect(p) AS posts
+          FOREACH (post IN posts |
             MERGE (member)-[:CANNOT_SEE]->(post))
           RETURN member {.*, myRoleInGroup: NULL}
         `

@@ -182,6 +182,33 @@ describe('Posts in Groups', () => {
         roleInGroup: 'usual',
       },
     })
+    await Factory.build('emailAddress', {
+      email: 'new-user@example.org',
+      nonce: '12345',
+      verifiedAt: null,
+    })
+    const result = await mutate({
+      mutation: signupVerificationMutation,
+      variables: {
+        name: 'New User',
+        slug: 'new-user',
+        nonce: '12345',
+        password: '1234',
+        about: 'I am a new user!',
+        email: 'new-user@example.org',
+        termsAndConditionsAgreedVersion: '0.0.1',
+      },
+    })
+    newUser = result.data.SignupVerification
+    authenticatedUser = await anyUser.toJson()
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'post-without-group',
+        title: 'A post without a group',
+        content: 'I am a user who does not belong to a group yet.',
+      },
+    })
   })
 
   describe('creating posts in groups', () => {
@@ -417,27 +444,6 @@ describe('Posts in Groups', () => {
       })
 
       describe('as new user', () => {
-        beforeAll(async () => {
-          await Factory.build('emailAddress', {
-            email: 'new-user@example.org',
-            nonce: '12345',
-            verifiedAt: null,
-          })
-          const result = await mutate({
-            mutation: signupVerificationMutation,
-            variables: {
-              name: 'New User',
-              slug: 'new-user',
-              nonce: '12345',
-              password: '1234',
-              about: 'I am a new user!',
-              email: 'new-user@example.org',
-              termsAndConditionsAgreedVersion: '0.0.1',
-            },
-          })
-          newUser = result.data.SignupVerification
-        })
-
         beforeEach(async () => {
           authenticatedUser = newUser
         })
@@ -631,18 +637,6 @@ describe('Posts in Groups', () => {
     })
 
     describe('filter posts', () => {
-      beforeAll(async () => {
-        authenticatedUser = newUser
-        await mutate({
-          mutation: createPostMutation(),
-          variables: {
-            id: 'post-without-group',
-            title: 'A post without a group',
-            content: 'As a new user, I do not belong to a group yet.',
-          },
-        })
-      })
-
       describe('without authentication', () => {
         beforeEach(async () => {
           authenticatedUser = null
@@ -662,7 +656,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -690,7 +684,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -718,7 +712,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -746,7 +740,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -774,7 +768,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-closed-group',
@@ -814,7 +808,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -842,7 +836,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -870,7 +864,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -898,7 +892,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -926,7 +920,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-closed-group',
@@ -1000,7 +994,7 @@ describe('Posts in Groups', () => {
                     {
                       id: 'post-without-group',
                       title: 'A post without a group',
-                      content: 'As a new user, I do not belong to a group yet.',
+                      content: 'I am a user who does not belong to a group yet.',
                     },
                   ]),
                 },
@@ -1037,7 +1031,7 @@ describe('Posts in Groups', () => {
                     {
                       id: 'post-without-group',
                       title: 'A post without a group',
-                      content: 'As a new user, I do not belong to a group yet.',
+                      content: 'I am a user who does not belong to a group yet.',
                     },
                   ]),
                 },
@@ -1074,7 +1068,7 @@ describe('Posts in Groups', () => {
                     {
                       id: 'post-without-group',
                       title: 'A post without a group',
-                      content: 'As a new user, I do not belong to a group yet.',
+                      content: 'I am a user who does not belong to a group yet.',
                     },
                   ]),
                 },
@@ -1111,7 +1105,7 @@ describe('Posts in Groups', () => {
                     {
                       id: 'post-without-group',
                       title: 'A post without a group',
-                      content: 'As a new user, I do not belong to a group yet.',
+                      content: 'I am a user who does not belong to a group yet.',
                     },
                     {
                       id: 'post-to-closed-group',
@@ -1166,7 +1160,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-closed-group',
@@ -1211,7 +1205,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-closed-group',
@@ -1263,7 +1257,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-hidden-group',
@@ -1308,7 +1302,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -1319,6 +1313,51 @@ describe('Posts in Groups', () => {
     })
 
     describe('usual member leaves', () => {
+      describe('public group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await allGroupsUser.toJson()
+          await mutate({
+            mutation: leaveGroupMutation(),
+            variables: {
+              groupId: 'public-group',
+              userId: 'all-groups-user',
+            },
+          })
+        })
+
+        it('still shows the posts of the public group', async () => {
+          const result = await query({ query: filterPosts(), variables: {} })
+          expect(result.data.Post).toHaveLength(4)
+          expect(result).toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'I am a user who does not belong to a group yet.',
+                },
+                {
+                  id: 'post-to-closed-group',
+                  title: 'A post to a closed group',
+                  content: 'I am posting into a closed group as a member of the group',
+                },
+                {
+                  id: 'post-to-hidden-group',
+                  title: 'A post to a hidden group',
+                  content: 'I am posting into a hidden group as a member of the group',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+
       describe('closed group', () => {
         beforeAll(async () => {
           authenticatedUser = await allGroupsUser.toJson()
@@ -1345,7 +1384,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-hidden-group',
@@ -1385,7 +1424,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -1427,7 +1466,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-closed-group',
@@ -1472,7 +1511,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-closed-group',
