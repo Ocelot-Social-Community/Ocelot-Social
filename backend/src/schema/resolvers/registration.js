@@ -72,19 +72,19 @@ const signupCypher = (inviteCode) => {
       (inviteCode:InviteCode {code: $inviteCode})<-[:GENERATED]-(host:User)
       `
     optionalMerge = `
-      MERGE(user)-[:REDEEMED { createdAt: toString(datetime()) }]->(inviteCode)
-      MERGE(host)-[:INVITED { createdAt: toString(datetime()) }]->(user)
-      MERGE(user)-[:FOLLOWS { createdAt: toString(datetime()) }]->(host)
-      MERGE(host)-[:FOLLOWS { createdAt: toString(datetime()) }]->(user)
+      MERGE (user)-[:REDEEMED { createdAt: toString(datetime()) }]->(inviteCode)
+      MERGE (host)-[:INVITED { createdAt: toString(datetime()) }]->(user)
+      MERGE (user)-[:FOLLOWS { createdAt: toString(datetime()) }]->(host)
+      MERGE (host)-[:FOLLOWS { createdAt: toString(datetime()) }]->(user)
       `
   }
   const cypher = `
-      MATCH(email:EmailAddress {nonce: $nonce, email: $email})
+      MATCH (email:EmailAddress {nonce: $nonce, email: $email})
       WHERE NOT (email)-[:BELONGS_TO]->()
       ${optionalMatch}
       CREATE (user:User)
-      MERGE(user)-[:PRIMARY_EMAIL]->(email)
-      MERGE(user)<-[:BELONGS_TO]-(email)
+      MERGE (user)-[:PRIMARY_EMAIL]->(email)
+      MERGE (user)<-[:BELONGS_TO]-(email)
       ${optionalMerge}
       SET user += $args
       SET user.id = randomUUID()
@@ -95,6 +95,13 @@ const signupCypher = (inviteCode) => {
       SET user.showShoutsPublicly = false
       SET user.sendNotificationEmails = true
       SET email.verifiedAt = toString(datetime())
+      WITH user
+      OPTIONAL MATCH (post:Post)-[:IN]->(group:Group)
+        WHERE NOT group.groupType = 'public'
+      WITH user, collect(post) AS invisiblePosts
+      FOREACH (invisiblePost IN invisiblePosts |
+        MERGE (user)-[:CANNOT_SEE]->(invisiblePost)
+      )
       RETURN user {.*}
     `
   return cypher

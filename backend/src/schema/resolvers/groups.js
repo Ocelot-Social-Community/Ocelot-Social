@@ -261,8 +261,15 @@ export default {
         const leaveGroupCypher = `
           MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
           DELETE membership
+          WITH member, group
+          OPTIONAL MATCH (p:Post)-[:IN]->(group)
+          WHERE NOT group.groupType = 'public' 
+          WITH member, group, collect(p) AS posts
+          FOREACH (post IN posts |
+            MERGE (member)-[:CANNOT_SEE]->(post))
           RETURN member {.*, myRoleInGroup: NULL}
         `
+
         const transactionResponse = await transaction.run(leaveGroupCypher, { groupId, userId })
         const [member] = await transactionResponse.records.map((record) => record.get('member'))
         return member
@@ -279,8 +286,22 @@ export default {
       const { groupId, userId, roleInGroup } = params
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        let postRestrictionCypher = ''
+        if (['usual', 'admin', 'owner'].includes(roleInGroup)) {
+          postRestrictionCypher = `
+            WITH group, member, membership
+            FOREACH (restriction IN [(member)-[r:CANNOT_SEE]->(:Post)-[:IN]->(group) | r] |
+              DELETE restriction)`
+        } else {
+          postRestrictionCypher = `
+            WITH group, member, membership
+            FOREACH (post IN [(p:Post)-[:IN]->(group) | p] |
+              MERGE (member)-[:CANNOT_SEE]->(post))`
+        }
+
         const joinGroupCypher = `
-          MATCH (member:User {id: $userId}), (group:Group {id: $groupId})
+          MATCH (member:User {id: $userId})
+          MATCH (group:Group {id: $groupId})
           MERGE (member)-[membership:MEMBER_OF]->(group)
           ON CREATE SET
             membership.createdAt = toString(datetime()),
@@ -289,8 +310,10 @@ export default {
           ON MATCH SET
             membership.updatedAt = toString(datetime()),
             membership.role = $roleInGroup
+          ${postRestrictionCypher}
           RETURN member {.*, myRoleInGroup: membership.role}
         `
+
         const transactionResponse = await transaction.run(joinGroupCypher, {
           groupId,
           userId,
@@ -313,6 +336,7 @@ export default {
       undefinedToNull: ['deleted', 'disabled', 'locationName', 'about'],
       hasMany: {
         categories: '-[:CATEGORIZED]->(related:Category)',
+        posts: '<-[:IN]-(related:Post)',
       },
       hasOne: {
         avatar: '-[:AVATAR_IMAGE]->(related:Image)',

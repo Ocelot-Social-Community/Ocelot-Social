@@ -709,7 +709,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     await Promise.all([
       mutate({
-        mutation: createPostMutation,
+        mutation: createPostMutation(),
         variables: {
           id: 'p2',
           title: `Nature Philosophy Yoga`,
@@ -718,7 +718,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: createPostMutation,
+        mutation: createPostMutation(),
         variables: {
           id: 'p7',
           title: 'This is post #7',
@@ -727,7 +727,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: createPostMutation,
+        mutation: createPostMutation(),
         variables: {
           id: 'p8',
           image: faker.image.unsplash.nature(),
@@ -737,7 +737,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: createPostMutation,
+        mutation: createPostMutation(),
         variables: {
           id: 'p12',
           title: 'This is post #12',

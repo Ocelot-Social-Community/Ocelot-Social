@@ -366,7 +366,7 @@ describe('slugifyMiddleware', () => {
       it('generates a slug based on title', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: createPostMutation(),
             variables,
           }),
         ).resolves.toMatchObject({
@@ -382,7 +382,7 @@ describe('slugifyMiddleware', () => {
       it('generates a slug based on given slug', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: createPostMutation(),
             variables: {
               ...variables,
               slug: 'the-post',
@@ -417,7 +417,7 @@ describe('slugifyMiddleware', () => {
       it('chooses another slug', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: createPostMutation(),
             variables: {
               ...variables,
               title: 'Pre-existing post',
@@ -440,7 +440,7 @@ describe('slugifyMiddleware', () => {
           try {
             await expect(
               mutate({
-                mutation: createPostMutation,
+                mutation: createPostMutation(),
                 variables: {
                   ...variables,
                   title: 'Pre-existing post',
