@@ -262,7 +262,10 @@ export default {
           MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
           DELETE membership
           WITH member, group
-          FOREACH (post IN [(p:Post)-[:IN]->(group) | p] |
+          OPTIONAL MATCH (p:Post)-[:IN]->(group)
+          WHERE NOT group.groupType = 'public' 
+          WITH member, group, collect(p) AS posts
+          FOREACH (post IN posts |
             MERGE (member)-[:CANNOT_SEE]->(post))
           RETURN member {.*, myRoleInGroup: NULL}
         `
@@ -284,17 +287,16 @@ export default {
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         let postRestrictionCypher = ''
-        if (['owner', 'admin', 'usual'].includes(roleInGroup)) {
-          postRestrictionCypher = `
-            WITH group, member, membership
-            FOREACH (restriction IN [(member)-[r:CANNOT_SEE]->(:Post)-[:IN]->(group) | r] |
-              DELETE restriction)`
-        } else {
-          // user becomes pending member
+        if (roleInGroup === 'pending') {
           postRestrictionCypher = `
             WITH group, member, membership
             FOREACH (post IN [(p:Post)-[:IN]->(group) | p] |
               MERGE (member)-[:CANNOT_SEE]->(post))`
+        } else {
+          postRestrictionCypher = `
+            WITH group, member, membership
+            FOREACH (restriction IN [(member)-[r:CANNOT_SEE]->(:Post)-[:IN]->(group) | r] |
+              DELETE restriction)`
         }
 
         const joinGroupCypher = `

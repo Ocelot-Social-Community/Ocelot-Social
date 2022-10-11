@@ -13,7 +13,7 @@ const getInvisiblePosts = async (context) => {
       cypher = `
         MATCH (post:Post)-[:IN]->(group:Group)
         WHERE NOT group.groupType = 'public'
-        RETURN  collect(post.id) AS invisiblePostIds`
+        RETURN collect(post.id) AS invisiblePostIds`
     }
     const invisiblePostIdsResponse = await transaction.run(cypher, {
       userId: user ? user.id : null,

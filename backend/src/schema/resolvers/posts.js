@@ -102,7 +102,7 @@ export default {
                WHERE group.groupType IN ['closed', 'hidden']
                  AND membership.role IN ['usual', 'admin', 'owner']
              WITH post, collect(user.id) AS userIds
-             OPTIONAL MATCH path =(blocked:User) WHERE NOT blocked.id IN userIds 
+             OPTIONAL MATCH path =(restricted:User) WHERE NOT restricted.id IN userIds 
              FOREACH (user IN nodes(path) |
                MERGE (user)-[:CANNOT_SEE]->(post)
              )`
@@ -129,7 +129,7 @@ export default {
             ${groupCypher}
             RETURN post {.*}
           `,
-          { userId: context.user.id, params, categoryIds, groupId },
+          { userId: context.user.id, categoryIds, groupId, params },
         )
         const [post] = createPostTransactionResponse.records.map((record) => record.get('post'))
         if (imageInput) {

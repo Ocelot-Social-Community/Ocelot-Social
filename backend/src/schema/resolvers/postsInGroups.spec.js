@@ -59,7 +59,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  // await cleanDatabase()
+  await cleanDatabase()
 })
 
 describe('Posts in Groups', () => {
@@ -182,11 +182,20 @@ describe('Posts in Groups', () => {
         roleInGroup: 'usual',
       },
     })
+    authenticatedUser = await anyUser.toJson()
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'post-without-group',
+        title: 'A post without a group',
+        content: 'I am a user who does not belong to a group yet.',
+      },
+    })
   })
 
   describe('creating posts in groups', () => {
     describe('without membership of group', () => {
-      beforeEach(async () => {
+      beforeAll(async () => {
         authenticatedUser = await anyUser.toJson()
       })
 
@@ -240,7 +249,7 @@ describe('Posts in Groups', () => {
     })
 
     describe('as a pending member of group', () => {
-      beforeEach(async () => {
+      beforeAll(async () => {
         authenticatedUser = await pendingUser.toJson()
       })
 
@@ -294,7 +303,7 @@ describe('Posts in Groups', () => {
     })
 
     describe('as a member of group', () => {
-      beforeEach(async () => {
+      beforeAll(async () => {
         authenticatedUser = await allGroupsUser.toJson()
       })
 
@@ -372,7 +381,7 @@ describe('Posts in Groups', () => {
   describe('visibility of posts', () => {
     describe('query post by ID', () => {
       describe('without authentication', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = null
         })
 
@@ -436,9 +445,6 @@ describe('Posts in Groups', () => {
             },
           })
           newUser = result.data.SignupVerification
-        })
-
-        beforeEach(async () => {
           authenticatedUser = newUser
         })
 
@@ -483,7 +489,7 @@ describe('Posts in Groups', () => {
       })
 
       describe('without membership of group', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = await anyUser.toJson()
         })
 
@@ -528,7 +534,7 @@ describe('Posts in Groups', () => {
       })
 
       describe('with pending membership of group', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = await pendingUser.toJson()
         })
 
@@ -573,7 +579,7 @@ describe('Posts in Groups', () => {
       })
 
       describe('as member of group', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = await allGroupsUser.toJson()
         })
 
@@ -631,24 +637,12 @@ describe('Posts in Groups', () => {
     })
 
     describe('filter posts', () => {
-      beforeAll(async () => {
-        authenticatedUser = newUser
-        await mutate({
-          mutation: createPostMutation(),
-          variables: {
-            id: 'post-without-group',
-            title: 'A post without a group',
-            content: 'As a new user, I do not belong to a group yet.',
-          },
-        })
-      })
-
       describe('without authentication', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = null
         })
 
-        it('shows a the post of the public group and the post without group', async () => {
+        it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: filterPosts(), variables: {} })
           expect(result.data.Post).toHaveLength(2)
           expect(result).toMatchObject({
@@ -662,7 +656,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -672,11 +666,11 @@ describe('Posts in Groups', () => {
       })
 
       describe('as new user', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = newUser
         })
 
-        it('shows a the post of the public group and the post without group', async () => {
+        it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: filterPosts(), variables: {} })
           expect(result.data.Post).toHaveLength(2)
           expect(result).toMatchObject({
@@ -690,7 +684,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -700,11 +694,11 @@ describe('Posts in Groups', () => {
       })
 
       describe('without membership of group', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = await anyUser.toJson()
         })
 
-        it('shows a the post of the public group and the post without group', async () => {
+        it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: filterPosts(), variables: {} })
           expect(result.data.Post).toHaveLength(2)
           expect(result).toMatchObject({
@@ -718,7 +712,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -728,11 +722,11 @@ describe('Posts in Groups', () => {
       })
 
       describe('with pending membership of group', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = await pendingUser.toJson()
         })
 
-        it('shows a the post of the public group and the post without group', async () => {
+        it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: filterPosts(), variables: {} })
           expect(result.data.Post).toHaveLength(2)
           expect(result).toMatchObject({
@@ -746,7 +740,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -756,7 +750,7 @@ describe('Posts in Groups', () => {
       })
 
       describe('as member of group', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = await allGroupsUser.toJson()
         })
 
@@ -774,7 +768,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-closed-group',
@@ -796,11 +790,11 @@ describe('Posts in Groups', () => {
 
     describe('profile page posts', () => {
       describe('without authentication', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = null
         })
 
-        it('shows a the post of the public group and the post without group', async () => {
+        it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: profilePagePosts(), variables: {} })
           expect(result.data.profilePagePosts).toHaveLength(2)
           expect(result).toMatchObject({
@@ -814,7 +808,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -824,11 +818,11 @@ describe('Posts in Groups', () => {
       })
 
       describe('as new user', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = newUser
         })
 
-        it('shows a the post of the public group and the post without group', async () => {
+        it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: profilePagePosts(), variables: {} })
           expect(result.data.profilePagePosts).toHaveLength(2)
           expect(result).toMatchObject({
@@ -842,7 +836,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -852,11 +846,11 @@ describe('Posts in Groups', () => {
       })
 
       describe('without membership of group', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = await anyUser.toJson()
         })
 
-        it('shows a the post of the public group and the post without group', async () => {
+        it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: profilePagePosts(), variables: {} })
           expect(result.data.profilePagePosts).toHaveLength(2)
           expect(result).toMatchObject({
@@ -870,7 +864,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -880,11 +874,11 @@ describe('Posts in Groups', () => {
       })
 
       describe('with pending membership of group', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = await pendingUser.toJson()
         })
 
-        it('shows a the post of the public group and the post without group', async () => {
+        it('shows the post of the public group and the post without group', async () => {
           const result = await query({ query: profilePagePosts(), variables: {} })
           expect(result.data.profilePagePosts).toHaveLength(2)
           expect(result).toMatchObject({
@@ -898,7 +892,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -908,7 +902,7 @@ describe('Posts in Groups', () => {
       })
 
       describe('as member of group', () => {
-        beforeEach(async () => {
+        beforeAll(async () => {
           authenticatedUser = await allGroupsUser.toJson()
         })
 
@@ -926,7 +920,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-closed-group',
@@ -944,189 +938,189 @@ describe('Posts in Groups', () => {
           })
         })
       })
+    })
 
-      describe('searchPosts', () => {
-        describe('without authentication', () => {
-          beforeEach(async () => {
-            authenticatedUser = null
-          })
-
-          it('finds nothing', async () => {
-            const result = await query({
-              query: searchPosts(),
-              variables: {
-                query: 'post',
-                postsOffset: 0,
-                firstPosts: 25,
-              },
-            })
-            expect(result.data.searchPosts.posts).toHaveLength(0)
-            expect(result).toMatchObject({
-              data: {
-                searchPosts: {
-                  postCount: 0,
-                  posts: [],
-                },
-              },
-            })
-          })
+    describe('searchPosts', () => {
+      describe('without authentication', () => {
+        beforeAll(async () => {
+          authenticatedUser = null
         })
 
-        describe('as new user', () => {
-          beforeEach(async () => {
-            authenticatedUser = newUser
+        it('finds nothing', async () => {
+          const result = await query({
+            query: searchPosts(),
+            variables: {
+              query: 'post',
+              postsOffset: 0,
+              firstPosts: 25,
+            },
           })
-
-          it('finds the post of the public group and the post without group', async () => {
-            const result = await query({
-              query: searchPosts(),
-              variables: {
-                query: 'post',
-                postsOffset: 0,
-                firstPosts: 25,
+          expect(result.data.searchPosts.posts).toHaveLength(0)
+          expect(result).toMatchObject({
+            data: {
+              searchPosts: {
+                postCount: 0,
+                posts: [],
               },
-            })
-            expect(result.data.searchPosts.posts).toHaveLength(2)
-            expect(result).toMatchObject({
-              data: {
-                searchPosts: {
-                  postCount: 2,
-                  posts: expect.arrayContaining([
-                    {
-                      id: 'post-to-public-group',
-                      title: 'A post to a public group',
-                      content: 'I am posting into a public group as a member of the group',
-                    },
-                    {
-                      id: 'post-without-group',
-                      title: 'A post without a group',
-                      content: 'As a new user, I do not belong to a group yet.',
-                    },
-                  ]),
-                },
-              },
-            })
+            },
           })
         })
+      })
 
-        describe('without membership of group', () => {
-          beforeEach(async () => {
-            authenticatedUser = await anyUser.toJson()
-          })
-
-          it('finds the post of the public group and the post without group', async () => {
-            const result = await query({
-              query: searchPosts(),
-              variables: {
-                query: 'post',
-                postsOffset: 0,
-                firstPosts: 25,
-              },
-            })
-            expect(result.data.searchPosts.posts).toHaveLength(2)
-            expect(result).toMatchObject({
-              data: {
-                searchPosts: {
-                  postCount: 2,
-                  posts: expect.arrayContaining([
-                    {
-                      id: 'post-to-public-group',
-                      title: 'A post to a public group',
-                      content: 'I am posting into a public group as a member of the group',
-                    },
-                    {
-                      id: 'post-without-group',
-                      title: 'A post without a group',
-                      content: 'As a new user, I do not belong to a group yet.',
-                    },
-                  ]),
-                },
-              },
-            })
-          })
+      describe('as new user', () => {
+        beforeAll(async () => {
+          authenticatedUser = newUser
         })
 
-        describe('with pending membership of group', () => {
-          beforeEach(async () => {
-            authenticatedUser = await pendingUser.toJson()
+        it('finds the post of the public group and the post without group', async () => {
+          const result = await query({
+            query: searchPosts(),
+            variables: {
+              query: 'post',
+              postsOffset: 0,
+              firstPosts: 25,
+            },
           })
-
-          it('finds the post of the public group and the post without group', async () => {
-            const result = await query({
-              query: searchPosts(),
-              variables: {
-                query: 'post',
-                postsOffset: 0,
-                firstPosts: 25,
+          expect(result.data.searchPosts.posts).toHaveLength(2)
+          expect(result).toMatchObject({
+            data: {
+              searchPosts: {
+                postCount: 2,
+                posts: expect.arrayContaining([
+                  {
+                    id: 'post-to-public-group',
+                    title: 'A post to a public group',
+                    content: 'I am posting into a public group as a member of the group',
+                  },
+                  {
+                    id: 'post-without-group',
+                    title: 'A post without a group',
+                    content: 'I am a user who does not belong to a group yet.',
+                  },
+                ]),
               },
-            })
-            expect(result.data.searchPosts.posts).toHaveLength(2)
-            expect(result).toMatchObject({
-              data: {
-                searchPosts: {
-                  postCount: 2,
-                  posts: expect.arrayContaining([
-                    {
-                      id: 'post-to-public-group',
-                      title: 'A post to a public group',
-                      content: 'I am posting into a public group as a member of the group',
-                    },
-                    {
-                      id: 'post-without-group',
-                      title: 'A post without a group',
-                      content: 'As a new user, I do not belong to a group yet.',
-                    },
-                  ]),
-                },
-              },
-            })
+            },
           })
         })
+      })
 
-        describe('as member of group', () => {
-          beforeEach(async () => {
-            authenticatedUser = await allGroupsUser.toJson()
+      describe('without membership of group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await anyUser.toJson()
+        })
+
+        it('finds the post of the public group and the post without group', async () => {
+          const result = await query({
+            query: searchPosts(),
+            variables: {
+              query: 'post',
+              postsOffset: 0,
+              firstPosts: 25,
+            },
           })
+          expect(result.data.searchPosts.posts).toHaveLength(2)
+          expect(result).toMatchObject({
+            data: {
+              searchPosts: {
+                postCount: 2,
+                posts: expect.arrayContaining([
+                  {
+                    id: 'post-to-public-group',
+                    title: 'A post to a public group',
+                    content: 'I am posting into a public group as a member of the group',
+                  },
+                  {
+                    id: 'post-without-group',
+                    title: 'A post without a group',
+                    content: 'I am a user who does not belong to a group yet.',
+                  },
+                ]),
+              },
+            },
+          })
+        })
+      })
 
-          it('finds all posts', async () => {
-            const result = await query({
-              query: searchPosts(),
-              variables: {
-                query: 'post',
-                postsOffset: 0,
-                firstPosts: 25,
+      describe('with pending membership of group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await pendingUser.toJson()
+        })
+
+        it('finds the post of the public group and the post without group', async () => {
+          const result = await query({
+            query: searchPosts(),
+            variables: {
+              query: 'post',
+              postsOffset: 0,
+              firstPosts: 25,
+            },
+          })
+          expect(result.data.searchPosts.posts).toHaveLength(2)
+          expect(result).toMatchObject({
+            data: {
+              searchPosts: {
+                postCount: 2,
+                posts: expect.arrayContaining([
+                  {
+                    id: 'post-to-public-group',
+                    title: 'A post to a public group',
+                    content: 'I am posting into a public group as a member of the group',
+                  },
+                  {
+                    id: 'post-without-group',
+                    title: 'A post without a group',
+                    content: 'I am a user who does not belong to a group yet.',
+                  },
+                ]),
               },
-            })
-            expect(result.data.searchPosts.posts).toHaveLength(4)
-            expect(result).toMatchObject({
-              data: {
-                searchPosts: {
-                  postCount: 4,
-                  posts: expect.arrayContaining([
-                    {
-                      id: 'post-to-public-group',
-                      title: 'A post to a public group',
-                      content: 'I am posting into a public group as a member of the group',
-                    },
-                    {
-                      id: 'post-without-group',
-                      title: 'A post without a group',
-                      content: 'As a new user, I do not belong to a group yet.',
-                    },
-                    {
-                      id: 'post-to-closed-group',
-                      title: 'A post to a closed group',
-                      content: 'I am posting into a closed group as a member of the group',
-                    },
-                    {
-                      id: 'post-to-hidden-group',
-                      title: 'A post to a hidden group',
-                      content: 'I am posting into a hidden group as a member of the group',
-                    },
-                  ]),
-                },
+            },
+          })
+        })
+      })
+
+      describe('as member of group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await allGroupsUser.toJson()
+        })
+
+        it('finds all posts', async () => {
+          const result = await query({
+            query: searchPosts(),
+            variables: {
+              query: 'post',
+              postsOffset: 0,
+              firstPosts: 25,
+            },
+          })
+          expect(result.data.searchPosts.posts).toHaveLength(4)
+          expect(result).toMatchObject({
+            data: {
+              searchPosts: {
+                postCount: 4,
+                posts: expect.arrayContaining([
+                  {
+                    id: 'post-to-public-group',
+                    title: 'A post to a public group',
+                    content: 'I am posting into a public group as a member of the group',
+                  },
+                  {
+                    id: 'post-without-group',
+                    title: 'A post without a group',
+                    content: 'I am a user who does not belong to a group yet.',
+                  },
+                  {
+                    id: 'post-to-closed-group',
+                    title: 'A post to a closed group',
+                    content: 'I am posting into a closed group as a member of the group',
+                  },
+                  {
+                    id: 'post-to-hidden-group',
+                    title: 'A post to a hidden group',
+                    content: 'I am posting into a hidden group as a member of the group',
+                  },
+                ]),
               },
-            })
+            },
           })
         })
       })
@@ -1146,9 +1140,6 @@ describe('Posts in Groups', () => {
               roleInGroup: 'usual',
             },
           })
-        })
-
-        beforeEach(async () => {
           authenticatedUser = await pendingUser.toJson()
         })
 
@@ -1166,7 +1157,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-closed-group',
@@ -1191,9 +1182,6 @@ describe('Posts in Groups', () => {
               roleInGroup: 'usual',
             },
           })
-        })
-
-        beforeEach(async () => {
           authenticatedUser = await pendingUser.toJson()
         })
 
@@ -1211,7 +1199,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-closed-group',
@@ -1243,13 +1231,10 @@ describe('Posts in Groups', () => {
               roleInGroup: 'pending',
             },
           })
-        })
-
-        beforeEach(async () => {
           authenticatedUser = await pendingUser.toJson()
         })
 
-        it('does not shows the posts of the closed group anymore', async () => {
+        it('does not show the posts of the closed group anymore', async () => {
           const result = await query({ query: filterPosts(), variables: {} })
           expect(result.data.Post).toHaveLength(3)
           expect(result).toMatchObject({
@@ -1263,7 +1248,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-hidden-group',
@@ -1288,9 +1273,6 @@ describe('Posts in Groups', () => {
               roleInGroup: 'pending',
             },
           })
-        })
-
-        beforeEach(async () => {
           authenticatedUser = await pendingUser.toJson()
         })
 
@@ -1308,7 +1290,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -1319,6 +1301,51 @@ describe('Posts in Groups', () => {
     })
 
     describe('usual member leaves', () => {
+      describe('public group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await allGroupsUser.toJson()
+          await mutate({
+            mutation: leaveGroupMutation(),
+            variables: {
+              groupId: 'public-group',
+              userId: 'all-groups-user',
+            },
+          })
+        })
+
+        it('still shows the posts of the public group', async () => {
+          const result = await query({ query: filterPosts(), variables: {} })
+          expect(result.data.Post).toHaveLength(4)
+          expect(result).toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                {
+                  id: 'post-to-public-group',
+                  title: 'A post to a public group',
+                  content: 'I am posting into a public group as a member of the group',
+                },
+                {
+                  id: 'post-without-group',
+                  title: 'A post without a group',
+                  content: 'I am a user who does not belong to a group yet.',
+                },
+                {
+                  id: 'post-to-closed-group',
+                  title: 'A post to a closed group',
+                  content: 'I am posting into a closed group as a member of the group',
+                },
+                {
+                  id: 'post-to-hidden-group',
+                  title: 'A post to a hidden group',
+                  content: 'I am posting into a hidden group as a member of the group',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+
       describe('closed group', () => {
         beforeAll(async () => {
           authenticatedUser = await allGroupsUser.toJson()
@@ -1331,7 +1358,7 @@ describe('Posts in Groups', () => {
           })
         })
 
-        it('does not shows the posts of the closed group anymore', async () => {
+        it('does not show the posts of the closed group anymore', async () => {
           const result = await query({ query: filterPosts(), variables: {} })
           expect(result.data.Post).toHaveLength(3)
           expect(result).toMatchObject({
@@ -1345,7 +1372,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-hidden-group',
@@ -1385,7 +1412,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
               ]),
             },
@@ -1407,13 +1434,10 @@ describe('Posts in Groups', () => {
               roleInGroup: 'usual',
             },
           })
-        })
-
-        beforeEach(async () => {
           authenticatedUser = await allGroupsUser.toJson()
         })
 
-        it('does not shows the posts of the closed group', async () => {
+        it('does not show the posts of the closed group', async () => {
           const result = await query({ query: filterPosts(), variables: {} })
           expect(result.data.Post).toHaveLength(3)
           expect(result).toMatchObject({
@@ -1427,7 +1451,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-closed-group',
@@ -1452,9 +1476,6 @@ describe('Posts in Groups', () => {
               roleInGroup: 'usual',
             },
           })
-        })
-
-        beforeEach(async () => {
           authenticatedUser = await allGroupsUser.toJson()
         })
 
@@ -1472,7 +1493,7 @@ describe('Posts in Groups', () => {
                 {
                   id: 'post-without-group',
                   title: 'A post without a group',
-                  content: 'As a new user, I do not belong to a group yet.',
+                  content: 'I am a user who does not belong to a group yet.',
                 },
                 {
                   id: 'post-to-closed-group',
