@@ -15,6 +15,9 @@ COPY branding/constants/ constants/
 COPY branding/locales/ locales/
 COPY branding/assets/styles/imports/ assets/styles/imports/
 
+## Something like (bash, jq must be installed)
+# for locale in `ls locales/*.json`; do  jq -s '.[0] * .[1]' source/$locale $locale; done;
+
 ##################################################################################
 # BUILD ##########################################################################
 ##################################################################################

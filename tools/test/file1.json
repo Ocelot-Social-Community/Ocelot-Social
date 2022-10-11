@@ -1,0 +1,12 @@
+{
+  "a-key": "A",
+  "b-key": {
+    "a-subkey": "A",
+    "b-subkey": "B",
+    "c-subkey": {
+      "a-subsubkey": "A",
+      "b-subsubkey": "B"
+    }
+  },
+  "c-key": "C"
+}
