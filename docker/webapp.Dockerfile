@@ -12,8 +12,14 @@ FROM $APP_IMAGE_CODE as code
 # copy public constants into the Docker image to brand it
 COPY branding/static/ static/
 COPY branding/constants/ constants/
-COPY branding/locales/ locales/
+COPY branding/locales/html/ locales/html/
+# COPY branding/locales/index.js locales/index.js
+COPY branding/locales/*.json locales/tmp/
 COPY branding/assets/styles/imports/ assets/styles/imports/
+
+RUN apk add --no-cache bash jq
+
+RUN tools/merge-locales.sh
 
 ## Something like (bash, jq must be installed)
 # for locale in `ls locales/*.json`; do  jq -s '.[0] * .[1]' source/$locale $locale; done;
