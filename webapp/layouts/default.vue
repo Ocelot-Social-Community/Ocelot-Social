@@ -19,12 +19,12 @@
             >
               <a v-if="item.url" :href="item.url" target="_blank">
                 <ds-text size="large" bold>
-                  {{ item.name }}
+                  {{ $t(item.nameIdent) }}
                 </ds-text>
               </a>
               <nuxt-link v-else :to="item.path">
                 <ds-text size="large" bold>
-                  {{ item.name }}
+                  {{ $t(item.nameIdent) }}
                 </ds-text>
               </nuxt-link>
             </ds-flex-item>
