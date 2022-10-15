@@ -1,11 +1,11 @@
 export default {
   MENU: [
     {
-      name: 'Beiträge',
-      path: '/#',
+      nameIdent: 'ocelotRebranding.newsFeed',
+      path: '/',
     },
     {
-      name: 'Über Yunite',
+      nameIdent: 'ocelotRebranding.about',
       url: 'https://yunite.org',
     },
   ],
