@@ -11,8 +11,8 @@
       <template #default="{ errors }">
         <!-- group Name -->
         <ds-input
-          :label="$t('group.name')"
           name="name"
+          :label="$t('group.name')"
           model="name"
           autofocus
           :placeholder="`${$t('group.name')} …`"
@@ -77,11 +77,11 @@
           {{ $t('group.description') }}
         </ds-text>
         <editor
+          name="description"
+          model="description"
           :users="null"
           :value="formData.description"
           :hashtags="null"
-          model="description"
-          name="description"
           @input="updateEditorDescription"
         />
         <ds-chip size="base" :color="errors && errors.description && 'danger'">
@@ -163,7 +163,7 @@
           <nuxt-link to="/my-groups">
             <ds-button>{{ $t('actions.cancel') }}</ds-button>
           </nuxt-link>
-          <ds-button type="submit" icon="save" primary :disabled="errors" fill>
+          <ds-button type="submit" icon="save" primary :disabled="checkFormError(errors)" fill>
             {{ update ? $t('group.update') : $t('group.save') }}
           </ds-button>
         </ds-space>
@@ -261,8 +261,43 @@ export default {
     descriptionLength() {
       return this.$filters.removeHtml(this.formData.description).length
     },
+    sameLocation() {
+      if (this.group.locationName === null) return true
+      if (this.group.locationName !== this.formData.locationName) return false
+      return true
+    },
+    sameCategories() {
+      if (this.group.categories.length !== this.formData.categoryIds.length) return false
+      const groupCategories = []
+      this.group.categories.forEach((categories) => {
+        groupCategories.push(categories.id)
+        const some = this.formData.categoryIds.some((item) => item === categories.id)
+        if (!some) return false
+      })
+
+      return true
+    },
+    disableButtomByUpdate() {
+      if (!this.update) return true
+      if (
+        this.group.name === this.formData.name &&
+        this.group.slug === this.formData.slug &&
+        this.group.about === this.formData.about &&
+        this.group.description === this.formData.description &&
+        this.group.actionRadius === this.formData.actionRadius &&
+        this.sameLocation &&
+        this.sameCategories
+      )
+        return true
+      return false
+    },
   },
   methods: {
+    checkFormError(error) {
+      if (!this.update && error && !!error && this.disableButtomByUpdate) return true
+      if (this.update && !error && this.disableButtomByUpdate) return true
+      return false
+    },
     changeGroupType(event) {
       this.formData.groupType = event.target.value
     },
