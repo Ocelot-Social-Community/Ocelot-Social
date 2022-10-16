@@ -277,7 +277,7 @@ export default {
 
       return true
     },
-    disableButtomByUpdate() {
+    disableButtonByUpdate() {
       if (!this.update) return true
       if (
         this.group.name === this.formData.name &&
@@ -294,8 +294,8 @@ export default {
   },
   methods: {
     checkFormError(error) {
-      if (!this.update && error && !!error && this.disableButtomByUpdate) return true
-      if (this.update && !error && this.disableButtomByUpdate) return true
+      if (!this.update && error && !!error && this.disableButtonByUpdate) return true
+      if (this.update && !error && this.disableButtonByUpdate) return true
       return false
     },
     changeGroupType(event) {
