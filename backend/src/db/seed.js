@@ -580,7 +580,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       }),
     ])
 
-    authenticatedUser = await peterLustig.toJson()
+    authenticatedUser = await louie.toJson()
     await Promise.all([
       mutate({
         mutation: createPostMutation(),
