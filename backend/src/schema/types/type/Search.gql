@@ -1,4 +1,4 @@
-union SearchResult = Post | User | Tag
+union SearchResult = Post | User | Tag | Group
 
 type postSearchResults {
   postCount: Int
@@ -15,9 +15,15 @@ type hashtagSearchResults {
   hashtags: [Tag]!
 }
 
+type groupSearchResults {
+  groupCount: Int
+  groups: [Group]!
+}
+
 type Query {
   searchPosts(query: String!, firstPosts: Int, postsOffset: Int): postSearchResults!
   searchUsers(query: String!, firstUsers: Int, usersOffset: Int): userSearchResults!
+  searchGroups(query: String!, firstGroups: Int, groupsOffset: Int): groupSearchResults!
   searchHashtags(query: String!, firstHashtags: Int, hashtagsOffset: Int): hashtagSearchResults!
   searchResults(query: String!, limit: Int = 5): [SearchResult]!
 }
