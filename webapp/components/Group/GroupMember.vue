@@ -1,5 +1,24 @@
 <template>
   <div>
+    <base-card>
+      <h2 class="title">{{ $t('admin.users.name') }}</h2>
+      <ds-form v-model="form" @submit="submit">
+        <ds-flex gutter="small">
+          <ds-flex-item width="90%">
+            <ds-input
+              name="query"
+              model="query"
+              :placeholder="$t('admin.users.form.placeholder')"
+              icon="search"
+            />
+          </ds-flex-item>
+          <ds-flex-item width="30px">
+            <!-- <base-button filled circle type="submit" icon="search" :loading="$apollo.loading" /> -->
+            <base-button filled circle type="submit" icon="search"  />
+          </ds-flex-item>
+        </ds-flex>
+      </ds-form>
+    </base-card>
     <ds-table :fields="tableFields" :data="groupMembers" condensed>
       <template #avatar="scope">
         <nuxt-link
@@ -74,6 +93,7 @@
   </div>
 </template>
 <script>
+import { User } from '~/graphql/User'
 import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
 
 export default {
@@ -92,6 +112,9 @@ export default {
     return {
       isOpen: false,
       memberId: null,
+      form: {
+          query: '',
+      },
     }
   },
   computed: {
@@ -121,6 +144,7 @@ export default {
     },
   },
   methods: {
+    
     async changeMemberRole(id, event) {
       const newRole = event.target.value
       try {
@@ -135,6 +159,9 @@ export default {
         this.$toast.error(error.message)
       }
     },
+    async submit() {
+      console.log('submit', this.form.query)
+    }
     // TODO: implement removal of group members
     // openModal(row) {
     //   this.isOpen = true
