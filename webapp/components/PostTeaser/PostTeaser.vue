@@ -15,7 +15,7 @@
         <img :src="post.image | proxyApiUrl" class="image" />
       </template>
       <client-only>
-        <user-teaser :user="post.author" :date-time="post.createdAt" />
+        <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" />
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
       <!-- TODO: replace editor content with tiptap render view -->
