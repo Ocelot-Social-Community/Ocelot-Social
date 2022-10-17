@@ -136,7 +136,7 @@
           icon="close"
           ghost
           size="small"
-          style="position: relative; display: inline-block; right: -93%; top: -45px"
+          style="position: relative; display: inline-block; right: -96%; top: -33px;  width: 26px;"
           @click="formData.locationName = ''"
         ></base-button>
 
@@ -262,8 +262,11 @@ export default {
       return this.$filters.removeHtml(this.formData.description).length
     },
     sameLocation() {
-      if (this.group.locationName === null) return true
-      if (this.group.locationName !== this.formData.locationName) return false
+      console.log('this.group.locationName', this.group.locationName)
+      console.log('this.formData.locationName', this.formData.locationName)
+      console.log('this.group.locationName === null && this.formData.locationName === ', this.group.locationName === null && this.formData.locationName === '')
+      if (this.group.locationName === null || this.formData.locationName !== '') return true
+      if (this.group.locationName !== this.formData.locationName.value) return false
       return true
     },
     sameCategories() {
