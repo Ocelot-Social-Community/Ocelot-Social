@@ -175,6 +175,10 @@ export default {
           mutation: changeGroupMemberRoleMutation(),
           variables: { groupId: this.groupId, userId: this.slugUser[0].id, roleInGroup: newRole },
         })
+        // this.$apollo.queries.GroupMembers.refetch()
+         this.$emit('loadGroupMembers')
+         this.slugUser = []
+         this.form.query = ''
         this.$toast.success(
           this.$t('group.changeMemberRole', { role: this.$t(`group.roles.${newRole}`) }),
         )
