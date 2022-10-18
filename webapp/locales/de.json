@@ -440,6 +440,7 @@
       "roleInGroup": "Rolle",
       "slug": "Eindeutiger Name"
     },
+    "addMemberToGroup":"zur Gruppe hinzufügen",
     "membersCount": "Mitglied ::: Mitglieder",
     "membersListTitle": "Gruppenmitglieder",
     "membersListTitleNotAllowedSeeingGroupMembers": "Gruppenmitglieder unsichtbar",

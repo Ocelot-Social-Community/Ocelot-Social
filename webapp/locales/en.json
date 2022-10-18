@@ -441,6 +441,7 @@
       "slug": "Unique name"
     },
     "membersCount": "Member ::: Members",
+    "addMemberToGroup":"zur Gruppe hinzufügen",
     "membersListTitle": "Group Members",
     "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
     "myGroups": "My Groups",

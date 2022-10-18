@@ -18,6 +18,13 @@
           </ds-flex-item>
         </ds-flex>
       </ds-form>
+      <div v-if="noSlug">Kein User mit diesem Slug gefunden!</div>
+      <div v-if="slugUser.length > 0">
+        {{slugUser}}
+        <ds-button size="small" primary @click="addMemberToGroup(slugUser)">
+          {{ $t('group.addMemberToGroup') }}
+        </ds-button>
+      </div>
     </base-card>
     <ds-table :fields="tableFields" :data="groupMembers" condensed>
       <template #avatar="scope">
@@ -70,7 +77,7 @@
         </ds-chip>
       </template>
       <template #edit="scope">
-        <ds-button size="small" primary :disabled="true" @click="openModal(scope.row)">
+        <ds-button  v-if="scope.row.myRoleInGroup !== 'owner'" size="small" primary @click="deleteMember(scope.row.id)">
           <!-- TODO: implement removal of group members -->
           <!--           :disabled="scope.row.myRoleInGroup === 'owner'"
  -->
@@ -93,7 +100,7 @@
   </div>
 </template>
 <script>
-import { User } from '~/graphql/User'
+import { minimisedUserQuery } from '~/graphql/User'
 import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
 
 export default {
@@ -112,6 +119,8 @@ export default {
     return {
       isOpen: false,
       memberId: null,
+      noSlug: false,
+      slugUser: [],
       form: {
           query: '',
       },
@@ -159,17 +168,49 @@ export default {
         this.$toast.error(error.message)
       }
     },
+    async addMemberToGroup () {
+      const newRole = 'usual'
+      try {
+        await this.$apollo.mutate({
+          mutation: changeGroupMemberRoleMutation(),
+          variables: { groupId: this.groupId, userId: this.slugUser[0].id, roleInGroup: newRole },
+        })
+        this.$toast.success(
+          this.$t('group.changeMemberRole', { role: this.$t(`group.roles.${newRole}`) }),
+        )
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
     async submit() {
-      console.log('submit', this.form.query)
-    }
+      try {
+        const {
+          data: { User },
+        } = await this.$apollo.query({
+          query: minimisedUserQuery(),
+          variables: {
+            slug: this.form.query,
+          },
+        })
+        if(User.length === 0)  { 
+          this.noSlug = true
+        } else {
+          this.noSlug = false
+          this.slugUser = User
+        }
+      } catch (error) {
+        this.noSlug = true
+      } finally {
+      }
+    },
     // TODO: implement removal of group members
     // openModal(row) {
     //   this.isOpen = true
     //   this.memberId = row.id
     // },
-    // deleteMember(id) {
-    //   alert('deleteMember: ' + id)
-    // },
+    deleteMember(id) {
+      alert('deleteMember: ' + id)
+    },
   },
 }
 </script>
