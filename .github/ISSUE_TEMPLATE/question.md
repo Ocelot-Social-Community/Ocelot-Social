@@ -1,15 +1,13 @@
 ---
-name: "\U0001F4AC Question"
-about: If you need help understanding ocelot.social.
-title: "\U0001F4AC [Question] XXX"
+name: 💬 Question
+about: If you need help understanding our Software.
 labels: question
-assignees: ''
-
+title: 💬 [Question] 
 ---
+<!-- You can find the latest issue templates here https://github.com/ulfgebhardt/issue-templates -->
 
-<!-- Chat with ocelot.social team -->
-<!-- If you need an answer right away, visit the ocelot.social Discord:
-https://discord.gg/AJSX9DCSUA -->
+<!-- Question the project's team -->
+<!-- If you need an answer right away, consider to take other means of communication with the project's team -->
 
 ## 💬 Question
 <!-- Describe your Question in detail. Include screenshots and drawings if needed. -->
