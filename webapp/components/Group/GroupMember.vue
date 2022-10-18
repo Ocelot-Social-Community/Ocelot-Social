@@ -20,10 +20,18 @@
       </ds-form>
       <div v-if="noSlug">Kein User mit diesem Slug gefunden!</div>
       <div v-if="slugUser.length > 0">
-        {{slugUser}}
-        <ds-button size="small" primary @click="addMemberToGroup(slugUser)">
-          {{ $t('group.addMemberToGroup') }}
-        </ds-button>
+        <ds-space margin="base" />
+        <ds-flex>
+          <ds-flex-item><ds-avatar online size="small" :name="slugUser[0].name"></ds-avatar></ds-flex-item>
+          <ds-flex-item>{{ slugUser[0].name }}</ds-flex-item>
+          <ds-flex-item>{{ slugUser[0].slug }}</ds-flex-item>
+          <ds-flex-item>
+            <ds-button size="small" primary @click="addMemberToGroup(slugUser)">
+              {{ $t('group.addMemberToGroup') }}
+            </ds-button>
+          </ds-flex-item>
+        </ds-flex>
+        <ds-space margin="base" />
       </div>
     </base-card>
     <ds-table :fields="tableFields" :data="groupMembers" condensed>
