@@ -404,6 +404,9 @@
       "regional": "Regional Group"
     },
     "actionRadius": "Action radius",
+    "addMemberToGroup": "Add to group",
+    "addUser": "Add User",
+    "addUserPlaceholder": "unique username > @slug-from-user",
     "categories": "Topic ::: Topics",
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
@@ -441,7 +444,6 @@
       "slug": "Unique name"
     },
     "membersCount": "Member ::: Members",
-    "addMemberToGroup":"zur Gruppe hinzufügen",
     "membersListTitle": "Group Members",
     "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
     "myGroups": "My Groups",

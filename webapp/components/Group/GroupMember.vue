@@ -1,20 +1,20 @@
 <template>
   <div>
     <base-card>
-      <h2 class="title">{{ $t('admin.users.name') }}</h2>
+      <h2 class="title">{{ $t('group.addUser') }}</h2>
       <ds-form v-model="form" @submit="submit">
         <ds-flex gutter="small">
           <ds-flex-item width="90%">
             <ds-input
               name="query"
               model="query"
-              :placeholder="$t('admin.users.form.placeholder')"
+              :placeholder="$t('group.addUserPlaceholder')"
               icon="search"
             />
           </ds-flex-item>
           <ds-flex-item width="30px">
             <!-- <base-button filled circle type="submit" icon="search" :loading="$apollo.loading" /> -->
-            <base-button filled circle type="submit" icon="search"  />
+            <base-button filled circle type="submit" icon="search" />
           </ds-flex-item>
         </ds-flex>
       </ds-form>
@@ -22,7 +22,9 @@
       <div v-if="slugUser.length > 0">
         <ds-space margin="base" />
         <ds-flex>
-          <ds-flex-item><ds-avatar online size="small" :name="slugUser[0].name"></ds-avatar></ds-flex-item>
+          <ds-flex-item>
+            <ds-avatar online size="small" :name="slugUser[0].name"></ds-avatar>
+          </ds-flex-item>
           <ds-flex-item>{{ slugUser[0].name }}</ds-flex-item>
           <ds-flex-item>{{ slugUser[0].slug }}</ds-flex-item>
           <ds-flex-item>
@@ -85,7 +87,12 @@
         </ds-chip>
       </template>
       <template #edit="scope">
-        <ds-button  v-if="scope.row.myRoleInGroup !== 'owner'" size="small" primary @click="deleteMember(scope.row.id)">
+        <ds-button
+          v-if="scope.row.myRoleInGroup !== 'owner'"
+          size="small"
+          primary
+          @click="deleteMember(scope.row.id)"
+        >
           <!-- TODO: implement removal of group members -->
           <!--           :disabled="scope.row.myRoleInGroup === 'owner'"
  -->
@@ -130,7 +137,7 @@ export default {
       noSlug: false,
       slugUser: [],
       form: {
-          query: '',
+        query: '',
       },
     }
   },
@@ -161,7 +168,6 @@ export default {
     },
   },
   methods: {
-    
     async changeMemberRole(id, event) {
       const newRole = event.target.value
       try {
@@ -176,7 +182,7 @@ export default {
         this.$toast.error(error.message)
       }
     },
-    async addMemberToGroup () {
+    async addMemberToGroup() {
       const newRole = 'usual'
       try {
         await this.$apollo.mutate({
@@ -184,9 +190,9 @@ export default {
           variables: { groupId: this.groupId, userId: this.slugUser[0].id, roleInGroup: newRole },
         })
         // this.$apollo.queries.GroupMembers.refetch()
-         this.$emit('loadGroupMembers')
-         this.slugUser = []
-         this.form.query = ''
+        this.$emit('loadGroupMembers')
+        this.slugUser = []
+        this.form.query = ''
         this.$toast.success(
           this.$t('group.changeMemberRole', { role: this.$t(`group.roles.${newRole}`) }),
         )
@@ -204,7 +210,7 @@ export default {
             slug: this.form.query,
           },
         })
-        if(User.length === 0)  { 
+        if (User.length === 0) {
           this.noSlug = true
         } else {
           this.noSlug = false
