@@ -135,7 +135,7 @@
           @input.native="handleCityInput"
         />
         <base-button
-          v-if="formData.locationName !== ''"
+          v-if="formLocationName !== ''"
           icon="close"
           ghost
           size="small"
@@ -176,7 +176,6 @@
 </template>
 
 <script>
-import { isEmpty } from 'lodash'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import {
@@ -211,7 +210,6 @@ export default {
     const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
       this.group
     return {
-      isEmpty,
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
       groupTypeOptions: ['public', 'closed', 'hidden'],
@@ -269,39 +267,31 @@ export default {
     }
   },
   async created() {
-    if (typeof this.formData.locationName === 'string' && this.formData.locationName !== '') {
-      // set to "requestGeoData" object and fill select menu if possible
-      this.formData.locationName =
-        (await this.requestGeoData(this.formData.locationName)) || this.formData.locationName
-    }
+    // set to "requestGeoData" object and fill select menu if possible
+    this.formData.locationName =
+      (await this.requestGeoData(this.formLocationName)) || this.formLocationName
   },
   computed: {
+    formLocationName() {
+      const isNestedValue =
+        typeof this.formData.locationName === 'object' &&
+        typeof this.formData.locationName.value === 'string'
+      const isDirectString = typeof this.formData.locationName === 'string'
+      return isNestedValue
+        ? this.formData.locationName.value
+        : isDirectString
+        ? this.formData.locationName
+        : ''
+    },
     locationNameLabelAddOnOldName() {
-      const isNestedValue = !isEmpty(this.formData.locationName.value)
-      const isNoneEmptyString =
-        typeof this.formData.locationName === 'string' && this.formData.locationName !== ''
-      return (
-        (isNestedValue || isNoneEmptyString ? ' — ' : '') +
-        (isNestedValue
-          ? this.formData.locationName.value
-          : isNoneEmptyString
-          ? this.formData.locationName
-          : '')
-      )
+      return this.formLocationName !== '' ? ' — ' + this.formLocationName : ''
     },
     descriptionLength() {
       return this.$filters.removeHtml(this.formData.description).length
     },
     sameLocation() {
-      const isNestedValue = !isEmpty(this.formData.locationName.value)
-      const isNoneEmptyString =
-        typeof this.formData.locationName === 'string' && this.formData.locationName !== ''
       const dbLocationName = this.group.locationName || ''
-      return isNestedValue
-        ? this.formData.locationName.value === dbLocationName
-        : isNoneEmptyString
-        ? this.formData.locationName === dbLocationName
-        : dbLocationName === ''
+      return dbLocationName === this.formLocationName
     },
     sameCategories() {
       if (this.group.categories.length !== this.formData.categoryIds.length) return false
@@ -343,7 +333,7 @@ export default {
       this.$refs.groupForm.update('description', value)
     },
     submit() {
-      const { name, about, description, groupType, actionRadius, locationName, categoryIds } =
+      const { name, about, description, groupType, actionRadius, /* locationName, */ categoryIds } =
         this.formData
       const variables = {
         name,
@@ -351,11 +341,7 @@ export default {
         description,
         groupType,
         actionRadius,
-        locationName: !isEmpty(locationName.value)
-          ? locationName.value
-          : typeof locationName === 'string'
-          ? locationName
-          : '',
+        locationName: this.formLocationName,
         categoryIds,
       }
       this.update
