@@ -123,7 +123,7 @@
         <!-- location -->
         <ds-select
           id="city"
-          :label="$t('settings.data.labelCity')"
+          :label="$t('settings.data.labelCity') + locationNameLabelAddOnOldName"
           v-model="formData.locationName"
           :options="cities"
           icon="map-marker"
@@ -174,6 +174,7 @@
 </template>
 
 <script>
+import { isEmpty } from 'lodash'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import {
@@ -208,6 +209,7 @@ export default {
     const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
       this.group
     return {
+      isEmpty,
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
       groupTypeOptions: ['public', 'closed', 'hidden'],
@@ -220,6 +222,12 @@ export default {
         groupType: groupType || '',
         about: about || '',
         description: description || '',
+        // from database 'locationName' comes as "string | null"
+        // 'formData.locationName':
+        //   see 'created': tries to set it to a "requestGeoData" object and fills the menu if possible
+        //   if user selects one from menu we get a "requestGeoData" object here
+        //   "requestGeoData" object: "{ id: String, label: String, value: String }"
+        //   otherwise it's a string: empty or none empty
         locationName: locationName || '',
         actionRadius: actionRadius || '',
         categoryIds: categories ? categories.map((category) => category.id) : [],
@@ -258,42 +266,40 @@ export default {
       },
     }
   },
+  async created() {
+    if (typeof this.formData.locationName === 'string' && this.formData.locationName !== '') {
+      // set to "requestGeoData" object and fill select menu if possible
+      this.formData.locationName =
+        (await this.requestGeoData(this.formData.locationName)) || this.formData.locationName
+    }
+  },
   computed: {
+    locationNameLabelAddOnOldName() {
+      const isNestedValue = !isEmpty(this.formData.locationName.value)
+      const isNoneEmptyString =
+        typeof this.formData.locationName === 'string' && this.formData.locationName !== ''
+      return (
+        (isNestedValue || isNoneEmptyString ? ' — ' : '') +
+        (isNestedValue
+          ? this.formData.locationName.value
+          : isNoneEmptyString
+          ? this.formData.locationName
+          : '')
+      )
+    },
     descriptionLength() {
       return this.$filters.removeHtml(this.formData.description).length
     },
     sameLocation() {
-      console.log('sameLocation this.group.locationName', this.group.locationName)
-      console.log('sameLocation this.formData.locationName', this.formData.locationName)
-      if ( this.group.locationName === null ) { this.group.locationName = '' }
-
-      if ( this.formData.locationName.value ){
-        console.log('if value form', this.formData.locationName.value )
-        console.log('if value group', this.group.locationName )
-        if (this.formData.locationName.value !== this.group.locationName) {
-          console.log('value != group location name')
-          return false
-        }
-        
-      } else  {
-        console.log('if not value ')
-        if (this.formData.locationName !== this.group.locationName) {
-          console.log('ungleich')
-          return false
-        }
-        
-      }
-
-      
-      // if ( this.group.locationName !== null ) {
-      //   if ( this.formData.locationName !== '' ) {
-      //     if ( this.group.locationName !== this.formData.locationName.value ) return false
-      //   } else {
-      //     return false
-      //   }
-      // }  
-
-      return true
+      const isNestedValue = !isEmpty(this.formData.locationName.value)
+      const isNoneEmptyString =
+        typeof this.formData.locationName === 'string' && this.formData.locationName !== ''
+      const dbLocationName = this.group.locationName || ''
+      return isNestedValue
+        ? this.formData.locationName.value === dbLocationName
+        : isNoneEmptyString
+        ? this.formData.locationName === dbLocationName
+        : dbLocationName === ''
     },
     sameCategories() {
       if (this.group.categories.length !== this.formData.categoryIds.length) return false
@@ -308,14 +314,7 @@ export default {
     },
     disableButtonByUpdate() {
       if (!this.update) return true
-      console.log('name', this.group.name === this.formData.name)
-      console.log('slug', this.group.slug === this.formData.slug)
-      console.log('about', this.group.about === this.formData.about)
-      console.log('description', this.group.description === this.formData.description)
-      console.log('actionRadius', this.group.actionRadius === this.formData.actionRadius)
-      console.log('sameLocation', this.sameLocation)
-      console.log('sameCategories', this.sameCategories)
-      if (
+      return (
         this.group.name === this.formData.name &&
         this.group.slug === this.formData.slug &&
         this.group.about === this.formData.about &&
@@ -324,8 +323,6 @@ export default {
         this.sameLocation &&
         this.sameCategories
       )
-        return true
-      return false
     },
   },
   methods: {
@@ -346,14 +343,17 @@ export default {
     submit() {
       const { name, about, description, groupType, actionRadius, locationName, categoryIds } =
         this.formData
-        console.log(this.formData)
       const variables = {
         name,
         about,
         description,
         groupType,
         actionRadius,
-        locationName: locationName.label ? locationName.label : '',
+        locationName: !isEmpty(locationName.value)
+          ? locationName.value
+          : typeof locationName === 'string'
+          ? locationName
+          : '',
         categoryIds,
       }
       this.update
@@ -363,9 +363,12 @@ export default {
           })
         : this.$emit('createGroup', variables)
     },
-    handleCityInput(value) {
+    handleCityInput(event) {
       clearTimeout(timeout)
-      timeout = setTimeout(() => this.requestGeoData(value), 500)
+      timeout = setTimeout(
+        () => this.requestGeoData(event.target ? event.target.value.trim() : ''),
+        500,
+      )
     },
     processLocationsResult(places) {
       if (!places.length) {
@@ -382,8 +385,7 @@ export default {
 
       return result
     },
-    async requestGeoData(e) {
-      const value = e.target ? e.target.value.trim() : ''
+    async requestGeoData(value) {
       if (value === '') {
         this.cities = []
         return
@@ -394,11 +396,13 @@ export default {
       const lang = this.$i18n.locale()
 
       const {
-        data: { queryLocations: res },
+        data: { queryLocations: result },
       } = await this.$apollo.query({ query: queryLocations(), variables: { place, lang } })
 
-      this.cities = this.processLocationsResult(res)
+      this.cities = this.processLocationsResult(result)
       this.loadingGeo = false
+
+      return this.cities.find((city) => city.value === value)
     },
   },
 }
