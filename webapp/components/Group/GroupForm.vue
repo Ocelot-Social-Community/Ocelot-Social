@@ -17,7 +17,7 @@
           autofocus
           :placeholder="`${$t('group.name')} …`"
         />
-        <ds-chip size="base" :color="errors && errors.name && 'danger'">
+        <ds-chip size="base" :color="errors && errors.name ? 'danger' : 'medium'">
           {{ `${formData.name.length} / ${formSchema.name.min}–${formSchema.name.max}` }}
           <base-icon v-if="errors && errors.name" name="warning" />
         </ds-chip>
@@ -53,7 +53,7 @@
         </select>
         <ds-chip
           size="base"
-          :color="errors && errors.groupType && formData.groupType === '' && 'danger'"
+          :color="errors && errors.groupType && formData.groupType === '' ? 'danger' : 'medium'"
         >
           {{ `${formData.groupType === '' ? 0 : 1} / 1` }}
           <base-icon
@@ -85,7 +85,7 @@
           :hashtags="null"
           @input="updateEditorDescription"
         />
-        <ds-chip size="base" :color="errors && errors.description && 'danger'">
+        <ds-chip size="base" :color="errors && errors.description ? 'danger' : 'medium'">
           {{ `${descriptionLength} / ${formSchema.description.min}` }}
           <base-icon v-if="errors && errors.description" name="warning" />
         </ds-chip>
@@ -111,7 +111,9 @@
         </select>
         <ds-chip
           size="base"
-          :color="errors && errors.actionRadius && formData.actionRadius === '' && 'danger'"
+          :color="
+            errors && errors.actionRadius && formData.actionRadius === '' ? 'danger' : 'medium'
+          "
         >
           {{ `${formData.actionRadius === '' ? 0 : 1} / 1` }}
           <base-icon
@@ -153,7 +155,7 @@
         <ds-chip
           v-if="categoriesActive"
           size="base"
-          :color="errors && errors.categoryIds && 'danger'"
+          :color="errors && errors.categoryIds ? 'danger' : 'medium'"
         >
           {{ formData.categoryIds.length }} / 3
           <base-icon v-if="errors && errors.categoryIds" name="warning" />
