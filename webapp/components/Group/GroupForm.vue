@@ -42,6 +42,7 @@
         <select
           class="select ds-input appearance--auto"
           name="groupType"
+          model="groupType"
           :value="formData.groupType"
           :disabled="update"
           @change="changeGroupType($event)"
@@ -262,8 +263,36 @@ export default {
       return this.$filters.removeHtml(this.formData.description).length
     },
     sameLocation() {
-      if (this.group.locationName === null || this.formData.locationName !== '') return true
-      if (this.group.locationName !== this.formData.locationName.value) return false
+      console.log('sameLocation this.group.locationName', this.group.locationName)
+      console.log('sameLocation this.formData.locationName', this.formData.locationName)
+      if ( this.group.locationName === null ) { this.group.locationName = '' }
+
+      if ( this.formData.locationName.value ){
+        console.log('if value form', this.formData.locationName.value )
+        console.log('if value group', this.group.locationName )
+        if (this.formData.locationName.value !== this.group.locationName) {
+          console.log('value != group location name')
+          return false
+        }
+        
+      } else  {
+        console.log('if not value ')
+        if (this.formData.locationName !== this.group.locationName) {
+          console.log('ungleich')
+          return false
+        }
+        
+      }
+
+      
+      // if ( this.group.locationName !== null ) {
+      //   if ( this.formData.locationName !== '' ) {
+      //     if ( this.group.locationName !== this.formData.locationName.value ) return false
+      //   } else {
+      //     return false
+      //   }
+      // }  
+
       return true
     },
     sameCategories() {
@@ -279,6 +308,13 @@ export default {
     },
     disableButtonByUpdate() {
       if (!this.update) return true
+      console.log('name', this.group.name === this.formData.name)
+      console.log('slug', this.group.slug === this.formData.slug)
+      console.log('about', this.group.about === this.formData.about)
+      console.log('description', this.group.description === this.formData.description)
+      console.log('actionRadius', this.group.actionRadius === this.formData.actionRadius)
+      console.log('sameLocation', this.sameLocation)
+      console.log('sameCategories', this.sameCategories)
       if (
         this.group.name === this.formData.name &&
         this.group.slug === this.formData.slug &&
@@ -310,6 +346,7 @@ export default {
     submit() {
       const { name, about, description, groupType, actionRadius, locationName, categoryIds } =
         this.formData
+        console.log(this.formData)
       const variables = {
         name,
         about,
