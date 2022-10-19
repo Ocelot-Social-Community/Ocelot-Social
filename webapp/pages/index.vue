@@ -8,7 +8,7 @@
       <ds-grid-item v-if="showDonations" class="top-info-bar" :row-span="1" column-span="fullWidth">
         <donation-info :goal="goal" :progress="progress" />
       </ds-grid-item>
-      <!-- newsfeed -->
+      <!-- news feed -->
       <template v-if="hasResults">
         <masonry-grid-item
           v-for="post in posts"
