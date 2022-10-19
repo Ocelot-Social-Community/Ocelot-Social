@@ -7,7 +7,6 @@
           icon="ellipsis-v"
           size="small"
           circle
-          ghost
           @click.prevent="toggleMenu()"
         />
       </slot>

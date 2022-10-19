@@ -58,7 +58,7 @@
         <div v-else class="categories-placeholder"></div>
         <!-- group context menu -->
         <client-only>
-          <group-content-menu resource-type="group" :resource="group" :group="group" />
+          <group-content-menu :usage="'groupTeaser'" :group="group || {}" placement="bottom-end" />
         </client-only>
       </footer>
       <footer class="footer">
@@ -78,7 +78,7 @@
 
 <script>
 import Category from '~/components/Category'
-import GroupContentMenu from '~/components/Group/GroupContentMenu'
+import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 
 export default {
   name: 'GroupTeaser',
