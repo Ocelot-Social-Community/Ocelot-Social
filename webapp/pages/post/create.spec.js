@@ -11,6 +11,11 @@ describe('create.vue', () => {
     $env: {
       CATEGORIES_ACTIVE: false,
     },
+    $route: {
+      query: {
+        groupId: null,
+      },
+    },
   }
 
   describe('mount', () => {
