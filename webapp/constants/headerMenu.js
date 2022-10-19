@@ -1,13 +1,12 @@
 export default {
   MENU: [
     // {
-    //   name: 'Beiträge',
-    //   path: '/#',
+    //   nameIdent: 'ocelotRebranding.newsFeed',
+    //   path: '/',
     // },
     // {
-    //   name: 'Über Yunite',
-    //   path: '/#',
-    //   url: 'https://yunite.org',
+    //   nameIdent: 'ocelotRebranding.about',
+    //   url: 'https://ocelot.org',
     // },
   ],
 }
