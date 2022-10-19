@@ -15,6 +15,7 @@
               v-for="item in menu"
               :key="item.name"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+              class="branding-menu"
               :width="{ base: 'auto' }"
               style="margin-right: 20px"
             >
@@ -33,6 +34,7 @@
             <ds-flex-item
               v-if="categoriesActive && isLoggedIn"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+              class="branding-menu"
               style="flex-grow: 0; flex-basis: auto; margin-right: 20px"
             >
               <client-only>
@@ -113,6 +115,39 @@
               :class="{ 'hide-mobile-menu': !toggleMobileMenu}"
               class="footer-mobile"
             >
+            <!-- dynamic branding menu  -->
+            <ul v-if="isHeaderMenu" >
+              <li
+                v-for="item in menu" :key="item.name"
+              >
+              {{item}}
+                <a v-if="item.url" :href="item.url" target="_blank">
+                  <ds-text size="large" bold>
+                    {{ $t(item.nameIdent) }}
+                  </ds-text>
+                </a>
+                <nuxt-link v-else :to="item.path">
+                  <ds-text size="large" bold>
+                    {{ $t(item.nameIdent) }}
+                  </ds-text>
+                </nuxt-link>
+              </li>
+            </ul>
+            <!-- dynamic branding menu Categories / Topic  -->
+            <ul>
+              <li 
+              v-if="categoriesActive && isLoggedIn"
+              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+              style="flex-grow: 0; flex-basis: auto; margin-right: 20px"
+            >
+              <client-only>
+                <categories-menu></categories-menu>
+              </client-only>
+           
+              </li>
+            </ul>
+            <hr />
+            <!-- dynamic footer menu in header  -->
               <ul>
                 <li v-for="pageParams in links.FOOTER_LINK_LIST" :key="pageParams.name">
                   <page-params-link :pageParams="pageParams">
@@ -255,6 +290,7 @@ export default {
   .main-navigation-right {
     width: 100%;
   }
+  .branding-menu,
   .hide-mobile-menu {
     display: none;
   }
