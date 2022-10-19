@@ -53,8 +53,8 @@
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
               :width="{
                 base: '45%',
-                sm: '45%',
-                md: isHeaderMenu ? 'auto' : '45%',
+                sm: '40%',
+                md: isHeaderMenu ? 'auto' : '40%',
                 lg: isHeaderMenu ? 'auto' : '50%',
               }"
               style="flex-shrink: 0; flex-grow: 1"
@@ -107,6 +107,7 @@
           </ds-flex>
           <!-- avatar-menu -->
           <ds-flex>
+            <!-- Footer menu if mobile -->
           <ds-flex-item
               style="flex-basis: auto"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu}"
@@ -114,19 +115,9 @@
             >
               <ul>
                 <li v-for="pageParams in links.FOOTER_LINK_LIST" :key="pageParams.name">
-                  <!-- {{pageParams}} -->
-                  <!-- <b>{{pageParams.name}}</b> -->
-                   <a v-if="pageParams.externalLink !== 'null'" href="pageParams.externalLink" target="_blank">
-                    {{pageParams.name}}
-                    </a>
-                   <nuxt-link v-else :to="pageParams.internalPage.pageRoute">
-                    
-                    {{pageParams.name}}
-                   </nuxt-link>
-                  <!-- {{pageParams.externalLink ? pageParams.externalLink : 'null'}}
-                  {{pageParams.internalPage.pageRoute ? pageParams.internalPage.pageRoute : 'null'}} -->
-
-                  
+                  <page-params-link :pageParams="pageParams">
+                    {{ $t(pageParams.internalPage.footerIdent) }}
+                  </page-params-link>
                 </li>
               </ul>
             </ds-flex-item>
@@ -164,6 +155,8 @@ import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import InviteButton from '~/components/InviteButton/InviteButton'
 import CategoriesMenu from '~/components/FilterMenu/CategoriesMenu.vue'
 import links from '~/constants/links.js'
+import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
+
 
 export default {
   components: {
@@ -177,6 +170,7 @@ export default {
     PageFooter,
     InviteButton,
     CategoriesMenu,
+    PageParamsLink,
   },
   mixins: [seo],
   data() {
