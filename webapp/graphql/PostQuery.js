@@ -104,6 +104,11 @@ export const profilePagePosts = (i18n) => {
           ...userCounts
           ...locationAndBadges
         }
+        group {
+          id
+          name
+          slug
+        }
       }
     }
   `
