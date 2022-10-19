@@ -63,7 +63,9 @@
             >
               <search-field />
             </ds-flex-item>
-            <!-- filter-menu -->
+            <!-- filter-menu 
+                TODO: Filter is only visible on index    
+            -->
             <ds-flex-item
               v-if="isLoggedIn"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
@@ -106,7 +108,6 @@
               </div>
             </ds-flex-item>
           </ds-flex>
-          <!-- avatar-menu -->
           <ds-flex>
             <!-- Footer menu if mobile -->
             <ds-flex-item
@@ -270,7 +271,7 @@ export default {
   text-align: right;
 }
 
-.footer-mobile ul {
+.ds-flex-item.footer-mobile ul {
   margin-left: 20px;
   line-height: 30px;
   font-size: large;
