@@ -50,4 +50,9 @@ export default {
   margin-left: 0.2rem;
   margin-right: 0.2rem;
 }
+@media only screen and (max-width: 730px) {
+  .ds-footer {
+    display: none;
+  }
+}
 </style>

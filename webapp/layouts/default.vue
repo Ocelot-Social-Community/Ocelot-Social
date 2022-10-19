@@ -4,12 +4,13 @@
       <ds-container class="main-navigation-container" style="padding: 10px 10px">
         <div>
           <ds-flex class="main-navigation-flex">
+             <!-- logo -->
             <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
               <nuxt-link :to="{ name: 'index' }" v-scroll-to="'.main-navigation'">
                 <logo logoType="header" />
               </nuxt-link>
             </ds-flex-item>
-
+             <!-- dynamic-brand-menu -->
             <ds-flex-item
               v-for="item in menu"
               :key="item.name"
@@ -28,6 +29,7 @@
                 </ds-text>
               </nuxt-link>
             </ds-flex-item>
+            <!-- categories-menu -->
             <ds-flex-item
               v-if="categoriesActive && isLoggedIn"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
@@ -37,26 +39,29 @@
                 <categories-menu></categories-menu>
               </client-only>
             </ds-flex-item>
+             <!-- hamburger-menu -->
             <ds-flex-item
-              :width="{ base: '40%', sm: '40%', md: '40%', lg: '0%' }"
+              :width="{ base: '20%', sm: '40%', md: '40%', lg: '0%' }"
               class="mobile-hamburger-menu"
             >
               <base-button icon="bars" @click="toggleMobileMenuView" circle />
             </ds-flex-item>
+            <!-- search-field -->
             <ds-flex-item
+              v-if="isLoggedIn"
+              id="nav-search-box"
+              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
               :width="{
                 base: '45%',
                 sm: '45%',
                 md: isHeaderMenu ? 'auto' : '45%',
                 lg: isHeaderMenu ? 'auto' : '50%',
               }"
-              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
               style="flex-shrink: 0; flex-grow: 1"
-              id="nav-search-box"
-              v-if="isLoggedIn"
             >
               <search-field />
             </ds-flex-item>
+             <!-- filter-menu -->
             <ds-flex-item
               v-if="isLoggedIn"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
@@ -66,6 +71,7 @@
                 <filter-menu v-show="showFilterMenuDropdown" />
               </client-only>
             </ds-flex-item>
+             <!-- locale-switch -->
             <ds-flex-item
               style="flex-basis: auto"
               :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
@@ -81,21 +87,52 @@
                 <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
                 <template v-if="isLoggedIn">
                   <client-only>
+                     <!-- notification-menu -->
                     <notification-menu placement="top" />
                   </client-only>
                   <div v-if="inviteRegistration">
                     <client-only>
+                      <!-- invite-button -->
                       <invite-button placement="top" />
                     </client-only>
                   </div>
                   <client-only>
+                    <!-- avatar-menu -->
                     <avatar-menu placement="top" />
                   </client-only>
                 </template>
               </div>
             </ds-flex-item>
+            
+          </ds-flex>
+          <!-- avatar-menu -->
+          <ds-flex>
+          <ds-flex-item
+              style="flex-basis: auto"
+              :class="{ 'hide-mobile-menu': !toggleMobileMenu}"
+              class="footer-mobile"
+            >
+              <ul>
+                <li v-for="pageParams in links.FOOTER_LINK_LIST" :key="pageParams.name">
+                  <!-- {{pageParams}} -->
+                  <!-- <b>{{pageParams.name}}</b> -->
+                   <a v-if="pageParams.externalLink !== 'null'" href="pageParams.externalLink" target="_blank">
+                    {{pageParams.name}}
+                    </a>
+                   <nuxt-link v-else :to="pageParams.internalPage.pageRoute">
+                    
+                    {{pageParams.name}}
+                   </nuxt-link>
+                  <!-- {{pageParams.externalLink ? pageParams.externalLink : 'null'}}
+                  {{pageParams.internalPage.pageRoute ? pageParams.internalPage.pageRoute : 'null'}} -->
+
+                  
+                </li>
+              </ul>
+            </ds-flex-item>
           </ds-flex>
         </div>
+       
       </ds-container>
     </div>
     <ds-container>
@@ -126,6 +163,7 @@ import PageFooter from '~/components/PageFooter/PageFooter'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import InviteButton from '~/components/InviteButton/InviteButton'
 import CategoriesMenu from '~/components/FilterMenu/CategoriesMenu.vue'
+import links from '~/constants/links.js'
 
 export default {
   components: {
@@ -143,6 +181,7 @@ export default {
   mixins: [seo],
   data() {
     return {
+      links,
       LOGOS,
       isHeaderMenu: headerMenu.MENU.length > 0,
       menu: headerMenu.MENU,
@@ -207,18 +246,33 @@ export default {
   margin-left: auto;
   text-align: right;
 }
-@media only screen and (min-width: 730px) {
-  .mobile-hamburger-menu {
-    display: none;
-  }
+
+.footer-mobile ul {
+  margin-left: 20px;
+  line-height: 30px;
+  font-size: large;
 }
+ 
 @media only screen and (max-width: 730px) {
   #nav-search-box,
   .main-navigation-right {
     margin: 10px 0px;
   }
+  .main-navigation-right {
+    width: 100%;
+  }
   .hide-mobile-menu {
     display: none;
   }
+}
+@media only screen and (min-width: 730px) {
+  .footer-mobile,
+  .mobile-hamburger-menu {
+    display: none;
+  }
+ .main-navigation-right {
+   width: 100%;
+ }
+ 
 }
 </style>
