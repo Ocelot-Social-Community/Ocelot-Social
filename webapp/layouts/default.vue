@@ -276,7 +276,7 @@ export default {
   font-size: large;
 }
 
-@media only screen and (max-width: 730px) {
+@media only screen and (max-width: 810px) {
   #nav-search-box,
   .main-navigation-right {
     margin: 10px 0px;
@@ -289,7 +289,7 @@ export default {
     display: none;
   }
 }
-@media only screen and (min-width: 730px) {
+@media only screen and (min-width: 810px) {
   .footer-mobile,
   .mobile-hamburger-menu {
     display: none;
