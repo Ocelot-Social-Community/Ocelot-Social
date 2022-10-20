@@ -1,12 +1,11 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import GroupMember from './GroupMember.vue'
 
 const localVue = global.localVue
 
- 
 const propsData = {
-    groupId: '',
-    groupMembers: []
+  groupId: '',
+  groupMembers: [],
 }
 
 describe('GroupMember', () => {

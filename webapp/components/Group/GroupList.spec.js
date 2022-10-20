@@ -1,9 +1,8 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import GroupList from './GroupList.vue'
 
 const localVue = global.localVue
 
- 
 const propsData = {
   groups: [],
 }
