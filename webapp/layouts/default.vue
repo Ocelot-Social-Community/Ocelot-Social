@@ -118,7 +118,6 @@
               <!-- dynamic branding menu  -->
               <ul v-if="isHeaderMenu">
                 <li v-for="item in menu" :key="item.name">
-                  {{ item }}
                   <a v-if="item.url" :href="item.url" target="_blank">
                     <ds-text size="large" bold>
                       {{ $t(item.nameIdent) }}
