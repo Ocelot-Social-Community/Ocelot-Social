@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="group-member">
     <base-card>
       <h2 class="title">{{ $t('group.addUser') }}</h2>
       <ds-form v-model="form" @submit="submit">
