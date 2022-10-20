@@ -239,6 +239,10 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
+          })
+
           it('has group slug', () => {
             expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
             expect(wrapper.text()).toContain('yoga-practice')
@@ -388,6 +392,10 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          })
+
           it('has group slug', () => {
             expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
             expect(wrapper.text()).toContain('yoga-practice')
@@ -497,6 +505,10 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          })
+
           it('has group slug', () => {
             expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
             expect(wrapper.text()).toContain('yoga-practice')
@@ -604,6 +616,10 @@ describe('GroupProfileSlug', () => {
 
           it('has ProfileAvatar', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
+          })
+
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
           })
 
           it('has group slug', () => {
@@ -719,6 +735,10 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
+          })
+
           it('has group slug', () => {
             expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
             expect(wrapper.text()).toContain('school-for-citizens')
@@ -830,6 +850,10 @@ describe('GroupProfileSlug', () => {
 
           it('has ProfileAvatar', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
+          })
+
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
           })
 
           it('has group slug', () => {
@@ -945,6 +969,10 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          })
+
           it('has group slug', () => {
             expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
             expect(wrapper.text()).toContain('school-for-citizens')
@@ -1056,6 +1084,10 @@ describe('GroupProfileSlug', () => {
 
           it('has ProfileAvatar', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
+          })
+
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
           })
 
           it('has group slug', () => {
@@ -1175,6 +1207,10 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
+          })
+
           it('has group slug', () => {
             expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
             expect(wrapper.text()).toContain('investigative-journalism')
@@ -1289,6 +1325,10 @@ describe('GroupProfileSlug', () => {
 
           it('has ProfileAvatar', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
+          })
+
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
           })
 
           it('has group slug', () => {
@@ -1407,6 +1447,10 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(false)
           })
 
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          })
+
           it('has no(!) group slug', () => {
             expect(wrapper.find('[data-test="at"]').exists()).toBe(false)
             expect(wrapper.text()).not.toContain('investigative-journalism')
@@ -1509,6 +1553,10 @@ describe('GroupProfileSlug', () => {
 
           it('has not(!) ProfileAvatar', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(false)
+          })
+
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
           })
 
           it('has no(!) group slug', () => {

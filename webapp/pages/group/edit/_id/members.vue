@@ -22,11 +22,6 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      GroupMembers: [],
-    }
-  },
   computed: {
     groupMembers() {
       return this.GroupMembers ? this.GroupMembers : []

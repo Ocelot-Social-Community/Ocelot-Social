@@ -1,5 +1,5 @@
 <template>
-  <dropdown class="group-menu" :placement="placement" offset="5">
+  <dropdown class="group-content-menu" :placement="placement" offset="5">
     <template #default="{ toggleMenu }">
       <slot name="button" :toggleMenu="toggleMenu">
         <base-button
@@ -40,35 +40,34 @@ export default {
     Dropdown,
   },
   props: {
-    placement: { type: String, default: 'bottom-end' },
-    resource: { type: Object, required: true },
-    group: { type: Object, required: true },
-    resourceType: {
+    usage: {
       type: String,
       required: true,
       validator: (value) => {
-        return value.match(/(group)/)
+        return value.match(/(groupTeaser|groupProfile)/)
       },
     },
+    group: { type: Object, required: true },
+    placement: { type: String, default: 'bottom-end' },
   },
   computed: {
     routes() {
       const routes = []
 
-      if (this.resourceType === 'group') {
+      if (this.usage !== 'groupProfile') {
         routes.push({
           label: this.$t('group.contentMenu.visitGroupPage'),
           icon: 'home',
           name: 'group-id-slug',
           params: { id: this.group.id, slug: this.group.slug },
         })
-        if (this.group.myRole === 'owner') {
-          routes.push({
-            label: this.$t('admin.settings.name'),
-            path: `/group/edit/${this.resource.id}`,
-            icon: 'edit',
-          })
-        }
+      }
+      if (this.group.myRole === 'owner') {
+        routes.push({
+          label: this.$t('admin.settings.name'),
+          path: `/group/edit/${this.group.id}`,
+          icon: 'edit',
+        })
       }
 
       return routes
