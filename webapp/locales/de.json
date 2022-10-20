@@ -423,6 +423,7 @@
     "general": "Allgemein",
     "goal": "Ziel der Gruppe",
     "groupCreated": "Die Gruppe wurde angelegt!",
+    "in": "in",
     "joinLeaveButton": {
       "iAmMember": "Bin Mitglied",
       "join": "Beitreten"

@@ -16,13 +16,16 @@
               <span v-if="!userOnly" class="name">{{ userName }}</span>
             </span>
           </nuxt-link>
-          <span v-if="wide">&nbsp;&nbsp;&nbsp;</span>
-          <nuxt-link v-if="group" :to="groupLink">
-            <span class="text">
-              <span class="slug">{{ groupSlug }}</span>
-              <span v-if="!userOnly" class="name">{{ groupName }}</span>
-            </span>
-          </nuxt-link>
+          <span v-if="wide">&nbsp;</span>
+          <span v-if="group">
+            {{ $t('group.in') }}
+            <nuxt-link :to="groupLink">
+              <span class="text">
+                <span class="slug">{{ groupSlug }}</span>
+                <span v-if="!userOnly" class="name">{{ groupName }}</span>
+              </span>
+            </nuxt-link>
+          </span>
         </div>
         <span v-if="!userOnly" class="text">
           <base-icon name="clock" />
