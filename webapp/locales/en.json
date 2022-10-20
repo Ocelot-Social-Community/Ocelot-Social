@@ -605,7 +605,19 @@
       "submitted": "Comment submitted!",
       "updated": "Changes saved!"
     },
+    "createNewPost": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Create A New Post"
+    },
     "edited": "edited",
+    "editPost": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Edit Your Post"
+    },
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
@@ -618,6 +630,12 @@
     "pinned": "Announcement",
     "takeAction": {
       "name": "Take action"
+    },
+    "viewPost": {
+      "forGroup": {
+        "title": "In The Group “{name}”"
+      },
+      "title": "Post"
     }
   },
   "profile": {
