@@ -389,8 +389,9 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          it('has GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
+            // would be nice to check for menu items after click
           })
 
           it('has group slug', () => {
@@ -501,8 +502,9 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          it('has GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
+            // would be nice to check for menu items after click
           })
 
           it('has group slug', () => {
@@ -613,8 +615,9 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          it('has GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
+            // would be nice to check for menu items after click
           })
 
           it('has group slug', () => {
@@ -845,8 +848,9 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          it('has GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
+            // would be nice to check for menu items after click
           })
 
           it('has group slug', () => {
@@ -961,8 +965,9 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          it('has GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
+            // would be nice to check for menu items after click
           })
 
           it('has group slug', () => {
@@ -1077,8 +1082,9 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          it('has GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
+            // would be nice to check for menu items after click
           })
 
           it('has group slug', () => {
@@ -1316,8 +1322,9 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          it('has GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
+            // would be nice to check for menu items after click
           })
 
           it('has group slug', () => {

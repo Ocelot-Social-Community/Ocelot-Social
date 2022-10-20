@@ -115,16 +115,48 @@ export default {
       return reviewed && reviewed.length
     },
     iconName() {
-      if (this.isPost) return 'bookmark'
-      else if (this.isComment) return 'comments'
-      else if (this.isUser) return 'user'
-      else return null
+      let name
+      switch (this.report.resource.__typename) {
+        case 'User':
+          name = 'user'
+          break
+        case 'Group':
+          name = 'users'
+          break
+        case 'Post':
+          name = 'bookmark'
+          break
+        case 'Comment':
+          name = 'comments'
+          break
+
+        default:
+          name = null
+          break
+      }
+      return name
     },
     iconLabel() {
-      if (this.isPost) return this.$t('report.contribution.type')
-      else if (this.isComment) return this.$t('report.comment.type')
-      else if (this.isUser) return this.$t('report.user.type')
-      else return null
+      let label
+      switch (this.report.resource.__typename) {
+        case 'User':
+          label = this.$t('report.user.type')
+          break
+        case 'Group':
+          label = this.$t('report.group.type')
+          break
+        case 'Post':
+          label = this.$t('report.contribution.type')
+          break
+        case 'Comment':
+          label = this.$t('report.comment.type')
+          break
+
+        default:
+          label = null
+          break
+      }
+      return label
     },
     linkTarget() {
       const { id, slug } = this.isComment ? this.report.resource.post : this.report.resource
@@ -135,9 +167,26 @@ export default {
       }
     },
     linkText() {
-      return (
-        this.report.resource.title || this.$filters.removeHtml(this.report.resource.contentExcerpt)
-      )
+      let text
+      switch (this.report.resource.__typename) {
+        case 'User':
+          text = '' // user avatar is used
+          break
+        case 'Group':
+          text = this.report.resource.name
+          break
+        case 'Post':
+          text = this.report.resource.title
+          break
+        case 'Comment':
+          text = this.$filters.removeHtml(this.report.resource.contentExcerpt)
+          break
+
+        default:
+          text = null
+          break
+      }
+      return text
     },
     statusIconName() {
       return this.isDisabled ? 'eye-slash' : 'eye'

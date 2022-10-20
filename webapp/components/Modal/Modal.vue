@@ -64,6 +64,8 @@ export default {
       switch (this.data.type) {
         case 'user':
           return name
+        case 'group':
+          return name
         case 'contribution': // REFACTORING: In ConfirmModal – Already replaced  "title" by "this.menuModalsData.delete.messageParams".
           return title
         case 'comment':

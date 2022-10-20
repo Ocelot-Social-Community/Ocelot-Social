@@ -11,9 +11,14 @@ export default {
           `
             MATCH (submitter:User {id: $submitterId})
             MATCH (resource {id: $resourceId})
-            WHERE resource:User OR resource:Post OR resource:Comment
+            WHERE resource:User OR resource:Group OR resource:Post OR resource:Comment
             MERGE (resource)<-[:BELONGS_TO]-(report:Report {closed: false})
-            ON CREATE SET report.id = randomUUID(), report.createdAt = $createdAt, report.updatedAt = report.createdAt, report.rule = 'latestReviewUpdatedAtRules', report.disable = resource.disabled, report.closed = false
+            ON CREATE SET report.id = randomUUID(),
+              report.createdAt = $createdAt,
+              report.updatedAt = report.createdAt,
+              report.rule = 'latestReviewUpdatedAtRules',
+              report.disable = resource.disabled,
+              report.closed = false
             WITH submitter, resource, report
             CREATE (report)<-[filed:FILED {createdAt: $createdAt, reasonCategory: $reasonCategory, reasonDescription: $reasonDescription}]-(submitter)
 
@@ -86,16 +91,16 @@ export default {
           // !!! this Cypher query returns multiple reports on the same resource! i will create an issue for refactoring (bug fixing)
           `
             MATCH (report:Report)-[:BELONGS_TO]->(resource)
-            WHERE (resource:User OR resource:Post OR resource:Comment)
+            WHERE resource:User OR resource:Group OR resource:Post OR resource:Comment
             ${filterClause}
             WITH report, resource,
-            [(submitter:User)-[filed:FILED]->(report) |  filed {.*, submitter: properties(submitter)} ] as filed,
-            [(moderator:User)-[reviewed:REVIEWED]->(report) |  reviewed {.*, moderator: properties(moderator)} ] as reviewed,
-            [(resource)<-[:WROTE]-(author:User) | author {.*} ] as optionalAuthors,
-            [(resource)-[:COMMENTS]->(post:Post) | post {.*} ] as optionalCommentedPosts,
-            resource {.*, __typename: labels(resource)[0] } as resourceWithType
+              [(submitter:User)-[filed:FILED]->(report) |  filed {.*, submitter: properties(submitter)} ] as filed,
+              [(moderator:User)-[reviewed:REVIEWED]->(report) |  reviewed {.*, moderator: properties(moderator)} ] as reviewed,
+              [(resource)<-[:WROTE]-(author:User) | author {.*} ] as optionalAuthors,
+              [(resource)-[:COMMENTS]->(post:Post) | post {.*} ] as optionalCommentedPosts,
+              resource {.*, __typename: labels(resource)[0] } as resourceWithType
             WITH report, optionalAuthors, optionalCommentedPosts, reviewed, filed,
-            resourceWithType {.*, post: optionalCommentedPosts[0], author: optionalAuthors[0] } as finalResource
+              resourceWithType {.*, post: optionalCommentedPosts[0], author: optionalAuthors[0] } as finalResource
             RETURN report {.*, resource: finalResource, filed: filed, reviewed: reviewed }
             ${orderByClause}
             ${offset} ${limit}
