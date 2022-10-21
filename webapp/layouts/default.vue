@@ -29,15 +29,6 @@
               </nuxt-link>
             </ds-flex-item>
             <ds-flex-item
-              v-if="categoriesActive && isLoggedIn"
-              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-              style="flex-grow: 0; flex-basis: auto; margin-right: 20px"
-            >
-              <client-only>
-                <categories-menu></categories-menu>
-              </client-only>
-            </ds-flex-item>
-            <ds-flex-item
               :width="{ base: '40%', sm: '40%', md: '40%', lg: '0%' }"
               class="mobile-hamburger-menu"
             >
@@ -125,7 +116,6 @@ import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import PageFooter from '~/components/PageFooter/PageFooter'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import InviteButton from '~/components/InviteButton/InviteButton'
-import CategoriesMenu from '~/components/FilterMenu/CategoriesMenu.vue'
 
 export default {
   components: {
@@ -138,7 +128,6 @@ export default {
     FilterMenu,
     PageFooter,
     InviteButton,
-    CategoriesMenu,
   },
   mixins: [seo],
   data() {
