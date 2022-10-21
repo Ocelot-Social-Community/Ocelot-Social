@@ -18,7 +18,9 @@
           </nuxt-link>
           <span v-if="wide">&nbsp;</span>
           <span v-if="group">
-            {{ $t('group.in') }}
+            <span class="text">
+              {{ $t('group.in') }}
+            </span>
             <nuxt-link :to="groupLink">
               <span class="text">
                 <span class="slug">{{ groupSlug }}</span>
