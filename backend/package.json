@@ -52,7 +52,7 @@
     "apollo-link-context": "~1.0.20",
     "apollo-link-http": "~1.5.17",
     "apollo-server": "~2.14.2",
-    "apollo-server-express": "^2.14.2",
+    "apollo-server-express": "^2.26.1",
     "aws-sdk": "^2.652.0",
     "babel-core": "~7.0.0-0",
     "babel-eslint": "~10.1.0",
