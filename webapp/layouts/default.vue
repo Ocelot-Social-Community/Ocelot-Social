@@ -31,7 +31,7 @@
                 </ds-text>
               </nuxt-link>
             </ds-flex-item>
-            
+
             <!-- search-field -->
             <ds-flex-item
               v-if="isLoggedIn"
@@ -105,12 +105,12 @@
               </ds-flex-item>
 
               <!-- hamburger button -->
-              <ds-flex-item   class="mobile-hamburger-menu">
-                  <client-only >
-                    <div style="display: inline-flex; padding-right: 20px;">
-                      <notification-menu />
-                    </div>
-                  </client-only>
+              <ds-flex-item class="mobile-hamburger-menu">
+                <client-only>
+                  <div style="display: inline-flex; padding-right: 20px">
+                    <notification-menu />
+                  </div>
+                </client-only>
                 <base-button icon="bars" @click="toggleMobileMenuView" circle />
               </ds-flex-item>
             </ds-flex>
@@ -136,27 +136,33 @@
               </ds-flex-item>
             </ds-flex>
             <!-- switch language, notification, invite, profil -->
-            <ds-flex style="margin: 0 20px ">
+            <ds-flex style="margin: 0 20px">
               <!-- locale-switch mobile-->
               <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }">
                 <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
-              </ds-flex-item> 
-              <!-- invite-button mobile-->
-              <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }" style="text-align: center;">
-                <client-only>
-                        <invite-button placement="top" />
-                      </client-only>
               </ds-flex-item>
-              <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }" style="text-align: end;">
+              <!-- invite-button mobile-->
+              <ds-flex-item
+                :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+                style="text-align: center"
+              >
                 <client-only>
-                      <!-- avatar-menu mobile-->
-                      <avatar-menu placement="top" />
-                    </client-only>
+                  <invite-button placement="top" />
+                </client-only>
+              </ds-flex-item>
+              <ds-flex-item
+                :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+                style="text-align: end"
+              >
+                <client-only>
+                  <!-- avatar-menu mobile-->
+                  <avatar-menu placement="top" />
+                </client-only>
               </ds-flex-item>
             </ds-flex>
             <div
-            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-                class="mobile-menu footer-mobile"
+              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+              class="mobile-menu footer-mobile"
             >
               <!-- dynamic branding menu  -->
               <ul v-if="isHeaderMenu" class="dynamic-branding-mobil">
@@ -233,7 +239,7 @@ export default {
   mixins: [seo],
   data() {
     return {
-      windowWidth: null ,
+      windowWidth: null,
       links,
       LOGOS,
       isHeaderMenu: headerMenu.MENU.length > 0,
@@ -253,8 +259,8 @@ export default {
       return firstRoute && firstRoute.name === 'index'
     },
     showMobileMenu() {
-      return  this.windowWidth < 810 
-    }
+      return this.windowWidth < 810
+    },
   },
   methods: {
     toggleMobileMenuView() {
@@ -309,19 +315,18 @@ export default {
 }
 
 .mobile-menu {
- margin: 0 20px;
+  margin: 0 20px;
 }
 .mobile-search {
   margin-top: 20px;
 }
 
-.dynamic-branding-mobil, 
+.dynamic-branding-mobil,
 .dynamic-footer-mobil {
- 
   line-height: 30px;
   font-size: large;
 }
-.dynamic-branding-mobil li{
+.dynamic-branding-mobil li {
   margin: 17px 0;
 }
 
@@ -336,10 +341,8 @@ export default {
   .hide-mobile-menu {
     display: none;
   }
-  
 }
 @media only screen and (min-width: 810px) {
-   
   .main-navigation-right {
     width: 100%;
   }
