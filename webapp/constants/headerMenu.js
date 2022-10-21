@@ -1,12 +1,12 @@
 export default {
   MENU: [
-    // {
-    //   nameIdent: 'ocelotRebranding.newsFeed',
-    //   path: '/',
-    // },
-    // {
-    //   nameIdent: 'ocelotRebranding.about',
-    //   url: 'https://ocelot.org',
-    // },
+    {
+      nameIdent: 'Über Ocelot',
+      path: '/',
+    },
+    {
+      nameIdent: 'About',
+      url: 'https://ocelot.org',
+    },
   ],
 }
