@@ -1,20 +1,29 @@
 <template>
-  <ds-flex :width="{ base: '100%' }" gutter="base">
-    <ds-flex-item :width="{ base: '100%', md: 3 }">
-      <hc-contribution-form :contribution="contribution" />
-    </ds-flex-item>
-    <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
-  </ds-flex>
+  <div>
+    <ds-space margin="small">
+      <ds-heading tag="h1">{{ $t('post.editPost.title') }}</ds-heading>
+      <ds-heading v-if="contribution && contribution.group" tag="h2">
+        {{ $t('post.editPost.forGroup.title', { name: contribution.group.name }) }}
+      </ds-heading>
+    </ds-space>
+    <ds-space margin="large" />
+    <ds-flex :width="{ base: '100%' }" gutter="base">
+      <ds-flex-item :width="{ base: '100%', md: 3 }">
+        <contribution-form :contribution="contribution" />
+      </ds-flex-item>
+      <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
+    </ds-flex>
+  </div>
 </template>
 
 <script>
-import HcContributionForm from '~/components/ContributionForm/ContributionForm'
+import ContributionForm from '~/components/ContributionForm/ContributionForm'
 import PostQuery from '~/graphql/PostQuery'
 import { mapGetters } from 'vuex'
 
 export default {
   components: {
-    HcContributionForm,
+    ContributionForm,
   },
   computed: {
     ...mapGetters({

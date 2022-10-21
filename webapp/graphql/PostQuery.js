@@ -39,6 +39,11 @@ export default (i18n) => {
             ...locationAndBadges
           }
         }
+        group {
+          id
+          name
+          slug
+        }
       }
     }
   `

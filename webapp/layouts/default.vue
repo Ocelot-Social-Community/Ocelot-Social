@@ -5,7 +5,17 @@
         <div>
           <ds-flex class="main-navigation-flex">
             <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
-              <nuxt-link :to="{ name: 'index' }" v-scroll-to="'.main-navigation'">
+              <a
+                v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
+                :href="LOGOS.LOGO_HEADER_CLICK.externalLink"
+              >
+                <logo logoType="header" />
+              </a>
+              <nuxt-link
+                v-else
+                :to="LOGOS.LOGO_HEADER_CLICK.internalPath.to"
+                v-scroll-to="LOGOS.LOGO_HEADER_CLICK.internalPath.scrollTo"
+              >
                 <logo logoType="header" />
               </nuxt-link>
             </ds-flex-item>
@@ -19,23 +29,14 @@
             >
               <a v-if="item.url" :href="item.url" target="_blank">
                 <ds-text size="large" bold>
-                  {{ item.name }}
+                  {{ $t(item.nameIdent) }}
                 </ds-text>
               </a>
               <nuxt-link v-else :to="item.path">
                 <ds-text size="large" bold>
-                  {{ item.name }}
+                  {{ $t(item.nameIdent) }}
                 </ds-text>
               </nuxt-link>
-            </ds-flex-item>
-            <ds-flex-item
-              v-if="categoriesActive && isLoggedIn"
-              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-              style="flex-grow: 0; flex-basis: auto; margin-right: 20px"
-            >
-              <client-only>
-                <categories-menu></categories-menu>
-              </client-only>
             </ds-flex-item>
             <ds-flex-item
               :width="{ base: '40%', sm: '40%', md: '40%', lg: '0%' }"
@@ -116,35 +117,33 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import Logo from '~/components/Logo/Logo'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
-import headerMenu from '~/constants/headerMenu.js'
-import LOGOS from '~/constants/logos.js'
+import LOGOS from '../constants/logos.js'
+import headerMenu from '../constants/headerMenu.js'
 import seo from '~/mixins/seo'
+import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
+import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
+import InviteButton from '~/components/InviteButton/InviteButton'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import Logo from '~/components/Logo/Logo'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
 import Modal from '~/components/Modal'
-import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
-import CategoriesMenu from '~/components/FilterMenu/CategoriesMenu'
-import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import GroupButton from '~/components/Group/GroupButton'
-import InviteButton from '~/components/InviteButton/InviteButton'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
 import PageFooter from '~/components/PageFooter/PageFooter'
 
 export default {
   components: {
-    Logo,
-    LocaleSwitch,
-    SearchField,
-    Modal,
-    NotificationMenu,
     AvatarMenu,
     FilterMenu,
-    PageFooter,
     InviteButton,
-    CategoriesMenu,
+    LocaleSwitch,
+    Logo,
+    Modal,
+    NotificationMenu,
+    PageFooter,
     GroupButton,
+    SearchField,
   },
   mixins: [seo],
   data() {
