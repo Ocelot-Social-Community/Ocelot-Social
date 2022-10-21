@@ -49,8 +49,8 @@ export default (i18n) => {
 
 export const minimisedUserQuery = () => {
   return gql`
-    query {
-      User(orderBy: slug_asc) {
+    query ($slug: String) {
+      User(slug: $slug, orderBy: slug_asc) {
         id
         slug
         name
