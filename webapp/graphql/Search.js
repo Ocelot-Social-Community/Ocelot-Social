@@ -61,6 +61,20 @@ export const searchPosts = gql`
   }
 `
 
+export const searchGroups = gql`
+  ${groupFragment}
+
+  query ($query: String!, $firstGroups: Int, $groupsOffset: Int) {
+    searchGroups(query: $query, firstGroups: $firstGroups, groupsOffset: $groupsOffset) {
+      groupCount
+      groups {
+        __typename
+        ...group
+      }
+    }
+  }
+`
+
 export const searchUsers = gql`
   ${userFragment}
 
