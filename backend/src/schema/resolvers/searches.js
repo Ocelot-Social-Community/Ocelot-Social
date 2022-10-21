@@ -201,6 +201,8 @@ export default {
     },
     searchGroups: async (_parent, args, context, _resolveInfo) => {
       const { query, groupsOffset, firstGroups } = args
+      let userId = null
+      if (context.user) userId = context.user.id
       return {
         groupCount: getSearchResults(
           context,
@@ -208,6 +210,7 @@ export default {
           {
             query: queryString(query),
             skip: 0,
+            userId,
           },
           countResultCallback,
         ),
@@ -215,6 +218,7 @@ export default {
           query: queryString(query),
           skip: groupsOffset,
           limit: firstGroups,
+          userId,
         }),
       }
     },

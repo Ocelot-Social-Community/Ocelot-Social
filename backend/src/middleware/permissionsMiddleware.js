@@ -302,6 +302,7 @@ export default shield(
       searchResults: allow,
       searchPosts: allow,
       searchUsers: allow,
+      searchGroups: allow,
       searchHashtags: allow,
       embed: allow,
       Category: allow,
