@@ -223,8 +223,8 @@ export default {
       let userId = null
       if (context.user) userId = context.user.id
 
-      const searchType = query.replace(/^([!@#]?).*$/, '$1')
-      const searchString = query.replace(/^([!@#])/, '')
+      const searchType = query.replace(/^([!@#&]?).*$/, '$1')
+      const searchString = query.replace(/^([!@#&])/, '')
 
       const params = {
         query: queryString(searchString),
