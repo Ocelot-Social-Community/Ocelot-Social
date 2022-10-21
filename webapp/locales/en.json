@@ -744,6 +744,7 @@
     "failed": "Nothing found",
     "for": "Searching for ",
     "heading": {
+      "Group": "Group ::: Groups",
       "Post": "Post ::: Posts",
       "Tag": "Hashtag ::: Hashtags",
       "User": "User ::: Users"
