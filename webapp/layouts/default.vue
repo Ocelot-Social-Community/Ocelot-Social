@@ -259,6 +259,7 @@ export default {
       return firstRoute && firstRoute.name === 'index'
     },
     showMobileMenu() {
+      if (!this.windowWidth) return false
       return this.windowWidth < 810
     },
   },
@@ -268,6 +269,7 @@ export default {
     },
   },
   mounted() {
+    this.windowWidth = window.innerWidth
     window.addEventListener('resize', () => {
       this.windowWidth = window.innerWidth
     })
