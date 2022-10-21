@@ -7,7 +7,17 @@
           <ds-flex v-if="!showMobileMenu" class="main-navigation-flex">
             <!-- logo -->
             <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
-              <nuxt-link :to="{ name: 'index' }" v-scroll-to="'.main-navigation'">
+              <a
+                v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
+                :href="LOGOS.LOGO_HEADER_CLICK.externalLink"
+              >
+                <logo logoType="header" />
+              </a>
+              <nuxt-link
+                v-else
+                :to="LOGOS.LOGO_HEADER_CLICK.internalPath.to"
+                v-scroll-to="LOGOS.LOGO_HEADER_CLICK.internalPath.scrollTo"
+              >
                 <logo logoType="header" />
               </nuxt-link>
             </ds-flex-item>
@@ -207,34 +217,34 @@
 </template>
 
 <script>
-import Logo from '~/components/Logo/Logo'
+import { mapGetters } from 'vuex'
 import LOGOS from '../constants/logos.js'
 import headerMenu from '../constants/headerMenu.js'
-import { mapGetters } from 'vuex'
+import seo from '~/mixins/seo'
+import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
+import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
+import InviteButton from '~/components/InviteButton/InviteButton'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import Logo from '~/components/Logo/Logo'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
 import Modal from '~/components/Modal'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
-import seo from '~/mixins/seo'
-import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import PageFooter from '~/components/PageFooter/PageFooter'
-import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
-import InviteButton from '~/components/InviteButton/InviteButton'
 import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 
 export default {
   components: {
-    Logo,
-    LocaleSwitch,
-    SearchField,
-    Modal,
-    NotificationMenu,
     AvatarMenu,
     FilterMenu,
-    PageFooter,
     InviteButton,
+    LocaleSwitch,
+    Logo,
+    Modal,
+    NotificationMenu,
+    PageFooter,
     PageParamsLink,
+    SearchField,
   },
   mixins: [seo],
   data() {
