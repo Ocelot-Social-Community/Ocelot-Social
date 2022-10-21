@@ -3,7 +3,11 @@
     <base-card>
       <ds-heading tag="h3">{{ $t('group.members') }}</ds-heading>
       <ds-space margin="large" />
-      <group-member :groupId="group.id" :groupMembers="groupMembers" />
+      <group-member
+        :groupId="group.id"
+        :groupMembers="groupMembers"
+        @loadGroupMembers="loadGroupMembers"
+      />
     </base-card>
   </div>
 </template>
@@ -42,6 +46,11 @@ export default {
         this.$toast.error(error.message)
       },
       fetchPolicy: 'cache-and-network',
+    },
+  },
+  methods: {
+    loadGroupMembers() {
+      this.$apollo.queries.GroupMembers.refetch()
     },
   },
 }

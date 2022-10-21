@@ -404,6 +404,9 @@
       "regional": "Regionale Gruppe"
     },
     "actionRadius": "Aktionsradius",
+    "addMemberToGroup": "Zur Gruppe hinzufügen",
+    "addUser": "Benutzer hinzufügen",
+    "addUserPlaceholder": "eindeutiger Benutzername > @slug-from-user",
     "categories": "Thema ::: Themen",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
     "contentMenu": {
