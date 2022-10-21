@@ -1,11 +1,10 @@
 ---
-name: "\U0001F680 Feature Request"
-about: Suggest an idea for this project.
-title: "\U0001F680 [Feature] XXX"
+name: 🚀 Feature request
+about: Suggest an idea for this project
 labels: feature
-assignees: ''
-
+title: 🚀 [Feature] 
 ---
+<!-- You can find the latest issue templates here https://github.com/ulfgebhardt/issue-templates -->
 
-## :rocket: Feature Request
+## 🚀 Feature
 <!-- Give a short summary of the Feature. Use Screenshots if you want. -->
