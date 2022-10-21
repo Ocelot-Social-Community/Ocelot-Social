@@ -62,6 +62,18 @@ export const postFragment = gql`
   }
 `
 
+export const groupFragment = gql`
+  fragment group on Group {
+    id
+    groupName: name
+    slug
+    disabled
+    deleted
+    about
+    groupType
+  }
+`
+
 export const postCountsFragment = gql`
   fragment postCounts on Post {
     commentsCount

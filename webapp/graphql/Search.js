@@ -1,9 +1,15 @@
 import gql from 'graphql-tag'
-import { userFragment, postFragment, tagsCategoriesAndPinnedFragment } from './Fragments'
+import {
+  userFragment,
+  postFragment,
+  groupFragment,
+  tagsCategoriesAndPinnedFragment,
+} from './Fragments'
 
 export const searchQuery = gql`
   ${userFragment}
   ${postFragment}
+  ${groupFragment}
 
   query ($query: String!) {
     searchResults(query: $query, limit: 5) {
@@ -23,6 +29,9 @@ export const searchQuery = gql`
       }
       ... on Tag {
         id
+      }
+      ... on Group {
+        ...group
       }
     }
   }
