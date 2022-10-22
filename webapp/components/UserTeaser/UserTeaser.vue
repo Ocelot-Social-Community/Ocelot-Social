@@ -4,38 +4,58 @@
     <span class="info anonymous">{{ $t('profile.userAnonym') }}</span>
   </div>
   <div v-else :class="[{ 'disabled-content': user.disabled }]" placement="top-start">
-    <nuxt-link :to="userLink" :class="['user-teaser']">
-      <profile-avatar v-if="showAvatar" :profile="user" size="small" />
-      <div class="info">
-        <span class="text">
-          <span class="slug">{{ userSlug }}</span>
-          <span v-if="dateTime">{{ userName }}</span>
-        </span>
-        <span v-if="dateTime" class="text">
+    <div :class="['user-teaser']">
+      <nuxt-link :to="userLink" data-test="avatarUserLink">
+        <profile-avatar v-if="showAvatar" :profile="user" size="small" />
+      </nuxt-link>
+      <div class="info flex-direction-column">
+        <div :class="wide ? 'flex-direction-row' : 'flex-direction-column'">
+          <nuxt-link :to="userLink">
+            <span class="text">
+              <span class="slug">{{ userSlug }}</span>
+              <span v-if="!userOnly" class="name">{{ userName }}</span>
+            </span>
+          </nuxt-link>
+          <span v-if="wide">&nbsp;</span>
+          <span v-if="group">
+            <span class="text">
+              {{ $t('group.in') }}
+            </span>
+            <nuxt-link :to="groupLink">
+              <span class="text">
+                <span class="slug">{{ groupSlug }}</span>
+                <span v-if="!userOnly" class="name">{{ groupName }}</span>
+              </span>
+            </nuxt-link>
+          </span>
+        </div>
+        <span v-if="!userOnly" class="text">
           <base-icon name="clock" />
-          <hc-relative-date-time :date-time="dateTime" />
+          <relative-date-time :date-time="dateTime" />
           <slot name="dateTime"></slot>
         </span>
         <span v-else class="text">{{ userName }}</span>
       </div>
-    </nuxt-link>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 
-import HcRelativeDateTime from '~/components/RelativeDateTime'
+import RelativeDateTime from '~/components/RelativeDateTime'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 
 export default {
   name: 'UserTeaser',
   components: {
-    HcRelativeDateTime,
+    RelativeDateTime,
     ProfileAvatar,
   },
   props: {
     user: { type: Object, default: null },
+    group: { type: Object, default: null },
+    wide: { type: Boolean, default: false },
     showAvatar: { type: Boolean, default: true },
     dateTime: { type: [Date, String], default: null },
     showPopover: { type: Boolean, default: true },
@@ -62,6 +82,22 @@ export default {
     },
     userName() {
       const { name } = this.user || {}
+      return name || this.$t('profile.userAnonym')
+    },
+    userOnly() {
+      return !this.dateTime && !this.group
+    },
+    groupLink() {
+      const { id, slug } = this.group
+      if (!(id && slug)) return ''
+      return { name: 'group-id-slug', params: { slug, id } }
+    },
+    groupSlug() {
+      const { slug } = this.group || {}
+      return slug && `&${slug}`
+    },
+    groupName() {
+      const { name } = this.group || {}
       return name || this.$t('profile.userAnonym')
     },
   },
@@ -93,16 +129,10 @@ export default {
   }
 
   > .info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     padding-left: $space-xx-small;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-
-    color: $text-color-soft;
-    font-size: $font-size-small;
 
     &.anonymous {
       font-size: $font-size-base;
@@ -112,6 +142,23 @@ export default {
       color: $color-primary;
       font-size: $font-size-base;
     }
+
+    .name {
+      color: $text-color-soft;
+      font-size: $font-size-small;
+    }
+  }
+
+  .flex-direction-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .flex-direction-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
   }
 
   .text {

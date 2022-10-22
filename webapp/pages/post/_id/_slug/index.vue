@@ -33,7 +33,7 @@
               </aside>
             </template>
             <section class="menu">
-              <user-teaser :user="post.author" :date-time="post.createdAt">
+              <user-teaser :user="post.author" :group="post.group" wide :date-time="post.createdAt">
                 <template #dateTime>
                   <ds-text v-if="post.createdAt !== post.updatedAt">
                     ({{ $t('post.edited') }})
