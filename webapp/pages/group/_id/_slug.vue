@@ -38,8 +38,8 @@
             </ds-heading>
             <!-- group slug -->
             <ds-text align="center" color="soft">
-              <base-icon name="at" data-test="at" />
-              {{ groupSlug }}
+              <!-- <base-icon name="at" data-test="ampersand" /> -->
+              {{ `&${groupSlug}` }}
             </ds-text>
             <!-- group location -->
             <ds-text v-if="group && group.location" align="center" color="soft" size="small">

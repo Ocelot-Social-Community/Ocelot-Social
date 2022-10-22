@@ -244,8 +244,8 @@ describe('GroupProfileSlug', () => {
           })
 
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('yoga-practice')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&yoga-practice')
           })
 
           describe('displays no(!) group location – because is "null"', () => {
@@ -397,8 +397,8 @@ describe('GroupProfileSlug', () => {
           })
 
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('yoga-practice')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&yoga-practice')
           })
 
           describe('displays no(!) group location – because is "null"', () => {
@@ -510,8 +510,8 @@ describe('GroupProfileSlug', () => {
           })
 
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('yoga-practice')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&yoga-practice')
           })
 
           describe('displays no(!) group location – because is "null"', () => {
@@ -623,8 +623,8 @@ describe('GroupProfileSlug', () => {
           })
 
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('yoga-practice')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&yoga-practice')
           })
 
           describe('displays no(!) group location – because is "null"', () => {
@@ -740,8 +740,8 @@ describe('GroupProfileSlug', () => {
           })
 
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('school-for-citizens')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&school-for-citizens')
           })
 
           describe('displays group location', () => {
@@ -857,8 +857,8 @@ describe('GroupProfileSlug', () => {
           })
 
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('school-for-citizens')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&school-for-citizens')
           })
 
           describe('displays group location', () => {
@@ -974,8 +974,8 @@ describe('GroupProfileSlug', () => {
           })
 
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('school-for-citizens')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&school-for-citizens')
           })
 
           describe('displays group location', () => {
@@ -1091,8 +1091,8 @@ describe('GroupProfileSlug', () => {
           })
 
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('school-for-citizens')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&school-for-citizens')
           })
 
           describe('displays group location', () => {
@@ -1212,8 +1212,8 @@ describe('GroupProfileSlug', () => {
           })
 
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('investigative-journalism')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&investigative-journalism')
           })
 
           describe('displays group location', () => {
@@ -1332,8 +1332,8 @@ describe('GroupProfileSlug', () => {
           })
 
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('investigative-journalism')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&investigative-journalism')
           })
 
           describe('displays group location', () => {
@@ -1452,8 +1452,8 @@ describe('GroupProfileSlug', () => {
           })
 
           it('has no(!) group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(false)
-            expect(wrapper.text()).not.toContain('investigative-journalism')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(false)
+            expect(wrapper.text()).not.toContain('&investigative-journalism')
           })
 
           describe('displays not(!) group location', () => {
@@ -1560,8 +1560,8 @@ describe('GroupProfileSlug', () => {
           })
 
           it('has no(!) group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(false)
-            expect(wrapper.text()).not.toContain('investigative-journalism')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(false)
+            expect(wrapper.text()).not.toContain('&investigative-journalism')
           })
 
           describe('displays not(!) group location', () => {
