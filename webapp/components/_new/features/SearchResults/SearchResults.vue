@@ -305,7 +305,7 @@ export default {
       variables() {
         const { firstHashtags, hashtagsOffset, search } = this
         return {
-          query: search,
+          query: search.replace(/^([!@#&])/, ''),
           firstHashtags,
           hashtagsOffset,
         }
@@ -333,7 +333,7 @@ export default {
       variables() {
         const { firstUsers, usersOffset, search } = this
         return {
-          query: search,
+          query: search.replace(/^([!@#&])/, ''),
           firstUsers,
           usersOffset,
         }
@@ -355,7 +355,7 @@ export default {
       variables() {
         const { firstPosts, postsOffset, search } = this
         return {
-          query: search,
+          query: search.replace(/^([!@#&])/, ''),
           firstPosts,
           postsOffset,
         }
@@ -377,7 +377,7 @@ export default {
       variables() {
         const { firstGroups, groupsOffset, search } = this
         return {
-          query: search,
+          query: search.replace(/^([!@#&])/, ''),
           firstGroups,
           groupsOffset,
         }

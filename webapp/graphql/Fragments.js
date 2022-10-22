@@ -81,9 +81,6 @@ export const groupFragment = gql`
       icon
     }
     locationName
-    location {
-      name: name${lang}
-    }
     myRole
   }
 `
