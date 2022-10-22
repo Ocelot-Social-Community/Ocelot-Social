@@ -13,6 +13,7 @@ export default {
   },
 }
 </script>
+
 <style lang="scss">
 .search-group {
   display: flex;
