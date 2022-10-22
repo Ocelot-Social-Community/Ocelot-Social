@@ -5,7 +5,7 @@
   </div>
   <div v-else :class="[{ 'disabled-content': user.disabled }]" placement="top-start">
     <div :class="['user-teaser']">
-      <nuxt-link :to="userLink">
+      <nuxt-link :to="userLink" data-test="avatarUserLink">
         <profile-avatar v-if="showAvatar" :profile="user" size="small" />
       </nuxt-link>
       <div class="info flex-direction-column">
