@@ -1,15 +1,15 @@
 export default {
   MENU: [
     {
-      nameIdent: 'ocelotRebranding.newsFeed',
+      nameIdent: 'yuniteRebranding.newsFeed',
       path: '/',
     },
     {
-      nameIdent: 'ocelotRebranding.myGroups',
+      nameIdent: 'yuniteRebranding.myGroups',
       path: '/my-groups',
     },
     {
-      nameIdent: 'ocelotRebranding.about',
+      nameIdent: 'yuniteRebranding.about',
       url: 'https://yunite.org',
     },
   ],
