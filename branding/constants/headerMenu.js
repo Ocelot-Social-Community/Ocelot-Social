@@ -1,19 +1,19 @@
 export default {
   MENU: [
     {
-      nameIdent: 'yuniteRebranding.newsFeed',
+      nameIdent: 'yuniteRebranding.header.newsFeed',
       path: '/',
     },
     {
-      nameIdent: 'yuniteRebranding.myGroups',
+      nameIdent: 'yuniteRebranding.header.myGroups',
       path: '/my-groups',
     },
     {
-      nameIdent: 'yuniteRebranding.topics',
+      nameIdent: 'yuniteRebranding.header.topics',
       url: 'https://yunite.org/themen/',
     },
     {
-      nameIdent: 'yuniteRebranding.about',
+      nameIdent: 'yuniteRebranding.header.about',
       url: 'https://yunite.org',
     },
   ],
