@@ -270,7 +270,7 @@ export default {
     },
     showMobileMenu() {
       if (!this.windowWidth) return false
-      return this.windowWidth < 810
+      return this.windowWidth < 811
     },
   },
   methods: {
