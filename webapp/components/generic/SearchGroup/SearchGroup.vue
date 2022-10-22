@@ -1,5 +1,5 @@
 <template>
-  <section class="search-post">
+  <section class="search-group">
     <p class="label">{{ option.groupName | truncate(70) }}</p>
     <div class="metadata"></div>
   </section>
