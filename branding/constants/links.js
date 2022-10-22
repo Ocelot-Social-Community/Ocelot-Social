@@ -126,9 +126,9 @@ export default {
   FOOTER_LINK_LIST: [
     ORGANIZATION,
     // TERMS_AND_CONDITIONS,
-    CODE_OF_CONDUCT,
+    // CODE_OF_CONDUCT,
     DATA_PRIVACY,
-    FAQ,
+    // FAQ,
     // DONATE,
     // SUPPORT,
     IMPRINT,
