@@ -76,8 +76,8 @@ const searchGroupsSetup = {
                 AND NOT (resource.deleted = true OR resource.disabled = true)
                 AND (resource.groupType IN ['public', 'closed']
                   OR membership.role IN ['usual', 'admin', 'owner'])`,
-  withClause: 'WITH resource',
-  returnClause: 'resource { .*, __typename: labels(resource)[0] }',
+  withClause: 'WITH resource, membership',
+  returnClause: 'resource { .*, myRole: membership.role, __typename: labels(resource)[0] }',
   limit: 'LIMIT $limit',
 }
 
