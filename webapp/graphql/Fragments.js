@@ -70,7 +70,21 @@ export const groupFragment = gql`
     disabled
     deleted
     about
+    description
+    descriptionExcerpt
     groupType
+    actionRadius
+    categories {
+      id
+      slug
+      name
+      icon
+    }
+    locationName
+    location {
+      name: name${lang}
+    }
+    myRole
   }
 `
 
