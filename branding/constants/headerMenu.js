@@ -5,6 +5,10 @@ export default {
       path: '/',
     },
     {
+      nameIdent: 'ocelotRebranding.myGroups',
+      path: '/my-groups',
+    },
+    {
       nameIdent: 'ocelotRebranding.about',
       url: 'https://yunite.org',
     },
