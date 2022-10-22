@@ -98,7 +98,6 @@ const countHashtagsSetup = {
   ...searchHashtagsSetup,
   ...countSetup,
 }
-
 const countGroupsSetup = {
   ...searchGroupsSetup,
   ...countSetup,
