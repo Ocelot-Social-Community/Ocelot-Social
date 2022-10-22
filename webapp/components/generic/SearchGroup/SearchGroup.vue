@@ -14,7 +14,7 @@ export default {
 }
 </script>
 <style lang="scss">
-.search-post {
+.search-group {
   display: flex;
 
   > .label {
