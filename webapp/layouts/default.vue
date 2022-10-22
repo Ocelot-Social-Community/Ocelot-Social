@@ -1,14 +1,14 @@
 <template>
   <div class="layout-default">
     <div class="main-navigation">
-      <HeaderMenu :showMobileMenu="showMobileMenu" />
+      <header-menu :showMobileMenu="showMobileMenu" />
     </div>
     <ds-container>
       <div class="main-container">
         <nuxt />
       </div>
     </ds-container>
-    <page-footer v-if="!showMobileMenu"/>
+    <page-footer v-if="!showMobileMenu" />
     <div id="overlay" />
     <client-only>
       <modal />
@@ -32,7 +32,7 @@ export default {
   data() {
     return {
       windowWidth: null,
-      maxMobileWidth: 811
+      maxMobileWidth: 811,
     }
   },
   computed: {
@@ -57,5 +57,4 @@ export default {
   padding-top: 6rem;
   padding-bottom: 5rem;
 }
-
 </style>
