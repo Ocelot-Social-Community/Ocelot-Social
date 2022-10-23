@@ -70,7 +70,7 @@ export const searchGroups = (i18n) => {
         groups {
           __typename
           id
-          name
+          groupName: name
           slug
           createdAt
           updatedAt
