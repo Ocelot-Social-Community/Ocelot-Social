@@ -83,13 +83,13 @@ jobs:
       ##########################################################################
       - name: Backend | Build `branded` image
         run: |
-          docker build --target branded -t "${DOCKER_ORGANISATION}/backend-groups-branded:latest" -t "${DOCKER_ORGANISATION}/backend-groups-branded:${VERSION}" -t "${DOCKER_ORGANISATION}/backend-groups-branded:${BUILD_VERSION}" -f docker/backend.Dockerfile --build-arg "APP_IMAGE=ocelotsocialnetwork/backend-groups" --build-arg "APP_IMAGE_TAG_CODE=${OCELOT_DOCKER_VERSION_TAG}-code" --build-arg "APP_IMAGE_TAG_BASE=${OCELOT_DOCKER_VERSION_TAG}-base" .
-          docker save "${DOCKER_ORGANISATION}/backend-groups-branded" > /tmp/backend-groups-branded.tar
+          docker build --target branded -t "${DOCKER_ORGANISATION}/backend-branded:latest" -t "${DOCKER_ORGANISATION}/backend-branded:${VERSION}" -t "${DOCKER_ORGANISATION}/backend-branded:${BUILD_VERSION}" -f docker/backend.Dockerfile --build-arg "APP_IMAGE=ocelotsocialnetwork/backend" --build-arg "APP_IMAGE_TAG_CODE=${OCELOT_DOCKER_VERSION_TAG}-code" --build-arg "APP_IMAGE_TAG_BASE=${OCELOT_DOCKER_VERSION_TAG}-base" .
+          docker save "${DOCKER_ORGANISATION}/backend-branded" > /tmp/backend-branded.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: docker-backend-branded
-          path: /tmp/backend-groups-branded.tar
+          path: /tmp/backend-branded.tar
 
   ##############################################################################
   # JOB: DOCKER BUILD BRANDED WEBAPP ###########################################
@@ -125,13 +125,13 @@ jobs:
       ##########################################################################
       - name: Webapp | Build `branded` image
         run: |
-          docker build --target branded -t "${DOCKER_ORGANISATION}/webapp-groups-branded:latest" -t "${DOCKER_ORGANISATION}/webapp-groups-branded:${VERSION}" -t "${DOCKER_ORGANISATION}/webapp-groups-branded:${BUILD_VERSION}" -f docker/webapp.Dockerfile --build-arg "APP_IMAGE=ocelotsocialnetwork/webapp-groups" --build-arg "APP_IMAGE_TAG_CODE=${OCELOT_DOCKER_VERSION_TAG}-code" --build-arg "APP_IMAGE_TAG_BASE=${OCELOT_DOCKER_VERSION_TAG}-base" .
-          docker save "${DOCKER_ORGANISATION}/webapp-groups-branded" > /tmp/webapp-groups-branded.tar
+          docker build --target branded -t "${DOCKER_ORGANISATION}/webapp-branded:latest" -t "${DOCKER_ORGANISATION}/webapp-branded:${VERSION}" -t "${DOCKER_ORGANISATION}/webapp-branded:${BUILD_VERSION}" -f docker/webapp.Dockerfile --build-arg "APP_IMAGE=ocelotsocialnetwork/webapp" --build-arg "APP_IMAGE_TAG_CODE=${OCELOT_DOCKER_VERSION_TAG}-code" --build-arg "APP_IMAGE_TAG_BASE=${OCELOT_DOCKER_VERSION_TAG}-base" .
+          docker save "${DOCKER_ORGANISATION}/webapp-branded" > /tmp/webapp-branded.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: docker-webapp-branded
-          path: /tmp/webapp-groups-branded.tar
+          path: /tmp/webapp-branded.tar
 
   ##############################################################################
   # JOB: DOCKER BUILD BRANDED MAINTENANCE ######################################
@@ -167,13 +167,13 @@ jobs:
       ##########################################################################
       - name: Maintenance | Build `branded` image
         run: |
-          docker build --target branded -t "${DOCKER_ORGANISATION}/maintenance-groups-branded:latest" -t "${DOCKER_ORGANISATION}/maintenance-groups-branded:${VERSION}" -t "${DOCKER_ORGANISATION}/maintenance-groups-branded:${BUILD_VERSION}" -f docker/maintenance.Dockerfile --build-arg "APP_IMAGE=ocelotsocialnetwork/maintenance-groups" --build-arg "APP_IMAGE_TAG_CODE=${OCELOT_DOCKER_VERSION_TAG}-code" --build-arg "APP_IMAGE_TAG_BASE=${OCELOT_DOCKER_VERSION_TAG}-base" .
-          docker save "${DOCKER_ORGANISATION}/maintenance-groups-branded" > /tmp/maintenance-groups-branded.tar
+          docker build --target branded -t "${DOCKER_ORGANISATION}/maintenance-branded:latest" -t "${DOCKER_ORGANISATION}/maintenance-branded:${VERSION}" -t "${DOCKER_ORGANISATION}/maintenance-branded:${BUILD_VERSION}" -f docker/maintenance.Dockerfile --build-arg "APP_IMAGE=ocelotsocialnetwork/maintenance" --build-arg "APP_IMAGE_TAG_CODE=${OCELOT_DOCKER_VERSION_TAG}-code" --build-arg "APP_IMAGE_TAG_BASE=${OCELOT_DOCKER_VERSION_TAG}-base" .
+          docker save "${DOCKER_ORGANISATION}/maintenance-branded" > /tmp/maintenance-branded.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: docker-maintenance-branded
-          path: /tmp/maintenance-groups-branded.tar
+          path: /tmp/maintenance-branded.tar
 
   ##############################################################################
   # JOB: UPLOAD TO DOCKERHUB ###################################################
@@ -225,7 +225,7 @@ jobs:
           name: docker-backend-branded
           path: /tmp
       - name: Load Docker Image
-        run: docker load < /tmp/backend-groups-branded.tar
+        run: docker load < /tmp/backend-branded.tar
       # Webapp
       - name: Download Docker Image (Webapp)
         uses: actions/download-artifact@v2
@@ -233,7 +233,7 @@ jobs:
           name: docker-webapp-branded
           path: /tmp
       - name: Load Docker Image
-        run: docker load < /tmp/webapp-groups-branded.tar
+        run: docker load < /tmp/webapp-branded.tar
       # Maintenance
       - name: Download Docker Image (Maintenance)
         uses: actions/download-artifact@v2
@@ -241,7 +241,7 @@ jobs:
           name: docker-maintenance-branded
           path: /tmp
       - name: Load Docker Image
-        run: docker load < /tmp/maintenance-groups-branded.tar
+        run: docker load < /tmp/maintenance-branded.tar
       ##########################################################################
       # Upload #################################################################
       ##########################################################################
@@ -250,11 +250,11 @@ jobs:
       - name: Push Neo4j Community
         run: docker push --all-tags ${DOCKER_ORGANISATION}/neo4j-community-branded
       - name: Push Backend
-        run: docker push --all-tags ${DOCKER_ORGANISATION}/backend-groups-branded
+        run: docker push --all-tags ${DOCKER_ORGANISATION}/backend-branded
       - name: Push Webapp
-        run: docker push --all-tags ${DOCKER_ORGANISATION}/webapp-groups-branded
+        run: docker push --all-tags ${DOCKER_ORGANISATION}/webapp-branded
       - name: Push Maintenance
-        run: docker push --all-tags ${DOCKER_ORGANISATION}/maintenance-groups-branded
+        run: docker push --all-tags ${DOCKER_ORGANISATION}/maintenance-branded
 
   ##############################################################################
   # JOB: KUBERNETES DEPLOY ACTUAL/LATEST VERSION ######################################
@@ -297,23 +297,13 @@ jobs:
       ##########################################################################
       # Deploy new Docker images to DigitalOcean Kubernetes cluster ############
       ##########################################################################
-      # - name: Deploy 'latest' to DigitalOcean Kubernetes
-      #   run: |
-      #     kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:latest
-      #     kubectl -n default rollout restart deployment/ocelot-webapp
-      #     kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:latest
-      #     kubectl -n default rollout restart deployment/ocelot-backend
-      #     kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:latest
-      #     kubectl -n default rollout restart deployment/ocelot-maintenance
-      #     kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:latest
-      #     kubectl -n default rollout restart deployment/ocelot-neo4j
       - name: Deploy actual version '$BUILD_VERSION' to DigitalOcean Kubernetes
         run: |
-          kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=${DOCKER_ORGANISATION}/webapp-groups-branded:${BUILD_VERSION}
+          kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=${DOCKER_ORGANISATION}/webapp-branded:${BUILD_VERSION}
           kubectl -n default rollout restart deployment/ocelot-webapp
-          kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=${DOCKER_ORGANISATION}/backend-groups-branded:${BUILD_VERSION}
+          kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=${DOCKER_ORGANISATION}/backend-branded:${BUILD_VERSION}
           kubectl -n default rollout restart deployment/ocelot-backend
-          kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=${DOCKER_ORGANISATION}/maintenance-groups-branded:${BUILD_VERSION}
+          kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=${DOCKER_ORGANISATION}/maintenance-branded:${BUILD_VERSION}
           kubectl -n default rollout restart deployment/ocelot-maintenance
           kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=${DOCKER_ORGANISATION}/neo4j-community-branded:${BUILD_VERSION}
           kubectl -n default rollout restart deployment/ocelot-neo4j
