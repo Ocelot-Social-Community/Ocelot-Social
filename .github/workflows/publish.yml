@@ -3,7 +3,7 @@ name: ocelot.social publish branded CI
 on:
   push:
     branches:
-      # - master
+      - master
       - 5059-epic-groups # for testing while developing
 
 jobs:

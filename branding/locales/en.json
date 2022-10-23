@@ -1,0 +1,14 @@
+{
+  "yuniteRebranding": {
+    "header": {
+      "about": "About Yunite",
+      "myGroups": "Groups",
+      "newsFeed": "News Feed",
+      "topics": "Topics"
+    },
+    "footer": {
+      "dataPrivacy": "Data privacy",
+      "imprint": "Imprint"
+    }
+  }
+}
