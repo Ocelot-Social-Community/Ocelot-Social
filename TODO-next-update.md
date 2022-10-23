@@ -2,7 +2,7 @@
 
 When you overtake this deploy and rebrand repo to your network you have to recognize the following changes and doings …
 
-## This Latest Version >= 2.0.0 with 'ocelotDockerVersionTag' 2.0.0-XXX
+## This Latest Version >= 2.0.0 with 'ocelotDockerVersionTag' 2.0.0-250
 
 ### Main Code PR – feat: 🍰 Implement LOGO_HEADER_CLICK As Configuration #5525
 
