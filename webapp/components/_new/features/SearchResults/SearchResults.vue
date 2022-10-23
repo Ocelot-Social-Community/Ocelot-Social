@@ -120,6 +120,7 @@ import PaginationButtons from '~/components/_new/generic/PaginationButtons/Pagin
 import HcHashtag from '~/components/Hashtag/Hashtag'
 
 export default {
+  name: 'SearchResults',
   components: {
     TabNavigation,
     HcEmpty,
@@ -372,7 +373,7 @@ export default {
     },
     searchGroups: {
       query() {
-        return searchGroups
+        return searchGroups(this.i18n)
       },
       variables() {
         const { firstGroups, groupsOffset, search } = this

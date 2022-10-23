@@ -61,19 +61,45 @@ export const searchPosts = gql`
   }
 `
 
-export const searchGroups = gql`
-  ${groupFragment}
-
-  query ($query: String!, $firstGroups: Int, $groupsOffset: Int) {
-    searchGroups(query: $query, firstGroups: $firstGroups, groupsOffset: $groupsOffset) {
-      groupCount
-      groups {
-        __typename
-        ...group
+export const searchGroups = (i18n) => {
+  const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
+  return gql`
+    query ($query: String!, $firstGroups: Int, $groupsOffset: Int) {
+      searchGroups(query: $query, firstGroups: $firstGroups, groupsOffset: $groupsOffset) {
+        groupCount
+        groups {
+          __typename
+          id
+          name
+          slug
+          createdAt
+          updatedAt
+          disabled
+          deleted
+          about
+          description
+          descriptionExcerpt
+          groupType
+          actionRadius
+          categories {
+            id
+            slug
+            name
+            icon
+         }
+          avatar {
+            url
+          }
+          locationName
+          location {
+            name: name${lang}
+          }
+          myRole
+        }
       }
     }
-  }
-`
+  `
+}
 
 export const searchUsers = gql`
   ${userFragment}
