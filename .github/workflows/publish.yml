@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - 5059-epic-groups # for testing while developing
+      # - 5059-epic-groups # for testing while developing
 
 jobs:
   ##############################################################################
