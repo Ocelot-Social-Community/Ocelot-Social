@@ -59,6 +59,14 @@
               </base-card>
             </ds-grid-item>
           </template>
+          <!-- groups -->
+          <template v-if="activeTab === 'Group'">
+            <ds-grid-item v-for="group in activeResources" :key="group.id" :row-span="2">
+              <base-card :wideContent="true" class="group-teaser-card-wrapper">
+                <group-teaser :group="{ ...group, name: group.groupName }" />
+              </base-card>
+            </ds-grid-item>
+          </template>
           <!-- hashtags -->
           <template v-if="activeTab === 'Hashtag'">
             <ds-grid-item v-for="hashtag in activeResources" :key="hashtag.id" :row-span="2">
@@ -100,17 +108,19 @@
 
 <script>
 import postListActions from '~/mixins/postListActions'
-import { searchPosts, searchUsers, searchHashtags } from '~/graphql/Search.js'
+import { searchPosts, searchUsers, searchGroups, searchHashtags } from '~/graphql/Search.js'
 import HcEmpty from '~/components/Empty/Empty'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem'
 import PostTeaser from '~/components/PostTeaser/PostTeaser'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import GroupTeaser from '~/components/Group/GroupTeaser'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 
 export default {
+  name: 'SearchResults',
   components: {
     TabNavigation,
     HcEmpty,
@@ -119,6 +129,7 @@ export default {
     PostTeaser,
     PaginationButtons,
     UserTeaser,
+    GroupTeaser,
     HcHashtag,
   },
   mixins: [postListActions],
@@ -135,24 +146,29 @@ export default {
     return {
       posts: [],
       users: [],
+      groups: [],
       hashtags: [],
 
       postCount: 0,
       userCount: 0,
+      groupCount: 0,
       hashtagCount: 0,
 
       postPage: 0,
       userPage: 0,
+      groupPage: 0,
       hashtagPage: 0,
 
       activeTab: null,
 
       firstPosts: this.pageSize,
       firstUsers: this.pageSize,
+      firstGroups: this.pageSize,
       firstHashtags: this.pageSize,
 
       postsOffset: 0,
       usersOffset: 0,
+      groupsOffset: 0,
       hashtagsOffset: 0,
     }
   },
@@ -160,18 +176,21 @@ export default {
     activeResources() {
       if (this.activeTab === 'Post') return this.posts
       if (this.activeTab === 'User') return this.users
+      if (this.activeTab === 'Group') return this.groups
       if (this.activeTab === 'Hashtag') return this.hashtags
       return []
     },
     activeResourceCount() {
       if (this.activeTab === 'Post') return this.postCount
       if (this.activeTab === 'User') return this.userCount
+      if (this.activeTab === 'Group') return this.groupCount
       if (this.activeTab === 'Hashtag') return this.hashtagCount
       return 0
     },
     activePage() {
       if (this.activeTab === 'Post') return this.postPage
       if (this.activeTab === 'User') return this.userPage
+      if (this.activeTab === 'Group') return this.groupPage
       if (this.activeTab === 'Hashtag') return this.hashtagPage
       return 0
     },
@@ -190,6 +209,12 @@ export default {
           disabled: this.userCount === 0,
         },
         {
+          type: 'Group',
+          title: this.$t('search.heading.Group', {}, this.groupCount),
+          count: this.groupCount,
+          disabled: this.groupCount === 0,
+        },
+        {
           type: 'Hashtag',
           title: this.$t('search.heading.Tag', {}, this.hashtagCount),
           count: this.hashtagCount,
@@ -200,24 +225,27 @@ export default {
     hasPrevious() {
       if (this.activeTab === 'Post') return this.postsOffset > 0
       if (this.activeTab === 'User') return this.usersOffset > 0
+      if (this.activeTab === 'Group') return this.groupsOffset > 0
       if (this.activeTab === 'Hashtag') return this.hashtagsOffset > 0
       return false
     },
     hasNext() {
       if (this.activeTab === 'Post') return (this.postPage + 1) * this.pageSize < this.postCount
       if (this.activeTab === 'User') return (this.userPage + 1) * this.pageSize < this.userCount
+      if (this.activeTab === 'Group') return (this.groupPage + 1) * this.pageSize < this.groupCount
       if (this.activeTab === 'Hashtag')
         return (this.hashtagPage + 1) * this.pageSize < this.hashtagCount
       return false
     },
     searchCount() {
-      return this.postCount + this.userCount + this.hashtagCount
+      return this.postCount + this.userCount + this.groupCount + this.hashtagCount
     },
   },
   methods: {
     clearPage() {
       this.postPage = 0
       this.userPage = 0
+      this.groupPage = 0
       this.hashtagPage = 0
     },
     switchTab(tabType) {
@@ -235,6 +263,10 @@ export default {
           this.userPage--
           this.usersOffset = this.userPage * this.pageSize
           break
+        case 'Group':
+          this.groupPage--
+          this.groupsOffset = this.groupPage * this.pageSize
+          break
         case 'Hashtag':
           this.hashtagPage--
           this.hashtagsOffset = this.hashtagPage * this.pageSize
@@ -251,6 +283,10 @@ export default {
         case 'User':
           this.userPage++
           this.usersOffset += this.pageSize
+          break
+        case 'Group':
+          this.groupPage++
+          this.groupsOffset += this.pageSize
           break
         case 'Hashtag':
           this.hashtagPage++
@@ -270,7 +306,7 @@ export default {
       variables() {
         const { firstHashtags, hashtagsOffset, search } = this
         return {
-          query: search,
+          query: search.replace(/^([!@#&])/, ''),
           firstHashtags,
           hashtagsOffset,
         }
@@ -281,7 +317,12 @@ export default {
       update({ searchHashtags }) {
         this.hashtags = searchHashtags.hashtags
         this.hashtagCount = searchHashtags.hashtagCount
-        if (this.postCount === 0 && this.userCount === 0 && this.hashtagCount > 0)
+        if (
+          this.postCount === 0 &&
+          this.userCount === 0 &&
+          this.groupCount === 0 &&
+          this.hashtagCount > 0
+        )
           this.activeTab = 'Hashtag'
       },
       fetchPolicy: 'cache-and-network',
@@ -293,7 +334,7 @@ export default {
       variables() {
         const { firstUsers, usersOffset, search } = this
         return {
-          query: search,
+          query: search.replace(/^([!@#&])/, ''),
           firstUsers,
           usersOffset,
         }
@@ -315,7 +356,7 @@ export default {
       variables() {
         const { firstPosts, postsOffset, search } = this
         return {
-          query: search,
+          query: search.replace(/^([!@#&])/, ''),
           firstPosts,
           postsOffset,
         }
@@ -327,6 +368,29 @@ export default {
         this.posts = searchPosts.posts
         this.postCount = searchPosts.postCount
         if (this.postCount > 0) this.activeTab = 'Post'
+      },
+      fetchPolicy: 'cache-and-network',
+    },
+    searchGroups: {
+      query() {
+        return searchGroups(this.i18n)
+      },
+      variables() {
+        const { firstGroups, groupsOffset, search } = this
+        return {
+          query: search.replace(/^([!@#&])/, ''),
+          firstGroups,
+          groupsOffset,
+        }
+      },
+      skip() {
+        return !this.search
+      },
+      update({ searchGroups }) {
+        this.groups = searchGroups.groups
+        this.groupCount = searchGroups.groupCount
+        if (this.postCount === 0 && this.userCount === 0 && this.groupCount > 0)
+          this.activeTab = 'Group'
       },
       fetchPolicy: 'cache-and-network',
     },
@@ -364,6 +428,10 @@ export default {
     &:hover {
       opacity: 0.8;
     }
+  }
+
+  .group-teaser-card-wrapper {
+    padding: 0;
   }
 }
 

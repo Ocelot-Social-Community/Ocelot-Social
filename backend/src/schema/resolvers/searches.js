@@ -66,6 +66,21 @@ const searchHashtagsSetup = {
   limit: 'LIMIT $limit',
 }
 
+const searchGroupsSetup = {
+  fulltextIndex: 'group_fulltext_search',
+  match: `MATCH (resource:Group)
+          MATCH (user:User {id: $userId})
+          OPTIONAL MATCH (user)-[membership:MEMBER_OF]->(resource)
+          WITH user, resource, membership`,
+  whereClause: `WHERE score >= 0.0
+                AND NOT (resource.deleted = true OR resource.disabled = true)
+                AND (resource.groupType IN ['public', 'closed']
+                  OR membership.role IN ['usual', 'admin', 'owner'])`,
+  withClause: 'WITH resource, membership',
+  returnClause: 'resource { .*, myRole: membership.role, __typename: labels(resource)[0] }',
+  limit: 'LIMIT $limit',
+}
+
 const countSetup = {
   returnClause: 'toString(size(collect(resource)))',
   limit: '',
@@ -81,6 +96,10 @@ const countPostsSetup = {
 }
 const countHashtagsSetup = {
   ...searchHashtagsSetup,
+  ...countSetup,
+}
+const countGroupsSetup = {
+  ...searchGroupsSetup,
   ...countSetup,
 }
 
@@ -113,6 +132,7 @@ const multiSearchMap = [
   { symbol: '!', setup: searchPostsSetup, resultName: 'posts' },
   { symbol: '@', setup: searchUsersSetup, resultName: 'users' },
   { symbol: '#', setup: searchHashtagsSetup, resultName: 'hashtags' },
+  { symbol: '&', setup: searchGroupsSetup, resultName: 'groups' },
 ]
 
 export default {
@@ -178,13 +198,36 @@ export default {
         }),
       }
     },
+    searchGroups: async (_parent, args, context, _resolveInfo) => {
+      const { query, groupsOffset, firstGroups } = args
+      let userId = null
+      if (context.user) userId = context.user.id
+      return {
+        groupCount: getSearchResults(
+          context,
+          countGroupsSetup,
+          {
+            query: queryString(query),
+            skip: 0,
+            userId,
+          },
+          countResultCallback,
+        ),
+        groups: getSearchResults(context, searchGroupsSetup, {
+          query: queryString(query),
+          skip: groupsOffset,
+          limit: firstGroups,
+          userId,
+        }),
+      }
+    },
     searchResults: async (_parent, args, context, _resolveInfo) => {
       const { query, limit } = args
       let userId = null
       if (context.user) userId = context.user.id
 
-      const searchType = query.replace(/^([!@#]?).*$/, '$1')
-      const searchString = query.replace(/^([!@#])/, '')
+      const searchType = query.replace(/^([!@#&]?).*$/, '$1')
+      const searchString = query.replace(/^([!@#&])/, '')
 
       const params = {
         query: queryString(searchString),
@@ -197,6 +240,7 @@ export default {
         return [
           ...(await getSearchResults(context, searchPostsSetup, params)),
           ...(await getSearchResults(context, searchUsersSetup, params)),
+          ...(await getSearchResults(context, searchGroupsSetup, params)),
           ...(await getSearchResults(context, searchHashtagsSetup, params)),
         ]
 
