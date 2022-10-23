@@ -2,9 +2,19 @@
 
 When you overtake this deploy and rebrand repo to your network you have to recognize the following changes and doings …
 
+## This Latest Version >= 2.0.0 with 'ocelotDockerVersionTag' 2.0.0-250
+
+### Main Code PR – feat: 🍰 Implement LOGO_HEADER_CLICK As Configuration #5525
+
+- You have to set `LOGO_HEADER_CLICK` in `branding/constants/logos.js` originally in main code file `webapp/constants/logos.js` to your prevered value.
+
+### Main Code Issue – 🌟 [EPIC] Release v2.0.0 – Beta Test → Final #5547
+
+- You have to set `SHOW_GROUP_BUTTON_IN_HEADER` in `branding/constants/groups.js` originally in main code file `webapp/constants/groups.js` to your prevered value.
+
 ## This Latest Version >= 1.1.0 with 'ocelotDockerVersionTag' 1.1.0-205
 
-### Deployment/Rebranding PR –  chore: 🍰 Release v1.1.0 - Implement Categories Again #63
+### Deployment/Rebranding PR – chore: 🍰 Release v1.1.0 - Implement Categories Again #63
 
 - You have to add the `CATEGORIES_ACTIVE` from the `deployment/kubernetes/values.template.yaml` to your `deployment/kubernetes/values.yaml` and set it to your prevered value.
 - Make sure the correct categories are in your Neo4j database on the server.
