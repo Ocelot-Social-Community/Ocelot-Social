@@ -17,7 +17,7 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
 })
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
   // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  externalLink: 'https://yunite.org/brand-guidelines/', // if string is defined and not empty it's dominating
+  externalLink: 'https://yunite.org/spenden/', // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.donate', // localized string identifier, if undefined default is used
@@ -34,7 +34,7 @@ const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
   externalLink: 'https://yunite.org/impressum/', // if string is defined and not empty it's dominating
 
   internalPage: {
-    // footerIdent: 'site.imprint', // localized string identifier, if undefined default is used
+    footerIdent: 'yuniteRebranding.footer.imprint', // localized string identifier, if undefined default is used
     // headTitleIdent: 'site.imprint', // localized string identifier, if undefined default is used
     // headlineIdent: 'site.imprint', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
@@ -73,7 +73,7 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
   externalLink: 'https://yunite.org/datenschutz/', // if string is defined and not empty it's dominating
 
   internalPage: {
-    // footerIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
+    footerIdent: 'yuniteRebranding.footer.dataPrivacy', // localized string identifier, if undefined default is used
     // headTitleIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
     // headlineIdent: 'site.data-privacy', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
@@ -124,11 +124,11 @@ export default {
   SUPPORT,
 
   FOOTER_LINK_LIST: [
-    ORGANIZATION,
+    // ORGANIZATION,
     // TERMS_AND_CONDITIONS,
-    CODE_OF_CONDUCT,
+    // CODE_OF_CONDUCT,
     DATA_PRIVACY,
-    FAQ,
+    // FAQ,
     // DONATE,
     // SUPPORT,
     IMPRINT,

@@ -1,11 +1,19 @@
 export default {
   MENU: [
     {
-      name: 'Beiträge',
-      path: '/#',
+      nameIdent: 'yuniteRebranding.header.newsFeed',
+      path: '/',
     },
     {
-      name: 'Über Yunite',
+      nameIdent: 'yuniteRebranding.header.myGroups',
+      path: '/my-groups',
+    },
+    {
+      nameIdent: 'yuniteRebranding.header.topics',
+      url: 'https://yunite.org/themen/',
+    },
+    {
+      nameIdent: 'yuniteRebranding.header.about',
       url: 'https://yunite.org',
     },
   ],
