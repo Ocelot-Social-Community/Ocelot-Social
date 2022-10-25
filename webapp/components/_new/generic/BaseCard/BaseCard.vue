@@ -55,6 +55,7 @@ export default {
   padding: $space-base;
   border-radius: $border-radius-x-large;
   overflow: hidden;
+  overflow-wrap: break-word;
   background-color: $color-neutral-100;
   box-shadow: $box-shadow-base;
 
