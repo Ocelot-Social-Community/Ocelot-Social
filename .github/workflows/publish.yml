@@ -3,8 +3,10 @@ name: ocelot.social publish CI
 on:
   push:
     branches:
-      # - master
-      - 5059-epic-groups # for testing while developing
+      - master
+      # - 5059-epic-groups # for testing while developing
+      # template branches in repo
+      # - template--separate-branch-auto-deployment--5059-epic-groups
 
 jobs:
   ##############################################################################
@@ -94,16 +96,16 @@ jobs:
       ##########################################################################
       - name: Backend | Build `production` image
         run: |
-          docker build --target base -t "ocelotsocialnetwork/backend-groups:latest-base" -t "ocelotsocialnetwork/backend-groups:${VERSION}-base" -t "ocelotsocialnetwork/backend-groups:${BUILD_VERSION}-base" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT backend/
-          docker build --target code -t "ocelotsocialnetwork/backend-groups:latest-code" -t "ocelotsocialnetwork/backend-groups:${VERSION}-code" -t "ocelotsocialnetwork/backend-groups:${BUILD_VERSION}-code" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT backend/
-          docker build --target production -t "ocelotsocialnetwork/backend-groups:latest" -t "ocelotsocialnetwork/backend-groups:${VERSION}" -t "ocelotsocialnetwork/backend-groups:${BUILD_VERSION}" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT backend/
+          docker build --target base -t "ocelotsocialnetwork/backend:latest-base" -t "ocelotsocialnetwork/backend:${VERSION}-base" -t "ocelotsocialnetwork/backend:${BUILD_VERSION}-base" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT backend/
+          docker build --target code -t "ocelotsocialnetwork/backend:latest-code" -t "ocelotsocialnetwork/backend:${VERSION}-code" -t "ocelotsocialnetwork/backend:${BUILD_VERSION}-code" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT backend/
+          docker build --target production -t "ocelotsocialnetwork/backend:latest" -t "ocelotsocialnetwork/backend:${VERSION}" -t "ocelotsocialnetwork/backend:${BUILD_VERSION}" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT backend/
       - name: Backend | Save docker image
-        run: docker save "ocelotsocialnetwork/backend-groups" > /tmp/backend-groups.tar
+        run: docker save "ocelotsocialnetwork/backend" > /tmp/backend.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: docker-backend-production
-          path: /tmp/backend-groups.tar
+          path: /tmp/backend.tar
 
   ##############################################################################
   # JOB: DOCKER BUILD PRODUCTION WEBAPP ########################################
@@ -134,16 +136,16 @@ jobs:
       ##########################################################################
       - name: Webapp | Build `production` image
         run: |
-          docker build --target base -t "ocelotsocialnetwork/webapp-groups:latest-base" -t "ocelotsocialnetwork/webapp-groups:${VERSION}-base" -t "ocelotsocialnetwork/webapp-groups:${BUILD_VERSION}-base" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/
-          docker build --target code -t "ocelotsocialnetwork/webapp-groups:latest-code" -t "ocelotsocialnetwork/webapp-groups:${VERSION}-code" -t "ocelotsocialnetwork/webapp-groups:${BUILD_VERSION}-code" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/
-          docker build --target production -t "ocelotsocialnetwork/webapp-groups:latest" -t "ocelotsocialnetwork/webapp-groups:${VERSION}" -t "ocelotsocialnetwork/webapp-groups:${BUILD_VERSION}" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/
+          docker build --target base -t "ocelotsocialnetwork/webapp:latest-base" -t "ocelotsocialnetwork/webapp:${VERSION}-base" -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}-base" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/
+          docker build --target code -t "ocelotsocialnetwork/webapp:latest-code" -t "ocelotsocialnetwork/webapp:${VERSION}-code" -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}-code" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/
+          docker build --target production -t "ocelotsocialnetwork/webapp:latest" -t "ocelotsocialnetwork/webapp:${VERSION}" -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/
       - name: Webapp | Save docker image
-        run: docker save "ocelotsocialnetwork/webapp-groups" > /tmp/webapp-groups.tar
+        run: docker save "ocelotsocialnetwork/webapp" > /tmp/webapp.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: docker-webapp-production
-          path: /tmp/webapp-groups.tar
+          path: /tmp/webapp.tar
 
   ##############################################################################
   # JOB: DOCKER BUILD PRODUCTION MAINTENANCE ###################################
@@ -174,16 +176,16 @@ jobs:
       ##########################################################################
       - name: Maintenance | Build `production` image
         run: |
-          docker build --target base -t "ocelotsocialnetwork/maintenance-groups:latest-base" -t "ocelotsocialnetwork/maintenance-groups:${VERSION}-base" -t "ocelotsocialnetwork/maintenance-groups:${BUILD_VERSION}-base" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/ -f webapp/Dockerfile.maintenance
-          docker build --target code -t "ocelotsocialnetwork/maintenance-groups:latest-code" -t "ocelotsocialnetwork/maintenance-groups:${VERSION}-code" -t "ocelotsocialnetwork/maintenance-groups:${BUILD_VERSION}-code" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/ -f webapp/Dockerfile.maintenance
-          docker build --target production -t "ocelotsocialnetwork/maintenance-groups:latest" -t "ocelotsocialnetwork/maintenance-groups:${VERSION}" -t "ocelotsocialnetwork/maintenance-groups:${BUILD_VERSION}" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/ -f webapp/Dockerfile.maintenance
+          docker build --target base -t "ocelotsocialnetwork/maintenance:latest-base" -t "ocelotsocialnetwork/maintenance:${VERSION}-base" -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}-base" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/ -f webapp/Dockerfile.maintenance
+          docker build --target code -t "ocelotsocialnetwork/maintenance:latest-code" -t "ocelotsocialnetwork/maintenance:${VERSION}-code" -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}-code" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/ -f webapp/Dockerfile.maintenance
+          docker build --target production -t "ocelotsocialnetwork/maintenance:latest" -t "ocelotsocialnetwork/maintenance:${VERSION}" -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/ -f webapp/Dockerfile.maintenance
       - name: Maintenance | Save docker image
-        run: docker save "ocelotsocialnetwork/maintenance-groups" > /tmp/maintenance-groups.tar
+        run: docker save "ocelotsocialnetwork/maintenance" > /tmp/maintenance.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: docker-maintenance-production
-          path: /tmp/maintenance-groups.tar
+          path: /tmp/maintenance.tar
 
   ##############################################################################
   # JOB: UPLOAD TO DOCKERHUB ###################################################
@@ -217,21 +219,21 @@ jobs:
           name: docker-backend-production
           path: /tmp
       - name: Load Docker Image
-        run: docker load < /tmp/backend-groups.tar
+        run: docker load < /tmp/backend.tar
       - name: Download Docker Image (WebApp)
         uses: actions/download-artifact@v2
         with:
           name: docker-webapp-production
           path: /tmp
       - name: Load Docker Image
-        run: docker load < /tmp/webapp-groups.tar
+        run: docker load < /tmp/webapp.tar
       - name: Download Docker Image (Maintenance)
         uses: actions/download-artifact@v2
         with:
           name: docker-maintenance-production
           path: /tmp
       - name: Load Docker Image
-        run: docker load < /tmp/maintenance-groups.tar
+        run: docker load < /tmp/maintenance.tar
       ##########################################################################
       # Upload #################################################################
       ##########################################################################
@@ -240,11 +242,11 @@ jobs:
       - name: Push neo4j
         run: docker push --all-tags ocelotsocialnetwork/neo4j-community
       - name: Push backend
-        run: docker push --all-tags ocelotsocialnetwork/backend-groups
+        run: docker push --all-tags ocelotsocialnetwork/backend
       - name: Push webapp
-        run: docker push --all-tags ocelotsocialnetwork/webapp-groups
+        run: docker push --all-tags ocelotsocialnetwork/webapp
       - name: Push maintenance
-        run: docker push --all-tags ocelotsocialnetwork/maintenance-groups
+        run: docker push --all-tags ocelotsocialnetwork/maintenance
 
   ##############################################################################
   # JOB: KUBERNETES DEPLOY ACTUAL/LATEST VERSION ######################################
@@ -292,27 +294,30 @@ jobs:
       #     kubectl -n default rollout restart deployment/ocelot-neo4j
       - name: Deploy actual version '$BUILD_VERSION' to DigitalOcean Kubernetes
         run: |
-          kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp-groups:$BUILD_VERSION
+          kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:$BUILD_VERSION
           kubectl -n default rollout restart deployment/ocelot-webapp
-          kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend-groups:$BUILD_VERSION
+          kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:$BUILD_VERSION
           kubectl -n default rollout restart deployment/ocelot-backend
-          kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance-groups:$BUILD_VERSION
+          kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:$BUILD_VERSION
           kubectl -n default rollout restart deployment/ocelot-maintenance
           kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:$BUILD_VERSION
           kubectl -n default rollout restart deployment/ocelot-neo4j
       # because this step 'kubectl -n default rollout status deployment/* --timeout=600s' does not work as expected
       #   and we need the pods to be up again for cleaning and seeding the Neo4j database and the backend.
       #   !!! this is not a perfect solution !!!
-      # deployments are regularely up again after 3 minutes and 10 seconds
+      # deployments are regularly up again after 3 minutes and 10 seconds
       - name: Sleep for 4 minutes, means 240 seconds
         run: sleep 240s
         shell: bash
-      - name: Verify deployment and wait for the pods of each deplyment to get ready for cleaning and seeding of the database
+      - name: Verify deployment and wait for the pods of each deployment to get ready for cleaning and seeding of the database
         run: |
           kubectl -n default rollout status deployment/ocelot-backend --timeout=600s
           kubectl -n default rollout status deployment/ocelot-neo4j --timeout=600s
           kubectl -n default rollout status deployment/ocelot-maintenance --timeout=600s
           kubectl -n default rollout status deployment/ocelot-webapp --timeout=600s
+      - name: Run migrations for Neo4j database via backend for staging
+        run: |
+          kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "yarn prod:migrate up"
       - name: Reset and seed Neo4j database via backend for staging
         # db cleaning and seeding is only possible in production if env 'PRODUCTION_DB_CLEAN_ALLOW=true' is set in deployment
         run: |
