@@ -1,7 +1,7 @@
 {
   "name": "yunite.net",
-  "version": "2.0.0",
-  "ocelotDockerVersionTag": "2.0.0-250",
+  "version": "2.1.0",
+  "ocelotDockerVersionTag": "2.1.0-253",
   "dockerOrganisation": "tirokk",
   "description": "yunite.net Branded",
   "author": "yunite.net Community",
