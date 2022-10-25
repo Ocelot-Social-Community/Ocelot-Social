@@ -36,6 +36,7 @@ describe('SearchResults', () => {
     }
     propsData = {
       pageSize: 12,
+      search: '',
     }
     wrapper = Wrapper()
   })
@@ -169,7 +170,7 @@ describe('SearchResults', () => {
           await wrapper.vm.$nextTick()
           await expect(
             wrapper.vm.$options.apollo.searchPosts.variables.bind(wrapper.vm)(),
-          ).toMatchObject({ query: undefined, firstPosts: 12, postsOffset: 12 })
+          ).toMatchObject({ query: '', firstPosts: 12, postsOffset: 12 })
         })
 
         it('displays the next page button when next-button is clicked', async () => {
@@ -199,7 +200,7 @@ describe('SearchResults', () => {
           await wrapper.vm.$nextTick()
           await expect(
             wrapper.vm.$options.apollo.searchPosts.variables.bind(wrapper.vm)(),
-          ).toMatchObject({ query: undefined, firstPosts: 12, postsOffset: 24 })
+          ).toMatchObject({ query: '', firstPosts: 12, postsOffset: 24 })
         })
 
         it('deactivates next page button when next-button is clicked twice', async () => {
@@ -234,7 +235,7 @@ describe('SearchResults', () => {
           await wrapper.vm.$nextTick()
           await expect(
             wrapper.vm.$options.apollo.searchPosts.variables.bind(wrapper.vm)(),
-          ).toMatchObject({ query: undefined, firstPosts: 12, postsOffset: 0 })
+          ).toMatchObject({ query: '', firstPosts: 12, postsOffset: 0 })
         })
       })
     })

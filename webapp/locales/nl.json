@@ -82,6 +82,16 @@
     "follow": "Volgen",
     "following": "Volgt"
   },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null
+    },
+    "membersCount": null,
+    "membersListTitle": null
+  },
   "login": {
     "email": "Uw E-mail",
     "hello": "Hallo",
@@ -100,6 +110,9 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": null
+    },
     "follow": "Volgen",
     "followers": "Volgelingen",
     "following": "Volgt",

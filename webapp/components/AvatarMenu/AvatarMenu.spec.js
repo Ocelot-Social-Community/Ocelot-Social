@@ -42,9 +42,9 @@ describe('AvatarMenu.vue', () => {
       wrapper = Wrapper()
     })
 
-    it('renders the UserAvatar component', () => {
+    it('renders the ProfileAvatar component', () => {
       wrapper.find('.avatar-menu-trigger').trigger('click')
-      expect(wrapper.find('.user-avatar').exists()).toBe(true)
+      expect(wrapper.find('.profile-avatar').exists()).toBe(true)
     })
 
     describe('given a userName', () => {
@@ -90,6 +90,13 @@ describe('AvatarMenu.vue', () => {
           expect(profileLink.exists()).toBe(true)
         })
 
+        it('displays a link to "My groups"', () => {
+          const profileLink = wrapper
+            .findAll('.ds-menu-item span')
+            .at(wrapper.vm.routes.findIndex((route) => route.path === '/my-groups'))
+          expect(profileLink.exists()).toBe(true)
+        })
+
         it('displays a link to the notifications page', () => {
           const notificationsLink = wrapper
             .findAll('.ds-menu-item span')
@@ -102,6 +109,11 @@ describe('AvatarMenu.vue', () => {
             .findAll('.ds-menu-item span')
             .at(wrapper.vm.routes.findIndex((route) => route.path === '/settings'))
           expect(settingsLink.exists()).toBe(true)
+        })
+
+        it('displays a total of 4 links', () => {
+          const allLinks = wrapper.findAll('.ds-menu-item')
+          expect(allLinks).toHaveLength(4)
         })
       })
 
@@ -125,9 +137,9 @@ describe('AvatarMenu.vue', () => {
           expect(moderationLink.exists()).toBe(true)
         })
 
-        it('displays a total of 4 links', () => {
+        it('displays a total of 5 links', () => {
           const allLinks = wrapper.findAll('.ds-menu-item')
-          expect(allLinks).toHaveLength(4)
+          expect(allLinks).toHaveLength(5)
         })
       })
 
@@ -151,9 +163,9 @@ describe('AvatarMenu.vue', () => {
           expect(adminLink.exists()).toBe(true)
         })
 
-        it('displays a total of 5 links', () => {
+        it('displays a total of 6 links', () => {
           const allLinks = wrapper.findAll('.ds-menu-item')
-          expect(allLinks).toHaveLength(5)
+          expect(allLinks).toHaveLength(6)
         })
       })
     })

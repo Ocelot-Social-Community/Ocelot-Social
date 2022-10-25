@@ -11,7 +11,7 @@
         "
         @click.prevent="toggleMenu"
       >
-        <user-avatar :user="user" size="small" />
+        <profile-avatar :profile="user" size="small" />
         <base-icon class="dropdown-arrow" name="angle-down" />
       </a>
     </template>
@@ -50,12 +50,12 @@
 <script>
 import { mapGetters } from 'vuex'
 import Dropdown from '~/components/Dropdown'
-import UserAvatar from '~/components/_new/generic/UserAvatar/UserAvatar'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 
 export default {
   components: {
     Dropdown,
-    UserAvatar,
+    ProfileAvatar,
   },
   props: {
     placement: { type: String, default: 'top-end' },
@@ -72,9 +72,14 @@ export default {
       }
       const routes = [
         {
-          name: this.$t('profile.name'),
+          name: this.$t('header.avatarMenu.myProfile'),
           path: `/profile/${this.user.id}/${this.user.slug}`,
           icon: 'user',
+        },
+        {
+          name: this.$t('header.avatarMenu.myGroups'),
+          path: '/my-groups',
+          icon: 'users',
         },
         {
           name: this.$t('notifications.pageLink'),
@@ -130,7 +135,7 @@ export default {
   align-items: center;
   padding-left: $space-xx-small;
 
-  > .user-avatar {
+  > .profile-avatar {
     margin-right: $space-xx-small;
   }
 }

@@ -95,6 +95,10 @@
                       <invite-button placement="top" />
                     </client-only>
                   </div>
+                  <!-- group button -->
+                  <client-only v-if="SHOW_GROUP_BUTTON_IN_HEADER">
+                    <group-button />
+                  </client-only>
                   <client-only>
                     <!-- avatar-menu -->
                     <avatar-menu placement="top" />
@@ -160,6 +164,16 @@
                   <invite-button placement="top" />
                 </client-only>
               </ds-flex-item>
+              <!-- group button mobile -->
+              <ds-flex-item
+                v-if="SHOW_GROUP_BUTTON_IN_HEADER"
+                :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+                style="text-align: center"
+              >
+                <client-only>
+                  <group-button />
+                </client-only>
+              </ds-flex-item>
               <ds-flex-item
                 :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
                 style="text-align: end"
@@ -218,11 +232,14 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
+import links from '~/constants/links.js'
 import LOGOS from '../constants/logos.js'
 import headerMenu from '../constants/headerMenu.js'
 import seo from '~/mixins/seo'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
+import GroupButton from '~/components/Group/GroupButton'
 import InviteButton from '~/components/InviteButton/InviteButton'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
@@ -230,13 +247,13 @@ import SearchField from '~/components/features/SearchField/SearchField.vue'
 import Modal from '~/components/Modal'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
 import PageFooter from '~/components/PageFooter/PageFooter'
-import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 
 export default {
   components: {
     AvatarMenu,
     FilterMenu,
+    GroupButton,
     InviteButton,
     LocaleSwitch,
     Logo,
@@ -249,15 +266,16 @@ export default {
   mixins: [seo],
   data() {
     return {
-      windowWidth: null,
+      inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
+      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       links,
       LOGOS,
+      SHOW_GROUP_BUTTON_IN_HEADER,
       isHeaderMenu: headerMenu.MENU.length > 0,
       menu: headerMenu.MENU,
       mobileSearchVisible: false,
+      windowWidth: null,
       toggleMobileMenu: false,
-      inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
     }
   },
   computed: {

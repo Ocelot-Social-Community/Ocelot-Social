@@ -12,6 +12,7 @@ export const userFragment = gql`
     deleted
   }
 `
+
 export const locationAndBadgesFragment = (lang) => gql`
   fragment locationAndBadges on User {
     location {
@@ -58,6 +59,29 @@ export const postFragment = gql`
     }
     pinnedAt
     pinned
+  }
+`
+
+export const groupFragment = gql`
+  fragment group on Group {
+    id
+    groupName: name
+    slug
+    disabled
+    deleted
+    about
+    description
+    descriptionExcerpt
+    groupType
+    actionRadius
+    categories {
+      id
+      slug
+      name
+      icon
+    }
+    locationName
+    myRole
   }
 `
 

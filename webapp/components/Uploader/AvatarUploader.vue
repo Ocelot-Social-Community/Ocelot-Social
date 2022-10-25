@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="avatar-uploader">
     <vue-dropzone
       id="customdropzone"
       :key="avatarUrl"
@@ -10,8 +10,8 @@
     >
       <div class="dz-message" @mouseover="hover = true" @mouseleave="hover = false">
         <slot></slot>
-        <div class="hc-attachments-upload-area">
-          <div class="hc-drag-marker">
+        <div class="avatar-attachments-upload-area">
+          <div class="avatar-drag-marker">
             <base-icon v-if="hover" name="image" />
           </div>
         </div>
@@ -21,14 +21,15 @@
 </template>
 <script>
 import vueDropzone from 'nuxt-dropzone'
-import { updateUserMutation } from '~/graphql/User.js'
 
 export default {
+  name: 'AvatarUploader',
   components: {
     vueDropzone,
   },
   props: {
-    user: { type: Object, default: null },
+    profile: { type: Object, required: true },
+    updateMutation: { type: Function, required: true },
   },
   data() {
     return {
@@ -43,7 +44,7 @@ export default {
   },
   computed: {
     avatarUrl() {
-      const { avatar } = this.user
+      const { avatar } = this.profile
       return avatar && avatar.url
     },
   },
@@ -68,16 +69,16 @@ export default {
       const avatarUpload = file[0]
       this.$apollo
         .mutate({
-          mutation: updateUserMutation(),
+          mutation: this.updateMutation(),
           variables: {
             avatar: {
               upload: avatarUpload,
             },
-            id: this.user.id,
+            id: this.profile.id,
           },
         })
         .then(() => {
-          this.$toast.success(this.$t('user.avatar.submitted'))
+          this.$toast.success(this.$t('profile.avatar.submitted'))
         })
         .catch((error) => this.$toast.error(error.message))
     },
@@ -115,7 +116,7 @@ export default {
   width: 100%;
 }
 
-.hc-attachments-upload-area {
+.avatar-attachments-upload-area {
   position: relative;
   display: flex;
   align-items: center;
@@ -123,11 +124,11 @@ export default {
   cursor: pointer;
 }
 
-.hc-attachments-upload-button {
+.avatar-attachments-upload-button {
   pointer-events: none;
 }
 
-.hc-drag-marker {
+.avatar-drag-marker {
   position: relative;
   width: 122px;
   height: 122px;
@@ -165,7 +166,7 @@ export default {
     border-radius: 100%;
     border: 1px dashed hsl(0, 0%, 25%);
   }
-  .hc-attachments-upload-area:hover & {
+  .avatar-attachments-upload-area:hover & {
     opacity: 1;
   }
 }
