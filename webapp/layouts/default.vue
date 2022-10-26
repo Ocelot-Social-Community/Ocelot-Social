@@ -9,7 +9,8 @@
             <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
               <a
                 v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
-                :href="LOGOS.LOGO_HEADER_CLICK.externalLink"
+                :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
+                :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
               >
                 <logo logoType="header" />
               </a>
@@ -109,11 +110,21 @@
             <!-- logo, hamburger-->
             <ds-flex>
               <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
-                <nuxt-link :to="{ name: 'index' }" v-scroll-to="'.main-navigation'">
+                <a
+                  v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
+                  :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
+                  :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
+                >
+                  <logo logoType="header" />
+                </a>
+                <nuxt-link
+                  v-else
+                  :to="LOGOS.LOGO_HEADER_CLICK.internalPath.to"
+                  v-scroll-to="LOGOS.LOGO_HEADER_CLICK.internalPath.scrollTo"
+                >
                   <logo logoType="header" />
                 </nuxt-link>
               </ds-flex-item>
-
               <!-- hamburger button -->
               <ds-flex-item class="mobile-hamburger-menu">
                 <client-only>
