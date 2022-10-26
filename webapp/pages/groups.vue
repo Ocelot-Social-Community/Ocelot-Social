@@ -22,7 +22,33 @@
         </nuxt-link>
       </ds-space>
       <!-- group list -->
+      <ds-space centered v-if="showPagination">
+        <pagination-buttons
+          :hasNext="hasNext"
+          :showPageCounter="true"
+          :hasPrevious="hasPrevious"
+          :activePage="activePage"
+          :activeResourceCount="activeTab.count"
+          :key="'Top'"
+          :pageSize="pageSize"
+          @back="previousResults"
+          @next="nextResults"
+        />
+      </ds-space>
       <group-list :groups="myGroups" />
+      <ds-space centered v-if="showPagination">
+        <pagination-buttons
+          :hasNext="hasNext"
+          :showPageCounter="true"
+          :hasPrevious="hasPrevious"
+          :activePage="activePage"
+          :activeResourceCount="activeTab.count"
+          :key="'Bottom'"
+          :pageSize="pageSize"
+          @back="previousResults"
+          @next="nextResults"
+        />
+      </ds-space>
     </ds-container>
   </div>
 </template>
@@ -31,6 +57,7 @@
 import GroupList from '~/components/Group/GroupList'
 import { groupQuery, groupCountQuery } from '~/graphql/groups.js'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
+import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 
 const tabToFilterMapping = (tab) => {
   return {
@@ -44,6 +71,7 @@ export default {
   components: {
     GroupList,
     TabNavigation,
+    PaginationButtons,
   },
   data() {
     return {
@@ -51,7 +79,7 @@ export default {
       groupFilter: { isMember: true },
       tabActive: 'myGroups',
       pageSize: 5,
-      currentPage: 1,
+      activePage: 0,
       myGroupsCount: 0,
       allGroupsCount: 0,
     }
@@ -60,16 +88,37 @@ export default {
     handleTab(tab) {
       if (this.tabActive !== tab) {
         this.tabActive = tab
+        this.activePage = 0
         this.groupFilter = tabToFilterMapping(tab)
         this.$apollo.queries.Group.refetch()
       }
     },
+    previousResults() {
+      this.activePage--
+      this.$apollo.queries.Group.refetch()
+    },
+    nextResults() {
+      this.activePage++
+      this.$apollo.queries.Group.refetch()
+    },
   },
   computed: {
+    activeTab() {
+      return this.tabOptions.find((tab) => tab.type === this.tabActive)
+    },
+    showPagination() {
+      return this.activeTab.count > this.pageSize
+    },
+    hasNext() {
+      return (this.activePage + 1) * this.pageSize < this.activeTab.count
+    },
+    hasPrevious() {
+      return this.activePage > 0
+    },
     pagination() {
       return {
         first: this.pageSize,
-        offset: (this.currentPage - 1) * this.pageSize,
+        offset: this.activePage * this.pageSize,
       }
     },
     myGroups() {
