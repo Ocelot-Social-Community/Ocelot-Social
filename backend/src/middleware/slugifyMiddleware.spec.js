@@ -152,7 +152,7 @@ describe('slugifyMiddleware', () => {
       })
 
       describe('but if the client specifies a slug', () => {
-        it('rejects CreateGroup', async (done) => {
+        it('rejects CreateGroup', async () => {
           try {
             await expect(
               mutate({
@@ -171,7 +171,6 @@ describe('slugifyMiddleware', () => {
                 },
               ],
             })
-            done()
           } catch (error) {
             throw new Error(`
               ${error}
@@ -312,7 +311,7 @@ describe('slugifyMiddleware', () => {
         })
 
         describe('setting slug explicitly', () => {
-          it('rejects UpdateGroup', async (done) => {
+          it('rejects UpdateGroup', async () => {
             try {
               await expect(
                 mutate({
@@ -329,7 +328,6 @@ describe('slugifyMiddleware', () => {
                   },
                 ],
               })
-              done()
             } catch (error) {
               throw new Error(`
                 ${error}
@@ -436,7 +434,7 @@ describe('slugifyMiddleware', () => {
       })
 
       describe('but if the client specifies a slug', () => {
-        it('rejects CreatePost', async (done) => {
+        it('rejects CreatePost', async () => {
           try {
             await expect(
               mutate({
@@ -456,7 +454,6 @@ describe('slugifyMiddleware', () => {
                 },
               ],
             })
-            done()
           } catch (error) {
             throw new Error(`
               ${error}
