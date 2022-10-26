@@ -4,6 +4,10 @@ export default {
   LOGO_HEADER_PATH: '/img/custom/logo-horizontal.svg',
   LOGO_HEADER_WIDTH: '130px',
   LOGO_HEADER_CLICK: {
+    // externalLink: {
+    //   url: 'https://ocelot.social',
+    //   target: '_blank',
+    // },
     externalLink: null,
     internalPath: {
       to: {
