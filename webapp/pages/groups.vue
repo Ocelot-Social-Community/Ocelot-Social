@@ -67,7 +67,7 @@ const tabToFilterMapping = (tab) => {
 }
 
 export default {
-  name: 'MyGroups',
+  name: 'Groups',
   components: {
     GroupList,
     TabNavigation,
