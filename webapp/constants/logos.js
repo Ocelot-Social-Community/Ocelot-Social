@@ -5,8 +5,8 @@ export default {
   LOGO_HEADER_WIDTH: '130px',
   LOGO_HEADER_CLICK: {
     externalLink: {
-      url:'',
-      target:'_blank',
+      url: '',
+      target: '_blank',
     },
     internalPath: {
       to: {
