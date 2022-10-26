@@ -31,7 +31,7 @@
       <footer class="footer">
         <div>
           <!-- group my role in group -->
-          <ds-chip color="primary">
+          <ds-chip v-if="group && group.myRole" color="primary">
             {{ group && group.myRole ? $t('group.roles.' + group.myRole) : '' }}
           </ds-chip>
           <!-- group type -->
