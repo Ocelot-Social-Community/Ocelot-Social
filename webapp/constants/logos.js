@@ -4,7 +4,10 @@ export default {
   LOGO_HEADER_PATH: '/img/custom/logo-horizontal.svg',
   LOGO_HEADER_WIDTH: '130px',
   LOGO_HEADER_CLICK: {
-    externalLink: null,
+    externalLink: {
+      url: '',
+      target: '_blank',
+    },
     internalPath: {
       to: {
         name: 'index',
