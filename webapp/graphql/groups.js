@@ -145,8 +145,8 @@ export const changeGroupMemberRoleMutation = () => {
 export const groupQuery = (i18n) => {
   const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
   return gql`
-    query ($isMember: Boolean, $id: ID, $slug: String) {
-      Group(isMember: $isMember, id: $id, slug: $slug) {
+    query ($isMember: Boolean, $id: ID, $slug: String, $first: Int, $offset: Int) {
+      Group(isMember: $isMember, id: $id, slug: $slug, first: $first, offset: $offset) {
         id
         name
         slug
@@ -187,6 +187,14 @@ export const groupMembersQuery = () => {
         slug
         myRoleInGroup
       }
+    }
+  `
+}
+
+export const groupCountQuery = () => {
+  return gql`
+    query ($isMember: Boolean) {
+      GroupCount(isMember: $isMember)
     }
   `
 }

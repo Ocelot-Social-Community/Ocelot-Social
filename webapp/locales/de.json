@@ -407,6 +407,7 @@
     "addMemberToGroup": "Zur Gruppe hinzufügen",
     "addUser": "Benutzer hinzufügen",
     "addUserPlaceholder": "eindeutiger Benutzername > @slug-from-user",
+    "allGroups": "Alle Gruppen",
     "categories": "Thema ::: Themen",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
     "contentMenu": {
