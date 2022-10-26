@@ -65,8 +65,8 @@ type Query {
     isMember: Boolean # if 'undefined' or 'null' then get all groups
     id: ID
     slug: String
-    # first: Int # not implemented yet
-    # offset: Int # not implemented yet
+    first: Int
+    offset: Int
     # orderBy: [_GroupOrdering] # not implemented yet
     # filter: _GroupFilter # not implemented yet
   ): [Group]
@@ -79,6 +79,8 @@ type Query {
     # filter: _UserFilter # not implemented yet
   ): [User]
 
+  GroupCount(isMember: Boolean): Int
+  
   # AvailableGroupTypes: [GroupType]!
 
   # AvailableGroupActionRadii: [GroupActionRadius]!

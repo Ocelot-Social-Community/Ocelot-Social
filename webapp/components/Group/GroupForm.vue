@@ -163,7 +163,7 @@
 
         <!-- submit -->
         <ds-space margin-top="large">
-          <nuxt-link to="/my-groups">
+          <nuxt-link to="/groups">
             <ds-button>{{ $t('actions.cancel') }}</ds-button>
           </nuxt-link>
           <ds-button type="submit" icon="save" primary :disabled="checkFormError(errors)" fill>

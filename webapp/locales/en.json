@@ -407,6 +407,7 @@
     "addMemberToGroup": "Add to group",
     "addUser": "Add User",
     "addUserPlaceholder": "unique username > @slug-from-user",
+    "allGroups": "All Groups",
     "categories": "Topic ::: Topics",
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
@@ -476,7 +477,7 @@
   },
   "header": {
     "avatarMenu": {
-      "myGroups": "My groups",
+      "Groups": "Groups",
       "myProfile": "My profile"
     }
   },

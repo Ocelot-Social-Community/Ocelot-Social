@@ -90,10 +90,10 @@ describe('AvatarMenu.vue', () => {
           expect(profileLink.exists()).toBe(true)
         })
 
-        it('displays a link to "My groups"', () => {
+        it('displays a link to "Groups"', () => {
           const profileLink = wrapper
             .findAll('.ds-menu-item span')
-            .at(wrapper.vm.routes.findIndex((route) => route.path === '/my-groups'))
+            .at(wrapper.vm.routes.findIndex((route) => route.path === '/groups'))
           expect(profileLink.exists()).toBe(true)
         })
 
