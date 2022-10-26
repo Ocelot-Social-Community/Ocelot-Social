@@ -427,6 +427,7 @@
     "general": "General",
     "goal": "Goal of group",
     "groupCreated": "The group was created!",
+    "Groups": "Groups",
     "in": "in",
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
@@ -448,7 +449,6 @@
     "membersCount": "Member ::: Members",
     "membersListTitle": "Group Members",
     "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
-    "myGroups": "My Groups",
     "name": "Group name",
     "radius": "Radius",
     "removeMember": "Remove member",
@@ -477,7 +477,7 @@
   },
   "header": {
     "avatarMenu": {
-      "myGroups": "My groups",
+      "Groups": "Groups",
       "myProfile": "My profile"
     }
   },

@@ -77,8 +77,8 @@ export default {
           icon: 'user',
         },
         {
-          name: this.$t('header.avatarMenu.myGroups'),
-          path: '/my-groups',
+          name: this.$t('header.avatarMenu.Groups'),
+          path: '/groups',
           icon: 'users',
         },
         {
