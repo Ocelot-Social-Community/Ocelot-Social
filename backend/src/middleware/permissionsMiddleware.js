@@ -312,6 +312,7 @@ export default shield(
       currentUser: allow,
       Group: isAuthenticated,
       GroupMembers: isAllowedSeeingGroupMembers,
+      GroupCount: isAuthenticated,
       Post: allow,
       profilePagePosts: allow,
       Comment: allow,

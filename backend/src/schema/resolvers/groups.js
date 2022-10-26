@@ -81,6 +81,39 @@ export default {
         session.close()
       }
     },
+    GroupCount: async (_object, params, context, _resolveInfo) => {
+      const { isMember } = params
+      const {
+        user: { id: userId },
+      } = context
+      const session = context.driver.session()
+      const readTxResultPromise = session.readTransaction(async (txc) => {
+        let cypher
+        if (isMember) {
+          cypher = `MATCH (user:User)-[membership:MEMBER_OF]->(group:Group)
+                    WHERE user.id = $userId
+                    AND membership.role IN ['usual', 'admin', 'owner']
+                    RETURN toString(count(group)) AS count`
+        } else {
+          cypher = `MATCH (group:Group)
+                    OPTIONAL MATCH (user:User)-[membership:MEMBER_OF]->(group)
+                    WHERE user.id = $userId
+                    WITH group, membership
+                    WHERE group.groupType IN ['public', 'closed']
+                    OR membership.role IN ['usual', 'admin', 'owner']
+                    RETURN toString(count(group)) AS count`
+        }
+        const transactionResponse = await txc.run(cypher, { userId })
+        return transactionResponse.records.map((record) => record.get('count'))
+      })
+      try {
+        return parseInt(await readTxResultPromise)
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
   },
   Mutation: {
     CreateGroup: async (_parent, params, context, _resolveInfo) => {
