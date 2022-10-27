@@ -38,7 +38,7 @@ export default {
   computed: {
     showMobileMenu() {
       if (!this.windowWidth) return false
-      return this.windowWidth < this.maxMobileWidth
+      return this.windowWidth <= this.maxMobileWidth
     },
   },
   mounted() {
