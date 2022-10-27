@@ -32,7 +32,7 @@ export default {
   data() {
     return {
       windowWidth: null,
-      maxMobileWidth: 811,
+      maxMobileWidth: 810,
     }
   },
   computed: {
