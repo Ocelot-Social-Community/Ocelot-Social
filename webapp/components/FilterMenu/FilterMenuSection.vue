@@ -58,22 +58,22 @@ export default {
     flex-grow: 1;
 
     > .item {
-      width: 50%;
+      width: 30%;
       padding: 0 $space-x-small;
       margin-bottom: $space-small;
       text-align: center;
 
-      @media only screen and (max-width: 800px) {
-        width: 50%;
-      }
+      // @media only screen and (max-width: 800px) {
+      //   width: 30%;
+      // }
 
-      @media only screen and (max-width: 630px) {
-        width: 40%;
-      }
+      // @media only screen and (max-width: 630px) {
+      //   width: 30%;
+      // }
 
-      @media only screen and (max-width: 440px) {
-        width: 30%;
-      }
+      // @media only screen and (max-width: 440px) {
+      //   width: 30%;
+      // }
     }
   }
 
