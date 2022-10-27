@@ -249,6 +249,40 @@ const isMemberOfGroup = rule({
   }
 })
 
+const canCommentPost = rule({
+  cache: 'no_cache',
+})(async (_parent, args, { user, driver }) => {
+  if (!(user && user.id)) return false
+  const { postId } = args
+  const userId = user.id
+  const session = driver.session()
+  const readTxPromise = session.readTransaction(async (transaction) => {
+    const transactionResponse = await transaction.run(
+      `
+        MATCH (post:Post { id: $postId })
+        OPTIONAL MATCH (post)-[:IN]->(group:Group)
+        OPTIONAL MATCH (user:User { id: $userId })-[membership:MEMBER_OF]->(group)
+        RETURN group AS group, membership AS membership
+      `,
+      { postId, userId },
+    )
+    return {
+      group: transactionResponse.records.map((record) => record.get('group'))[0],
+      membership: transactionResponse.records.map((record) => record.get('membership'))[0],
+    }
+  })
+  try {
+    const { group, membership } = await readTxPromise
+    return (
+      !group || (membership && ['usual', 'admin', 'owner'].includes(membership.properties.role))
+    )
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+})
+
 const isAuthor = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
@@ -361,7 +395,7 @@ export default shield(
       unshout: isAuthenticated,
       changePassword: isAuthenticated,
       review: isModerator,
-      CreateComment: isAuthenticated,
+      CreateComment: and(isAuthenticated, canCommentPost),
       UpdateComment: isAuthor,
       DeleteComment: isAuthor,
       DeleteUser: or(isDeletingOwnAccount, isAdmin),
