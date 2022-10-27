@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils'
 import Vue from 'vue'
-import Upload from '.'
+import AvatarUploader from './AvatarUploader'
 
 const localVue = global.localVue
 
-describe('Upload', () => {
+describe('AvatarUploader', () => {
   let wrapper
 
   const mocks = {
@@ -26,21 +26,22 @@ describe('Upload', () => {
   }
 
   const propsData = {
-    user: {
+    profile: {
       avatar: { url: '/api/generic.jpg' },
     },
+    updateMutation: jest.fn(),
   }
 
   beforeEach(() => {
     jest.useFakeTimers()
-    wrapper = shallowMount(Upload, { localVue, propsData, mocks })
+    wrapper = shallowMount(AvatarUploader, { localVue, propsData, mocks })
   })
 
   afterEach(() => {
     jest.clearAllMocks()
   })
 
-  it('sends a the UpdateUser mutation when vddrop is called', () => {
+  it('sends the UpdateUser mutation when vddrop is called', () => {
     wrapper.vm.vddrop([{ filename: 'avatar.jpg' }])
     expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
   })

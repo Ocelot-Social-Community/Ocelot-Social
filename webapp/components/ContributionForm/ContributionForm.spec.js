@@ -4,7 +4,7 @@ import ContributionForm from './ContributionForm.vue'
 import Vuex from 'vuex'
 import PostMutations from '~/graphql/PostMutations.js'
 
-import ImageUploader from '~/components/ImageUploader/ImageUploader'
+import ImageUploader from '~/components/Uploader/ImageUploader'
 import MutationObserver from 'mutation-observer'
 
 global.MutationObserver = MutationObserver
@@ -138,6 +138,7 @@ describe('ContributionForm.vue', () => {
               categoryIds: [],
               id: null,
               image: null,
+              groupId: null,
             },
           }
           postTitleInput = wrapper.find('.ds-input')
@@ -260,6 +261,7 @@ describe('ContributionForm.vue', () => {
               content: propsData.contribution.content,
               categoryIds: [],
               id: propsData.contribution.id,
+              groupId: null,
               image: {
                 sensitive: false,
               },

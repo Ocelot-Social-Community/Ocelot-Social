@@ -1,6 +1,13 @@
 import sanitizeHtml from 'sanitize-html'
 import linkifyHtml from 'linkifyjs/html'
 
+export const removeHtmlTags = (input) => {
+  return sanitizeHtml(input, {
+    allowedTags: [],
+    allowedAttributes: {},
+  })
+}
+
 const standardSanitizeHtmlOptions = {
   allowedTags: [
     'img',

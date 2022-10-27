@@ -12,7 +12,6 @@
       v-tooltip="{
         content: $t(`contribution.category.description.${category.slug}`),
         placement: 'bottom-start',
-        delay: { show: 1500 },
       }"
     >
       {{ $t(`contribution.category.name.${category.slug}`) }}
@@ -22,6 +21,7 @@
 
 <script>
 import CategoryQuery from '~/graphql/CategoryQuery'
+import { CATEGORIES_MAX } from '~/constants/categories.js'
 import xor from 'lodash/xor'
 
 export default {
@@ -37,7 +37,7 @@ export default {
   data() {
     return {
       categories: null,
-      selectedMax: 3,
+      selectedMax: CATEGORIES_MAX,
       selectedCategoryIds: this.existingCategoryIds,
     }
   },

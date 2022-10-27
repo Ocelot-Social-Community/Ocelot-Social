@@ -3,8 +3,20 @@ import gql from 'graphql-tag'
 export default () => {
   return {
     CreatePost: gql`
-      mutation ($title: String!, $content: String!, $categoryIds: [ID], $image: ImageInput) {
-        CreatePost(title: $title, content: $content, categoryIds: $categoryIds, image: $image) {
+      mutation (
+        $title: String!
+        $content: String!
+        $categoryIds: [ID]
+        $image: ImageInput
+        $groupId: ID
+      ) {
+        CreatePost(
+          title: $title
+          content: $content
+          categoryIds: $categoryIds
+          image: $image
+          groupId: $groupId
+        ) {
           title
           slug
           content

@@ -357,15 +357,16 @@
     "placeholder": "Leave your inspirational thoughts …"
   },
   "error-pages": {
-    "403-default": "Not authorized to this page",
-    "404-default": "This page could not be found",
-    "500-default": "Internal Server Error",
-    "503-default": "Service Unavailable",
-    "back-to-index": "Back to index page",
-    "cannot-edit-post": "This post cannot be edited",
-    "default": "An error occurred",
-    "post-not-found": "This post could not be found",
-    "profile-not-found": "This profile could not be found"
+    "403-default": "Not authorized to this page!",
+    "404-default": "This page could not be found!",
+    "500-default": "Internal Server Error!",
+    "503-default": "Service Unavailable!",
+    "back-to-index": "Back to index page!",
+    "cannot-edit-post": "This post cannot be edited!",
+    "default": "An error occurred!",
+    "group-not-found": "This group profile could not be found!",
+    "post-not-found": "This post could not be found!",
+    "profile-not-found": "This profile could not be found!"
   },
   "filter-menu": {
     "all": "All",
@@ -394,10 +395,91 @@
     "follow": "Follow",
     "following": "Following"
   },
+  "group": {
+    "actionRadii": {
+      "continental": "Continental Group",
+      "global": "Global Group",
+      "interplanetary": "Interplanetary Group",
+      "national": "National Group",
+      "regional": "Regional Group"
+    },
+    "actionRadius": "Action radius",
+    "addMemberToGroup": "Add to group",
+    "addUser": "Add User",
+    "addUserPlaceholder": "unique username > @slug-from-user",
+    "allGroups": "All Groups",
+    "categories": "Topic ::: Topics",
+    "changeMemberRole": "The role has been changed to “{role}”!",
+    "contentMenu": {
+      "visitGroupPage": "Show group"
+    },
+    "createNewGroup": {
+      "title": "Create A New Group",
+      "tooltip": "Create a new group"
+    },
+    "description": "Description",
+    "editGroupSettings": {
+      "groupName": "Settings Of “{name}”",
+      "title": "Edit My Group"
+    },
+    "follow": "Follow",
+    "foundation": "Foundation",
+    "general": "General",
+    "goal": "Goal of group",
+    "groupCreated": "The group was created!",
+    "in": "in",
+    "joinLeaveButton": {
+      "iAmMember": "I'm a member",
+      "join": "Join"
+    },
+    "labelSlug": "Unique group name",
+    "leaveModal": {
+      "confirmButton": "Leave",
+      "message": "Leaving a group may be irreversible!<br>Leave group <b>“{name}”</b>!",
+      "title": "Do you really want to leave the group?"
+    },
+    "members": "Members",
+    "membersAdministrationList": {
+      "avatar": "Avatar",
+      "name": "Name",
+      "roleInGroup": "Role",
+      "slug": "Unique name"
+    },
+    "membersCount": "Member ::: Members",
+    "membersListTitle": "Group Members",
+    "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
+    "myGroups": "My Groups",
+    "name": "Group name",
+    "radius": "Radius",
+    "removeMember": "Remove member",
+    "removeMemberButton": "Remove",
+    "role": "Your role in the group",
+    "roles": {
+      "admin": "Administrator",
+      "owner": "Owner",
+      "pending": "Pending Member",
+      "usual": "Simple Member"
+    },
+    "save": "Create new group",
+    "type": "Group type",
+    "types": {
+      "closed": "Closed Group",
+      "hidden": "Hidden Group",
+      "public": "Public Group"
+    },
+    "update": "Save change",
+    "updatedGroup": "The group data has been changed."
+  },
   "hashtags-filter": {
     "clearSearch": "Clear search",
     "hashtag-search": "Searching for #{hashtag}",
     "title": "Your filter bubble"
+  },
+  "header": {
+    "avatarMenu": {
+      "Groups": "Groups",
+      "myProfile": "My profile"
+    }
   },
   "index": {
     "change-filter-settings": "Change your filter settings to get more results.",
@@ -528,7 +610,19 @@
       "submitted": "Comment submitted!",
       "updated": "Changes saved!"
     },
+    "createNewPost": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Create A New Post"
+    },
     "edited": "edited",
+    "editPost": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Edit Your Post"
+    },
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
@@ -541,9 +635,18 @@
     "pinned": "Announcement",
     "takeAction": {
       "name": "Take action"
+    },
+    "viewPost": {
+      "forGroup": {
+        "title": "In The Group “{name}”"
+      },
+      "title": "Post"
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Upload successful!"
+    },
     "commented": "Commented",
     "follow": "Follow",
     "followers": "Followers",
@@ -554,7 +657,6 @@
       "title": "Invite somebody to {APPLICATION_NAME}!"
     },
     "memberSince": "Member since",
-    "name": "My Profile",
     "network": {
       "andMore": "and {number} more …",
       "followedBy": "is followed by:",
@@ -644,11 +746,12 @@
     "failed": "Nothing found",
     "for": "Searching for ",
     "heading": {
+      "Group": "Group ::: Groups",
       "Post": "Post ::: Posts",
       "Tag": "Hashtag ::: Hashtags",
       "User": "User ::: Users"
     },
-    "hint": "What are you searching for? Use !… for posts, @… for users, #… for hashtags.",
+    "hint": "What are you searching for? Use !… for posts, @… for users, &… for groups, #… for hashtags.",
     "no-results": "No results found for \"{search}\". Try a different search term!",
     "page": "Page",
     "placeholder": "Search",
@@ -845,10 +948,5 @@
     "newTermsAndConditions": "New Terms and Conditions",
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Upload successful!"
-    }
   }
 }

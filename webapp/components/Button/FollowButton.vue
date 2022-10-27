@@ -19,7 +19,6 @@ import { followUserMutation, unfollowUserMutation } from '~/graphql/User'
 
 export default {
   name: 'HcFollowButton',
-
   props: {
     followId: { type: String, default: null },
     isFollowed: { type: Boolean, default: false },

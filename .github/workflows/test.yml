@@ -202,6 +202,8 @@ jobs:
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps neo4j backend
       - name: backend | Initialize Database
         run: docker-compose exec -T backend yarn db:migrate init
+      - name: backend | Migrate Database Up
+        run: docker-compose exec -T backend yarn db:migrate up
       - name: backend | Unit test
         run: docker-compose exec -T backend yarn test
       ##########################################################################
@@ -267,7 +269,7 @@ jobs:
           report_name: Coverage Webapp
           type: lcov
           result_path: ./coverage/lcov.info
-          min_coverage: 65
+          min_coverage: 64
           token: ${{ github.token }}
 
   ##############################################################################

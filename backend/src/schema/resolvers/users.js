@@ -4,7 +4,7 @@ import { UserInputError, ForbiddenError } from 'apollo-server'
 import { mergeImage, deleteImage } from './images/images'
 import Resolver from './helpers/Resolver'
 import log from './helpers/databaseLogger'
-import createOrUpdateLocations from './users/location'
+import { createOrUpdateLocations } from './users/location'
 
 const neode = getNeode()
 
@@ -139,9 +139,10 @@ export default {
       return blockedUser.toJson()
     },
     UpdateUser: async (_parent, params, context, _resolveInfo) => {
-      const { termsAndConditionsAgreedVersion } = params
       const { avatar: avatarInput } = params
       delete params.avatar
+      params.locationName = params.locationName === '' ? null : params.locationName
+      const { termsAndConditionsAgreedVersion } = params
       if (termsAndConditionsAgreedVersion) {
         const regEx = new RegExp(/^[0-9]+\.[0-9]+\.[0-9]+$/g)
         if (!regEx.test(termsAndConditionsAgreedVersion)) {
@@ -169,7 +170,8 @@ export default {
       })
       try {
         const user = await writeTxResultPromise
-        await createOrUpdateLocations(params.id, params.locationName, session)
+        // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
+        await createOrUpdateLocations('User', params.id, params.locationName, session)
         return user
       } catch (error) {
         throw new UserInputError(error.message)

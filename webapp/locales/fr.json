@@ -286,6 +286,16 @@
     "follow": "Suivre",
     "following": "Je suis les"
   },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null
+    },
+    "membersCount": null,
+    "membersListTitle": null
+  },
   "hashtags-filter": {
     "clearSearch": "Réinitialiser la recherche",
     "hashtag-search": "Recherche de #{hashtag}",
@@ -423,6 +433,9 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Téléchargement réussi"
+    },
     "commented": "Commentais",
     "follow": "Suivre",
     "followers": "Suiveurs",
@@ -683,10 +696,5 @@
     "newTermsAndConditions": "Nouvelles conditions générales",
     "termsAndConditionsNewConfirm": "J'ai lu et accepté les nouvelles conditions générales.",
     "termsAndConditionsNewConfirmText": "Veuillez lire les nouvelles conditions d'utilisation dès maintenant !"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Téléchargement réussi"
-    }
   }
 }
