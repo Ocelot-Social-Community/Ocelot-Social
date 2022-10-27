@@ -32,13 +32,13 @@ export default {
   data() {
     return {
       windowWidth: null,
-      maxMobileWidth: 811,
+      maxMobileWidth: 810,
     }
   },
   computed: {
     showMobileMenu() {
       if (!this.windowWidth) return false
-      return this.windowWidth < this.maxMobileWidth
+      return this.windowWidth <= this.maxMobileWidth
     },
   },
   mounted() {
