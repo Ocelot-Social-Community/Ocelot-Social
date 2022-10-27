@@ -27,7 +27,7 @@
           :width="{ base: 'auto' }"
           style="margin-right: 20px"
         >
-          <a v-if="item.url" :href="item.url" target="_blank">
+          <a v-if="item.url" :href="item.url" :target="item.target">
             <ds-text size="large" bold>
               {{ $t(item.nameIdent) }}
             </ds-text>

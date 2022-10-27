@@ -4,8 +4,9 @@ import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
   externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
-  target: '_blank',
+
   internalPage: {
+    target: '_blank',
     // footerIdent: 'site.made', // localized string identifier, if undefined default is used
     // headTitleIdent: 'site.made', // localized string identifier, if undefined default is used
     // headlineIdent: 'site.made', // localized string identifier, on null it's hidden, if undefined default is used
@@ -18,8 +19,9 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
   // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
   externalLink: 'https://ocelot-social.herokuapp.com/donations', // if string is defined and not empty it's dominating
-  target: '_blank',
+  
   internalPage: {
+    target: '_blank',
     // footerIdent: 'site.donate', // localized string identifier, if undefined default is used
     // headTitleIdent: 'site.donate', // localized string identifier, if undefined default is used
     // headlineIdent: 'site.donate', // localized string identifier, on null it's hidden, if undefined default is used
@@ -32,8 +34,9 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
   // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
   externalLink: 'https://ocelot-social.herokuapp.com/imprint', // if string is defined and not empty it's dominating
-  target: '_blank',
+
   internalPage: {
+    target: '_blank',
     // footerIdent: 'site.imprint', // localized string identifier, if undefined default is used
     // headTitleIdent: 'site.imprint', // localized string identifier, if undefined default is used
     // headlineIdent: 'site.imprint', // localized string identifier, on null it's hidden, if undefined default is used
@@ -97,8 +100,9 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
 })
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
   externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
-  target: '_blank',
+
   internalPage: {
+    target: '_blank',
     // footerIdent: 'site.support', // localized string identifier, if undefined default is used
     // headTitleIdent: 'site.support', // localized string identifier, if undefined default is used
     // headlineIdent: 'site.support', // on null default is used, on empty string it's hidden

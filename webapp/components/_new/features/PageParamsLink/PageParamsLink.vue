@@ -6,9 +6,10 @@
   >
     <slot />
   </nuxt-link>
-  <a v-else :href="pageParams.externalLink" :target="pageParams.target" :data-test="pageParams.name + '-link'">
+  <a v-else :href="pageParams.externalLink" :target="pageParams.internalPage.target" :data-test="pageParams.name + '-link'">
     <slot />
   </a>
+  
 </template>
 
 <script>
