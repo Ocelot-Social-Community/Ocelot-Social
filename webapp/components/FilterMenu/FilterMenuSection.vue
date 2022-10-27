@@ -42,7 +42,8 @@ export default {
     flex-wrap: wrap;
     flex-basis: 80%;
     flex-grow: 1;
-    max-width: $size-width-filter-sidebar;
+    margin-bottom: 20px;
+    // max-width: $size-width-filter-sidebar;
   }
 
   > .divider {

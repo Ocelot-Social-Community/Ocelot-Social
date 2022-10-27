@@ -6,9 +6,10 @@
         :label="$t('filter-menu.all')"
         icon="check"
         @click="resetCategories"
+        style="margin-right: 20px;"
       />
-      <hr />
       <labeled-button filled :label="$t('actions.save')" icon="save" @click="saveCategories" />
+      <hr />
     </template>
     <template #filter-list>
       <li v-for="category in categories" :key="category.id" class="item">
@@ -38,6 +39,9 @@ export default {
   components: {
     FilterMenuSection,
     LabeledButton,
+  },
+  props: {
+    showMobileMenu: { type: Boolean, default: false },
   },
   data() {
     return {

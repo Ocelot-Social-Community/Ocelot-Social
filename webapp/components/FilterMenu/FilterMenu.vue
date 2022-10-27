@@ -14,7 +14,7 @@
       <div class="filter-menu-options">
         <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
         <following-filter />
-        <categories-filter v-if="categoriesActive" />
+        <categories-filter v-if="categoriesActive" :showMobileMenu="showMobileMenu" />
       </div>
       <div class="filter-menu-options">
         <h2 class="title">{{ $t('filter-menu.order-by') }}</h2>
@@ -46,6 +46,7 @@ export default {
   props: {
     placement: { type: String },
     offset: { type: [String, Number] },
+    showMobileMenu: { type: Boolean, default: false },
   },
   computed: {
     ...mapGetters({
