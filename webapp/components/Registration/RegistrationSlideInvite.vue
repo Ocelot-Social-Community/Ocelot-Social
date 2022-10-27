@@ -17,6 +17,7 @@
       {{ $t('components.registration.invite-code.form.description') }}
     </ds-text>
     <slot></slot>
+    <space-xxx-small />
   </ds-form>
 </template>
 
