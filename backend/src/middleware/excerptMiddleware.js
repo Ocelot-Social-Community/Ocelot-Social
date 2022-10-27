@@ -8,7 +8,8 @@ export default {
       return resolve(root, args, context, info)
     },
     UpdateGroup: async (resolve, root, args, context, info) => {
-      args.descriptionExcerpt = trunc(args.description, DESCRIPTION_EXCERPT_HTML_LENGTH).html
+      if (args.description)
+        args.descriptionExcerpt = trunc(args.description, DESCRIPTION_EXCERPT_HTML_LENGTH).html
       return resolve(root, args, context, info)
     },
     CreatePost: async (resolve, root, args, context, info) => {
