@@ -6,7 +6,7 @@
         :label="$t('filter-menu.all')"
         icon="check"
         @click="resetCategories"
-        style="margin-left: 50px; margin-right: 20px;"
+        style="margin-left: 50px; margin-right: 20px"
       />
       <labeled-button filled :label="$t('actions.save')" icon="save" @click="saveCategories" />
       <hr />

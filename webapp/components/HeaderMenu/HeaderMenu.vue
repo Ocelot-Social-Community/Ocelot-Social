@@ -123,7 +123,7 @@
             style="flex-grow: 0; flex-basis: auto; padding: 20px 0"
           >
             <client-only>
-              <filter-menu v-show="showFilterMenuDropdown" :showMobileMenu="showMobileMenu"/>
+              <filter-menu v-show="showFilterMenuDropdown" :showMobileMenu="showMobileMenu" />
             </client-only>
           </ds-flex-item>
         </ds-flex>
