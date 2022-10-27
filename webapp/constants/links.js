@@ -19,7 +19,7 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
   // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
   externalLink: 'https://ocelot-social.herokuapp.com/donations', // if string is defined and not empty it's dominating
-  
+
   internalPage: {
     target: '_blank',
     // footerIdent: 'site.donate', // localized string identifier, if undefined default is used
