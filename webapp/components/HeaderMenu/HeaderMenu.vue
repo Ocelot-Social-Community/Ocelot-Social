@@ -87,7 +87,7 @@
       </ds-flex>
 
       <!-- mobile header menu -->
-      <div v-else>
+      <div v-else class="mobil-header-box">
         <!-- logo, hamburger-->
         <ds-flex>
           <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
