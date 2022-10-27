@@ -82,3 +82,27 @@ export default {
   },
 }
 </script>
+<style>
+
+section.filter-menu-section.categories-filter > ul button {
+  height: 40px;
+  width: 40px;
+}
+
+section.filter-menu-section.categories-filter > ul label {
+  font-size:small;
+}
+
+@media only screen and (min-width: 800px) {
+  section.filter-menu-section.categories-filter > ul button {
+  height: 50px;
+  width: 50px;
+}
+
+section.filter-menu-section.categories-filter > ul label {
+  font-size: large;
+}
+}
+
+
+</style>

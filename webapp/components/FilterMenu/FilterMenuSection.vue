@@ -63,9 +63,9 @@ export default {
       margin-bottom: $space-small;
       text-align: center;
 
-      // @media only screen and (max-width: 800px) {
-      //   width: 30%;
-      // }
+      @media only screen and (min-width: 800px) {
+        width: 20%;
+      }
 
       // @media only screen and (max-width: 630px) {
       //   width: 30%;
