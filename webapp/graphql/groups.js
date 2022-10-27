@@ -93,7 +93,9 @@ export const updateGroupMutation = () => {
           name
           icon
         }
-        # avatar # test this as result
+        avatar {
+          url
+        }
         locationName
         myRole
       }
