@@ -72,7 +72,9 @@ describe('CategoriesFilter.vue', () => {
 
     describe('click on an "catetories-buttons" button', () => {
       it('calls TOGGLE_CATEGORY when clicked', () => {
-        environmentAndNatureButton = wrapper.findAll('.categories-filter .item-category .base-button').at(0)
+        environmentAndNatureButton = wrapper
+          .findAll('.categories-filter .item-category .base-button')
+          .at(0)
         environmentAndNatureButton.trigger('click')
         expect(mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat4')
       })
