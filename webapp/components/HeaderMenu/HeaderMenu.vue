@@ -178,7 +178,7 @@
           <!-- dynamic branding menu  -->
           <ul v-if="isHeaderMenu" class="dynamic-branding-mobil">
             <li v-for="item in menu" :key="item.name">
-              <a v-if="item.url" :href="item.url" target="_blank">
+              <a v-if="item.url" :href="item.url" :target="item.target">
                 <ds-text size="large" bold>
                   {{ $t(item.nameIdent) }}
                 </ds-text>
