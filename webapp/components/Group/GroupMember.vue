@@ -91,6 +91,7 @@
           v-if="scope.row.myRoleInGroup !== 'owner'"
           size="small"
           primary
+          disabled
           @click="deleteMember(scope.row.id)"
         >
           <!-- TODO: implement removal of group members -->
