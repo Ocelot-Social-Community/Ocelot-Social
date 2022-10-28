@@ -1,7 +1,9 @@
 <template>
-  <filter-menu-section :title="$t('filter-menu.languages')" class="languages-filter">
-    <template #sidebar>
+  <div>
+    <!-- <filter-menu-section :title="$t('filter-menu.languages')" class="languages-filter">
+    <template>
       <labeled-button
+        class="filter-languages"
         :filled="!filteredLanguageCodes.length"
         :label="$t('filter-menu.all')"
         icon="check"
@@ -19,36 +21,37 @@
         </base-button>
       </li>
     </template>
-  </filter-menu-section>
+  </filter-menu-section> -->
+  </div>
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
-import orderBy from 'lodash/orderBy'
-import locales from '~/locales'
-import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
-import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
+// import { mapGetters, mapMutations } from 'vuex'
+// import orderBy from 'lodash/orderBy'
+// import locales from '~/locales'
+// import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
+// import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
 
-export default {
-  components: {
-    FilterMenuSection,
-    LabeledButton,
-  },
-  computed: {
-    ...mapGetters({
-      filteredLanguageCodes: 'posts/filteredLanguageCodes',
-    }),
-  },
-  methods: {
-    ...mapMutations({
-      resetLanguages: 'posts/RESET_LANGUAGES',
-      toggleLanguage: 'posts/TOGGLE_LANGUAGE',
-    }),
-  },
-  data() {
-    return {
-      locales: orderBy(locales, 'name'),
-    }
-  },
-}
+// export default {
+//   components: {
+//     FilterMenuSection,
+//     LabeledButton,
+//   },
+//   computed: {
+//     ...mapGetters({
+//       filteredLanguageCodes: 'posts/filteredLanguageCodes',
+//     }),
+//   },
+//   methods: {
+//     ...mapMutations({
+//       resetLanguages: 'posts/RESET_LANGUAGES',
+//       toggleLanguage: 'posts/TOGGLE_LANGUAGE',
+//     }),
+//   },
+//   data() {
+//     return {
+//       locales: orderBy(locales, 'name'),
+//     }
+//   },
+// }
 </script>
