@@ -92,7 +92,6 @@
           size="small"
           primary
           disabled
-          @click="deleteMember(scope.row.id)"
         >
           <!-- TODO: implement removal of group members -->
           <!--           :disabled="scope.row.myRoleInGroup === 'owner'"
@@ -227,9 +226,9 @@ export default {
     //   this.isOpen = true
     //   this.memberId = row.id
     // },
-    deleteMember(id) {
-      alert('deleteMember: ' + id)
-    },
+    // deleteMember(id) {
+    // alert('deleteMember: ' + id)
+    // },
   },
 }
 </script>
