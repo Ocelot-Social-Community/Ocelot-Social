@@ -78,8 +78,12 @@
                   <invite-button placement="top" />
                 </client-only>
               </div>
+              <!-- group button -->
+              <client-only v-if="SHOW_GROUP_BUTTON_IN_HEADER">
+                <group-button />
+              </client-only>
+              <!-- avatar-menu -->
               <client-only>
-                <!-- avatar-menu -->
                 <avatar-menu placement="top" />
               </client-only>
             </template>
@@ -154,9 +158,18 @@
               <invite-button placement="top" />
             </client-only>
           </ds-flex-item>
+          <!-- group button -->
+          <ds-flex-item
+            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+            style="text-align: center"
+          >
+            <client-only v-if="SHOW_GROUP_BUTTON_IN_HEADER">
+              <group-button />
+            </client-only>
+          </ds-flex-item>
+          <!-- avatar-menu mobile-->
           <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }" style="text-align: end">
             <client-only>
-              <!-- avatar-menu mobile-->
               <avatar-menu placement="top" />
             </client-only>
           </ds-flex-item>
@@ -193,10 +206,12 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
+import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
 import LOGOS from '~/constants/logos.js'
 import headerMenu from '~/constants/headerMenu.js'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
+import GroupButton from '~/components/Group/GroupButton'
 import InviteButton from '~/components/InviteButton/InviteButton'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
@@ -209,6 +224,7 @@ export default {
   components: {
     AvatarMenu,
     FilterMenu,
+    GroupButton,
     InviteButton,
     LocaleSwitch,
     Logo,
@@ -223,6 +239,7 @@ export default {
     return {
       links,
       LOGOS,
+      SHOW_GROUP_BUTTON_IN_HEADER,
       isHeaderMenu: headerMenu.MENU.length > 0,
       menu: headerMenu.MENU,
       mobileSearchVisible: false,
