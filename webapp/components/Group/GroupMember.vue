@@ -87,12 +87,7 @@
         </ds-chip>
       </template>
       <template #edit="scope">
-        <ds-button
-          v-if="scope.row.myRoleInGroup !== 'owner'"
-          size="small"
-          primary
-          disabled
-        >
+        <ds-button v-if="scope.row.myRoleInGroup !== 'owner'" size="small" primary disabled>
           <!-- TODO: implement removal of group members -->
           <!--           :disabled="scope.row.myRoleInGroup === 'owner'"
  -->
