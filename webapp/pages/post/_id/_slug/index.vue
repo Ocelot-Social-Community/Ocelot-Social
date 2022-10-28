@@ -103,7 +103,7 @@
               />
               <ds-space margin-bottom="large" />
               <comment-form
-                v-if="showNewCommentForm && !isBlocked"
+                v-if="showNewCommentForm && !isBlocked && canCommentPost"
                 ref="commentForm"
                 :post="post"
                 @createComment="createComment"
@@ -143,6 +143,7 @@ import {
   sortTagsAlphabetically,
 } from '~/components/utils/PostHelpers'
 import PostQuery from '~/graphql/PostQuery'
+import { groupQuery } from '~/graphql/groups'
 import PostMutations from '~/graphql/PostMutations'
 import links from '~/constants/links.js'
 
@@ -179,6 +180,7 @@ export default {
       blocked: null,
       postAuthor: null,
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
+      group: null,
     }
   },
   mounted() {
@@ -202,14 +204,14 @@ export default {
             },
             // TODO implement
             /* {
-              name: this.$t('common.letsTalk'),
-              path: `/post/${id}/${slug}#lets-talk`
-            }, */
+                name: this.$t('common.letsTalk'),
+                path: `/post/${id}/${slug}#lets-talk`
+                }, */
             // TODO implement
             /* {
-              name: this.$t('common.versus'),
-              path: `/post/${id}/${slug}#versus`
-            } */
+                name: this.$t('common.versus'),
+                path: `/post/${id}/${slug}#versus`
+                } */
           ],
         },
       ]
@@ -246,6 +248,11 @@ export default {
       return {
         '--hero-image-aspect-ratio': 1.0 / this.post.image.aspectRatio,
       }
+    },
+    canCommentPost() {
+      return (
+        !this.post.group || (this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole))
+      )
     },
   },
   methods: {
@@ -308,6 +315,22 @@ export default {
         this.blurred = image && image.sensitive
       },
       fetchPolicy: 'cache-and-network',
+    },
+    Group: {
+      query() {
+        return groupQuery(this.$i18n)
+      },
+      variables() {
+        return {
+          id: this.post && this.post.group ? this.post.group.id : null,
+        }
+      },
+      update({ Group }) {
+        this.group = Group[0]
+      },
+      skip() {
+        return !(this.post && this.post.group)
+      },
     },
   },
 }
