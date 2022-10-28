@@ -1,7 +1,7 @@
 <template>
   <section class="filter-menu-section">
     <h3 v-if="title" class="title">{{ title }}</h3>
-     
+
     <ul class="filter-list">
       <slot name="filter-follower" />
     </ul>

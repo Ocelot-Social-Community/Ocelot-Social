@@ -1,13 +1,13 @@
 <template>
   <filter-menu-section :title="$t('filter-menu.categories')" class="categories-filter">
     <template #filter-themen>
-      <li class="item"> 
+      <li class="item">
         <labeled-button
-        :filled="!filteredCategoryIds.length"
-        :label="$t('filter-menu.all')"
-        icon="check"
-        @click="resetCategories"
-      />
+          :filled="!filteredCategoryIds.length"
+          :label="$t('filter-menu.all')"
+          icon="check"
+          @click="resetCategories"
+        />
       </li>
       <li class="item">
         <labeled-button filled :label="$t('actions.save')" icon="save" @click="saveCategories" />

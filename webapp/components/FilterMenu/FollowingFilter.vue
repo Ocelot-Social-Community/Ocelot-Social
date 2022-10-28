@@ -1,14 +1,15 @@
 <template>
   <filter-menu-section :divider="false" class="following-filter">
     <template #filter-follower>
-      <li class="item"> 
+      <li class="item">
         <labeled-button
-        icon="user-plus"
-        :label="$t('filter-menu.following')"
-        :filled="filteredByUsersFollowed"
-        :title="$t('contribution.filterFollow')"
-        @click="toggleFilteredByFollowed(currentUser.id)"
-      /></li>
+          icon="user-plus"
+          :label="$t('filter-menu.following')"
+          :filled="filteredByUsersFollowed"
+          :title="$t('contribution.filterFollow')"
+          @click="toggleFilteredByFollowed(currentUser.id)"
+        />
+      </li>
     </template>
   </filter-menu-section>
 </template>
