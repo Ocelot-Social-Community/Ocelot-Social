@@ -23,12 +23,33 @@ When you overtake this deploy and rebrand repo to your network you have to recog
 
 ### Deployment/Rebranding PR – chore: 🍰 Implement PRODUCTION_DB_CLEAN_ALLOW for Staging Production Environments #56
 
-- Copy `PRODUCTION_DB_CLEAN_ALLOW` from `deployment/kubernetes/values.template.yaml` to `values.yaml` and set it to `false` for production envireonments and only for several stage test servers to `true`.
+- Copy `PRODUCTION_DB_CLEAN_ALLOW` from `deployment/kubernetes/values.template.yaml` to `values.yaml` and set it to `false` for production environments and only for several stage test servers to `true`.
 
 ### Deployment/Rebranding PR – chore: [WIP] 🍰 Refine docs, first step #46
 
-- Commit: `Update cert-manager apiVersion "cert-manager.io/v1alpha2" to "cert-manager.io/v1"
-  - Check for `kubectl` and `helm` versions.
+Upgrade the cert-manager, but install CRDs of the version 1.0.0-alpha to actually be able to upgrade ocelot. Then uninstall the legacy CRDs and install the correct ones.
+
+```
+# upgrade cert-manager to 1.9.1
+> helm upgrade --set installCRDs=true --version 1.9.1 --namespace cert-manager cert-manager jetstack/cert-manager
+# apply legacy CRDs
+> kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.0.0-alpha.1/cert-manager.crds.yaml
+# upgrade ocelot
+> helm upgrade ocelot ./
+# delete legacy CRDs
+> kubectl delete -f https://github.com/cert-manager/cert-manager/releases/download/v1.0.0-alpha.1/cert-manager.crds.yaml
+# apply CRDs for cert-manager 1.9.1
+> kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.crds.yaml
+```
+
+Background: We had to upgrade cert-manager due to an external dependency - therefore we had to update cert-manager apiVersion `cert-manager.io/v1alpha2` to `cert-manager.io/v1`.
+
+The error occurring when not doing this is the following:
+```
+Error: UPGRADE FAILED: unable to build kubernetes objects from current release manifest: [resource mapping not found for name: "letsencrypt-production" namespace: "" from "": no matches for kind "ClusterIssuer" in version "cert-manager.io/v1alpha2"
+ensure CRDs are installed first, resource mapping not found for name: "letsencrypt-staging" namespace: "" from "": no matches for kind "ClusterIssuer" in version "cert-manager.io/v1alpha2"
+ensure CRDs are installed first]
+```
 
 ## Version >= 1.0.8 with 'ocelotDockerVersionTag' 1.0.8-182
 
@@ -39,4 +60,4 @@ When you overtake this deploy and rebrand repo to your network you have to recog
 
 ## Version 1.0.7 with 'ocelotDockerVersionTag' 1.0.7-171
 
-- No informations.
+- No information.
