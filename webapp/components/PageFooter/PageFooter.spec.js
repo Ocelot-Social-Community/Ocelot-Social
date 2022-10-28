@@ -133,7 +133,8 @@ describe('PageFooter.vue', () => {
             externalLink: {
               url: 'https://ocelot.social/FAQ',
               target: '_blank',
-          } }),
+            },
+          }),
         }
         wrapper = Wrapper()
         wrapper.setData({ links })

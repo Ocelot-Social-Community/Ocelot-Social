@@ -36,10 +36,7 @@ export class PageParams {
       thisComponent.$router.push(this.internalPage.pageRoute)
     } else if (typeof window !== 'undefined') {
       if (this.externalLink.target === '_blank') {
-        window.open(
-          this.externalLink.url,
-          this.externalLink.target,
-        )
+        window.open(this.externalLink.url, this.externalLink.target)
       } else {
         window.location.href = this.externalLink.url
       }
