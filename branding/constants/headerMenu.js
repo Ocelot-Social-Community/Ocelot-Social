@@ -7,6 +7,7 @@ export default {
     // {
     //   nameIdent: 'nameIdent',
     //   url: 'https://ocelot.social',
+    //   target: '_blank',
     // },
   ],
 }
