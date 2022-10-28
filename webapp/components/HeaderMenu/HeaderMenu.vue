@@ -8,12 +8,7 @@
           <a
             v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
             :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
-            :target="
-              LOGOS.LOGO_HEADER_CLICK.externalLink.target ||
-              LOGOS.LOGO_HEADER_CLICK.externalLink.target === ''
-                ? LOGOS.LOGO_HEADER_CLICK.externalLink.target
-                : '_blank'
-            "
+            :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
           >
             <logo logoType="header" />
           </a>
@@ -100,12 +95,7 @@
             <a
               v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
               :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
-              :target="
-                LOGOS.LOGO_HEADER_CLICK.externalLink.target ||
-                LOGOS.LOGO_HEADER_CLICK.externalLink.target === ''
-                  ? LOGOS.LOGO_HEADER_CLICK.externalLink.target
-                  : '_blank'
-              "
+              :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
             >
               <logo logoType="header" />
             </a>
