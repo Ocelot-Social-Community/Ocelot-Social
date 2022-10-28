@@ -1,10 +1,10 @@
 {
-  "name": "yunite.net",
-  "version": "2.1.0",
-  "ocelotDockerVersionTag": "2.1.0-253",
+  "name": "yunite.me",
+  "version": "2.2.0",
+  "ocelotDockerVersionTag": "2.2.0-267",
   "dockerOrganisation": "tirokk",
-  "description": "yunite.net Branded",
-  "author": "yunite.net Community",
+  "description": "yunite.me – Alternatives Netzwerk für eine freie und bunte Zukunft",
+  "author": "yunite – Verein für Vernetzung und Kooperation",
   "license": "MIT",
   "private": false,
   "repository": {

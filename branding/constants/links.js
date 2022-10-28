@@ -3,7 +3,11 @@
 import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
-  externalLink: 'https://yunite.org', // if string is defined and not empty it's dominating
+  // if defined it's dominating
+  externalLink: {
+    url: 'https://yunite.org',
+    target: '',
+  },
 
   internalPage: {
     // footerIdent: 'site.made', // localized string identifier, if undefined default is used
@@ -16,8 +20,11 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
   },
 })
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
-  // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  externalLink: 'https://yunite.org/spenden/', // if string is defined and not empty it's dominating
+  // if defined it's dominating
+  externalLink: {
+    url: 'https://yunite.org/spenden/',
+    target: '',
+  },
 
   internalPage: {
     // footerIdent: 'site.donate', // localized string identifier, if undefined default is used
@@ -30,8 +37,11 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
   },
 })
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
-  // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  externalLink: 'https://yunite.org/impressum/', // if string is defined and not empty it's dominating
+  // if defined it's dominating
+  externalLink: {
+    url: 'https://yunite.org/impressum/',
+    target: '',
+  },
 
   internalPage: {
     footerIdent: 'yuniteRebranding.footer.imprint', // localized string identifier, if undefined default is used
@@ -44,7 +54,7 @@ const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
   },
 })
 const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwrite({
-  // externalLink: null, // if string is defined and not empty it's dominating
+  // externalLink: null, // if defined it's dominating
 
   internalPage: {
     // footerIdent: 'site.termsAndConditions', // localized string identifier, if undefined default is used
@@ -57,7 +67,11 @@ const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwri
   },
 })
 const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
-  externalLink: 'https://yunite.org/ueber-yunite/unsere-werte/', // if string is defined and not empty it's dominating
+  // if defined it's dominating
+  externalLink: {
+    url: 'https://yunite.org/ueber-yunite/unsere-werte/',
+    target: '',
+  },
 
   internalPage: {
     // footerIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
@@ -70,7 +84,11 @@ const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
   },
 })
 const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
-  externalLink: 'https://yunite.org/datenschutz/', // if string is defined and not empty it's dominating
+  // if defined it's dominating
+  externalLink: {
+    url: 'https://yunite.org/datenschutz/',
+    target: '',
+  },
 
   internalPage: {
     footerIdent: 'yuniteRebranding.footer.dataPrivacy', // localized string identifier, if undefined default is used
@@ -83,7 +101,11 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
-  externalLink: 'https://yunite.org/ueber-yunite/faq-hilfe/', // if string is defined and not empty it's dominating
+  // if defined it's dominating
+  externalLink: {
+    url: 'https://yunite.org/ueber-yunite/faq-hilfe/',
+    target: '',
+  },
 
   internalPage: {
     // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
@@ -96,7 +118,11 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
   },
 })
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
-  // externalLink: '', // if string is defined and not empty it's dominating
+  // if defined it's dominating
+  externalLink: {
+    url: 'https://yunite.org/ueber-yunite/faq-hilfe/',
+    target: '',
+  },
 
   internalPage: {
     // footerIdent: 'site.support', // localized string identifier, if undefined default is used

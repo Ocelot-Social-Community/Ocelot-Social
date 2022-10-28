@@ -5,16 +5,18 @@ export default {
       path: '/',
     },
     {
-      nameIdent: 'yuniteRebranding.header.myGroups',
-      path: '/my-groups',
+      nameIdent: 'yuniteRebranding.header.groups',
+      path: '/groups',
     },
     {
       nameIdent: 'yuniteRebranding.header.topics',
       url: 'https://yunite.org/themen/',
+      target: '',
     },
     {
       nameIdent: 'yuniteRebranding.header.about',
       url: 'https://yunite.org',
+      target: '',
     },
   ],
 }
