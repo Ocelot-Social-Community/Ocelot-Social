@@ -8,9 +8,9 @@
     <ul class="filter-list">
       <slot name="filter-themen" />
     </ul>
-    <!-- <aside class="sidebar">
+    <aside class="sidebar">
       <slot name="sidebar" />
-    </aside> -->
+    </aside>
     <!-- <div v-if="divider" class="divider" /> -->
     <ul class="filter-list">
       <slot name="filter-list" />

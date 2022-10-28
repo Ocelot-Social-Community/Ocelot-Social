@@ -1,7 +1,7 @@
 <template>
   <filter-menu-section :divider="false" class="following-filter">
     <template #filter-follower>
-      <li class="item">
+      <li class="item follower-item">
         <labeled-button
           icon="user-plus"
           :label="$t('filter-menu.following')"

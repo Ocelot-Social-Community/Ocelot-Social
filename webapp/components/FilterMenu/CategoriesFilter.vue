@@ -1,7 +1,7 @@
 <template>
   <filter-menu-section :title="$t('filter-menu.categories')" class="categories-filter">
     <template #filter-themen>
-      <li class="item">
+      <li class="item item-all-themen">
         <labeled-button
           :filled="!filteredCategoryIds.length"
           :label="$t('filter-menu.all')"
@@ -9,13 +9,13 @@
           @click="resetCategories"
         />
       </li>
-      <li class="item">
+      <li class="item item-save-themen">
         <labeled-button filled :label="$t('actions.save')" icon="save" @click="saveCategories" />
       </li>
     </template>
 
     <template #filter-list>
-      <li v-for="category in categories" :key="category.id" class="item">
+      <li v-for="category in categories" :key="category.id" class="item item-category">
         <labeled-button
           :icon="category.icon"
           :filled="filteredCategoryIds.includes(category.id)"
