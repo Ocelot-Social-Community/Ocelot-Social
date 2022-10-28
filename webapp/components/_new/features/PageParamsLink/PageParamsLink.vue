@@ -8,7 +8,7 @@
   </nuxt-link>
   <a
     v-else
-    :href="pageParams.externalLink"
+    :href="pageParams.externalLink.url"
     :target="pageParams.internalPage.target"
     :data-test="pageParams.name + '-link'"
   >
