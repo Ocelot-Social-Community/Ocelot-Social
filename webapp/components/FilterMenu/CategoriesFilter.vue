@@ -1,17 +1,23 @@
 <template>
   <filter-menu-section :title="$t('filter-menu.categories')" class="categories-filter">
-    <template #sidebar>
-      <labeled-button
-        :filled="!filteredCategoryIds.length"
-        :label="$t('filter-menu.all')"
-        icon="check"
-        @click="resetCategories"
-      />
+    <template #filter-topics>
+      <li class="item item-all-topics">
+        <labeled-button
+          :filled="!filteredCategoryIds.length"
+          :label="$t('filter-menu.all')"
+          icon="check"
+          @click="resetCategories"
+        />
+      </li>
+      <li class="item item-save-topics">
+        <labeled-button filled :label="$t('actions.save')" icon="save" @click="saveCategories" />
+      </li>
       <hr />
-      <labeled-button filled :label="$t('actions.save')" icon="save" @click="saveCategories" />
+      <ds-space margin="base" />
     </template>
+
     <template #filter-list>
-      <li v-for="category in categories" :key="category.id" class="item">
+      <li v-for="category in categories" :key="category.id" class="item item-category">
         <labeled-button
           :icon="category.icon"
           :filled="filteredCategoryIds.includes(category.id)"
@@ -38,6 +44,9 @@ export default {
   components: {
     FilterMenuSection,
     LabeledButton,
+  },
+  props: {
+    showMobileMenu: { type: Boolean, default: false },
   },
   data() {
     return {

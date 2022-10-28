@@ -92,7 +92,7 @@
       </ds-flex>
 
       <!-- mobile header menu -->
-      <div v-else>
+      <div v-else class="mobil-header-box">
         <!-- logo, hamburger-->
         <ds-flex>
           <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
@@ -139,7 +139,7 @@
             style="flex-grow: 0; flex-basis: auto; padding: 20px 0"
           >
             <client-only>
-              <filter-menu v-show="showFilterMenuDropdown" />
+              <filter-menu v-show="showFilterMenuDropdown" :showMobileMenu="showMobileMenu" />
             </client-only>
           </ds-flex-item>
         </ds-flex>

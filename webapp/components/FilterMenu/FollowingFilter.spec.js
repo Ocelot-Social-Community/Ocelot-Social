@@ -35,12 +35,16 @@ describe('FollowingFilter', () => {
     it('sets "filter-by-followed" button attribute `filled`', () => {
       getters['posts/filteredByUsersFollowed'] = jest.fn(() => true)
       const wrapper = Wrapper()
-      expect(wrapper.find('.following-filter .sidebar .base-button').classes('--filled')).toBe(true)
+      expect(
+        wrapper
+          .find('.following-filter .filter-list .follower-item .base-button')
+          .classes('--filled'),
+      ).toBe(true)
     })
 
     describe('click "filter-by-followed" button', () => {
       it('calls TOGGLE_FILTER_BY_FOLLOWED', () => {
-        wrapper.find('.following-filter .sidebar .base-button').trigger('click')
+        wrapper.find('.following-filter .filter-list .follower-item .base-button').trigger('click')
         expect(mutations['posts/TOGGLE_FILTER_BY_FOLLOWED']).toHaveBeenCalledWith({}, 'u34')
       })
     })
