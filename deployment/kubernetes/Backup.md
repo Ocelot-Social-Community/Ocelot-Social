@@ -17,7 +17,7 @@ $ kubectl config use-context <your-context>
 $ kubectl -n default get pods -o wide
 ```
 
-The very first step is to put the webside into **maintenance mode**.
+The very first step is to put the website into **maintenance mode**.
 
 ### Set Maintenance Mode
 
