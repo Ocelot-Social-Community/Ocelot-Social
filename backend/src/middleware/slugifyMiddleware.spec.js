@@ -213,33 +213,6 @@ describe('slugifyMiddleware', () => {
 
     describe('if group exists', () => {
       describe('if new slug not(!) exists', () => {
-        describe('setting slug by group name', () => {
-          it('has the new slug', async () => {
-            await expect(
-              mutate({
-                mutation: updateGroupMutation(),
-                variables: {
-                  id: createGroupResult.data.CreateGroup.id,
-                  name: 'My Best Group',
-                },
-              }),
-            ).resolves.toMatchObject({
-              data: {
-                UpdateGroup: {
-                  name: 'My Best Group',
-                  slug: 'my-best-group',
-                  about: 'Some about',
-                  description: 'Some description' + descriptionAdditional100,
-                  groupType: 'closed',
-                  actionRadius: 'national',
-                  myRole: 'owner',
-                },
-              },
-              errors: undefined,
-            })
-          })
-        })
-
         describe('setting slug explicitly', () => {
           it('has the new slug', async () => {
             await expect(
@@ -281,33 +254,6 @@ describe('slugifyMiddleware', () => {
               actionRadius: 'national',
               categoryIds,
             },
-          })
-        })
-
-        describe('setting slug by group name', () => {
-          it('has unique slug "*-1"', async () => {
-            await expect(
-              mutate({
-                mutation: updateGroupMutation(),
-                variables: {
-                  id: createGroupResult.data.CreateGroup.id,
-                  name: 'Pre-Existing Group',
-                },
-              }),
-            ).resolves.toMatchObject({
-              data: {
-                UpdateGroup: {
-                  name: 'Pre-Existing Group',
-                  slug: 'pre-existing-group-1',
-                  about: 'Some about',
-                  description: 'Some description' + descriptionAdditional100,
-                  groupType: 'closed',
-                  actionRadius: 'national',
-                  myRole: 'owner',
-                },
-              },
-              errors: undefined,
-            })
           })
         })
 

@@ -333,10 +333,10 @@ export default {
       this.$refs.groupForm.update('description', value)
     },
     submit() {
-      const { name, about, description, groupType, actionRadius, /* locationName, */ categoryIds } =
-        this.formData
+      const { name, slug, about, description, groupType, actionRadius, categoryIds } = this.formData
       const variables = {
         name,
+        slug,
         about,
         description,
         groupType,

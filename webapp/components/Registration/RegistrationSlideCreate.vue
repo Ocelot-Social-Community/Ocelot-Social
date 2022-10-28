@@ -6,6 +6,7 @@
     <ds-text align="center" bold color="success">
       {{ $t('components.registration.create-user-account.success') }}
     </ds-text>
+    <ds-space margin="xxx-small" />
   </div>
   <div v-else-if="response === 'error'">
     <transition name="ds-transition-fade">
@@ -21,6 +22,7 @@
     <ds-space centered>
       <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
     </ds-space>
+    <ds-space margin="xxx-small" />
   </div>
   <div v-else class="create-account-card">
     <ds-form
@@ -112,6 +114,7 @@
           </label>
         </ds-text>
       </template>
+      <ds-space margin="xxx-small" />
     </ds-form>
   </div>
 </template>

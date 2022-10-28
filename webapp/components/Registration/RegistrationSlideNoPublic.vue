@@ -2,6 +2,7 @@
   <ds-space centered>
     <hc-empty icon="events" :message="$t('components.registration.signup.unavailable')" />
     <slot></slot>
+    <ds-space margin="xxx-small" />
   </ds-space>
 </template>
 

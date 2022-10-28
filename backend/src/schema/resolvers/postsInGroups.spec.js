@@ -14,6 +14,7 @@ import {
   profilePagePosts,
   searchPosts,
 } from '../../db/graphql/posts'
+import { createCommentMutation } from '../../db/graphql/comments'
 // eslint-disable-next-line no-unused-vars
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
 import CONFIG from '../../config'
@@ -370,6 +371,170 @@ describe('Posts in Groups', () => {
               id: 'post-to-hidden-group',
               title: 'A post to a hidden group',
               content: 'I am posting into a hidden group as a member of the group',
+            },
+          },
+          errors: undefined,
+        })
+      })
+    })
+  })
+
+  describe('commenting posts in groups', () => {
+    describe('without membership of group', () => {
+      beforeAll(async () => {
+        authenticatedUser = await anyUser.toJson()
+      })
+
+      it('throws an error for public groups', async () => {
+        await expect(
+          mutate({
+            mutation: createCommentMutation,
+            variables: {
+              postId: 'post-to-public-group',
+              content:
+                'I am commenting a post in a public group without being a member of the group',
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: expect.arrayContaining([expect.objectContaining({ message: 'Not Authorized!' })]),
+        })
+      })
+
+      it('throws an error for closed groups', async () => {
+        await expect(
+          mutate({
+            mutation: createCommentMutation,
+            variables: {
+              postId: 'post-to-closed-group',
+              content:
+                'I am commenting a post in a closed group without being a member of the group',
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: expect.arrayContaining([expect.objectContaining({ message: 'Not Authorized!' })]),
+        })
+      })
+
+      it('throws an error for hidden groups', async () => {
+        await expect(
+          mutate({
+            mutation: createCommentMutation,
+            variables: {
+              postId: 'post-to-hidden-group',
+              content:
+                'I am commenting a post in a hidden group without being a member of the group',
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: expect.arrayContaining([expect.objectContaining({ message: 'Not Authorized!' })]),
+        })
+      })
+    })
+
+    describe('as a pending member of group', () => {
+      beforeAll(async () => {
+        authenticatedUser = await pendingUser.toJson()
+      })
+
+      it('throws an error for public groups', async () => {
+        await expect(
+          mutate({
+            mutation: createCommentMutation,
+            variables: {
+              postId: 'post-to-public-group',
+              content: 'I am commenting a post in a public group as a pending member of the group',
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: expect.arrayContaining([expect.objectContaining({ message: 'Not Authorized!' })]),
+        })
+      })
+
+      it('throws an error for closed groups', async () => {
+        await expect(
+          mutate({
+            mutation: createCommentMutation,
+            variables: {
+              postId: 'post-to-closed-group',
+              content: 'I am commenting a post in a closed group  as a pending member of the group',
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: expect.arrayContaining([expect.objectContaining({ message: 'Not Authorized!' })]),
+        })
+      })
+
+      it('throws an error for hidden groups', async () => {
+        await expect(
+          mutate({
+            mutation: createCommentMutation,
+            variables: {
+              postId: 'post-to-hidden-group',
+              content: 'I am commenting a post in a hidden group as a pending member of the group',
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: expect.arrayContaining([expect.objectContaining({ message: 'Not Authorized!' })]),
+        })
+      })
+    })
+
+    describe('as a member of group', () => {
+      beforeAll(async () => {
+        authenticatedUser = await allGroupsUser.toJson()
+      })
+
+      it('comments a post in a public group', async () => {
+        await expect(
+          mutate({
+            mutation: createCommentMutation,
+            variables: {
+              postId: 'post-to-public-group',
+              content: 'I am commenting a post in a public group as a member of the group',
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            CreateComment: {
+              id: expect.any(String),
+            },
+          },
+          errors: undefined,
+        })
+      })
+
+      it('comments a post in a closed group', async () => {
+        await expect(
+          mutate({
+            mutation: createCommentMutation,
+            variables: {
+              postId: 'post-to-closed-group',
+              content: 'I am commenting a post in a closed group as a member of the group',
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            CreateComment: {
+              id: expect.any(String),
+            },
+          },
+          errors: undefined,
+        })
+      })
+
+      it('comments a post in a hidden group', async () => {
+        await expect(
+          mutate({
+            mutation: createCommentMutation,
+            variables: {
+              postId: 'post-to-hidden-group',
+              content: 'I am commenting a post in a hidden group as a member of the group',
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            CreateComment: {
+              id: expect.any(String),
             },
           },
           errors: undefined,
