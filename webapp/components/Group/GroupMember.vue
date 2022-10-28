@@ -221,14 +221,6 @@ export default {
       } finally {
       }
     },
-    // TODO: implement removal of group members
-    // openModal(row) {
-    //   this.isOpen = true
-    //   this.memberId = row.id
-    // },
-    // deleteMember(id) {
-    // alert('deleteMember: ' + id)
-    // },
   },
 }
 </script>
