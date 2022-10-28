@@ -2714,7 +2714,7 @@ describe('in mode', () => {
                     UpdateGroup: {
                       id: 'my-group',
                       name: 'The New Group For Our Country',
-                      slug: 'the-new-group-for-our-country', // changing the slug is tested in the slugifyMiddleware
+                      slug: 'the-best-group', // changing the slug is tested in the slugifyMiddleware
                       about: 'We will change the land!',
                       description: 'Some country relevant description' + descriptionAdditional100,
                       descriptionExcerpt:

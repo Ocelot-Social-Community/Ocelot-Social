@@ -2,7 +2,10 @@
   <div class="progress-bar-component">
     <div class="progress-bar">
       <div class="progress-bar__goal"></div>
-      <div class="progress-bar__progress" :style="progressBarWidth"></div>
+      <div
+        :class="['progress-bar__progress', progressBarColorClass]"
+        :style="progressBarWidth"
+      ></div>
       <div class="progress-bar__border" style="width: 100%">
         <span v-if="label" class="progress-bar__label">{{ label }}</span>
       </div>
@@ -14,6 +17,8 @@
 </template>
 
 <script>
+import { PROGRESS_BAR_COLOR_TYPE } from '~/constants/donation.js'
+
 export default {
   props: {
     goal: {
@@ -31,6 +36,11 @@ export default {
   computed: {
     progressBarWidth() {
       return `width: ${(this.progress / this.goal) * 100}%;`
+    },
+    progressBarColorClass() {
+      return PROGRESS_BAR_COLOR_TYPE === 'gradient'
+        ? 'color-repeating-linear-gradient'
+        : 'color-uni'
     },
   },
 }
@@ -66,15 +76,22 @@ export default {
   left: 0px;
   height: 26px; // styleguide-button-size
   max-width: 100%;
-  background: repeating-linear-gradient(
-    120deg,
-    $color-primary 0px,
-    $color-primary 30px,
-    $color-primary-light 50px,
-    $color-primary-light 75px,
-    $color-primary 95px
-  );
   border-radius: $border-radius-base;
+
+  &.color-uni {
+    background: $color-primary-light;
+  }
+
+  &.color-repeating-linear-gradient {
+    background: repeating-linear-gradient(
+      120deg,
+      $color-primary 0px,
+      $color-primary 30px,
+      $color-primary-light 50px,
+      $color-primary-light 75px,
+      $color-primary 95px
+    );
+  }
 }
 
 .progress-bar__border {
