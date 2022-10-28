@@ -9,7 +9,7 @@
   <a
     v-else
     :href="pageParams.externalLink.url"
-    :target="pageParams.internalPage.target"
+    :target="pageParams.externalLink.target"
     :data-test="pageParams.name + '-link'"
   >
     <slot />
