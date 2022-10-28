@@ -1,7 +1,7 @@
 <template>
   <filter-menu-section :title="$t('filter-menu.categories')" class="categories-filter">
-    <template #filter-themen>
-      <li class="item item-all-themen">
+    <template #filter-topics>
+      <li class="item item-all-topics">
         <labeled-button
           :filled="!filteredCategoryIds.length"
           :label="$t('filter-menu.all')"
@@ -9,9 +9,11 @@
           @click="resetCategories"
         />
       </li>
-      <li class="item item-save-themen">
+      <li class="item item-save-topics">
         <labeled-button filled :label="$t('actions.save')" icon="save" @click="saveCategories" />
       </li>
+      <hr />
+      <ds-space margin="base" />
     </template>
 
     <template #filter-list>

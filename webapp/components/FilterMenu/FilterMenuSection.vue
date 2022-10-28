@@ -6,11 +6,11 @@
       <slot name="filter-follower" />
     </ul>
     <ul class="filter-list">
-      <slot name="filter-themen" />
+      <slot name="filter-topics" />
     </ul>
-    <aside class="sidebar">
+    <!-- <aside class="sidebar">
       <slot name="sidebar" />
-    </aside>
+    </aside> -->
     <!-- <div v-if="divider" class="divider" /> -->
     <ul class="filter-list">
       <slot name="filter-list" />
@@ -21,10 +21,10 @@
 <script>
 export default {
   props: {
-    divider: {
-      type: Boolean,
-      default: true,
-    },
+    // divider: {
+    //   type: Boolean,
+    //   default: true,
+    // },
     title: {
       type: String,
     },
@@ -49,14 +49,14 @@ export default {
   //   flex-wrap: wrap;
   //   flex-basis: 80%;
   //   flex-grow: 1;
-  //   margin-bottom: 20px;
-  //   // max-width: $size-width-filter-sidebar;
+  //   max-width: $size-width-filter-sidebar;
   // }
 
   // > .divider {
-  //   border-left: $border-size-base solid $border-color-soft;
+  //   // border-left: $border-size-base solid $border-color-soft;
   //   margin: $space-small;
   //   margin-left: 0;
+  //   border-top: $border-size-base solid $border-color-soft;
   // }
 
   > .filter-list {
