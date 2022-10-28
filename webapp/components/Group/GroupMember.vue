@@ -87,12 +87,7 @@
         </ds-chip>
       </template>
       <template #edit="scope">
-        <ds-button
-          v-if="scope.row.myRoleInGroup !== 'owner'"
-          size="small"
-          primary
-          @click="deleteMember(scope.row.id)"
-        >
+        <ds-button v-if="scope.row.myRoleInGroup !== 'owner'" size="small" primary disabled>
           <!-- TODO: implement removal of group members -->
           <!--           :disabled="scope.row.myRoleInGroup === 'owner'"
  -->
@@ -220,14 +215,6 @@ export default {
         this.noSlug = true
       } finally {
       }
-    },
-    // TODO: implement removal of group members
-    // openModal(row) {
-    //   this.isOpen = true
-    //   this.memberId = row.id
-    // },
-    deleteMember(id) {
-      alert('deleteMember: ' + id)
     },
   },
 }
