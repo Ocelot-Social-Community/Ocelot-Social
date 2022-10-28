@@ -5,8 +5,8 @@ export default {
       path: '/',
     },
     {
-      nameIdent: 'yuniteRebranding.header.myGroups',
-      path: '/my-groups',
+      nameIdent: 'yuniteRebranding.header.groups',
+      path: '/groups',
     },
     {
       nameIdent: 'yuniteRebranding.header.topics',
