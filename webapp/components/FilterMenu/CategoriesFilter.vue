@@ -1,16 +1,19 @@
 <template>
   <filter-menu-section :title="$t('filter-menu.categories')" class="categories-filter">
-    <template #sidebar>
-      <labeled-button
+    <template #filter-themen>
+      <li class="item"> 
+        <labeled-button
         :filled="!filteredCategoryIds.length"
         :label="$t('filter-menu.all')"
         icon="check"
         @click="resetCategories"
-        style="margin-left: 50px; margin-right: 20px"
       />
-      <labeled-button filled :label="$t('actions.save')" icon="save" @click="saveCategories" />
-      <hr />
+      </li>
+      <li class="item">
+        <labeled-button filled :label="$t('actions.save')" icon="save" @click="saveCategories" />
+      </li>
     </template>
+
     <template #filter-list>
       <li v-for="category in categories" :key="category.id" class="item">
         <labeled-button

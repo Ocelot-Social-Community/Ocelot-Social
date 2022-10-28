@@ -1,10 +1,17 @@
 <template>
   <section class="filter-menu-section">
     <h3 v-if="title" class="title">{{ title }}</h3>
-    <aside class="sidebar">
+     
+    <ul class="filter-list">
+      <slot name="filter-follower" />
+    </ul>
+    <ul class="filter-list">
+      <slot name="filter-themen" />
+    </ul>
+    <!-- <aside class="sidebar">
       <slot name="sidebar" />
-    </aside>
-    <div v-if="divider" class="divider" />
+    </aside> -->
+    <!-- <div v-if="divider" class="divider" /> -->
     <ul class="filter-list">
       <slot name="filter-list" />
     </ul>
@@ -37,25 +44,25 @@ export default {
     font-size: $font-size-base;
   }
 
-  > .sidebar {
-    display: flex;
-    flex-wrap: wrap;
-    flex-basis: 80%;
-    flex-grow: 1;
-    margin-bottom: 20px;
-    // max-width: $size-width-filter-sidebar;
-  }
+  // > .sidebar {
+  //   display: flex;
+  //   flex-wrap: wrap;
+  //   flex-basis: 80%;
+  //   flex-grow: 1;
+  //   margin-bottom: 20px;
+  //   // max-width: $size-width-filter-sidebar;
+  // }
 
-  > .divider {
-    border-left: $border-size-base solid $border-color-soft;
-    margin: $space-small;
-    margin-left: 0;
-  }
+  // > .divider {
+  //   border-left: $border-size-base solid $border-color-soft;
+  //   margin: $space-small;
+  //   margin-left: 0;
+  // }
 
   > .filter-list {
     display: flex;
     flex-wrap: wrap;
-    flex-basis: 80%;
+    flex-basis: 100%;
     flex-grow: 1;
 
     > .item {
@@ -67,14 +74,6 @@ export default {
       @media only screen and (min-width: 800px) {
         width: 20%;
       }
-
-      // @media only screen and (max-width: 630px) {
-      //   width: 30%;
-      // }
-
-      // @media only screen and (max-width: 440px) {
-      //   width: 30%;
-      // }
     }
   }
 
@@ -85,14 +84,14 @@ export default {
       text-align: center;
     }
 
-    > .sidebar {
-      max-width: none;
-    }
+    // > .sidebar {
+    //   max-width: none;
+    // }
 
-    > .divider {
-      border-top: $border-size-base solid $border-color-soft;
-      margin: $space-small;
-    }
+    // > .divider {
+    //   border-top: $border-size-base solid $border-color-soft;
+    //   margin: $space-small;
+    // }
   }
 }
 </style>
