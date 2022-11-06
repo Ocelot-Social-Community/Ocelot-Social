@@ -1,4 +1,4 @@
-import { When } from "cypress-cucumber-preprocessor/steps";
+import { When } from "@badeball/cypress-cucumber-preprocessor";
 import 'cypress-network-idle';
 
 When("I click on the avatar menu in the top right corner", () => {

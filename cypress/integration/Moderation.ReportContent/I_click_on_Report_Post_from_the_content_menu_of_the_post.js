@@ -1,4 +1,4 @@
-import { When } from "cypress-cucumber-preprocessor/steps";
+import { When } from "@badeball/cypress-cucumber-preprocessor";
 
 When('I click on "Report Post" from the content menu of the post', () => {
   cy.contains('.base-card', 'The Truth about the Holocaust')

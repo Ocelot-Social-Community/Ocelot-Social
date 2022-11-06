@@ -1,4 +1,4 @@
-import { Then } from "cypress-cucumber-preprocessor/steps";
+import { Then } from "@badeball/cypress-cucumber-preprocessor";
 
 Then("the post was saved successfully with the {string} teaser image", condition => {
   cy.get(".base-card > .title")

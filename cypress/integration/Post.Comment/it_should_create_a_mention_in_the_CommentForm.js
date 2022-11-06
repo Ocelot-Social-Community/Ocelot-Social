@@ -1,4 +1,4 @@
-import { Then } from "cypress-cucumber-preprocessor/steps";
+import { Then } from "@badeball/cypress-cucumber-preprocessor";
 
 Then("it should create a mention in the CommentForm", () => {
   cy.get(".ProseMirror a")

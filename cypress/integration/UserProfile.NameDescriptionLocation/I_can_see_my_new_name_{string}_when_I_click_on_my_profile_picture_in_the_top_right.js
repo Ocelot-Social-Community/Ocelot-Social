@@ -1,4 +1,4 @@
-import { Then } from "cypress-cucumber-preprocessor/steps";
+import { Then } from "@badeball/cypress-cucumber-preprocessor";
 
 Then('I can see my new name {string} when I click on my profile picture in the top right', name => {
   cy.get(".avatar-menu").then(($menu) => {

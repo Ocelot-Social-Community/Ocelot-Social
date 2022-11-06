@@ -1,4 +1,4 @@
-import { Then } from "cypress-cucumber-preprocessor/steps";
+import { Then } from "@badeball/cypress-cucumber-preprocessor";
 
 Then("I should have one item in the select dropdown", () => {
   cy.get(".searchable-input .ds-select-dropdown").should($li => {

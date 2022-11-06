@@ -1,3 +1,5 @@
+import { Given } from "@badeball/cypress-cucumber-preprocessor";
+
 Given("there is an annoying user who has muted me", () => {
   cy.neode()
     .first("User", {

@@ -1,5 +1,5 @@
-import { Given } from "cypress-cucumber-preprocessor/steps";
-import encode from '../../../backend/src/jwt/encode'
+import { Given } from "@badeball/cypress-cucumber-preprocessor";
+import encode from '../../../../backend/src/jwt/encode'
 
 Given("I am logged in as {string}", slug => {
   cy.neode()

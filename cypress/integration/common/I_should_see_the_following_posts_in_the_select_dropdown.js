@@ -1,4 +1,4 @@
-import { Then } from "cypress-cucumber-preprocessor/steps";
+import { Then } from "@badeball/cypress-cucumber-preprocessor";
 
 Then("I should see the following posts in the select dropdown:", table => {
   table.hashes().forEach(({ title }) => {

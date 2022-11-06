@@ -1,5 +1,4 @@
-import { When } from "cypress-cucumber-preprocessor/steps";
-import 'cypress-network-idle';
+import { When } from "@badeball/cypress-cucumber-preprocessor";
 
 When("I click on {string}", element => {
   const elementSelectors = {

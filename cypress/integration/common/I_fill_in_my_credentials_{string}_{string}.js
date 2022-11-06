@@ -1,4 +1,4 @@
-import { When } from "cypress-cucumber-preprocessor/steps";
+import { When } from "@badeball/cypress-cucumber-preprocessor";
 
 When("I fill in my credentials {string} {string}", (email,password) => {
   cy.get("input[name=email]")
