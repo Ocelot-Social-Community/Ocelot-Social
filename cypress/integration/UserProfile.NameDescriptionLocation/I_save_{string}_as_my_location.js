@@ -1,4 +1,4 @@
-import { When } from "cypress-cucumber-preprocessor/steps";
+import { When } from "@badeball/cypress-cucumber-preprocessor";
 
 When('I save {string} as my location', location => {
     cy.get('input[id=city]').type(location)

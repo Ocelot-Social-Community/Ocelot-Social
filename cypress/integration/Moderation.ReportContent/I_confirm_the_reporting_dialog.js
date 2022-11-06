@@ -1,4 +1,4 @@
-import { When } from "cypress-cucumber-preprocessor/steps";
+import { When } from "@badeball/cypress-cucumber-preprocessor";
 
 When(/^I confirm the reporting dialog .*:$/, message => {
   cy.contains(message) // wait for element to become visible

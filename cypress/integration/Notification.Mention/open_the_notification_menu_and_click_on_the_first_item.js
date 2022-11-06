@@ -1,4 +1,4 @@
-import { When } from "cypress-cucumber-preprocessor/steps";
+import { When } from "@badeball/cypress-cucumber-preprocessor";
 
 When("open the notification menu and click on the first item", () => {
   cy.get(".notifications-menu")

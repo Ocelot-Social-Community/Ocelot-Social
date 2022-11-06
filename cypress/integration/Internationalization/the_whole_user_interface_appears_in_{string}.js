@@ -1,5 +1,5 @@
-import { Then } from "cypress-cucumber-preprocessor/steps";
-import locales from '../../../webapp/locales'
+import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import locales from '../../../../webapp/locales'
 
 Then("the whole user interface appears in {string}", language => {
   const { code } = locales.find((entry) => entry.name === language);
