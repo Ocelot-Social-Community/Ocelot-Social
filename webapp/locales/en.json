@@ -422,6 +422,9 @@
       "groupName": "Settings Of “{name}”",
       "title": "Edit My Group"
     },
+    "errors": {
+      "userAlreadyMember": "User @{slug} is already a member"
+    },
     "follow": "Follow",
     "foundation": "Foundation",
     "general": "General",

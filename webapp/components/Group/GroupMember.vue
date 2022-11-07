@@ -179,12 +179,17 @@ export default {
     },
     async addMemberToGroup() {
       const newRole = 'usual'
+      if (this.groupMembers.find((member) => member.id === this.slugUser[0].id)) {
+        this.$toast.error(
+          this.$t('group.errors.userAlreadyMember', { slug: this.slugUser[0].slug }),
+        )
+        return
+      }
       try {
         await this.$apollo.mutate({
           mutation: changeGroupMemberRoleMutation(),
           variables: { groupId: this.groupId, userId: this.slugUser[0].id, roleInGroup: newRole },
         })
-        // this.$apollo.queries.GroupMembers.refetch()
         this.$emit('loadGroupMembers')
         this.slugUser = []
         this.form.query = ''
