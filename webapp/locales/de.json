@@ -422,6 +422,9 @@
       "groupName": "Einstellungen für „{name}“",
       "title": "Meine Gruppe ändern"
     },
+    "errors": {
+      "userAlreadyMember": "Nutzer @{slug} ist bereits Mitglied"
+    },
     "follow": "Folge",
     "foundation": "Gründung",
     "general": "Allgemein",
