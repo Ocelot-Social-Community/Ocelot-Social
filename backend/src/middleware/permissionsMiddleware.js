@@ -143,16 +143,20 @@ const isAllowedToChangeGroupMemberRole = rule({
   })
   try {
     const { admin, group, member } = await readTxPromise
+    const groupExists = !!group
+    const adminExists = !!admin
+    const userIsMember = !!member
+    const sameUserRoleInGroup = member && member.myRoleInGroup === roleInGroup
+    const userIsOwner = member && ['owner'].includes(member.myRoleInGroup)
+    const adminIsAdmin = admin && ['admin'].includes(admin.myRoleInGroup)
+    const adminCanSetRole = ['pending', 'usual', 'admin'].includes(roleInGroup)
+    const adminIsOwner = admin && ['owner'].includes(admin.myRoleInGroup)
+    const ownerCanSetRole = ['pending', 'usual', 'admin', 'owner'].includes(roleInGroup)
     return (
-      !!group &&
-      !!admin &&
-      (!member ||
-        (!!member &&
-          (member.myRoleInGroup === roleInGroup || !['owner'].includes(member.myRoleInGroup)))) &&
-      ((['admin'].includes(admin.myRoleInGroup) &&
-        ['pending', 'usual', 'admin'].includes(roleInGroup)) ||
-        (['owner'].includes(admin.myRoleInGroup) &&
-          ['pending', 'usual', 'admin', 'owner'].includes(roleInGroup)))
+      groupExists &&
+      adminExists &&
+      (!userIsMember || (userIsMember && (sameUserRoleInGroup || !userIsOwner))) &&
+      ((adminIsAdmin && adminCanSetRole) || (adminIsOwner && ownerCanSetRole))
     )
   } catch (error) {
     throw new Error(error)
