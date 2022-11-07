@@ -112,7 +112,7 @@ export default {
       let mutation, variables, successMessage
       if (isCreation) {
         mutation = gql`
-          mutation($url: String!) {
+          mutation ($url: String!) {
             CreateSocialMedia(url: $url) {
               id
               url
@@ -123,7 +123,7 @@ export default {
         successMessage = thisList.$t('settings.social-media.successAdd')
       } else {
         mutation = gql`
-          mutation($id: ID!, $url: String!) {
+          mutation ($id: ID!, $url: String!) {
             UpdateSocialMedia(id: $id, url: $url) {
               id
               url
@@ -160,7 +160,7 @@ export default {
       try {
         await thisList.$apollo.mutate({
           mutation: gql`
-            mutation($id: ID!) {
+            mutation ($id: ID!) {
               DeleteSocialMedia(id: $id) {
                 id
                 url

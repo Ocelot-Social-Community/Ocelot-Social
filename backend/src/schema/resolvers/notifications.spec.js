@@ -165,7 +165,7 @@ describe('given some notifications', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const { errors } = await query({ query: notificationQuery })
-        expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -313,7 +313,7 @@ describe('given some notifications', () => {
           mutation: markAsReadMutation,
           variables: { ...variables, id: 'p1' },
         })
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 

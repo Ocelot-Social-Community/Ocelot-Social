@@ -166,6 +166,16 @@
     "follow": "naśladować",
     "following": "w skutek"
   },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null
+    },
+    "membersCount": null,
+    "membersListTitle": null
+  },
   "hashtags-filter": {
     "title": "Twoja bańka filtrująca"
   },
@@ -208,6 +218,9 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Przesłano pomyślnie"
+    },
     "commented": "Skomentuj",
     "follow": "Obserwuj",
     "followers": "Obserwujący",
@@ -278,7 +291,7 @@
   },
   "search": {
     "failed": "Niczego nie znaleziono",
-    "hint": "Czego szukasz?",
+    "hint": "Czego szukasz? Użyj !... dla postów, @... dla użytkowników, #... dla hashtagów.",
     "placeholder": "Szukaj"
   },
   "settings": {
@@ -356,10 +369,5 @@
     "taxident": "Numer identyfikacyjny podatku od wartości dodanej zgodnie z § 27 a Ustawa o podatku od wartości dodanej (Niemcy)",
     "termsAc": "Warunki użytkowania",
     "tribunal": "sąd rejestrowy"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Przesłano pomyślnie"
-    }
   }
 }

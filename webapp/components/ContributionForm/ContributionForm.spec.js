@@ -4,7 +4,7 @@ import ContributionForm from './ContributionForm.vue'
 import Vuex from 'vuex'
 import PostMutations from '~/graphql/PostMutations.js'
 
-import ImageUploader from '~/components/ImageUploader/ImageUploader'
+import ImageUploader from '~/components/Uploader/ImageUploader'
 import MutationObserver from 'mutation-observer'
 
 global.MutationObserver = MutationObserver
@@ -57,6 +57,9 @@ describe('ContributionForm.vue', () => {
       $router: {
         back: jest.fn(),
         push: jest.fn(),
+      },
+      $env: {
+        CATEGORIES_ACTIVE: false,
       },
     }
     propsData = {}
@@ -132,8 +135,10 @@ describe('ContributionForm.vue', () => {
             variables: {
               title: postTitle,
               content: postContent,
+              categoryIds: [],
               id: null,
               image: null,
+              groupId: null,
             },
           }
           postTitleInput = wrapper.find('.ds-input')
@@ -198,7 +203,7 @@ describe('ContributionForm.vue', () => {
         beforeEach(async () => {
           jest.useFakeTimers()
           mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({
-            message: 'Not Authorised!',
+            message: 'Not Authorized!',
           })
           wrapper = Wrapper()
           postTitleInput = wrapper.find('.ds-input')
@@ -209,7 +214,7 @@ describe('ContributionForm.vue', () => {
         it('shows an error toaster when apollo mutation rejects', async () => {
           await wrapper.find('form').trigger('submit')
           await mocks.$apollo.mutate
-          await expect(mocks.$toast.error).toHaveBeenCalledWith('Not Authorised!')
+          await expect(mocks.$toast.error).toHaveBeenCalledWith('Not Authorized!')
         })
       })
     })
@@ -254,7 +259,9 @@ describe('ContributionForm.vue', () => {
             variables: {
               title: propsData.contribution.title,
               content: propsData.contribution.content,
+              categoryIds: [],
               id: propsData.contribution.id,
+              groupId: null,
               image: {
                 sensitive: false,
               },

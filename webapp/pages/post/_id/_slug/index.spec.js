@@ -56,6 +56,10 @@ describe('PostSlug', () => {
         },
         $route: {
           hash: '',
+          params: {
+            slug: 'slug',
+            id: 'id',
+          },
         },
         // If you are mocking the router, then don't use VueRouter with localVue: https://vue-test-utils.vuejs.org/guides/using-with-vue-router.html
         $router: {
@@ -72,6 +76,9 @@ describe('PostSlug', () => {
           query: jest.fn().mockResolvedValue({ data: { PostEmotionsCountByEmotion: {} } }),
         },
         $scrollTo: jest.fn(),
+        $env: {
+          CATEGORIES_ACTIVE: false,
+        },
       }
       stubs = {
         HcEditor: { render: () => {}, methods: { insertReply: jest.fn(() => null) } },

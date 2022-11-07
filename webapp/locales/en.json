@@ -11,7 +11,7 @@
   "admin": {
     "categories": {
       "categoryName": "Name",
-      "name": "Categories",
+      "name": "Topics",
       "postCount": "Posts"
     },
     "dashboard": {
@@ -98,7 +98,7 @@
     }
   },
   "common": {
-    "category": "Category ::: Categories",
+    "category": "Topic ::: Topics",
     "comment": "Comment ::: Comments",
     "letsTalk": "Let`s Talk",
     "loading": "loading",
@@ -113,7 +113,7 @@
     "takeAction": "Take Action",
     "user": "User ::: Users",
     "validations": {
-      "categories": "at least one and at most three categories must be selected",
+      "categories": "at least one and at most three topics must be selected",
       "email": "must be a valid e-mail address",
       "url": "must be a valid URL"
     },
@@ -214,26 +214,50 @@
     "amount-shouts": "{amount} recommendations",
     "amount-views": "{amount} views",
     "categories": {
-      "infoSelectedNoOfMaxCategories": "{chosen} of {max} categories selected"
+      "infoSelectedNoOfMaxCategories": "{chosen} of {max} topics selected"
     },
     "category": {
+      "description": {
+        "body-and-excercise": "Sports, yoga, massage, relaxation",
+        "children": "Family, education, school, imprinting",
+        "culture": "Art, theatre, music, photography, film",
+        "economy": "Trade, consumption, marketing, supply chains",
+        "energy": "Oil, gas, coal, wind, hydrodynamic power, biogas, atomic energy",
+        "finance": "Money, financial system, alternative currencies",
+        "health": "Medicine, nutrition, WHO, vaccination, harmful substances",
+        "home": "Construction, communities, tiny houses, kitchen garden",
+        "it-and-media": "News, manipulation, privacy, control, data leeches, AI, software, apps",
+        "law": "Human rights, laws, decrees",
+        "miscellaneous": "Miscellaneous",
+        "mobility": "Travel, traffic, electric mobility",
+        "nature": "Animals, plants, agriculture, ecologu, biodiversity",
+        "networking": "Cooperation, action alliances, solidarity, help",
+        "peace": "War, military, social defence, arms, cyber attacks",
+        "politics": "Democracy, participation, elections, corruption, parties",
+        "psyche": "Soul, feelings, happiness",
+        "science": "Education, university, publications",
+        "spirituality": "Religion, values, ethics"
+      },
       "name": {
-        "animal-protection": "Animal Protection",
-        "art-culture-sport": "Art, Culture, & Sport",
-        "consumption-sustainability": "Consumption & Sustainability",
-        "cooperation-development": "Cooperation & Development",
-        "democracy-politics": "Democracy & Politics",
-        "economy-finances": "Economy & Finances",
-        "education-sciences": "Education & Sciences",
-        "energy-technology": "Energy & Technology",
-        "environment-nature": "Environment & Nature",
-        "freedom-of-speech": "Freedom of Speech",
-        "global-peace-nonviolence": "Global Peace & Nonviolence",
-        "happiness-values": "Happiness & Values",
-        "health-wellbeing": "Health & Wellbeing",
-        "human-rights-justice": "Human Rights & Justice",
-        "it-internet-data-privacy": "IT, Internet & Data Privacy",
-        "just-for-fun": "Just for Fun"
+        "body-and-excercise": "Body & Excercise",
+        "children": "Children",
+        "culture": "Culture",
+        "economy": "Economy",
+        "energy": "Energy",
+        "finance": "Finance",
+        "health": "Health",
+        "home": "Home",
+        "it-and-media": "IT & Media",
+        "law": "Law",
+        "miscellaneous": "Miscellaneous",
+        "mobility": "Mobility",
+        "nature": "Nature",
+        "networking": "Networking",
+        "peace": "Peace",
+        "politics": "Politics",
+        "psyche": "Psyche",
+        "science": "Science",
+        "spirituality": "Spirituality"
       }
     },
     "emotions-label": {
@@ -333,19 +357,20 @@
     "placeholder": "Leave your inspirational thoughts …"
   },
   "error-pages": {
-    "403-default": "Not authorized to this page",
-    "404-default": "This page could not be found",
-    "500-default": "Internal Server Error",
-    "503-default": "Service Unavailable",
-    "back-to-index": "Back to index page",
-    "cannot-edit-post": "This post cannot be edited",
-    "default": "An error occurred",
-    "post-not-found": "This post could not be found",
-    "profile-not-found": "This profile could not be found"
+    "403-default": "Not authorized to this page!",
+    "404-default": "This page could not be found!",
+    "500-default": "Internal Server Error!",
+    "503-default": "Service Unavailable!",
+    "back-to-index": "Back to index page!",
+    "cannot-edit-post": "This post cannot be edited!",
+    "default": "An error occurred!",
+    "group-not-found": "This group profile could not be found!",
+    "post-not-found": "This post could not be found!",
+    "profile-not-found": "This profile could not be found!"
   },
   "filter-menu": {
     "all": "All",
-    "categories": "Categories of Content",
+    "categories": "Topics",
     "emotions": "Emotions",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
@@ -360,16 +385,101 @@
         "label": "Oldest first"
       }
     },
-    "order-by": "Order by ..."
+    "order-by": "Order by ...",
+    "save": {
+      "error": "Failed saving topic settings!",
+      "success": "Topics saved!"
+    }
   },
   "followButton": {
     "follow": "Follow",
     "following": "Following"
   },
+  "group": {
+    "actionRadii": {
+      "continental": "Continental Group",
+      "global": "Global Group",
+      "interplanetary": "Interplanetary Group",
+      "national": "National Group",
+      "regional": "Regional Group"
+    },
+    "actionRadius": "Action radius",
+    "addMemberToGroup": "Add to group",
+    "addUser": "Add User",
+    "addUserPlaceholder": "unique username > @slug-from-user",
+    "allGroups": "All Groups",
+    "categories": "Topic ::: Topics",
+    "changeMemberRole": "The role has been changed to “{role}”!",
+    "contentMenu": {
+      "visitGroupPage": "Show group"
+    },
+    "createNewGroup": {
+      "title": "Create A New Group",
+      "tooltip": "Create a new group"
+    },
+    "description": "Description",
+    "editGroupSettings": {
+      "groupName": "Settings Of “{name}”",
+      "title": "Edit My Group"
+    },
+    "follow": "Follow",
+    "foundation": "Foundation",
+    "general": "General",
+    "goal": "Goal of group",
+    "groupCreated": "The group was created!",
+    "in": "in",
+    "joinLeaveButton": {
+      "iAmMember": "I'm a member",
+      "join": "Join"
+    },
+    "labelSlug": "Unique group name",
+    "leaveModal": {
+      "confirmButton": "Leave",
+      "message": "Leaving a group may be irreversible!<br>Leave group <b>“{name}”</b>!",
+      "title": "Do you really want to leave the group?"
+    },
+    "members": "Members",
+    "membersAdministrationList": {
+      "avatar": "Avatar",
+      "name": "Name",
+      "roleInGroup": "Role",
+      "slug": "Unique name"
+    },
+    "membersCount": "Member ::: Members",
+    "membersListTitle": "Group Members",
+    "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
+    "myGroups": "My Groups",
+    "name": "Group name",
+    "radius": "Radius",
+    "removeMember": "Remove member",
+    "removeMemberButton": "Remove",
+    "role": "Your role in the group",
+    "roles": {
+      "admin": "Administrator",
+      "owner": "Owner",
+      "pending": "Pending Member",
+      "usual": "Simple Member"
+    },
+    "save": "Create new group",
+    "type": "Group type",
+    "types": {
+      "closed": "Closed Group",
+      "hidden": "Hidden Group",
+      "public": "Public Group"
+    },
+    "update": "Save change",
+    "updatedGroup": "The group data has been changed."
+  },
   "hashtags-filter": {
     "clearSearch": "Clear search",
     "hashtag-search": "Searching for #{hashtag}",
     "title": "Your filter bubble"
+  },
+  "header": {
+    "avatarMenu": {
+      "Groups": "Groups",
+      "myProfile": "My profile"
+    }
   },
   "index": {
     "change-filter-settings": "Change your filter settings to get more results.",
@@ -467,7 +577,7 @@
       "noDecision": "No decision!",
       "numberOfUsers": "{count} users",
       "previousDecision": "Previous decision:",
-      "reasonCategory": "Category",
+      "reasonCategory": "Topic",
       "reasonDescription": "Description",
       "reportedOn": "Date",
       "status": "Current status",
@@ -500,7 +610,19 @@
       "submitted": "Comment submitted!",
       "updated": "Changes saved!"
     },
+    "createNewPost": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Create A New Post"
+    },
     "edited": "edited",
+    "editPost": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Edit Your Post"
+    },
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
@@ -513,9 +635,18 @@
     "pinned": "Announcement",
     "takeAction": {
       "name": "Take action"
+    },
+    "viewPost": {
+      "forGroup": {
+        "title": "In The Group “{name}”"
+      },
+      "title": "Post"
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Upload successful!"
+    },
     "commented": "Commented",
     "follow": "Follow",
     "followers": "Followers",
@@ -526,7 +657,6 @@
       "title": "Invite somebody to {APPLICATION_NAME}!"
     },
     "memberSince": "Member since",
-    "name": "My Profile",
     "network": {
       "andMore": "and {number} more …",
       "followedBy": "is followed by:",
@@ -584,8 +714,8 @@
     },
     "reason": {
       "category": {
-        "invalid": "Please select a valid category",
-        "label": "Select a category:",
+        "invalid": "Please select a valid topic",
+        "label": "Select a topic:",
         "options": {
           "advert_products_services_commercial": "Advertising products and services with commercial intent.",
           "criminal_behavior_violation_german_law": "Criminal behavior or violation of German law.",
@@ -596,7 +726,7 @@
           "other": "Other …",
           "pornographic_content_links": "Posting or linking of clearly pornographic material."
         },
-        "placeholder": "Category …"
+        "placeholder": "Topic …"
       },
       "description": {
         "label": "Please explain: Why you like to report this?",
@@ -616,11 +746,12 @@
     "failed": "Nothing found",
     "for": "Searching for ",
     "heading": {
+      "Group": "Group ::: Groups",
       "Post": "Post ::: Posts",
       "Tag": "Hashtag ::: Hashtags",
       "User": "User ::: Users"
     },
-    "hint": "What are you searching for?",
+    "hint": "What are you searching for? Use !… for posts, @… for users, &… for groups, #… for hashtags.",
     "no-results": "No results found for \"{search}\". Try a different search term!",
     "page": "Page",
     "placeholder": "Search",
@@ -817,10 +948,5 @@
     "newTermsAndConditions": "New Terms and Conditions",
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Upload successful!"
-    }
   }
 }

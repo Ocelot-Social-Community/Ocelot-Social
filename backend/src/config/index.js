@@ -22,6 +22,8 @@ const environment = {
   DEBUG: env.NODE_ENV !== 'production' && env.DEBUG,
   TEST: env.NODE_ENV === 'test',
   PRODUCTION: env.NODE_ENV === 'production',
+  // used for staging enviroments if 'PRODUCTION=true' and 'PRODUCTION_DB_CLEAN_ALLOW=true'
+  PRODUCTION_DB_CLEAN_ALLOW: env.PRODUCTION_DB_CLEAN_ALLOW === 'true' || false, // default = false
   DISABLED_MIDDLEWARES: (env.NODE_ENV !== 'production' && env.DISABLED_MIDDLEWARES) || false,
 }
 
@@ -84,6 +86,7 @@ const options = {
   ORGANIZATION_URL: emails.ORGANIZATION_LINK,
   PUBLIC_REGISTRATION: env.PUBLIC_REGISTRATION === 'true' || false,
   INVITE_REGISTRATION: env.INVITE_REGISTRATION !== 'false', // default = true
+  CATEGORIES_ACTIVE: process.env.CATEGORIES_ACTIVE === 'true' || false,
 }
 
 // Check if all required configs are present

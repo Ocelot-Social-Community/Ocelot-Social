@@ -7,8 +7,9 @@ Run the following command to install everything through docker.
 The installation takes a bit longer on the first pass or on rebuild ...
 
 ```bash
+# in main folder
 $ docker-compose up
-
+# or
 # rebuild the containers for a cleanup
 $ docker-compose up --build
 ```
@@ -28,6 +29,7 @@ between different local node versions.
 Install node dependencies with [yarn](https://yarnpkg.com/en/):
 
 ```bash
+# in main folder
 $ cd backend
 $ yarn install
 ```
@@ -45,12 +47,14 @@ a [local Neo4J](http://localhost:7474) instance is up and running.
 Start the backend for development with:
 
 ```bash
+# in backend/
 $ yarn run dev
 ```
 
 or start the backend in production environment with:
 
 ```bash
+# in backend/
 $ yarn run start
 ```
 
@@ -60,6 +64,7 @@ your `.env` configuration file.
 Your backend is up and running at [http://localhost:4000/](http://localhost:4000/)
 This will start the GraphQL service \(by default on localhost:4000\) where you
 can issue GraphQL requests or access GraphQL Playground in the browser.
+More details about our GraphQL playground and how to use it with ocelot.social can be found [here](./src/graphql/GraphQL-Playground.md).
 
 ![GraphQL Playground](../.gitbook/assets/graphql-playground.png)
 
@@ -72,6 +77,7 @@ backend is running:
 {% tab title="Docker" %}
 
 ```bash
+# in main folder while docker-compose is running
 $ docker-compose exec backend yarn run db:migrate init
 ```
 
@@ -79,7 +85,7 @@ $ docker-compose exec backend yarn run db:migrate init
 {% tab title="Without Docker" %}
 
 ```bash
-# in folder backend/
+# in folder backend/ while database is running
 # make sure your database is running on http://localhost:7474/browser/
 yarn run db:migrate init
 ```
@@ -98,12 +104,14 @@ need to seed your database:
 In another terminal run:
 
 ```bash
+# in main folder while docker-compose is running
 $ docker-compose exec backend yarn run db:seed
 ```
 
 To reset the database run:
 
 ```bash
+# in main folder while docker-compose is running
 $ docker-compose exec backend yarn run db:reset
 # you could also wipe out your neo4j database and delete all volumes with:
 $ docker-compose down -v
@@ -117,12 +125,14 @@ $ docker-compose exec backend yarn run db:migrate init
 Run:
 
 ```bash
+# in backend/ while database is running
 $ yarn run db:seed
 ```
 
 To reset the database run:
 
 ```bash
+# in backend/ while database is running
 $ yarn run db:reset
 ```
 
@@ -140,6 +150,7 @@ you have to migrate your data e.g. because your data modeling has changed.
 Generate a data migration file:
 
 ```bash
+# in main folder while docker-compose is running
 $ docker-compose exec backend yarn run db:migrate:create your_data_migration
 # Edit the file in ./src/db/migrations/
 ```
@@ -147,6 +158,7 @@ $ docker-compose exec backend yarn run db:migrate:create your_data_migration
 To run the migration:
 
 ```bash
+# in main folder while docker-compose is running
 $ docker-compose exec backend yarn run db:migrate up
 ```
 
@@ -156,6 +168,7 @@ $ docker-compose exec backend yarn run db:migrate up
 Generate a data migration file:
 
 ```bash
+# in backend/
 $ yarn run db:migrate:create your_data_migration
 # Edit the file in ./src/db/migrations/
 ```
@@ -163,6 +176,7 @@ $ yarn run db:migrate:create your_data_migration
 To run the migration:
 
 ```bash
+# in backend/ while database is running
 $ yarn run db:migrate up
 ```
 
@@ -180,6 +194,7 @@ database after each test, running the tests will wipe out all your data!
 Run the unit tests:
 
 ```bash
+# in main folder while docker-compose is running
 $ docker-compose exec backend yarn run test
 ```
 
@@ -190,6 +205,7 @@ $ docker-compose exec backend yarn run test
 Run the unit tests:
 
 ```bash
+# in backend/ while database is running
 $ yarn run test
 ```
 

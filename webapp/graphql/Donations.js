@@ -13,7 +13,7 @@ export const DonationsQuery = () => gql`
 
 export const UpdateDonations = () => {
   return gql`
-    mutation($showDonations: Boolean, $goal: Int, $progress: Int) {
+    mutation ($showDonations: Boolean, $goal: Int, $progress: Int) {
       UpdateDonations(showDonations: $showDonations, goal: $goal, progress: $progress) {
         id
         showDonations

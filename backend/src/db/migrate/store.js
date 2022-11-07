@@ -1,6 +1,8 @@
 import { getDriver, getNeode } from '../../db/neo4j'
 import { hashSync } from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
+import { categories } from '../../constants/categories'
+import CONFIG from '../../config'
 
 const defaultAdmin = {
   email: 'admin@example.org',
@@ -8,6 +10,29 @@ const defaultAdmin = {
   name: 'admin',
   id: uuid(),
   slug: 'admin',
+}
+
+const createCategories = async (session) => {
+  const createCategoriesTxResultPromise = session.writeTransaction(async (txc) => {
+    categories.forEach(({ icon, name }, index) => {
+      const id = `cat${index + 1}`
+      txc.run(
+        `MERGE (c:Category {
+          icon: "${icon}",
+          slug: "${name}",
+          name: "${name}",
+          id: "${id}",
+          createdAt: toString(datetime())
+        })`,
+      )
+    })
+  })
+  try {
+    await createCategoriesTxResultPromise
+    console.log('Successfully created categories!') // eslint-disable-line no-console
+  } catch (error) {
+    console.log(`Error creating categories: ${error}`) // eslint-disable-line no-console
+  }
 }
 
 const createDefaultAdminUser = async (session) => {
@@ -45,7 +70,7 @@ const createDefaultAdminUser = async (session) => {
     })
     try {
       await createAdminTxResultPromise
-      console.log('Successfully created default admin user') // eslint-disable-line no-console
+      console.log('Successfully created default admin user!') // eslint-disable-line no-console
     } catch (error) {
       console.log(error) // eslint-disable-line no-console
     }
@@ -58,12 +83,13 @@ class Store {
     const { driver } = neode
     const session = driver.session()
     await createDefaultAdminUser(session)
+    if (CONFIG.CATEGORIES_ACTIVE) await createCategories(session)
     const writeTxResultPromise = session.writeTransaction(async (txc) => {
-      await txc.run('CALL apoc.schema.assert({},{},true)') // drop all indices
+      await txc.run('CALL apoc.schema.assert({},{},true)') // drop all indices and contraints
       return Promise.all(
         [
-          'CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"])',
           'CALL db.index.fulltext.createNodeIndex("user_fulltext_search",["User"],["name", "slug"])',
+          'CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"])',
           'CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"])',
         ].map((statement) => txc.run(statement)),
       )

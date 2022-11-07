@@ -20,7 +20,7 @@ export const mutedUsers = () => {
 
 export const muteUser = () => {
   return gql`
-    mutation($id: ID!) {
+    mutation ($id: ID!) {
       muteUser(id: $id) {
         id
         name
@@ -33,7 +33,7 @@ export const muteUser = () => {
 
 export const unmuteUser = () => {
   return gql`
-    mutation($id: ID!) {
+    mutation ($id: ID!) {
       unmuteUser(id: $id) {
         id
         name

@@ -33,6 +33,7 @@ const options = {
   // Cookies
   COOKIE_EXPIRE_TIME: process.env.COOKIE_EXPIRE_TIME || 730, // Two years by default
   COOKIE_HTTPS_ONLY: process.env.COOKIE_HTTPS_ONLY || process.env.NODE_ENV === 'production', // ensure true in production if not set explicitly
+  CATEGORIES_ACTIVE: process.env.CATEGORIES_ACTIVE === 'true' || false,
 }
 
 const CONFIG = {

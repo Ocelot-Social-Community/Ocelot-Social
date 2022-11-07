@@ -29,6 +29,10 @@ describe('Registration', () => {
         query: {},
       },
       $env: {},
+      $toast: {
+        error: jest.fn(),
+        success: jest.fn(),
+      },
     }
     asyncData = false
     isLoggedIn = false

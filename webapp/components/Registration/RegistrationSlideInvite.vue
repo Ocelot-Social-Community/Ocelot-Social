@@ -17,6 +17,7 @@
       {{ $t('components.registration.invite-code.form.description') }}
     </ds-text>
     <slot></slot>
+    <ds-space margin="xxx-small" />
   </ds-form>
 </template>
 
@@ -25,7 +26,7 @@ import gql from 'graphql-tag'
 import CONSTANTS_REGISTRATION from './../../constants/registration'
 
 export const isValidInviteCodeQuery = gql`
-  query($code: ID!) {
+  query ($code: ID!) {
     isValidInviteCode(code: $code)
   }
 `

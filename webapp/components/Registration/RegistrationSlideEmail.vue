@@ -24,6 +24,7 @@
         {{ $t('components.registration.email.form.sendEmailAgain') }}
       </label>
     </ds-text>
+    <ds-space margin="xxx-small" />
   </ds-form>
 </template>
 
@@ -35,7 +36,7 @@ import normalizeEmail from '~/components/utils/NormalizeEmail'
 import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
 
 export const SignupMutation = gql`
-  mutation($email: String!, $inviteCode: String) {
+  mutation ($email: String!, $inviteCode: String) {
     Signup(email: $email, inviteCode: $inviteCode) {
       email
     }
@@ -165,9 +166,8 @@ export default {
             })
             this.setButtonValues()
 
-            const { email: responseEmail } = this.sliderData.sliders[
-              this.sliderIndex
-            ].data.response.Signup
+            const { email: responseEmail } =
+              this.sliderData.sliders[this.sliderIndex].data.response.Signup
             this.$toast.success(
               this.$t('components.registration.email.form.success', { email: responseEmail }),
             )

@@ -281,7 +281,7 @@ describe('CreatePost', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: createPostMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -368,8 +368,8 @@ describe('UpdatePost', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
-      expect(mutate({ mutation: updatePostMutation, variables })).resolves.toMatchObject({
-        errors: [{ message: 'Not Authorised!' }],
+      await expect(mutate({ mutation: updatePostMutation, variables })).resolves.toMatchObject({
+        errors: [{ message: 'Not Authorized!' }],
         data: { UpdatePost: null },
       })
     })
@@ -382,7 +382,7 @@ describe('UpdatePost', () => {
 
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: updatePostMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -547,7 +547,7 @@ describe('pin posts', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
       await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
         data: { pinPost: null },
       })
     })
@@ -556,7 +556,7 @@ describe('pin posts', () => {
   describe('ordinary users', () => {
     it('throws authorization error', async () => {
       await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
         data: { pinPost: null },
       })
     })
@@ -571,7 +571,7 @@ describe('pin posts', () => {
 
     it('throws authorization error', async () => {
       await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
         data: { pinPost: null },
       })
     })
@@ -854,7 +854,7 @@ describe('unpin posts', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
       await expect(mutate({ mutation: unpinPostMutation, variables })).resolves.toMatchObject({
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
         data: { unpinPost: null },
       })
     })
@@ -863,7 +863,7 @@ describe('unpin posts', () => {
   describe('users cannot unpin posts', () => {
     it('throws authorization error', async () => {
       await expect(mutate({ mutation: unpinPostMutation, variables })).resolves.toMatchObject({
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
         data: { unpinPost: null },
       })
     })
@@ -878,7 +878,7 @@ describe('unpin posts', () => {
 
     it('throws authorization error', async () => {
       await expect(mutate({ mutation: unpinPostMutation, variables })).resolves.toMatchObject({
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
         data: { unpinPost: null },
       })
     })
@@ -975,7 +975,7 @@ describe('DeletePost', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: deletePostMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -986,7 +986,7 @@ describe('DeletePost', () => {
 
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: deletePostMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -1128,7 +1128,7 @@ describe('emotions', () => {
           variables,
         })
 
-        expect(addPostEmotions.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(addPostEmotions.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -1249,7 +1249,7 @@ describe('emotions', () => {
           mutation: removePostEmotionsMutation,
           variables: removePostEmotionsVariables,
         })
-        expect(removePostEmotions.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(removePostEmotions.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 

@@ -48,6 +48,7 @@ import { queryLocations } from '~/graphql/location'
 let timeout
 
 export default {
+  name: 'NewsFeed',
   data() {
     return {
       cities: [],

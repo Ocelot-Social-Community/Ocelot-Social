@@ -55,7 +55,7 @@ describe('slug', () => {
         \`\`\`
 
         Learn how to setup the database here:
-        https://docs.human-connection.org/human-connection/backend#database-indices-and-constraints
+        https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/backend/README.md#database-indices-and-constraints
       `)
     }
   })

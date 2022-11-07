@@ -31,7 +31,7 @@ const setPostCounter = async (postId, relation, context) => {
 }
 
 const userClickedPost = async (resolve, root, args, context, info) => {
-  if (args.id) {
+  if (args.id && context.user) {
     await setPostCounter(args.id, 'CLICKED', context)
   }
   return resolve(root, args, context, info)

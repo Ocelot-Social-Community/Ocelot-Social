@@ -19,6 +19,7 @@
       {{ $t('components.registration.email-nonce.form.description') }}
     </ds-text>
     <slot></slot>
+    <ds-space margin="xxx-small" />
   </ds-form>
 </template>
 
@@ -30,7 +31,7 @@ import CONSTANTS_REGISTRATION from './../../constants/registration'
 import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 
 export const verifyNonceQuery = gql`
-  query($email: String!, $nonce: String!) {
+  query ($email: String!, $nonce: String!) {
     VerifyNonce(email: $email, nonce: $nonce)
   }
 `

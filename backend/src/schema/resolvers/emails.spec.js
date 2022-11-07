@@ -63,7 +63,7 @@ describe('AddEmailAddress', () => {
     it('throws AuthorizationError', async () => {
       await expect(mutate({ mutation, variables })).resolves.toMatchObject({
         data: { AddEmailAddress: null },
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
       })
     })
   })
@@ -169,7 +169,7 @@ describe('VerifyEmailAddress', () => {
     it('throws AuthorizationError', async () => {
       await expect(mutate({ mutation, variables })).resolves.toMatchObject({
         data: { VerifyEmailAddress: null },
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
       })
     })
   })

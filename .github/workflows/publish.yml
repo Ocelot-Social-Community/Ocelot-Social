@@ -4,7 +4,9 @@ on:
   push:
     branches:
       - master
-      # - 4451-new-deployment-with-base-and-code # for testing while developing
+      # - 5059-epic-groups # for testing while developing
+      # template branches in repo
+      # - template--separate-branch-auto-deployment--5059-epic-groups
 
 jobs:
   ##############################################################################
@@ -56,9 +58,9 @@ jobs:
       # NEO4J ##################################################################
       ##########################################################################
       - name: Neo4J | Build `community` image
-        run: docker build --target community -t "ocelotsocialnetwork/neo4j:latest" -t "ocelotsocialnetwork/neo4j:community" -t "ocelotsocialnetwork/neo4j:${VERSION}" -t "ocelotsocialnetwork/neo4j:${BUILD_VERSION}" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT neo4j/
+        run: docker build --target community -t "ocelotsocialnetwork/neo4j-community:latest" -t "ocelotsocialnetwork/neo4j-community:${VERSION}" -t "ocelotsocialnetwork/neo4j-community:${BUILD_VERSION}" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT neo4j/
       - name: Neo4J | Save docker image 
-        run: docker save "ocelotsocialnetwork/neo4j" > /tmp/neo4j.tar
+        run: docker save "ocelotsocialnetwork/neo4j-community" > /tmp/neo4j.tar
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -238,13 +240,88 @@ jobs:
       - name: login to dockerhub
         run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
       - name: Push neo4j
-        run: docker push --all-tags ocelotsocialnetwork/neo4j
+        run: docker push --all-tags ocelotsocialnetwork/neo4j-community
       - name: Push backend
         run: docker push --all-tags ocelotsocialnetwork/backend
       - name: Push webapp
         run: docker push --all-tags ocelotsocialnetwork/webapp
       - name: Push maintenance
         run: docker push --all-tags ocelotsocialnetwork/maintenance
+
+  ##############################################################################
+  # JOB: KUBERNETES DEPLOY ACTUAL/LATEST VERSION ######################################
+  ##############################################################################
+  kubernetes_deploy:
+    # see example https://github.com/do-community/example-doctl-action
+    # see example https://github.com/do-community/example-doctl-action/blob/main/.github/workflows/workflow.yaml
+    name: Kubernetes deploy of latest version to stage.ocelot.social cluster at DigitalOcean
+    runs-on: ubuntu-latest
+    needs: [upload_to_dockerhub]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # SET ENVS ###############################################################
+      ##########################################################################
+      - name: ENV - VERSION
+        run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+      - name: ENV - BUILD_VERSION
+        run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+      ##########################################################################
+      # Install DigitalOceans doctl and set kubeconfig #########################
+      ##########################################################################
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - name: Save DigitalOcean kubeconfig with short-lived credentials
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 cluster-stage-ocelot-social
+      ##########################################################################
+      # Deploy new Docker images to DigitalOcean Kubernetes cluster ############
+      ##########################################################################
+      # - name: Deploy 'latest' to DigitalOcean Kubernetes
+      #   run: |
+      #     kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:latest
+      #     kubectl -n default rollout restart deployment/ocelot-webapp
+      #     kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:latest
+      #     kubectl -n default rollout restart deployment/ocelot-backend
+      #     kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:latest
+      #     kubectl -n default rollout restart deployment/ocelot-maintenance
+      #     kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:latest
+      #     kubectl -n default rollout restart deployment/ocelot-neo4j
+      - name: Deploy actual version '$BUILD_VERSION' to DigitalOcean Kubernetes
+        run: |
+          kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:$BUILD_VERSION
+          kubectl -n default rollout restart deployment/ocelot-webapp
+          kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:$BUILD_VERSION
+          kubectl -n default rollout restart deployment/ocelot-backend
+          kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:$BUILD_VERSION
+          kubectl -n default rollout restart deployment/ocelot-maintenance
+          kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:$BUILD_VERSION
+          kubectl -n default rollout restart deployment/ocelot-neo4j
+      # because this step 'kubectl -n default rollout status deployment/* --timeout=600s' does not work as expected
+      #   and we need the pods to be up again for cleaning and seeding the Neo4j database and the backend.
+      #   !!! this is not a perfect solution !!!
+      # deployments are regularly up again after 3 minutes and 10 seconds
+      - name: Sleep for 4 minutes, means 240 seconds
+        run: sleep 240s
+        shell: bash
+      - name: Verify deployment and wait for the pods of each deployment to get ready for cleaning and seeding of the database
+        run: |
+          kubectl -n default rollout status deployment/ocelot-backend --timeout=600s
+          kubectl -n default rollout status deployment/ocelot-neo4j --timeout=600s
+          kubectl -n default rollout status deployment/ocelot-maintenance --timeout=600s
+          kubectl -n default rollout status deployment/ocelot-webapp --timeout=600s
+      - name: Run migrations for Neo4j database via backend for staging
+        run: |
+          kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "yarn prod:migrate up"
+      - name: Reset and seed Neo4j database via backend for staging
+        # db cleaning and seeding is only possible in production if env 'PRODUCTION_DB_CLEAN_ALLOW=true' is set in deployment
+        run: |
+          kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "node --experimental-repl-await dist/db/clean.js && node --experimental-repl-await dist/db/seed.js"
 
   ##############################################################################
   # JOB: GITHUB TAG LATEST VERSION #############################################

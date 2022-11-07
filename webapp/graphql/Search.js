@@ -1,11 +1,17 @@
 import gql from 'graphql-tag'
-import { userFragment, postFragment, tagsCategoriesAndPinnedFragment } from './Fragments'
+import {
+  userFragment,
+  postFragment,
+  groupFragment,
+  tagsCategoriesAndPinnedFragment,
+} from './Fragments'
 
 export const searchQuery = gql`
   ${userFragment}
   ${postFragment}
+  ${groupFragment}
 
-  query($query: String!) {
+  query ($query: String!) {
     searchResults(query: $query, limit: 5) {
       __typename
       ... on Post {
@@ -24,6 +30,9 @@ export const searchQuery = gql`
       ... on Tag {
         id
       }
+      ... on Group {
+        ...group
+      }
     }
   }
 `
@@ -33,7 +42,7 @@ export const searchPosts = gql`
   ${postFragment}
   ${tagsCategoriesAndPinnedFragment}
 
-  query($query: String!, $firstPosts: Int, $postsOffset: Int) {
+  query ($query: String!, $firstPosts: Int, $postsOffset: Int) {
     searchPosts(query: $query, firstPosts: $firstPosts, postsOffset: $postsOffset) {
       postCount
       posts {
@@ -52,10 +61,50 @@ export const searchPosts = gql`
   }
 `
 
+export const searchGroups = (i18n) => {
+  const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
+  return gql`
+    query ($query: String!, $firstGroups: Int, $groupsOffset: Int) {
+      searchGroups(query: $query, firstGroups: $firstGroups, groupsOffset: $groupsOffset) {
+        groupCount
+        groups {
+          __typename
+          id
+          groupName: name
+          slug
+          createdAt
+          updatedAt
+          disabled
+          deleted
+          about
+          description
+          descriptionExcerpt
+          groupType
+          actionRadius
+          categories {
+            id
+            slug
+            name
+            icon
+         }
+          avatar {
+            url
+          }
+          locationName
+          location {
+            name: name${lang}
+          }
+          myRole
+        }
+      }
+    }
+  `
+}
+
 export const searchUsers = gql`
   ${userFragment}
 
-  query($query: String!, $firstUsers: Int, $usersOffset: Int) {
+  query ($query: String!, $firstUsers: Int, $usersOffset: Int) {
     searchUsers(query: $query, firstUsers: $firstUsers, usersOffset: $usersOffset) {
       userCount
       users {
@@ -67,7 +116,7 @@ export const searchUsers = gql`
 `
 
 export const searchHashtags = gql`
-  query($query: String!, $firstHashtags: Int, $hashtagsOffset: Int) {
+  query ($query: String!, $firstHashtags: Int, $hashtagsOffset: Int) {
     searchHashtags(query: $query, firstHashtags: $firstHashtags, hashtagsOffset: $hashtagsOffset) {
       hashtagCount
       hashtags {

@@ -1,6 +1,9 @@
 <template>
   <div>
-    <ds-heading tag="h1">{{ $t('settings.name') }}</ds-heading>
+    <ds-space margin="small">
+      <ds-heading tag="h1">{{ $t('settings.name') }}</ds-heading>
+    </ds-space>
+    <ds-space margin="large" />
     <ds-flex gutter="small">
       <ds-flex-item :width="{ base: '100%', md: '200px' }">
         <ds-menu :routes="routes" :is-exact="() => true" />

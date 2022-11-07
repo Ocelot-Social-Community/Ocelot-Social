@@ -4481,10 +4481,10 @@ neo4j-driver@^4.2.2, neo4j-driver@^4.3.4:
     neo4j-driver-core "^4.3.4"
     rxjs "^6.6.3"
 
-neode@^0.4.7:
-  version "0.4.7"
-  resolved "https://registry.yarnpkg.com/neode/-/neode-0.4.7.tgz#033007b57a2ee167e9ee5537493086db08d005eb"
-  integrity sha512-YXlc187JRpeKCBcUIkY6nimXXG+Tvlopfe71/FPno2THrwmYt5mm0RPHZ+mXF2O1Xg6zvjKvOpCpDz2vHBfroQ==
+neode@^0.4.8:
+  version "0.4.8"
+  resolved "https://registry.yarnpkg.com/neode/-/neode-0.4.8.tgz#0889b4fc7f1bf0b470b01fa5b8870373b5d47ad6"
+  integrity sha512-pb91NfCOg4Fj5o+98H+S2XYC+ByQfbdhwcc1UVuzuUQ0Ezzj+jWz8NmKWU8ZfCH6l4plk71yDAPd2eTwpt+Xvg==
   dependencies:
     "@hapi/joi" "^15.1.1"
     dotenv "^4.0.0"
@@ -5426,10 +5426,10 @@ slice-ansi@0.0.4:
   resolved "https://registry.yarnpkg.com/slice-ansi/-/slice-ansi-0.0.4.tgz#edbf8903f66f7ce2f8eafd6ceed65e264c831b35"
   integrity sha1-7b+JA/ZvfOL46v1s7tZeJkyDGzU=
 
-slug@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/slug/-/slug-5.1.0.tgz#8a7e30ca1c3a6dc40cf74e269750913a865edb0b"
-  integrity sha512-IS39jKR6m+puU8zWgH6ruwx1sfzFNJ6Ai5PKIlUqd0X8C3ca7PB49Cvm0uayqgEt1jgaojO2wWEsQJngnh7fDA==
+slug@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/slug/-/slug-6.0.0.tgz#39637b32e5a873bc692812a630842880499ed6c9"
+  integrity sha512-0MpNLyCSUSf0G1nAZmp9gY1cvesPP35a1Live25vZ23gWQ5SAopF0N+0hk9KI4ytNuTebJrHGNrgTnxboofcSg==
 
 snapdragon-node@^2.0.1:
   version "2.1.1"

@@ -311,6 +311,16 @@
     "follow": "Подписаться",
     "following": "Вы подписаны"
   },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null
+    },
+    "membersCount": null,
+    "membersListTitle": null
+  },
   "hashtags-filter": {
     "clearSearch": "Очистить поиск",
     "hashtag-search": "Поиск по #{hashtag}",
@@ -449,6 +459,9 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Успешная загрузка!"
+    },
     "commented": "Прокомментированные",
     "follow": "Подписаться",
     "followers": "Подписчики",
@@ -551,7 +564,7 @@
       "Post": "Посты",
       "User": "Пользователи"
     },
-    "hint": "Что вы хотите найти?",
+    "hint": "Что вы хотите найти? Используйте !... для постов, @... для пользователей, #... для хэштегов.",
     "placeholder": "Поиск"
   },
   "settings": {
@@ -729,10 +742,5 @@
     "newTermsAndConditions": "Новые условия и положения",
     "termsAndConditionsNewConfirm": "Я прочитал(а) и согласен(на) с новыми условиями.",
     "termsAndConditionsNewConfirmText": "Пожалуйста, ознакомьтесь с новыми условиями использования!"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Успешная загрузка!"
-    }
   }
 }

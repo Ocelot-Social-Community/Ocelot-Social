@@ -93,7 +93,7 @@ export default {
   methods: {
     async handleSubmitPassword() {
       const mutation = gql`
-        mutation($nonce: String!, $email: String!, $password: String!) {
+        mutation ($nonce: String!, $email: String!, $password: String!) {
           resetPassword(nonce: $nonce, email: $email, newPassword: $password)
         }
       `

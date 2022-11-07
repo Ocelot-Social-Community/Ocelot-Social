@@ -1,10 +1,22 @@
 import sample from 'lodash/sample'
 import { createTestClient } from 'apollo-server-testing'
+import CONFIG from '../config'
 import createServer from '../server'
 import faker from '@faker-js/faker'
 import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
-import { gql } from '../helpers/jest'
+import {
+  createGroupMutation,
+  joinGroupMutation,
+  changeGroupMemberRoleMutation,
+} from './graphql/groups'
+import { createPostMutation } from './graphql/posts'
+import { createCommentMutation } from './graphql/comments'
+import { categories } from '../constants/categories'
+
+if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
+  throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
+}
 
 const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
@@ -262,104 +274,16 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       dagobert.relateTo(louie, 'blocked'),
     ])
 
-    await Promise.all([
-      Factory.build('category', {
-        id: 'cat1',
-        name: 'Just For Fun',
-        slug: 'just-for-fun',
-        icon: 'smile',
+    await Promise.all(
+      categories.map(({ icon, name }, index) => {
+        Factory.build('category', {
+          id: `cat${index + 1}`,
+          slug: name,
+          name,
+          icon,
+        })
       }),
-      Factory.build('category', {
-        id: 'cat2',
-        name: 'Happiness & Values',
-        slug: 'happiness-values',
-        icon: 'heart-o',
-      }),
-      Factory.build('category', {
-        id: 'cat3',
-        name: 'Health & Wellbeing',
-        slug: 'health-wellbeing',
-        icon: 'medkit',
-      }),
-      Factory.build('category', {
-        id: 'cat4',
-        name: 'Environment & Nature',
-        slug: 'environment-nature',
-        icon: 'tree',
-      }),
-      Factory.build('category', {
-        id: 'cat5',
-        name: 'Animal Protection',
-        slug: 'animal-protection',
-        icon: 'paw',
-      }),
-      Factory.build('category', {
-        id: 'cat6',
-        name: 'Human Rights & Justice',
-        slug: 'human-rights-justice',
-        icon: 'balance-scale',
-      }),
-      Factory.build('category', {
-        id: 'cat7',
-        name: 'Education & Sciences',
-        slug: 'education-sciences',
-        icon: 'graduation-cap',
-      }),
-      Factory.build('category', {
-        id: 'cat8',
-        name: 'Cooperation & Development',
-        slug: 'cooperation-development',
-        icon: 'users',
-      }),
-      Factory.build('category', {
-        id: 'cat9',
-        name: 'Democracy & Politics',
-        slug: 'democracy-politics',
-        icon: 'university',
-      }),
-      Factory.build('category', {
-        id: 'cat10',
-        name: 'Economy & Finances',
-        slug: 'economy-finances',
-        icon: 'money',
-      }),
-      Factory.build('category', {
-        id: 'cat11',
-        name: 'Energy & Technology',
-        slug: 'energy-technology',
-        icon: 'flash',
-      }),
-      Factory.build('category', {
-        id: 'cat12',
-        name: 'IT, Internet & Data Privacy',
-        slug: 'it-internet-data-privacy',
-        icon: 'mouse-pointer',
-      }),
-      Factory.build('category', {
-        id: 'cat13',
-        name: 'Art, Culture & Sport',
-        slug: 'art-culture-sport',
-        icon: 'paint-brush',
-      }),
-      Factory.build('category', {
-        id: 'cat14',
-        name: 'Freedom of Speech',
-        slug: 'freedom-of-speech',
-        icon: 'bullhorn',
-      }),
-      Factory.build('category', {
-        id: 'cat15',
-        name: 'Consumption & Sustainability',
-        slug: 'consumption-sustainability',
-        icon: 'shopping-cart',
-      }),
-      Factory.build('category', {
-        id: 'cat16',
-        name: 'Global Peace & Nonviolence',
-        slug: 'global-peace-nonviolence',
-        icon: 'angellist',
-      }),
-    ])
+    )
 
     const [environment, nature, democracy, freedom] = await Promise.all([
       Factory.build('tag', {
@@ -375,6 +299,302 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         id: 'Freedom',
       }),
     ])
+
+    // Create Groups
+
+    authenticatedUser = await peterLustig.toJson()
+    await Promise.all([
+      mutate({
+        mutation: createGroupMutation(),
+        variables: {
+          id: 'g0',
+          name: 'Investigative Journalism',
+          about: 'Investigative journalists share ideas and insights and can collaborate.',
+          description: `<p class=""><em>English:</em></p><p class="">This group is hidden.</p><h3>What is our group for?</h3><p>This group was created to allow investigative journalists to share and collaborate.</p><h3>How does it work?</h3><p>Here you can internally share posts and comments about them.</p><p><br></p><p><em>Deutsch:</em></p><p class="">Diese Gruppe ist verborgen.</p><h3>Wofür ist unsere Gruppe?</h3><p class="">Diese Gruppe wurde geschaffen, um investigativen Journalisten den Austausch und die Zusammenarbeit zu ermöglichen.</p><h3>Wie funktioniert das?</h3><p class="">Hier könnt ihr euch intern über Beiträge und Kommentare zu ihnen austauschen.</p>`,
+          groupType: 'hidden',
+          actionRadius: 'global',
+          categoryIds: ['cat6', 'cat12', 'cat16'],
+          locationName: 'Hamburg, Germany',
+        },
+      }),
+    ])
+    await Promise.all([
+      mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g0',
+          userId: 'u2',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g0',
+          userId: 'u4',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g0',
+          userId: 'u6',
+        },
+      }),
+    ])
+    await Promise.all([
+      mutate({
+        mutation: changeGroupMemberRoleMutation(),
+        variables: {
+          groupId: 'g0',
+          userId: 'u2',
+          roleInGroup: 'usual',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation(),
+        variables: {
+          groupId: 'g0',
+          userId: 'u4',
+          roleInGroup: 'admin',
+        },
+      }),
+    ])
+
+    // post into group
+    await Promise.all([
+      mutate({
+        mutation: createPostMutation(),
+        variables: {
+          id: 'p0-g0',
+          groupId: 'g0',
+          title: `What happend in Shanghai?`,
+          content: 'A sack of rise dropped in Shanghai. Should we further investigate?',
+          categoryIds: ['cat6'],
+        },
+      }),
+    ])
+    authenticatedUser = await bobDerBaumeister.toJson()
+    await Promise.all([
+      mutate({
+        mutation: createPostMutation(),
+        variables: {
+          id: 'p1-g0',
+          groupId: 'g0',
+          title: `The man on the moon`,
+          content: 'We have to further investigate about the stories of a man living on the moon.',
+          categoryIds: ['cat12', 'cat16'],
+        },
+      }),
+    ])
+
+    authenticatedUser = await jennyRostock.toJson()
+    await Promise.all([
+      mutate({
+        mutation: createGroupMutation(),
+        variables: {
+          id: 'g1',
+          name: 'School For Citizens',
+          about: 'Our children shall receive education for life.',
+          description: `<p class=""><em>English</em></p><h3>Our goal</h3><p>Only those who enjoy learning and do not lose their curiosity can obtain a good education for life and continue to learn with joy throughout their lives.</p><h3>Curiosity</h3><p>For this we need a school that takes up the curiosity of the children, the people, and satisfies it through a lot of experience.</p><p><br></p><p><em>Deutsch</em></p><h3>Unser Ziel</h3><p class="">Nur wer Spaß am Lernen hat und seine Neugier nicht verliert, kann gute Bildung für's Leben erlangen und sein ganzes Leben mit Freude weiter lernen.</p><h3>Neugier</h3><p class="">Dazu benötigen wir eine Schule, die die Neugier der Kinder, der Menschen, aufnimmt und durch viel Erfahrung befriedigt.</p>`,
+          groupType: 'closed',
+          actionRadius: 'national',
+          categoryIds: ['cat8', 'cat14'],
+          locationName: 'France',
+        },
+      }),
+    ])
+    await Promise.all([
+      mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g1',
+          userId: 'u1',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g1',
+          userId: 'u2',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g1',
+          userId: 'u5',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g1',
+          userId: 'u6',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g1',
+          userId: 'u7',
+        },
+      }),
+    ])
+    await Promise.all([
+      mutate({
+        mutation: changeGroupMemberRoleMutation(),
+        variables: {
+          groupId: 'g1',
+          userId: 'u1',
+          roleInGroup: 'usual',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation(),
+        variables: {
+          groupId: 'g1',
+          userId: 'u5',
+          roleInGroup: 'admin',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation(),
+        variables: {
+          groupId: 'g1',
+          userId: 'u6',
+          roleInGroup: 'owner',
+        },
+      }),
+    ])
+    // post into group
+    await Promise.all([
+      mutate({
+        mutation: createPostMutation(),
+        variables: {
+          id: 'p0-g1',
+          groupId: 'g1',
+          title: `Can we use ocelot for education?`,
+          content: 'I like the concept of this school. Can we use our software in this?',
+          categoryIds: ['cat8'],
+        },
+      }),
+    ])
+    authenticatedUser = await peterLustig.toJson()
+    await Promise.all([
+      mutate({
+        mutation: createPostMutation(),
+        variables: {
+          id: 'p1-g1',
+          groupId: 'g1',
+          title: `Can we push this idea out of France?`,
+          content: 'This idea is too inportant to have the scope only on France.',
+          categoryIds: ['cat14'],
+        },
+      }),
+    ])
+
+    authenticatedUser = await bobDerBaumeister.toJson()
+    await Promise.all([
+      mutate({
+        mutation: createGroupMutation(),
+        variables: {
+          id: 'g2',
+          name: 'Yoga Practice',
+          about: 'We do yoga around the clock.',
+          description: `<h3>What Is yoga?</h3><p>Yoga is not just about practicing asanas. It's about how we do it.</p><p class="">And practicing asanas doesn't have to be yoga, it can be more athletic than yogic.</p><h3>What makes practicing asanas yogic?</h3><p class="">The important thing is:</p><ul><li><p>Use the exercises (consciously) for your personal development.</p></li></ul>`,
+          groupType: 'public',
+          actionRadius: 'interplanetary',
+          categoryIds: ['cat4', 'cat5', 'cat17'],
+        },
+      }),
+    ])
+    await Promise.all([
+      mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g2',
+          userId: 'u3',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g2',
+          userId: 'u4',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g2',
+          userId: 'u5',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g2',
+          userId: 'u6',
+        },
+      }),
+      mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g2',
+          userId: 'u7',
+        },
+      }),
+    ])
+    await Promise.all([
+      mutate({
+        mutation: changeGroupMemberRoleMutation(),
+        variables: {
+          groupId: 'g2',
+          userId: 'u3',
+          roleInGroup: 'usual',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation(),
+        variables: {
+          groupId: 'g2',
+          userId: 'u4',
+          roleInGroup: 'pending',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation(),
+        variables: {
+          groupId: 'g2',
+          userId: 'u5',
+          roleInGroup: 'admin',
+        },
+      }),
+      mutate({
+        mutation: changeGroupMemberRoleMutation(),
+        variables: {
+          groupId: 'g2',
+          userId: 'u6',
+          roleInGroup: 'usual',
+        },
+      }),
+    ])
+
+    authenticatedUser = await louie.toJson()
+    await Promise.all([
+      mutate({
+        mutation: createPostMutation(),
+        variables: {
+          id: 'p0-g2',
+          groupId: 'g2',
+          title: `I am a Noob`,
+          content: 'I am new to Yoga and did not join this group so far.',
+          categoryIds: ['cat4'],
+        },
+      }),
+    ])
+
+    // Create Posts
 
     const [p0, p1, p3, p4, p5, p6, p9, p10, p11, p13, p14, p15] = await Promise.all([
       Factory.build(
@@ -553,17 +773,10 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       'See <a class="hashtag" data-hashtag-id="NaturphilosophieYoga" href="/?hashtag=NaturphilosophieYoga">#NaturphilosophieYoga</a>, it can really help you!'
     const hashtagAndMention1 =
       'The new physics of <a class="hashtag" data-hashtag-id="QuantenFlussTheorie" href="/?hashtag=QuantenFlussTheorie">#QuantenFlussTheorie</a> can explain <a class="hashtag" data-hashtag-id="QuantumGravity" href="/?hashtag=QuantumGravity">#QuantumGravity</a>! <a class="mention" data-mention-id="u1" href="/profile/u1">@peter-lustig</a> got that already. ;-)'
-    const createPostMutation = gql`
-      mutation ($id: ID, $title: String!, $content: String!, $categoryIds: [ID]) {
-        CreatePost(id: $id, title: $title, content: $content, categoryIds: $categoryIds) {
-          id
-        }
-      }
-    `
 
     await Promise.all([
       mutate({
-        mutation: createPostMutation,
+        mutation: createPostMutation(),
         variables: {
           id: 'p2',
           title: `Nature Philosophy Yoga`,
@@ -572,7 +785,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: createPostMutation,
+        mutation: createPostMutation(),
         variables: {
           id: 'p7',
           title: 'This is post #7',
@@ -581,7 +794,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: createPostMutation,
+        mutation: createPostMutation(),
         variables: {
           id: 'p8',
           image: faker.image.unsplash.nature(),
@@ -591,7 +804,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: createPostMutation,
+        mutation: createPostMutation(),
         variables: {
           id: 'p12',
           title: 'This is post #12',
@@ -610,13 +823,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       'I heard <a class="mention" data-mention-id="u3" href="/profile/u3">@jenny-rostock</a> has practiced it for 3 years now.'
     const mentionInComment2 =
       'Did <a class="mention" data-mention-id="u1" href="/profile/u1">@peter-lustig</a> tell you?'
-    const createCommentMutation = gql`
-      mutation ($id: ID, $postId: ID!, $content: String!) {
-        CreateComment(id: $id, postId: $postId, content: $content) {
-          id
-        }
-      }
-    `
     await Promise.all([
       mutate({
         mutation: createCommentMutation,

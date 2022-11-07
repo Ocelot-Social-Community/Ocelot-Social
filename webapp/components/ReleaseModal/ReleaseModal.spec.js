@@ -25,7 +25,7 @@ describe('ReleaseModal.vue', () => {
       },
       $t: jest.fn(),
       $apollo: {
-        mutate: jest.fn().mockResolvedValueOnce().mockRejectedValue({ message: 'Not Authorised!' }),
+        mutate: jest.fn().mockResolvedValueOnce().mockRejectedValue({ message: 'Not Authorized!' }),
       },
       location: {
         reload: jest.fn(),
@@ -181,7 +181,7 @@ describe('ReleaseModal.vue', () => {
           })
 
           it('shows an error toaster when mutation rejects', async () => {
-            await expect(mocks.$toast.error).toHaveBeenCalledWith('Not Authorised!')
+            await expect(mocks.$toast.error).toHaveBeenCalledWith('Not Authorized!')
           })
         })
       })

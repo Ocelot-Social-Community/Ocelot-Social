@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 export const SignupVerificationMutation = gql`
-  mutation(
+  mutation (
     $nonce: String!
     $name: String!
     $email: String!

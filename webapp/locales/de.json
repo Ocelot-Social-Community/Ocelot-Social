@@ -11,7 +11,7 @@
   "admin": {
     "categories": {
       "categoryName": "Name",
-      "name": "Kategorien",
+      "name": "Themen",
       "postCount": "Beiträge"
     },
     "dashboard": {
@@ -98,7 +98,7 @@
     }
   },
   "common": {
-    "category": "Kategorie ::: Kategorien",
+    "category": "Thema ::: Themen",
     "comment": "Kommentar ::: Kommentare",
     "letsTalk": "Miteinander reden",
     "loading": "wird geladen",
@@ -113,7 +113,7 @@
     "takeAction": "Aktiv werden",
     "user": "Benutzer ::: Benutzer",
     "validations": {
-      "categories": "es müssen eine bis drei Kategorien ausgewählt werden",
+      "categories": "es müssen eine bis drei Themen ausgewählt werden",
       "email": "muss eine gültige E-Mail-Adresse sein",
       "url": "muss eine gültige URL sein"
     },
@@ -214,26 +214,50 @@
     "amount-shouts": "{amount} recommendations",
     "amount-views": "{amount} views",
     "categories": {
-      "infoSelectedNoOfMaxCategories": "{chosen} von {max} Kategorien ausgewählt"
+      "infoSelectedNoOfMaxCategories": "{chosen} von {max} Themen ausgewählt"
     },
     "category": {
+      "description": {
+        "body-and-excercise": "Sport, Yoga, Massage, Tanzen, Entspannung",
+        "children": "Familie, Pädagogik, Schule, Prägung",
+        "culture": "Kunst, Theater, Musik, Fotografie, Film",
+        "economy": "Handel, Konsum, Marketing, Lieferketten",
+        "energy": "Öl, Gas, Kohle, Wind, Wasserkraft, Biogas, Atomenergie",
+        "finance": "Geld, Finanzsystem, Alternativwährungen",
+        "health": "Medizin, Ernährung, WHO, Impfungen, Schadstoffe",
+        "home": "Bauen, Lebensgemeinschaften, Tiny Houses, Gemüsegarten",
+        "it-and-media": "Nachrichten, Manipulation, Datenschutz, Überwachung, Datenkraken, KI, Software, Apps",
+        "law": "Menschenrechte, Gesetze, Verordnungen",
+        "miscellaneous": "Sonstiges",
+        "mobility": "Reise, Verkehr, Elektromobilität",
+        "nature": "Tiere, Pflanzen, Landwirtschaft, Ökologie, Artenvielfalt",
+        "networking": "Kooperation, Aktionsbündnisse, Solidarität, Hilfe",
+        "peace": "Krieg, Militär, soziale Verteidigung, Waffen, Cyberattacken",
+        "politics": "Demokratie, Mitbestimmung, Wahlen, Korruption, Parteien",
+        "psyche": "Seele, Gefühle, Glück",
+        "science": "Bildung, Hochschule, Publikationen",
+        "spirituality": "Religion, Werte, Ethik"
+      },
       "name": {
-        "animal-protection": "Schutz der Tiere",
-        "art-culture-sport": "Kunst, Kultur & Sport",
-        "consumption-sustainability": "Verbrauch & Nachhaltigkeit",
-        "cooperation-development": "Zusammenarbeit & Entwicklung",
-        "democracy-politics": "Demokratie & Politik",
-        "economy-finances": "Wirtschaft & Finanzen",
-        "education-sciences": "Bildung & Wissenschaft",
-        "energy-technology": "Energie & Technologie",
-        "environment-nature": "Umwelt & Natur",
-        "freedom-of-speech": "Redefreiheit",
-        "global-peace-nonviolence": "Globaler Frieden & Gewaltlosigkeit",
-        "happiness-values": "Glück & Werte",
-        "health-wellbeing": "Gesundheit & Wohlbefinden",
-        "human-rights-justice": "Menschenrechte & Gerechtigkeit",
-        "it-internet-data-privacy": "IT, Internet & Datenschutz",
-        "just-for-fun": "Nur zum Spaß"
+        "body-and-excercise": "Körper & Bewegung",
+        "children": "Kinder",
+        "culture": "Kultur",
+        "economy": "Wirtschaft",
+        "energy": "Energie",
+        "finance": "Finanzen",
+        "health": "Gesundheit",
+        "home": "Wohnen",
+        "it-and-media": "IT & Medien",
+        "law": "Recht",
+        "miscellaneous": "Sonstiges",
+        "mobility": "Mobilität",
+        "nature": "Natur",
+        "networking": "Vernetzung",
+        "peace": "Frieden",
+        "politics": "Politik",
+        "psyche": "Psyche",
+        "science": "Wissenschaft",
+        "spirituality": "Spiritualität"
       }
     },
     "emotions-label": {
@@ -333,19 +357,20 @@
     "placeholder": "Schreib etwas Inspirierendes …"
   },
   "error-pages": {
-    "403-default": "Kein Zugang zu dieser Seite",
-    "404-default": "Diese Seite konnte nicht gefunden werden",
-    "500-default": "Internal Server Error",
-    "503-default": "Dienst steht nicht zur Verfügung",
-    "back-to-index": "Zurück zur Startseite",
-    "cannot-edit-post": "Dieser Beitrag kann nicht editiert werden",
-    "default": "Ein Fehler ist aufgetreten",
-    "post-not-found": "Dieser Beitrag konnte nicht gefunden werden",
-    "profile-not-found": "Dieses Profil konnte nicht gefunden werden"
+    "403-default": "Kein Zugang zu dieser Seite!",
+    "404-default": "Diese Seite konnte nicht gefunden werden!",
+    "500-default": "Internal Server Error!",
+    "503-default": "Dienst steht nicht zur Verfügung!",
+    "back-to-index": "Zurück zur Startseite!",
+    "cannot-edit-post": "Dieser Beitrag kann nicht editiert werden!",
+    "default": "Ein Fehler ist aufgetreten!",
+    "group-not-found": "Dieses Gruppenprofil konnte nicht gefunden werden!",
+    "post-not-found": "Dieser Beitrag konnte nicht gefunden werden!",
+    "profile-not-found": "Dieses Profil konnte nicht gefunden werden!"
   },
   "filter-menu": {
     "all": "Alle",
-    "categories": "Themenkategorien",
+    "categories": "Themen",
     "emotions": "Emotionen",
     "filter-by": "Filtern nach ...",
     "following": "Benutzern, denen ich folge",
@@ -360,16 +385,101 @@
         "label": "Älteste zuerst"
       }
     },
-    "order-by": "Sortieren nach ..."
+    "order-by": "Sortieren nach ...",
+    "save": {
+      "error": "Themen konnten nicht gespeichert werden!",
+      "success": "Themen gespeichert!"
+    }
   },
   "followButton": {
     "follow": "Folgen",
     "following": "Folge Ich"
   },
+  "group": {
+    "actionRadii": {
+      "continental": "Kontinentale Gruppe",
+      "global": "Globale Gruppe",
+      "interplanetary": "Interplanetare Gruppe",
+      "national": "Nationale Gruppe",
+      "regional": "Regionale Gruppe"
+    },
+    "actionRadius": "Aktionsradius",
+    "addMemberToGroup": "Zur Gruppe hinzufügen",
+    "addUser": "Benutzer hinzufügen",
+    "addUserPlaceholder": "eindeutiger Benutzername > @slug-from-user",
+    "allGroups": "Alle Gruppen",
+    "categories": "Thema ::: Themen",
+    "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
+    "contentMenu": {
+      "visitGroupPage": "Gruppe anzeigen"
+    },
+    "createNewGroup": {
+      "title": "Erstelle eine neue Gruppe",
+      "tooltip": "Erstelle eine neue Gruppe"
+    },
+    "description": "Beschreibung",
+    "editGroupSettings": {
+      "groupName": "Einstellungen für „{name}“",
+      "title": "Meine Gruppe ändern"
+    },
+    "follow": "Folge",
+    "foundation": "Gründung",
+    "general": "Allgemein",
+    "goal": "Ziel der Gruppe",
+    "groupCreated": "Die Gruppe wurde angelegt!",
+    "in": "in",
+    "joinLeaveButton": {
+      "iAmMember": "Bin Mitglied",
+      "join": "Beitreten"
+    },
+    "labelSlug": "Eindeutiger Gruppenname",
+    "leaveModal": {
+      "confirmButton": "Verlassen",
+      "message": "Eine Gruppe zu verlassen ist möglicherweise nicht rückgängig zu machen!<br>Gruppe <b>„{name}“</b> verlassen!",
+      "title": "Möchtest du wirklich die Gruppe verlassen?"
+    },
+    "members": "Mitglieder",
+    "membersAdministrationList": {
+      "avatar": "Avatar",
+      "name": "Name",
+      "roleInGroup": "Rolle",
+      "slug": "Eindeutiger Name"
+    },
+    "membersCount": "Mitglied ::: Mitglieder",
+    "membersListTitle": "Gruppenmitglieder",
+    "membersListTitleNotAllowedSeeingGroupMembers": "Gruppenmitglieder unsichtbar",
+    "myGroups": "Meine Gruppen",
+    "name": "Gruppenname",
+    "radius": "Radius",
+    "removeMember": "Mitglied aus der Gruppe entfernen?",
+    "removeMemberButton": "Entfernen",
+    "role": "Deine Rolle in der Gruppe",
+    "roles": {
+      "admin": "Administrator",
+      "owner": "Inhaber",
+      "pending": "Ausstehendes Mitglied",
+      "usual": "Einfaches Mitglied"
+    },
+    "save": "Neue Gruppe anlegen",
+    "type": "Gruppentyp",
+    "types": {
+      "closed": "Geschlossene Gruppe",
+      "hidden": "Versteckte Gruppe",
+      "public": "Öffentliche Gruppe"
+    },
+    "update": "Änderung speichern",
+    "updatedGroup": "Die Gruppendaten wurden geändert!"
+  },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",
     "hashtag-search": "Suche nach #{hashtag}",
     "title": "Deine Filterblase"
+  },
+  "header": {
+    "avatarMenu": {
+      "Groups": "Gruppen",
+      "myProfile": "Mein Profil"
+    }
   },
   "index": {
     "change-filter-settings": "Verändere die Filter-Einstellungen, um mehr Ergebnisse zu erhalten.",
@@ -467,7 +577,7 @@
       "noDecision": "Keine Entscheidung!",
       "numberOfUsers": "{count} Nutzern",
       "previousDecision": "Vorherige Entscheidung:",
-      "reasonCategory": "Kategorie",
+      "reasonCategory": "Thema",
       "reasonDescription": "Beschreibung",
       "reportedOn": "Datum",
       "status": "Aktueller Status",
@@ -500,7 +610,19 @@
       "submitted": "Kommentar gesendet",
       "updated": "Änderungen gespeichert"
     },
+    "createNewPost": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Erstelle einen neuen Beitrag"
+    },
     "edited": "bearbeitet",
+    "editPost": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Bearbeite deinen Beitrag"
+    },
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
@@ -513,9 +635,18 @@
     "pinned": "Meldung",
     "takeAction": {
       "name": "Aktiv werden"
+    },
+    "viewPost": {
+      "forGroup": {
+        "title": "In der Gruppe „{name}“"
+      },
+      "title": "Beitrag"
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Erfolgreich hochgeladen!"
+    },
     "commented": "Kommentiert",
     "follow": "Folgen",
     "followers": "Folgen",
@@ -526,7 +657,6 @@
       "title": "Lade jemanden zu {APPLICATION_NAME} ein!"
     },
     "memberSince": "Mitglied seit",
-    "name": "Mein Profil",
     "network": {
       "andMore": "und {number} weitere …",
       "followedBy": "wird gefolgt von:",
@@ -584,8 +714,8 @@
     },
     "reason": {
       "category": {
-        "invalid": "Bitte wähle eine gültige Kategorie aus",
-        "label": "Wähle eine Kategorie:",
+        "invalid": "Bitte wähle ein gültiges Thema aus",
+        "label": "Wähle ein Thema:",
         "options": {
           "advert_products_services_commercial": "Bewerben von Produkten und Dienstleistungen mit kommerzieller Absicht.",
           "criminal_behavior_violation_german_law": "Strafbares Verhalten bzw. Verstoß gegen deutsches Recht.",
@@ -596,7 +726,7 @@
           "other": "Andere …",
           "pornographic_content_links": "Das Senden oder Verlinken eindeutig pornografischen Materials."
         },
-        "placeholder": "Kategorie …"
+        "placeholder": "Thema …"
       },
       "description": {
         "label": "Bitte erkläre: Warum möchtest Du dies melden?",
@@ -616,11 +746,12 @@
     "failed": "Nichts gefunden",
     "for": "Suche nach ",
     "heading": {
+      "Group": "Gruppe ::: Gruppen",
       "Post": "Beitrag ::: Beiträge",
       "Tag": "Hashtag ::: Hashtags",
       "User": "Benutzer ::: Benutzer"
     },
-    "hint": "Wonach suchst Du?",
+    "hint": "Wonach suchst Du? Nutze !… für Beiträge, @… für Mitglieder, &… für Gruppen, #… für Hashtags",
     "no-results": "Keine Ergebnisse für \"{search}\" gefunden. Versuch' es mit einem anderen Begriff!",
     "page": "Seite",
     "placeholder": "Suchen",
@@ -817,10 +948,5 @@
     "newTermsAndConditions": "Neue Nutzungsbedingungen",
     "termsAndConditionsNewConfirm": "Ich habe die neuen Nutzungsbedingungen durchgelesen und stimme zu.",
     "termsAndConditionsNewConfirmText": "Bitte lies Dir die neuen Nutzungsbedingungen jetzt durch!"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Erfolgreich hochgeladen!"
-    }
   }
 }

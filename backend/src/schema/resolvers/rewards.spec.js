@@ -97,7 +97,7 @@ describe('rewards', () => {
         authenticatedUser = null
         await expect(mutate({ mutation: rewardMutation, variables })).resolves.toMatchObject({
           data: { reward: null },
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -255,7 +255,7 @@ describe('rewards', () => {
         it('throws authorization error', async () => {
           await expect(mutate({ mutation: rewardMutation, variables })).resolves.toMatchObject({
             data: { reward: null },
-            errors: [{ message: 'Not Authorised!' }],
+            errors: [{ message: 'Not Authorized!' }],
           })
         })
       })
@@ -308,7 +308,7 @@ describe('rewards', () => {
         authenticatedUser = null
         await expect(mutate({ mutation: unrewardMutation, variables })).resolves.toMatchObject({
           data: { unreward: null },
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -341,7 +341,7 @@ describe('rewards', () => {
         it('throws authorization error', async () => {
           await expect(mutate({ mutation: unrewardMutation, variables })).resolves.toMatchObject({
             data: { unreward: null },
-            errors: [{ message: 'Not Authorised!' }],
+            errors: [{ message: 'Not Authorized!' }],
           })
         })
       })

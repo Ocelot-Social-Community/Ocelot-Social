@@ -9,7 +9,7 @@
     </span>
     <!-- version -->
     <a
-      href="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/CHANGELOG.md"
+      href="https://github.com/Ocelot-Social-Community/Ocelot-Social/releases"
       target="_blank"
       data-test="version-link"
     >
@@ -38,10 +38,13 @@ export default {
   position: fixed;
   bottom: 0px;
   z-index: 10;
-  background-color: white;
+  background-color: $color-footer-background;
   width: 100%;
   padding: 10px 10px;
   box-shadow: 0px -6px 12px -4px rgba(0, 0, 0, 0.1);
+}
+.ds-footer a {
+  color: $color-footer-link;
 }
 .division-line {
   margin-left: 0.2rem;

@@ -294,6 +294,16 @@
     "follow": null,
     "following": null
   },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null
+    },
+    "membersCount": null,
+    "membersListTitle": null
+  },
   "hashtags-filter": {
     "clearSearch": null,
     "hashtag-search": null,
@@ -376,6 +386,9 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": null
+    },
     "commented": "Commentato",
     "follow": "Seguire",
     "followers": "Seguenti",
@@ -473,9 +486,9 @@
     }
   },
   "search": {
-    "failed": null,
-    "hint": null,
-    "placeholder": null
+    "failed": "Non è stato trovato nulla",
+    "hint": "Cosa state cercando? Usate !... per i post, @... per gli utenti, #... per gli hashtag.",
+    "placeholder": "Ricerca"
   },
   "settings": {
     "data": {
@@ -633,10 +646,5 @@
     "newTermsAndConditions": "Nuovi Termini e Condizioni",
     "termsAndConditionsNewConfirm": "Ho letto e accetto le nuove condizioni generali di contratto.",
     "termsAndConditionsNewConfirmText": "Si prega di leggere le nuove condizioni d'uso ora!"
-  },
-  "user": {
-    "avatar": {
-      "submitted": null
-    }
   }
 }

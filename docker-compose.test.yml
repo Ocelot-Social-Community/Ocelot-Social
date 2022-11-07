@@ -1,10 +1,12 @@
 version: "3.4"
 
 services:
+
   ########################################################
   # WEBAPP ###############################################
   ########################################################
   webapp:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/webapp:test
     build:
       target: test
@@ -12,10 +14,12 @@ services:
       - NODE_ENV="test"
     volumes:
       - ./coverage:/app/coverage 
+
   ########################################################
   # BACKEND ##############################################
   ########################################################
   backend:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/backend:test
     build:
       target: test
@@ -23,11 +27,20 @@ services:
       - NODE_ENV="test"
     volumes:
       - ./coverage:/app/coverage 
+
+  ########################################################
+  # MAINTENANCE ##########################################
+  ########################################################
+  maintenance:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/maintenance:test
+
   ########################################################
   # NEO4J ################################################
   ########################################################
   neo4j:
-    image: ocelotsocialnetwork/neo4j:community
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/neo4j-community:test
     #environment:
     #  - NEO4J_dbms_connector_bolt_enabled=true
     #  - NEO4J_dbms_connector_bolt_tls__level=OPTIONAL
@@ -39,11 +52,7 @@ services:
     networks:
       # So we can access the neo4j query browser from our host machine
       - external-net
-  ########################################################
-  # MAINTENANCE ##########################################
-  ########################################################
-  maintenance:
-    image: ocelotsocialnetwork/maintenance:test
+
   ########################################################
   # MAILSERVER TO FAKE SMTP ##############################
   ########################################################

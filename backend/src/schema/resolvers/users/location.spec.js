@@ -121,7 +121,7 @@ describe('Location Service', () => {
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual(
       expect.arrayContaining([
-        { id: 'place.14094307404564380', place_name: 'Berlin, Germany' },
+        { id: expect.stringMatching(/^place\.[0-9]+$/), place_name: 'Berlin, Germany' },
         {
           id: expect.stringMatching(/^place\.[0-9]+$/),
           place_name: 'Berlin, Maryland, United States',

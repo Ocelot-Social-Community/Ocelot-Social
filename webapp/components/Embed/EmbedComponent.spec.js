@@ -114,8 +114,7 @@ describe('EmbedComponent.vue', () => {
             video: null,
             lang: 'de',
             sources: ['resource', 'oembed'],
-            html:
-              '<iframe width="480" height="270" src="https://www.youtube.com/embed/qkdXAtO40Fo?feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>',
+            html: '<iframe width="480" height="270" src="https://www.youtube.com/embed/qkdXAtO40Fo?feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>',
           }
           wrapper = Wrapper()
         })

@@ -1,9 +1,10 @@
 ---
-name: 🚀 Feature Request
-about: Suggest an idea for this project.
+name: 🚀 Feature request
+about: Suggest an idea for this project
 labels: feature
 title: 🚀 [Feature] 
 ---
+<!-- You can find the latest issue templates here https://github.com/ulfgebhardt/issue-templates -->
 
-## :rocket: Feature Request
+## 🚀 Feature
 <!-- Give a short summary of the Feature. Use Screenshots if you want. -->

@@ -6,11 +6,13 @@
 version: "3.4"
 
 services:
+
   ########################################################
   # WEBAPP ###############################################
   ########################################################
   webapp:
-    image: ocelotsocialnetwork/webapp:latest
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/webapp:local-production
     build:
       context: ./webapp
       target: production
@@ -35,11 +37,13 @@ services:
       - GRAPHQL_URI=http://backend:4000
     env_file:
       - ./webapp/.env
+
   ########################################################
   # BACKEND ##############################################
   ########################################################
   backend:
-    image: ocelotsocialnetwork/backend:latest
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/backend:local-production
     build:
       context: ./backend
       target: production
@@ -67,11 +71,28 @@ services:
       - CLIENT_URI=http://webapp:3000
     env_file:
       - ./backend/.env
+
+  ########################################################
+  # MAINTENANCE ##########################################
+  ########################################################
+  maintenance:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/maintenance:local-production
+    build:
+      # TODO: Separate from webapp, this must be independent
+      context: ./webapp
+      dockerfile: Dockerfile.maintenance
+    networks:
+      - external-net
+    ports:
+      - 3001:80
+
   ########################################################
   # NEO4J ################################################
   ########################################################
   neo4j:
-    image: ocelotsocialnetwork/neo4j:latest
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/neo4j-community:local-production
     build:
       context: ./neo4j
       # community edition 👆🏼, because we have no enterprise licence 👇🏼 at the moment
@@ -90,19 +111,6 @@ services:
       # TODO: clarify if that is the only thing needed to unlock the Enterprise version
       # - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
       # TODO: Remove the playground from production
-  ########################################################
-  # MAINTENANCE ##########################################
-  ########################################################
-  maintenance:
-    image: ocelotsocialnetwork/maintenance:latest
-    build:
-      # TODO: Separate from webapp, this must be independent
-      context: ./webapp
-      dockerfile: Dockerfile.maintenance
-    networks:
-      - external-net
-    ports:
-      - 5000:80
 
 networks:
   external-net:

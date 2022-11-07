@@ -59,7 +59,11 @@ export default {
   },
   data() {
     const logosObject = {
-      header: { path: logos.LOGO_HEADER_PATH, alt: 'Header', widthDefault: '130px' },
+      header: {
+        path: logos.LOGO_HEADER_PATH,
+        alt: 'Header',
+        widthDefault: logos.LOGO_HEADER_WIDTH,
+      },
       welcome: { path: logos.LOGO_WELCOME_PATH, alt: 'Welcome', widthDefault: '200px' },
       signup: { path: logos.LOGO_SIGNUP_PATH, alt: 'Sign Up', widthDefault: '200px' },
       logout: { path: logos.LOGO_LOGOUT_PATH, alt: 'Logging Out', widthDefault: '200px' },
@@ -107,7 +111,6 @@ export default {
 }
 
 .ds-logo-svg {
-  width: 130px;
   height: auto;
   fill: #000000;
 }

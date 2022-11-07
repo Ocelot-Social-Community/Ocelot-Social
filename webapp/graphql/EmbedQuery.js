@@ -2,7 +2,7 @@ import gql from 'graphql-tag'
 
 export default function () {
   return gql`
-    query($url: String!) {
+    query ($url: String!) {
       embed(url: $url) {
         type
         title

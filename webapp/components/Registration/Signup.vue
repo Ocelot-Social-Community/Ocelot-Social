@@ -70,7 +70,7 @@ import { SweetalertIcon } from 'vue-sweetalert-icons'
 import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
 
 export const SignupMutation = gql`
-  mutation($email: String!, $inviteCode: String) {
+  mutation ($email: String!, $inviteCode: String) {
     Signup(email: $email, inviteCode: $inviteCode) {
       email
     }

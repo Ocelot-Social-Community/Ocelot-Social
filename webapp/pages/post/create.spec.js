@@ -5,13 +5,18 @@ const localVue = global.localVue
 
 describe('create.vue', () => {
   let wrapper
-  let mocks
 
-  beforeEach(() => {
-    mocks = {
-      $t: jest.fn(),
-    }
-  })
+  const mocks = {
+    $t: jest.fn(),
+    $env: {
+      CATEGORIES_ACTIVE: false,
+    },
+    $route: {
+      query: {
+        groupId: null,
+      },
+    },
+  }
 
   describe('mount', () => {
     const Wrapper = () => {

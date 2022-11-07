@@ -61,7 +61,7 @@ describe('Signup', () => {
       CONFIG.INVITE_REGISTRATION = false
       CONFIG.PUBLIC_REGISTRATION = false
       await expect(mutate({ mutation, variables })).resolves.toMatchObject({
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
       })
     })
 

@@ -58,6 +58,7 @@ import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParams
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   components: {
@@ -84,12 +85,27 @@ export default {
     iconName() {
       return this.showPassword ? 'eye-slash' : 'eye'
     },
+    ...mapGetters({
+      currentUser: 'auth/user',
+    }),
   },
   methods: {
+    ...mapMutations({
+      toggleCategory: 'posts/TOGGLE_CATEGORY',
+      resetCategories: 'posts/RESET_CATEGORIES',
+    }),
     async onSubmit() {
       const { email, password } = this.form
       try {
         await this.$store.dispatch('auth/login', { email, password })
+        if (this.currentUser && this.currentUser.activeCategories) {
+          this.resetCategories()
+          if (this.currentUser.activeCategories.length > 0) {
+            this.currentUser.activeCategories.forEach((categoryId) => {
+              this.toggleCategory(categoryId)
+            })
+          }
+        }
         this.$toast.success(this.$t('login.success'))
         this.$emit('success')
       } catch (err) {

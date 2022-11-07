@@ -15,18 +15,28 @@
         <img :src="post.image | proxyApiUrl" class="image" />
       </template>
       <client-only>
-        <user-teaser :user="post.author" :date-time="post.createdAt" />
+        <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" />
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
       <!-- TODO: replace editor content with tiptap render view -->
-      <!-- eslint-disable vue/no-v-html -->
+      <!-- eslint-disable-next-line vue/no-v-html -->
       <div class="content hyphenate-text" v-html="excerpt" />
-      <!-- eslint-enable vue/no-v-html -->
       <footer
         class="footer"
         v-observe-visibility="(isVisible, entry) => visibilityChanged(isVisible, entry, post.id)"
       >
-        <div class="categories-placeholder"></div>
+        <div class="categories" v-if="categoriesActive">
+          <hc-category
+            v-for="category in post.categories"
+            :key="category.id"
+            v-tooltip="{
+              content: $t(`contribution.category.description.${category.slug}`),
+              placement: 'bottom-start',
+            }"
+            :icon="category.icon"
+          />
+        </div>
+        <div v-else class="categories-placeholder"></div>
         <counter-icon
           icon="bullhorn"
           :count="post.shoutedCount"
@@ -70,6 +80,7 @@
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import HcRibbon from '~/components/Ribbon'
+import HcCategory from '~/components/Category'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
@@ -79,6 +90,7 @@ export default {
   name: 'PostTeaser',
   components: {
     UserTeaser,
+    HcCategory,
     HcRibbon,
     ContentMenu,
     CounterIcon,
@@ -92,6 +104,11 @@ export default {
       type: Object,
       default: () => {},
     },
+  },
+  data() {
+    return {
+      categoriesActive: this.$env.CATEGORIES_ACTIVE,
+    }
   },
   mounted() {
     const { image } = this.post

@@ -297,6 +297,16 @@
     "follow": "Seguir",
     "following": "Siguiendo"
   },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null
+    },
+    "membersCount": null,
+    "membersListTitle": null
+  },
   "hashtags-filter": {
     "clearSearch": "Borrar búsqueda",
     "hashtag-search": "Buscando a #{hashtag}",
@@ -435,6 +445,9 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Carga con éxito"
+    },
     "commented": "Comentado",
     "follow": "Seguir",
     "followers": "Seguidores",
@@ -537,7 +550,7 @@
       "Post": "Contribuciones",
       "User": "Usuarios"
     },
-    "hint": "¿Qué estás buscando?",
+    "hint": "¿Qué estás buscando? Utiliza !… para contribuciones, @… para usuarios, #… para hashtags.",
     "placeholder": "Buscar"
   },
   "settings": {
@@ -715,10 +728,5 @@
     "newTermsAndConditions": "Nuevos términos de uso",
     "termsAndConditionsNewConfirm": "He leído y acepto los nuevos términos de uso.",
     "termsAndConditionsNewConfirmText": "¡Por favor, lea los nuevos términos de uso ahora!"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Carga con éxito"
-    }
   }
 }

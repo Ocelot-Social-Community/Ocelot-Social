@@ -120,7 +120,7 @@ describe('moderate resources', () => {
         await expect(
           mutate({ mutation: reviewMutation, variables: disableVariables }),
         ).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -134,7 +134,7 @@ describe('moderate resources', () => {
         await expect(
           mutate({ mutation: reviewMutation, variables: disableVariables }),
         ).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -218,7 +218,7 @@ describe('moderate resources', () => {
         await expect(
           mutate({ mutation: reviewMutation, variables: disableVariables }),
         ).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -232,7 +232,7 @@ describe('moderate resources', () => {
         await expect(
           mutate({ mutation: reviewMutation, variables: disableVariables }),
         ).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -488,7 +488,7 @@ describe('moderate resources', () => {
         await expect(
           mutate({ mutation: reviewMutation, variables: enableVariables }),
         ).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -507,7 +507,7 @@ describe('moderate resources', () => {
           await expect(
             mutate({ mutation: reviewMutation, variables: enableVariables }),
           ).resolves.toMatchObject({
-            errors: [{ message: 'Not Authorised!' }],
+            errors: [{ message: 'Not Authorized!' }],
           })
         })
       })

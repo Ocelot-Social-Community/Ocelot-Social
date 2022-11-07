@@ -7,10 +7,10 @@
           :class="{ 'disabled-content': user.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
-          <hc-upload v-if="myProfile" :user="user">
-            <user-avatar :user="user" class="profile-avatar" size="large"></user-avatar>
-          </hc-upload>
-          <user-avatar v-else :user="user" class="profile-avatar" size="large" />
+          <avatar-uploader v-if="myProfile" :profile="user" :updateMutation="updateUserMutation">
+            <profile-avatar :profile="user" class="profile-page-avatar" size="large" />
+          </avatar-uploader>
+          <profile-avatar v-else :profile="user" class="profile-page-avatar" size="large" />
           <!-- Menu -->
           <client-only>
             <content-menu
@@ -31,7 +31,8 @@
               {{ userName }}
             </ds-heading>
             <ds-text align="center" color="soft">
-              {{ userSlug }}
+              <!-- <base-icon name="at" data-test="at" /> -->
+              {{ `@${userSlug}` }}
             </ds-text>
             <ds-text v-if="user.location" align="center" color="soft" size="small">
               <base-icon name="map-marker" />
@@ -120,7 +121,6 @@
                   v-tooltip="{
                     content: $t('contribution.newPost'),
                     placement: 'left',
-                    delay: { show: 500 },
                   }"
                   :path="{ name: 'post-create' }"
                   class="profile-post-add-button"
@@ -172,19 +172,20 @@
 import uniqBy from 'lodash/uniqBy'
 import postListActions from '~/mixins/postListActions'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
-import HcFollowButton from '~/components/FollowButton.vue'
+import HcFollowButton from '~/components/Button/FollowButton'
 import HcCountTo from '~/components/CountTo.vue'
 import HcBadges from '~/components/Badges.vue'
-import FollowList from '~/components/features/FollowList/FollowList'
+import FollowList, { followListVisibleCount } from '~/components/features/ProfileList/FollowList'
 import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import HcUpload from '~/components/Upload'
-import UserAvatar from '~/components/_new/generic/UserAvatar/UserAvatar'
+import AvatarUploader from '~/components/Uploader/AvatarUploader'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import UserQuery from '~/graphql/User'
+import { updateUserMutation } from '~/graphql/User.js'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 import UpdateQuery from '~/components/utils/UpdateQuery'
@@ -206,9 +207,9 @@ export default {
     HcCountTo,
     HcBadges,
     HcEmpty,
-    UserAvatar,
+    ProfileAvatar,
     ContentMenu,
-    HcUpload,
+    AvatarUploader,
     MasonryGrid,
     MasonryGridItem,
     FollowList,
@@ -218,6 +219,11 @@ export default {
   transition: {
     name: 'slide-up',
     mode: 'out-in',
+  },
+  head() {
+    return {
+      title: this.userName,
+    }
   },
   data() {
     const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
@@ -230,8 +236,9 @@ export default {
       tabActive: 'post',
       filter,
       followedByCountStartValue: 0,
-      followedByCount: 7,
-      followingCount: 7,
+      followedByCount: followListVisibleCount,
+      followingCount: followListVisibleCount,
+      updateUserMutation,
     }
   },
   computed: {
@@ -247,7 +254,7 @@ export default {
     },
     userSlug() {
       const { slug } = this.user || {}
-      return slug && `@${slug}`
+      return slug
     },
     tabOptions() {
       return [
@@ -417,7 +424,7 @@ export default {
 </script>
 
 <style lang="scss">
-.profile-avatar.user-avatar {
+.profile-page-avatar.profile-avatar {
   margin: auto;
   margin-top: -60px;
 }

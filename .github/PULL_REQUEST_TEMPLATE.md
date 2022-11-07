@@ -1,3 +1,5 @@
+<!-- You can find the latest issue templates here https://github.com/ulfgebhardt/issue-templates -->
+
 ## 🍰 Pullrequest
 <!-- Describe the Pullrequest. Use Screenshots if possible. -->
 
