@@ -97,7 +97,7 @@ export default {
         if (isMember) {
           cypher = `MATCH (user:User)-[membership:MEMBER_OF]->(group:Group)
                     WHERE user.id = $userId
-                    AND membership.role IN ['usual', 'admin', 'owner']
+                    AND membership.role IN ['usual', 'admin', 'owner', 'pending']
                     RETURN toString(count(group)) AS count`
         } else {
           cypher = `MATCH (group:Group)
