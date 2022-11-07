@@ -97,9 +97,9 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
   // externalLink: null, // if defined it's dominating
 
   internalPage: {
-    // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.faq', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.faq', // on null default is used, on empty string it's hidden
+    footerIdent: 'freilernen.help', // localized string identifier, if undefined default is used
+    headTitleIdent: 'freilernen.help', // localized string identifier, if undefined default is used
+    headlineIdent: 'freilernen.help', // on null default is used, on empty string it's hidden
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
@@ -145,7 +145,7 @@ export default {
     DATA_PRIVACY,
     FAQ,
     DONATE,
-    SUPPORT,
+  //  SUPPORT,
     IMPRINT,
   ],
 }

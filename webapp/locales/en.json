@@ -395,6 +395,9 @@
     "follow": "Follow",
     "following": "Following"
   },
+  "freilernen": {
+    "help": "Help"
+  },
   "group": {
     "actionRadii": {
       "continental": "Continental Group",
