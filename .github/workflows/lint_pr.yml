@@ -25,7 +25,7 @@ jobs:
           # Configure which scopes are allowed (newline delimited).
           scopes: |
             backend
-            frontend
+            webapp
             database
             release
             other
