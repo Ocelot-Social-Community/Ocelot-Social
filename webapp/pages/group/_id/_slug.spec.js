@@ -6,10 +6,10 @@ const localVue = global.localVue
 localVue.filter('date', (d) => d)
 
 config.stubs['client-only'] = '<span><slot /></span>'
-// config.stubs['v-popover'] = '<span><slot /></span>'
+config.stubs['v-popover'] = '<span><slot /></span>'
 config.stubs['nuxt-link'] = '<span><slot /></span>'
-// config.stubs['infinite-loading'] = '<span><slot /></span>'
-// config.stubs['follow-list'] = '<span><slot /></span>'
+config.stubs['infinite-loading'] = '<span><slot /></span>'
+config.stubs['follow-list'] = '<span><slot /></span>'
 
 describe('GroupProfileSlug', () => {
   let wrapper
@@ -196,10 +196,11 @@ describe('GroupProfileSlug', () => {
   })
 
   describe('mount', () => {
-    Wrapper = () => {
+    Wrapper = (data = () => {}) => {
       return mount(GroupProfileSlug, {
         mocks,
         localVue,
+        data,
       })
     }
 
@@ -213,15 +214,16 @@ describe('GroupProfileSlug', () => {
                 'auth/isModerator': () => false,
               },
             }
-            wrapper = Wrapper()
-            wrapper.setData({
-              Group: [
-                {
-                  ...yogaPractice,
-                  myRole: 'owner',
-                },
-              ],
-              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...yogaPractice,
+                    myRole: 'owner',
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
@@ -237,9 +239,13 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
+          })
+
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('yoga-practice')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&yoga-practice')
           })
 
           describe('displays no(!) group location – because is "null"', () => {
@@ -361,15 +367,16 @@ describe('GroupProfileSlug', () => {
                 'auth/isModerator': () => false,
               },
             }
-            wrapper = Wrapper()
-            wrapper.setData({
-              Group: [
-                {
-                  ...yogaPractice,
-                  myRole: 'usual',
-                },
-              ],
-              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...yogaPractice,
+                    myRole: 'usual',
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
@@ -385,9 +392,13 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          })
+
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('yoga-practice')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&yoga-practice')
           })
 
           describe('displays no(!) group location – because is "null"', () => {
@@ -469,15 +480,16 @@ describe('GroupProfileSlug', () => {
                 'auth/isModerator': () => false,
               },
             }
-            wrapper = Wrapper()
-            wrapper.setData({
-              Group: [
-                {
-                  ...yogaPractice,
-                  myRole: 'pending',
-                },
-              ],
-              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...yogaPractice,
+                    myRole: 'pending',
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
@@ -493,9 +505,13 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          })
+
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('yoga-practice')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&yoga-practice')
           })
 
           describe('displays no(!) group location – because is "null"', () => {
@@ -577,15 +593,16 @@ describe('GroupProfileSlug', () => {
                 'auth/isModerator': () => false,
               },
             }
-            wrapper = Wrapper()
-            wrapper.setData({
-              Group: [
-                {
-                  ...yogaPractice,
-                  myRole: null,
-                },
-              ],
-              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...yogaPractice,
+                    myRole: null,
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
@@ -601,9 +618,13 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          })
+
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('yoga-practice')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&yoga-practice')
           })
 
           describe('displays no(!) group location – because is "null"', () => {
@@ -689,15 +710,16 @@ describe('GroupProfileSlug', () => {
                 'auth/isModerator': () => false,
               },
             }
-            wrapper = Wrapper()
-            wrapper.setData({
-              Group: [
-                {
-                  ...schoolForCitizens,
-                  myRole: 'owner',
-                },
-              ],
-              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...schoolForCitizens,
+                    myRole: 'owner',
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
@@ -713,9 +735,13 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
+          })
+
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('school-for-citizens')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&school-for-citizens')
           })
 
           describe('displays group location', () => {
@@ -801,15 +827,16 @@ describe('GroupProfileSlug', () => {
                 'auth/isModerator': () => false,
               },
             }
-            wrapper = Wrapper()
-            wrapper.setData({
-              Group: [
-                {
-                  ...schoolForCitizens,
-                  myRole: 'usual',
-                },
-              ],
-              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...schoolForCitizens,
+                    myRole: 'usual',
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
@@ -825,9 +852,13 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          })
+
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('school-for-citizens')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&school-for-citizens')
           })
 
           describe('displays group location', () => {
@@ -913,15 +944,16 @@ describe('GroupProfileSlug', () => {
                 'auth/isModerator': () => false,
               },
             }
-            wrapper = Wrapper()
-            wrapper.setData({
-              Group: [
-                {
-                  ...schoolForCitizens,
-                  myRole: 'pending',
-                },
-              ],
-              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...schoolForCitizens,
+                    myRole: 'pending',
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
@@ -937,9 +969,13 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          })
+
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('school-for-citizens')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&school-for-citizens')
           })
 
           describe('displays group location', () => {
@@ -1025,15 +1061,16 @@ describe('GroupProfileSlug', () => {
                 'auth/isModerator': () => false,
               },
             }
-            wrapper = Wrapper()
-            wrapper.setData({
-              Group: [
-                {
-                  ...schoolForCitizens,
-                  myRole: null,
-                },
-              ],
-              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...schoolForCitizens,
+                    myRole: null,
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
@@ -1049,9 +1086,13 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          })
+
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('school-for-citizens')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&school-for-citizens')
           })
 
           describe('displays group location', () => {
@@ -1141,15 +1182,16 @@ describe('GroupProfileSlug', () => {
                 'auth/isModerator': () => false,
               },
             }
-            wrapper = Wrapper()
-            wrapper.setData({
-              Group: [
-                {
-                  ...investigativeJournalism,
-                  myRole: 'owner',
-                },
-              ],
-              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...investigativeJournalism,
+                    myRole: 'owner',
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
@@ -1165,9 +1207,13 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
+          })
+
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('investigative-journalism')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&investigative-journalism')
           })
 
           describe('displays group location', () => {
@@ -1256,15 +1302,16 @@ describe('GroupProfileSlug', () => {
                 'auth/isModerator': () => false,
               },
             }
-            wrapper = Wrapper()
-            wrapper.setData({
-              Group: [
-                {
-                  ...investigativeJournalism,
-                  myRole: 'usual',
-                },
-              ],
-              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...investigativeJournalism,
+                    myRole: 'usual',
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
@@ -1280,9 +1327,13 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(true)
           })
 
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          })
+
           it('has group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('investigative-journalism')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
+            expect(wrapper.text()).toContain('&investigative-journalism')
           })
 
           describe('displays group location', () => {
@@ -1371,15 +1422,16 @@ describe('GroupProfileSlug', () => {
                 'auth/isModerator': () => false,
               },
             }
-            wrapper = Wrapper()
-            wrapper.setData({
-              Group: [
-                {
-                  ...investigativeJournalism,
-                  myRole: 'pending',
-                },
-              ],
-              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...investigativeJournalism,
+                    myRole: 'pending',
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
@@ -1395,9 +1447,13 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(false)
           })
 
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          })
+
           it('has no(!) group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(false)
-            expect(wrapper.text()).not.toContain('investigative-journalism')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(false)
+            expect(wrapper.text()).not.toContain('&investigative-journalism')
           })
 
           describe('displays not(!) group location', () => {
@@ -1474,15 +1530,16 @@ describe('GroupProfileSlug', () => {
                 'auth/isModerator': () => false,
               },
             }
-            wrapper = Wrapper()
-            wrapper.setData({
-              Group: [
-                {
-                  ...investigativeJournalism,
-                  myRole: null,
-                },
-              ],
-              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...investigativeJournalism,
+                    myRole: null,
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
@@ -1498,9 +1555,13 @@ describe('GroupProfileSlug', () => {
             expect(wrapper.find('.profile-avatar').exists()).toBe(false)
           })
 
+          it('has not(!) GroupContentMenu', () => {
+            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
+          })
+
           it('has no(!) group slug', () => {
-            expect(wrapper.find('[data-test="at"]').exists()).toBe(false)
-            expect(wrapper.text()).not.toContain('investigative-journalism')
+            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(false)
+            expect(wrapper.text()).not.toContain('&investigative-journalism')
           })
 
           describe('displays not(!) group location', () => {

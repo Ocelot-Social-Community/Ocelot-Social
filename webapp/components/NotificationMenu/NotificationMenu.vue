@@ -112,16 +112,6 @@ export default {
 </script>
 
 <style lang="scss">
-.notifications-menu {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-
-  .base-button {
-    overflow: visible;
-  }
-}
-
 .notifications-menu-popover {
   max-width: 500px;
   margin-bottom: $size-height-base;

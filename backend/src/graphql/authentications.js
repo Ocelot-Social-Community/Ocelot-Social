@@ -19,6 +19,7 @@ export const signupVerificationMutation = gql`
       nonce: $nonce
       termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
     ) {
+      id
       slug
     }
   }

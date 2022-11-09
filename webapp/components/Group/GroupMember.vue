@@ -1,5 +1,41 @@
 <template>
-  <div>
+  <div class="group-member">
+    <base-card>
+      <h2 class="title">{{ $t('group.addUser') }}</h2>
+      <ds-form v-model="form" @submit="submit">
+        <ds-flex gutter="small">
+          <ds-flex-item width="90%">
+            <ds-input
+              name="query"
+              model="query"
+              :placeholder="$t('group.addUserPlaceholder')"
+              icon="search"
+            />
+          </ds-flex-item>
+          <ds-flex-item width="30px">
+            <!-- <base-button filled circle type="submit" icon="search" :loading="$apollo.loading" /> -->
+            <base-button filled circle type="submit" icon="search" />
+          </ds-flex-item>
+        </ds-flex>
+      </ds-form>
+      <div v-if="noSlug">Kein User mit diesem Slug gefunden!</div>
+      <div v-if="slugUser.length > 0">
+        <ds-space margin="base" />
+        <ds-flex>
+          <ds-flex-item>
+            <ds-avatar online size="small" :name="slugUser[0].name"></ds-avatar>
+          </ds-flex-item>
+          <ds-flex-item>{{ slugUser[0].name }}</ds-flex-item>
+          <ds-flex-item>{{ slugUser[0].slug }}</ds-flex-item>
+          <ds-flex-item>
+            <ds-button size="small" primary @click="addMemberToGroup(slugUser)">
+              {{ $t('group.addMemberToGroup') }}
+            </ds-button>
+          </ds-flex-item>
+        </ds-flex>
+        <ds-space margin="base" />
+      </div>
+    </base-card>
     <ds-table :fields="tableFields" :data="groupMembers" condensed>
       <template #avatar="scope">
         <nuxt-link
@@ -51,7 +87,7 @@
         </ds-chip>
       </template>
       <template #edit="scope">
-        <ds-button size="small" primary :disabled="true" @click="openModal(scope.row)">
+        <ds-button v-if="scope.row.myRoleInGroup !== 'owner'" size="small" primary disabled>
           <!-- TODO: implement removal of group members -->
           <!--           :disabled="scope.row.myRoleInGroup === 'owner'"
  -->
@@ -74,6 +110,7 @@
   </div>
 </template>
 <script>
+import { minimisedUserQuery } from '~/graphql/User'
 import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
 
 export default {
@@ -92,6 +129,11 @@ export default {
     return {
       isOpen: false,
       memberId: null,
+      noSlug: false,
+      slugUser: [],
+      form: {
+        query: '',
+      },
     }
   },
   computed: {
@@ -135,14 +177,50 @@ export default {
         this.$toast.error(error.message)
       }
     },
-    // TODO: implement removal of group members
-    // openModal(row) {
-    //   this.isOpen = true
-    //   this.memberId = row.id
-    // },
-    // deleteMember(id) {
-    //   alert('deleteMember: ' + id)
-    // },
+    async addMemberToGroup() {
+      const newRole = 'usual'
+      if (this.groupMembers.find((member) => member.id === this.slugUser[0].id)) {
+        this.$toast.error(
+          this.$t('group.errors.userAlreadyMember', { slug: this.slugUser[0].slug }),
+        )
+        return
+      }
+      try {
+        await this.$apollo.mutate({
+          mutation: changeGroupMemberRoleMutation(),
+          variables: { groupId: this.groupId, userId: this.slugUser[0].id, roleInGroup: newRole },
+        })
+        this.$emit('loadGroupMembers')
+        this.slugUser = []
+        this.form.query = ''
+        this.$toast.success(
+          this.$t('group.changeMemberRole', { role: this.$t(`group.roles.${newRole}`) }),
+        )
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
+    async submit() {
+      try {
+        const {
+          data: { User },
+        } = await this.$apollo.query({
+          query: minimisedUserQuery(),
+          variables: {
+            slug: this.form.query,
+          },
+        })
+        if (User.length === 0) {
+          this.noSlug = true
+        } else {
+          this.noSlug = false
+          this.slugUser = User
+        }
+      } catch (error) {
+        this.noSlug = true
+      } finally {
+      }
+    },
   },
 }
 </script>

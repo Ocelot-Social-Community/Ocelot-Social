@@ -99,6 +99,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    groupId: {
+      type: String,
+      default: () => null,
+    },
   },
   data() {
     const { title, content, image, categories } = this.contribution
@@ -173,6 +177,7 @@ export default {
             categoryIds,
             id: this.contribution.id || null,
             image,
+            groupId: this.groupId,
           },
         })
         .then(({ data }) => {

@@ -360,6 +360,33 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       }),
     ])
 
+    // post into group
+    await Promise.all([
+      mutate({
+        mutation: createPostMutation(),
+        variables: {
+          id: 'p0-g0',
+          groupId: 'g0',
+          title: `What happend in Shanghai?`,
+          content: 'A sack of rise dropped in Shanghai. Should we further investigate?',
+          categoryIds: ['cat6'],
+        },
+      }),
+    ])
+    authenticatedUser = await bobDerBaumeister.toJson()
+    await Promise.all([
+      mutate({
+        mutation: createPostMutation(),
+        variables: {
+          id: 'p1-g0',
+          groupId: 'g0',
+          title: `The man on the moon`,
+          content: 'We have to further investigate about the stories of a man living on the moon.',
+          categoryIds: ['cat12', 'cat16'],
+        },
+      }),
+    ])
+
     authenticatedUser = await jennyRostock.toJson()
     await Promise.all([
       mutate({
@@ -436,6 +463,32 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           groupId: 'g1',
           userId: 'u6',
           roleInGroup: 'owner',
+        },
+      }),
+    ])
+    // post into group
+    await Promise.all([
+      mutate({
+        mutation: createPostMutation(),
+        variables: {
+          id: 'p0-g1',
+          groupId: 'g1',
+          title: `Can we use ocelot for education?`,
+          content: 'I like the concept of this school. Can we use our software in this?',
+          categoryIds: ['cat8'],
+        },
+      }),
+    ])
+    authenticatedUser = await peterLustig.toJson()
+    await Promise.all([
+      mutate({
+        mutation: createPostMutation(),
+        variables: {
+          id: 'p1-g1',
+          groupId: 'g1',
+          title: `Can we push this idea out of France?`,
+          content: 'This idea is too inportant to have the scope only on France.',
+          categoryIds: ['cat14'],
         },
       }),
     ])
@@ -523,6 +576,20 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           groupId: 'g2',
           userId: 'u6',
           roleInGroup: 'usual',
+        },
+      }),
+    ])
+
+    authenticatedUser = await louie.toJson()
+    await Promise.all([
+      mutate({
+        mutation: createPostMutation(),
+        variables: {
+          id: 'p0-g2',
+          groupId: 'g2',
+          title: `I am a Noob`,
+          content: 'I am new to Yoga and did not join this group so far.',
+          categoryIds: ['cat4'],
         },
       }),
     ])
@@ -709,7 +776,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     await Promise.all([
       mutate({
-        mutation: createPostMutation,
+        mutation: createPostMutation(),
         variables: {
           id: 'p2',
           title: `Nature Philosophy Yoga`,
@@ -718,7 +785,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: createPostMutation,
+        mutation: createPostMutation(),
         variables: {
           id: 'p7',
           title: 'This is post #7',
@@ -727,7 +794,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: createPostMutation,
+        mutation: createPostMutation(),
         variables: {
           id: 'p8',
           image: faker.image.unsplash.nature(),
@@ -737,7 +804,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       }),
       mutate({
-        mutation: createPostMutation,
+        mutation: createPostMutation(),
         variables: {
           id: 'p12',
           title: 'This is post #12',

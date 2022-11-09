@@ -3,7 +3,11 @@
 import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
-  externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  // if defined it's dominating
+  externalLink: {
+    url: 'https://ocelot.social',
+    target: '_blank',
+  },
 
   internalPage: {
     // footerIdent: 'site.made', // localized string identifier, if undefined default is used
@@ -16,8 +20,12 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
   },
 })
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
-  // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  externalLink: 'https://ocelot-social.herokuapp.com/donations', // if string is defined and not empty it's dominating
+  // if defined it's dominating
+  externalLink: {
+    // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
+    url: 'https://ocelot-social.herokuapp.com/donations',
+    target: '_blank',
+  },
 
   internalPage: {
     // footerIdent: 'site.donate', // localized string identifier, if undefined default is used
@@ -30,8 +38,11 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
   },
 })
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
-  // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-  externalLink: 'https://ocelot-social.herokuapp.com/imprint', // if string is defined and not empty it's dominating
+  externalLink: {
+    // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
+    url: 'https://ocelot-social.herokuapp.com/imprint',
+    target: '_blank',
+  },
 
   internalPage: {
     // footerIdent: 'site.imprint', // localized string identifier, if undefined default is used
@@ -44,7 +55,7 @@ const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
   },
 })
 const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwrite({
-  // externalLink: null, // if string is defined and not empty it's dominating
+  // externalLink: null, // if defined it's dominating
 
   internalPage: {
     // footerIdent: 'site.termsAndConditions', // localized string identifier, if undefined default is used
@@ -57,7 +68,7 @@ const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwri
   },
 })
 const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
-  // externalLink: null, // if string is defined and not empty it's dominating
+  // externalLink: null, // if defined it's dominating
 
   internalPage: {
     // footerIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
@@ -70,7 +81,7 @@ const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
   },
 })
 const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
-  // externalLink: null, // if string is defined and not empty it's dominating
+  // externalLink: null, // if defined it's dominating
 
   internalPage: {
     // footerIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
@@ -83,7 +94,7 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
-  // externalLink: null, // if string is defined and not empty it's dominating
+  // externalLink: null, // if defined it's dominating
 
   internalPage: {
     // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
@@ -96,7 +107,11 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
   },
 })
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
-  externalLink: 'https://ocelot.social', // if string is defined and not empty it's dominating
+  // if defined it's dominating
+  externalLink: {
+    url: 'https://ocelot.social',
+    target: '_blank',
+  },
 
   internalPage: {
     // footerIdent: 'site.support', // localized string identifier, if undefined default is used

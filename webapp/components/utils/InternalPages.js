@@ -4,7 +4,11 @@ export const defaultPageParamsPages = {
   ORGANIZATION: new PageParams({
     name: 'organization',
 
-    externalLink: null, // if string is defined and not empty it's dominating
+    // externalLink: {
+    //   url: 'https://ocelot.social',
+    //   target: '_blank',
+    // },
+    externalLink: null, // if defined it's dominating
 
     internalPage: {
       pageRoute: '/organization', // static, don't change! internal page in case no external is defined
@@ -21,7 +25,11 @@ export const defaultPageParamsPages = {
   DONATE: new PageParams({
     name: 'donate',
 
-    externalLink: null, // if string is defined and not empty it's dominating
+    // externalLink: {
+    //   url: 'https://ocelot.social',
+    //   target: '_blank',
+    // },
+    externalLink: null, // if defined it's dominating
 
     internalPage: {
       pageRoute: '/donate', // static, don't change! internal page in case no external is defined
@@ -38,7 +46,11 @@ export const defaultPageParamsPages = {
   IMPRINT: new PageParams({
     name: 'imprint',
 
-    externalLink: null, // if string is defined and not empty it's dominating
+    // externalLink: {
+    //   url: 'https://ocelot.social',
+    //   target: '_blank',
+    // },
+    externalLink: null, // if defined it's dominating
 
     internalPage: {
       pageRoute: '/imprint', // static, don't change! internal page in case no external is defined
@@ -55,7 +67,11 @@ export const defaultPageParamsPages = {
   TERMS_AND_CONDITIONS: new PageParams({
     name: 'terms-and-conditions',
 
-    externalLink: null, // if string is defined and not empty it's dominating
+    // externalLink: {
+    //   url: 'https://ocelot.social',
+    //   target: '_blank',
+    // },
+    externalLink: null, // if defined it's dominating
 
     internalPage: {
       pageRoute: '/terms-and-conditions', // static, don't change! internal page in case no external is defined
@@ -72,7 +88,11 @@ export const defaultPageParamsPages = {
   CODE_OF_CONDUCT: new PageParams({
     name: 'code-of-conduct',
 
-    externalLink: null, // if string is defined and not empty it's dominating
+    // externalLink: {
+    //   url: 'https://ocelot.social',
+    //   target: '_blank',
+    // },
+    externalLink: null, // if defined it's dominating
 
     internalPage: {
       pageRoute: '/code-of-conduct', // static, don't change! internal page in case no external is defined
@@ -89,7 +109,11 @@ export const defaultPageParamsPages = {
   DATA_PRIVACY: new PageParams({
     name: 'data-privacy',
 
-    externalLink: null, // if string is defined and not empty it's dominating
+    // externalLink: {
+    //   url: 'https://ocelot.social',
+    //   target: '_blank',
+    // },
+    externalLink: null, // if defined it's dominating
 
     internalPage: {
       pageRoute: '/data-privacy', // static, don't change! internal page in case no external is defined
@@ -106,7 +130,11 @@ export const defaultPageParamsPages = {
   FAQ: new PageParams({
     name: 'faq',
 
-    externalLink: null, // if string is defined and not empty it's dominating
+    // externalLink: {
+    //   url: 'https://ocelot.social',
+    //   target: '_blank',
+    // },
+    externalLink: null, // if defined it's dominating
 
     internalPage: {
       pageRoute: '/faq', // static, don't change! internal page in case no external is defined
@@ -123,7 +151,11 @@ export const defaultPageParamsPages = {
   SUPPORT: new PageParams({
     name: 'support',
 
-    externalLink: null,
+    // externalLink: {
+    //   url: 'https://ocelot.social',
+    //   target: '_blank',
+    // },
+    externalLink: null, // if defined it's dominating
 
     internalPage: {
       pageRoute: '/support', // static, don't change '*/support'! internal page in case no external is defined

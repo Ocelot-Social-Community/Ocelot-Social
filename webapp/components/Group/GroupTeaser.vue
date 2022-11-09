@@ -13,8 +13,8 @@
         <!-- group slug -->
         <div>
           <ds-text color="soft">
-            <base-icon name="at" />
-            {{ group.slug }}
+            <!-- <base-icon name="at" data-test="ampersand" /> -->
+            {{ `&${group.slug}` }}
           </ds-text>
         </div>
         <!-- group location -->
@@ -31,7 +31,7 @@
       <footer class="footer">
         <div>
           <!-- group my role in group -->
-          <ds-chip color="primary">
+          <ds-chip v-if="group && group.myRole" color="primary">
             {{ group && group.myRole ? $t('group.roles.' + group.myRole) : '' }}
           </ds-chip>
           <!-- group type -->
@@ -58,7 +58,7 @@
         <div v-else class="categories-placeholder"></div>
         <!-- group context menu -->
         <client-only>
-          <group-content-menu resource-type="group" :resource="group" :group="group" />
+          <group-content-menu :usage="'groupTeaser'" :group="group || {}" placement="bottom-end" />
         </client-only>
       </footer>
       <footer class="footer">
@@ -78,7 +78,7 @@
 
 <script>
 import Category from '~/components/Category'
-import GroupContentMenu from '~/components/Group/GroupContentMenu'
+import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 
 export default {
   name: 'GroupTeaser',

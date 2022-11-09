@@ -5,6 +5,7 @@ import { UserInputError } from 'apollo-server'
 import { mergeImage, deleteImage } from './images/images'
 import Resolver from './helpers/Resolver'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
+import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import CONFIG from '../../config'
 
 const maintainPinnedPosts = (params) => {
@@ -20,15 +21,13 @@ const maintainPinnedPosts = (params) => {
 export default {
   Query: {
     Post: async (object, params, context, resolveInfo) => {
+      params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
       params = await maintainPinnedPosts(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
-    findPosts: async (object, params, context, resolveInfo) => {
-      params = await filterForMutedUsers(params, context)
-      return neo4jgraphql(object, params, context, resolveInfo)
-    },
     profilePagePosts: async (object, params, context, resolveInfo) => {
+      params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
@@ -77,13 +76,37 @@ export default {
   },
   Mutation: {
     CreatePost: async (_parent, params, context, _resolveInfo) => {
-      const { categoryIds } = params
+      const { categoryIds, groupId } = params
       const { image: imageInput } = params
       delete params.categoryIds
       delete params.image
+      delete params.groupId
       params.id = params.id || uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        let groupCypher = ''
+        if (groupId) {
+          groupCypher = `
+            WITH post MATCH (group:Group { id: $groupId })
+            MERGE (post)-[:IN]->(group)`
+          const groupTypeResponse = await transaction.run(
+            `
+            MATCH (group:Group { id: $groupId }) RETURN group.groupType AS groupType`,
+            { groupId },
+          )
+          const [groupType] = groupTypeResponse.records.map((record) => record.get('groupType'))
+          if (groupType !== 'public')
+            groupCypher += `
+             WITH post, group
+             MATCH (user:User)-[membership:MEMBER_OF]->(group)
+               WHERE group.groupType IN ['closed', 'hidden']
+                 AND membership.role IN ['usual', 'admin', 'owner']
+             WITH post, collect(user.id) AS userIds
+             OPTIONAL MATCH path =(restricted:User) WHERE NOT restricted.id IN userIds 
+             FOREACH (user IN nodes(path) |
+               MERGE (user)-[:CANNOT_SEE]->(post)
+             )`
+        }
         const categoriesCypher =
           CONFIG.CATEGORIES_ACTIVE && categoryIds
             ? `WITH post
@@ -103,9 +126,10 @@ export default {
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
             ${categoriesCypher}
+            ${groupCypher}
             RETURN post {.*}
           `,
-          { userId: context.user.id, params, categoryIds },
+          { userId: context.user.id, categoryIds, groupId, params },
         )
         const [post] = createPostTransactionResponse.records.map((record) => record.get('post'))
         if (imageInput) {
@@ -367,6 +391,7 @@ export default {
         author: '<-[:WROTE]-(related:User)',
         pinnedBy: '<-[:PINNED]-(related:User)',
         image: '-[:HERO_IMAGE]->(related:Image)',
+        group: '-[:IN]->(related:Group)',
       },
       count: {
         commentsCount:

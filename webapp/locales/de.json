@@ -404,6 +404,10 @@
       "regional": "Regionale Gruppe"
     },
     "actionRadius": "Aktionsradius",
+    "addMemberToGroup": "Zur Gruppe hinzufügen",
+    "addUser": "Benutzer hinzufügen",
+    "addUserPlaceholder": "eindeutiger Benutzername > @slug-from-user",
+    "allGroups": "Alle Gruppen",
     "categories": "Thema ::: Themen",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
     "contentMenu": {
@@ -418,11 +422,15 @@
       "groupName": "Einstellungen für „{name}“",
       "title": "Meine Gruppe ändern"
     },
+    "errors": {
+      "userAlreadyMember": "Nutzer @{slug} ist bereits Mitglied"
+    },
     "follow": "Folge",
     "foundation": "Gründung",
     "general": "Allgemein",
     "goal": "Ziel der Gruppe",
     "groupCreated": "Die Gruppe wurde angelegt!",
+    "in": "in",
     "joinLeaveButton": {
       "iAmMember": "Bin Mitglied",
       "join": "Beitreten"
@@ -472,7 +480,7 @@
   },
   "header": {
     "avatarMenu": {
-      "myGroups": "Mein Gruppen",
+      "Groups": "Gruppen",
       "myProfile": "Mein Profil"
     }
   },
@@ -605,7 +613,19 @@
       "submitted": "Kommentar gesendet",
       "updated": "Änderungen gespeichert"
     },
+    "createNewPost": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Erstelle einen neuen Beitrag"
+    },
     "edited": "bearbeitet",
+    "editPost": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Bearbeite deinen Beitrag"
+    },
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
@@ -618,6 +638,12 @@
     "pinned": "Meldung",
     "takeAction": {
       "name": "Aktiv werden"
+    },
+    "viewPost": {
+      "forGroup": {
+        "title": "In der Gruppe „{name}“"
+      },
+      "title": "Beitrag"
     }
   },
   "profile": {
@@ -723,11 +749,12 @@
     "failed": "Nichts gefunden",
     "for": "Suche nach ",
     "heading": {
+      "Group": "Gruppe ::: Gruppen",
       "Post": "Beitrag ::: Beiträge",
       "Tag": "Hashtag ::: Hashtags",
       "User": "Benutzer ::: Benutzer"
     },
-    "hint": "Wonach suchst Du? Nutze !… für Beiträge, @… für Mitglieder, #… für Hashtags",
+    "hint": "Wonach suchst Du? Nutze !… für Beiträge, @… für Mitglieder, &… für Gruppen, #… für Hashtags",
     "no-results": "Keine Ergebnisse für \"{search}\" gefunden. Versuch' es mit einem anderen Begriff!",
     "page": "Seite",
     "placeholder": "Suchen",

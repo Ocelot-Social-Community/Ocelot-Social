@@ -14,6 +14,7 @@
       <div class="filter-menu-options">
         <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
         <following-filter />
+        <categories-filter v-if="categoriesActive" :showMobileMenu="showMobileMenu" />
       </div>
       <div class="filter-menu-options">
         <h2 class="title">{{ $t('filter-menu.order-by') }}</h2>
@@ -28,16 +29,24 @@ import Dropdown from '~/components/Dropdown'
 import { mapGetters } from 'vuex'
 import FollowingFilter from './FollowingFilter'
 import OrderByFilter from './OrderByFilter'
+import CategoriesFilter from './CategoriesFilter'
 
 export default {
   components: {
     Dropdown,
     FollowingFilter,
     OrderByFilter,
+    CategoriesFilter,
+  },
+  data() {
+    return {
+      categoriesActive: this.$env.CATEGORIES_ACTIVE,
+    }
   },
   props: {
     placement: { type: String },
     offset: { type: [String, Number] },
+    showMobileMenu: { type: Boolean, default: false },
   },
   computed: {
     ...mapGetters({

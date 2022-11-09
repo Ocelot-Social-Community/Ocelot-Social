@@ -31,8 +31,8 @@
               {{ userName }}
             </ds-heading>
             <ds-text align="center" color="soft">
-              <base-icon name="at" />
-              {{ userSlug }}
+              <!-- <base-icon name="at" data-test="at" /> -->
+              {{ `@${userSlug}` }}
             </ds-text>
             <ds-text v-if="user.location" align="center" color="soft" size="small">
               <base-icon name="map-marker" />

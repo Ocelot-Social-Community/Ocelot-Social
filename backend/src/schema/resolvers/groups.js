@@ -14,7 +14,9 @@ import { createOrUpdateLocations } from './users/location'
 export default {
   Query: {
     Group: async (_object, params, context, _resolveInfo) => {
-      const { isMember, id, slug } = params
+      const { isMember, id, slug, first, offset } = params
+      let pagination = ''
+      if (first !== undefined && offset !== undefined) pagination = `SKIP ${offset} LIMIT ${first}`
       const matchParams = { id, slug }
       removeUndefinedNullValuesFromObject(matchParams)
       const session = context.driver.session()
@@ -27,6 +29,7 @@ export default {
             WITH group, membership
             WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
             RETURN group {.*, myRole: membership.role}
+            ${pagination}
           `
         } else {
           if (isMember === false) {
@@ -36,6 +39,7 @@ export default {
               WITH group
               WHERE group.groupType IN ['public', 'closed']
               RETURN group {.*, myRole: NULL}
+              ${pagination}
             `
           } else {
             groupCypher = `
@@ -44,6 +48,7 @@ export default {
               WITH group, membership
               WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
               RETURN group {.*, myRole: membership.role}
+              ${pagination}
             `
           }
         }
@@ -75,6 +80,39 @@ export default {
       })
       try {
         return await readTxResultPromise
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    GroupCount: async (_object, params, context, _resolveInfo) => {
+      const { isMember } = params
+      const {
+        user: { id: userId },
+      } = context
+      const session = context.driver.session()
+      const readTxResultPromise = session.readTransaction(async (txc) => {
+        let cypher
+        if (isMember) {
+          cypher = `MATCH (user:User)-[membership:MEMBER_OF]->(group:Group)
+                    WHERE user.id = $userId
+                    AND membership.role IN ['usual', 'admin', 'owner', 'pending']
+                    RETURN toString(count(group)) AS count`
+        } else {
+          cypher = `MATCH (group:Group)
+                    OPTIONAL MATCH (user:User)-[membership:MEMBER_OF]->(group)
+                    WHERE user.id = $userId
+                    WITH group, membership
+                    WHERE group.groupType IN ['public', 'closed']
+                    OR membership.role IN ['usual', 'admin', 'owner']
+                    RETURN toString(count(group)) AS count`
+        }
+        const transactionResponse = await txc.run(cypher, { userId })
+        return transactionResponse.records.map((record) => record.get('count'))
+      })
+      try {
+        return parseInt(await readTxResultPromise)
       } catch (error) {
         throw new Error(error)
       } finally {
@@ -264,8 +302,15 @@ export default {
         const leaveGroupCypher = `
           MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
           DELETE membership
+          WITH member, group
+          OPTIONAL MATCH (p:Post)-[:IN]->(group)
+          WHERE NOT group.groupType = 'public' 
+          WITH member, group, collect(p) AS posts
+          FOREACH (post IN posts |
+            MERGE (member)-[:CANNOT_SEE]->(post))
           RETURN member {.*, myRoleInGroup: NULL}
         `
+
         const transactionResponse = await transaction.run(leaveGroupCypher, { groupId, userId })
         const [member] = await transactionResponse.records.map((record) => record.get('member'))
         return member
@@ -282,8 +327,22 @@ export default {
       const { groupId, userId, roleInGroup } = params
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        let postRestrictionCypher = ''
+        if (['usual', 'admin', 'owner'].includes(roleInGroup)) {
+          postRestrictionCypher = `
+            WITH group, member, membership
+            FOREACH (restriction IN [(member)-[r:CANNOT_SEE]->(:Post)-[:IN]->(group) | r] |
+              DELETE restriction)`
+        } else {
+          postRestrictionCypher = `
+            WITH group, member, membership
+            FOREACH (post IN [(p:Post)-[:IN]->(group) | p] |
+              MERGE (member)-[:CANNOT_SEE]->(post))`
+        }
+
         const joinGroupCypher = `
-          MATCH (member:User {id: $userId}), (group:Group {id: $groupId})
+          MATCH (member:User {id: $userId})
+          MATCH (group:Group {id: $groupId})
           MERGE (member)-[membership:MEMBER_OF]->(group)
           ON CREATE SET
             membership.createdAt = toString(datetime()),
@@ -292,8 +351,10 @@ export default {
           ON MATCH SET
             membership.updatedAt = toString(datetime()),
             membership.role = $roleInGroup
+          ${postRestrictionCypher}
           RETURN member {.*, myRoleInGroup: membership.role}
         `
+
         const transactionResponse = await transaction.run(joinGroupCypher, {
           groupId,
           userId,
@@ -316,6 +377,7 @@ export default {
       undefinedToNull: ['deleted', 'disabled', 'locationName', 'about'],
       hasMany: {
         categories: '-[:CATEGORIZED]->(related:Category)',
+        posts: '<-[:IN]-(related:Post)',
       },
       hasOne: {
         avatar: '-[:AVATAR_IMAGE]->(related:Image)',

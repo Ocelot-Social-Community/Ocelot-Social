@@ -24,6 +24,7 @@
         {{ $t('components.registration.email.form.sendEmailAgain') }}
       </label>
     </ds-text>
+    <ds-space margin="xxx-small" />
   </ds-form>
 </template>
 

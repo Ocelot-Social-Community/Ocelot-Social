@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 export default () => {
   return gql`
     query {
-      Category {
+      Category(orderBy: slug_asc) {
         id
         slug
         icon

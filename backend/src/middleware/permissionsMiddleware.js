@@ -1,4 +1,4 @@
-import { rule, shield, deny, allow, or } from 'graphql-shield'
+import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 import { getNeode } from '../db/neo4j'
 import CONFIG from '../config'
 import { validateInviteCode } from '../schema/resolvers/transactions/inviteCodes'
@@ -122,37 +122,41 @@ const isAllowedToChangeGroupMemberRole = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
   if (!(user && user.id)) return false
-  const adminId = user.id
+  const currentUserId = user.id
   const { groupId, userId, roleInGroup } = args
-  if (adminId === userId) return false
+  if (currentUserId === userId) return false
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
       `
-        MATCH (admin:User {id: $adminId})-[adminMembership:MEMBER_OF]->(group:Group {id: $groupId})
+        MATCH (currentUser:User {id: $currentUserId})-[currentUserMembership:MEMBER_OF]->(group:Group {id: $groupId})
         OPTIONAL MATCH (group)<-[userMembership:MEMBER_OF]-(member:User {id: $userId})
-        RETURN group {.*}, admin {.*, myRoleInGroup: adminMembership.role}, member {.*, myRoleInGroup: userMembership.role}
+        RETURN group {.*}, currentUser {.*, myRoleInGroup: currentUserMembership.role}, member {.*, myRoleInGroup: userMembership.role}
       `,
-      { groupId, adminId, userId },
+      { groupId, currentUserId, userId },
     )
     return {
-      admin: transactionResponse.records.map((record) => record.get('admin'))[0],
+      currentUser: transactionResponse.records.map((record) => record.get('currentUser'))[0],
       group: transactionResponse.records.map((record) => record.get('group'))[0],
       member: transactionResponse.records.map((record) => record.get('member'))[0],
     }
   })
   try {
-    const { admin, group, member } = await readTxPromise
+    const { currentUser, group, member } = await readTxPromise
+    const groupExists = !!group
+    const currentUserExists = !!currentUser
+    const userIsMember = !!member
+    const sameUserRoleInGroup = member && member.myRoleInGroup === roleInGroup
+    const userIsOwner = member && ['owner'].includes(member.myRoleInGroup)
+    const currentUserIsAdmin = currentUser && ['admin'].includes(currentUser.myRoleInGroup)
+    const adminCanSetRole = ['pending', 'usual', 'admin'].includes(roleInGroup)
+    const currentUserIsOwner = currentUser && ['owner'].includes(currentUser.myRoleInGroup)
+    const ownerCanSetRole = ['pending', 'usual', 'admin', 'owner'].includes(roleInGroup)
     return (
-      !!group &&
-      !!admin &&
-      (!member ||
-        (!!member &&
-          (member.myRoleInGroup === roleInGroup || !['owner'].includes(member.myRoleInGroup)))) &&
-      ((['admin'].includes(admin.myRoleInGroup) &&
-        ['pending', 'usual', 'admin'].includes(roleInGroup)) ||
-        (['owner'].includes(admin.myRoleInGroup) &&
-          ['pending', 'usual', 'admin', 'owner'].includes(roleInGroup)))
+      groupExists &&
+      currentUserExists &&
+      (!userIsMember || (userIsMember && (sameUserRoleInGroup || !userIsOwner))) &&
+      ((currentUserIsAdmin && adminCanSetRole) || (currentUserIsOwner && ownerCanSetRole))
     )
   } catch (error) {
     throw new Error(error)
@@ -221,6 +225,68 @@ const isAllowedToLeaveGroup = rule({
   }
 })
 
+const isMemberOfGroup = rule({
+  cache: 'no_cache',
+})(async (_parent, args, { user, driver }) => {
+  if (!(user && user.id)) return false
+  const { groupId } = args
+  if (!groupId) return true
+  const userId = user.id
+  const session = driver.session()
+  const readTxPromise = session.readTransaction(async (transaction) => {
+    const transactionResponse = await transaction.run(
+      `
+        MATCH (User {id: $userId})-[membership:MEMBER_OF]->(Group {id: $groupId})
+        RETURN membership.role AS role
+      `,
+      { groupId, userId },
+    )
+    return transactionResponse.records.map((record) => record.get('role'))[0]
+  })
+  try {
+    const role = await readTxPromise
+    return ['usual', 'admin', 'owner'].includes(role)
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+})
+
+const canCommentPost = rule({
+  cache: 'no_cache',
+})(async (_parent, args, { user, driver }) => {
+  if (!(user && user.id)) return false
+  const { postId } = args
+  const userId = user.id
+  const session = driver.session()
+  const readTxPromise = session.readTransaction(async (transaction) => {
+    const transactionResponse = await transaction.run(
+      `
+        MATCH (post:Post { id: $postId })
+        OPTIONAL MATCH (post)-[:IN]->(group:Group)
+        OPTIONAL MATCH (user:User { id: $userId })-[membership:MEMBER_OF]->(group)
+        RETURN group AS group, membership AS membership
+      `,
+      { postId, userId },
+    )
+    return {
+      group: transactionResponse.records.map((record) => record.get('group'))[0],
+      membership: transactionResponse.records.map((record) => record.get('membership'))[0],
+    }
+  })
+  try {
+    const { group, membership } = await readTxPromise
+    return (
+      !group || (membership && ['usual', 'admin', 'owner'].includes(membership.properties.role))
+    )
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+})
+
 const isAuthor = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
@@ -271,11 +337,10 @@ export default shield(
   {
     Query: {
       '*': deny,
-      findPosts: allow,
-      findUsers: allow,
       searchResults: allow,
       searchPosts: allow,
       searchUsers: allow,
+      searchGroups: allow,
       searchHashtags: allow,
       embed: allow,
       Category: allow,
@@ -285,6 +350,7 @@ export default shield(
       currentUser: allow,
       Group: isAuthenticated,
       GroupMembers: isAllowedSeeingGroupMembers,
+      GroupCount: isAuthenticated,
       Post: allow,
       profilePagePosts: allow,
       Comment: allow,
@@ -316,7 +382,7 @@ export default shield(
       JoinGroup: isAllowedToJoinGroup,
       LeaveGroup: isAllowedToLeaveGroup,
       ChangeGroupMemberRole: isAllowedToChangeGroupMemberRole,
-      CreatePost: isAuthenticated,
+      CreatePost: and(isAuthenticated, isMemberOfGroup),
       UpdatePost: isAuthor,
       DeletePost: isAuthor,
       fileReport: isAuthenticated,
@@ -333,7 +399,7 @@ export default shield(
       unshout: isAuthenticated,
       changePassword: isAuthenticated,
       review: isModerator,
-      CreateComment: isAuthenticated,
+      CreateComment: and(isAuthenticated, canCommentPost),
       UpdateComment: isAuthor,
       DeleteComment: isAuthor,
       DeleteUser: or(isDeletingOwnAccount, isAdmin),

@@ -138,6 +138,7 @@ describe('ContributionForm.vue', () => {
               categoryIds: [],
               id: null,
               image: null,
+              groupId: null,
             },
           }
           postTitleInput = wrapper.find('.ds-input')
@@ -260,6 +261,7 @@ describe('ContributionForm.vue', () => {
               content: propsData.contribution.content,
               categoryIds: [],
               id: propsData.contribution.id,
+              groupId: null,
               image: {
                 sensitive: false,
               },

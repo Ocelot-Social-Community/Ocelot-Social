@@ -404,6 +404,10 @@
       "regional": "Regional Group"
     },
     "actionRadius": "Action radius",
+    "addMemberToGroup": "Add to group",
+    "addUser": "Add User",
+    "addUserPlaceholder": "unique username > @slug-from-user",
+    "allGroups": "All Groups",
     "categories": "Topic ::: Topics",
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
@@ -418,11 +422,15 @@
       "groupName": "Settings Of “{name}”",
       "title": "Edit My Group"
     },
+    "errors": {
+      "userAlreadyMember": "User @{slug} is already a member"
+    },
     "follow": "Follow",
     "foundation": "Foundation",
     "general": "General",
     "goal": "Goal of group",
     "groupCreated": "The group was created!",
+    "in": "in",
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
       "join": "Join"
@@ -472,7 +480,7 @@
   },
   "header": {
     "avatarMenu": {
-      "myGroups": "My groups",
+      "Groups": "Groups",
       "myProfile": "My profile"
     }
   },
@@ -605,7 +613,19 @@
       "submitted": "Comment submitted!",
       "updated": "Changes saved!"
     },
+    "createNewPost": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Create A New Post"
+    },
     "edited": "edited",
+    "editPost": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Edit Your Post"
+    },
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
@@ -618,6 +638,12 @@
     "pinned": "Announcement",
     "takeAction": {
       "name": "Take action"
+    },
+    "viewPost": {
+      "forGroup": {
+        "title": "In The Group “{name}”"
+      },
+      "title": "Post"
     }
   },
   "profile": {
@@ -723,11 +749,12 @@
     "failed": "Nothing found",
     "for": "Searching for ",
     "heading": {
+      "Group": "Group ::: Groups",
       "Post": "Post ::: Posts",
       "Tag": "Hashtag ::: Hashtags",
       "User": "User ::: Users"
     },
-    "hint": "What are you searching for? Use !… for posts, @… for users, #… for hashtags.",
+    "hint": "What are you searching for? Use !… for posts, @… for users, &… for groups, #… for hashtags.",
     "no-results": "No results found for \"{search}\". Try a different search term!",
     "page": "Page",
     "placeholder": "Search",

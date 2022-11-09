@@ -1,15 +1,14 @@
 import { mount } from '@vue/test-utils'
-import GroupContentMenu from './GroupContentMenu.vue'
+import GroupMember from './GroupMember.vue'
 
 const localVue = global.localVue
 
 const propsData = {
-  resource: {},
-  group: {},
-  resourceType: 'group',
+  groupId: '',
+  groupMembers: [],
 }
 
-describe('GroupContentMenu', () => {
+describe('GroupMember', () => {
   let wrapper
   let mocks
 
@@ -21,7 +20,7 @@ describe('GroupContentMenu', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(GroupContentMenu, { propsData, mocks, localVue })
+      return mount(GroupMember, { propsData, mocks, localVue })
     }
 
     beforeEach(() => {
@@ -29,7 +28,7 @@ describe('GroupContentMenu', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.findAll('.group-menu')).toHaveLength(1)
+      expect(wrapper.findAll('.group-member')).toHaveLength(1)
     })
   })
 })
