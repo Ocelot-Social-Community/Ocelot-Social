@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import { UserInputError } from 'apollo-server'
 import CONFIG from '../../config'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '../../constants/categories'
-import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
+import { GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
 import { removeHtmlTags } from '../../middleware/helpers/cleanHtml.js'
 import Resolver, {
   removeUndefinedNullValuesFromObject,
@@ -134,7 +134,7 @@ export default {
       if (
         params.description === undefined ||
         params.description === null ||
-        removeHtmlTags(params.description).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
+        removeHtmlTags(params.description).length < GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN
       ) {
         throw new UserInputError('Description too short!')
       }
@@ -204,7 +204,7 @@ export default {
       }
       if (
         params.description &&
-        removeHtmlTags(params.description).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
+        removeHtmlTags(params.description).length < GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN
       ) {
         throw new UserInputError('Description too short!')
       }

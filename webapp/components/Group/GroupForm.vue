@@ -179,9 +179,9 @@
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import {
-  NAME_LENGTH_MIN,
-  NAME_LENGTH_MAX,
-  DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
+  GROUPNAME_LENGTH_MIN,
+  GROUPNAME_LENGTH_MAX,
+  GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
 } from '~/constants/groups.js'
 import Editor from '~/components/Editor/Editor'
 import { queryLocations } from '~/graphql/location'
@@ -233,14 +233,14 @@ export default {
         categoryIds: categories ? categories.map((category) => category.id) : [],
       },
       formSchema: {
-        name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
-        slug: { required: false, min: NAME_LENGTH_MIN },
+        name: { required: true, min: GROUPNAME_LENGTH_MIN, max: GROUPNAME_LENGTH_MAX },
+        slug: { required: false, min: GROUPNAME_LENGTH_MIN },
         groupType: { required: true, min: 1 },
         about: { required: false },
         description: {
           type: 'string',
           required: true,
-          min: DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
+          min: GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
           validator: (_, value = '') => {
             if (this.$filters.removeHtml(value).length < this.formSchema.description.min) {
               return [new Error()]
