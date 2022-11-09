@@ -238,7 +238,11 @@
               class="content hyphenate-text"
               v-html="groupDescriptionExcerpt"
             />
-            <content-viewer v-else class="content hyphenate-text" :content="group.description" />
+            <content-viewer
+              v-else
+              class="content hyphenate-text"
+              :content="group.groupDescription"
+            />
             <base-button
               class="collaps-button"
               size="small"
@@ -403,7 +407,7 @@ export default {
       return slug
     },
     groupDescriptionExcerpt() {
-      return this.group ? this.$filters.removeLinks(this.group.descriptionExcerpt) : ''
+      return this.group ? this.$filters.removeLinks(this.group.groupDescriptionExcerpt) : ''
     },
     isGroupOwner() {
       return this.group ? this.group.myRole === 'owner' : false

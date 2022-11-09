@@ -26,7 +26,7 @@ let ownerMemberUser
 let secondOwnerMemberUser
 
 const categoryIds = ['cat9', 'cat4', 'cat15']
-const descriptionAdditional100 =
+const groupDescriptionAdditional100 =
   ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 let variables = {}
 
@@ -161,7 +161,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
       id: 'public-group',
       name: 'The Best Group',
       about: 'We will change the world!',
-      description: 'Some description' + descriptionAdditional100,
+      groupDescription: 'Some description' + groupDescriptionAdditional100,
       groupType: 'public',
       actionRadius: 'regional',
       categoryIds,
@@ -189,7 +189,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
       id: 'closed-group',
       name: 'Uninteresting Group',
       about: 'We will change nothing!',
-      description: 'We love it like it is!?' + descriptionAdditional100,
+      groupDescription: 'We love it like it is!?' + groupDescriptionAdditional100,
       groupType: 'closed',
       actionRadius: 'national',
       categoryIds,
@@ -203,7 +203,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
       id: 'hidden-group',
       name: 'Investigative Journalism Group',
       about: 'We will change all.',
-      description: 'We research …' + descriptionAdditional100,
+      groupDescription: 'We research …' + groupDescriptionAdditional100,
       groupType: 'hidden',
       actionRadius: 'global',
       categoryIds,
@@ -273,7 +273,7 @@ describe('in mode', () => {
           name: 'The Best Group',
           slug: 'the-group',
           about: 'We will change the world!',
-          description: 'Some description' + descriptionAdditional100,
+          groupDescription: 'Some description' + groupDescriptionAdditional100,
           groupType: 'public',
           actionRadius: 'regional',
           categoryIds,
@@ -302,8 +302,8 @@ describe('in mode', () => {
                 name: 'The Best Group',
                 slug: 'the-group',
                 about: 'We will change the world!',
-                description: 'Some description' + descriptionAdditional100,
-                descriptionExcerpt: 'Some description' + descriptionAdditional100,
+                groupDescription: 'Some description' + groupDescriptionAdditional100,
+                groupDescriptionExcerpt: 'Some description' + groupDescriptionAdditional100,
                 groupType: 'public',
                 actionRadius: 'regional',
                 locationName: 'Hamburg, Germany',
@@ -348,7 +348,7 @@ describe('in mode', () => {
                   mutation: createGroupMutation(),
                   variables: {
                     ...variables,
-                    description:
+                    groupDescription:
                       '0123456789' +
                       '<a href="https://domain.org/0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789">0123456789</a>',
                   },
@@ -476,7 +476,7 @@ describe('in mode', () => {
               id: 'others-group',
               name: 'Uninteresting Group',
               about: 'We will change nothing!',
-              description: 'We love it like it is!?' + descriptionAdditional100,
+              groupDescription: 'We love it like it is!?' + groupDescriptionAdditional100,
               groupType: 'closed',
               actionRadius: 'global',
               categoryIds,
@@ -489,7 +489,7 @@ describe('in mode', () => {
               id: 'hidden-group',
               name: 'Investigative Journalism Group',
               about: 'We will change all.',
-              description: 'We research …' + descriptionAdditional100,
+              groupDescription: 'We research …' + groupDescriptionAdditional100,
               groupType: 'hidden',
               actionRadius: 'global',
               categoryIds,
@@ -501,7 +501,7 @@ describe('in mode', () => {
               id: 'second-hidden-group',
               name: 'Second Investigative Journalism Group',
               about: 'We will change all.',
-              description: 'We research …' + descriptionAdditional100,
+              groupDescription: 'We research …' + groupDescriptionAdditional100,
               groupType: 'hidden',
               actionRadius: 'global',
               categoryIds,
@@ -521,7 +521,7 @@ describe('in mode', () => {
               id: 'third-hidden-group',
               name: 'Third Investigative Journalism Group',
               about: 'We will change all.',
-              description: 'We research …' + descriptionAdditional100,
+              groupDescription: 'We research …' + groupDescriptionAdditional100,
               groupType: 'hidden',
               actionRadius: 'global',
               categoryIds,
@@ -542,7 +542,7 @@ describe('in mode', () => {
               id: 'my-group',
               name: 'The Best Group',
               about: 'We will change the world!',
-              description: 'Some description' + descriptionAdditional100,
+              groupDescription: 'Some description' + groupDescriptionAdditional100,
               groupType: 'public',
               actionRadius: 'regional',
               categoryIds,
@@ -562,7 +562,7 @@ describe('in mode', () => {
                       expect.objectContaining({
                         id: 'my-group',
                         slug: 'the-best-group',
-                        descriptionExcerpt: 'Some description' + descriptionAdditional100,
+                        groupDescriptionExcerpt: 'Some description' + groupDescriptionAdditional100,
                         locationName: 'Hamburg, Germany',
                         location: expect.objectContaining({
                           name: 'Hamburg',
@@ -574,7 +574,8 @@ describe('in mode', () => {
                       expect.objectContaining({
                         id: 'others-group',
                         slug: 'uninteresting-group',
-                        descriptionExcerpt: 'We love it like it is!?' + descriptionAdditional100,
+                        groupDescriptionExcerpt:
+                          'We love it like it is!?' + groupDescriptionAdditional100,
                         locationName: null,
                         location: null,
                         myRole: null,
@@ -582,7 +583,7 @@ describe('in mode', () => {
                       expect.objectContaining({
                         id: 'third-hidden-group',
                         slug: 'third-investigative-journalism-group',
-                        descriptionExcerpt: 'We research …' + descriptionAdditional100,
+                        groupDescriptionExcerpt: 'We research …' + groupDescriptionAdditional100,
                         myRole: 'usual',
                         locationName: null,
                         location: null,
@@ -868,7 +869,7 @@ describe('in mode', () => {
               id: 'closed-group',
               name: 'Uninteresting Group',
               about: 'We will change nothing!',
-              description: 'We love it like it is!?' + descriptionAdditional100,
+              groupDescription: 'We love it like it is!?' + groupDescriptionAdditional100,
               groupType: 'closed',
               actionRadius: 'national',
               categoryIds,
@@ -881,7 +882,7 @@ describe('in mode', () => {
               id: 'hidden-group',
               name: 'Investigative Journalism Group',
               about: 'We will change all.',
-              description: 'We research …' + descriptionAdditional100,
+              groupDescription: 'We research …' + groupDescriptionAdditional100,
               groupType: 'hidden',
               actionRadius: 'global',
               categoryIds,
@@ -894,7 +895,7 @@ describe('in mode', () => {
               id: 'public-group',
               name: 'The Best Group',
               about: 'We will change the world!',
-              description: 'Some description' + descriptionAdditional100,
+              groupDescription: 'Some description' + groupDescriptionAdditional100,
               groupType: 'public',
               actionRadius: 'regional',
               categoryIds,
@@ -1119,7 +1120,7 @@ describe('in mode', () => {
               id: 'public-group',
               name: 'The Best Group',
               about: 'We will change the world!',
-              description: 'Some description' + descriptionAdditional100,
+              groupDescription: 'Some description' + groupDescriptionAdditional100,
               groupType: 'public',
               actionRadius: 'regional',
               categoryIds,
@@ -1147,7 +1148,7 @@ describe('in mode', () => {
               id: 'closed-group',
               name: 'Uninteresting Group',
               about: 'We will change nothing!',
-              description: 'We love it like it is!?' + descriptionAdditional100,
+              groupDescription: 'We love it like it is!?' + groupDescriptionAdditional100,
               groupType: 'closed',
               actionRadius: 'national',
               categoryIds,
@@ -1176,7 +1177,7 @@ describe('in mode', () => {
               id: 'hidden-group',
               name: 'Investigative Journalism Group',
               about: 'We will change all.',
-              description: 'We research …' + descriptionAdditional100,
+              groupDescription: 'We research …' + groupDescriptionAdditional100,
               groupType: 'hidden',
               actionRadius: 'global',
               categoryIds,
@@ -2659,7 +2660,7 @@ describe('in mode', () => {
               id: 'others-group',
               name: 'Uninteresting Group',
               about: 'We will change nothing!',
-              description: 'We love it like it is!?' + descriptionAdditional100,
+              groupDescription: 'We love it like it is!?' + groupDescriptionAdditional100,
               groupType: 'closed',
               actionRadius: 'global',
               categoryIds,
@@ -2672,7 +2673,7 @@ describe('in mode', () => {
               id: 'my-group',
               name: 'The Best Group',
               about: 'We will change the world!',
-              description: 'Some description' + descriptionAdditional100,
+              groupDescription: 'Some description' + groupDescriptionAdditional100,
               groupType: 'public',
               actionRadius: 'regional',
               categoryIds,
@@ -2704,7 +2705,8 @@ describe('in mode', () => {
                       id: 'my-group',
                       name: 'The New Group For Our Country',
                       about: 'We will change the land!',
-                      description: 'Some country relevant description' + descriptionAdditional100,
+                      groupDescription:
+                        'Some country relevant description' + groupDescriptionAdditional100,
                       actionRadius: 'national',
                       // avatar, // test this as result
                     },
@@ -2716,9 +2718,10 @@ describe('in mode', () => {
                       name: 'The New Group For Our Country',
                       slug: 'the-best-group', // changing the slug is tested in the slugifyMiddleware
                       about: 'We will change the land!',
-                      description: 'Some country relevant description' + descriptionAdditional100,
-                      descriptionExcerpt:
-                        'Some country relevant description' + descriptionAdditional100,
+                      groupDescription:
+                        'Some country relevant description' + groupDescriptionAdditional100,
+                      groupDescriptionExcerpt:
+                        'Some country relevant description' + groupDescriptionAdditional100,
                       actionRadius: 'national',
                       // avatar, // test this as result
                       myRole: 'owner',
@@ -2870,7 +2873,7 @@ describe('in mode', () => {
                       mutation: updateGroupMutation(),
                       variables: {
                         id: 'my-group',
-                        description:
+                        groupDescription:
                           '0123456789' +
                           '<a href="https://domain.org/0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789">0123456789</a>',
                       },
@@ -2951,7 +2954,8 @@ describe('in mode', () => {
                   id: 'my-group',
                   name: 'The New Group For Our Country',
                   about: 'We will change the land!',
-                  description: 'Some country relevant description' + descriptionAdditional100,
+                  groupDescription:
+                    'Some country relevant description' + groupDescriptionAdditional100,
                   actionRadius: 'national',
                   categoryIds: ['cat4', 'cat27'],
                 },
@@ -2969,7 +2973,8 @@ describe('in mode', () => {
                   id: 'my-group',
                   name: 'The New Group For Our Country',
                   about: 'We will change the land!',
-                  description: 'Some country relevant description' + descriptionAdditional100,
+                  groupDescription:
+                    'Some country relevant description' + groupDescriptionAdditional100,
                   actionRadius: 'national',
                   categoryIds: ['cat4', 'cat27'],
                 },

@@ -28,8 +28,8 @@ export default {
   },
 
   about: { type: 'string', allow: [null, ''] },
-  description: { type: 'string', disallow: [null], min: 100 },
-  descriptionExcerpt: { type: 'string', allow: [null] },
+  groupDescription: { type: 'string', disallow: [null], min: 100 },
+  groupDescriptionExcerpt: { type: 'string', allow: [null] },
   groupType: { type: 'string', default: 'public' },
   actionRadius: { type: 'string', default: 'regional' },
 

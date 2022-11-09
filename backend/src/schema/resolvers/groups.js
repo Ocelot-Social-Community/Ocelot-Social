@@ -125,16 +125,19 @@ export default {
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
+      // TODO: move to 'backend/src/middleware/validation/validationMiddleware.js'
       if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
         throw new UserInputError('Too view categories!')
       }
+      // TODO: move to 'backend/src/middleware/validation/validationMiddleware.js'
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
         throw new UserInputError('Too many categories!')
       }
+      // TODO: move to 'backend/src/middleware/validation/validationMiddleware.js'
       if (
-        params.description === undefined ||
-        params.description === null ||
-        removeHtmlTags(params.description).length < GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN
+        params.groupDescription === undefined ||
+        params.groupDescription === null ||
+        removeHtmlTags(params.groupDescription).length < GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN
       ) {
         throw new UserInputError('Description too short!')
       }
@@ -194,6 +197,7 @@ export default {
       delete params.avatar
       params.locationName = params.locationName === '' ? null : params.locationName
 
+      // TODO: move to 'backend/src/middleware/validation/validationMiddleware.js'
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds) {
         if (categoryIds.length < CATEGORIES_MIN) {
           throw new UserInputError('Too view categories!')
@@ -202,13 +206,15 @@ export default {
           throw new UserInputError('Too many categories!')
         }
       }
+      // TODO: move to 'backend/src/middleware/validation/validationMiddleware.js'
       if (
-        params.description &&
-        removeHtmlTags(params.description).length < GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN
+        params.groupDescription &&
+        removeHtmlTags(params.groupDescription).length < GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN
       ) {
         throw new UserInputError('Description too short!')
       }
       const session = context.driver.session()
+      // TODO: move to 'backend/src/middleware/validation/validationMiddleware.js'
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
         const cypherDeletePreviousRelations = `
           MATCH (group:Group {id: $groupId})-[previousRelations:CATEGORIZED]->(category:Category)

@@ -147,7 +147,7 @@ describe('validateCreateComment', () => {
       mutate({ mutation: createCommentMutation, variables: createCommentVariables }),
     ).resolves.toMatchObject({
       data: { CreateComment: null },
-      errors: [{ message: 'Comment must be at least 1 character long!' }],
+      errors: [{ message: 'Comment must be at least 1 characters long!' }],
     })
   })
 
@@ -157,7 +157,7 @@ describe('validateCreateComment', () => {
       mutate({ mutation: createCommentMutation, variables: createCommentVariables }),
     ).resolves.toMatchObject({
       data: { CreateComment: null },
-      errors: [{ message: 'Comment must be at least 1 character long!' }],
+      errors: [{ message: 'Comment must be at least 1 characters long!' }],
     })
   })
 
@@ -200,7 +200,7 @@ describe('validateCreateComment', () => {
         mutate({ mutation: updateCommentMutation, variables: updateCommentVariables }),
       ).resolves.toMatchObject({
         data: { UpdateComment: null },
-        errors: [{ message: 'Comment must be at least 1 character long!' }],
+        errors: [{ message: 'Comment must be at least 1 characters long!' }],
       })
     })
 
@@ -210,7 +210,7 @@ describe('validateCreateComment', () => {
         mutate({ mutation: updateCommentMutation, variables: updateCommentVariables }),
       ).resolves.toMatchObject({
         data: { UpdateComment: null },
-        errors: [{ message: 'Comment must be at least 1 character long!' }],
+        errors: [{ message: 'Comment must be at least 1 characters long!' }],
       })
     })
   })
@@ -333,7 +333,7 @@ describe('validateReview', () => {
       }
       await expect(mutate({ mutation: updateUserMutation, variables })).resolves.toMatchObject({
         data: { UpdateUser: null },
-        errors: [{ message: 'Username must be at least 3 character long!' }],
+        errors: [{ message: 'Username must be at least 3 characters long!' }],
       })
     })
   })

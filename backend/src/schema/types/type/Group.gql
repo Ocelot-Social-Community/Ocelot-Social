@@ -28,8 +28,8 @@ type Group {
   avatar: Image @relation(name: "AVATAR_IMAGE", direction: "OUT")
 
   about: String # goal
-  description: String!
-  descriptionExcerpt: String!
+  groupDescription: String!
+  groupDescriptionExcerpt: String!
   groupType: GroupType!
   actionRadius: GroupActionRadius!
 
@@ -50,7 +50,7 @@ input _GroupFilter {
   name_contains: String
   slug_contains: String
   about_contains: String
-  description_contains: String
+  groupDescription_contains: String
   groupType_in: [GroupType!]
   actionRadius_in: [GroupActionRadius!]
   myRole_in: [GroupMemberRole!]
@@ -94,7 +94,7 @@ type Mutation {
     name: String!
     slug: String
     about: String
-    description: String!
+    groupDescription: String!
     groupType: GroupType!
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
@@ -107,7 +107,7 @@ type Mutation {
     name: String
     slug: String
     about: String
-    description: String
+    groupDescription: String
     # groupType: GroupType # is not possible at the moment and has to be discussed. may be in the stronger direction: public → closed → hidden
     actionRadius: GroupActionRadius
     categoryIds: [ID]
