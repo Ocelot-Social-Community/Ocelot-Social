@@ -948,5 +948,17 @@
     "newTermsAndConditions": "Neue Nutzungsbedingungen",
     "termsAndConditionsNewConfirm": "Ich habe die neuen Nutzungsbedingungen durchgelesen und stimme zu.",
     "termsAndConditionsNewConfirmText": "Bitte lies Dir die neuen Nutzungsbedingungen jetzt durch!"
+  },
+  "yuniteRebranding": {
+    "header": {
+      "about": "Über Yunite",
+      "groups": "Gruppen",
+      "newsFeed": "Beiträge",
+      "topics": "Themen"
+    },
+    "footer": {
+      "dataPrivacy": "Datenschutz",
+      "imprint": "Impressum"
+    }
   }
 }

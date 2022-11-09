@@ -5,8 +5,8 @@ import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
   // if defined it's dominating
   externalLink: {
-    url: 'https://ocelot.social',
-    target: '_blank',
+    url: 'https://yunite.org',
+    target: '',
   },
 
   internalPage: {
@@ -22,9 +22,8 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
   // if defined it's dominating
   externalLink: {
-    // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-    url: 'https://ocelot-social.herokuapp.com/donations',
-    target: '_blank',
+    url: 'https://yunite.org/spenden/',
+    target: '',
   },
 
   internalPage: {
@@ -34,24 +33,24 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
+  // if defined it's dominating
   externalLink: {
-    // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-    url: 'https://ocelot-social.herokuapp.com/imprint',
-    target: '_blank',
+    url: 'https://yunite.org/impressum/',
+    target: '',
   },
 
   internalPage: {
-    // footerIdent: 'site.imprint', // localized string identifier, if undefined default is used
+    footerIdent: 'yuniteRebranding.footer.imprint', // localized string identifier, if undefined default is used
     // headTitleIdent: 'site.imprint', // localized string identifier, if undefined default is used
     // headlineIdent: 'site.imprint', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwrite({
@@ -64,11 +63,15 @@ const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwri
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
-  // externalLink: null, // if defined it's dominating
+  // if defined it's dominating
+  externalLink: {
+    url: 'https://yunite.org/ueber-yunite/unsere-werte/',
+    target: '',
+  },
 
   internalPage: {
     // footerIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
@@ -77,24 +80,32 @@ const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
-  // externalLink: null, // if defined it's dominating
+  // if defined it's dominating
+  externalLink: {
+    url: 'https://yunite.org/datenschutz/',
+    target: '',
+  },
 
   internalPage: {
-    // footerIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
+    footerIdent: 'yuniteRebranding.footer.dataPrivacy', // localized string identifier, if undefined default is used
     // headTitleIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
     // headlineIdent: 'site.data-privacy', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
-  // externalLink: null, // if defined it's dominating
+  // if defined it's dominating
+  externalLink: {
+    url: 'https://yunite.org/ueber-yunite/faq-hilfe/',
+    target: '',
+  },
 
   internalPage: {
     // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
@@ -103,14 +114,14 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
   // if defined it's dominating
   externalLink: {
-    url: 'https://ocelot.social',
-    target: '_blank',
+    url: 'https://yunite.org/ueber-yunite/faq-hilfe/',
+    target: '',
   },
 
   internalPage: {
@@ -120,7 +131,7 @@ const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 
@@ -139,13 +150,13 @@ export default {
   SUPPORT,
 
   FOOTER_LINK_LIST: [
-    ORGANIZATION,
-    TERMS_AND_CONDITIONS,
-    CODE_OF_CONDUCT,
+    // ORGANIZATION,
+    // TERMS_AND_CONDITIONS,
+    // CODE_OF_CONDUCT,
     DATA_PRIVACY,
-    FAQ,
-    DONATE,
-    SUPPORT,
+    // FAQ,
+    // DONATE,
+    // SUPPORT,
     IMPRINT,
   ],
 }

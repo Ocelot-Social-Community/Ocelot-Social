@@ -3,3 +3,30 @@
     * Here, all SCSS variables and classes can be adapted to your custom design. 
     *
 */
+
+$color-primary: #6e8b87;
+$color-primary-light: #a6ff00;
+
+$color-header-background: $color-primary;
+$color-footer-background: $color-primary-light;
+
+$color-locale-menu: $color-primary-light;
+
+.main-navigation a {
+    color: $color-primary-light;
+}
+.main-navigation a:hover {
+    color: $color-neutral-100;
+}
+
+.main-navigation .locale-menu {
+    color: $color-primary-light;
+}
+
+.main-navigation .base-button {
+    color: $color-primary-light;
+}
+
+#nav-search-box .hc-hashtag a{
+    color: #17b53f;
+}
