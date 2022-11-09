@@ -6,19 +6,19 @@ import {
   createGroupMutation,
   changeGroupMemberRoleMutation,
   leaveGroupMutation,
-} from '../../db/graphql/groups'
+} from '../../graphql/groups'
 import {
   createPostMutation,
   postQuery,
   filterPosts,
   profilePagePosts,
   searchPosts,
-} from '../../db/graphql/posts'
-import { createCommentMutation } from '../../db/graphql/comments'
+} from '../../graphql/posts'
+import { createCommentMutation } from '../../graphql/comments'
 // eslint-disable-next-line no-unused-vars
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
 import CONFIG from '../../config'
-import { signupVerificationMutation } from '../../db/graphql/authentications'
+import { signupVerificationMutation } from '../../graphql/authentications'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
