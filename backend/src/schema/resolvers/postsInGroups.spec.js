@@ -16,7 +16,7 @@ import {
 } from '../../db/graphql/posts'
 import { createCommentMutation } from '../../db/graphql/comments'
 // eslint-disable-next-line no-unused-vars
-import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
+import { GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
 import CONFIG from '../../config'
 import { signupVerificationMutation } from '../../db/graphql/authentications'
 
@@ -25,7 +25,7 @@ CONFIG.CATEGORIES_ACTIVE = false
 jest.mock('../../constants/groups', () => {
   return {
     __esModule: true,
-    DESCRIPTION_WITHOUT_HTML_LENGTH_MIN: 5,
+    GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN: 5,
   }
 })
 
