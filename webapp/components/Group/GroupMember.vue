@@ -1,11 +1,10 @@
 <template>
   <div class="group-member">
- 
-      <h3 class="title">{{ $t('group.addUser') }}</h3>
-      <ds-space margin-bottom="small" />
-     
+    <h3 class="title">{{ $t('group.addUser') }}</h3>
+    <ds-space margin-bottom="small" />
+
     <ds-space margin-bottom="small">
-    <ds-select
+      <ds-select
         type="search"
         icon="search"
         v-model="query"
@@ -32,8 +31,6 @@
           </p>
         </template>
       </ds-select>
-      
-      
     </ds-space>
     <ds-space margin-bottom="large" />
     <h3 class="title">{{ $t('group.membersListTitle') }}</h3>
@@ -257,8 +254,6 @@ export default {
 }
 </script>
 <style scoped>
-
-  
 .ds-select-dropdown {
   position: unset;
 }
