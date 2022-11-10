@@ -1,8 +1,11 @@
 <template>
   <div class="group-member">
-    <base-card>
-      <h2 class="title">{{ $t('group.addUser') }}</h2>
-      <ds-select
+ 
+      <h3 class="title">{{ $t('group.addUser') }}</h3>
+      <ds-space margin-bottom="small" />
+     
+    <ds-space margin-bottom="small">
+    <ds-select
         type="search"
         icon="search"
         v-model="query"
@@ -29,7 +32,12 @@
           </p>
         </template>
       </ds-select>
-    </base-card>
+      
+      
+    </ds-space>
+    <ds-space margin-bottom="large" />
+    <h3 class="title">{{ $t('group.membersListTitle') }}</h3>
+    <ds-space margin-bottom="small" />
     <ds-table :fields="tableFields" :data="groupMembers" condensed>
       <template #avatar="scope">
         <nuxt-link
@@ -248,3 +256,10 @@ export default {
   },
 }
 </script>
+<style scoped>
+
+  
+.ds-select-dropdown {
+  position: unset;
+}
+</style>
