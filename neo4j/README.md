@@ -103,17 +103,17 @@ $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backen
 ```bash
 # in browser command line or cypher shell
 
-# show all indexes and contraints
+# show all indexes and constraints
 $ :schema
 
 # show all indexes
 $ CALL db.indexes();
 
-# show all contraints
+# show all constraints
 $ CALL db.constraints();
 ```
 
-***Cypher commands to create and drop indexes and contraints***
+***Cypher commands to create and drop indexes and constraints***
 
 ```bash
 # in browser command line or cypher shell
@@ -122,9 +122,17 @@ $ CALL db.constraints();
 $ CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"]);
 $ CALL db.index.fulltext.createNodeIndex("user_fulltext_search",["User"],["name", "slug"]);
 $ CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"]);
+$ CALL db.index.fulltext.createNodeIndex("group_fulltext_search",["Group"],["name", "slug", "about", "description"])
 
 # drop an index
-$ DROP CONSTRAINT ON ( image:Image ) ASSERT image.url IS UNIQUE
+$ CALL db.index.fulltext.drop('post_fulltext_search')
+$ CALL db.index.fulltext.drop('group_fulltext_search')
+
+# create constraint
+$ CREATE CONSTRAINT ON ( group:Group ) ASSERT group.id IS UNIQUE
+
+# drop a constraint
+$ DROP CONSTRAINT ON ( group:Group ) ASSERT group.id IS UNIQUE
 
 # drop all indexes and contraints
 $ CALL apoc.schema.assert({},{},true) YIELD label, key RETURN * ;

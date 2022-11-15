@@ -9,6 +9,8 @@ localVue.use(VueMeta, { keyName: 'head' })
 const assignMock = jest.fn()
 delete window.location
 window.location = { assign: assignMock }
+delete window.open
+window.open = jest.fn()
 
 describe('imprint.vue', () => {
   let wrapper

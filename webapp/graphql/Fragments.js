@@ -70,8 +70,8 @@ export const groupFragment = gql`
     disabled
     deleted
     about
-    description
-    descriptionExcerpt
+    groupDescription
+    groupDescriptionExcerpt
     groupType
     actionRadius
     categories {

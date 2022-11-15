@@ -16,7 +16,7 @@ import {
 } from '../../graphql/posts'
 import { createCommentMutation } from '../../graphql/comments'
 // eslint-disable-next-line no-unused-vars
-import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
+import { GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
 import CONFIG from '../../config'
 import { signupVerificationMutation } from '../../graphql/authentications'
 
@@ -25,7 +25,7 @@ CONFIG.CATEGORIES_ACTIVE = false
 jest.mock('../../constants/groups', () => {
   return {
     __esModule: true,
-    DESCRIPTION_WITHOUT_HTML_LENGTH_MIN: 5,
+    GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN: 5,
   }
 })
 
@@ -106,7 +106,7 @@ describe('Posts in Groups', () => {
         id: 'public-group',
         name: 'The Public Group',
         about: 'The public group!',
-        description: 'Anyone can see the posts of this group.',
+        groupDescription: 'Anyone can see the posts of this group.',
         groupType: 'public',
         actionRadius: 'regional',
       },
@@ -134,7 +134,7 @@ describe('Posts in Groups', () => {
         id: 'closed-group',
         name: 'The Closed Group',
         about: 'The closed group!',
-        description: 'Only members of this group can see the posts of this group.',
+        groupDescription: 'Only members of this group can see the posts of this group.',
         groupType: 'closed',
         actionRadius: 'regional',
       },
@@ -162,7 +162,7 @@ describe('Posts in Groups', () => {
         id: 'hidden-group',
         name: 'The Hidden Group',
         about: 'The hidden group!',
-        description: 'Only members of this group can see the posts of this group.',
+        groupDescription: 'Only members of this group can see the posts of this group.',
         groupType: 'hidden',
         actionRadius: 'regional',
       },

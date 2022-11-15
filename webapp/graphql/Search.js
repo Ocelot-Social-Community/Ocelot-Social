@@ -77,8 +77,8 @@ export const searchGroups = (i18n) => {
           disabled
           deleted
           about
-          description
-          descriptionExcerpt
+          groupDescription
+          groupDescriptionExcerpt
           groupType
           actionRadius
           categories {

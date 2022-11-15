@@ -12,7 +12,7 @@ const categoryIds = ['cat9']
 
 const driver = getDriver()
 const neode = getNeode()
-const descriptionAdditional100 =
+const groupDescriptionAdditional100 =
   ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 
 const { server } = createServer({
@@ -69,7 +69,7 @@ describe('slugifyMiddleware', () => {
         ...variables,
         name: 'The Best Group',
         about: 'Some about',
-        description: 'Some description' + descriptionAdditional100,
+        groupDescription: 'Some description' + groupDescriptionAdditional100,
         groupType: 'closed',
         actionRadius: 'national',
         categoryIds,
@@ -89,7 +89,7 @@ describe('slugifyMiddleware', () => {
               name: 'The Best Group',
               slug: 'the-best-group',
               about: 'Some about',
-              description: 'Some description' + descriptionAdditional100,
+              groupDescription: 'Some description' + groupDescriptionAdditional100,
               groupType: 'closed',
               actionRadius: 'national',
             },
@@ -203,7 +203,7 @@ describe('slugifyMiddleware', () => {
           name: 'The Best Group',
           slug: 'the-best-group',
           about: 'Some about',
-          description: 'Some description' + descriptionAdditional100,
+          groupDescription: 'Some description' + groupDescriptionAdditional100,
           groupType: 'closed',
           actionRadius: 'national',
           categoryIds,
@@ -229,7 +229,7 @@ describe('slugifyMiddleware', () => {
                   name: 'The Best Group',
                   slug: 'my-best-group',
                   about: 'Some about',
-                  description: 'Some description' + descriptionAdditional100,
+                  groupDescription: 'Some description' + groupDescriptionAdditional100,
                   groupType: 'closed',
                   actionRadius: 'national',
                   myRole: 'owner',
@@ -249,7 +249,7 @@ describe('slugifyMiddleware', () => {
               name: 'Pre-Existing Group',
               slug: 'pre-existing-group',
               about: 'Some about',
-              description: 'Some description' + descriptionAdditional100,
+              groupDescription: 'Some description' + groupDescriptionAdditional100,
               groupType: 'closed',
               actionRadius: 'national',
               categoryIds,

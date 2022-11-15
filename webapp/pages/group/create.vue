@@ -36,11 +36,12 @@ export default {
   },
   methods: {
     async createGroup(value) {
-      const { name, about, description, groupType, actionRadius, locationName, categoryIds } = value
+      const { name, about, groupDescription, groupType, actionRadius, locationName, categoryIds } =
+        value
       const variables = {
         name,
         about,
-        description,
+        groupDescription,
         groupType,
         actionRadius,
         locationName,

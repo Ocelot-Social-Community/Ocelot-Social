@@ -73,21 +73,21 @@
 
         <ds-space margin-top="small" />
 
-        <!-- description -->
+        <!-- groupDescription -->
         <ds-text class="select-label">
-          {{ $t('group.description') }}
+          {{ $t('group.groupDescription') }}
         </ds-text>
         <editor
-          name="description"
-          model="description"
+          name="groupDescription"
+          model="groupDescription"
           :users="null"
-          :value="formData.description"
+          :value="formData.groupDescription"
           :hashtags="null"
           @input="updateEditorDescription"
         />
-        <ds-chip size="base" :color="errors && errors.description ? 'danger' : 'medium'">
-          {{ `${descriptionLength} / ${formSchema.description.min}` }}
-          <base-icon v-if="errors && errors.description" name="warning" />
+        <ds-chip size="base" :color="errors && errors.groupDescription ? 'danger' : 'medium'">
+          {{ `${groupDescriptionLength} / ${formSchema.groupDescription.min}` }}
+          <base-icon v-if="errors && errors.groupDescription" name="warning" />
         </ds-chip>
 
         <!-- actionRadius -->
@@ -179,9 +179,9 @@
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import {
-  NAME_LENGTH_MIN,
-  NAME_LENGTH_MAX,
-  DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
+  GROUPNAME_LENGTH_MIN,
+  GROUPNAME_LENGTH_MAX,
+  GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
 } from '~/constants/groups.js'
 import Editor from '~/components/Editor/Editor'
 import { queryLocations } from '~/graphql/location'
@@ -207,8 +207,16 @@ export default {
     },
   },
   data() {
-    const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
-      this.group
+    const {
+      name,
+      slug,
+      groupType,
+      about,
+      groupDescription,
+      actionRadius,
+      locationName,
+      categories,
+    } = this.group
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
@@ -221,7 +229,7 @@ export default {
         slug: slug || '',
         groupType: groupType || '',
         about: about || '',
-        description: description || '',
+        groupDescription: groupDescription || '',
         // from database 'locationName' comes as "string | null"
         // 'formData.locationName':
         //   see 'created': tries to set it to a "requestGeoData" object and fills the menu if possible
@@ -233,16 +241,16 @@ export default {
         categoryIds: categories ? categories.map((category) => category.id) : [],
       },
       formSchema: {
-        name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
-        slug: { required: false, min: NAME_LENGTH_MIN },
+        name: { required: true, min: GROUPNAME_LENGTH_MIN, max: GROUPNAME_LENGTH_MAX },
+        slug: { required: false, min: GROUPNAME_LENGTH_MIN },
         groupType: { required: true, min: 1 },
         about: { required: false },
-        description: {
+        groupDescription: {
           type: 'string',
           required: true,
-          min: DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
+          min: GROUPDESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
           validator: (_, value = '') => {
-            if (this.$filters.removeHtml(value).length < this.formSchema.description.min) {
+            if (this.$filters.removeHtml(value).length < this.formSchema.groupDescription.min) {
               return [new Error()]
             }
             return []
@@ -286,8 +294,8 @@ export default {
     locationNameLabelAddOnOldName() {
       return this.formLocationName !== '' ? ' — ' + this.formLocationName : ''
     },
-    descriptionLength() {
-      return this.$filters.removeHtml(this.formData.description).length
+    groupDescriptionLength() {
+      return this.$filters.removeHtml(this.formData.groupDescription).length
     },
     sameLocation() {
       const dbLocationName = this.group.locationName || ''
@@ -310,7 +318,7 @@ export default {
         this.group.name === this.formData.name &&
         this.group.slug === this.formData.slug &&
         this.group.about === this.formData.about &&
-        this.group.description === this.formData.description &&
+        this.group.groupDescription === this.formData.groupDescription &&
         this.group.actionRadius === this.formData.actionRadius &&
         this.sameLocation &&
         this.sameCategories
@@ -330,15 +338,16 @@ export default {
       this.formData.actionRadius = event.target.value
     },
     updateEditorDescription(value) {
-      this.$refs.groupForm.update('description', value)
+      this.$refs.groupForm.update('groupDescription', value)
     },
     submit() {
-      const { name, slug, about, description, groupType, actionRadius, categoryIds } = this.formData
+      const { name, slug, about, groupDescription, groupType, actionRadius, categoryIds } =
+        this.formData
       const variables = {
         name,
         slug,
         about,
-        description,
+        groupDescription,
         groupType,
         actionRadius,
         locationName: this.formLocationName,
