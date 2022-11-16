@@ -12,17 +12,19 @@
         <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
       </base-button>
     </template>
-    <template slot="popover">
+    <template #popover>
       <div class="notifications-menu-popover">
         <notification-list :notifications="notifications" @markAsRead="markAsRead" />
       </div>
       <ds-flex class="notifications-link-container">
-        <ds-flex-item :width="{ base: '50%' }" centered>
+        <ds-flex-item :width="{ base: 'auto' }" centered>
           <nuxt-link :to="{ name: 'notifications' }">
-            {{ $t('notifications.pageLink') }}
+            <ds-button ghost primary>
+              {{ $t('notifications.pageLink') }}
+            </ds-button>
           </nuxt-link>
         </ds-flex-item>
-        <ds-flex-item :width="{ base: '50%' }" centered>
+        <ds-flex-item :width="{ base: 'auto' }" centered>
           <ds-button ghost primary @click="markAllAsRead" data-test="markAllAsRead-button">
             {{ $t('notifications.markAllAsRead') }}
           </ds-button>
@@ -146,7 +148,7 @@ export default {
 }
 .notifications-link-container {
   background-color: $background-color-softer-active;
-  text-align: center;
+  justify-content: center;
   position: fixed;
   bottom: 0;
   left: 0;
