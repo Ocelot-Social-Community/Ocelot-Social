@@ -1,6 +1,6 @@
 {
   "actions": {
-    "cancel": "",
+    "cancel": null,
     "create": "Crea",
     "delete": "Cancella",
     "edit": "Modifica",
@@ -33,16 +33,16 @@
       "successfulUpdate": "Informazioni sulle donazioni aggiornate con successo!"
     },
     "hashtags": {
-      "name": "",
-      "nameOfHashtag": "",
-      "number": "",
-      "tagCount": "",
-      "tagCountUnique": ""
+      "name": null,
+      "nameOfHashtag": null,
+      "number": null,
+      "tagCount": null,
+      "tagCountUnique": null
     },
     "invites": {
-      "description": "",
-      "name": "",
-      "title": ""
+      "description": null,
+      "name": null,
+      "title": null
     },
     "name": "Admin",
     "notifications": {
@@ -63,87 +63,40 @@
       "tagCountUnique": "Utenti"
     },
     "users": {
-      "empty": "",
+      "empty": null,
       "form": {
-        "placeholder": ""
+        "placeholder": null
       },
       "name": "Utenti",
       "table": {
         "columns": {
-          "createdAt": "",
-          "email": "",
-          "name": "",
-          "number": "",
-          "role": "",
-          "slug": ""
+          "createdAt": null,
+          "email": null,
+          "name": null,
+          "number": null,
+          "role": null,
+          "slug": null
         }
       }
     }
   },
   "code-of-conduct": {
-    "consequences": {
-      "description": "Se un membro della comunità manifesta comportamenti inaccettabili, gli operatori, i moderatori e gli amministratori responsabili della rete possono adottare le misure appropriate, inclusi ma non limitati a:",
-      "list": {
-        "0": "Richiesta di cessazione immediata di comportamenti inaccettabili",
-        "1": "Blocco o eliminazione di commenti",
-        "2": "Esclusione temporanea dal rispettivo posto o contributo",
-        "3": "Blocco o eliminazione di contenuti",
-        "4": "Revoca temporanea delle autorizzazioni di scrittura",
-        "5": "Esclusione temporanea dalla rete",
-        "6": "Esclusione definitiva dalla rete",
-        "7": "Violazioni della legge tedesca possono essere segnalate."
-      },
-      "title": "Conseguenze di comportamenti inaccettabilil"
-    },
-    "expected-behaviour": {
-      "description": "",
-      "list": {
-        "0": "",
-        "1": "",
-        "2": "",
-        "3": "Fai attenzione a ciò che ti circonda e ai tuoi compagni partecipanti. Avvisare i leader della comunità se si nota una situazione pericolosa, qualcuno in difficoltà o violazioni del presente Codice di condotta, anche se sembrano insignificanti."
-      },
-      "title": ""
-    },
-    "get-help": "Se sei soggetto o testimone di un comportamento inaccettabile, o se hai altre preoccupazioni, ti preghiamo di avvisare al più presto un organizzatore della comunità e di fare riferimento al contenuto corrispondente:",
-    "preamble": {
-      "description": "Human Connection è una rete di conoscenza e azione sociale senza scopo di lucro della prossima generazione. Dalle persone - per le persone. Open Source, equo e trasparente. Per un cambiamento locale e globale positivo in tutte le aree della vita. Ridisegniamo completamente lo scambio pubblico di conoscenze, idee e progetti. Le funzioni di Human Connection riuniscono le persone - offline e online - in modo che possiamo rendere il mondo un posto migliore.",
-      "title": ""
-    },
-    "purpose": {
-      "description": "Con questo codice di condotta regoliamo i principi essenziali di comportamento nel nostro social network. La Carta dei diritti umani delle Nazioni Unite è il nostro orientamento e costituisce il cuore della nostra comprensione dei valori. Il codice di condotta funge da principio guida per il nostro aspetto personale e l'interazione reciproca. Chiunque sia attivo come utente nella rete di connessione umana, scrive articoli, commenti o contatta altri utenti, compresi quelli esterni alla rete, riconosce queste regole di condotta come vincolanti.",
-      "title": ""
-    },
-    "subheader": "",
-    "unacceptable-behaviour": {
-      "description": "",
-      "list": {
-        "0": "Posti discriminatori, commenti, dichiarazioni o insulti, in particolare quelli relativi a genere, orientamento sessuale, razza, religione, orientamento politico o filosofico o disabilità.",
-        "1": "Pubblicazione o collegamento di materiale chiaramente pornografico.",
-        "2": "Glorificazione o banalizzazione di atti di violenza crudele o disumana.",
-        "3": "La divulgazione di informazioni personali altrui senza il loro consenso o minaccia di (\"doxing\").",
-        "4": "Intimidazione intenzionale, stalking o persecuzione.",
-        "5": "Pubblicità di prodotti e servizi a fini commerciali.",
-        "6": "Comportamento criminale o violazione della legge tedesca.",
-        "7": "Sostenere o incoraggiare tale condotta."
-      },
-      "title": ""
-    }
+    "subheader": null
   },
   "comment": {
     "content": {
-      "unavailable-placeholder": ""
+      "unavailable-placeholder": null
     },
-    "delete": "",
-    "edit": "",
-    "edited": "",
+    "delete": null,
+    "edit": null,
+    "edited": null,
     "menu": {
-      "delete": "",
-      "edit": ""
+      "delete": null,
+      "edit": null
     },
     "show": {
-      "less": "",
-      "more": ""
+      "less": null,
+      "more": null
     }
   },
   "common": {
@@ -152,304 +105,312 @@
     "letsTalk": "Discutiamo",
     "loading": "Caricamento in corso",
     "loadMore": "Caricare di più",
-    "moreInfo": "Ulteriori informazioni",
     "name": "Nome",
     "organization": "Organizzazione ::: Organizzazioni",
     "post": "Messaggio ::: Messaggi",
     "project": "Progetto ::: Progetti",
-    "reportContent": "",
+    "reportContent": null,
     "shout": "Grido ::: Gridi",
     "tag": "Tag ::: Tag",
     "takeAction": "Agire",
     "user": "Utente ::: Utenti",
     "validations": {
-      "categories": "",
-      "email": "",
-      "url": ""
+      "categories": null,
+      "email": null,
+      "url": null
     },
     "versus": "Verso"
   },
   "components": {
-    "enter-nonce": {
-      "form": {
-        "description": "",
-        "next": "",
-        "nonce": "",
-        "validations": {
-          "length": ""
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "Modifica della password non riuscita. Forse il codice di sicurezza non era corretto?",
-        "help": "",
-        "success": ""
+        "help": null,
+        "success": null
       },
       "request": {
         "form": {
-          "description": "",
-          "submit": "",
-          "submitted": ""
+          "description": null,
+          "submit": null,
+          "submitted": null
         },
-        "title": ""
+        "title": null
       }
     },
     "registration": {
       "create-user-account": {
-        "error": "",
-        "help": "",
-        "success": "",
-        "title": ""
+        "error": null,
+        "help": null,
+        "success": null,
+        "title": null
+      },
+      "email-nonce": {
+        "form": {
+          "description": null,
+          "next": null,
+          "nonce": null,
+          "validations": {
+            "length": null
+          }
+        }
       },
       "signup": {
         "form": {
-          "data-privacy": "",
-          "description": "",
+          "data-privacy": null,
+          "description": null,
           "errors": {
-            "email-exists": "",
-            "invalid-invitation-token": "Sembra che l'invito sia già stato utilizzato. I link di invito possono essere utilizzati una sola volta."
+            "email-exists": null
           },
-          "invitation-code": "",
-          "minimum-age": "",
-          "submit": "",
-          "success": "",
-          "terms-and-condition": ""
+          "submit": null,
+          "success": null,
+          "terms-and-condition": null
         },
-        "title": "",
-        "unavailable": ""
+        "title": null,
+        "unavailable": null
       }
     }
   },
   "contribution": {
     "categories": {
-      "infoSelectedNoOfMaxCategories": ""
+      "infoSelectedNoOfMaxCategories": null
     },
     "category": {
       "name": {
-        "animal-protection": "",
-        "art-culture-sport": "",
-        "consumption-sustainability": "",
-        "cooperation-development": "",
-        "democracy-politics": "",
-        "economy-finances": "",
-        "education-sciences": "",
-        "energy-technology": "",
-        "environment-nature": "",
-        "freedom-of-speech": "",
-        "global-peace-nonviolence": "",
-        "happiness-values": "",
-        "health-wellbeing": "",
-        "human-rights-justice": "",
-        "it-internet-data-privacy": "",
-        "just-for-fun": ""
+        "animal-protection": null,
+        "art-culture-sport": null,
+        "consumption-sustainability": null,
+        "cooperation-development": null,
+        "democracy-politics": null,
+        "economy-finances": null,
+        "education-sciences": null,
+        "energy-technology": null,
+        "environment-nature": null,
+        "freedom-of-speech": null,
+        "global-peace-nonviolence": null,
+        "happiness-values": null,
+        "health-wellbeing": null,
+        "human-rights-justice": null,
+        "it-internet-data-privacy": null,
+        "just-for-fun": null
       }
     },
-    "delete": "",
-    "edit": "",
+    "delete": null,
+    "edit": null,
     "emotions-label": {
-      "angry": "",
-      "cry": "",
-      "funny": "",
-      "happy": "",
-      "surprised": ""
+      "angry": null,
+      "cry": null,
+      "funny": null,
+      "happy": null,
+      "surprised": null
     },
-    "filterALL": "",
-    "filterFollow": "",
-    "languageSelectLabel": "",
-    "languageSelectText": "",
-    "newPost": "",
-    "success": "",
+    "filterALL": null,
+    "filterFollow": null,
+    "languageSelectLabel": null,
+    "languageSelectText": null,
+    "newPost": null,
+    "success": null,
     "teaserImage": {
       "cropperConfirm": "Confermare",
-      "supportedFormats": "Inserisci un'immagine in formato file JPG, PNG o GIF"
+      "supportedFormats": "Inserisci un'immagine in formato file JPG, PNG o GIF!"
     },
-    "title": ""
+    "title": null
   },
   "delete": {
-    "cancel": "",
+    "cancel": null,
     "comment": {
-      "message": "",
-      "success": "",
-      "title": "",
-      "type": ""
+      "message": null,
+      "success": null,
+      "title": null,
+      "type": null
     },
     "contribution": {
-      "message": "",
-      "success": "",
-      "title": "",
-      "type": ""
+      "message": null,
+      "success": null,
+      "title": null,
+      "type": null
     },
-    "submit": ""
+    "submit": null
   },
   "disable": {
-    "cancel": "",
+    "cancel": null,
     "comment": {
-      "message": "",
-      "title": "",
-      "type": ""
+      "message": null,
+      "title": null,
+      "type": null
     },
     "contribution": {
-      "message": "",
-      "title": "",
-      "type": ""
+      "message": null,
+      "title": null,
+      "type": null
     },
-    "submit": "",
-    "success": "",
+    "submit": null,
+    "success": null,
     "user": {
-      "message": "",
-      "title": "",
-      "type": ""
+      "message": null,
+      "title": null,
+      "type": null
     }
   },
   "donations": {
     "amount-of-total": "{amount} of {total} € collezionato",
-    "donate-now": "Dona ora",
-    "donations-for": "Donazioni per"
+    "donate-now": "Dona ora"
   },
   "editor": {
     "embed": {
-      "always_allow": "",
+      "always_allow": null,
       "data_privacy_info": "I tuoi dati non sono ancora stati condivisi con fornitori terzi. Se continui a guardare questo video, il seguente fornitore probabilmente raccoglierà i dati dell'utente:",
-      "data_privacy_warning": "",
-      "play_now": ""
+      "data_privacy_warning": null,
+      "play_now": null
     },
     "hashtag": {
-      "addHashtag": "",
-      "addLetter": "",
-      "noHashtagsFound": ""
+      "addHashtag": null,
+      "addLetter": null,
+      "noHashtagsFound": null
     },
     "mention": {
-      "noUsersFound": ""
+      "noUsersFound": null
     },
-    "placeholder": ""
+    "placeholder": null
   },
   "filter-menu": {
-    "all": "",
-    "categories": "",
-    "emotions": "",
-    "filter-by": "",
-    "following": "",
-    "languages": ""
+    "all": null,
+    "categories": null,
+    "emotions": null,
+    "filter-by": null,
+    "following": null,
+    "languages": null,
+    "order": {
+      "newest": {
+        "hint": null,
+        "label": null
+      },
+      "oldest": {
+        "hint": null,
+        "label": null
+      }
+    }
   },
   "followButton": {
-    "follow": "",
-    "following": ""
+    "follow": null,
+    "following": null
+  },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null
+    },
+    "membersCount": null,
+    "membersListTitle": null
   },
   "hashtags-filter": {
-    "clearSearch": "",
-    "hashtag-search": "",
-    "title": ""
+    "clearSearch": null,
+    "hashtag-search": null,
+    "title": null
   },
   "index": {
-    "change-filter-settings": "",
-    "no-results": ""
+    "change-filter-settings": null,
+    "no-results": null
   },
   "login": {
-    "copy": "Se sei gia registrato su Human Connection, accedi qui.",
     "email": "La tua email",
-    "failure": "",
-    "forgotPassword": "",
+    "failure": null,
+    "forgotPassword": null,
     "hello": "Ciao",
     "login": "Accesso",
     "logout": "Logout",
-    "moreInfo": "Che cosa è Human Connection?",
-    "moreInfoHint": "",
-    "moreInfoURL": "",
-    "no-account": "",
+    "moreInfo": "Che cosa è {APPLICATION_NAME}?",
+    "moreInfoHint": null,
+    "no-account": null,
     "password": "La tua password",
-    "register": "",
-    "success": ""
+    "register": null,
+    "success": null
   },
   "maintenance": {
-    "explanation": "",
-    "questions": "",
-    "title": ""
+    "explanation": null,
+    "questions": null,
+    "title": null
   },
   "moderation": {
-    "name": "",
+    "name": null,
     "reports": {
-      "createdAt": "",
-      "disabledBy": "",
-      "empty": "",
-      "name": "",
-      "reasonCategory": "",
-      "reasonDescription": "",
-      "reporter": "",
-      "submitter": ""
+      "createdAt": null,
+      "disabledBy": null,
+      "empty": null,
+      "name": null,
+      "reasonCategory": null,
+      "reasonDescription": null,
+      "reporter": null,
+      "submitter": null
     }
   },
   "notifications": {
-    "comment": "",
-    "content": "",
-    "empty": "",
+    "comment": null,
+    "content": null,
+    "empty": null,
     "filterLabel": {
-      "all": "",
-      "read": "",
-      "unread": ""
+      "all": null,
+      "read": null,
+      "unread": null
     },
     "markAllAsRead": "Segna tutti come letti",
-    "pageLink": "",
-    "post": "",
+    "pageLink": null,
+    "post": null,
     "reason": {
-      "commented_on_post": "",
-      "mentioned_in_comment": "",
-      "mentioned_in_post": ""
+      "commented_on_post": null,
+      "mentioned_in_comment": null,
+      "mentioned_in_post": null
     },
-    "title": "",
-    "user": ""
+    "title": null,
+    "user": null
   },
   "post": {
     "comment": {
-      "submit": "",
-      "submitted": "",
-      "updated": ""
+      "submit": null,
+      "submitted": null,
+      "updated": null
     },
-    "edited": "",
+    "edited": null,
     "menu": {
-      "delete": "",
-      "edit": "",
-      "pin": "",
-      "pinnedSuccessfully": "",
-      "unpin": "",
-      "unpinnedSuccessfully": ""
-    },
-    "moreInfo": {
-      "description": "",
-      "name": "Ulteriori informazioni",
-      "title": "",
-      "titleOfCategoriesSection": "",
-      "titleOfHashtagsSection": "",
-      "titleOfRelatedContributionsSection": ""
+      "delete": null,
+      "edit": null,
+      "pin": null,
+      "pinnedSuccessfully": null,
+      "unpin": null,
+      "unpinnedSuccessfully": null
     },
     "name": "Messaggio",
-    "pinned": "",
+    "pinned": null,
     "takeAction": {
       "name": "Agire"
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": null
+    },
     "commented": "Commentato",
     "follow": "Seguire",
     "followers": "Seguenti",
     "following": "Seguendo",
     "invites": {
-      "description": "",
-      "emailPlaceholder": "",
-      "title": ""
+      "description": null,
+      "emailPlaceholder": null,
+      "title": null
     },
     "memberSince": "Membro dal",
     "name": "Il mio profilo",
     "network": {
-      "andMore": "",
-      "followedBy": "",
-      "followedByNobody": "",
-      "following": "",
-      "followingNobody": "",
-      "title": ""
+      "andMore": null,
+      "followedBy": null,
+      "followedByNobody": null,
+      "following": null,
+      "followingNobody": null,
+      "title": null
     },
     "shouted": "Gridato",
-    "socialMedia": "",
+    "socialMedia": null,
     "userAnonym": "Anonymous"
   },
   "quotes": {
@@ -459,86 +420,86 @@
     }
   },
   "release": {
-    "cancel": "",
+    "cancel": null,
     "comment": {
-      "error": "",
-      "message": "",
-      "title": "",
-      "type": ""
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
     },
     "contribution": {
-      "error": "",
-      "message": "",
-      "title": "",
-      "type": ""
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
     },
-    "submit": "",
-    "success": "",
+    "submit": null,
+    "success": null,
     "user": {
-      "error": "",
-      "message": "",
-      "title": "",
-      "type": ""
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
     }
   },
   "report": {
-    "cancel": "",
+    "cancel": null,
     "comment": {
-      "error": "",
-      "message": "",
-      "title": "",
-      "type": ""
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
     },
     "contribution": {
-      "error": "",
-      "message": "",
-      "title": "",
-      "type": ""
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
     },
     "reason": {
       "category": {
-        "invalid": "",
-        "label": "",
+        "invalid": null,
+        "label": null,
         "options": {
-          "advert_products_services_commercial": "",
-          "criminal_behavior_violation_german_law": "",
-          "discrimination_etc": "",
-          "doxing": "",
-          "glorific_trivia_of_cruel_inhuman_acts": "",
-          "intentional_intimidation_stalking_persecution": "",
-          "other": "",
-          "pornographic_content_links": ""
+          "advert_products_services_commercial": null,
+          "criminal_behavior_violation_german_law": null,
+          "discrimination_etc": null,
+          "doxing": null,
+          "glorific_trivia_of_cruel_inhuman_acts": null,
+          "intentional_intimidation_stalking_persecution": null,
+          "other": null,
+          "pornographic_content_links": null
         },
-        "placeholder": ""
+        "placeholder": null
       },
       "description": {
-        "label": "",
-        "placeholder": ""
+        "label": null,
+        "placeholder": null
       }
     },
-    "submit": "",
-    "success": "",
+    "submit": null,
+    "success": null,
     "user": {
-      "error": "",
-      "message": "",
-      "title": "",
-      "type": ""
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
     }
   },
   "search": {
-    "failed": "",
-    "hint": "",
-    "placeholder": ""
+    "failed": "Non è stato trovato nulla",
+    "hint": "Cosa state cercando? Usate !... per i post, @... per gli utenti, #... per gli hashtag.",
+    "placeholder": "Ricerca"
   },
   "settings": {
     "data": {
       "labelBio": "Su di te",
       "labelCity": "La tua città o regione",
       "labelName": "Nome",
-      "labelSlug": "",
+      "labelSlug": null,
       "name": "I tuoi dati",
       "namePlaceholder": "Anonymous",
-      "success": ""
+      "success": null
     },
     "delete": {
       "name": "Elimina Account"
@@ -556,39 +517,39 @@
       "name": "Scaricamento dati"
     },
     "email": {
-      "change-successful": "",
-      "labelEmail": "",
-      "labelNewEmail": "",
-      "labelNonce": "",
-      "name": "",
-      "submitted": "",
-      "success": "",
+      "change-successful": null,
+      "labelEmail": null,
+      "labelNewEmail": null,
+      "labelNonce": null,
+      "name": null,
+      "submitted": null,
+      "success": null,
       "validation": {
-        "same-email": ""
+        "same-email": null
       },
       "verification-error": {
-        "explanation": "",
-        "message": "",
+        "explanation": null,
+        "message": null,
         "reason": {
-          "invalid-nonce": "",
-          "no-email-request": ""
+          "invalid-nonce": null,
+          "no-email-request": null
         },
-        "support": ""
+        "support": null
       }
     },
     "embeds": {
       "info-description": "Ecco l'elenco dei fornitori di terze parti i cui contenuti possono essere visualizzati come codice di terze parti, ad esempio sotto forma di video incorporati.",
-      "name": "",
+      "name": null,
       "status": {
         "change": {
-          "allow": "",
-          "deny": "",
-          "question": ""
+          "allow": null,
+          "deny": null,
+          "question": null
         },
-        "description": "",
+        "description": null,
         "disabled": {
-          "off": "",
-          "on": ""
+          "off": null,
+          "on": null
         }
       }
     },
@@ -621,121 +582,70 @@
       "name": "Mie organizzazioni"
     },
     "privacy": {
-      "make-shouts-public": "",
-      "name": "",
-      "success-update": ""
+      "make-shouts-public": null,
+      "name": null,
+      "success-update": null
     },
     "security": {
       "change-password": {
-        "button": "",
-        "label-new-password": "",
-        "label-new-password-confirm": "",
-        "label-old-password": "",
-        "message-new-password-confirm-required": "",
-        "message-new-password-missmatch": "",
-        "message-new-password-required": "",
-        "message-old-password-required": "",
-        "passwordSecurity": "",
-        "passwordStrength0": "",
-        "passwordStrength1": "",
-        "passwordStrength2": "",
-        "passwordStrength3": "",
-        "passwordStrength4": "",
-        "success": ""
+        "button": null,
+        "label-new-password": null,
+        "label-new-password-confirm": null,
+        "label-old-password": null,
+        "message-new-password-confirm-required": null,
+        "message-new-password-missmatch": null,
+        "message-new-password-required": null,
+        "message-old-password-required": null,
+        "passwordSecurity": null,
+        "passwordStrength0": null,
+        "passwordStrength1": null,
+        "passwordStrength2": null,
+        "passwordStrength3": null,
+        "passwordStrength4": null,
+        "success": null
       },
       "name": "Sicurezza"
     },
     "social-media": {
-      "name": "",
-      "placeholder": "",
-      "requireUnique": "",
-      "submit": "",
+      "name": null,
+      "placeholder": null,
+      "requireUnique": null,
+      "submit": null,
       "successAdd": "Social media aggiunti. \nProfilo utente aggiornato ",
       "successDelete": "Social media cancellati. Profilo utente aggiornato!"
     },
     "validation": {
       "slug": {
-        "alreadyTaken": "",
-        "regex": ""
+        "alreadyTaken": null,
+        "regex": null
       }
     }
   },
   "shoutButton": {
-    "shouted": ""
+    "shouted": null
   },
   "site": {
-    "back-to-login": "",
+    "back-to-login": null,
     "bank": "conto bancario",
-    "code-of-conduct": "",
+    "code-of-conduct": null,
     "contact": "Contatto",
     "data-privacy": "protezione dei dati",
     "director": "Direttore Generale",
-    "error-occurred": "",
-    "faq": "",
+    "error-occurred": null,
+    "faq": null,
     "germany": "Germania",
     "imprint": "Impressum",
-    "made": "Con &#10084; fatto",
+    "made": "Con ❤️ fatto",
     "register": "numero di registro",
     "responsible": "Responsabile ai sensi del § 55 Abs. 2 RStV (Germania)",
     "taxident": "Numero di identificazione dell'imposta sul valore aggiunto ai sensi del § 27 a Legge sull'imposta sul valore aggiunto (Germania)",
-    "termsAndConditions": "",
-    "thanks": "",
+    "termsAndConditions": null,
+    "thanks": null,
     "tribunal": "registro tribunale"
   },
-  "store": {
-    "posts": {
-      "orderBy": {
-        "newest": {
-          "label": ""
-        },
-        "oldest": {
-          "label": ""
-        }
-      }
-    }
-  },
   "termsAndConditions": {
-    "addition": {
-      "description": "Https://human-connection. org/eventi/",
-      "title": "Inoltre, teniamo regolarmente eventi in cui puoi anche condividere le tue impressioni e porre domande. Puoi trovare una panoramica attuale qui:"
-    },
-    "agree": "Sono d'accordo!",
-    "code-of-conduct": {
-      "description": "Il nostro codice di condotta funge da manuale per l'aspetto personale e l'interazione reciproca. Chiunque sia attivo come utente nella rete di Human Connection, scrive articoli, commenti o contatta altri utenti, anche al di fuori della rete, riconosce queste regole di condotta come vincolanti. <a href=\"https://alpha.human-connection.org/code-of-conduct\" target=\"_blank\"> https://alpha.human-connection.org/code-of-conduct </a>",
-      "title": "Codice di condotta"
-    },
-    "errors-and-feedback": {
-      "description": "Facciamo ogni sforzo per mantenere la nostra rete e i nostri dati al sicuro e disponibili. Ogni nuova versione del software viene sottoposta a test sia automatizzati che manuali. Tuttavia, possono verificarsi errori imprevisti. Pertanto, siamo grati per tutti i bug segnalati. Siete invitati a segnalare eventuali bug che si scopre inviando un'e-mail al supporto presso support@human-connection.org",
-      "title": "Errori e feedback"
-    },
-    "help-and-questions": {
-      "description": "Per aiuto e domande abbiamo compilato per voi una raccolta completa di domande e risposte alle domande più frequenti (FAQ). Potete trovarli qui: <a href=\"https://support.human-connection.org/kb/\" target=\"_blank\" >https:</a>//support.human-connection.org/kb/ ",
-      "title": "Aiuto e domande"
-    },
-    "moderation": {
-      "description": "Fino a quando le nostre possibilità finanziarie ci permettono di implementare il sistema di moderazione comunitaria, abbiamo moderato con un sistema semplificato e con personale proprio o eventualmente volontario. Formiamo questi moderatori e per questo motivo solo loro prendono le decisioni appropriate. Questi moderatori svolgono il loro lavoro in forma anonima. È possibile segnalare a noi messaggi, commenti e utenti (ad esempio, se forniscono informazioni nel loro profilo o se hanno immagini che violano queste Condizioni d'uso). Se ci segnalate qualcosa, potete darci una ragione e una breve spiegazione. Dopodiché daremo un'occhiata a ciò che hai segnalato e, se necessario, ti sanzioneremo, ad esempio bloccando i contributi, i commenti o gli utenti. Purtroppo, lei e la persona interessata non riceverà alcun feedback da parte nostra in questo momento, ma questo è in fase di pianificazione. Indipendentemente da ciò, ci riserviamo il diritto di imporre sanzioni in linea di principio per motivi che non sono o non sono ancora elencati nel nostro Codice di condotta o nei presenti termini di servizio.",
-      "title": "Moderazione"
-    },
     "newTermsAndConditions": "Nuovi Termini e Condizioni",
-    "privacy-statement": {
-      "description": "La nostra rete è una rete di conoscenza e azione sociale. Per noi è quindi particolarmente importante che il maggior numero possibile di contenuti sia accessibile al pubblico. Nel corso dello sviluppo della nostra rete ci sarà sempre più la possibilità di decidere sulla visibilità dei dati personali. Ti informeremo su queste nuove funzionalità. Altrimenti, dovresti sempre pensare a quali dati personali divulghi su te stesso (o altri). Ciò vale in particolare per il contenuto di post e commenti, poiché questi hanno un carattere ampiamente pubblico. Successivamente ci saranno possibilità di limitare la visibilità del tuo profilo. Parte dei termini di servizio è la nostra informativa sulla privacy, che ti informa sulle singole operazioni di trattamento dei dati nella nostra rete: <a href=\"https://human-connection.org/datenschutz/#netzwerk\" target=\"_blank\"> https://human-connection.org/datenschutz/#netzwerk </a> bzw. <a href=\"https://human-connection.org/datenschutz/\" target=\"_blank\"> https://human-connection.org/datenschutz/ </a> La nostra informativa sulla privacy è adattata alla situazione legale e caratteristiche della nostra rete ed è sempre valido nella versione più recente.",
-      "title": "Informativa sulla Privacy"
-    },
-    "terms-of-service": {
-      "description": "Le seguenti condizioni d'uso costituiscono la base per l'utilizzo della nostra rete. Quando ti registri, devi accettarli e ti informeremo in seguito di eventuali modifiche che potrebbero aver luogo. La rete di connessione umana è gestita in Germania ed è quindi soggetta alla legge tedesca. Il foro competente è Kirchheim / Teck. Per i dettagli, consulta la nostra impronta: <a href=\"https://human-connection.org/imprint\" target=\"_blank\" > https://human-connection.org/imprint </a>",
-      "title": "Termini di servizio"
-    },
-    "termsAndConditionsConfirmed": "Ho letto e confermato i <a href=\"/terms-and-conditions\" target=\"_blank\"> Termini e condizioni </a> .",
     "termsAndConditionsNewConfirm": "Ho letto e accetto le nuove condizioni generali di contratto.",
-    "termsAndConditionsNewConfirmText": "Si prega di leggere le nuove condizioni d'uso ora!",
-    "use-and-license": {
-      "description": "Se qualsiasi contenuto pubblicato su di noi è protetto da diritti di proprietà intellettuale, l'utente ci concede una licenza mondiale, non esclusiva, trasferibile e sub-licenziabile, per l'utilizzo di tali contenuti per la pubblicazione nella nostra rete. Questa licenza scade quando si elimina il contenuto o l'intero account. Ricorda che altri potrebbero condividere i tuoi contenuti e noi non possiamo cancellarli.",
-      "title": "Uso e licenza"
-    }
-  },
-  "user": {
-    "avatar": {
-      "submitted": ""
-    }
+    "termsAndConditionsNewConfirmText": "Si prega di leggere le nuove condizioni d'uso ora!"
   }
 }

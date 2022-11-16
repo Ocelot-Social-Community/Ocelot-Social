@@ -33,7 +33,7 @@ describe('my-social-media.vue', () => {
   })
 
   describe('mount', () => {
-    let form, input, submitButton
+    let form, input
     const Wrapper = () => {
       const store = new Vuex.Store({
         getters,
@@ -42,11 +42,12 @@ describe('my-social-media.vue', () => {
     }
 
     describe('adding social media link', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         wrapper = Wrapper()
         form = wrapper.find('form')
-        input = wrapper.find('input#addSocialMedia')
-        submitButton = wrapper.find('button')
+        form.trigger('submit')
+        await Vue.nextTick()
+        input = wrapper.find('input#editSocialMedia')
       })
 
       it('requires the link to be a valid url', async () => {
@@ -79,7 +80,6 @@ describe('my-social-media.vue', () => {
           const expected = expect.objectContaining({
             variables: { url: newSocialMediaUrl },
           })
-
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
         })
 
@@ -88,10 +88,10 @@ describe('my-social-media.vue', () => {
           expect(mocks.$toast.success).toHaveBeenCalledTimes(1)
         })
 
-        it('clears the form', async () => {
+        it('switches back to list', async () => {
           await flushPromises()
-          expect(input.value).toBe(undefined)
-          expect(submitButton.vm.$attrs.disabled).toBe(true)
+          const submitButton = wrapper.find('.base-button[data-test="add-save-button"]')
+          expect(submitButton.text()).not.toContain('settings.social-media.submit')
         })
       })
     })
@@ -100,10 +100,9 @@ describe('my-social-media.vue', () => {
       beforeEach(() => {
         getters = {
           'auth/user': () => ({
-            socialMedia: [{ id: 's1', url: socialMediaUrl }],
+            socialMedia: [{ id: 's1', url: socialMediaUrl, favicon: faviconUrl }],
           }),
         }
-
         wrapper = Wrapper()
         form = wrapper.find('form')
       })
@@ -116,18 +115,12 @@ describe('my-social-media.vue', () => {
         it('displays the url', () => {
           expect(wrapper.find(`a[href="${socialMediaUrl}"]`).exists()).toBe(true)
         })
-
-        it('displays the edit button', () => {
-          expect(wrapper.find('.base-button[data-test="edit-button"]').exists()).toBe(true)
-        })
-
-        it('displays the delete button', () => {
-          expect(wrapper.find('.base-button[data-test="delete-button"]').exists()).toBe(true)
-        })
       })
 
       it('does not accept a duplicate url', async () => {
-        wrapper.find('input#addSocialMedia').setValue(socialMediaUrl)
+        form.trigger('submit')
+        await Vue.nextTick()
+        wrapper.find('input#editSocialMedia').setValue(socialMediaUrl)
         form.trigger('submit')
         await Vue.nextTick()
         expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
@@ -141,12 +134,6 @@ describe('my-social-media.vue', () => {
           input = wrapper.find('input#editSocialMedia')
         })
 
-        it('disables adding new links while editing', () => {
-          const addInput = wrapper.find('input#addSocialMedia')
-
-          expect(addInput.exists()).toBe(false)
-        })
-
         it('sends the new url to the backend', async () => {
           const expected = expect.objectContaining({
             variables: { id: 's1', url: newSocialMediaUrl },
@@ -155,13 +142,6 @@ describe('my-social-media.vue', () => {
           form.trigger('submit')
           await Vue.nextTick()
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
-        })
-
-        it('allows the user to cancel editing', async () => {
-          const cancelButton = wrapper.find('button#cancel')
-          cancelButton.trigger('click')
-          await Vue.nextTick()
-          expect(wrapper.find('input#editSocialMedia').exists()).toBe(false)
         })
       })
 
@@ -176,7 +156,6 @@ describe('my-social-media.vue', () => {
           const expected = expect.objectContaining({
             variables: { id: 's1' },
           })
-
           expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
         })

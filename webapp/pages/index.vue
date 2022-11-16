@@ -4,22 +4,11 @@
       <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </ds-grid-item>
-      <ds-grid-item :row-span="2" column-span="fullWidth" class="top-info-bar">
-        <!--<donation-info /> -->
-        <div>
-          <a target="_blank" href="https://human-connection.org/spenden/">
-            <base-button filled>{{ $t('donations.donate-now') }}</base-button>
-          </a>
-        </div>
-        <div class="sorting-dropdown">
-          <ds-select
-            v-model="selected"
-            :options="sortingOptions"
-            size="large"
-            :icon-right="sortingIcon"
-          ></ds-select>
-        </div>
+      <!-- donation info -->
+      <ds-grid-item v-if="showDonations" class="top-info-bar" :row-span="1" column-span="fullWidth">
+        <donation-info :goal="goal" :progress="progress" />
       </ds-grid-item>
+      <!-- news feed -->
       <template v-if="hasResults">
         <masonry-grid-item
           v-for="post in posts"
@@ -28,9 +17,9 @@
         >
           <post-teaser
             :post="post"
-            @removePostFromList="deletePost"
-            @pinPost="pinPost"
-            @unpinPost="unpinPost"
+            @removePostFromList="posts = removePostFromList(post, posts)"
+            @pinPost="pinPost(post, refetchPostList)"
+            @unpinPost="unpinPost(post, refetchPostList)"
           />
         </masonry-grid-item>
       </template>
@@ -42,13 +31,13 @@
         </ds-grid-item>
       </template>
     </masonry-grid>
+    <!-- create post -->
     <client-only>
       <nuxt-link :to="{ name: 'post-create' }">
         <base-button
           v-tooltip="{
             content: $t('contribution.newPost'),
             placement: 'left',
-            delay: { show: 500 },
           }"
           class="post-add-button"
           icon="plus"
@@ -57,6 +46,7 @@
         />
       </nuxt-link>
     </client-only>
+    <!-- infinite loading -->
     <client-only>
       <infinite-loading v-if="hasMore" @infinite="showMoreContributions" />
     </client-only>
@@ -64,29 +54,34 @@
 </template>
 
 <script>
-// import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
+import postListActions from '~/mixins/postListActions'
+import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter.vue'
 import HcEmpty from '~/components/Empty/Empty'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
+import { DonationsQuery } from '~/graphql/Donations'
 import { filterPosts } from '~/graphql/PostQuery.js'
-import PostMutations from '~/graphql/PostMutations'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 
 export default {
   components: {
-    // DonationInfo,
+    DonationInfo,
     HashtagsFilter,
     PostTeaser,
     HcEmpty,
     MasonryGrid,
     MasonryGridItem,
   },
+  mixins: [postListActions],
   data() {
     const { hashtag = null } = this.$route.query
     return {
+      showDonations: true,
+      goal: 15000,
+      progress: 7000,
       posts: [],
       hasMore: true,
       // Initialize your apollo data
@@ -98,24 +93,8 @@ export default {
   computed: {
     ...mapGetters({
       postsFilter: 'posts/filter',
-      orderOptions: 'posts/orderOptions',
       orderBy: 'posts/orderBy',
-      selectedOrder: 'posts/selectedOrder',
-      sortingIcon: 'posts/orderIcon',
     }),
-    selected: {
-      get() {
-        return this.selectedOrder(this)
-      },
-      set({ value }) {
-        this.offset = 0
-        this.posts = []
-        this.selectOrder(value)
-      },
-    },
-    sortingOptions() {
-      return this.orderOptions(this)
-    },
     finalFilters() {
       let filter = this.postsFilter
       if (this.hashtag) {
@@ -132,9 +111,6 @@ export default {
   },
   watchQuery: ['hashtag'],
   methods: {
-    ...mapMutations({
-      selectOrder: 'posts/SELECT_ORDER',
-    }),
     clearSearch() {
       this.$router.push({ path: '/' })
       this.hashtag = null
@@ -160,44 +136,29 @@ export default {
         updateQuery: UpdateQuery(this, { $state, pageKey: 'Post' }),
       })
     },
-    deletePost(deletedPost) {
-      this.posts = this.posts.filter((post) => {
-        return post.id !== deletedPost.id
-      })
-    },
     resetPostList() {
       this.offset = 0
       this.posts = []
       this.hasMore = true
     },
-    pinPost(post) {
-      this.$apollo
-        .mutate({
-          mutation: PostMutations().pinPost,
-          variables: { id: post.id },
-        })
-        .then(() => {
-          this.$toast.success(this.$t('post.menu.pinnedSuccessfully'))
-          this.resetPostList()
-          this.$apollo.queries.Post.refetch()
-        })
-        .catch((error) => this.$toast.error(error.message))
-    },
-    unpinPost(post) {
-      this.$apollo
-        .mutate({
-          mutation: PostMutations().unpinPost,
-          variables: { id: post.id },
-        })
-        .then(() => {
-          this.$toast.success(this.$t('post.menu.unpinnedSuccessfully'))
-          this.resetPostList()
-          this.$apollo.queries.Post.refetch()
-        })
-        .catch((error) => this.$toast.error(error.message))
+    refetchPostList() {
+      this.resetPostList()
+      this.$apollo.queries.Post.refetch()
     },
   },
   apollo: {
+    Donations: {
+      query() {
+        return DonationsQuery()
+      },
+      update({ Donations }) {
+        if (!Donations) return
+        const { showDonations, goal, progress } = Donations
+        this.showDonations = showDonations
+        this.goal = goal
+        this.progress = progress < goal ? progress : goal
+      },
+    },
     Post: {
       query() {
         return filterPosts(this.$i18n)
@@ -247,23 +208,8 @@ export default {
   box-shadow: $box-shadow-x-large;
 }
 
-.sorting-dropdown {
-  width: 250px;
-  position: relative;
-
-  @media (max-width: 680px) {
-    width: 180px;
-  }
-}
-
 .top-info-bar {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-
-  @media (max-width: 546px) {
-    grid-row-end: span 3 !important;
-    flex-direction: column;
-  }
+  align-items: center;
 }
 </style>

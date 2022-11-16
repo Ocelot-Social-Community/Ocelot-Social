@@ -4,7 +4,7 @@ import { UserInputError, ForbiddenError } from 'apollo-server'
 import { mergeImage, deleteImage } from './images/images'
 import Resolver from './helpers/Resolver'
 import log from './helpers/databaseLogger'
-import createOrUpdateLocations from './users/location'
+import { createOrUpdateLocations } from './users/location'
 
 const neode = getNeode()
 
@@ -139,9 +139,10 @@ export default {
       return blockedUser.toJson()
     },
     UpdateUser: async (_parent, params, context, _resolveInfo) => {
-      const { termsAndConditionsAgreedVersion } = params
       const { avatar: avatarInput } = params
       delete params.avatar
+      params.locationName = params.locationName === '' ? null : params.locationName
+      const { termsAndConditionsAgreedVersion } = params
       if (termsAndConditionsAgreedVersion) {
         const regEx = new RegExp(/^[0-9]+\.[0-9]+\.[0-9]+$/g)
         if (!regEx.test(termsAndConditionsAgreedVersion)) {
@@ -169,7 +170,8 @@ export default {
       })
       try {
         const user = await writeTxResultPromise
-        await createOrUpdateLocations(params.id, params.locationName, session)
+        // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
+        await createOrUpdateLocations('User', params.id, params.locationName, session)
         return user
       } catch (error) {
         throw new UserInputError(error.message)
@@ -244,6 +246,74 @@ export default {
         session.close()
       }
     },
+    switchUserRole: async (object, args, context, resolveInfo) => {
+      const { role, id } = args
+
+      if (context.user.id === id) throw new Error('you-cannot-change-your-own-role')
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const switchUserRoleResponse = await transaction.run(
+          `
+            MATCH (user:User {id: $id})
+            SET user.role = $role
+            SET user.updatedAt = toString(datetime())
+            RETURN user {.*}
+          `,
+          { id, role },
+        )
+        const [user] = switchUserRoleResponse.records.map((record) => record.get('user'))
+        return user
+      })
+      try {
+        const user = await writeTxResultPromise
+        return user
+      } finally {
+        session.close()
+      }
+    },
+    saveCategorySettings: async (object, args, context, resolveInfo) => {
+      const { activeCategories } = args
+      const {
+        user: { id },
+      } = context
+
+      const session = context.driver.session()
+      await session.writeTransaction((transaction) => {
+        return transaction.run(
+          `
+          MATCH (user:User { id: $id })-[previousCategories:NOT_INTERESTED_IN]->(category:Category)
+          DELETE previousCategories
+          RETURN user, category
+        `,
+          { id },
+        )
+      })
+
+      // frontend gives [] when all categories are selected (default)
+      if (activeCategories.length === 0) return true
+
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const saveCategorySettingsResponse = await transaction.run(
+          `
+            MATCH (category:Category) WHERE NOT category.id IN $activeCategories
+            MATCH (user:User { id: $id })
+            MERGE (user)-[r:NOT_INTERESTED_IN]->(category)
+            RETURN user, r, category
+          `,
+          { id, activeCategories },
+        )
+        const [user] = await saveCategorySettingsResponse.records.map((record) =>
+          record.get('user'),
+        )
+        return user
+      })
+      try {
+        await writeTxResultPromise
+        return true
+      } finally {
+        session.close()
+      }
+    },
   },
   User: {
     email: async (parent, params, context, resolveInfo) => {
@@ -265,6 +335,7 @@ export default {
         'termsAndConditionsAgreedAt',
         'allowEmbedIframes',
         'showShoutsPublicly',
+        'sendNotificationEmails',
         'locale',
       ],
       boolean: {
@@ -293,6 +364,7 @@ export default {
         avatar: '-[:AVATAR_IMAGE]->(related:Image)',
         invitedBy: '<-[:INVITED]-(related:User)',
         location: '-[:IS_IN]->(related:Location)',
+        redeemedInviteCode: '-[:REDEEMED]->(related:InviteCode)',
       },
       hasMany: {
         followedBy: '<-[:FOLLOWS]-(related:User)',
@@ -304,6 +376,7 @@ export default {
         shouted: '-[:SHOUTED]->(related:Post)',
         categories: '-[:CATEGORIZED]->(related:Category)',
         badges: '<-[:REWARDED]-(related:Badge)',
+        inviteCodes: '-[:GENERATED]->(related:InviteCode)',
       },
     }),
   },

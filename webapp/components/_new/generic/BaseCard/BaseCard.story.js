@@ -1,5 +1,6 @@
 import { storiesOf } from '@storybook/vue'
 import helpers from '~/storybook/helpers'
+import logos from '~/constants/logos.js'
 import BaseCard from './BaseCard.vue'
 
 storiesOf('Generic/BaseCard', module)
@@ -33,7 +34,7 @@ storiesOf('Generic/BaseCard', module)
     template: `
       <base-card style="width: 600px;">
         <template #imageColumn>
-          <img class="image" src="/img/sign-up/humanconnection.svg" />
+          <img class="image" alt="Example image" src="${logos.LOGO_WELCOME_PATH}" />
         </template>
         <h2 class="title">I am a card heading</h2>
         <p>And I am a paragraph.</p>
@@ -46,7 +47,7 @@ storiesOf('Generic/BaseCard', module)
     template: `
       <base-card style="width: 600px;">
         <template #imageColumn>
-          <img class="image" src="/img/sign-up/humanconnection.svg" />
+          <img class="image" alt="Example image" src="${logos.LOGO_WELCOME_PATH}" />
         </template>
         <h2 class="title">I am a card heading</h2>
         <p>And I am a paragraph.</p>

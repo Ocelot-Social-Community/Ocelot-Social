@@ -35,4 +35,4 @@ To run Storybook, first start the app, then enter the following command in a new
 
 ![Storybook output](../.gitbook/assets/storybook-output.png)
 
-The Human Connection Storybook will then be available on `http://localhost:3002`.
+The ocelot.social Storybook will then be available on `http://localhost:3002`.

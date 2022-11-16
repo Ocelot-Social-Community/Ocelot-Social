@@ -11,7 +11,7 @@ describe('file a report on a resource', () => {
   let authenticatedUser, currentUser, mutate, query, moderator, abusiveUser, otherReportingUser
   const categoryIds = ['cat9']
   const fileReportMutation = gql`
-    mutation($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
+    mutation ($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
       fileReport(
         resourceId: $resourceId
         reasonCategory: $reasonCategory
@@ -42,7 +42,7 @@ describe('file a report on a resource', () => {
     reasonDescription: 'Violates code of conduct !!!',
   }
   const reportsQuery = gql`
-    query($closed: Boolean) {
+    query ($closed: Boolean) {
       reports(orderBy: createdAt_desc, closed: $closed) {
         id
         createdAt
@@ -74,7 +74,7 @@ describe('file a report on a resource', () => {
     }
   `
   const reviewMutation = gql`
-    mutation($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
+    mutation ($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
       review(resourceId: $resourceId, disable: $disable, closed: $closed) {
         createdAt
         resource {
@@ -101,6 +101,7 @@ describe('file a report on a resource', () => {
 
   beforeAll(async () => {
     await cleanDatabase()
+
     const { server } = createServer({
       context: () => {
         return {
@@ -114,6 +115,11 @@ describe('file a report on a resource', () => {
     query = createTestClient(server).query
   })
 
+  afterAll(async () => {
+    await cleanDatabase()
+  })
+
+  // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
   afterEach(async () => {
     await cleanDatabase()
   })
@@ -124,7 +130,7 @@ describe('file a report on a resource', () => {
         authenticatedUser = null
         await expect(mutate({ mutation: fileReportMutation, variables })).resolves.toMatchObject({
           data: { fileReport: null },
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -723,7 +729,7 @@ describe('file a report on a resource', () => {
         authenticatedUser = null
         expect(query({ query: reportsQuery })).resolves.toMatchObject({
           data: { reports: null },
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -733,7 +739,7 @@ describe('file a report on a resource', () => {
         authenticatedUser = await currentUser.toJson()
         expect(query({ query: reportsQuery })).resolves.toMatchObject({
           data: { reports: null },
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
 

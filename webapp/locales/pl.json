@@ -67,7 +67,6 @@
     "letsTalk": "Porozmawiajmy",
     "loading": "załadunek",
     "loadMore": "Obciążenie więcej",
-    "moreInfo": "Więcej informacji",
     "name": "Nazwa",
     "organization": "Organization ::: Organizations",
     "post": "Poczta ::: Posty",
@@ -83,16 +82,6 @@
     "versus": "werset"
   },
   "components": {
-    "enter-nonce": {
-      "form": {
-        "description": "Otwórz swoją skrzynkę odbiorczą i wpisz kod, który do Ciebie wysłaliśmy.",
-        "next": "Kontynuuj",
-        "nonce": "Wprowadź swój kod",
-        "validations": {
-          "length": "musi mieć długość 6 znaków."
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "Zmiana hasła nie powiodła się. Może kod bezpieczeństwa nie był poprawny?",
@@ -107,6 +96,18 @@
         },
         "title": "Zresetuj hasło"
       }
+    },
+    "registration": {
+      "email-nonce": {
+        "form": {
+          "description": "Otwórz swoją skrzynkę odbiorczą i wpisz kod, który do Ciebie wysłaliśmy.",
+          "next": "Kontynuuj",
+          "nonce": "Wprowadź swój kod",
+          "validations": {
+            "length": "musi mieć długość {nonceLength} znaków."
+          }
+        }
+      }
     }
   },
   "contribution": {
@@ -120,7 +121,7 @@
     "success": "Zapisano!",
     "teaserImage": {
       "cropperConfirm": "Potwierdzać",
-      "supportedFormats": "Wstaw zdjęcie w formacie pliku JPG, PNG lub GIF"
+      "supportedFormats": "Wstaw zdjęcie w formacie pliku JPG, PNG lub GIF!"
     }
   },
   "delete": {
@@ -165,19 +166,27 @@
     "follow": "naśladować",
     "following": "w skutek"
   },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null
+    },
+    "membersCount": null,
+    "membersListTitle": null
+  },
   "hashtags-filter": {
     "title": "Twoja bańka filtrująca"
   },
   "login": {
-    "copy": "Jeśli masz już konto Human Connection, zaloguj się tutaj.",
     "email": "Twój adres e-mail",
     "forgotPassword": "Zapomniałeś hasła?",
     "hello": "Cześć",
     "login": "Logowanie",
     "logout": "Wyloguj się",
-    "moreInfo": "Co to jest Human Connection?",
+    "moreInfo": "Co to jest {APPLICATION_NAME}?",
     "moreInfoHint": "idź po więcej szczegółów",
-    "moreInfoURL": "https://human-connection.org/en/",
     "password": "Twoje hasło"
   },
   "moderation": {
@@ -203,15 +212,15 @@
       "delete": "Usuń wpis",
       "edit": "Edytuj wpis"
     },
-    "moreInfo": {
-      "name": "Więcej informacji"
-    },
     "name": "Poczta",
     "takeAction": {
       "name": "Podejmij działanie"
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Przesłano pomyślnie"
+    },
     "commented": "Skomentuj",
     "follow": "Obserwuj",
     "followers": "Obserwujący",
@@ -282,7 +291,7 @@
   },
   "search": {
     "failed": "Niczego nie znaleziono",
-    "hint": "Czego szukasz?",
+    "hint": "Czego szukasz? Użyj !... dla postów, @... dla użytkowników, #... dla hashtagów.",
     "placeholder": "Szukaj"
   },
   "settings": {
@@ -354,16 +363,11 @@
     "director": "Dyrektor zarządzający",
     "germany": "Niemcy",
     "imprint": "Nadruk",
-    "made": "Z &#10084; zrobiony",
+    "made": "Z ❤️ zrobiony",
     "register": "numer rejestracyjny",
     "responsible": "Odpowiedzialny zgodnie z § 55 Abs. 2 RStV (Niemcy)",
     "taxident": "Numer identyfikacyjny podatku od wartości dodanej zgodnie z § 27 a Ustawa o podatku od wartości dodanej (Niemcy)",
     "termsAc": "Warunki użytkowania",
     "tribunal": "sąd rejestrowy"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Przesłano pomyślnie"
-    }
   }
 }

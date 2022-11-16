@@ -40,7 +40,7 @@ describe('ChangePassword ', () => {
     describe('given email and nonce', () => {
       beforeEach(() => {
         propsData.email = 'mail@example.org'
-        propsData.nonce = '123456'
+        propsData.nonce = '12345'
       })
 
       describe('submitting new password', () => {
@@ -57,7 +57,7 @@ describe('ChangePassword ', () => {
 
         it('delivers new password to backend', () => {
           const expected = expect.objectContaining({
-            variables: { nonce: '123456', email: 'mail@example.org', password: 'supersecret' },
+            variables: { nonce: '12345', email: 'mail@example.org', password: 'supersecret' },
           })
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
         })
@@ -74,6 +74,22 @@ describe('ChangePassword ', () => {
             it('emits `change-password-sucess`', () => {
               expect(wrapper.emitted('passwordResetResponse')).toEqual([['success']])
             })
+          })
+        })
+
+        describe('password reset not successful', () => {
+          beforeEach(() => {
+            mocks.$apollo.mutate = jest.fn().mockRejectedValue({
+              message: 'Ouch!',
+            })
+            wrapper = Wrapper()
+            wrapper.find('input#password').setValue('supersecret')
+            wrapper.find('input#passwordConfirmation').setValue('supersecret')
+            wrapper.find('form').trigger('submit')
+          })
+
+          it('display a toast error', () => {
+            expect(mocks.$toast.error).toHaveBeenCalled()
           })
         })
       })

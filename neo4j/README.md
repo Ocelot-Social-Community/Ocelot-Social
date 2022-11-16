@@ -7,7 +7,7 @@ database available. The community edition of Neo4J is Free and Open Source and
 we try our best to keep our application compatible with the community edition
 only.
 
-## Installation with Docker
+## Installation With Docker
 
 Run:
 
@@ -19,7 +19,7 @@ You can access Neo4J through [http://localhost:7474/](http://localhost:7474/)
 for an interactive cypher shell and a visualization of the graph.
 
 
-## Installation without Docker
+## Installation Without Docker
 
 Install the community edition of [Neo4j](https://neo4j.com/) along with the plugin
 [Apoc](https://github.com/neo4j-contrib/neo4j-apoc-procedures) on your system.
@@ -51,3 +51,81 @@ in `backend/.env`.
 
 Start Neo4J and confirm the database is running at [http://localhost:7474](http://localhost:7474).
 
+## Commands
+
+Here we describe some rarely used Cypher commands for Neo4j that are needed from time to time:
+
+### Index And Contraint Commands
+
+If indexes or constraints are missing or not set correctly, the browser search will not work or the database seed for development will not work.
+
+The indexes and constraints of our database are set in `backend/src/db/migrate/store.js`.
+This is where the magic happens.
+
+It's called by our `prod:migrate init` command.
+This command initializes the Admin user and creates all necessary indexes and constraints in the Neo4j database.
+
+***Calls in development***
+
+Locally without Docker:
+
+```bash
+# in backend folder
+$ yarn prod:migrate init
+```
+
+Locally with Docker:
+
+```bash
+# in main folder
+$ docker compose exec backend yarn prod:migrate init
+```
+
+***Calls in production***
+
+Locally with Docker:
+
+```bash
+# in main folder
+$ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
+```
+
+On a server with Kubernetes cluster:
+
+```bash
+# tested for one backend replica
+# !!! be aware of the kubectl context !!!
+$ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "yarn prod:migrate init"
+```
+
+***Cypher commands to show indexes and contraints***
+
+```bash
+# in browser command line or cypher shell
+
+# show all indexes and contraints
+$ :schema
+
+# show all indexes
+$ CALL db.indexes();
+
+# show all contraints
+$ CALL db.constraints();
+```
+
+***Cypher commands to create and drop indexes and contraints***
+
+```bash
+# in browser command line or cypher shell
+
+# create indexes
+$ CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"]);
+$ CALL db.index.fulltext.createNodeIndex("user_fulltext_search",["User"],["name", "slug"]);
+$ CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"]);
+
+# drop an index
+$ DROP CONSTRAINT ON ( image:Image ) ASSERT image.url IS UNIQUE
+
+# drop all indexes and contraints
+$ CALL apoc.schema.assert({},{},true) YIELD label, key RETURN * ;
+```

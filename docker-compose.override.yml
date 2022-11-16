@@ -1,44 +1,79 @@
 version: "3.4"
 
 services:
+
+  ########################################################
+  # WEBAPP ###############################################
+  ########################################################
+  webapp:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/webapp:local-development
+    build:
+      target: development
+    environment:
+      - NODE_ENV="development"
+      # - DEBUG=true
+      - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
+    volumes:
+      # This makes sure the docker container has its own node modules.
+      # Therefore it is possible to have a different node version on the host machine
+      - webapp_node_modules:/app/node_modules
+      # bind the local folder to the docker to allow live reload
+      - ./webapp:/app
+
+  ########################################################
+  # BACKEND ##############################################
+  ########################################################
+  backend:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/backend:local-development
+    build:
+      target: development
+    environment:
+      - NODE_ENV="development"
+      - DEBUG=true
+    volumes:
+      # This makes sure the docker container has its own node modules.
+      # Therefore it is possible to have a different node version on the host machine
+      - backend_node_modules:/app/node_modules
+      # bind the local folder to the docker to allow live reload
+      - ./backend:/app
+
+  ########################################################
+  # MAINTENANCE ##########################################
+  ########################################################
+  maintenance:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/maintenance:local-development
+
+  ########################################################
+  # NEO4J ################################################
+  ########################################################
+  neo4j:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/neo4j-community:local-development
+    ports:
+      # Also expose the neo4j query browser
+      - 7474:7474
+    networks:
+      # So we can access the neo4j query browser from our host machine
+      - external-net
+
+  ########################################################
+  # MAILSERVER TO FAKE SMTP ##############################
+  ########################################################
   mailserver:
     image: djfarrelly/maildev
     ports:
       - 1080:80
     networks:
-      - hc-network
-  webapp:
-    build:
-      context: webapp
-      target: build-and-test
-    volumes:
-      - ./webapp:/develop-webapp
-    environment:
-      - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
-      - PUBLIC_REGISTRATION=false
-    command: yarn run dev
-  backend:
-    build:
-      context: backend
-      target: build-and-test
-    volumes:
-      - ./backend:/develop-backend
-    command: yarn run dev
-    environment:
-      - SMTP_HOST=mailserver
-      - SMTP_PORT=25
-      - SMTP_IGNORE_TLS=true
-      - "DEBUG=${DEBUG}"
-      - PUBLIC_REGISTRATION=false
-  maintenance:
-    image: ocelotsocialnetwork/develop-maintenance:latest
-    build:
-      context: webapp
-      dockerfile: Dockerfile.maintenance
-    networks:
-      - hc-network
-    ports:
-      - 3503:80
+      - external-net
+      
+# the following network from the main YAML gives the warning `WARNING: Some networks were defined but are not used by any service: internal-net` and should be removed
+#   but removing is not possible yet, it seems: https://github.com/docker/compose/issues/3729#issuecomment-623154878
+# networks:
+#   internal-net:
 
-networks:
-  hc-network:
+volumes:
+  webapp_node_modules:
+  backend_node_modules:

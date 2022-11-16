@@ -9,8 +9,7 @@ const embed = {
   title: 'Video Titel',
   // html: null,
   description: 'Video Description',
-  html:
-    '<iframe width="auto" height="250" src="https://www.youtube.com/embed/qkdXAtO40Fo?feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+  html: '<iframe width="auto" height="250" src="https://www.youtube.com/embed/qkdXAtO40Fo?feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
 }
 
 const plugins = [
@@ -65,7 +64,7 @@ storiesOf('Editor', module)
         <p>
           Here is some <em>italic</em>, <b>bold</b> and <u>underline</u> text.
           <br/>
-          Also do we have some <a href="https://human-connection.org">inline links</a> here.
+          Also do we have some <a href="https://ocelot.social">inline links</a> here.
         </p>
         <h3>Heading 3</h3>
         <p>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</p>
@@ -79,15 +78,35 @@ storiesOf('Editor', module)
           <li><p>Also some list</p></li>
           <li><p>with</p></li>
           <li><p>several</p></li>
-          <li><p>points</p></li>
+          <li>
+            <p>points</p>
+            <ul>
+              <li>
+                <p>and indentations</p>
+                <p>as well as text parapgraphs</p>
+                <p>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p><p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</p>
+              </li>
+            </ul>
+          </li>
         </ul>
 
         <h3>Ordered List</h3>
         <ol>
-          <li><p>justo</p></li>
-          <li><p>dolores</p></li>
-          <li><p>et ea rebum</p></li>
-          <li><p>kasd gubergren</p></li>
+          <li>
+            <p>ordered lists</p>
+            <p>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsu</p>
+            <ol>
+              <li>
+                <p>can have indentations</p>
+                <ol>
+                  <li>
+                    <p>and text parapgraphs, too</p>
+                    <p>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p><p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</p>
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </li>
         </ol>
       `,
     }),
@@ -115,7 +134,7 @@ storiesOf('Editor', module)
       users,
       content: `
         <p>
-          This text contains <a href="#" class="hashtag">#hashtags</a> for projects like <a href="https://human-connection.org" class="hashtag">#human-connection</a>
+          This text contains <a href="#" class="hashtag">#hashtags</a> for projects like <a href="https://ocelot.social" class="hashtag">#ocelot-social</a>
           Try to add more by typing #.
         </p>
       `,

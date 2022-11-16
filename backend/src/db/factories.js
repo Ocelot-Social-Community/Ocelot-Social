@@ -1,10 +1,11 @@
 import { v4 as uuid } from 'uuid'
-import faker from 'faker'
 import slugify from 'slug'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
+import faker from '@faker-js/faker'
 import { getDriver, getNeode } from './neo4j'
 import CONFIG from '../config/index.js'
+import generateInviteCode from '../schema/resolvers/helpers/generateInviteCode.js'
 
 const neode = getNeode()
 
@@ -48,8 +49,9 @@ Factory.define('badge')
 
 Factory.define('image')
   .attr('url', faker.image.unsplash.imageUrl)
-  .attr('aspectRatio', 1)
+  .attr('aspectRatio', 1.3333333333333333)
   .attr('alt', faker.lorem.sentence)
+  .attr('type', 'image/jpeg')
   .after((buildObject, options) => {
     const { url: imageUrl } = buildObject
     if (imageUrl) buildObject.url = uniqueImageUrl(imageUrl)
@@ -68,6 +70,7 @@ Factory.define('basicUser')
     termsAndConditionsAgreedAt: '2019-08-01T10:47:19.212Z',
     allowEmbedIframes: false,
     showShoutsPublicly: false,
+    sendNotificationEmails: true,
     locale: 'en',
   })
   .attr('slug', ['slug', 'name'], (slug, name) => {
@@ -103,12 +106,12 @@ Factory.define('user')
   })
 
 Factory.define('post')
-  .option('categoryIds', [])
+  /* .option('categoryIds', [])
   .option('categories', ['categoryIds'], (categoryIds) => {
     if (categoryIds.length) return Promise.all(categoryIds.map((id) => neode.find('Category', id)))
     // there must be at least one category
     return Promise.all([Factory.build('category')])
-  })
+  }) */
   .option('tagIds', [])
   .option('tags', ['tagIds'], (tagIds) => {
     return Promise.all(tagIds.map((id) => neode.find('Tag', id)))
@@ -128,6 +131,8 @@ Factory.define('post')
     deleted: false,
     imageBlurred: false,
     imageAspectRatio: 1.333,
+    clickedCount: 0,
+    viewedTeaserCount: 0,
   })
   .attr('pinned', ['pinned'], (pinned) => {
     // Convert false to null
@@ -143,16 +148,16 @@ Factory.define('post')
     return language || 'en'
   })
   .after(async (buildObject, options) => {
-    const [post, author, image, categories, tags] = await Promise.all([
+    const [post, author, image, /* categories, */ tags] = await Promise.all([
       neode.create('Post', buildObject),
       options.author,
       options.image,
-      options.categories,
+      // options.categories,
       options.tags,
     ])
     await Promise.all([
       post.relateTo(author, 'author'),
-      Promise.all(categories.map((c) => c.relateTo(post, 'post'))),
+      // Promise.all(categories.map((c) => c.relateTo(post, 'post'))),
       Promise.all(tags.map((t) => t.relateTo(post, 'post'))),
     ])
     if (image) await post.relateTo(image, 'image')
@@ -193,8 +198,9 @@ Factory.define('comment')
 
 Factory.define('donations')
   .attr('id', uuid)
+  .attr('showDonations', true)
   .attr('goal', 15000)
-  .attr('progress', 0)
+  .attr('progress', 7000)
   .after((buildObject, options) => {
     return neode.create('Donations', buildObject)
   })
@@ -205,7 +211,7 @@ const emailDefaults = {
 }
 
 Factory.define('emailAddress')
-  .attr(emailDefaults)
+  .attrs(emailDefaults)
   .after((buildObject, options) => {
     return neode.create('EmailAddress', buildObject)
   })
@@ -214,6 +220,28 @@ Factory.define('unverifiedEmailAddress')
   .attr(emailDefaults)
   .after((buildObject, options) => {
     return neode.create('UnverifiedEmailAddress', buildObject)
+  })
+
+const inviteCodeDefaults = {
+  code: () => generateInviteCode(),
+  createdAt: () => new Date().toISOString(),
+  expiresAt: () => null,
+}
+
+Factory.define('inviteCode')
+  .attrs(inviteCodeDefaults)
+  .option('generatedById', null)
+  .option('generatedBy', ['generatedById'], (generatedById) => {
+    if (generatedById) return neode.find('User', generatedById)
+    return Factory.build('user')
+  })
+  .after(async (buildObject, options) => {
+    const [inviteCode, generatedBy] = await Promise.all([
+      neode.create('InviteCode', buildObject),
+      options.generatedBy,
+    ])
+    await Promise.all([inviteCode.relateTo(generatedBy, 'generated')])
+    return inviteCode
   })
 
 Factory.define('location')

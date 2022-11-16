@@ -1,0 +1,135 @@
+enum _GroupOrdering {
+  id_asc
+  id_desc
+  name_asc
+  name_desc
+  slug_asc
+  slug_desc
+  locationName_asc
+  locationName_desc
+  about_asc
+  about_desc
+  createdAt_asc
+  createdAt_desc
+  updatedAt_asc
+  updatedAt_desc
+}
+
+type Group {
+  id: ID!
+  name: String! # title
+  slug: String!
+
+  createdAt: String!
+  updatedAt: String!
+  deleted: Boolean
+  disabled: Boolean
+
+  avatar: Image @relation(name: "AVATAR_IMAGE", direction: "OUT")
+
+  about: String # goal
+  description: String!
+  descriptionExcerpt: String!
+  groupType: GroupType!
+  actionRadius: GroupActionRadius!
+
+  locationName: String
+  location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
+
+  categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
+
+  myRole: GroupMemberRole # if 'null' then the current user is no member
+
+  posts: [Post] @relation(name: "IN", direction: "IN")
+}
+
+
+input _GroupFilter {
+  AND: [_GroupFilter!]
+  OR: [_GroupFilter!]
+  name_contains: String
+  slug_contains: String
+  about_contains: String
+  description_contains: String
+  groupType_in: [GroupType!]
+  actionRadius_in: [GroupActionRadius!]
+  myRole_in: [GroupMemberRole!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+}
+
+type Query {
+  Group(
+    isMember: Boolean # if 'undefined' or 'null' then get all groups
+    id: ID
+    slug: String
+    first: Int
+    offset: Int
+    # orderBy: [_GroupOrdering] # not implemented yet
+    # filter: _GroupFilter # not implemented yet
+  ): [Group]
+
+  GroupMembers(
+    id: ID!
+    # first: Int # not implemented yet
+    # offset: Int # not implemented yet
+    # orderBy: [_UserOrdering] # not implemented yet
+    # filter: _UserFilter # not implemented yet
+  ): [User]
+
+  GroupCount(isMember: Boolean): Int
+  
+  # AvailableGroupTypes: [GroupType]!
+
+  # AvailableGroupActionRadii: [GroupActionRadius]!
+
+  # AvailableGroupMemberRoles: [GroupMemberRole]!
+}
+
+type Mutation {
+  CreateGroup(
+    id: ID
+    name: String!
+    slug: String
+    about: String
+    description: String!
+    groupType: GroupType!
+    actionRadius: GroupActionRadius!
+    categoryIds: [ID]
+    # avatar: ImageInput # a group can not be created with an avatar
+    locationName: String # empty string '' sets it to null
+  ): Group
+
+  UpdateGroup(
+    id: ID!
+    name: String
+    slug: String
+    about: String
+    description: String
+    # groupType: GroupType # is not possible at the moment and has to be discussed. may be in the stronger direction: public → closed → hidden
+    actionRadius: GroupActionRadius
+    categoryIds: [ID]
+    avatar: ImageInput # test this as result
+    locationName: String # empty string '' sets it to null
+  ): Group
+
+  # DeleteGroup(id: ID!): Group
+
+  JoinGroup(
+    groupId: ID!
+    userId: ID!
+  ): User
+
+  LeaveGroup(
+    groupId: ID!
+    userId: ID!
+  ): User
+
+  ChangeGroupMemberRole(
+    groupId: ID!
+    userId: ID!
+    roleInGroup: GroupMemberRole!
+  ): User
+}

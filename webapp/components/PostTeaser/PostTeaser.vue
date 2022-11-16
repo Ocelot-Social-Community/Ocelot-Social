@@ -15,26 +15,28 @@
         <img :src="post.image | proxyApiUrl" class="image" />
       </template>
       <client-only>
-        <user-teaser :user="post.author" :date-time="post.createdAt" />
+        <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" />
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
       <!-- TODO: replace editor content with tiptap render view -->
-      <!-- eslint-disable vue/no-v-html -->
+      <!-- eslint-disable-next-line vue/no-v-html -->
       <div class="content hyphenate-text" v-html="excerpt" />
-      <!-- eslint-enable vue/no-v-html -->
-      <footer class="footer">
-        <div class="categories">
+      <footer
+        class="footer"
+        v-observe-visibility="(isVisible, entry) => visibilityChanged(isVisible, entry, post.id)"
+      >
+        <div class="categories" v-if="categoriesActive">
           <hc-category
             v-for="category in post.categories"
             :key="category.id"
             v-tooltip="{
-              content: $t(`contribution.category.name.${category.slug}`),
+              content: $t(`contribution.category.description.${category.slug}`),
               placement: 'bottom-start',
-              delay: { show: 500 },
             }"
             :icon="category.icon"
           />
         </div>
+        <div v-else class="categories-placeholder"></div>
         <counter-icon
           icon="bullhorn"
           :count="post.shoutedCount"
@@ -44,6 +46,16 @@
           icon="comments"
           :count="post.commentsCount"
           :title="$t('contribution.amount-comments', { amount: post.commentsCount })"
+        />
+        <counter-icon
+          icon="hand-pointer"
+          :count="post.clickedCount"
+          :title="$t('contribution.amount-clicks', { amount: post.clickedCount })"
+        />
+        <counter-icon
+          icon="eye"
+          :count="post.viewedTeaserCount"
+          :title="$t('contribution.amount-views', { amount: post.viewedTeaserCount })"
         />
         <client-only>
           <content-menu
@@ -67,10 +79,11 @@
 <script>
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import HcCategory from '~/components/Category'
 import HcRibbon from '~/components/Ribbon'
+import HcCategory from '~/components/Category'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import { mapGetters } from 'vuex'
+import PostMutations from '~/graphql/PostMutations'
 import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostHelpers'
 
 export default {
@@ -91,6 +104,11 @@ export default {
       type: Object,
       default: () => {},
     },
+  },
+  data() {
+    return {
+      categoriesActive: this.$env.CATEGORIES_ACTIVE,
+    }
   },
   mounted() {
     const { image } = this.post
@@ -143,6 +161,18 @@ export default {
     unpinPost(post) {
       this.$emit('unpinPost', post)
     },
+    visibilityChanged(isVisible, entry, id) {
+      if (!this.post.viewedTeaserByCurrentUser && isVisible) {
+        this.$apollo
+          .mutate({
+            mutation: PostMutations().markTeaserAsViewed,
+            variables: { id },
+          })
+          .catch((error) => this.$toast.error(error.message))
+        this.post.viewedTeaserByCurrentUser = true
+        this.post.viewedTeaserCount++
+      }
+    },
   },
 }
 </script>
@@ -181,7 +211,7 @@ export default {
     justify-content: space-between;
     align-items: center;
 
-    > .categories {
+    > .categories-placeholder {
       flex-grow: 1;
     }
 

@@ -19,19 +19,16 @@
             :class="[formData.imageBlurred && '--blur-image']"
             @addHeroImage="addHeroImage"
             @addImageAspectRatio="addImageAspectRatio"
+            @addImageType="addImageType"
           />
         </template>
         <div v-if="formData.image" class="blur-toggle">
           <label for="blur-img">{{ $t('contribution.inappropriatePicture') }}</label>
           <input type="checkbox" id="blur-img" v-model="formData.imageBlurred" />
-          <a
-            href="https://support.human-connection.org/kb/faq.php?id=113"
-            target="_blank"
-            class="link"
-          >
-            {{ $t('contribution.inappropriatePictureText') }}
+          <page-params-link class="link" :pageParams="links.FAQ">
+            {{ $t('contribution.inappropriatePicture') }}
             <base-icon name="question-circle" />
-          </a>
+          </page-params-link>
         </div>
         <ds-input
           model="title"
@@ -54,21 +51,18 @@
           {{ contentLength }}
           <base-icon v-if="errors && errors.content" name="warning" />
         </ds-chip>
-        <categories-select model="categoryIds" :existingCategoryIds="formData.categoryIds" />
-        <ds-chip size="base" :color="errors && errors.categoryIds && 'danger'">
+        <categories-select
+          v-if="categoriesActive"
+          model="categoryIds"
+          :existingCategoryIds="formData.categoryIds"
+        />
+        <ds-chip
+          v-if="categoriesActive"
+          size="base"
+          :color="errors && errors.categoryIds && 'danger'"
+        >
           {{ formData.categoryIds.length }} / 3
           <base-icon v-if="errors && errors.categoryIds" name="warning" />
-        </ds-chip>
-        <ds-select
-          model="language"
-          icon="globe"
-          class="select-field"
-          :options="languageOptions"
-          :placeholder="$t('contribution.languageSelectText')"
-          :label="$t('contribution.languageSelectLabel')"
-        />
-        <ds-chip v-if="errors && errors.language" size="base" color="danger">
-          <base-icon name="warning" />
         </ds-chip>
         <div class="buttons">
           <base-button data-test="cancel-button" :disabled="loading" @click="$router.back()" danger>
@@ -85,61 +79,66 @@
 
 <script>
 import gql from 'graphql-tag'
-import orderBy from 'lodash/orderBy'
 import { mapGetters } from 'vuex'
 import HcEditor from '~/components/Editor/Editor'
-import locales from '~/locales'
 import PostMutations from '~/graphql/PostMutations.js'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
-import ImageUploader from '~/components/ImageUploader/ImageUploader'
+import ImageUploader from '~/components/Uploader/ImageUploader'
+import links from '~/constants/links.js'
+import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 
 export default {
   components: {
     HcEditor,
-    CategoriesSelect,
     ImageUploader,
+    PageParamsLink,
+    CategoriesSelect,
   },
   props: {
     contribution: {
       type: Object,
       default: () => ({}),
     },
+    groupId: {
+      type: String,
+      default: () => null,
+    },
   },
   data() {
-    const { title, content, image, language, categories } = this.contribution
-
-    const languageOptions = orderBy(locales, 'name').map((locale) => {
-      return { label: locale.name, value: locale.code }
-    })
-    const { sensitive: imageBlurred = false, aspectRatio: imageAspectRatio = null } = image || {}
+    const { title, content, image, categories } = this.contribution
+    const {
+      sensitive: imageBlurred = false,
+      aspectRatio: imageAspectRatio = null,
+      type: imageType = null,
+    } = image || {}
 
     return {
+      categoriesActive: this.$env.CATEGORIES_ACTIVE,
+      links,
       formData: {
         title: title || '',
         content: content || '',
         image: image || null,
         imageAspectRatio,
+        imageType,
         imageBlurred,
-        language: languageOptions.find((option) => option.value === language) || null,
         categoryIds: categories ? categories.map((category) => category.id) : [],
       },
       formSchema: {
         title: { required: true, min: 3, max: 100 },
         content: { required: true },
+        imageBlurred: { required: false },
         categoryIds: {
           type: 'array',
-          required: true,
+          required: this.categoriesActive,
           validator: (_, value = []) => {
-            if (value.length === 0 || value.length > 3) {
+            if (this.categoriesActive && (value.length === 0 || value.length > 3)) {
               return [new Error(this.$t('common.validations.categories'))]
             }
             return []
           },
         },
-        language: { required: true },
-        imageBlurred: { required: false },
       },
-      languageOptions,
       loading: false,
       users: [],
       hashtags: [],
@@ -165,6 +164,7 @@ export default {
         if (this.imageUpload) {
           image.upload = this.imageUpload
           image.aspectRatio = this.formData.imageAspectRatio
+          image.type = this.formData.imageType
         }
       }
       this.loading = true
@@ -176,8 +176,8 @@ export default {
             content,
             categoryIds,
             id: this.contribution.id || null,
-            language: this.formData.language.value,
             image,
+            groupId: this.groupId,
           },
         })
         .then(({ data }) => {
@@ -214,6 +214,9 @@ export default {
     },
     addImageAspectRatio(aspectRatio) {
       this.formData.imageAspectRatio = aspectRatio
+    },
+    addImageType(imageType) {
+      this.formData.imageType = imageType
     },
   },
   apollo: {

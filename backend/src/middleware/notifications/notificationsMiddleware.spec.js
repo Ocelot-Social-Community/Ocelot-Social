@@ -10,7 +10,7 @@ const driver = getDriver()
 const neode = getNeode()
 const categoryIds = ['cat9']
 const createPostMutation = gql`
-  mutation($id: ID, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
+  mutation ($id: ID, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
     CreatePost(id: $id, title: $title, content: $postContent, categoryIds: $categoryIds) {
       id
       title
@@ -19,7 +19,7 @@ const createPostMutation = gql`
   }
 `
 const updatePostMutation = gql`
-  mutation($id: ID!, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
+  mutation ($id: ID!, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
     UpdatePost(id: $id, content: $postContent, title: $title, categoryIds: $categoryIds) {
       title
       content
@@ -27,7 +27,7 @@ const updatePostMutation = gql`
   }
 `
 const createCommentMutation = gql`
-  mutation($id: ID, $postId: ID!, $commentContent: String!) {
+  mutation ($id: ID, $postId: ID!, $commentContent: String!) {
     CreateComment(id: $id, postId: $postId, content: $commentContent) {
       id
       content
@@ -37,6 +37,7 @@ const createCommentMutation = gql`
 
 beforeAll(async () => {
   await cleanDatabase()
+
   publishSpy = jest.spyOn(pubsub, 'publish')
   const createServerResult = createServer({
     context: () => {
@@ -51,6 +52,10 @@ beforeAll(async () => {
   const createTestClientResult = createTestClient(server)
   query = createTestClientResult.query
   mutate = createTestClientResult.mutate
+})
+
+afterAll(async () => {
+  await cleanDatabase()
 })
 
 beforeEach(async () => {
@@ -74,13 +79,14 @@ beforeEach(async () => {
   })
 })
 
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
 
 describe('notifications', () => {
   const notificationQuery = gql`
-    query($read: Boolean) {
+    query ($read: Boolean) {
       notifications(read: $read, orderBy: updatedAt_desc) {
         read
         reason
@@ -367,7 +373,7 @@ describe('notifications', () => {
           describe('if the notification was marked as read earlier', () => {
             const markAsReadAction = async () => {
               const mutation = gql`
-                mutation($id: ID!) {
+                mutation ($id: ID!) {
                   markAsRead(id: $id) {
                     read
                   }

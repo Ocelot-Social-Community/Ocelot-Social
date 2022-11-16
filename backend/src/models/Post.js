@@ -22,6 +22,8 @@ export default {
   contentExcerpt: { type: 'string', allow: [null] },
   deleted: { type: 'boolean', default: false },
   disabled: { type: 'boolean', default: false },
+  clickedCount: { type: 'int', default: 0 },
+  viewedTeaserCount: { type: 'int', default: 0 },
   notified: {
     type: 'relationship',
     relationship: 'NOTIFIED',

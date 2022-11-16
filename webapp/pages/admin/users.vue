@@ -48,6 +48,21 @@
         <template #createdAt="scope">
           {{ scope.row.createdAt | dateTime }}
         </template>
+
+        <template slot="role" slot-scope="scope">
+          <template v-if="userRoles">
+            <select
+              v-if="scope.row.id !== currentUser.id"
+              :value="`${scope.row.role}`"
+              v-on:change="changeUserRole(scope.row.id, $event)"
+            >
+              <option v-for="value in userRoles" :key="value">
+                {{ value }}
+              </option>
+            </select>
+            <ds-text v-else>{{ scope.row.role }}</ds-text>
+          </template>
+        </template>
       </ds-table>
       <pagination-buttons :hasNext="hasNext" :hasPrevious="hasPrevious" @next="next" @back="back" />
     </base-card>
@@ -58,10 +73,12 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import gql from 'graphql-tag'
 import { isEmail } from 'validator'
 import normalizeEmail from '~/components/utils/NormalizeEmail'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
+import { FetchAllRoles, updateUserRole } from '~/graphql/admin/Roles'
 
 export default {
   components: {
@@ -77,6 +94,7 @@ export default {
       hasNext: false,
       email: null,
       filter: null,
+      userRoles: [],
       form: {
         formData: {
           query: '',
@@ -88,6 +106,9 @@ export default {
     hasPrevious() {
       return this.offset > 0
     },
+    ...mapGetters({
+      currentUser: 'auth/user',
+    }),
     fields() {
       return {
         index: this.$t('admin.users.table.columns.number'),
@@ -118,7 +139,7 @@ export default {
     User: {
       query() {
         return gql`
-          query($filter: _UserFilter, $first: Int, $offset: Int, $email: String) {
+          query ($filter: _UserFilter, $first: Int, $offset: Int, $email: String) {
             User(
               email: $email
               filter: $filter
@@ -153,6 +174,14 @@ export default {
         return User.map((u, i) => Object.assign({}, u, { index: this.offset + i }))
       },
     },
+    userRoles: {
+      query() {
+        return FetchAllRoles()
+      },
+      update({ availableRoles }) {
+        return availableRoles
+      },
+    },
   },
   methods: {
     back() {
@@ -173,6 +202,20 @@ export default {
           OR: [{ name_contains: query }, { slug_contains: query }, { about_contains: query }],
         }
       }
+    },
+    changeUserRole(id, event) {
+      const newRole = event.target.value
+      this.$apollo
+        .mutate({
+          mutation: updateUserRole(),
+          variables: { role: newRole, id },
+        })
+        .then(({ data }) => {
+          this.$toast.success(this.$t('admin.users.roleChanged'))
+        })
+        .catch((error) => {
+          this.$toast.error(error.message)
+        })
     },
   },
 }

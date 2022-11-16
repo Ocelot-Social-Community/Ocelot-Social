@@ -1,110 +1,129 @@
 <template>
   <transition name="fade" appear>
-    <base-card
-      v-if="post && ready"
-      :lang="post.language"
-      :class="{
-        'post-page': true,
-        'disabled-content': post.disabled,
-        '--blur-image': blurred,
-      }"
-      :style="heroImageStyle"
-    >
-      <template #heroImage v-if="post.image">
-        <img :src="post.image | proxyApiUrl" class="image" />
-        <aside v-show="post.image && post.image.sensitive" class="blur-toggle">
-          <img v-show="blurred" :src="post.image | proxyApiUrl" class="preview" />
-          <base-button
-            :icon="blurred ? 'eye' : 'eye-slash'"
-            filled
-            circle
-            @click="blurred = !blurred"
-          />
-        </aside>
-      </template>
-      <section class="menu">
-        <user-teaser :user="post.author" :date-time="post.createdAt">
-          <template #dateTime>
-            <ds-text v-if="post.createdAt !== post.updatedAt">({{ $t('post.edited') }})</ds-text>
-          </template>
-        </user-teaser>
-        <client-only>
-          <content-menu
-            placement="bottom-end"
-            resource-type="contribution"
-            :resource="post"
-            :modalsData="menuModalsData"
-            :is-owner="isAuthor"
-            @pinPost="pinPost"
-            @unpinPost="unpinPost"
-          />
-        </client-only>
-      </section>
-      <ds-space margin-bottom="small" />
-      <h2 class="title hyphenate-text">{{ post.title }}</h2>
-      <ds-space margin-bottom="small" />
-      <content-viewer class="content hyphenate-text" :content="post.content" />
-      <!-- eslint-enable vue/no-v-html -->
-      <ds-space margin="xx-large" />
-      <!-- Categories -->
-      <div class="categories">
-        <ds-space margin="xx-small" />
-        <hc-category
-          v-for="category in post.categories"
-          :key="category.id"
-          :icon="category.icon"
-          :name="$t(`contribution.category.name.${category.slug}`)"
-        />
-        <!-- Post language -->
-        <ds-tag v-if="post.language" class="category-tag language">
-          <base-icon name="globe" />
-          {{ post.language.toUpperCase() }}
-        </ds-tag>
-      </div>
-      <ds-space margin-bottom="small" />
-      <!-- Tags -->
-      <div v-if="post.tags && post.tags.length" class="tags">
-        <ds-space margin="xx-small" />
-        <hc-hashtag v-for="tag in sortedTags" :key="tag.id" :id="tag.id" />
-      </div>
-      <ds-space margin-top="x-large">
-        <ds-flex :gutter="{ lg: 'small' }">
-          <ds-flex-item :width="{ lg: '75%', md: '75%', sm: '75%', base: '100%' }">
-            <hc-emotions :post="post" />
-          </ds-flex-item>
-          <!-- Shout Button -->
-          <ds-flex-item
-            :width="{ lg: '15%', md: '22%', sm: '22%', base: '100%' }"
-            class="shout-button"
-          >
-            <hc-shout-button
-              v-if="post.author"
-              :disabled="isAuthor"
-              :count="post.shoutedCount"
-              :is-shouted="post.shoutedByCurrentUser"
-              :post-id="post.id"
-            />
-          </ds-flex-item>
-        </ds-flex>
+    <div>
+      <ds-space margin="small">
+        <ds-heading tag="h1">{{ $t('post.viewPost.title') }}</ds-heading>
+        <ds-heading v-if="post && post.group" tag="h2">
+          {{ $t('post.viewPost.forGroup.title', { name: post.group.name }) }}
+        </ds-heading>
       </ds-space>
-      <!-- Comments -->
-      <ds-section>
-        <comment-list :post="post" @toggleNewCommentForm="toggleNewCommentForm" @reply="reply" />
-        <ds-space margin-bottom="large" />
-        <comment-form
-          v-if="showNewCommentForm && !isBlocked"
-          ref="commentForm"
-          :post="post"
-          @createComment="createComment"
-        />
-        <ds-placeholder v-if="isBlocked">
-          {{ $t('settings.blocked-users.explanation.commenting-disabled') }}
-          <br />
-          {{ $t('settings.blocked-users.explanation.commenting-explanation') }}
-          <a href="https://support.human-connection.org/kb/" target="_blank">FAQ</a>
-        </ds-placeholder>
-      </ds-section>
-    </base-card>
+      <ds-space margin="large" />
+      <ds-flex gutter="small">
+        <ds-flex-item :width="{ base: '100%', sm: 2, md: 2, lg: 1 }">
+          <base-card
+            v-if="post && ready"
+            :lang="post.language"
+            :class="{
+              'post-page': true,
+              'disabled-content': post.disabled,
+              '--blur-image': blurred,
+            }"
+            :style="heroImageStyle"
+          >
+            <template #heroImage v-if="post.image">
+              <img :src="post.image | proxyApiUrl" class="image" />
+              <aside v-show="post.image && post.image.sensitive" class="blur-toggle">
+                <img v-show="blurred" :src="post.image | proxyApiUrl" class="preview" />
+                <base-button
+                  :icon="blurred ? 'eye' : 'eye-slash'"
+                  filled
+                  circle
+                  @click="blurred = !blurred"
+                />
+              </aside>
+            </template>
+            <section class="menu">
+              <user-teaser :user="post.author" :group="post.group" wide :date-time="post.createdAt">
+                <template #dateTime>
+                  <ds-text v-if="post.createdAt !== post.updatedAt">
+                    ({{ $t('post.edited') }})
+                  </ds-text>
+                </template>
+              </user-teaser>
+              <client-only>
+                <content-menu
+                  placement="bottom-end"
+                  resource-type="contribution"
+                  :resource="post"
+                  :modalsData="menuModalsData"
+                  :is-owner="isAuthor"
+                  @pinPost="pinPost"
+                  @unpinPost="unpinPost"
+                />
+              </client-only>
+            </section>
+            <ds-space margin-bottom="small" />
+            <h2 class="title hyphenate-text">{{ post.title }}</h2>
+            <ds-space margin-bottom="small" />
+            <content-viewer class="content hyphenate-text" :content="post.content" />
+            <!-- Categories -->
+            <div v-if="categoriesActive" class="categories">
+              <ds-space margin="xx-large" />
+              <ds-space margin="xx-small" />
+              <hc-category
+                v-for="category in post.categories"
+                :key="category.id"
+                :icon="category.icon"
+                :name="$t(`contribution.category.name.${category.slug}`)"
+                v-tooltip="{
+                  content: $t(`contribution.category.description.${category.slug}`),
+                  placement: 'bottom-start',
+                }"
+              />
+            </div>
+            <ds-space margin-bottom="small" />
+            <!-- Tags -->
+            <div v-if="post.tags && post.tags.length" class="tags">
+              <ds-space margin="xx-small" />
+              <hc-hashtag v-for="tag in sortedTags" :key="tag.id" :id="tag.id" />
+            </div>
+            <ds-space margin-top="small">
+              <ds-flex :gutter="{ lg: 'small' }">
+                <!-- Shout Button -->
+                <ds-flex-item
+                  :width="{ lg: '15%', md: '22%', sm: '22%', base: '100%' }"
+                  class="shout-button"
+                >
+                  <hc-shout-button
+                    v-if="post.author"
+                    :disabled="isAuthor"
+                    :count="post.shoutedCount"
+                    :is-shouted="post.shoutedByCurrentUser"
+                    :post-id="post.id"
+                  />
+                </ds-flex-item>
+              </ds-flex>
+            </ds-space>
+            <!-- Comments -->
+            <ds-section>
+              <comment-list
+                :post="post"
+                @toggleNewCommentForm="toggleNewCommentForm"
+                @reply="reply"
+              />
+              <ds-space margin-bottom="large" />
+              <comment-form
+                v-if="showNewCommentForm && !isBlocked && canCommentPost"
+                ref="commentForm"
+                :post="post"
+                @createComment="createComment"
+              />
+              <ds-placeholder v-if="isBlocked">
+                {{ $t('settings.blocked-users.explanation.commenting-disabled') }}
+                <br />
+                {{ $t('settings.blocked-users.explanation.commenting-explanation') }}
+                <page-params-link :pageParams="links.FAQ">
+                  {{ $t('site.faq') }}
+                </page-params-link>
+              </ds-placeholder>
+            </ds-section>
+          </base-card>
+        </ds-flex-item>
+        <ds-flex-item :width="{ base: '200px' }">
+          <ds-menu :routes="routes" class="post-side-navigation" />
+        </ds-flex-item>
+      </ds-flex>
+    </div>
   </transition>
 </template>
 
@@ -117,14 +136,16 @@ import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcShoutButton from '~/components/ShoutButton.vue'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentList from '~/components/CommentList/CommentList'
+import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import {
   postMenuModalsData,
   deletePostMutation,
   sortTagsAlphabetically,
 } from '~/components/utils/PostHelpers'
 import PostQuery from '~/graphql/PostQuery'
-import HcEmotions from '~/components/Emotions/Emotions'
+import { groupQuery } from '~/graphql/groups'
 import PostMutations from '~/graphql/PostMutations'
+import links from '~/constants/links.js'
 
 export default {
   name: 'PostSlug',
@@ -133,15 +154,15 @@ export default {
     mode: 'out-in',
   },
   components: {
-    HcCategory,
-    HcHashtag,
-    UserTeaser,
-    HcShoutButton,
     ContentMenu,
     CommentForm,
     CommentList,
-    HcEmotions,
     ContentViewer,
+    HcCategory,
+    HcHashtag,
+    HcShoutButton,
+    PageParamsLink,
+    UserTeaser,
   },
   head() {
     return {
@@ -150,6 +171,7 @@ export default {
   },
   data() {
     return {
+      links,
       post: null,
       ready: false,
       title: 'loading',
@@ -157,6 +179,8 @@ export default {
       blurred: false,
       blocked: null,
       postAuthor: null,
+      categoriesActive: this.$env.CATEGORIES_ACTIVE,
+      group: null,
     }
   },
   mounted() {
@@ -167,6 +191,31 @@ export default {
     }, 50)
   },
   computed: {
+    routes() {
+      const { slug, id } = this.$route.params
+      return [
+        {
+          name: this.$t('common.post', null, 1),
+          path: `/post/${id}/${slug}`,
+          children: [
+            {
+              name: this.$t('common.comment', null, 2),
+              path: `/post/${id}/${slug}#comments`,
+            },
+            // TODO implement
+            /* {
+                name: this.$t('common.letsTalk'),
+                path: `/post/${id}/${slug}#lets-talk`
+                }, */
+            // TODO implement
+            /* {
+                name: this.$t('common.versus'),
+                path: `/post/${id}/${slug}#versus`
+                } */
+          ],
+        },
+      ]
+    },
     menuModalsData() {
       return postMenuModalsData(
         // "this.post" may not always be defined at the beginning …
@@ -190,15 +239,20 @@ export default {
     heroImageStyle() {
       /*  Return false when image property is not present or is not a number
           so no unnecessary css variables are set.
-      */
-      if (!this.post.image || typeof this.post.image.aspectRatio !== 'number') return false
+        */
 
+      if (!this.post.image || typeof this.post.image.aspectRatio !== 'number') return false
       /*  Return the aspect ratio as a css variable. Later to be used when calculating
           the height with respect to the width.
-      */
+        */
       return {
-        '--hero-image-aspect-ratio': 1 / this.post.image.aspectRatio,
+        '--hero-image-aspect-ratio': 1.0 / this.post.image.aspectRatio,
       }
+    },
+    canCommentPost() {
+      return (
+        !this.post.group || (this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole))
+      )
     },
   },
   methods: {
@@ -262,22 +316,43 @@ export default {
       },
       fetchPolicy: 'cache-and-network',
     },
+    Group: {
+      query() {
+        return groupQuery(this.$i18n)
+      },
+      variables() {
+        return {
+          id: this.post && this.post.group ? this.post.group.id : null,
+        }
+      },
+      update({ Group }) {
+        this.group = Group[0]
+      },
+      skip() {
+        return !(this.post && this.post.group)
+      },
+    },
   },
 }
 </script>
 <style lang="scss">
+.post-side-navigation {
+  position: sticky;
+  top: 65px;
+  z-index: 2;
+}
 .post-page {
   > .hero-image {
     position: relative;
     /*  The padding top makes sure the correct height is set (according to the
         hero image aspect ratio) before the hero image loads so
         the autoscroll works correctly when following a comment link. 
-    */
-    padding-top: calc(var(--hero-image-aspect-ratio) * 100%);
+      */
 
+    padding-top: calc(var(--hero-image-aspect-ratio) * (100% + 48px));
     /*  Letting the image fill the container, since the container
         is the one determining height
-    */
+      */
     > .image {
       position: absolute;
       top: 0;

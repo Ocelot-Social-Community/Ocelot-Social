@@ -111,6 +111,21 @@ describe('EmailSettingsIndexPage', () => {
             expect(wrapper.text()).toContain('registration.signup.form.errors.email-exists')
           })
         })
+
+        describe('if backend sends any other error', () => {
+          beforeEach(() => {
+            mocks.$apollo.mutate = jest.fn().mockRejectedValue({
+              message: 'Ouch!',
+            })
+            wrapper = Wrapper()
+            wrapper.find('#email').setValue('already-taken@example.org')
+            wrapper.find('form').trigger('submit')
+          })
+
+          it('display a toast error', () => {
+            expect(mocks.$toast.error).toHaveBeenCalled()
+          })
+        })
       })
     })
   })

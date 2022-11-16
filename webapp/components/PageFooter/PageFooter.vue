@@ -1,26 +1,17 @@
 <template>
   <div id="footer" class="ds-footer">
-    <a href="https://human-connection.org" target="_blank" v-html="$t('site.made')"></a>
-    <span>-</span>
-    <a href="https://human-connection.org/impressum/" target="_blank">
-      {{ $t('site.imprint') }}
-    </a>
-    <span>-</span>
-    <nuxt-link to="/terms-and-conditions">{{ $t('site.termsAndConditions') }}</nuxt-link>
-    <span>-</span>
-    <nuxt-link to="/code-of-conduct">{{ $t('site.code-of-conduct') }}</nuxt-link>
-    <span>-</span>
-    <a href="https://human-connection.org/datenschutz/" target="_blank">
-      {{ $t('site.data-privacy') }}
-    </a>
-    <span>-</span>
-    <a href="https://faq.human-connection.org/" target="_blank">
-      {{ $t('site.faq') }}
-    </a>
-    <span>-</span>
+    <!-- links to internal or external pages -->
+    <span v-for="pageParams in links.FOOTER_LINK_LIST" :key="pageParams.name">
+      <page-params-link :pageParams="pageParams">
+        {{ $t(pageParams.internalPage.footerIdent) }}
+      </page-params-link>
+      <span class="division-line">-</span>
+    </span>
+    <!-- version -->
     <a
-      href="https://github.com/Human-Connection/Human-Connection/blob/master/CHANGELOG.md"
+      href="https://github.com/Ocelot-Social-Community/Ocelot-Social/releases"
       target="_blank"
+      data-test="version-link"
     >
       {{ version }}
     </a>
@@ -28,9 +19,15 @@
 </template>
 
 <script>
+import links from '~/constants/links.js'
+import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
+
 export default {
+  components: {
+    PageParamsLink,
+  },
   data() {
-    return { version: `v${process.env.release}` }
+    return { links, version: `v${this.$env.VERSION}` }
   },
 }
 </script>
@@ -41,12 +38,16 @@ export default {
   position: fixed;
   bottom: 0px;
   z-index: 10;
-  background-color: white;
+  background-color: $color-footer-background;
   width: 100%;
   padding: 10px 10px;
   box-shadow: 0px -6px 12px -4px rgba(0, 0, 0, 0.1);
 }
-span {
+.ds-footer a {
+  color: $color-footer-link;
+}
+.division-line {
+  margin-left: 0.2rem;
   margin-right: 0.2rem;
 }
 </style>

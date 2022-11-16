@@ -99,6 +99,37 @@ describe('Editor.vue', () => {
         })
       })
 
+      it('suggestion list returns results prefixed by query', () => {
+        const manyUsersList = []
+        for (let i = 0; i < 10; i++) {
+          manyUsersList.push({ id: `user${i}` })
+          manyUsersList.push({ id: `admin${i}` })
+          manyUsersList.push({ id: `moderator${i}` })
+        }
+        propsData.users = manyUsersList
+        wrapper = Wrapper()
+        const suggestionList = wrapper.vm.editor.extensions.options.mention.onFilter(
+          propsData.users,
+          'moderator',
+        )
+        expect(suggestionList).toHaveLength(10)
+        for (var i = 0; i < suggestionList.length; i++) {
+          expect(suggestionList[i].id).toMatch(/^moderator.*/)
+        }
+      })
+
+      it('exact match appears at the top of suggestion list', () => {
+        const manyUsersList = []
+        for (let i = 0; i < 25; i++) {
+          manyUsersList.push({ id: `user${i}` })
+        }
+        propsData.users = manyUsersList
+        wrapper = Wrapper()
+        expect(
+          wrapper.vm.editor.extensions.options.mention.onFilter(propsData.users, 'user7')[0].id,
+        ).toMatch('user7')
+      })
+
       it('sets the Hashtag items to the hashtags', () => {
         propsData.hashtags = [
           {

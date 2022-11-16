@@ -81,4 +81,23 @@ describe('NotificationList.vue', () => {
       })
     })
   })
+
+  describe('shallowMount with no notifications', () => {
+    const Wrapper = () => {
+      return shallowMount(NotificationList, {
+        propsData: {},
+        mocks,
+        store,
+        localVue,
+      })
+    }
+
+    beforeEach(() => {
+      wrapper = Wrapper()
+    })
+
+    it('renders Notification.vue zero times', () => {
+      expect(wrapper.findAll(Notification)).toHaveLength(0)
+    })
+  })
 })

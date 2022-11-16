@@ -5,7 +5,7 @@
       <template #index="scope">{{ scope.index + 1 }}.</template>
       <template #id="scope">
         <nuxt-link :to="{ path: '/', query: { hashtag: encodeURI(scope.row.id) } }">
-          <b>#{{ scope.row.id | truncate(20) }}</b>
+          <b>#{{ scope.row.id | truncateStr(20) }}</b>
         </nuxt-link>
       </template>
     </ds-table>

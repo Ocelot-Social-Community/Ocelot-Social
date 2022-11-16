@@ -2,10 +2,12 @@ import jwt from 'jsonwebtoken'
 import CONFIG from './../../config'
 import Factory, { cleanDatabase } from '../../db/factories'
 import { gql } from '../../helpers/jest'
+import { loginMutation } from '../../graphql/userManagement'
 import { createTestClient } from 'apollo-server-testing'
 import createServer, { context } from '../../server'
 import encode from '../../jwt/encode'
 import { getNeode } from '../../db/neo4j'
+import { categories } from '../../constants/categories'
 
 const neode = getNeode()
 let query, mutate, variables, req, user
@@ -29,12 +31,9 @@ const disable = async (id) => {
   ])
 }
 
-beforeEach(() => {
-  user = null
-  req = { headers: {} }
-})
+beforeAll(async () => {
+  await cleanDatabase()
 
-beforeAll(() => {
   const { server } = createServer({
     context: () => {
       // One of the rare occasions where we test
@@ -46,6 +45,16 @@ beforeAll(() => {
   mutate = createTestClient(server).mutate
 })
 
+afterAll(async () => {
+  await cleanDatabase()
+})
+
+beforeEach(() => {
+  user = null
+  req = { headers: {} }
+})
+
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -111,6 +120,7 @@ describe('currentUser', () => {
         }
         email
         role
+        activeCategories
       }
     }
   `
@@ -165,17 +175,57 @@ describe('currentUser', () => {
         }
         await respondsWith(expected)
       })
+
+      describe('with categories in DB', () => {
+        beforeEach(async () => {
+          await Promise.all(
+            categories.map(async ({ icon, name }, index) => {
+              await Factory.build('category', {
+                id: `cat${index + 1}`,
+                slug: name,
+                name,
+                icon,
+              })
+            }),
+          )
+        })
+
+        it('returns empty array for all categories', async () => {
+          await respondsWith({
+            data: {
+              currentUser: expect.objectContaining({ activeCategories: [] }),
+            },
+          })
+        })
+
+        describe('with categories saved for current user', () => {
+          const saveCategorySettings = gql`
+            mutation ($activeCategories: [String]) {
+              saveCategorySettings(activeCategories: $activeCategories)
+            }
+          `
+          beforeEach(async () => {
+            await mutate({
+              mutation: saveCategorySettings,
+              variables: { activeCategories: ['cat1', 'cat3', 'cat5', 'cat7'] },
+            })
+          })
+
+          it('returns only the saved active categories', async () => {
+            const result = await query({ query: currentUserQuery, variables })
+            expect(result.data.currentUser.activeCategories).toHaveLength(4)
+            expect(result.data.currentUser.activeCategories).toContain('cat1')
+            expect(result.data.currentUser.activeCategories).toContain('cat3')
+            expect(result.data.currentUser.activeCategories).toContain('cat5')
+            expect(result.data.currentUser.activeCategories).toContain('cat7')
+          })
+        })
+      })
     })
   })
 })
 
 describe('login', () => {
-  const loginMutation = gql`
-    mutation($email: String!, $password: String!) {
-      login(email: $email, password: $password)
-    }
-  `
-
   const respondsWith = async (expected) => {
     await expect(mutate({ mutation: loginMutation, variables })).resolves.toMatchObject(expected)
   }
@@ -287,7 +337,7 @@ describe('login', () => {
 
 describe('change password', () => {
   const changePasswordMutation = gql`
-    mutation($oldPassword: String!, $newPassword: String!) {
+    mutation ($oldPassword: String!, $newPassword: String!) {
       changePassword(oldPassword: $oldPassword, newPassword: $newPassword)
     }
   `
@@ -303,8 +353,8 @@ describe('change password', () => {
   })
 
   describe('unauthenticated', () => {
-    it('throws "Not Authorised!"', async () => {
-      await respondsWith({ errors: [{ message: 'Not Authorised!' }] })
+    it('throws "Not Authorized!"', async () => {
+      await respondsWith({ errors: [{ message: 'Not Authorized!' }] })
     })
   })
 

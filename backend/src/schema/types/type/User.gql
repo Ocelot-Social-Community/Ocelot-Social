@@ -28,13 +28,13 @@ type User {
   avatar: Image @relation(name: "AVATAR_IMAGE", direction: "OUT")
   deleted: Boolean
   disabled: Boolean
-  role: UserGroup!
+  role: UserRole!
   publicKey: String
   invitedBy: User @relation(name: "INVITED", direction: "IN")
   invited: [User] @relation(name: "INVITED", direction: "OUT")
 
-  location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
   locationName: String
+  location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
   about: String
   socialMedia: [SocialMedia]! @relation(name: "OWNED_BY", direction: "IN")
 
@@ -46,6 +46,7 @@ type User {
 
   allowEmbedIframes: Boolean
   showShoutsPublicly: Boolean
+  sendNotificationEmails: Boolean
   locale: String
   friends: [User]! @relation(name: "FRIENDS", direction: "BOTH")
   friendsCount: Int! @cypher(statement: "MATCH (this)<-[:FRIENDS]->(r:User) RETURN COUNT(DISTINCT r)")
@@ -55,6 +56,9 @@ type User {
 
   followedBy: [User]! @relation(name: "FOLLOWS", direction: "IN")
   followedByCount: Int! @cypher(statement: "MATCH (this)<-[:FOLLOWS]-(r:User) RETURN COUNT(DISTINCT r)")
+
+  inviteCodes: [InviteCode] @relation(name: "GENERATED", direction: "OUT")
+  redeemedInviteCode: InviteCode @relation(name: "REDEEMED", direction: "OUT")
 
   # Is the currently logged in user following that user?
   followedByCurrentUser: Boolean! @cypher(
@@ -83,7 +87,7 @@ type User {
   RETURN COUNT(user) >= 1
   """
   )
-
+  
   # contributions: [WrittenPost]!
   # contributions2(first: Int = 10, offset: Int = 0): [WrittenPost2]!
   # @cypher(
@@ -104,12 +108,22 @@ type User {
   shouted: [Post]! @relation(name: "SHOUTED", direction: "OUT")
   shoutedCount: Int! @cypher(statement: "MATCH (this)-[:SHOUTED]->(r:Post) WHERE NOT r.deleted = true AND NOT r.disabled = true RETURN COUNT(DISTINCT r)")
 
-  categories: [Category]! @relation(name: "CATEGORIZED", direction: "OUT")
+  categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
   badges: [Badge]! @relation(name: "REWARDED", direction: "IN")
   badgesCount: Int! @cypher(statement: "MATCH (this)<-[:REWARDED]-(r:Badge) RETURN COUNT(r)")
 
   emotions: [EMOTED]
+
+  activeCategories: [String] @cypher(
+  statement: """
+  MATCH (category:Category)
+  WHERE NOT ((this)-[:NOT_INTERESTED_IN]->(category))
+  RETURN collect(category.id)
+  """
+  )
+
+  myRoleInGroup: GroupMemberRole
 }
 
 
@@ -147,42 +161,31 @@ input _UserFilter {
   followedBy_none: _UserFilter
   followedBy_single: _UserFilter
   followedBy_every: _UserFilter
-  role_in: [UserGroup!]
+  role_in: [UserRole!]
 }
 
 type Query {
   User(
-  id: ID
-  email: String # admins need to search for a user sometimes
-  name: String
-  slug: String
-  role: UserGroup
-  locationName: String
-  about: String
-  createdAt: String
-  updatedAt: String
-  first: Int
-  offset: Int
-  orderBy: [_UserOrdering]
-  filter: _UserFilter
+    id: ID
+    email: String # admins need to search for a user sometimes
+    name: String
+    slug: String
+    role: UserRole
+    locationName: String
+    about: String
+    createdAt: String
+    updatedAt: String
+    first: Int
+    offset: Int
+    orderBy: [_UserOrdering]
+    filter: _UserFilter
   ): [User]
 
+  availableRoles: [UserRole]! 
   mutedUsers: [User]
   blockedUsers: [User]
   isLoggedIn: Boolean!
   currentUser: User
-  findUsers(query: String!,limit: Int = 10, filter: _UserFilter): [User]!
-    @cypher(
-      statement: """
-      CALL db.index.fulltext.queryNodes('user_fulltext_search', $query)
-      YIELD node as post, score
-      MATCH (user)
-      WHERE score >= 0.2
-      AND NOT user.deleted = true AND NOT user.disabled = true
-      RETURN user
-      LIMIT $limit
-        """
-    )
 }
 
 enum Deletable {
@@ -192,18 +195,19 @@ enum Deletable {
 
 type Mutation {
   UpdateUser (
-  id: ID!
-  name: String
-  email: String
-  slug: String
-  avatar: ImageInput
-  locationName: String
-  about: String
-  termsAndConditionsAgreedVersion: String
-  termsAndConditionsAgreedAt: String
-  allowEmbedIframes: Boolean
-  showShoutsPublicly: Boolean
-  locale: String
+    id: ID!
+    name: String
+    email: String
+    slug: String
+    avatar: ImageInput
+    locationName: String # empty string '' sets it to null
+    about: String
+    termsAndConditionsAgreedVersion: String
+    termsAndConditionsAgreedAt: String
+    allowEmbedIframes: Boolean
+    showShoutsPublicly: Boolean
+    sendNotificationEmails: Boolean
+    locale: String
   ): User
 
   DeleteUser(id: ID!, resource: [Deletable]): User
@@ -212,4 +216,8 @@ type Mutation {
   unmuteUser(id: ID!): User
   blockUser(id: ID!): User
   unblockUser(id: ID!): User
+
+  switchUserRole(role: UserRole!, id: ID!): User
+
+  saveCategorySettings(activeCategories: [String]): Boolean
 }

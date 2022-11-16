@@ -6,6 +6,14 @@ import { getDriver } from '../../db/neo4j'
 
 const driver = getDriver()
 
+beforeAll(async () => {
+  await cleanDatabase()
+})
+
+afterAll(async () => {
+  await cleanDatabase()
+})
+
 describe('SocialMedia', () => {
   let socialMediaAction, someUser, ownerNode, owner
 
@@ -61,6 +69,7 @@ describe('SocialMedia', () => {
     }
   })
 
+  // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
   afterEach(async () => {
     await cleanDatabase()
   })
@@ -70,7 +79,7 @@ describe('SocialMedia', () => {
 
     beforeEach(() => {
       mutation = gql`
-        mutation($url: String!) {
+        mutation ($url: String!) {
           CreateSocialMedia(url: $url) {
             id
             url
@@ -85,7 +94,7 @@ describe('SocialMedia', () => {
         const user = null
         const result = await socialMediaAction(user, mutation, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -131,7 +140,7 @@ describe('SocialMedia', () => {
     describe('ownedBy', () => {
       beforeEach(() => {
         mutation = gql`
-          mutation($url: String!) {
+          mutation ($url: String!) {
             CreateSocialMedia(url: $url) {
               url
               ownedBy {
@@ -162,7 +171,7 @@ describe('SocialMedia', () => {
       const socialMedia = await setUpSocialMedia()
 
       mutation = gql`
-        mutation($id: ID!, $url: String!) {
+        mutation ($id: ID!, $url: String!) {
           UpdateSocialMedia(id: $id, url: $url) {
             id
             url
@@ -177,7 +186,7 @@ describe('SocialMedia', () => {
         const user = null
         const result = await socialMediaAction(user, mutation, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -186,7 +195,7 @@ describe('SocialMedia', () => {
         const user = someUser
         const result = await socialMediaAction(user, mutation, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -213,7 +222,7 @@ describe('SocialMedia', () => {
         variables.id = 'some-id'
         const result = await socialMediaAction(user, mutation, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
   })
@@ -225,7 +234,7 @@ describe('SocialMedia', () => {
       const socialMedia = await setUpSocialMedia()
 
       mutation = gql`
-        mutation($id: ID!) {
+        mutation ($id: ID!) {
           DeleteSocialMedia(id: $id) {
             id
             url
@@ -240,7 +249,7 @@ describe('SocialMedia', () => {
         const user = null
         const result = await socialMediaAction(user, mutation, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -249,7 +258,7 @@ describe('SocialMedia', () => {
         const user = someUser
         const result = await socialMediaAction(user, mutation, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 

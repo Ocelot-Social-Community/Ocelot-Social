@@ -8,11 +8,12 @@
       @submit="handleSubmit"
     >
       <h1>
-        {{ invitation ? $t('profile.invites.title') : $t('components.registration.signup.title') }}
+        {{
+          invitation
+            ? $t('profile.invites.title', metadata)
+            : $t('components.registration.signup.title', metadata)
+        }}
       </h1>
-      <ds-space v-if="token" margin-botton="large">
-        <ds-text v-html="$t('registration.signup.form.invitation-code', { code: token })" />
-      </ds-space>
       <ds-space margin-botton="large">
         <ds-text>
           {{
@@ -64,18 +65,13 @@
 
 <script>
 import gql from 'graphql-tag'
+import metadata from '~/constants/metadata'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
+import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
 
 export const SignupMutation = gql`
-  mutation($email: String!) {
-    Signup(email: $email) {
-      email
-    }
-  }
-`
-export const SignupByInvitationMutation = gql`
-  mutation($email: String!, $token: String!) {
-    SignupByInvitation(email: $email, token: $token) {
+  mutation ($email: String!, $inviteCode: String) {
+    Signup(email: $email, inviteCode: $inviteCode) {
       email
     }
   }
@@ -86,11 +82,11 @@ export default {
     SweetalertIcon,
   },
   props: {
-    token: { type: String, default: null },
     invitation: { type: Boolean, default: false },
   },
   data() {
     return {
+      metadata,
       formData: {
         email: '',
       },
@@ -120,32 +116,28 @@ export default {
       this.disabled = false
     },
     async handleSubmit() {
-      const mutation = this.token ? SignupByInvitationMutation : SignupMutation
-      const { token } = this
       const { email } = this.formData
 
       try {
-        const response = await this.$apollo.mutate({ mutation, variables: { email, token } })
+        const response = await this.$apollo.mutate({
+          mutation: SignupMutation,
+          variables: { email, inviteCode: null },
+        })
         this.data = response.data
         setTimeout(() => {
           this.$emit('submit', { email: this.data.Signup.email })
         }, 3000)
       } catch (err) {
-        const { message } = err
-        const mapping = {
-          'A user account with this email already exists': 'email-exists',
-          'Invitation code already used or does not exist': 'invalid-invitation-token',
-        }
-        for (const [pattern, key] of Object.entries(mapping)) {
-          if (message.includes(pattern))
-            this.error = {
-              key,
-              message: this.$t(`components.registration.signup.form.errors.${key}`),
-            }
-        }
-        if (!this.error) {
-          this.$toast.error(message)
-        }
+        this.$toast.error(
+          translateErrorMessage(
+            err.message,
+            {
+              'A user account with this email already exists':
+                'components.registration.signup.form.errors.email-exists',
+            },
+            this.$t,
+          ),
+        )
       }
     },
   },

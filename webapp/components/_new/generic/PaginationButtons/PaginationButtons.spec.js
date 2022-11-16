@@ -5,61 +5,80 @@ import PaginationButtons from './PaginationButtons'
 const localVue = global.localVue
 
 describe('PaginationButtons.vue', () => {
-  let propsData = {}
+  const propsData = {
+    showPageCounter: true,
+    activePage: 1,
+    activeResourceCount: 57,
+  }
   let wrapper
-  let nextButton
-  let backButton
+  const mocks = {
+    $t: jest.fn(),
+  }
 
   const Wrapper = () => {
-    return mount(PaginationButtons, { propsData, localVue })
+    return mount(PaginationButtons, { mocks, propsData, localVue })
   }
 
   describe('mount', () => {
-    describe('next button', () => {
-      beforeEach(() => {
-        propsData.hasNext = true
-        wrapper = Wrapper()
-        nextButton = wrapper.find('[data-test="next-button"]')
-      })
+    beforeEach(() => {
+      wrapper = Wrapper()
+    })
 
+    describe('next button', () => {
       it('is disabled by default', () => {
-        propsData = {}
-        wrapper = Wrapper()
-        nextButton = wrapper.find('[data-test="next-button"]')
+        const nextButton = wrapper.find('[data-test="next-button"]')
         expect(nextButton.attributes().disabled).toEqual('disabled')
       })
 
-      it('is enabled if hasNext is true', () => {
+      it('is enabled if hasNext is true', async () => {
+        wrapper.setProps({ hasNext: true })
+        await wrapper.vm.$nextTick()
+        const nextButton = wrapper.find('[data-test="next-button"]')
         expect(nextButton.attributes().disabled).toBeUndefined()
       })
 
       it('emits next when clicked', async () => {
-        await nextButton.trigger('click')
+        wrapper.setProps({ hasNext: true })
+        await wrapper.vm.$nextTick()
+        wrapper.find('[data-test="next-button"]').trigger('click')
+        await wrapper.vm.$nextTick()
         expect(wrapper.emitted().next).toHaveLength(1)
       })
     })
 
-    describe('back button', () => {
-      beforeEach(() => {
-        propsData.hasPrevious = true
-        wrapper = Wrapper()
-        backButton = wrapper.find('[data-test="previous-button"]')
-      })
-
+    describe('previous button', () => {
       it('is disabled by default', () => {
-        propsData = {}
-        wrapper = Wrapper()
-        backButton = wrapper.find('[data-test="previous-button"]')
-        expect(backButton.attributes().disabled).toEqual('disabled')
+        const previousButton = wrapper.find('[data-test="previous-button"]')
+        expect(previousButton.attributes().disabled).toEqual('disabled')
       })
 
-      it('is enabled if hasPrevious is true', () => {
-        expect(backButton.attributes().disabled).toBeUndefined()
+      it('is enabled if hasPrevious is true', async () => {
+        wrapper.setProps({ hasPrevious: true })
+        await wrapper.vm.$nextTick()
+        const previousButton = wrapper.find('[data-test="previous-button"]')
+        expect(previousButton.attributes().disabled).toBeUndefined()
       })
 
       it('emits back when clicked', async () => {
-        await backButton.trigger('click')
+        wrapper.setProps({ hasPrevious: true })
+        await wrapper.vm.$nextTick()
+        wrapper.find('[data-test="previous-button"]').trigger('click')
+        await wrapper.vm.$nextTick()
         expect(wrapper.emitted().back).toHaveLength(1)
+      })
+    })
+
+    describe('page counter', () => {
+      it('displays the page counter when showPageCount is true', () => {
+        const paginationPageCount = wrapper.find('[data-test="pagination-pageCount"]')
+        expect(paginationPageCount.text().replace(/\s+/g, ' ')).toEqual('2 / 3')
+      })
+
+      it('does not display the page counter when showPageCount is false', async () => {
+        wrapper.setProps({ showPageCounter: false })
+        await wrapper.vm.$nextTick()
+        const paginationPageCount = wrapper.find('[data-test="pagination-pageCount"]')
+        expect(paginationPageCount.exists()).toEqual(false)
       })
     })
   })

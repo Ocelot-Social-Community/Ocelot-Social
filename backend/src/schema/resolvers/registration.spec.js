@@ -3,6 +3,7 @@ import { gql } from '../../helpers/jest'
 import { getDriver, getNeode } from '../../db/neo4j'
 import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
+import CONFIG from '../../config'
 
 const neode = getNeode()
 
@@ -11,11 +12,9 @@ let authenticatedUser
 let variables
 const driver = getDriver()
 
-beforeEach(async () => {
-  variables = {}
-})
+beforeAll(async () => {
+  await cleanDatabase()
 
-beforeAll(() => {
   const { server } = createServer({
     context: () => {
       return {
@@ -28,14 +27,23 @@ beforeAll(() => {
   mutate = createTestClient(server).mutate
 })
 
+afterAll(async () => {
+  await cleanDatabase()
+})
+
+beforeEach(async () => {
+  variables = {}
+})
+
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
 
 describe('Signup', () => {
   const mutation = gql`
-    mutation($email: String!) {
-      Signup(email: $email) {
+    mutation ($email: String!, $inviteCode: String) {
+      Signup(email: $email, inviteCode: $inviteCode) {
         email
       }
     }
@@ -50,8 +58,10 @@ describe('Signup', () => {
     })
 
     it('throws AuthorizationError', async () => {
+      CONFIG.INVITE_REGISTRATION = false
+      CONFIG.PUBLIC_REGISTRATION = false
       await expect(mutate({ mutation, variables })).resolves.toMatchObject({
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
       })
     })
 
@@ -141,7 +151,7 @@ describe('Signup', () => {
 
 describe('SignupVerification', () => {
   const mutation = gql`
-    mutation(
+    mutation (
       $name: String!
       $password: String!
       $email: String!
@@ -169,7 +179,7 @@ describe('SignupVerification', () => {
     beforeEach(async () => {
       variables = {
         ...variables,
-        nonce: '123456',
+        nonce: '12345',
         name: 'John Doe',
         password: '123',
         email: 'john@example.org',
@@ -197,7 +207,7 @@ describe('SignupVerification', () => {
 
         describe('sending a valid nonce', () => {
           beforeEach(() => {
-            variables = { ...variables, nonce: '123456' }
+            variables = { ...variables, nonce: '12345' }
           })
 
           it('rejects', async () => {
@@ -212,7 +222,7 @@ describe('SignupVerification', () => {
         beforeEach(async () => {
           const args = {
             email: 'john@example.org',
-            nonce: '123456',
+            nonce: '12345',
           }
           await neode.model('EmailAddress').create(args)
         })

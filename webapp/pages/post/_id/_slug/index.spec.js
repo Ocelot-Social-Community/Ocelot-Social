@@ -4,6 +4,7 @@ import Vue from 'vue'
 import PostSlug from './index.vue'
 import CommentList from '~/components/CommentList/CommentList'
 import HcHashtag from '~/components/Hashtag/Hashtag'
+import VueMeta from 'vue-meta'
 
 config.stubs['client-only'] = '<span><slot /></span>'
 config.stubs['nuxt-link'] = '<span><slot /></span>'
@@ -11,6 +12,7 @@ config.stubs['router-link'] = '<span><slot /></span>'
 
 const localVue = global.localVue
 localVue.directive('scrollTo', jest.fn())
+localVue.use(VueMeta, { keyName: 'head' })
 
 describe('PostSlug', () => {
   let wrapper, Wrapper, backendData, mocks, stubs
@@ -54,6 +56,10 @@ describe('PostSlug', () => {
         },
         $route: {
           hash: '',
+          params: {
+            slug: 'slug',
+            id: 'id',
+          },
         },
         // If you are mocking the router, then don't use VueRouter with localVue: https://vue-test-utils.vuejs.org/guides/using-with-vue-router.html
         $router: {
@@ -70,6 +76,9 @@ describe('PostSlug', () => {
           query: jest.fn().mockResolvedValue({ data: { PostEmotionsCountByEmotion: {} } }),
         },
         $scrollTo: jest.fn(),
+        $env: {
+          CATEGORIES_ACTIVE: false,
+        },
       }
       stubs = {
         HcEditor: { render: () => {}, methods: { insertReply: jest.fn(() => null) } },
@@ -90,6 +99,11 @@ describe('PostSlug', () => {
       await Vue.nextTick()
       return wrapper
     }
+
+    it('has correct <head> content', async () => {
+      wrapper = await Wrapper()
+      expect(wrapper.vm.$metaInfo.title).toBe('loading')
+    })
 
     describe('given author is `null`', () => {
       it('does not crash', async () => {

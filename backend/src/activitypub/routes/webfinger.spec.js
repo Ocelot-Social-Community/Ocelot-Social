@@ -1,6 +1,7 @@
 import { handler } from './webfinger'
 import Factory, { cleanDatabase } from '../../db/factories'
 import { getDriver } from '../../db/neo4j'
+import CONFIG from '../../config'
 
 let resource, res, json, status, contentType
 
@@ -26,6 +27,15 @@ const request = () => {
   return handler(req, res)
 }
 
+beforeAll(async () => {
+  await cleanDatabase()
+})
+
+afterAll(async () => {
+  await cleanDatabase()
+})
+
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -98,12 +108,12 @@ describe('webfinger', () => {
           expect(json).toHaveBeenCalledWith({
             links: [
               {
-                href: 'http://localhost:3000/activitypub/users/some-user',
+                href: `${CONFIG.CLIENT_URI}/activitypub/users/some-user`,
                 rel: 'self',
                 type: 'application/activity+json',
               },
             ],
-            subject: 'acct:some-user@localhost:3000',
+            subject: `acct:some-user@${new URL(CONFIG.CLIENT_URI).host}`,
           })
         })
       })

@@ -5,10 +5,10 @@ import slug from 'slug'
 import { existsSync, unlinkSync, createWriteStream } from 'fs'
 import { UserInputError } from 'apollo-server'
 import { getDriver } from '../../../db/neo4j'
-import { s3Configs } from '../../../config'
+import CONFIG from '../../../config'
 
 // const widths = [34, 160, 320, 640, 1024]
-const { AWS_ENDPOINT: endpoint, AWS_REGION: region, AWS_BUCKET: Bucket, S3_CONFIGURED } = s3Configs
+const { AWS_ENDPOINT: endpoint, AWS_REGION: region, AWS_BUCKET: Bucket, S3_CONFIGURED } = CONFIG
 
 export async function deleteImage(resource, relationshipType, opts = {}) {
   sanitizeRelationshipType(relationshipType)
@@ -53,8 +53,8 @@ export async function mergeImage(resource, relationshipType, imageInput, opts = 
   if (!(existingImage || upload)) throw new UserInputError('Cannot find image for given resource')
   if (existingImage && upload) deleteImageFile(existingImage, deleteCallback)
   const url = await uploadImageFile(upload, uploadCallback)
-  const { alt, sensitive, aspectRatio } = imageInput
-  const image = { alt, sensitive, aspectRatio, url }
+  const { alt, sensitive, aspectRatio, type } = imageInput
+  const image = { alt, sensitive, aspectRatio, url, type }
   txResult = await transaction.run(
     `
     MATCH (resource {id: $resource.id})

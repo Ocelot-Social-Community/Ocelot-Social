@@ -3,6 +3,15 @@ import { getNeode } from '../db/neo4j'
 
 const neode = getNeode()
 
+beforeAll(async () => {
+  await cleanDatabase()
+})
+
+afterAll(async () => {
+  await cleanDatabase()
+})
+
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -46,7 +55,7 @@ describe('slug', () => {
         \`\`\`
 
         Learn how to setup the database here:
-        https://docs.human-connection.org/human-connection/backend#database-indices-and-constraints
+        https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/backend/README.md#database-indices-and-constraints
       `)
     }
   })

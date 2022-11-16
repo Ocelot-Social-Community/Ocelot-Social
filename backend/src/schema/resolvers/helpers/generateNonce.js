@@ -1,4 +1,11 @@
-import { v4 as uuid } from 'uuid'
+import CONSTANTS_REGISTRATION from './../../../constants/registration'
+
+// TODO: why this is not used in resolver 'requestPasswordReset'?
 export default function generateNonce() {
-  return uuid().substring(0, 6)
+  return Array.from(
+    { length: CONSTANTS_REGISTRATION.NONCE_LENGTH },
+    (n = Math.floor(Math.random() * 10)) => {
+      return String.fromCharCode(n + 48)
+    },
+  ).join('')
 }

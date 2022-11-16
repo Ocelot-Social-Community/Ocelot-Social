@@ -1,6 +1,7 @@
 import Factory, { cleanDatabase } from '../../db/factories'
 import { gql } from '../../helpers/jest'
 import { getNeode, getDriver } from '../../db/neo4j'
+import CONSTANTS_REGISTRATION from './../../constants/registration'
 import createPasswordReset from './helpers/createPasswordReset'
 import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
@@ -20,11 +21,9 @@ const getAllPasswordResets = async () => {
   return resets
 }
 
-beforeEach(() => {
-  variables = {}
-})
+beforeAll(async () => {
+  await cleanDatabase()
 
-beforeAll(() => {
   const { server } = createServer({
     context: () => {
       return {
@@ -37,6 +36,15 @@ beforeAll(() => {
   mutate = createTestClient(server).mutate
 })
 
+afterAll(async () => {
+  await cleanDatabase()
+})
+
+beforeEach(() => {
+  variables = {}
+})
+
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -55,7 +63,7 @@ describe('passwordReset', () => {
 
     describe('requestPasswordReset', () => {
       const mutation = gql`
-        mutation($email: String!) {
+        mutation ($email: String!) {
           requestPasswordReset(email: $email)
         }
       `
@@ -102,7 +110,7 @@ describe('passwordReset', () => {
           const resets = await getAllPasswordResets()
           const [reset] = resets
           const { nonce } = reset.properties
-          expect(nonce).toHaveLength(6)
+          expect(nonce).toHaveLength(CONSTANTS_REGISTRATION.NONCE_LENGTH)
         })
       })
     })
@@ -111,12 +119,12 @@ describe('passwordReset', () => {
 
 describe('resetPassword', () => {
   const setup = async (options = {}) => {
-    const { email = 'user@example.org', issuedAt = new Date(), nonce = 'abcdef' } = options
+    const { email = 'user@example.org', issuedAt = new Date(), nonce = '12345' } = options
     await createPasswordReset({ driver, email, issuedAt, nonce })
   }
 
   const mutation = gql`
-    mutation($nonce: String!, $email: String!, $newPassword: String!) {
+    mutation ($nonce: String!, $email: String!, $newPassword: String!) {
       resetPassword(nonce: $nonce, email: $email, newPassword: $newPassword)
     }
   `
@@ -141,7 +149,7 @@ describe('resetPassword', () => {
     describe('invalid email', () => {
       it('resolves to false', async () => {
         await setup()
-        variables = { ...variables, email: 'non-existent@example.org', nonce: 'abcdef' }
+        variables = { ...variables, email: 'non-existent@example.org', nonce: '12345' }
         await expect(mutate({ mutation, variables })).resolves.toMatchObject({
           data: { resetPassword: false },
         })
@@ -155,7 +163,7 @@ describe('resetPassword', () => {
 
       describe('but invalid nonce', () => {
         beforeEach(() => {
-          variables = { ...variables, nonce: 'slkdjf' }
+          variables = { ...variables, nonce: 'slkdj' }
         })
 
         it('resolves to false', async () => {
@@ -170,7 +178,7 @@ describe('resetPassword', () => {
         beforeEach(() => {
           variables = {
             ...variables,
-            nonce: 'abcdef',
+            nonce: '12345',
           }
         })
 
@@ -196,7 +204,7 @@ describe('resetPassword', () => {
           it('updates password of the user', async () => {
             await mutate({ mutation, variables })
             const checkLoginMutation = gql`
-              mutation($email: String!, $password: String!) {
+              mutation ($email: String!, $password: String!) {
                 login(email: $email, password: $password)
               }
             `

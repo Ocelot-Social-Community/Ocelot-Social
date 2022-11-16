@@ -12,7 +12,9 @@ let variables
 let query
 let mutate
 
-beforeAll(() => {
+beforeAll(async () => {
+  await cleanDatabase()
+
   const { server } = createServer({
     context: () => {
       return {
@@ -25,11 +27,16 @@ beforeAll(() => {
   mutate = createTestClient(server).mutate
 })
 
+afterAll(async () => {
+  await cleanDatabase()
+})
+
 beforeEach(async () => {
   authenticatedUser = null
   variables = { orderBy: 'createdAt_asc' }
 })
 
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -139,7 +146,7 @@ describe('given some notifications', () => {
 
   describe('notifications', () => {
     const notificationQuery = gql`
-      query($read: Boolean, $orderBy: NotificationOrdering) {
+      query ($read: Boolean, $orderBy: NotificationOrdering) {
         notifications(read: $read, orderBy: $orderBy) {
           from {
             __typename
@@ -158,7 +165,7 @@ describe('given some notifications', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const { errors } = await query({ query: notificationQuery })
-        expect(errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -249,7 +256,7 @@ describe('given some notifications', () => {
           const deletePostAction = async () => {
             authenticatedUser = await author.toJson()
             const deletePostMutation = gql`
-              mutation($id: ID!) {
+              mutation ($id: ID!) {
                 DeletePost(id: $id) {
                   id
                   deleted
@@ -284,7 +291,7 @@ describe('given some notifications', () => {
 
   describe('markAsRead', () => {
     const markAsReadMutation = gql`
-      mutation($id: ID!) {
+      mutation ($id: ID!) {
         markAsRead(id: $id) {
           from {
             __typename
@@ -307,7 +314,7 @@ describe('given some notifications', () => {
           mutation: markAsReadMutation,
           variables: { ...variables, id: 'p1' },
         })
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorised!')
+        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 

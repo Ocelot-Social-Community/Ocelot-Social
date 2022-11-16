@@ -24,7 +24,7 @@
         />
         <!-- eslint-enable vue/use-v-on-exact -->
         <ds-input
-          id="bio"
+          id="about"
           model="about"
           type="textarea"
           rows="3"
@@ -41,17 +41,16 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import { CancelToken } from 'axios'
 import UniqueSlugForm from '~/components/utils/UniqueSlugForm'
 import { updateUserMutation } from '~/graphql/User'
+import { queryLocations } from '~/graphql/location'
 
 let timeout
-const mapboxToken = process.env.MAPBOX_TOKEN
 
 export default {
+  name: 'NewsFeed',
   data() {
     return {
-      axiosSource: null,
       cities: [],
       loadingData: false,
       loadingGeo: false,
@@ -123,51 +122,38 @@ export default {
       clearTimeout(timeout)
       timeout = setTimeout(() => this.requestGeoData(value), 500)
     },
-    processCityResults(res) {
-      if (!res || !res.data || !res.data.features || !res.data.features.length) {
+    processLocationsResult(places) {
+      if (!places.length) {
         return []
       }
-      const output = []
-      res.data.features.forEach((item) => {
-        output.push({
-          label: item.place_name,
-          value: item.place_name,
-          id: item.id,
+      const result = []
+      places.forEach((place) => {
+        result.push({
+          label: place.place_name,
+          value: place.place_name,
+          id: place.id,
         })
       })
 
-      return output
+      return result
     },
-    requestGeoData(e) {
-      if (this.axiosSource) {
-        // cancel last request
-        this.axiosSource.cancel()
-      }
-
+    async requestGeoData(e) {
       const value = e.target ? e.target.value.trim() : ''
-      if (value === '' || value.length < 3) {
+      if (value === '') {
         this.cities = []
         return
       }
       this.loadingGeo = true
-      this.axiosSource = CancelToken.source()
 
       const place = encodeURIComponent(value)
       const lang = this.$i18n.locale()
 
-      this.$axios
-        .get(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${mapboxToken}&types=region,place,country&language=${lang}`,
-          {
-            cancelToken: this.axiosSource.token,
-          },
-        )
-        .then((res) => {
-          this.cities = this.processCityResults(res)
-        })
-        .finally(() => {
-          this.loadingGeo = false
-        })
+      const {
+        data: { queryLocations: res },
+      } = await this.$apollo.query({ query: queryLocations(), variables: { place, lang } })
+
+      this.cities = this.processLocationsResult(res)
+      this.loadingGeo = false
     },
   },
 }

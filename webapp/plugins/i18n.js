@@ -2,6 +2,13 @@ import Vue from 'vue'
 import vuexI18n from 'vuex-i18n/dist/vuex-i18n.umd.js'
 import { isEmpty, find } from 'lodash'
 import locales from '~/locales'
+import htmlTranslations from '~/locales/html/'
+
+const registerTranslation = ({ Vue, locale }) => {
+  const translation = require(`~/locales/${locale}.json`)
+  translation.html = htmlTranslations[locale]
+  Vue.i18n.add(locale, translation)
+}
 
 /**
  * TODO: Refactor and simplify browser detection
@@ -14,18 +21,30 @@ export default ({ app, req, cookie, store }) => {
   const changeHandler = async (mutation) => {
     if (process.server) return
 
-    const newLocale = mutation.payload.locale
-    const currentLocale = await app.$cookies.get(key)
-    const isDifferent = newLocale !== currentLocale
+    const localeInStore = mutation.payload.locale
+    let cookieExists = true
+    let localeInCookies = await app.$cookies.get(key)
+    if (!localeInCookies) {
+      cookieExists = false
+      localeInCookies = navigator.language.split('-')[0] // get browser language
+    }
+    const isLocaleStoreSameAsCookies = localeInStore === localeInCookies
 
-    if (!isDifferent) {
+    // cookie has to be set, otherwise Cypress test does not work
+    if (cookieExists && isLocaleStoreSameAsCookies) {
       return
     }
 
-    app.$cookies.set(key, newLocale)
-    if (!app.$i18n.localeExists(newLocale)) {
-      import(`~/locales/${newLocale}.json`).then((res) => {
-        app.$i18n.add(newLocale, res.default)
+    const expires = new Date()
+    expires.setDate(expires.getDate() + app.$env.COOKIE_EXPIRE_TIME)
+    app.$cookies.set(key, localeInStore, {
+      expires,
+      // maxAge: app.$env.COOKIE_EXPIRE_TIME * 60 * 60 * 24, // days to seconds
+      sameSite: 'lax', // for the meaning see https://www.thinktecture.com/de/identity/samesite/samesite-in-a-nutshell/
+    })
+    if (!app.$i18n.localeExists(localeInStore)) {
+      import(`~/locales/${localeInStore}.json`).then((res) => {
+        app.$i18n.add(localeInStore, res.default)
       })
     }
 
@@ -35,7 +54,7 @@ export default ({ app, req, cookie, store }) => {
     if (user && user._id && token) {
       // TODO: SAVE LOCALE
       // store.dispatch('usersettings/patch', {
-      //   uiLanguage: newLocale
+      //   uiLanguage: localeInStore
       // }, { root: true })
     }
   }
@@ -52,9 +71,6 @@ export default ({ app, req, cookie, store }) => {
       }
     },
   })
-
-  // register the fallback locales
-  Vue.i18n.add('en', require('~/locales/en.json'))
 
   let userLocale = 'en'
   const localeCookie = app.$cookies.get(key)
@@ -80,8 +96,10 @@ export default ({ app, req, cookie, store }) => {
   const availableLocales = locales.filter((lang) => !!lang.enabled)
   const locale = find(availableLocales, ['code', userLocale]) ? userLocale : 'en'
 
+  // register the fallback locales
+  registerTranslation({ Vue, locale: 'en' })
   if (locale !== 'en') {
-    Vue.i18n.add(locale, require(`~/locales/${locale}.json`))
+    registerTranslation({ Vue, locale })
   }
 
   // Set the start locale to use

@@ -21,9 +21,24 @@ const neode = getNeode()
 //   iss: 'http://localhost:4000',
 //   sub: 'u3'
 // }
+// !!! if the token expires go into the GraphQL Playground in the browser at 'http://localhost:4000' with a running backend and a seeded Neo4j database
+//     now do the login mutation:
+//       mutation {
+//         login(email:"user@example.org", password:"1234")
+//       }
+//     replace this token here with the one you received as the result
 export const validAuthorizationHeader =
-  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsImxvY2F0aW9uTmFtZSI6bnVsbCwibmFtZSI6Ikplbm55IFJvc3RvY2siLCJhYm91dCI6bnVsbCwiYXZhdGFyIjoiaHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3VpZmFjZXMvZmFjZXMvdHdpdHRlci9zYXNoYV9zaGVzdGFrb3YvMTI4LmpwZyIsImlkIjoidTMiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5vcmciLCJzbHVnIjoiamVubnktcm9zdG9jayIsImlhdCI6MTU1MDg0NjY4MCwiZXhwIjoxNjM3MjQ2NjgwLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjQwMDAiLCJzdWIiOiJ1MyJ9.eZ_mVKas4Wzoc_JrQTEWXyRn7eY64cdIg4vqQ-F_7Jc'
+  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InUzIiwibmFtZSI6Ikplbm55IFJvc3RvY2siLCJzbHVnIjoiamVubnktcm9zdG9jayIsImlhdCI6MTYzNzY0NDMwMCwiZXhwIjoxNzAwNzU5NTAwLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjQwMDAiLCJzdWIiOiJ1MyJ9.ispIfRfgkXuYoIhKx7x2jPxgvHDJVv1ogMycLmfUnsk'
 
+beforeAll(async () => {
+  await cleanDatabase()
+})
+
+afterAll(async () => {
+  await cleanDatabase()
+})
+
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -38,6 +53,7 @@ describe('decode', () => {
     beforeEach(() => {
       authorizationHeader = null
     })
+
     it('returns null', returnsNull)
   })
 
@@ -45,6 +61,7 @@ describe('decode', () => {
     beforeEach(() => {
       authorizationHeader = undefined
     })
+
     it('returns null', returnsNull)
   })
 
@@ -52,6 +69,7 @@ describe('decode', () => {
     beforeEach(() => {
       authorizationHeader = 'blah'
     })
+
     it('returns null', returnsNull)
   })
 
@@ -59,6 +77,7 @@ describe('decode', () => {
     beforeEach(() => {
       authorizationHeader = validAuthorizationHeader
     })
+
     it('returns null', returnsNull)
 
     describe('and corresponding user in the database', () => {

@@ -14,16 +14,9 @@
 
 /* globals Cypress cy */
 import "cypress-file-upload";
-import helpers from "./helpers";
 import { GraphQLClient, request } from 'graphql-request'
 import { gql } from '../../backend/src/helpers/jest'
 import config from '../../backend/src/config'
-import encode from '../../backend/src/jwt/encode'
-
-const switchLang = name => {
-  cy.get(".locale-menu").click();
-  cy.contains(".locale-menu-popover a", name).click();
-};
 
 const authenticatedHeaders = (variables) => {
   const mutation = gql`
@@ -38,48 +31,9 @@ const authenticatedHeaders = (variables) => {
   })
 }
 
-Cypress.Commands.add("switchLanguage", (name, force) => {
-  const { code } = helpers.getLangByName(name);
-  if (force) {
-    switchLang(name);
-  } else {
-    cy.get("html").then($html => {
-      if ($html && $html.attr("lang") !== code) {
-        switchLang(name);
-      }
-    });
-  }
-});
-
-Cypress.Commands.add("login", user => {
-  const token = encode(user)
-  cy.setCookie('human-connection-token', token)
-    .visit("/")
-});
-
-Cypress.Commands.add("manualLogin", ({ email, password }) => {
-  cy.visit(`/login`)
-    .get("input[name=email]")
-    .trigger("focus")
-    .type(email)
-    .get("input[name=password]")
-    .trigger("focus")
-    .type(password)
-    .get("button[name=submit]")
-    .as("submitButton")
-    .click();
-});
-
 Cypress.Commands.add("logout", () => {
   cy.visit(`/logout`);
   cy.location("pathname").should("contain", "/login"); // we're out
-});
-
-Cypress.Commands.add("openPage", page => {
-  if (page === "landing") {
-    page = "";
-  }
-  cy.visit(`/${page}`);
 });
 
 Cypress.Commands.add(

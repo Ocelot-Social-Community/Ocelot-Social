@@ -36,6 +36,12 @@
           <search-post :option="option" />
         </p>
         <p
+          v-if="option.__typename === 'Group'"
+          :class="{ 'option-with-heading': isFirstOfType(option) }"
+        >
+          <search-group :option="option" />
+        </p>
+        <p
           v-if="option.__typename === 'Tag'"
           :class="{ 'option-with-heading': isFirstOfType(option) }"
         >
@@ -51,6 +57,7 @@
 import { isEmpty } from 'lodash'
 import SearchHeading from '~/components/generic/SearchHeading/SearchHeading.vue'
 import SearchPost from '~/components/generic/SearchPost/SearchPost.vue'
+import SearchGroup from '~/components/generic/SearchGroup/SearchGroup.vue'
 import HcHashtag from '~/components/Hashtag/Hashtag.vue'
 import UserTeaser from '~/components/UserTeaser/UserTeaser.vue'
 
@@ -58,6 +65,7 @@ export default {
   name: 'SearchableInput',
   components: {
     SearchHeading,
+    SearchGroup,
     SearchPost,
     HcHashtag,
     UserTeaser,
@@ -107,15 +115,12 @@ export default {
         this.$emit('query', this.value)
       }, this.delay)
     },
-    /**
-     * TODO: on enter we should go to a dedicated search page!?
-     */
     onEnter(event) {
-      clearTimeout(this.searchProcess)
-      if (!this.loading) {
-        this.previousSearchTerm = this.unprocessedSearchInput
-        this.$emit('query', this.unprocessedSearchInput)
-      }
+      this.$router.push({
+        path: '/search/search-results',
+        query: { search: this.unprocessedSearchInput },
+      })
+      this.$emit('clearSearch')
     },
     onDelete(event) {
       clearTimeout(this.searchProcess)
@@ -143,8 +148,17 @@ export default {
         this.searchValue = this.previousSearchTerm
       })
     },
-    isPost(item) {
-      return item.__typename === 'Post'
+    getRouteName(item) {
+      switch (item.__typename) {
+        case 'Post':
+          return 'post-id-slug'
+        case 'User':
+          return 'profile-id-slug'
+        case 'Group':
+          return 'group-id-slug'
+        default:
+          return null
+      }
     },
     isTag(item) {
       return item.__typename === 'Tag'
@@ -153,7 +167,7 @@ export default {
       this.$nextTick(() => {
         if (!this.isTag(item)) {
           this.$router.push({
-            name: this.isPost(item) ? 'post-id-slug' : 'profile-id-slug',
+            name: this.getRouteName(item),
             params: { id: item.id, slug: item.slug },
           })
         } else {

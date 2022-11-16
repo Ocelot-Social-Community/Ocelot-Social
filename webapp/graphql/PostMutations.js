@@ -3,19 +3,19 @@ import gql from 'graphql-tag'
 export default () => {
   return {
     CreatePost: gql`
-      mutation(
+      mutation (
         $title: String!
         $content: String!
-        $language: String
         $categoryIds: [ID]
         $image: ImageInput
+        $groupId: ID
       ) {
         CreatePost(
           title: $title
           content: $content
-          language: $language
           categoryIds: $categoryIds
           image: $image
+          groupId: $groupId
         ) {
           title
           slug
@@ -30,11 +30,10 @@ export default () => {
       }
     `,
     UpdatePost: gql`
-      mutation(
+      mutation (
         $id: ID!
         $title: String!
         $content: String!
-        $language: String
         $image: ImageInput
         $categoryIds: [ID]
       ) {
@@ -42,7 +41,6 @@ export default () => {
           id: $id
           title: $title
           content: $content
-          language: $language
           image: $image
           categoryIds: $categoryIds
         ) {
@@ -66,14 +64,14 @@ export default () => {
       }
     `,
     DeletePost: gql`
-      mutation($id: ID!) {
+      mutation ($id: ID!) {
         DeletePost(id: $id) {
           id
         }
       }
     `,
     AddPostEmotionsMutation: gql`
-      mutation($to: _PostInput!, $data: _EMOTEDInput!) {
+      mutation ($to: _PostInput!, $data: _EMOTEDInput!) {
         AddPostEmotions(to: $to, data: $data) {
           emotion
           from {
@@ -86,7 +84,7 @@ export default () => {
       }
     `,
     RemovePostEmotionsMutation: gql`
-      mutation($to: _PostInput!, $data: _EMOTEDInput!) {
+      mutation ($to: _PostInput!, $data: _EMOTEDInput!) {
         RemovePostEmotions(to: $to, data: $data) {
           emotion
           from {
@@ -99,7 +97,7 @@ export default () => {
       }
     `,
     pinPost: gql`
-      mutation($id: ID!) {
+      mutation ($id: ID!) {
         pinPost(id: $id) {
           id
           title
@@ -116,7 +114,7 @@ export default () => {
       }
     `,
     unpinPost: gql`
-      mutation($id: ID!) {
+      mutation ($id: ID!) {
         unpinPost(id: $id) {
           id
           title
@@ -129,6 +127,13 @@ export default () => {
             name
             role
           }
+        }
+      }
+    `,
+    markTeaserAsViewed: gql`
+      mutation ($id: ID!) {
+        markTeaserAsViewed(id: $id) {
+          id
         }
       }
     `,

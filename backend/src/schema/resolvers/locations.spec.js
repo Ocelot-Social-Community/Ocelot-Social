@@ -9,7 +9,9 @@ let mutate, authenticatedUser
 const driver = getDriver()
 const neode = getNeode()
 
-beforeAll(() => {
+beforeAll(async () => {
+  await cleanDatabase()
+
   const { server } = createServer({
     context: () => {
       return {
@@ -22,6 +24,11 @@ beforeAll(() => {
   mutate = createTestClient(server).mutate
 })
 
+afterAll(async () => {
+  await cleanDatabase()
+})
+
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -31,7 +38,7 @@ describe('resolvers', () => {
     describe('custom mutation, not handled by neo4j-graphql-js', () => {
       let variables
       const updateUserMutation = gql`
-        mutation($id: ID!, $name: String) {
+        mutation ($id: ID!, $name: String) {
           UpdateUser(id: $id, name: $name) {
             name
             location {

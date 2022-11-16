@@ -83,7 +83,7 @@ export default {
       this.$apollo
         .query({
           query: gql`
-            query($postId: ID!, $data: _EMOTEDInput!) {
+            query ($postId: ID!, $data: _EMOTEDInput!) {
               PostsEmotionsCountByEmotion(postId: $postId, data: $data)
             }
           `,

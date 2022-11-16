@@ -6,17 +6,15 @@ import { createTestClient } from 'apollo-server-testing'
 
 const neode = getNeode()
 
-let mutate
+let mutate, query
 let authenticatedUser
 let user
 let variables
 const driver = getDriver()
 
-beforeEach(async () => {
-  variables = {}
-})
+beforeAll(async () => {
+  await cleanDatabase()
 
-beforeAll(() => {
   const { server } = createServer({
     context: () => {
       return {
@@ -27,15 +25,25 @@ beforeAll(() => {
     },
   })
   mutate = createTestClient(server).mutate
+  query = createTestClient(server).query
 })
 
+afterAll(async () => {
+  await cleanDatabase()
+})
+
+beforeEach(async () => {
+  variables = {}
+})
+
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
 
 describe('AddEmailAddress', () => {
   const mutation = gql`
-    mutation($email: String!) {
+    mutation ($email: String!) {
       AddEmailAddress(email: $email) {
         email
         verifiedAt
@@ -55,7 +63,7 @@ describe('AddEmailAddress', () => {
     it('throws AuthorizationError', async () => {
       await expect(mutate({ mutation, variables })).resolves.toMatchObject({
         data: { AddEmailAddress: null },
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
       })
     })
   })
@@ -140,7 +148,7 @@ describe('AddEmailAddress', () => {
 
 describe('VerifyEmailAddress', () => {
   const mutation = gql`
-    mutation($email: String!, $nonce: String!) {
+    mutation ($email: String!, $nonce: String!) {
       VerifyEmailAddress(email: $email, nonce: $nonce) {
         email
         createdAt
@@ -150,7 +158,7 @@ describe('VerifyEmailAddress', () => {
   `
 
   beforeEach(() => {
-    variables = { ...variables, email: 'to-be-verified@example.org', nonce: '123456' }
+    variables = { ...variables, email: 'to-be-verified@example.org', nonce: '12345' }
   })
 
   describe('unauthenticated', () => {
@@ -161,7 +169,7 @@ describe('VerifyEmailAddress', () => {
     it('throws AuthorizationError', async () => {
       await expect(mutate({ mutation, variables })).resolves.toMatchObject({
         data: { VerifyEmailAddress: null },
-        errors: [{ message: 'Not Authorised!' }],
+        errors: [{ message: 'Not Authorized!' }],
       })
     })
   })
@@ -185,7 +193,7 @@ describe('VerifyEmailAddress', () => {
       let emailAddress
       beforeEach(async () => {
         emailAddress = await Factory.build('unverifiedEmailAddress', {
-          nonce: 'abcdef',
+          nonce: '12345',
           verifiedAt: null,
           createdAt: new Date().toISOString(),
           email: 'to-be-verified@example.org',
@@ -204,7 +212,7 @@ describe('VerifyEmailAddress', () => {
 
       describe('given valid nonce for `UnverifiedEmailAddress` node', () => {
         beforeEach(() => {
-          variables = { ...variables, nonce: 'abcdef' }
+          variables = { ...variables, nonce: '12345' }
         })
 
         describe('but the address does not belong to the authenticated user', () => {
@@ -292,6 +300,43 @@ describe('VerifyEmailAddress', () => {
           })
         })
       })
+    })
+  })
+})
+
+describe('VerifyNonce', () => {
+  beforeEach(async () => {
+    await Factory.build('emailAddress', {
+      nonce: '12345',
+      verifiedAt: null,
+      createdAt: new Date().toISOString(),
+      email: 'to-be-verified@example.org',
+    })
+  })
+
+  const verifyNonceQuery = gql`
+    query ($email: String!, $nonce: String!) {
+      VerifyNonce(email: $email, nonce: $nonce)
+    }
+  `
+
+  it('returns true when nonce and email match', async () => {
+    variables = {
+      email: 'to-be-verified@example.org',
+      nonce: '12345',
+    }
+    await expect(query({ query: verifyNonceQuery, variables })).resolves.toMatchObject({
+      data: { VerifyNonce: true },
+    })
+  })
+
+  it('returns false when nonce and email do not match', async () => {
+    variables = {
+      email: 'to-be-verified@example.org',
+      nonce: '---',
+    }
+    await expect(query({ query: verifyNonceQuery, variables })).resolves.toMatchObject({
+      data: { VerifyNonce: false },
     })
   })
 })

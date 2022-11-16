@@ -52,7 +52,6 @@
     "letsTalk": "Laten we praten",
     "loading": "inlading",
     "loadMore": "meer laden",
-    "moreInfo": "Meer info",
     "name": "Naam",
     "organization": "Organisatie ::: Organisaties",
     "post": "Bericht ::: Berichten",
@@ -69,7 +68,7 @@
     "edit": "Bijdrage bewerken",
     "teaserImage": {
       "cropperConfirm": "Bevestigen",
-      "supportedFormats": "Voeg een afbeelding in met het bestandsformaat JPG, PNG of GIF"
+      "supportedFormats": "Voeg een afbeelding in met het bestandsformaat JPG, PNG of GIF!"
     }
   },
   "disable": {
@@ -83,13 +82,22 @@
     "follow": "Volgen",
     "following": "Volgt"
   },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null
+    },
+    "membersCount": null,
+    "membersListTitle": null
+  },
   "login": {
-    "copy": "Als u al een mini-aansluiting account heeft, log dan hier in.",
     "email": "Uw E-mail",
     "hello": "Hallo",
     "login": "Inloggen",
     "logout": "Uitloggen",
-    "moreInfo": "Wat is Human Connection?",
+    "moreInfo": "Wat is {APPLICATION_NAME}?",
     "password": "Uw Wachtwoord"
   },
   "notifications": {
@@ -122,6 +130,9 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": null
+    },
     "follow": "Volgen",
     "followers": "Volgelingen",
     "following": "Volgt",
@@ -152,6 +163,11 @@
       "title": "Gebruiker melden",
       "type": "Gebruiker"
     }
+  },
+  "search": {
+    "failed": "Niets gevonden",
+    "hint": "Waar zoekt u naar? Gebruik !... voor berichten, @... voor gebruikers, #... voor hashtags.",
+    "placeholder": "Zoeken"
   },
   "settings": {
     "data": {
@@ -187,7 +203,7 @@
     "director": "Directeur",
     "germany": "Duitsland",
     "imprint": "Afdruk",
-    "made": "Met &#10084; gemaakt",
+    "made": "Met ❤️ gemaakt",
     "register": "inschrijfnummer",
     "responsible": "Verantwoordelijk volgens § 55 Abs. 2 RStV (Duitsland).",
     "taxident": "Identificatienummer voor de belasting over de toegevoegde waarde overeenkomstig § 27 a Wet op de belasting over de toegevoegde waarde (Duitsland).",

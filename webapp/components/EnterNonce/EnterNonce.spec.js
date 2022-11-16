@@ -37,12 +37,12 @@ describe('EnterNonce ', () => {
     describe('after nonce entered', () => {
       beforeEach(() => {
         wrapper = Wrapper()
-        wrapper.find('input#nonce').setValue('123456')
+        wrapper.find('input#nonce').setValue('12345')
         wrapper.find('form').trigger('submit')
       })
 
       it('emits `nonceEntered`', () => {
-        const expected = [[{ nonce: '123456', email: 'mail@example.org' }]]
+        const expected = [[{ nonce: '12345', email: 'mail@example.org' }]]
         expect(wrapper.emitted('nonceEntered')).toEqual(expected)
       })
     })

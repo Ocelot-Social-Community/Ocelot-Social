@@ -15,8 +15,19 @@ describe('CategoriesFilter.vue', () => {
     'posts/filteredCategoryIds': jest.fn(() => []),
   }
 
+  const apolloMutationMock = jest.fn().mockResolvedValue({
+    data: { saveCategorySettings: true },
+  })
+
   const mocks = {
     $t: jest.fn((string) => string),
+    $apollo: {
+      mutate: apolloMutationMock,
+    },
+    $toast: {
+      success: jest.fn(),
+      error: jest.fn(),
+    },
   }
 
   const Wrapper = () => {
@@ -48,20 +59,22 @@ describe('CategoriesFilter.vue', () => {
 
   describe('mount', () => {
     it('starts with all categories button active', () => {
-      const allCategoriesButton = wrapper.find('.categories-filter .sidebar .base-button')
+      const allCategoriesButton = wrapper.find('.categories-filter .item-all-topics .base-button')
       expect(allCategoriesButton.attributes().class).toContain('--filled')
     })
 
     it('sets category button attribute `filled` when corresponding category is filtered', async () => {
       getters['posts/filteredCategoryIds'] = jest.fn(() => ['cat9'])
       wrapper = await Wrapper()
-      democracyAndPoliticsButton = wrapper.findAll('.categories-filter .item .base-button').at(2)
+      democracyAndPoliticsButton = wrapper.find('.categories-filter .item-save-topics .base-button')
       expect(democracyAndPoliticsButton.attributes().class).toContain('--filled')
     })
 
     describe('click on an "catetories-buttons" button', () => {
       it('calls TOGGLE_CATEGORY when clicked', () => {
-        environmentAndNatureButton = wrapper.findAll('.categories-filter .item .base-button').at(0)
+        environmentAndNatureButton = wrapper
+          .findAll('.categories-filter .item-category .base-button')
+          .at(0)
         environmentAndNatureButton.trigger('click')
         expect(mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat4')
       })
@@ -71,9 +84,18 @@ describe('CategoriesFilter.vue', () => {
       it('when all button is clicked', async () => {
         getters['posts/filteredCategoryIds'] = jest.fn(() => ['cat9'])
         wrapper = await Wrapper()
-        const allCategoriesButton = wrapper.find('.categories-filter .sidebar .base-button')
+        const allCategoriesButton = wrapper.find('.categories-filter .item-all-topics .base-button')
         allCategoriesButton.trigger('click')
         expect(mutations['posts/RESET_CATEGORIES']).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('save categories', () => {
+      it('calls the API', async () => {
+        wrapper = await Wrapper()
+        const saveButton = wrapper.find('.categories-filter .item-save-topics .base-button')
+        saveButton.trigger('click')
+        expect(apolloMutationMock).toBeCalled()
       })
     })
   })

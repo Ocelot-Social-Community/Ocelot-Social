@@ -1,16 +1,16 @@
 import { sentry } from 'graphql-middleware-sentry'
-import { sentryConfigs } from '../config'
+import CONFIG from '../config'
 
 let sentryMiddleware = (resolve, root, args, context, resolveInfo) =>
   resolve(root, args, context, resolveInfo)
 
-if (sentryConfigs.SENTRY_DSN_BACKEND) {
+if (CONFIG.SENTRY_DSN_BACKEND) {
   sentryMiddleware = sentry({
     forwardErrors: true,
     config: {
-      dsn: sentryConfigs.SENTRY_DSN_BACKEND,
-      release: sentryConfigs.COMMIT,
-      environment: process.env.NODE_ENV,
+      dsn: CONFIG.SENTRY_DSN_BACKEND,
+      release: CONFIG.COMMIT,
+      environment: CONFIG.NODE_ENV,
     },
     withScope: (scope, error, context) => {
       scope.setUser({
@@ -23,7 +23,7 @@ if (sentryConfigs.SENTRY_DSN_BACKEND) {
   })
 } else {
   // eslint-disable-next-line no-console
-  if (process.env.NODE_ENV !== 'test') console.log('Warning: Sentry middleware inactive.')
+  if (!CONFIG.TEST) console.log('Warning: Sentry middleware inactive.')
 }
 
 export default sentryMiddleware

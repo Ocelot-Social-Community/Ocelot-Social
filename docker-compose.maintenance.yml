@@ -1,3 +1,5 @@
+# Todo: !!! This file seems related to our old maintenance worker for MongoDB and has to be refactored in case of using it !!!
+
 version: "3.4"
 
 services:
@@ -18,7 +20,7 @@ services:
       - GRAPHQL_URI=http://localhost:4000
       - CLIENT_URI=http://localhost:3000
       - JWT_SECRET=b/&&7b78BF&fv/Vd
-      - MAPBOX_TOKEN=pk.eyJ1IjoiaHVtYW4tY29ubmVjdGlvbiIsImEiOiJjajl0cnBubGoweTVlM3VwZ2lzNTNud3ZtIn0.KZ8KK9l70omjXbEkkbHGsQ
+      - MAPBOX_TOKEN=pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g
       - PRIVATE_KEY_PASSPHRASE=a7dsf78sadg87ad87sfagsadg78
       - NEO4J_apoc_import_file_enabled=true
       - "SSH_USERNAME=${SSH_USERNAME}"

@@ -29,7 +29,7 @@
               </ds-list-item>
             </ds-list>
             {{ $t('settings.email.verification-error.support') }}
-            <a href="mailto:support@human-connection.org">support@human-connection.org</a>
+            <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
           </ds-text>
         </client-only>
       </ds-space>
@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import emails from '~/constants/emails.js'
 import { VerifyEmailAddressMutation } from '~/graphql/EmailAddress.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 
@@ -55,6 +56,11 @@ export default {
       setTimeout(() => {
         this.$router.replace({ name: 'settings-my-email-address' })
       }, 3000)
+    }
+  },
+  data() {
+    return {
+      supportEmail: emails.SUPPORT_EMAIL,
     }
   },
   async asyncData(context) {

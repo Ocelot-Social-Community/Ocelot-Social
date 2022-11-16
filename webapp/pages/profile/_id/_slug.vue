@@ -5,12 +5,12 @@
       <ds-flex-item :width="{ base: '100%', sm: 2, md: 2, lg: 1 }">
         <base-card
           :class="{ 'disabled-content': user.disabled }"
-          style="position: relative; height: auto; overflow: visible;"
+          style="position: relative; height: auto; overflow: visible"
         >
-          <hc-upload v-if="myProfile" :user="user">
-            <user-avatar :user="user" class="profile-avatar" size="large"></user-avatar>
-          </hc-upload>
-          <user-avatar v-else :user="user" class="profile-avatar" size="large" />
+          <avatar-uploader v-if="myProfile" :profile="user" :updateMutation="updateUserMutation">
+            <profile-avatar :profile="user" class="profile-page-avatar" size="large" />
+          </avatar-uploader>
+          <profile-avatar v-else :profile="user" class="profile-page-avatar" size="large" />
           <!-- Menu -->
           <client-only>
             <content-menu
@@ -31,7 +31,8 @@
               {{ userName }}
             </ds-heading>
             <ds-text align="center" color="soft">
-              {{ userSlug }}
+              <!-- <base-icon name="at" data-test="at" /> -->
+              {{ `@${userSlug}` }}
             </ds-text>
             <ds-text v-if="user.location" align="center" color="soft" size="small">
               <base-icon name="map-marker" />
@@ -87,7 +88,7 @@
           </template>
         </base-card>
         <ds-space />
-        <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px;">
+        <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
           {{ $t('profile.network.title') }}
         </ds-heading>
         <follow-list
@@ -103,71 +104,15 @@
           type="following"
           @fetchAllConnections="fetchAllConnections"
         />
-        <ds-space v-if="user.socialMedia && user.socialMedia.length" margin="large">
-          <base-card style="position: relative; height: auto;">
-            <ds-space margin="x-small">
-              <ds-text tag="h5" color="soft">
-                {{ $t('profile.socialMedia') }} {{ userName | truncate(15) }}?
-              </ds-text>
-              <template>
-                <ds-space v-for="link in socialMediaLinks" :key="link.username" margin="x-small">
-                  <a :href="link.url" target="_blank">
-                    <user-avatar :image="link.favicon" />
-                    {{ link.username }}
-                  </a>
-                </ds-space>
-              </template>
-            </ds-space>
-          </base-card>
-        </ds-space>
+        <social-media :user-name="userName" :user="user" />
       </ds-flex-item>
 
       <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
         <masonry-grid>
-          <ds-grid-item class="profile-top-navigation" :row-span="3" column-span="fullWidth">
-            <base-card class="ds-tab-nav">
-              <ul class="Tabs">
-                <li class="Tabs__tab pointer" :class="{ active: tabActive === 'post' }">
-                  <a @click="handleTab('post')">
-                    <ds-space margin="small">
-                      <client-only placeholder="Loading...">
-                        <ds-number :label="$t('common.post', null, user.contributionsCount)">
-                          <hc-count-to slot="count" :end-val="user.contributionsCount" />
-                        </ds-number>
-                      </client-only>
-                    </ds-space>
-                  </a>
-                </li>
-                <li class="Tabs__tab pointer" :class="{ active: tabActive === 'comment' }">
-                  <a @click="handleTab('comment')">
-                    <ds-space margin="small">
-                      <client-only placeholder="Loading...">
-                        <ds-number :label="$t('profile.commented')">
-                          <hc-count-to slot="count" :end-val="user.commentedCount" />
-                        </ds-number>
-                      </client-only>
-                    </ds-space>
-                  </a>
-                </li>
-                <li
-                  class="Tabs__tab pointer"
-                  :class="{ active: tabActive === 'shout' }"
-                  v-if="myProfile || user.showShoutsPublicly"
-                >
-                  <a @click="handleTab('shout')">
-                    <ds-space margin="small">
-                      <client-only placeholder="Loading...">
-                        <ds-number :label="$t('profile.shouted')">
-                          <hc-count-to slot="count" :end-val="user.shoutedCount" />
-                        </ds-number>
-                      </client-only>
-                    </ds-space>
-                  </a>
-                </li>
-              </ul>
-            </base-card>
-          </ds-grid-item>
+          <!-- TapNavigation -->
+          <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" />
 
+          <!-- feed -->
           <ds-grid-item :row-span="2" column-span="fullWidth">
             <ds-space centered>
               <nuxt-link :to="{ name: 'post-create' }">
@@ -176,7 +121,6 @@
                   v-tooltip="{
                     content: $t('contribution.newPost'),
                     placement: 'left',
-                    delay: { show: 500 },
                   }"
                   :path="{ name: 'post-create' }"
                   class="profile-post-add-button"
@@ -197,9 +141,9 @@
               <post-teaser
                 :post="post"
                 :width="{ base: '100%', md: '100%', xl: '50%' }"
-                @removePostFromList="removePostFromList"
-                @pinPost="pinPost"
-                @unpinPost="unpinPost"
+                @removePostFromList="posts = removePostFromList(post, posts)"
+                @pinPost="pinPost(post, refetchPostList)"
+                @unpinPost="unpinPost(post, refetchPostList)"
               />
             </masonry-grid-item>
           </template>
@@ -226,23 +170,26 @@
 
 <script>
 import uniqBy from 'lodash/uniqBy'
+import postListActions from '~/mixins/postListActions'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
-import HcFollowButton from '~/components/FollowButton.vue'
+import HcFollowButton from '~/components/Button/FollowButton'
 import HcCountTo from '~/components/CountTo.vue'
 import HcBadges from '~/components/Badges.vue'
-import FollowList from '~/components/features/FollowList/FollowList'
+import FollowList, { followListVisibleCount } from '~/components/features/ProfileList/FollowList'
 import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import HcUpload from '~/components/Upload'
-import UserAvatar from '~/components/_new/generic/UserAvatar/UserAvatar'
+import AvatarUploader from '~/components/Uploader/AvatarUploader'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
+import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import UserQuery from '~/graphql/User'
+import { updateUserMutation } from '~/graphql/User.js'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
-import PostMutations from '~/graphql/PostMutations'
 import UpdateQuery from '~/components/utils/UpdateQuery'
+import SocialMedia from '~/components/SocialMedia/SocialMedia'
 
 const tabToFilterMapping = ({ tab, id }) => {
   return {
@@ -254,21 +201,29 @@ const tabToFilterMapping = ({ tab, id }) => {
 
 export default {
   components: {
+    SocialMedia,
     PostTeaser,
     HcFollowButton,
     HcCountTo,
     HcBadges,
     HcEmpty,
-    UserAvatar,
+    ProfileAvatar,
     ContentMenu,
-    HcUpload,
+    AvatarUploader,
     MasonryGrid,
     MasonryGridItem,
     FollowList,
+    TabNavigation,
   },
+  mixins: [postListActions],
   transition: {
     name: 'slide-up',
     mode: 'out-in',
+  },
+  head() {
+    return {
+      title: this.userName,
+    }
   },
   data() {
     const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
@@ -281,8 +236,9 @@ export default {
       tabActive: 'post',
       filter,
       followedByCountStartValue: 0,
-      followedByCount: 7,
-      followingCount: 7,
+      followedByCount: followListVisibleCount,
+      followingCount: followListVisibleCount,
+      updateUserMutation,
     }
   },
   computed: {
@@ -292,36 +248,44 @@ export default {
     user() {
       return this.User ? this.User[0] : {}
     },
-    socialMediaLinks() {
-      const { socialMedia = [] } = this.user
-      return socialMedia.map((socialMedia) => {
-        const { url } = socialMedia
-        const matches = url.match(/^(?:https?:\/\/)?(?:[^@\n])?(?:www\.)?([^:/\n?]+)/g)
-        const [domain] = matches || []
-        const favicon = domain ? `${domain}/favicon.ico` : null
-        const username = url.split('/').pop()
-        return { url, username, favicon }
-      })
-    },
     userName() {
       const { name } = this.user || {}
       return name || this.$t('profile.userAnonym')
     },
     userSlug() {
       const { slug } = this.user || {}
-      return slug && `@${slug}`
+      return slug
+    },
+    tabOptions() {
+      return [
+        {
+          type: 'post',
+          title: this.$t('common.post', null, this.user.contributionsCount),
+          count: this.user.contributionsCount,
+          disabled: this.user.contributionsCount === 0,
+        },
+        {
+          type: 'comment',
+          title: this.$t('profile.commented'),
+          count: this.user.commentedCount,
+          disabled: this.user.commentedCount === 0,
+        },
+        {
+          type: 'shout',
+          title: this.$t('profile.shouted'),
+          count: this.user.shoutedCount,
+          disabled: this.user.shoutedCount === 0,
+        },
+      ]
     },
   },
   methods: {
-    removePostFromList(deletedPost) {
-      this.posts = this.posts.filter((post) => {
-        return post.id !== deletedPost.id
-      })
-    },
     handleTab(tab) {
-      this.tabActive = tab
-      this.filter = tabToFilterMapping({ tab, id: this.$route.params.id })
-      this.resetPostList()
+      if (this.tabActive !== tab) {
+        this.tabActive = tab
+        this.filter = tabToFilterMapping({ tab, id: this.$route.params.id })
+        this.resetPostList()
+      }
     },
     uniq(items, field = 'id') {
       return uniqBy(items, field)
@@ -345,6 +309,10 @@ export default {
       this.offset = 0
       this.posts = []
       this.hasMore = true
+    },
+    refetchPostList() {
+      this.resetPostList()
+      this.$apollo.queries.profilePagePosts.refetch()
     },
     async muteUser(user) {
       try {
@@ -393,32 +361,6 @@ export default {
           userdata: userdata,
         },
       })
-    },
-    pinPost(post) {
-      this.$apollo
-        .mutate({
-          mutation: PostMutations().pinPost,
-          variables: { id: post.id },
-        })
-        .then(() => {
-          this.$toast.success(this.$t('post.menu.pinnedSuccessfully'))
-          this.resetPostList()
-          this.$apollo.queries.profilePagePosts.refetch()
-        })
-        .catch((error) => this.$toast.error(error.message))
-    },
-    unpinPost(post) {
-      this.$apollo
-        .mutate({
-          mutation: PostMutations().unpinPost,
-          variables: { id: post.id },
-        })
-        .then(() => {
-          this.$toast.success(this.$t('post.menu.unpinnedSuccessfully'))
-          this.resetPostList()
-          this.$apollo.queries.profilePagePosts.refetch()
-        })
-        .catch((error) => this.$toast.error(error.message))
     },
     optimisticFollow({ followedByCurrentUser }) {
       /*
@@ -482,34 +424,7 @@ export default {
 </script>
 
 <style lang="scss">
-.pointer {
-  cursor: pointer;
-}
-
-.Tabs {
-  position: relative;
-  background-color: #fff;
-  height: 100%;
-  display: flex;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-
-  &__tab {
-    text-align: center;
-    height: 100%;
-    flex-grow: 1;
-
-    &:hover {
-      border-bottom: 2px solid #c9c6ce;
-    }
-
-    &.active {
-      border-bottom: 2px solid #17b53f;
-    }
-  }
-}
-.profile-avatar.user-avatar {
+.profile-page-avatar.profile-avatar {
   margin: auto;
   margin-top: -60px;
 }
@@ -518,26 +433,6 @@ export default {
     position: absolute;
     top: $space-x-small;
     right: $space-x-small;
-  }
-}
-.profile-top-navigation {
-  position: sticky;
-  top: 53px;
-  z-index: 2;
-}
-.ds-tab-nav.base-card {
-  padding: 0;
-
-  .ds-tab-nav-item {
-    &.ds-tab-nav-item-active {
-      border-bottom: 3px solid #17b53f;
-      &:first-child {
-        border-bottom-left-radius: $border-radius-x-large;
-      }
-      &:last-child {
-        border-bottom-right-radius: $border-radius-x-large;
-      }
-    }
   }
 }
 .profile-post-add-button {

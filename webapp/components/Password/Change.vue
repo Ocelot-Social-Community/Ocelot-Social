@@ -65,7 +65,7 @@ export default {
     async handleSubmit(data) {
       this.loading = true
       const mutation = gql`
-        mutation($oldPassword: String!, $password: String!) {
+        mutation ($oldPassword: String!, $password: String!) {
           changePassword(oldPassword: $oldPassword, newPassword: $password)
         }
       `

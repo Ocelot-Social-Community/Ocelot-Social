@@ -39,6 +39,11 @@ export default (i18n) => {
             ...locationAndBadges
           }
         }
+        group {
+          id
+          name
+          slug
+        }
       }
     }
   `
@@ -63,6 +68,11 @@ export const filterPosts = (i18n) => {
           ...user
           ...userCounts
           ...locationAndBadges
+        }
+        group {
+          id
+          name
+          slug
         }
       }
     }
@@ -93,6 +103,11 @@ export const profilePagePosts = (i18n) => {
           ...user
           ...userCounts
           ...locationAndBadges
+        }
+        group {
+          id
+          name
+          slug
         }
       }
     }

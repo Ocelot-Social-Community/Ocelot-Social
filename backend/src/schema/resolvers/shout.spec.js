@@ -9,17 +9,17 @@ const instance = getNeode()
 const driver = getDriver()
 
 const mutationShoutPost = gql`
-  mutation($id: ID!) {
+  mutation ($id: ID!) {
     shout(id: $id, type: Post)
   }
 `
 const mutationUnshoutPost = gql`
-  mutation($id: ID!) {
+  mutation ($id: ID!) {
     unshout(id: $id, type: Post)
   }
 `
 const queryPost = gql`
-  query($id: ID!) {
+  query ($id: ID!) {
     Post(id: $id) {
       id
       shoutedBy {
@@ -31,7 +31,10 @@ const queryPost = gql`
 
 describe('shout and unshout posts', () => {
   let currentUser, postAuthor
-  beforeAll(() => {
+
+  beforeAll(async () => {
+    await cleanDatabase()
+
     authenticatedUser = undefined
     const { server } = createServer({
       context: () => {
@@ -45,6 +48,11 @@ describe('shout and unshout posts', () => {
     mutate = createTestClient(server).mutate
     query = createTestClient(server).query
   })
+
+  afterAll(async () => {
+    await cleanDatabase()
+  })
+
   beforeEach(async () => {
     currentUser = await Factory.build(
       'user',
@@ -70,6 +78,8 @@ describe('shout and unshout posts', () => {
       },
     )
   })
+
+  // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
   afterEach(async () => {
     await cleanDatabase()
   })
@@ -80,7 +90,7 @@ describe('shout and unshout posts', () => {
         variables = { id: 'post-to-shout-id' }
         authenticatedUser = undefined
         await expect(mutate({ mutation: mutationShoutPost, variables })).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
@@ -155,7 +165,7 @@ describe('shout and unshout posts', () => {
         authenticatedUser = undefined
         variables = { id: 'post-to-shout-id' }
         await expect(mutate({ mutation: mutationUnshoutPost, variables })).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })

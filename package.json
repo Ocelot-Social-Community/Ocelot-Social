@@ -1,59 +1,54 @@
 {
-  "name": "human-connection",
-  "version": "0.6.3",
-  "description": "Fullstack and API tests with cypress and cucumber for Human Connection",
-  "author": "Human Connection gGmbh",
+  "name": "ocelot-social",
+  "version": "2.2.0",
+  "description": "Free and open source software program code available to run social networks.",
+  "author": "ocelot.social Community",
   "license": "MIT",
+  "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/Human-Connection/Human-Connection.git"
+    "url": "https://github.com/Ocelot-Social-Community/Ocelot-Social.git"
   },
   "cypress-cucumber-preprocessor": {
     "nonGlobalStepDefinitions": true
   },
   "scripts": {
-    "install:all": "yarn install && cd backend && yarn install && cd ../webapp && yarn install",
     "db:seed": "cd backend && yarn run db:seed",
     "db:reset": "cd backend && yarn run db:reset",
-    "cypress:backend": "cd backend && yarn run dev",
-    "cypress:webapp": "cd webapp && yarn run dev",
-    "cypress:setup": "run-p cypress:backend cypress:webapp",
-    "cypress:run": "cross-env cypress run --browser firefox",
-    "cypress:open": "cross-env cypress open --browser firefox",
+    "cypress:run": "cypress run --browser electron --config-file ./cypress/cypress.json",
+    "cypress:open": "cypress open --browser electron --config-file ./cypress/cypress.json",
     "cucumber:setup": "cd backend && yarn run dev",
     "cucumber": "wait-on tcp:4000 && cucumber-js --require-module @babel/register --exit",
-    "release": "standard-version",
-    "generate:changelog": "yarn version && auto-changelog"
+    "release": "yarn version --no-git-tag-version --no-commit-hooks --no-commit && auto-changelog --latest-version $(node -p -e \"require('./package.json').version\") && cd backend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp/maintenance/source && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../../../package.json').version\")"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
-    "@babel/preset-env": "^7.9.0",
-    "@babel/register": "^7.9.0",
-    "auto-changelog": "^1.16.4",
+    "@babel/preset-env": "^7.12.7",
+    "@babel/register": "^7.12.10",
+    "@faker-js/faker": "5.1.0",
+    "auto-changelog": "^2.3.0",
     "bcryptjs": "^2.4.3",
-    "codecov": "^3.6.5",
-    "cross-env": "^7.0.2",
+    "codecov": "^3.8.2",
+    "cross-env": "^7.0.3",
     "cucumber": "^6.0.5",
-    "cypress": "^4.2.0",
+    "cypress": "^7.0.1",
     "cypress-cucumber-preprocessor": "^2.2.1",
     "cypress-file-upload": "^3.5.3",
-    "cypress-plugin-retries": "^1.5.2",
-    "date-fns": "^2.12.0",
+    "date-fns": "^2.25.0",
     "dotenv": "^8.2.0",
     "expect": "^25.3.0",
-    "faker": "Marak/faker.js#master",
-    "graphql-request": "^1.8.2",
+    "graphql-request": "^2.0.0",
     "import": "^0.0.6",
     "jsonwebtoken": "^8.5.1",
     "mock-socket": "^9.0.3",
-    "neo4j-driver": "^4.0.2",
-    "neode": "^0.3.7",
+    "neo4j-driver": "^4.3.4",
+    "neode": "^0.4.8",
     "npm-run-all": "^4.1.5",
-    "rosie": "^2.0.1",
-    "slug": "^2.1.1",
-    "standard-version": "^7.1.0"
+    "rosie": "^2.1.0",
+    "slug": "^6.0.0"
   },
   "resolutions": {
     "set-value": "^2.0.1"
-  }
+  },
+  "dependencies": {}
 }

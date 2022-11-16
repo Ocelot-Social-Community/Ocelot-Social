@@ -10,7 +10,7 @@ export default {
     isActive: Boolean,
     icon: String,
     label: String,
-    onClick: Function,
+    onClick: { type: Function, default: () => {} },
   },
 }
 </script>

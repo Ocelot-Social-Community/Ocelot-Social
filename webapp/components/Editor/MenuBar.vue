@@ -59,6 +59,8 @@
         :onClick="commands.horizontal_rule"
         icon="minus"
       />
+
+      <menu-legend class="legend-button" />
     </div>
   </editor-menu-bar>
 </template>
@@ -66,11 +68,13 @@
 <script>
 import { EditorMenuBar } from 'tiptap'
 import MenuBarButton from './MenuBarButton'
+import MenuLegend from './MenuLegend.vue'
 
 export default {
   components: {
     EditorMenuBar,
     MenuBarButton,
+    MenuLegend,
   },
   props: {
     editor: Object,
@@ -78,3 +82,10 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.legend-button {
+  display: inline;
+  position: relative;
+}
+</style>

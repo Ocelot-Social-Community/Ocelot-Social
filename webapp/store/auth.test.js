@@ -1,5 +1,13 @@
 import { getters, actions } from './auth.js'
 
+jest.mock('universal-cookie', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      get: (arg) => 'my-cookie-name',
+    }
+  })
+})
+
 let state
 let commit
 let dispatch

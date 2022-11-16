@@ -191,10 +191,10 @@ $font-weight-bold: 600;
  * @presenter LineHeight
  */
 
-$line-height-large: 1.5;
-$line-height-base: 1.3;
-$line-height-small: 1.1;
-$line-height-smaller: 1.0;
+$line-height-large: 1.5rem;
+$line-height-base: 1.3rem;
+$line-height-small: 1.1rem;
+$line-height-smaller: 1.0rem;
 
 /**
  * @tokens Letter Spacing
@@ -251,7 +251,7 @@ $size-ribbon: 6px;
  */
 
 $size-width-filter-sidebar: 85px;
-$size-width-paginate: 100px;
+$size-width-paginate: 200px;
 $size-max-width-filter-menu: 1026px;
 
 /**
@@ -268,6 +268,7 @@ $size-avatar-large: 114px;
  * @presenter Spacing
  */
 
+ $size-button-large: 50px;
  $size-button-base: 36px;
  $size-button-small: 26px;
 
@@ -352,3 +353,26 @@ $media-query-small: (min-width: 600px);
 $media-query-medium: (min-width: 768px);
 $media-query-large: (min-width: 1024px);
 $media-query-x-large: (min-width: 1200px);
+
+/** 
+ * @tokens Background Images
+ */
+
+/** 
+ * @tokens Header Color
+ */
+
+$color-header-background: $color-neutral-100;
+
+/** 
+ * @tokens Footer Color
+ */
+
+$color-footer-background: $color-neutral-100;
+$color-footer-link: $color-primary;
+
+/** 
+ * @tokens Locale Menu Color
+ */
+
+$color-locale-menu: $text-color-soft;

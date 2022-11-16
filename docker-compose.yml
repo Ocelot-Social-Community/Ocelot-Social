@@ -1,71 +1,122 @@
+# This file defines the production settings. It is overwritten by docker-compose.override.yml,
+# which defines the development settings. The override.yml is loaded by default. Therefore it
+# is required to explicitly define if you want an production build:
+# > docker-compose -f docker-compose.yml up 
+
 version: "3.4"
 
 services:
+
+  ########################################################
+  # WEBAPP ###############################################
+  ########################################################
   webapp:
-    image: ocelotsocialnetwork/develop-webapp:latest
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/webapp:local-production
     build:
-      context: webapp
+      context: ./webapp
       target: production
-      args:
-        - "BUILD_COMMIT=${TRAVIS_COMMIT}"
-    ports:
-      - 3000:3000
-      - 3002:3002
     networks:
-      - hc-network
+      - external-net
     depends_on:
       - backend
-    volumes:
-      - webapp_node_modules:/develop-webapp/node_modules
+    ports:
+      - 3000:3000
+      # Storybook: Todo externalize, its not working anyways
+      # - 3002:3002
     environment:
-      - HOST=0.0.0.0
+      # Envs used in Dockerfile
+      # - DOCKER_WORKDIR="/app"
+      # - PORT="3000"
+      - BUILD_DATE
+      - BUILD_VERSION
+      - BUILD_COMMIT
+      - NODE_ENV="production"
+      # Application only envs
+      - HOST=0.0.0.0 # This is nuxt specific, alternative value is HOST=webapp
       - GRAPHQL_URI=http://backend:4000
-      - MAPBOX_TOKEN="pk.eyJ1IjoiaHVtYW4tY29ubmVjdGlvbiIsImEiOiJjajl0cnBubGoweTVlM3VwZ2lzNTNud3ZtIn0.bZ8KK9l70omjXbEkkbHGsQ"
+    env_file:
+      - ./webapp/.env
+
+  ########################################################
+  # BACKEND ##############################################
+  ########################################################
   backend:
-    image: ocelotsocialnetwork/develop-backend:latest
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/backend:local-production
     build:
-      context: backend
+      context: ./backend
       target: production
-      args:
-        - "BUILD_COMMIT=${TRAVIS_COMMIT}"
     networks:
-      - hc-network
+      - external-net
+      - internal-net
     depends_on:
       - neo4j
     ports:
       - 4000:4000
     volumes:
-      - backend_node_modules:/develop-backend/node_modules
-      - uploads:/develop-backend/public/uploads
+      - backend_uploads:/app/public/uploads
     environment:
+      # Envs used in Dockerfile
+      # - DOCKER_WORKDIR="/app"
+      # - PORT="4000"
+      - BUILD_DATE
+      - BUILD_VERSION
+      - BUILD_COMMIT
+      - NODE_ENV="production"
+      # Application only envs
+      - DEBUG=false
       - NEO4J_URI=bolt://neo4j:7687
       - GRAPHQL_URI=http://backend:4000
-      - CLIENT_URI=http://localhost:3000
-      - JWT_SECRET=b/&&7b78BF&fv/Vd
-      - MAPBOX_TOKEN=pk.eyJ1IjoiaHVtYW4tY29ubmVjdGlvbiIsImEiOiJjajl0cnBubGoweTVlM3VwZ2lzNTNud3ZtIn0.KZ8KK9l70omjXbEkkbHGsQ
-      - PRIVATE_KEY_PASSPHRASE=a7dsf78sadg87ad87sfagsadg78
-      - "DEBUG=${DEBUG}"
-  neo4j:
-    image: ocelotsocialnetwork/develop-neo4j:latest
+      - CLIENT_URI=http://webapp:3000
+    env_file:
+      - ./backend/.env
+
+  ########################################################
+  # MAINTENANCE ##########################################
+  ########################################################
+  maintenance:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/maintenance:local-production
     build:
-      context: neo4j
-      args:
-        - "BUILD_COMMIT=${TRAVIS_COMMIT}"
+      # TODO: Separate from webapp, this must be independent
+      context: ./webapp
+      dockerfile: Dockerfile.maintenance
     networks:
-      - hc-network
-    environment:
-      - NEO4J_AUTH=none
-      - NEO4J_dbms_security_procedures_unrestricted=algo.*,apoc.*
-      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - external-net
+    ports:
+      - 3001:80
+
+  ########################################################
+  # NEO4J ################################################
+  ########################################################
+  neo4j:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/neo4j-community:local-production
+    build:
+      context: ./neo4j
+      # community edition 👆🏼, because we have no enterprise licence 👇🏼 at the moment
+      target: community
+    networks:
+      - internal-net
     ports:
       - 7687:7687
-      - 7474:7474
     volumes:
       - neo4j_data:/data
+    environment:
+      # TODO: This sounds scary for a production environment
+      - NEO4J_AUTH=none
+      - NEO4J_dbms_security_procedures_unrestricted=algo.*,apoc.*
+      # Uncomment following line for Neo4j Enterprise version instead of Community version
+      # TODO: clarify if that is the only thing needed to unlock the Enterprise version
+      # - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      # TODO: Remove the playground from production
+
 networks:
-  hc-network:
+  external-net:
+  internal-net:
+    internal: true
+
 volumes:
-  webapp_node_modules:
-  backend_node_modules:
+  backend_uploads:
   neo4j_data:
-  uploads:

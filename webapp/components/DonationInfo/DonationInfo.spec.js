@@ -8,63 +8,61 @@ const mockDate = new Date(2019, 11, 6)
 global.Date = jest.fn(() => mockDate)
 
 describe('DonationInfo.vue', () => {
-  let mocks, wrapper
+  let mocks, wrapper, propsData
 
   beforeEach(() => {
     mocks = {
       $t: jest.fn((string) => string),
       $i18n: {
-        locale: () => 'de',
+        locale: () => 'en',
       },
+    }
+    propsData = {
+      goal: 50000,
+      progress: 10000,
     }
   })
 
-  const Wrapper = () => mount(DonationInfo, { mocks, localVue })
+  const Wrapper = () => mount(DonationInfo, { mocks, localVue, propsData })
 
-  it('includes a link to the Human Connection donations website', () => {
-    expect(Wrapper().find('a').attributes('href')).toBe('https://human-connection.org/spenden/')
-  })
-
-  it('displays a call to action button', () => {
-    expect(Wrapper().find('.base-button').text()).toBe('donations.donate-now')
-  })
-
-  it.skip('creates a title from the current month and a translation string', () => {
-    mocks.$t = jest.fn(() => 'Spenden für')
-    expect(Wrapper().vm.title).toBe('Spenden für Dezember')
-  })
-
-  describe('mount with data', () => {
+  describe('mount', () => {
     beforeEach(() => {
       wrapper = Wrapper()
-      wrapper.setData({ goal: 50000, progress: 10000 })
     })
 
-    describe('given german locale', () => {
-      it.skip('creates a label from the given amounts and a translation string', () => {
-        expect(mocks.$t).toBeCalledWith(
-          'donations.amount-of-total',
-          expect.objectContaining({
+    it('displays the progress bar', () => {
+      expect(wrapper.find('.progress-bar').exists()).toBe(true)
+    })
+
+    it('displays the action button', () => {
+      expect(wrapper.find('.base-button').text()).toBe('donations.donate-now')
+    })
+
+    describe('mount with data', () => {
+      describe('given german locale', () => {
+        beforeEach(() => {
+          mocks.$i18n.locale = () => 'de'
+        })
+
+        // it looks to me that toLocaleString for some reason is not working as expected
+        it.skip('creates a label from the given amounts and a translation string', () => {
+          expect(mocks.$t).nthCalledWith(1, 'donations.amount-of-total', {
             amount: '10.000',
             total: '50.000',
-          }),
-        )
-      })
-    })
-
-    describe('given english locale', () => {
-      beforeEach(() => {
-        mocks.$i18n.locale = () => 'en'
+          })
+        })
       })
 
-      it.skip('creates a label from the given amounts and a translation string', () => {
-        expect(mocks.$t).toBeCalledWith(
-          'donations.amount-of-total',
-          expect.objectContaining({
-            amount: '10,000',
-            total: '50,000',
-          }),
-        )
+      describe('given english locale', () => {
+        it('creates a label from the given amounts and a translation string', () => {
+          expect(mocks.$t).toBeCalledWith(
+            'donations.amount-of-total',
+            expect.objectContaining({
+              amount: '10,000',
+              total: '50,000',
+            }),
+          )
+        })
       })
     })
   })

@@ -25,6 +25,7 @@ import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { updateUserMutation } from '~/graphql/User.js'
 
 export default {
+  name: 'TermsAndConditionsConfirm',
   layout: 'default',
   head() {
     return {
@@ -39,16 +40,6 @@ export default {
   data() {
     return {
       checked: false,
-      sections: [
-        'risk',
-        'data-privacy',
-        'work-in-progress',
-        'code-of-conduct',
-        'moderation',
-        'fairness',
-        'questions',
-        'human-connection',
-      ],
     }
   },
   asyncData({ store, redirect }) {

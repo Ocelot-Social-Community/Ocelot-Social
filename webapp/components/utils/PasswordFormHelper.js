@@ -15,7 +15,7 @@ export default function PasswordForm({ translate }) {
       },
       passwordConfirmation: [
         {
-          validator(rule, value, callback, source, options) {
+          validator(_rule, value, callback, source, _options) {
             var errors = []
             if (source.password !== value) {
               errors.push(new Error(passwordMismatchMessage))

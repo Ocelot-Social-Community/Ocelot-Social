@@ -25,7 +25,7 @@ export default {
         interactive: true,
         placement,
         showOnInit,
-        theme: 'human-connection',
+        theme: 'ocelot-social',
         trigger,
         onMount(instance) {
           const input = instance.popper.querySelector('input')
@@ -65,7 +65,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tippy-tooltip.human-connection-theme {
+.tippy-tooltip.ocelot-social-theme {
   background-color: $color-primary;
   padding: 0;
   font-size: 1rem;

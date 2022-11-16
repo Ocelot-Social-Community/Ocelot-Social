@@ -1,5 +1,0 @@
-enum UserGroup {
-  admin
-  moderator
-  user
-}

@@ -1,0 +1,343 @@
+name: ocelot.social test CI
+
+
+on: [push]
+
+jobs:
+  ##############################################################################
+  # JOB: PREPARE #####################################################
+  ##############################################################################
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    # needs: [nothing]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # TODO: DO STUFF ??? #####################################################
+      ##########################################################################
+      - name: Check translation files
+        run: |
+          scripts/translations/sort.sh
+          scripts/translations/missing-keys.sh
+
+  ##############################################################################
+  # JOB: DOCKER BUILD TEST NEO4J ###############################################
+  ##############################################################################
+  build_test_neo4j:
+    name: Docker Build Test - Neo4J
+    runs-on: ubuntu-latest
+    needs: [prepare]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # NEO4J ##################################################################
+      ##########################################################################
+      - name: Neo4J | Build `community` image
+        run: |
+          docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
+          docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/neo4j.tar
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-neo4j-image
+          path: /tmp/neo4j.tar
+
+  ##############################################################################
+  # JOB: DOCKER BUILD TEST BACKEND #############################################
+  ##############################################################################
+  build_test_backend:
+    name: Docker Build Test - Backend
+    runs-on: ubuntu-latest
+    needs: [prepare]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # BUILD BACKEND DOCKER IMAGE (build) #####################################
+      ##########################################################################
+      - name: backend | Build `test` image
+        run: |
+          docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
+          docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-backend-test
+          path: /tmp/backend.tar
+
+  ##############################################################################
+  # JOB: DOCKER BUILD TEST WEBAPP ##############################################
+  ##############################################################################
+  build_test_webapp:
+    name: Docker Build Test - WebApp
+    runs-on: ubuntu-latest
+    needs: [prepare]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # BUILD WEBAPP DOCKER IMAGE (build) ######################################
+      ##########################################################################
+      - name: webapp | Build `test` image
+        run: |
+          docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
+          docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-webapp-test
+          path: /tmp/webapp.tar
+
+  ##############################################################################
+  # JOB: LINT BACKEND ##########################################################
+  ##############################################################################
+  lint_backend:
+    name: Lint backend
+    runs-on: ubuntu-latest
+    needs: [build_test_backend]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # DOWNLOAD DOCKER IMAGE ##################################################
+      ##########################################################################
+      - name: Download Docker Image (Backend)
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-backend-test
+          path: /tmp
+      - name: Load Docker Image
+        run: docker load < /tmp/backend.tar
+      ##########################################################################
+      # LINT BACKEND ###########################################################
+      ##########################################################################
+      - name: backend | Lint
+        run: docker run --rm ocelotsocialnetwork/backend:test yarn run lint
+
+  ##############################################################################
+  # JOB: LINT WEBAPP ###########################################################
+  ##############################################################################
+  lint_webapp:
+    name: Lint webapp
+    runs-on: ubuntu-latest
+    needs: [build_test_webapp]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # DOWNLOAD DOCKER IMAGE ##################################################
+      ##########################################################################
+      - name: Download Docker Image (Webapp)
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-webapp-test
+          path: /tmp
+      - name: Load Docker Image
+        run: docker load < /tmp/webapp.tar
+      ##########################################################################
+      # LINT WEBAPP ############################################################
+      ##########################################################################
+      - name: webapp | Lint
+        run: docker run --rm ocelotsocialnetwork/webapp:test yarn run lint
+
+  ##############################################################################
+  # JOB: UNIT TEST BACKEND #####################################################
+  ##############################################################################
+  unit_test_backend:
+    name: Unit tests - backend
+    runs-on: ubuntu-latest
+    needs: [build_test_neo4j,build_test_backend]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # DOWNLOAD DOCKER IMAGES #################################################
+      ##########################################################################
+      - name: Download Docker Image (Neo4J)
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-neo4j-image
+          path: /tmp
+      - name: Load Docker Image
+        run: docker load < /tmp/neo4j.tar
+      - name: Download Docker Image (Backend)
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-backend-test
+          path: /tmp
+      - name: Load Docker Image
+        run: docker load < /tmp/backend.tar
+      ##########################################################################
+      # UNIT TESTS BACKEND #####################################################
+      ##########################################################################
+      - name: backend | copy env files webapp
+        run: cp webapp/.env.template webapp/.env
+      - name: backend | copy env files backend
+        run: cp backend/.env.template backend/.env
+      - name: backend | docker-compose
+        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps neo4j backend
+      - name: backend | Initialize Database
+        run: docker-compose exec -T backend yarn db:migrate init
+      - name: backend | Migrate Database Up
+        run: docker-compose exec -T backend yarn db:migrate up
+      - name: backend | Unit test
+        run: docker-compose exec -T backend yarn test
+      ##########################################################################
+      # COVERAGE CHECK BACKEND #################################################
+      ##########################################################################
+      - name: backend | Coverage check
+        uses: webcraftmedia/coverage-check-action@master
+        with:
+          report_name: Coverage Backend
+          type: lcov
+          result_path: ./coverage/lcov.info
+          min_coverage: 57
+          token: ${{ github.token }}
+
+  ##############################################################################
+  # JOB: UNIT TEST WEBAPP ######################################################
+  ##############################################################################
+  unit_test_webapp:
+    name: Unit tests - webapp
+    runs-on: ubuntu-latest
+    needs: [build_test_webapp]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # DOWNLOAD DOCKER IMAGES #################################################
+      ##########################################################################
+      - name: Download Docker Image (Webapp)
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-webapp-test
+          path: /tmp
+      - name: Load Docker Image
+        run: docker load < /tmp/webapp.tar
+      ##########################################################################
+      # UNIT TESTS WEBAPP ######################################################
+      ##########################################################################
+      - name: backend | copy env files webapp
+        run: cp webapp/.env.template webapp/.env
+      - name: backend | copy env files backend
+        run: cp backend/.env.template backend/.env
+      - name: backend | docker-compose
+        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
+      - name: webapp | Unit tests
+        run: docker-compose exec -T webapp yarn test
+      ##########################################################################
+      # COVERAGE REPORT FRONTEND ################################################
+      ##########################################################################
+      #- name: frontend | Coverage report
+      #  uses: romeovs/lcov-reporter-action@v0.2.21
+      #  with:
+      #    github-token: ${{ secrets.GITHUB_TOKEN }}
+      #    lcov-file: ./coverage/lcov.info
+      ##########################################################################
+      # COVERAGE CHECK WEBAPP ##################################################
+      ##########################################################################
+      - name: webapp | Coverage check
+        uses: webcraftmedia/coverage-check-action@master
+        with:
+          report_name: Coverage Webapp
+          type: lcov
+          result_path: ./coverage/lcov.info
+          min_coverage: 63
+          token: ${{ github.token }}
+
+  ##############################################################################
+  # JOB: FULLSTACK TESTS #######################################################
+  ##############################################################################
+  fullstack_tests:
+    name: Fullstack tests
+    runs-on: ubuntu-latest
+    needs: [build_test_webapp, build_test_backend, build_test_neo4j]
+    env:
+      jobs: 8
+    strategy:
+      matrix:
+        # run copies of the current job in parallel
+        job: [1, 2, 3, 4, 5, 6, 7, 8]
+    steps:
+      ##########################################################################
+      # CHECKOUT CODE ##########################################################
+      ##########################################################################
+      - name: Checkout code
+        uses: actions/checkout@v2
+      ##########################################################################
+      # DOWNLOAD DOCKER IMAGES #################################################
+      ##########################################################################
+      - name: Download Docker Image (Neo4J)
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-neo4j-image
+          path: /tmp
+      - name: Load Docker Image
+        run: docker load < /tmp/neo4j.tar
+      - name: Download Docker Image (Backend)
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-backend-test
+          path: /tmp
+      - name: Load Docker Image
+        run: docker load < /tmp/backend.tar
+      - name: Download Docker Image (Webapp)
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-webapp-test
+          path: /tmp
+      - name: Load Docker Image
+        run: docker load < /tmp/webapp.tar
+      ##########################################################################
+      # FULLSTACK TESTS CYPRESS ################################################
+      ##########################################################################
+      - name: webapp | copy env files webapp
+        run: cp webapp/.env.template webapp/.env
+      - name: backend | copy env files backend
+        run: cp backend/.env.template backend/.env
+      - name: backend | docker-compose
+        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp neo4j backend
+      - name: cypress | Fullstack tests
+        run: |
+          yarn install
+          yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
+      ##########################################################################
+      # UPLOAD SCREENSHOTS & VIDEO #############################################
+      ##########################################################################
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots/
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cypress-videos
+          path: cypress/videos/

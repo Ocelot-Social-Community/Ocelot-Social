@@ -1,13 +1,15 @@
 <template>
   <filter-menu-section :divider="false" class="following-filter">
-    <template #sidebar>
-      <labeled-button
-        icon="user-plus"
-        :label="$t('filter-menu.following')"
-        :filled="filteredByUsersFollowed"
-        :title="$t('contribution.filterFollow')"
-        @click="toggleFilteredByFollowed(currentUser.id)"
-      />
+    <template #filter-follower>
+      <li class="item follower-item">
+        <labeled-button
+          icon="user-plus"
+          :label="$t('filter-menu.following')"
+          :filled="filteredByUsersFollowed"
+          :title="$t('contribution.filterFollow')"
+          @click="toggleFilteredByFollowed(currentUser.id)"
+        />
+      </li>
     </template>
   </filter-menu-section>
 </template>
@@ -18,6 +20,7 @@ import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
 
 export default {
+  name: 'FollowingFilter',
   components: {
     FilterMenuSection,
     LabeledButton,

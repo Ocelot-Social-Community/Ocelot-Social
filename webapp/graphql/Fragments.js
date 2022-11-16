@@ -12,6 +12,7 @@ export const userFragment = gql`
     deleted
   }
 `
+
 export const locationAndBadgesFragment = (lang) => gql`
   fragment locationAndBadges on User {
     location {
@@ -51,6 +52,7 @@ export const postFragment = gql`
       url
       sensitive
       aspectRatio
+      type
     }
     author {
       ...user
@@ -60,12 +62,38 @@ export const postFragment = gql`
   }
 `
 
+export const groupFragment = gql`
+  fragment group on Group {
+    id
+    groupName: name
+    slug
+    disabled
+    deleted
+    about
+    description
+    descriptionExcerpt
+    groupType
+    actionRadius
+    categories {
+      id
+      slug
+      name
+      icon
+    }
+    locationName
+    myRole
+  }
+`
+
 export const postCountsFragment = gql`
   fragment postCounts on Post {
     commentsCount
     shoutedCount
     shoutedByCurrentUser
     emotionsCount
+    clickedCount
+    viewedTeaserCount
+    viewedTeaserByCurrentUser
   }
 `
 

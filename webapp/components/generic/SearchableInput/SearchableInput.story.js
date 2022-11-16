@@ -14,6 +14,8 @@ export const searchResults = [
     value: 'User Post by Jenny',
     shoutedCount: 0,
     commentsCount: 4,
+    clickedCount: 8,
+    viewedTeaserCount: 15,
     createdAt: '2019-11-13T03:03:16.155Z',
     author: {
       id: 'u3',
@@ -29,6 +31,8 @@ export const searchResults = [
     value: 'Eum quos est molestiae enim magni consequuntur sed commodi eos.',
     shoutedCount: 0,
     commentsCount: 0,
+    clickedCount: 9,
+    viewedTeaserCount: 2,
     createdAt: '2019-11-13T03:00:45.478Z',
     author: {
       id: 'u6',
@@ -44,6 +48,8 @@ export const searchResults = [
     value: 'This is post #7',
     shoutedCount: 1,
     commentsCount: 1,
+    clickedCount: 1,
+    viewedTeaserCount: 4,
     createdAt: '2019-11-13T03:00:23.098Z',
     author: {
       id: 'u6',
@@ -59,6 +65,8 @@ export const searchResults = [
     value: 'This is post #12',
     shoutedCount: 0,
     commentsCount: 12,
+    clickedCount: 14,
+    viewedTeaserCount: 58,
     createdAt: '2019-11-13T03:00:23.098Z',
     author: {
       id: 'u6',
@@ -70,8 +78,7 @@ export const searchResults = [
     id: 'u1',
     __typename: 'User',
     avatar: {
-      url:
-        'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
+      url: 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
     },
     name: 'Peter Lustig',
     slug: 'peter-lustig',
@@ -80,8 +87,7 @@ export const searchResults = [
     id: 'cdbca762-0632-4564-b646-415a0c42d8b8',
     __typename: 'User',
     avatar: {
-      url:
-        'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
+      url: 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
     },
     name: 'Herbert Schultz',
     slug: 'herbert-schultz',
@@ -90,8 +96,7 @@ export const searchResults = [
     id: 'u2',
     __typename: 'User',
     avatar: {
-      url:
-        'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
+      url: 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
     },
     name: 'Bob der Baumeister',
     slug: 'bob-der-baumeister',
@@ -100,8 +105,7 @@ export const searchResults = [
     id: '7b654f72-f4da-4315-8bed-39de0859754b',
     __typename: 'User',
     avatar: {
-      url:
-        'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
+      url: 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
     },
     name: 'Tonya Mohr',
     slug: 'tonya-mohr',
@@ -112,7 +116,7 @@ export const searchResults = [
   },
 ]
 
-storiesOf('Search Field', module)
+storiesOf('SearchableInput', module)
   .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('test', () => ({
@@ -122,6 +126,6 @@ storiesOf('Search Field', module)
       searchResults,
     }),
     template: `
-      <searchable-input :options="searchResults" />
+      <searchable-input :loading="false" :options="searchResults" />
     `,
   }))

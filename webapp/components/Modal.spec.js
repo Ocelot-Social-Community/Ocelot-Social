@@ -131,6 +131,42 @@ describe('Modal.vue', () => {
           })
         })
       })
+
+      describe('store/modal data contains an user', () => {
+        it('passes user name to report modal', () => {
+          state.data = {
+            type: 'user',
+            resource: {
+              id: 'u456',
+              name: 'Username',
+            },
+          }
+          wrapper = Wrapper()
+          expect(wrapper.find(DisableModal).props()).toEqual({
+            type: 'user',
+            name: 'Username',
+            id: 'u456',
+          })
+        })
+      })
+
+      describe('store/modal data contains no valid datatype', () => {
+        it('passes something  as datatype to modal', () => {
+          state.data = {
+            type: 'something',
+            resource: {
+              id: 's456',
+              name: 'Username',
+            },
+          }
+          wrapper = Wrapper()
+          expect(wrapper.find(DisableModal).props()).toEqual({
+            type: 'something',
+            name: null,
+            id: 's456',
+          })
+        })
+      })
     })
   })
 })

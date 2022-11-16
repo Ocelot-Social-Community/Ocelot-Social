@@ -1,1 +1,0 @@
-MATCH (u1:User)-[f:FOLLOWS]->(u2:User) DETACH DELETE f;

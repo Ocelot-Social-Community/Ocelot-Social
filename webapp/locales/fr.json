@@ -76,54 +76,7 @@
     }
   },
   "code-of-conduct": {
-    "consequences": {
-      "description": "Si un membre de la communauté présente un comportement inacceptable, les opérateurs, modérateurs et administrateurs responsables du réseau peuvent prendre les mesures appropriées, notamment:",
-      "list": {
-        "0": "Veuillez cesser immédiatement tout comportement inacceptable",
-        "1": "Verrouillage ou suppression des commentaires",
-        "2": "Exclusion temporaire du poste ou de la contribution en question",
-        "3": "Blocage ou suppression de contenu",
-        "4": "Retrait temporaire des droits d'écriture",
-        "5": "Exclusion temporaire du réseau",
-        "6": "Exclusion définitive du réseau",
-        "7": "Des violations du droit allemand peuvent être signalées."
-      },
-      "title": "Conséquences d'un comportement inacceptable"
-    },
-    "expected-behaviour": {
-      "description": "Les comportements suivants sont attendus et exigés de tous les membres de la communauté :",
-      "list": {
-        "0": "Faites preuve de considération et de respect dans votre discours et vos actions.",
-        "1": "Tenter de collaborer avant le conflit.",
-        "2": "S'abstenir de tout comportement ou discours dégradant, discriminatoire ou harcelant.",
-        "3": "Soyez attentif à votre environnement et aux autres participants. Alertez les leaders de la communauté si vous remarquez une situation dangereuse, une personne en détresse ou une violation du Code de Conduite, même si elle vous semble sans importance."
-      },
-      "title": "Comportement attendu"
-    },
-    "get-help": "Si vous êtes victime ou témoin d'un comportement inacceptable, ou si vous avez d'autres préoccupations, veuillez en aviser un organisateur communautaire dès que possible et établir un lien ou vous référer au contenu correspondant:",
-    "preamble": {
-      "description": "Human Connection est un réseau de connaissances et d'action sociale à but non lucratif de la prochaine génération. Par les gens - pour les gens. Open Source, équitable et transparent. Pour un changement local et global positif dans tous les domaines de la vie. Nous redessinons complètement l'échange public de connaissances, d'idées et de projets. Les fonctions de Human Connection rassemblent les gens - hors ligne et en ligne - afin que nous puissions rendre le monde meilleur.",
-      "title": "Préambule"
-    },
-    "purpose": {
-      "description": "Avec ce code de conduite, nous réglementons les principes essentiels de comportement dans notre réseau social. Nous nous orientons à la Charte des Droits de l'Homme, elle est le cœur de notre compréhension des valeurs. Le code de conduite sert de fil conducteur pour notre apparence personnelle et notre interaction les uns avec les autres. Toute personne active comme utilisateur sur le réseau Human Connection, écrit des articles, commente ou contacte d'autres utilisateurs, y compris ceux qui ne font pas partie du réseau, reconnaît ces règles comme contractuel.",
-      "title": "Objectif"
-    },
-    "subheader": "pour le réseau social de la Human Connection gGmbH",
-    "unacceptable-behaviour": {
-      "description": "Les comportements suivants sont inacceptables dans notre communauté:",
-      "list": {
-        "0": "Les messages, commentaires, déclarations ou insultes discriminatoires, en particulier ceux relatifs au sexe, à l'orientation sexuelle, à la race, à la religion, à l'orientation politique ou philosophique ou au handicap.",
-        "1": "Publication ou partage de matériel clairement pornographique.",
-        "2": "Glorification ou banalisation d'actes de violence cruels ou inhumains.",
-        "3": "La divulgation de renseignements personnels sans le consentement ou la menace d' (\"doxing\").",
-        "4": "L'intimidation, le harcèlement ou la persécution intentionnelle.",
-        "5": "Publicité de produits et de services à des fins commerciaux.",
-        "6": "Comportement criminel ou violation du droit allemand.",
-        "7": "Cautionner ou encourager de tels comportements."
-      },
-      "title": "Comportement inacceptable"
-    }
+    "subheader": "pour le réseau social de {ORGANIZATION_NAME}"
   },
   "comment": {
     "content": {
@@ -145,7 +98,6 @@
     "letsTalk": "Parlons-en",
     "loading": "chargement",
     "loadMore": "charger plus",
-    "moreInfo": "Plus d'infos",
     "name": "Nom",
     "organization": "Organisation ::: Organisations",
     "post": "Message ::: Messages",
@@ -163,16 +115,6 @@
     "versus": "Versus"
   },
   "components": {
-    "enter-nonce": {
-      "form": {
-        "description": "Ouvrez votre boîte de réception et entrez le code que nous vous avons envoyé.",
-        "next": "Continuer",
-        "nonce": "Entrez votre code",
-        "validations": {
-          "length": "doit comporter 6 caractères"
-        }
-      }
-    },
     "password-reset": {
       "change-password": {
         "error": "La modification de votre mot de passe a échoué. Peut-être que le code de sécurité n'était pas correct ?",
@@ -195,23 +137,28 @@
         "success": "Votre compte a été créé!",
         "title": "Créer un compte utilisateur"
       },
+      "email-nonce": {
+        "form": {
+          "description": "Ouvrez votre boîte de réception et entrez le code que nous vous avons envoyé.",
+          "next": "Continuer",
+          "nonce": "Entrez votre code",
+          "validations": {
+            "length": "doit comporter {nonceLength} caractères"
+          }
+        }
+      },
       "signup": {
         "form": {
-          "data-privacy": "J'ai lu et compris la <a href=\"https://human-connection.org/datenschutz/\" target=\"_blank\"> <ds-text bold color=\"primary\" > Déclaration de confidentialité </ds-text> </a> ",
+          "data-privacy": "J'ai lu et compris la Déclaration de confidentialité.",
           "description": "Pour commencer, entrez votre adresse mail :",
           "errors": {
-            "email-exists": "Il existe déjà un compte utilisateur avec cette adresse mail!",
-            "invalid-invitation-token": "On dirait que l'invitation a déjà été utilisée. Les liens d'invitation ne peuvent être utilisés qu'une seule fois."
+            "email-exists": "Il existe déjà un compte utilisateur avec cette adresse mail!"
           },
-          "invitation-code": "Votre code d'invitation est: <b> {code} </b>",
-          "minimum-age": "J'ai 18 ans ou plus.",
-          "no-commercial": "Je n'ai aucun intérêt commercial et je ne représente pas d'entreprise ou toute autre organisation commerciale sur le réseau.",
-          "no-political": "Je ne parle pas au nom d'un parti ou d'une organisation politique sur le réseau.",
           "submit": "Créer un compte",
           "success": "Un mail avec un lien pour compléter votre inscription a été envoyé à <b>{email}</b>",
-          "terms-and-condition": "Je confirme les <a href=\"/terms-and-conditions\"> <ds-text bold color=\"primary\" > Conditions générales </ds-text> </a>."
+          "terms-and-condition": "Je confirme les Conditions générales."
         },
-        "title": "Rejoignez Human Connection!",
+        "title": "Rejoignez {APPLICATION_NAME}!",
         "unavailable": "Malheureusement, l'enregistrement public des comptes utilisateurs n'est pas encore disponible sur ce serveur."
       }
     }
@@ -250,14 +197,13 @@
     "filterALL": "Voir toutes les contributions",
     "filterFollow": "Filtrer les contributions des utilisateurs que je suis",
     "inappropriatePicture": "Cette image peut être inappropriée pour certaines personnes.",
-    "inappropriatePictureText": "Quand est ce que ma photo doit-elle être floue",
     "languageSelectLabel": "Langue",
     "languageSelectText": "Sélectionner une langue",
     "newPost": "Créer un nouveau Post",
     "success": "Enregistré!",
     "teaserImage": {
       "cropperConfirm": "Confirmer",
-      "supportedFormats": "Insérer une image au format de fichier JPG, PNG ou GIF"
+      "supportedFormats": "Insérer une image au format de fichier JPG, PNG ou GIF!"
     },
     "title": "Titre"
   },
@@ -299,8 +245,7 @@
   },
   "donations": {
     "amount-of-total": "{amount} de {total} € collectés",
-    "donate-now": "Faites un don",
-    "donations-for": "Dons pour"
+    "donate-now": "Faites un don"
   },
   "editor": {
     "embed": {
@@ -323,13 +268,33 @@
     "all": "Toutes",
     "categories": "Catégories de contenu",
     "emotions": "Émotions",
-    "filter-by": "Filtrer par...",
+    "filter-by": "Filtrer par ...",
     "following": "Utilisateurs que je suis",
-    "languages": "Langues"
+    "languages": "Langues",
+    "order": {
+      "newest": {
+        "hint": null,
+        "label": "Plus récent"
+      },
+      "oldest": {
+        "hint": null,
+        "label": "Le plus ancien"
+      }
+    }
   },
   "followButton": {
     "follow": "Suivre",
     "following": "Je suis les"
+  },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null
+    },
+    "membersCount": null,
+    "membersListTitle": null
   },
   "hashtags-filter": {
     "clearSearch": "Réinitialiser la recherche",
@@ -341,16 +306,14 @@
     "no-results": "Pas de contribution trouvée."
   },
   "login": {
-    "copy": "Si vous avez déjà un compte human-connection, connectez-vous ici.",
     "email": "Votre mail",
     "failure": "Adresse mail ou mot de passe incorrect.",
     "forgotPassword": "Mot de passe oublié?",
     "hello": "Bonjour",
     "login": "Connexion",
     "logout": "Déconnexion",
-    "moreInfo": "Qu'est-ce que Human Connection?",
+    "moreInfo": "Qu'est-ce que {APPLICATION_NAME}?",
     "moreInfoHint": "à la page de présentation",
-    "moreInfoURL": "https://human-connection.org/fr/",
     "no-account": "Vous n'avez pas de compte?",
     "password": "Votre mot de passe",
     "register": "S'inscrire",
@@ -359,7 +322,7 @@
   "maintenance": {
     "explanation": "Pour l'instant, nous faisons de la maintenance programmée, veuillez réessayer plus tard.",
     "questions": "Des questions ou des préoccupations, envoyez un mail à",
-    "title": "Human Connection est en maintenance"
+    "title": "{APPLICATION_NAME} est en maintenance"
   },
   "moderation": {
     "name": "Modération",
@@ -464,14 +427,6 @@
       "unpin": "Retirer l'épingle du poste",
       "unpinnedSuccessfully": "Épingle retirer du Post avec succès!"
     },
-    "moreInfo": {
-      "description": "Ici vous pouvez trouver plus d'informations à ce sujet.",
-      "name": "Plus d'infos",
-      "title": "Plus d'information",
-      "titleOfCategoriesSection": "Catégories",
-      "titleOfHashtagsSection": "Hashtags",
-      "titleOfRelatedContributionsSection": "Articles Similaires"
-    },
     "name": "Post",
     "pinned": "Annonce",
     "takeAction": {
@@ -479,6 +434,9 @@
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Téléchargement réussi"
+    },
     "commented": "Commentais",
     "follow": "Suivre",
     "followers": "Suiveurs",
@@ -486,7 +444,7 @@
     "invites": {
       "description": "Entrez leur adresse mail pour l'invitation.",
       "emailPlaceholder": "Mail d'invitation",
-      "title": "Invitez quelqu'un à Human Connection!"
+      "title": "Invitez quelqu'un à {APPLICATION_NAME}!"
     },
     "memberSince": "Membre depuis",
     "name": "Mon profil",
@@ -581,7 +539,7 @@
       "Post": "Posts",
       "User": "Utilisateurs"
     },
-    "hint": "Qu'est-ce que vous cherchez ?",
+    "hint": "Qu'est-ce que vous cherchez? Utiliser !… pour des posts, @… pour des membres, #… pour des hashtag.",
     "placeholder": "Rechercher"
   },
   "settings": {
@@ -727,7 +685,7 @@
     "faq": "FAQ",
     "germany": "Allemagne",
     "imprint": "Mentions légales",
-    "made": "Fabriqué avec &#10084;",
+    "made": "Fabriqué avec ❤️",
     "register": "Numéro de registre",
     "responsible": "Responsable selon § 55 Abs. 2 RStV (Allemagne)",
     "taxident": "Numéro d'identification à la taxe sur la valeur ajoutée selon § 27 a de la loi sur la taxe sur la valeur ajoutée (Allemagne)",
@@ -735,64 +693,9 @@
     "thanks": "Merci!",
     "tribunal": "Tribunal de registre"
   },
-  "store": {
-    "posts": {
-      "orderBy": {
-        "newest": {
-          "label": "Plus récent"
-        },
-        "oldest": {
-          "label": "Le plus ancien"
-        }
-      }
-    }
-  },
   "termsAndConditions": {
-    "addition": {
-      "description": "<a href=\"https://human-connection.org/events/\" target=\"_blank\" > https://human-connection.org/events/ </a>",
-      "title": "De plus, nous organisons régulièrement des événements où vous pouvez également partager vos impressions et poser vos questions. Ici, vous trouverez un aperçu actuel:"
-    },
-    "agree": "J'accepte!",
-    "code-of-conduct": {
-      "description": "Notre code de conduite sert de manuel pour l'apparence personnelle et l'interaction les uns avec les autres. Quiconque est actif en tant qu'utilisateur sur le réseau Human Connection, écrit des articles, commente ou établit des contacts avec d'autres utilisateurs, même en dehors du réseau, reconnaît que ces règles de conduite sont contractuel. <a href=\"https://alpha.human-connection.org/code-of-conduct\" target=\"_blank\"> https://alpha.human-connection.org/code-of-conduct </a>",
-      "title": "Code de conduite"
-    },
-    "errors-and-feedback": {
-      "description": "Nous mettons tout en œuvre pour que notre réseau et nos données soient sécurisés et disponibles. Chaque nouvelle version du logiciel passe par des tests automatisés et manuels. Cependant, des erreurs imprévues peuvent survenir. Par conséquent, nous sommes reconnaissants pour tous les bugs signalés. Nous vous invitons à signaler les bugs que vous avez découverts en envoyant un mail à support@human-connection.org.",
-      "title": "Erreurs et Feedback"
-    },
-    "help-and-questions": {
-      "description": "Pour obtenir de l'aide et des questions, nous avons compilé une foire aux questions (FAQ) complète pour vous. Vous pouvez les trouver ici: <a href=\"https://support.human-connection.org/kb/\" target=\"_blank\" >https://support.human-connection.org/kb/ </a>",
-      "title": "Aide et questions"
-    },
-    "moderation": {
-      "description": "Jusqu'à ce que nos possibilités financières nous permettent de mettre en œuvre le système de modération communautaire, nous modérons avec un système simplifié et avec notre propre personnel ou éventuellement des bénévoles. Nous formons ces modérateurs et c'est pour cette raison qu'ils sont les seuls à prendre les décisions appropriées. Ces modérateurs effectuent leur travail de manière anonyme. Vous pouvez nous signaler des postes, commentaires et utilisateurs (par exemple, s'ils fournissent des informations dans leur profil ou s'ils ont des images qui violent ces Conditions d'utilisation). Si vous nous signalez quelque chose, vous pouvez nous donner une raison et une brève explication. Nous examinerons ensuite ce que vous nous avez signalé et vous sanctionnerons si nécessaire, par exemple en bloquant des contributions, des commentaires ou des utilisateurs. Malheureusement, vous et la personne concernée ne recevrez pas de commentaires de notre part pour le moment, mais c'est à l'étape de la planification. Indépendamment de cela, nous nous réservons le droit d'imposer des sanctions de principe pour des raisons qui ne figurent pas ou pas encore dans notre Code de conduite ou dans les présentes conditions de service.",
-      "title": "Modération"
-    },
     "newTermsAndConditions": "Nouvelles conditions générales",
-    "no-commercial-use": {
-      "description": "L'utilisation du réseau Human Connetion à fin commercial n'est pas autorisée. Cela comprend, sans s'y limiter, la publicité de produits à des fins commerciales, la publication de liens d'affiliation, la sollicitation directe de dons ou l'octroi d'un soutien financier à des fins qui ne sont pas reconnues comme organismes de bienfaisance aux fins de l'impôt.",
-      "title": "Pas d'utilisation commerciale"
-    },
-    "privacy-statement": {
-      "description": "Notre réseau est un réseau de connaissances et d'action sociale. Il est donc particulièrement important pour nous qu'autant de contenu que possible soit accessible au public. Au cours du développement de notre réseau, il y aura de plus en plus la possibilité de décider de la visibilité des données personnelles. Nous vous informerons de ces nouvelles fonctionnalités. Sinon, vous devriez toujours penser aux données personnelles que vous divulguez à votre sujet (ou à celui d'autres personnes). Cela vaut en particulier pour le contenu des messages et des commentaires, qui ont un caractère largement public. Plus tard, il y aura des possibilités de limiter la visibilité de votre profil. Une partie des conditions d'utilisation est notre déclaration de confidentialité, qui vous informe sur les différentes opérations de traitement des données dans notre réseau: <a href=\"https://human-connection.org/datenschutz/#netzwerk\" target=\"_blank\"> https://human-connection.org/datenschutz/#netzwerk</a> ex: <a href=\"https://human-connection.org/datenschutz/\" target=\"_blank\">https://human-connection.org/datenschutz/</a> Notre déclaration de confidentialité est adaptée à la situation juridique et aux caractéristiques de notre réseau et est toujours valable dans la version la plus récente.",
-      "title": "Déclaration de confidentialité"
-    },
-    "terms-of-service": {
-      "description": "Les conditions d'utilisation suivantes constituent la base de l'utilisation de notre réseau. Lorsque vous vous inscrivez, vous devez les accepter et nous vous informerons ultérieurement de tout changement qui pourrait survenir. Le réseau Human Connection Network est exploité en Allemagne et est donc soumis au droit allemand. Le tribunal compétent est celui de Kirchheim / Teck. Pour plus de détails, consultez notre site Internet: <a href=\"https://human-connection.org/en/imprint\" target=\"_blank\" >https://human-connection.org/en/imprint</a> ",
-      "title": "Conditions d'utilisation"
-    },
-    "termsAndConditionsConfirmed": "J'ai lu et accepte les <a href=\"/terms-and-conditions\" target=\"_blank\">conditions générales</a>.",
     "termsAndConditionsNewConfirm": "J'ai lu et accepté les nouvelles conditions générales.",
-    "termsAndConditionsNewConfirmText": "Veuillez lire les nouvelles conditions d'utilisation dès maintenant !",
-    "use-and-license": {
-      "description": "Si un contenu que vous nous publiez est protégé par des droits de propriété intellectuelle, vous nous accordez une licence mondiale non exclusive, transférable, transférable et pouvant faire l'objet d'une sous-licence pour utiliser ce contenu à des fins de publication sur notre réseau. Cette licence expire lorsque vous supprimez votre contenu ou l'ensemble de votre compte. Rappelez-vous que d'autres personnes peuvent partager votre contenu et que nous ne pouvons pas le supprimer.",
-      "title": "Utilisation et licence"
-    }
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Téléchargement réussi"
-    }
+    "termsAndConditionsNewConfirmText": "Veuillez lire les nouvelles conditions d'utilisation dès maintenant !"
   }
 }

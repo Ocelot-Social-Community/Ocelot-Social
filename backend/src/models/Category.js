@@ -9,8 +9,7 @@ export default {
   updatedAt: {
     type: 'string',
     isoDate: true,
-    required: true,
-    default: () => new Date().toISOString(),
+    required: false,
   },
   post: {
     type: 'relationship',

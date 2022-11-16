@@ -17,42 +17,22 @@ let authenticatedUser,
   commentingUser
 
 const createCommentMutation = gql`
-  mutation($id: ID, $postId: ID!, $content: String!) {
+  mutation ($id: ID, $postId: ID!, $content: String!) {
     CreateComment(id: $id, postId: $postId, content: $content) {
       id
     }
   }
 `
 const updateCommentMutation = gql`
-  mutation($content: String!, $id: ID!) {
+  mutation ($content: String!, $id: ID!) {
     UpdateComment(content: $content, id: $id) {
       id
     }
   }
 `
-const createPostMutation = gql`
-  mutation($id: ID, $title: String!, $content: String!, $language: String, $categoryIds: [ID]) {
-    CreatePost(
-      id: $id
-      title: $title
-      content: $content
-      language: $language
-      categoryIds: $categoryIds
-    ) {
-      id
-    }
-  }
-`
 
-const updatePostMutation = gql`
-  mutation($id: ID!, $title: String!, $content: String!, $categoryIds: [ID]) {
-    UpdatePost(id: $id, title: $title, content: $content, categoryIds: $categoryIds) {
-      id
-    }
-  }
-`
 const reportMutation = gql`
-  mutation($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
+  mutation ($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
     fileReport(
       resourceId: $resourceId
       reasonCategory: $reasonCategory
@@ -63,22 +43,24 @@ const reportMutation = gql`
   }
 `
 const reviewMutation = gql`
-  mutation($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
+  mutation ($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
     review(resourceId: $resourceId, disable: $disable, closed: $closed) {
       createdAt
       updatedAt
     }
   }
 `
-
 const updateUserMutation = gql`
-  mutation($id: ID!, $name: String) {
+  mutation ($id: ID!, $name: String) {
     UpdateUser(id: $id, name: $name) {
       name
     }
   }
 `
-beforeAll(() => {
+
+beforeAll(async () => {
+  await cleanDatabase()
+
   const { server } = createServer({
     context: () => {
       return {
@@ -89,6 +71,10 @@ beforeAll(() => {
     },
   })
   mutate = createTestClient(server).mutate
+})
+
+afterAll(async () => {
+  await cleanDatabase()
 })
 
 beforeEach(async () => {
@@ -140,6 +126,7 @@ beforeEach(async () => {
   offensivePost = posts[0]
 })
 
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -224,104 +211,6 @@ describe('validateCreateComment', () => {
       ).resolves.toMatchObject({
         data: { UpdateComment: null },
         errors: [{ message: 'Comment must be at least 1 character long!' }],
-      })
-    })
-  })
-
-  describe('validatePost', () => {
-    let createPostVariables
-    beforeEach(async () => {
-      createPostVariables = {
-        title: 'I am  a title',
-        content: 'Some content',
-      }
-      authenticatedUser = await commentingUser.toJson()
-    })
-
-    describe('categories', () => {
-      describe('null', () => {
-        it('throws UserInputError', async () => {
-          createPostVariables = { ...createPostVariables, categoryIds: null }
-          await expect(
-            mutate({ mutation: createPostMutation, variables: createPostVariables }),
-          ).resolves.toMatchObject({
-            data: { CreatePost: null },
-            errors: [
-              {
-                message: 'You cannot save a post without at least one category or more than three',
-              },
-            ],
-          })
-        })
-      })
-
-      describe('empty', () => {
-        it('throws UserInputError', async () => {
-          createPostVariables = { ...createPostVariables, categoryIds: [] }
-          await expect(
-            mutate({ mutation: createPostMutation, variables: createPostVariables }),
-          ).resolves.toMatchObject({
-            data: { CreatePost: null },
-            errors: [
-              {
-                message: 'You cannot save a post without at least one category or more than three',
-              },
-            ],
-          })
-        })
-      })
-
-      describe('more than 3 categoryIds', () => {
-        it('throws UserInputError', async () => {
-          createPostVariables = {
-            ...createPostVariables,
-            categoryIds: ['cat9', 'cat27', 'cat15', 'cat4'],
-          }
-          await expect(
-            mutate({ mutation: createPostMutation, variables: createPostVariables }),
-          ).resolves.toMatchObject({
-            data: { CreatePost: null },
-            errors: [
-              {
-                message: 'You cannot save a post without at least one category or more than three',
-              },
-            ],
-          })
-        })
-      })
-    })
-  })
-
-  describe('validateUpdatePost', () => {
-    describe('post created without categories somehow', () => {
-      let owner, updatePostVariables
-      beforeEach(async () => {
-        const postSomehowCreated = await neode.create('Post', {
-          id: 'how-was-this-created',
-        })
-        owner = await neode.create('User', {
-          id: 'author-of-post-without-category',
-          slug: 'hacker',
-        })
-        await postSomehowCreated.relateTo(owner, 'author')
-        authenticatedUser = await owner.toJson()
-        updatePostVariables = {
-          id: 'how-was-this-created',
-          title: 'I am  a title',
-          content: 'Some content',
-          categoryIds: [],
-        }
-      })
-
-      it('requires at least one category for successful update', async () => {
-        await expect(
-          mutate({ mutation: updatePostMutation, variables: updatePostVariables }),
-        ).resolves.toMatchObject({
-          data: { UpdatePost: null },
-          errors: [
-            { message: 'You cannot save a post without at least one category or more than three' },
-          ],
-        })
       })
     })
   })

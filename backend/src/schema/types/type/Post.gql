@@ -81,6 +81,7 @@ input _PostFilter {
   emotions_none: _PostEMOTEDFilter
   emotions_single: _PostEMOTEDFilter
   emotions_every: _PostEMOTEDFilter
+  group: _GroupFilter
 }
 
 enum _PostOrdering {
@@ -136,7 +137,7 @@ type Post {
       """
     )
   tags: [Tag]! @relation(name: "TAGGED", direction: "OUT")
-  categories: [Category]! @relation(name: "CATEGORIZED", direction: "OUT")
+  categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
   comments: [Comment]! @relation(name: "COMMENTS", direction: "IN")
   commentsCount: Int!
@@ -156,9 +157,19 @@ type Post {
       statement: "MATCH (this)<-[:SHOUTED]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1"
     )
 
+  clickedCount: Int!
+
+  viewedTeaserCount: Int!
+  viewedTeaserByCurrentUser: Boolean!
+    @cypher(
+      statement: "MATCH (this)<-[:VIEWED_TEASER]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1"
+    )
+  
   emotions: [EMOTED]
   emotionsCount: Int!
     @cypher(statement: "MATCH (this)<-[emoted:EMOTED]-(:User) RETURN COUNT(DISTINCT emoted)")
+
+  group: Group @relation(name: "IN", direction: "OUT")
 }
 
 input _PostInput {
@@ -176,6 +187,7 @@ type Mutation {
     language: String
     categoryIds: [ID]
     contentExcerpt: String
+    groupId: ID
   ): Post
   UpdatePost(
     id: ID!
@@ -193,6 +205,7 @@ type Mutation {
   RemovePostEmotions(to: _PostInput!, data: _EMOTEDInput!): EMOTED
   pinPost(id: ID!): Post
   unpinPost(id: ID!): Post
+  markTeaserAsViewed(id: ID!): Post
 }
 
 type Query {
@@ -216,18 +229,4 @@ type Query {
   PostsEmotionsCountByEmotion(postId: ID!, data: _EMOTEDInput!): Int!
   PostsEmotionsByCurrentUser(postId: ID!): [String]
   profilePagePosts(filter: _PostFilter, first: Int, offset: Int, orderBy: [_PostOrdering]): [Post]
-  findPosts(query: String!, limit: Int = 10, filter: _PostFilter): [Post]!
-    @cypher(
-      statement: """
-      CALL db.index.fulltext.queryNodes('post_fulltext_search', $query)
-      YIELD node as post, score
-      MATCH (post)<-[:WROTE]-(user:User)
-      WHERE score >= 0.2
-      AND NOT user.deleted = true AND NOT user.disabled = true
-      AND NOT post.deleted = true AND NOT post.disabled = true
-      AND NOT user.id in COALESCE($filter.author_not.id_in, [])
-      RETURN post
-      LIMIT $limit
-      """
-    )
 }

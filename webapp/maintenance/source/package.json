@@ -1,12 +1,12 @@
 {
-  "name": "@human-connection/maintenance",
-  "version": "1.0.0",
-  "description": "Maintenance page for Human Connection",
-  "main": "index.js",
-  "repository": "https://github.com/Human-Connection/Human-Connection",
-  "author": "Robert Schäfer",
+  "name": "@ocelot-social/maintenance",
+  "version": "2.2.0",
+  "description": "Maintenance page for ocelot.social",
+  "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
+  "author": "ocelot.social Community",
   "license": "MIT",
   "private": false,
+  "main": "index.js",
   "scripts": {
     "dev": "yarn run nuxt -c nuxt.config.maintenance.js",
     "build": "yarn run nuxt build -c nuxt.config.maintenance.js",

@@ -17,8 +17,7 @@ export const post = {
   author: {
     id: 'u3',
     avatar: {
-      url:
-        'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
+      url: 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
     },
     slug: 'jenny-rostock',
     name: 'Rainer Unsinn',
@@ -28,6 +27,7 @@ export const post = {
     shoutedCount: 5,
     commentedCount: 39,
     followedByCount: 2,
+    clickedCount: 42,
     followedByCurrentUser: true,
     location: null,
     badges: [
@@ -43,6 +43,7 @@ export const post = {
   commentsCount: 12,
   categories: [],
   shoutedCount: 421,
+  viewedTeaserCount: 1584,
   __typename: 'Post',
 }
 

@@ -41,6 +41,7 @@ export default (i18n) => {
           url
         }
         showShoutsPublicly
+        sendNotificationEmails
       }
     }
   `
@@ -48,8 +49,8 @@ export default (i18n) => {
 
 export const minimisedUserQuery = () => {
   return gql`
-    query {
-      User(orderBy: slug_asc) {
+    query ($slug: String) {
+      User(slug: $slug, orderBy: slug_asc) {
         id
         slug
         name
@@ -67,7 +68,7 @@ export const notificationQuery = (i18n) => {
     ${commentFragment}
     ${postFragment}
 
-    query($read: Boolean, $orderBy: NotificationOrdering, $first: Int, $offset: Int) {
+    query ($read: Boolean, $orderBy: NotificationOrdering, $first: Int, $offset: Int) {
       notifications(read: $read, orderBy: $orderBy, first: $first, offset: $offset) {
         id
         read
@@ -106,7 +107,7 @@ export const markAsReadMutation = (i18n) => {
     ${commentFragment}
     ${postFragment}
 
-    mutation($id: ID!) {
+    mutation ($id: ID!) {
       markAsRead(id: $id) {
         id
         read
@@ -215,7 +216,7 @@ export const followUserMutation = (i18n) => {
     ${userFragment}
     ${userCountsFragment}
 
-    mutation($id: ID!) {
+    mutation ($id: ID!) {
       followUser(id: $id) {
         ...user
         ...userCounts
@@ -235,7 +236,7 @@ export const unfollowUserMutation = (i18n) => {
     ${userFragment}
     ${userCountsFragment}
 
-    mutation($id: ID!) {
+    mutation ($id: ID!) {
       unfollowUser(id: $id) {
         ...user
         ...userCounts
@@ -252,27 +253,29 @@ export const unfollowUserMutation = (i18n) => {
 
 export const updateUserMutation = () => {
   return gql`
-    mutation(
+    mutation (
       $id: ID!
       $slug: String
       $name: String
-      $locationName: String
       $about: String
       $allowEmbedIframes: Boolean
       $showShoutsPublicly: Boolean
+      $sendNotificationEmails: Boolean
       $termsAndConditionsAgreedVersion: String
       $avatar: ImageInput
+      $locationName: String # empty string '' sets it to null
     ) {
       UpdateUser(
         id: $id
         slug: $slug
         name: $name
-        locationName: $locationName
         about: $about
         allowEmbedIframes: $allowEmbedIframes
         showShoutsPublicly: $showShoutsPublicly
+        sendNotificationEmails: $sendNotificationEmails
         termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
         avatar: $avatar
+        locationName: $locationName
       ) {
         id
         slug
@@ -281,6 +284,7 @@ export const updateUserMutation = () => {
         about
         allowEmbedIframes
         showShoutsPublicly
+        sendNotificationEmails
         locale
         termsAndConditionsAgreedVersion
         avatar {
@@ -292,7 +296,7 @@ export const updateUserMutation = () => {
 }
 
 export const checkSlugAvailableQuery = gql`
-  query($slug: String!) {
+  query ($slug: String!) {
     User(slug: $slug) {
       slug
     }
@@ -311,11 +315,13 @@ export const currentUserQuery = gql`
       locale
       allowEmbedIframes
       showShoutsPublicly
+      sendNotificationEmails
       termsAndConditionsAgreedVersion
       socialMedia {
         id
         url
       }
+      activeCategories
     }
   }
 `
@@ -334,7 +340,7 @@ export const userDataQuery = (i18n) => {
     ${userFragment}
     ${postFragment}
     ${commentFragment}
-    query($id: ID!) {
+    query ($id: ID!) {
       userData(id: $id) {
         user {
           ...user

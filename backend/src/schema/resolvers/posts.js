@@ -5,6 +5,8 @@ import { UserInputError } from 'apollo-server'
 import { mergeImage, deleteImage } from './images/images'
 import Resolver from './helpers/Resolver'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
+import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
+import CONFIG from '../../config'
 
 const maintainPinnedPosts = (params) => {
   const pinnedPostFilter = { pinned: true }
@@ -19,15 +21,13 @@ const maintainPinnedPosts = (params) => {
 export default {
   Query: {
     Post: async (object, params, context, resolveInfo) => {
+      params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
       params = await maintainPinnedPosts(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
-    findPosts: async (object, params, context, resolveInfo) => {
-      params = await filterForMutedUsers(params, context)
-      return neo4jgraphql(object, params, context, resolveInfo)
-    },
     profilePagePosts: async (object, params, context, resolveInfo) => {
+      params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
@@ -76,29 +76,60 @@ export default {
   },
   Mutation: {
     CreatePost: async (_parent, params, context, _resolveInfo) => {
-      const { categoryIds } = params
+      const { categoryIds, groupId } = params
       const { image: imageInput } = params
       delete params.categoryIds
       delete params.image
+      delete params.groupId
       params.id = params.id || uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        let groupCypher = ''
+        if (groupId) {
+          groupCypher = `
+            WITH post MATCH (group:Group { id: $groupId })
+            MERGE (post)-[:IN]->(group)`
+          const groupTypeResponse = await transaction.run(
+            `
+            MATCH (group:Group { id: $groupId }) RETURN group.groupType AS groupType`,
+            { groupId },
+          )
+          const [groupType] = groupTypeResponse.records.map((record) => record.get('groupType'))
+          if (groupType !== 'public')
+            groupCypher += `
+             WITH post, group
+             MATCH (user:User)-[membership:MEMBER_OF]->(group)
+               WHERE group.groupType IN ['closed', 'hidden']
+                 AND membership.role IN ['usual', 'admin', 'owner']
+             WITH post, collect(user.id) AS userIds
+             OPTIONAL MATCH path =(restricted:User) WHERE NOT restricted.id IN userIds 
+             FOREACH (user IN nodes(path) |
+               MERGE (user)-[:CANNOT_SEE]->(post)
+             )`
+        }
+        const categoriesCypher =
+          CONFIG.CATEGORIES_ACTIVE && categoryIds
+            ? `WITH post
+              UNWIND $categoryIds AS categoryId
+              MATCH (category:Category {id: categoryId})
+              MERGE (post)-[:CATEGORIZED]->(category)`
+            : ''
         const createPostTransactionResponse = await transaction.run(
           `
             CREATE (post:Post)
             SET post += $params
             SET post.createdAt = toString(datetime())
             SET post.updatedAt = toString(datetime())
+            SET post.clickedCount = 0
+            SET post.viewedTeaserCount = 0
             WITH post
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
-            WITH post
-            UNWIND $categoryIds AS categoryId
-            MATCH (category:Category {id: categoryId})
-            MERGE (post)-[:CATEGORIZED]->(category)
+            ${categoriesCypher}
+            ${groupCypher}
             RETURN post {.*}
           `,
-          { userId: context.user.id, categoryIds, params },
+          { userId: context.user.id, categoryIds, groupId, params },
         )
         const [post] = createPostTransactionResponse.records.map((record) => record.get('post'))
         if (imageInput) {
@@ -124,13 +155,13 @@ export default {
       delete params.image
       const session = context.driver.session()
       let updatePostCypher = `
-                                MATCH (post:Post {id: $params.id})
-                                SET post += $params
-                                SET post.updatedAt = toString(datetime())
-                                WITH post
-                              `
+        MATCH (post:Post {id: $params.id})
+        SET post += $params
+        SET post.updatedAt = toString(datetime())
+        WITH post
+      `
 
-      if (categoryIds && categoryIds.length) {
+      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
         const cypherDeletePreviousRelations = `
           MATCH (post:Post { id: $params.id })-[previousRelations:CATEGORIZED]->(category:Category)
           DELETE previousRelations
@@ -320,6 +351,31 @@ export default {
       }
       return unpinnedPost
     },
+    markTeaserAsViewed: async (_parent, params, context, _resolveInfo) => {
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const transactionResponse = await transaction.run(
+          `
+          MATCH (post:Post { id: $params.id })
+          MATCH (user:User { id: $userId })
+          MERGE (user)-[relation:VIEWED_TEASER { }]->(post)
+          ON CREATE
+          SET relation.createdAt = toString(datetime()),
+          post.viewedTeaserCount = post.viewedTeaserCount + 1
+          RETURN post
+        `,
+          { userId: context.user.id, params },
+        )
+        return transactionResponse.records.map((record) => record.get('post').properties)
+      })
+      try {
+        const [post] = await writeTxResultPromise
+        post.viewedTeaserCount = post.viewedTeaserCount.low
+        return post
+      } finally {
+        session.close()
+      }
+    },
   },
   Post: {
     ...Resolver('Post', {
@@ -335,6 +391,7 @@ export default {
         author: '<-[:WROTE]-(related:User)',
         pinnedBy: '<-[:PINNED]-(related:User)',
         image: '-[:HERO_IMAGE]->(related:Image)',
+        group: '-[:IN]->(related:Group)',
       },
       count: {
         commentsCount:
@@ -346,6 +403,8 @@ export default {
       boolean: {
         shoutedByCurrentUser:
           'MATCH(this)<-[:SHOUTED]-(related:User {id: $cypherParams.currentUserId}) RETURN COUNT(related) >= 1',
+        viewedTeaserByCurrentUser:
+          'MATCH (this)<-[:VIEWED_TEASER]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1',
       },
     }),
     relatedContributions: async (parent, params, context, resolveInfo) => {

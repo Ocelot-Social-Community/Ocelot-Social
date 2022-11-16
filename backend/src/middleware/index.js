@@ -12,8 +12,10 @@ import orderBy from './orderByMiddleware'
 import validation from './validation/validationMiddleware'
 import notifications from './notifications/notificationsMiddleware'
 import hashtags from './hashtags/hashtagsMiddleware'
-import email from './email/emailMiddleware'
+import login from './login/loginMiddleware'
 import sentry from './sentryMiddleware'
+import languages from './languages/languages'
+import userInteractions from './userInteractions'
 
 export default (schema) => {
   const middlewares = {
@@ -24,12 +26,14 @@ export default (schema) => {
     validation,
     sluggify,
     excerpt,
-    email,
+    login,
     notifications,
     hashtags,
     softDelete,
     includedFields,
     orderBy,
+    languages,
+    userInteractions,
   }
 
   let order = [
@@ -38,9 +42,11 @@ export default (schema) => {
     'xss',
     // 'activityPub', disabled temporarily
     'validation',
+    'userInteractions',
     'sluggify',
+    'languages',
     'excerpt',
-    'email',
+    'login',
     'notifications',
     'hashtags',
     'softDelete',

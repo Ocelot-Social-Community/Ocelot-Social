@@ -9,8 +9,32 @@ let query, authenticatedUser
 const driver = getDriver()
 const neode = getNeode()
 
+const userDataQuery = gql`
+  query ($id: ID!) {
+    userData(id: $id) {
+      user {
+        id
+        name
+        slug
+      }
+      posts {
+        id
+        title
+        content
+        comments {
+          content
+          author {
+            slug
+          }
+        }
+      }
+    }
+  }
+`
+
 beforeAll(async () => {
   await cleanDatabase()
+
   const user = await Factory.build('user', {
     id: 'a-user',
     name: 'John Doe',
@@ -37,29 +61,6 @@ beforeAll(async () => {
 afterAll(async () => {
   await cleanDatabase()
 })
-
-const userDataQuery = gql`
-  query($id: ID!) {
-    userData(id: $id) {
-      user {
-        id
-        name
-        slug
-      }
-      posts {
-        id
-        title
-        content
-        comments {
-          content
-          author {
-            slug
-          }
-        }
-      }
-    }
-  }
-`
 
 describe('resolvers/userData', () => {
   let variables = { id: 'a-user' }

@@ -16,7 +16,7 @@ let user2
 let variables
 
 const mutationFollowUser = gql`
-  mutation($id: ID!) {
+  mutation ($id: ID!) {
     followUser(id: $id) {
       name
       followedBy {
@@ -27,9 +27,8 @@ const mutationFollowUser = gql`
     }
   }
 `
-
 const mutationUnfollowUser = gql`
-  mutation($id: ID!) {
+  mutation ($id: ID!) {
     unfollowUser(id: $id) {
       name
       followedBy {
@@ -40,9 +39,8 @@ const mutationUnfollowUser = gql`
     }
   }
 `
-
 const userQuery = gql`
-  query($id: ID) {
+  query ($id: ID) {
     User(id: $id) {
       followedBy {
         id
@@ -54,6 +52,7 @@ const userQuery = gql`
 
 beforeAll(async () => {
   await cleanDatabase()
+
   const { server } = createServer({
     context: () => ({
       driver,
@@ -68,6 +67,10 @@ beforeAll(async () => {
   const testClient = createTestClient(server)
   query = testClient.query
   mutate = testClient.mutate
+})
+
+afterAll(async () => {
+  await cleanDatabase()
 })
 
 beforeEach(async () => {
@@ -98,6 +101,7 @@ beforeEach(async () => {
   variables = { id: user2.id }
 })
 
+// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -113,7 +117,7 @@ describe('follow', () => {
             variables,
           }),
         ).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
           data: { followUser: null },
         })
       })
@@ -187,7 +191,7 @@ describe('follow', () => {
         authenticatedUser = null
         await expect(mutate({ mutation: mutationUnfollowUser, variables })).resolves.toMatchObject({
           data: { unfollowUser: null },
-          errors: [{ message: 'Not Authorised!' }],
+          errors: [{ message: 'Not Authorized!' }],
         })
       })
     })

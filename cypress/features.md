@@ -1,6 +1,6 @@
 # Network Specification
 
-Human Connection is a nonprofit social, action and knowledge network that connects information to action and promotes positive local and global change in all areas of life.
+ocelot.social is free and open-source social network code that connects information to action and promotes positive local and global change in all areas of life.
 
 * **Social**: Interact with other people not just by commenting their posts, but by providing **Pro & Contra** arguments, give a **Versus** or ask them by integrated **Chat** or **Let's Talk**
 * **Knowledge**: Read articles about interesting topics and find related posts in the **More Info** tab or by **Filtering** based on **Categories** and **Tagging** or by using the **Fulltext Search**.
@@ -16,7 +16,7 @@ The following features will be implemented. This gets done in three steps:
 
 ### User Account
 
-[Cucumber Features](https://github.com/Human-Connection/Human-Connection/tree/master/cypress/integration/user_account)
+[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/user_account)
 
 * Sign-up
 * Agree to Data Privacy Statement
@@ -34,7 +34,7 @@ The following features will be implemented. This gets done in three steps:
 
 ### User Profile
 
-[Cucumber Features](https://github.com/Human-Connection/Human-Connection/tree/master/cypress/integration/user_profile)
+[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/user_profile)
 
 * Upload and Change Avatar
 * Upload and Change Profile Picture
@@ -59,7 +59,7 @@ The following features will be implemented. This gets done in three steps:
 
 ### Posts
 
-[Cucumber Features](https://github.com/Human-Connection/Human-Connection/tree/master/cypress/integration/post)
+[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/post)
 
 * Creating Posts
 * Persistent Links
@@ -84,7 +84,8 @@ The following features will be implemented. This gets done in three steps:
 * Upvote comments of others
 
 ### Notifications
-[Cucumber features](https://github.com/Human-Connection/Human-Connection/tree/master/cypress/integration/notifications)
+
+[Cucumber features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/notifications)
 
 * User @-mentionings
 * Notify authors for comments
@@ -116,7 +117,7 @@ The following features will be implemented. This gets done in three steps:
 
 ### Search
 
-[Cucumber Features](https://github.com/Human-Connection/Human-Connection/tree/master/cypress/integration/search)
+[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/search)
 
 * Search for Categories
 * Search for Tags
@@ -237,7 +238,7 @@ Shows automatically related actions for existing post.
 
 ### Moderation
 
-[Cucumber Features](https://github.com/Human-Connection/Human-Connection/tree/master/cypress/integration/moderation)
+[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/moderation)
 
 * Report Button for users for doubtful Content
 * Moderator Panel
@@ -249,7 +250,7 @@ Shows automatically related actions for existing post.
 
 ### Administration
 
-[Cucumber Features](https://github.com/Human-Connection/Human-Connection/tree/master/cypress/integration/administration)
+[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/administration)
 
 * Provide Admin-Interface to send Users Invite Code
 * Static Pages for Data Privacy Statement ...
@@ -264,7 +265,7 @@ Shows automatically related actions for existing post.
 
 ### Internationalization
 
-[Cucumber Features](https://github.com/Human-Connection/Human-Connection/tree/master/cypress/integration/internationalization)
+[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/internationalization)
 
 * Frontend UI
 * Backend Error Messages

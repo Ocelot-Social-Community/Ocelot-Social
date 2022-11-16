@@ -25,6 +25,8 @@ describe('PostTeaser', () => {
         disabled: false,
         shoutedCount: 0,
         commentsCount: 0,
+        clickedCount: 0,
+        viewedTeaserCount: 0,
         name: 'It is a post',
         author: {
           id: 'u1',
@@ -44,6 +46,9 @@ describe('PostTeaser', () => {
         mutate: jest.fn().mockResolvedValue({
           data: { DeletePost: { id: 'deleted-post-id' } },
         }),
+      },
+      $env: {
+        CATEGORIES_ACTIVE: false,
       },
     }
     getters = {
