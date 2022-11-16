@@ -162,9 +162,11 @@ export default {
   }
 
   .text {
+    display: inline-block;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    max-width: 95%; 
 
     > .ds-text {
       display: inline;
