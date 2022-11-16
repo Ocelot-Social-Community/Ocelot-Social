@@ -55,7 +55,7 @@ Start Neo4J and confirm the database is running at [http://localhost:7474](http:
 
 Here we describe some rarely used Cypher commands for Neo4j that are needed from time to time:
 
-### Index And Contraint Commands
+### Index And Constraint Commands
 
 If indexes or constraints are missing or not set correctly, the browser search will not work or the database seed for development will not work.
 
@@ -98,22 +98,22 @@ On a server with Kubernetes cluster:
 $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "yarn prod:migrate init"
 ```
 
-***Cypher commands to show indexes and contraints***
+***Cypher commands to show indexes and constraints***
 
 ```bash
 # in browser command line or cypher shell
 
-# show all indexes and contraints
+# show all indexes and constraints
 $ :schema
 
 # show all indexes
 $ CALL db.indexes();
 
-# show all contraints
+# show all constraints
 $ CALL db.constraints();
 ```
 
-***Cypher commands to create and drop indexes and contraints***
+***Cypher commands to create and drop indexes and constraints***
 
 ```bash
 # in browser command line or cypher shell
@@ -126,6 +126,6 @@ $ CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"]);
 # drop an index
 $ DROP CONSTRAINT ON ( image:Image ) ASSERT image.url IS UNIQUE
 
-# drop all indexes and contraints
+# drop all indexes and constraints
 $ CALL apoc.schema.assert({},{},true) YIELD label, key RETURN * ;
 ```
