@@ -16,19 +16,24 @@
       :notifications="notifications"
     />
 
-    <ds-flex>
-      <ds-flex-item class="notifications-footer" :width="{ base: '90%' }" centered>
-        <ds-button ghost primary @click="markAllAsRead" data-test="markAllAsRead-button">
-          {{ $t('notifications.markAllAsRead') }}
-        </ds-button>
-      </ds-flex-item>
-      <ds-flex-item :width="{ base: '10%' }">
+    <ds-flex class="notifications-footer">
+      <ds-flex-item :width="{ base: 'auto' }" centered>
         <pagination-buttons
           :hasNext="hasNext"
           :hasPrevious="hasPrevious"
           @back="back"
           @next="next"
         />
+      </ds-flex-item>
+      <ds-flex-item class="notifications-footer-button" :width="{ base: 'auto' }" centered>
+        <ds-button
+          primary
+          :disabled="unreadNotificationsCount === 0"
+          @click="markAllAsRead"
+          data-test="markAllAsRead-button"
+        >
+          {{ $t('notifications.markAllAsRead') }}
+        </ds-button>
       </ds-flex-item>
     </ds-flex>
   </base-card>
@@ -151,6 +156,6 @@ export default {
 }
 
 .notifications-footer {
-  text-align: center;
+  justify-content: space-evenly;
 }
 </style>
