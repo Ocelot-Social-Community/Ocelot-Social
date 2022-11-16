@@ -101,24 +101,24 @@
     "password": "Uw Wachtwoord"
   },
   "notifications": {
-    "comment": "",
-    "content": "",
-    "empty": "",
+    "comment": null,
+    "content": null,
+    "empty": null,
     "filterLabel": {
-      "all": "",
-      "read": "",
-      "unread": ""
+      "all": null,
+      "read": null,
+      "unread": null
     },
     "markAllAsRead": "Markeer alles als gelezen",
-    "pageLink": "",
-    "post": "",
+    "pageLink": null,
+    "post": null,
     "reason": {
-      "commented_on_post": "",
-      "mentioned_in_comment": "",
-      "mentioned_in_post": ""
+      "commented_on_post": null,
+      "mentioned_in_comment": null,
+      "mentioned_in_post": null
     },
-    "title": "",
-    "user": ""
+    "title": null,
+    "user": null
   },
   "post": {
     "moreInfo": {
