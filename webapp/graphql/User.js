@@ -62,7 +62,7 @@ export const minimisedUserQuery = () => {
   `
 }
 
-export const notificationQuery = (i18n) => {
+export const notificationQuery = (_i18n) => {
   return gql`
     ${userFragment}
     ${commentFragment}
@@ -101,7 +101,7 @@ export const notificationQuery = (i18n) => {
   `
 }
 
-export const markAsReadMutation = (i18n) => {
+export const markAsReadMutation = (_i18n) => {
   return gql`
     ${userFragment}
     ${commentFragment}
@@ -137,7 +137,7 @@ export const markAsReadMutation = (i18n) => {
   `
 }
 
-export const markAllAsReadMutation = (i18n) => {
+export const markAllAsReadMutation = (_i18n) => {
   return gql`
     ${userFragment}
     ${commentFragment}
