@@ -10,7 +10,7 @@
     >
       <base-icon class="dropdown-arrow" name="angle-down" />
     </base-button>
-    <template slot="popover">
+    <template #popover>
       <div class="filter-menu-options">
         <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
         <following-filter />
