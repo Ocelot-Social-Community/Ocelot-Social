@@ -10,7 +10,7 @@
       </nuxt-link>
       <div class="info flex-direction-column">
         <div :class="wide ? 'flex-direction-row' : 'flex-direction-column'">
-          <nuxt-link :to="userLink">
+          <nuxt-link :to="userLink" class="flex-direction-column_link">
             <span class="text">
               <span class="slug">{{ userSlug }}</span>
               <span v-if="!userOnly" class="name">{{ userName }}</span>
@@ -21,7 +21,7 @@
             <span class="text">
               {{ $t('group.in') }}
             </span>
-            <nuxt-link :to="groupLink">
+            <nuxt-link :to="groupLink" class="flex-direction-column_link">
               <span class="text">
                 <span class="slug">{{ groupSlug }}</span>
                 <span v-if="!userOnly" class="name">{{ groupName }}</span>
@@ -161,12 +161,17 @@ export default {
     justify-content: center;
   }
 
-  .text {
-    display: inline-block;
+  .flex-direction-column_link {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #70677e
+  }
+
+  .text {   
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 95%; 
+    text-overflow: ellipsis; 
 
     > .ds-text {
       display: inline;
