@@ -61,7 +61,7 @@ import HcEmpty from '~/components/Empty/Empty'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import { DonationsQuery } from '~/graphql/Donations'
 import { filterPosts } from '~/graphql/PostQuery.js'
 import UpdateQuery from '~/components/utils/UpdateQuery'
@@ -108,9 +108,22 @@ export default {
     hasResults() {
       return this.$apollo.loading || (this.posts && this.posts.length > 0)
     },
+    categoryId() {
+      return this.$route.query && this.$route.query.categoryId ? this.$route.query.categoryId : null
+    },
   },
   watchQuery: ['hashtag'],
+  mounted() {
+    if (this.categoryId) {
+      this.resetCategories()
+      this.toggleCategory(this.categoryId)
+    }
+  },
   methods: {
+    ...mapMutations({
+      resetCategories: 'posts/RESET_CATEGORIES',
+      toggleCategory: 'posts/TOGGLE_CATEGORY',
+    }),
     clearSearch() {
       this.$router.push({ path: '/' })
       this.hashtag = null
