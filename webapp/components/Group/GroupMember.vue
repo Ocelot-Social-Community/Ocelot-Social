@@ -1,39 +1,6 @@
 <template>
   <div class="group-member">
-    <h3 class="title">{{ $t('group.addUser') }}</h3>
-    <ds-space margin-bottom="small" />
-
-    <ds-space margin-bottom="small">
-      <ds-select
-        type="search"
-        icon="search"
-        v-model="query"
-        label-prop="id"
-        :icon-right="null"
-        :options="users"
-        :loading="$apollo.queries.searchUsers.loading"
-        :filter="(item) => item"
-        :no-options-available="$t('group.addUserPlaceholder')"
-        :auto-reset-search="!startSearch"
-        :placeholder="$t('group.addUserPlaceholder')"
-        @focus.capture.native="onFocus"
-        @input.native="handleInput"
-        @keyup.enter.native="onEnter"
-        @keyup.delete.native="onDelete"
-        @keyup.esc.native="clear"
-        @blur.capture.native="onBlur"
-        @input.exact="onSelect"
-      >
-        <template #option="{ option }">
-          <p>
-            <!-- ToDo: Avoid redirect to user profile when clicking on slug -->
-            <user-teaser :user="option" :showPopover="false" />
-          </p>
-        </template>
-      </ds-select>
-    </ds-space>
-    <ds-space margin-bottom="large" />
-    <h3 class="title">{{ $t('group.membersListTitle') }}</h3>
+    <h2 class="title">{{ $t('group.membersListTitle') }}</h2>
     <ds-space margin-bottom="small" />
     <ds-table :fields="tableFields" :data="groupMembers" condensed>
       <template #avatar="scope">
@@ -110,15 +77,9 @@
 </template>
 <script>
 import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
-import { searchUsers } from '~/graphql/Search.js'
-import { isEmpty } from 'lodash'
-import UserTeaser from '~/components/UserTeaser/UserTeaser.vue'
 
 export default {
   name: 'GroupMember',
-  components: {
-    UserTeaser,
-  },
   props: {
     groupId: {
       type: String,
@@ -131,9 +92,6 @@ export default {
   },
   data() {
     return {
-      // isOpen: false,
-      // memberId: null,
-      users: [],
       id: 'search-user-to-add-to-group',
       query: '',
       searchProcess: null,
@@ -165,37 +123,8 @@ export default {
         },
       }
     },
-    startSearch() {
-      return this.query && this.query.length > 3
-    },
   },
   methods: {
-    onFocus(event) {},
-    onBlur(event) {
-      this.query = ''
-    },
-    handleInput(event) {
-      this.query = event.target ? event.target.value.trim() : ''
-    },
-    onDelete(event) {
-      const value = event.target ? event.target.value.trim() : ''
-      if (isEmpty(value)) {
-        this.clear()
-      } else {
-        this.handleInput(event)
-      }
-    },
-    clear() {
-      this.query = ''
-      this.user = {}
-      this.users = []
-    },
-    onSelect(item) {
-      this.user = item
-      this.addMemberToGroup()
-      this.clear()
-    },
-    onEnter() {},
     async changeMemberRole(id, event) {
       const newRole = event.target.value
       try {
@@ -228,27 +157,6 @@ export default {
       } catch (error) {
         this.$toast.error(error.message)
       }
-    },
-  },
-  apollo: {
-    searchUsers: {
-      query() {
-        return searchUsers
-      },
-      variables() {
-        return {
-          query: this.query,
-          firstUsers: 5,
-          usersOffset: 0,
-        }
-      },
-      skip() {
-        return !this.startSearch
-      },
-      update({ searchUsers }) {
-        this.users = searchUsers.users
-      },
-      fetchPolicy: 'cache-and-network',
     },
   },
 }
