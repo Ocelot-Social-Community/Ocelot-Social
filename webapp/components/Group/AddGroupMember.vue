@@ -169,6 +169,6 @@ export default {
 <style lang="scss">
 .add-group-member {
   background-color: white;
-  padding: 24px;
+  padding: $space-base;
 }
 </style>
