@@ -20,6 +20,8 @@ describe('PostIndex', () => {
   beforeEach(() => {
     mutations = {
       'posts/TOGGLE_ORDER': jest.fn(),
+      'posts/RESET_CATEGORIES': jest.fn(),
+      'posts/TOGGLE_CATEGORY': jest.fn(),
     }
     store = new Vuex.Store({
       getters: {
@@ -92,6 +94,23 @@ describe('PostIndex', () => {
       wrapper = Wrapper()
       wrapper.find(HashtagsFilter).vm.$emit('clearSearch')
       expect(wrapper.vm.hashtag).toBeNull()
+    })
+
+    describe('category filter', () => {
+      beforeEach(() => {
+        mocks.$route.query = {
+          categoryId: 'cat3',
+        }
+        wrapper = Wrapper()
+      })
+
+      it('resets the category filter', () => {
+        expect(mutations['posts/RESET_CATEGORIES']).toBeCalled()
+      })
+
+      it('sets the category', () => {
+        expect(mutations['posts/TOGGLE_CATEGORY']).toBeCalledWith({}, 'cat3')
+      })
     })
   })
 
