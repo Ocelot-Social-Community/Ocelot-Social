@@ -406,7 +406,8 @@
     "actionRadius": "Action radius",
     "addMemberToGroup": "Add to group",
     "addUser": "Add User",
-    "addUserPlaceholder": "unique username > @slug-from-user",
+    "addUserNoOptions": "No users found!",
+    "addUserPlaceholder": " User name or slug",
     "allGroups": "All Groups",
     "categories": "Topic ::: Topics",
     "changeMemberRole": "The role has been changed to “{role}”!",
@@ -451,6 +452,12 @@
     "membersCount": "Member ::: Members",
     "membersListTitle": "Group Members",
     "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
+    "modal": {
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "confirmAddGroupMemberText": "Add user “{name}” to group?",
+      "confirmAddGroupMemberTitle": "Confirm"
+    },
     "myGroups": "My Groups",
     "name": "Group name",
     "radius": "Radius",

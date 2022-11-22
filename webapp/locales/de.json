@@ -406,7 +406,8 @@
     "actionRadius": "Aktionsradius",
     "addMemberToGroup": "Zur Gruppe hinzufügen",
     "addUser": "Benutzer hinzufügen",
-    "addUserPlaceholder": "eindeutiger Benutzername > @slug-from-user",
+    "addUserNoOptions": "Keine Nutzer gefunden!",
+    "addUserPlaceholder": "Benutzername oder Slug",
     "allGroups": "Alle Gruppen",
     "categories": "Thema ::: Themen",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
@@ -451,6 +452,12 @@
     "membersCount": "Mitglied ::: Mitglieder",
     "membersListTitle": "Gruppenmitglieder",
     "membersListTitleNotAllowedSeeingGroupMembers": "Gruppenmitglieder unsichtbar",
+    "modal": {
+      "cancel": "Abbrechen",
+      "confirm": "Bestätigen",
+      "confirmAddGroupMemberText": "Nutzer “{name}” zur Gruppe hinzufügen?",
+      "confirmAddGroupMemberTitle": "Bestätigen"
+    },
     "myGroups": "Meine Gruppen",
     "name": "Gruppenname",
     "radius": "Radius",
