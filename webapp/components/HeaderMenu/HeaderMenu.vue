@@ -94,7 +94,7 @@
       <!-- mobile header menu -->
       <div v-else class="mobil-header-box">
         <!-- logo, hamburger-->
-        <ds-flex>
+        <ds-flex style="align-items: center">
           <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
             <a
               v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
@@ -112,7 +112,7 @@
             </nuxt-link>
           </ds-flex-item>
 
-          <!-- hamburger button -->
+          <!-- mobile hamburger menu -->
           <ds-flex-item class="mobile-hamburger-menu">
             <client-only>
               <div style="display: inline-flex; padding-right: 20px">
