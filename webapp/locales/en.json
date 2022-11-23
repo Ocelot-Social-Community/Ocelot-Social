@@ -405,9 +405,10 @@
     },
     "actionRadius": "Action radius",
     "addMemberToGroup": "Add to group",
+    "addMemberToGroupSuccess": "“{name}” was added to the group with the role “{role}”!",
     "addUser": "Add User",
     "addUserNoOptions": "No users found!",
-    "addUserPlaceholder": " User name or slug",
+    "addUserPlaceholder": " Username",
     "allGroups": "All Groups",
     "categories": "Topic ::: Topics",
     "changeMemberRole": "The role has been changed to “{role}”!",
@@ -424,7 +425,7 @@
       "title": "Edit My Group"
     },
     "errors": {
-      "userAlreadyMember": "User @{slug} is already a member"
+      "userAlreadyMember": "User “{name}” is already a member"
     },
     "follow": "Follow",
     "foundation": "Foundation",

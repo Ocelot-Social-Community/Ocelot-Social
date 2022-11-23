@@ -87,19 +87,20 @@ export default {
   },
   methods: {
     cancelModal() {
-      this.user = {}
+      this.clear()
       this.isOpen = false
     },
     closeModal() {
+      this.clear()
       this.isOpen = false
     },
     confirmModal() {
       this.addMemberToGroup()
-      this.clear()
       this.isOpen = false
+      this.clear()
     },
-    onFocus(event) {},
-    onBlur(event) {
+    onFocus() {},
+    onBlur() {
       this.query = ''
     },
     handleInput(event) {
@@ -119,10 +120,10 @@ export default {
       this.users = []
     },
     onSelect(item) {
-      this.user = item
+      this.user = { ...item }
       if (this.groupMembers.find((member) => member.id === this.user.id)) {
-        this.$toast.error(this.$t('group.errors.userAlreadyMember', { slug: this.user.slug }))
-        this.user = {}
+        this.$toast.error(this.$t('group.errors.userAlreadyMember', { name: this.user.name }))
+        this.clear()
         return
       }
       this.isOpen = true
@@ -135,10 +136,13 @@ export default {
           mutation: changeGroupMemberRoleMutation(),
           variables: { groupId: this.groupId, userId: this.user.id, roleInGroup: newRole },
         })
-        this.$emit('loadGroupMembers')
         this.$toast.success(
-          this.$t('group.changeMemberRole', { role: this.$t(`group.roles.${newRole}`) }),
+          this.$t('group.addMemberToGroupSuccess', {
+            role: this.$t(`group.roles.${newRole}`),
+            name: this.user.name,
+          }),
         )
+        this.$emit('loadGroupMembers')
       } catch (error) {
         this.$toast.error(error.message)
       }

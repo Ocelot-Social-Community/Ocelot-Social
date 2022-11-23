@@ -139,30 +139,6 @@ export default {
         this.$toast.error(error.message)
       }
     },
-    async addMemberToGroup() {
-      const newRole = 'usual'
-      if (this.groupMembers.find((member) => member.id === this.user.id)) {
-        this.$toast.error(this.$t('group.errors.userAlreadyMember', { slug: this.user.slug }))
-        return
-      }
-      try {
-        await this.$apollo.mutate({
-          mutation: changeGroupMemberRoleMutation(),
-          variables: { groupId: this.groupId, userId: this.user.id, roleInGroup: newRole },
-        })
-        this.$emit('loadGroupMembers')
-        this.$toast.success(
-          this.$t('group.changeMemberRole', { role: this.$t(`group.roles.${newRole}`) }),
-        )
-      } catch (error) {
-        this.$toast.error(error.message)
-      }
-    },
   },
 }
 </script>
-<style scoped>
-.ds-select-dropdown {
-  position: unset;
-}
-</style>

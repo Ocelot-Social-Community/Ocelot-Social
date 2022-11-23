@@ -405,9 +405,10 @@
     },
     "actionRadius": "Aktionsradius",
     "addMemberToGroup": "Zur Gruppe hinzufügen",
+    "addMemberToGroupSuccess": "„{name}“ wurde der Gruppe mit der Rolle „{role}“ hinzugefügt!",
     "addUser": "Benutzer hinzufügen",
     "addUserNoOptions": "Keine Nutzer gefunden!",
-    "addUserPlaceholder": "Benutzername oder Slug",
+    "addUserPlaceholder": "Benutzername",
     "allGroups": "Alle Gruppen",
     "categories": "Thema ::: Themen",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
@@ -424,7 +425,7 @@
       "title": "Meine Gruppe ändern"
     },
     "errors": {
-      "userAlreadyMember": "Nutzer @{slug} ist bereits Mitglied"
+      "userAlreadyMember": "Nutzer „{name}“ ist bereits Mitglied"
     },
     "follow": "Folge",
     "foundation": "Gründung",
@@ -455,7 +456,7 @@
     "modal": {
       "cancel": "Abbrechen",
       "confirm": "Bestätigen",
-      "confirmAddGroupMemberText": "Nutzer “{name}” zur Gruppe hinzufügen?",
+      "confirmAddGroupMemberText": "Nutzer „{name}“ zur Gruppe hinzufügen?",
       "confirmAddGroupMemberTitle": "Bestätigen"
     },
     "myGroups": "Meine Gruppen",
