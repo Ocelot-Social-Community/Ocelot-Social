@@ -1,11 +1,10 @@
 ---
-name: "\U0001F527 Refactor"
+name: 🔧 Refactor ticket
 about: Help us improve our code by refactoring it.
-title: "\U0001F527 [Refactor] XXX"
 labels: refactor
-assignees: ''
-
+title: 🔧 [Refactor]
 ---
+<!-- You can find the latest issue templates here https://github.com/ulfgebhardt/issue-templates -->
 
-## 🔧 Refactor
+## 🔧 Refactor ticket
 <!-- Describe your issue in detail. Include screenshots if needed. Give us as much information as possible. Use a clear and concise description of what the problem is.-->

@@ -1,13 +1,13 @@
 export default {
   MENU: [
     // {
-    //   name: 'Beiträge',
-    //   path: '/#',
+    //   nameIdent: 'nameIdent',
+    //   path: '/',
     // },
     // {
-    //   name: 'Über Yunite',
-    //   path: '/#',
-    //   url: 'https://yunite.org',
+    //   nameIdent: 'nameIdent',
+    //   url: 'https://ocelot.social',
+    //   target: '_blank',
     // },
   ],
 }

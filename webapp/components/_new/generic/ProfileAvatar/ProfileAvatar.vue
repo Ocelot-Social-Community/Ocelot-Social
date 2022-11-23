@@ -1,14 +1,14 @@
 <template>
-  <div :class="['user-avatar', size && `--${this.size}`, !isAvatar && '--no-image']">
+  <div :class="['profile-avatar', size && `--${this.size}`, !isAvatar && '--no-image']">
     <!-- '--no-image' is neccessary, because otherwise we still have a little unwanted boarder araund the image for images with white backgrounds -->
-    <span class="initials">{{ userInitials }}</span>
+    <span class="initials">{{ profileInitials }}</span>
     <base-icon v-if="isAnonymous" name="eye-slash" />
     <img
       v-if="isAvatar"
-      :src="user.avatar | proxyApiUrl"
+      :src="profile.avatar | proxyApiUrl"
       class="image"
-      :alt="user.name"
-      :title="user.name"
+      :alt="profile.name"
+      :title="profile.name"
       @error="$event.target.style.display = 'none'"
     />
   </div>
@@ -16,7 +16,7 @@
 
 <script>
 export default {
-  name: 'UserAvatar',
+  name: 'ProfileAvatar',
   props: {
     size: {
       type: String,
@@ -25,30 +25,30 @@ export default {
         return value.match(/(small|large)/)
       },
     },
-    user: {
+    profile: {
       type: Object,
       default: null,
     },
   },
   computed: {
     isAnonymous() {
-      return !this.user || !this.user.name || this.user.name.toLowerCase() === 'anonymous'
+      return !this.profile || !this.profile.name || this.profile.name.toLowerCase() === 'anonymous'
     },
     isAvatar() {
       // TODO may we could test as well if the image is reachable? otherwise the background gets white and the initails can not be read
-      return this.user && this.user.avatar
+      return this.profile && this.profile.avatar
     },
-    userInitials() {
+    profileInitials() {
       if (this.isAnonymous) return ''
 
-      return this.user.name.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
+      return this.profile.name.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
     },
   },
 }
 </script>
 
 <style lang="scss">
-.user-avatar {
+.profile-avatar {
   position: relative;
   height: $size-avatar-base;
   width: $size-avatar-base;

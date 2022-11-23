@@ -49,8 +49,8 @@ export default (i18n) => {
 
 export const minimisedUserQuery = () => {
   return gql`
-    query {
-      User(orderBy: slug_asc) {
+    query ($slug: String) {
+      User(slug: $slug, orderBy: slug_asc) {
         id
         slug
         name
@@ -221,25 +221,25 @@ export const updateUserMutation = () => {
       $id: ID!
       $slug: String
       $name: String
-      $locationName: String
       $about: String
       $allowEmbedIframes: Boolean
       $showShoutsPublicly: Boolean
       $sendNotificationEmails: Boolean
       $termsAndConditionsAgreedVersion: String
       $avatar: ImageInput
+      $locationName: String # empty string '' sets it to null
     ) {
       UpdateUser(
         id: $id
         slug: $slug
         name: $name
-        locationName: $locationName
         about: $about
         allowEmbedIframes: $allowEmbedIframes
         showShoutsPublicly: $showShoutsPublicly
         sendNotificationEmails: $sendNotificationEmails
         termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
         avatar: $avatar
+        locationName: $locationName
       ) {
         id
         slug

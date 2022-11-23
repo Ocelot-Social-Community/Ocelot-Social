@@ -357,15 +357,16 @@
     "placeholder": "Schreib etwas Inspirierendes …"
   },
   "error-pages": {
-    "403-default": "Kein Zugang zu dieser Seite",
-    "404-default": "Diese Seite konnte nicht gefunden werden",
-    "500-default": "Internal Server Error",
-    "503-default": "Dienst steht nicht zur Verfügung",
-    "back-to-index": "Zurück zur Startseite",
-    "cannot-edit-post": "Dieser Beitrag kann nicht editiert werden",
-    "default": "Ein Fehler ist aufgetreten",
-    "post-not-found": "Dieser Beitrag konnte nicht gefunden werden",
-    "profile-not-found": "Dieses Profil konnte nicht gefunden werden"
+    "403-default": "Kein Zugang zu dieser Seite!",
+    "404-default": "Diese Seite konnte nicht gefunden werden!",
+    "500-default": "Internal Server Error!",
+    "503-default": "Dienst steht nicht zur Verfügung!",
+    "back-to-index": "Zurück zur Startseite!",
+    "cannot-edit-post": "Dieser Beitrag kann nicht editiert werden!",
+    "default": "Ein Fehler ist aufgetreten!",
+    "group-not-found": "Dieses Gruppenprofil konnte nicht gefunden werden!",
+    "post-not-found": "Dieser Beitrag konnte nicht gefunden werden!",
+    "profile-not-found": "Dieses Profil konnte nicht gefunden werden!"
   },
   "filter-menu": {
     "all": "Alle",
@@ -394,10 +395,94 @@
     "follow": "Folgen",
     "following": "Folge Ich"
   },
+  "group": {
+    "actionRadii": {
+      "continental": "Kontinentale Gruppe",
+      "global": "Globale Gruppe",
+      "interplanetary": "Interplanetare Gruppe",
+      "national": "Nationale Gruppe",
+      "regional": "Regionale Gruppe"
+    },
+    "actionRadius": "Aktionsradius",
+    "addMemberToGroup": "Zur Gruppe hinzufügen",
+    "addUser": "Benutzer hinzufügen",
+    "addUserPlaceholder": "eindeutiger Benutzername > @slug-from-user",
+    "allGroups": "Alle Gruppen",
+    "categories": "Thema ::: Themen",
+    "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
+    "contentMenu": {
+      "visitGroupPage": "Gruppe anzeigen"
+    },
+    "createNewGroup": {
+      "title": "Erstelle eine neue Gruppe",
+      "tooltip": "Erstelle eine neue Gruppe"
+    },
+    "description": "Beschreibung",
+    "editGroupSettings": {
+      "groupName": "Einstellungen für „{name}“",
+      "title": "Meine Gruppe ändern"
+    },
+    "errors": {
+      "userAlreadyMember": "Nutzer @{slug} ist bereits Mitglied"
+    },
+    "follow": "Folge",
+    "foundation": "Gründung",
+    "general": "Allgemein",
+    "goal": "Ziel der Gruppe",
+    "groupCreated": "Die Gruppe wurde angelegt!",
+    "in": "in",
+    "joinLeaveButton": {
+      "iAmMember": "Bin Mitglied",
+      "join": "Beitreten"
+    },
+    "labelSlug": "Eindeutiger Gruppenname",
+    "leaveModal": {
+      "confirmButton": "Verlassen",
+      "message": "Eine Gruppe zu verlassen ist möglicherweise nicht rückgängig zu machen!<br>Gruppe <b>„{name}“</b> verlassen!",
+      "title": "Möchtest du wirklich die Gruppe verlassen?"
+    },
+    "members": "Mitglieder",
+    "membersAdministrationList": {
+      "avatar": "Avatar",
+      "name": "Name",
+      "roleInGroup": "Rolle",
+      "slug": "Eindeutiger Name"
+    },
+    "membersCount": "Mitglied ::: Mitglieder",
+    "membersListTitle": "Gruppenmitglieder",
+    "membersListTitleNotAllowedSeeingGroupMembers": "Gruppenmitglieder unsichtbar",
+    "myGroups": "Meine Gruppen",
+    "name": "Gruppenname",
+    "radius": "Radius",
+    "removeMember": "Mitglied aus der Gruppe entfernen?",
+    "removeMemberButton": "Entfernen",
+    "role": "Deine Rolle in der Gruppe",
+    "roles": {
+      "admin": "Administrator",
+      "owner": "Inhaber",
+      "pending": "Ausstehendes Mitglied",
+      "usual": "Einfaches Mitglied"
+    },
+    "save": "Neue Gruppe anlegen",
+    "type": "Gruppentyp",
+    "types": {
+      "closed": "Geschlossene Gruppe",
+      "hidden": "Versteckte Gruppe",
+      "public": "Öffentliche Gruppe"
+    },
+    "update": "Änderung speichern",
+    "updatedGroup": "Die Gruppendaten wurden geändert!"
+  },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",
     "hashtag-search": "Suche nach #{hashtag}",
     "title": "Deine Filterblase"
+  },
+  "header": {
+    "avatarMenu": {
+      "Groups": "Gruppen",
+      "myProfile": "Mein Profil"
+    }
   },
   "index": {
     "change-filter-settings": "Verändere die Filter-Einstellungen, um mehr Ergebnisse zu erhalten.",
@@ -528,7 +613,19 @@
       "submitted": "Kommentar gesendet",
       "updated": "Änderungen gespeichert"
     },
+    "createNewPost": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Erstelle einen neuen Beitrag"
+    },
     "edited": "bearbeitet",
+    "editPost": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Bearbeite deinen Beitrag"
+    },
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
@@ -541,9 +638,18 @@
     "pinned": "Meldung",
     "takeAction": {
       "name": "Aktiv werden"
+    },
+    "viewPost": {
+      "forGroup": {
+        "title": "In der Gruppe „{name}“"
+      },
+      "title": "Beitrag"
     }
   },
   "profile": {
+    "avatar": {
+      "submitted": "Erfolgreich hochgeladen!"
+    },
     "commented": "Kommentiert",
     "follow": "Folgen",
     "followers": "Folgen",
@@ -554,7 +660,6 @@
       "title": "Lade jemanden zu {APPLICATION_NAME} ein!"
     },
     "memberSince": "Mitglied seit",
-    "name": "Mein Profil",
     "network": {
       "andMore": "und {number} weitere …",
       "followedBy": "wird gefolgt von:",
@@ -644,11 +749,12 @@
     "failed": "Nichts gefunden",
     "for": "Suche nach ",
     "heading": {
+      "Group": "Gruppe ::: Gruppen",
       "Post": "Beitrag ::: Beiträge",
       "Tag": "Hashtag ::: Hashtags",
       "User": "Benutzer ::: Benutzer"
     },
-    "hint": "Wonach suchst Du? Nutze !… für Beiträge, @… für Mitglieder, #… für Hashtags",
+    "hint": "Wonach suchst Du? Nutze !… für Beiträge, @… für Mitglieder, &… für Gruppen, #… für Hashtags",
     "no-results": "Keine Ergebnisse für \"{search}\" gefunden. Versuch' es mit einem anderen Begriff!",
     "page": "Seite",
     "placeholder": "Suchen",
@@ -850,10 +956,5 @@
     "newTermsAndConditions": "Neue Nutzungsbedingungen",
     "termsAndConditionsNewConfirm": "Ich habe die neuen Nutzungsbedingungen durchgelesen und stimme zu.",
     "termsAndConditionsNewConfirmText": "Bitte lies Dir die neuen Nutzungsbedingungen jetzt durch!"
-  },
-  "user": {
-    "avatar": {
-      "submitted": "Erfolgreich hochgeladen!"
-    }
   }
 }

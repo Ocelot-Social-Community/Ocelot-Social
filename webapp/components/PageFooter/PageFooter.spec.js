@@ -100,21 +100,41 @@ describe('PageFooter.vue', () => {
         const links = {
           ...linksDefault,
           ORGANIZATION: linksDefault.ORGANIZATION.overwrite({
-            externalLink: 'https://ocelot.social',
+            externalLink: {
+              url: 'https://ocelot.social',
+              target: '_blank',
+            },
           }),
           IMPRINT: linksDefault.IMPRINT.overwrite({
-            externalLink: 'https://ocelot.social/IMPRINT',
+            externalLink: {
+              url: 'https://ocelot.social/IMPRINT',
+              target: '_blank',
+            },
           }),
           TERMS_AND_CONDITIONS: linksDefault.TERMS_AND_CONDITIONS.overwrite({
-            externalLink: 'https://ocelot.social/TERMS_AND_CONDITIONS',
+            externalLink: {
+              url: 'https://ocelot.social/TERMS_AND_CONDITIONS',
+              target: '_blank',
+            },
           }),
           CODE_OF_CONDUCT: linksDefault.CODE_OF_CONDUCT.overwrite({
-            externalLink: 'https://ocelot.social/CODE_OF_CONDUCT',
+            externalLink: {
+              url: 'https://ocelot.social/CODE_OF_CONDUCT',
+              target: '_blank',
+            },
           }),
           DATA_PRIVACY: linksDefault.DATA_PRIVACY.overwrite({
-            externalLink: 'https://ocelot.social/DATA_PRIVACY',
+            externalLink: {
+              url: 'https://ocelot.social/DATA_PRIVACY',
+              target: '_blank',
+            },
           }),
-          FAQ: linksDefault.FAQ.overwrite({ externalLink: 'https://ocelot.social/FAQ' }),
+          FAQ: linksDefault.FAQ.overwrite({
+            externalLink: {
+              url: 'https://ocelot.social/FAQ',
+              target: '_blank',
+            },
+          }),
         }
         wrapper = Wrapper()
         wrapper.setData({ links })

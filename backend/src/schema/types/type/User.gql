@@ -33,8 +33,8 @@ type User {
   invitedBy: User @relation(name: "INVITED", direction: "IN")
   invited: [User] @relation(name: "INVITED", direction: "OUT")
 
-  location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
   locationName: String
+  location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
   about: String
   socialMedia: [SocialMedia]! @relation(name: "OWNED_BY", direction: "IN")
 
@@ -122,6 +122,8 @@ type User {
   RETURN collect(category.id)
   """
   )
+
+  myRoleInGroup: GroupMemberRole
 }
 
 
@@ -164,19 +166,19 @@ input _UserFilter {
 
 type Query {
   User(
-  id: ID
-  email: String # admins need to search for a user sometimes
-  name: String
-  slug: String
-  role: UserRole
-  locationName: String
-  about: String
-  createdAt: String
-  updatedAt: String
-  first: Int
-  offset: Int
-  orderBy: [_UserOrdering]
-  filter: _UserFilter
+    id: ID
+    email: String # admins need to search for a user sometimes
+    name: String
+    slug: String
+    role: UserRole
+    locationName: String
+    about: String
+    createdAt: String
+    updatedAt: String
+    first: Int
+    offset: Int
+    orderBy: [_UserOrdering]
+    filter: _UserFilter
   ): [User]
 
   availableRoles: [UserRole]! 
@@ -184,18 +186,6 @@ type Query {
   blockedUsers: [User]
   isLoggedIn: Boolean!
   currentUser: User
-  findUsers(query: String!,limit: Int = 10, filter: _UserFilter): [User]!
-    @cypher(
-      statement: """
-      CALL db.index.fulltext.queryNodes('user_fulltext_search', $query)
-      YIELD node as post, score
-      MATCH (user)
-      WHERE score >= 0.2
-      AND NOT user.deleted = true AND NOT user.disabled = true
-      RETURN user
-      LIMIT $limit
-        """
-    )
 }
 
 enum Deletable {
@@ -205,19 +195,19 @@ enum Deletable {
 
 type Mutation {
   UpdateUser (
-  id: ID!
-  name: String
-  email: String
-  slug: String
-  avatar: ImageInput
-  locationName: String
-  about: String
-  termsAndConditionsAgreedVersion: String
-  termsAndConditionsAgreedAt: String
-  allowEmbedIframes: Boolean
-  showShoutsPublicly: Boolean
-  sendNotificationEmails: Boolean
-  locale: String
+    id: ID!
+    name: String
+    email: String
+    slug: String
+    avatar: ImageInput
+    locationName: String # empty string '' sets it to null
+    about: String
+    termsAndConditionsAgreedVersion: String
+    termsAndConditionsAgreedAt: String
+    allowEmbedIframes: Boolean
+    showShoutsPublicly: Boolean
+    sendNotificationEmails: Boolean
+    locale: String
   ): User
 
   DeleteUser(id: ID!, resource: [Deletable]): User

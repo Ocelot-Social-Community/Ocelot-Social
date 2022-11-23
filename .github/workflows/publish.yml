@@ -4,7 +4,9 @@ on:
   push:
     branches:
       - master
-      # - 5093-fix-automatic-deployment # for testing while developing
+      # - 5059-epic-groups # for testing while developing
+      # template branches in repo
+      # - template--separate-branch-auto-deployment--5059-epic-groups
 
 jobs:
   ##############################################################################
@@ -303,16 +305,19 @@ jobs:
       # because this step 'kubectl -n default rollout status deployment/* --timeout=600s' does not work as expected
       #   and we need the pods to be up again for cleaning and seeding the Neo4j database and the backend.
       #   !!! this is not a perfect solution !!!
-      # deployments are regularely up again after 3 minutes and 10 seconds
+      # deployments are regularly up again after 3 minutes and 10 seconds
       - name: Sleep for 4 minutes, means 240 seconds
         run: sleep 240s
         shell: bash
-      - name: Verify deployment and wait for the pods of each deplyment to get ready for cleaning and seeding of the database
+      - name: Verify deployment and wait for the pods of each deployment to get ready for cleaning and seeding of the database
         run: |
           kubectl -n default rollout status deployment/ocelot-backend --timeout=600s
           kubectl -n default rollout status deployment/ocelot-neo4j --timeout=600s
           kubectl -n default rollout status deployment/ocelot-maintenance --timeout=600s
           kubectl -n default rollout status deployment/ocelot-webapp --timeout=600s
+      - name: Run migrations for Neo4j database via backend for staging
+        run: |
+          kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "yarn prod:migrate up"
       - name: Reset and seed Neo4j database via backend for staging
         # db cleaning and seeding is only possible in production if env 'PRODUCTION_DB_CLEAN_ALLOW=true' is set in deployment
         run: |

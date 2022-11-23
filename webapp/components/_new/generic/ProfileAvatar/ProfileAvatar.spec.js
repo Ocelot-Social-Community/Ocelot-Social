@@ -1,10 +1,10 @@
 import { mount } from '@vue/test-utils'
-import UserAvatar from './UserAvatar.vue'
+import ProfileAvatar from './ProfileAvatar'
 import BaseIcon from '~/components/_new/generic/BaseIcon/BaseIcon'
 
 const localVue = global.localVue
 
-describe('UserAvatar.vue', () => {
+describe('ProfileAvatar', () => {
   let propsData, wrapper
   beforeEach(() => {
     propsData = {}
@@ -12,7 +12,7 @@ describe('UserAvatar.vue', () => {
   })
 
   const Wrapper = () => {
-    return mount(UserAvatar, { propsData, localVue })
+    return mount(ProfileAvatar, { propsData, localVue })
   }
 
   it('renders no image', () => {
@@ -23,39 +23,39 @@ describe('UserAvatar.vue', () => {
     expect(wrapper.find(BaseIcon).exists()).toBe(true)
   })
 
-  describe('given a user', () => {
+  describe('given a profile', () => {
     describe('with no image', () => {
       beforeEach(() => {
         propsData = {
-          user: {
+          profile: {
             name: 'Matt Rider',
           },
         }
         wrapper = Wrapper()
       })
 
-      describe('no user name', () => {
+      describe('no profile name', () => {
         it('renders an icon', () => {
-          propsData = { user: { name: null } }
+          propsData = { profile: { name: null } }
           wrapper = Wrapper()
           expect(wrapper.find(BaseIcon).exists()).toBe(true)
         })
       })
 
-      describe("user name is 'Anonymous'", () => {
+      describe("profile name is 'Anonymous'", () => {
         it('renders an icon', () => {
-          propsData = { user: { name: 'Anonymous' } }
+          propsData = { profile: { name: 'Anonymous' } }
           wrapper = Wrapper()
           expect(wrapper.find(BaseIcon).exists()).toBe(true)
         })
       })
 
-      it('displays user initials', () => {
+      it('displays profile initials', () => {
         expect(wrapper.find('.initials').text()).toEqual('MR')
       })
 
       it('displays no more than 3 initials', () => {
-        propsData = { user: { name: 'Ana Paula Nunes Marques' } }
+        propsData = { profile: { name: 'Ana Paula Nunes Marques' } }
         wrapper = Wrapper()
         expect(wrapper.find('.initials').text()).toEqual('APN')
       })
@@ -64,7 +64,7 @@ describe('UserAvatar.vue', () => {
     describe('with a relative avatar url', () => {
       beforeEach(() => {
         propsData = {
-          user: {
+          profile: {
             name: 'Not Anonymous',
             avatar: {
               url: '/avatar.jpg',
@@ -82,7 +82,7 @@ describe('UserAvatar.vue', () => {
     describe('with an absolute avatar url', () => {
       beforeEach(() => {
         propsData = {
-          user: {
+          profile: {
             name: 'Not Anonymous',
             avatar: {
               url: 'https://s3.amazonaws.com/uifaces/faces/twitter/sawalazar/128.jpg',

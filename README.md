@@ -65,11 +65,18 @@ Change into the new folder.
 $ cd Ocelot-Social
 ```
 
+## Live Demo And Developer Logins
+
+**Try out our deployed [development environment](https://stage.ocelot.social).**
+
+Visit our staging networks:
+
+* central staging network: [stage.ocelot.social](https://stage.ocelot.social)
+<!-- - rebranded staging network: [rebrand.ocelot.social](https://stage.ocelot.social). -->
+
 ### Login
 
-<!-- Try out our deployed [development environment](https://develop.human-connection.org/). -->
-
-Logins in the browser after the following installations:
+Logins for the live demos and developers (local developers after the following installations) in the browser:
 
 | email | password | role |
 | :--- | :--- | :--- |
