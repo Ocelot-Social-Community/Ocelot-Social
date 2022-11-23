@@ -75,7 +75,6 @@ export default {
       users: [],
       id: 'search-user-to-add-to-group',
       query: '',
-      searchProcess: null,
       user: {},
       isOpen: false,
     }
@@ -120,7 +119,7 @@ export default {
       this.users = []
     },
     onSelect(item) {
-      this.user = { ...item }
+      this.user = item
       if (this.groupMembers.find((member) => member.id === this.user.id)) {
         this.$toast.error(this.$t('group.errors.userAlreadyMember', { name: this.user.name }))
         this.clear()
@@ -131,6 +130,7 @@ export default {
     onEnter() {},
     async addMemberToGroup() {
       const newRole = 'usual'
+      const username = this.user.name
       try {
         await this.$apollo.mutate({
           mutation: changeGroupMemberRoleMutation(),
@@ -139,7 +139,7 @@ export default {
         this.$toast.success(
           this.$t('group.addMemberToGroupSuccess', {
             role: this.$t(`group.roles.${newRole}`),
-            name: this.user.name,
+            name: username,
           }),
         )
         this.$emit('loadGroupMembers')
