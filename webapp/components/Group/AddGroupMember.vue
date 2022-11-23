@@ -7,6 +7,8 @@
         type="search"
         icon="search"
         label-prop="id"
+        v-model="query"
+        :id="id"
         :icon-right="null"
         :options="users"
         :loading="$apollo.queries.searchUsers.loading"
@@ -91,9 +93,8 @@ export default {
     closeModal() {
       this.isOpen = false
     },
-    confirmModal(item) {
+    confirmModal() {
       this.addMemberToGroup()
-      item = null
       this.clear()
       this.isOpen = false
     },
