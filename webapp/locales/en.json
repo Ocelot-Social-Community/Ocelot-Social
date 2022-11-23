@@ -804,7 +804,7 @@
       "add-new-link": "Add new link",
       "delete-modal": {
         "confirm-button": "Delete",
-        "message": "Delete \"{name}\".",
+        "message": "Delete “{name}”.",
         "title": "Do you really want to delete your link?"
       },
       "edit-link": "Edit link",
