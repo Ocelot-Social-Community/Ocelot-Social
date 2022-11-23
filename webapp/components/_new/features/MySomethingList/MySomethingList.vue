@@ -32,11 +32,11 @@
                 data-test="edit-button"
               />
               <base-button
+                :title="$t('actions.delete')"
                 icon="trash"
                 circle
                 ghost
                 @click="handleDeleteItem(item)"
-                :title="$t('actions.delete')"
                 data-test="delete-button"
               />
             </template>
