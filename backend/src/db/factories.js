@@ -23,6 +23,7 @@ export const cleanDatabase = async (options = {}) => {
       return transaction.run(
         `
           MATCH (everything)
+          WHERE NOT 'Migration' IN labels(everything) 
           DETACH DELETE everything
         `,
       )
