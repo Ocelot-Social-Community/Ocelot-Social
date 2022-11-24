@@ -1,7 +1,13 @@
 import walkRecursive from '../helpers/walkRecursive'
 import { cleanHtml } from '../middleware/helpers/cleanHtml.js'
 
-const fields = ['content', 'contentExcerpt', 'reasonDescription']
+const fields = [
+  'content',
+  'contentExcerpt',
+  'reasonDescription',
+  'description',
+  'descriptionExcerpt',
+]
 
 export default {
   Mutation: async (resolve, root, args, context, info) => {
