@@ -12,7 +12,7 @@ function walkRecursive(data, fields, fieldName, callback, _key) {
   if (data && typeof data === 'string' && fields.includes(_key)) {
     // well we found what we searched for, lets replace the value with our callback result
     const key = _key.split('!')
-    if (key.length === 1 || key[1] !== fieldName) data = callback(data, _key)
+    if (key.length === 1 || key[1] !== fieldName) data = callback(data, key[0])
   } else if (data && Array.isArray(data)) {
     // go into the rabbit hole and dig through that array
     data.forEach((res, index) => {
