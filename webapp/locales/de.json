@@ -425,7 +425,7 @@
       "title": "Meine Gruppe ändern"
     },
     "errors": {
-      "userAlreadyMember": "Nutzer „{name}“ ist bereits Mitglied"
+      "userAlreadyMember": "Benutzer „{name}“ ist bereits Mitglied!"
     },
     "follow": "Folge",
     "foundation": "Gründung",
