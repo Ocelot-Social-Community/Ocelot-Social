@@ -15,28 +15,12 @@
     "dev": "nodemon --exec babel-node src/ -e js,gql",
     "dev:debug": "nodemon --exec babel-node --inspect=0.0.0.0:9229 src/ -e js,gql",
     "lint": "eslint src --config .eslintrc.js",
-    "test": "cross-env NODE_ENV=test NODE_OPTIONS=--max-old-space-size=8192 jest --forceExit --detectOpenHandles --runInBand --coverage --logHeapUsage",
+    "test": "cross-env NODE_ENV=test NODE_OPTIONS=--max-old-space-size=8192 jest --runInBand --coverage --forceExit --detectOpenHandles",
     "db:clean": "babel-node src/db/clean.js",
     "db:reset": "yarn run db:clean",
     "db:seed": "babel-node src/db/seed.js",
     "db:migrate": "yarn run __migrate --store ./src/db/migrate/store.js",
     "db:migrate:create": "yarn run __migrate --template-file ./src/db/migrate/template.js --date-format 'yyyymmddHHmmss' create"
-  },
-  "jest": {
-    "verbose": true,
-    "collectCoverageFrom": [
-      "**/*.js",
-      "!**/node_modules/**",
-      "!**/test/**",
-      "!**/dist/**",
-      "!**/src/**/?(*.)+(spec|test).js?(x)"
-    ],
-    "coverageReporters": [
-      "lcov"
-    ],
-    "testMatch": [
-      "**/src/**/?(*.)+(spec|test).js?(x)"
-    ]
   },
   "dependencies": {
     "@babel/cli": "~7.8.4",
