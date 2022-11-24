@@ -65,6 +65,26 @@ export default {
     categoryButtonsId(categoryId) {
       return `category-buttons-${categoryId}`
     },
+    sortCategories(categories) {
+      const misc = categories.find((cat) => cat.slug === 'miscellaneous')
+      const sortedCategories = categories
+        .filter((cat) => cat.slug !== 'miscellaneous')
+        .sort((a, b) => {
+          if (
+            this.$t(`contribution.category.name.${a.slug}`) <
+            this.$t(`contribution.category.name.${b.slug}`)
+          )
+            return -1
+          if (
+            this.$t(`contribution.category.name.${a.slug}`) >
+            this.$t(`contribution.category.name.${b.slug}`)
+          )
+            return 1
+          return 0
+        })
+      if (misc) sortedCategories.push(misc)
+      return sortedCategories
+    },
   },
   apollo: {
     Category: {
@@ -72,7 +92,7 @@ export default {
         return CategoryQuery()
       },
       result({ data: { Category } }) {
-        this.categories = Category
+        this.categories = this.sortCategories(Category)
       },
     },
   },
