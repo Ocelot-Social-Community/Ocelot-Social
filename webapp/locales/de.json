@@ -405,8 +405,10 @@
     },
     "actionRadius": "Aktionsradius",
     "addMemberToGroup": "Zur Gruppe hinzufügen",
+    "addMemberToGroupSuccess": "„{name}“ wurde der Gruppe mit der Rolle „{role}“ hinzugefügt!",
     "addUser": "Benutzer hinzufügen",
-    "addUserPlaceholder": "eindeutiger Benutzername > @slug-from-user",
+    "addUserNoOptions": "Keine Nutzer gefunden!",
+    "addUserPlaceholder": "Benutzername",
     "allGroups": "Alle Gruppen",
     "categories": "Thema ::: Themen",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
@@ -423,7 +425,7 @@
       "title": "Meine Gruppe ändern"
     },
     "errors": {
-      "userAlreadyMember": "Nutzer @{slug} ist bereits Mitglied"
+      "userAlreadyMember": "Benutzer „{name}“ ist bereits Mitglied!"
     },
     "follow": "Folge",
     "foundation": "Gründung",
@@ -451,6 +453,12 @@
     "membersCount": "Mitglied ::: Mitglieder",
     "membersListTitle": "Gruppenmitglieder",
     "membersListTitleNotAllowedSeeingGroupMembers": "Gruppenmitglieder unsichtbar",
+    "modal": {
+      "cancel": "Abbrechen",
+      "confirm": "Bestätigen",
+      "confirmAddGroupMemberText": "Nutzer „{name}“ zur Gruppe hinzufügen?",
+      "confirmAddGroupMemberTitle": "Bestätigen"
+    },
     "myGroups": "Meine Gruppen",
     "name": "Gruppenname",
     "radius": "Radius",

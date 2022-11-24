@@ -1,8 +1,12 @@
 <template>
   <div>
+    <add-group-member
+      :groupId="group.id"
+      :groupMembers="groupMembers"
+      @loadGroupMembers="loadGroupMembers"
+    />
+    <ds-space margin-bottom="small" />
     <base-card>
-      <ds-heading tag="h3">{{ $t('group.members') }}</ds-heading>
-      <ds-space margin="large" />
       <group-member
         :groupId="group.id"
         :groupMembers="groupMembers"
@@ -14,11 +18,13 @@
 
 <script>
 import GroupMember from '~/components/Group/GroupMember'
+import AddGroupMember from '~/components/Group/AddGroupMember'
 import { groupMembersQuery } from '~/graphql/groups.js'
 
 export default {
   components: {
     GroupMember,
+    AddGroupMember,
   },
   props: {
     group: {
