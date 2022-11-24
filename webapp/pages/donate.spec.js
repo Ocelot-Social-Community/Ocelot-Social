@@ -10,6 +10,11 @@ const assignMock = jest.fn()
 delete window.location
 window.location = { assign: assignMock }
 
+const openMock = jest.fn()
+delete window.open
+window.open = openMock
+
+
 describe('donate.vue', () => {
   let wrapper
   let mocks
