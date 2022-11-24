@@ -425,7 +425,7 @@
       "title": "Edit My Group"
     },
     "errors": {
-      "userAlreadyMember": "User “{name}” is already a member"
+      "userAlreadyMember": "User “{name}” is already a member!"
     },
     "follow": "Follow",
     "foundation": "Foundation",
