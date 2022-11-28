@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - do-not-delete-migrations-on-db-reset
       # - 5059-epic-groups # for testing while developing
       # template branches in repo
       # - template--separate-branch-auto-deployment--5059-epic-groups
