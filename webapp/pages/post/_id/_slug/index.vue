@@ -61,7 +61,7 @@
               <ds-space margin="xx-large" />
               <ds-space margin="xx-small" />
               <hc-category
-                v-for="category in sortCategories(post.categories, $t)"
+                v-for="category in sortCategories(post.categories)"
                 :key="category.id"
                 :icon="category.icon"
                 :name="$t(`contribution.category.name.${category.slug}`)"

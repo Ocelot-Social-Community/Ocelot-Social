@@ -74,7 +74,7 @@ export default {
         return CategoryQuery()
       },
       result({ data: { Category } }) {
-        this.categories = this.sortCategories(Category, this.$t)
+        this.categories = this.sortCategories(Category)
       },
     },
   },

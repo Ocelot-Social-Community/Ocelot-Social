@@ -86,7 +86,7 @@ export default {
       },
       update({ Category }) {
         if (!Category) return []
-        this.categories = this.sortCategories(Category, this.$t)
+        this.categories = this.sortCategories(Category)
       },
       fetchPolicy: 'cache-and-network',
     },
