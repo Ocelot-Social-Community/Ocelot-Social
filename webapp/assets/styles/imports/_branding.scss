@@ -5,29 +5,37 @@
 */
  
 
-  @font-face {
-    font-family: "Overpass";
-    src: local("Overpass"),   url(../../fonts/Overpass-VariableFont_wght.ttf) format("truetype");}
+  
+@font-face {
+    font-family: Overpass;
+    src: url('~@/assets/fonts/Overpass-VariableFont_wght.ttf');
+}
 
-  body {
+body {
     font-family: "Overpass";
   }
 
 $color-primary: #6e8b87;
-$color-primary-light: #a6ff00;
-$color-primary-white: #fff;
-$color-primary-active: #fff;
+$color-primary-yunite: #a6ff00;
+$color-primary-light: #fff;
+$color-primary-active: hsla(0,0%,100%,.8);
 
 $color-header-background: $color-primary;
-$color-footer-background: $color-primary-light;
+$color-footer-background: $color-primary-yunite;
 
-$color-locale-menu: $color-primary-light;
+$color-locale-menu: $color-primary-yunite;
 
 .main-navigation a {
     color: $color-primary-light;
+    text-transform: uppercase;
+    font-size: 16px;
+    font-weight: 500;
 }
 .main-navigation a:hover {
-    color: $color-neutral-100;
+    color: $color-primary-active;
+}
+.main-navigation .router-link-exact-active { 
+    color:  #A6FF00!important;
 }
 
 .main-navigation .locale-menu {
@@ -40,4 +48,12 @@ $color-locale-menu: $color-primary-light;
 
 #nav-search-box .hc-hashtag a{
     color: #17b53f;
+}
+
+#footer {
+ background-color: $color-primary-yunite;
+}
+
+#footer a {
+    color: $color-primary;
 }
