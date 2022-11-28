@@ -39,12 +39,14 @@ import CategoryQuery from '~/graphql/CategoryQuery.js'
 import SaveCategories from '~/graphql/SaveCategories.js'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
+import SortCategories from '~/mixins/sortCategoriesMixin.js'
 
 export default {
   components: {
     FilterMenuSection,
     LabeledButton,
   },
+  mixins: [SortCategories],
   props: {
     showMobileMenu: { type: Boolean, default: false },
   },
@@ -84,7 +86,7 @@ export default {
       },
       update({ Category }) {
         if (!Category) return []
-        this.categories = Category
+        this.categories = this.sortCategories(Category, this.$t)
       },
       fetchPolicy: 'cache-and-network',
     },
