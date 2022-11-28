@@ -61,7 +61,7 @@
               <ds-space margin="xx-large" />
               <ds-space margin="xx-small" />
               <hc-category
-                v-for="category in post.categories"
+                v-for="category in sortCategories(post.categories, $t)"
                 :key="category.id"
                 :icon="category.icon"
                 :name="$t(`contribution.category.name.${category.slug}`)"
@@ -146,6 +146,7 @@ import PostQuery from '~/graphql/PostQuery'
 import { groupQuery } from '~/graphql/groups'
 import PostMutations from '~/graphql/PostMutations'
 import links from '~/constants/links.js'
+import SortCategories from '~/mixins/sortCategoriesMixin.js'
 
 export default {
   name: 'PostSlug',
@@ -164,6 +165,7 @@ export default {
     PageParamsLink,
     UserTeaser,
   },
+  mixins: [SortCategories],
   head() {
     return {
       title: this.title,

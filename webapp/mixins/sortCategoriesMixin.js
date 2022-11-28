@@ -1,9 +1,10 @@
 export default {
   methods: {
     sortCategories(categories, locales) {
-      const misc = categories.find((cat) => cat.slug === 'miscellaneous')
+      const miscSlug = 'miscellaneous'
+      const misc = categories.find((cat) => cat.slug === miscSlug)
       const sortedCategories = categories
-        .filter((cat) => cat.slug !== misc.slug)
+        .filter((cat) => cat.slug !== miscSlug)
         .sort((a, b) => {
           if (
             locales(`contribution.category.name.${a.slug}`) <
