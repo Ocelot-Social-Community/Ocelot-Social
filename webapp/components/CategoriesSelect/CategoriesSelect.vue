@@ -68,7 +68,7 @@ export default {
     sortCategories(categories) {
       const misc = categories.find((cat) => cat.slug === 'miscellaneous')
       const sortedCategories = categories
-        .filter((cat) => cat.slug !== 'miscellaneous')
+        .filter((cat) => cat.slug !== misc.slug)
         .sort((a, b) => {
           if (
             this.$t(`contribution.category.name.${a.slug}`) <
