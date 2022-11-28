@@ -3,9 +3,20 @@
     * Here, all SCSS variables and classes can be adapted to your custom design. 
     *
 */
+ 
+
+  @font-face {
+    font-family: "Overpass";
+    src: local("Overpass"),   url(../../fonts/Overpass-VariableFont_wght.ttf) format("truetype");}
+
+  body {
+    font-family: "Overpass";
+  }
 
 $color-primary: #6e8b87;
 $color-primary-light: #a6ff00;
+$color-primary-white: #fff;
+$color-primary-active: #fff;
 
 $color-header-background: $color-primary;
 $color-footer-background: $color-primary-light;
