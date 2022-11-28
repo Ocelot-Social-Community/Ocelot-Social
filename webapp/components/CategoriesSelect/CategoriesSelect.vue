@@ -23,6 +23,7 @@
 import CategoryQuery from '~/graphql/CategoryQuery'
 import { CATEGORIES_MAX } from '~/constants/categories.js'
 import xor from 'lodash/xor'
+import SortCategories from '~/mixins/sortCategoriesMixin.js'
 
 export default {
   inject: {
@@ -30,6 +31,7 @@ export default {
       default: null,
     },
   },
+  mixins: [SortCategories],
   props: {
     existingCategoryIds: { type: Array, default: () => [] },
     model: { type: String, required: true },
@@ -65,26 +67,6 @@ export default {
     categoryButtonsId(categoryId) {
       return `category-buttons-${categoryId}`
     },
-    sortCategories(categories) {
-      const misc = categories.find((cat) => cat.slug === 'miscellaneous')
-      const sortedCategories = categories
-        .filter((cat) => cat.slug !== misc.slug)
-        .sort((a, b) => {
-          if (
-            this.$t(`contribution.category.name.${a.slug}`) <
-            this.$t(`contribution.category.name.${b.slug}`)
-          )
-            return -1
-          if (
-            this.$t(`contribution.category.name.${a.slug}`) >
-            this.$t(`contribution.category.name.${b.slug}`)
-          )
-            return 1
-          return 0
-        })
-      if (misc) sortedCategories.push(misc)
-      return sortedCategories
-    },
   },
   apollo: {
     Category: {
@@ -92,7 +74,7 @@ export default {
         return CategoryQuery()
       },
       result({ data: { Category } }) {
-        this.categories = this.sortCategories(Category)
+        this.categories = this.sortCategories(Category, this.$t)
       },
     },
   },
