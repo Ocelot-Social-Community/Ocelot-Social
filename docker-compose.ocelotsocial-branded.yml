@@ -2,10 +2,12 @@
 version: "3.4"
 
 services:
+
   ########################################################
   # WEBAPP ###############################################
   ########################################################
   webapp:
+    # name the image to match our image to be tested from our DockerHub repository so that it can be pulled from there, otherwise it will be created locally from the 'dockerfile'
     image: ocelotsocialnetwork/webapp-branded:latest
     ports:
       - 3000:3000
@@ -19,10 +21,14 @@ services:
       - MAPBOX_TOKEN="pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g"
       # - WEBSOCKETS_URI=ws://backend:4000/graphql # is not working and not given in Docker YAML in main repo
       - PUBLIC_REGISTRATION=true
+      - INVITE_REGISTRATION=true
+      - CATEGORIES_ACTIVE=true
+
   ########################################################
   # BACKEND ##############################################
   ########################################################
   backend:
+    # name the image to match our image to be tested from our DockerHub repository so that it can be pulled from there, otherwise it will be created locally from the 'dockerfile'
     image: ocelotsocialnetwork/backend-branded:latest
     networks:
       - test-network
@@ -41,16 +47,32 @@ services:
       - PRIVATE_KEY_PASSPHRASE=a7dsf78sadg87ad87sfagsadg78
       - EMAIL_SUPPORT=support@wir.social
       - EMAIL_DEFAULT_SENDER=info@wir.social
+      # - PRODUCTION_DB_CLEAN_ALLOW=false # only true for production environments on staging servers
       - PUBLIC_REGISTRATION=true
+      - INVITE_REGISTRATION=true
+      - CATEGORIES_ACTIVE=true
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_HOST=mailserver
       - SMTP_PORT=25
       - SMTP_IGNORE_TLS=true
+
+  ########################################################
+  # MAINTENANCE ##########################################
+  ########################################################
+  maintenance:
+    # name the image to match our image to be tested from our DockerHub repository so that it can be pulled from there, otherwise it will be created locally from the 'dockerfile'
+    image: ocelotsocialnetwork/maintenance-branded:latest
+    networks:
+      - test-network
+    ports:
+      - 3001:80
+
   ########################################################
   # NEO4J ################################################
   ########################################################
   neo4j:
+    # name the image to match our image to be tested from our DockerHub repository so that it can be pulled from there, otherwise it will be created locally from the 'dockerfile'
     image: ocelotsocialnetwork/neo4j-community-branded:latest
     networks:
       - test-network
@@ -62,15 +84,7 @@ services:
       - 7687:7687
     volumes:
       - neo4j_data:/data
-  ########################################################
-  # MAINTENANCE ##########################################
-  ########################################################
-  maintenance:
-    image: ocelotsocialnetwork/maintenance-branded:latest
-    networks:
-      - test-network
-    ports:
-      - 5000:80
+
   ########################################################
   # MAILSERVER TO FAKE SMTP ##############################
   ########################################################

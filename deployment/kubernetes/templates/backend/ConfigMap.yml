@@ -11,8 +11,10 @@ metadata:
     app.kubernetes.io/managed-by: "{{ .Release.Service }}"
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 data:
+  PRODUCTION_DB_CLEAN_ALLOW: "{{ .Values.PRODUCTION_DB_CLEAN_ALLOW }}"
   PUBLIC_REGISTRATION: "{{ .Values.PUBLIC_REGISTRATION }}"
   INVITE_REGISTRATION: "{{ .Values.INVITE_REGISTRATION }}"
+  CATEGORIES_ACTIVE: "{{ .Values.CATEGORIES_ACTIVE }}"
   CLIENT_URI: "{{ .Values.BACKEND.CLIENT_URI }}"
   EMAIL_DEFAULT_SENDER: "{{ .Values.BACKEND.EMAIL_DEFAULT_SENDER }}"
   SMTP_HOST: "{{ .Values.BACKEND.SMTP_HOST }}"

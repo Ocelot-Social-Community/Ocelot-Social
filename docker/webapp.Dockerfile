@@ -10,9 +10,18 @@ ARG APP_IMAGE_CODE=${APP_IMAGE}:${APP_IMAGE_TAG_CODE}
 FROM $APP_IMAGE_CODE as code
 
 # copy public constants into the Docker image to brand it
+COPY tools/ tools/
 COPY branding/static/ static/
 COPY branding/constants/ constants/
-COPY branding/locales/ locales/
+COPY branding/locales/html/ locales/html/
+# COPY branding/locales/index.js locales/index.js
+COPY branding/locales/*.json locales/tmp/
+COPY branding/assets/styles/imports/ assets/styles/imports/
+COPY branding/assets/fonts/ assets/fonts/
+
+RUN apk add --no-cache bash jq
+
+RUN tools/merge-locales.sh
 
 ##################################################################################
 # BUILD ##########################################################################
@@ -41,6 +50,8 @@ COPY --from=build ${DOCKER_WORKDIR}/config/ ./config/
 COPY --from=build ${DOCKER_WORKDIR}/constants ./constants
 COPY --from=build ${DOCKER_WORKDIR}/static ./static
 COPY --from=build ${DOCKER_WORKDIR}/locales ./locales
+COPY --from=build ${DOCKER_WORKDIR}/assets/styles/imports ./assets/styles/imports
+COPY --from=build ${DOCKER_WORKDIR}/assets/fonts ./assets/fonts
 # Copy package.json for script definitions (lock file should not be needed)
 COPY --from=build ${DOCKER_WORKDIR}/package.json ./package.json
 

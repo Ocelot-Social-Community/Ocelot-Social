@@ -18,17 +18,17 @@ On the right top you find the button `Create`. Click on it and choose `Kubernete
 - use the latest Kubernetes version
 - choose your datacenter region
 - name your node pool: e.g. `pool-<your-network-name>`
-- 2 `Basic node` with a total of 4GB and 2 shared CPUs are enough to start with
-- no tags necessary
+- `2 Basic nodes` with `2.5 GB RAM (total of 4 GB)`, `2 shared CPUs`, and `80 GB Disk` each is optimal for the beginning
 - set your cluster name: e.g. `cluster-<your-network-name>`
 - select your project
+- no tags necessary
 
 ## Getting Started
 
-After your cluster is set up, see progress bar above, click on `Getting started`. Please install the following management tools:
+After your cluster is set up – see progress bar above – click on `Getting started`. Please install the following management tools:
 
-- [kubectl](https://kubernetes.io/docs/tasks/tools/)
-- [doctl](https://github.com/digitalocean/doctl)
+- [kubectl v1.24.1](https://kubernetes.io/docs/tasks/tools/)
+- [doctl v1.78.0](https://github.com/digitalocean/doctl)
 
 Install the tools as described on the tab or see the links here.
 

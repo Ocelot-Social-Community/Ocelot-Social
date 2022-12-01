@@ -19,15 +19,40 @@ Besides the `values.template.yaml` file we provide a `nginx.values.template.yaml
 
 ## Installation
 
-Due to the many limitations of Helm you still have to do several manual steps. Those occur before you run the actual *ocelot.social* Helm chart. Obviously it is expected of you to have `helm` and `kubectl` installed. For DigitalOcean you might require `doctl` aswell.
+Due to the many limitations of Helm you still have to do several manual steps.
+Those occur before you run the actual *ocelot.social* Helm chart.
+Obviously it is expected of you to have `helm` and `kubectl` installed.
+For the cert-manager you may need `cmctl`, see below.
+For DigitalOcean you may also need `doctl`.
+
+Install:
+
+- [kubectl v1.24.1](https://kubernetes.io/docs/tasks/tools/)
+- [doctl v1.78.0](https://docs.digitalocean.com/reference/doctl/how-to/install/)
+- [cmctl v1.8.2](https://cert-manager.io/docs/usage/cmctl/#installation)
+- [helm v3.9.0](https://helm.sh/docs/intro/install/)
+
 
 ### Cert Manager (https)
 
-Please refer to [cert-manager.io docs](https://cert-manager.io/docs/installation/kubernetes/) for more details.
+Please refer to [cert-manager.io docs](https://cert-manager.io/docs/installation/) for more details.
 
 ***ATTENTION:*** *Be with the Terminal in your repository in the folder of this README.*
 
-#### 1. Create Namespace
+We have three ways to install the cert-manager, purely via `kubectl`, via `cmctl`, or with `helm`.
+
+We recommend using `helm` because then we do not mix the installation methods.
+Please have a look here:
+
+- [Installing with Helm](https://cert-manager.io/docs/installation/helm/#installing-with-helm)
+
+Our Helm installation is optimized for cert-manager version `v1.9.1` and `kubectl` version `"v1.24.2`.
+
+Please search here for cert-manager versions that are compatible with your `kubectl` version on the cluster and on the client: [cert-manager Supported Releases](https://cert-manager.io/docs/installation/supported-releases/#supported-releases).
+
+***ATTENTION:*** *When uninstalling cert-manager, be sure to use the same method as for installation! Otherwise, we could end up in a broken state, see [Uninstall](https://cert-manager.io/docs/installation/kubectl/#uninstalling).*
+
+<!-- #### 1. Create Namespace
 
 ```bash
 # kubeconfig.yaml set globaly
@@ -54,19 +79,19 @@ $ helm repo update
 # kubeconfig.yaml set globaly
 $ helm install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-  --version v1.1.0 \
+  --version v1.9.1 \
   --set installCRDs=true
 # or kubeconfig.yaml in your repo, then adjust
 $ helm --kubeconfig=/../kubeconfig.yaml \
   install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-  --version v1.1.0 \
+  --version v1.9.1 \
   --set installCRDs=true
-```
+``` -->
 
 ### Ingress-Nginx
 
-#### 1. Add Helm repository and update
+#### 1. Add Helm repository for `ingress-nginx` and update
 
 ```bash
 $ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
@@ -108,7 +133,7 @@ You will need an API token, which you can generate in the control panel at <http
 $ doctl kubernetes cluster list
 ```
 
-Fill in the `CLUSTER_UUID` and `your-domain`:
+Fill in the `CLUSTER_UUID` and `your-domain`. The latter with hyphens `-` instead of dots `.`:
 
 ```bash
 # without doctl context
@@ -139,7 +164,7 @@ $ doctl compute firewall get <ID> --context <context-name>
 This chart is only necessary (recommended is more precise) if you run DigitalOcean without load balancer.
 You need to generate an access token with read + write for the `dns.values.yaml` at <https://cloud.digitalocean.com/account/api/tokens> and fill it in.
 
-#### 1. Add Helm repository and update
+#### 1. Add Helm repository for `binami` and update
 
 ```bash
 $ helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -225,3 +250,50 @@ support, try this [helm chart](https://github.com/helm/charts/tree/master/stable
 
 On our kubernetes cluster we get "mult-attach" errors for persistent volumes.
 Apparently DigitalOcean's kubernetes clusters do not fulfill the requirements.
+
+## Kubernetes Commands (Without Helm) To Deploy New Docker Images To A Kubernetes Cluster
+
+### Deploy A Version
+
+```bash
+# !!! be aware of the correct kube context !!!
+$ kubectl config get-contexts
+
+# deploy version '$BUILD_VERSION'
+# !!! 'latest' is not recommended on production !!!
+
+# for easyness set env
+$ export BUILD_VERSION=1.0.8-48-ocelot.social1.0.8-184 # example
+# check this with
+$ echo $BUILD_VERSION
+1.0.8-48-ocelot.social1.0.8-184
+
+# deploy actual version '$BUILD_VERSION' to Kubernetes cluster
+$ kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:$BUILD_VERSION
+$ kubectl -n default rollout restart deployment/ocelot-webapp
+$ kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:$BUILD_VERSION
+$ kubectl -n default rollout restart deployment/ocelot-backend
+$ kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:$BUILD_VERSION
+$ kubectl -n default rollout restart deployment/ocelot-maintenance
+$ kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:$BUILD_VERSION
+$ kubectl -n default rollout restart deployment/ocelot-neo4j
+# verify deployment and wait for the pods of each deployment to get ready for cleaning and seeding of the database
+$ kubectl -n default rollout status deployment/ocelot-webapp --timeout=240s
+$ kubectl -n default rollout status deployment/ocelot-maintenance --timeout=240s
+$ kubectl -n default rollout status deployment/ocelot-backend --timeout=240s
+$ kubectl -n default rollout status deployment/ocelot-neo4j --timeout=240s
+```
+
+### Staging – Clean And Seed Neo4j Database
+
+***ATTENTION:*** Cleaning and seeding of our Neo4j database is only possible in production if env `PRODUCTION_DB_CLEAN_ALLOW=true` is set in our deployment.
+
+```bash
+# !!! be aware of the correct kube context !!!
+$ kubectl config get-contexts
+
+# reset and seed Neo4j database via backend for staging
+$ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "node --experimental-repl-await dist/db/clean.js && node --experimental-repl-await dist/db/seed.js"
+
+
+```

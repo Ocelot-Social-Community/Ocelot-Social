@@ -1,9 +1,11 @@
 # please duplicate template file and rename to "values.yaml" and fill in your value
 
 # change all the below if needed
+PRODUCTION_DB_CLEAN_ALLOW: false # only true for production environments on staging servers
 PUBLIC_REGISTRATION: false
 INVITE_REGISTRATION: false
 COOKIE_EXPIRE_TIME: 730 # days (730 days, two years is the default in main code)
+CATEGORIES_ACTIVE: false
 
 BACKEND:
   # change all the below if needed

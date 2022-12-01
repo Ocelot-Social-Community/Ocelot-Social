@@ -4,21 +4,18 @@
     *
 */
  
-
-  
 @font-face {
     font-family: Overpass;
     src: url('~@/assets/fonts/Overpass-VariableFont_wght.ttf');
 }
-
 
 $color-primary: #6e8b87;
 $color-primary-yunite: #a6ff00;
 $color-primary-light: #fff;
 $color-primary-active: hsla(0,0%,100%,.8);
 
-$font-family-heading: 'Overpass',Helvetica,Arial,Lucida,sans-serif;;
-$font-family-text: 'Overpass',Helvetica,Arial,Lucida,sans-serif;;
+$font-family-heading: 'Overpass',Helvetica,Arial,Lucida,sans-serif;
+$font-family-text: 'Overpass',Helvetica,Arial,Lucida,sans-serif;
 
 $color-header-background: $color-primary;
 $color-footer-background: $color-primary-yunite;
