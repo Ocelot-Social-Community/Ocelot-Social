@@ -29,14 +29,14 @@
           style="margin-right: 20px"
         >
           <a v-if="item.url" :href="item.url" :target="item.target">
-            
+            <ds-text>
               {{ $t(item.nameIdent) }}
-          
+            </ds-text>
           </a>
           <nuxt-link v-else :to="item.path">
-        
+            <ds-text>
               {{ $t(item.nameIdent) }}
-            
+            </ds-text>
           </nuxt-link>
         </ds-flex-item>
 
@@ -266,10 +266,6 @@ export default {
 </script>
 
 <style lang="scss">
-.branding-menu {
-  font-family: 'Overpass';
-  font-weight: 600;
-}
 .margin-right-20 {
   margin-right: 20px;
 }
