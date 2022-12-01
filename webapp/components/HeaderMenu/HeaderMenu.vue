@@ -29,12 +29,12 @@
           style="margin-right: 20px"
         >
           <a v-if="item.url" :href="item.url" :target="item.target">
-            <ds-text>
+            <ds-text size="large" bold>
               {{ $t(item.nameIdent) }}
             </ds-text>
           </a>
           <nuxt-link v-else :to="item.path">
-            <ds-text>
+            <ds-text size="large" bold>
               {{ $t(item.nameIdent) }}
             </ds-text>
           </nuxt-link>
