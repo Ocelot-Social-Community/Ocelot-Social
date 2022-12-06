@@ -21,7 +21,6 @@ __Try out our deployed [development environment](https://stage.ocelot.social).__
 Visit our staging networks:
 
 - central staging network: [stage.ocelot.social](https://stage.ocelot.social)
-- Yunite staging network: [stage.yunite.me](https://stage.yunite.me)
 <!-- - rebranded staging network: [rebrand.ocelot.social](https://stage.ocelot.social). -->
 
 Logins:

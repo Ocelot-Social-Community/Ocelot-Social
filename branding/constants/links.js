@@ -5,8 +5,8 @@ import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
   // if defined it's dominating
   externalLink: {
-    url: 'https://yunite.org',
-    target: '',
+    url: 'https://ocelot.social',
+    target: '_blank',
   },
 
   internalPage: {
@@ -16,14 +16,15 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
   // if defined it's dominating
   externalLink: {
-    url: 'https://yunite.org/spenden/',
-    target: '',
+    // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
+    url: 'https://ocelot-social.herokuapp.com/donations',
+    target: '_blank',
   },
 
   internalPage: {
@@ -39,12 +40,13 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
   // if defined it's dominating
   externalLink: {
-    url: 'https://yunite.org/impressum/',
-    target: '',
+    // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
+    url: 'https://ocelot-social.herokuapp.com/imprint',
+    target: '_blank',
   },
 
   internalPage: {
-    footerIdent: 'yuniteRebranding.footer.imprint', // localized string identifier, if undefined default is used
+    // footerIdent: 'site.imprint', // localized string identifier, if undefined default is used
     // headTitleIdent: 'site.imprint', // localized string identifier, if undefined default is used
     // headlineIdent: 'site.imprint', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
@@ -67,11 +69,7 @@ const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwri
   },
 })
 const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
-  // if defined it's dominating
-  externalLink: {
-    url: 'https://yunite.org/ueber-yunite/unsere-werte/',
-    target: '',
-  },
+  // externalLink: null, // if defined it's dominating
 
   internalPage: {
     // footerIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
@@ -84,14 +82,10 @@ const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
   },
 })
 const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
-  // if defined it's dominating
-  externalLink: {
-    url: 'https://yunite.org/datenschutz/',
-    target: '',
-  },
+  // externalLink: null, // if defined it's dominating
 
   internalPage: {
-    footerIdent: 'yuniteRebranding.footer.dataPrivacy', // localized string identifier, if undefined default is used
+    // footerIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
     // headTitleIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
     // headlineIdent: 'site.data-privacy', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
@@ -101,11 +95,7 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
-  // if defined it's dominating
-  externalLink: {
-    url: 'https://yunite.org/ueber-yunite/faq-hilfe/',
-    target: '',
-  },
+  // externalLink: null, // if defined it's dominating
 
   internalPage: {
     // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
@@ -120,8 +110,8 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
   // if defined it's dominating
   externalLink: {
-    url: 'https://yunite.org/ueber-yunite/faq-hilfe/',
-    target: '',
+    url: 'https://ocelot.social',
+    target: '_blank',
   },
 
   internalPage: {
@@ -150,13 +140,13 @@ export default {
   SUPPORT,
 
   FOOTER_LINK_LIST: [
-    // ORGANIZATION,
-    // TERMS_AND_CONDITIONS,
-    // CODE_OF_CONDUCT,
+    ORGANIZATION,
+    TERMS_AND_CONDITIONS,
+    CODE_OF_CONDUCT,
     DATA_PRIVACY,
-    // FAQ,
-    // DONATE,
-    // SUPPORT,
+    FAQ,
+    DONATE,
     IMPRINT,
+    SUPPORT,
   ],
 }
