@@ -2,4 +2,4 @@
 export const NAME_LENGTH_MIN = 3
 export const NAME_LENGTH_MAX = 50
 export const DESCRIPTION_WITHOUT_HTML_LENGTH_MIN = 100 // with removed HTML tags
-export const SHOW_GROUP_BUTTON_IN_HEADER = true
+export const SHOW_GROUP_BUTTON_IN_HEADER = false
