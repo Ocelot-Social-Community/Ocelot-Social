@@ -87,7 +87,7 @@ services:
   ########################################################
   neo4j:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/neo4j-community-branded:latest
+    image: ocelotsocialnetwork/neo4j-community-branded:local-production
     networks:
       - test-network
     volumes:
