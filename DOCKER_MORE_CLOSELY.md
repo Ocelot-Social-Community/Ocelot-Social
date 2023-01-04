@@ -4,7 +4,7 @@
 
 ***Attention:** For using Docker commands in Apple M1 environments!*
 
-### Enviroment Variable For Apple M1 Platform
+### Environment Variable For Apple M1 Platform
 
 To set the Docker platform environment variable in your terminal tab, run:
 
@@ -22,7 +22,7 @@ For Docker compose `up` or `build` commands, you can use our Apple M1 override f
 
 # for development
 $ docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.apple-m1.override.yml up
-# only once: init admin user and create indexes and contraints in Neo4j database
+# only once: init admin user and create indexes and constraints in Neo4j database
 $ docker compose exec backend yarn prod:migrate init
 # clean db
 $ docker compose exec backend yarn db:reset
@@ -31,7 +31,7 @@ $ docker compose exec backend yarn db:seed
 
 # for production
 $ docker compose -f docker-compose.yml -f docker-compose.apple-m1.override.yml up
-# only once: init admin user and create indexes and contraints in Neo4j database
+# only once: init admin user and create indexes and constraints in Neo4j database
 $ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
 ```
 
