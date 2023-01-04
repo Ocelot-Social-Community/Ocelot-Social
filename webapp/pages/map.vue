@@ -32,6 +32,7 @@
     </mgl-map>
   </client-only>
 </template>
+
 <script>
 import mapboxgl from 'mapbox-gl'
 export default {
@@ -40,8 +41,7 @@ export default {
     return {
       mapboxgl,
       mapOptions: {
-        accessToken:
-          'pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g', // ocelot-token
+        accessToken: this.$env.MAPBOX_TOKEN,
         style: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
         center: [10.452764, 51.165707], // center of Germany
         zoom: 4,
