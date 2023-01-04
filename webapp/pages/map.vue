@@ -33,16 +33,16 @@
   </client-only>
 </template>
 <script>
-import mapboxgl from "mapbox-gl";
+import mapboxgl from 'mapbox-gl'
 export default {
-  name: "Map",
+  name: 'Map',
   data() {
     return {
       mapboxgl,
       mapOptions: {
         accessToken:
-          "pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g", // ocelot-token
-        style: "mapbox://styles/mapbox/outdoors-v12?optimize=true",
+          'pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g', // ocelot-token
+        style: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
         center: [10.452764, 51.165707], // center of Germany
         zoom: 4,
         maxZoom: 22,
@@ -51,35 +51,35 @@ export default {
         // https://docs.mapbox.com/api/maps/styles/
         available: [
           {
-            title: "Outdoors",
-            url: "mapbox://styles/mapbox/outdoors-v12?optimize=true",
+            title: 'Outdoors',
+            url: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
           },
           {
-            title: "Streets",
-            url: "mapbox://styles/mapbox/streets-v11?optimize=true",
+            title: 'Streets',
+            url: 'mapbox://styles/mapbox/streets-v11?optimize=true',
           },
           {
-            title: "Satellite",
-            url: "mapbox://styles/mapbox/satellite-streets-v11?optimize=true",
+            title: 'Satellite',
+            url: 'mapbox://styles/mapbox/satellite-streets-v11?optimize=true',
           },
           {
-            title: "Dark",
-            url: "mapbox://styles/mapbox/dark-v10?optimize=true",
+            title: 'Dark',
+            url: 'mapbox://styles/mapbox/dark-v10?optimize=true',
           },
         ],
       },
-    };
+    }
   },
   methods: {
     onMapLoad({ map }) {
-      this.map = map;
+      this.map = map
     },
     setStyle(url) {
       this.map.setStyle(url)
       this.mapOptions.style = url
     },
   },
-};
+}
 </script>
 
 <style lang="scss">
