@@ -88,8 +88,8 @@ export default {
 }
 .map-controls {
   position: absolute;
-  left: 50px;
   top: 100px;
+  padding-left: 3px;
 }
 .map-controls button {
   margin-left: 5px;
