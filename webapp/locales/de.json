@@ -522,6 +522,14 @@
     "questions": "Bei Fragen oder Problemen erreichst Du uns per E-Mail an",
     "title": "{APPLICATION_NAME} befindet sich in der Wartung"
   },
+  "map": {
+    "styles": {
+      "outdoors": "Landschaft",
+      "dark": "Dunkel",
+      "satellite": "Satellit",
+      "streets": "Straßen"
+    }
+  },
   "modals": {
     "deleteUser": {
       "created": "Erstellt"

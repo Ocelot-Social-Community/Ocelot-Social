@@ -522,6 +522,14 @@
     "questions": "Any Questions or concerns, send an e-mail to",
     "title": "{APPLICATION_NAME} is under maintenance"
   },
+  "map": {
+    "styles": {
+      "outdoors": "Outdoors",
+      "dark": "Dark",
+      "satellite": "Satellite",
+      "streets": "Streets"
+    }
+  },
   "modals": {
     "deleteUser": {
       "created": "Created"

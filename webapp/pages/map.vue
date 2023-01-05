@@ -35,40 +35,52 @@
 
 <script>
 import mapboxgl from 'mapbox-gl'
+import { objectValuesToArray } from '../utils/utils'
+
 export default {
   name: 'Map',
   data() {
     return {
       mapboxgl,
-      mapOptions: {
+      activeStyle: null,
+    }
+  },
+  computed: {
+    styles() {
+      return {
+        available: objectValuesToArray(this.availableStyles),
+      }
+    },
+    availableStyles() {
+      // https://docs.mapbox.com/api/maps/styles/
+      const availableStyles = {
+        outdoors: {
+          url: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
+        },
+        streets: {
+          url: 'mapbox://styles/mapbox/streets-v11?optimize=true',
+        },
+        satellite: {
+          url: 'mapbox://styles/mapbox/satellite-streets-v11?optimize=true',
+        },
+        dark: {
+          url: 'mapbox://styles/mapbox/dark-v10?optimize=true',
+        },
+      }
+      Object.keys(availableStyles).map((key) => {
+        availableStyles[key].title = this.$t('map.styles.' + key)
+      })
+      return availableStyles
+    },
+    mapOptions() {
+      return {
         accessToken: this.$env.MAPBOX_TOKEN,
-        style: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
+        style: !this.activeStyle ? this.availableStyles.outdoors.url : this.activeStyle,
         center: [10.452764, 51.165707], // center of Germany
         zoom: 4,
         maxZoom: 22,
-      },
-      styles: {
-        // https://docs.mapbox.com/api/maps/styles/
-        available: [
-          {
-            title: 'Outdoors',
-            url: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
-          },
-          {
-            title: 'Streets',
-            url: 'mapbox://styles/mapbox/streets-v11?optimize=true',
-          },
-          {
-            title: 'Satellite',
-            url: 'mapbox://styles/mapbox/satellite-streets-v11?optimize=true',
-          },
-          {
-            title: 'Dark',
-            url: 'mapbox://styles/mapbox/dark-v10?optimize=true',
-          },
-        ],
-      },
-    }
+      }
+    },
   },
   methods: {
     onMapLoad({ map }) {
@@ -76,7 +88,7 @@ export default {
     },
     setStyle(url) {
       this.map.setStyle(url)
-      this.mapOptions.style = url
+      this.activeStyle = url
     },
   },
 }
