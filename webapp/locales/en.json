@@ -524,8 +524,8 @@
   },
   "map": {
     "styles": {
-      "outdoors": "Outdoors",
       "dark": "Dark",
+      "outdoors": "Outdoors",
       "satellite": "Satellite",
       "streets": "Streets"
     }
