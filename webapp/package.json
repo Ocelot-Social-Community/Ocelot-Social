@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@human-connection/styleguide": "0.5.22",
+    "@mapbox/mapbox-gl-language": "0.10.0",
     "@nuxtjs/apollo": "^4.0.0-rc19",
     "@nuxtjs/axios": "~5.9.7",
     "@nuxtjs/dotenv": "~1.4.1",

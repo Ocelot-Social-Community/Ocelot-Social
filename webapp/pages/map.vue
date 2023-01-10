@@ -47,6 +47,7 @@
 
 <script>
 import mapboxgl from 'mapbox-gl'
+import MapboxLanguage from '@mapbox/mapbox-gl-language'
 import { objectValuesToArray } from '../utils/utils'
 
 export default {
@@ -102,6 +103,22 @@ export default {
   methods: {
     onMapLoad({ map }) {
       this.map = map
+      // documentation of correct version: https://github.com/mapbox/mapbox-gl-language/tree/v0.10.0
+      // Add RTL support if you want to support Arabic
+      // Wolle: does not work yet
+      mapboxgl.accessToken = this.$env.MAPBOX_TOKEN
+      mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.1.0/mapbox-gl-rtl-text.js')
+      const language = new MapboxLanguage({
+        defaultLanguage: 'en', // Wolle
+        // defaultLanguage: 'de', // Wolle
+        // defaultLanguage: 'auto', // Wolle
+      })
+      this.language = language
+      this.map.addControl(language)
+      console.log('this.map: ', this.map)
+      console.log('this.language: ', this.language)
+      // is unclear, how to 
+      // this.language.setLanguage('de') // makes error
     },
     setStyle(url) {
       this.map.setStyle(url)
