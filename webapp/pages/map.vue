@@ -17,21 +17,18 @@
       @load="onMapLoad"
     >
       <!-- <MglScaleControl /> -->
-      <!-- TODO: Move into mapboxgl-control-container -->
-      <div class="map-controls">
-        <ds-button
-          class="style-button"
-          v-for="style in styles.available"
-          :key="style.title"
-          filled
-          size="small"
-          :primary="mapOptions.style === style.url ? true : false"
-          @click="setStyle(style.url)"
-        >
-          {{ style.title }}
-        </ds-button>
-        <MglMarker :coordinates="[10.452764, 51.165707]" color="blue" />
-      </div>
+      <ds-button
+        class="style-button"
+        v-for="style in styles.available"
+        :key="style.title"
+        filled
+        size="small"
+        :primary="mapOptions.style === style.url ? true : false"
+        @click="setStyle(style.url)"
+      >
+        {{ style.title }}
+      </ds-button>
+      <MglMarker :coordinates="[10.452764, 51.165707]" color="blue" />
     </mgl-map>
   </client-only>
 </template>
@@ -100,8 +97,6 @@ export default {
 <style lang="scss">
 // description: https: //github.com/geospoc/v-mapbox/tree/v1.11.2/docs
 //   code example: https: //codesandbox.io/embed/v-mapbox-map-demo-k1l1n?autoresize=1&fontsize=14&hidenavigation=1&theme=dark
-// @import "~mapbox-gl/dist/mapbox-gl.css";
-// @import "~v-mapbox/dist/v-mapbox.css";
 @import "mapbox-gl/dist/mapbox-gl.css";
 @import "v-mapbox/dist/v-mapbox.css";
 
@@ -112,18 +107,4 @@ export default {
   margin-left: 5px;
   margin-top: 5px;
 }
-// .map-controls {
-//   position: absolute;
-//   top: 100px;
-//   padding-left: 3px;
-// }
-// .map-controls button {
-//   margin-left: 5px;
-// }
-// .mapboxgl-control-container {
-//   margin-top: -45px;
-// }
-// .mapboxgl-control-container a {
-//   color: black;
-// }
 </style>
