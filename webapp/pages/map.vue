@@ -21,7 +21,6 @@
         :max-pitch="60"
         @load="onMapLoad"
       >
-        <!-- <MglScaleControl /> -->
         <ds-button
           class="style-button"
           v-for="style in styles.available"
@@ -33,6 +32,7 @@
         >
           {{ style.title }}
         </ds-button>
+        <MglScaleControl />
         <MglMarker :coordinates="[10.452764, 51.165707]" color="blue" />
       </mgl-map>
     </client-only>
