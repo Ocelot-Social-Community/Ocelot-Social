@@ -523,6 +523,7 @@
     "title": "{APPLICATION_NAME} befindet sich in der Wartung"
   },
   "map": {
+    "pageTitle": "Karte",
     "styles": {
       "dark": "Dunkel",
       "outdoors": "Landschaft",

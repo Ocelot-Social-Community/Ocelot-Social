@@ -523,6 +523,7 @@
     "title": "{APPLICATION_NAME} is under maintenance"
   },
   "map": {
+    "pageTitle": "Map",
     "styles": {
       "dark": "Dark",
       "outdoors": "Outdoors",

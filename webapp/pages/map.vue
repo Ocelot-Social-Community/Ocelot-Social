@@ -1,36 +1,42 @@
 <!-- Example Reference: https://codesandbox.io/s/v-mapbox-with-nuxt-lbrt6?file=/pages/index.vue -->
 <template>
-  <client-only>
-    <mgl-map
-      :mapbox-gl="mapboxgl"
-      :access-token="mapOptions.accessToken"
-      :map-style.sync="mapOptions.style"
-      :center="mapOptions.center"
-      :zoom="mapOptions.zoom"
-      :max-zoom="mapOptions.maxZoom"
-      :cross-source-collisions="false"
-      :fail-if-major-performance-caveat="false"
-      :preserve-drawing-buffer="true"
-      :hash="false"
-      :min-pitch="0"
-      :max-pitch="60"
-      @load="onMapLoad"
-    >
-      <!-- <MglScaleControl /> -->
-      <ds-button
-        class="style-button"
-        v-for="style in styles.available"
-        :key="style.title"
-        filled
-        size="small"
-        :primary="mapOptions.style === style.url ? true : false"
-        @click="setStyle(style.url)"
+  <div>
+    <ds-space margin="small">
+      <ds-heading tag="h1">{{ $t('map.pageTitle') }}</ds-heading>
+    </ds-space>
+    <ds-space margin="large" />
+    <client-only>
+      <mgl-map
+        :mapbox-gl="mapboxgl"
+        :access-token="mapOptions.accessToken"
+        :map-style.sync="mapOptions.style"
+        :center="mapOptions.center"
+        :zoom="mapOptions.zoom"
+        :max-zoom="mapOptions.maxZoom"
+        :cross-source-collisions="false"
+        :fail-if-major-performance-caveat="false"
+        :preserve-drawing-buffer="true"
+        :hash="false"
+        :min-pitch="0"
+        :max-pitch="60"
+        @load="onMapLoad"
       >
-        {{ style.title }}
-      </ds-button>
-      <MglMarker :coordinates="[10.452764, 51.165707]" color="blue" />
-    </mgl-map>
-  </client-only>
+        <!-- <MglScaleControl /> -->
+        <ds-button
+          class="style-button"
+          v-for="style in styles.available"
+          :key="style.title"
+          filled
+          size="small"
+          :primary="mapOptions.style === style.url ? true : false"
+          @click="setStyle(style.url)"
+        >
+          {{ style.title }}
+        </ds-button>
+        <MglMarker :coordinates="[10.452764, 51.165707]" color="blue" />
+      </mgl-map>
+    </client-only>
+  </div>
 </template>
 
 <script>
@@ -39,6 +45,11 @@ import { objectValuesToArray } from '../utils/utils'
 
 export default {
   name: 'Map',
+  head() {
+    return {
+      title: this.$t('map.pageTitle'),
+    }
+  },
   data() {
     return {
       mapboxgl,
@@ -97,8 +108,8 @@ export default {
 <style lang="scss">
 // description: https: //github.com/geospoc/v-mapbox/tree/v1.11.2/docs
 //   code example: https: //codesandbox.io/embed/v-mapbox-map-demo-k1l1n?autoresize=1&fontsize=14&hidenavigation=1&theme=dark
-@import "mapbox-gl/dist/mapbox-gl.css";
-@import "v-mapbox/dist/v-mapbox.css";
+@import 'mapbox-gl/dist/mapbox-gl.css';
+@import 'v-mapbox/dist/v-mapbox.css';
 
 .mgl-map-wrapper {
   height: 70vh;
