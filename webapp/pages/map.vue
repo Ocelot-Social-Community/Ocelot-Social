@@ -35,9 +35,10 @@
         </ds-button>
         <!-- Wolle: is MglAttributionControl needed? or what can we use for? -->
         <!-- <MglAttributionControl /> -->
-        <MglScaleControl />
+        <MglFullscreenControl />
         <MglNavigationControl position="top-right" />
         <MglGeolocateControl position="top-right" />
+        <MglScaleControl />
         <MglMarker :coordinates="[10.452764, 51.165707]" color="blue" />
       </mgl-map>
     </client-only>
