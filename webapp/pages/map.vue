@@ -115,8 +115,8 @@ export default {
       })
       this.language = language
       this.map.addControl(language)
-      console.log('this.map: ', this.map)
-      console.log('this.language: ', this.language)
+      // console.log('this.map: ', this.map)
+      // console.log('this.language: ', this.language)
       // is unclear, how to 
       // this.language.setLanguage('de') // makes error
     },
