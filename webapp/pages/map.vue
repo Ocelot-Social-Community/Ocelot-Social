@@ -21,6 +21,7 @@
         :max-pitch="60"
         @load="onMapLoad"
       >
+        <!-- may use MglPopup for the styles -->
         <ds-button
           class="style-button"
           v-for="style in styles.available"
@@ -32,7 +33,11 @@
         >
           {{ style.title }}
         </ds-button>
+        <!-- Wolle: is MglAttributionControl needed? or what can we use for? -->
+        <!-- <MglAttributionControl /> -->
         <MglScaleControl />
+        <MglNavigationControl position="top-right" />
+        <MglGeolocateControl position="top-right" />
         <MglMarker :coordinates="[10.452764, 51.165707]" color="blue" />
       </mgl-map>
     </client-only>

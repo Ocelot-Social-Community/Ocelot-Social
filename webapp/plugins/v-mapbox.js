@@ -6,14 +6,20 @@ import {
   MglMap,
   MglMarker,
   MglPopup,
+  MglAttributionControl,
   MglScaleControl,
+  MglNavigationControl,
+  MglGeolocateControl,
 } from 'v-mapbox'
 
 // Map
 Vue.component('MglMap', MglMap)
 
 // Controls
+Vue.component('MglAttributionControl', MglAttributionControl)
 Vue.component('MglScaleControl', MglScaleControl)
+Vue.component('MglNavigationControl', MglNavigationControl)
+Vue.component('MglGeolocateControl', MglGeolocateControl)
 
 // Layers
 Vue.component('MglGeojsonLayer', MglGeojsonLayer)
