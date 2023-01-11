@@ -39,7 +39,11 @@
         <MglNavigationControl position="top-right" />
         <MglGeolocateControl position="top-right" />
         <MglScaleControl />
-        <MglMarker :coordinates="[10.452764, 51.165707]" color="blue" />
+        <MglMarker
+          v-if="this.currentUserCoordinates"
+          :coordinates="this.currentUserCoordinates"
+          color="blue"
+        />
       </mgl-map>
     </client-only>
   </div>
@@ -47,8 +51,10 @@
 
 <script>
 import mapboxgl from 'mapbox-gl'
-import MapboxLanguage from '@mapbox/mapbox-gl-language'
+// import MapboxLanguage from '@mapbox/mapbox-gl-language'
 import { objectValuesToArray } from '../utils/utils'
+import { mapGetters } from 'vuex'
+import UserQuery from '~/graphql/User'
 
 export default {
   name: 'Map',
@@ -61,9 +67,22 @@ export default {
     return {
       mapboxgl,
       activeStyle: null,
+      defaultCenter: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE
+      currentUserLocation: null,
+      currentUserCoordinates: null,
     }
   },
+  async mounted() {
+    this.currentUserLocation = await this.getUserLocation(this.currentUser.id)
+    this.currentUserCoordinates = this.currentUserLocation
+      ? [this.currentUserLocation.lng, this.currentUserLocation.lat]
+      : null
+    this.mapFlyToCenter()
+  },
   computed: {
+    ...mapGetters({
+      currentUser: 'auth/user',
+    }),
     styles() {
       return {
         available: objectValuesToArray(this.availableStyles),
@@ -94,35 +113,69 @@ export default {
       return {
         accessToken: this.$env.MAPBOX_TOKEN,
         style: !this.activeStyle ? this.availableStyles.outdoors.url : this.activeStyle,
-        center: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE
-        zoom: 4,
+        center: this.mapCenter,
+        zoom: this.mapZoom,
         maxZoom: 22,
       }
+    },
+    mapCenter() {
+      return this.currentUserCoordinates ? this.currentUserCoordinates : this.defaultCenter
+    },
+    mapZoom() {
+      return this.currentUserCoordinates ? 10 : 4
     },
   },
   methods: {
     onMapLoad({ map }) {
       this.map = map
-      // documentation of correct version: https://github.com/mapbox/mapbox-gl-language/tree/v0.10.0
-      // Add RTL support if you want to support Arabic
-      // Wolle: does not work yet
-      mapboxgl.accessToken = this.$env.MAPBOX_TOKEN
-      mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.1.0/mapbox-gl-rtl-text.js')
-      const language = new MapboxLanguage({
-        defaultLanguage: 'en', // Wolle
-        // defaultLanguage: 'de', // Wolle
-        // defaultLanguage: 'auto', // Wolle
-      })
-      this.language = language
-      this.map.addControl(language)
-      // console.log('this.map: ', this.map)
-      // console.log('this.language: ', this.language)
-      // is unclear, how to 
-      // this.language.setLanguage('de') // makes error
+      // // documentation of correct version: https://github.com/mapbox/mapbox-gl-language/tree/v0.10.0
+      // // Add RTL support if you want to support Arabic
+      // // Wolle: does not work yet
+      // // mapboxgl.accessToken = this.$env.MAPBOX_TOKEN
+      // // mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.1.0/mapbox-gl-rtl-text.js')
+      // const language = new MapboxLanguage({
+      //   defaultLanguage: 'en', // Wolle
+      //   // defaultLanguage: 'de', // Wolle
+      //   // defaultLanguage: 'auto', // Wolle
+      // })
+      // this.language = language
+      // this.map.addControl(language)
+      // // console.log('this.map: ', this.map)
+      // // console.log('this.language: ', this.language)
+      // // is unclear, how to
+      // // this.language.setLanguage('de') // makes error
+      // documentation: https://docs.mapbox.com/mapbox-gl-js/example/center-on-feature/
+      this.mapFlyToCenter()
     },
     setStyle(url) {
       this.map.setStyle(url)
       this.activeStyle = url
+    },
+    mapFlyToCenter() {
+      if (this.map) {
+        this.map.flyTo({
+          center: this.mapCenter,
+          zoom: this.mapZoom,
+        })
+      }
+    },
+    async getUserLocation(id) {
+      try {
+        const {
+          data: { User: users },
+        } = await this.$apollo.query({
+          query: UserQuery(this.$i18n),
+          variables: {
+            id,
+            followedByCount: 0,
+            followingCount: 0,
+          },
+        })
+        return users && users[0] && users[0].location ? users[0].location : null
+      } catch (err) {
+        this.$toast.error(err.message)
+        return null
+      }
     },
   },
 }

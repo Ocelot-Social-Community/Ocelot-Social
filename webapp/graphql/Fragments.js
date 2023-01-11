@@ -17,6 +17,8 @@ export const locationAndBadgesFragment = (lang) => gql`
   fragment locationAndBadges on User {
     location {
       name: name${lang}
+      lng
+      lat
     }
     badges {
       id
