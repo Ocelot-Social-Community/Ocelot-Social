@@ -14,7 +14,7 @@ export default (i18n) => {
     ${userCountsFragment}
     ${locationAndBadgesFragment(lang)}
 
-    query User($id: ID!, $followedByCount: Int, $followingCount: Int) {
+    query User($id: ID!, $followedByCount: Int!, $followingCount: Int!) {
       User(id: $id) {
         ...user
         ...userCounts
