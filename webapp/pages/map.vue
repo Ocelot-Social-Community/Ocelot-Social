@@ -162,7 +162,6 @@ export default {
       // // console.log('this.language: ', this.language)
       // // is unclear, how to
       // // this.language.setLanguage('de') // makes error
-      // documentation: https://docs.mapbox.com/mapbox-gl-js/example/center-on-feature/
       this.mapFlyToCenter()
     },
     setStyle(url) {
@@ -171,6 +170,7 @@ export default {
     },
     mapFlyToCenter() {
       if (this.map) {
+        // example: https://docs.mapbox.com/mapbox-gl-js/example/center-on-feature/
         this.map.flyTo({
           center: this.mapCenter,
           zoom: this.mapZoom,
