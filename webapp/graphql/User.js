@@ -62,6 +62,30 @@ export const minimisedUserQuery = () => {
   `
 }
 
+export const adminUserQuery = () => {
+  return gql`
+    query ($filter: _UserFilter, $first: Int, $offset: Int, $email: String) {
+      User(
+        email: $email
+        filter: $filter
+        first: $first
+        offset: $offset
+        orderBy: createdAt_desc
+      ) {
+        id
+        name
+        slug
+        email
+        role
+        createdAt
+        contributionsCount
+        commentedCount
+        shoutedCount
+      }
+    }
+  `
+}
+
 export const notificationQuery = (i18n) => {
   return gql`
     ${userFragment}
