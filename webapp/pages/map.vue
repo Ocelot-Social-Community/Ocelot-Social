@@ -188,11 +188,8 @@ export default {
           this.markers.isCurrentUserAdded = true
         }
         if (!this.markers.isUsersAdded && this.currentUser && this.users) {
-          console.log('markers.isUsersAdded !!! this.users: ', this.users)
           this.users.forEach((user, index) => {
-            console.log('markers.isUsersAdded !!! user index: ', index)
             if (user.id !== this.currentUser.id && user.location) {
-              console.log('markers.isUsersAdded !!! user index if: ', index)
               this.markers.array.push(
                 new mapboxgl.Marker({
                   // Wolle: coordinates: this.getCoordinates(user.location),
@@ -208,16 +205,8 @@ export default {
           this.markers.isUsersAdded = true
         }
         if (!this.markers.isGroupsAdded && this.groups) {
-          console.log('markers.isGroupsAdded !!! this.groups: ', this.groups)
           this.groups.forEach((group, index) => {
-            console.log('markers.isGroupsAdded !!! group index: ', index)
             if (group.location) {
-              console.log(
-                'markers.isGroupsAdded !!! group index if: ',
-                index,
-                ' location: ',
-                this.getCoordinates(group.location),
-              )
               this.markers.array.push(
                 new mapboxgl.Marker({
                   // Wolle: coordinates: this.getCoordinates(group.location),
