@@ -78,7 +78,7 @@ export default {
   async mounted() {
     this.currentUserLocation = await this.getUserLocation(this.currentUser.id)
     this.currentUserCoordinates = this.currentUserLocation
-      ? [this.currentUserLocation.lng, this.currentUserLocation.lat] // Wolle: getCoordinates
+      ? this.getCoordinates(this.currentUserLocation)
       : null
     this.mapFlyToCenter()
   },
