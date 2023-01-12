@@ -39,11 +39,13 @@
         <MglNavigationControl position="top-right" />
         <MglGeolocateControl position="top-right" />
         <MglScaleControl />
-        <MglMarker
-          v-if="this.currentUserCoordinates"
-          :coordinates="this.currentUserCoordinates"
-          color="blue"
-        />
+        <div v-for="user in users" :key="user.id">
+          <MglMarker
+            v-if="user.location"
+            :coordinates="getCoordinates(user.location)"
+            :color="user.id === currentUser.id ? 'red' : 'blue'"
+          />
+        </div>
       </mgl-map>
     </client-only>
   </div>
@@ -54,7 +56,7 @@ import mapboxgl from 'mapbox-gl'
 // import MapboxLanguage from '@mapbox/mapbox-gl-language'
 import { objectValuesToArray } from '../utils/utils'
 import { mapGetters } from 'vuex'
-import { profileUserQuery } from '~/graphql/User'
+import { profileUserQuery, mapUserQuery } from '~/graphql/User'
 
 export default {
   name: 'Map',
@@ -70,12 +72,13 @@ export default {
       defaultCenter: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE
       currentUserLocation: null,
       currentUserCoordinates: null,
+      users: [],
     }
   },
   async mounted() {
     this.currentUserLocation = await this.getUserLocation(this.currentUser.id)
     this.currentUserCoordinates = this.currentUserLocation
-      ? [this.currentUserLocation.lng, this.currentUserLocation.lat]
+      ? [this.currentUserLocation.lng, this.currentUserLocation.lat] // Wolle: getCoordinates
       : null
     this.mapFlyToCenter()
   },
@@ -159,6 +162,9 @@ export default {
         })
       }
     },
+    getCoordinates(location) {
+      return [location.lng, location.lat]
+    },
     async getUserLocation(id) {
       try {
         const {
@@ -176,6 +182,20 @@ export default {
         this.$toast.error(err.message)
         return null
       }
+    },
+  },
+  apollo: {
+    User: {
+      query() {
+        return mapUserQuery(this.$i18n)
+      },
+      variables() {
+        return {}
+      },
+      update({ User }) {
+        this.users = User
+      },
+      fetchPolicy: 'cache-and-network',
     },
   },
 }

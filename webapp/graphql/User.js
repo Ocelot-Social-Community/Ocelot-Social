@@ -97,10 +97,9 @@ export const mapUserQuery = (i18n) => {
     ${locationFragment(lang)}
     ${badgesFragment}
 
-    query User() {
-      User() {
+    query {
+      User {
         ...user
-        ...userCounts
         ...location
         ...badges
       }
