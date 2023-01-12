@@ -54,7 +54,7 @@ import mapboxgl from 'mapbox-gl'
 // import MapboxLanguage from '@mapbox/mapbox-gl-language'
 import { objectValuesToArray } from '../utils/utils'
 import { mapGetters } from 'vuex'
-import UserQuery from '~/graphql/User'
+import { profileUserQuery } from '~/graphql/User'
 
 export default {
   name: 'Map',
@@ -164,7 +164,7 @@ export default {
         const {
           data: { User: users },
         } = await this.$apollo.query({
-          query: UserQuery(this.$i18n),
+          query: profileUserQuery(this.$i18n),
           variables: {
             id,
             followedByCount: 0,

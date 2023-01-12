@@ -7,7 +7,7 @@ import {
   commentFragment,
 } from './Fragments'
 
-export default (i18n) => {
+export const profileUserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
     ${userFragment}
