@@ -5,7 +5,8 @@ import {
   commentFragment,
   postCountsFragment,
   userCountsFragment,
-  locationAndBadgesFragment,
+  locationFragment,
+  badgesFragment,
   tagsCategoriesAndPinnedFragment,
 } from './Fragments'
 
@@ -14,7 +15,8 @@ export default (i18n) => {
   return gql`
     ${userFragment}
     ${userCountsFragment}
-    ${locationAndBadgesFragment(lang)}
+    ${locationFragment(lang)}
+    ${badgesFragment}
     ${postFragment}
     ${postCountsFragment}
     ${tagsCategoriesAndPinnedFragment}
@@ -28,7 +30,8 @@ export default (i18n) => {
         author {
           ...user
           ...userCounts
-          ...locationAndBadges
+          ...location
+          ...badges
           blocked
         }
         comments(orderBy: createdAt_asc) {
@@ -36,7 +39,8 @@ export default (i18n) => {
           author {
             ...user
             ...userCounts
-            ...locationAndBadges
+            ...location
+            ...badges
           }
         }
         group {
@@ -54,7 +58,8 @@ export const filterPosts = (i18n) => {
   return gql`
     ${userFragment}
     ${userCountsFragment}
-    ${locationAndBadgesFragment(lang)}
+    ${locationFragment(lang)}
+    ${badgesFragment}
     ${postFragment}
     ${postCountsFragment}
     ${tagsCategoriesAndPinnedFragment}
@@ -67,7 +72,8 @@ export const filterPosts = (i18n) => {
         author {
           ...user
           ...userCounts
-          ...locationAndBadges
+          ...location
+          ...badges
         }
         group {
           id
@@ -84,7 +90,8 @@ export const profilePagePosts = (i18n) => {
   return gql`
     ${userFragment}
     ${userCountsFragment}
-    ${locationAndBadgesFragment(lang)}
+    ${locationFragment(lang)}
+    ${badgesFragment}
     ${postFragment}
     ${postCountsFragment}
     ${tagsCategoriesAndPinnedFragment}
@@ -102,7 +109,8 @@ export const profilePagePosts = (i18n) => {
         author {
           ...user
           ...userCounts
-          ...locationAndBadges
+          ...location
+          ...badges
         }
         group {
           id
@@ -127,7 +135,8 @@ export const relatedContributions = (i18n) => {
   return gql`
     ${userFragment}
     ${userCountsFragment}
-    ${locationAndBadgesFragment(lang)}
+    ${locationFragment(lang)}
+    ${badgesFragment}
     ${postFragment}
     ${postCountsFragment}
     ${tagsCategoriesAndPinnedFragment}
@@ -140,7 +149,8 @@ export const relatedContributions = (i18n) => {
         author {
           ...user
           ...userCounts
-          ...locationAndBadges
+          ...location
+          ...badges
         }
         relatedContributions(first: 2) {
           ...post
@@ -149,7 +159,8 @@ export const relatedContributions = (i18n) => {
           author {
             ...user
             ...userCounts
-            ...locationAndBadges
+            ...location
+            ...badges
           }
         }
       }

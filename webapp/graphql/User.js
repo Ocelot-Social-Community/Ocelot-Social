@@ -1,7 +1,8 @@
 import gql from 'graphql-tag'
 import {
   userCountsFragment,
-  locationAndBadgesFragment,
+  locationFragment,
+  badgesFragment,
   userFragment,
   postFragment,
   commentFragment,
@@ -12,15 +13,16 @@ export const profileUserQuery = (i18n) => {
   return gql`
     ${userFragment}
     ${userCountsFragment}
-    ${locationAndBadgesFragment(lang)}
+    ${locationFragment(lang)}
+    ${badgesFragment}
 
     query User($id: ID!, $followedByCount: Int!, $followingCount: Int!) {
       User(id: $id) {
         ...user
         ...userCounts
-        ...locationAndBadges
+        ...location
+        ...badges
         about
-        locationName
         createdAt
         followedByCurrentUser
         isMuted
@@ -29,12 +31,14 @@ export const profileUserQuery = (i18n) => {
         following(first: $followingCount) {
           ...user
           ...userCounts
-          ...locationAndBadges
+          ...location
+          ...badges
         }
         followedBy(first: $followedByCount) {
           ...user
           ...userCounts
-          ...locationAndBadges
+          ...location
+          ...badges
         }
         socialMedia {
           id
@@ -81,6 +85,24 @@ export const adminUserQuery = () => {
         contributionsCount
         commentedCount
         shoutedCount
+      }
+    }
+  `
+}
+
+export const mapUserQuery = (i18n) => {
+  const lang = i18n.locale().toUpperCase()
+  return gql`
+    ${userFragment}
+    ${locationFragment(lang)}
+    ${badgesFragment}
+
+    query User() {
+      User() {
+        ...user
+        ...userCounts
+        ...location
+        ...badges
       }
     }
   `
