@@ -39,10 +39,11 @@
         <MglNavigationControl position="top-right" />
         <MglGeolocateControl position="top-right" />
         <MglScaleControl />
-        <div v-for="group in groups" :key="group.id">
+        <!-- <div v-for="group in groups" :key="group.id">
           <MglMarker
             v-if="group.location"
             :coordinates="getCoordinates(group.location)"
+            :scale="0.75"
             :color="'green'"
           />
         </div>
@@ -50,15 +51,16 @@
           <MglMarker
             v-if="user.id !== currentUser.id && user.location"
             :coordinates="getCoordinates(user.location)"
+            :scale="0.75"
             :color="'blue'"
           />
         </div>
-        <!-- have this as last to have the users marker in front of all others -->
+        < !-- have this as last to have the users marker in front of all others -- >
         <MglMarker
           v-if="currentUserCoordinates"
           :coordinates="currentUserCoordinates"
           :color="'red'"
-        />
+        /> -->
       </mgl-map>
     </client-only>
   </div>
@@ -86,8 +88,14 @@ export default {
       defaultCenter: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE
       currentUserLocation: null,
       currentUserCoordinates: null,
-      users: [],
-      groups: [],
+      users: null,
+      groups: null,
+      markers: {
+        array: [],
+        isCurrentUserAdded: false,
+        isUsersAdded: false,
+        isGroupsAdded: false,
+      },
     }
   },
   async mounted() {
@@ -96,6 +104,7 @@ export default {
       ? this.getCoordinates(this.currentUserLocation)
       : null
     this.mapFlyToCenter()
+    this.addMissingMarkers()
   },
   computed: {
     ...mapGetters({
@@ -163,10 +172,58 @@ export default {
       // // is unclear, how to
       // // this.language.setLanguage('de') // makes error
       this.mapFlyToCenter()
+      this.addMissingMarkers()
     },
     setStyle(url) {
       this.map.setStyle(url)
       this.activeStyle = url
+    },
+    addMissingMarkers() {
+      if (this.map) {
+        if (!this.markers.isCurrentUserAdded && this.currentUserCoordinates) {
+          this.markers.array.push(new mapboxgl.Marker())
+          this.markers.array[this.markers.array.length - 1]
+            .setLngLat(this.currentUserCoordinates)
+            .addTo(this.map)
+          this.markers.isCurrentUserAdded = true
+        }
+        if (!this.markers.isUsersAdded && this.currentUser && this.users) {
+          console.log('markers.isUsersAdded !!! this.users: ', this.users)
+          this.users.forEach((user, index) => {
+            console.log('markers.isUsersAdded !!! user index: ', index)
+            if (user.id !== this.currentUser.id && user.location) {
+              console.log('markers.isUsersAdded !!! user index if: ', index)
+              this.markers.array.push(new mapboxgl.Marker({
+                coordinates: this.getCoordinates(user.location),
+                scale: 0.75,
+                color: 'blue',
+              }))
+              this.markers.array[this.markers.array.length - 1]
+                .setLngLat(this.currentUserCoordinates)
+                .addTo(this.map)
+            }
+          })
+          this.markers.isUsersAdded = true
+        }
+        if (!this.markers.isGroupsAdded && this.groups) {
+          console.log('markers.isGroupsAdded !!! this.groups: ', this.groups)
+          this.groups.forEach((group, index) => {
+            console.log('markers.isGroupsAdded !!! group index: ', index)
+            if (group.location) {
+              console.log('markers.isGroupsAdded !!! group index if: ', index)
+              this.markers.array.push(new mapboxgl.Marker({
+                coordinates: this.getCoordinates(group.location),
+                scale: 0.75,
+                color: 'green',
+              }))
+              this.markers.array[this.markers.array.length - 1]
+                .setLngLat(this.currentUserCoordinates)
+                .addTo(this.map)
+            }
+          })
+          this.markers.isGroupsAdded = true
+        }
+      }
     },
     mapFlyToCenter() {
       if (this.map) {
@@ -209,6 +266,7 @@ export default {
       },
       update({ User }) {
         this.users = User
+        this.addMissingMarkers()
       },
       fetchPolicy: 'cache-and-network',
     },
@@ -221,6 +279,7 @@ export default {
       },
       update({ Group }) {
         this.groups = Group
+        this.addMissingMarkers()
       },
       fetchPolicy: 'cache-and-network',
     },
