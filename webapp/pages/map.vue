@@ -193,13 +193,15 @@ export default {
             console.log('markers.isUsersAdded !!! user index: ', index)
             if (user.id !== this.currentUser.id && user.location) {
               console.log('markers.isUsersAdded !!! user index if: ', index)
-              this.markers.array.push(new mapboxgl.Marker({
-                coordinates: this.getCoordinates(user.location),
-                scale: 0.75,
-                color: 'blue',
-              }))
+              this.markers.array.push(
+                new mapboxgl.Marker({
+                  // Wolle: coordinates: this.getCoordinates(user.location),
+                  scale: 0.75,
+                  color: 'blue',
+                }),
+              )
               this.markers.array[this.markers.array.length - 1]
-                .setLngLat(this.currentUserCoordinates)
+                .setLngLat(this.getCoordinates(user.location))
                 .addTo(this.map)
             }
           })
@@ -210,14 +212,21 @@ export default {
           this.groups.forEach((group, index) => {
             console.log('markers.isGroupsAdded !!! group index: ', index)
             if (group.location) {
-              console.log('markers.isGroupsAdded !!! group index if: ', index)
-              this.markers.array.push(new mapboxgl.Marker({
-                coordinates: this.getCoordinates(group.location),
-                scale: 0.75,
-                color: 'green',
-              }))
+              console.log(
+                'markers.isGroupsAdded !!! group index if: ',
+                index,
+                ' location: ',
+                this.getCoordinates(group.location),
+              )
+              this.markers.array.push(
+                new mapboxgl.Marker({
+                  // Wolle: coordinates: this.getCoordinates(group.location),
+                  scale: 0.75,
+                  color: 'green',
+                }),
+              )
               this.markers.array[this.markers.array.length - 1]
-                .setLngLat(this.currentUserCoordinates)
+                .setLngLat(this.getCoordinates(group.location))
                 .addTo(this.map)
             }
           })
