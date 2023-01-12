@@ -39,13 +39,26 @@
         <MglNavigationControl position="top-right" />
         <MglGeolocateControl position="top-right" />
         <MglScaleControl />
-        <div v-for="user in users" :key="user.id">
+        <div v-for="group in groups" :key="group.id">
           <MglMarker
-            v-if="user.location"
-            :coordinates="getCoordinates(user.location)"
-            :color="user.id === currentUser.id ? 'red' : 'blue'"
+            v-if="group.location"
+            :coordinates="getCoordinates(group.location)"
+            :color="'green'"
           />
         </div>
+        <div v-for="user in users" :key="user.id">
+          <MglMarker
+            v-if="user.id !== currentUser.id && user.location"
+            :coordinates="getCoordinates(user.location)"
+            :color="'blue'"
+          />
+        </div>
+        <!-- have this as last to have the users marker in front of all others -->
+        <MglMarker
+          v-if="currentUserCoordinates"
+          :coordinates="currentUserCoordinates"
+          :color="'red'"
+        />
       </mgl-map>
     </client-only>
   </div>
@@ -57,6 +70,7 @@ import mapboxgl from 'mapbox-gl'
 import { objectValuesToArray } from '../utils/utils'
 import { mapGetters } from 'vuex'
 import { profileUserQuery, mapUserQuery } from '~/graphql/User'
+import { groupQuery } from '~/graphql/groups'
 
 export default {
   name: 'Map',
@@ -73,6 +87,7 @@ export default {
       currentUserLocation: null,
       currentUserCoordinates: null,
       users: [],
+      groups: [],
     }
   },
   async mounted() {
@@ -194,6 +209,18 @@ export default {
       },
       update({ User }) {
         this.users = User
+      },
+      fetchPolicy: 'cache-and-network',
+    },
+    Group: {
+      query() {
+        return groupQuery(this.$i18n)
+      },
+      variables() {
+        return {}
+      },
+      update({ Group }) {
+        this.groups = Group
       },
       fetchPolicy: 'cache-and-network',
     },

@@ -173,6 +173,8 @@ export const groupQuery = (i18n) => {
         locationName
         location {
           name: name${lang}
+          lng
+          lat
         }
         myRole
       }
