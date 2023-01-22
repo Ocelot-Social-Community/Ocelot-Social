@@ -1,5 +1,5 @@
 <template>
-  <ds-container class="main-navigation-container" style="padding: 10px 10px">
+  <ds-container class="main-navigation-container"  :class="{ 'hide-navbar': hideNavbar }" id="navbar">
     <div>
       <!-- header menu -->
       <ds-flex v-if="!showMobileMenu" class="main-navigation-flex">
@@ -237,6 +237,8 @@ export default {
   },
   data() {
     return {
+      hideNavbar: false,
+      prevScrollpos: 0,
       links,
       LOGOS,
       SHOW_GROUP_BUTTON_IN_HEADER,
@@ -258,14 +260,32 @@ export default {
     },
   },
   methods: {
+    handleScroll() {
+      let currentScrollPos = window.pageYOffset;
+      if (this.prevScrollpos > currentScrollPos) {
+        this.hideNavbar = false;
+      } else {
+        this.hideNavbar = true;
+      }
+      this.prevScrollpos = currentScrollPos;
+    },
     toggleMobileMenuView() {
       this.toggleMobileMenu = !this.toggleMobileMenu
     },
+  },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll);
   },
 }
 </script>
 
 <style lang="scss">
+#navbar {
+  padding: 10px 10px;
+}
+.hide-navbar {
+  display: none;
+}
 .margin-right-20 {
   margin-right: 20px;
 }
