@@ -1,5 +1,9 @@
 <template>
-  <ds-container class="main-navigation-container"  :class="{ 'hide-navbar': hideNavbar }" id="navbar">
+  <ds-container
+    class="main-navigation-container"
+    :class="{ 'hide-navbar': hideNavbar }"
+    id="navbar"
+  >
     <div>
       <!-- header menu -->
       <ds-flex v-if="!showMobileMenu" class="main-navigation-flex">
@@ -261,20 +265,20 @@ export default {
   },
   methods: {
     handleScroll() {
-      let currentScrollPos = window.pageYOffset;
+      const currentScrollPos = window.pageYOffset
       if (this.prevScrollpos > currentScrollPos) {
-        this.hideNavbar = false;
+        this.hideNavbar = false
       } else {
-        this.hideNavbar = true;
+        this.hideNavbar = true
       }
-      this.prevScrollpos = currentScrollPos;
+      this.prevScrollpos = currentScrollPos
     },
     toggleMobileMenuView() {
       this.toggleMobileMenu = !this.toggleMobileMenu
     },
   },
   mounted() {
-    window.addEventListener('scroll', this.handleScroll);
+    window.addEventListener('scroll', this.handleScroll)
   },
 }
 </script>
