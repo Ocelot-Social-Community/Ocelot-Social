@@ -5,7 +5,7 @@
     </div>
     <ds-container>
       <div class="main-container">
-        <nuxt />
+        <nuxt :showMobileMenu="showMobileMenu" />
       </div>
     </ds-container>
     <page-footer v-if="!showMobileMenu" />
