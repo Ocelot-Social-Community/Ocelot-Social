@@ -68,6 +68,8 @@
 
 <script>
 import mapboxgl from 'mapbox-gl'
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 // import MapboxLanguage from '@mapbox/mapbox-gl-language'
 import { objectValuesToArray } from '../utils/utils'
 import { mapGetters } from 'vuex'
@@ -171,6 +173,12 @@ export default {
       // // console.log('this.language: ', this.language)
       // // is unclear, how to
       // // this.language.setLanguage('de') // makes error
+      this.map.addControl(
+        new MapboxGeocoder({
+          accessToken: this.$env.MAPBOX_TOKEN,
+          mapboxgl,
+        }),
+      )
       this.mapFlyToCenter()
       this.addMissingMarkers()
     },
