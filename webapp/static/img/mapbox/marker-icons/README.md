@@ -9,4 +9,4 @@ At URL:
 ## Folder For Images Reachable By URL
 
 It looks like that not all folders, as example the `assets/*` folder, is reachable by URL.
-Or images have to be in the `static/img/*` folder.
+Our images have to be in the `static/img/*` folder.

@@ -21,7 +21,7 @@
         :max-pitch="60"
         @load="onMapLoad"
       >
-        <!-- may use MglPopup for the styles -->
+        <!-- may use MglPopup for the styles? -->
         <ds-button
           class="style-button"
           v-for="style in styles.available"
@@ -33,34 +33,12 @@
         >
           {{ style.title }}
         </ds-button>
-        <!-- Wolle: is MglAttributionControl needed? or what can we use for? -->
+        <!-- Wolle: is MglAttributionControl needed? or what can we use it for? -->
         <!-- <MglAttributionControl /> -->
         <MglFullscreenControl />
         <MglNavigationControl position="top-right" />
         <MglGeolocateControl position="top-right" />
         <MglScaleControl />
-        <!-- <div v-for="group in groups" :key="group.id">
-          <MglMarker
-            v-if="group.location"
-            :coordinates="getCoordinates(group.location)"
-            :scale="0.75"
-            :color="'green'"
-          />
-        </div>
-        <div v-for="user in users" :key="user.id">
-          <MglMarker
-            v-if="user.id !== currentUser.id && user.location"
-            :coordinates="getCoordinates(user.location)"
-            :scale="0.75"
-            :color="'blue'"
-          />
-        </div>
-        < !-- have this as last to have the users marker in front of all others -- >
-        <MglMarker
-          v-if="currentUserCoordinates"
-          :coordinates="currentUserCoordinates"
-          :color="'red'"
-        /> -->
       </mgl-map>
     </client-only>
   </div>
@@ -70,8 +48,6 @@
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
-// Wolle: import myImage from '../assets/mapbox/marker-icons/mapbox-marker-icon-blue.svg'
-// import myImage from '~/assets/mapbox/marker-icons/mapbox-marker-icon-20px-blue.png'
 // import MapboxLanguage from '@mapbox/mapbox-gl-language'
 import { objectValuesToArray } from '../utils/utils'
 import { mapGetters } from 'vuex'
@@ -95,11 +71,8 @@ export default {
       users: null,
       groups: null,
       markers: {
-        array: [],
+        geoJSON: [],
         isAdded: false,
-        isCurrentUserAdded: false,
-        isUsersAdded: false,
-        isGroupsAdded: false,
         isImagesAdded: false,
       },
     }
@@ -109,7 +82,7 @@ export default {
     this.currentUserCoordinates = this.currentUserLocation
       ? this.getCoordinates(this.currentUserLocation)
       : null
-    this.addMissingMarkers()
+    this.addMarkersOnCheckPrepared()
   },
   computed: {
     ...mapGetters({
@@ -160,6 +133,7 @@ export default {
   methods: {
     onMapLoad({ map }) {
       this.map = map
+
       // // documentation of correct version: https://github.com/mapbox/mapbox-gl-language/tree/v0.10.0
       // // Add RTL support if you want to support Arabic
       // // Wolle: does not work yet
@@ -176,143 +150,132 @@ export default {
       // // console.log('this.language: ', this.language)
       // // is unclear, how to
       // // this.language.setLanguage('de') // makes error
+
+      // add search field for locations
       this.map.addControl(
         new MapboxGeocoder({
           accessToken: this.$env.MAPBOX_TOKEN,
           mapboxgl: this.mapboxgl,
         }),
       )
-      this.map.loadImage(
-        // 'https://docs.mapbox.com/mapbox-gl-js/assets/cat.png',
-        // 'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
-        'img/mapbox/marker-icons/mapbox-marker-icon-20px-blue.png',
-        // 'img/mapbox/marker-icons/mapbox-marker-icon-blue.svg', // SVG is not supported is the error
-        // myImage,
-        (error, image) => {
-          // console.log('cat: ', image, error)
-          console.log('custom-marker: ', image, error)
-          if (error) throw error
-
-          // Add the image to the map style.
-          // this.map.addImage('cat', image)
-          this.map.addImage('custom-marker', image)
-          this.markers.isImagesAdded = true
-          this.addMissingMarkers()
+      // load markers
+      const markers = [
+        {
+          id: 'marker-blue',
+          name: 'mapbox-marker-icon-20px-blue.png',
         },
-      )
-      // const image = new Image(35, 35);
-      // image.src = myImage;
-      // this.map.addImage('custom-marker', image);
-      // this.markers.isImagesAdded = true
-      // this.addMissingMarkers()
-
-      // Wolle: this.mapFlyToCenter()
-      // this.addMissingMarkers()
+        {
+          id: 'marker-red',
+          name: 'mapbox-marker-icon-20px-red.png',
+        },
+        {
+          id: 'marker-green',
+          name: 'mapbox-marker-icon-20px-green.png',
+        },
+      ]
+      Promise.all(
+        markers.map(
+          (marker) =>
+            new Promise((resolve, reject) => {
+              // our images have to be in the 'static/img/*' folder otherwise they are not reachable via URL
+              map.loadImage('img/mapbox/marker-icons/' + marker.name, (error, image) => {
+                if (error) throw error
+                map.addImage(marker.id, image)
+                resolve()
+              })
+            }),
+        ),
+      ).then(() => {
+        this.markers.isImagesAdded = true
+        this.addMarkersOnCheckPrepared()
+      })
     },
     setStyle(url) {
       this.map.setStyle(url)
       this.activeStyle = url
     },
-    addMissingMarkers() {
+    addMarkersOnCheckPrepared() {
       if (
-        // Wolle: !this.isReadyToAddMarkers
-        // &&
         !this.markers.isAdded &&
         this.map &&
         this.markers.isImagesAdded &&
         this.currentUser &&
         this.users &&
         this.groups
-        // Wolle: && !(
-        //   // this.markers.isCurrentUserAdded
-        //   // && this.markers.isUsersAdded
-        //   // && this.markers.isGroupsAdded
-        //   )
       ) {
-        // if (!this.markers.isCurrentUserAdded && this.currentUserCoordinates) {
-        //   this.markers.array.push(new mapboxgl.Marker())
-        //   this.markers.array[this.markers.array.length - 1]
-        //     .setLngLat(this.currentUserCoordinates)
-        //     .addTo(this.map)
-        //   this.markers.isCurrentUserAdded = true
-        // }
-        if (!this.markers.isCurrentUserAdded && this.currentUserCoordinates) {
-          // this.markers.array.push(new mapboxgl.Marker())
-          // this.markers.array[this.markers.array.length - 1]
-          //   .setLngLat(this.currentUserCoordinates)
-          //   .addTo(this.map)
-          console.log('this.markers.isImagesAdded: ', this.markers.isImagesAdded)
-          this.map.addSource('markers', {
-            type: 'geojson',
-            data: {
-              type: 'FeatureCollection',
-              features: [
-                {
-                  type: 'Feature',
-                  properties: {
-                    type: 'theUser',
-                    title: this.currentUser.name,
-                  },
-                  geometry: {
-                    type: 'Point',
-                    coordinates: this.currentUserCoordinates,
-                  },
-                },
-              ],
+        // add marker for "currentUser"
+        if (this.currentUserCoordinates) {
+          this.markers.geoJSON.push({
+            type: 'Feature',
+            properties: {
+              type: 'the-user',
+              iconName: 'marker-blue',
+              title: this.currentUser.name,
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: this.currentUserCoordinates,
             },
           })
-          this.map.addLayer({
-            id: 'markers',
-            type: 'symbol',
-            source: 'markers',
-            layout: {
-              // 'icon-image': 'cat',
-              'icon-image': 'custom-marker',
-              'icon-size': 1.0,
-              // get the title name from the source's "title" property
-              'text-field': ['get', 'title'],
-              'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-              // 'text-offset': [0, 1.25],
-              'text-offset': [0, 0],
-              'text-anchor': 'top',
-            },
-          })
-          this.markers.isCurrentUserAdded = true
         }
-        // if (!this.markers.isUsersAdded && this.currentUser && this.users) {
-        //   this.users.forEach((user, index) => {
-        //     if (user.id !== this.currentUser.id && user.location) {
-        //       this.markers.array.push(
-        //         new mapboxgl.Marker({
-        //           // Wolle: coordinates: this.getCoordinates(user.location),
-        //           scale: 0.75,
-        //           color: 'blue',
-        //         }),
-        //       )
-        //       this.markers.array[this.markers.array.length - 1]
-        //         .setLngLat(this.getCoordinates(user.location))
-        //         .addTo(this.map)
-        //     }
-        //   })
-        //   this.markers.isUsersAdded = true
-        // }
-        // if (!this.markers.isGroupsAdded && this.groups) {
-        //   this.groups.forEach((group, index) => {
-        //     if (group.location) {
-        //       this.markers.array.push(
-        //         new mapboxgl.Marker({
-        //           // Wolle: coordinates: this.getCoordinates(group.location),
-        //           scale: 0.75,
-        //           color: 'green',
-        //         }),
-        //       )
-        //       this.markers.array[this.markers.array.length - 1]
-        //         .setLngLat(this.getCoordinates(group.location))
-        //         .addTo(this.map)
-        //     }
-        //   })
-        //   this.markers.isGroupsAdded = true
-        // }
+        // add markers for "users"
+        this.users.forEach((user) => {
+          if (user.id !== this.currentUser.id && user.location) {
+            this.markers.geoJSON.push({
+              type: 'Feature',
+              properties: {
+                type: 'user',
+                iconName: 'marker-red',
+                title: user.name,
+              },
+              geometry: {
+                type: 'Point',
+                coordinates: this.getCoordinates(user.location),
+              },
+            })
+          }
+        })
+        // add markers for "groups"
+        this.groups.forEach((group) => {
+          if (group.location) {
+            this.markers.geoJSON.push({
+              type: 'Feature',
+              properties: {
+                type: 'group',
+                iconName: 'marker-green',
+                title: group.name,
+              },
+              geometry: {
+                type: 'Point',
+                coordinates: this.getCoordinates(group.location),
+              },
+            })
+          }
+        })
+
+        // add source and layer
+        this.map.addSource('markers', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: this.markers.geoJSON,
+          },
+        })
+        this.map.addLayer({
+          id: 'markers',
+          type: 'symbol',
+          source: 'markers',
+          layout: {
+            // get the "icon-image" from the source's "iconName" property
+            'icon-image': ['get', 'iconName'],
+            'icon-size': 1.0,
+            // get the "text-field" from the source's "title" property
+            'text-field': ['get', 'title'],
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            'text-offset': [0, 0],
+            'text-anchor': 'top',
+          },
+        })
 
         this.markers.isAdded = true
 
@@ -360,7 +323,7 @@ export default {
       },
       update({ User }) {
         this.users = User
-        this.addMissingMarkers()
+        this.addMarkersOnCheckPrepared()
       },
       fetchPolicy: 'cache-and-network',
     },
@@ -373,7 +336,7 @@ export default {
       },
       update({ Group }) {
         this.groups = Group
-        this.addMissingMarkers()
+        this.addMarkersOnCheckPrepared()
       },
       fetchPolicy: 'cache-and-network',
     },
