@@ -71,9 +71,25 @@ export default {
       users: null,
       groups: null,
       markers: {
+        icons: [
+          {
+            id: 'marker-blue',
+            name: 'mapbox-marker-icon-20px-blue.png',
+          },
+          {
+            id: 'marker-orange',
+            name: 'mapbox-marker-icon-20px-orange.png',
+          },
+          {
+            id: 'marker-green',
+            name: 'mapbox-marker-icon-20px-green.png',
+          },
+        ],
+        isImagesLoaded: false,
         geoJSON: [],
-        isAdded: false,
-        isImagesAdded: false,
+        isGeoJSON: false,
+        isSourceAndLayerAdded: false,
+        isFlyToCenter: false,
       },
     }
   },
@@ -101,6 +117,8 @@ export default {
         },
         streets: {
           url: 'mapbox://styles/mapbox/streets-v11?optimize=true',
+          // Wolle: url: 'mapbox://styles/mapbox/streets-v12',
+          // use the newest version?
         },
         satellite: {
           url: 'mapbox://styles/mapbox/satellite-streets-v11?optimize=true',
@@ -121,6 +139,7 @@ export default {
         center: this.mapCenter,
         zoom: this.mapZoom,
         maxZoom: 22,
+        // projection: 'globe', // the package is probably to old, because of Vue2: https://docs.mapbox.com/mapbox-gl-js/example/globe/
       }
     },
     mapCenter() {
@@ -133,6 +152,13 @@ export default {
   methods: {
     onMapLoad({ map }) {
       this.map = map
+
+      map.on('style.load', (value) => {
+        // Triggered when `setStyle` is called.
+        this.markers.isImagesLoaded = false
+        this.markers.isSourceAndLayerAdded = false
+        this.loadMarkesIconsAndAddMarkers()
+      })
 
       // // documentation of correct version: https://github.com/mapbox/mapbox-gl-language/tree/v0.10.0
       // // Add RTL support if you want to support Arabic
@@ -151,6 +177,9 @@ export default {
       // // is unclear, how to
       // // this.language.setLanguage('de') // makes error
 
+      // set the default atmosphere style
+      // this.map.setFog({}) // the package is probably to old, because of Vue2: https://docs.mapbox.com/mapbox-gl-js/example/globe/
+
       // add search field for locations
       this.map.addControl(
         new MapboxGeocoder({
@@ -158,47 +187,37 @@ export default {
           mapboxgl: this.mapboxgl,
         }),
       )
+
       // load markers
-      const markers = [
-        {
-          id: 'marker-blue',
-          name: 'mapbox-marker-icon-20px-blue.png',
-        },
-        {
-          id: 'marker-red',
-          name: 'mapbox-marker-icon-20px-red.png',
-        },
-        {
-          id: 'marker-green',
-          name: 'mapbox-marker-icon-20px-green.png',
-        },
-      ]
-      Promise.all(
-        markers.map(
-          (marker) =>
-            new Promise((resolve, reject) => {
-              // our images have to be in the 'static/img/*' folder otherwise they are not reachable via URL
-              map.loadImage('img/mapbox/marker-icons/' + marker.name, (error, image) => {
-                if (error) throw error
-                map.addImage(marker.id, image)
-                resolve()
-              })
-            }),
-        ),
-      ).then(() => {
-        this.markers.isImagesAdded = true
-        this.addMarkersOnCheckPrepared()
-      })
+      this.loadMarkesIconsAndAddMarkers()
     },
     setStyle(url) {
       this.map.setStyle(url)
       this.activeStyle = url
     },
+    loadMarkesIconsAndAddMarkers() {
+      Promise.all(
+        this.markers.icons.map(
+          (marker) =>
+            new Promise((resolve, reject) => {
+              // our images have to be in the 'static/img/*' folder otherwise they are not reachable via URL
+              this.map.loadImage('img/mapbox/marker-icons/' + marker.name, (error, image) => {
+                if (error) throw error
+                this.map.addImage(marker.id, image)
+                resolve()
+              })
+            }),
+        ),
+      ).then(() => {
+        this.markers.isImagesLoaded = true
+        this.addMarkersOnCheckPrepared()
+      })
+    },
     addMarkersOnCheckPrepared() {
+      // set geoJSON for markers
       if (
-        !this.markers.isAdded &&
-        this.map &&
-        this.markers.isImagesAdded &&
+        !this.markers.isGeoJSON &&
+        this.markers.isImagesLoaded &&
         this.currentUser &&
         this.users &&
         this.groups
@@ -209,7 +228,8 @@ export default {
             type: 'Feature',
             properties: {
               type: 'the-user',
-              iconName: 'marker-blue',
+              iconName: 'marker-orange',
+              iconRotate: 45.0,
               title: this.currentUser.name,
             },
             geometry: {
@@ -225,7 +245,8 @@ export default {
               type: 'Feature',
               properties: {
                 type: 'user',
-                iconName: 'marker-red',
+                iconName: 'marker-blue',
+                iconRotate: 0.0,
                 title: user.name,
               },
               geometry: {
@@ -243,6 +264,7 @@ export default {
               properties: {
                 type: 'group',
                 iconName: 'marker-green',
+                iconRotate: 0.0,
                 title: group.name,
               },
               geometry: {
@@ -253,7 +275,11 @@ export default {
           }
         })
 
-        // add source and layer
+        this.markers.isGeoJSON = true
+      }
+
+      // add source and layer
+      if (!this.markers.isSourceAndLayerAdded && this.markers.isGeoJSON && this.map) {
         this.map.addSource('markers', {
           type: 'geojson',
           data: {
@@ -266,20 +292,25 @@ export default {
           type: 'symbol',
           source: 'markers',
           layout: {
-            // get the "icon-image" from the source's "iconName" property
-            'icon-image': ['get', 'iconName'],
+            'icon-image': ['get', 'iconName'], // get the "icon-image" from the source's "iconName" property
+            'icon-allow-overlap': true,
             'icon-size': 1.0,
-            // get the "text-field" from the source's "title" property
-            'text-field': ['get', 'title'],
+            'icon-rotate': ['get', 'iconRotate'], // get the "icon-rotate" from the source's "iconRotate" property
+            'text-field': ['get', 'title'], // get the "text-field" from the source's "title" property
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
             'text-offset': [0, 0],
             'text-anchor': 'top',
+            'text-allow-overlap': true,
           },
         })
 
-        this.markers.isAdded = true
+        this.markers.isSourceAndLayerAdded = true
+      }
 
+      // fly to center of never done and markers added
+      if (!this.markers.isFlyToCenter && this.markers.isSourceAndLayerAdded) {
         this.mapFlyToCenter()
+        this.markers.isFlyToCenter = true
       }
     },
     mapFlyToCenter() {
