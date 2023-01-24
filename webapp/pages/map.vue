@@ -70,6 +70,8 @@
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
+// Wolle: import myImage from '../assets/mapbox/marker-icons/mapbox-marker-icon-blue.svg'
+// import myImage from '~/assets/mapbox/marker-icons/mapbox-marker-icon-20px-blue.png'
 // import MapboxLanguage from '@mapbox/mapbox-gl-language'
 import { objectValuesToArray } from '../utils/utils'
 import { mapGetters } from 'vuex'
@@ -94,9 +96,11 @@ export default {
       groups: null,
       markers: {
         array: [],
+        isAdded: false,
         isCurrentUserAdded: false,
         isUsersAdded: false,
         isGroupsAdded: false,
+        isImagesAdded: false,
       },
     }
   },
@@ -105,7 +109,6 @@ export default {
     this.currentUserCoordinates = this.currentUserLocation
       ? this.getCoordinates(this.currentUserLocation)
       : null
-    this.mapFlyToCenter()
     this.addMissingMarkers()
   },
   computed: {
@@ -176,59 +179,144 @@ export default {
       this.map.addControl(
         new MapboxGeocoder({
           accessToken: this.$env.MAPBOX_TOKEN,
-          mapboxgl,
+          mapboxgl: this.mapboxgl,
         }),
       )
-      this.mapFlyToCenter()
-      this.addMissingMarkers()
+      this.map.loadImage(
+        // 'https://docs.mapbox.com/mapbox-gl-js/assets/cat.png',
+        // 'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
+        'img/mapbox/marker-icons/mapbox-marker-icon-20px-blue.png',
+        // 'img/mapbox/marker-icons/mapbox-marker-icon-blue.svg', // SVG is not supported is the error
+        // myImage,
+        (error, image) => {
+          // console.log('cat: ', image, error)
+          console.log('custom-marker: ', image, error)
+          if (error) throw error
+
+          // Add the image to the map style.
+          // this.map.addImage('cat', image)
+          this.map.addImage('custom-marker', image)
+          this.markers.isImagesAdded = true
+          this.addMissingMarkers()
+        },
+      )
+      // const image = new Image(35, 35);
+      // image.src = myImage;
+      // this.map.addImage('custom-marker', image);
+      // this.markers.isImagesAdded = true
+      // this.addMissingMarkers()
+
+      // Wolle: this.mapFlyToCenter()
+      // this.addMissingMarkers()
     },
     setStyle(url) {
       this.map.setStyle(url)
       this.activeStyle = url
     },
     addMissingMarkers() {
-      if (this.map) {
+      if (
+        // Wolle: !this.isReadyToAddMarkers
+        // &&
+        !this.markers.isAdded &&
+        this.map &&
+        this.markers.isImagesAdded &&
+        this.currentUser &&
+        this.users &&
+        this.groups
+        // Wolle: && !(
+        //   // this.markers.isCurrentUserAdded
+        //   // && this.markers.isUsersAdded
+        //   // && this.markers.isGroupsAdded
+        //   )
+      ) {
+        // if (!this.markers.isCurrentUserAdded && this.currentUserCoordinates) {
+        //   this.markers.array.push(new mapboxgl.Marker())
+        //   this.markers.array[this.markers.array.length - 1]
+        //     .setLngLat(this.currentUserCoordinates)
+        //     .addTo(this.map)
+        //   this.markers.isCurrentUserAdded = true
+        // }
         if (!this.markers.isCurrentUserAdded && this.currentUserCoordinates) {
-          this.markers.array.push(new mapboxgl.Marker())
-          this.markers.array[this.markers.array.length - 1]
-            .setLngLat(this.currentUserCoordinates)
-            .addTo(this.map)
+          // this.markers.array.push(new mapboxgl.Marker())
+          // this.markers.array[this.markers.array.length - 1]
+          //   .setLngLat(this.currentUserCoordinates)
+          //   .addTo(this.map)
+          console.log('this.markers.isImagesAdded: ', this.markers.isImagesAdded)
+          this.map.addSource('markers', {
+            type: 'geojson',
+            data: {
+              type: 'FeatureCollection',
+              features: [
+                {
+                  type: 'Feature',
+                  properties: {
+                    type: 'theUser',
+                    title: this.currentUser.name,
+                  },
+                  geometry: {
+                    type: 'Point',
+                    coordinates: this.currentUserCoordinates,
+                  },
+                },
+              ],
+            },
+          })
+          this.map.addLayer({
+            id: 'markers',
+            type: 'symbol',
+            source: 'markers',
+            layout: {
+              // 'icon-image': 'cat',
+              'icon-image': 'custom-marker',
+              'icon-size': 1.0,
+              // get the title name from the source's "title" property
+              'text-field': ['get', 'title'],
+              'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+              // 'text-offset': [0, 1.25],
+              'text-offset': [0, 0],
+              'text-anchor': 'top',
+            },
+          })
           this.markers.isCurrentUserAdded = true
         }
-        if (!this.markers.isUsersAdded && this.currentUser && this.users) {
-          this.users.forEach((user, index) => {
-            if (user.id !== this.currentUser.id && user.location) {
-              this.markers.array.push(
-                new mapboxgl.Marker({
-                  // Wolle: coordinates: this.getCoordinates(user.location),
-                  scale: 0.75,
-                  color: 'blue',
-                }),
-              )
-              this.markers.array[this.markers.array.length - 1]
-                .setLngLat(this.getCoordinates(user.location))
-                .addTo(this.map)
-            }
-          })
-          this.markers.isUsersAdded = true
-        }
-        if (!this.markers.isGroupsAdded && this.groups) {
-          this.groups.forEach((group, index) => {
-            if (group.location) {
-              this.markers.array.push(
-                new mapboxgl.Marker({
-                  // Wolle: coordinates: this.getCoordinates(group.location),
-                  scale: 0.75,
-                  color: 'green',
-                }),
-              )
-              this.markers.array[this.markers.array.length - 1]
-                .setLngLat(this.getCoordinates(group.location))
-                .addTo(this.map)
-            }
-          })
-          this.markers.isGroupsAdded = true
-        }
+        // if (!this.markers.isUsersAdded && this.currentUser && this.users) {
+        //   this.users.forEach((user, index) => {
+        //     if (user.id !== this.currentUser.id && user.location) {
+        //       this.markers.array.push(
+        //         new mapboxgl.Marker({
+        //           // Wolle: coordinates: this.getCoordinates(user.location),
+        //           scale: 0.75,
+        //           color: 'blue',
+        //         }),
+        //       )
+        //       this.markers.array[this.markers.array.length - 1]
+        //         .setLngLat(this.getCoordinates(user.location))
+        //         .addTo(this.map)
+        //     }
+        //   })
+        //   this.markers.isUsersAdded = true
+        // }
+        // if (!this.markers.isGroupsAdded && this.groups) {
+        //   this.groups.forEach((group, index) => {
+        //     if (group.location) {
+        //       this.markers.array.push(
+        //         new mapboxgl.Marker({
+        //           // Wolle: coordinates: this.getCoordinates(group.location),
+        //           scale: 0.75,
+        //           color: 'green',
+        //         }),
+        //       )
+        //       this.markers.array[this.markers.array.length - 1]
+        //         .setLngLat(this.getCoordinates(group.location))
+        //         .addTo(this.map)
+        //     }
+        //   })
+        //   this.markers.isGroupsAdded = true
+        // }
+
+        this.markers.isAdded = true
+
+        this.mapFlyToCenter()
       }
     },
     mapFlyToCenter() {
