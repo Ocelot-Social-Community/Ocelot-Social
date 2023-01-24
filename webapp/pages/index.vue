@@ -12,7 +12,7 @@
         column-span="fullWidth"
         style="z-index: 1"
       >
-        <span v-if="Object.keys(postsFilter).length !== 0">
+        <span v-if="postsFilter['categories_some']">
           <ds-chip
             v-for="filter in postsFilter.categories_some.id_in"
             @remove="removeFilter"
