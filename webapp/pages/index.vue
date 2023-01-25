@@ -12,27 +12,40 @@
         column-span="fullWidth"
         style="z-index: 1"
       >
-        <span v-if="postsFilter['categories_some']">
-          <ds-chip
-            v-for="filter in postsFilter.categories_some.id_in"
-            @remove="removeFilter"
-            removable
-            :key="filter"
-            color="inverse"
-            size="large"
+        <ds-button
+          class="my-filter-button"
+          v-if="!postsFilter['categories_some'] && !postsFilter['author']" 
+          :icon="filterButtonIcon" 
+          right 
+          @click="showFilter = !showFilter">
+          {{ $t('contribution.filterMasonryGrid.noFilter') }}
+        </ds-button>
+
+        <ds-button 
+          class="my-filter-button" 
+          v-if="postsFilter['categories_some']" 
+          :icon="filterButtonIcon" 
+          right 
+          @click="showFilter = !showFilter">
+          {{ $t('contribution.filterMasonryGrid.myTheme') }}
+        </ds-button>
+
+        <ds-button 
+          class="my-filter-button" 
+          v-if="postsFilter['author']" 
+          :icon="filterButtonIcon" 
+          right 
+          @click="showFilter = !showFilter"
           >
-            {{ filter }}
-          </ds-chip>
-        </span>
-        <ds-button :icon="filterButtonIcon" right @click="showFilter = !showFilter">
-          {{ filterButtonText }}
+          {{ $t('contribution.filterMasonryGrid.myFriends') }}
         </ds-button>
 
         <div
+          id="my-filter"
           style="background-color: white; box-shadow: rgb(189 189 189) 1px 9px 15px 1px"
           v-if="showFilter"
         >
-          <filter-menu-component :showMobileMenu="showMobileMenu" />
+          <filter-menu-component :showMobileMenu="showMobileMenu"/>
         </div>
       </ds-grid-item>
       <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
@@ -140,10 +153,6 @@ export default {
       }
       return 'filter'
     },
-    filterButtonText() {
-      if (this.postsFilter.author) return 'Beiträge von Freunden filtern'
-      return 'Beiträge filtern'
-    },
     finalFilters() {
       let filter = this.postsFilter
       if (this.hashtag) {
@@ -167,14 +176,21 @@ export default {
       this.resetCategories()
       this.toggleCategory(this.categoryId)
     }
+     document.addEventListener('click', this.removeFilter)
   },
   methods: {
     ...mapMutations({
       resetCategories: 'posts/RESET_CATEGORIES',
       toggleCategory: 'posts/TOGGLE_CATEGORY',
     }),
-    removeFilter() {
-      alert('Filter löschen')
+    removeFilter(e) {  
+      if (!e.target.closest('#my-filter') && !e.target.closest('.my-filter-button')) {
+        if (!this.showFilter) return 
+        this.showFilter = false          
+      }     
+    },
+    beforeDestroy() {
+       document.removeEventListener('click', this.removeFilter);
     },
     clearSearch() {
       this.$router.push({ path: '/' })
