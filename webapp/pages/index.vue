@@ -14,29 +14,31 @@
       >
         <ds-button
           class="my-filter-button"
-          v-if="!postsFilter['categories_some'] && !postsFilter['author']" 
-          :icon="filterButtonIcon" 
-          right 
-          @click="showFilter = !showFilter">
+          v-if="!postsFilter['categories_some'] && !postsFilter['author']"
+          :icon="filterButtonIcon"
+          right
+          @click="showFilter = !showFilter"
+        >
           {{ $t('contribution.filterMasonryGrid.noFilter') }}
         </ds-button>
 
-        <ds-button 
-          class="my-filter-button" 
-          v-if="postsFilter['categories_some']" 
-          :icon="filterButtonIcon" 
-          right 
-          @click="showFilter = !showFilter">
+        <ds-button
+          class="my-filter-button"
+          v-if="postsFilter['categories_some']"
+          :icon="filterButtonIcon"
+          right
+          @click="showFilter = !showFilter"
+        >
           {{ $t('contribution.filterMasonryGrid.myTheme') }}
         </ds-button>
 
-        <ds-button 
-          class="my-filter-button" 
-          v-if="postsFilter['author']" 
-          :icon="filterButtonIcon" 
-          right 
+        <ds-button
+          class="my-filter-button"
+          v-if="postsFilter['author']"
+          :icon="filterButtonIcon"
+          right
           @click="showFilter = !showFilter"
-          >
+        >
           {{ $t('contribution.filterMasonryGrid.myFriends') }}
         </ds-button>
 
@@ -45,7 +47,7 @@
           style="background-color: white; box-shadow: rgb(189 189 189) 1px 9px 15px 1px"
           v-if="showFilter"
         >
-          <filter-menu-component :showMobileMenu="showMobileMenu"/>
+          <filter-menu-component :showMobileMenu="showMobileMenu" />
         </div>
       </ds-grid-item>
       <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
@@ -176,21 +178,21 @@ export default {
       this.resetCategories()
       this.toggleCategory(this.categoryId)
     }
-     document.addEventListener('click', this.removeFilter)
+    document.addEventListener('click', this.removeFilter)
   },
   methods: {
     ...mapMutations({
       resetCategories: 'posts/RESET_CATEGORIES',
       toggleCategory: 'posts/TOGGLE_CATEGORY',
     }),
-    removeFilter(e) {  
+    removeFilter(e) {
       if (!e.target.closest('#my-filter') && !e.target.closest('.my-filter-button')) {
-        if (!this.showFilter) return 
-        this.showFilter = false          
-      }     
+        if (!this.showFilter) return
+        this.showFilter = false
+      }
     },
     beforeDestroy() {
-       document.removeEventListener('click', this.removeFilter);
+      document.removeEventListener('click', this.removeFilter)
     },
     clearSearch() {
       this.$router.push({ path: '/' })
