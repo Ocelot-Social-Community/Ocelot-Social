@@ -267,12 +267,12 @@
       "happy": "Glücklich",
       "surprised": "Erstaunt"
     },
-    "filterMasonryGrid": {
-      "noFilter":"Beiträge filtern",
-      "myTheme":"Meine Themen",
-      "myFriends":"Beiträge von meinen Freunden"
-    },
     "filterFollow": "Beiträge von Benutzern filtern, denen ich folge",
+    "filterMasonryGrid": {
+      "myFriends": "Beiträge von meinen Freunden",
+      "myTheme": "Meine Themen",
+      "noFilter": "Beiträge filtern"
+    },
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache Deines Beitrags",
     "languageSelectText": "Sprache wählen",
