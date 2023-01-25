@@ -91,7 +91,6 @@ export default {
         isSourceAndLayerAdded: false,
         isFlyToCenter: false,
         popup: null,
-        popupIsVisible: false,
       },
     }
   },
@@ -200,9 +199,8 @@ export default {
       this.map.on('mouseenter', 'markers', (e) => {
         if (e.features[0].properties.type !== 'the-user') {
           // close old popup first
-          if (this.markers.popupIsVisible) {
+          if (this.markers.popup.isOpen()) {
             this.markers.popup.remove()
-            this.markers.popupIsVisible = false
           }
 
           // Change the cursor style as a UI indicator.
@@ -229,23 +227,12 @@ export default {
           // Populate the popup and set its coordinates
           // based on the feature found.
           this.markers.popup.setLngLat(coordinates).setHTML(description).addTo(this.map)
-
-          this.markers.popupIsVisible = true
         }
       })
 
       // this.map.on('mouseleave', 'markers', () => {
       //   this.map.getCanvas().style.cursor = ''
       //   this.markers.popup.remove()
-      //   this.markers.popupIsVisible = false
-      // })
-
-      // Wolle: this.map.on('click', (e) => {
-      //   // close old popup first
-      //   if (this.markers.popupIsVisible) {
-      //     this.markers.popup.remove()
-      //     this.markers.popupIsVisible = false
-      //   }
       // })
 
       // load markers
