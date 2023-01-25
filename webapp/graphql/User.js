@@ -100,6 +100,7 @@ export const mapUserQuery = (i18n) => {
     query {
       User {
         ...user
+        about
         ...location
         ...badges
       }
