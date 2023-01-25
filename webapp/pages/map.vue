@@ -90,6 +90,8 @@ export default {
         isGeoJSON: false,
         isSourceAndLayerAdded: false,
         isFlyToCenter: false,
+        popup: null,
+        popupIsVisible: false,
       },
     }
   },
@@ -153,13 +155,6 @@ export default {
     onMapLoad({ map }) {
       this.map = map
 
-      map.on('style.load', (value) => {
-        // Triggered when `setStyle` is called.
-        this.markers.isImagesLoaded = false
-        this.markers.isSourceAndLayerAdded = false
-        this.loadMarkesIconsAndAddMarkers()
-      })
-
       // // documentation of correct version: https://github.com/mapbox/mapbox-gl-language/tree/v0.10.0
       // // Add RTL support if you want to support Arabic
       // // Wolle: does not work yet
@@ -180,6 +175,13 @@ export default {
       // set the default atmosphere style
       // this.map.setFog({}) // the package is probably to old, because of Vue2: https://docs.mapbox.com/mapbox-gl-js/example/globe/
 
+      this.map.on('style.load', (value) => {
+        // Triggered when `setStyle` is called.
+        this.markers.isImagesLoaded = false
+        this.markers.isSourceAndLayerAdded = false
+        this.loadMarkesIconsAndAddMarkers()
+      })
+
       // add search field for locations
       this.map.addControl(
         new MapboxGeocoder({
@@ -187,6 +189,64 @@ export default {
           mapboxgl: this.mapboxgl,
         }),
       )
+
+      // example: https://docs.mapbox.com/mapbox-gl-js/example/popup-on-hover/
+      // create a popup, but don't add it to the map yet
+      this.markers.popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: true,
+      })
+
+      this.map.on('mouseenter', 'markers', (e) => {
+        if (e.features[0].properties.type !== 'the-user') {
+          // close old popup first
+          if (this.markers.popupIsVisible) {
+            this.markers.popup.remove()
+            this.markers.popupIsVisible = false
+          }
+
+          // Change the cursor style as a UI indicator.
+          this.map.getCanvas().style.cursor = 'pointer'
+
+          // Copy coordinates array.
+          const coordinates = e.features[0].geometry.coordinates.slice()
+          // const description = `
+          //   <div>
+          //     <div>
+          //       <b>${e.features[0].properties.type === 'user' ? 'Benutzer' : 'Gruppe'}: ${e.features[0].properties.name}</b>
+          //     </div>
+          //   </div>
+          // `
+          const description = e.features[0].properties.name
+
+          // Ensure that if the map is zoomed out such that multiple
+          // copies of the feature are visible, the popup appears
+          // over the copy being pointed to.
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
+          }
+
+          // Populate the popup and set its coordinates
+          // based on the feature found.
+          this.markers.popup.setLngLat(coordinates).setHTML(description).addTo(this.map)
+
+          this.markers.popupIsVisible = true
+        }
+      })
+
+      // this.map.on('mouseleave', 'markers', () => {
+      //   this.map.getCanvas().style.cursor = ''
+      //   this.markers.popup.remove()
+      //   this.markers.popupIsVisible = false
+      // })
+
+      // Wolle: this.map.on('click', (e) => {
+      //   // close old popup first
+      //   if (this.markers.popupIsVisible) {
+      //     this.markers.popup.remove()
+      //     this.markers.popupIsVisible = false
+      //   }
+      // })
 
       // load markers
       this.loadMarkesIconsAndAddMarkers()
@@ -222,22 +282,6 @@ export default {
         this.users &&
         this.groups
       ) {
-        // add marker for "currentUser"
-        if (this.currentUserCoordinates) {
-          this.markers.geoJSON.push({
-            type: 'Feature',
-            properties: {
-              type: 'the-user',
-              iconName: 'marker-orange',
-              iconRotate: 45.0,
-              title: this.currentUser.name,
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: this.currentUserCoordinates,
-            },
-          })
-        }
         // add markers for "users"
         this.users.forEach((user) => {
           if (user.id !== this.currentUser.id && user.location) {
@@ -247,7 +291,7 @@ export default {
                 type: 'user',
                 iconName: 'marker-blue',
                 iconRotate: 0.0,
-                title: user.name,
+                name: user.name,
               },
               geometry: {
                 type: 'Point',
@@ -265,7 +309,7 @@ export default {
                 type: 'group',
                 iconName: 'marker-green',
                 iconRotate: 0.0,
-                title: group.name,
+                name: group.name,
               },
               geometry: {
                 type: 'Point',
@@ -274,6 +318,22 @@ export default {
             })
           }
         })
+        // add marker for "currentUser"
+        if (this.currentUserCoordinates) {
+          this.markers.geoJSON.push({
+            type: 'Feature',
+            properties: {
+              type: 'the-user',
+              iconName: 'marker-orange',
+              iconRotate: 45.0,
+              name: this.currentUser.name,
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: this.currentUserCoordinates,
+            },
+          })
+        }
 
         this.markers.isGeoJSON = true
       }
@@ -296,11 +356,11 @@ export default {
             'icon-allow-overlap': true,
             'icon-size': 1.0,
             'icon-rotate': ['get', 'iconRotate'], // get the "icon-rotate" from the source's "iconRotate" property
-            'text-field': ['get', 'title'], // get the "text-field" from the source's "title" property
-            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-            'text-offset': [0, 0],
-            'text-anchor': 'top',
-            'text-allow-overlap': true,
+            // 'text-field': ['get', 'name'], // get the "text-field" from the source's "name" property
+            // 'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            // 'text-offset': [0, 0],
+            // 'text-anchor': 'top',
+            // 'text-allow-overlap': true,
           },
         })
 
