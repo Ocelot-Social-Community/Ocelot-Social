@@ -197,37 +197,62 @@ export default {
       })
 
       this.map.on('mouseenter', 'markers', (e) => {
-        if (e.features[0].properties.type !== 'the-user') {
-          // close old popup first
-          if (this.markers.popup.isOpen()) {
-            this.markers.popup.remove()
-          }
-
-          // Change the cursor style as a UI indicator.
-          this.map.getCanvas().style.cursor = 'pointer'
-
-          // Copy coordinates array.
-          const coordinates = e.features[0].geometry.coordinates.slice()
-          // const description = `
-          //   <div>
-          //     <div>
-          //       <b>${e.features[0].properties.type === 'user' ? 'Benutzer' : 'Gruppe'}: ${e.features[0].properties.name}</b>
-          //     </div>
-          //   </div>
-          // `
-          const description = e.features[0].properties.name
-
-          // Ensure that if the map is zoomed out such that multiple
-          // copies of the feature are visible, the popup appears
-          // over the copy being pointed to.
-          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
-          }
-
-          // Populate the popup and set its coordinates
-          // based on the feature found.
-          this.markers.popup.setLngLat(coordinates).setHTML(description).addTo(this.map)
+        // if (e.features[0].properties.type !== 'the-user') {}
+        if (this.markers.popup.isOpen()) {
+          this.map.getCanvas().style.cursor = ''
+          this.markers.popup.remove()
         }
+
+        // Change the cursor style as a UI indicator.
+        this.map.getCanvas().style.cursor = 'pointer'
+
+        // Copy coordinates array.
+        const coordinates = e.features[0].geometry.coordinates.slice()
+        const markerTypeLabel =
+          e.features[0].properties.type === 'group'
+            ? 'Gruppe'
+            : e.features[0].properties.type === 'user'
+            ? 'Benutzer'
+            : 'Deine Position'
+        const markerAboutLabel = e.features[0].properties.type === 'group' ? 'Ziel' : 'Über'
+        const markerProfileLinkLabel = 'Profil besuchen'
+        const markerProfileLinkTitle = `@${e.features[0].properties.slug}`
+        const markerProfileLink =
+          (e.features[0].properties.type === 'group' ? '/group' : '/profile') +
+          `/${e.features[0].properties.id}/${e.features[0].properties.slug}`
+        let description = `
+          <div>`
+        description += `
+            <div>
+              <i>${markerTypeLabel}:</i> <b>${e.features[0].properties.name}</b>
+            </div>`
+        description +=
+          e.features[0].properties.about && e.features[0].properties.about.length > 0
+            ? `
+            <div style="margin-top: 4pt;">
+              <i>${markerAboutLabel}:</i> ${e.features[0].properties.about}
+            </div>`
+            : ''
+        description += `
+            <div style="margin-top: 4pt;">
+              <i>${markerProfileLinkLabel}:</i>
+              <br>
+              <a href="${markerProfileLink}" target="_blank">${markerProfileLinkTitle}</a>
+            </div>`
+        description += `
+          </div>
+        `
+
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
+        }
+
+        // Populate the popup and set its coordinates
+        // based on the feature found.
+        this.markers.popup.setLngLat(coordinates).setHTML(description).addTo(this.map)
       })
 
       // this.map.on('mouseleave', 'markers', () => {
@@ -278,7 +303,10 @@ export default {
                 type: 'user',
                 iconName: 'marker-blue',
                 iconRotate: 0.0,
+                id: user.id,
+                slug: user.slug,
                 name: user.name,
+                about: user.about,
               },
               geometry: {
                 type: 'Point',
@@ -296,7 +324,10 @@ export default {
                 type: 'group',
                 iconName: 'marker-green',
                 iconRotate: 0.0,
+                id: group.id,
+                slug: group.slug,
                 name: group.name,
+                about: group.about,
               },
               geometry: {
                 type: 'Point',
@@ -313,7 +344,10 @@ export default {
               type: 'the-user',
               iconName: 'marker-orange',
               iconRotate: 45.0,
+              id: this.currentUser.id,
+              slug: this.currentUser.slug,
               name: this.currentUser.name,
+              about: this.currentUser.about,
             },
             geometry: {
               type: 'Point',
@@ -354,7 +388,7 @@ export default {
         this.markers.isSourceAndLayerAdded = true
       }
 
-      // fly to center of never done and markers added
+      // fly to center if never done
       if (!this.markers.isFlyToCenter && this.markers.isSourceAndLayerAdded) {
         this.mapFlyToCenter()
         this.markers.isFlyToCenter = true
