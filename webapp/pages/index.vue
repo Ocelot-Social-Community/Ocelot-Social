@@ -22,25 +22,36 @@
           {{ $t('contribution.filterMasonryGrid.noFilter') }}
         </ds-button>
 
-        <ds-button
-          class="my-filter-button"
-          v-if="postsFilter['categories_some']"
-          :icon="filterButtonIcon"
-          right
-          @click="showFilter = !showFilter"
-        >
-          {{ $t('contribution.filterMasonryGrid.myTheme') }}
-        </ds-button>
+        <span v-if="postsFilter['categories_some']">
+          <ds-button class="my-filter-button" right @click="showFilter = !showFilter">
+            {{ $t('contribution.filterMasonryGrid.myTheme') }}
+          </ds-button>
+          <ds-button
+            class="filter-remove"
+            @click="resetCategories"
+            icon="close"
+            title="Filter löschen"
+            style="margin-left: -14px"
+          ></ds-button>
+        </span>
 
-        <ds-button
-          class="my-filter-button"
-          v-if="postsFilter['author']"
-          :icon="filterButtonIcon"
-          right
-          @click="showFilter = !showFilter"
-        >
-          {{ $t('contribution.filterMasonryGrid.myFriends') }}
-        </ds-button>
+        <span v-if="postsFilter['author']">
+          <ds-button
+            v-if="postsFilter['author']"
+            class="my-filter-button"
+            right
+            @click="showFilter = !showFilter"
+          >
+            {{ $t('contribution.filterMasonryGrid.myFriends') }}
+          </ds-button>
+          <ds-button
+            class="filter-remove"
+            @click="resetByFollowed"
+            icon="close"
+            title="Filter löschen"
+            style="margin-left: -14px"
+          ></ds-button>
+        </span>
 
         <div
           id="my-filter"
@@ -151,9 +162,9 @@ export default {
     }),
     filterButtonIcon() {
       if (Object.keys(this.postsFilter).length === 0) {
-        return this.showFilter ? 'angle-down' : 'angle-up'
+        return this.showFilter ? 'angle-up' : 'angle-down'
       }
-      return 'filter'
+      return 'close'
     },
     finalFilters() {
       let filter = this.postsFilter
@@ -178,21 +189,22 @@ export default {
       this.resetCategories()
       this.toggleCategory(this.categoryId)
     }
-    document.addEventListener('click', this.removeFilter)
+    document.addEventListener('click', this.showFilterMenu)
   },
   methods: {
     ...mapMutations({
+      resetByFollowed: 'posts/TOGGLE_FILTER_BY_FOLLOWED',
       resetCategories: 'posts/RESET_CATEGORIES',
       toggleCategory: 'posts/TOGGLE_CATEGORY',
     }),
-    removeFilter(e) {
+    showFilterMenu(e) {
       if (!e.target.closest('#my-filter') && !e.target.closest('.my-filter-button')) {
         if (!this.showFilter) return
         this.showFilter = false
       }
     },
     beforeDestroy() {
-      document.removeEventListener('click', this.removeFilter)
+      document.removeEventListener('click', this.showFilterMenu)
     },
     clearSearch() {
       this.$router.push({ path: '/' })
