@@ -10,9 +10,19 @@
         v-if="categoriesActive"
         :row-span="1"
         column-span="fullWidth"
-        style="z-index: 1"
+        class="filterButtonMenu"
       >
-        <ds-button
+        <base-button
+          class="my-filter-button"
+          v-if="!postsFilter['categories_some'] && !postsFilter['author']"
+          :icon="filterButtonIcon"
+          right
+          @click="showFilter = !showFilter"
+          filled
+        >
+          {{ $t('contribution.filterMasonryGrid.noFilter') }}
+        </base-button>
+        <!-- <ds-button
           class="my-filter-button"
           v-if="!postsFilter['categories_some'] && !postsFilter['author']"
           :icon="filterButtonIcon"
@@ -20,23 +30,47 @@
           @click="showFilter = !showFilter"
         >
           {{ $t('contribution.filterMasonryGrid.noFilter') }}
-        </ds-button>
+        </ds-button> -->
 
         <span v-if="postsFilter['categories_some']">
-          <ds-button class="my-filter-button" right @click="showFilter = !showFilter">
+          <!-- <ds-button class="my-filter-button" right @click="showFilter = !showFilter">
             {{ $t('contribution.filterMasonryGrid.myTheme') }}
-          </ds-button>
-          <ds-button
+          </ds-button> -->
+          <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
+            {{ $t('contribution.filterMasonryGrid.myTheme') }}
+          </base-button>
+          <base-button
+            class="filter-remove"
+            @click="resetCategories"
+            icon="close"
+            title="Filter löschen"
+            style="margin-left: -6px"
+            filled
+          />
+
+          <!-- <ds-button
             class="filter-remove"
             @click="resetCategories"
             icon="close"
             title="Filter löschen"
             style="margin-left: -14px"
-          ></ds-button>
+          ></ds-button> -->
         </span>
 
         <span v-if="postsFilter['author']">
-          <ds-button
+          <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
+            {{ $t('contribution.filterMasonryGrid.myFriends') }}
+          </base-button>
+          <base-button
+            class="filter-remove"
+            @click="resetByFollowed"
+            icon="close"
+            title="Filter löschen"
+            style="margin-left: -6px"
+            filled
+          />
+
+          <!-- <ds-button
             v-if="postsFilter['author']"
             class="my-filter-button"
             right
@@ -50,7 +84,7 @@
             icon="close"
             title="Filter löschen"
             style="margin-left: -14px"
-          ></ds-button>
+          ></ds-button> -->
         </span>
 
         <div
@@ -306,5 +340,13 @@ export default {
 .top-info-bar {
   display: flex;
   align-items: center;
+}
+.filterButtonMenu {
+  position: fixed;
+  z-index: 1;
+  margin-top: -35px;
+  padding: 20px 10px 5px 10px;
+  border-radius: 7px;
+  background-color: #fff;
 }
 </style>
