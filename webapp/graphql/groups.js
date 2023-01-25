@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-// Wolle: import { locationFragment } from './Fragments'
+// import { locationFragment } from './Fragments'
 
 // ------ mutations
 
