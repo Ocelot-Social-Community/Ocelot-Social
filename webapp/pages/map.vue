@@ -189,7 +189,7 @@ export default {
         }),
       )
 
-      // example: https://docs.mapbox.com/mapbox-gl-js/example/popup-on-hover/
+      // example for popup: https://docs.mapbox.com/mapbox-gl-js/example/popup-on-hover/
       // create a popup, but don't add it to the map yet
       this.markers.popup = new mapboxgl.Popup({
         closeButton: false,
@@ -197,7 +197,7 @@ export default {
       })
 
       this.map.on('mouseenter', 'markers', (e) => {
-        // if (e.features[0].properties.type !== 'the-user') {}
+        // if (e.features[0].properties.type !== 'theUser') {}
         if (this.markers.popup.isOpen()) {
           this.map.getCanvas().style.cursor = ''
           this.markers.popup.remove()
@@ -210,38 +210,33 @@ export default {
         const coordinates = e.features[0].geometry.coordinates.slice()
         const markerTypeLabel =
           e.features[0].properties.type === 'group'
-            ? 'Gruppe'
+            ? this.$t('map.markerTypes.group')
             : e.features[0].properties.type === 'user'
-            ? 'Benutzer'
-            : 'Deine Position'
-        const markerAboutLabel = e.features[0].properties.type === 'group' ? 'Ziel' : 'Über'
-        const markerProfileLinkLabel = 'Profil besuchen'
-        const markerProfileLinkTitle = `@${e.features[0].properties.slug}`
+            ? this.$t('map.markerTypes.user')
+            : this.$t('map.markerTypes.theUser')
+        const markerProfileLinkTitle =
+          (e.features[0].properties.type === 'group' ? '&' : '@') + e.features[0].properties.slug
         const markerProfileLink =
           (e.features[0].properties.type === 'group' ? '/group' : '/profile') +
           `/${e.features[0].properties.id}/${e.features[0].properties.slug}`
         let description = `
           <div>
             <div>
-              <i>${markerTypeLabel}:</i> <b>${e.features[0].properties.name}</b>
-            </div>`
-        description +=
-          e.features[0].properties.about && e.features[0].properties.about.length > 0
-            ? `
-            <hr>
-            <div style="margin-top: 4pt;">
-              <i>${markerAboutLabel}:</i> ${e.features[0].properties.about}
-            </div>`
-            : ''
-        description += `
-            <hr>
-            <div style="margin-top: 4pt;">
-              <i>${markerProfileLinkLabel}:</i>
-              <br>
+              <b>${e.features[0].properties.name}</b> <i>(${markerTypeLabel})</i>
+            </div>
+            <div>
               <a href="${markerProfileLink}" target="_blank">${markerProfileLinkTitle}</a>
             </div>
           </div>
         `
+        description +=
+          e.features[0].properties.about && e.features[0].properties.about.length > 0
+            ? `
+            <hr>
+            <div>
+              ${e.features[0].properties.about}
+            </div>`
+            : ''
 
         // Ensure that if the map is zoomed out such that multiple
         // copies of the feature are visible, the popup appears
@@ -254,11 +249,6 @@ export default {
         // based on the feature found.
         this.markers.popup.setLngLat(coordinates).setHTML(description).addTo(this.map)
       })
-
-      // this.map.on('mouseleave', 'markers', () => {
-      //   this.map.getCanvas().style.cursor = ''
-      //   this.markers.popup.remove()
-      // })
 
       // load markers
       this.loadMarkesIconsAndAddMarkers()
@@ -301,7 +291,7 @@ export default {
               type: 'Feature',
               properties: {
                 type: 'user',
-                iconName: 'marker-blue',
+                iconName: 'marker-green',
                 iconRotate: 0.0,
                 id: user.id,
                 slug: user.slug,
@@ -322,7 +312,7 @@ export default {
               type: 'Feature',
               properties: {
                 type: 'group',
-                iconName: 'marker-green',
+                iconName: 'marker-blue',
                 iconRotate: 0.0,
                 id: group.id,
                 slug: group.slug,
@@ -341,7 +331,7 @@ export default {
           this.markers.geoJSON.push({
             type: 'Feature',
             properties: {
-              type: 'the-user',
+              type: 'theUser',
               iconName: 'marker-orange',
               iconRotate: 45.0,
               id: this.currentUser.id,

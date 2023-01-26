@@ -523,6 +523,11 @@
     "title": "{APPLICATION_NAME} is under maintenance"
   },
   "map": {
+    "markerTypes": {
+      "group": "group",
+      "theUser": "your position",
+      "user": "user"
+    },
     "pageTitle": "Map",
     "styles": {
       "dark": "Dark",

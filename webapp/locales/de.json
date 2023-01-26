@@ -523,6 +523,11 @@
     "title": "{APPLICATION_NAME} befindet sich in der Wartung"
   },
   "map": {
+    "markerTypes": {
+      "group": "Gruppe",
+      "theUser": "deine Position",
+      "user": "Benutzer"
+    },
     "pageTitle": "Karte",
     "styles": {
       "dark": "Dunkel",
