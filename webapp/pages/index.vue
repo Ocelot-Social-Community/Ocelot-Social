@@ -15,12 +15,13 @@
         <base-button
           class="my-filter-button"
           v-if="!postsFilter['categories_some'] && !postsFilter['author']"
-          :icon="filterButtonIcon"
           right
           @click="showFilter = !showFilter"
           filled
         >
           {{ $t('contribution.filterMasonryGrid.noFilter') }}
+          &nbsp;
+          <base-icon class="my-filter-button" :name="filterButtonIcon"></base-icon>
         </base-button>
         <!-- <ds-button
           class="my-filter-button"
@@ -44,7 +45,7 @@
             @click="resetCategories"
             icon="close"
             title="Filter löschen"
-            style="margin-left: -6px"
+            style="margin-left: -8px"
             filled
           />
 
@@ -66,7 +67,7 @@
             @click="resetByFollowed"
             icon="close"
             title="Filter löschen"
-            style="margin-left: -6px"
+            style="margin-left: -8px"
             filled
           />
 
@@ -343,7 +344,7 @@ export default {
 }
 .filterButtonMenu {
   position: fixed;
-  z-index: 1;
+  z-index: 6;
   margin-top: -35px;
   padding: 20px 10px 5px 10px;
   border-radius: 7px;
