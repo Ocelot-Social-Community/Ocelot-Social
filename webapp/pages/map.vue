@@ -62,8 +62,10 @@ export default {
     }
   },
   data() {
+    mapboxgl.accessToken = this.$env.MAPBOX_TOKEN
     return {
       mapboxgl,
+      // mapboxLanguage: null,
       activeStyle: null,
       defaultCenter: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE
       currentUserLocation: null,
@@ -135,7 +137,7 @@ export default {
     },
     mapOptions() {
       return {
-        accessToken: this.$env.MAPBOX_TOKEN,
+        // accessToken: this.$env.MAPBOX_TOKEN, // is set already above
         style: !this.activeStyle ? this.availableStyles.outdoors.url : this.activeStyle,
         center: this.mapCenter,
         zoom: this.mapZoom,
@@ -154,22 +156,20 @@ export default {
     onMapLoad({ map }) {
       this.map = map
 
-      // // documentation of correct version: https://github.com/mapbox/mapbox-gl-language/tree/v0.10.0
-      // // Add RTL support if you want to support Arabic
-      // // Wolle: does not work yet
-      // // mapboxgl.accessToken = this.$env.MAPBOX_TOKEN
-      // // mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.1.0/mapbox-gl-rtl-text.js')
-      // const language = new MapboxLanguage({
-      //   defaultLanguage: 'en', // Wolle
-      //   // defaultLanguage: 'de', // Wolle
+      // documentation of correct version: https://github.com/mapbox/mapbox-gl-language/tree/v0.10.0
+      // Add RTL support if you want to support Arabic
+      // Wolle: does not work yet
+      // this.mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.1.0/mapbox-gl-rtl-text.js')
+      // this.mapboxLanguage = new MapboxLanguage({
+      //   // defaultLanguage: 'en', // Wolle
+      //   defaultLanguage: 'de', // Wolle
       //   // defaultLanguage: 'auto', // Wolle
       // })
-      // this.language = language
-      // this.map.addControl(language)
-      // // console.log('this.map: ', this.map)
-      // // console.log('this.language: ', this.language)
-      // // is unclear, how to
-      // // this.language.setLanguage('de') // makes error
+      // this.map.addControl(this.mapboxLanguage)
+      // console.log('this.map: ', this.map)
+      // console.log('this.language: ', this.language)
+      // is unclear, how to
+      // this.mapboxLanguage.setLanguage('de') // makes error
 
       // set the default atmosphere style
       // this.map.setFog({}) // the package is probably to old, because of Vue2: https://docs.mapbox.com/mapbox-gl-js/example/globe/
