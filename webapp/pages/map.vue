@@ -221,25 +221,25 @@ export default {
           (e.features[0].properties.type === 'group' ? '/group' : '/profile') +
           `/${e.features[0].properties.id}/${e.features[0].properties.slug}`
         let description = `
-          <div>`
-        description += `
+          <div>
             <div>
               <i>${markerTypeLabel}:</i> <b>${e.features[0].properties.name}</b>
             </div>`
         description +=
           e.features[0].properties.about && e.features[0].properties.about.length > 0
             ? `
+            <hr>
             <div style="margin-top: 4pt;">
               <i>${markerAboutLabel}:</i> ${e.features[0].properties.about}
             </div>`
             : ''
         description += `
+            <hr>
             <div style="margin-top: 4pt;">
               <i>${markerProfileLinkLabel}:</i>
               <br>
               <a href="${markerProfileLink}" target="_blank">${markerProfileLinkTitle}</a>
-            </div>`
-        description += `
+            </div>
           </div>
         `
 
