@@ -10,10 +10,13 @@ const sendSignupMail = async (resolve, root, args, context, resolveInfo) => {
   const { inviteCode } = args
   const response = await resolve(root, args, context, resolveInfo)
   const { email, nonce } = response
-  if (inviteCode) {
-    await sendMail(signupTemplate({ email, variables: { nonce, inviteCode } }))
-  } else {
-    await sendMail(signupTemplate({ email, variables: { nonce } }))
+  if (nonce) {
+    // emails that already exist do not have a nonce
+    if (inviteCode) {
+      await sendMail(signupTemplate({ email, variables: { nonce, inviteCode } }))
+    } else {
+      await sendMail(signupTemplate({ email, variables: { nonce } }))
+    }
   }
   delete response.nonce
   return response

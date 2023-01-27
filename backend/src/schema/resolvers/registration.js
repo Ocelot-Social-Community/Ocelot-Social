@@ -13,7 +13,12 @@ export default {
       args.nonce = generateNonce()
       args.email = normalizeEmail(args.email)
       let emailAddress = await existingEmailAddress({ args, context })
-      if (emailAddress) return emailAddress
+      /*
+      if (emailAddress.user) {
+        // what to do?
+      }
+      */
+      if (emailAddress.alreadyExistingEmail) return emailAddress.alreadyExistingEmail
       try {
         emailAddress = await neode.create('EmailAddress', args)
         return emailAddress.toJson()
