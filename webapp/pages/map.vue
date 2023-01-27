@@ -48,7 +48,6 @@
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
-// import MapboxLanguage from '@mapbox/mapbox-gl-language'
 import { objectValuesToArray } from '../utils/utils'
 import { mapGetters } from 'vuex'
 import { profileUserQuery, mapUserQuery } from '~/graphql/User'
@@ -65,13 +64,12 @@ export default {
     mapboxgl.accessToken = this.$env.MAPBOX_TOKEN
     return {
       mapboxgl,
-      // mapboxLanguage: null,
       activeStyle: null,
       defaultCenter: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE
-      currentUserLocation: null,
-      currentUserCoordinates: null,
-      users: null,
-      groups: null,
+      currentUserLocation: null,// documentation of correct version: https://github.com/mapbox/mapbox-gl-language/tree/v0.10.0
+
+      // set the default atmosphere style
+      // this.map.setFog({}) // the package is probably to old, because of Vue2: https://docs.mapbox.com/mapbox-gl-js/example/globe/
       markers: {
         icons: [
           {
@@ -119,7 +117,7 @@ export default {
           url: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
         },
         streets: {
-          url: 'mapbox://styles/mapbox/streets-v11?optimize=true',
+          url: 'mapbox://styles/mapbox/streets-v11',
           // Wolle: url: 'mapbox://styles/mapbox/streets-v12',
           // use the newest version?
         },
@@ -153,26 +151,17 @@ export default {
     },
   },
   methods: {
+    language(map) {
+      map.getStyle().layers.forEach(function(thisLayer){
+        if(thisLayer.id.indexOf('-label')>0){
+          //seems to use user language. specific language would be `name_de`, but is not compatible with all maps
+          map.setLayoutProperty(thisLayer.id, 'text-field', ['get','name'])
+        }
+      });
+    },
+
     onMapLoad({ map }) {
       this.map = map
-
-      // documentation of correct version: https://github.com/mapbox/mapbox-gl-language/tree/v0.10.0
-      // Add RTL support if you want to support Arabic
-      // Wolle: does not work yet
-      // this.mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.1.0/mapbox-gl-rtl-text.js')
-      // this.mapboxLanguage = new MapboxLanguage({
-      //   // defaultLanguage: 'en', // Wolle
-      //   defaultLanguage: 'de', // Wolle
-      //   // defaultLanguage: 'auto', // Wolle
-      // })
-      // this.map.addControl(this.mapboxLanguage)
-      // console.log('this.map: ', this.map)
-      // console.log('this.language: ', this.language)
-      // is unclear, how to
-      // this.mapboxLanguage.setLanguage('de') // makes error
-
-      // set the default atmosphere style
-      // this.map.setFog({}) // the package is probably to old, because of Vue2: https://docs.mapbox.com/mapbox-gl-js/example/globe/
 
       this.map.on('style.load', (value) => {
         // Triggered when `setStyle` is called.
@@ -273,6 +262,7 @@ export default {
       ).then(() => {
         this.markers.isImagesLoaded = true
         this.addMarkersOnCheckPrepared()
+        this.language(this.map)
       })
     },
     addMarkersOnCheckPrepared() {
