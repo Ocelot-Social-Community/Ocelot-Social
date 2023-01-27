@@ -2909,11 +2909,6 @@
     suggestions "^1.6.0"
     xtend "^4.0.1"
 
-"@mapbox/mapbox-gl-language@0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@mapbox/mapbox-gl-language/-/mapbox-gl-language-0.10.0.tgz#f93fb05cde7a8c092c29ff393c51b54e2e26611d"
-  integrity sha512-BBJ6CQStZbGKfARPOcVol97J5PLaLEbm6ya/PzzhC4Aw7f7a3cBiV5p6SYQFGhyAh2Z8MxjFaXH18xyB8KgrkA==
-
 "@mapbox/mapbox-gl-supported@^1.5.0":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@mapbox/mapbox-gl-supported/-/mapbox-gl-supported-1.5.0.tgz#f60b6a55a5d8e5ee908347d2ce4250b15103dc8e"
