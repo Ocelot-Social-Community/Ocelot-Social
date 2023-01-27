@@ -113,12 +113,12 @@ const sanitizeRelationshipType = (relationshipType) => {
 const localFileUpload = ({ createReadStream, uniqueFilename }) => {
   const destination = `/uploads/${uniqueFilename}`
   return new Promise((resolve, reject) =>
-    createReadStream()
-      .pipe(createWriteStream(`public${destination}`)
+    createReadStream().pipe(
+      createWriteStream(`public${destination}`)
         .on('finish', () => resolve(destination))
-        .on('error', (error) => reject(error))
-      )
-    )
+        .on('error', (error) => reject(error)),
+    ),
+  )
 }
 
 const s3Upload = async ({ createReadStream, uniqueFilename, mimetype }) => {

@@ -87,7 +87,7 @@ const createServer = (options) => {
   app.use(express.static('public'))
   app.use(bodyParser.json({ limit: '10mb' }))
   app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }))
-  app.use(graphqlUploadExpress());
+  app.use(graphqlUploadExpress())
   server.applyMiddleware({ app, path: '/' })
   const httpServer = http.createServer(app)
   server.installSubscriptionHandlers(httpServer)
