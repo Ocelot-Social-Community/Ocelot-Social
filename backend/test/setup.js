@@ -3,3 +3,6 @@
 import { TextEncoder, TextDecoder } from 'util'
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
+
+// Metascraper takes longer nowadays, double time
+jest.setTimeout(10000)
