@@ -22,17 +22,19 @@
         @load="onMapLoad"
       >
         <!-- may use MglPopup for the styles? -->
-        <ds-button
-          class="map-style-button"
+        <base-button
+          :class="[
+            'map-style-button',
+            mapOptions.style === style.url ? '' : '--deactivated'
+          ]"
           v-for="style in styles.available"
           :key="style.title"
           filled
           size="small"
-          :primary="mapOptions.style === style.url ? true : false"
           @click="setStyle(style.url)"
         >
           {{ style.title }}
-        </ds-button>
+        </base-button>
         <!-- Wolle: is MglAttributionControl needed? or what can we use it for? -->
         <!-- <MglAttributionControl /> -->
         <MglFullscreenControl />
@@ -462,7 +464,13 @@ export default {
   height: 70vh;
 }
 .map-style-button {
-  margin-left: 5px;
-  margin-top: 5px;
+  position: relative;
+  margin-left: 6px;
+  margin-top: 6px;
+
+  &.--deactivated {
+    color: $text-color-base;
+    background-color: $background-color-softer;
+  }
 }
 </style>
