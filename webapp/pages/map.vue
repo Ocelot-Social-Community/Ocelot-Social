@@ -23,7 +23,7 @@
       >
         <!-- may use MglPopup for the styles? -->
         <ds-button
-          class="style-button"
+          class="map-style-button"
           v-for="style in styles.available"
           :key="style.title"
           filled
@@ -461,7 +461,7 @@ export default {
 .mgl-map-wrapper {
   height: 70vh;
 }
-.style-button {
+.map-style-button {
   margin-left: 5px;
   margin-top: 5px;
 }
