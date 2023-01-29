@@ -249,7 +249,7 @@ export default {
           this.popupOnLeaveTimeoutId = setTimeout(() => {
             this.map.getCanvas().style.cursor = ''
             this.markers.popup.remove()
-          }, 2000)
+          }, 3000)
         }
       })
 
