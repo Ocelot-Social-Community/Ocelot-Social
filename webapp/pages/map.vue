@@ -66,7 +66,7 @@ export default {
       mapboxgl,
       activeStyle: null,
       defaultCenter: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE
-      currentUserLocation: null,// documentation of correct version: https://github.com/mapbox/mapbox-gl-language/tree/v0.10.0
+      currentUserLocation: null, // documentation of correct version: https://github.com/mapbox/mapbox-gl-language/tree/v0.10.0
 
       // set the default atmosphere style
       // this.map.setFog({}) // the package is probably to old, because of Vue2: https://docs.mapbox.com/mapbox-gl-js/example/globe/
@@ -91,6 +91,7 @@ export default {
         isSourceAndLayerAdded: false,
         isFlyToCenter: false,
         popup: null,
+        popupOnLeaveTimeoutId: null,
       },
     }
   },
@@ -152,12 +153,12 @@ export default {
   },
   methods: {
     language(map) {
-      map.getStyle().layers.forEach(function(thisLayer){
-        if(thisLayer.id.indexOf('-label')>0){
-          //seems to use user language. specific language would be `name_de`, but is not compatible with all maps
-          map.setLayoutProperty(thisLayer.id, 'text-field', ['get','name'])
+      map.getStyle().layers.forEach(function (thisLayer) {
+        if (thisLayer.id.indexOf('-label') > 0) {
+          // seems to use user language. specific language would be `name_de`, but is not compatible with all maps
+          map.setLayoutProperty(thisLayer.id, 'text-field', ['get', 'name'])
         }
-      });
+      })
     },
 
     onMapLoad({ map }) {
@@ -187,6 +188,10 @@ export default {
 
       this.map.on('mouseenter', 'markers', (e) => {
         // if (e.features[0].properties.type !== 'theUser') {}
+        if (this.popupOnLeaveTimeoutId) {
+          clearTimeout(this.popupOnLeaveTimeoutId)
+          this.popupOnLeaveTimeoutId = null
+        }
         if (this.markers.popup.isOpen()) {
           this.map.getCanvas().style.cursor = ''
           this.markers.popup.remove()
@@ -237,6 +242,15 @@ export default {
         // Populate the popup and set its coordinates
         // based on the feature found.
         this.markers.popup.setLngLat(coordinates).setHTML(description).addTo(this.map)
+      })
+
+      this.map.on('mouseleave', 'markers', (e) => {
+        if (this.markers.popup.isOpen()) {
+          this.popupOnLeaveTimeoutId = setTimeout(() => {
+            this.map.getCanvas().style.cursor = ''
+            this.markers.popup.remove()
+          }, 2000)
+        }
       })
 
       // load markers
