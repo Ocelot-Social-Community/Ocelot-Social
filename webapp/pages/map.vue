@@ -66,10 +66,10 @@ export default {
       mapboxgl,
       activeStyle: null,
       defaultCenter: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE
-      currentUserLocation: null, // documentation of correct version: https://github.com/mapbox/mapbox-gl-language/tree/v0.10.0
-
-      // set the default atmosphere style
-      // this.map.setFog({}) // the package is probably to old, because of Vue2: https://docs.mapbox.com/mapbox-gl-js/example/globe/
+      currentUserLocation: null,
+      currentUserCoordinates: null,
+      users: null,
+      groups: null,
       markers: {
         icons: [
           {
@@ -118,9 +118,9 @@ export default {
           url: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
         },
         streets: {
-          url: 'mapbox://styles/mapbox/streets-v11',
-          // Wolle: url: 'mapbox://styles/mapbox/streets-v12',
+          url: 'mapbox://styles/mapbox/streets-v11?optimize=true',
           // use the newest version?
+          // url: 'mapbox://styles/mapbox/streets-v12',
         },
         satellite: {
           url: 'mapbox://styles/mapbox/satellite-streets-v11?optimize=true',
@@ -152,17 +152,11 @@ export default {
     },
   },
   methods: {
-    language(map) {
-      map.getStyle().layers.forEach(function (thisLayer) {
-        if (thisLayer.id.indexOf('-label') > 0) {
-          // seems to use user language. specific language would be `name_de`, but is not compatible with all maps
-          map.setLayoutProperty(thisLayer.id, 'text-field', ['get', 'name'])
-        }
-      })
-    },
-
     onMapLoad({ map }) {
       this.map = map
+
+      // set the default atmosphere style
+      // this.map.setFog({}) // the package is probably to old, because of Vue2: https://docs.mapbox.com/mapbox-gl-js/example/globe/
 
       this.map.on('style.load', (value) => {
         // Triggered when `setStyle` is called.
@@ -253,8 +247,16 @@ export default {
         }
       })
 
-      // load markers
       this.loadMarkesIconsAndAddMarkers()
+    },
+    language(map) {
+      map.getStyle().layers.forEach(function (thisLayer) {
+        if (thisLayer.id.indexOf('-label') > 0) {
+          // seems to use user language. specific language would be `name_de`, but is not compatible with all maps
+          // variant sets all 'text-field' layers to languages of their countries
+          map.setLayoutProperty(thisLayer.id, 'text-field', ['get', 'name'])
+        }
+      })
     },
     setStyle(url) {
       this.map.setStyle(url)
@@ -275,8 +277,8 @@ export default {
         ),
       ).then(() => {
         this.markers.isImagesLoaded = true
-        this.addMarkersOnCheckPrepared()
         this.language(this.map)
+        this.addMarkersOnCheckPrepared()
       })
     },
     addMarkersOnCheckPrepared() {
