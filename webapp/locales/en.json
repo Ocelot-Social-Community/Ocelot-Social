@@ -397,13 +397,13 @@
   },
   "group": {
     "actionRadii": {
-      "continental": "Continental Group",
-      "global": "Global Group",
-      "interplanetary": "Interplanetary Group",
-      "national": "National Group",
-      "regional": "Regional Group"
+      "continental": "Continental",
+      "global": "Global or only virtual",
+      "interplanetary": "Interplanetary",
+      "national": "National",
+      "regional": "Regional"
     },
-    "actionRadius": "Action radius",
+    "actionRadius": "Action radius of the group",
     "addMemberToGroup": "Add to group",
     "addMemberToGroupSuccess": "“{name}” was added to the group with the role “{role}”!",
     "addUser": "Add User",
@@ -411,6 +411,7 @@
     "addUserPlaceholder": " Username",
     "allGroups": "All Groups",
     "categories": "Topic ::: Topics",
+    "categoriesTitle": "Topics of the group",
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
       "visitGroupPage": "Show group"
@@ -472,11 +473,16 @@
       "usual": "Simple Member"
     },
     "save": "Create new group",
-    "type": "Group type",
+    "type": "Visibility of the group",
     "types": {
-      "closed": "Closed Group",
-      "hidden": "Hidden Group",
-      "public": "Public Group"
+      "closed": "Closed",
+      "hidden": "Secret",
+      "public": "Public"
+    },
+    "typesOptions": {
+      "closed": "Closed — All posts only visible to the group's members",
+      "hidden": "Secret — Group (including the name) is completely invisible",
+      "public": "Public — Group and all posts are visible for all registered users"
     },
     "update": "Save change",
     "updatedGroup": "The group data has been changed."
