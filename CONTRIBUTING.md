@@ -105,7 +105,7 @@ Sprint retrospective
 
 ## Philosophy
 
-We practise [collective code ownership](http://www.extremeprogramming.org/rules/collective.html) rather than strong code ownership, which means that:
+We practice [collective code ownership](http://www.extremeprogramming.org/rules/collective.html) rather than strong code ownership, which means that:
 
 * developers can make contributions to other people's PRs (after checking in with them)
 * we avoid blocking because someone else isn't working, so we sometimes take over PRs from other developers
@@ -115,7 +115,7 @@ We believe in open source contributions as a learning experience – everyone is
 
 We use pair programming sessions as a tool for knowledge sharing. We can learn a lot from each other and only by sharing what we know and overcoming challenges together can we grow as a team and truly own this project collectively.
 
-As a volunteeer you have no commitment except your own self development and your awesomeness by contributing to this free and open-source software project. Cheers to you!
+As a volunteer you have no commitment except your own self development and your awesomeness by contributing to this free and open-source software project. Cheers to you!
 
 <!--
 ## Open-Source Bounties
@@ -149,3 +149,106 @@ Our Open-Source bounty program is a work-in-progress. Based on our future
 experience we will make changes and improvements. So keep an eye on this
 contribution guide.
 -->
+
+## Programming
+
+### Localization
+
+#### Quotation Marks
+
+The following characters are different from the programming quotation mark:
+
+`"` or `\"`
+
+Please copy and paste the following quotes for the languages:
+
+* de: „Dies ist ein Beispielsatz.“
+* en: “This is a sample sentence.”
+  * See <https://grammar.collinsdictionary.com/easy-learning/when-do-you-use-quotation-marks-or-in-english>
+
+## Docker – More Closely
+
+### Apple M1 Platform
+
+***Attention:** For using Docker commands in Apple M1 environments!*
+
+#### Environment Variable For Apple M1 Platform
+
+To set the Docker platform environment variable in your terminal tab, run:
+
+```bash
+# set env variable for your shell
+$ export DOCKER_DEFAULT_PLATFORM=linux/amd64
+```
+
+#### Docker Compose Override File For Apple M1 Platform
+
+For Docker compose `up` or `build` commands, you can use our Apple M1 override file that specifies the M1 platform:
+
+```bash
+# in main folder
+
+# for development
+$ docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.apple-m1.override.yml up
+# only once: init admin user and create indexes and contraints in Neo4j database
+$ docker compose exec backend yarn prod:migrate init
+# clean db
+$ docker compose exec backend yarn db:reset
+# seed db
+$ docker compose exec backend yarn db:seed
+
+# for production
+$ docker compose -f docker-compose.yml -f docker-compose.apple-m1.override.yml up
+# only once: init admin user and create indexes and contraints in Neo4j database
+$ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
+```
+
+### Analyzing Docker Builds
+
+To analyze a Docker build, there is a wonderful tool called [dive](https://github.com/wagoodman/dive). Please sponsor if you're using it!
+
+The `dive build` command is exactly the right one to fulfill what we are looking for.
+We can use it just like the `docker build` command and get an analysis afterwards.
+
+So, in our main folder, we use it in the following way:
+
+```bash
+# in main folder
+$ dive build --target <layer-name> -t "ocelotsocialnetwork/<app-name>:local-<layer-name>" --build-arg BBUILD_DATE="<build-date>" --build-arg BBUILD_VERSION="<build-version>" --build-arg BBUILD_COMMIT="<build-commit>" <app-folder-name-or-dot>/
+```
+
+The build arguments are optional.
+
+For the specific applications, we use them as follows.
+
+#### Backend
+
+##### Production For Backend
+
+```bash
+# in main folder
+$ dive build --target production -t "ocelotsocialnetwork/backend:local-production" backend/
+```
+
+##### Development For Backend
+
+```bash
+# in main folder
+$ dive build --target development -t "ocelotsocialnetwork/backend:local-development" backend/
+```
+
+#### Webapp
+
+##### Production For Webapp
+
+```bash
+# in main folder
+$ dive build --target production -t "ocelotsocialnetwork/webapp:local-production" webapp/
+```
+
+##### Development For Webapp
+
+```bash
+# in main folder
+$ dive build --target development -t "ocelotsocialnetwork/webapp:local-development" webapp/
+```
