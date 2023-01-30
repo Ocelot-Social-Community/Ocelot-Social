@@ -12,7 +12,6 @@
     "storybook": "cross-env NODE_OPTIONS=--openssl-legacy-provider start-storybook -p 3002  -s ./static -c storybook/",
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt build",
     "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt start",
-    "generate:maintenance": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt generate -c maintenance/source/nuxt.config.maintenance.js",
     "generate": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt generate",
     "lint": "eslint --ext .js,.vue .",
     "locales": "../scripts/translations/missing-keys.sh && ../scripts/translations/sort.sh",
