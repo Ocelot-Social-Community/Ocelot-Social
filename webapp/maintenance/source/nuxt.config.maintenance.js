@@ -1,4 +1,4 @@
-import defaultConfig from 'nuxt.config.js'
+import defaultConfig from './nuxt.config.js'
 
 const { css, styleResources, manifest } = defaultConfig
 
