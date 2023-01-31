@@ -921,8 +921,13 @@
       "name": "Security"
     },
     "social-media": {
-      "addNewTitle": "Add new link",
-      "editTitle": "Edit link \"{name}\"",
+      "add-new-link": "Add new link",
+      "delete-modal": {
+        "confirm-button": "Delete",
+        "message": "Delete “{name}”.",
+        "title": "Do you really want to delete your link?"
+      },
+      "edit-link": "Edit link",
       "name": "Social media",
       "placeholder": "Your social media url",
       "requireUnique": "You added this url already",
