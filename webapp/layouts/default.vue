@@ -29,7 +29,7 @@ export default {
     Modal,
     PageFooter,
   },
-  mixins: [seo, mobile],
+  mixins: [seo, mobile()],
 }
 </script>
 
