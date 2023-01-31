@@ -5,7 +5,7 @@
       <ds-heading tag="h1">{{ $t('map.pageTitle') }}</ds-heading>
     </ds-space>
     <ds-space margin="large" />
-    <client-only>
+    <client-only v-if="!isEmpty($env.MAPBOX_TOKEN)">
       <map-styles-buttons
         v-if="isMobile"
         :styles="styles"
@@ -39,10 +39,12 @@
         <MglScaleControl />
       </mgl-map>
     </client-only>
+    <empty v-else icon="alert" :message="$t('map.alertMessage')" />
   </div>
 </template>
 
 <script>
+import isEmpty from 'lodash/isEmpty'
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
@@ -51,6 +53,7 @@ import { objectValuesToArray } from '~/utils/utils'
 import { profileUserQuery, mapUserQuery } from '~/graphql/User'
 import { groupQuery } from '~/graphql/groups'
 import mobile from '~/mixins/mobile'
+import Empty from '~/components/Empty/Empty'
 import MapStylesButtons from '~/components/Map/MapStylesButtons'
 
 const maxMobileWidth = 639 // on this width and smaller the mapbox 'MapboxGeocoder' search gets bigger
@@ -59,6 +62,7 @@ export default {
   name: 'Map',
   mixins: [mobile(maxMobileWidth)],
   components: {
+    Empty,
     MapStylesButtons,
   },
   head() {
@@ -69,6 +73,7 @@ export default {
   data() {
     mapboxgl.accessToken = this.$env.MAPBOX_TOKEN
     return {
+      isEmpty,
       mapboxgl,
       activeStyle: null,
       defaultCenter: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE

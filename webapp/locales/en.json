@@ -526,6 +526,7 @@
     "title": "{APPLICATION_NAME} is under maintenance"
   },
   "map": {
+    "alertMessage": "The map cannot be accessed: The Mapbox token is not set on the server!",
     "button": {
       "tooltip": "Show map"
     },

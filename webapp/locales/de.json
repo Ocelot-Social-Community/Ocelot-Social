@@ -526,6 +526,7 @@
     "title": "{APPLICATION_NAME} befindet sich in der Wartung"
   },
   "map": {
+    "alertMessage": "Es kann nicht auf die Karte zugegriffen werden: Der Mapbox-Token ist auf dem Server nicht gesetzt!",
     "button": {
       "tooltip": "Landkarte anzeigen"
     },
