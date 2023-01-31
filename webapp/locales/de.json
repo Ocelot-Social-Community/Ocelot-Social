@@ -915,9 +915,14 @@
       "name": "Sicherheit"
     },
     "social-media": {
-      "addNewTitle": "Neuen Link hinzufügen",
-      "editTitle": "Link \"{name}\" ändern",
-      "name": "Soziale Netzwerke",
+      "add-new-link": "Neuen Link hinzufügen",
+      "delete-modal": {
+        "confirm-button": "Löschen",
+        "message": "Lösche „{name}“.",
+        "title": "Möchtest du wirklich deinen Link löschen?"
+      },
+      "edit-link": "Ändere den Link",
+      "name": "Soziale Medien",
       "placeholder": "Deine Webadresse des Sozialen Netzwerkes",
       "requireUnique": "Dieser Link existiert bereits",
       "submit": "Link hinzufügen",

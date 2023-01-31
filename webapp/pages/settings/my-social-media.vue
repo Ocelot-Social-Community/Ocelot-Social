@@ -7,13 +7,8 @@
       :useItems="socialMediaLinks"
       :defaultItem="{ url: '' }"
       :namePropertyKey="'url'"
-      :callbacks="{
-        handleInput: () => {},
-        handleInputValid,
-        edit: callbackEditSocialMedia,
-        submit: handleSubmitSocialMedia,
-        delete: callbackDeleteSocialMedia,
-      }"
+      :texts="mySomethingListTexts"
+      :callbacks="mySomethingListCallbacks"
     >
       <template #list-item="{ item }">
         <social-media-list-item :item="item" />
@@ -33,7 +28,11 @@
 <script>
 import { mapGetters, mapMutations } from 'vuex'
 import unionBy from 'lodash/unionBy'
-import gql from 'graphql-tag'
+import {
+  createSocialMediaMutation,
+  updateSocialMediaMutation,
+  deleteSocialMediaMutation,
+} from '~/graphql/SocialMedia.js'
 import MySomethingList from '~/components/_new/features/MySomethingList/MySomethingList.vue'
 import SocialMediaListItem from '~/components/_new/features/SocialMedia/SocialMediaListItem.vue'
 
@@ -77,6 +76,30 @@ export default {
         return { id, url, favicon }
       })
     },
+    mySomethingListTexts() {
+      return {
+        addButton: this.$t('settings.social-media.submit'),
+        addNew: this.$t('settings.social-media.add-new-link'),
+        deleteModal: {
+          titleIdent: 'settings.social-media.delete-modal.title',
+          messageIdent: 'settings.social-media.delete-modal.message',
+          confirm: {
+            icon: 'trash',
+            buttonTextIdent: 'settings.social-media.delete-modal.confirm-button',
+          },
+        },
+        edit: this.$t('settings.social-media.edit-link'),
+      }
+    },
+    mySomethingListCallbacks() {
+      return {
+        handleInput: () => {},
+        handleInputValid: this.handleInputValid,
+        edit: this.callbackEditSocialMedia,
+        submit: this.handleSubmitSocialMedia,
+        delete: this.callbackDeleteSocialMedia,
+      }
+    },
   },
   methods: {
     ...mapMutations({
@@ -93,7 +116,7 @@ export default {
       thisList.formData.socialMediaUrl = link.url
       // try to set focus on link edit field
       // thisList.$refs.socialMediaUrl.$el.focus()
-      // !!! Check for existenz
+      // !!! check for existence
       // this.$scopedSlots.default()[0].context.$refs
       // thisList.$scopedSlots['edit-item']()[0].$el.focus()
       // console.log(thisList.$scopedSlots['edit-item']()[0].context.$refs)
@@ -111,25 +134,11 @@ export default {
 
       let mutation, variables, successMessage
       if (isCreation) {
-        mutation = gql`
-          mutation ($url: String!) {
-            CreateSocialMedia(url: $url) {
-              id
-              url
-            }
-          }
-        `
+        mutation = createSocialMediaMutation()
         variables = { url: item.url }
         successMessage = thisList.$t('settings.social-media.successAdd')
       } else {
-        mutation = gql`
-          mutation ($id: ID!, $url: String!) {
-            UpdateSocialMedia(id: $id, url: $url) {
-              id
-              url
-            }
-          }
-        `
+        mutation = updateSocialMediaMutation()
         variables = { id: item.id, url: item.url }
         successMessage = thisList.$t('settings.data.success')
       }
@@ -159,14 +168,7 @@ export default {
     async callbackDeleteSocialMedia(thisList, item) {
       try {
         await thisList.$apollo.mutate({
-          mutation: gql`
-            mutation ($id: ID!) {
-              DeleteSocialMedia(id: $id) {
-                id
-                url
-              }
-            }
-          `,
+          mutation: deleteSocialMediaMutation(),
           variables: {
             id: item.id,
           },

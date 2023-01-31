@@ -12,6 +12,7 @@ import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { PubSub } from 'graphql-subscriptions'
 import Redis from 'ioredis'
 import bodyParser from 'body-parser'
+import { graphqlUploadExpress } from 'graphql-upload'
 
 export const NOTIFICATION_ADDED = 'NOTIFICATION_ADDED'
 const { REDIS_DOMAIN, REDIS_PORT, REDIS_PASSWORD } = CONFIG
@@ -67,6 +68,7 @@ const createServer = (options) => {
       },
     },
     debug: !!CONFIG.DEBUG,
+    uploads: false,
     tracing: !!CONFIG.DEBUG,
     formatError: (error) => {
       if (error.message === 'ERROR_VALIDATION') {
@@ -85,6 +87,7 @@ const createServer = (options) => {
   app.use(express.static('public'))
   app.use(bodyParser.json({ limit: '10mb' }))
   app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }))
+  app.use(graphqlUploadExpress())
   server.applyMiddleware({ app, path: '/' })
   const httpServer = http.createServer(app)
   server.installSubscriptionHandlers(httpServer)

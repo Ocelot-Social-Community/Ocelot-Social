@@ -10,4 +10,5 @@ module.exports = {
   ],
   coverageReporters: ['lcov', 'text'],
   testMatch: ['**/src/**/?(*.)+(spec|test).js?(x)'],
+  setupFilesAfterEnv: ['<rootDir>/test/setup.js']
 }

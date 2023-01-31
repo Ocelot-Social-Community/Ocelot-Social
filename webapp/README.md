@@ -4,18 +4,32 @@
 
 ## Installation
 
+For preparation we need Node and recommend to use [node version manager](https://github.com/nvm-sh/nvm) `nvm` to switch
+between different local Node versions:
+
+```bash
+# install Node
+$ cd webapp
+$ nvm install v16.19.0
+$ nvm use v16.19.0
+```
+
+Install node dependencies with [yarn](https://yarnpkg.com/en/):
+
 ```bash
 # install all dependencies
-$ cd webapp/
+$ cd webapp
 $ yarn install
 # or just
 $ yarn
+# or just later on to use version of ".nvmrc" file
+$ nvm use && yarn
 ```
 
 Copy:
 
 ```text
-# in webapp/
+# in webapp
 cp .env.template .env
 ```
 
