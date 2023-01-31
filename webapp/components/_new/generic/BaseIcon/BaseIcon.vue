@@ -59,7 +59,6 @@ export default {
     }
 
     &.--large {
-      margin-top: 1px;
       margin-left: 4px;
       height: 2.2em;
     }
