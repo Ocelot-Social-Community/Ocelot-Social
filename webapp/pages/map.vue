@@ -24,7 +24,7 @@
         <!-- may use MglPopup for the styles? -->
         <base-button
           :class="['map-style-button', mapOptions.style === style.url ? '' : '--deactivated']"
-          v-for="style in styles.available"
+          v-for="style in styles"
           :key="style.title"
           filled
           size="small"
@@ -104,9 +104,7 @@ export default {
       currentUser: 'auth/user',
     }),
     styles() {
-      return {
-        available: objectValuesToArray(this.availableStyles),
-      }
+      return objectValuesToArray(this.availableStyles)
     },
     availableStyles() {
       // https://docs.mapbox.com/api/maps/styles/
