@@ -6,18 +6,12 @@
     </ds-space>
     <ds-space margin="large" />
     <client-only>
-      <div v-if="isMobile">
-        <base-button
-          :class="['map-style-button', mapOptions.style === style.url ? '' : '--deactivated']"
-          v-for="style in styles"
-          :key="style.title"
-          filled
-          size="small"
-          @click="setStyle(style.url)"
-        >
-          {{ style.title }}
-        </base-button>
-      </div>
+      <map-styles-buttons
+        v-if="isMobile"
+        :styles="styles"
+        :actualStyle="mapOptions.style"
+        :setStyle="setStyle"
+      />
       <mgl-map
         :mapbox-gl="mapboxgl"
         :access-token="mapOptions.accessToken"
@@ -33,18 +27,12 @@
         :max-pitch="60"
         @load="onMapLoad"
       >
-        <div v-if="!isMobile">
-          <base-button
-            :class="['map-style-button', mapOptions.style === style.url ? '' : '--deactivated']"
-            v-for="style in styles"
-            :key="style.title"
-            filled
-            size="small"
-            @click="setStyle(style.url)"
-          >
-            {{ style.title }}
-          </base-button>
-        </div>
+        <map-styles-buttons
+          v-if="!isMobile"
+          :styles="styles"
+          :actualStyle="mapOptions.style"
+          :setStyle="setStyle"
+        />
         <MglFullscreenControl />
         <MglNavigationControl position="top-right" />
         <MglGeolocateControl position="top-right" />
@@ -63,12 +51,16 @@ import { objectValuesToArray } from '~/utils/utils'
 import { profileUserQuery, mapUserQuery } from '~/graphql/User'
 import { groupQuery } from '~/graphql/groups'
 import mobile from '~/mixins/mobile'
+import MapStylesButtons from '~/components/Map/MapStylesButtons'
 
 const maxMobileWidth = 639 // on this width and smaller the mapbox 'MapboxGeocoder' search gets bigger
 
 export default {
   name: 'Map',
   mixins: [mobile(maxMobileWidth)],
+  components: {
+    MapStylesButtons,
+  },
   head() {
     return {
       title: this.$t('map.pageTitle'),
@@ -473,16 +465,5 @@ export default {
 
 .mgl-map-wrapper {
   height: 70vh;
-}
-.map-style-button {
-  position: relative;
-  margin-left: 6px;
-  margin-top: 6px;
-  margin-bottom: 6px;
-
-  &.--deactivated {
-    color: $text-color-base;
-    background-color: $background-color-softer;
-  }
 }
 </style>
