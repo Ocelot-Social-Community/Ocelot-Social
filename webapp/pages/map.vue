@@ -6,6 +6,18 @@
     </ds-space>
     <ds-space margin="large" />
     <client-only>
+      <div v-if="isMobile">
+        <base-button
+          :class="['map-style-button', mapOptions.style === style.url ? '' : '--deactivated']"
+          v-for="style in styles"
+          :key="style.title"
+          filled
+          size="small"
+          @click="setStyle(style.url)"
+        >
+          {{ style.title }}
+        </base-button>
+      </div>
       <mgl-map
         :mapbox-gl="mapboxgl"
         :access-token="mapOptions.accessToken"
@@ -21,17 +33,18 @@
         :max-pitch="60"
         @load="onMapLoad"
       >
-        <!-- may use MglPopup for the styles? -->
-        <base-button
-          :class="['map-style-button', mapOptions.style === style.url ? '' : '--deactivated']"
-          v-for="style in styles"
-          :key="style.title"
-          filled
-          size="small"
-          @click="setStyle(style.url)"
-        >
-          {{ style.title }}
-        </base-button>
+        <div v-if="!isMobile">
+          <base-button
+            :class="['map-style-button', mapOptions.style === style.url ? '' : '--deactivated']"
+            v-for="style in styles"
+            :key="style.title"
+            filled
+            size="small"
+            @click="setStyle(style.url)"
+          >
+            {{ style.title }}
+          </base-button>
+        </div>
         <MglFullscreenControl />
         <MglNavigationControl position="top-right" />
         <MglGeolocateControl position="top-right" />
@@ -45,13 +58,17 @@
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
-import { objectValuesToArray } from '../utils/utils'
 import { mapGetters } from 'vuex'
+import { objectValuesToArray } from '~/utils/utils'
 import { profileUserQuery, mapUserQuery } from '~/graphql/User'
 import { groupQuery } from '~/graphql/groups'
+import mobile from '~/mixins/mobile'
+
+const maxMobileWidth = 639 // on this width and smaller the mapbox 'MapboxGeocoder' search gets bigger
 
 export default {
   name: 'Map',
+  mixins: [mobile(maxMobileWidth)],
   head() {
     return {
       title: this.$t('map.pageTitle'),
@@ -461,6 +478,7 @@ export default {
   position: relative;
   margin-left: 6px;
   margin-top: 6px;
+  margin-bottom: 6px;
 
   &.--deactivated {
     color: $text-color-base;
