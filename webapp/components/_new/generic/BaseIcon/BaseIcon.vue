@@ -59,8 +59,8 @@ export default {
     }
 
     &.--large {
-      margin-top: 2.5px;
-      margin-left: 3px;
+      margin-top: 1px;
+      margin-left: 4px;
       height: 2.2em;
     }
   }
