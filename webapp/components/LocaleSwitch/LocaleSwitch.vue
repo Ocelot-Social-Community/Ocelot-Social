@@ -3,7 +3,7 @@
     <dropdown ref="menu" :placement="placement" :offset="offset">
       <template #default="{ toggleMenu }">
         <a class="locale-menu" href="#" @click.prevent="toggleMenu()">
-          <base-icon name="globe" />
+          <!-- <base-icon name="globe" /> -->
           <span class="label">{{ current.code.toUpperCase() }}</span>
           <base-icon class="dropdown-arrow" name="angle-down" />
         </a>
