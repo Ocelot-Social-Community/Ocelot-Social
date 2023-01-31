@@ -61,7 +61,7 @@ export default {
     &.--large {
       margin-top: 2.5px;
       margin-left: 3px;
-      height: 45.4px;
+      height: 2.2em;
     }
   }
 }
