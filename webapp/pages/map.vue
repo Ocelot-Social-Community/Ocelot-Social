@@ -23,10 +23,7 @@
       >
         <!-- may use MglPopup for the styles? -->
         <base-button
-          :class="[
-            'map-style-button',
-            mapOptions.style === style.url ? '' : '--deactivated'
-          ]"
+          :class="['map-style-button', mapOptions.style === style.url ? '' : '--deactivated']"
           v-for="style in styles.available"
           :key="style.title"
           filled
@@ -35,8 +32,6 @@
         >
           {{ style.title }}
         </base-button>
-        <!-- Wolle: is MglAttributionControl needed? or what can we use it for? -->
-        <!-- <MglAttributionControl /> -->
         <MglFullscreenControl />
         <MglNavigationControl position="top-right" />
         <MglGeolocateControl position="top-right" />
@@ -252,6 +247,7 @@ export default {
       this.loadMarkesIconsAndAddMarkers()
     },
     language(map) {
+      // example in mapbox-gl-language: https://github.com/mapbox/mapbox-gl-language/blob/master/index.js
       map.getStyle().layers.forEach(function (thisLayer) {
         if (thisLayer.id.indexOf('-label') > 0) {
           // seems to use user language. specific language would be `name_de`, but is not compatible with all maps
