@@ -1,6 +1,6 @@
 <template>
   <span v-if="svgIcon" class="base-icon">
-    <component :is="svgIcon" aria-hidden="true" focusable="false" class="svg" />
+    <component :class="['svg', `--${size}`]" :is="svgIcon" aria-hidden="true" focusable="false" />
   </span>
 </template>
 
@@ -14,6 +14,13 @@ export default {
       required: true,
       validator(value) {
         return iconNames.includes(value)
+      },
+    },
+    size: {
+      type: String,
+      default: 'regular',
+      validator(value) {
+        return value.match(/(small|regular|large)/)
       },
     },
   },
@@ -42,6 +49,20 @@ export default {
   > .svg {
     height: 1.2em;
     fill: currentColor;
+
+    &.--small {
+      height: 0.8em;
+    }
+
+    &.--regular {
+      height: 1.2em;
+    }
+
+    &.--large {
+      margin-top: 2.5px;
+      margin-left: 3px;
+      height: 45.4px;
+    }
   }
 }
 </style>
