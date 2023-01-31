@@ -5,12 +5,12 @@
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </ds-grid-item>
       <!--Filter Button-->
-
       <ds-grid-item
         v-if="categoriesActive"
         :row-span="1"
         column-span="fullWidth"
         class="filterButtonMenu"
+        :class="{ 'hide-filter': hideFilter }"
       >
         <base-button
           class="my-filter-button"
@@ -23,20 +23,7 @@
           &nbsp;
           <base-icon class="my-filter-button" :name="filterButtonIcon"></base-icon>
         </base-button>
-        <!-- <ds-button
-          class="my-filter-button"
-          v-if="!postsFilter['categories_some'] && !postsFilter['author']"
-          :icon="filterButtonIcon"
-          right
-          @click="showFilter = !showFilter"
-        >
-          {{ $t('contribution.filterMasonryGrid.noFilter') }}
-        </ds-button> -->
-
         <span v-if="postsFilter['categories_some']">
-          <!-- <ds-button class="my-filter-button" right @click="showFilter = !showFilter">
-            {{ $t('contribution.filterMasonryGrid.myTheme') }}
-          </ds-button> -->
           <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
             {{ $t('contribution.filterMasonryGrid.myTheme') }}
           </base-button>
@@ -48,16 +35,7 @@
             style="margin-left: -8px"
             filled
           />
-
-          <!-- <ds-button
-            class="filter-remove"
-            @click="resetCategories"
-            icon="close"
-            title="Filter löschen"
-            style="margin-left: -14px"
-          ></ds-button> -->
         </span>
-
         <span v-if="postsFilter['author']">
           <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
             {{ $t('contribution.filterMasonryGrid.myFriends') }}
@@ -70,22 +48,6 @@
             style="margin-left: -8px"
             filled
           />
-
-          <!-- <ds-button
-            v-if="postsFilter['author']"
-            class="my-filter-button"
-            right
-            @click="showFilter = !showFilter"
-          >
-            {{ $t('contribution.filterMasonryGrid.myFriends') }}
-          </ds-button>
-          <ds-button
-            class="filter-remove"
-            @click="resetByFollowed"
-            icon="close"
-            title="Filter löschen"
-            style="margin-left: -14px"
-          ></ds-button> -->
         </span>
 
         <div
@@ -97,7 +59,6 @@
         </div>
       </ds-grid-item>
       <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
-
       <!-- donation info -->
       <ds-grid-item v-if="showDonations" class="top-info-bar" :row-span="1" column-span="fullWidth">
         <donation-info :goal="goal" :progress="progress" />
@@ -177,6 +138,8 @@ export default {
   data() {
     const { hashtag = null } = this.$route.query
     return {
+      hideFilter: false,
+      revScrollpos: 0,
       showFilter: false,
       showDonations: true,
       goal: 15000,
@@ -225,6 +188,7 @@ export default {
       this.toggleCategory(this.categoryId)
     }
     document.addEventListener('click', this.showFilterMenu)
+    window.addEventListener('scroll', this.handleScroll)
   },
   methods: {
     ...mapMutations({
@@ -237,6 +201,15 @@ export default {
         if (!this.showFilter) return
         this.showFilter = false
       }
+    },
+    handleScroll() {
+      const currentScrollPos = window.pageYOffset
+      if (this.prevScrollpos > currentScrollPos) {
+        this.hideFilter = false
+      } else {
+        this.hideFilter = true
+      }
+      this.prevScrollpos = currentScrollPos
     },
     beforeDestroy() {
       document.removeEventListener('click', this.showFilterMenu)
@@ -324,6 +297,10 @@ export default {
   &--full-width {
     grid-column: 1 / -1;
   }
+}
+
+.hide-filter {
+  display: none;
 }
 
 .base-button.--circle.post-add-button {
