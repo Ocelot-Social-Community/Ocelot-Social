@@ -300,7 +300,6 @@ export default {
 .topbar-locale-switch {
   display: flex;
   margin-right: $space-xx-small;
-  margin-top: -$space-xx-small;
   align-self: center;
   display: inline-flex;
 }
