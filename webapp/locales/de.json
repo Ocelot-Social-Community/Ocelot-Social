@@ -526,6 +526,9 @@
     "title": "{APPLICATION_NAME} befindet sich in der Wartung"
   },
   "map": {
+    "button": {
+      "tooltip": "Landkarte anzeigen"
+    },
     "markerTypes": {
       "group": "Gruppe",
       "theUser": "deine Position",

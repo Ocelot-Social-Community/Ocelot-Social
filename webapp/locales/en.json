@@ -526,6 +526,9 @@
     "title": "{APPLICATION_NAME} is under maintenance"
   },
   "map": {
+    "button": {
+      "tooltip": "Show map"
+    },
     "markerTypes": {
       "group": "group",
       "theUser": "your position",
