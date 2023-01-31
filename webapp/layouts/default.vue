@@ -1,14 +1,14 @@
 <template>
   <div class="layout-default">
     <div class="main-navigation">
-      <header-menu :showMobileMenu="showMobileMenu" />
+      <header-menu :showMobileMenu="isMobile" />
     </div>
     <ds-container>
       <div class="main-container">
         <nuxt />
       </div>
     </ds-container>
-    <page-footer v-if="!showMobileMenu" />
+    <page-footer v-if="!isMobile" />
     <div id="overlay" />
     <client-only>
       <modal />
@@ -17,8 +17,9 @@
 </template>
 
 <script>
-import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
 import seo from '~/mixins/seo'
+import mobile from '~/mixins/mobile'
+import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
 import Modal from '~/components/Modal'
 import PageFooter from '~/components/PageFooter/PageFooter'
 
@@ -28,27 +29,10 @@ export default {
     Modal,
     PageFooter,
   },
-  mixins: [seo],
-  data() {
-    return {
-      windowWidth: null,
-      maxMobileWidth: 810,
-    }
-  },
-  computed: {
-    showMobileMenu() {
-      if (!this.windowWidth) return false
-      return this.windowWidth <= this.maxMobileWidth
-    },
-  },
-  mounted() {
-    this.windowWidth = window.innerWidth
-    window.addEventListener('resize', () => {
-      this.windowWidth = window.innerWidth
-    })
-  },
+  mixins: [seo, mobile],
 }
 </script>
+
 <style lang="scss">
 .main-navigation {
   background-color: $color-header-background;
