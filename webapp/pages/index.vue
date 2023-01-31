@@ -25,13 +25,13 @@
         </base-button>
         <span v-if="postsFilter['categories_some']">
           <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
-            {{ $t('contribution.filterMasonryGrid.myTheme') }}
+            {{ $t('contribution.filterMasonryGrid.myTopics') }}
           </base-button>
           <base-button
             class="filter-remove"
             @click="resetCategories"
             icon="close"
-            title="Filter löschen"
+            :title="$t('filter-menu.deleteFilter')"
             style="margin-left: -8px"
             filled
           />
@@ -44,7 +44,7 @@
             class="filter-remove"
             @click="resetByFollowed"
             icon="close"
-            title="Filter löschen"
+            :title="$t('filter-menu.deleteFilter')"
             style="margin-left: -8px"
             filled
           />

@@ -270,7 +270,7 @@
     "filterFollow": "Beiträge von Benutzern filtern, denen ich folge",
     "filterMasonryGrid": {
       "myFriends": "Beiträge von meinen Freunden",
-      "myTheme": "Meine Themen",
+      "myTopics": "Meine Themen",
       "noFilter": "Beiträge filtern"
     },
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
@@ -375,6 +375,7 @@
   "filter-menu": {
     "all": "Alle",
     "categories": "Themen",
+    "deleteFilter": "Filter löschen",
     "emotions": "Emotionen",
     "filter-by": "Filtern nach ...",
     "following": "Benutzern, denen ich folge",
