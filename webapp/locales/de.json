@@ -816,6 +816,7 @@
     "data": {
       "labelBio": "Über Dich",
       "labelCity": "Deine Stadt oder Region",
+      "labelCityHint": " (zeigt ungenaue Position auf der Landkarte)",
       "labelName": "Dein Name",
       "labelSlug": "Dein eindeutiger Benutzername",
       "name": "Deine Daten",

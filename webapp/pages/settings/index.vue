@@ -17,7 +17,7 @@
           model="locationName"
           icon="map-marker"
           :options="cities"
-          :label="$t('settings.data.labelCity')"
+          :label="$t('settings.data.labelCity') + $t('settings.data.labelCityHint')"
           :placeholder="$t('settings.data.labelCity')"
           :loading="loadingGeo"
           @input.native="handleCityInput"

@@ -125,7 +125,11 @@
         <!-- location -->
         <ds-select
           id="city"
-          :label="$t('settings.data.labelCity') + locationNameLabelAddOnOldName"
+          :label="
+            $t('settings.data.labelCity') +
+            locationNameLabelAddOnOldName +
+            $t('settings.data.labelCityHint')
+          "
           v-model="formData.locationName"
           :options="cities"
           icon="map-marker"
