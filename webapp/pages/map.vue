@@ -117,6 +117,15 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+    isPreparedForMarkers() {
+      return (
+        !this.markers.isGeoJSON &&
+        this.markers.isImagesLoaded &&
+        this.currentUser &&
+        this.users &&
+        this.groups
+      )
+    },
     styles() {
       return objectValuesToArray(this.availableStyles)
     },
@@ -158,6 +167,13 @@ export default {
     },
     mapZoom() {
       return this.currentUserCoordinates ? 10 : 4
+    },
+  },
+  watch: {
+    isPreparedForMarkers(newValue) {
+      if (newValue) {
+        this.addMarkersOnCheckPrepared()
+      }
     },
   },
   methods: {
@@ -293,13 +309,7 @@ export default {
     },
     addMarkersOnCheckPrepared() {
       // set geoJSON for markers
-      if (
-        !this.markers.isGeoJSON &&
-        this.markers.isImagesLoaded &&
-        this.currentUser &&
-        this.users &&
-        this.groups
-      ) {
+      if (this.isPreparedForMarkers) {
         // add markers for "users"
         this.users.forEach((user) => {
           if (user.id !== this.currentUser.id && user.location) {
