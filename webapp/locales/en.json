@@ -410,6 +410,9 @@
     "addUserNoOptions": "No users found!",
     "addUserPlaceholder": " Username",
     "allGroups": "All Groups",
+    "button": {
+      "tooltip": "Show groups"
+    },
     "categories": "Topic ::: Topics",
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
