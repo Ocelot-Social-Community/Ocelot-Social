@@ -816,7 +816,7 @@
     "data": {
       "labelBio": "About You",
       "labelCity": "Your City or Region",
-      "labelCityHint": " (shows inaccurate position on map)",
+      "labelCityHint": "(shows approximate position on map)",
       "labelName": "Your Name",
       "labelSlug": "Your unique user name",
       "name": "Your data",

@@ -1,5 +1,5 @@
 <template>
-  <ds-form v-model="form" :schema="formSchema" @submit="submit">
+  <ds-form class="settings-form" v-model="form" :schema="formSchema" @submit="submit">
     <template #default="{ errors }">
       <base-card>
         <h2 class="title">{{ $t('settings.data.name') }}</h2>
@@ -17,11 +17,14 @@
           model="locationName"
           icon="map-marker"
           :options="cities"
-          :label="$t('settings.data.labelCity') + $t('settings.data.labelCityHint')"
+          :label="$t('settings.data.labelCity')"
           :placeholder="$t('settings.data.labelCity')"
           :loading="loadingGeo"
           @input.native="handleCityInput"
         />
+        <ds-text class="location-hint" color="softer">
+          {{ $t('settings.data.labelCityHint') }}
+        </ds-text>
         <!-- eslint-enable vue/use-v-on-exact -->
         <ds-input
           id="about"
@@ -158,3 +161,12 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+// .settings-form {
+// >
+.location-hint {
+  margin-top: -$space-x-small - $space-xxx-small - $space-xxx-small;
+}
+// }
+</style>
