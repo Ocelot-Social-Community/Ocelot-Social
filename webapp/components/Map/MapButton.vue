@@ -1,7 +1,15 @@
 <template>
   <div>
     <nuxt-link to="/map">
-      <base-button class="map-button" circle ghost>
+      <base-button
+        class="map-button"
+        circle
+        ghost
+        v-tooltip="{
+          content: $t('map.button.tooltip'),
+          placement: 'bottom-start',
+        }"
+      >
         <base-icon name="globe-detailed" size="large" />
       </base-button>
     </nuxt-link>
