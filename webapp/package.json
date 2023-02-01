@@ -44,7 +44,7 @@
     "nuxt": "~2.12.1",
     "nuxt-dropzone": "^1.0.4",
     "nuxt-env": "~0.1.0",
-    "sass": "^1.30.0",
+    "sass": "^1.58.0",
     "stack-utils": "^2.0.3",
     "tippy.js": "^4.3.5",
     "tiptap": "~1.26.6",
