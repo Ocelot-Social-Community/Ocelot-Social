@@ -397,13 +397,13 @@
   },
   "group": {
     "actionRadii": {
-      "continental": "Kontinentale Gruppe",
-      "global": "Globale Gruppe",
-      "interplanetary": "Interplanetare Gruppe",
-      "national": "Nationale Gruppe",
-      "regional": "Regionale Gruppe"
+      "continental": "Kontinental",
+      "global": "Global oder nur virtuell",
+      "interplanetary": "Interplanetar",
+      "national": "National",
+      "regional": "Regional"
     },
-    "actionRadius": "Aktionsradius",
+    "actionRadius": "Aktionsradius der Gruppe",
     "addMemberToGroup": "Zur Gruppe hinzufügen",
     "addMemberToGroupSuccess": "„{name}“ wurde der Gruppe mit der Rolle „{role}“ hinzugefügt!",
     "addUser": "Benutzer hinzufügen",
@@ -411,6 +411,7 @@
     "addUserPlaceholder": "Benutzername",
     "allGroups": "Alle Gruppen",
     "categories": "Thema ::: Themen",
+    "categoriesTitle": "Themen der Gruppe",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
     "contentMenu": {
       "visitGroupPage": "Gruppe anzeigen"
@@ -472,11 +473,16 @@
       "usual": "Einfaches Mitglied"
     },
     "save": "Neue Gruppe anlegen",
-    "type": "Gruppentyp",
+    "type": "Öffentlichkeit der Gruppe",
     "types": {
-      "closed": "Geschlossene Gruppe",
-      "hidden": "Versteckte Gruppe",
-      "public": "Öffentliche Gruppe"
+      "closed": "Geschlossen",
+      "hidden": "Geheim",
+      "public": "Öffentlich"
+    },
+    "typesOptions": {
+      "closed": "Geschlossen — Alle Beiträge nur für Gruppenmitglieder sichtbar",
+      "hidden": "Geheim — Gruppe (auch der Name) komplett unsichtbar",
+      "public": "Öffentlich — Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
     },
     "update": "Änderung speichern",
     "updatedGroup": "Die Gruppendaten wurden geändert!"
