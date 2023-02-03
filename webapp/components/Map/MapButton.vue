@@ -18,7 +18,7 @@
 
 <script>
 export default {
-  name: 'MapButton'
+  name: 'MapButton',
 }
 </script>
 
