@@ -6,7 +6,7 @@
       </ds-grid-item>
       <!--Filter Button-->
       <ds-grid-item
-        v-if="categoriesActive"
+        v-if="categoriesActive && SHOW_CONTENT_FILTER_MASONRY_GRID"
         :row-span="1"
         column-span="fullWidth"
         class="filterButtonMenu"
@@ -117,6 +117,8 @@ import { DonationsQuery } from '~/graphql/Donations'
 import { filterPosts } from '~/graphql/PostQuery.js'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
+import { SHOW_CONTENT_FILTER_MASONRY_GRID } from '~/constants/filter.js'
+
 export default {
   components: {
     DonationInfo,
@@ -147,6 +149,7 @@ export default {
       pageSize: 12,
       hashtag,
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
+      SHOW_CONTENT_FILTER_MASONRY_GRID
     }
   },
   computed: {

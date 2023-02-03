@@ -63,7 +63,7 @@
                 TODO: Filter is only visible on index    
             -->
         <ds-flex-item v-if="isLoggedIn" style="flex-grow: 0; flex-basis: auto">
-          <client-only>
+          <client-only v-if="SHOW_CONTENT_FILTER_HEADER_MENU">
             <filter-menu v-show="showFilterMenuDropdown" />
           </client-only>
         </ds-flex-item>
@@ -211,6 +211,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
+import { SHOW_CONTENT_FILTER_HEADER_MENU } from '~/constants/filter.js'
 import LOGOS from '~/constants/logos.js'
 import headerMenu from '~/constants/headerMenu.js'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
@@ -246,6 +247,7 @@ export default {
       links,
       LOGOS,
       SHOW_GROUP_BUTTON_IN_HEADER,
+      SHOW_CONTENT_FILTER_HEADER_MENU,
       isHeaderMenu: headerMenu.MENU.length > 0,
       menu: headerMenu.MENU,
       mobileSearchVisible: false,
