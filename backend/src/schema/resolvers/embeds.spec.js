@@ -96,7 +96,7 @@ describe('Query', () => {
               description: null,
               html: null,
               image: null,
-              lang: null,
+              lang: 'false',
               publisher: null,
               sources: ['resource'],
               title: null,

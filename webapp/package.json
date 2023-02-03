@@ -7,13 +7,12 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "nuxt",
+    "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt",
     "dev:styleguide": "cross-env STYLEGUIDE_DEV=true yarn run dev",
-    "storybook": "start-storybook -p 3002  -s ./static -c storybook/",
-    "build": "nuxt build",
-    "start": "nuxt start",
-    "generate:maintenance": "nuxt generate -c nuxt.config.maintenance.js",
-    "generate": "nuxt generate",
+    "storybook": "cross-env NODE_OPTIONS=--openssl-legacy-provider start-storybook -p 3002  -s ./static -c storybook/",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt build",
+    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt start",
+    "generate": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt generate",
     "lint": "eslint --ext .js,.vue .",
     "locales": "../scripts/translations/missing-keys.sh && ../scripts/translations/sort.sh",
     "precommit": "yarn lint",
@@ -112,5 +111,8 @@
     "vue-jest": "~3.0.5",
     "vue-svg-loader": "~0.16.0",
     "vue-template-compiler": "^2.6.11"
+  },
+  "resolutions": {
+    "nan": "2.17.0"
   }
 }

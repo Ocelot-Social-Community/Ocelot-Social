@@ -397,13 +397,13 @@
   },
   "group": {
     "actionRadii": {
-      "continental": "Kontinentale Gruppe",
-      "global": "Globale Gruppe",
-      "interplanetary": "Interplanetare Gruppe",
-      "national": "Nationale Gruppe",
-      "regional": "Regionale Gruppe"
+      "continental": "Kontinental",
+      "global": "Global oder nur virtuell",
+      "interplanetary": "Interplanetar",
+      "national": "National",
+      "regional": "Regional"
     },
-    "actionRadius": "Aktionsradius",
+    "actionRadius": "Aktionsradius der Gruppe",
     "addMemberToGroup": "Zur Gruppe hinzufügen",
     "addMemberToGroupSuccess": "„{name}“ wurde der Gruppe mit der Rolle „{role}“ hinzugefügt!",
     "addUser": "Benutzer hinzufügen",
@@ -414,6 +414,7 @@
       "tooltip": "Gruppen anzeigen"
     },
     "categories": "Thema ::: Themen",
+    "categoriesTitle": "Themen der Gruppe",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
     "contentMenu": {
       "visitGroupPage": "Gruppe anzeigen"
@@ -475,11 +476,16 @@
       "usual": "Einfaches Mitglied"
     },
     "save": "Neue Gruppe anlegen",
-    "type": "Gruppentyp",
+    "type": "Öffentlichkeit der Gruppe",
     "types": {
-      "closed": "Geschlossene Gruppe",
-      "hidden": "Versteckte Gruppe",
-      "public": "Öffentliche Gruppe"
+      "closed": "Geschlossen",
+      "hidden": "Geheim",
+      "public": "Öffentlich"
+    },
+    "typesOptions": {
+      "closed": "Geschlossen — Alle Beiträge nur für Gruppenmitglieder sichtbar",
+      "hidden": "Geheim — Gruppe (auch der Name) komplett unsichtbar",
+      "public": "Öffentlich — Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
     },
     "update": "Änderung speichern",
     "updatedGroup": "Die Gruppendaten wurden geändert!"
@@ -937,9 +943,14 @@
       "name": "Sicherheit"
     },
     "social-media": {
-      "addNewTitle": "Neuen Link hinzufügen",
-      "editTitle": "Link \"{name}\" ändern",
-      "name": "Soziale Netzwerke",
+      "add-new-link": "Neuen Link hinzufügen",
+      "delete-modal": {
+        "confirm-button": "Löschen",
+        "message": "Lösche „{name}“.",
+        "title": "Möchtest du wirklich deinen Link löschen?"
+      },
+      "edit-link": "Ändere den Link",
+      "name": "Soziale Medien",
       "placeholder": "Deine Webadresse des Sozialen Netzwerkes",
       "requireUnique": "Dieser Link existiert bereits",
       "submit": "Link hinzufügen",
