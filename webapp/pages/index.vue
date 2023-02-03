@@ -50,11 +50,7 @@
           />
         </span>
 
-        <div
-          id="my-filter"
-          style="background-color: white; box-shadow: rgb(189 189 189) 1px 9px 15px 1px"
-          v-if="showFilter"
-        >
+        <div id="my-filter" v-if="showFilter">
           <filter-menu-component :showMobileMenu="showMobileMenu" />
         </div>
       </ds-grid-item>
@@ -284,6 +280,13 @@ export default {
 </script>
 
 <style lang="scss">
+#my-filter {
+  background-color: white; 
+  box-shadow: rgb(189 189 189) 1px 9px 15px 1px; 
+  height: 448px; 
+  overflow: auto;
+}
+
 .masonry-grid {
   display: grid;
   grid-gap: 10px;
@@ -325,6 +328,6 @@ export default {
   margin-top: -35px;
   padding: 20px 10px 5px 10px;
   border-radius: 7px;
-  background-color: #fff;
+  background-color: #f5f4f6;
 }
 </style>
