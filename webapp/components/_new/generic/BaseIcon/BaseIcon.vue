@@ -20,7 +20,7 @@ export default {
       type: String,
       default: 'regular',
       validator(value) {
-        return value.match(/(small|regular|large)/)
+        return value.match(/^(small|regular|large)$/)
       },
     },
   },
