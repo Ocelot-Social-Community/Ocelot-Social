@@ -1,37 +1,92 @@
+// eslint-disable-next-line no-unused-vars
+import mapboxgl from 'mapbox-gl'
 import { mount } from '@vue/test-utils'
-// import Map from './map.vue'
 import VueMeta from 'vue-meta'
+import Vuex from 'vuex'
+import Map from './map'
+
+jest.mock('mapbox-gl', () => {
+  return {
+    GeolocateControl: jest.fn(),
+    Map: jest.fn(() => ({
+      addControl: jest.fn(),
+      on: jest.fn(),
+      remove: jest.fn(),
+    })),
+    NavigationControl: jest.fn(),
+    Popup: jest.fn(() => {
+      return {
+        isOpen: jest.fn(),
+        setLngLat: jest.fn(() => {
+          return {
+            setHTML: jest.fn(() => {
+              return {
+                addTo: jest.fn(),
+              }
+            }),
+          }
+        }),
+      }
+    }),
+  }
+})
 
 const localVue = global.localVue
 localVue.use(VueMeta, { keyName: 'head' })
 
-// try to solve error "TypeError: window.URL.createObjectURL is not a function"
-// window.URL.createObjectURL = jest.fn()
+const onEventMocks = {}
 
-// avoid: 'Error: Not implemented: navigation (except hash changes)', see https://stackoverflow.com/questions/54090231/how-to-fix-error-not-implemented-navigation-except-hash-changes
-const assignMock = jest.fn()
-delete window.location
-window.location = { assign: assignMock }
+const mapOnMock = jest.fn((key, ...args) => {
+  onEventMocks[key] = args[args.length - 1]
+})
+const mapAddControlMock = jest.fn()
 
-const openMock = jest.fn()
-delete window.open
-window.open = openMock
+const mapMock = {
+  on: mapOnMock,
+  addControl: mapAddControlMock,
+  loadImage: jest.fn(),
+  getCanvas: jest.fn(() => {
+    return {
+      style: {
+        cursor: 'pointer',
+      },
+    }
+  }),
+}
 
-describe.skip('map', () => {
+const stubs = {
+  'client-only': true,
+  'mgl-map': true,
+  MglFullscreenControl: true,
+  MglNavigationControl: true,
+  MglGeolocateControl: true,
+  MglScaleControl: true,
+}
+
+describe('map', () => {
   let wrapper
   let mocks
 
   beforeEach(() => {
     mocks = {
       $t: (t) => t,
+      $env: {
+        MAPBOX_TOKEN: 'MY_MAPBOX_TOKEN',
+      },
+      $toast: {
+        error: jest.fn(),
+      },
     }
   })
 
   describe('mount', () => {
     const Wrapper = () => {
+      const store = new Vuex.Store({ getters: { 'auth/user': () => false } })
       return mount(Map, {
         mocks,
         localVue,
+        stubs,
+        store,
       })
     }
 
@@ -43,9 +98,67 @@ describe.skip('map', () => {
       expect(wrapper.is('div')).toBeTruthy()
     })
 
-    it.skip('has correct <head> content', () => {
-      // set correct after solving error above
-      expect(wrapper.vm.$metaInfo.title).toBe('site.imprint')
+    it('has correct <head> content', () => {
+      expect(wrapper.vm.$metaInfo.title).toBe('map.pageTitle')
+    })
+
+    describe('trigger map load', () => {
+      beforeEach(async () => {
+        await wrapper.find('mgl-map-stub').vm.$emit('load', { map: mapMock })
+      })
+
+      it('initializes on style load', () => {
+        expect(mapOnMock).toBeCalledWith('style.load', expect.any(Function))
+      })
+
+      it('initializes on mouseenter', () => {
+        expect(mapOnMock).toBeCalledWith('mouseenter', 'markers', expect.any(Function))
+      })
+
+      it('initializes on mouseleave', () => {
+        expect(mapOnMock).toBeCalledWith('mouseleave', 'markers', expect.any(Function))
+      })
+
+      it('calls add map control', () => {
+        expect(mapAddControlMock).toBeCalled()
+      })
+
+      describe('trigger style load event', () => {
+        let spy
+        beforeEach(() => {
+          spy = jest.spyOn(wrapper.vm, 'loadMarkersIconsAndAddMarkers')
+          onEventMocks['style.load']()
+        })
+
+        it('calls loadMarkersIconsAndAddMarkers', () => {
+          expect(spy).toBeCalled()
+        })
+      })
+
+      describe('trigger mouse enter event', () => {
+        beforeEach(() => {
+          onEventMocks.mouseenter({
+            features: [
+              {
+                geometry: {
+                  coordinates: [100, 200],
+                },
+                properties: {
+                  type: 'user',
+                },
+              },
+            ],
+            lngLat: {
+              lng: 100,
+              lat: 200,
+            },
+          })
+        })
+
+        it('works without errors and warnings', () => {
+          expect(true).toBe(true)
+        })
+      })
     })
   })
 })
