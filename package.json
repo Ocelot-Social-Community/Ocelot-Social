@@ -48,7 +48,8 @@
     "slug": "^6.0.0"
   },
   "resolutions": {
-    "set-value": "^2.0.1"
+    "set-value": "^2.0.1",
+    "nan": "2.17.0"
   },
   "dependencies": {}
 }

@@ -402,20 +402,24 @@
   },
   "group": {
     "actionRadii": {
-      "continental": "Continental Group",
-      "global": "Global Group",
-      "interplanetary": "Interplanetary Group",
-      "national": "National Group",
-      "regional": "Regional Group"
+      "continental": "Continental",
+      "global": "Global or only virtual",
+      "interplanetary": "Interplanetary",
+      "national": "National",
+      "regional": "Regional"
     },
-    "actionRadius": "Action radius",
+    "actionRadius": "Action radius of the group",
     "addMemberToGroup": "Add to group",
     "addMemberToGroupSuccess": "“{name}” was added to the group with the role “{role}”!",
     "addUser": "Add User",
     "addUserNoOptions": "No users found!",
     "addUserPlaceholder": " Username",
     "allGroups": "All Groups",
+    "button": {
+      "tooltip": "Show groups"
+    },
     "categories": "Topic ::: Topics",
+    "categoriesTitle": "Topics of the group",
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
       "visitGroupPage": "Show group"
@@ -477,11 +481,16 @@
       "usual": "Simple Member"
     },
     "save": "Create new group",
-    "type": "Group type",
+    "type": "Visibility of the group",
     "types": {
-      "closed": "Closed Group",
-      "hidden": "Hidden Group",
-      "public": "Public Group"
+      "closed": "Closed",
+      "hidden": "Secret",
+      "public": "Public"
+    },
+    "typesOptions": {
+      "closed": "Closed — All posts only visible to the group's members",
+      "hidden": "Secret — Group (including the name) is completely invisible",
+      "public": "Public — Group and all posts are visible for all registered users"
     },
     "update": "Save change",
     "updatedGroup": "The group data has been changed."
@@ -526,6 +535,24 @@
     "explanation": "At the moment we are doing some scheduled maintenance, please try again later.",
     "questions": "Any Questions or concerns, send an e-mail to",
     "title": "{APPLICATION_NAME} is under maintenance"
+  },
+  "map": {
+    "alertMessage": "The map cannot be accessed: The Mapbox token is not set on the server!",
+    "button": {
+      "tooltip": "Show map"
+    },
+    "markerTypes": {
+      "group": "group",
+      "theUser": "your position",
+      "user": "user"
+    },
+    "pageTitle": "Map",
+    "styles": {
+      "dark": "Dark",
+      "outdoors": "Outdoors",
+      "satellite": "Satellite",
+      "streets": "Streets"
+    }
   },
   "modals": {
     "deleteUser": {
@@ -800,6 +827,7 @@
     "data": {
       "labelBio": "About You",
       "labelCity": "Your City or Region",
+      "labelCityHint": "(shows approximate position on map)",
       "labelName": "Your Name",
       "labelSlug": "Your unique user name",
       "name": "Your data",
@@ -920,8 +948,13 @@
       "name": "Security"
     },
     "social-media": {
-      "addNewTitle": "Add new link",
-      "editTitle": "Edit link \"{name}\"",
+      "add-new-link": "Add new link",
+      "delete-modal": {
+        "confirm-button": "Delete",
+        "message": "Delete “{name}”.",
+        "title": "Do you really want to delete your link?"
+      },
+      "edit-link": "Edit link",
       "name": "Social media",
       "placeholder": "Your social media url",
       "requireUnique": "You added this url already",

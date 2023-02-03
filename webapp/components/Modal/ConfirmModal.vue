@@ -1,5 +1,5 @@
 <template>
-  <ds-modal :title="title" :is-open="isOpen" @cancel="cancel">
+  <ds-modal :title="title" :is-open="isOpen" @cancel="cancel" data-test="confirm-modal">
     <transition name="ds-transition-fade">
       <ds-flex v-if="success" class="hc-modal-success" centered>
         <sweetalert-icon icon="success" />
@@ -15,6 +15,7 @@
         :danger="!modalData.buttons.confirm.danger"
         :icon="modalData.buttons.cancel.icon"
         @click="cancel"
+        data-test="cancel-button"
       >
         {{ $t(modalData.buttons.cancel.textIdent) }}
       </base-button>
@@ -25,6 +26,7 @@
         :icon="modalData.buttons.confirm.icon"
         :loading="loading"
         @click="confirm"
+        data-test="confirm-button"
       >
         {{ $t(modalData.buttons.confirm.textIdent) }}
       </base-button>
@@ -41,10 +43,10 @@ export default {
     SweetalertIcon,
   },
   props: {
-    name: { type: String, default: '' },
-    type: { type: String, required: true },
+    name: { type: String, default: '' }, // only used for compatibility with the other modals in 'Modal.vue'
+    type: { type: String, required: true }, // only used for compatibility with the other modals in 'Modal.vue'
     modalData: { type: Object, required: true },
-    id: { type: String, required: true },
+    id: { type: String, required: true }, // only used for compatibility with the other modals in 'Modal.vue'
   },
   data() {
     return {

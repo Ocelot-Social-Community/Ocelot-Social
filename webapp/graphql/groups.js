@@ -1,4 +1,5 @@
 import gql from 'graphql-tag'
+// import { locationFragment } from './Fragments'
 
 // ------ mutations
 
@@ -146,7 +147,9 @@ export const changeGroupMemberRoleMutation = () => {
 
 export const groupQuery = (i18n) => {
   const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
+  // ${locationFragment(lang)}
   return gql`
+
     query ($isMember: Boolean, $id: ID, $slug: String, $first: Int, $offset: Int) {
       Group(isMember: $isMember, id: $id, slug: $slug, first: $first, offset: $offset) {
         id
@@ -171,8 +174,11 @@ export const groupQuery = (i18n) => {
           url
         }
         locationName
+        # ...location
         location {
           name: name${lang}
+          lng
+          lat
         }
         myRole
       }

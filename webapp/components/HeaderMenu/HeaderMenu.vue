@@ -24,7 +24,7 @@
             <logo logoType="header" />
           </nuxt-link>
         </ds-flex-item>
-        <!-- dynamic-brand-menu -->
+        <!-- dynamic brand menus -->
         <ds-flex-item
           v-for="item in menu"
           :key="item.name"
@@ -43,8 +43,7 @@
             </ds-text>
           </nuxt-link>
         </ds-flex-item>
-
-        <!-- search-field -->
+        <!-- search field -->
         <ds-flex-item
           v-if="isLoggedIn"
           id="nav-search-box"
@@ -59,233 +58,254 @@
         >
           <search-field />
         </ds-flex-item>
-        <!-- filter-menu 
-                TODO: Filter is only visible on index    
-            -->
-        <ds-flex-item
-          v-if="isLoggedIn && SHOW_CONTENT_FILTER_HEADER_MENU"
-          style="flex-grow: 0; flex-basis: auto"
-        >
-          <client-only>
-            <filter-menu v-show="showFilterMenuDropdown" />
-          </client-only>
-        </ds-flex-item>
-        <!-- locale-switch -->
-        <ds-flex-item style="flex-basis: auto">
-          <div class="main-navigation-right" style="flex-basis: auto">
-            <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
-            <template v-if="isLoggedIn">
-              <client-only>
-                <!-- notification-menu -->
-                <notification-menu placement="top" />
-              </client-only>
-              <div v-if="inviteRegistration">
+        <!-- filter menu -->
+        <!-- TODO: Filter is only visible on index -->
+          <ds-flex-item v-if="isLoggedIn && SHOW_CONTENT_FILTER_HEADER_MENU" style="flex-grow: 0; flex-basis: auto">
+            <client-only>
+              <filter-menu v-show="showFilterMenuDropdown" />
+            </client-only>
+          </ds-flex-item>
+          <!-- right symbols -->
+          <ds-flex-item style="flex-basis: auto">
+            <div class="main-navigation-right" style="flex-basis: auto">
+              <!-- locale switch -->
+              <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
+              <template v-if="isLoggedIn">
+                <!-- notification menu -->
                 <client-only>
-                  <!-- invite-button -->
-                  <invite-button placement="top" />
+                  <notification-menu placement="top" />
                 </client-only>
-              </div>
-              <!-- group button -->
-              <client-only v-if="SHOW_GROUP_BUTTON_IN_HEADER">
+                <!-- invite button -->
+                <div v-if="inviteRegistration">
+                  <client-only>
+                    <invite-button placement="top" />
+                  </client-only>
+                </div>
+                <!-- group button -->
+                <client-only v-if="SHOW_GROUP_BUTTON_IN_HEADER">
+                  <group-button />
+                </client-only>
+                <!-- map button -->
+                <client-only v-if="!isEmpty(this.$env.MAPBOX_TOKEN)">
+                  <map-button />
+                </client-only>
+                <!-- avatar menu -->
+                <client-only>
+                  <avatar-menu placement="top" />
+                </client-only>
+              </template>
+            </div>
+          </ds-flex-item>
+        </ds-flex>
+
+        <!-- mobile header menu -->
+        <div v-else class="mobil-header-box">
+          <!-- logo, hamburger-->
+          <ds-flex style="align-items: center">
+            <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
+              <a
+                v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
+                :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
+                :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
+              >
+                <logo logoType="header" />
+              </a>
+              <nuxt-link
+                v-else
+                :to="LOGOS.LOGO_HEADER_CLICK.internalPath.to"
+                v-scroll-to="LOGOS.LOGO_HEADER_CLICK.internalPath.scrollTo"
+              >
+                <logo logoType="header" />
+              </nuxt-link>
+            </ds-flex-item>
+
+            <!-- mobile hamburger menu -->
+            <ds-flex-item class="mobile-hamburger-menu">
+              <client-only>
+                <div style="display: inline-flex; padding-right: 20px">
+                  <notification-menu />
+                </div>
+              </client-only>
+              <base-button icon="bars" @click="toggleMobileMenuView" circle />
+            </ds-flex-item>
+          </ds-flex>
+          <!-- search, filter -->
+          <ds-flex class="mobile-menu">
+            <!-- search field mobile -->
+            <ds-flex-item
+              v-if="isLoggedIn"
+              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+              style="padding: 20px"
+            >
+              <search-field />
+            </ds-flex-item>
+            <!-- filter menu mobile -->
+            <ds-flex-item
+              v-if="isLoggedIn"
+              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+              style="flex-grow: 0; flex-basis: auto; padding: 20px 0"
+            >
+              <client-only>
+                <filter-menu v-show="showFilterMenuDropdown" :showMobileMenu="showMobileMenu" />
+              </client-only>
+            </ds-flex-item>
+          </ds-flex>
+          <!-- right symbols -->
+          <ds-flex style="margin: 0 20px">
+            <!-- locale switch mobile -->
+            <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }">
+              <locale-switch
+                class="topbar-locale-switch topbar-locale-switch-mobile"
+                placement="top"
+                offset="8"
+              />
+            </ds-flex-item>
+            <!-- invite button mobile -->
+            <ds-flex-item
+              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+              style="text-align: center"
+            >
+              <client-only>
+                <invite-button placement="top" />
+              </client-only>
+            </ds-flex-item>
+            <!-- group button -->
+            <ds-flex-item
+              v-if="SHOW_GROUP_BUTTON_IN_HEADER"
+              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+              style="text-align: center"
+            >
+              <client-only>
                 <group-button />
               </client-only>
-              <!-- avatar-menu -->
+            </ds-flex-item>
+            <!-- map button -->
+            <ds-flex-item
+              v-if="!isEmpty(this.$env.MAPBOX_TOKEN)"
+              :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+              style="text-align: center"
+            >
+              <client-only>
+                <map-button />
+              </client-only>
+            </ds-flex-item>
+            <!-- avatar menu mobile -->
+            <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }" style="text-align: end">
               <client-only>
                 <avatar-menu placement="top" />
               </client-only>
-            </template>
+            </ds-flex-item>
+          </ds-flex>
+          <div :class="{ 'hide-mobile-menu': !toggleMobileMenu }" class="mobile-menu footer-mobile">
+            <!-- dynamic branding menus -->
+            <ul v-if="isHeaderMenu" class="dynamic-branding-mobil">
+              <li v-for="item in menu" :key="item.name">
+                <a v-if="item.url" :href="item.url" :target="item.target">
+                  <ds-text size="large" bold>
+                    {{ $t(item.nameIdent) }}
+                  </ds-text>
+                </a>
+                <nuxt-link v-else :to="item.path">
+                  <ds-text size="large" bold>
+                    {{ $t(item.nameIdent) }}
+                  </ds-text>
+                </nuxt-link>
+              </li>
+            </ul>
+            <hr />
+            <!-- dynamic footer menu in header  -->
+            <ul class="dynamic-footer-mobil">
+              <li v-for="pageParams in links.FOOTER_LINK_LIST" :key="pageParams.name">
+                <page-params-link :pageParams="pageParams">
+                  {{ $t(pageParams.internalPage.footerIdent) }}
+                </page-params-link>
+              </li>
+            </ul>
           </div>
-        </ds-flex-item>
-      </ds-flex>
-
-      <!-- mobile header menu -->
-      <div v-else class="mobil-header-box">
-        <!-- logo, hamburger-->
-        <ds-flex style="align-items: center">
-          <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
-            <a
-              v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
-              :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
-              :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
-            >
-              <logo logoType="header" />
-            </a>
-            <nuxt-link
-              v-else
-              :to="LOGOS.LOGO_HEADER_CLICK.internalPath.to"
-              v-scroll-to="LOGOS.LOGO_HEADER_CLICK.internalPath.scrollTo"
-            >
-              <logo logoType="header" />
-            </nuxt-link>
-          </ds-flex-item>
-
-          <!-- mobile hamburger menu -->
-          <ds-flex-item class="mobile-hamburger-menu">
-            <client-only>
-              <div style="display: inline-flex; padding-right: 20px">
-                <notification-menu />
-              </div>
-            </client-only>
-            <base-button icon="bars" @click="toggleMobileMenuView" circle />
-          </ds-flex-item>
-        </ds-flex>
-        <!-- search, filter-->
-        <ds-flex class="mobile-menu">
-          <!-- search-field mobile-->
-          <ds-flex-item
-            v-if="isLoggedIn"
-            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-            style="padding: 20px"
-          >
-            <search-field />
-          </ds-flex-item>
-          <!-- filter menu mobile-->
-          <ds-flex-item
-            v-if="isLoggedIn"
-            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-            style="flex-grow: 0; flex-basis: auto; padding: 20px 0"
-          >
-            <client-only>
-              <filter-menu v-show="showFilterMenuDropdown" :showMobileMenu="showMobileMenu" />
-            </client-only>
-          </ds-flex-item>
-        </ds-flex>
-        <!-- switch language, notification, invite, profil -->
-        <ds-flex style="margin: 0 20px">
-          <!-- locale-switch mobile-->
-          <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }">
-            <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
-          </ds-flex-item>
-          <!-- invite-button mobile-->
-          <ds-flex-item
-            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-            style="text-align: center"
-          >
-            <client-only>
-              <invite-button placement="top" />
-            </client-only>
-          </ds-flex-item>
-          <!-- group button -->
-          <ds-flex-item
-            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-            style="text-align: center"
-          >
-            <client-only v-if="SHOW_GROUP_BUTTON_IN_HEADER">
-              <group-button />
-            </client-only>
-          </ds-flex-item>
-          <!-- avatar-menu mobile-->
-          <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }" style="text-align: end">
-            <client-only>
-              <avatar-menu placement="top" />
-            </client-only>
-          </ds-flex-item>
-        </ds-flex>
-        <div :class="{ 'hide-mobile-menu': !toggleMobileMenu }" class="mobile-menu footer-mobile">
-          <!-- dynamic branding menu  -->
-          <ul v-if="isHeaderMenu" class="dynamic-branding-mobil">
-            <li v-for="item in menu" :key="item.name">
-              <a v-if="item.url" :href="item.url" :target="item.target">
-                <ds-text size="large" bold>
-                  {{ $t(item.nameIdent) }}
-                </ds-text>
-              </a>
-              <nuxt-link v-else :to="item.path">
-                <ds-text size="large" bold>
-                  {{ $t(item.nameIdent) }}
-                </ds-text>
-              </nuxt-link>
-            </li>
-          </ul>
-          <hr />
-          <!-- dynamic footer menu in header  -->
-          <ul class="dynamic-footer-mobil">
-            <li v-for="pageParams in links.FOOTER_LINK_LIST" :key="pageParams.name">
-              <page-params-link :pageParams="pageParams">
-                {{ $t(pageParams.internalPage.footerIdent) }}
-              </page-params-link>
-            </li>
-          </ul>
         </div>
-      </div>
     </div>
   </ds-container>
 </template>
-<script>
-import { mapGetters } from 'vuex'
-import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
-import { SHOW_CONTENT_FILTER_HEADER_MENU } from '~/constants/filter.js'
-import LOGOS from '~/constants/logos.js'
-import headerMenu from '~/constants/headerMenu.js'
-import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
-import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
-import GroupButton from '~/components/Group/GroupButton'
-import InviteButton from '~/components/InviteButton/InviteButton'
-import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
-import Logo from '~/components/Logo/Logo'
-import SearchField from '~/components/features/SearchField/SearchField.vue'
-import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
-import links from '~/constants/links.js'
-import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 
-export default {
-  components: {
-    AvatarMenu,
-    FilterMenu,
-    GroupButton,
-    InviteButton,
-    LocaleSwitch,
-    Logo,
-    NotificationMenu,
-    PageParamsLink,
-    SearchField,
-  },
-  props: {
-    showMobileMenu: { type: Boolean, default: false },
-  },
-  data() {
-    return {
-      hideNavbar: false,
-      prevScrollpos: 0,
-      links,
-      LOGOS,
-      SHOW_GROUP_BUTTON_IN_HEADER,
-      SHOW_CONTENT_FILTER_HEADER_MENU,
-      isHeaderMenu: headerMenu.MENU.length > 0,
-      menu: headerMenu.MENU,
-      mobileSearchVisible: false,
-      toggleMobileMenu: false,
-      inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
-    }
-  },
-  computed: {
-    ...mapGetters({
-      isLoggedIn: 'auth/isLoggedIn',
-    }),
-    showFilterMenuDropdown() {
-      const [firstRoute] = this.$route.matched
-      return firstRoute && firstRoute.name === 'index'
-    },
-  },
-  methods: {
-    handleScroll() {
-      const currentScrollPos = window.pageYOffset
-      if (this.prevScrollpos > currentScrollPos) {
-        this.hideNavbar = false
-      } else {
-        this.hideNavbar = true
-      }
-      this.prevScrollpos = currentScrollPos
-    },
-    toggleMobileMenuView() {
-      this.toggleMobileMenu = !this.toggleMobileMenu
-    },
-  },
-  mounted() {
-    window.addEventListener('scroll', this.handleScroll)
-  },
-}
+<script>
+ import { mapGetters } from 'vuex'
+ import isEmpty from 'lodash/isEmpty'
+ import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
+ import { SHOW_CONTENT_FILTER_HEADER_MENU } from '~/constants/filter.js'
+ import LOGOS from '~/constants/logos.js'
+ import headerMenu from '~/constants/headerMenu.js'
+ import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
+ import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
+ import GroupButton from '~/components/Group/GroupButton'
+ import InviteButton from '~/components/InviteButton/InviteButton'
+ import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+ import Logo from '~/components/Logo/Logo'
+ import MapButton from '~/components/Map/MapButton'
+ import SearchField from '~/components/features/SearchField/SearchField.vue'
+ import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
+ import links from '~/constants/links.js'
+ import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
+
+ export default {
+   components: {
+     AvatarMenu,
+     FilterMenu,
+     GroupButton,
+     InviteButton,
+     LocaleSwitch,
+     Logo,
+     MapButton,
+     NotificationMenu,
+     PageParamsLink,
+     SearchField,
+   },
+   props: {
+     showMobileMenu: { type: Boolean, default: false },
+   },
+   data() {
+     return {
+       hideNavbar: false,
+       prevScrollpos: 0,
+       isEmpty,
+       links,
+       LOGOS,
+       SHOW_GROUP_BUTTON_IN_HEADER,
+       SHOW_CONTENT_FILTER_HEADER_MENU,
+       isHeaderMenu: headerMenu.MENU.length > 0,
+       menu: headerMenu.MENU,
+       mobileSearchVisible: false,
+       toggleMobileMenu: false,
+       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
+       categoriesActive: this.$env.CATEGORIES_ACTIVE,
+     }
+   },
+   computed: {
+     ...mapGetters({
+       isLoggedIn: 'auth/isLoggedIn',
+     }),
+     showFilterMenuDropdown() {
+       const [firstRoute] = this.$route.matched
+       return firstRoute && firstRoute.name === 'index'
+     },
+   },
+   methods: {
+     handleScroll() {
+       const currentScrollPos = window.pageYOffset
+       if (this.prevScrollpos > currentScrollPos) {
+         this.hideNavbar = false
+       } else {
+         this.hideNavbar = true
+       }
+       this.prevScrollpos = currentScrollPos
+     },
+     toggleMobileMenuView() {
+       this.toggleMobileMenu = !this.toggleMobileMenu
+     },
+   },
+   mounted() {
+     window.addEventListener('scroll', this.handleScroll)
+   },
+ }
 </script>
 
 <style lang="scss">
@@ -308,6 +328,9 @@ export default {
   margin-right: $space-xx-small;
   align-self: center;
   display: inline-flex;
+}
+.topbar-locale-switch-mobile {
+  margin-top: $space-xx-small;
 }
 .main-navigation-flex {
   align-items: center;
