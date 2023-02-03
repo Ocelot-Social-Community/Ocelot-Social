@@ -1,6 +1,7 @@
 import { When } from "cypress-cucumber-preprocessor/steps";
 
 When("I log out", () => {
+  cy.scrollTo('top')
   cy.get(".avatar-menu")
     .click();
   cy.get(".avatar-menu-popover")
