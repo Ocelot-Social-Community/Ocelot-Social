@@ -149,7 +149,7 @@ export default {
       pageSize: 12,
       hashtag,
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
-      SHOW_CONTENT_FILTER_MASONRY_GRID
+      SHOW_CONTENT_FILTER_MASONRY_GRID,
     }
   },
   computed: {
@@ -284,9 +284,9 @@ export default {
 
 <style lang="scss">
 #my-filter {
-  background-color: white; 
-  box-shadow: rgb(189 189 189) 1px 9px 15px 1px; 
-  max-height: 480px; 
+  background-color: white;
+  box-shadow: rgb(189 189 189) 1px 9px 15px 1px;
+  max-height: 480px;
   overflow: auto;
 }
 
