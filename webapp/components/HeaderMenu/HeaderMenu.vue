@@ -62,7 +62,10 @@
         <!-- filter-menu 
                 TODO: Filter is only visible on index    
             -->
-        <ds-flex-item v-if="isLoggedIn" style="flex-grow: 0; flex-basis: auto">
+        <ds-flex-item
+          v-if="isLoggedIn && SHOW_CONTENT_FILTER_HEADER_MENU"
+          style="flex-grow: 0; flex-basis: auto"
+        >
           <client-only>
             <filter-menu v-show="showFilterMenuDropdown" />
           </client-only>
