@@ -410,6 +410,9 @@
     "addUserNoOptions": "Keine Nutzer gefunden!",
     "addUserPlaceholder": "Benutzername",
     "allGroups": "Alle Gruppen",
+    "button": {
+      "tooltip": "Gruppen anzeigen"
+    },
     "categories": "Thema ::: Themen",
     "categoriesTitle": "Themen der Gruppe",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
@@ -527,6 +530,24 @@
     "explanation": "Derzeit führen wir einige geplante Wartungsarbeiten durch, bitte versuche es später erneut.",
     "questions": "Bei Fragen oder Problemen erreichst Du uns per E-Mail an",
     "title": "{APPLICATION_NAME} befindet sich in der Wartung"
+  },
+  "map": {
+    "alertMessage": "Es kann nicht auf die Karte zugegriffen werden: Der Mapbox-Token ist auf dem Server nicht gesetzt!",
+    "button": {
+      "tooltip": "Landkarte anzeigen"
+    },
+    "markerTypes": {
+      "group": "Gruppe",
+      "theUser": "deine Position",
+      "user": "Benutzer"
+    },
+    "pageTitle": "Landkarte",
+    "styles": {
+      "dark": "Dunkel",
+      "outdoors": "Landschaft",
+      "satellite": "Satellit",
+      "streets": "Straßen"
+    }
   },
   "modals": {
     "deleteUser": {
@@ -801,6 +822,7 @@
     "data": {
       "labelBio": "Über Dich",
       "labelCity": "Deine Stadt oder Region",
+      "labelCityHint": "(zeigt ungefähre Position auf der Landkarte)",
       "labelName": "Dein Name",
       "labelSlug": "Dein eindeutiger Benutzername",
       "name": "Deine Daten",

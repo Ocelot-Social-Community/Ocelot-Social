@@ -410,6 +410,9 @@
     "addUserNoOptions": "No users found!",
     "addUserPlaceholder": " Username",
     "allGroups": "All Groups",
+    "button": {
+      "tooltip": "Show groups"
+    },
     "categories": "Topic ::: Topics",
     "categoriesTitle": "Topics of the group",
     "changeMemberRole": "The role has been changed to “{role}”!",
@@ -527,6 +530,24 @@
     "explanation": "At the moment we are doing some scheduled maintenance, please try again later.",
     "questions": "Any Questions or concerns, send an e-mail to",
     "title": "{APPLICATION_NAME} is under maintenance"
+  },
+  "map": {
+    "alertMessage": "The map cannot be accessed: The Mapbox token is not set on the server!",
+    "button": {
+      "tooltip": "Show map"
+    },
+    "markerTypes": {
+      "group": "group",
+      "theUser": "your position",
+      "user": "user"
+    },
+    "pageTitle": "Map",
+    "styles": {
+      "dark": "Dark",
+      "outdoors": "Outdoors",
+      "satellite": "Satellite",
+      "streets": "Streets"
+    }
   },
   "modals": {
     "deleteUser": {
@@ -801,6 +822,7 @@
     "data": {
       "labelBio": "About You",
       "labelCity": "Your City or Region",
+      "labelCityHint": "(shows approximate position on map)",
       "labelName": "Your Name",
       "labelSlug": "Your unique user name",
       "name": "Your data",

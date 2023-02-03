@@ -13,11 +13,19 @@ export const userFragment = gql`
   }
 `
 
-export const locationAndBadgesFragment = (lang) => gql`
-  fragment locationAndBadges on User {
+export const locationFragment = (lang) => gql`
+  fragment location on User {
+    locationName
     location {
       name: name${lang}
+      lng
+      lat
     }
+  }
+`
+
+export const badgesFragment = gql`
+  fragment badges on User {
     badges {
       id
       icon

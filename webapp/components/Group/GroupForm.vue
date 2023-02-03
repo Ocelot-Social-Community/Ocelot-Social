@@ -142,6 +142,9 @@
           style="position: relative; display: inline-block; right: -96%; top: -33px; width: 26px"
           @click="formData.locationName = ''"
         ></base-button>
+        <ds-text class="location-hint" color="softer">
+          {{ $t('settings.data.labelCityHint') }}
+        </ds-text>
 
         <ds-space margin-top="small" />
 
@@ -435,6 +438,10 @@ export default {
   > .buttons {
     align-self: flex-end;
     margin-top: $space-base;
+  }
+
+  > .location-hint {
+    margin-top: -$space-base + $space-xxx-small;
   }
 }
 </style>
