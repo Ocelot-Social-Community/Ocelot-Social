@@ -269,7 +269,7 @@ jobs:
           report_name: Coverage Webapp
           type: lcov
           result_path: ./coverage/lcov.info
-          min_coverage: 61
+          min_coverage: 63
           token: ${{ github.token }}
 
   ##############################################################################

@@ -44,12 +44,11 @@
 </template>
 
 <script>
-import isEmpty from 'lodash/isEmpty'
+import { isEmpty, toArray } from 'lodash'
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import { mapGetters } from 'vuex'
-import { objectValuesToArray } from '~/utils/utils'
 import { profileUserQuery, mapUserQuery } from '~/graphql/User'
 import { groupQuery } from '~/graphql/groups'
 import mobile from '~/mixins/mobile'
@@ -127,7 +126,7 @@ export default {
       )
     },
     styles() {
-      return objectValuesToArray(this.availableStyles)
+      return toArray(this.availableStyles)
     },
     availableStyles() {
       // https://docs.mapbox.com/api/maps/styles/
@@ -187,7 +186,7 @@ export default {
         // Triggered when `setStyle` is called.
         this.markers.isImagesLoaded = false
         this.markers.isSourceAndLayerAdded = false
-        this.loadMarkesIconsAndAddMarkers()
+        this.loadMarkersIconsAndAddMarkers()
       })
 
       // add search field for locations
@@ -241,7 +240,7 @@ export default {
               <a href="${markerProfileLink}" target="_blank">${markerProfileLinkTitle}</a>
             </div>
           </div>
-        `
+           `
         description +=
           e.features[0].properties.about && e.features[0].properties.about.length > 0
             ? `
@@ -272,7 +271,7 @@ export default {
         }
       })
 
-      this.loadMarkesIconsAndAddMarkers()
+      this.loadMarkersIconsAndAddMarkers()
     },
     language(map) {
       // example in mapbox-gl-language: https://github.com/mapbox/mapbox-gl-language/blob/master/index.js
@@ -288,7 +287,7 @@ export default {
       this.map.setStyle(url)
       this.activeStyle = url
     },
-    loadMarkesIconsAndAddMarkers() {
+    loadMarkersIconsAndAddMarkers() {
       Promise.all(
         this.markers.icons.map(
           (marker) =>
