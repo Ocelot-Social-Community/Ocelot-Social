@@ -1,0 +1,3 @@
+export const SHOW_CONTENT_FILTER_HEADER_MENU = false
+export const SHOW_CONTENT_FILTER_MASONRY_GRID = true
+
