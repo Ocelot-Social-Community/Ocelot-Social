@@ -286,7 +286,7 @@ export default {
 #my-filter {
   background-color: white; 
   box-shadow: rgb(189 189 189) 1px 9px 15px 1px; 
-  height: 448px; 
+  max-height: 480px; 
   overflow: auto;
 }
 
