@@ -267,8 +267,12 @@
       "happy": "Glücklich",
       "surprised": "Erstaunt"
     },
-    "filterALL": "Alle Beiträge anzeigen",
     "filterFollow": "Beiträge von Benutzern filtern, denen ich folge",
+    "filterMasonryGrid": {
+      "myFriends": "Beiträge von meinen Freunden",
+      "myTopics": "Meine Themen",
+      "noFilter": "Beiträge filtern"
+    },
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache Deines Beitrags",
     "languageSelectText": "Sprache wählen",
@@ -371,6 +375,7 @@
   "filter-menu": {
     "all": "Alle",
     "categories": "Themen",
+    "deleteFilter": "Filter löschen",
     "emotions": "Emotionen",
     "filter-by": "Filtern nach ...",
     "following": "Benutzern, denen ich folge",

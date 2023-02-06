@@ -267,8 +267,12 @@
       "happy": "Happy",
       "surprised": "Surprised"
     },
-    "filterALL": "View all contributions",
     "filterFollow": "Filter contributions from users I follow",
+    "filterMasonryGrid": {
+      "myFriends": "Posts from my friends",
+      "myTopics": "My topics",
+      "noFilter": "Filter posts"
+    },
     "inappropriatePicture": "This image may be inappropriate for some people.",
     "languageSelectLabel": "Language of your contribution",
     "languageSelectText": "Select Language",
@@ -371,6 +375,7 @@
   "filter-menu": {
     "all": "All",
     "categories": "Topics",
+    "deleteFilter": "Delete filter",
     "emotions": "Emotions",
     "filter-by": "Filter by ...",
     "following": "Users I follow",

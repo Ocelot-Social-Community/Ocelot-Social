@@ -11,15 +11,7 @@
       <base-icon class="dropdown-arrow" name="angle-down" />
     </base-button>
     <template slot="popover">
-      <div class="filter-menu-options">
-        <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
-        <following-filter />
-        <categories-filter v-if="categoriesActive" :showMobileMenu="showMobileMenu" />
-      </div>
-      <div class="filter-menu-options">
-        <h2 class="title">{{ $t('filter-menu.order-by') }}</h2>
-        <order-by-filter />
-      </div>
+      <filter-menu-component :showMobileMenu="showMobileMenu" />
     </template>
   </dropdown>
 </template>
@@ -27,21 +19,12 @@
 <script>
 import Dropdown from '~/components/Dropdown'
 import { mapGetters } from 'vuex'
-import FollowingFilter from './FollowingFilter'
-import OrderByFilter from './OrderByFilter'
-import CategoriesFilter from './CategoriesFilter'
+import FilterMenuComponent from './FilterMenuComponent'
 
 export default {
   components: {
     Dropdown,
-    FollowingFilter,
-    OrderByFilter,
-    CategoriesFilter,
-  },
-  data() {
-    return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
-    }
+    FilterMenuComponent,
   },
   props: {
     placement: { type: String },
@@ -55,14 +38,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss">
-.filter-menu-options {
-  max-width: $size-max-width-filter-menu;
-  padding: $space-small $space-x-small;
-
-  > .title {
-    font-size: $font-size-large;
-  }
-}
-</style>

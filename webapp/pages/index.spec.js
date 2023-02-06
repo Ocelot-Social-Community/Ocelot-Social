@@ -73,6 +73,9 @@ describe('PostIndex', () => {
       $route: {
         query: {},
       },
+      $env: {
+        CATEGORIES_ACTIVE: true,
+      },
     }
   })
 

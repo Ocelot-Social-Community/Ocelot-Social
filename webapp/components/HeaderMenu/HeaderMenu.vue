@@ -1,5 +1,9 @@
 <template>
-  <ds-container class="main-navigation-container" style="padding: 10px 10px">
+  <ds-container
+    class="main-navigation-container"
+    :class="{ 'hide-navbar': hideNavbar }"
+    id="navbar"
+  >
     <div>
       <!-- header menu -->
       <ds-flex v-if="!showMobileMenu" class="main-navigation-flex">
@@ -56,7 +60,10 @@
         </ds-flex-item>
         <!-- filter menu -->
         <!-- TODO: Filter is only visible on index -->
-        <ds-flex-item v-if="isLoggedIn" style="flex-grow: 0; flex-basis: auto">
+        <ds-flex-item
+          v-if="isLoggedIn && SHOW_CONTENT_FILTER_HEADER_MENU"
+          style="flex-grow: 0; flex-basis: auto"
+        >
           <client-only>
             <filter-menu v-show="showFilterMenuDropdown" />
           </client-only>
@@ -227,6 +234,7 @@
 import { mapGetters } from 'vuex'
 import isEmpty from 'lodash/isEmpty'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
+import { SHOW_CONTENT_FILTER_HEADER_MENU } from '~/constants/filter.js'
 import LOGOS from '~/constants/logos.js'
 import headerMenu from '~/constants/headerMenu.js'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
@@ -259,10 +267,13 @@ export default {
   },
   data() {
     return {
+      hideNavbar: false,
+      prevScrollpos: 0,
       isEmpty,
       links,
       LOGOS,
       SHOW_GROUP_BUTTON_IN_HEADER,
+      SHOW_CONTENT_FILTER_HEADER_MENU,
       isHeaderMenu: headerMenu.MENU.length > 0,
       menu: headerMenu.MENU,
       mobileSearchVisible: false,
@@ -281,14 +292,32 @@ export default {
     },
   },
   methods: {
+    handleScroll() {
+      const currentScrollPos = window.pageYOffset
+      if (this.prevScrollpos > currentScrollPos) {
+        this.hideNavbar = false
+      } else {
+        this.hideNavbar = true
+      }
+      this.prevScrollpos = currentScrollPos
+    },
     toggleMobileMenuView() {
       this.toggleMobileMenu = !this.toggleMobileMenu
     },
+  },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll)
   },
 }
 </script>
 
 <style lang="scss">
+#navbar {
+  padding: 10px 10px;
+}
+.hide-navbar {
+  display: none;
+}
 .margin-right-20 {
   margin-right: 20px;
 }
