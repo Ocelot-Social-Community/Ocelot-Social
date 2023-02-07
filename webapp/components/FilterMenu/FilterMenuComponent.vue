@@ -3,7 +3,7 @@
     <div class="filter-menu-options">
       <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
       <following-filter />
-      <categories-filter v-if="categoriesActive" :showMobileMenu="showMobileMenu" />
+      <categories-filter v-if="categoriesActive" />
     </div>
     <div class="filter-menu-options">
       <h2 class="title">{{ $t('filter-menu.order-by') }}</h2>
@@ -27,9 +27,6 @@ export default {
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
     }
-  },
-  props: {
-    showMobileMenu: { type: Boolean, default: false },
   },
 }
 </script>

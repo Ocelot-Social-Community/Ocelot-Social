@@ -11,7 +11,7 @@
       <base-icon class="dropdown-arrow" name="angle-down" />
     </base-button>
     <template slot="popover">
-      <filter-menu-component :showMobileMenu="showMobileMenu" />
+      <filter-menu-component />
     </template>
   </dropdown>
 </template>
@@ -29,7 +29,6 @@ export default {
   props: {
     placement: { type: String },
     offset: { type: [String, Number] },
-    showMobileMenu: { type: Boolean, default: false },
   },
   computed: {
     ...mapGetters({

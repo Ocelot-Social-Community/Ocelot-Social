@@ -23,7 +23,7 @@
         v-if="categoriesActive && SHOW_CONTENT_FILTER_MASONRY_GRID"
         :row-span="1"
         column-span="fullWidth"
-        class="top-info-bar"
+        class="top-filter-menu"
       >
         <div class="filterButtonBox">
           <div class="filterButtonMenu" :class="{ 'hide-filter': hideByScroll }">
@@ -66,7 +66,7 @@
             </span>
 
             <div id="my-filter" v-if="showFilter">
-              <filter-menu-component :showMobileMenu="showMobileMenu" />
+              <filter-menu-component />
             </div>
           </div>
         </div>
@@ -139,9 +139,6 @@ export default {
     FilterMenuComponent,
   },
   mixins: [postListActions],
-  props: {
-    showMobileMenu: { type: Boolean, default: false },
-  },
   data() {
     const { hashtag = null } = this.$route.query
     return {
@@ -341,7 +338,8 @@ export default {
   box-shadow: $box-shadow-x-large;
 }
 
-.top-info-bar {
+.top-info-bar,
+.top-filter-menu {
   display: flex;
   align-items: center;
 }

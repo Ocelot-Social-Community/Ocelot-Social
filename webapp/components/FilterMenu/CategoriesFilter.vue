@@ -47,9 +47,6 @@ export default {
     LabeledButton,
   },
   mixins: [SortCategories],
-  props: {
-    showMobileMenu: { type: Boolean, default: false },
-  },
   data() {
     return {
       categories: [],
