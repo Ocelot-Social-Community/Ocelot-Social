@@ -1,25 +1,25 @@
 <template>
   <div>
-     <!-- create post -->
-     <div :class="POST_ADD_BUTTON_POSITION_TOP ? 'box-add-button-top' : ''">
-     <client-only>
-      <nuxt-link :to="{ name: 'post-create' }"  :class="{ 'hide-filter': hideByScroll }">
-        <base-button
-          v-tooltip="{
-            content: $t('contribution.newPost'),
-            placement: 'left',
-          }"
-          :class="POST_ADD_BUTTON_POSITION_TOP ? 'post-add-button-top' : 'post-add-button'"
-          icon="plus"
-          filled
-          circle
-        />
-      </nuxt-link>
-    </client-only>
-  </div>
+    <!-- create post -->
+    <div :class="POST_ADD_BUTTON_POSITION_TOP ? 'box-add-button-top' : ''">
+      <client-only>
+        <nuxt-link :to="{ name: 'post-create' }" :class="{ 'hide-filter': hideByScroll }">
+          <base-button
+            v-tooltip="{
+              content: $t('contribution.newPost'),
+              placement: 'left',
+            }"
+            :class="POST_ADD_BUTTON_POSITION_TOP ? 'post-add-button-top' : 'post-add-button'"
+            icon="plus"
+            filled
+            circle
+          />
+        </nuxt-link>
+      </client-only>
+    </div>
     <masonry-grid>
-            <!--Filter Button-->
-            <ds-grid-item
+      <!--Filter Button-->
+      <ds-grid-item
         v-if="categoriesActive && SHOW_CONTENT_FILTER_MASONRY_GRID"
         :row-span="1"
         column-span="fullWidth"
@@ -104,7 +104,7 @@
         </ds-grid-item>
       </template>
     </masonry-grid>
-   
+
     <!-- infinite loading -->
     <client-only>
       <infinite-loading v-if="hasMore" @infinite="showMoreContributions" />
@@ -216,7 +216,7 @@ export default {
       if (this.prevScrollpos > currentScrollPos) {
         this.hideByScroll = false
       } else {
-        if(!this.showFilter) {
+        if (!this.showFilter) {
           this.hideByScroll = true
         }
       }
@@ -362,54 +362,53 @@ export default {
 }
 @media screen and (min-height: 401px) {
   #my-filter {
-  max-height: 330px;
+    max-height: 330px;
   }
 }
 @media screen and (min-height: 501px) {
   #my-filter {
-  max-height: 440px;
+    max-height: 440px;
   }
 }
 @media screen and (min-height: 601px) {
   #my-filter {
-  max-height: 550px;
+    max-height: 550px;
   }
 }
 @media screen and (min-height: 701px) {
   #my-filter {
-  max-height: 640px;
+    max-height: 640px;
   }
 }
 @media screen and (min-height: 801px) {
   #my-filter {
-  max-height: 750px;
+    max-height: 750px;
   }
 }
 @media screen and (min-height: 950px) {
   #my-filter {
-  max-height: 830px;
+    max-height: 830px;
   }
 }
 @media screen and (min-height: 1025px) {
   #my-filter {
-  max-height: 870px;
+    max-height: 870px;
   }
 }
-@media screen and (min-width: 800px) and (min-height: 500px){
+@media screen and (min-width: 800px) and (min-height: 500px) {
   #my-filter {
-  padding-bottom: 80px;
+    padding-bottom: 80px;
   }
-
 }
 @media screen and (max-width: 1200px) {
   .box-add-button-top {
-  padding-right: 40px;
-}
-.base-button.--circle.post-add-button-top {
-  height: 44px;
-  width: 44px;
-  font-size: 23px;
-  z-index: 10;
-}
+    padding-right: 40px;
+  }
+  .base-button.--circle.post-add-button-top {
+    height: 44px;
+    width: 44px;
+    font-size: 23px;
+    z-index: 10;
+  }
 }
 </style>
