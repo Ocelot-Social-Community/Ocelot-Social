@@ -179,7 +179,9 @@
             style="text-align: center"
           >
             <client-only>
-              <group-button />
+              <div @click="toggleMobileMenuView">
+                <group-button />
+              </div>
             </client-only>
           </ds-flex-item>
           <!-- map button -->

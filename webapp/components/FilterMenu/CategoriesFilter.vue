@@ -6,7 +6,7 @@
           :filled="!filteredCategoryIds.length"
           :label="$t('filter-menu.all')"
           icon="check"
-          @click="resetCategories"
+          @click="setResetCategories"
         />
       </li>
       <li class="item item-save-topics">
@@ -62,6 +62,10 @@ export default {
       resetCategories: 'posts/RESET_CATEGORIES',
       toggleCategory: 'posts/TOGGLE_CATEGORY',
     }),
+    setResetCategories() {
+      this.resetCategories()
+      this.$emit('showFilterMenu')
+    },
     saveCategories() {
       this.$apollo
         .mutate({
@@ -69,6 +73,7 @@ export default {
           variables: { activeCategories: this.filteredCategoryIds },
         })
         .then(() => {
+          this.$emit('showFilterMenu')
           this.$toast.success(this.$t('filter-menu.save.success'))
         })
         .catch(() => {

@@ -66,7 +66,9 @@
             </span>
 
             <div id="my-filter" v-if="showFilter">
-              <filter-menu-component />
+              <div @mouseleave="showFilter = false">
+                <filter-menu-component @showFilterMenu="showFilterMenu" />
+              </div>
             </div>
           </div>
         </div>
@@ -203,7 +205,7 @@ export default {
       toggleCategory: 'posts/TOGGLE_CATEGORY',
     }),
     showFilterMenu(e) {
-      if (!e.target.closest('#my-filter') && !e.target.closest('.my-filter-button')) {
+      if (!e || (!e.target.closest('#my-filter') && !e.target.closest('.my-filter-button'))) {
         if (!this.showFilter) return
         this.showFilter = false
       }
