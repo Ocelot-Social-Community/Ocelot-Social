@@ -1,64 +1,86 @@
 <template>
   <div>
+     <!-- create post -->
+     <div :class="POST_ADD_BUTTON_POSITION_TOP ? 'box-add-button-top' : ''">
+     <client-only>
+      <nuxt-link :to="{ name: 'post-create' }"  :class="{ 'hide-filter': hideByScroll }">
+        <base-button
+          v-tooltip="{
+            content: $t('contribution.newPost'),
+            placement: 'left',
+          }"
+          :class="POST_ADD_BUTTON_POSITION_TOP ? 'post-add-button-top' : 'post-add-button'"
+          icon="plus"
+          filled
+          circle
+        />
+      </nuxt-link>
+    </client-only>
+  </div>
     <masonry-grid>
-      <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
-        <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
-      </ds-grid-item>
-      <!--Filter Button-->
-      <ds-grid-item
+            <!--Filter Button-->
+            <ds-grid-item
         v-if="categoriesActive && SHOW_CONTENT_FILTER_MASONRY_GRID"
         :row-span="1"
         column-span="fullWidth"
-        class="filterButtonMenu"
-        :class="{ 'hide-filter': hideFilter }"
+        class="top-info-bar"
       >
-        <base-button
-          class="my-filter-button"
-          v-if="!postsFilter['categories_some'] && !postsFilter['author']"
-          right
-          @click="showFilter = !showFilter"
-          filled
-        >
-          {{ $t('contribution.filterMasonryGrid.noFilter') }}
-          &nbsp;
-          <base-icon class="my-filter-button" :name="filterButtonIcon"></base-icon>
-        </base-button>
-        <span v-if="postsFilter['categories_some']">
-          <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
-            {{ $t('contribution.filterMasonryGrid.myTopics') }}
-          </base-button>
-          <base-button
-            class="filter-remove"
-            @click="resetCategories"
-            icon="close"
-            :title="$t('filter-menu.deleteFilter')"
-            style="margin-left: -8px"
-            filled
-          />
-        </span>
-        <span v-if="postsFilter['author']">
-          <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
-            {{ $t('contribution.filterMasonryGrid.myFriends') }}
-          </base-button>
-          <base-button
-            class="filter-remove"
-            @click="resetByFollowed"
-            icon="close"
-            :title="$t('filter-menu.deleteFilter')"
-            style="margin-left: -8px"
-            filled
-          />
-        </span>
+        <div class="filterButtonBox">
+          <div class="filterButtonMenu" :class="{ 'hide-filter': hideByScroll }">
+            <base-button
+              class="my-filter-button"
+              v-if="!postsFilter['categories_some'] && !postsFilter['author']"
+              right
+              @click="showFilter = !showFilter"
+              filled
+            >
+              {{ $t('contribution.filterMasonryGrid.noFilter') }}
+              &nbsp;
+              <base-icon class="my-filter-button" :name="filterButtonIcon"></base-icon>
+            </base-button>
+            <span v-if="postsFilter['categories_some']">
+              <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
+                {{ $t('contribution.filterMasonryGrid.myTopics') }}
+              </base-button>
+              <base-button
+                class="filter-remove"
+                @click="resetCategories"
+                icon="close"
+                :title="$t('filter-menu.deleteFilter')"
+                style="margin-left: -8px"
+                filled
+              />
+            </span>
+            <span v-if="postsFilter['author']">
+              <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
+                {{ $t('contribution.filterMasonryGrid.myFriends') }}
+              </base-button>
+              <base-button
+                class="filter-remove"
+                @click="resetByFollowed"
+                icon="close"
+                :title="$t('filter-menu.deleteFilter')"
+                style="margin-left: -8px"
+                filled
+              />
+            </span>
 
-        <div id="my-filter" v-if="showFilter">
-          <filter-menu-component :showMobileMenu="showMobileMenu" />
+            <div id="my-filter" v-if="showFilter">
+              <filter-menu-component :showMobileMenu="showMobileMenu" />
+            </div>
+          </div>
         </div>
+      </ds-grid-item>
+      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
+      <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
+        <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </ds-grid-item>
       <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
       <!-- donation info -->
       <ds-grid-item v-if="showDonations" class="top-info-bar" :row-span="1" column-span="fullWidth">
         <donation-info :goal="goal" :progress="progress" />
       </ds-grid-item>
+      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
       <!-- news feed -->
       <template v-if="hasResults">
         <masonry-grid-item
@@ -82,21 +104,7 @@
         </ds-grid-item>
       </template>
     </masonry-grid>
-    <!-- create post -->
-    <client-only>
-      <nuxt-link :to="{ name: 'post-create' }">
-        <base-button
-          v-tooltip="{
-            content: $t('contribution.newPost'),
-            placement: 'left',
-          }"
-          class="post-add-button"
-          icon="plus"
-          filled
-          circle
-        />
-      </nuxt-link>
-    </client-only>
+   
     <!-- infinite loading -->
     <client-only>
       <infinite-loading v-if="hasMore" @infinite="showMoreContributions" />
@@ -118,6 +126,7 @@ import { filterPosts } from '~/graphql/PostQuery.js'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import { SHOW_CONTENT_FILTER_MASONRY_GRID } from '~/constants/filter.js'
+import { POST_ADD_BUTTON_POSITION_TOP } from '~/constants/posts.js'
 
 export default {
   components: {
@@ -136,7 +145,7 @@ export default {
   data() {
     const { hashtag = null } = this.$route.query
     return {
-      hideFilter: false,
+      hideByScroll: false,
       revScrollpos: 0,
       showFilter: false,
       showDonations: true,
@@ -150,6 +159,7 @@ export default {
       hashtag,
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       SHOW_CONTENT_FILTER_MASONRY_GRID,
+      POST_ADD_BUTTON_POSITION_TOP,
     }
   },
   computed: {
@@ -204,14 +214,17 @@ export default {
     handleScroll() {
       const currentScrollPos = window.pageYOffset
       if (this.prevScrollpos > currentScrollPos) {
-        this.hideFilter = false
+        this.hideByScroll = false
       } else {
-        this.hideFilter = true
+        if(!this.showFilter) {
+          this.hideByScroll = true
+        }
       }
       this.prevScrollpos = currentScrollPos
     },
     beforeDestroy() {
       document.removeEventListener('click', this.showFilterMenu)
+      window.removeEventListener('scroll', this.handleScroll)
     },
     clearSearch() {
       this.$router.push({ path: '/' })
@@ -283,13 +296,6 @@ export default {
 </script>
 
 <style lang="scss">
-#my-filter {
-  background-color: white;
-  box-shadow: rgb(189 189 189) 1px 9px 15px 1px;
-  max-height: 480px;
-  overflow: auto;
-}
-
 .masonry-grid {
   display: grid;
   grid-gap: 10px;
@@ -309,6 +315,10 @@ export default {
   display: none;
 }
 
+.box-add-button-top {
+  float: right;
+}
+
 .base-button.--circle.post-add-button {
   height: 54px;
   width: 54px;
@@ -318,6 +328,16 @@ export default {
   bottom: -5px;
   left: 98vw;
   transform: translate(-120%, -120%);
+  box-shadow: $box-shadow-x-large;
+}
+
+.base-button.--circle.post-add-button-top {
+  height: 54px;
+  width: 54px;
+  font-size: 26px;
+  z-index: 100;
+  position: fixed;
+  top: 80px;
   box-shadow: $box-shadow-x-large;
 }
 
@@ -332,5 +352,64 @@ export default {
   padding: 20px 10px 5px 10px;
   border-radius: 7px;
   background-color: #f5f4f6;
+}
+#my-filter {
+  background-color: white;
+  box-shadow: rgb(189 189 189) 1px 9px 15px 1px;
+  max-height: 950px;
+  overflow: auto;
+  padding-bottom: 0px;
+}
+@media screen and (min-height: 401px) {
+  #my-filter {
+  max-height: 330px;
+  }
+}
+@media screen and (min-height: 501px) {
+  #my-filter {
+  max-height: 440px;
+  }
+}
+@media screen and (min-height: 601px) {
+  #my-filter {
+  max-height: 550px;
+  }
+}
+@media screen and (min-height: 701px) {
+  #my-filter {
+  max-height: 640px;
+  }
+}
+@media screen and (min-height: 801px) {
+  #my-filter {
+  max-height: 750px;
+  }
+}
+@media screen and (min-height: 950px) {
+  #my-filter {
+  max-height: 830px;
+  }
+}
+@media screen and (min-height: 1025px) {
+  #my-filter {
+  max-height: 870px;
+  }
+}
+@media screen and (min-width: 800px) and (min-height: 500px){
+  #my-filter {
+  padding-bottom: 80px;
+  }
+
+}
+@media screen and (max-width: 1200px) {
+  .box-add-button-top {
+  padding-right: 40px;
+}
+.base-button.--circle.post-add-button-top {
+  height: 44px;
+  width: 44px;
+  font-size: 23px;
+  z-index: 10;
+}
 }
 </style>
