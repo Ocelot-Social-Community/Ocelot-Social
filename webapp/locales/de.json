@@ -8,6 +8,11 @@
     "loadMore": "mehr laden",
     "save": "Speichern"
   },
+  "position": {
+    "my":"Meine Position",
+    "members":"Mitglied",
+    "organizations":"Organisation"
+  },
   "admin": {
     "categories": {
       "categoryName": "Name",
