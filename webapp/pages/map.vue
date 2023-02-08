@@ -11,17 +11,9 @@
             width="15"
           />
           {{ $t('position.my') }}
-          <img
-            alt="user"
-            src="/img/mapbox/marker-icons/mapbox-marker-icon-green.svg"
-            width="15"
-          />
+          <img alt="user" src="/img/mapbox/marker-icons/mapbox-marker-icon-green.svg" width="15" />
           {{ $t('position.user') }}
-          <img
-            alt="group"
-            src="/img/mapbox/marker-icons/mapbox-marker-icon-blue.svg"
-            width="15"
-          />
+          <img alt="group" src="/img/mapbox/marker-icons/mapbox-marker-icon-blue.svg" width="15" />
           {{ $t('position.group') }}
         </div>
       </small>
