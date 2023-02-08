@@ -8,11 +8,6 @@
     "loadMore": "mehr laden",
     "save": "Speichern"
   },
-  "position": {
-    "my":"Meine Position",
-    "members":"Mitglied",
-    "organizations":"Organisation"
-  },
   "admin": {
     "categories": {
       "categoryName": "Name",
@@ -650,6 +645,11 @@
     },
     "title": "Benachrichtigungen",
     "user": "Benutzer"
+  },
+  "position": {
+    "members": "Mitglied",
+    "my": "Meine Position",
+    "organizations": "Organisation"
   },
   "post": {
     "comment": {
