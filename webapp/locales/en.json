@@ -269,7 +269,7 @@
     },
     "filterFollow": "Filter contributions from users I follow",
     "filterMasonryGrid": {
-      "myFriends": "Posts from my friends",
+      "myFriends": "Users I follow",
       "myTopics": "My topics",
       "noFilter": "Filter posts"
     },
