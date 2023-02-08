@@ -5,17 +5,28 @@
       <ds-heading tag="h1">{{ $t('map.pageTitle') }}</ds-heading>
       <small>
         <div>
-     
-     <img alt="my position" src="/img/mapbox/marker-icons/mapbox-marker-icon-orange.svg" width="15"/> 
-     {{ $t('position.my') }}
-     <img alt="members" src="/img/mapbox/marker-icons/mapbox-marker-icon-green.svg" width="15"/> 
-     {{ $t('position.members') }}
-     <img alt="organisations" src="/img/mapbox/marker-icons/mapbox-marker-icon-blue.svg" width="15"/> 
-     {{ $t('position.organizations') }}
-   </div>
+          <img
+            alt="my position"
+            src="/img/mapbox/marker-icons/mapbox-marker-icon-orange.svg"
+            width="15"
+          />
+          {{ $t('position.my') }}
+          <img
+            alt="members"
+            src="/img/mapbox/marker-icons/mapbox-marker-icon-green.svg"
+            width="15"
+          />
+          {{ $t('position.members') }}
+          <img
+            alt="organisations"
+            src="/img/mapbox/marker-icons/mapbox-marker-icon-blue.svg"
+            width="15"
+          />
+          {{ $t('position.organizations') }}
+        </div>
       </small>
     </ds-space>
-   
+
     <ds-space margin="small" />
     <client-only v-if="!isEmpty($env.MAPBOX_TOKEN)">
       <map-styles-buttons
