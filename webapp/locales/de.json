@@ -269,7 +269,7 @@
     },
     "filterFollow": "Beiträge von Benutzern filtern, denen ich folge",
     "filterMasonryGrid": {
-      "myFriends": "Beiträge von meinen Freunden",
+      "myFriends": "Benutzer denen ich folge",
       "myTopics": "Meine Themen",
       "noFilter": "Beiträge filtern"
     },
@@ -378,7 +378,7 @@
     "deleteFilter": "Filter löschen",
     "emotions": "Emotionen",
     "filter-by": "Filtern nach ...",
-    "following": "Benutzern, denen ich folge",
+    "following": "Benutzer denen ich folge",
     "languages": "Sprachen",
     "order": {
       "newest": {
