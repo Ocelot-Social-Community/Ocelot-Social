@@ -22,7 +22,7 @@
             src="/img/mapbox/marker-icons/mapbox-marker-icon-blue.svg"
             width="15"
           />
-          {{ $t('position.organizations') }}
+          {{ $t('position.group') }}
         </div>
       </small>
     </ds-space>
