@@ -9,7 +9,8 @@
               content: $t('contribution.newPost'),
               placement: 'left',
             }"
-            :class="POST_ADD_BUTTON_POSITION_TOP ? 'post-add-button-top' : 'post-add-button'"
+            class="post-add-button"
+            :class="POST_ADD_BUTTON_POSITION_TOP ? 'post-add-button-top' : 'post-add-button-bottom'"
             icon="plus"
             filled
             circle
@@ -318,7 +319,7 @@ export default {
   float: right;
 }
 
-.base-button.--circle.post-add-button {
+.base-button.--circle.post-add-button-bottom {
   height: 54px;
   width: 54px;
   font-size: 26px;
