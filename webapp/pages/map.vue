@@ -16,7 +16,7 @@
             src="/img/mapbox/marker-icons/mapbox-marker-icon-green.svg"
             width="15"
           />
-          {{ $t('position.members') }}
+          {{ $t('position.user') }}
           <img
             alt="organisations"
             src="/img/mapbox/marker-icons/mapbox-marker-icon-blue.svg"
