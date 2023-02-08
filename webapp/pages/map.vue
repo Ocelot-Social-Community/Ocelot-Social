@@ -12,7 +12,7 @@
           />
           {{ $t('position.my') }}
           <img
-            alt="members"
+            alt="user"
             src="/img/mapbox/marker-icons/mapbox-marker-icon-green.svg"
             width="15"
           />
