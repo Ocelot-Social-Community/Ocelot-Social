@@ -649,7 +649,7 @@
   "position": {
     "user": "User",
     "my": "My position",
-    "organizations": "Organizations"
+    "group": "Group"
   },
   "post": {
     "comment": {
