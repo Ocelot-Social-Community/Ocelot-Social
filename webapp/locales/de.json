@@ -647,9 +647,9 @@
     "user": "Benutzer"
   },
   "position": {
-    "user": "Benutzer",
+    "group": "Gruppe",
     "my": "Meine Position",
-    "group": "Gruppe"
+    "user": "Benutzer"
   },
   "post": {
     "comment": {
