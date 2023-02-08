@@ -646,6 +646,11 @@
     "title": "Benachrichtigungen",
     "user": "Benutzer"
   },
+  "position": {
+    "group": "Gruppe",
+    "my": "Meine Position",
+    "user": "Benutzer"
+  },
   "post": {
     "comment": {
       "reply": "Antworten",

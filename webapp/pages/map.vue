@@ -3,8 +3,23 @@
   <div>
     <ds-space margin="small">
       <ds-heading tag="h1">{{ $t('map.pageTitle') }}</ds-heading>
+      <small>
+        <div>
+          <img
+            alt="my position"
+            src="/img/mapbox/marker-icons/mapbox-marker-icon-orange.svg"
+            width="15"
+          />
+          {{ $t('position.my') }}
+          <img alt="user" src="/img/mapbox/marker-icons/mapbox-marker-icon-green.svg" width="15" />
+          {{ $t('position.user') }}
+          <img alt="group" src="/img/mapbox/marker-icons/mapbox-marker-icon-blue.svg" width="15" />
+          {{ $t('position.group') }}
+        </div>
+      </small>
     </ds-space>
-    <ds-space margin="large" />
+
+    <ds-space margin="small" />
     <client-only v-if="!isEmpty($env.MAPBOX_TOKEN)">
       <map-styles-buttons
         v-if="isMobile"
