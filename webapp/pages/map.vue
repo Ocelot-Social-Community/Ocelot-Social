@@ -18,7 +18,7 @@
           />
           {{ $t('position.user') }}
           <img
-            alt="organisations"
+            alt="group"
             src="/img/mapbox/marker-icons/mapbox-marker-icon-blue.svg"
             width="15"
           />
