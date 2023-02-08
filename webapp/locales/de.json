@@ -647,7 +647,7 @@
     "user": "Benutzer"
   },
   "position": {
-    "members": "Mitglied",
+    "user": "Benutzer",
     "my": "Meine Position",
     "organizations": "Organisation"
   },
