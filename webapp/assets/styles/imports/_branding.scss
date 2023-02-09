@@ -3,3 +3,41 @@
     * Here, all SCSS variables and classes can be adapted to your custom design. 
     *
 */
+
+/* 
+    *
+    * Here, all SCSS variables and classes can be adapted to your custom design. 
+    *
+*/
+
+$color-primary: #6e8b87;
+$color-primary-light: #a6ff00;
+
+$color-header-background: $color-primary;
+$color-footer-background: $color-primary-light;
+
+// $color-locale-menu: $color-primary-light;
+$color-locale-menu: #FFFFFF!important;
+
+.main-navigation a {
+    color: #FFFFFF!important;
+}
+.main-navigation a:hover {
+    color: hsla(0,0%,100%,.8);
+}
+
+.main-navigation .locale-menu {
+    color: #FFFFFF!important;
+}
+
+.main-navigation .base-button {
+    color: #FFFFFF!important;
+}
+
+#nav-search-box .hc-hashtag a{
+    color: #17b53f;
+}
+
+.ds-chip-primary {
+    background-color: $color-primary;
+}
