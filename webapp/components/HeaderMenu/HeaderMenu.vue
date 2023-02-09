@@ -106,20 +106,22 @@
         <!-- logo, hamburger-->
         <ds-flex style="align-items: center">
           <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
-            <a
-              v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
-              :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
-              :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
-            >
-              <logo logoType="header" />
-            </a>
-            <nuxt-link
-              v-else
-              :to="LOGOS.LOGO_HEADER_CLICK.internalPath.to"
-              v-scroll-to="LOGOS.LOGO_HEADER_CLICK.internalPath.scrollTo"
-            >
-              <logo logoType="header" />
-            </nuxt-link>
+            <div @click="toggleMobileMenu ? toggleMobileMenuView() : ''">
+              <a
+                v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
+                :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
+                :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
+              >
+                <logo logoType="header" />
+              </a>
+              <nuxt-link
+                v-else
+                :to="LOGOS.LOGO_HEADER_CLICK.internalPath.to"
+                v-scroll-to="LOGOS.LOGO_HEADER_CLICK.internalPath.scrollTo"
+              >
+                <logo logoType="header" />
+              </nuxt-link>
+            </div>
           </ds-flex-item>
 
           <!-- mobile hamburger menu -->

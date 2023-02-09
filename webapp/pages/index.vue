@@ -299,21 +299,6 @@ export default {
 </script>
 
 <style lang="scss">
-.masonry-grid {
-  display: grid;
-  grid-gap: 10px;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-auto-rows: 20px;
-}
-
-.grid-item {
-  grid-row-end: span 2;
-
-  &--full-width {
-    grid-column: 1 / -1;
-  }
-}
-
 .hide-filter {
   display: none;
 }
