@@ -105,7 +105,7 @@
       <div v-else class="mobil-header-box">
         <!-- logo, hamburger-->
         <ds-flex style="align-items: center">
-          <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px" >
+          <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
             <div @click="toggleMobileMenu ? toggleMobileMenuView() : ''">
               <a
                 v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
