@@ -37,6 +37,7 @@
               placement: 'bottom-start',
             }"
             :icon="category.icon"
+            :filterActive="postsFilter ? postsFilter.id_in.includes(category.id) : false"
           />
         </div>
         <div v-else class="categories-placeholder"></div>
@@ -104,6 +105,10 @@ export default {
       required: true,
     },
     width: {
+      type: Object,
+      default: () => {},
+    },
+    postsFilter: {
       type: Object,
       default: () => {},
     },

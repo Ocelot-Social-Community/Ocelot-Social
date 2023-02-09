@@ -93,6 +93,7 @@
         >
           <post-teaser
             :post="post"
+            :postsFilter="postsFilter['categories_some']"
             @removePostFromList="posts = removePostFromList(post, posts)"
             @pinPost="pinPost(post, refetchPostList)"
             @unpinPost="unpinPost(post, refetchPostList)"
