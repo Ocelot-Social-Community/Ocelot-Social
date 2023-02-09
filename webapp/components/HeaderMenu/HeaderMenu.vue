@@ -199,7 +199,7 @@
           <!-- avatar menu mobile -->
           <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }" style="text-align: end">
             <client-only>
-              <avatar-menu placement="top" />
+              <avatar-menu placement="top" @toggle-Mobile-Menu-view="toggleMobileMenuView" />
             </client-only>
           </ds-flex-item>
         </ds-flex>
@@ -207,7 +207,12 @@
           <!-- dynamic branding menus -->
           <ul v-if="isHeaderMenu" class="dynamic-branding-mobil">
             <li v-for="item in menu" :key="item.name">
-              <a v-if="item.url" :href="item.url" :target="item.target" @click="toggleMobileMenuView">
+              <a
+                v-if="item.url"
+                :href="item.url"
+                :target="item.target"
+                @click="toggleMobileMenuView"
+              >
                 <ds-text size="large" bold>
                   {{ $t(item.nameIdent) }}
                 </ds-text>
@@ -224,7 +229,11 @@
           <hr />
           <!-- dynamic footer menu in header  -->
           <ul class="dynamic-footer-mobil">
-            <li v-for="pageParams in links.FOOTER_LINK_LIST" :key="pageParams.name" @click="toggleMobileMenuView">
+            <li
+              v-for="pageParams in links.FOOTER_LINK_LIST"
+              :key="pageParams.name"
+              @click="toggleMobileMenuView"
+            >
               <page-params-link :pageParams="pageParams">
                 {{ $t(pageParams.internalPage.footerIdent) }}
               </page-params-link>
