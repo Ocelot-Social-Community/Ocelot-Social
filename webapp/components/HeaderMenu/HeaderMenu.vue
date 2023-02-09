@@ -309,10 +309,12 @@ export default {
   methods: {
     handleScroll() {
       const currentScrollPos = window.pageYOffset
-      if (this.prevScrollpos > currentScrollPos) {
-        this.hideNavbar = false
-      } else {
-        this.hideNavbar = true
+      if (this.prevScrollpos > 50) {
+        if (this.prevScrollpos > currentScrollPos) {
+          this.hideNavbar = false
+        } else {
+          this.hideNavbar = true
+        }
       }
       this.prevScrollpos = currentScrollPos
     },

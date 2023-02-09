@@ -214,11 +214,13 @@ export default {
     },
     handleScroll() {
       const currentScrollPos = window.pageYOffset
-      if (this.prevScrollpos > currentScrollPos) {
-        this.hideByScroll = false
-      } else {
-        if (!this.showFilter) {
-          this.hideByScroll = true
+      if (this.prevScrollpos > 50) {
+        if (this.prevScrollpos > currentScrollPos) {
+          this.hideByScroll = false
+        } else {
+          if (!this.showFilter) {
+            this.hideByScroll = true
+          }
         }
       }
       this.prevScrollpos = currentScrollPos
