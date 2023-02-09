@@ -29,7 +29,7 @@ export default {
     font-size: $font-size-base;
   }
 }
-.filterActive{
+.filterActive {
   background-color: $color-success-active;
 }
 </style>
