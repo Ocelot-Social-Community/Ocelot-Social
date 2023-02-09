@@ -314,7 +314,7 @@ export default {
           this.hideNavbar = false
         } else {
           this.hideNavbar = true
-        } 
+        }
       }
       this.prevScrollpos = currentScrollPos
     },
