@@ -140,7 +140,12 @@ describe('currentUser', () => {
 
   describe('authenticated', () => {
     describe('and corresponding user in the database', () => {
+      let avatar
+
       beforeEach(async () => {
+        avatar = await Factory.build('image', {
+          url: 'https://s3.amazonaws.com/uifaces/faces/twitter/jimmuirhead/128.jpg',
+        })
         await Factory.build(
           'user',
           {
@@ -152,9 +157,7 @@ describe('currentUser', () => {
           },
           {
             email: 'test@example.org',
-            avatar: Factory.build('image', {
-              url: 'https://s3.amazonaws.com/uifaces/faces/twitter/jimmuirhead/128.jpg',
-            }),
+            avatar,
           },
         )
         const userBearerToken = encode({ id: 'u3' })
@@ -166,9 +169,11 @@ describe('currentUser', () => {
           data: {
             currentUser: {
               id: 'u3',
-              avatar: Factory.build('image', {
-                url: 'https://s3.amazonaws.com/uifaces/faces/twitter/jimmuirhead/128.jpg',
-              }),
+              avatar: {
+                url: expect.stringContaining(
+                  'https://s3.amazonaws.com/uifaces/faces/twitter/jimmuirhead/128.jpg',
+                ),
+              },
               email: 'test@example.org',
               name: 'Matilde Hermiston',
               slug: 'matilde-hermiston',
@@ -246,7 +251,7 @@ describe('login', () => {
 
   describe('ask for a `token`', () => {
     describe('with a valid email/password combination', () => {
-      it('responds with a JWT bearer token', async (done) => {
+      it('responds with a JWT bearer token', async () => {
         const {
           data: { login: token },
         } = await mutate({ mutation: loginMutation, variables })
@@ -255,7 +260,6 @@ describe('login', () => {
             id: 'acb2d923-f3af-479e-9f00-61b12e864666',
           })
           expect(err).toBeNull()
-          done()
         })
       })
 
