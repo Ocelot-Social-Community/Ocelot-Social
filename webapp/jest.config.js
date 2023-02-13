@@ -30,4 +30,5 @@ module.exports = {
     '^~/(.*)$': '<rootDir>/$1',
   },
   moduleFileExtensions: ['js', 'json', 'vue'],
+  testEnvironment: 'jsdom',
 }
