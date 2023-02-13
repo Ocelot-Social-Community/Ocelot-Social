@@ -1,9 +1,11 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import settings from './settings.vue'
 
 const localVue = global.localVue
 
-config.stubs['nuxt-child'] = '<span class="nuxt-child"><slot /></span>'
+const stubs = {
+  'nuxt-child': true,
+}
 
 describe('settings.vue', () => {
   let wrapper
@@ -20,6 +22,7 @@ describe('settings.vue', () => {
       return mount(settings, {
         mocks,
         localVue,
+        stubs,
       })
     }
 
@@ -28,7 +31,7 @@ describe('settings.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('div')).toBe(true)
+      expect(wrapper.element.tagName).toBe('DIV')
     })
   })
 })
