@@ -1,14 +1,16 @@
-import { config, shallowMount, mount } from '@vue/test-utils'
+import { shallowMount, mount } from '@vue/test-utils'
 import PostIndex from './index.vue'
 import Vuex from 'vuex'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter'
 
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['router-link'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
-config.stubs['infinite-loading'] = '<span><slot /></span>'
+const stubs = {
+  'client-only': true,
+  'router-link': true,
+  'nuxt-link': true,
+  'infinite-loading': true,
+}
 
 describe('PostIndex', () => {
   let wrapper
@@ -95,7 +97,7 @@ describe('PostIndex', () => {
     it('clears the search when the filter menu emits clearSearch', () => {
       mocks.$route.query.hashtag = '#samplehashtag'
       wrapper = Wrapper()
-      wrapper.find(HashtagsFilter).vm.$emit('clearSearch')
+      wrapper.findComponent(HashtagsFilter).vm.$emit('clearSearch')
       expect(wrapper.vm.hashtag).toBeNull()
     })
 
@@ -123,6 +125,7 @@ describe('PostIndex', () => {
         store,
         mocks,
         localVue,
+        stubs,
       })
     }
 
