@@ -1,8 +1,11 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Moderation from './index.vue'
 
 const localVue = global.localVue
-config.stubs['client-only'] = '<span><slot /></span>'
+
+const stubs = {
+  'client-only': true,
+}
 
 describe('moderation/index.vue', () => {
   let wrapper
@@ -16,7 +19,7 @@ describe('moderation/index.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(Moderation, { mocks, localVue })
+      return mount(Moderation, { mocks, localVue, stubs })
     }
 
     beforeEach(() => {
@@ -24,7 +27,7 @@ describe('moderation/index.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('.base-card')).toBe(true)
+      expect(wrapper.classes('base-card')).toBe(true)
     })
   })
 })

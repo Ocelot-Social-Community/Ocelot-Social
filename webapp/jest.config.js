@@ -20,6 +20,7 @@ module.exports = {
   transform: {
     '.*\\.(vue)$': 'vue-jest',
     '^.+\\.js$': 'babel-jest',
+    '<rootDir>/node_modules/@mapbox/mapbox-gl-geocoder/dist/*': 'babel-jest',
   },
   testMatch: ['**/?(*.)+(spec|test).js?(x)'],
   modulePathIgnorePatterns: ['<rootDir>/build/'],

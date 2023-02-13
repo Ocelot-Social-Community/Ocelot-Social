@@ -5,6 +5,8 @@ import VueMeta from 'vue-meta'
 import Vuex from 'vuex'
 import Map from './map'
 
+jest.mock('@mapbox/mapbox-gl-geocoder')
+
 jest.mock('mapbox-gl', () => {
   return {
     GeolocateControl: jest.fn(),
