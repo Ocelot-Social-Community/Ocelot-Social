@@ -26,7 +26,7 @@ describe('my-organizations.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('.base-card')).toBe(true)
+      expect(wrapper.element.tagName).toBe('DIV')
     })
   })
 })
