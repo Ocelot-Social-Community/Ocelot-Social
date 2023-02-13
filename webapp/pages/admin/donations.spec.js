@@ -57,7 +57,7 @@ describe('donations.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('.base-card')).toBe(true)
+      expect(wrapper.classes('base-card')).toBe(true)
     })
 
     describe('displays', () => {
@@ -89,23 +89,19 @@ describe('donations.vue', () => {
     describe('form component click', () => {
       it('on #showDonations checkbox changes "showDonations" to true', async () => {
         // starts with false
-        wrapper.find('#showDonations').trigger('click') // set to true
-        await wrapper.vm.$nextTick()
+        await wrapper.find('#showDonations').setChecked(true) // set to true
         expect(wrapper.vm.showDonations).toBe(true)
       })
 
       it('on #showDonations checkbox twice changes "showDonations" back to false', async () => {
         // starts with false
-        wrapper.find('#showDonations').trigger('click') // set to true
-        wrapper.find('#showDonations').trigger('click') // set to false
-        await wrapper.vm.$nextTick()
+        await wrapper.find('#showDonations').setChecked(true) // set to true
+        await wrapper.find('#showDonations').setChecked(false) // set to true
         expect(wrapper.vm.showDonations).toBe(false)
       })
 
       it.skip('on donations-goal and enter value XXX', async () => {
-        wrapper.find('#donations-goal').setValue('20000')
-        await wrapper.vm.$nextTick()
-        // console.log(wrapper.find('#donations-goal').element.value)
+        await wrapper.find('#donations-goal').setValue('20000')
         expect(wrapper.vm.formData.goal).toBe('20000')
       })
     })
@@ -141,7 +137,7 @@ describe('donations.vue', () => {
         })
 
         it('calls mutation with input values once', async () => {
-          wrapper.find('#showDonations').trigger('click') // set to true
+          wrapper.find('#showDonations').setChecked(true) // set to true
           await wrapper.vm.$nextTick()
           wrapper.find('#donations-goal').setValue('20000')
           await wrapper.vm.$nextTick()
