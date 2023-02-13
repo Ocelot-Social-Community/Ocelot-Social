@@ -6,10 +6,12 @@ import { loginMutation } from '../../graphql/userManagement'
 import { createTestClient } from 'apollo-server-testing'
 import createServer, { context } from '../../server'
 import encode from '../../jwt/encode'
-import { getNeode } from '../../db/neo4j'
+import { getNeode, getDriver } from '../../db/neo4j'
 import { categories } from '../../constants/categories'
 
 const neode = getNeode()
+const driver = getDriver()
+
 let query, mutate, variables, req, user
 
 const disable = async (id) => {
@@ -47,6 +49,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
+  driver.close()
 })
 
 beforeEach(() => {

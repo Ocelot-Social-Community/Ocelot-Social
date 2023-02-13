@@ -60,6 +60,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
+  driver.close()
 })
 
 describe('resolvers/userData', () => {
