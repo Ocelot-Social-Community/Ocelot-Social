@@ -11,6 +11,7 @@ const stubs = {
   'nuxt-link': true,
   'infinite-loading': true,
   'follow-list': true,
+  'router-link': true,
 }
 
 describe('ProfileSlug', () => {
