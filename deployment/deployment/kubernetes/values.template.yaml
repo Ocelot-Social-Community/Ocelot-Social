@@ -1,0 +1,120 @@
+# please duplicate template file and rename to "values.yaml" and fill in your value
+
+# change all the below if needed
+PRODUCTION_DB_CLEAN_ALLOW: false # only true for production environments on staging servers
+PUBLIC_REGISTRATION: false
+INVITE_REGISTRATION: false
+COOKIE_EXPIRE_TIME: 730 # days (730 days, two years is the default in main code)
+CATEGORIES_ACTIVE: false
+
+BACKEND:
+  # change all the below if needed
+  # DOCKER_IMAGE_REPO - change that to your branded docker image
+  #  label is appended based on .Chart.appVersion
+  DOCKER_IMAGE_REPO: "ocelotsocialnetwork/backend-branded"
+  CLIENT_URI: "https://staging.ocelot.social"
+  # create a new one for your network
+  JWT_SECRET: "b/&&7b78BF&fv/Vd"
+  MAPBOX_TOKEN: "pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g"
+  PRIVATE_KEY_PASSPHRASE: "a7dsf78sadg87ad87sfagsadg78"
+  # ocelot.social mail dummy
+  EMAIL_DEFAULT_SENDER: "devops@ocelot.social"
+  SMTP_HOST: "mail.ocelot.social"
+  SMTP_USERNAME: "devops@ocelot.social"
+  SMTP_PASSWORD: "devops@ocelot.social"
+  SMTP_PORT: "587"
+  SMTP_IGNORE_TLS: 'false'
+  SMTP_SECURE: 'false' # true for 465, false for other ports
+  # or
+  # SMTP_PORT: "465"
+  # SMTP_IGNORE_TLS: 'true'
+  # SMTP_SECURE: 'true' # true for 465, false for other ports
+
+  # most likely you don't need to change this
+  MIN_READY_SECONDS: "15"
+  PROGRESS_DEADLINE_SECONDS: "60"
+  REVISIONS_HISTORY_LIMIT: "25"
+  CONTAINER_RESTART_POLICY: "Always"
+  CONTAINER_TERMINATION_GRACE_PERIOD_SECONDS: "30"
+  DOCKER_IMAGE_PULL_POLICY: "Always"
+  STORAGE_UPLOADS: "25Gi"
+
+WEBAPP:
+  # change all the below if needed
+  # DOCKER_IMAGE_REPO - change that to your branded docker image
+  #  label is appended based on .Chart.appVersion
+  DOCKER_IMAGE_REPO: "ocelotsocialnetwork/webapp-branded"
+  WEBSOCKETS_URI: "wss://staging.ocelot.social/api/graphql"
+
+  # Most likely you don't need to change this
+  REPLICAS: "2"
+  MIN_READY_SECONDS: "15"
+  PROGRESS_DEADLINE_SECONDS: "60"
+  REVISIONS_HISTORY_LIMIT: "25"
+  CONTAINER_RESTART_POLICY: "Always"
+  CONTAINER_TERMINATION_GRACE_PERIOD_SECONDS: "30"
+  DOCKER_IMAGE_PULL_POLICY: "Always"
+
+NEO4J:
+  # most likely you don't need to change this
+  REVISIONS_HISTORY_LIMIT: "25"
+  DOCKER_IMAGE_REPO: "ocelotsocialnetwork/neo4j-community-branded"
+  DOCKER_IMAGE_PULL_POLICY: "Always"
+  CONTAINER_RESTART_POLICY: "Always"
+  CONTAINER_TERMINATION_GRACE_PERIOD_SECONDS: "30"
+  STORAGE: "5Gi"
+  # RESOURCE_REQUESTS_MEMORY configures the memory available for requests.
+  RESOURCE_REQUESTS_MEMORY: "2G"
+  # RESOURCE_LIMITS_MEMORY configures the memory limits available.
+  RESOURCE_LIMITS_MEMORY: "4G"
+  # required for Neo4j Enterprice version
+  #ACCEPT_LICENSE_AGREEMENT: "yes"
+  ACCEPT_LICENSE_AGREEMENT: "no"
+  AUTH: "none"
+  #DBMS_CONNECTOR_BOLT_THREAD_POOL_MAX_SIZE: "10000" # hc value
+  DBMS_CONNECTOR_BOLT_THREAD_POOL_MAX_SIZE: "400" # default value
+  #DBMS_MEMORY_HEAP_INITIAL_SIZE: "500MB" # HC value
+  DBMS_MEMORY_HEAP_INITIAL_SIZE: "" # default
+  #DBMS_MEMORY_HEAP_MAX_SIZE: "500MB" # HC value
+  DBMS_MEMORY_HEAP_MAX_SIZE: "" # default
+  #DBMS_MEMORY_PAGECACHE_SIZE: "490M" # HC value
+  DBMS_MEMORY_PAGECACHE_SIZE: "" # default
+  #APOC_IMPORT_FILE_ENABLED: "true" # HC value
+  APOC_IMPORT_FILE_ENABLED: "false" # default
+  DBMS_SECURITY_PROCEDURES_UNRESTRICTED: "algo.*,apoc.*"
+
+MAINTENANCE:
+  # change all the below if needed
+  # DOCKER_IMAGE_REPO - change that to your branded docker image
+  #  label is appended based on .Chart.appVersion
+  DOCKER_IMAGE_REPO: "ocelotsocialnetwork/maintenance-branded"
+
+  # Most likely you don't need to change this
+  REVISIONS_HISTORY_LIMIT: "25"
+  CONTAINER_RESTART_POLICY: "Always"
+  CONTAINER_TERMINATION_GRACE_PERIOD_SECONDS: "30"
+  DOCKER_IMAGE_PULL_POLICY: "Always"
+
+LETSENCRYPT:
+  # change all the below if needed
+  # ISSUER is used by cert-manager to set up certificates with the given provider.
+  #  change it to "letsencrypt-production" once you are ready to have valid cetrificates.
+  #  Be aware that the is an issuing limit with letsencrypt, so a dry run with staging might be wise
+  ISSUER: "letsencrypt-staging"
+  EMAIL: "devops@ocelot.social"
+  DOMAINS:
+    - "staging.ocelot.social"
+    - "www.staging.ocelot.social"
+
+NGINX:
+  # most likely you don't need to change this
+  PROXY_BODY_SIZE: "10m"
+
+STORAGE:
+  # change all the below if needed
+  PROVISIONER: "dobs.csi.digitalocean.com"
+
+  # most likely you don't need to change this
+  RECLAIM_POLICY: "Retain"
+  VOLUME_BINDING_MODE: "Immediate"
+  ALLOW_VOLUME_EXPANSION: true

@@ -1,0 +1,57 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name:  {{ .Release.Name }}-backend
+  labels:
+    app.kubernetes.io/name:	"{{ .Chart.Name }}"
+    app.kubernetes.io/instance:	"{{ .Release.Name }}"
+    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+    app.kubernetes.io/component: "deployment-backend"
+    app.kubernetes.io/part-of:	"{{ .Chart.Name }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  replicas: 1
+  minReadySeconds: {{ .Values.BACKEND.MIN_READY_SECONDS }}
+  progressDeadlineSeconds: {{ .Values.BACKEND.PROGRESS_DEADLINE_SECONDS }}
+  revisionHistoryLimit: {{ .Values.BACKEND.REVISIONS_HISTORY_LIMIT }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-backend
+  template:
+    metadata:
+      annotations:
+        backup.velero.io/backup-volumes: uploads
+        # make sure the pod is redeployed
+        rollme: {{ randAlphaNum 5 | quote }}
+      labels:
+        app: {{ .Release.Name }}-backend
+    spec:
+      containers:
+      - name: container-{{ .Release.Name }}-backend
+        image: "{{ .Values.BACKEND.DOCKER_IMAGE_REPO }}:{{ .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.BACKEND.DOCKER_IMAGE_PULL_POLICY }}
+        envFrom:
+        - configMapRef:
+            name: configmap-{{ .Release.Name }}-backend
+        - secretRef:
+            name: secret-{{ .Release.Name }}-backend
+        ports:
+        - containerPort: 4000
+          protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+          - mountPath: /app/public/uploads
+            name: uploads
+      dnsPolicy: ClusterFirst
+      schedulerName: default-scheduler
+      restartPolicy: {{ .Values.BACKEND.CONTAINER_RESTART_POLICY }}
+      terminationGracePeriodSeconds: {{ .Values.BACKEND.CONTAINER_TERMINATION_GRACE_PERIOD_SECONDS }}
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: volume-claim-{{ .Release.Name }}-uploads
