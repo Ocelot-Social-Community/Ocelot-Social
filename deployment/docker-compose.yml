@@ -11,15 +11,19 @@ services:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/webapp-branded:local-production
     build:
-      dockerfile: docker/webapp.Dockerfile
+      dockerfile: src/docker/webapp.Dockerfile
       target: branded
       context: .
+      args:
+        - CONFIGURATION_FOLDER=$CONFIGURATION_FOLDER
     ports:
       - 3000:3000
     networks:
       - test-network
     depends_on:
       - backend
+    env_file: 
+      - .env
     environment:
       - HOST=0.0.0.0
       - GRAPHQL_URI=http://backend:4000
@@ -36,9 +40,11 @@ services:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/backend-branded:local-production
     build:
-      dockerfile: docker/backend.Dockerfile
+      dockerfile: src/docker/backend.Dockerfile
       target: branded
       context: .
+      args:
+        - CONFIGURATION_FOLDER=$CONFIGURATION_FOLDER
     networks:
       - test-network
     depends_on:
@@ -65,6 +71,8 @@ services:
       - SMTP_HOST=mailserver
       - SMTP_PORT=25
       - SMTP_IGNORE_TLS=true
+    # env_file: 
+    #  - .env
 
   ########################################################
   # MAINTENANCE ##########################################
@@ -74,9 +82,11 @@ services:
     image: ocelotsocialnetwork/maintenance-branded:local-production
     build:
       # TODO: Separate from webapp, this must be independent
-      dockerfile: docker/maintenance.Dockerfile
+      dockerfile: src/docker/maintenance.Dockerfile
       target: branded
       context: .
+      args:
+        - CONFIGURATION_FOLDER=$CONFIGURATION_FOLDER
     networks:
       - test-network
     ports:
@@ -88,6 +98,10 @@ services:
   neo4j:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/neo4j-community-branded:local-production
+    build:
+      dockerfile: src/docker/neo4j.Dockerfile
+      target: community-branded
+      context: .
     networks:
       - test-network
     volumes:
