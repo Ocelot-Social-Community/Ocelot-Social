@@ -42,6 +42,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
+  driver.close()
 })
 
 describe('middleware/userInteractions', () => {
