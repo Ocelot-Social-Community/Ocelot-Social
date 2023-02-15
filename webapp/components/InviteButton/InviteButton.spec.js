@@ -1,7 +1,9 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import InviteButton from './InviteButton.vue'
 
-config.stubs['v-popover'] = '<span><slot /></span>'
+const stubs = {
+  'v-popover': true,
+}
 
 describe('InviteButton.vue', () => {
   let wrapper
@@ -22,7 +24,7 @@ describe('InviteButton.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(InviteButton, { mocks, propsData })
+      return mount(InviteButton, { mocks, propsData, stubs })
     }
 
     beforeEach(() => {

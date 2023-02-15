@@ -1,12 +1,10 @@
-import { config, mount, RouterLinkStub } from '@vue/test-utils'
+import { mount, RouterLinkStub } from '@vue/test-utils'
 import Vuex from 'vuex'
 import ReportRow from './ReportRow.vue'
 import BaseIcon from '~/components/_new/generic/BaseIcon/BaseIcon'
 import { reports } from '~/components/features/ReportList/ReportList.story.js'
 
 const localVue = global.localVue
-
-config.stubs['client-only'] = '<span><slot /></span>'
 
 describe('ReportRow', () => {
   let propsData, mocks, stubs, getters, wrapper
@@ -18,6 +16,7 @@ describe('ReportRow', () => {
     }
     stubs = {
       NuxtLink: RouterLinkStub,
+      'client-only': true,
     }
     getters = {
       'auth/user': () => {

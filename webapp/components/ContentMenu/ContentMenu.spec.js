@@ -1,4 +1,4 @@
-import { config, mount, createLocalVue } from '@vue/test-utils'
+import { mount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import VTooltip from 'v-tooltip'
 import Styleguide from '@human-connection/styleguide'
@@ -10,7 +10,11 @@ localVue.use(Styleguide)
 localVue.use(VTooltip)
 localVue.use(Vuex)
 
-config.stubs['router-link'] = '<span><slot /></span>'
+const stubs = {
+  'router-link': {
+    template: '<span><slot /></span>',
+  },
+}
 
 let getters, mutations, mocks, menuToggle, openModalSpy
 
@@ -36,7 +40,7 @@ describe('ContentMenu.vue', () => {
       'auth/isAdmin': () => false,
     }
 
-    const openContentMenu = (values = {}) => {
+    const openContentMenu = async (values = {}) => {
       const store = new Vuex.Store({ mutations, getters })
       const wrapper = mount(ContentMenu, {
         propsData: {
@@ -45,16 +49,17 @@ describe('ContentMenu.vue', () => {
         mocks,
         store,
         localVue,
+        stubs,
       })
       menuToggle = wrapper.find('[data-test="content-menu-button"]')
-      menuToggle.trigger('click')
+      await menuToggle.trigger('click')
       return wrapper
     }
 
     describe('owner of contribution', () => {
       let wrapper
-      beforeEach(() => {
-        wrapper = openContentMenu({
+      beforeEach(async () => {
+        wrapper = await openContentMenu({
           isOwner: true,
           resourceType: 'contribution',
           resource: {
@@ -86,9 +91,9 @@ describe('ContentMenu.vue', () => {
     })
 
     describe('admin can', () => {
-      it('pin unpinned post', () => {
+      it('pin unpinned post', async () => {
         getters['auth/isAdmin'] = () => true
-        const wrapper = openContentMenu({
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'contribution',
           resource: {
@@ -111,8 +116,8 @@ describe('ContentMenu.vue', () => {
         ])
       })
 
-      it('unpin pinned post', () => {
-        const wrapper = openContentMenu({
+      it('unpin pinned post', async () => {
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'contribution',
           resource: {
@@ -135,11 +140,11 @@ describe('ContentMenu.vue', () => {
         ])
       })
 
-      it('can delete another user', () => {
+      it('can delete another user', async () => {
         getters['auth/user'] = () => {
           return { id: 'some-user', slug: 'some-user' }
         }
-        const wrapper = openContentMenu({
+        const wrapper = await openContentMenu({
           resourceType: 'user',
           resource: {
             id: 'another-user',
@@ -161,8 +166,8 @@ describe('ContentMenu.vue', () => {
         ])
       })
 
-      it('can not delete the own account', () => {
-        const wrapper = openContentMenu({
+      it('can not delete the own account', async () => {
+        const wrapper = await openContentMenu({
           resourceType: 'user',
           resource: {
             id: 'some-user',
@@ -179,8 +184,8 @@ describe('ContentMenu.vue', () => {
 
     describe('owner of comment can', () => {
       let wrapper
-      beforeEach(() => {
-        wrapper = openContentMenu({
+      beforeEach(async () => {
+        wrapper = await openContentMenu({
           isOwner: true,
           resourceType: 'comment',
           resource: {
@@ -208,10 +213,10 @@ describe('ContentMenu.vue', () => {
     })
 
     describe('reporting', () => {
-      it('a post of another user is possible', () => {
+      it('a post of another user is possible', async () => {
         getters['auth/isAdmin'] = () => false
         getters['auth/isModerator'] = () => false
-        const wrapper = openContentMenu({
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'contribution',
           resource: {
@@ -227,8 +232,8 @@ describe('ContentMenu.vue', () => {
         expect(openModalSpy).toHaveBeenCalledWith('report')
       })
 
-      it('a comment of another user is possible', () => {
-        const wrapper = openContentMenu({
+      it('a comment of another user is possible', async () => {
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'comment',
           resource: {
@@ -244,8 +249,8 @@ describe('ContentMenu.vue', () => {
         expect(openModalSpy).toHaveBeenCalledWith('report')
       })
 
-      it('another user is possible', () => {
-        const wrapper = openContentMenu({
+      it('another user is possible', async () => {
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'user',
           resource: {
@@ -261,8 +266,8 @@ describe('ContentMenu.vue', () => {
         expect(openModalSpy).toHaveBeenCalledWith('report')
       })
 
-      it('another organization is possible', () => {
-        const wrapper = openContentMenu({
+      it('another organization is possible', async () => {
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'organization',
           resource: {
@@ -280,10 +285,10 @@ describe('ContentMenu.vue', () => {
     })
 
     describe('moderator', () => {
-      it('can disable posts', () => {
+      it('can disable posts', async () => {
         getters['auth/isAdmin'] = () => false
         getters['auth/isModerator'] = () => true
-        const wrapper = openContentMenu({
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'contribution',
           resource: {
@@ -300,8 +305,8 @@ describe('ContentMenu.vue', () => {
         expect(openModalSpy).toHaveBeenCalledWith('disable')
       })
 
-      it('can disable comments', () => {
-        const wrapper = openContentMenu({
+      it('can disable comments', async () => {
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'comment',
           resource: {
@@ -318,8 +323,8 @@ describe('ContentMenu.vue', () => {
         expect(openModalSpy).toHaveBeenCalledWith('disable')
       })
 
-      it('can disable users', () => {
-        const wrapper = openContentMenu({
+      it('can disable users', async () => {
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'user',
           resource: {
@@ -336,8 +341,8 @@ describe('ContentMenu.vue', () => {
         expect(openModalSpy).toHaveBeenCalledWith('disable')
       })
 
-      it('can disable organizations', () => {
-        const wrapper = openContentMenu({
+      it('can disable organizations', async () => {
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'organization',
           resource: {
@@ -354,8 +359,8 @@ describe('ContentMenu.vue', () => {
         expect(openModalSpy).toHaveBeenCalledWith('disable')
       })
 
-      it('can release posts', () => {
-        const wrapper = openContentMenu({
+      it('can release posts', async () => {
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'contribution',
           resource: {
@@ -372,8 +377,8 @@ describe('ContentMenu.vue', () => {
         expect(openModalSpy).toHaveBeenCalledWith('release')
       })
 
-      it('can release comments', () => {
-        const wrapper = openContentMenu({
+      it('can release comments', async () => {
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'comment',
           resource: {
@@ -390,8 +395,8 @@ describe('ContentMenu.vue', () => {
         expect(openModalSpy).toHaveBeenCalledWith('release')
       })
 
-      it('can release users', () => {
-        const wrapper = openContentMenu({
+      it('can release users', async () => {
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'user',
           resource: {
@@ -408,8 +413,8 @@ describe('ContentMenu.vue', () => {
         expect(openModalSpy).toHaveBeenCalledWith('release')
       })
 
-      it('can release organizations', () => {
-        const wrapper = openContentMenu({
+      it('can release organizations', async () => {
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'organization',
           resource: {
@@ -428,10 +433,10 @@ describe('ContentMenu.vue', () => {
     })
 
     describe('user', () => {
-      it('can access settings', () => {
+      it('can access settings', async () => {
         getters['auth/isAdmin'] = () => false
         getters['auth/isModerator'] = () => false
-        const wrapper = openContentMenu({
+        const wrapper = await openContentMenu({
           isOwner: true,
           resourceType: 'user',
           resource: {
@@ -448,8 +453,8 @@ describe('ContentMenu.vue', () => {
         ).toBe('/settings')
       })
 
-      it('can mute other users', () => {
-        const wrapper = openContentMenu({
+      it('can mute other users', async () => {
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'user',
           resource: {
@@ -472,8 +477,8 @@ describe('ContentMenu.vue', () => {
         ])
       })
 
-      it('can unmute muted users', () => {
-        const wrapper = openContentMenu({
+      it('can unmute muted users', async () => {
+        const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'user',
           resource: {

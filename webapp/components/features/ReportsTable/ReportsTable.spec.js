@@ -1,12 +1,14 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import ReportsTable from './ReportsTable.vue'
 import { reports } from '~/components/features/ReportList/ReportList.story.js'
 
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+const stubs = {
+  'client-only': true,
+  'nuxt-link': true,
+}
 
 describe('ReportsTable', () => {
   let propsData, mocks, getters, wrapper, reportsTable
@@ -29,7 +31,7 @@ describe('ReportsTable', () => {
       const store = new Vuex.Store({
         getters,
       })
-      return mount(ReportsTable, { propsData, mocks, localVue, store })
+      return mount(ReportsTable, { propsData, mocks, localVue, store, stubs })
     }
 
     describe('given no reports', () => {

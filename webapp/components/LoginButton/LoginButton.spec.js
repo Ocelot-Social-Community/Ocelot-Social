@@ -1,7 +1,9 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import LoginButton from './LoginButton.vue'
 
-config.stubs['v-popover'] = '<span><slot /></span>'
+const stubs = {
+  'v-popover': true,
+}
 
 describe('LoginButton.vue', () => {
   let wrapper
@@ -22,7 +24,7 @@ describe('LoginButton.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(LoginButton, { mocks, propsData })
+      return mount(LoginButton, { mocks, propsData, stubs })
     }
 
     beforeEach(() => {

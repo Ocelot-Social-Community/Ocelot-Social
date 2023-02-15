@@ -1,14 +1,16 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import TabNavigation from './TabNavigation'
 
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span><slot /></span>'
+const stubs = {
+  'client-only': true,
+}
 
 describe('TabNavigation', () => {
   let mocks, propsData, wrapper
   const Wrapper = () => {
-    return mount(TabNavigation, { mocks, localVue, propsData })
+    return mount(TabNavigation, { mocks, localVue, propsData, stubs })
   }
 
   beforeEach(() => {
