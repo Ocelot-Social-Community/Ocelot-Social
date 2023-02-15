@@ -9,15 +9,17 @@ ARG APP_IMAGE_CODE=${APP_IMAGE}:${APP_IMAGE_TAG_CODE}
 ##################################################################################
 FROM $APP_IMAGE_CODE as code
 
+ARG CONFIGURATION_FOLDER=configurations/example
+
 # copy public constants into the Docker image to brand it
-COPY tools/ tools/
-COPY branding/static/ static/
-COPY branding/constants/ constants/
-COPY branding/locales/html/ locales/html/
-# COPY branding/locales/index.js locales/index.js
-COPY branding/locales/*.json locales/tmp/
-COPY branding/assets/styles/imports/ assets/styles/imports/
-COPY branding/assets/fonts/ assets/fonts/
+COPY src/tools/ tools/
+COPY ${CONFIGURATION_FOLDER}/branding/static/ static/
+COPY ${CONFIGURATION_FOLDER}/branding/constants/ constants/
+COPY ${CONFIGURATION_FOLDER}/branding/locales/html/ locales/html/
+# COPY ${CONFIGURATION_FOLDER}/branding/locales/index.js locales/index.js
+COPY ${CONFIGURATION_FOLDER}/branding/locales/*.json locales/tmp/
+COPY ${CONFIGURATION_FOLDER}/branding/assets/styles/imports/ assets/styles/imports/
+COPY ${CONFIGURATION_FOLDER}/branding/assets/fonts/ assets/fonts/
 
 RUN apk add --no-cache bash jq
 
