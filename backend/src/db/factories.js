@@ -89,10 +89,12 @@ Factory.define('userWithoutEmailAddress')
 Factory.define('user')
   .extend('basicUser')
   .option('email', faker.internet.exampleEmail)
-  .option('avatar', () =>
-    Factory.build('image', {
-      url: faker.internet.avatar(),
-    }),
+  .option(
+    'avatar',
+    async () =>
+      await Factory.build('image', {
+        url: faker.internet.avatar(),
+      }),
   )
   .after(async (buildObject, options) => {
     const [user, email, avatar] = await Promise.all([
