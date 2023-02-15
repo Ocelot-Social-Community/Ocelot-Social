@@ -21,7 +21,7 @@ jobs:
       # CHECKOUT CODE ##########################################################
       ##########################################################################
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       ##########################################################################
       # TODO: DO STUFF ??? #####################################################
       ##########################################################################
@@ -42,7 +42,7 @@ jobs:
       # CHECKOUT CODE ##########################################################
       ##########################################################################
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       ##########################################################################
       # SET ENVS ###############################################################
       ##########################################################################
@@ -62,7 +62,7 @@ jobs:
       - name: Neo4J | Save docker image 
         run: docker save "ocelotsocialnetwork/neo4j-community" > /tmp/neo4j.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: docker-neo4j-community
           path: /tmp/neo4j.tar
@@ -79,7 +79,7 @@ jobs:
       # CHECKOUT CODE ##########################################################
       ##########################################################################
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       ##########################################################################
       # SET ENVS ###############################################################
       ##########################################################################
@@ -102,7 +102,7 @@ jobs:
       - name: Backend | Save docker image
         run: docker save "ocelotsocialnetwork/backend" > /tmp/backend.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: docker-backend-production
           path: /tmp/backend.tar
@@ -119,7 +119,7 @@ jobs:
       # CHECKOUT CODE ##########################################################
       ##########################################################################
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       ##########################################################################
       # SET ENVS ###############################################################
       ##########################################################################
@@ -142,7 +142,7 @@ jobs:
       - name: Webapp | Save docker image
         run: docker save "ocelotsocialnetwork/webapp" > /tmp/webapp.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: docker-webapp-production
           path: /tmp/webapp.tar
@@ -159,7 +159,7 @@ jobs:
       # CHECKOUT CODE ##########################################################
       ##########################################################################
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       ##########################################################################
       # SET ENVS ###############################################################
       ##########################################################################
@@ -182,7 +182,7 @@ jobs:
       - name: Maintenance | Save docker image
         run: docker save "ocelotsocialnetwork/maintenance" > /tmp/maintenance.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: docker-maintenance-production
           path: /tmp/maintenance.tar
@@ -202,7 +202,7 @@ jobs:
       # CHECKOUT CODE ##########################################################
       ##########################################################################
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       ##########################################################################
       # DOWNLOAD DOCKER IMAGES #################################################
       ##########################################################################
@@ -262,7 +262,7 @@ jobs:
       # CHECKOUT CODE ##########################################################
       ##########################################################################
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       ##########################################################################
       # SET ENVS ###############################################################
       ##########################################################################
@@ -335,7 +335,7 @@ jobs:
       # CHECKOUT CODE ##########################################################
       ##########################################################################
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Fetch full History for changelog
       ##########################################################################
