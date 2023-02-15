@@ -103,7 +103,7 @@ Factory.define('user')
       options.avatar,
     ])
     await Promise.all([user.relateTo(email, 'primaryEmail'), email.relateTo(user, 'belongsTo')])
-    if (avatar) await user.relateTo(avatar, 'avatar')
+    if (avatar && user) await user.relateTo(avatar, 'avatar')
     return user
   })
 
@@ -124,7 +124,7 @@ Factory.define('post')
     return Factory.build('user')
   })
   .option('pinnedBy', null)
-  .option('image', () => Factory.build('image'))
+  .option('image', async () => await Factory.build('image'))
   .attrs({
     id: uuid,
     title: faker.lorem.sentence,
