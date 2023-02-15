@@ -2,7 +2,9 @@ import { mount } from '@vue/test-utils'
 import InviteButton from './InviteButton.vue'
 
 const stubs = {
-  'v-popover': true,
+  'v-popover': {
+    template: '<span><slot /></span>',
+  },
 }
 
 describe('InviteButton.vue', () => {
@@ -32,12 +34,12 @@ describe('InviteButton.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.contains('.invite-button')).toBe(true)
+      expect(wrapper.find('.invite-button').exists()).toBe(true)
     })
 
     it('open popup', () => {
       wrapper.find('.base-button').trigger('click')
-      expect(wrapper.contains('.invite-button')).toBe(true)
+      expect(wrapper.find('.invite-button').exists()).toBe(true)
     })
 
     it('invite codes not available', async () => {

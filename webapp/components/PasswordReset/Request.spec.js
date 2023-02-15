@@ -22,7 +22,7 @@ describe('Request', () => {
       },
     }
     stubs = {
-      LocaleSwitch: "<div class='stub'></div>",
+      LocaleSwitch: true,
       'sweetalert-icon': true,
       'client-only': true,
       'nuxt-link': true,

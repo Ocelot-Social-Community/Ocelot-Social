@@ -36,7 +36,7 @@ describe('SearchField.vue', () => {
     describe('Emitted events', () => {
       let searchableInputComponent
       beforeEach(() => {
-        searchableInputComponent = wrapper.find(SearchableInput)
+        searchableInputComponent = wrapper.findComponent(SearchableInput)
       })
 
       describe('query event', () => {

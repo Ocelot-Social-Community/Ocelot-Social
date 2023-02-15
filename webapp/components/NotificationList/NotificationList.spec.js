@@ -52,7 +52,7 @@ describe('NotificationList.vue', () => {
     })
 
     it('renders Notification.vue for each notification of the user', () => {
-      expect(wrapper.findAll(Notification)).toHaveLength(2)
+      expect(wrapper.findAllComponents(Notification)).toHaveLength(2)
     })
   })
 
@@ -97,7 +97,7 @@ describe('NotificationList.vue', () => {
     })
 
     it('renders Notification.vue zero times', () => {
-      expect(wrapper.findAll(Notification)).toHaveLength(0)
+      expect(wrapper.findAllComponents(Notification)).toHaveLength(0)
     })
   })
 })

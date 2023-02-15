@@ -56,11 +56,11 @@ describe('ReportList', () => {
       })
 
       it('renders DropdownFilter', () => {
-        expect(wrapper.find(DropdownFilter).exists()).toBe(true)
+        expect(wrapper.findComponent(DropdownFilter).exists()).toBe(true)
       })
 
       it('renders ReportsTable', () => {
-        expect(wrapper.find(ReportsTable).exists()).toBe(true)
+        expect(wrapper.findComponent(ReportsTable).exists()).toBe(true)
       })
     })
 
@@ -68,7 +68,7 @@ describe('ReportList', () => {
       beforeEach(async () => {
         wrapper = Wrapper()
         wrapper.setData({ reports })
-        wrapper.find(ReportsTable).vm.$emit('confirm', reports[0])
+        wrapper.findComponent(ReportsTable).vm.$emit('confirm', reports[0])
       })
 
       it('calls modal/SET_OPEN', () => {

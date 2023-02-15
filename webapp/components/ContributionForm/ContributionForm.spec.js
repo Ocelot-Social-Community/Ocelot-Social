@@ -166,7 +166,7 @@ describe('ContributionForm.vue', () => {
             .mockImplementation(function () {
               this.onload({ target: { result: 'someUrlToImage' } })
             })
-          wrapper.find(ImageUploader).vm.$emit('addHeroImage', imageUpload)
+          wrapper.findComponent(ImageUploader).vm.$emit('addHeroImage', imageUpload)
           await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
           expect(spy).toHaveBeenCalledWith(imageUpload)
