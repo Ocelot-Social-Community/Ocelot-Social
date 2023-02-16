@@ -889,7 +889,6 @@ describe('unpin posts', () => {
     })
   })
 
-  
   describe('admin can unpin posts', () => {
     let admin
     beforeEach(async () => {
