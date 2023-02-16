@@ -9,13 +9,13 @@ ARG APP_IMAGE_CODE=${APP_IMAGE}:${APP_IMAGE_TAG_CODE}
 ##################################################################################
 FROM $APP_IMAGE_CODE as code
 
-ARG CONFIGURATION_FOLDER=configurations/example
+ARG CONFIGURATION=example
 
 # copy public constants and email templates into the Docker image to brand it
-COPY ${CONFIGURATION_FOLDER}/branding/constants/emails.js src/config/
-COPY ${CONFIGURATION_FOLDER}/branding/constants/logos.js src/config/
-COPY ${CONFIGURATION_FOLDER}/branding/constants/metadata.js src/config/
-COPY ${CONFIGURATION_FOLDER}/branding/email/ src/middleware/helpers/email/
+COPY configurations/${CONFIGURATION}/branding/constants/emails.js src/config/
+COPY configurations/${CONFIGURATION}/branding/constants/logos.js src/config/
+COPY configurations/${CONFIGURATION}/branding/constants/metadata.js src/config/
+COPY configurations/${CONFIGURATION}/branding/email/ src/middleware/helpers/email/
 
 ##################################################################################
 # BUILD ##########################################################################

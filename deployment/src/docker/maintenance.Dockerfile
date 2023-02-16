@@ -9,12 +9,12 @@ ARG APP_IMAGE_CODE=${APP_IMAGE}:${APP_IMAGE_TAG_CODE}
 ##################################################################################
 FROM $APP_IMAGE_CODE as code
 
-ARG CONFIGURATION_FOLDER=configurations/example
+ARG CONFIGURATION=example
 
 # copy public constants into the Docker image to brand it
-COPY ${CONFIGURATION_FOLDER}/branding/static/ static/
-COPY ${CONFIGURATION_FOLDER}/branding/constants/ constants/
-COPY ${CONFIGURATION_FOLDER}/branding/locales/ locales/
+COPY configurations/${CONFIGURATION}/branding/static/ static/
+COPY configurations/${CONFIGURATION}/branding/constants/ constants/
+COPY configurations/${CONFIGURATION}/branding/locales/ locales/
 
 ##################################################################################
 # BUILD ##########################################################################

@@ -16,13 +16,13 @@ services:
       target: code
 
   webapp:
-    image: ocelotsocialnetwork/webapp-branded:local-production
+    image: ocelotsocialnetwork/webapp-branded:local-${CONFIGURATION}
     build:
       dockerfile: src/docker/webapp.Dockerfile
       target: branded
       context: .
       args:
-        - CONFIGURATION_FOLDER=$CONFIGURATION_FOLDER
+        - CONFIGURATION=$CONFIGURATION
         - APP_IMAGE_TAG_BASE=local-base
         - APP_IMAGE_TAG_CODE=local-code
     ports:
@@ -59,13 +59,13 @@ services:
       target: code
   
   backend:
-    image: ocelotsocialnetwork/backend-branded:local-production
+    image: ocelotsocialnetwork/backend-branded:local-${CONFIGURATION}
     build:
       dockerfile: src/docker/backend.Dockerfile
       target: branded
       context: .
       args:
-        - CONFIGURATION_FOLDER=$CONFIGURATION_FOLDER
+        - CONFIGURATION=$CONFIGURATION
         - APP_IMAGE_TAG_BASE=local-base
         - APP_IMAGE_TAG_CODE=local-code
     networks:
@@ -113,14 +113,14 @@ services:
 
   maintenance:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/maintenance-branded:local-production
+    image: ocelotsocialnetwork/maintenance-branded:local-${CONFIGURATION}
     build:
       # TODO: Separate from webapp, this must be independent
       dockerfile: src/docker/maintenance.Dockerfile
       target: branded
       context: .
       args:
-        - CONFIGURATION_FOLDER=$CONFIGURATION_FOLDER
+        - CONFIGURATION=$CONFIGURATION
         - APP_IMAGE_TAG_BASE=local-base
         - APP_IMAGE_TAG_CODE=local-code
     networks:
