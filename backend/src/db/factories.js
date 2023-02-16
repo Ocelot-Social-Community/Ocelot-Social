@@ -100,8 +100,12 @@ Factory.define('user')
       neode.create('EmailAddress', { email: options.email }),
       options.avatar,
     ])
-    await Promise.all([user.relateTo(email, 'primaryEmail'), email.relateTo(user, 'belongsTo')])
-    if (avatar) await user.relateTo(avatar, 'avatar')
+    try {
+      await Promise.all([user.relateTo(email, 'primaryEmail'), email.relateTo(user, 'belongsTo')])
+      if (avatar) await user.relateTo(avatar, 'avatar')
+    } catch (err) {
+      console.log(err)
+    }
     return user
   })
 
