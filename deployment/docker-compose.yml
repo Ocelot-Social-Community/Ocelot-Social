@@ -1,8 +1,19 @@
 # This docker-compose file is just here for testing
-
 version: "3.4"
-
 services:
+  webapp-base:
+    image: ocelotsocialnetwork/webapp:local-base
+    build: 
+      dockerfile: ../webapp/Dockerfile
+      context: ../webapp
+      target: base
+
+  webapp-code:
+    image: ocelotsocialnetwork/webapp:local-code
+    build: 
+      dockerfile: ../webapp/Dockerfile
+      context: ../webapp
+      target: code
 
   webapp:
     image: ocelotsocialnetwork/webapp-branded:local-production
@@ -20,6 +31,8 @@ services:
       - test-network
     depends_on:
       - backend
+      - webapp-base
+      - webapp-code
     env_file: 
       - .env
     environment:
@@ -31,6 +44,20 @@ services:
       - INVITE_REGISTRATION=true
       - CATEGORIES_ACTIVE=true
 
+  backend-base:
+    image: ocelotsocialnetwork/backend:local-base
+    build: 
+      dockerfile: ../backend/Dockerfile
+      context: ../backend
+      target: base
+  
+  backend-code:
+    image: ocelotsocialnetwork/backend:local-code
+    build: 
+      dockerfile: ../backend/Dockerfile
+      context: ../backend
+      target: code
+  
   backend:
     image: ocelotsocialnetwork/backend-branded:local-production
     build:
@@ -45,6 +72,8 @@ services:
       - test-network
     depends_on:
       - neo4j
+      - backend-base
+      - backend-code
     ports:
       - 4000:4000
     volumes:
@@ -68,6 +97,20 @@ services:
       - SMTP_PORT=25
       - SMTP_IGNORE_TLS=true
 
+  maintenance-base:
+    image: ocelotsocialnetwork/maintenance:local-base
+    build: 
+      dockerfile: ../webapp/Dockerfile.maintenance
+      context: ../webapp
+      target: base
+
+  maintenance-code:
+    image: ocelotsocialnetwork/maintenance:local-code
+    build: 
+      dockerfile: ../webapp/Dockerfile.maintenance
+      context: ../webapp
+      target: code
+
   maintenance:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/maintenance-branded:local-production
@@ -82,19 +125,14 @@ services:
         - APP_IMAGE_TAG_CODE=local-code
     networks:
       - test-network
+    depends_on:
+      - maintenance-base
+      - maintenance-code
     ports:
       - 3001:80
 
-  ########################################################
-  # NEO4J ################################################
-  ########################################################
   neo4j:
-    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/neo4j-community-branded:local-production
-    build:
-      dockerfile: src/docker/neo4j.Dockerfile
-      target: community-branded
-      context: .
+    image: ocelotsocialnetwork/neo4j-community:latest
     networks:
       - test-network
     volumes:
@@ -106,9 +144,6 @@ services:
     ports:
       - 7687:7687
 
-  ########################################################
-  # MAILSERVER TO FAKE SMTP ##############################
-  ########################################################
   mailserver:
     image: djfarrelly/maildev
     ports:
