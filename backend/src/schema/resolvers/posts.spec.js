@@ -863,6 +863,7 @@ describe('unpin posts', () => {
 
   describe('users cannot unpin posts', () => {
     it('throws authorization error', async () => {
+      authenticatedUser = await user.toJson()
       await expect(mutate({ mutation: unpinPostMutation, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
         data: { unpinPost: null },
