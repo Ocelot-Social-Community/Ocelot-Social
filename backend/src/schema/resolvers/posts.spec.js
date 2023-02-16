@@ -556,6 +556,7 @@ describe('pin posts', () => {
 
   describe('ordinary users', () => {
     it('throws authorization error', async () => {
+      authenticatedUser = await user.toJson()
       await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
         data: { pinPost: null },
@@ -874,7 +875,9 @@ describe('unpin posts', () => {
   describe('moderators cannot unpin posts', () => {
     let moderator
     beforeEach(async () => {
+      console.log(await user.toJson())
       moderator = await user.update({ role: 'moderator', updatedAt: new Date().toISOString() })
+      console.log(await moderator.toJson())
       authenticatedUser = await moderator.toJson()
     })
 
