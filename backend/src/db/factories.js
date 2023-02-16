@@ -89,12 +89,10 @@ Factory.define('userWithoutEmailAddress')
 Factory.define('user')
   .extend('basicUser')
   .option('email', faker.internet.exampleEmail)
-  .option(
-    'avatar',
-    async () =>
-      await Factory.build('image', {
-        url: faker.internet.avatar(),
-      }),
+  .option('avatar', () =>
+    Factory.build('image', {
+      url: faker.internet.avatar(),
+    }),
   )
   .after(async (buildObject, options) => {
     const [user, email, avatar] = await Promise.all([
@@ -103,7 +101,7 @@ Factory.define('user')
       options.avatar,
     ])
     await Promise.all([user.relateTo(email, 'primaryEmail'), email.relateTo(user, 'belongsTo')])
-    if (avatar && user) await user.relateTo(avatar, 'avatar')
+    if (avatar) await user.relateTo(avatar, 'avatar')
     return user
   })
 
@@ -124,7 +122,7 @@ Factory.define('post')
     return Factory.build('user')
   })
   .option('pinnedBy', null)
-  .option('image', async () => await Factory.build('image'))
+  .option('image', () => Factory.build('image'))
   .attrs({
     id: uuid,
     title: faker.lorem.sentence,
