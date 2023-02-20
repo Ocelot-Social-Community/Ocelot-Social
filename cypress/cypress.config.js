@@ -46,7 +46,7 @@ module.exports = defineConfig({
     chromeWebSecurity: false,
     baseUrl: "http://localhost:3000",
     specPattern: "**/*.feature",
-    supportFile: false,
+    supportFile: "cypress/support/e2e.js",
     retries: {
       runMode: 2,
       openMode: 0,
