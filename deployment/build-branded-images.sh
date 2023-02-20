@@ -3,7 +3,7 @@
 # for a branded version you should pass the following env variables:
 # CONFIGURATION - your configuration folder name
 # DOCKERHUB_ORGANISATION - your dockerhub organisation
-# OCELOT_VERSION - specify the specific tag to build upon e.g. 2.4.0-291
+# OCELOT_VERSION - specify the specific tag to build upon e.g. 2.4.0-300
 
 # base setup
 SCRIPT_PATH=$(realpath $0)
