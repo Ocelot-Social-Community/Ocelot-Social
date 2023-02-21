@@ -6,11 +6,8 @@ SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
 # configuration
 CONFIGURATION=${CONFIGURATION:-"example"}
-KUBECONFIG=${KUBECONFIG:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubeconfig.yml}
-VALUES=${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubenertes/values.yaml
-
-# constants
-CHART=${SCRIPT_DIR}/../src/kubernetes/Chart.yaml
+KUBECONFIG=${KUBECONFIG:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubeconfig.yaml}
+VALUES=${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubernetes/values.yaml
 
 # upgrade with helm
-helm --kubeconfig=... upgrade ocelot --values ${VALUES} ${CHART}
+helm --kubeconfig=${KUBECONFIG} upgrade ocelot --values ${VALUES} ${SCRIPT_DIR}/../src/kubernetes/
