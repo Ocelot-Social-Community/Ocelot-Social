@@ -69,13 +69,15 @@ jobs:
           path: /tmp
       - name: Load Docker Image
         run: docker load < /tmp/maintenance-branded.tar
-      
-      - name: login to dockerhub
-        run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
 
-      - name: Push Backend
-        run: docker push --all-tags ocelotsocialnetwork/backend-branded
-      - name: Push Webapp
-        run: docker push --all-tags ocelotsocialnetwork/webapp-branded
-      - name: Push Maintenance
-        run: docker push --all-tags ocelotsocialnetwork/maintenance-branded
+      - name: Upload to dockerhub
+        run: deployment/upload-branded-images.sh
+#      - name: login to dockerhub
+#        run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+#
+#      - name: Push Backend
+#        run: docker push --all-tags ocelotsocialnetwork/backend-branded
+#      - name: Push Webapp
+#        run: docker push --all-tags ocelotsocialnetwork/webapp-branded
+#      - name: Push Maintenance
+#        run: docker push --all-tags ocelotsocialnetwork/maintenance-branded
