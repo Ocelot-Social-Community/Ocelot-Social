@@ -1,6 +1,7 @@
 # please duplicate template file and rename to "values.yaml" and fill in your value
 
 # change all the below if needed
+MAPBOX_TOKEN: "pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g"
 PRODUCTION_DB_CLEAN_ALLOW: false # only true for production environments on staging servers
 PUBLIC_REGISTRATION: false
 INVITE_REGISTRATION: false
@@ -15,7 +16,6 @@ BACKEND:
   CLIENT_URI: "https://staging.ocelot.social"
   # create a new one for your network
   JWT_SECRET: "b/&&7b78BF&fv/Vd"
-  MAPBOX_TOKEN: "pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g"
   PRIVATE_KEY_PASSPHRASE: "a7dsf78sadg87ad87sfagsadg78"
   # ocelot.social mail dummy
   EMAIL_DEFAULT_SENDER: "devops@ocelot.social"
