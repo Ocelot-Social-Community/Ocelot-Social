@@ -10,4 +10,4 @@ KUBECONFIG=${KUBECONFIG:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubeco
 VALUES=${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubernetes/values.yaml
 
 # upgrade with helm
-helm --kubeconfig=${KUBECONFIG} upgrade ocelot --values ${VALUES} ${SCRIPT_DIR}/../src/kubernetes/ # --debug --timeout 10m
+helm --kubeconfig=${KUBECONFIG} upgrade ocelot --values ${VALUES} ${SCRIPT_DIR}/../src/kubernetes/ --debug --timeout 10m
