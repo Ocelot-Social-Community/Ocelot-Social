@@ -24,7 +24,7 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.12.7",
-    "@babel/register": "^7.12.10",
+    "@babel/register": "^7.21.0",
     "@faker-js/faker": "5.1.0",
     "auto-changelog": "^2.3.0",
     "bcryptjs": "^2.4.3",
