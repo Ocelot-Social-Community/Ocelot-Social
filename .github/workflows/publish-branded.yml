@@ -15,7 +15,7 @@ jobs:
 
       - name: Build branded images
         run: |
-          deployment/build-branded-images.sh
+          deployment/scripts/build-branded-images.sh
           docker save "ocelotsocialnetwork/backend-branded" > /tmp/backend-branded.tar
           docker save "ocelotsocialnetwork/webapp-branded" > /tmp/webapp-branded.tar
           docker save "ocelotsocialnetwork/maintenance-branded" > /tmp/maintenance-branded.tar
@@ -46,6 +46,9 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
       - name: Download Docker Image (Backend)
         uses: actions/download-artifact@v2
         with:
@@ -71,7 +74,7 @@ jobs:
         run: docker load < /tmp/maintenance-branded.tar
 
       - name: Upload to dockerhub
-        run: deployment/upload-branded-images.sh
+        run: deployment/scripts/upload-branded-images.sh
 #      - name: login to dockerhub
 #        run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
 #

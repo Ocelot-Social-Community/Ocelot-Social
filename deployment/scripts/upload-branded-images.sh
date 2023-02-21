@@ -12,7 +12,7 @@ SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
 # configuration
 DOCKERHUB_ORGANISATION=${DOCKERHUB_ORGANISATION:-"ocelotsocialnetwork"}
-OCELOT_VERSION=${OCELOT_VERSION:-$(node -p -e "require('${SCRIPT_DIR}/../package.json').version")}
+OCELOT_VERSION=${OCELOT_VERSION:-$(node -p -e "require('${SCRIPT_DIR}/../../package.json').version")}
 BRANDED_VERSION=${BRANDED_VERSION:-${GITHUB_RUN_NUMBER:-"local"}}
 BUILD_VERSION=${BRANDED_VERSION}-ocelot.social${OCELOT_VERSION}
 
