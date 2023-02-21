@@ -357,7 +357,7 @@ export default {
                 id: group.id,
                 slug: group.slug,
                 name: group.name,
-                about: group.about  ? group.about : undefined,
+                about: group.about ? group.about : undefined,
               },
               geometry: {
                 type: 'Point',
