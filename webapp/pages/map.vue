@@ -257,7 +257,7 @@ export default {
           </div>
            `
         description +=
-          e.features[0].properties.about && e.features[0].properties.about.length > 0
+          e.features[0].properties.about && e.features[0].properties.about !== 'null' && e.features[0].properties.about.length > 0
             ? `
             <hr>
             <div>
