@@ -875,9 +875,7 @@ describe('unpin posts', () => {
   describe('moderators cannot unpin posts', () => {
     let moderator
     beforeEach(async () => {
-      console.log(await user.toJson())
       moderator = await user.update({ role: 'moderator', updatedAt: new Date().toISOString() })
-      console.log(await moderator.toJson())
       authenticatedUser = await moderator.toJson()
     })
 

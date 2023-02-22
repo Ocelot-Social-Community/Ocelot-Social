@@ -101,7 +101,7 @@ Factory.define('user')
       options.avatar,
     ])
     await Promise.all([user.relateTo(email, 'primaryEmail'), email.relateTo(user, 'belongsTo')])
-    if (avatar) await user.relateTo(avatar, 'avatar')
+    if (avatar) await user.relateTo(await avatar, 'avatar')
     return user
   })
 
