@@ -1,4 +1,4 @@
-import { When } from "cypress-cucumber-preprocessor/steps";
+import { When } from "@badeball/cypress-cucumber-preprocessor";
 
 When('I delete the social media link {string}', (link) => {
   cy.get('[data-test="delete-button"]')
