@@ -30,10 +30,14 @@
             v-for="category in post.categories"
             :key="category.id"
             v-tooltip="{
-              content: $t(`contribution.category.description.${category.slug}`),
+              content: `
+                ${$t(`contribution.category.name.${category.slug}`)}: 
+                ${$t(`contribution.category.description.${category.slug}`)}
+              `,
               placement: 'bottom-start',
             }"
             :icon="category.icon"
+            :filterActive="postsFilter ? postsFilter.id_in.includes(category.id) : false"
           />
         </div>
         <div v-else class="categories-placeholder"></div>
@@ -101,6 +105,10 @@ export default {
       required: true,
     },
     width: {
+      type: Object,
+      default: () => {},
+    },
+    postsFilter: {
       type: Object,
       default: () => {},
     },

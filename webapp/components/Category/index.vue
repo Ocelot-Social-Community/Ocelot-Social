@@ -1,5 +1,5 @@
 <template>
-  <ds-tag class="category-tag">
+  <ds-tag class="category-tag" :class="filterActive ? 'filterActive' : ''">
     <base-icon :name="icon" />
     {{ name }}
   </ds-tag>
@@ -11,6 +11,7 @@ export default {
   props: {
     icon: { type: String, required: true },
     name: { type: String, default: '' },
+    filterActive: { type: Boolean, default: false, required: false },
   },
 }
 </script>
@@ -27,5 +28,8 @@ export default {
     margin-right: $space-xx-small;
     font-size: $font-size-base;
   }
+}
+.filterActive {
+  background-color: $color-success-active;
 }
 </style>

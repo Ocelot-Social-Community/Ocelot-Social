@@ -5,17 +5,22 @@
   </div>
   <div v-else :class="[{ 'disabled-content': user.disabled }]" placement="top-start">
     <div :class="['user-teaser']">
-      <nuxt-link :to="userLink" data-test="avatarUserLink">
-        <profile-avatar v-if="showAvatar" :profile="user" size="small" />
+      <nuxt-link v-if="linkToProfile && showAvatar" :to="userLink" data-test="avatarUserLink">
+        <profile-avatar :profile="user" size="small" />
       </nuxt-link>
+      <profile-avatar v-else-if="showAvatar" :profile="user" size="small" />
       <div class="info flex-direction-column">
         <div :class="wide ? 'flex-direction-row' : 'flex-direction-column'">
-          <nuxt-link :to="userLink">
+          <nuxt-link v-if="linkToProfile" :to="userLink">
             <span class="text">
               <span class="slug">{{ userSlug }}</span>
               <span v-if="!userOnly" class="name">{{ userName }}</span>
             </span>
           </nuxt-link>
+          <span v-else class="text">
+            <span class="slug">{{ userSlug }}</span>
+            <span v-if="!userOnly" class="name">{{ userName }}</span>
+          </span>
           <span v-if="wide">&nbsp;</span>
           <span v-if="group">
             <span class="text">
@@ -53,6 +58,7 @@ export default {
     ProfileAvatar,
   },
   props: {
+    linkToProfile: { type: Boolean, default: true },
     user: { type: Object, default: null },
     group: { type: Object, default: null },
     wide: { type: Boolean, default: false },

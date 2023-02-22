@@ -74,10 +74,10 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import gql from 'graphql-tag'
 import { isEmail } from 'validator'
 import normalizeEmail from '~/components/utils/NormalizeEmail'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
+import { adminUserQuery } from '~/graphql/User'
 import { FetchAllRoles, updateUserRole } from '~/graphql/admin/Roles'
 
 export default {
@@ -138,27 +138,7 @@ export default {
   apollo: {
     User: {
       query() {
-        return gql`
-          query ($filter: _UserFilter, $first: Int, $offset: Int, $email: String) {
-            User(
-              email: $email
-              filter: $filter
-              first: $first
-              offset: $offset
-              orderBy: createdAt_desc
-            ) {
-              id
-              name
-              slug
-              email
-              role
-              createdAt
-              contributionsCount
-              commentedCount
-              shoutedCount
-            }
-          }
-        `
+        return adminUserQuery()
       },
       variables() {
         const { offset, first, email, filter } = this

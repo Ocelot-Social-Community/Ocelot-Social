@@ -23,6 +23,7 @@
 import CategoryQuery from '~/graphql/CategoryQuery'
 import { CATEGORIES_MAX } from '~/constants/categories.js'
 import xor from 'lodash/xor'
+import SortCategories from '~/mixins/sortCategoriesMixin.js'
 
 export default {
   inject: {
@@ -30,6 +31,7 @@ export default {
       default: null,
     },
   },
+  mixins: [SortCategories],
   props: {
     existingCategoryIds: { type: Array, default: () => [] },
     model: { type: String, required: true },
@@ -72,7 +74,7 @@ export default {
         return CategoryQuery()
       },
       result({ data: { Category } }) {
-        this.categories = Category
+        this.categories = this.sortCategories(Category)
       },
     },
   },

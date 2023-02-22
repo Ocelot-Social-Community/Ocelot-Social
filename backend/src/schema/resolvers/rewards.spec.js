@@ -33,6 +33,7 @@ describe('rewards', () => {
 
   afterAll(async () => {
     await cleanDatabase()
+    driver.close()
   })
 
   beforeEach(async () => {

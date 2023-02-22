@@ -29,6 +29,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
+  driver.close()
 })
 
 beforeEach(async () => {
@@ -118,9 +119,9 @@ describe('Signup', () => {
               await emailAddress.relateTo(user, 'belongsTo')
             })
 
-            it('throws UserInputError error because of unique constraint violation', async () => {
+            it('does not throw UserInputError error', async () => {
               await expect(mutate({ mutation, variables })).resolves.toMatchObject({
-                errors: [{ message: 'A user account with this email already exists.' }],
+                data: { Signup: { email: 'someuser@example.org' } },
               })
             })
           })

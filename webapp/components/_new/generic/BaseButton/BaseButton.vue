@@ -96,6 +96,7 @@ export default {
   border-radius: $border-radius-x-large;
   overflow: hidden;
   font-weight: $font-weight-bold;
+  letter-spacing: $letter-spacing-large;
   cursor: pointer;
 
   &.--danger {

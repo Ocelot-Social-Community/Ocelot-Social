@@ -184,8 +184,7 @@ import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import { profilePagePosts } from '~/graphql/PostQuery'
-import UserQuery from '~/graphql/User'
-import { updateUserMutation } from '~/graphql/User.js'
+import { profileUserQuery, updateUserMutation } from '~/graphql/User'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 import UpdateQuery from '~/components/utils/UpdateQuery'
@@ -408,7 +407,7 @@ export default {
     },
     User: {
       query() {
-        return UserQuery(this.$i18n)
+        return profileUserQuery(this.$i18n)
       },
       variables() {
         return {

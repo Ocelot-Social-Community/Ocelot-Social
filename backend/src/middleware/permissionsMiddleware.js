@@ -122,37 +122,41 @@ const isAllowedToChangeGroupMemberRole = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
   if (!(user && user.id)) return false
-  const adminId = user.id
+  const currentUserId = user.id
   const { groupId, userId, roleInGroup } = args
-  if (adminId === userId) return false
+  if (currentUserId === userId) return false
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
       `
-        MATCH (admin:User {id: $adminId})-[adminMembership:MEMBER_OF]->(group:Group {id: $groupId})
+        MATCH (currentUser:User {id: $currentUserId})-[currentUserMembership:MEMBER_OF]->(group:Group {id: $groupId})
         OPTIONAL MATCH (group)<-[userMembership:MEMBER_OF]-(member:User {id: $userId})
-        RETURN group {.*}, admin {.*, myRoleInGroup: adminMembership.role}, member {.*, myRoleInGroup: userMembership.role}
+        RETURN group {.*}, currentUser {.*, myRoleInGroup: currentUserMembership.role}, member {.*, myRoleInGroup: userMembership.role}
       `,
-      { groupId, adminId, userId },
+      { groupId, currentUserId, userId },
     )
     return {
-      admin: transactionResponse.records.map((record) => record.get('admin'))[0],
+      currentUser: transactionResponse.records.map((record) => record.get('currentUser'))[0],
       group: transactionResponse.records.map((record) => record.get('group'))[0],
       member: transactionResponse.records.map((record) => record.get('member'))[0],
     }
   })
   try {
-    const { admin, group, member } = await readTxPromise
+    const { currentUser, group, member } = await readTxPromise
+    const groupExists = !!group
+    const currentUserExists = !!currentUser
+    const userIsMember = !!member
+    const sameUserRoleInGroup = member && member.myRoleInGroup === roleInGroup
+    const userIsOwner = member && ['owner'].includes(member.myRoleInGroup)
+    const currentUserIsAdmin = currentUser && ['admin'].includes(currentUser.myRoleInGroup)
+    const adminCanSetRole = ['pending', 'usual', 'admin'].includes(roleInGroup)
+    const currentUserIsOwner = currentUser && ['owner'].includes(currentUser.myRoleInGroup)
+    const ownerCanSetRole = ['pending', 'usual', 'admin', 'owner'].includes(roleInGroup)
     return (
-      !!group &&
-      !!admin &&
-      (!member ||
-        (!!member &&
-          (member.myRoleInGroup === roleInGroup || !['owner'].includes(member.myRoleInGroup)))) &&
-      ((['admin'].includes(admin.myRoleInGroup) &&
-        ['pending', 'usual', 'admin'].includes(roleInGroup)) ||
-        (['owner'].includes(admin.myRoleInGroup) &&
-          ['pending', 'usual', 'admin', 'owner'].includes(roleInGroup)))
+      groupExists &&
+      currentUserExists &&
+      (!userIsMember || (userIsMember && (sameUserRoleInGroup || !userIsOwner))) &&
+      ((currentUserIsAdmin && adminCanSetRole) || (currentUserIsOwner && ownerCanSetRole))
     )
   } catch (error) {
     throw new Error(error)
