@@ -4481,10 +4481,10 @@ neo4j-driver@^4.2.2, neo4j-driver@^4.3.4:
     neo4j-driver-core "^4.3.4"
     rxjs "^6.6.3"
 
-neode@^0.4.8:
-  version "0.4.8"
-  resolved "https://registry.yarnpkg.com/neode/-/neode-0.4.8.tgz#0889b4fc7f1bf0b470b01fa5b8870373b5d47ad6"
-  integrity sha512-pb91NfCOg4Fj5o+98H+S2XYC+ByQfbdhwcc1UVuzuUQ0Ezzj+jWz8NmKWU8ZfCH6l4plk71yDAPd2eTwpt+Xvg==
+neode@^0.4.9:
+  version "0.4.9"
+  resolved "https://registry.yarnpkg.com/neode/-/neode-0.4.9.tgz#11c46c50d0348751dc6db828f3ca59252e7c247f"
+  integrity sha512-3RufLD2cmTXrPpvsgkEAqS3maRjXJ89vjbyYmyqJMJl5uv6gcUa32N6hRwHcqfjWRWUaFKaoGLEJLaOQobs4eA==
   dependencies:
     "@hapi/joi" "^15.1.1"
     dotenv "^4.0.0"
@@ -6109,12 +6109,7 @@ util@~0.10.1:
   dependencies:
     inherits "2.0.3"
 
-uuid@^3.3.2:
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
-  integrity sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
-
-uuid@^3.4.0:
+uuid@^3.3.2, uuid@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
