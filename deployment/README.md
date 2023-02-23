@@ -131,3 +131,6 @@ Browser compatibility testing with [BrowserStack](https://www.browserstack.com/)
 ## License
 
 See the [LICENSE](/LICENSE.md) file for license rights and limitations (MIT).
+
+
+We need `DOCKER_BUILDKIT=0` for this to work.
