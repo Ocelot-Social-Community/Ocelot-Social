@@ -7,6 +7,7 @@ services:
       dockerfile: ../webapp/Dockerfile
       context: ../webapp
       target: base
+    command: sleep 0
 
   webapp-code:
     image: ocelotsocialnetwork/webapp:local-code
@@ -14,6 +15,7 @@ services:
       dockerfile: ../webapp/Dockerfile
       context: ../webapp
       target: code
+    command: sleep 0
 
   webapp:
     image: ocelotsocialnetwork/webapp-branded:local-${CONFIGURATION}
@@ -51,6 +53,7 @@ services:
       dockerfile: ../backend/Dockerfile
       context: ../backend
       target: base
+    command: sleep 0
   
   backend-code:
     image: ocelotsocialnetwork/backend:local-code
@@ -58,6 +61,7 @@ services:
       dockerfile: ../backend/Dockerfile
       context: ../backend
       target: code
+    command: sleep 0
   
   backend:
     image: ocelotsocialnetwork/backend-branded:local-${CONFIGURATION}
@@ -106,6 +110,7 @@ services:
       dockerfile: ../webapp/Dockerfile.maintenance
       context: ../webapp
       target: base
+    command: sleep 0
 
   maintenance-code:
     image: ocelotsocialnetwork/maintenance:local-code
@@ -113,6 +118,7 @@ services:
       dockerfile: ../webapp/Dockerfile.maintenance
       context: ../webapp
       target: code
+    command: sleep 0
 
   maintenance:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
