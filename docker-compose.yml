@@ -13,6 +13,7 @@ services:
   webapp:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/webapp:local-production
+    container_name: webapp
     build:
       context: ./webapp
       target: production
@@ -44,6 +45,7 @@ services:
   backend:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/backend:local-production
+    container_name: backend
     build:
       context: ./backend
       target: production
@@ -78,6 +80,7 @@ services:
   maintenance:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/maintenance:local-production
+    container_name: maintenance
     build:
       # TODO: Separate from webapp, this must be independent
       context: ./webapp
@@ -93,6 +96,7 @@ services:
   neo4j:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/neo4j-community:local-production
+    container_name: neo4j
     build:
       context: ./neo4j
       # community edition 👆🏼, because we have no enterprise licence 👇🏼 at the moment

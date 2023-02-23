@@ -1,0 +1,29 @@
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: job-{{ .Release.Name }}-db-migrate
+  labels:
+    app.kubernetes.io/name:	"{{ .Chart.Name }}"
+    app.kubernetes.io/instance:	"{{ .Release.Name }}"
+    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+    app.kubernetes.io/component: "job-db-migrate"
+    app.kubernetes.io/part-of:	"{{ .Chart.Name }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  annotations:
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded, hook-failed
+    "helm.sh/hook-weight": "5"
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: job-{{ .Release.Name }}-db-migrations
+          image: "{{ .Values.BACKEND.DOCKER_IMAGE_REPO }}:{{ .Chart.AppVersion }}"
+          command: ["/bin/sh", "-c", "yarn prod:migrate up"]
+          envFrom:
+          - configMapRef:
+              name: configmap-{{ .Release.Name }}-backend
+          - secretRef:
+              name: secret-{{ .Release.Name }}-backend
