@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - deployment
 jobs:
   build_branded:
     name: Docker Build Branded
