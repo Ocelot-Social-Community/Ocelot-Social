@@ -4,8 +4,11 @@ import { mount } from '@vue/test-utils'
 import VueMeta from 'vue-meta'
 import Vuex from 'vuex'
 import Map from './map'
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 
-jest.mock('@mapbox/mapbox-gl-geocoder')
+jest.mock('@mapbox/mapbox-gl-geocoder', () => {
+  return jest.fn().mockImplementation(jest.fn())
+})
 
 jest.mock('mapbox-gl', () => {
   return {
@@ -70,6 +73,7 @@ describe('map', () => {
   let mocks
 
   beforeEach(() => {
+    MapboxGeocoder.mockClear()
     mocks = {
       $t: (t) => t,
       $env: {
@@ -97,7 +101,7 @@ describe('map', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('div')).toBeTruthy()
+      expect(wrapper.element.tagName).toBe('DIV')
     })
 
     it('has correct <head> content', () => {

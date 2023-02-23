@@ -20,16 +20,16 @@ module.exports = {
   transform: {
     '.*\\.(vue)$': 'vue-jest',
     '^.+\\.js$': 'babel-jest',
-    '<rootDir>/node_modules/@mapbox/mapbox-gl-geocoder/dist/*': 'babel-jest',
   },
   testMatch: ['**/?(*.)+(spec|test).js?(x)'],
   modulePathIgnorePatterns: ['<rootDir>/build/'],
   moduleNameMapper: {
     '\\.(svg)$': '<rootDir>/test/fileMock.js',
     '\\.(css|less)$': 'identity-obj-proxy',
+    '@mapbox/mapbox-gl-geocoder': 'identity-obj-proxy',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^~/(.*)$': '<rootDir>/$1',
   },
   moduleFileExtensions: ['js', 'json', 'vue'],
-  testEnvironment: 'jsdom',
+  testEnvironment: 'jest-environment-jsdom',
 }
