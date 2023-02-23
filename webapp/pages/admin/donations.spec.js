@@ -88,15 +88,13 @@ describe('donations.vue', () => {
 
     describe('form component click', () => {
       it('on #showDonations checkbox changes "showDonations" to true', async () => {
-        // starts with false
-        await wrapper.find('#showDonations').setChecked(true) // set to true
+        await wrapper.find('#showDonations').setChecked(true)
         expect(wrapper.vm.showDonations).toBe(true)
       })
 
       it('on #showDonations checkbox twice changes "showDonations" back to false', async () => {
-        // starts with false
-        await wrapper.find('#showDonations').setChecked(true) // set to true
-        await wrapper.find('#showDonations').setChecked(false) // set to true
+        await wrapper.find('#showDonations').setChecked(true)
+        await wrapper.find('#showDonations').setChecked(false)
         expect(wrapper.vm.showDonations).toBe(false)
       })
 
@@ -137,7 +135,7 @@ describe('donations.vue', () => {
         })
 
         it('calls mutation with input values once', async () => {
-          wrapper.find('#showDonations').setChecked(true) // set to true
+          wrapper.find('#showDonations').setChecked(true)
           await wrapper.vm.$nextTick()
           wrapper.find('#donations-goal').setValue('20000')
           await wrapper.vm.$nextTick()
