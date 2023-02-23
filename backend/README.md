@@ -89,7 +89,7 @@ backend is running:
 
 ```bash
 # in main folder while docker-compose is running
-$ docker-compose exec backend yarn run db:migrate init
+$ docker exec backend yarn run db:migrate init
 ```
 
 {% endtab %}
@@ -116,18 +116,18 @@ In another terminal run:
 
 ```bash
 # in main folder while docker-compose is running
-$ docker-compose exec backend yarn run db:seed
+$ docker exec backend yarn run db:seed
 ```
 
 To reset the database run:
 
 ```bash
 # in main folder while docker-compose is running
-$ docker-compose exec backend yarn run db:reset
+$ docker exec backend yarn run db:reset
 # you could also wipe out your neo4j database and delete all volumes with:
 $ docker-compose down -v
 # if container is not running, run this command to set up your database indeces and contstraints
-$ docker-compose exec backend yarn run db:migrate init
+$ docker exec backend yarn run db:migrate init
 ```
 
 {% endtab %}
@@ -170,7 +170,7 @@ To run the migration:
 
 ```bash
 # in main folder while docker-compose is running
-$ docker-compose exec backend yarn run db:migrate up
+$ docker exec backend yarn run db:migrate up
 ```
 
 {% endtab %}
@@ -206,7 +206,7 @@ Run the unit tests:
 
 ```bash
 # in main folder while docker-compose is running
-$ docker-compose exec backend yarn run test
+$ docker exec backend yarn run test
 ```
 
 {% endtab %}
