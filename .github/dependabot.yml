@@ -1,6 +1,6 @@
 version: 2
 updates:
-- package-ecosystem: npm
+- package-ecosystem: "github-actions"
   directory: "/"
   schedule:
     interval: weekly
@@ -9,6 +9,14 @@ updates:
     time: "03:00"
   # open-pull-requests-limit: 10
   # ignore:
+
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
 - package-ecosystem: npm
   directory: "/backend"
   schedule:
@@ -16,8 +24,6 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
-  # open-pull-requests-limit: 10
-  # ignore:
 - package-ecosystem: npm
   directory: "/webapp"
   schedule:
@@ -25,17 +31,7 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
-  # open-pull-requests-limit: 10
-  # ignore:
-- package-ecosystem: docker
-  directory: "/webapp"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    timezone: "Europe/Berlin"
-    time: "03:00"
-  # open-pull-requests-limit: 10
-  # ignore:
+
 - package-ecosystem: docker
   directory: "/backend"
   schedule:
@@ -43,8 +39,13 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
-  # open-pull-requests-limit: 10
-  # ignore:
+- package-ecosystem: docker
+  directory: "/webapp"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
 - package-ecosystem: docker
   directory: "/neo4j"
   schedule:
@@ -52,14 +53,10 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
-  # open-pull-requests-limit: 10
-  # ignore:
 - package-ecosystem: docker
-  directory: "/deployment/legacy-migration/maintenance-worker"
+  directory: "/deployment/src/docker"
   schedule:
     interval: weekly
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
-  # open-pull-requests-limit: 10
-  # ignore:
