@@ -168,7 +168,8 @@ jobs:
     name: Unit tests - backend
     runs-on: ubuntu-latest
     needs: [build_test_neo4j,build_test_backend]
-    permissions: write-all
+    permissions: 
+      statuses: write
       # security-events: write
     steps:
       ##########################################################################
@@ -227,7 +228,8 @@ jobs:
     name: Unit tests - webapp
     runs-on: ubuntu-latest
     needs: [build_test_webapp]
-    permissions: write-all
+    permissions: 
+      statuses: write
     #  security-events: write
     steps:
       ##########################################################################
