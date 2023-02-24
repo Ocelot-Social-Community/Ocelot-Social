@@ -11,16 +11,14 @@ FROM $APP_IMAGE_CODE as code
 
 ARG CONFIGURATION=example
 
-COPY src/tools/ tools/
-
 # copy public constants into the Docker image to brand it
 COPY configurations/${CONFIGURATION}/branding/static/ static/
 COPY configurations/${CONFIGURATION}/branding/constants/ constants/
+
+# locales
 COPY configurations/${CONFIGURATION}/branding/locales/*.json locales/tmp/
-# COPY configurations/${CONFIGURATION}/branding/locales/ locales/
-
+COPY src/tools/ tools/
 RUN apk add --no-cache bash jq
-
 RUN tools/merge-locales.sh
 
 ##################################################################################
