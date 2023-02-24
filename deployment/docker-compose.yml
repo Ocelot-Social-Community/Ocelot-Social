@@ -19,7 +19,7 @@ services:
 
   webapp:
     image: ocelotsocialnetwork/webapp-branded:local-${CONFIGURATION}
-    container_name: webapp
+    container_name: webapp-branded
     build:
       dockerfile: src/docker/webapp.Dockerfile
       target: branded
@@ -68,7 +68,7 @@ services:
     container_name: backend
     build:
       dockerfile: src/docker/backend.Dockerfile
-      target: branded
+      target: branded-branded
       context: .
       args:
         - CONFIGURATION=$CONFIGURATION
@@ -123,7 +123,7 @@ services:
   maintenance:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ocelotsocialnetwork/maintenance-branded:local-${CONFIGURATION}
-    container_name: maintenance
+    container_name: maintenance-branded
     build:
       # TODO: Separate from webapp, this must be independent
       dockerfile: src/docker/maintenance.Dockerfile
@@ -158,7 +158,7 @@ services:
 
   mailserver:
     image: djfarrelly/maildev
-    container_name: mailserver
+    container_name: mailserver-branded
     ports:
       - 1080:80
     networks:
