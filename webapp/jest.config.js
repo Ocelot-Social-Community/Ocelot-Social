@@ -22,7 +22,7 @@ module.exports = {
     '^.+\\.js$': 'babel-jest',
   },
   testMatch: ['**/?(*.)+(spec|test).js?(x)'],
-  modulePathIgnorePatterns: ['<rootDir>/build/'],
+  modulePathIgnorePatterns: ['<rootDir>/dist/'],
   moduleNameMapper: {
     '\\.(svg)$': '<rootDir>/test/fileMock.js',
     '\\.(css|less)$': 'identity-obj-proxy',
