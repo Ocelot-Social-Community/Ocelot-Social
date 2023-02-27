@@ -174,34 +174,15 @@ Please copy and paste the following quotes for the languages:
 
 #### Environment Variable For Apple M1 Platform
 
-To set the Docker platform environment variable in your terminal tab, run:
+To set the following environment variable seems not be needed anymore, probably because Docker knows in its newest version on which CPU it runs and sets that to default.
+But we leave this command here to keep the knowledge about how to set the platform:
 
 ```bash
 # set env variable for your shell
 $ export DOCKER_DEFAULT_PLATFORM=linux/amd64
 ```
 
-#### Docker Compose Override File For Apple M1 Platform
-
-For Docker compose `up` or `build` commands, you can use our Apple M1 override file that specifies the M1 platform:
-
-```bash
-# in main folder
-
-# for development
-$ docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.apple-m1.override.yml up
-# only once: init admin user and create indexes and contraints in Neo4j database
-$ docker compose exec backend yarn prod:migrate init
-# clean db
-$ docker compose exec backend yarn db:reset
-# seed db
-$ docker compose exec backend yarn db:seed
-
-# for production
-$ docker compose -f docker-compose.yml -f docker-compose.apple-m1.override.yml up
-# only once: init admin user and create indexes and contraints in Neo4j database
-$ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
-```
+Or alternatively use a `YAML` docker compose overwrite file with `platform: linux/amd64`.
 
 ### Analyzing Docker Builds
 
