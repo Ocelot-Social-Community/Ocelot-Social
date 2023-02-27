@@ -149,7 +149,7 @@ export default {
       hideByScroll: false,
       revScrollpos: 0,
       showFilter: false,
-      showDonations: true,
+      showDonations: false,
       goal: 15000,
       progress: 7000,
       posts: [],
