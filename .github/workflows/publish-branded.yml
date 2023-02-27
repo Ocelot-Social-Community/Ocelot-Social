@@ -20,19 +20,19 @@ jobs:
           docker save "ocelotsocialnetwork/maintenance-branded" > /tmp/maintenance-branded.tar
 
       - name: Upload Artifact (Backend)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: docker-backend-branded
           path: /tmp/backend-branded.tar
 
       - name: Upload Artifact (Webapp)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: docker-webapp-branded
           path: /tmp/webapp-branded.tar
 
       - name: Upload Artifact (Maintenance)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: docker-maintenance-branded
           path: /tmp/maintenance-branded.tar
