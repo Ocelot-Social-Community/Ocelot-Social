@@ -97,10 +97,11 @@ Factory.define('user')
   .after(async (buildObject, options) => {
     const user = await neode.create('User', buildObject)
     const email = await neode.create('EmailAddress', { email: options.email })
-    const avatar = await options.avatar
     await user.relateTo(email, 'primaryEmail')
     await email.relateTo(user, 'belongsTo')
-    if (avatar) await user.relateTo(avatar, 'avatar')
+    if (options.avatar) {
+      await user.relateTo(await options.avatar, 'avatar')
+    }
     return user
   })
 
