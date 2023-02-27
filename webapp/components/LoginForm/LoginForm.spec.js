@@ -2,15 +2,17 @@ import Vue from 'vue'
 import LoginForm from './LoginForm.vue'
 import Styleguide from '@human-connection/styleguide'
 import Vuex from 'vuex'
-import { config, mount, createLocalVue } from '@vue/test-utils'
+import { mount, createLocalVue } from '@vue/test-utils'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
 localVue.use(Styleguide)
 
-config.stubs['nuxt-link'] = '<span><slot /></span>'
-config.stubs['locale-switch'] = '<span><slot /></span>'
-config.stubs['client-only'] = '<span><slot /></span>'
+const stubs = {
+  'nuxt-link': true,
+  'locale-switch': true,
+  'client-only': true,
+}
 
 const authUserMock = jest.fn().mockReturnValue({ activeCategories: [] })
 
@@ -46,7 +48,7 @@ describe('LoginForm', () => {
           error: jest.fn(),
         },
       }
-      return mount(LoginForm, { mocks, localVue, propsData, store })
+      return mount(LoginForm, { mocks, localVue, propsData, store, stubs })
     }
 
     describe('fill in email and password and submit', () => {

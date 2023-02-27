@@ -1,10 +1,12 @@
-import { config, shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 
 import Hashtag from './Hashtag'
 
 const localVue = global.localVue
 
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+const stubs = {
+  'nuxt-link': true,
+}
 
 describe('Hashtag', () => {
   let id
@@ -15,6 +17,7 @@ describe('Hashtag', () => {
       propsData: {
         id,
       },
+      stubs,
     })
   }
 
