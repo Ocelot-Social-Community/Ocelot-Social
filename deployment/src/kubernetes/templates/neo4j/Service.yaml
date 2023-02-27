@@ -1,0 +1,23 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-neo4j
+  labels:
+    app.kubernetes.io/name:	"{{ .Chart.Name }}"
+    app.kubernetes.io/instance:	"{{ .Release.Name }}"
+    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+    app.kubernetes.io/component: "service-neo4j"
+    app.kubernetes.io/part-of:	"{{ .Chart.Name }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  ports:
+  - name: {{ .Release.Name }}-bolt
+    port: 7687
+    targetPort: 7687
+    protocol: TCP
+  #- name: {{ .Release.Name }}-http
+  #  port: 7474
+  #  targetPort: 7474
+  selector:
+    app: {{ .Release.Name }}-neo4j

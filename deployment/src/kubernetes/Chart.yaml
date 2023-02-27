@@ -1,0 +1,39 @@
+type: application
+apiVersion: v2
+name: ocelot-social
+version: "1.0.0"
+# The appVersion defines which docker image is pulled.
+# Having it set to latest will pull the latest build on dockerhub.
+# You are free to define a specific version here tho.
+# e.g. appVersion: "latest" or "1.0.2-3-ocelot.social1.0.2-79"
+# Be aware that this requires all your apps to have the same docker image version available.
+appVersion: "latest"
+description: The Helm chart for ocelot.social
+home: https://ocelot.social
+sources:
+  - https://github.com/Ocelot-Social-Community/
+  - https://github.com/Ocelot-Social-Community/Ocelot-Social
+  - https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding
+maintainers:
+  - name: Ulf Gebhardt
+    email: ulf.gebhardt@webcraft-media.de
+    url: https://www.webcraft-media.de/#!ulf_gebhardt
+icon: https://github.com/Ocelot-Social-Community/Ocelot-Social/raw/master/webapp/static/img/custom/welcome.svg
+deprecated: false
+
+# Unused Fields
+#dependencies: # A list of the chart requirements (optional)
+#  - name: ingress-nginx
+#    version: v1.10.0
+#    repository: https://kubernetes.github.io/ingress-nginx
+#    condition: (optional) A yaml path that resolves to a boolean, used for enabling/disabling charts (e.g. subchart1.enabled )
+#    tags: # (optional)
+#      - Tags can be used to group charts for enabling/disabling together
+#    import-values: # (optional)
+#      - ImportValues holds the mapping of source values to parent key to be imported. Each item can be a string or pair of child/parent sublist items.
+#    alias: (optional) Alias to be used for the chart. Useful when you have to add the same chart multiple times
+#kubeVersion: A SemVer range of compatible Kubernetes versions (optional)
+#keywords:
+#  - A list of keywords about this project (optional)
+#annotations:
+#  example: A list of annotations keyed by name (optional).

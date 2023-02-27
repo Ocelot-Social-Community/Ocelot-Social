@@ -1,11 +1,7 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Request from './Request'
 
 const localVue = global.localVue
-
-config.stubs['sweetalert-icon'] = '<span><slot /></span>'
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
 
 describe('Request', () => {
   let wrapper, Wrapper, mocks, stubs
@@ -26,12 +22,17 @@ describe('Request', () => {
       },
     }
     stubs = {
-      LocaleSwitch: "<div class='stub'></div>",
+      LocaleSwitch: true,
+      'sweetalert-icon': true,
+      'client-only': true,
+      'nuxt-link': true,
     }
   })
 
   describe('mount', () => {
-    beforeEach(jest.useFakeTimers)
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
 
     Wrapper = () => {
       return mount(Request, {

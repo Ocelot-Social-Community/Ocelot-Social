@@ -102,7 +102,9 @@ describe('DisableModal.vue', () => {
         localVue,
       })
     }
-    beforeEach(jest.useFakeTimers)
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
 
     describe('given id', () => {
       beforeEach(() => {

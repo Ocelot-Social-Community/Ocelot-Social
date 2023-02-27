@@ -1,10 +1,12 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import groups from './groups.vue'
 
 const localVue = global.localVue
 
-config.stubs['nuxt-link'] = '<span class="nuxt-link"><slot /></span>'
-config.stubs['client-only'] = '<span class="client-only"><slot /></span>'
+const stubs = {
+  'nuxt-link': true,
+  'client-only': true,
+}
 
 describe('groups', () => {
   let wrapper
@@ -21,6 +23,7 @@ describe('groups', () => {
       return mount(groups, {
         mocks,
         localVue,
+        stubs,
       })
     }
 
@@ -29,7 +32,7 @@ describe('groups', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('div')).toBe(true)
+      expect(wrapper.element.tagName).toBe('DIV')
     })
   })
 })

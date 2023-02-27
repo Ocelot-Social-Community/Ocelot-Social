@@ -36,7 +36,7 @@ export default ({ app, req, cookie, store }) => {
     }
 
     const expires = new Date()
-    expires.setDate(expires.getDate() + app.$env.COOKIE_EXPIRE_TIME)
+    expires.setDate(expires.getDate() + app.$env && app.$env.COOKIE_EXPIRE_TIME)
     app.$cookies.set(key, localeInStore, {
       expires,
       // maxAge: app.$env.COOKIE_EXPIRE_TIME * 60 * 60 * 24, // days to seconds

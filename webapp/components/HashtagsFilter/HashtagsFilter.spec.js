@@ -29,7 +29,7 @@ describe('HashtagsFilter.vue', () => {
 
       it('renders a card', () => {
         wrapper = Wrapper()
-        expect(wrapper.is('.base-card')).toBe(true)
+        expect(wrapper.classes('base-card')).toBe(true)
       })
 
       describe('click clear search button', () => {

@@ -1,9 +1,11 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import ChangePassword from './ChangePassword'
 
 const localVue = global.localVue
 
-config.stubs['sweetalert-icon'] = '<span><slot /></span>'
+const stubs = {
+  'sweetalert-icon': true,
+}
 
 describe('ChangePassword ', () => {
   let wrapper
@@ -27,13 +29,16 @@ describe('ChangePassword ', () => {
   })
 
   describe('mount', () => {
-    beforeEach(jest.useFakeTimers)
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
 
     Wrapper = () => {
       return mount(ChangePassword, {
         mocks,
         propsData,
         localVue,
+        stubs,
       })
     }
 
