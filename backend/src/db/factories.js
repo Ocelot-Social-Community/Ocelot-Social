@@ -36,15 +36,15 @@ Factory.define('category')
   .attr('id', uuid)
   .attr('icon', 'globe')
   .attr('name', 'Global Peace & Nonviolence')
-  .after((buildObject, options) => {
-    return neode.create('Category', buildObject)
+  .after(async (buildObject, options) => {
+    return await neode.create('Category', buildObject)
   })
 
 Factory.define('badge')
   .attr('type', 'crowdfunding')
   .attr('status', 'permanent')
-  .after((buildObject, options) => {
-    return neode.create('Badge', buildObject)
+  .after(async (buildObject, options) => {
+    return await neode.create('Badge', buildObject)
   })
 
 Factory.define('image')
@@ -52,10 +52,10 @@ Factory.define('image')
   .attr('aspectRatio', 1.3333333333333333)
   .attr('alt', faker.lorem.sentence)
   .attr('type', 'image/jpeg')
-  .after((buildObject, options) => {
+  .after(async (buildObject, options) => {
     const { url: imageUrl } = buildObject
     if (imageUrl) buildObject.url = uniqueImageUrl(imageUrl)
-    return neode.create('Image', buildObject)
+    return await neode.create('Image', buildObject)
   })
 
 Factory.define('basicUser')
@@ -83,7 +83,7 @@ Factory.define('basicUser')
 Factory.define('userWithoutEmailAddress')
   .extend('basicUser')
   .after(async (buildObject, options) => {
-    return neode.create('User', buildObject)
+    return await neode.create('User', buildObject)
   })
 
 Factory.define('user')
@@ -101,7 +101,7 @@ Factory.define('user')
       options.avatar,
     ])
     await Promise.all([user.relateTo(email, 'primaryEmail'), email.relateTo(user, 'belongsTo')])
-    if (avatar) await user.relateTo(await avatar, 'avatar')
+    if (avatar) await user.relateTo(avatar, 'avatar')
     return user
   })
 
@@ -201,8 +201,8 @@ Factory.define('donations')
   .attr('showDonations', true)
   .attr('goal', 15000)
   .attr('progress', 7000)
-  .after((buildObject, options) => {
-    return neode.create('Donations', buildObject)
+  .after(async (buildObject, options) => {
+    return await neode.create('Donations', buildObject)
   })
 
 const emailDefaults = {
@@ -212,14 +212,14 @@ const emailDefaults = {
 
 Factory.define('emailAddress')
   .attrs(emailDefaults)
-  .after((buildObject, options) => {
-    return neode.create('EmailAddress', buildObject)
+  .after(async (buildObject, options) => {
+    return await neode.create('EmailAddress', buildObject)
   })
 
 Factory.define('unverifiedEmailAddress')
   .attr(emailDefaults)
-  .after((buildObject, options) => {
-    return neode.create('UnverifiedEmailAddress', buildObject)
+  .after(async (buildObject, options) => {
+    return await neode.create('UnverifiedEmailAddress', buildObject)
   })
 
 const inviteCodeDefaults = {
@@ -258,28 +258,28 @@ Factory.define('location')
     id: 'country.10743216036480410',
     type: 'country',
   })
-  .after((buildObject, options) => {
-    return neode.create('Location', buildObject)
+  .after(async (buildObject, options) => {
+    return await neode.create('Location', buildObject)
   })
 
-Factory.define('report').after((buildObject, options) => {
-  return neode.create('Report', buildObject)
+Factory.define('report').after(async (buildObject, options) => {
+  return await neode.create('Report', buildObject)
 })
 
 Factory.define('tag')
   .attrs({
     name: '#human-connection',
   })
-  .after((buildObject, options) => {
-    return neode.create('Tag', buildObject)
+  .after(async (buildObject, options) => {
+    return await neode.create('Tag', buildObject)
   })
 
 Factory.define('socialMedia')
   .attrs({
     url: 'https://mastodon.social/@Gargron',
   })
-  .after((buildObject, options) => {
-    return neode.create('SocialMedia', buildObject)
+  .after(async (buildObject, options) => {
+    return await neode.create('SocialMedia', buildObject)
   })
 
 export default Factory
