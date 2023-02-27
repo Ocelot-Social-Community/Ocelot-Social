@@ -75,15 +75,16 @@
         </div>
       </ds-grid-item>
       <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
+      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
+      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
+      <!-- hashtag filter -->
       <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </ds-grid-item>
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
       <!-- donation info -->
       <ds-grid-item v-if="showDonations" class="top-info-bar" :row-span="1" column-span="fullWidth">
         <donation-info :goal="goal" :progress="progress" />
       </ds-grid-item>
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
       <!-- news feed -->
       <template v-if="hasResults">
         <masonry-grid-item
