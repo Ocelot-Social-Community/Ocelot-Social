@@ -148,19 +148,15 @@ Factory.define('post')
     return language || 'en'
   })
   .after(async (buildObject, options) => {
-    const [post, author, image, /* categories, */ tags] = await Promise.all([
-      neode.create('Post', buildObject),
-      options.author,
-      options.image,
-      // options.categories,
-      options.tags,
-    ])
-    await Promise.all([
-      post.relateTo(author, 'author'),
-      // Promise.all(categories.map((c) => c.relateTo(post, 'post'))),
-      Promise.all(tags.map((t) => t.relateTo(post, 'post'))),
-    ])
-    if (image) await post.relateTo(image, 'image')
+    const post = await neode.create('Post', buildObject)
+    const author = await options.author
+    await post.relateTo(author, 'author')
+    if (options.image) {
+      await post.relateTo(await options.image, 'image')
+    }
+    if (options.tags) {
+      await Promise.all((await options.tags).map((t) => t.relateTo(post, 'post')))
+    }
     if (buildObject.pinned) {
       const pinnedBy = await (options.pinnedBy || Factory.build('user', { role: 'admin' }))
       await pinnedBy.relateTo(post, 'pinned')
