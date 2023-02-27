@@ -1,29 +1,14 @@
-# Ocelot.Social Deploy And Rebranding
+# Ocelot.Social Deployment And Rebranding
 
-[![Build Status Publish](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/actions/workflows/publish.yml/badge.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/actions)
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/blob/LICENSE.md)
-[![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discord.gg/AJSX9DCSUA)
-[![Open Source Helpers](https://www.codetriage.com/ocelot-social-community/ocelot-social-deploy-rebranding/badges/users.svg)](https://www.codetriage.com/ocelot-social-community/ocelot-social-deploy-rebranding)
-
-This repository is an in use template to rebrand, configure, and deploy [ocelot.social](https://github.com/Ocelot-Social-Community/Ocelot-Social) networks.
-The forked original repository is [Ocelot-Social-Deploy-Rebranding](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding).
-
-<!-- markdownlint-disable MD033 -->
-<p align="center">
-  <a href="https://ocelot.social" target="_blank"><img src="branding/static/img/custom/logo-squared.svg" alt="Ocelot-Social" width="40%" height="40%"></a>
-</p>
-<!-- markdownlint-enable MD033 -->
+The `deployment` directory is about how to change the look and feel of ocelot.social (called branding) and how to get the software running on a kubernetes cluster (deployment).
 
 ## Live demo
 
 __Try out our deployed [development environment](https://stage.ocelot.social).__
 
-Visit our staging networks:
+This environment is the vanilla ocelot without branding and with seed data.
 
-- central staging network: [stage.ocelot.social](https://stage.ocelot.social)
-<!-- - rebranded staging network: [rebrand.ocelot.social](https://stage.ocelot.social). -->
-
-Logins:
+### Logins
 
 | email | password | role |
 | :--- | :--- | :--- |
@@ -31,42 +16,114 @@ Logins:
 | `moderator@example.org` | 1234 | moderator |
 | `admin@example.org` | 1234 | admin |
 
+## Software requirements
+
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [helm](https://helm.sh/docs/intro/install/)
+
+Depending on your Kubernetes providers you deploy on:
+| Cluster | Type | Tool |
+| DigitalOcean | Cloud Hosting | [doctl](https://docs.digitalocean.com/reference/doctl/how-to/install/) |
+| Minicube | Local Deployment | [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) |
+
+If you're just getting started, Minikube is a tool that you can use to get your feet wet.
+
 ## Usage
 
-Fork this repository to configure and rebrand it for your own [ocelot.social](https://github.com/Ocelot-Social-Community/Ocelot-Social) network.
+The following tasks can be achieved with the tools contained in this directory:
 
-### Package.Json And DockerHub Organisation
+### Start branded docker environment locally
 
-Write your own data into the main configuration file:
+For the developers we offer a `docker-compose` in this directory.
 
-- [package.json](/package.json)
+1. Copy `.env.dist` and rename it to `.env`
+2. (optional) change the `CONFIGURATION` in the `.env` value according to your desired brand. By default its `example`
+3. Run `docker-compose up`
 
-Since all deployment methods described here depend on [Docker](https://docker.com) and [DockerHub](https://hub.docker.com), you need to create your own organisation on DockerHub and put its name in the [package.json](/package.json) file as your `dockerOrganisation`.
+This will start the ocelot services within docker in the selected branded version.
 
-### Configure And Branding
+If you stop the docker-compose, change the value of `CONFIGURATION` in the `.env` and restart with `docker-compose up` the branded version will change.
 
-The next step is:
+Note: this might require `export DOCKER_BUILDKIT=0` to be set in order to have docker-compose build correctly.
 
-- [Configure And Branding](/branding/README.md)
+### Install a cluster
 
-### Optional: Locally Testing Configuration And Branding
+TODO
 
-Just in case you have Docker installed and run the following, you can check your branding locally:
+### Upgrade a cluster
 
-```bash
-# in main folder
-$ docker-compose up
-# fill the database with an initial admin
-$ docker-compose exec backend yarn run prod:migrate init
+To upgrade a cluster set the selected brand
+`export CONFIGURATION=yourbrand`
+then run
+`./scripts/cluster.upgrade.sh`
+
+### Toggle cluster maintenance mode
+
+To set a cluster in maintenance mode set the selected brand
+`export CONFIGURATION=yourbrand`
+then run
+`./scripts/cluster.maintenance.sh on`
+and respective
+`./scripts/cluster.maintenance.sh off`
+
+### Backup cluster data
+
+To backup the data of a cluster set the selected brand
+`export CONFIGURATION=yourbrand`
+then run
+`./scripts/cluster.backup.sh`
+
+This will set the cluster in maintenance-mode, shutdown the database, run the backup, then start the database again and remove maintenance-mode.
+
+### Build branded images
+
+To build branded images set the following environment variables:
+```
+export CONFIGURATION=yourbrand
+export DOCKERHUB_ORGANISATION=yourdockerhub
 ```
 
-The database is then initialised with the default administrator:
+then run
+`./scripts/braded-images.build.sh`
+
+For more environment variable options see the script itself.
+
+### Upload branded images
+
+To upload branded images to your dockerhub account you must have built the images and set the following environment variables:
+```
+export DOCKERHUB_ORGANISATION=yourdockerhub
+```
+
+## Configuration and branding
+
+Since all deployment methods described here depend on [Docker](https://docker.com) and [DockerHub](https://hub.docker.com). You need to create your own organization on DockerHub.
+
+
+TODO: define branding structure
+TODO: external branding repo
+TODO: encrypted external branding secrets
+TODO: no brand deployment
+
+### After deployment
+
+After the first deployment of the new network on your server, the database is initialized with the default administrator:
 
 - E-mail: admin@example.org
 - Password: 1234
 
-For login or registration have a look in your browser at `http://localhost:3000/`.  
-For the maintenance page have a look in your browser at `http://localhost:5000/`.
+***ATTENTION:*** When you are logged in for the first time, please change your (the admin's) e-mail to an existing one and change your password to a secure one !!!
+
+
+
+
+TODO: remove
+
+# Configure And Branding
+
+In this folder you will find all configuration files and logo images to customise the configuration and branding of the [ocelot.social](https://github.com/Ocelot-Social-Community/Ocelot-Social) network code to your own needs.
+
+Please change these and they will be used automatically as part of the [deployment](/deployment/README.md) process.
 
 ### Push Changes To GitHub
 
@@ -97,40 +154,344 @@ $ docker-compose exec backend yarn run prod:migrate init
 
 See the login details and browser addresses above.
 
-### Deployment
 
-Afterwards you can [deploy](/deployment/README.md) it on your server:
+# Kubernetes Helm Installation Of Ocelot.Social
 
-- [Kubernetes with Helm](/deployment/kubernetes/README.md)
+Deploying [ocelot.social](https://github.com/Ocelot-Social-Community/Ocelot-Social) with [Helm](https://helm.sh) for [Kubernetes](https://kubernetes.io) is very straight forward. All you have to do is to change certain parameters, like domain names and API keys, then you just install our provided Helm chart to your cluster.
 
-## Developer Chat
+## Kubernetes Cloud Hosting
 
-Join our friendly open-source community on [Discord](https://discord.gg/AJSX9DCSUA) :heart_eyes_cat:
-Just introduce yourself at `#introduce-yourself` and mention `@@Mentor` to get you onboard :neckbeard:
-Check out the [contribution guideline](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/CONTRIBUTING.md), too!
+There are various ways to set up your own or a managed Kubernetes cluster. We will extend the following lists over time.  
+Please contact us if you are interested in options not listed below.
 
-We give write permissions to every developer who asks for it. Just text us on
-[Discord](https://discord.gg/AJSX9DCSUA).
+Managed Kubernetes:
 
-## Technology Stack
+- [DigitalOcean](/deployment/kubernetes/DigitalOcean.md)
 
-- [Docker](https://www.docker.com)
-- [Kubernetes](https://kubernetes.io)
-- [Helm](https://helm.sh)
+## Configuration
 
-<!--
-## Attributions
+You can customize the network server with your configuration by duplicate the `values.template.yaml` to a new `values.yaml` file and change it to your need. All included variables will be available as environment variables in your deployed kubernetes pods.
 
-Locale Icons made by [Freepik](http://www.freepik.com/) from [www.flaticon.com](https://www.flaticon.com/) is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/).
+Besides the `values.template.yaml` file we provide a `nginx.values.template.yaml` and `dns.values.template.yaml` for a similar procedure. The new `nginx.values.yaml` is the configuration for the ingress-nginx Helm chart, while the `dns.values.yaml` file is for automatically updating the dns values on DigitalOcean and therefore optional.
 
-Browser compatibility testing with [BrowserStack](https://www.browserstack.com/).
+### Cert Manager (https)
 
-<img alt="BrowserStack Logo" src=".gitbook/assets/browserstack-logo.svg" width="256">
--->
+Please refer to [cert-manager.io docs](https://cert-manager.io/docs/installation/) for more details.
 
-## License
+***ATTENTION:*** *Be with the Terminal in your repository in the folder of this README.*
 
-See the [LICENSE](/LICENSE.md) file for license rights and limitations (MIT).
+We have three ways to install the cert-manager, purely via `kubectl`, via `cmctl`, or with `helm`.
+
+We recommend using `helm` because then we do not mix the installation methods.
+Please have a look here:
+
+- [Installing with Helm](https://cert-manager.io/docs/installation/helm/#installing-with-helm)
+
+Our Helm installation is optimized for cert-manager version `v1.9.1` and `kubectl` version `"v1.24.2`.
+
+Please search here for cert-manager versions that are compatible with your `kubectl` version on the cluster and on the client: [cert-manager Supported Releases](https://cert-manager.io/docs/installation/supported-releases/#supported-releases).
+
+***ATTENTION:*** *When uninstalling cert-manager, be sure to use the same method as for installation! Otherwise, we could end up in a broken state, see [Uninstall](https://cert-manager.io/docs/installation/kubectl/#uninstalling).*
+
+<!-- #### 1. Create Namespace
+
+```bash
+# kubeconfig.yaml set globaly
+$ kubectl create namespace cert-manager
+# or kubeconfig.yaml in your repo, then adjust
+$ kubectl --kubeconfig=/../kubeconfig.yaml create namespace cert-manager
+```
+
+#### 2. Add Helm repository and update
+
+```bash
+$ helm repo add jetstack https://charts.jetstack.io
+$ helm repo update
+```
+
+#### 3. Install Cert-Manager Helm chart
+
+```bash
+# option 1
+# this can't be applied via kubectl to our cluster since the CRDs can't be installed properly this way ...
+# $ kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.crds.yaml
+
+# option 2
+# kubeconfig.yaml set globaly
+$ helm install cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --version v1.9.1 \
+  --set installCRDs=true
+# or kubeconfig.yaml in your repo, then adjust
+$ helm --kubeconfig=/../kubeconfig.yaml \
+  install cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --version v1.9.1 \
+  --set installCRDs=true
+``` -->
+
+### Ingress-Nginx
+
+#### 1. Add Helm repository for `ingress-nginx` and update
+
+```bash
+$ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+$ helm repo update
+```
+
+#### 2. Install ingress-nginx
+
+```bash
+# kubeconfig.yaml set globaly
+$ helm install ingress-nginx ingress-nginx/ingress-nginx -f nginx.values.yaml
+# or kubeconfig.yaml in your repo, then adjust
+$ helm --kubeconfig=/../kubeconfig.yaml install ingress-nginx ingress-nginx/ingress-nginx -f nginx.values.yaml
+```
+
+### DigitalOcean Firewall
+
+This is only necessary if you run DigitalOcean without load balancer ([see here for more info](https://stackoverflow.com/questions/54119399/expose-port-80-on-digital-oceans-managed-kubernetes-without-a-load-balancer/55968709)) .
+
+#### 1. Authenticate towards DO with your local `doctl`
+
+You will need a DO token for that.
+
+```bash
+# without doctl context
+$ doctl auth init
+# with doctl new context to be filled in
+$ doctl auth init --context <new-context-name>
+```
+
+You will need an API token, which you can generate in the control panel at <https://cloud.digitalocean.com/account/api/tokens> .
+
+#### 2. Generate DO firewall
+
+ Get the `CLUSTER_UUID` value from the dashboard or from the ID column via `doctl kubernetes cluster list`:
+
+```bash
+# need to apply access token by `doctl auth init` before
+$ doctl kubernetes cluster list
+```
+
+Fill in the `CLUSTER_UUID` and `your-domain`. The latter with hyphens `-` instead of dots `.`:
+
+```bash
+# without doctl context
+$ doctl compute firewall create \
+--inbound-rules="protocol:tcp,ports:80,address:0.0.0.0/0,address:::/0 protocol:tcp,ports:443,address:0.0.0.0/0,address:::/0" \
+--tag-names=k8s:<CLUSTER_UUID> \
+--name=<your-domain>-http-https
+# with doctl context to be filled in
+$ doctl compute firewall create \
+--inbound-rules="protocol:tcp,ports:80,address:0.0.0.0/0,address:::/0 protocol:tcp,ports:443,address:0.0.0.0/0,address:::/0" \
+--tag-names=k8s:<CLUSTER_UUID> \
+--name=<your-domain>-http-https --context <context-name>
+```
+
+To get informations about your success use this command. (Fill in the `ID` you got at creation.):
+
+```bash
+# without doctl context
+$ doctl compute firewall get <ID>
+# with doctl context to be filled in
+$ doctl compute firewall get <ID> --context <context-name>
+```
+
+### DNS
+
+***TODO:** I thought this is necessary if we use the DigitalOcean DNS management service? See [Manage DNS With DigitalOcean](/deployment/kubernetes/DigitalOcean.md#manage-dns-with-digitalocean)*
+
+This chart is only necessary (recommended is more precise) if you run DigitalOcean without load balancer.
+You need to generate an access token with read + write for the `dns.values.yaml` at <https://cloud.digitalocean.com/account/api/tokens> and fill it in.
+
+#### 1. Add Helm repository for `binami` and update
+
+```bash
+$ helm repo add bitnami https://charts.bitnami.com/bitnami
+$ helm repo update
+```
+
+#### 2. Install DNS
+
+```bash
+# kubeconfig.yaml set globaly
+$ helm install dns bitnami/external-dns -f dns.values.yaml
+# or kubeconfig.yaml in your repo, then adjust
+$ helm --kubeconfig=/../kubeconfig.yaml install dns bitnami/external-dns -f dns.values.yaml
+```
+
+### Ocelot.Social
+
+***Attention:** Before installing your own ocelot.social network, you need to create a DockerHub (account and) organization, put its name in the `package.json` file, and push your deployment and rebranding code to GitHub so that GitHub Actions can push your Docker images to DockerHub. This is because Kubernetes will pull these images to create PODs from them.*
+
+All commands for ocelot need to be executed in the kubernetes folder. Therefore `cd deployment/kubernetes/` is expected to be run before every command. Furthermore the given commands will install ocelot into the default namespace. This can be modified to by attaching `--namespace not.default`.
+
+#### Install
+
+Only run once for the first time of installation:
+
+```bash
+# kubeconfig.yaml set globaly
+$ helm install ocelot ./
+# or kubeconfig.yaml in your repo, then adjust
+$ helm --kubeconfig=/../kubeconfig.yaml install ocelot ./
+```
+
+#### Upgrade & Update
+
+#### Rollback
+
+Run for a rollback, in case something went wrong:
+
+```bash
+# kubeconfig.yaml set globaly
+$ helm rollback ocelot
+# or kubeconfig.yaml in your repo, then adjust
+$ helm --kubeconfig=/../kubeconfig.yaml rollback ocelot
+```
+
+#### Uninstall
+
+Be aware that if you uninstall ocelot the formerly bound volumes become unbound. Those volumes contain all data from uploads and database. You have to manually free their reference in order to bind them again when reinstalling. Once unbound from their former container references they should automatically be rebound (considering the sizes did not change)
+
+```bash
+# kubeconfig.yaml set globaly
+$ helm uninstall ocelot
+# or kubeconfig.yaml in your repo, then adjust
+$ helm --kubeconfig=/../kubeconfig.yaml uninstall ocelot
+```
+
+## Error Reporting
+
+We use [Sentry](https://github.com/getsentry/sentry) for error reporting in both
+our backend and web frontend. You can either use a hosted or a self-hosted
+instance. Just set the two `DSN` in your
+[configmap](../templates/configmap.template.yaml) and update the `COMMIT`
+during a deployment with your commit or the version of your release.
+
+### Self-hosted Sentry
+
+For data privacy it is recommended to set up your own instance of sentry. 
+If you are lucky enough to have a kubernetes cluster with the required hardware
+support, try this [helm chart](https://github.com/helm/charts/tree/master/stable/sentry).
+
+On our kubernetes cluster we get "mult-attach" errors for persistent volumes.
+Apparently DigitalOcean's kubernetes clusters do not fulfill the requirements.
+
+## Kubernetes Commands (Without Helm) To Deploy New Docker Images To A Kubernetes Cluster
+
+### Deploy A Version
+
+```bash
+# !!! be aware of the correct kube context !!!
+$ kubectl config get-contexts
+
+# deploy version '$BUILD_VERSION'
+# !!! 'latest' is not recommended on production !!!
+
+# for easyness set env
+$ export BUILD_VERSION=1.0.8-48-ocelot.social1.0.8-184 # example
+# check this with
+$ echo $BUILD_VERSION
+1.0.8-48-ocelot.social1.0.8-184
+
+# deploy actual version '$BUILD_VERSION' to Kubernetes cluster
+$ kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:$BUILD_VERSION
+$ kubectl -n default rollout restart deployment/ocelot-webapp
+$ kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:$BUILD_VERSION
+$ kubectl -n default rollout restart deployment/ocelot-backend
+$ kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:$BUILD_VERSION
+$ kubectl -n default rollout restart deployment/ocelot-maintenance
+$ kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:$BUILD_VERSION
+$ kubectl -n default rollout restart deployment/ocelot-neo4j
+# verify deployment and wait for the pods of each deployment to get ready for cleaning and seeding of the database
+$ kubectl -n default rollout status deployment/ocelot-webapp --timeout=240s
+$ kubectl -n default rollout status deployment/ocelot-maintenance --timeout=240s
+$ kubectl -n default rollout status deployment/ocelot-backend --timeout=240s
+$ kubectl -n default rollout status deployment/ocelot-neo4j --timeout=240s
+```
+
+### Staging – Clean And Seed Neo4j Database
+
+***ATTENTION:*** Cleaning and seeding of our Neo4j database is only possible in production if env `PRODUCTION_DB_CLEAN_ALLOW=true` is set in our deployment.
+
+```bash
+# !!! be aware of the correct kube context !!!
+$ kubectl config get-contexts
+
+# reset and seed Neo4j database via backend for staging
+$ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "node --experimental-repl-await dist/db/clean.js && node --experimental-repl-await dist/db/seed.js"
 
 
-We need `DOCKER_BUILDKIT=0` for this to work.
+```
+
+
+# DigitalOcean
+
+If you want to set up a [Kubernetes](https://kubernetes.io) cluster on [DigitalOcean](https://www.digitalocean.com), follow this guide.
+
+## Create Account
+
+Create an account with DigitalOcean.
+
+## Add Project
+
+On the left side you will see a menu. Click on `New Project`. Enter a name and click `Create Project`.  
+Skip moving resources, probably.
+
+## Create Kubernetes Cluster
+
+On the right top you find the button `Create`. Click on it and choose `Kubernetes - Create Kubernetes Cluster`.
+
+- use the latest Kubernetes version
+- choose your datacenter region
+- name your node pool: e.g. `pool-<your-network-name>`
+- `2 Basic nodes` with `2.5 GB RAM (total of 4 GB)`, `2 shared CPUs`, and `80 GB Disk` each is optimal for the beginning
+- set your cluster name: e.g. `cluster-<your-network-name>`
+- select your project
+- no tags necessary
+
+### Download Configuration File
+
+Follow the steps to download the configuration file.
+
+You can skip this step if necessary, as you can download the file later. You can then do this by clicking on `Kubernetes` in the left menu. In the menu to the right of the cluster name in the cluster list, click on `More` and select `Download Config`.
+
+### Patch & Minor Version Upgrades
+
+Skip `Patch & Minor Version Upgrades` for now.
+
+## DNS Configuration
+
+There are the following two ways to set up the DNS.
+
+### Manage DNS With A Different Domain Provider
+
+If you have registered your domain or subdomain with another domain provider, add an `A` record there with one of the IP addresses from one of the cluster droplets in the DNS.
+
+To find the correct IP address to set in the DNS `A` record, click `Droplets` in the left main menu.
+A list of all your droplets will be displayed.
+Take one of the IPs of perhaps two or more droplets in your cluster from the list and enter it into the `A` record.
+
+### Manage DNS With DigitalOcean
+
+***TODO:** How to configure the DigitalOcean DNS management service …*
+
+To understand what makes sense to do when managing your DNS with DigitalOcean, you need to know how DNS works:
+
+DNS means `Domain Name System`. It resolves domains like `example.com` into an IP like `123.123.123.123`.
+DigitalOcean is not a domain registrar, but provides a DNS management service. If you use DigitalOcean's DNS management service, you can configure [your cluster](/deployment/kubernetes/README.md#dns) to always resolve the domain to the correct IP and automatically update it for that.  
+The IPs of the DigitalOcean machines are not necessarily stable, so the cluster's DNS service will update the DNS records managed by DigitalOcean to the new IP as needed.
+
+***CAUTION:** If you are using an external DNS, you currently have to do this manually, which can cause downtime.*
+
+## Deploy
+
+Yeah, you're done here. Back to [Deployment with Helm for Kubernetes](/deployment/kubernetes/README.md).
+
+## Backups On DigitalOcean
+
+You can and should do [backups](/deployment/kubernetes/Backup.md) with Kubernetes for sure.
+
+Additional to backup and copying the Neo4j database dump and the backend images you can do a volume snapshot on DigitalOcean at the moment you have the database in sleep mode.
