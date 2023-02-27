@@ -14,8 +14,7 @@ BACKUP_FOLDER=${BACKUP_FOLDER:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/
 mkdir -p ${BACKUP_FOLDER}
 
 # maintenance mode on
-# TODO
-# ${SCRIPT_DIR}/cluster.maintenance.sh on
+${SCRIPT_DIR}/cluster.maintenance.sh on
 
 # shutdown database
 kubectl --kubeconfig=${KUBECONFIG} get deployment ocelot-neo4j -o json \
@@ -26,11 +25,15 @@ kubectl --kubeconfig=${KUBECONFIG} get deployment ocelot-neo4j -o json \
 sleep 60
 
 # database backup
-kubectl --kubeconfig=${KUBECONFIG} -n default exec -it $(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-neo4j | awk '{ print $1 }') -- neo4j-admin dump --to=/var/lib/neo4j/$BACKUP_DATE-neo4j-dump
+kubectl --kubeconfig=${KUBECONFIG} -n default exec -it \
+    $(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-neo4j | awk '{ print $1 }') \
+    -- neo4j-admin dump --to=/var/lib/neo4j/$BACKUP_DATE-neo4j-dump
 # copy neo4j backup to local drive
-kubectl --kubeconfig=${KUBECONFIG} cp default/$(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-neo4j |awk '{ print $1 }'):/var/lib/neo4j/$BACKUP_DATE-neo4j-dump $BACKUP_FOLDER/neo4j-dump
+kubectl --kubeconfig=${KUBECONFIG} cp \
+    default/$(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-neo4j |awk '{ print $1 }'):/var/lib/neo4j/$BACKUP_DATE-neo4j-dump $BACKUP_FOLDER/neo4j-dump
 # copy image data
-kubectl --kubeconfig=${KUBECONFIG} cp default/$(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-backend |awk '{ print $1 }'):/app/public/uploads $BACKUP_FOLDER/public-uploads
+kubectl --kubeconfig=${KUBECONFIG} cp \
+    default/$(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-backend |awk '{ print $1 }'):/app/public/uploads $BACKUP_FOLDER/public-uploads
 
 # restart database
 kubectl --kubeconfig=${KUBECONFIG} get deployment ocelot-neo4j -o json \
@@ -41,5 +44,4 @@ kubectl --kubeconfig=${KUBECONFIG} get deployment ocelot-neo4j -o json \
 sleep 60
 
 # maintenance mode off
-# TODO
-# ${SCRIPT_DIR}/cluster.maintenance.sh on
+${SCRIPT_DIR}/cluster.maintenance.sh off
