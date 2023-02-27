@@ -1,4 +1,4 @@
-import { config, mount, RouterLinkStub } from '@vue/test-utils'
+import { mount, RouterLinkStub } from '@vue/test-utils'
 import Vuex from 'vuex'
 import FiledReportsTable from './FiledReportsTable'
 import { reports } from '~/components/features/ReportList/ReportList.story.js'
@@ -6,8 +6,6 @@ import { reports } from '~/components/features/ReportList/ReportList.story.js'
 const localVue = global.localVue
 
 localVue.filter('truncate', (string) => string)
-
-config.stubs['client-only'] = '<span><slot /></span>'
 
 describe('FiledReportsTable.vue', () => {
   let wrapper, mocks, propsData, stubs, filed
@@ -18,6 +16,7 @@ describe('FiledReportsTable.vue', () => {
     }
     stubs = {
       NuxtLink: RouterLinkStub,
+      'client-only': true,
     }
     propsData = {}
   })

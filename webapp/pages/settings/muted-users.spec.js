@@ -1,4 +1,4 @@
-import { config, mount, createLocalVue } from '@vue/test-utils'
+import { mount, createLocalVue } from '@vue/test-utils'
 import MutedUsers from './muted-users.vue'
 import Styleguide from '@human-connection/styleguide'
 import Filters from '~/plugins/vue-filters'
@@ -9,7 +9,9 @@ const localVue = createLocalVue()
 localVue.use(Styleguide)
 localVue.use(Filters)
 
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+const stubs = {
+  'nuxt-link': true,
+}
 
 describe('muted-users.vue', () => {
   let wrapper
@@ -35,7 +37,7 @@ describe('muted-users.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(MutedUsers, { mocks, localVue })
+      return mount(MutedUsers, { mocks, localVue, stubs })
     }
 
     beforeEach(() => {
@@ -43,7 +45,7 @@ describe('muted-users.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('div')).toBe(true)
+      expect(wrapper.element.tagName).toBe('DIV')
     })
 
     describe('given a list of muted users', () => {

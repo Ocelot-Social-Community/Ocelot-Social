@@ -32,7 +32,7 @@ describe('logout.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('div')).toBe(true)
+      expect(wrapper.element.tagName).toBe('DIV')
     })
 
     it('logs out and redirects to login', () => {

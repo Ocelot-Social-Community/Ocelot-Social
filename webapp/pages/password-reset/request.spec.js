@@ -1,10 +1,11 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import request from './request.vue'
 
 const localVue = global.localVue
 
-// config.stubs['sweetalert-icon'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span class="nuxt-link"><slot /></span>'
+const stubs = {
+  'nuxt-link': true,
+}
 
 describe('request.vue', () => {
   let wrapper
@@ -29,7 +30,7 @@ describe('request.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(request, { mocks, localVue })
+      return mount(request, { mocks, localVue, stubs })
     }
 
     beforeEach(() => {
