@@ -1,11 +1,13 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import searchResults from './search-results.vue'
 import VueMeta from 'vue-meta'
 
 const localVue = global.localVue
 localVue.use(VueMeta, { keyName: 'head' })
 
-config.stubs['client-only'] = '<span class="client-only"><slot /></span>'
+const stubs = {
+  'client-only': true,
+}
 
 describe('search-results.vue', () => {
   let wrapper
@@ -32,7 +34,7 @@ describe('search-results.vue', () => {
           return { ...data, ...aData }
         }
       }
-      return mount(searchResults, { mocks, localVue })
+      return mount(searchResults, { mocks, localVue, stubs })
     }
 
     it('renders', async () => {

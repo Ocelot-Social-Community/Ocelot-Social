@@ -1,11 +1,9 @@
-import { config, mount, RouterLinkStub } from '@vue/test-utils'
+import { mount, RouterLinkStub } from '@vue/test-utils'
 import NotificationMenu from './NotificationMenu'
 
 const localVue = global.localVue
 
 localVue.filter('truncate', (string) => string)
-
-config.stubs.dropdown = '<span class="dropdown"><slot :toggleMenu="() => null" /></span>'
 
 describe('NotificationMenu.vue', () => {
   let wrapper
@@ -23,6 +21,8 @@ describe('NotificationMenu.vue', () => {
     }
     stubs = {
       NuxtLink: RouterLinkStub,
+      UserTeaser: true,
+      'client-only': true,
     }
   })
 
@@ -38,13 +38,13 @@ describe('NotificationMenu.vue', () => {
 
     it('renders as link without counter', () => {
       wrapper = Wrapper()
-      expect(wrapper.is('a.notifications-menu')).toBe(true)
+      expect(wrapper.classes('notifications-menu')).toBe(true)
       expect(() => wrapper.get('.count')).toThrow()
     })
 
     it('no dropdown is rendered', () => {
       wrapper = Wrapper()
-      expect(wrapper.contains('.dropdown')).toBe(false)
+      expect(wrapper.find('.dropdown').exists()).toBe(false)
     })
 
     describe('given only read notifications', () => {
@@ -73,13 +73,13 @@ describe('NotificationMenu.vue', () => {
 
       it('renders as link without counter', () => {
         wrapper = Wrapper()
-        expect(wrapper.is('a.notifications-menu')).toBe(true)
+        expect(wrapper.classes('notifications-menu')).toBe(true)
         expect(() => wrapper.get('.count')).toThrow()
       })
 
       it('no dropdown is rendered', () => {
         wrapper = Wrapper()
-        expect(wrapper.contains('.dropdown')).toBe(false)
+        expect(wrapper.find('.dropdown').exists()).toBe(false)
       })
     })
 
@@ -101,6 +101,14 @@ describe('NotificationMenu.vue', () => {
                     name: 'John Doe',
                   },
                 },
+                from: {
+                  title: 'Title',
+                  author: {
+                    id: 'reporter',
+                    slug: 'reporter',
+                    name: 'reporter',
+                  },
+                },
               },
               {
                 id: 'notification-42',
@@ -115,6 +123,14 @@ describe('NotificationMenu.vue', () => {
                     name: 'John Doe',
                   },
                 },
+                from: {
+                  title: 'Title',
+                  author: {
+                    id: 'reporter',
+                    slug: 'reporter',
+                    name: 'reporter',
+                  },
+                },
               },
               {
                 id: 'notification-43',
@@ -127,6 +143,14 @@ describe('NotificationMenu.vue', () => {
                     id: 'john-1',
                     slug: 'john-doe',
                     name: 'John Doe',
+                  },
+                },
+                from: {
+                  title: 'Title',
+                  author: {
+                    id: 'reporter',
+                    slug: 'reporter',
+                    name: 'reporter',
                   },
                 },
               },

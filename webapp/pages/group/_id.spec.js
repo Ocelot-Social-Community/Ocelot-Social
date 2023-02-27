@@ -1,9 +1,11 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import _id from './_id.vue'
 
 const localVue = global.localVue
 
-config.stubs['nuxt-child'] = '<span class="nuxt-child"><slot /></span>'
+const stubs = {
+  'nuxt-child': true,
+}
 
 describe('Group profile _id.vue', () => {
   let wrapper
@@ -19,6 +21,7 @@ describe('Group profile _id.vue', () => {
       return mount(_id, {
         mocks,
         localVue,
+        stubs,
       })
     }
 
@@ -27,7 +30,7 @@ describe('Group profile _id.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.findAll('.nuxt-child')).toHaveLength(1)
+      expect(wrapper.findComponent({ name: 'nuxt-child' }).exists()).toBe(true)
     })
   })
 })

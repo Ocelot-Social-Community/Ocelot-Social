@@ -115,9 +115,9 @@ describe('DeleteData.vue', () => {
         enableContributionDeletionCheckbox = wrapper.find(
           '[data-test="contributions-deletion-checkbox"]',
         )
-        enableContributionDeletionCheckbox.trigger('click')
+        enableContributionDeletionCheckbox.setChecked(true)
         enableCommentDeletionCheckbox = wrapper.find('[data-test="comments-deletion-checkbox"]')
-        enableCommentDeletionCheckbox.trigger('click')
+        enableCommentDeletionCheckbox.setChecked(true)
         deleteAccountBtn.trigger('click')
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -133,7 +133,7 @@ describe('DeleteData.vue', () => {
         enableContributionDeletionCheckbox = wrapper.find(
           '[data-test="contributions-deletion-checkbox"]',
         )
-        enableContributionDeletionCheckbox.trigger('click')
+        enableContributionDeletionCheckbox.setChecked(true)
         deleteAccountBtn.trigger('click')
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -147,7 +147,7 @@ describe('DeleteData.vue', () => {
 
       it("deletes a user's comments if requested", () => {
         enableCommentDeletionCheckbox = wrapper.find('[data-test="comments-deletion-checkbox"]')
-        enableCommentDeletionCheckbox.trigger('click')
+        enableCommentDeletionCheckbox.setChecked(true)
         deleteAccountBtn.trigger('click')
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
           expect.objectContaining({

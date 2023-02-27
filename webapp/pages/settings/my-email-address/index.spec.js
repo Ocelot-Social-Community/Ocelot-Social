@@ -1,10 +1,12 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import EmailSettingsIndexPage from './index.vue'
 import Vuex from 'vuex'
 
 const localVue = global.localVue
 
-config.stubs['sweetalert-icon'] = '<span><slot /></span>'
+const stubs = {
+  'sweetalert-icon': true,
+}
 
 describe('EmailSettingsIndexPage', () => {
   let store
@@ -43,12 +45,15 @@ describe('EmailSettingsIndexPage', () => {
         store,
         mocks,
         localVue,
+        stubs,
       })
     }
 
     describe('form', () => {
       describe('submit', () => {
-        beforeEach(jest.useFakeTimers)
+        beforeEach(() => {
+          jest.useFakeTimers()
+        })
 
         describe('email unchanged', () => {
           beforeEach(() => {
