@@ -1,11 +1,13 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 
 import LocaleSwitch from './LocaleSwitch.vue'
 import Vuex from 'vuex'
 
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span><slot /></span>'
+const stubs = {
+  'client-only': true,
+}
 
 describe('LocaleSwitch.vue', () => {
   let wrapper, mocks, computed, deutschLanguageItem, getters
@@ -65,7 +67,7 @@ describe('LocaleSwitch.vue', () => {
     const store = new Vuex.Store({
       getters,
     })
-    return mount(LocaleSwitch, { mocks, localVue, computed, store })
+    return mount(LocaleSwitch, { mocks, localVue, computed, store, stubs })
   }
 
   describe('with current user', () => {

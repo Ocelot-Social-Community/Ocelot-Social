@@ -29,7 +29,7 @@ describe('invite.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('.ds-section')).toBe(true)
+      expect(wrapper.classes('ds-section')).toBe(true)
     })
   })
 })

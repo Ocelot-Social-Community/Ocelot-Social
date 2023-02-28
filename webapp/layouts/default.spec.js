@@ -1,13 +1,21 @@
 import Vuex from 'vuex'
-import { config, shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import Default from './default.vue'
 
 const localVue = global.localVue
 localVue.directive('scrollTo', jest.fn())
 
-config.stubs.nuxt = '<span><slot /></span>'
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+const stubs = {
+  nuxt: {
+    template: '<span><slot /></span>',
+  },
+  'client-only': {
+    template: '<span><slot /></span>',
+  },
+  'nuxt-link': {
+    template: '<span><slot /></span>',
+  },
+}
 
 describe('default.vue', () => {
   let wrapper
@@ -38,6 +46,7 @@ describe('default.vue', () => {
         store,
         mocks,
         localVue,
+        stubs,
       })
     }
 
@@ -46,7 +55,7 @@ describe('default.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('.layout-default')).toBe(true)
+      expect(wrapper.classes('layout-default')).toBe(true)
     })
   })
 })

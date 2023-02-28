@@ -1,4 +1,4 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import ContributionForm from './ContributionForm.vue'
 
 import Vuex from 'vuex'
@@ -11,9 +11,11 @@ global.MutationObserver = MutationObserver
 
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
-config.stubs['v-popover'] = '<span><slot /></span>'
+const stubs = {
+  'client-only': true,
+  'nuxt-link': true,
+  'v-popover': true,
+}
 
 describe('ContributionForm.vue', () => {
   let wrapper, postTitleInput, expectedParams, cancelBtn, mocks, propsData
@@ -88,6 +90,7 @@ describe('ContributionForm.vue', () => {
         localVue,
         store,
         propsData,
+        stubs,
       })
     }
 
@@ -163,7 +166,7 @@ describe('ContributionForm.vue', () => {
             .mockImplementation(function () {
               this.onload({ target: { result: 'someUrlToImage' } })
             })
-          wrapper.find(ImageUploader).vm.$emit('addHeroImage', imageUpload)
+          wrapper.findComponent(ImageUploader).vm.$emit('addHeroImage', imageUpload)
           await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
           expect(spy).toHaveBeenCalledWith(imageUpload)

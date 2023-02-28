@@ -1,7 +1,11 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import InviteButton from './InviteButton.vue'
 
-config.stubs['v-popover'] = '<span><slot /></span>'
+const stubs = {
+  'v-popover': {
+    template: '<span><slot /></span>',
+  },
+}
 
 describe('InviteButton.vue', () => {
   let wrapper
@@ -22,7 +26,7 @@ describe('InviteButton.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(InviteButton, { mocks, propsData })
+      return mount(InviteButton, { mocks, propsData, stubs })
     }
 
     beforeEach(() => {
@@ -30,12 +34,12 @@ describe('InviteButton.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.contains('.invite-button')).toBe(true)
+      expect(wrapper.find('.invite-button').exists()).toBe(true)
     })
 
     it('open popup', () => {
       wrapper.find('.base-button').trigger('click')
-      expect(wrapper.contains('.invite-button')).toBe(true)
+      expect(wrapper.find('.invite-button').exists()).toBe(true)
     })
 
     it('invite codes not available', async () => {

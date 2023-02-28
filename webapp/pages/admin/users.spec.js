@@ -1,9 +1,12 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import Users from './users.vue'
 
 const localVue = global.localVue
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+
+const stubs = {
+  'nuxt-link': true,
+}
 
 describe('Users', () => {
   let wrapper
@@ -49,12 +52,13 @@ describe('Users', () => {
         mocks,
         localVue,
         store,
+        stubs,
       })
     }
 
     it('renders', () => {
       wrapper = Wrapper()
-      expect(wrapper.is('div')).toBe(true)
+      expect(wrapper.element.tagName).toBe('DIV')
     })
 
     describe('search', () => {

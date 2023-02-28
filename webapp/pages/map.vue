@@ -209,6 +209,7 @@ export default {
         new MapboxGeocoder({
           accessToken: this.$env.MAPBOX_TOKEN,
           mapboxgl: this.mapboxgl,
+          marker: false,
         }),
       )
 

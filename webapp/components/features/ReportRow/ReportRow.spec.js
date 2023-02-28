@@ -1,12 +1,10 @@
-import { config, mount, RouterLinkStub } from '@vue/test-utils'
+import { mount, RouterLinkStub } from '@vue/test-utils'
 import Vuex from 'vuex'
 import ReportRow from './ReportRow.vue'
 import BaseIcon from '~/components/_new/generic/BaseIcon/BaseIcon'
 import { reports } from '~/components/features/ReportList/ReportList.story.js'
 
 const localVue = global.localVue
-
-config.stubs['client-only'] = '<span><slot /></span>'
 
 describe('ReportRow', () => {
   let propsData, mocks, stubs, getters, wrapper
@@ -18,6 +16,7 @@ describe('ReportRow', () => {
     }
     stubs = {
       NuxtLink: RouterLinkStub,
+      'client-only': true,
     }
     getters = {
       'auth/user': () => {
@@ -85,7 +84,9 @@ describe('ReportRow', () => {
           wrapper = Wrapper()
         })
         it('renders the disabled icon', () => {
-          expect(wrapper.find('.status-line').find(BaseIcon).props().name).toEqual('eye-slash')
+          expect(wrapper.find('.status-line').findComponent(BaseIcon).props().name).toEqual(
+            'eye-slash',
+          )
         })
 
         it('renders its current status', () => {
@@ -99,7 +100,7 @@ describe('ReportRow', () => {
           wrapper = Wrapper()
         })
         it('renders the enabled icon', () => {
-          expect(wrapper.find('.status-line').find(BaseIcon).props().name).toEqual('eye')
+          expect(wrapper.find('.status-line').findComponent(BaseIcon).props().name).toEqual('eye')
         })
 
         it('renders its current status', () => {
@@ -120,7 +121,7 @@ describe('ReportRow', () => {
       })
 
       it('renders a comments icon', () => {
-        const commentsIcon = wrapper.find(BaseIcon).props().name
+        const commentsIcon = wrapper.findComponent(BaseIcon).props().name
         expect(commentsIcon).toEqual('comments')
       })
 
@@ -142,7 +143,7 @@ describe('ReportRow', () => {
       })
 
       it('renders a bookmark icon', () => {
-        const postIcon = wrapper.find(BaseIcon).props().name
+        const postIcon = wrapper.findComponent(BaseIcon).props().name
         expect(postIcon).toEqual('bookmark')
       })
 
@@ -164,7 +165,7 @@ describe('ReportRow', () => {
       })
 
       it('renders a user icon', () => {
-        const userIcon = wrapper.find(BaseIcon).props().name
+        const userIcon = wrapper.findComponent(BaseIcon).props().name
         expect(userIcon).toEqual('user')
       })
 

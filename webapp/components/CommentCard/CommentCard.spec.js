@@ -1,12 +1,9 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import CommentCard from './CommentCard.vue'
 import Vuex from 'vuex'
 
 const localVue = global.localVue
 localVue.directive('scrollTo', jest.fn())
-
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
 
 describe('CommentCard.vue', () => {
   let propsData, mocks, stubs, getters, wrapper, Wrapper
@@ -46,6 +43,8 @@ describe('CommentCard.vue', () => {
     }
     stubs = {
       ContentViewer: true,
+      'client-only': true,
+      'nuxt-link': true,
     }
     getters = {
       'auth/user': () => {
@@ -56,7 +55,9 @@ describe('CommentCard.vue', () => {
   })
 
   describe('mount', () => {
-    beforeEach(jest.useFakeTimers)
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
 
     Wrapper = () => {
       const store = new Vuex.Store({

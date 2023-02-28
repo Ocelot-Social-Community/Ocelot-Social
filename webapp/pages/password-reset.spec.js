@@ -1,11 +1,13 @@
 import Vuex from 'vuex'
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import PasswordReset from './password-reset.vue'
 
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span class="client-only"><slot /></span>'
-config.stubs['nuxt-child'] = '<span class="nuxt-child"><slot /></span>'
+const stubs = {
+  'client-only': true,
+  'nuxt-child': true,
+}
 
 describe('password-reset.vue', () => {
   let wrapper
@@ -47,12 +49,13 @@ describe('password-reset.vue', () => {
       return mount(PasswordReset, {
         mocks,
         localVue,
+        stubs,
       })
     }
 
     it('renders', async () => {
       wrapper = await Wrapper()
-      expect(wrapper.is('div')).toBe(true)
+      expect(wrapper.element.tagName).toBe('DIV')
     })
 
     it('renders with asyncData and not loggedIn', async () => {
