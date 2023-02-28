@@ -1002,5 +1002,17 @@
     "newTermsAndConditions": "New Terms and Conditions",
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
+  },
+  "yuniteRebranding": {
+    "header": {
+      "about": "About Yunite",
+      "groups": "Groups",
+      "newsFeed": "News Feed",
+      "topics": "Topics"
+    },
+    "footer": {
+      "dataPrivacy": "Data privacy",
+      "imprint": "Imprint"
+    }
   }
 }
