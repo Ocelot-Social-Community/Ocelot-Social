@@ -44,7 +44,7 @@ This will start the ocelot services within docker in the selected branded versio
 
 If you stop the `docker compose`, change the value of `CONFIGURATION` in the `.env` and restart with `docker compose up` the branded version will change.
 
-Note: this might require `export DOCKER_BUILDKIT=0` to be set in order to have docker-compose build correctly.
+Note: this might require `export DOCKER_BUILDKIT=0` to be set in order to have `docker compose` build correctly.
 
 ### Install a cluster
 
