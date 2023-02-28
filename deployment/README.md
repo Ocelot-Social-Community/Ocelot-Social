@@ -34,7 +34,7 @@ The following tasks can be achieved with the tools contained in this directory:
 
 ### Start branded docker environment locally
 
-For the developers we offer a `docker-compose` in this directory.
+For the developers we offer a `docker compose` in this directory.
 
 1. Copy `.env.dist` and rename it to `.env`
 2. (optional) change the `CONFIGURATION` in the `.env` value according to your desired brand. By default its `example`
