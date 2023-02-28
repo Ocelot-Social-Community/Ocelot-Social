@@ -40,7 +40,7 @@ For the developers we offer a `docker compose` in this directory.
 2. (optional) change the `CONFIGURATION` in the `.env` value according to your desired brand. By default its `example`
 3. Run `docker-compose up`
 
-This will start the ocelot services within docker in the selected branded version.
+This will start the ocelot services within Docker in the selected branded version.
 
 If you stop the `docker compose`, change the value of `CONFIGURATION` in the `.env` and restart with `docker compose up` the branded version will change.
 
