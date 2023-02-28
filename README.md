@@ -139,6 +139,7 @@ Prepare database once before you start by running the following command in a sec
 ```bash
 # in main folder while docker-compose is up
 $ docker-compose exec backend yarn run db:migrate init
+$ docker-compose exec backend yarn run db:migrate up
 ```
 
 Then clear and seed database by running the following command as well in the second terminal:
