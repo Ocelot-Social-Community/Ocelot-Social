@@ -79,17 +79,17 @@ export default {
   border-radius: $border-radius-base;
 
   &.color-uni {
-    background: $color-primary-light;
+    background: $color-donation-bar;
   }
 
   &.color-repeating-linear-gradient {
     background: repeating-linear-gradient(
       120deg,
-      $color-primary 0px,
-      $color-primary 30px,
-      $color-primary-light 50px,
-      $color-primary-light 75px,
-      $color-primary 95px
+      $color-donation-bar 0px,
+      $color-donation-bar 30px,
+      $color-donation-bar-light 50px,
+      $color-donation-bar-light 75px,
+      $color-donation-bar 95px
     );
   }
 }
