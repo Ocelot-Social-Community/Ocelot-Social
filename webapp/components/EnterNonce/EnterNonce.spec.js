@@ -19,7 +19,9 @@ describe('EnterNonce ', () => {
   })
 
   describe('mount', () => {
-    beforeEach(jest.useFakeTimers)
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
 
     Wrapper = () => {
       return mount(EnterNonce, {

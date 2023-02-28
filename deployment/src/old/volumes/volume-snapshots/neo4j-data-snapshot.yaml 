@@ -1,0 +1,8 @@
+---
+apiVersion: snapshot.storage.k8s.io/v1beta1
+kind: VolumeSnapshot
+metadata:
+  name: YYYY-MM-DD-neo4j-data-snapshot
+spec:
+  source:
+    persistentVolumeClaimName: volume-claim-ocelot-neo4j 

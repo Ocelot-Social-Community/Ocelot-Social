@@ -168,6 +168,8 @@ jobs:
     name: Unit tests - backend
     runs-on: ubuntu-latest
     needs: [build_test_neo4j,build_test_backend]
+    permissions: 
+      checks: write
     steps:
       ##########################################################################
       # CHECKOUT CODE ##########################################################
@@ -225,6 +227,8 @@ jobs:
     name: Unit tests - webapp
     runs-on: ubuntu-latest
     needs: [build_test_webapp]
+    permissions: 
+      checks: write
     steps:
       ##########################################################################
       # CHECKOUT CODE ##########################################################
@@ -269,7 +273,7 @@ jobs:
           report_name: Coverage Webapp
           type: lcov
           result_path: ./coverage/lcov.info
-          min_coverage: 63
+          min_coverage: 83
           token: ${{ github.token }}
 
   ##############################################################################

@@ -1,13 +1,10 @@
-import { config, shallowMount, mount, RouterLinkStub } from '@vue/test-utils'
+import { shallowMount, mount, RouterLinkStub } from '@vue/test-utils'
 
 import Vuex from 'vuex'
 
 import PostTeaser from './PostTeaser.vue'
 
 const localVue = global.localVue
-
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['v-popover'] = '<span><slot /></span>'
 
 describe('PostTeaser', () => {
   let store
@@ -35,6 +32,8 @@ describe('PostTeaser', () => {
     }
     stubs = {
       NuxtLink: RouterLinkStub,
+      'client-only': true,
+      'v-popover': true,
     }
     mocks = {
       $t: jest.fn(),
@@ -77,7 +76,9 @@ describe('PostTeaser', () => {
       spy.mockReset()
     })
 
-    beforeEach(jest.useFakeTimers)
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
 
     describe('test Post callbacks', () => {
       beforeEach(() => {

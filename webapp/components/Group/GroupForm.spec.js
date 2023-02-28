@@ -1,9 +1,11 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import GroupForm from './GroupForm.vue'
 
 const localVue = global.localVue
 
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+const stubs = {
+  'nuxt-link': true,
+}
 
 const propsData = {
   update: false,
@@ -25,7 +27,7 @@ describe('GroupForm', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(GroupForm, { propsData, mocks, localVue })
+      return mount(GroupForm, { propsData, mocks, localVue, stubs })
     }
 
     beforeEach(() => {

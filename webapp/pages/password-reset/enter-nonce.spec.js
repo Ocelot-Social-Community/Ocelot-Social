@@ -1,9 +1,11 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import enterNonce from './enter-nonce.vue'
 
 const localVue = global.localVue
 
-config.stubs['nuxt-link'] = '<span class="nuxt-link"><slot /></span>'
+const stubs = {
+  'nuxt-link': true,
+}
 
 describe('enter-nonce.vue', () => {
   let wrapper
@@ -20,7 +22,7 @@ describe('enter-nonce.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(enterNonce, { mocks, localVue })
+      return mount(enterNonce, { mocks, localVue, stubs })
     }
 
     beforeEach(() => {

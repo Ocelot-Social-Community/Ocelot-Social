@@ -1,0 +1,20 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: configmap-{{ .Release.Name }}-webapp
+  labels:
+    app.kubernetes.io/name:       "{{ .Chart.Name }}"
+    app.kubernetes.io/instance:   "{{ .Release.Name }}"
+    app.kubernetes.io/version:    "{{ .Chart.AppVersion }}"
+    app.kubernetes.io/component:  "configmap-webapp"
+    app.kubernetes.io/part-of:    "{{ .Chart.Name }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    helm.sh/chart:                "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+data:
+  HOST: "0.0.0.0"
+  PUBLIC_REGISTRATION: "{{ .Values.PUBLIC_REGISTRATION }}"
+  INVITE_REGISTRATION: "{{ .Values.INVITE_REGISTRATION }}"
+  CATEGORIES_ACTIVE: "{{ .Values.CATEGORIES_ACTIVE }}"
+  COOKIE_EXPIRE_TIME: "{{ .Values.COOKIE_EXPIRE_TIME }}"
+  WEBSOCKETS_URI: "{{ .Values.WEBAPP.WEBSOCKETS_URI }}"
+  GRAPHQL_URI: "http://{{ .Release.Name }}-backend:4000"
