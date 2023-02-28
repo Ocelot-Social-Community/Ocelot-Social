@@ -118,9 +118,10 @@ Factory.define('user')
     console.log(u2e)
     const e2u = await email.relateTo(user, 'belongsTo')
     console.log(e2u)
-    if (options.avatar) {
-      console.log(options.avatar)
-      const u2a = await user.relateTo(await options.avatar, 'avatar')
+    const avatar = await options.avatar
+    console.log(avatar)
+    if (avatar) {
+      const u2a = await user.relateTo(avatar, 'avatar')
       console.log(u2a)
     }
     return user
