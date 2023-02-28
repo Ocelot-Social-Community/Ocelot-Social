@@ -81,8 +81,7 @@ More details about our GraphQL playground and how to use it with ocelot.social c
 
 ### Database Indices and Constraints
 
-Database indices and constraints need to be created when the database and the
-backend is running:
+Database indices and constraints need to be created and upgraded when the database and the backend are running:
 
 {% tabs %}
 {% tab title="Docker" %}
@@ -92,6 +91,11 @@ backend is running:
 $ docker exec backend yarn run db:migrate init
 ```
 
+```bash
+# in main folder with docker compose running
+$ docker exec backend yarn run db:migrate up
+```
+
 {% endtab %}
 {% tab title="Without Docker" %}
 
@@ -99,6 +103,11 @@ $ docker exec backend yarn run db:migrate init
 # in folder backend/ while database is running
 # make sure your database is running on http://localhost:7474/browser/
 yarn run db:migrate init
+```
+
+```bash
+# in backend/ with database running (In docker or local)
+yarn run db:migrate up
 ```
 
 {% endtab %}
@@ -126,8 +135,10 @@ To reset the database run:
 $ docker exec backend yarn run db:reset
 # you could also wipe out your neo4j database and delete all volumes with:
 $ docker-compose down -v
-# if container is not running, run this command to set up your database indeces and contstraints
+# if container is not running, run this command to set up your database indices and constraints
 $ docker exec backend yarn run db:migrate init
+# And then upgrade the indices and const
+$ docker exec backend yarn run db:migrate up
 ```
 
 {% endtab %}
