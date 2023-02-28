@@ -20,7 +20,7 @@ describe('ProfileAvatar', () => {
   })
 
   it('renders an icon', () => {
-    expect(wrapper.find(BaseIcon).exists()).toBe(true)
+    expect(wrapper.findComponent(BaseIcon).exists()).toBe(true)
   })
 
   describe('given a profile', () => {
@@ -38,7 +38,7 @@ describe('ProfileAvatar', () => {
         it('renders an icon', () => {
           propsData = { profile: { name: null } }
           wrapper = Wrapper()
-          expect(wrapper.find(BaseIcon).exists()).toBe(true)
+          expect(wrapper.findComponent(BaseIcon).exists()).toBe(true)
         })
       })
 
@@ -46,7 +46,7 @@ describe('ProfileAvatar', () => {
         it('renders an icon', () => {
           propsData = { profile: { name: 'Anonymous' } }
           wrapper = Wrapper()
-          expect(wrapper.find(BaseIcon).exists()).toBe(true)
+          expect(wrapper.findComponent(BaseIcon).exists()).toBe(true)
         })
       })
 

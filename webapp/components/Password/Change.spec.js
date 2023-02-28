@@ -90,9 +90,8 @@ describe('ChangePassword.vue', () => {
       })
 
       describe('submit form', () => {
-        beforeEach(async (done) => {
+        beforeEach(async () => {
           await wrapper.find('form').trigger('submit')
-          done()
         })
 
         it('calls changePassword mutation', () => {

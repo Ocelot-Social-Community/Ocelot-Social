@@ -1,11 +1,9 @@
-import { config, mount, RouterLinkStub } from '@vue/test-utils'
+import { mount, RouterLinkStub } from '@vue/test-utils'
 import Notification from './Notification.vue'
 
 import Vuex from 'vuex'
 
 const localVue = global.localVue
-
-config.stubs['client-only'] = '<span><slot /></span>'
 
 describe('Notification', () => {
   let stubs
@@ -20,6 +18,7 @@ describe('Notification', () => {
     }
     stubs = {
       NuxtLink: RouterLinkStub,
+      'client-only': true,
     }
     getters = {
       'auth/user': () => {

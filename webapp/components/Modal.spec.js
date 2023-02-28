@@ -57,9 +57,9 @@ describe('Modal.vue', () => {
 
     it('initially empty', () => {
       wrapper = Wrapper()
-      expect(wrapper.contains(ConfirmModal)).toBe(false)
-      expect(wrapper.contains(DisableModal)).toBe(false)
-      expect(wrapper.contains(ReportModal)).toBe(false)
+      expect(wrapper.findComponent(ConfirmModal).exists()).toBe(false)
+      expect(wrapper.findComponent(DisableModal).exists()).toBe(false)
+      expect(wrapper.findComponent(ReportModal).exists()).toBe(false)
     })
 
     describe('store/modal holds data to disable', () => {
@@ -78,11 +78,11 @@ describe('Modal.vue', () => {
       })
 
       it('renders disable modal', () => {
-        expect(wrapper.contains(DisableModal)).toBe(true)
+        expect(wrapper.findComponent(DisableModal).exists()).toBe(true)
       })
 
       it('passes data to disable modal', () => {
-        expect(wrapper.find(DisableModal).props()).toEqual({
+        expect(wrapper.findComponent(DisableModal).props()).toEqual({
           type: 'contribution',
           name: 'some title',
           id: 'c456',
@@ -91,9 +91,9 @@ describe('Modal.vue', () => {
 
       describe('child component emits close', () => {
         it('turns empty', async () => {
-          wrapper.find(DisableModal).vm.$emit('close')
+          wrapper.findComponent(DisableModal).vm.$emit('close')
           await Vue.nextTick()
-          expect(wrapper.contains(DisableModal)).toBe(false)
+          expect(wrapper.findComponent(DisableModal).exists()).toBe(false)
         })
       })
 
@@ -109,7 +109,7 @@ describe('Modal.vue', () => {
             },
           }
           wrapper = Wrapper()
-          expect(wrapper.find(DisableModal).props()).toEqual({
+          expect(wrapper.findComponent(DisableModal).props()).toEqual({
             type: 'comment',
             name: 'Author name',
             id: 'c456',
@@ -124,7 +124,7 @@ describe('Modal.vue', () => {
             },
           }
           wrapper = Wrapper()
-          expect(wrapper.find(DisableModal).props()).toEqual({
+          expect(wrapper.findComponent(DisableModal).props()).toEqual({
             type: 'comment',
             name: '',
             id: 'c456',
@@ -142,7 +142,7 @@ describe('Modal.vue', () => {
             },
           }
           wrapper = Wrapper()
-          expect(wrapper.find(DisableModal).props()).toEqual({
+          expect(wrapper.findComponent(DisableModal).props()).toEqual({
             type: 'user',
             name: 'Username',
             id: 'u456',
@@ -160,7 +160,7 @@ describe('Modal.vue', () => {
             },
           }
           wrapper = Wrapper()
-          expect(wrapper.find(DisableModal).props()).toEqual({
+          expect(wrapper.findComponent(DisableModal).props()).toEqual({
             type: 'something',
             name: null,
             id: 's456',
