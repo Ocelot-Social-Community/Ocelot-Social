@@ -36,7 +36,7 @@ describe('embeds.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('.base-card')).toBe(true)
+      expect(wrapper.classes('base-card')).toBe(true)
     })
   })
 })

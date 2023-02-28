@@ -1,10 +1,12 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Signup, { SignupMutation } from './Signup'
 
 const localVue = global.localVue
 
-config.stubs['sweetalert-icon'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+const stubs = {
+  'sweetalert-icon': true,
+  'nuxt-link': true,
+}
 
 describe('Signup', () => {
   let wrapper
@@ -28,13 +30,16 @@ describe('Signup', () => {
   })
 
   describe('mount', () => {
-    beforeEach(jest.useFakeTimers)
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
 
     Wrapper = () => {
       return mount(Signup, {
         mocks,
         propsData,
         localVue,
+        stubs,
       })
     }
 

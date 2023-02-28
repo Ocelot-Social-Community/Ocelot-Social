@@ -1,9 +1,13 @@
-import { config, shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import Error from './error.vue'
 
 const localVue = global.localVue
 
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+const stubs = {
+  'nuxt-link': {
+    template: '<span><slot /></span>',
+  },
+}
 
 describe('error.vue', () => {
   let mocks, wrapper
@@ -15,7 +19,7 @@ describe('error.vue', () => {
   })
 
   const Wrapper = (propsData = {}) => {
-    return shallowMount(Error, { mocks, propsData, localVue })
+    return shallowMount(Error, { mocks, propsData, localVue, stubs })
   }
 
   describe('shallowMount', () => {

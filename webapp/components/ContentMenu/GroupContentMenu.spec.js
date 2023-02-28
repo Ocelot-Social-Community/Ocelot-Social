@@ -1,9 +1,13 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import GroupContentMenu from './GroupContentMenu.vue'
 
 const localVue = global.localVue
 
-config.stubs['router-link'] = '<span><slot /></span>'
+const stubs = {
+  'router-link': {
+    template: '<span><slot /></span>',
+  },
+}
 
 const propsData = {
   usage: 'groupTeaser',
@@ -24,7 +28,7 @@ describe('GroupContentMenu', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(GroupContentMenu, { propsData, mocks, localVue })
+      return mount(GroupContentMenu, { propsData, mocks, localVue, stubs })
     }
 
     beforeEach(() => {

@@ -1,4 +1,4 @@
-import { config, shallowMount, mount } from '@vue/test-utils'
+import { shallowMount, mount } from '@vue/test-utils'
 import NotificationsPage from './index.vue'
 
 import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
@@ -7,7 +7,9 @@ import PaginationButtons from '~/components/_new/generic/PaginationButtons/Pagin
 
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span><slot /></span>'
+const stubs = {
+  'client-only': true,
+}
 
 describe('PostIndex', () => {
   let wrapper, Wrapper, mocks, propsData
@@ -42,6 +44,7 @@ describe('PostIndex', () => {
           mocks,
           localVue,
           propsData,
+          stubs,
         })
       }
       wrapper = Wrapper()
@@ -67,6 +70,7 @@ describe('PostIndex', () => {
           mocks,
           localVue,
           propsData,
+          stubs,
         })
       }
     })
@@ -79,7 +83,7 @@ describe('PostIndex', () => {
           { label: 'Unread', value: false },
         ]
         wrapper = Wrapper()
-        wrapper.find(DropdownFilter).vm.$emit('filter', propsData.filterOptions[1])
+        wrapper.findComponent(DropdownFilter).vm.$emit('filter', propsData.filterOptions[1])
       })
 
       it('sets `notificationRead` to value of received option', () => {
@@ -98,7 +102,9 @@ describe('PostIndex', () => {
     describe('markNotificationAsRead', () => {
       beforeEach(() => {
         wrapper = Wrapper()
-        wrapper.find(NotificationsTable).vm.$emit('markNotificationAsRead', 'notificationSourceId')
+        wrapper
+          .findComponent(NotificationsTable)
+          .vm.$emit('markNotificationAsRead', 'notificationSourceId')
       })
 
       it('calls markNotificationAsRead mutation', () => {
@@ -112,7 +118,7 @@ describe('PostIndex', () => {
           mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({ message: 'Some error message' })
           wrapper = Wrapper()
           wrapper
-            .find(NotificationsTable)
+            .findComponent(NotificationsTable)
             .vm.$emit('markNotificationAsRead', 'notificationSourceId')
         })
 
@@ -129,7 +135,7 @@ describe('PostIndex', () => {
 
       describe('next: given a user is on the first page', () => {
         it('adds offset to pageSize to skip first x notifications and display next page', () => {
-          wrapper.find(PaginationButtons).vm.$emit('next')
+          wrapper.findComponent(PaginationButtons).vm.$emit('next')
           expect(wrapper.vm.offset).toEqual(12)
         })
       })
@@ -137,7 +143,7 @@ describe('PostIndex', () => {
       describe('back: given a user is on the third page', () => {
         it('sets offset when back is emitted', () => {
           wrapper.setData({ offset: 24 })
-          wrapper.find(PaginationButtons).vm.$emit('back')
+          wrapper.findComponent(PaginationButtons).vm.$emit('back')
           expect(wrapper.vm.offset).toEqual(12)
         })
       })
