@@ -1,5 +1,5 @@
 import { Given } from "cypress-cucumber-preprocessor/steps";
-import { gql } from '../../../backend/src/helpers/jest'
+import gql from 'graphql-tag'
 
 Given('somebody reported the following posts:', table => {
   table.hashes().forEach(({ submitterEmail, resourceId, reasonCategory, reasonDescription }) => {

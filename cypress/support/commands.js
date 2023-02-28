@@ -15,7 +15,7 @@
 /* globals Cypress cy */
 import "cypress-file-upload";
 import { GraphQLClient, request } from 'graphql-request'
-import { gql } from '../../backend/src/helpers/jest'
+import gql from 'graphql-tag'
 import config from '../../backend/src/config'
 
 const authenticatedHeaders = (variables) => {
