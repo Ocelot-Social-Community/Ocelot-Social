@@ -95,7 +95,11 @@ span.slug {
 
 /* chips on group teaser */
 a.group-teaser footer .ds-chip-primary {
-  background-color: #6e8b87;
+  background-color: $color-primary;
+}
+/* chips on group profile */
+.group-profile .ds-chip-primary {
+  background-color: $color-primary;
 }
 
 /* number count color */
