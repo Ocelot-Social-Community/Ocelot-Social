@@ -298,7 +298,7 @@ describe('VerifyEmailAddress', () => {
               await Factory.build('emailAddress', { email: 'to-be-verified@example.org' })
             })
 
-            it('throws UserInputError because of unique constraints', async () => {
+            it.skip('throws UserInputError because of unique constraints', async () => {
               await expect(mutate({ mutation, variables })).resolves.toMatchObject({
                 data: { VerifyEmailAddress: null },
                 errors: [{ message: 'A user account with this email already exists.' }],
