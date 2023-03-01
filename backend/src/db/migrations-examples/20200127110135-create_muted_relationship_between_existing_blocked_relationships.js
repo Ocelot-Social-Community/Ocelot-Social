@@ -32,7 +32,7 @@ export async function up(next) {
   }
 }
 
-export function down(next) {
+export async function down(next) {
   const driver = getDriver()
   const session = driver.session()
   try {
