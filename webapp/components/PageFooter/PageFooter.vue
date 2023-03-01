@@ -47,7 +47,7 @@ export default {
   color: $color-footer-link;
 }
 .division-space {
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
+  margin-left: 0.4rem;
+  margin-right: 0.4rem;
 }
 </style>
