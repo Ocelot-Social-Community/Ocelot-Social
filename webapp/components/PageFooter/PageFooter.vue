@@ -5,7 +5,7 @@
       <page-params-link :pageParams="pageParams">
         {{ $t(pageParams.internalPage.footerIdent) }}
       </page-params-link>
-      <span class="division-line">-</span>
+      <span class="division-space">&nbsp;</span>
     </span>
     <!-- version -->
     <a
@@ -46,8 +46,8 @@ export default {
 .ds-footer a {
   color: $color-footer-link;
 }
-.division-line {
-  margin-left: 0.2rem;
-  margin-right: 0.2rem;
+.division-space {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 </style>
