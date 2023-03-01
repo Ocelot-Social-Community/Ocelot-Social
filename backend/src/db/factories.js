@@ -18,19 +18,13 @@ const uniqueImageUrl = (imageUrl) => {
 export const cleanDatabase = async (options = {}) => {
   const { driver = getDriver() } = options
   const session = driver.session()
+  const txc = session.beginTransaction()
   try {
-    await session.writeTransaction((transaction) => {
-      return transaction.run(
-        `
-          MATCH (everything)
-          DETACH DELETE everything
-        `,
-      )
-    })
+    await txc.run('MATCH (everything) DETACH DELETE everything')
+    await txc.commit()
   } finally {
     await session.close()
   }
-  return true
 }
 
 Factory.define('category')
