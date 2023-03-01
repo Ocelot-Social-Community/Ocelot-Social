@@ -104,20 +104,20 @@ a.group-teaser footer .ds-chip-primary {
 
 /* number count color */
 div.ds-number > p.ds-number-count {
-  color: #6e8b87;
+  color: $color-primary;
 }
 
 /* active tab border bottom color */
 div.tab-navigation li.Tabs__tab {
-  border-bottom-color: #6e8b87;
+  border-bottom-color: $color-primary;
 }
 
 /* submit button color group form */
 form.group-form button.ds-button-primary {
-  background-color: #6e8b87;
+  background-color: $color-primary;
 }
 
 /* color of active filter tags in post teaser */
 span.category-tag.filterActive {
-  background-color: #6e8b87;
+  background-color: $color-primary;
 }
