@@ -28,8 +28,9 @@ export const cleanDatabase = async (options = {}) => {
       )
     })
   } finally {
-    session.close()
+    await session.close()
   }
+  return true
 }
 
 Factory.define('category')
