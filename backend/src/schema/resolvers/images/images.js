@@ -78,7 +78,7 @@ const wrapTransaction = async (wrappedCallback, args, opts) => {
     })
     return result
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

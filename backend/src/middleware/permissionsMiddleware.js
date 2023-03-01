@@ -78,7 +78,7 @@ const isAllowedToChangeGroupSettings = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
@@ -114,7 +114,7 @@ const isAllowedSeeingGroupMembers = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
@@ -161,7 +161,7 @@ const isAllowedToChangeGroupMemberRole = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
@@ -191,7 +191,7 @@ const isAllowedToJoinGroup = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
@@ -221,7 +221,7 @@ const isAllowedToLeaveGroup = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
@@ -249,7 +249,7 @@ const isMemberOfGroup = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
@@ -283,7 +283,7 @@ const canCommentPost = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
@@ -307,7 +307,7 @@ const isAuthor = rule({
     const [author] = await authorReadTxPromise
     return !!author
   } finally {
-    session.close()
+    await session.close()
   }
 })
 

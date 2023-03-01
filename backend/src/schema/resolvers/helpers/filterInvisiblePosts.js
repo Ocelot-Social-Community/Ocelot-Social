@@ -24,7 +24,7 @@ const getInvisiblePosts = async (context) => {
     const [invisiblePostIds] = readTxResultPromise
     return invisiblePostIds
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

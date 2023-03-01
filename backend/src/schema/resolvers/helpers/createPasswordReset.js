@@ -29,6 +29,6 @@ export default async function createPasswordReset(options) {
     const [records] = await createPasswordResetTxPromise
     return records || {}
   } finally {
-    session.close()
+    await session.close()
   }
 }

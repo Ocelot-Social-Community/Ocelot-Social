@@ -71,7 +71,7 @@ export default {
           })
           return readTxResult.records.map((r) => r.get('user').properties)
         } finally {
-          session.close()
+          await session.close()
         }
       }
       return neo4jgraphql(object, args, context, resolveInfo)
@@ -176,7 +176,7 @@ export default {
       } catch (error) {
         throw new UserInputError(error.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     DeleteUser: async (object, params, context, resolveInfo) => {
@@ -243,7 +243,7 @@ export default {
         const user = await deleteUserTxResultPromise
         return user
       } finally {
-        session.close()
+        await session.close()
       }
     },
     switchUserRole: async (object, args, context, resolveInfo) => {
@@ -268,7 +268,7 @@ export default {
         const user = await writeTxResultPromise
         return user
       } finally {
-        session.close()
+        await session.close()
       }
     },
     saveCategorySettings: async (object, args, context, resolveInfo) => {
@@ -311,7 +311,7 @@ export default {
         await writeTxResultPromise
         return true
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

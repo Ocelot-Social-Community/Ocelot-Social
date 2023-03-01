@@ -21,7 +21,7 @@ const updateHashtagsOfPost = async (postId, hashtags, context) => {
       )
     })
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

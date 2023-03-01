@@ -49,7 +49,7 @@ const createDefaultAdminUser = async (session) => {
   }
   if (createAdmin) {
     const createAdminTxResultPromise = session.writeTransaction(async (txc) => {
-      txc.run(
+      await txc.run(
         `MERGE (e:EmailAddress {
            email: "${defaultAdmin.email}",
            createdAt: toString(datetime())
@@ -104,8 +104,8 @@ class Store {
       console.log(error) // eslint-disable-line no-console
       next(error, null)
     } finally {
-      session.close()
-      driver.close()
+      await session.close()
+      await driver.close()
     }
   }
 
@@ -133,7 +133,7 @@ class Store {
       console.log(error) // eslint-disable-line no-console
       next(error)
     } finally {
-      session.close()
+      await session.close()
     }
   }
 
@@ -168,7 +168,7 @@ class Store {
       console.log(error) // eslint-disable-line no-console
       next(error)
     } finally {
-      session.close()
+      await session.close()
     }
   }
 }

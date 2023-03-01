@@ -38,7 +38,7 @@ export default {
         counts.countInvites = counts.countEmails - counts.countUsers
         return counts
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

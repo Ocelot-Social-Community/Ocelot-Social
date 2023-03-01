@@ -24,6 +24,6 @@ export default async function alreadyExistingMail({ args, context }) {
     */
     return emailBelongsToUser || {}
   } finally {
-    session.close()
+    await session.close()
   }
 }

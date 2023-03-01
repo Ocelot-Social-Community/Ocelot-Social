@@ -48,7 +48,7 @@ export async function handler(req, res) {
       error: `Something went terribly wrong. Please visit ${CONFIG.SUPPORT_URL}`,
     })
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

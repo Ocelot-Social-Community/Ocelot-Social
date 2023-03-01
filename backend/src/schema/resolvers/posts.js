@@ -50,7 +50,7 @@ export default {
         const [emotionsCount] = await readTxResultPromise
         return emotionsCount
       } finally {
-        session.close()
+        await session.close()
       }
     },
     PostsEmotionsByCurrentUser: async (object, params, context, resolveInfo) => {
@@ -70,7 +70,7 @@ export default {
         const [emotions] = await readTxResultPromise
         return emotions
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -145,7 +145,7 @@ export default {
           throw new UserInputError('Post with this slug already exists!')
         throw new Error(e)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     UpdatePost: async (_parent, params, context, _resolveInfo) => {
@@ -195,7 +195,7 @@ export default {
         const post = await writeTxResultPromise
         return post
       } finally {
-        session.close()
+        await session.close()
       }
     },
 
@@ -223,7 +223,7 @@ export default {
         const post = await writeTxResultPromise
         return post
       } finally {
-        session.close()
+        await session.close()
       }
     },
     AddPostEmotions: async (object, params, context, resolveInfo) => {
@@ -250,7 +250,7 @@ export default {
         const [emoted] = await writeTxResultPromise
         return emoted
       } finally {
-        session.close()
+        await session.close()
       }
     },
     RemovePostEmotions: async (object, params, context, resolveInfo) => {
@@ -278,7 +278,7 @@ export default {
         const [emoted] = await writeTxResultPromise
         return emoted
       } finally {
-        session.close()
+        await session.close()
       }
     },
     pinPost: async (_parent, params, context, _resolveInfo) => {
@@ -325,7 +325,7 @@ export default {
           pinnedAt,
         }
       } finally {
-        session.close()
+        await session.close()
       }
       return pinnedPostWithNestedAttributes
     },
@@ -347,7 +347,7 @@ export default {
       try {
         ;[unpinnedPost] = await writeTxResultPromise
       } finally {
-        session.close()
+        await session.close()
       }
       return unpinnedPost
     },
@@ -373,7 +373,7 @@ export default {
         post.viewedTeaserCount = post.viewedTeaserCount.low
         return post
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -430,7 +430,7 @@ export default {
         const relatedContributions = await writeTxResultPromise
         return relatedContributions
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

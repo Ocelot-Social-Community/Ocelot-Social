@@ -38,7 +38,7 @@ export default {
         const currentUser = await currentUserTransactionPromise
         return currentUser
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -75,7 +75,7 @@ export default {
           throw new AuthenticationError('Incorrect email address or password.')
         }
       } finally {
-        session.close()
+        await session.close()
       }
     },
     changePassword: async (_, { oldPassword, newPassword }, { driver, user }) => {

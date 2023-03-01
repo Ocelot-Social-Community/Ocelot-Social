@@ -33,6 +33,6 @@ export default async (driver, authorizationHeader) => {
       ...currentUser,
     }
   } finally {
-    session.close()
+    await session.close()
   }
 }

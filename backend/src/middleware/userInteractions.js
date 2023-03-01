@@ -26,7 +26,7 @@ const setPostCounter = async (postId, relation, context) => {
       return txc.run(createRelatedCypher(relation), { currentUser, postId })
     })
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

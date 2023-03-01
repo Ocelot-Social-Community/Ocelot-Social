@@ -62,7 +62,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     GroupMembers: async (_object, params, context, _resolveInfo) => {
@@ -83,7 +83,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     GroupCount: async (_object, params, context, _resolveInfo) => {
@@ -116,7 +116,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -184,7 +184,7 @@ export default {
           throw new UserInputError('Group with this slug already exists!')
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     UpdateGroup: async (_parent, params, context, _resolveInfo) => {
@@ -260,7 +260,7 @@ export default {
           throw new UserInputError('Group with this slug already exists!')
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     JoinGroup: async (_parent, params, context, _resolveInfo) => {
@@ -289,7 +289,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     LeaveGroup: async (_parent, params, context, _resolveInfo) => {
@@ -317,7 +317,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     ChangeGroupMemberRole: async (_parent, params, context, _resolveInfo) => {
@@ -365,7 +365,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

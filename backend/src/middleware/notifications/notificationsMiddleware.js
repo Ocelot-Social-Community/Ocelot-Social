@@ -27,7 +27,7 @@ const queryNotificationEmails = async (context, notificationUserIds) => {
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -90,7 +90,7 @@ const postAuthorOfComment = async (commentId, { context }) => {
     })
     return postAuthorId.records.map((record) => record.get('authorId'))
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -149,7 +149,7 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -178,7 +178,7 @@ const notifyUsersOfComment = async (label, commentId, postAuthorId, reason, cont
     const notifications = await writeTxResultPromise
     return notifications
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

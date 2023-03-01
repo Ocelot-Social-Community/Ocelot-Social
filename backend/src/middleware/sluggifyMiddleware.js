@@ -15,7 +15,7 @@ const isUniqueFor = (context, type) => {
       })
       return existingSlug.records.length === 0
     } finally {
-      session.close()
+      await session.close()
     }
   }
 }

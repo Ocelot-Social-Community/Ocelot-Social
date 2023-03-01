@@ -28,7 +28,7 @@ export async function up(next) {
     // eslint-disable-next-line no-console
     console.log('rolled back')
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -41,6 +41,6 @@ export function down(next) {
   } catch (err) {
     next(err)
   } finally {
-    session.close()
+    await session.close()
   }
 }

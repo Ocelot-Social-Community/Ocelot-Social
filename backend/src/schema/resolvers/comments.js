@@ -37,7 +37,7 @@ export default {
         const [comment] = await writeTxResultPromise
         return comment
       } finally {
-        session.close()
+        await session.close()
       }
     },
     UpdateComment: async (_parent, params, context, _resolveInfo) => {
@@ -60,7 +60,7 @@ export default {
         const [comment] = await writeTxResultPromise
         return comment
       } finally {
-        session.close()
+        await session.close()
       }
     },
     DeleteComment: async (_parent, args, context, _resolveInfo) => {
@@ -84,7 +84,7 @@ export default {
         const [comment] = await writeTxResultPromise
         return comment
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

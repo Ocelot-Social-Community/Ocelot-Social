@@ -65,7 +65,7 @@ export default {
         const notifications = await readTxResultPromise
         return notifications
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -96,7 +96,7 @@ export default {
         const [notifications] = await writeTxResultPromise
         return notifications
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

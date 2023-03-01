@@ -29,7 +29,7 @@ const swap = async function (next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

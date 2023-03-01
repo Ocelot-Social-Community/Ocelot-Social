@@ -39,7 +39,7 @@ export default function Resolver(type, options = {}) {
         if (returnType === 'object') response = response[0] || null
         return response
       } finally {
-        session.close()
+        await session.close()
       }
     }
   }
@@ -62,7 +62,7 @@ export default function Resolver(type, options = {}) {
         try {
           return await readTxResultPromise
         } finally {
-          session.close()
+          await session.close()
         }
       }
     }
@@ -89,7 +89,7 @@ export default function Resolver(type, options = {}) {
         try {
           return await readTxResultPromise
         } finally {
-          session.close()
+          await session.close()
         }
       }
     }

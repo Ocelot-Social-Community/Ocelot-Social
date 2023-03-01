@@ -22,7 +22,7 @@ export default {
         if (!txResult[0]) return null
         donations = txResult[0]
       } finally {
-        session.close()
+        await session.close()
       }
       return donations
     },
@@ -52,7 +52,7 @@ export default {
         if (!txResult[0]) return null
         donations = txResult[0]
       } finally {
-        session.close()
+        await session.close()
       }
       return donations
     },

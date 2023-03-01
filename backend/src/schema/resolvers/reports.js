@@ -35,7 +35,7 @@ export default {
         const [filedReport] = await fileReportWriteTxResultPromise
         return filedReport || null
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -108,7 +108,7 @@ export default {
         const reports = await reportsReadTxPromise
         return reports
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -143,7 +143,7 @@ export default {
           return relationshipWithNestedAttributes
         })
       } finally {
-        session.close()
+        await session.close()
       }
       return filed
     },
@@ -178,7 +178,7 @@ export default {
           return relationshipWithNestedAttributes
         })
       } finally {
-        session.close()
+        await session.close()
       }
       return reviewed
     },

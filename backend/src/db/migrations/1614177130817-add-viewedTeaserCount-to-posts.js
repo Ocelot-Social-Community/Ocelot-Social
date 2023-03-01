@@ -24,7 +24,7 @@ module.exports.up = async function (next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -48,6 +48,6 @@ module.exports.down = async function (next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }

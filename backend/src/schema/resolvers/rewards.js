@@ -38,7 +38,7 @@ export default {
           )
         })
       } finally {
-        session.close()
+        await session.close()
       }
       return user.toJson()
     },

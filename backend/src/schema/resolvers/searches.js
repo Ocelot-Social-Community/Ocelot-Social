@@ -124,7 +124,7 @@ const getSearchResults = async (context, setup, params, resultCallback = searchR
     log(results)
     return resultCallback(results)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

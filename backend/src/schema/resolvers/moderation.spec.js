@@ -70,7 +70,7 @@ describe('moderate resources', () => {
 
   afterAll(async () => {
     await cleanDatabase()
-    driver.close()
+    await driver.close()
   })
 
   beforeEach(async () => {

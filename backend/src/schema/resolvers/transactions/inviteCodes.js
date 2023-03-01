@@ -17,6 +17,6 @@ export async function validateInviteCode(session, inviteCode) {
     const txResult = await readTxResultPromise
     return !!txResult[0]
   } finally {
-    session.close()
+    await session.close()
   }
 }

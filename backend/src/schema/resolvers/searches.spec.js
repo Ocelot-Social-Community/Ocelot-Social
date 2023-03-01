@@ -26,8 +26,8 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
-  neode.close()
+  await driver.close()
+  await neode.close()
 })
 
 const searchQuery = gql`

@@ -27,7 +27,7 @@ export default {
         const [isShouted] = await shoutWriteTxResultPromise
         return isShouted
       } finally {
-        session.close()
+        await session.close()
       }
     },
 
@@ -55,7 +55,7 @@ export default {
         const [isShouted] = await unshoutWriteTxResultPromise
         return isShouted
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

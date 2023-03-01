@@ -31,7 +31,7 @@ const validateCreateComment = async (resolve, root, args, context, info) => {
       return resolve(root, args, context, info)
     }
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -94,7 +94,7 @@ const validateReview = async (resolve, root, args, context, info) => {
     if (authorId && authorId === user.id)
       throw new Error(`You cannot review your own ${existingReportedResource.label}!`)
   } finally {
-    session.close()
+    await session.close()
   }
 
   return resolve(root, args, context, info)

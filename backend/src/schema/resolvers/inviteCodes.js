@@ -56,7 +56,7 @@ export default {
         const txResult = await writeTxResultPromise
         return txResult[0]
       } finally {
-        session.close()
+        await session.close()
       }
     },
     MyInviteCodes: async (_parent, args, context, _resolveInfo) => {
@@ -78,7 +78,7 @@ export default {
         const txResult = await readTxResultPromise
         return txResult
       } finally {
-        session.close()
+        await session.close()
       }
     },
     isValidInviteCode: async (_parent, args, context, _resolveInfo) => {
@@ -118,7 +118,7 @@ export default {
         const txResult = await writeTxResultPromise
         return txResult[0]
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

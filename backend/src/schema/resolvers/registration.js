@@ -62,7 +62,7 @@ export default {
           throw new UserInputError('User with this slug already exists!')
         throw new UserInputError(e.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

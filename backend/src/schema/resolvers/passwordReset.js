@@ -41,7 +41,7 @@ export default {
         const [reset] = await passwordResetTxPromise
         return !!(reset && reset.properties.usedAt)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
