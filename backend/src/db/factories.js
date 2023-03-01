@@ -106,18 +106,12 @@ Factory.define('user')
   )
   .after(async (buildObject, options) => {
     const user = await neode.create('User', buildObject)
-    console.log(user)
     const email = await neode.create('EmailAddress', { email: options.email })
-    console.log(email)
-    const u2e = await user.relateTo(email, 'primaryEmail')
-    console.log(u2e)
-    const e2u = await email.relateTo(user, 'belongsTo')
-    console.log(e2u)
+    await user.relateTo(email, 'primaryEmail')
+    await email.relateTo(user, 'belongsTo')
     const avatar = await options.avatar
-    console.log(avatar)
     if (avatar) {
-      const u2a = await user.relateTo(avatar, 'avatar')
-      console.log(u2a)
+      await user.relateTo(avatar, 'avatar')
     }
     return user
   })
