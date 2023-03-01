@@ -80,7 +80,7 @@ export default {
       } = context
       const { nonce, email } = args
       const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (txc) => {
+      const writeTxResultPromise = await session.writeTransaction(async (txc) => {
         const result = await txc.run(
           `
             MATCH (user:User {id: $userId})-[:PRIMARY_EMAIL]->(previous:EmailAddress)
