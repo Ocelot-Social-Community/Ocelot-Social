@@ -74,9 +74,9 @@
           </div>
         </div>
       </ds-grid-item>
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
+      <!-- Placeholder/Space Row -->
+      <ds-grid-item :row-span="1" column-span="fullWidth">
+      </ds-grid-item>
       <!-- hashtag filter -->
       <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
