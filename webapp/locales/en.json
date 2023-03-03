@@ -452,6 +452,7 @@
       "message": "Leaving a group may be irreversible!<br>Leave group <b>“{name}”</b>!",
       "title": "Do you really want to leave the group?"
     },
+    "memberRemoved": "User “{name}” was removed from group",
     "members": "Members",
     "membersAdministrationList": {
       "avatar": "Avatar",

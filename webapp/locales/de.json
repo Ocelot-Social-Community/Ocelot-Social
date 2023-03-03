@@ -452,6 +452,7 @@
       "message": "Eine Gruppe zu verlassen ist möglicherweise nicht rückgängig zu machen!<br>Gruppe <b>„{name}“</b> verlassen!",
       "title": "Möchtest du wirklich die Gruppe verlassen?"
     },
+    "memberRemoved": "Nutzer „{name}“ wurde aus der Gruppe entfernt",
     "members": "Mitglieder",
     "membersAdministrationList": {
       "avatar": "Avatar",
