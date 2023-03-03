@@ -6,6 +6,7 @@ import {
   joinGroupMutation,
   leaveGroupMutation,
   changeGroupMemberRoleMutation,
+  removeUserFromGroupMutation,
   groupMembersQuery,
   groupQuery,
 } from '../../graphql/groups'
@@ -196,7 +197,6 @@ const seedComplexScenarioAndClearAuthentication = async () => {
     },
   })
   // hidden-group
-  authenticatedUser = await adminMemberUser.toJson()
   await mutate({
     mutation: createGroupMutation(),
     variables: {
@@ -214,32 +214,17 @@ const seedComplexScenarioAndClearAuthentication = async () => {
     mutation: changeGroupMemberRoleMutation(),
     variables: {
       groupId: 'hidden-group',
-      userId: 'admin-member-user',
+      userId: 'usual-member-user',
       roleInGroup: 'usual',
     },
   })
-  await mutate({
-    mutation: changeGroupMemberRoleMutation(),
-    variables: {
-      groupId: 'hidden-group',
-      userId: 'second-owner-member-user',
-      roleInGroup: 'usual',
-    },
-  })
+
   await mutate({
     mutation: changeGroupMemberRoleMutation(),
     variables: {
       groupId: 'hidden-group',
       userId: 'admin-member-user',
-      roleInGroup: 'usual',
-    },
-  })
-  await mutate({
-    mutation: changeGroupMemberRoleMutation(),
-    variables: {
-      groupId: 'hidden-group',
-      userId: 'second-owner-member-user',
-      roleInGroup: 'usual',
+      roleInGroup: 'admin',
     },
   })
 
@@ -251,7 +236,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  await cleanDatabase()
+  // await cleanDatabase()
   driver.close()
 })
 
@@ -2977,6 +2962,173 @@ describe('in mode', () => {
               })
               expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
             })
+          })
+        })
+      })
+    })
+  })
+
+  describe('RemoveUserFromGroup', () => {
+    beforeAll(async () => {
+      await seedComplexScenarioAndClearAuthentication()
+    })
+
+    afterEach(async () => {
+      // await cleanDatabase()
+    })
+
+    describe('unauthenticated', () => {
+      it('throws an error', async () => {
+        await expect(
+          mutate({
+            mutation: removeUserFromGroupMutation(),
+            variables: {
+              groupId: 'hidden-group',
+              userId: 'usual-member-user',
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: expect.arrayContaining([
+            expect.objectContaining({
+              message: 'Not Authorized!',
+            }),
+          ]),
+        })
+      })
+    })
+
+    describe('authenticated', () => {
+      describe('as usual member', () => {
+        it('throws an error', async () => {
+          authenticatedUser = await usualMemberUser.toJson()
+          await expect(
+            mutate({
+              mutation: removeUserFromGroupMutation(),
+              variables: {
+                groupId: 'hidden-group',
+                userId: 'admin-member-user',
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: expect.arrayContaining([
+              expect.objectContaining({
+                message: 'Not Authorized!',
+              }),
+            ]),
+          })
+        })
+      })
+
+      describe('as owner', () => {
+        beforeEach(async () => {
+          authenticatedUser = await ownerMemberUser.toJson()
+        })
+
+        it('removes the user from the group', async () => {
+          await expect(
+            mutate({
+              mutation: removeUserFromGroupMutation(),
+              variables: {
+                groupId: 'hidden-group',
+                userId: 'usual-member-user',
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              RemoveUserFromGroup: expect.objectContaining({
+                id: 'usual-member-user',
+                myRoleInGroup: null,
+              }),
+            },
+            errors: undefined,
+          })
+        })
+
+        it('cannot remove self', async () => {
+          await expect(
+            mutate({
+              mutation: removeUserFromGroupMutation(),
+              variables: {
+                groupId: 'hidden-group',
+                userId: 'owner-member-user',
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: expect.arrayContaining([
+              expect.objectContaining({
+                message: 'Not Authorized!',
+              }),
+            ]),
+          })
+        })
+      })
+
+      describe('as admin', () => {
+        beforeEach(async () => {
+          authenticatedUser = await adminMemberUser.toJson()
+          await mutate({
+            mutation: changeGroupMemberRoleMutation(),
+            variables: {
+              groupId: 'hidden-group',
+              userId: 'usual-member-user',
+              roleInGroup: 'usual',
+            },
+          })
+        })
+
+        it('removes the user from the group', async () => {
+          await expect(
+            mutate({
+              mutation: removeUserFromGroupMutation(),
+              variables: {
+                groupId: 'hidden-group',
+                userId: 'usual-member-user',
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              RemoveUserFromGroup: expect.objectContaining({
+                id: 'usual-member-user',
+                myRoleInGroup: null,
+              }),
+            },
+            errors: undefined,
+          })
+        })
+
+        it('cannot remove self', async () => {
+          await expect(
+            mutate({
+              mutation: removeUserFromGroupMutation(),
+              variables: {
+                groupId: 'hidden-group',
+                userId: 'admin-member-user',
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: expect.arrayContaining([
+              expect.objectContaining({
+                message: 'Not Authorized!',
+              }),
+            ]),
+          })
+        })
+
+        it('cannot remove owner', async () => {
+          await expect(
+            mutate({
+              mutation: removeUserFromGroupMutation(),
+              variables: {
+                groupId: 'hidden-group',
+                userId: 'owner-member-user',
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: expect.arrayContaining([
+              expect.objectContaining({
+                message: 'Not Authorized!',
+              }),
+            ]),
           })
         })
       })

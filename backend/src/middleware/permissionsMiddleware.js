@@ -271,19 +271,25 @@ const canRemoveUserFromGroup = rule({
       { currentUserId, groupId, userId },
     )
     return {
-      currentUserRole: transactionResponse.records.map((record) => record.get('currentUserRole'))[0],
+      currentUserRole: transactionResponse.records.map((record) =>
+        record.get('currentUserRole'),
+      )[0],
       userRole: transactionResponse.records.map((record) => record.get('userRole'))[0],
     }
   })
   try {
     const { currentUserRole, userRole } = await readTxPromise
-    return currentUserRole && ['admin', 'owner'].includes(currentUserRole)
-      && userRole && userRole !== 'owner'
+    return (
+      currentUserRole &&
+      ['admin', 'owner'].includes(currentUserRole) &&
+      userRole &&
+      userRole !== 'owner'
+    )
   } catch (error) {
     throw new Error(error)
   } finally {
     session.close()
-  }  
+  }
 })
 
 const canCommentPost = rule({
