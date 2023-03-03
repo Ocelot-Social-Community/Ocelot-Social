@@ -400,5 +400,8 @@ export default {
     font-size: 23px;
     z-index: 10;
   }
+  .ds-grid{                                         
+    padding-top: 1em;                               
+  } 
 }
 </style>
