@@ -236,7 +236,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  // await cleanDatabase()
+  await cleanDatabase()
   driver.close()
 })
 
@@ -2973,8 +2973,8 @@ describe('in mode', () => {
       await seedComplexScenarioAndClearAuthentication()
     })
 
-    afterEach(async () => {
-      // await cleanDatabase()
+    afterAll(async () => {
+      await cleanDatabase()
     })
 
     describe('unauthenticated', () => {
