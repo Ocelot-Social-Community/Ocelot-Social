@@ -15,11 +15,10 @@
 /* globals Cypress cy */
 import "cypress-file-upload";
 import { GraphQLClient, request } from 'graphql-request'
-import gql from 'graphql-tag'
 import config from '../../backend/src/config'
 
 const authenticatedHeaders = (variables) => {
-  const mutation = gql`
+  const mutation = `
     mutation($email: String!, $password: String!) {
       login(email: $email, password: $password)
     }
