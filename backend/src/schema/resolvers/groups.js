@@ -368,6 +368,37 @@ export default {
         session.close()
       }
     },
+    RemoveUserFromGroup: async (_parent, params, context, _resolveInfo) => {
+      const { groupId, userId } = params
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const removeUserFromGroupCypher = `
+          MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
+          DELETE membership
+          WITH member AS user, group
+          OPTIONAL MATCH (u:User)-[:WROTE]->(p:Post)-[:IN]->(group)
+            WHERE NOT u.id = $userId
+          WITH user, collect(p) AS posts
+          FOREACH (post IN posts |
+            MERGE (user)-[:CANNOT_SEE]->(post))
+          RETURN user {.*, myRoleInGroup: null}`
+
+        const transactionResponse = await transaction.run(removeUserFromGroupCypher, {
+          groupId,
+          userId,
+        })
+
+        const [user] = await transactionResponse.records.map((record) => record.get('user'))
+        return user
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
   },
   Group: {
     ...Resolver('Group', {
