@@ -25,9 +25,9 @@ jobs:
       - name: Neo4J | Build `community` image
         run: |
           docker build --target community \
-            --tag "ocelotsocialnetwork/neo4j-community:latest" \
-            --tag "ocelotsocialnetwork/neo4j-community:${VERSION}" \
-            --tag "ocelotsocialnetwork/neo4j-community:${BUILD_VERSION}" \
+            --tag 'ocelotsocialnetwork/neo4j-community:latest' \
+            --tag 'ocelotsocialnetwork/neo4j-community:${VERSION}'' \
+            --tag 'ocelotsocialnetwork/neo4j-community:${BUILD_VERSION}'' \
             --build-arg BBUILD_DATE=$BUILD_DATE \
             --build-arg BBUILD_VERSION=$BUILD_VERSION \
             --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
