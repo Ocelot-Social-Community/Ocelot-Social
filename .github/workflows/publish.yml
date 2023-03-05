@@ -25,9 +25,9 @@ jobs:
       - name: Neo4J | Build `community` image
         run: |
           docker build --target community \
-            -t "ocelotsocialnetwork/neo4j-community:latest" \
-            -t "ocelotsocialnetwork/neo4j-community:${VERSION}" \
-            -t "ocelotsocialnetwork/neo4j-community:${BUILD_VERSION}" \
+            --tag "ocelotsocialnetwork/neo4j-community:latest" \
+            --tag "ocelotsocialnetwork/neo4j-community:${VERSION}" \
+            --tag "ocelotsocialnetwork/neo4j-community:${BUILD_VERSION}" \
             --build-arg BBUILD_DATE=$BUILD_DATE \
             --build-arg BBUILD_VERSION=$BUILD_VERSION \
             --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
@@ -58,25 +58,25 @@ jobs:
       - name: Backend | Build `production` image
         run: |
           docker build --target base \
-            -t "ocelotsocialnetwork/backend:latest-base" \
-            -t "ocelotsocialnetwork/backend:${VERSION}-base" \
-            -t "ocelotsocialnetwork/backend:${BUILD_VERSION}-base" \
+            --tag "ocelotsocialnetwork/backend:latest-base" \
+            --tag "ocelotsocialnetwork/backend:${VERSION}-base" \
+            --tag "ocelotsocialnetwork/backend:${BUILD_VERSION}-base" \
             --build-arg BBUILD_DATE=$BUILD_DATE \
             --build-arg BBUILD_VERSION=$BUILD_VERSION \
             --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
             backend/
           docker build --target code \
-            -t "ocelotsocialnetwork/backend:latest-code" \
-            -t "ocelotsocialnetwork/backend:${VERSION}-code" \
-            -t "ocelotsocialnetwork/backend:${BUILD_VERSION}-code" \
+            --tag "ocelotsocialnetwork/backend:latest-code" \
+            --tag "ocelotsocialnetwork/backend:${VERSION}-code" \
+            --tag "ocelotsocialnetwork/backend:${BUILD_VERSION}-code" \
             --build-arg BBUILD_DATE=$BUILD_DATE \
             --build-arg BBUILD_VERSION=$BUILD_VERSION \
             --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
             backend/
           docker build --target production \
-            -t "ocelotsocialnetwork/backend:latest" \
-            -t "ocelotsocialnetwork/backend:${VERSION}" \
-            -t "ocelotsocialnetwork/backend:${BUILD_VERSION}" \
+            --tag "ocelotsocialnetwork/backend:latest" \
+            --tag "ocelotsocialnetwork/backend:${VERSION}" \
+            --tag "ocelotsocialnetwork/backend:${BUILD_VERSION}" \
             --build-arg BBUILD_DATE=$BUILD_DATE \
             --build-arg BBUILD_VERSION=$BUILD_VERSION \
             --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
@@ -107,25 +107,25 @@ jobs:
       - name: Webapp | Build `production` image
         run: |
           docker build --target base \
-            -t "ocelotsocialnetwork/webapp:latest-base" \
-            -t "ocelotsocialnetwork/webapp:${VERSION}-base" \
-            -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}-base" \
+            --tag "ocelotsocialnetwork/webapp:latest-base" \
+            --tag "ocelotsocialnetwork/webapp:${VERSION}-base" \
+            --tag "ocelotsocialnetwork/webapp:${BUILD_VERSION}-base" \
             --build-arg BBUILD_DATE=$BUILD_DATE \
             --build-arg BBUILD_VERSION=$BUILD_VERSION \
             --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
             webapp/
           docker build --target code \
-            -t "ocelotsocialnetwork/webapp:latest-code" \
-            -t "ocelotsocialnetwork/webapp:${VERSION}-code" \
-            -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}-code" \
+            --tag "ocelotsocialnetwork/webapp:latest-code" \
+            --tag "ocelotsocialnetwork/webapp:${VERSION}-code" \
+            --tag "ocelotsocialnetwork/webapp:${BUILD_VERSION}-code" \
             --build-arg BBUILD_DATE=$BUILD_DATE \
             --build-arg BBUILD_VERSION=$BUILD_VERSION \
             --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
             webapp/
           docker build --target production \
-            -t "ocelotsocialnetwork/webapp:latest" \
-            -t "ocelotsocialnetwork/webapp:${VERSION}" \
-            -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}" \
+            --tag "ocelotsocialnetwork/webapp:latest" \
+            --tag "ocelotsocialnetwork/webapp:${VERSION}" \
+            --tag "ocelotsocialnetwork/webapp:${BUILD_VERSION}" \
             --build-arg BBUILD_DATE=$BUILD_DATE \
             --build-arg BBUILD_VERSION=$BUILD_VERSION \
             --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
@@ -156,27 +156,27 @@ jobs:
       - name: Maintenance | Build `production` image
         run: |
           docker build --target base \
-            -t "ocelotsocialnetwork/maintenance:latest-base" \
-            -t "ocelotsocialnetwork/maintenance:${VERSION}-base" \
-            -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}-base" \
+            --tag "ocelotsocialnetwork/maintenance:latest-base" \
+            --tag "ocelotsocialnetwork/maintenance:${VERSION}-base" \
+            --tag "ocelotsocialnetwork/maintenance:${BUILD_VERSION}-base" \
             --build-arg BBUILD_DATE=$BUILD_DATE \
             --build-arg BBUILD_VERSION=$BUILD_VERSION \
             --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
             -f webapp/Dockerfile.maintenance \
             webapp/ 
           docker build --target code \
-            -t "ocelotsocialnetwork/maintenance:latest-code" \
-            -t "ocelotsocialnetwork/maintenance:${VERSION}-code" \
-            -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}-code" \
+            --tag "ocelotsocialnetwork/maintenance:latest-code" \
+            --tag "ocelotsocialnetwork/maintenance:${VERSION}-code" \
+            --tag "ocelotsocialnetwork/maintenance:${BUILD_VERSION}-code" \
             --build-arg BBUILD_DATE=$BUILD_DATE \
             --build-arg BBUILD_VERSION=$BUILD_VERSION \
             --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
             -f webapp/Dockerfile.maintenance \
             webapp/
           docker build --target production \
-            -t "ocelotsocialnetwork/maintenance:latest" \
-            -t "ocelotsocialnetwork/maintenance:${VERSION}" \
-            -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}" \
+            --tag "ocelotsocialnetwork/maintenance:latest" \
+            --tag "ocelotsocialnetwork/maintenance:${VERSION}" \
+            --tag "ocelotsocialnetwork/maintenance:${BUILD_VERSION}" \
             --build-arg BBUILD_DATE=$BUILD_DATE \
             --build-arg BBUILD_VERSION=$BUILD_VERSION \
             --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
