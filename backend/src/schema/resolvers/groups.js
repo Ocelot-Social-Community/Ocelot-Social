@@ -295,25 +295,8 @@ export default {
     LeaveGroup: async (_parent, params, context, _resolveInfo) => {
       const { groupId, userId } = params
       const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const leaveGroupCypher = `
-          MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
-          DELETE membership
-          WITH member, group
-          OPTIONAL MATCH (p:Post)-[:IN]->(group)
-          WHERE NOT group.groupType = 'public' 
-          WITH member, group, collect(p) AS posts
-          FOREACH (post IN posts |
-            MERGE (member)-[:CANNOT_SEE]->(post))
-          RETURN member {.*, myRoleInGroup: NULL}
-        `
-
-        const transactionResponse = await transaction.run(leaveGroupCypher, { groupId, userId })
-        const [member] = await transactionResponse.records.map((record) => record.get('member'))
-        return member
-      })
       try {
-        return await writeTxResultPromise
+        return await removeUserFromGroupWriteTxResultPromise(session, groupId, userId)
       } catch (error) {
         throw new Error(error)
       } finally {
@@ -371,28 +354,8 @@ export default {
     RemoveUserFromGroup: async (_parent, params, context, _resolveInfo) => {
       const { groupId, userId } = params
       const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const removeUserFromGroupCypher = `
-          MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
-          DELETE membership
-          WITH member AS user, group
-          OPTIONAL MATCH (u:User)-[:WROTE]->(p:Post)-[:IN]->(group)
-            WHERE NOT u.id = $userId
-          WITH user, collect(p) AS posts
-          FOREACH (post IN posts |
-            MERGE (user)-[:CANNOT_SEE]->(post))
-          RETURN user {.*, myRoleInGroup: null}`
-
-        const transactionResponse = await transaction.run(removeUserFromGroupCypher, {
-          groupId,
-          userId,
-        })
-
-        const [user] = await transactionResponse.records.map((record) => record.get('user'))
-        return user
-      })
       try {
-        return await writeTxResultPromise
+        return await removeUserFromGroupWriteTxResultPromise(session, groupId, userId)
       } catch (error) {
         throw new Error(error)
       } finally {
@@ -413,4 +376,28 @@ export default {
       },
     }),
   },
+}
+
+const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId) => {
+  return session.writeTransaction(async (transaction) => {
+    const removeUserFromGroupCypher = `
+      MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
+      DELETE membership
+      WITH user, group
+      OPTIONAL MATCH (author:User)-[:WROTE]->(p:Post)-[:IN]->(group)
+      WHERE NOT group.groupType = 'public' 
+        AND NOT author.id = $userId
+      WITH user, collect(p) AS posts
+      FOREACH (post IN posts |
+        MERGE (user)-[:CANNOT_SEE]->(post))
+      RETURN user {.*, myRoleInGroup: NULL}
+    `
+
+    const transactionResponse = await transaction.run(removeUserFromGroupCypher, {
+      groupId,
+      userId,
+    })
+    const [user] = await transactionResponse.records.map((record) => record.get('user'))
+    return user
+  })
 }

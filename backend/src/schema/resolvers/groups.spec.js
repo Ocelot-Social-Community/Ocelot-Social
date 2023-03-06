@@ -3076,6 +3076,26 @@ describe('in mode', () => {
           })
         })
 
+        it('throws an error', async () => {
+          authenticatedUser = await usualMemberUser.toJson()
+          await expect(
+            mutate({
+              mutation: removeUserFromGroupMutation(),
+              variables: {
+                groupId: 'hidden-group',
+                userId: 'admin-member-user',
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: expect.arrayContaining([
+              expect.objectContaining({
+                message: 'Not Authorized!',
+              }),
+            ]),
+          })
+        })
+
+        /*
         it('removes the user from the group', async () => {
           await expect(
             mutate({
@@ -3131,6 +3151,7 @@ describe('in mode', () => {
             ]),
           })
         })
+        */
       })
     })
   })

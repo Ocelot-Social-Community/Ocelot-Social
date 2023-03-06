@@ -280,10 +280,7 @@ const canRemoveUserFromGroup = rule({
   try {
     const { currentUserRole, userRole } = await readTxPromise
     return (
-      currentUserRole &&
-      ['admin', 'owner'].includes(currentUserRole) &&
-      userRole &&
-      userRole !== 'owner'
+      currentUserRole && ['owner'].includes(currentUserRole) && userRole && userRole !== 'owner'
     )
   } catch (error) {
     throw new Error(error)
