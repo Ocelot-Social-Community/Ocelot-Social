@@ -1,4 +1,4 @@
-name: ocelot.social publish CI
+name: publish
 
 on:
   push:
@@ -279,6 +279,26 @@ jobs:
           body_path: ./CHANGELOG.md
           draft: false
           prerelease: false
+
+  build_trigger:
+    name: Trigger successful build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch full History for changelog
+      - name: Setup env
+        run: |
+          echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+          echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
+      - run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          event-type: trigger_build_success
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "VERSION": "${VERSION}", "BUILD_DATE": "${BUILD_DATE}", "BUILD_COMMIT": "${BUILD_COMMIT}", "BUILD_VERSION": "${BUILD_VERSION}"}'
 
   # ##############################################################################
   # # JOB: KUBERNETES DEPLOY ACTUAL/LATEST VERSION ######################################
