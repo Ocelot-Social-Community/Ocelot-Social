@@ -16,7 +16,7 @@
           :label="$t('filter-menu.my-groups')"
           :filled="filteredByPostsInMyGroups"
           :title="$t('contribution.filterMyGroups')"
-          @click="toggleFilteredByMyGroups(currentUser.id)"
+          @click="toggleFilteredByMyGroups()"
         />
       </li>
     </template>
