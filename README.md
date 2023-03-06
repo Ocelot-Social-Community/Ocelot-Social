@@ -20,6 +20,12 @@ At the same time, it should be possible in the future to link these networks wit
 
 In other words, we are interested in a network of networks and in keeping the data as close as possible to the user and the operator they trusts.
 
+## Screenshots
+
+<img src="https://user-images.githubusercontent.com/17728384/218597429-554e4082-3906-4721-8f68-0c13146fc218.png" alt="Post feed" title="Post feed" />
+
+Check out more screenshots [here](/wiki/en:Screenshots).
+
 ## Features
 
 Ocelot.social networks feature: 
@@ -33,12 +39,6 @@ Ocelot.social networks feature:
 * and more …
 
 Check out the [full feature list](/wiki/en:FAQ#what-are-the-features).
-
-## Screenshots
-
-<img src="https://user-images.githubusercontent.com/17728384/218597429-554e4082-3906-4721-8f68-0c13146fc218.png" alt="Post feed" title="Post feed" />
-
-Check out more screenshots [here](/wiki/en:Screenshots).
 
 ## User Guide and Frequently Asked Questions
 
