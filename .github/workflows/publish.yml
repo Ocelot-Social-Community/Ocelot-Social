@@ -283,6 +283,7 @@ jobs:
   build_trigger:
     name: Trigger successful build
     runs-on: ubuntu-latest
+    needs: [github_tag]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -297,6 +298,7 @@ jobs:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v1
         with:
+          token: ${{ secrets.PAT }}
           event-type: trigger_build_success
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "VERSION": "${VERSION}", "BUILD_DATE": "${BUILD_DATE}", "BUILD_COMMIT": "${BUILD_COMMIT}", "BUILD_VERSION": "${BUILD_VERSION}"}'
 
