@@ -1,7 +1,7 @@
 name: publish-branded
 on:
   repository_dispatch:
-    types: [trigger_build_success]
+    types: [trigger-build-success]
 jobs:
   build_branded:
     name: Docker Build Branded

@@ -299,7 +299,8 @@ jobs:
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ github.token }}
-          event-type: trigger_build_success
+          event-type: trigger-build-success
+          repository: ${{ github.repository }}
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "VERSION": "${VERSION}", "BUILD_DATE": "${BUILD_DATE}", "BUILD_COMMIT": "${BUILD_COMMIT}", "BUILD_VERSION": "${BUILD_VERSION}"}'
 
   # ##############################################################################
