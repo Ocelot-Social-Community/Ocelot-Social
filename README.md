@@ -53,7 +53,7 @@ Try out our live demo network, see [here](#live-demo-and-developer-logins).
 
 ## Help us
 
-If you're wondering how could you help, there are plenty of ways, e.g.:
+If you're wondering how you could help, there are plenty of ways, e.g.:
 
 * Spread the good word about ocelot.social to make it more popular:
   * Add the link [ocelot.social](https://ocelot.social) to your website.
