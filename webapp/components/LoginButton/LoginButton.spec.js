@@ -1,7 +1,10 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import LoginButton from './LoginButton.vue'
 
-config.stubs['v-popover'] = '<span><slot /></span>'
+const stubs = {
+  'v-popover': true,
+  'nuxt-link': true,
+}
 
 describe('LoginButton.vue', () => {
   let wrapper
@@ -22,7 +25,7 @@ describe('LoginButton.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(LoginButton, { mocks, propsData })
+      return mount(LoginButton, { mocks, propsData, stubs })
     }
 
     beforeEach(() => {
@@ -30,12 +33,12 @@ describe('LoginButton.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.contains('.login-button')).toBe(true)
+      expect(wrapper.find('.login-button').exists()).toBe(true)
     })
 
     it('open popup', () => {
       wrapper.find('.base-button').trigger('click')
-      expect(wrapper.contains('.login-button')).toBe(true)
+      expect(wrapper.find('.login-button').exists()).toBe(true)
     })
   })
 })

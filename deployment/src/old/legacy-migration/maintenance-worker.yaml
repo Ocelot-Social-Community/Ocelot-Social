@@ -1,0 +1,40 @@
+---
+  kind: Pod
+  apiVersion: v1
+  metadata:
+    name: develop-maintenance-worker
+    namespace: ocelot-social
+  spec:
+    containers:
+    - name: develop-maintenance-worker
+      image: ocelotsocialnetwork/develop-maintenance-worker:latest
+      imagePullPolicy: Always
+      resources:
+        requests:
+          memory: "2G"
+        limits:
+          memory: "8G"
+      envFrom:
+      - configMapRef:
+          name: maintenance-worker
+      - configMapRef:
+          name: configmap
+      volumeMounts:
+      - name: secret-volume
+        readOnly: false
+        mountPath: /root/.ssh
+      - name: uploads
+        mountPath: /uploads
+      - name: neo4j-data
+        mountPath: /data/
+    volumes:
+    - name: secret-volume
+      secret:
+        secretName: ssh-keys
+        defaultMode: 0400
+    - name: uploads
+      persistentVolumeClaim:
+        claimName: uploads-claim
+    - name: neo4j-data
+      persistentVolumeClaim:
+        claimName: neo4j-data-claim

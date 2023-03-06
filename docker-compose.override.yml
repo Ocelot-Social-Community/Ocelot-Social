@@ -64,6 +64,7 @@ services:
   ########################################################
   mailserver:
     image: djfarrelly/maildev
+    container_name: mailserver
     ports:
       - 1080:80
     networks:

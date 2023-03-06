@@ -1,0 +1,29 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: configmap-{{ .Release.Name }}-backend
+  labels:
+    app.kubernetes.io/name:	"{{ .Chart.Name }}"
+    app.kubernetes.io/instance:	"{{ .Release.Name }}"
+    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+    app.kubernetes.io/component: "configmap-backend"
+    app.kubernetes.io/part-of:	"{{ .Chart.Name }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+data:
+  PRODUCTION_DB_CLEAN_ALLOW: "{{ .Values.PRODUCTION_DB_CLEAN_ALLOW }}"
+  PUBLIC_REGISTRATION: "{{ .Values.PUBLIC_REGISTRATION }}"
+  INVITE_REGISTRATION: "{{ .Values.INVITE_REGISTRATION }}"
+  CATEGORIES_ACTIVE: "{{ .Values.CATEGORIES_ACTIVE }}"
+  CLIENT_URI: "{{ .Values.BACKEND.CLIENT_URI }}"
+  EMAIL_DEFAULT_SENDER: "{{ .Values.BACKEND.EMAIL_DEFAULT_SENDER }}"
+  SMTP_HOST: "{{ .Values.BACKEND.SMTP_HOST }}"
+  SMTP_PORT: "{{ .Values.BACKEND.SMTP_PORT }}"
+  SMTP_IGNORE_TLS: "{{ .Values.BACKEND.SMTP_IGNORE_TLS }}"
+  SMTP_SECURE: "{{ .Values.BACKEND.SMTP_SECURE }}"
+  GRAPHQL_URI: "http://{{ .Release.Name }}-backend:4000"
+  NEO4J_URI: "bolt://{{ .Release.Name }}-neo4j:7687"
+  #REDIS_DOMAIN: ---toBeSet(IP)---
+  #REDIS_PORT: "6379"
+  #SENTRY_DSN_WEBAPP: "---toBeSet---"
+  #SENTRY_DSN_BACKEND: "---toBeSet---"
