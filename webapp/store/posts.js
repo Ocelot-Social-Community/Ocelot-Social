@@ -30,6 +30,19 @@ export const mutations = {
       }
     }
   },
+  TOGGLE_FILTER_BY_MY_GROUPS(state) {
+    const filter = clone(state.filter)
+    const status = get(filter, 'postsInMyGroups')
+    if (status) {
+      delete filter.postsInMyGroups
+      state.filter = filter
+    } else {
+      state.filter = {
+        ...filter,
+        postsInMyGroups: true,
+      }
+    }
+  },
   RESET_CATEGORIES(state) {
     const filter = clone(state.filter)
     delete filter.categories_some
@@ -83,6 +96,9 @@ export const getters = {
   },
   filteredByUsersFollowed(state) {
     return !!get(state.filter, 'author.followedBy_some.id')
+  },
+  filteredByPostsInMyGroups(state) {
+    return !!get(state.filter, 'postsInMyGroups')
   },
   filteredByEmotions(state) {
     return get(state.filter, 'emotions_some.emotion_in') || []
