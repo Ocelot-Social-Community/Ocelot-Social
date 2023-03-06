@@ -337,7 +337,7 @@ export default {
                 id: user.id,
                 slug: user.slug,
                 name: user.name,
-                about: user.about,
+                about: user.about ? user.about : undefined,
               },
               geometry: {
                 type: 'Point',
@@ -358,7 +358,7 @@ export default {
                 id: group.id,
                 slug: group.slug,
                 name: group.name,
-                about: group.about,
+                about: group.about ? group.about : undefined,
               },
               geometry: {
                 type: 'Point',
@@ -378,7 +378,7 @@ export default {
               id: this.currentUser.id,
               slug: this.currentUser.slug,
               name: this.currentUser.name,
-              about: this.currentUser.about,
+              about: this.currentUser.about ? this.currentUser.about : undefined,
             },
             geometry: {
               type: 'Point',
