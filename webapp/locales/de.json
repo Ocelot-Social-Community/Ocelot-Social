@@ -270,6 +270,7 @@
     "filterFollow": "Beiträge von Nutzern filtern, denen ich folge",
     "filterMasonryGrid": {
       "myFriends": "Nutzer denen ich folge",
+      "myGroups": "Meine Gruppen",
       "myTopics": "Meine Themen",
       "noFilter": "Beiträge filtern"
     },
