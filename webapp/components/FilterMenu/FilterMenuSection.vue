@@ -4,14 +4,13 @@
 
     <ul class="filter-list">
       <slot name="filter-follower" />
-      <slot name="filter-posts-in-my-groups" />
     </ul>
     <ul class="filter-list">
       <slot name="filter-topics" />
     </ul>
     <!-- <aside class="sidebar">
-         <slot name="sidebar" />
-         </aside> -->
+      <slot name="sidebar" />
+    </aside> -->
     <!-- <div v-if="divider" class="divider" /> -->
     <ul class="filter-list">
       <slot name="filter-list" />
