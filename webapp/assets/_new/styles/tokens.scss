@@ -376,3 +376,20 @@ $color-footer-link: $color-primary;
  */
 
 $color-locale-menu: $text-color-soft;
+
+/** 
+ * @tokens Donation Bar Color
+ */
+
+$color-donation-bar: $color-primary;
+$color-donation-bar-light: $color-primary-light;
+
+/** 
+ * @tokens Toast Color
+ */
+
+$color-toast-red: $color-danger;
+$color-toast-orange: $color-warning;
+$color-toast-yellow: $color-yellow;
+$color-toast-blue: $color-secondary;
+$color-toast-green: $color-success;
