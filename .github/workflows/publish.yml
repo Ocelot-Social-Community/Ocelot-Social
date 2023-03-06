@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - new-ocelot-workflows-publish-deploy
 
 jobs:
   ##############################################################################
@@ -260,9 +259,7 @@ jobs:
           github_repo: ${{ github.repository }}
           version: ${{ env.BUILD_VERSION }}
           git_commit_sha: ${{ github.sha }}
-          #git_tag_prefix: "b"
-          # TODO
-          git_tag_prefix: "test"
+          git_tag_prefix: "b"
       - name: Generate changelog
         run: |
           yarn install
