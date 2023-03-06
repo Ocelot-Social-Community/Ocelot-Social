@@ -16,7 +16,7 @@
     "lint": "eslint --ext .js,.vue .",
     "locales": "../scripts/translations/missing-keys.sh && ../scripts/translations/sort.sh",
     "precommit": "yarn lint",
-    "test": "cross-env NODE_ENV=test jest --coverage --forceExit --detectOpenHandles",
+    "test": "cross-env NODE_ENV=test jest --no-cache --forceExit --detectOpenHandles",
     "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand"
   },
   "dependencies": {
@@ -83,6 +83,7 @@
     "babel-eslint": "~10.1.0",
     "babel-jest": "29.4",
     "babel-loader": "~8.1.0",
+    "babel-plugin-component": "^1.1.1",
     "babel-plugin-require-context-hook": "^1.0.0",
     "babel-preset-vue": "~2.0.2",
     "core-js": "~2.6.10",
