@@ -32,8 +32,7 @@ export const mutations = {
   },
   TOGGLE_FILTER_BY_MY_GROUPS(state) {
     const filter = clone(state.filter)
-    const status = get(filter, 'postsInMyGroups')
-    if (status) {
+    if (get(filter, 'postsInMyGroups')) {
       delete filter.postsInMyGroups
       state.filter = filter
     } else {
