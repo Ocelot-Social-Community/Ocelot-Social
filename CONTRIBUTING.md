@@ -175,7 +175,7 @@ Please copy and paste the following quotes for the languages:
 #### Environment Variable For Apple M1 Platform
 
 To set the following environment variable seems not be needed anymore, probably because Docker knows in its newest version on which CPU it runs and sets that to default.
-But we leave this command here to keep the knowledge about how to set the platform:
+If you encounter trouble building the docker containers on an Apple M1 chip you can try to explicitly define the target platform docker builds and pulls images for:
 
 ```bash
 # set env variable for your shell
