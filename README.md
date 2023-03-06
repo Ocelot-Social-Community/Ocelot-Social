@@ -30,7 +30,7 @@ Ocelot.social networks feature:
 * <strong>maps</strong>
 * <strong>search</strong>
 * <strong>filters</strong>
-* ...and more. 
+* and more …
 
 Check out the [full feature list](/wiki/en:FAQ#what-are-the-features).
 
