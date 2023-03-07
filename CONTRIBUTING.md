@@ -199,7 +199,7 @@ $ docker compose exec backend yarn db:seed
 
 # for production
 $ docker compose -f docker-compose.yml -f docker-compose.apple-m1.override.yml up
-# only once: init admin user and create indices and constraints in Neo4j database
+# only once: init admin user and create indexes and constraints in Neo4j database
 $ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
 ```
 
