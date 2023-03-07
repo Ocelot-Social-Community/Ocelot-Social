@@ -2,7 +2,7 @@ import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../../db/factories'
 import { getDriver, getNeode } from '../../db/neo4j'
 import createServer from '../../server'
-import { gql } from '../../helpers/jest'
+import gql from 'graphql-tag'
 
 const driver = getDriver()
 const neode = getNeode()
