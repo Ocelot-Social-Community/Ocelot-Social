@@ -2,16 +2,16 @@ version: 2
 updates:
 - package-ecosystem: "github-actions"
   directory: "/"
+  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
-  # open-pull-requests-limit: 10
-  # ignore:
 
 - package-ecosystem: npm
   directory: "/"
+  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -19,6 +19,7 @@ updates:
     time: "03:00"
 - package-ecosystem: npm
   directory: "/backend"
+  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -26,6 +27,7 @@ updates:
     time: "03:00"
 - package-ecosystem: npm
   directory: "/webapp"
+  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -34,6 +36,7 @@ updates:
 
 - package-ecosystem: docker
   directory: "/backend"
+  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -41,6 +44,7 @@ updates:
     time: "03:00"
 - package-ecosystem: docker
   directory: "/webapp"
+  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -48,6 +52,7 @@ updates:
     time: "03:00"
 - package-ecosystem: docker
   directory: "/neo4j"
+  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -55,6 +60,7 @@ updates:
     time: "03:00"
 - package-ecosystem: docker
   directory: "/deployment/src/docker"
+  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
