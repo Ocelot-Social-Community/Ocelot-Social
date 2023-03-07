@@ -53,7 +53,7 @@
         </ds-chip>
       </template>
       <template #edit="scope">
-        <ds-button
+        <base-button
           v-if="scope.row.myRoleInGroup !== 'owner'"
           size="small"
           primary
@@ -63,7 +63,7 @@
           "
         >
           {{ $t('group.removeMemberButton') }}
-        </ds-button>
+        </base-button>
       </template>
     </ds-table>
     <ds-modal
