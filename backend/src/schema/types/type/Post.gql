@@ -82,6 +82,7 @@ input _PostFilter {
   emotions_single: _PostEMOTEDFilter
   emotions_every: _PostEMOTEDFilter
   group: _GroupFilter
+  postsInMyGroups: Boolean
 }
 
 enum _PostOrdering {
