@@ -56,6 +56,18 @@ describe('getters', () => {
     })
   })
 
+  describe('filteredByPostsInMyGroups', () => {
+    it('returns true if filter is set', () => {
+      state = { filter: { postsInMyGroups: true } }
+      expect(getters.filteredByPostsInMyGroups(state)).toBe(true)
+    })
+
+    it('returns false if filter is not set', () => {
+      state = { filter: { categories_some: { id_in: [23] } } }
+      expect(getters.filteredByUsersFollowed(state)).toBe(false)
+    })
+  })
+
   describe('filteredByEmotions', () => {
     it('returns an emotions array if filter is set', () => {
       state = { filter: { emotions_some: { emotion_in: ['sad'] } } }
@@ -226,6 +238,35 @@ describe('mutations', () => {
 
       it('remove the id of the current user from the filter object', () => {
         expect(testMutation(4711)).toEqual({})
+      })
+    })
+  })
+
+  describe('TOGGLE_FILTER_BY_MY_GROUPS', () => {
+    beforeEach(() => {
+      testMutation = () => {
+        mutations.TOGGLE_FILTER_BY_MY_GROUPS(state)
+        return getters.filter(state)
+      }
+    })
+
+    describe('given empty filter', () => {
+      beforeEach(() => {
+        state = { filter: {} }
+      })
+
+      it('sets postsInMyGroups filter to true', () => {
+        expect(testMutation()).toEqual({ postsInMyGroups: true })
+      })
+    })
+
+    describe('already filtered', () => {
+      beforeEach(() => {
+        state = { filter: { postsInMyGroups: true } }
+      })
+
+      it('removes postsInMyGroups filter', () => {
+        expect(testMutation()).toEqual({})
       })
     })
   })
