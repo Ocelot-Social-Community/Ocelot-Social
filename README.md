@@ -20,12 +20,71 @@ At the same time, it should be possible in the future to link these networks wit
 
 In other words, we are interested in a network of networks and in keeping the data as close as possible to the user and the operator they trusts.
 
-## Introduction
+## Screenshots
+
+<img src="https://user-images.githubusercontent.com/17728384/218597429-554e4082-3906-4721-8f68-0c13146fc218.png" alt="Post feed" title="Post feed" />
+
+Check out more screenshots [here](/wiki/en:Screenshots).
+
+## Features
+
+Ocelot.social networks feature: 
+* <strong>user accounts</strong>
+* <strong>user roles</strong>
+* <strong>posts</strong> and <strong>comments</strong>
+* <strong>groups</strong>
+* <strong>maps</strong>
+* <strong>search</strong>
+* <strong>filters</strong>
+* and more …
+
+Check out the [full feature list](/wiki/en:FAQ#what-are-the-features).
+
+## User Guide and Frequently Asked Questions
+
+In the [wiki](/wiki) you can find more information.
+
+* [User Guide](/wiki/en:User-Guide)
+* [Frequently Asked Questions](/wiki/en:FAQ)
+
+## Demo
+
+Try out our live demo network, see [here](#live-demo-and-developer-logins).
+
+## Help us
+
+If you're wondering how you could help, there are plenty of ways, e.g.:
+
+* Spread the good word about ocelot.social to make it more popular:
+  * Add the link [ocelot.social](https://ocelot.social) to your website.
+  * Give ocelot.social a Like at https://alternativeto.net/software/ocelot-social/.
+  * Star our project on GitHub at https://github.com/Ocelot-Social-Community/Ocelot-Social/.
+  * Promote it on your social networks.
+  * Tell your friends about it by word-of-mouth.
+  * Write a press article on ocelot.social or contact the editorial office of your local newspage or radio station.
+* Take a [good first issue](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) or issues that need help. Make sure to read [CONTRIBUTING.md](/CONTRIBUTING.md) first though.
+* Testing and [reporting](/issues/new/choose) bugs.
+* Translating: Please [contact us](#contact).
+* Reviewing and testing pull requests.
+
+## Donate 
+
+Your donation is very welcome and helps to enhance and improve the network. This software is mostly developped and maintained by the association [busFaktor() e.V.](https://www.busfaktor.org/en). Please support us with a [donation](https://www.busfaktor.org/en/donations) to busFaktor() e.V.. Thanks a lot! ❤️
+
+## Contact
+
+Are you interested in operating your own ocelot.social network or becoming a user? Please contact us here:
+* [hello@ocelot.social](mailto:hello@ocelot.social)
+* [Discord](https://discord.com/invite/DFSjPaX)
+
+## For Developers and Contributors
+
+### Introduction
 
 Have a look into our short video:
 [ocelot.social - GitHub - Developer Welcome - Tutorial (english)](https://www.youtube.com/watch?v=gZSL6KvBIiY&list=PLFMD5liPP01kbuReHxYXxv_1fI5rIgS1f&index=1)
 
-## Directory Layout
+### Directory Layout
 
 There are three important directories:
 
@@ -41,9 +100,9 @@ There are two approaches:
 1. [Local](#local-installation) installation, which means you have to take care of dependencies yourself.
 2. **Or** Install everything through [Docker](#docker-installation) which takes care of dependencies for you.
 
-## Installation
+### Installation
 
-### Clone the Repository
+#### Clone the Repository
 
 Clone the repository, this will create a new folder called `Ocelot-Social`:
 
@@ -65,7 +124,7 @@ Change into the new folder.
 $ cd Ocelot-Social
 ```
 
-## Live Demo And Developer Logins
+### Live Demo And Developer Logins
 
 **Try out our deployed [development environment](https://stage.ocelot.social).**
 
@@ -74,7 +133,7 @@ Visit our staging networks:
 * central staging network: [stage.ocelot.social](https://stage.ocelot.social)
 <!-- - rebranded staging network: [rebrand.ocelot.social](https://stage.ocelot.social). -->
 
-### Login
+#### Login
 
 Logins for the live demos and developers (local developers after the following installations) in the browser:
 
@@ -84,11 +143,11 @@ Logins for the live demos and developers (local developers after the following i
 | `moderator@example.org` | 1234 | moderator |
 | `admin@example.org` | 1234 | admin |
 
-### Docker Installation
+#### Docker Installation
 
 Docker is a software development container tool that combines software and its dependencies into one standardized unit that contains everything needed to run it. This helps us to avoid problems with dependencies and makes installation easier.
 
-#### General Installation of Docker
+##### General Installation of Docker
 
 There are [several ways to install Docker CE](https://docs.docker.com/install/) on your computer or server.
 
@@ -105,7 +164,7 @@ $ docker-compose --version
 docker-compose version 1.23.2
 ```
 
-#### Start Ocelot-Social via Docker-Compose
+##### Start Ocelot-Social via Docker-Compose
 
 Prepare ENVs once beforehand:
 
@@ -152,11 +211,11 @@ $ docker-compose exec backend yarn run db:seed
 For a closer description see [backend README.md](./backend/README.md).  
 For a full documentation see [SUMMARY](./SUMMARY.md).
 
-### Local Installation
+#### Local Installation
 
 For a full documentation see [SUMMARY](./SUMMARY.md).
 
-## Contributing
+### Contributing
 
 Choose an issue (consider our label [good-first-issue](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)) and leave a comment there. We will then invite you to join our volunteers team.
 To have the necessary permission to push directly to this repository, please accept our invitation to join our volunteers team, you will receive via the email, Github will send you, once invited. If we did not invite you yet, please request an invitation via Discord.
@@ -182,7 +241,7 @@ $ yarn test
 
 Check out our [contribution guideline](./CONTRIBUTING.md), too!
 
-### Developer Chat
+#### Developer Chat
 
 Join our friendly open-source community on [Discord](https://discord.gg/AJSX9DCSUA) :heart_eyes_cat:
 Just introduce yourself at `#introduce-yourself` and mention a mentor or `@@Mentors` to get you onboard :neckbeard:
@@ -190,13 +249,13 @@ Just introduce yourself at `#introduce-yourself` and mention a mentor or `@@Ment
 We give write permissions to every developer who asks for it. Just text us on
 [Discord](https://discord.gg/AJSX9DCSUA).
 
-## Deployment
+### Deployment
 
 Deployment methods can be found in the [Ocelot-Social-Deploy-Rebranding](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding) repository.
 
 The only deployment method in this repository for development purposes as described above is `docker-compose`.
 
-## Technology Stack
+### Technology Stack
 
 * [VueJS](https://vuejs.org/)
 * [NuxtJS](https://nuxtjs.org/)
@@ -204,7 +263,7 @@ The only deployment method in this repository for development purposes as descri
 * [NodeJS](https://nodejs.org/en/)
 * [Neo4J](https://neo4j.com/)
 
-### For Testing
+#### For Testing
 
 * [Cypress](https://docs.cypress.io/)
 * [Storybook](https://storybook.js.org/)
@@ -212,7 +271,7 @@ The only deployment method in this repository for development purposes as descri
 * [Vue Test Utils](https://vue-test-utils.vuejs.org/)
 * [ESLint](https://eslint.org/)
 
-## Attributions
+### Attributions
 
 Locale Icons made by [Freepik](http://www.freepik.com/) from [www.flaticon.com](https://www.flaticon.com/) is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/).
 
@@ -220,6 +279,6 @@ Browser compatibility testing with [BrowserStack](https://www.browserstack.com/)
 
 <img alt="BrowserStack Logo" src=".gitbook/assets/browserstack-logo.svg" width="256">
 
-## License
+### License
 
 See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
