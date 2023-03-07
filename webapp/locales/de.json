@@ -270,9 +270,11 @@
     "filterFollow": "Beiträge von Nutzern filtern, denen ich folge",
     "filterMasonryGrid": {
       "myFriends": "Nutzer denen ich folge",
+      "myGroups": "Meine Gruppen",
       "myTopics": "Meine Themen",
       "noFilter": "Beiträge filtern"
     },
+    "filterMyGroups": "Beiträge in meinen Gruppen",
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache Deines Beitrags",
     "languageSelectText": "Sprache wählen",
@@ -380,6 +382,7 @@
     "filter-by": "Filtern nach ...",
     "following": "Nutzer denen ich folge",
     "languages": "Sprachen",
+    "my-groups": "Meinen Gruppen",
     "order": {
       "newest": {
         "hint": "Sortiere die Neuesten nach vorn",
