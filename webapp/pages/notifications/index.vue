@@ -115,6 +115,7 @@ export default {
         await this.$apollo.mutate({
           mutation: markAllAsReadMutation(this.$i18n),
         })
+        this.$apollo.queries.notifications.refresh()
       } catch (error) {
         this.$toast.error(error.message)
       }

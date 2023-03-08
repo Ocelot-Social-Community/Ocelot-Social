@@ -1,4 +1,4 @@
-import { shallowMount, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import NotificationsPage from './index.vue'
 
 import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
@@ -10,13 +10,13 @@ const localVue = global.localVue
 
 const stubs = {
   'client-only': true,
+  'notifications-table': true,
 }
 
 describe('PostIndex', () => {
-  let wrapper, Wrapper, mocks, propsData, markAllAsReadButton
+  let wrapper, Wrapper, mocks
 
   beforeEach(() => {
-    propsData = {}
     mocks = {
       $t: (string) => string,
       $toast: {
@@ -38,97 +38,97 @@ describe('PostIndex', () => {
     }
   })
 
-  describe('shallowMount', () => {
-    beforeEach(() => {
-      Wrapper = () => {
-        return shallowMount(NotificationsPage, {
-          mocks,
-          localVue,
-          propsData,
-          stubs,
-        })
-      }
-      wrapper = Wrapper()
-    })
-
-    it('renders a Notications header', () => {
-      expect(wrapper.find('ds-heading-stub').exists()).toBe(true)
-    })
-
-    it('renders a `dropdown-filter` component', () => {
-      expect(wrapper.find('dropdown-filter-stub').exists()).toBe(true)
-    })
-
-    it('renders a `notifications-table` component', () => {
-      expect(wrapper.find('notifications-table-stub').exists()).toBe(true)
-    })
-  })
-
   describe('mount', () => {
+    jest.clearAllMocks()
     beforeEach(() => {
       Wrapper = () => {
         return mount(NotificationsPage, {
           mocks,
           localVue,
-          propsData,
           stubs,
         })
       }
+      wrapper = Wrapper()
+      wrapper.setData({
+        notifications: [
+          {
+            id: 'mentioned_in_comment/c4-1/u1',
+            read: false,
+            reason: 'mentioned_in_comment',
+            createdAt: '2023-03-06T14:32:47.924Z',
+            updatedAt: '2023-03-06T14:32:47.924Z',
+          },
+          {
+            id: 'mentioned_in_post/p8/u1',
+            read: false,
+            reason: 'mentioned_in_post',
+            createdAt: '2023-03-06T14:32:47.667Z',
+            updatedAt: '2023-03-06T14:32:47.667Z',
+          },
+        ],
+      })
+    })
+
+    it('renders a Notications header', () => {
+      expect(wrapper.find('.ds-heading').exists()).toBe(true)
+    })
+
+    it('renders a `dropdown-filter` component', () => {
+      expect(wrapper.find('.dropdown-filter').exists()).toBe(true)
+    })
+
+    it('renders a `notifications-table` component', () => {
+      expect(wrapper.findComponent(NotificationsTable).exists()).toBe(true)
+    })
+
+    it('renders a `mark-all-as-read` button', () => {
+      expect(wrapper.find('[data-test="markAllAsRead-button"]').exists()).toBe(true)
     })
 
     describe('filter', () => {
-      beforeEach(() => {
-        propsData.filterOptions = [
-          { label: 'All', value: null },
-          { label: 'Read', value: true },
-          { label: 'Unread', value: false },
-        ]
-        wrapper = Wrapper()
-        markAllAsReadButton = wrapper.find('[data-test="markAllAsRead-button"]')
-        expect(markAllAsReadButton).toBeTruthy()
-        wrapper.findComponent(DropdownFilter).vm.$emit('filter', propsData.filterOptions[1])
+      it('has "All" as default', () => {
+        expect(wrapper.find('a.dropdown-filter').text()).toBe('notifications.filterLabel.all')
       })
 
-      it('sets `notificationRead` to value of received option', () => {
-        expect(wrapper.vm.notificationRead).toEqual(propsData.filterOptions[1].value)
-      })
+      describe('select Read', () => {
+        beforeEach(() => {
+          wrapper.findComponent(DropdownFilter).vm.$emit('filter', wrapper.vm.filterOptions[1])
+        })
 
-      it('set label to the label of the received option', () => {
-        expect(wrapper.vm.selected).toEqual(propsData.filterOptions[1].label)
-      })
+        it('sets `notificationRead` to value of received option', () => {
+          expect(wrapper.vm.notificationRead).toEqual(wrapper.vm.filterOptions[1].value)
+        })
 
-      it('refreshes the notifications', () => {
-        expect(mocks.$apollo.queries.notifications.refresh).toHaveBeenCalledTimes(1)
-      })
+        it('sets label to the label of the received option', () => {
+          expect(wrapper.vm.selected).toEqual(wrapper.vm.filterOptions[1].label)
+        })
 
-      it('click on `mark all as read` button', async () => {
-        await markAllAsReadButton.trigger('click')
-        expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+        it('refreshes the notifications', () => {
+          expect(mocks.$apollo.queries.notifications.refresh).toHaveBeenCalledTimes(1)
+        })
       })
     })
 
-    describe('markAllAsRead', () => {
-      let expectedParams
+    describe('markNotificationAsRead', () => {
       beforeEach(() => {
-        wrapper = Wrapper()
         wrapper
-          .findComponentComponent(NotificationsTable)
+          .findComponent(NotificationsTable)
           .vm.$emit('markNotificationAsRead', 'notificationSourceId')
       })
 
       it('calls markAllAsRead mutation', () => {
-        expectedParams = {
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
           mutation: markAsReadMutation(),
           variables: { id: 'notificationSourceId' },
-        }
-        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
+        })
       })
 
       describe('error handling', () => {
         beforeEach(() => {
           mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({ message: 'Some error message' })
-          wrapper = Wrapper()
-          wrapper.findComponent(NotificationsTable).vm.$emit('markAllAsRead', 'notificationSourceId')
+          wrapper
+            .findComponent(NotificationsTable)
+            .vm.$emit('markNotificationAsRead', 'notificationSourceId')
         })
 
         it('shows an error message if there is an error', () => {
@@ -138,37 +138,21 @@ describe('PostIndex', () => {
     })
 
     describe('markAllNotificationAsRead', () => {
-      let expectedParams
-      beforeEach(() => {
-        wrapper = Wrapper()
-        // FIXME Should I remove next line?
-        wrapper.find(NotificationsTable).vm.$emit('markAllAsRead', 'notificationSourceId')
-      })
-
-      // FIXME: I need to discover why this test isn't working =(
-      it.skip('calls markAllNotificationAsRead mutation', async () => {
-        expectedParams = {
+      it('calls markAllNotificationAsRead mutation and refreshes notification', async () => {
+        wrapper.find('button[data-test="markAllAsRead-button"]').trigger('click')
+        await expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
           mutation: markAllAsReadMutation(),
-        }
-        // expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
-        // await wrapper.find('[data-test="markAllAsRead-button"]').trigger('click')
-
-        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
+        })
+        expect(mocks.$apollo.queries.notifications.refresh).toHaveBeenCalledTimes(1)
       })
 
       describe('error handling', () => {
-        beforeEach(() => {
-          mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({ message: 'Some error message' })
-          wrapper = Wrapper()
-          // FIXME Should I remove next line?
-          wrapper.findComponent(NotificationsTable).vm.$emit('markAllAsRead', 'notificationSourceId')
-          wrapper
-            .findComponent(NotificationsTable)
-            .vm.$emit('markNotificationAsRead', 'notificationSourceId')
-        })
-
-        it('shows an error message if there is an error', () => {
-          expect(mocks.$toast.error).toHaveBeenCalledWith('Some error message')
+        it('shows an error message if there is an error', async () => {
+          mocks.$apollo.mutate = jest
+            .fn()
+            .mockRejectedValueOnce({ message: 'Another error message' })
+          await wrapper.find('button[data-test="markAllAsRead-button"]').trigger('click')
+          expect(mocks.$toast.error).toHaveBeenCalledWith('Another error message')
         })
       })
     })
