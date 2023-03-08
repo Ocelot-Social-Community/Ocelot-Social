@@ -137,7 +137,7 @@ $ docker exec backend yarn run db:reset
 $ docker-compose down -v
 # if container is not running, run this command to set up your database indexes and constraints
 $ docker exec backend yarn run db:migrate init
-# And then upgrade the indices and const
+# And then upgrade the indexes and const
 $ docker exec backend yarn run db:migrate up
 ```
 
