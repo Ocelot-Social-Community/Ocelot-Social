@@ -11,7 +11,7 @@ export default makeAugmentedSchema({
         'Badge',
         'Embed',
         'EmailAddress',
-        'Notfication',
+        'Notification',
         'Statistics',
         'LoggedInUser',
         'Location',

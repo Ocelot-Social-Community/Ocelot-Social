@@ -28,6 +28,7 @@ const sentry = {
 const options = {
   VERSION: process.env.VERSION || pkg.version,
   DESCRIPTION: process.env.DESCRIPTION || pkg.description,
+  MAPBOX_TOKEN: process.env.MAPBOX_TOKEN,
   PUBLIC_REGISTRATION: process.env.PUBLIC_REGISTRATION === 'true' || false,
   INVITE_REGISTRATION: process.env.INVITE_REGISTRATION !== 'false', // default = true
   // Cookies

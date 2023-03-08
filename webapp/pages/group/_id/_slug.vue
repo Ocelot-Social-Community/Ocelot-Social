@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isGroupVisible">
+  <div class="group-profile" v-if="isGroupVisible">
     <ds-space />
     <ds-flex v-if="group" :width="{ base: '100%' }" gutter="base">
       <ds-flex-item :width="{ base: '100%', sm: 2, md: 2, lg: 1 }">
@@ -26,10 +26,10 @@
             />
             <!-- TODO: implement later on -->
             <!-- @mute="muteUser"
-              @unmute="unmuteUser"
-              @block="blockUser"
-              @unblock="unblockUser"
-              @delete="deleteUser" -->
+                 @unmute="unmuteUser"
+                 @block="blockUser"
+                 @unblock="unblockUser"
+                 @delete="deleteUser" -->
           </client-only>
           <ds-space margin="small">
             <!-- group name -->
@@ -65,38 +65,38 @@
               </client-only>
             </ds-flex-item>
             <!-- <ds-flex-item>
-              <client-only>
-                <ds-number :label="$t('profile.followers')">
-                  <count-to
-                    slot="count"
-                    :start-val="followedByCountStartValue"
-                    :end-val="user.followedByCount"
-                  />
-                </ds-number>
-              </client-only>
-            </ds-flex-item> -->
+                 <client-only>
+                 <ds-number :label="$t('profile.followers')">
+                 <count-to
+                 slot="count"
+                 :start-val="followedByCountStartValue"
+                 :end-val="user.followedByCount"
+                 />
+                 </ds-number>
+                 </client-only>
+                 </ds-flex-item> -->
             <!-- <ds-flex-item>
-              <client-only>
-                <ds-number :label="$t('profile.following')">
-                  <count-to slot="count" :end-val="user.followingCount" />
-                </ds-number>
-              </client-only>
-            </ds-flex-item> -->
+                 <client-only>
+                 <ds-number :label="$t('profile.following')">
+                 <count-to slot="count" :end-val="user.followingCount" />
+                 </ds-number>
+                 </client-only>
+                 </ds-flex-item> -->
           </ds-flex>
           <div class="action-buttons">
             <!-- <base-button v-if="user.isBlocked" @click="unblockUser(user)">
-              {{ $t('settings.blocked-users.unblock') }}
-            </base-button>
-            <base-button v-if="user.isMuted" @click="unmuteUser(user)">
-              {{ $t('settings.muted-users.unmute') }}
-            </base-button>
-            <follow-button
-              v-if="!user.isMuted && !user.isBlocked"
-              :follow-id="user.id"
-              :is-followed="user.followedByCurrentUser"
-              @optimistic="optimisticFollow"
-              @update="updateFollow"
-            /> -->
+                 {{ $t('settings.blocked-users.unblock') }}
+                 </base-button>
+                 <base-button v-if="user.isMuted" @click="unmuteUser(user)">
+                 {{ $t('settings.muted-users.unmute') }}
+                 </base-button>
+                 <follow-button
+                 v-if="!user.isMuted && !user.isBlocked"
+                 :follow-id="user.id"
+                 :is-followed="user.followedByCurrentUser"
+                 @optimistic="optimisticFollow"
+                 @update="updateFollow"
+                 /> -->
             <!-- Group join / leave -->
             <join-leave-button
               :group="group || {}"
@@ -108,7 +108,7 @@
               @update="updateJoinLeave"
             />
             <!-- implement:
-              v-if="!user.isMuted && !user.isBlocked" -->
+                 v-if="!user.isMuted && !user.isBlocked" -->
           </div>
           <hr />
           <ds-space margin-top="small" margin-bottom="small">
@@ -161,7 +161,9 @@
               <ds-space margin="xx-small" />
               <div class="categories">
                 <div
-                  v-for="(category, index) in group.categories"
+                  v-for="(category, index) in sortCategories(
+                    group && group.categories ? group.categories : [],
+                  )"
                   :key="category.id"
                   align="center"
                 >
@@ -211,19 +213,19 @@
           @fetchAllProfiles="fetchAllMembers"
         />
         <!-- <ds-space />
-        <follow-list
-          :loading="$apollo.loading"
-          :user="user"
-          type="followedBy"
-          @fetchAllConnections="fetchAllConnections"
-        />
-        <ds-space />
-        <follow-list
-          :loading="$apollo.loading"
-          :user="user"
-          type="following"
-          @fetchAllConnections="fetchAllConnections"
-        /> -->
+             <follow-list
+             :loading="$apollo.loading"
+             :user="user"
+             type="followedBy"
+             @fetchAllConnections="fetchAllConnections"
+             />
+             <ds-space />
+             <follow-list
+             :loading="$apollo.loading"
+             :user="user"
+             type="following"
+             @fetchAllConnections="fetchAllConnections"
+             /> -->
         <!-- <social-media :user-name="groupName" :user="user" /> -->
       </ds-flex-item>
 
@@ -326,6 +328,7 @@ import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import ProfileList from '~/components/features/ProfileList/ProfileList'
+import SortCategories from '~/mixins/sortCategoriesMixin.js'
 // import SocialMedia from '~/components/SocialMedia/SocialMedia'
 // import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 
@@ -356,7 +359,7 @@ export default {
     // SocialMedia,
     // TabNavigation,
   },
-  mixins: [postListActions],
+  mixins: [postListActions, SortCategories],
   transition: {
     name: 'slide-up',
     mode: 'out-in',

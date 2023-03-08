@@ -1,11 +1,13 @@
-import { config, shallowMount, mount } from '@vue/test-utils'
+import { shallowMount, mount } from '@vue/test-utils'
 
 import ConfirmModal from './ConfirmModal.vue'
 import { postMenuModalsData } from '~/components/utils/PostHelpers'
 
 const localVue = global.localVue
 
-config.stubs['sweetalert-icon'] = '<span><slot /></span>'
+const stubs = {
+  'sweetalert-icon': true,
+}
 
 describe('ConfirmModal.vue', () => {
   let Wrapper
@@ -41,6 +43,7 @@ describe('ConfirmModal.vue', () => {
         propsData,
         mocks,
         localVue,
+        stubs,
       })
     }
 
@@ -90,10 +93,13 @@ describe('ConfirmModal.vue', () => {
         propsData,
         mocks,
         localVue,
+        stubs,
       })
     }
 
-    beforeEach(jest.useFakeTimers)
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
 
     describe('given post id', () => {
       beforeEach(() => {

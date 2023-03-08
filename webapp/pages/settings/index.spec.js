@@ -87,7 +87,7 @@ describe('index.vue', () => {
     })
 
     it('renders', () => {
-      expect(Wrapper().contains('div')).toBe(true)
+      expect(Wrapper().element.tagName).toBe('FORM')
     })
 
     describe('given form validation errors', () => {

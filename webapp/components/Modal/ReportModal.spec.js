@@ -1,10 +1,12 @@
-import { config, shallowMount, mount } from '@vue/test-utils'
+import { shallowMount, mount } from '@vue/test-utils'
 import ReportModal from './ReportModal.vue'
 import Vue from 'vue'
 
 const localVue = global.localVue
 
-config.stubs['sweetalert-icon'] = '<span><slot /></span>'
+const stubs = {
+  'sweetalert-icon': true,
+}
 
 describe('ReportModal.vue', () => {
   let wrapper
@@ -39,6 +41,7 @@ describe('ReportModal.vue', () => {
         propsData,
         mocks,
         localVue,
+        stubs,
       })
     }
 
@@ -109,13 +112,16 @@ describe('ReportModal.vue', () => {
         propsData,
         mocks,
         localVue,
+        stubs,
       })
     }
 
-    beforeEach(jest.useFakeTimers)
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
 
     it('renders', () => {
-      expect(Wrapper().is('div')).toBe(true)
+      expect(Wrapper().element.tagName).toBe('DIV')
     })
 
     describe('given id', () => {

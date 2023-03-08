@@ -1,9 +1,12 @@
-import { config, mount, shallowMount } from '@vue/test-utils'
+import { mount, shallowMount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import DeleteUserModal from './DeleteUserModal.vue'
 const localVue = global.localVue
-config.stubs['sweetalert-icon'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+
+const stubs = {
+  'sweetalert-icon': true,
+  'nuxt-link': true,
+}
 
 localVue.use(DeleteUserModal)
 
@@ -49,6 +52,7 @@ describe('DeleteUserModal.vue', () => {
         mocks,
         store,
         localVue,
+        stubs,
       })
     }
 
@@ -74,9 +78,12 @@ describe('DeleteUserModal.vue', () => {
         mocks,
         store,
         localVue,
+        stubs,
       })
     }
-    beforeEach(jest.useFakeTimers)
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
 
     describe('given another user', () => {
       beforeEach(() => {

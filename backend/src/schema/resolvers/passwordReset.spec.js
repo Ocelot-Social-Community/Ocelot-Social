@@ -1,5 +1,5 @@
 import Factory, { cleanDatabase } from '../../db/factories'
-import { gql } from '../../helpers/jest'
+import gql from 'graphql-tag'
 import { getNeode, getDriver } from '../../db/neo4j'
 import CONSTANTS_REGISTRATION from './../../constants/registration'
 import createPasswordReset from './helpers/createPasswordReset'
@@ -38,6 +38,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
+  driver.close()
 })
 
 beforeEach(() => {

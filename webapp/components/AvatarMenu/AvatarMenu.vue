@@ -31,7 +31,10 @@
             slot-scope="item"
             :route="item.route"
             :parents="item.parents"
-            @click.native="closeMenu(false)"
+            @click.native="
+              closeMenu(false)
+              $emit('toggle-Mobile-Menu-view')
+            "
           >
             <base-icon :name="item.route.icon" />
             {{ item.route.name }}

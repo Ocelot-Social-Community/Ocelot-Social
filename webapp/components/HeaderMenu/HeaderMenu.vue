@@ -1,5 +1,9 @@
 <template>
-  <ds-container class="main-navigation-container" style="padding: 10px 10px">
+  <ds-container
+    class="main-navigation-container"
+    :class="{ 'hide-navbar': hideNavbar }"
+    id="navbar"
+  >
     <div>
       <!-- header menu -->
       <ds-flex v-if="!showMobileMenu" class="main-navigation-flex">
@@ -20,7 +24,7 @@
             <logo logoType="header" />
           </nuxt-link>
         </ds-flex-item>
-        <!-- dynamic-brand-menu -->
+        <!-- dynamic brand menus -->
         <ds-flex-item
           v-for="item in menu"
           :key="item.name"
@@ -39,8 +43,7 @@
             </ds-text>
           </nuxt-link>
         </ds-flex-item>
-
-        <!-- search-field -->
+        <!-- search field -->
         <ds-flex-item
           v-if="isLoggedIn"
           id="nav-search-box"
@@ -55,26 +58,29 @@
         >
           <search-field />
         </ds-flex-item>
-        <!-- filter-menu 
-                TODO: Filter is only visible on index    
-            -->
-        <ds-flex-item v-if="isLoggedIn" style="flex-grow: 0; flex-basis: auto">
+        <!-- filter menu -->
+        <!-- TODO: Filter is only visible on index -->
+        <ds-flex-item
+          v-if="isLoggedIn && SHOW_CONTENT_FILTER_HEADER_MENU"
+          style="flex-grow: 0; flex-basis: auto"
+        >
           <client-only>
             <filter-menu v-show="showFilterMenuDropdown" />
           </client-only>
         </ds-flex-item>
-        <!-- locale-switch -->
+        <!-- right symbols -->
         <ds-flex-item style="flex-basis: auto">
           <div class="main-navigation-right" style="flex-basis: auto">
+            <!-- locale switch -->
             <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
             <template v-if="isLoggedIn">
+              <!-- notification menu -->
               <client-only>
-                <!-- notification-menu -->
                 <notification-menu placement="top" />
               </client-only>
+              <!-- invite button -->
               <div v-if="inviteRegistration">
                 <client-only>
-                  <!-- invite-button -->
                   <invite-button placement="top" />
                 </client-only>
               </div>
@@ -82,7 +88,11 @@
               <client-only v-if="SHOW_GROUP_BUTTON_IN_HEADER">
                 <group-button />
               </client-only>
-              <!-- avatar-menu -->
+              <!-- map button -->
+              <client-only v-if="!isEmpty(this.$env.MAPBOX_TOKEN)">
+                <map-button />
+              </client-only>
+              <!-- avatar menu -->
               <client-only>
                 <avatar-menu placement="top" />
               </client-only>
@@ -96,20 +106,22 @@
         <!-- logo, hamburger-->
         <ds-flex style="align-items: center">
           <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
-            <a
-              v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
-              :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
-              :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
-            >
-              <logo logoType="header" />
-            </a>
-            <nuxt-link
-              v-else
-              :to="LOGOS.LOGO_HEADER_CLICK.internalPath.to"
-              v-scroll-to="LOGOS.LOGO_HEADER_CLICK.internalPath.scrollTo"
-            >
-              <logo logoType="header" />
-            </nuxt-link>
+            <div @click="toggleMobileMenu ? toggleMobileMenuView() : ''">
+              <a
+                v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
+                :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
+                :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
+              >
+                <logo logoType="header" />
+              </a>
+              <nuxt-link
+                v-else
+                :to="LOGOS.LOGO_HEADER_CLICK.internalPath.to"
+                v-scroll-to="LOGOS.LOGO_HEADER_CLICK.internalPath.scrollTo"
+              >
+                <logo logoType="header" />
+              </nuxt-link>
+            </div>
           </ds-flex-item>
 
           <!-- mobile hamburger menu -->
@@ -122,9 +134,9 @@
             <base-button icon="bars" @click="toggleMobileMenuView" circle />
           </ds-flex-item>
         </ds-flex>
-        <!-- search, filter-->
+        <!-- search, filter -->
         <ds-flex class="mobile-menu">
-          <!-- search-field mobile-->
+          <!-- search field mobile -->
           <ds-flex-item
             v-if="isLoggedIn"
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
@@ -132,24 +144,28 @@
           >
             <search-field />
           </ds-flex-item>
-          <!-- filter menu mobile-->
+          <!-- filter menu mobile -->
           <ds-flex-item
             v-if="isLoggedIn"
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="flex-grow: 0; flex-basis: auto; padding: 20px 0"
           >
             <client-only>
-              <filter-menu v-show="showFilterMenuDropdown" :showMobileMenu="showMobileMenu" />
+              <filter-menu v-if="showFilterMenuDropdown && SHOW_CONTENT_FILTER_HEADER_MENU" />
             </client-only>
           </ds-flex-item>
         </ds-flex>
-        <!-- switch language, notification, invite, profil -->
+        <!-- right symbols -->
         <ds-flex style="margin: 0 20px">
-          <!-- locale-switch mobile-->
+          <!-- locale switch mobile -->
           <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }">
-            <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
+            <locale-switch
+              class="topbar-locale-switch topbar-locale-switch-mobile"
+              placement="top"
+              offset="8"
+            />
           </ds-flex-item>
-          <!-- invite-button mobile-->
+          <!-- invite button mobile -->
           <ds-flex-item
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="text-align: center"
@@ -160,40 +176,66 @@
           </ds-flex-item>
           <!-- group button -->
           <ds-flex-item
+            v-if="SHOW_GROUP_BUTTON_IN_HEADER"
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="text-align: center"
           >
-            <client-only v-if="SHOW_GROUP_BUTTON_IN_HEADER">
-              <group-button />
+            <client-only>
+              <div @click="toggleMobileMenuView">
+                <group-button />
+              </div>
             </client-only>
           </ds-flex-item>
-          <!-- avatar-menu mobile-->
+          <!-- map button -->
+          <ds-flex-item
+            v-if="!isEmpty(this.$env.MAPBOX_TOKEN)"
+            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+            style="text-align: center"
+          >
+            <client-only>
+              <div @click="toggleMobileMenuView">
+                <map-button />
+              </div>
+            </client-only>
+          </ds-flex-item>
+          <!-- avatar menu mobile -->
           <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }" style="text-align: end">
             <client-only>
-              <avatar-menu placement="top" />
+              <avatar-menu placement="top" @toggle-Mobile-Menu-view="toggleMobileMenuView" />
             </client-only>
           </ds-flex-item>
         </ds-flex>
         <div :class="{ 'hide-mobile-menu': !toggleMobileMenu }" class="mobile-menu footer-mobile">
-          <!-- dynamic branding menu  -->
+          <!-- dynamic branding menus -->
           <ul v-if="isHeaderMenu" class="dynamic-branding-mobil">
             <li v-for="item in menu" :key="item.name">
-              <a v-if="item.url" :href="item.url" :target="item.target">
+              <a
+                v-if="item.url"
+                :href="item.url"
+                :target="item.target"
+                @click="toggleMobileMenuView"
+              >
                 <ds-text size="large" bold>
                   {{ $t(item.nameIdent) }}
                 </ds-text>
               </a>
               <nuxt-link v-else :to="item.path">
-                <ds-text size="large" bold>
-                  {{ $t(item.nameIdent) }}
-                </ds-text>
+                <div @click="toggleMobileMenuView">
+                  <ds-text size="large" bold>
+                    {{ $t(item.nameIdent) }}
+                  </ds-text>
+                </div>
               </nuxt-link>
             </li>
           </ul>
           <hr />
           <!-- dynamic footer menu in header  -->
           <ul class="dynamic-footer-mobil">
-            <li v-for="pageParams in links.FOOTER_LINK_LIST" :key="pageParams.name">
+            <li
+              v-for="pageParams in links.FOOTER_LINK_LIST"
+              :key="pageParams.name"
+              @click="toggleMobileMenuView"
+            >
               <page-params-link :pageParams="pageParams">
                 {{ $t(pageParams.internalPage.footerIdent) }}
               </page-params-link>
@@ -204,9 +246,12 @@
     </div>
   </ds-container>
 </template>
+
 <script>
 import { mapGetters } from 'vuex'
+import isEmpty from 'lodash/isEmpty'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
+import { SHOW_CONTENT_FILTER_HEADER_MENU } from '~/constants/filter.js'
 import LOGOS from '~/constants/logos.js'
 import headerMenu from '~/constants/headerMenu.js'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
@@ -215,6 +260,7 @@ import GroupButton from '~/components/Group/GroupButton'
 import InviteButton from '~/components/InviteButton/InviteButton'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
+import MapButton from '~/components/Map/MapButton'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
 import links from '~/constants/links.js'
@@ -228,6 +274,7 @@ export default {
     InviteButton,
     LocaleSwitch,
     Logo,
+    MapButton,
     NotificationMenu,
     PageParamsLink,
     SearchField,
@@ -237,9 +284,13 @@ export default {
   },
   data() {
     return {
+      hideNavbar: false,
+      prevScrollpos: 0,
+      isEmpty,
       links,
       LOGOS,
       SHOW_GROUP_BUTTON_IN_HEADER,
+      SHOW_CONTENT_FILTER_HEADER_MENU,
       isHeaderMenu: headerMenu.MENU.length > 0,
       menu: headerMenu.MENU,
       mobileSearchVisible: false,
@@ -258,14 +309,34 @@ export default {
     },
   },
   methods: {
+    handleScroll() {
+      const currentScrollPos = window.pageYOffset
+      if (this.prevScrollpos > 50) {
+        if (this.prevScrollpos > currentScrollPos) {
+          this.hideNavbar = false
+        } else {
+          this.hideNavbar = true
+        }
+      }
+      this.prevScrollpos = currentScrollPos
+    },
     toggleMobileMenuView() {
       this.toggleMobileMenu = !this.toggleMobileMenu
     },
+  },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll)
   },
 }
 </script>
 
 <style lang="scss">
+#navbar {
+  padding: 10px 10px;
+}
+.hide-navbar {
+  display: none;
+}
 .margin-right-20 {
   margin-right: 20px;
 }
@@ -279,6 +350,9 @@ export default {
   margin-right: $space-xx-small;
   align-self: center;
   display: inline-flex;
+}
+.topbar-locale-switch-mobile {
+  margin-top: $space-xx-small;
 }
 .main-navigation-flex {
   align-items: center;

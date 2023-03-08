@@ -19,7 +19,7 @@ describe('CounterIcon.vue', () => {
     })
 
     it('renders the icon', () => {
-      expect(wrapper.find(BaseIcon).exists()).toBe(true)
+      expect(wrapper.findComponent(BaseIcon).exists()).toBe(true)
     })
 
     it('renders the count', () => {
@@ -35,7 +35,7 @@ describe('CounterIcon.vue', () => {
     })
 
     it('renders the icon', () => {
-      expect(wrapper.find(BaseIcon).exists()).toBe(true)
+      expect(wrapper.findComponent(BaseIcon).exists()).toBe(true)
     })
 
     it('renders the capped count with a plus', () => {

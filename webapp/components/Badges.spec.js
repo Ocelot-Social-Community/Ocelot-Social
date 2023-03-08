@@ -14,7 +14,7 @@ describe('Badges.vue', () => {
     }
 
     it('has class "hc-badges"', () => {
-      expect(Wrapper().contains('.hc-badges')).toBe(true)
+      expect(Wrapper().find('.hc-badges').exists()).toBe(true)
     })
 
     describe('given a badge', () => {
@@ -23,7 +23,7 @@ describe('Badges.vue', () => {
       })
 
       it('proxies badge icon, which is just a URL without metadata', () => {
-        expect(Wrapper().contains('img[src="/api/path/to/some/icon"]')).toBe(true)
+        expect(Wrapper().find('img[src="/api/path/to/some/icon"]').exists()).toBe(true)
       })
     })
   })

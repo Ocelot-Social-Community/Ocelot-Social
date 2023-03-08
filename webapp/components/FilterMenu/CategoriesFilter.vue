@@ -6,7 +6,7 @@
           :filled="!filteredCategoryIds.length"
           :label="$t('filter-menu.all')"
           icon="check"
-          @click="resetCategories"
+          @click="setResetCategories"
         />
       </li>
       <li class="item item-save-topics">
@@ -39,15 +39,14 @@ import CategoryQuery from '~/graphql/CategoryQuery.js'
 import SaveCategories from '~/graphql/SaveCategories.js'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
+import SortCategories from '~/mixins/sortCategoriesMixin.js'
 
 export default {
   components: {
     FilterMenuSection,
     LabeledButton,
   },
-  props: {
-    showMobileMenu: { type: Boolean, default: false },
-  },
+  mixins: [SortCategories],
   data() {
     return {
       categories: [],
@@ -63,6 +62,10 @@ export default {
       resetCategories: 'posts/RESET_CATEGORIES',
       toggleCategory: 'posts/TOGGLE_CATEGORY',
     }),
+    setResetCategories() {
+      this.resetCategories()
+      this.$emit('showFilterMenu')
+    },
     saveCategories() {
       this.$apollo
         .mutate({
@@ -70,6 +73,7 @@ export default {
           variables: { activeCategories: this.filteredCategoryIds },
         })
         .then(() => {
+          this.$emit('showFilterMenu')
           this.$toast.success(this.$t('filter-menu.save.success'))
         })
         .catch(() => {
@@ -84,7 +88,7 @@ export default {
       },
       update({ Category }) {
         if (!Category) return []
-        this.categories = Category
+        this.categories = this.sortCategories(Category)
       },
       fetchPolicy: 'cache-and-network',
     },

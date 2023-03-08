@@ -22,6 +22,7 @@
       :name="name"
       @close="close"
     />
+    <!-- "id", "type", and "name" props are only used for compatibility with the other modals -->
     <confirm-modal
       v-if="open === 'confirm'"
       :id="data.resource.id"
@@ -57,6 +58,7 @@ export default {
       open: 'modal/open',
     }),
     name() {
+      // REFACTORING: This gets unneccesary if we use "modalData" in all modals by probaply replacing them all by "confirm-modal"
       if (!this.data || !this.data.resource) return ''
       const {
         resource: { name, title, author },

@@ -1,4 +1,4 @@
-import { config, shallowMount, mount, RouterLinkStub } from '@vue/test-utils'
+import { shallowMount, mount, RouterLinkStub } from '@vue/test-utils'
 import NotificationList from './NotificationList'
 import Notification from '../Notification/Notification'
 import Vuex from 'vuex'
@@ -8,9 +8,6 @@ import { notifications } from '~/components/utils/Notifications'
 const localVue = global.localVue
 
 localVue.filter('truncate', (string) => string)
-
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['v-popover'] = '<span><slot /></span>'
 
 describe('NotificationList.vue', () => {
   let wrapper
@@ -33,6 +30,8 @@ describe('NotificationList.vue', () => {
     }
     stubs = {
       NuxtLink: RouterLinkStub,
+      'client-only': true,
+      'v-popover': true,
     }
     propsData = { notifications }
   })
@@ -44,6 +43,7 @@ describe('NotificationList.vue', () => {
         mocks,
         store,
         localVue,
+        stubs,
       })
     }
 
@@ -52,7 +52,7 @@ describe('NotificationList.vue', () => {
     })
 
     it('renders Notification.vue for each notification of the user', () => {
-      expect(wrapper.findAll(Notification)).toHaveLength(2)
+      expect(wrapper.findAllComponents(Notification)).toHaveLength(2)
     })
   })
 
@@ -97,7 +97,7 @@ describe('NotificationList.vue', () => {
     })
 
     it('renders Notification.vue zero times', () => {
-      expect(wrapper.findAll(Notification)).toHaveLength(0)
+      expect(wrapper.findAllComponents(Notification)).toHaveLength(0)
     })
   })
 })

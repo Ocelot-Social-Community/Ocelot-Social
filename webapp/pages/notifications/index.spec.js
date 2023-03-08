@@ -1,4 +1,4 @@
-import { config, shallowMount, mount } from '@vue/test-utils'
+import { shallowMount, mount } from '@vue/test-utils'
 import NotificationsPage from './index.vue'
 
 import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
@@ -8,7 +8,9 @@ import PaginationButtons from '~/components/_new/generic/PaginationButtons/Pagin
 import { markAsReadMutation, markAllAsReadMutation } from '~/graphql/User'
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span><slot /></span>'
+const stubs = {
+  'client-only': true,
+}
 
 describe('PostIndex', () => {
   let wrapper, Wrapper, mocks, propsData, markAllAsReadButton
@@ -43,6 +45,7 @@ describe('PostIndex', () => {
           mocks,
           localVue,
           propsData,
+          stubs,
         })
       }
       wrapper = Wrapper()
@@ -68,6 +71,7 @@ describe('PostIndex', () => {
           mocks,
           localVue,
           propsData,
+          stubs,
         })
       }
     })
@@ -80,10 +84,9 @@ describe('PostIndex', () => {
           { label: 'Unread', value: false },
         ]
         wrapper = Wrapper()
-        wrapper.find(DropdownFilter).vm.$emit('filter', propsData.filterOptions[1])
-
         markAllAsReadButton = wrapper.find('[data-test="markAllAsRead-button"]')
         expect(markAllAsReadButton).toBeTruthy()
+        wrapper.findComponent(DropdownFilter).vm.$emit('filter', propsData.filterOptions[1])
       })
 
       it('sets `notificationRead` to value of received option', () => {
@@ -108,7 +111,9 @@ describe('PostIndex', () => {
       let expectedParams
       beforeEach(() => {
         wrapper = Wrapper()
-        wrapper.find(NotificationsTable).vm.$emit('markAllAsRead', 'notificationSourceId')
+        wrapper
+          .findComponentComponent(NotificationsTable)
+          .vm.$emit('markNotificationAsRead', 'notificationSourceId')
       })
 
       it('calls markAllAsRead mutation', () => {
@@ -123,7 +128,7 @@ describe('PostIndex', () => {
         beforeEach(() => {
           mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({ message: 'Some error message' })
           wrapper = Wrapper()
-          wrapper.find(NotificationsTable).vm.$emit('markAllAsRead', 'notificationSourceId')
+          wrapper.findComponent(NotificationsTable).vm.$emit('markAllAsRead', 'notificationSourceId')
         })
 
         it('shows an error message if there is an error', () => {
@@ -156,7 +161,10 @@ describe('PostIndex', () => {
           mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({ message: 'Some error message' })
           wrapper = Wrapper()
           // FIXME Should I remove next line?
-          wrapper.find(NotificationsTable).vm.$emit('markAllAsRead', 'notificationSourceId')
+          wrapper.findComponent(NotificationsTable).vm.$emit('markAllAsRead', 'notificationSourceId')
+          wrapper
+            .findComponent(NotificationsTable)
+            .vm.$emit('markNotificationAsRead', 'notificationSourceId')
         })
 
         it('shows an error message if there is an error', () => {
@@ -172,7 +180,7 @@ describe('PostIndex', () => {
 
       describe('next: given a user is on the first page', () => {
         it('adds offset to pageSize to skip first x notifications and display next page', () => {
-          wrapper.find(PaginationButtons).vm.$emit('next')
+          wrapper.findComponent(PaginationButtons).vm.$emit('next')
           expect(wrapper.vm.offset).toEqual(12)
         })
       })
@@ -180,7 +188,7 @@ describe('PostIndex', () => {
       describe('back: given a user is on the third page', () => {
         it('sets offset when back is emitted', () => {
           wrapper.setData({ offset: 24 })
-          wrapper.find(PaginationButtons).vm.$emit('back')
+          wrapper.findComponent(PaginationButtons).vm.$emit('back')
           expect(wrapper.vm.offset).toEqual(12)
         })
       })

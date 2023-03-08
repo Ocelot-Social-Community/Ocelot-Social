@@ -1,6 +1,6 @@
 import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../../db/factories'
-import { gql } from '../../helpers/jest'
+import gql from 'graphql-tag'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
 
@@ -37,6 +37,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
+  driver.close()
 })
 
 describe('donations', () => {

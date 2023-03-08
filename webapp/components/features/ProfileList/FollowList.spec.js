@@ -1,4 +1,4 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 
 import helpers from '~/storybook/helpers'
@@ -6,9 +6,11 @@ import FollowList from './FollowList.vue'
 
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['ds-space'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+const stubs = {
+  'client-only': true,
+  'ds-space': true,
+  'nuxt-link': true,
+}
 
 const user = {
   ...helpers.fakeUser()[0],
@@ -45,6 +47,7 @@ describe('FollowList.vue', () => {
         $t: jest.fn((str) => str),
       },
       localVue,
+      stubs,
     })
 
   beforeAll(() => {
@@ -138,11 +141,11 @@ describe('FollowList.vue', () => {
         })
 
         it('renders the user-teasers as an overflowing list', () => {
-          expect(wrapper.find('.--overflow').is('ul')).toBe(true)
+          expect(wrapper.find('.--overflow').element.tagName).toBe('UL')
         })
 
         it('renders a filter text input', () => {
-          expect(wrapper.find('[name="followingFilter"]').is('input')).toBe(true)
+          expect(wrapper.find('[name="followingFilter"]').element.tagName).toBe('INPUT')
         })
       })
     })

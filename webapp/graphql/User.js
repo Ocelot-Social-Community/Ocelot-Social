@@ -1,26 +1,28 @@
 import gql from 'graphql-tag'
 import {
   userCountsFragment,
-  locationAndBadgesFragment,
+  locationFragment,
+  badgesFragment,
   userFragment,
   postFragment,
   commentFragment,
 } from './Fragments'
 
-export default (i18n) => {
+export const profileUserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
     ${userFragment}
     ${userCountsFragment}
-    ${locationAndBadgesFragment(lang)}
+    ${locationFragment(lang)}
+    ${badgesFragment}
 
-    query User($id: ID!, $followedByCount: Int, $followingCount: Int) {
+    query User($id: ID!, $followedByCount: Int!, $followingCount: Int!) {
       User(id: $id) {
         ...user
         ...userCounts
-        ...locationAndBadges
+        ...location
+        ...badges
         about
-        locationName
         createdAt
         followedByCurrentUser
         isMuted
@@ -29,12 +31,14 @@ export default (i18n) => {
         following(first: $followingCount) {
           ...user
           ...userCounts
-          ...locationAndBadges
+          ...location
+          ...badges
         }
         followedBy(first: $followedByCount) {
           ...user
           ...userCounts
-          ...locationAndBadges
+          ...location
+          ...badges
         }
         socialMedia {
           id
@@ -57,6 +61,48 @@ export const minimisedUserQuery = () => {
         avatar {
           url
         }
+      }
+    }
+  `
+}
+
+export const adminUserQuery = () => {
+  return gql`
+    query ($filter: _UserFilter, $first: Int, $offset: Int, $email: String) {
+      User(
+        email: $email
+        filter: $filter
+        first: $first
+        offset: $offset
+        orderBy: createdAt_desc
+      ) {
+        id
+        name
+        slug
+        email
+        role
+        createdAt
+        contributionsCount
+        commentedCount
+        shoutedCount
+      }
+    }
+  `
+}
+
+export const mapUserQuery = (i18n) => {
+  const lang = i18n.locale().toUpperCase()
+  return gql`
+    ${userFragment}
+    ${locationFragment(lang)}
+    ${badgesFragment}
+
+    query {
+      User {
+        ...user
+        about
+        ...location
+        ...badges
       }
     }
   `

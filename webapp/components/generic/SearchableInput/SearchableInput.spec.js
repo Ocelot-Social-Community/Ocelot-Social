@@ -1,4 +1,4 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import Vue from 'vue'
 import SearchableInput from './SearchableInput'
@@ -8,7 +8,10 @@ const localVue = global.localVue
 
 localVue.filter('truncate', () => 'truncated string')
 localVue.filter('dateTime', () => Date.now)
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+
+const stubs = {
+  'nuxt-link': true,
+}
 
 describe('SearchableInput.vue', () => {
   let mocks, propsData, getters, wrapper
@@ -28,7 +31,7 @@ describe('SearchableInput.vue', () => {
     const store = new Vuex.Store({
       getters,
     })
-    return mount(SearchableInput, { mocks, localVue, propsData, store })
+    return mount(SearchableInput, { mocks, localVue, propsData, store, stubs })
   }
 
   describe('mount', () => {

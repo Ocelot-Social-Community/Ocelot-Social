@@ -1,14 +1,16 @@
-import { config, shallowMount, mount } from '@vue/test-utils'
+import { shallowMount, mount } from '@vue/test-utils'
 import PostIndex from './index.vue'
 import Vuex from 'vuex'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter'
 
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['router-link'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
-config.stubs['infinite-loading'] = '<span><slot /></span>'
+const stubs = {
+  'client-only': true,
+  'router-link': true,
+  'nuxt-link': true,
+  'infinite-loading': true,
+}
 
 describe('PostIndex', () => {
   let wrapper
@@ -20,6 +22,8 @@ describe('PostIndex', () => {
   beforeEach(() => {
     mutations = {
       'posts/TOGGLE_ORDER': jest.fn(),
+      'posts/RESET_CATEGORIES': jest.fn(),
+      'posts/TOGGLE_CATEGORY': jest.fn(),
     }
     store = new Vuex.Store({
       getters: {
@@ -71,6 +75,9 @@ describe('PostIndex', () => {
       $route: {
         query: {},
       },
+      $env: {
+        CATEGORIES_ACTIVE: true,
+      },
     }
   })
 
@@ -90,8 +97,25 @@ describe('PostIndex', () => {
     it('clears the search when the filter menu emits clearSearch', () => {
       mocks.$route.query.hashtag = '#samplehashtag'
       wrapper = Wrapper()
-      wrapper.find(HashtagsFilter).vm.$emit('clearSearch')
+      wrapper.findComponent(HashtagsFilter).vm.$emit('clearSearch')
       expect(wrapper.vm.hashtag).toBeNull()
+    })
+
+    describe('category filter', () => {
+      beforeEach(() => {
+        mocks.$route.query = {
+          categoryId: 'cat3',
+        }
+        wrapper = Wrapper()
+      })
+
+      it('resets the category filter', () => {
+        expect(mutations['posts/RESET_CATEGORIES']).toBeCalled()
+      })
+
+      it('sets the category', () => {
+        expect(mutations['posts/TOGGLE_CATEGORY']).toBeCalledWith({}, 'cat3')
+      })
     })
   })
 
@@ -101,6 +125,7 @@ describe('PostIndex', () => {
         store,
         mocks,
         localVue,
+        stubs,
       })
     }
 

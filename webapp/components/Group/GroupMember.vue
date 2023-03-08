@@ -1,41 +1,7 @@
 <template>
   <div class="group-member">
-    <base-card>
-      <h2 class="title">{{ $t('group.addUser') }}</h2>
-      <ds-form v-model="form" @submit="submit">
-        <ds-flex gutter="small">
-          <ds-flex-item width="90%">
-            <ds-input
-              name="query"
-              model="query"
-              :placeholder="$t('group.addUserPlaceholder')"
-              icon="search"
-            />
-          </ds-flex-item>
-          <ds-flex-item width="30px">
-            <!-- <base-button filled circle type="submit" icon="search" :loading="$apollo.loading" /> -->
-            <base-button filled circle type="submit" icon="search" />
-          </ds-flex-item>
-        </ds-flex>
-      </ds-form>
-      <div v-if="noSlug">Kein User mit diesem Slug gefunden!</div>
-      <div v-if="slugUser.length > 0">
-        <ds-space margin="base" />
-        <ds-flex>
-          <ds-flex-item>
-            <ds-avatar online size="small" :name="slugUser[0].name"></ds-avatar>
-          </ds-flex-item>
-          <ds-flex-item>{{ slugUser[0].name }}</ds-flex-item>
-          <ds-flex-item>{{ slugUser[0].slug }}</ds-flex-item>
-          <ds-flex-item>
-            <ds-button size="small" primary @click="addMemberToGroup(slugUser)">
-              {{ $t('group.addMemberToGroup') }}
-            </ds-button>
-          </ds-flex-item>
-        </ds-flex>
-        <ds-space margin="base" />
-      </div>
-    </base-card>
+    <h2 class="title">{{ $t('group.membersListTitle') }}</h2>
+    <ds-space margin-bottom="small" />
     <ds-table :fields="tableFields" :data="groupMembers" condensed>
       <template #avatar="scope">
         <nuxt-link
@@ -90,7 +56,7 @@
         <ds-button v-if="scope.row.myRoleInGroup !== 'owner'" size="small" primary disabled>
           <!-- TODO: implement removal of group members -->
           <!--           :disabled="scope.row.myRoleInGroup === 'owner'"
- -->
+          -->
           {{ $t('group.removeMemberButton') }}
         </ds-button>
       </template>
@@ -98,19 +64,18 @@
     <!-- TODO: implement removal of group members -->
     <!-- TODO: change to ocelot.social modal -->
     <!-- <ds-modal
-      v-if="isOpen"
-      v-model="isOpen"
-      :title="`${$t('group.removeMember')}`"
-      force
-      extended
-      :confirm-label="$t('group.removeMember')"
-      :cancel-label="$t('actions.cancel')"
-      @confirm="deleteMember(memberId)"
-    /> -->
+         v-if="isOpen"
+         v-model="isOpen"
+         :title="`${$t('group.removeMember')}`"
+         force
+         extended
+         :confirm-label="$t('group.removeMember')"
+         :cancel-label="$t('actions.cancel')"
+         @confirm="deleteMember(memberId)"
+         /> -->
   </div>
 </template>
 <script>
-import { minimisedUserQuery } from '~/graphql/User'
 import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
 
 export default {
@@ -127,13 +92,10 @@ export default {
   },
   data() {
     return {
-      isOpen: false,
-      memberId: null,
-      noSlug: false,
-      slugUser: [],
-      form: {
-        query: '',
-      },
+      id: 'search-user-to-add-to-group',
+      query: '',
+      searchProcess: null,
+      user: {},
     }
   },
   computed: {
@@ -175,50 +137,6 @@ export default {
         )
       } catch (error) {
         this.$toast.error(error.message)
-      }
-    },
-    async addMemberToGroup() {
-      const newRole = 'usual'
-      if (this.groupMembers.find((member) => member.id === this.slugUser[0].id)) {
-        this.$toast.error(
-          this.$t('group.errors.userAlreadyMember', { slug: this.slugUser[0].slug }),
-        )
-        return
-      }
-      try {
-        await this.$apollo.mutate({
-          mutation: changeGroupMemberRoleMutation(),
-          variables: { groupId: this.groupId, userId: this.slugUser[0].id, roleInGroup: newRole },
-        })
-        this.$emit('loadGroupMembers')
-        this.slugUser = []
-        this.form.query = ''
-        this.$toast.success(
-          this.$t('group.changeMemberRole', { role: this.$t(`group.roles.${newRole}`) }),
-        )
-      } catch (error) {
-        this.$toast.error(error.message)
-      }
-    },
-    async submit() {
-      try {
-        const {
-          data: { User },
-        } = await this.$apollo.query({
-          query: minimisedUserQuery(),
-          variables: {
-            slug: this.form.query,
-          },
-        })
-        if (User.length === 0) {
-          this.noSlug = true
-        } else {
-          this.noSlug = false
-          this.slugUser = User
-        }
-      } catch (error) {
-        this.noSlug = true
-      } finally {
       }
     },
   },

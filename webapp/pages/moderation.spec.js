@@ -1,7 +1,9 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import moderation from './moderation.vue'
 
-config.stubs['nuxt-child'] = '<span><slot /></span>'
+const stubs = {
+  'nuxt-child': true,
+}
 
 const localVue = global.localVue
 
@@ -20,6 +22,7 @@ describe('moderation.vue', () => {
       return mount(moderation, {
         mocks,
         localVue,
+        stubs,
       })
     }
 
@@ -28,7 +31,7 @@ describe('moderation.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('div')).toBe(true)
+      expect(wrapper.element.tagName).toBe('DIV')
     })
   })
 })

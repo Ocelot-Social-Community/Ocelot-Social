@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 
 import Category from './index'
 
@@ -9,7 +9,7 @@ describe('Category', () => {
   let name
 
   const Wrapper = () => {
-    return shallowMount(Category, {
+    return mount(Category, {
       localVue,
       propsData: {
         icon,
@@ -27,8 +27,9 @@ describe('Category', () => {
     it('shows Name', () => {
       expect(Wrapper().text()).toContain('Peter')
     })
-    it('shows Icon Svg', () => {
-      expect(Wrapper().contains('svg'))
+
+    it('shows base icon', () => {
+      expect(Wrapper().find('.base-icon').exists()).toBe(true)
     })
   })
 })

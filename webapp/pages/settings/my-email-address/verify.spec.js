@@ -1,11 +1,13 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import EmailVerifyPage from './verify.vue'
 import Vuex from 'vuex'
 
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['sweetalert-icon'] = '<span><slot /></span>'
+const stubs = {
+  'sweetalert-icon': true,
+  'client-only': true,
+}
 
 describe('EmailVerifyPage', () => {
   let store
@@ -108,12 +110,15 @@ describe('EmailVerifyPage', () => {
   })
 
   describe('mount', () => {
-    beforeEach(jest.useFakeTimers)
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
     const Wrapper = () => {
       return mount(EmailVerifyPage, {
         store,
         mocks,
         localVue,
+        stubs,
       })
     }
 

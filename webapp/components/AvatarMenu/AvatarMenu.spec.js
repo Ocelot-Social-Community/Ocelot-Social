@@ -1,11 +1,13 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import AvatarMenu from './AvatarMenu.vue'
 
 const localVue = global.localVue
 
-config.stubs['nuxt-link'] = '<span><slot /></span>'
-config.stubs['router-link'] = '<span><slot /></span>'
+const stubs = {
+  'nuxt-link': true,
+  'router-link': true,
+}
 
 describe('AvatarMenu.vue', () => {
   let propsData, getters, wrapper, mocks
@@ -34,7 +36,7 @@ describe('AvatarMenu.vue', () => {
     const store = new Vuex.Store({
       getters,
     })
-    return mount(AvatarMenu, { propsData, localVue, store, mocks })
+    return mount(AvatarMenu, { propsData, localVue, store, mocks, stubs })
   }
 
   describe('mount', () => {

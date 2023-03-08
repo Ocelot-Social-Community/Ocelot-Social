@@ -42,7 +42,7 @@ describe('RelativeDateTime', () => {
     })
 
     it('renders', () => {
-      expect(Wrapper().is('span')).toBe(true)
+      expect(Wrapper().element.tagName).toBe('SPAN')
     })
 
     describe("locale == 'en'", () => {

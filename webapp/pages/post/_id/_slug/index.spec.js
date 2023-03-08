@@ -1,14 +1,10 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import Vue from 'vue'
 import PostSlug from './index.vue'
 import CommentList from '~/components/CommentList/CommentList'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 import VueMeta from 'vue-meta'
-
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
-config.stubs['router-link'] = '<span><slot /></span>'
 
 const localVue = global.localVue
 localVue.directive('scrollTo', jest.fn())
@@ -81,6 +77,9 @@ describe('PostSlug', () => {
         },
       }
       stubs = {
+        'client-only': true,
+        'nuxt-link': true,
+        'router-link': true,
         HcEditor: { render: () => {}, methods: { insertReply: jest.fn(() => null) } },
         ContentViewer: true,
       }
@@ -148,7 +147,7 @@ describe('PostSlug', () => {
     describe('reply method called when emitted reply received', () => {
       it('CommentList', async () => {
         wrapper = await Wrapper()
-        wrapper.find(CommentList).vm.$emit('reply', {
+        wrapper.findComponent(CommentList).vm.$emit('reply', {
           id: 'commentAuthorId',
           slug: 'ogerly',
         })
@@ -176,12 +175,12 @@ describe('PostSlug', () => {
 
       it('are present', async () => {
         // Get length from backendData and compare against number of tags present in component.
-        expect(wrapper.findAll(HcHashtag).length).toBe(backendData.post.tags.length)
+        expect(wrapper.findAllComponents(HcHashtag).length).toBe(backendData.post.tags.length)
       })
 
       it('are alphabetically ordered', async () => {
         // Get all HcHastag components
-        const wrappers = wrapper.findAll(HcHashtag).wrappers
+        const wrappers = wrapper.findAllComponents(HcHashtag).wrappers
         // Exctract ID properties (tag names) from component.
         const ids = []
         wrappers.forEach((x) => {

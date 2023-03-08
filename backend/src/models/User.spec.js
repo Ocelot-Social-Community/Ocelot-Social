@@ -1,6 +1,7 @@
 import { cleanDatabase } from '../db/factories'
-import { getNeode } from '../db/neo4j'
+import { getNeode, getDriver } from '../db/neo4j'
 
+const driver = getDriver()
 const neode = getNeode()
 
 beforeAll(async () => {
@@ -9,6 +10,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
+  driver.close()
 })
 
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
@@ -37,11 +39,10 @@ describe('slug', () => {
     )
   })
 
-  it('must be unique', async (done) => {
+  it('must be unique', async () => {
     await neode.create('User', { slug: 'Matt' })
     try {
       await expect(neode.create('User', { slug: 'Matt' })).rejects.toThrow('already exists')
-      done()
     } catch (error) {
       throw new Error(`
         ${error}

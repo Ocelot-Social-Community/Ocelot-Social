@@ -48,7 +48,7 @@
           @change="changeGroupType($event)"
         >
           <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
-            {{ $t(`group.types.${groupType}`) }}
+            {{ $t(`group.typesOptions.${groupType}`) }}
           </option>
         </select>
         <ds-chip
@@ -142,25 +142,28 @@
           style="position: relative; display: inline-block; right: -96%; top: -33px; width: 26px"
           @click="formData.locationName = ''"
         ></base-button>
+        <ds-text class="location-hint" color="softer">
+          {{ $t('settings.data.labelCityHint') }}
+        </ds-text>
 
         <ds-space margin-top="small" />
 
         <!-- category -->
-        <categories-select
-          v-if="categoriesActive"
-          model="categoryIds"
-          name="categoryIds"
-          :existingCategoryIds="formData.categoryIds"
-        />
-        <ds-chip
-          v-if="categoriesActive"
-          size="base"
-          :color="errors && errors.categoryIds ? 'danger' : 'medium'"
-        >
-          {{ formData.categoryIds.length }} / 3
-          <base-icon v-if="errors && errors.categoryIds" name="warning" />
-        </ds-chip>
+        <div v-if="categoriesActive">
+          <ds-text class="select-label">
+            {{ $t('group.categoriesTitle') }}
+          </ds-text>
 
+          <categories-select
+            model="categoryIds"
+            name="categoryIds"
+            :existingCategoryIds="formData.categoryIds"
+          />
+          <ds-chip size="base" :color="errors && errors.categoryIds ? 'danger' : 'medium'">
+            {{ formData.categoryIds.length }} / 3
+            <base-icon v-if="errors && errors.categoryIds" name="warning" />
+          </ds-chip>
+        </div>
         <!-- submit -->
         <ds-space margin-top="large">
           <nuxt-link to="/groups">
@@ -435,6 +438,10 @@ export default {
   > .buttons {
     align-self: flex-end;
     margin-top: $space-base;
+  }
+
+  > .location-hint {
+    margin-top: -$space-base + $space-xxx-small;
   }
 }
 </style>

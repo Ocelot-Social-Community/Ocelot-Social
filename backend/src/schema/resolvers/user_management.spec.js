@@ -1,15 +1,17 @@
 import jwt from 'jsonwebtoken'
 import CONFIG from './../../config'
 import Factory, { cleanDatabase } from '../../db/factories'
-import { gql } from '../../helpers/jest'
+import gql from 'graphql-tag'
 import { loginMutation } from '../../graphql/userManagement'
 import { createTestClient } from 'apollo-server-testing'
 import createServer, { context } from '../../server'
 import encode from '../../jwt/encode'
-import { getNeode } from '../../db/neo4j'
+import { getNeode, getDriver } from '../../db/neo4j'
 import { categories } from '../../constants/categories'
 
 const neode = getNeode()
+const driver = getDriver()
+
 let query, mutate, variables, req, user
 
 const disable = async (id) => {
@@ -47,6 +49,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
+  driver.close()
 })
 
 beforeEach(() => {
@@ -137,7 +140,12 @@ describe('currentUser', () => {
 
   describe('authenticated', () => {
     describe('and corresponding user in the database', () => {
+      let avatar
+
       beforeEach(async () => {
+        avatar = await Factory.build('image', {
+          url: 'https://s3.amazonaws.com/uifaces/faces/twitter/jimmuirhead/128.jpg',
+        })
         await Factory.build(
           'user',
           {
@@ -149,9 +157,7 @@ describe('currentUser', () => {
           },
           {
             email: 'test@example.org',
-            avatar: Factory.build('image', {
-              url: 'https://s3.amazonaws.com/uifaces/faces/twitter/jimmuirhead/128.jpg',
-            }),
+            avatar,
           },
         )
         const userBearerToken = encode({ id: 'u3' })
@@ -163,9 +169,11 @@ describe('currentUser', () => {
           data: {
             currentUser: {
               id: 'u3',
-              avatar: Factory.build('image', {
-                url: 'https://s3.amazonaws.com/uifaces/faces/twitter/jimmuirhead/128.jpg',
-              }),
+              avatar: {
+                url: expect.stringContaining(
+                  'https://s3.amazonaws.com/uifaces/faces/twitter/jimmuirhead/128.jpg',
+                ),
+              },
               email: 'test@example.org',
               name: 'Matilde Hermiston',
               slug: 'matilde-hermiston',
@@ -243,7 +251,7 @@ describe('login', () => {
 
   describe('ask for a `token`', () => {
     describe('with a valid email/password combination', () => {
-      it('responds with a JWT bearer token', async (done) => {
+      it('responds with a JWT bearer token', async () => {
         const {
           data: { login: token },
         } = await mutate({ mutation: loginMutation, variables })
@@ -252,7 +260,6 @@ describe('login', () => {
             id: 'acb2d923-f3af-479e-9f00-61b12e864666',
           })
           expect(err).toBeNull()
-          done()
         })
       })
 
