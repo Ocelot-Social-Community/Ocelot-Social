@@ -98,7 +98,7 @@ On a server with Kubernetes cluster:
 $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "yarn prod:migrate init"
 ```
 
-***Cypher commands to show indices and constraints***
+***Cypher commands to show indexes and constraints***
 
 ```bash
 # in browser command line or cypher shell
