@@ -118,7 +118,7 @@ $ CALL db.constraints();
 ```bash
 # in browser command line or cypher shell
 
-# create indices
+# create indexes
 $ CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"]);
 $ CALL db.index.fulltext.createNodeIndex("user_fulltext_search",["User"],["name", "slug"]);
 $ CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"]);
