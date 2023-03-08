@@ -10,7 +10,7 @@
     >
       <base-icon class="dropdown-arrow" name="angle-down" />
     </base-button>
-    <template #popover">
+    <template #popover>
       <filter-menu-component />
     </template>
   </dropdown>
