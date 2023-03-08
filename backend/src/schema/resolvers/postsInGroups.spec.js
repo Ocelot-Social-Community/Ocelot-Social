@@ -1524,9 +1524,9 @@ describe('Posts in Groups', () => {
           })
         })
 
-        it('does not show the posts of the closed group anymore', async () => {
+        it('stil shows the posts of the closed group', async () => {
           const result = await query({ query: filterPosts(), variables: {} })
-          expect(result.data.Post).toHaveLength(3)
+          expect(result.data.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
@@ -1539,6 +1539,11 @@ describe('Posts in Groups', () => {
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
+                },
+                {
+                  id: 'post-to-closed-group',
+                  title: 'A post to a closed group',
+                  content: 'I am posting into a closed group as a member of the group',
                 },
                 {
                   id: 'post-to-hidden-group',
@@ -1564,9 +1569,9 @@ describe('Posts in Groups', () => {
           })
         })
 
-        it('does only show the public posts', async () => {
+        it('still shows the post of the hidden group', async () => {
           const result = await query({ query: filterPosts(), variables: {} })
-          expect(result.data.Post).toHaveLength(2)
+          expect(result.data.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
@@ -1579,6 +1584,16 @@ describe('Posts in Groups', () => {
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
+                },
+                {
+                  id: 'post-to-closed-group',
+                  title: 'A post to a closed group',
+                  content: 'I am posting into a closed group as a member of the group',
+                },
+                {
+                  id: 'post-to-hidden-group',
+                  title: 'A post to a hidden group',
+                  content: 'I am posting into a hidden group as a member of the group',
                 },
               ]),
             },
@@ -1603,9 +1618,9 @@ describe('Posts in Groups', () => {
           authenticatedUser = await allGroupsUser.toJson()
         })
 
-        it('does not show the posts of the closed group', async () => {
+        it('shows the posts of the closed group', async () => {
           const result = await query({ query: filterPosts(), variables: {} })
-          expect(result.data.Post).toHaveLength(3)
+          expect(result.data.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
@@ -1623,6 +1638,11 @@ describe('Posts in Groups', () => {
                   id: 'post-to-closed-group',
                   title: 'A post to a closed group',
                   content: 'I am posting into a closed group as a member of the group',
+                },
+                {
+                  id: 'post-to-hidden-group',
+                  title: 'A post to a hidden group',
+                  content: 'I am posting into a hidden group as a member of the group',
                 },
               ]),
             },
