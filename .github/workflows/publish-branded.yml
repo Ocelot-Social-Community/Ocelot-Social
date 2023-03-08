@@ -1,9 +1,7 @@
-name: ocelot.social publish branded CI
-
+name: publish-branded
 on:
-  push:
-    branches:
-      - master
+  repository_dispatch:
+    types: [trigger-build-success]
 jobs:
   build_branded:
     name: Docker Build Branded
@@ -11,7 +9,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
+        with:
+          ref: ${{ github.event.client_payload.ref }}
+      - name: Setup env
+        run: echo "OCELOT_VERSION=${{ github.event.client_payload.BUILD_VERSION }}" >> $GITHUB_ENV
       - name: Build branded images
         run: |
           deployment/scripts/branded-images.build.sh
@@ -45,9 +46,6 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Download Docker Image (Backend)
         uses: actions/download-artifact@v2
         with:
@@ -74,12 +72,3 @@ jobs:
 
       - name: Upload to dockerhub
         run: deployment/scripts/branded-images.upload.sh
-#      - name: login to dockerhub
-#        run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-#
-#      - name: Push Backend
-#        run: docker push --all-tags ocelotsocialnetwork/backend-branded
-#      - name: Push Webapp
-#        run: docker push --all-tags ocelotsocialnetwork/webapp-branded
-#      - name: Push Maintenance
-#        run: docker push --all-tags ocelotsocialnetwork/maintenance-branded

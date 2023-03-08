@@ -6,6 +6,7 @@ import { mergeImage, deleteImage } from './images/images'
 import Resolver from './helpers/Resolver'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
+import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
 import CONFIG from '../../config'
 
 const maintainPinnedPosts = (params) => {
@@ -21,12 +22,14 @@ const maintainPinnedPosts = (params) => {
 export default {
   Query: {
     Post: async (object, params, context, resolveInfo) => {
+      params = await filterPostsOfMyGroups(params, context)
       params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
       params = await maintainPinnedPosts(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
     profilePagePosts: async (object, params, context, resolveInfo) => {
+      params = await filterPostsOfMyGroups(params, context)
       params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
       return neo4jgraphql(object, params, context, resolveInfo)
