@@ -106,7 +106,7 @@ $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backen
 # show all indexes and constraints
 $ :schema
 
-# show all indices
+# show all indexes
 $ CALL db.indexes();
 
 # show all constraints
