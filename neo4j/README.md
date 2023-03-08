@@ -126,6 +126,6 @@ $ CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"]);
 # drop an index
 $ DROP CONSTRAINT ON ( image:Image ) ASSERT image.url IS UNIQUE
 
-# drop all indices and constraints
+# drop all indexes and constraints
 $ CALL apoc.schema.assert({},{},true) YIELD label, key RETURN * ;
 ```
