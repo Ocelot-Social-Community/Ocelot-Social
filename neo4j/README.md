@@ -113,7 +113,7 @@ $ CALL db.indexes();
 $ CALL db.constraints();
 ```
 
-***Cypher commands to create and drop indices and constraints***
+***Cypher commands to create and drop indexes and constraints***
 
 ```bash
 # in browser command line or cypher shell
