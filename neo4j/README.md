@@ -103,7 +103,7 @@ $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backen
 ```bash
 # in browser command line or cypher shell
 
-# show all indices and constraints
+# show all indexes and constraints
 $ :schema
 
 # show all indices
