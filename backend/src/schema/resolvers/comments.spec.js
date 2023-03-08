@@ -1,5 +1,5 @@
 import Factory, { cleanDatabase } from '../../db/factories'
-import { gql } from '../../helpers/jest'
+import gql from 'graphql-tag'
 import { createTestClient } from 'apollo-server-testing'
 import createServer from '../../server'
 import { getNeode, getDriver } from '../../db/neo4j'

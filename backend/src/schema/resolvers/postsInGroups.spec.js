@@ -1678,5 +1678,59 @@ describe('Posts in Groups', () => {
         })
       })
     })
+
+    describe('filter posts in my groups', () => {
+      describe('without any posts in groups', () => {
+        beforeAll(async () => {
+          authenticatedUser = await anyUser.toJson()
+        })
+
+        it('finds no posts', async () => {
+          const result = await query({
+            query: filterPosts(),
+            variables: { filter: { postsInMyGroups: true } },
+          })
+          expect(result.data.Post).toHaveLength(0)
+          expect(result).toMatchObject({
+            data: {
+              Post: [],
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('with posts in groups', () => {
+        beforeAll(async () => {
+          // member of hidden-group and closed-group
+          authenticatedUser = await allGroupsUser.toJson()
+        })
+
+        it('finds two posts', async () => {
+          const result = await query({
+            query: filterPosts(),
+            variables: { filter: { postsInMyGroups: true } },
+          })
+          expect(result.data.Post).toHaveLength(2)
+          expect(result).toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                {
+                  id: 'post-to-closed-group',
+                  title: 'A post to a closed group',
+                  content: 'I am posting into a closed group as a member of the group',
+                },
+                {
+                  id: 'post-to-hidden-group',
+                  title: 'A post to a hidden group',
+                  content: 'I am posting into a hidden group as a member of the group',
+                },
+              ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+    })
   })
 })
