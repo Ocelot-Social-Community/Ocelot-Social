@@ -40,7 +40,7 @@
               <base-icon class="my-filter-button" :name="filterButtonIcon"></base-icon>
             </base-button>
             <span v-if="postsFilter['categories_some']">
-              <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
+              <base-button class="my-filter-button my-filter-button-selected" right @click="showFilter = !showFilter" filled>
                 {{ $t('contribution.filterMasonryGrid.myTopics') }}
               </base-button>
               <base-button
@@ -48,12 +48,13 @@
                 @click="resetCategories"
                 icon="close"
                 :title="$t('filter-menu.deleteFilter')"
-                style="margin-left: -8px"
+                size="small"
+                circle
                 filled
               />
             </span>
             <span v-if="postsFilter['author']">
-              <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
+              <base-button class="my-filter-button my-filter-button-selected" right @click="showFilter = !showFilter" filled>
                 {{ $t('contribution.filterMasonryGrid.myFriends') }}
               </base-button>
               <base-button
@@ -61,7 +62,8 @@
                 @click="resetByFollowed"
                 icon="close"
                 :title="$t('filter-menu.deleteFilter')"
-                style="margin-left: -8px"
+                size="small"
+                circle
                 filled
               />
             </span>
@@ -307,6 +309,17 @@ export default {
   float: right;
 }
 
+.my-filter-button-selected {
+  padding-right: 30px;
+  margin-left: 8px;
+}
+
+.base-button.filter-remove {
+  position: relative;
+  margin-left: -31px;
+  top: -5px;
+}
+
 .base-button.--circle.post-add-button-bottom {
   height: 54px;
   width: 54px;
@@ -335,6 +348,7 @@ export default {
   align-items: center;
 }
 .filterButtonMenu {
+  width: 70%;
   position: fixed;
   z-index: 6;
   margin-top: -35px;
