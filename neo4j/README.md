@@ -55,7 +55,7 @@ Start Neo4J and confirm the database is running at [http://localhost:7474](http:
 
 Here we describe some rarely used Cypher commands for Neo4j that are needed from time to time:
 
-### Index And Contraint Commands
+### Index And Constraint Commands
 
 If indexes or constraints are missing or not set correctly, the browser search will not work or the database seed for development will not work.
 
