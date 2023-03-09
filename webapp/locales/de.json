@@ -515,6 +515,9 @@
     "no-results": "Keine Beiträge gefunden."
   },
   "invite-codes": {
+    "button": {
+      "tooltip": "Lade deine Freunde ein"
+    },
     "copy-code": "Einladungslink kopieren",
     "copy-success": "Einladungscode erfolgreich in die Zwischenablage kopiert",
     "not-available": "Du hast keinen Einladungscode zur Verfügung!",

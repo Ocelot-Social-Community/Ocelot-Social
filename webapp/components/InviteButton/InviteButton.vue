@@ -1,7 +1,15 @@
 <template>
   <dropdown class="invite-button" offset="8" :placement="placement">
     <template #default="{ toggleMenu }">
-      <base-button icon="user-plus" circle ghost @click.prevent="toggleMenu" />
+      <base-button
+        icon="user-plus"
+        circle ghost
+        v-tooltip="{
+          content: $t('invite-codes.button.tooltip'),
+          placement: 'bottom-start',
+        }"
+        @click.prevent="toggleMenu"
+      />
     </template>
     <template #popover>
       <div class="invite-button-menu-popover">
