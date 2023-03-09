@@ -24,7 +24,7 @@
       "posts": "Beiträge",
       "projects": "Projekte",
       "shouts": "Empfehlungen",
-      "users": "Benutzer"
+      "users": "Nutzer"
     },
     "donations": {
       "goal": "Monatlich benötigte Spenden",
@@ -38,11 +38,11 @@
       "nameOfHashtag": "Name",
       "number": "Nr.",
       "tagCount": "Beiträge",
-      "tagCountUnique": "Benutzer"
+      "tagCountUnique": "Nutzer"
     },
     "invites": {
       "description": "Einladungen sind eine wunderbare Möglichkeit, Deine Freunde in Deinem Netzwerk zu haben …",
-      "name": "Benutzer einladen",
+      "name": "Nutzer einladen",
       "title": "Leute einladen"
     },
     "name": "Systemverwaltung",
@@ -59,11 +59,11 @@
       "name": "Einstellungen"
     },
     "users": {
-      "empty": "Keine Benutzer gefunden",
+      "empty": "Keine Nutzer gefunden",
       "form": {
         "placeholder": "E-Mail, Name oder Beschreibung"
       },
-      "name": "Benutzer",
+      "name": "Nutzer",
       "roleChanged": "Rolle erfolgreich geändert!",
       "table": {
         "columns": {
@@ -111,7 +111,7 @@
     "shout": "Empfehlung ::: Empfehlungen",
     "tag": "Schlagwort ::: Schlagwörter",
     "takeAction": "Aktiv werden",
-    "user": "Benutzer ::: Benutzer",
+    "user": "Nutzer ::: Nutzer",
     "validations": {
       "categories": "es müssen eine bis drei Themen ausgewählt werden",
       "email": "muss eine gültige E-Mail-Adresse sein",
@@ -138,12 +138,12 @@
     "registration": {
       "create-user-account": {
         "buttonTitle": "Erstellen",
-        "error": "Es konnte kein Benutzerkonto erstellt werden!",
+        "error": "Es konnte kein Nutzerkonto erstellt werden!",
         "help": "Vielleicht war der Bestätigungscode falsch oder abgelaufen? Wenn das Problem weiterhin besteht, schicke uns gerne eine E-Mail an:",
         "recieveCommunicationAsEmailsEtcConfirmed": "Ich stimme auch dem Erhalt von E-Mails und anderen Formen der Kommunikation (z.B. Push-Benachrichtigungen) zu.",
-        "success": "Dein Benutzerkonto wurde erstellt!",
+        "success": "Dein Nutzerkonto wurde erstellt!",
         "termsAndCondsEtcConfirmed": "Ich habe folgendes gelesen, verstanden und stimme zu:",
-        "title": "Benutzerkonto anlegen"
+        "title": "Nutzerkonto anlegen"
       },
       "email": {
         "buttonTitle": {
@@ -197,14 +197,14 @@
           "data-privacy": "Ich habe die Datenschutzerklärung gelesen und verstanden.",
           "description": "Um loszulegen, kannst Du Dich hier kostenfrei registrieren:",
           "errors": {
-            "email-exists": "Es gibt schon ein Benutzerkonto mit dieser E-Mail-Adresse!"
+            "email-exists": "Es gibt schon ein Nutzerkonto mit dieser E-Mail-Adresse!"
           },
           "submit": "Konto erstellen",
           "success": "Eine E-Mail mit einem Link zum Abschließen Deiner Registrierung wurde an <b>{email}</b> geschickt",
           "terms-and-condition": "Ich stimme den <a href=\"/terms-and-conditions\" target=\"_blank\"><ds-text bold color=\"primary\">Nutzungsbedingungen</ds-text></a> zu."
         },
         "title": "Mach mit bei {APPLICATION_NAME}!",
-        "unavailable": "Leider ist die öffentliche Registrierung von Benutzerkonten auf diesem Server derzeit nicht möglich."
+        "unavailable": "Leider ist die öffentliche Registrierung von Nutzerkonten auf diesem Server derzeit nicht möglich."
       }
     }
   },
@@ -267,12 +267,14 @@
       "happy": "Glücklich",
       "surprised": "Erstaunt"
     },
-    "filterFollow": "Beiträge von Benutzern filtern, denen ich folge",
+    "filterFollow": "Beiträge von Nutzern filtern, denen ich folge",
     "filterMasonryGrid": {
-      "myFriends": "Benutzer denen ich folge",
+      "myFriends": "Nutzer denen ich folge",
+      "myGroups": "Aus meinen Gruppen",
       "myTopics": "Meine Themen",
       "noFilter": "Beiträge filtern"
     },
+    "filterMyGroups": "Beiträge in meinen Gruppen",
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache Deines Beitrags",
     "languageSelectText": "Sprache wählen",
@@ -356,7 +358,7 @@
       "unorderedList": "Ungeordnete Liste"
     },
     "mention": {
-      "noUsersFound": "Keine Benutzer gefunden"
+      "noUsersFound": "Keine Nutzer gefunden"
     },
     "placeholder": "Schreib etwas Inspirierendes …"
   },
@@ -378,8 +380,9 @@
     "deleteFilter": "Filter löschen",
     "emotions": "Emotionen",
     "filter-by": "Filtern nach ...",
-    "following": "Benutzer denen ich folge",
+    "following": "Nutzer denen ich folge",
     "languages": "Sprachen",
+    "my-groups": "Meinen Gruppen",
     "order": {
       "newest": {
         "hint": "Sortiere die Neuesten nach vorn",
@@ -411,9 +414,9 @@
     "actionRadius": "Aktionsradius der Gruppe",
     "addMemberToGroup": "Zur Gruppe hinzufügen",
     "addMemberToGroupSuccess": "„{name}“ wurde der Gruppe mit der Rolle „{role}“ hinzugefügt!",
-    "addUser": "Benutzer hinzufügen",
+    "addUser": "Nutzer hinzufügen",
     "addUserNoOptions": "Keine Nutzer gefunden!",
-    "addUserPlaceholder": "Benutzername",
+    "addUserPlaceholder": "Nutzername",
     "allGroups": "Alle Gruppen",
     "button": {
       "tooltip": "Gruppen anzeigen"
@@ -434,7 +437,7 @@
       "title": "Meine Gruppe ändern"
     },
     "errors": {
-      "userAlreadyMember": "Benutzer „{name}“ ist bereits Mitglied!"
+      "userAlreadyMember": "Nutzer „{name}“ ist bereits Mitglied!"
     },
     "follow": "Folge",
     "foundation": "Gründung",
@@ -452,6 +455,7 @@
       "message": "Eine Gruppe zu verlassen ist möglicherweise nicht rückgängig zu machen!<br>Gruppe <b>„{name}“</b> verlassen!",
       "title": "Möchtest du wirklich die Gruppe verlassen?"
     },
+    "memberRemoved": "Nutzer „{name}“ wurde aus der Gruppe entfernt!",
     "members": "Mitglieder",
     "membersAdministrationList": {
       "avatar": "Avatar",
@@ -525,10 +529,10 @@
     "logout": "Abmelden",
     "moreInfo": "Was ist {APPLICATION_NAME}?",
     "moreInfoHint": "zur Präsentationsseite",
-    "no-account": "Du hast noch kein Benutzerkonto?",
+    "no-account": "Du hast noch kein Nutzerkonto?",
     "no-cookie": "Es kann kein Cookie angelegt werden. Du must Cookies akzeptieren.",
     "password": "Dein Passwort",
-    "register": "Benutzerkonto erstellen",
+    "register": "Nutzerkonto erstellen",
     "success": "Du bist eingeloggt!"
   },
   "maintenance": {
@@ -544,7 +548,7 @@
     "markerTypes": {
       "group": "Gruppe",
       "theUser": "deine Position",
-      "user": "Benutzer"
+      "user": "Nutzer"
     },
     "pageTitle": "Landkarte",
     "styles": {
@@ -591,12 +595,12 @@
         "submit": "Bestätige Entscheidung",
         "User": {
           "disable": {
-            "message": "Möchtest Du den Benutzer „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
-            "title": "Sperre den Benutzer abschließend"
+            "message": "Möchtest Du den Nutzer „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
+            "title": "Sperre den Nutzer abschließend"
           },
           "enable": {
-            "message": "Möchtest Du den Benutzer „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
-            "title": "Entsperre den Benutzer abschließend"
+            "message": "Möchtest Du den Nutzer „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
+            "title": "Entsperre den Nutzer abschließend"
           }
         }
       },
@@ -636,6 +640,7 @@
       "read": "Gelesen",
       "unread": "Ungelesen"
     },
+    "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag",
     "reason": {
@@ -644,12 +649,12 @@
       "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …"
     },
     "title": "Benachrichtigungen",
-    "user": "Benutzer"
+    "user": "Nutzer"
   },
   "position": {
     "group": "Gruppe",
     "my": "Meine Position",
-    "user": "Benutzer"
+    "user": "Nutzer"
   },
   "post": {
     "comment": {
@@ -740,7 +745,7 @@
     "submit": "freigeben",
     "success": "Erfolgreich freigegeben!",
     "user": {
-      "error": "Den Benutzer hast Du schon gemeldet!",
+      "error": "Den Nutzer hast Du schon gemeldet!",
       "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ freigeben möchtest?",
       "title": "Nutzer freigeben",
       "type": "Nutzer"
@@ -784,7 +789,7 @@
     "submit": "Meldung senden",
     "success": "Vielen Dank für diese Meldung!",
     "user": {
-      "error": "Du hast den Benutzer bereits gemeldet!",
+      "error": "Du hast den Nutzer bereits gemeldet!",
       "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ melden möchtest?",
       "title": "Nutzer melden",
       "type": "Nutzer"
@@ -797,7 +802,7 @@
       "Group": "Gruppe ::: Gruppen",
       "Post": "Beitrag ::: Beiträge",
       "Tag": "Hashtag ::: Hashtags",
-      "User": "Benutzer ::: Benutzer"
+      "User": "Nutzer ::: Nutzer"
     },
     "hint": "Wonach suchst Du? Nutze !… für Beiträge, @… für Mitglieder, &… für Gruppen, #… für Hashtags",
     "no-results": "Keine Ergebnisse für \"{search}\" gefunden. Versuch' es mit einem anderen Begriff!",
@@ -816,16 +821,16 @@
       },
       "empty": "Bislang hast Du niemanden blockiert.",
       "explanation": {
-        "closing": "Das sollte fürs Erste genügen, damit blockierte Benutzer Dich nicht mehr länger belästigen können.",
+        "closing": "Das sollte fürs Erste genügen, damit blockierte Nutzer Dich nicht mehr länger belästigen können.",
         "commenting-disabled": "Du kannst den Beitrag derzeit nicht kommentieren.",
         "commenting-explanation": "Dafür kann es mehrere Gründe geben, bitte schau in unsere ",
-        "intro": "Wenn ein anderer Benutzer durch Dich blockiert wurde, dann passiert Folgendes:",
-        "notifications": "Von Dir blockierte Benutzer werden keine Benachrichtigungen mehr erhalten, falls sie in Deinen Beiträgen erwähnt werden.",
+        "intro": "Wenn ein anderer Nutzer durch Dich blockiert wurde, dann passiert Folgendes:",
+        "notifications": "Von Dir blockierte Nutzer werden keine Benachrichtigungen mehr erhalten, falls sie in Deinen Beiträgen erwähnt werden.",
         "their-perspective": "Umgekehrt das gleiche: Die blockierte Person bekommt auch in ihren Benachrichtigungen Deine Beiträge nicht mehr zu sehen.",
         "your-perspective": "In Deinen Benachrichtigungen tauchen keine Beiträge der blockierten Person mehr auf."
       },
-      "how-to": "Du kannst andere Benutzer auf deren Profilseite über das Inhaltsmenü blockieren.",
-      "name": "Blockierte Benutzer",
+      "how-to": "Du kannst andere Nutzer auf deren Profilseite über das Inhaltsmenü blockieren.",
+      "name": "Blockierte Nutzer",
       "unblock": "Blockierten Nutzer freigeben",
       "unblocked": "{name} ist wieder entsperrt"
     },
@@ -834,7 +839,7 @@
       "labelCity": "Deine Stadt oder Region",
       "labelCityHint": "(zeigt ungefähre Position auf der Landkarte)",
       "labelName": "Dein Name",
-      "labelSlug": "Dein eindeutiger Benutzername",
+      "labelSlug": "Dein eindeutiger Nutzername",
       "name": "Deine Daten",
       "namePlaceholder": "Petra Lustig",
       "success": "Deine Daten wurden erfolgreich aktualisiert!"
@@ -843,12 +848,12 @@
       "accountDescription": "Sei dir bewusst, dass deine Beiträge und Kommentare für unsere Community wichtig sind. Wenn du sie trotzdem löschen möchtest, musst du sie unten markieren.",
       "accountWarning": "Dein Konto, deine Beiträge oder Kommentare kannst du nach dem Löschen WEDER VERWALTEN NOCH WIEDERHERSTELLEN!",
       "accountWarningAdmin": "Das Konto, die Beiträge oder Kommentare können nach dem Löschen WEDER VERWALTET NOCH WIEDERHERGESTELLT WERDEN!",
-      "accountWarningIsAdmin": "Achtung! Du löschst jetzt ein Benutzerkonto!",
+      "accountWarningIsAdmin": "Achtung! Du löschst jetzt ein Nutzerkonto!",
       "commentedCount": "Meinen {count} Kommentar löschen ::: Meine {count} Kommentare löschen",
-      "confirmDeleting": "Benutzerkonto jetzt löschen",
+      "confirmDeleting": "Nutzerkonto jetzt löschen",
       "contributionsCount": "Meinen {count} Beitrag löschen ::: Meine {count} Beiträge löschen",
       "infoAdmin": "Alle Beiträge und Kommentare des Users werden zusätzlich gelöscht!",
-      "name": "Benutzerkonto löschen",
+      "name": "Nutzerkonto löschen",
       "pleaseConfirm": "Zerstörerische Aktion! Gib „{confirm}“ ein, um zu bestätigen.",
       "success": "Konto erfolgreich gelöscht!"
     },
@@ -908,13 +913,13 @@
       },
       "empty": "Bislang hast du niemanden stummgeschaltet.",
       "explanation": {
-        "intro": "Wenn ein anderer Benutzer von dir stummgeschaltet wurde, dann passiert folgendes:",
+        "intro": "Wenn ein anderer Nutzer von dir stummgeschaltet wurde, dann passiert folgendes:",
         "search": "Die Beiträge von stummgeschalteten Personen verschwinden aus deinen Suchergebnissen.",
         "your-perspective": "In deiner Beitragsübersicht tauchen keine Beiträge der stummgeschalteten Person mehr auf."
       },
-      "how-to": "Du kannst andere Benutzer auf deren Profilseite über das Inhaltsmenü stummschalten.",
+      "how-to": "Du kannst andere Nutzer auf deren Profilseite über das Inhaltsmenü stummschalten.",
       "mute": "Stumm schalten",
-      "name": "Stummgeschaltete Benutzer",
+      "name": "Stummgeschaltete Nutzer",
       "unmute": "Stummschaltung aufheben",
       "unmuted": "{name} ist nicht mehr stummgeschaltet"
     },
@@ -969,7 +974,7 @@
     },
     "validation": {
       "slug": {
-        "alreadyTaken": "Dieser Benutzername ist schon vergeben.",
+        "alreadyTaken": "Dieser Nutzername ist schon vergeben.",
         "regex": "Es sind nur Kleinbuchstaben, Zahlen, Unterstriche oder Bindestriche erlaubt."
       }
     }
