@@ -113,6 +113,6 @@ export default {
 }
 
 .invite-code {
-  left: 50%;
+  margin-left: 25%;
 }
 </style>
