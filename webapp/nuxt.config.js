@@ -62,7 +62,8 @@ export default {
       },
       {
         name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        // content: 'width=device-width, initial-scale=1', // "width=device-width" does not work correctly for Safari on iOS
+        content: 'initial-scale=1',
       },
       {
         hid: 'description',
