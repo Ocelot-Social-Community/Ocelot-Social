@@ -518,7 +518,7 @@
     "copy-code": "Code:",
     "copy-success": "Invite code copied to clipboard",
     "not-available": "You have no valid invite code available!",
-    "your-code": "Copy your invite code to the clipboard:"
+    "your-code": "Send this link per e-mail or in social media to invite your friends:"
   },
   "login": {
     "email": "Your E-mail",
