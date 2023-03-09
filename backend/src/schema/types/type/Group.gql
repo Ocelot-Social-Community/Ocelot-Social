@@ -132,4 +132,9 @@ type Mutation {
     userId: ID!
     roleInGroup: GroupMemberRole!
   ): User
+
+  RemoveUserFromGroup(
+    groupId: ID!
+    userId: ID!
+  ): User
 }
