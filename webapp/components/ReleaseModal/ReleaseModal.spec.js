@@ -100,7 +100,9 @@ describe('ReleaseModal.vue', () => {
       })
     }
 
-    beforeEach(jest.useFakeTimers)
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
 
     describe('given id', () => {
       beforeEach(() => {

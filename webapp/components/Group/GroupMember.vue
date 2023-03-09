@@ -53,30 +53,33 @@
         </ds-chip>
       </template>
       <template #edit="scope">
-        <ds-button v-if="scope.row.myRoleInGroup !== 'owner'" size="small" primary disabled>
-          <!-- TODO: implement removal of group members -->
-          <!--           :disabled="scope.row.myRoleInGroup === 'owner'"
-          -->
+        <base-button
+          v-if="scope.row.myRoleInGroup !== 'owner'"
+          size="small"
+          primary
+          @click="
+            isOpen = true
+            userId = scope.row.id
+          "
+        >
           {{ $t('group.removeMemberButton') }}
-        </ds-button>
+        </base-button>
       </template>
     </ds-table>
-    <!-- TODO: implement removal of group members -->
-    <!-- TODO: change to ocelot.social modal -->
-    <!-- <ds-modal
-         v-if="isOpen"
-         v-model="isOpen"
-         :title="`${$t('group.removeMember')}`"
-         force
-         extended
-         :confirm-label="$t('group.removeMember')"
-         :cancel-label="$t('actions.cancel')"
-         @confirm="deleteMember(memberId)"
-         /> -->
+    <ds-modal
+      v-if="isOpen"
+      v-model="isOpen"
+      :title="`${$t('group.removeMember')}`"
+      force
+      extended
+      :confirm-label="$t('group.removeMember')"
+      :cancel-label="$t('actions.cancel')"
+      @confirm="removeUser()"
+    />
   </div>
 </template>
 <script>
-import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
+import { changeGroupMemberRoleMutation, removeUserFromGroupMutation } from '~/graphql/groups.js'
 
 export default {
   name: 'GroupMember',
@@ -96,6 +99,8 @@ export default {
       query: '',
       searchProcess: null,
       user: {},
+      isOpen: false,
+      userId: null,
     }
   },
   computed: {
@@ -138,6 +143,25 @@ export default {
       } catch (error) {
         this.$toast.error(error.message)
       }
+    },
+    removeUser() {
+      this.$apollo
+        .mutate({
+          mutation: removeUserFromGroupMutation(),
+          variables: { groupId: this.groupId, userId: this.userId },
+        })
+        .then(({ data }) => {
+          this.$emit('loadGroupMembers')
+          this.$toast.success(
+            this.$t('group.memberRemoved', { name: data.RemoveUserFromGroup.slug }),
+          )
+        })
+        .catch((error) => {
+          this.$toast.error(error.message)
+        })
+        .finally(() => {
+          this.userId = null
+        })
     },
   },
 }

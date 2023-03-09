@@ -160,7 +160,7 @@ describe('EmbedComponent.vue', () => {
 
           describe('sets permanently', () => {
             beforeEach(() => {
-              wrapper.find('input[type=checkbox]').trigger('click')
+              wrapper.find('input[type=checkbox]').setChecked(true)
               wrapper.find('[data-test="play-now-button"]').trigger('click')
             })
 

@@ -52,7 +52,7 @@ describe('ComponentSlider.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('div')).toBe(true)
+      expect(wrapper.element.tagName).toBe('DIV')
     })
 
     it('click on next Button', async () => {

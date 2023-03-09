@@ -1,4 +1,4 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import SearchField from './SearchField.vue'
 import SearchableInput from '~/components/generic/SearchableInput/SearchableInput'
@@ -7,7 +7,10 @@ const localVue = global.localVue
 
 localVue.filter('truncate', () => 'truncated string')
 localVue.filter('dateTime', () => Date.now)
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+
+const stubs = {
+  'nuxt-link': true,
+}
 
 describe('SearchField.vue', () => {
   let mocks, wrapper, getters
@@ -26,14 +29,14 @@ describe('SearchField.vue', () => {
     const store = new Vuex.Store({
       getters,
     })
-    return mount(SearchField, { mocks, localVue, store })
+    return mount(SearchField, { mocks, localVue, store, stubs })
   }
 
   describe('mount', () => {
     describe('Emitted events', () => {
       let searchableInputComponent
       beforeEach(() => {
-        searchableInputComponent = wrapper.find(SearchableInput)
+        searchableInputComponent = wrapper.findComponent(SearchableInput)
       })
 
       describe('query event', () => {
