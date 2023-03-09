@@ -289,7 +289,8 @@
       },
       "supportedFormats": "Insert a picture of file format JPG, PNG or GIF"
     },
-    "title": "Title"
+    "title": "Title",
+    "visibleOnlyForMembersOfGroup": "This post will only be visible to members of the “<b>{name}</b>” group."
   },
   "delete": {
     "cancel": "Cancel",
