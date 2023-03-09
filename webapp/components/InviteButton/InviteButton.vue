@@ -3,7 +3,8 @@
     <template #default="{ toggleMenu }">
       <base-button
         icon="user-plus"
-        circle ghost
+        circle
+        ghost
         v-tooltip="{
           content: $t('invite-codes.button.tooltip'),
           placement: 'bottom-start',
