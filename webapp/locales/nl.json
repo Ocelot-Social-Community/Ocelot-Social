@@ -100,6 +100,26 @@
     "moreInfo": "Wat is {APPLICATION_NAME}?",
     "password": "Uw Wachtwoord"
   },
+  "notifications": {
+    "comment": null,
+    "content": null,
+    "empty": null,
+    "filterLabel": {
+      "all": null,
+      "read": null,
+      "unread": null
+    },
+    "markAllAsRead": "Markeer alles als gelezen",
+    "pageLink": null,
+    "post": null,
+    "reason": {
+      "commented_on_post": null,
+      "mentioned_in_comment": null,
+      "mentioned_in_post": null
+    },
+    "title": null,
+    "user": null
+  },
   "post": {
     "moreInfo": {
       "name": "Meer info"
