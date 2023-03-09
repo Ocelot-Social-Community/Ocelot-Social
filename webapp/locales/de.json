@@ -515,10 +515,13 @@
     "no-results": "Keine Beiträge gefunden."
   },
   "invite-codes": {
-    "copy-code": "Code:",
+    "button": {
+      "tooltip": "Lade deine Freunde ein"
+    },
+    "copy-code": "Einladungslink kopieren",
     "copy-success": "Einladungscode erfolgreich in die Zwischenablage kopiert",
     "not-available": "Du hast keinen Einladungscode zur Verfügung!",
-    "your-code": "Kopiere deinen Einladungscode in die Ablage:"
+    "your-code": "Sende diesen Link per E-Mail oder in sozialen Medien, um deine Freunde einzuladen:"
   },
   "login": {
     "email": "Deine E-Mail",
