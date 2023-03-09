@@ -15,10 +15,7 @@
               ghost
               @click="copyInviteLink"
             >
-              <ds-text bold>
-                {{ $t('invite-codes.copy-code') }}
-                {{ inviteCode.code }}
-              </ds-text>
+              <ds-text bold>{{ $t('invite-codes.copy-code') }}</ds-text>
             </base-button>
           </base-card>
         </div>

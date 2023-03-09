@@ -515,7 +515,7 @@
     "no-results": "No contributions found."
   },
   "invite-codes": {
-    "copy-code": "Code:",
+    "copy-code": "Copy Invite Link",
     "copy-success": "Invite code copied to clipboard",
     "not-available": "You have no valid invite code available!",
     "your-code": "Send this link per e-mail or in social media to invite your friends:"
