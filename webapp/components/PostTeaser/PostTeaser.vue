@@ -42,7 +42,7 @@
         </div>
         <div v-else class="categories-placeholder"></div>
         <counter-icon
-          icon="bullhorn"
+          icon="heart-o"
           :count="post.shoutedCount"
           :title="$t('contribution.amount-shouts', { amount: post.shoutedCount })"
         />
