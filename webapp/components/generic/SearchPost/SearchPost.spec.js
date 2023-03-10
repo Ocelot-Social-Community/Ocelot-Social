@@ -37,11 +37,11 @@ describe('SearchPost.vue', () => {
     })
 
     it('renders post commentsCount', () => {
-      expect(counts.text()).toContain(propsData.option.commentsCount)
+      expect(counts.text()).toContain(propsData.option.commentsCount.toString())
     })
 
     it('renders post shoutedCount', () => {
-      expect(counts.text()).toContain(propsData.option.shoutedCount)
+      expect(counts.text()).toContain(propsData.option.shoutedCount.toString())
     })
 
     it('renders post author', () => {

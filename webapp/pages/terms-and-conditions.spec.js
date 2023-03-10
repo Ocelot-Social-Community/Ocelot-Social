@@ -33,7 +33,7 @@ describe('terms-and-conditions.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('div')).toBeTruthy()
+      expect(wrapper.element.tagName).toBe('DIV')
     })
 
     it('has correct <head> content', () => {

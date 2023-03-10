@@ -1,14 +1,16 @@
 import Vuex from 'vuex'
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Registration from './registration.vue'
 import Vue from 'vue'
 
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['router-link'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
-config.stubs['infinite-loading'] = '<span><slot /></span>'
+const stubs = {
+  'client-only': true,
+  'router-link': true,
+  'nuxt-link': true,
+  'infinite-loading': true,
+}
 
 describe('Registration', () => {
   let wrapper
@@ -73,6 +75,7 @@ describe('Registration', () => {
       return mount(Registration, {
         mocks,
         localVue,
+        stubs,
       })
     }
 
@@ -310,7 +313,7 @@ describe('Registration', () => {
 
     it('renders', async () => {
       wrapper = await Wrapper()
-      expect(wrapper.is('.registration-slider')).toBe(true)
+      expect(wrapper.classes('registration-slider')).toBe(true)
     })
 
     // The asyncTests must go last

@@ -1,179 +1,68 @@
 version: 2
 updates:
+- package-ecosystem: "github-actions"
+  directory: "/"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+
 - package-ecosystem: npm
   directory: "/"
+  rebase-strategy: "disabled"
   schedule:
-    interval: daily
-    time: "04:00"
-  open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: cypress
-    versions:
-    - 6.3.0
-    - 6.4.0
-    - 6.5.0
-    - 6.6.0
-    - 6.7.1
-    - 6.8.0
-    - 7.0.0
-    - 7.0.1
-    - 7.1.0
-  - dependency-name: cypress-cucumber-preprocessor
-    versions:
-    - 4.0.0
-    - 4.0.1
-    - 4.0.3
-  - dependency-name: date-fns
-    versions:
-    - 2.16.1
-    - 2.17.0
-    - 2.18.0
-    - 2.19.0
-    - 2.20.0
-    - 2.20.1
-    - 2.20.2
-    - 2.20.3
-    - 2.21.0
-  - dependency-name: cypress-file-upload
-    versions:
-    - 5.0.2
-    - 5.0.3
-    - 5.0.4
-    - 5.0.5
-  - dependency-name: neo4j-driver
-    versions:
-    - 4.2.2
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
 - package-ecosystem: npm
   directory: "/backend"
+  rebase-strategy: "disabled"
   schedule:
-    interval: daily
-    time: "04:00"
-  open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: y18n
-    versions:
-    - 4.0.1
-    - 4.0.2
-  - dependency-name: metascraper-publisher
-    versions:
-    - 5.16.16
-    - 5.18.1
-    - 5.18.12
-    - 5.18.2
-    - 5.18.4
-    - 5.18.5
-    - 5.18.6
-    - 5.18.9
-    - 5.20.0
-    - 5.21.0
-    - 5.21.2
-    - 5.21.3
-    - 5.21.4
-    - 5.21.5
-  - dependency-name: metascraper-author
-    versions:
-    - 5.16.16
-    - 5.18.1
-    - 5.18.12
-    - 5.18.2
-    - 5.18.4
-    - 5.18.5
-    - 5.18.6
-    - 5.18.9
-    - 5.20.0
-    - 5.21.0
-    - 5.21.2
-    - 5.21.3
-    - 5.21.4
-    - 5.21.5
-  - dependency-name: neo4j-driver
-    versions:
-    - 4.2.2
-  - dependency-name: neo4j-graphql-js
-    versions:
-    - 2.19.1
-  - dependency-name: mustache
-    versions:
-    - 4.1.0
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
 - package-ecosystem: npm
   directory: "/webapp"
+  rebase-strategy: "disabled"
   schedule:
-    interval: daily
-    time: "04:00"
-  open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: nuxt
-    versions:
-    - 2.14.12
-    - 2.15.0
-    - 2.15.1
-    - 2.15.2
-    - 2.15.3
-  - dependency-name: v-tooltip
-    versions:
-    - 2.1.2
-  - dependency-name: "@vue/server-test-utils"
-    versions:
-    - 1.1.2
-    - 1.1.3
-  - dependency-name: node-notifier
-    versions:
-    - 8.0.1
-- package-ecosystem: docker
-  directory: "/webapp"
-  schedule:
-    interval: daily
-    time: "04:00"
-  open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: node
-    versions:
-    - ">= 15.5.a, < 15.6"
-  - dependency-name: node
-    versions:
-    - 15.10.0.pre.alpine3.10
-    - 15.11.0.pre.alpine3.10
-    - 15.12.0.pre.alpine3.10
-    - 15.13.0.pre.alpine3.10
-    - 15.7.0.pre.alpine3.10
-    - 15.8.0.pre.alpine3.10
-    - 15.9.0.pre.alpine3.10
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+
 - package-ecosystem: docker
   directory: "/backend"
+  rebase-strategy: "disabled"
   schedule:
-    interval: daily
-    time: "04:00"
-  open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: node
-    versions:
-    - ">= 15.4.a, < 15.5"
-  - dependency-name: node
-    versions:
-    - ">= 15.5.a, < 15.6"
-  - dependency-name: node
-    versions:
-    - 15.10.0.pre.alpine3.10
-    - 15.11.0.pre.alpine3.10
-    - 15.12.0.pre.alpine3.10
-    - 15.13.0.pre.alpine3.10
-    - 15.7.0.pre.alpine3.10
-    - 15.8.0.pre.alpine3.10
-    - 15.9.0.pre.alpine3.10
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+- package-ecosystem: docker
+  directory: "/webapp"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
 - package-ecosystem: docker
   directory: "/neo4j"
+  rebase-strategy: "disabled"
   schedule:
-    interval: daily
-    time: "04:00"
-  open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: neo4j
-    versions:
-    - 4.2.3
-    - 4.2.4
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
 - package-ecosystem: docker
-  directory: "/deployment/legacy-migration/maintenance-worker"
+  directory: "/deployment/src/docker"
+  rebase-strategy: "disabled"
   schedule:
-    interval: daily
-    time: "04:00"
-  open-pull-requests-limit: 10
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"

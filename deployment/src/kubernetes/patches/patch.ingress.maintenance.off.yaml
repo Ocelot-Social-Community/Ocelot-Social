@@ -1,0 +1,12 @@
+spec:
+  rules:
+    - host: 
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: ocelot-webapp
+                port:
+                  number: 3000

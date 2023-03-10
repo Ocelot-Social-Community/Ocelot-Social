@@ -1,4 +1,4 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import ReportList from './ReportList'
 import { reports } from './ReportList.story'
@@ -7,8 +7,10 @@ import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
 
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+const stubs = {
+  'client-only': true,
+  'nuxt-link': true,
+}
 
 describe('ReportList', () => {
   let mocks, mutations, getters, wrapper
@@ -45,7 +47,7 @@ describe('ReportList', () => {
         mutations,
         getters,
       })
-      return mount(ReportList, { mocks, localVue, store })
+      return mount(ReportList, { mocks, localVue, store, stubs })
     }
 
     describe('renders children components', () => {
@@ -54,11 +56,11 @@ describe('ReportList', () => {
       })
 
       it('renders DropdownFilter', () => {
-        expect(wrapper.find(DropdownFilter).exists()).toBe(true)
+        expect(wrapper.findComponent(DropdownFilter).exists()).toBe(true)
       })
 
       it('renders ReportsTable', () => {
-        expect(wrapper.find(ReportsTable).exists()).toBe(true)
+        expect(wrapper.findComponent(ReportsTable).exists()).toBe(true)
       })
     })
 
@@ -66,7 +68,7 @@ describe('ReportList', () => {
       beforeEach(async () => {
         wrapper = Wrapper()
         wrapper.setData({ reports })
-        wrapper.find(ReportsTable).vm.$emit('confirm', reports[0])
+        wrapper.findComponent(ReportsTable).vm.$emit('confirm', reports[0])
       })
 
       it('calls modal/SET_OPEN', () => {

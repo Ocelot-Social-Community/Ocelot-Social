@@ -30,7 +30,11 @@
           <div class="filterButtonMenu" :class="{ 'hide-filter': hideByScroll }">
             <base-button
               class="my-filter-button"
-              v-if="!postsFilter['categories_some'] && !postsFilter['author']"
+              v-if="
+                !postsFilter['categories_some'] &&
+                !postsFilter['author'] &&
+                !postsFilter['postsInMyGroups']
+              "
               right
               @click="showFilter = !showFilter"
               filled
@@ -59,6 +63,20 @@
               <base-button
                 class="filter-remove"
                 @click="resetByFollowed"
+                icon="close"
+                :title="$t('filter-menu.deleteFilter')"
+                style="margin-left: -8px"
+                filled
+              />
+            </span>
+
+            <span v-if="postsFilter['postsInMyGroups']">
+              <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
+                {{ $t('contribution.filterMasonryGrid.myGroups') }}
+              </base-button>
+              <base-button
+                class="filter-remove"
+                @click="resetByGroups"
                 icon="close"
                 :title="$t('filter-menu.deleteFilter')"
                 style="margin-left: -8px"
@@ -203,6 +221,7 @@ export default {
   methods: {
     ...mapMutations({
       resetByFollowed: 'posts/TOGGLE_FILTER_BY_FOLLOWED',
+      resetByGroups: 'posts/TOGGLE_FILTER_BY_MY_GROUPS',
       resetCategories: 'posts/RESET_CATEGORIES',
       toggleCategory: 'posts/TOGGLE_CATEGORY',
     }),

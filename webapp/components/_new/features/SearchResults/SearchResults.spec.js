@@ -1,4 +1,4 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import SearchResults from './SearchResults'
 import helpers from '~/storybook/helpers'
@@ -9,8 +9,10 @@ const localVue = global.localVue
 
 localVue.directive('scrollTo', jest.fn())
 
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+const stubs = {
+  'client-only': true,
+  'nuxt-link': true,
+}
 
 describe('SearchResults', () => {
   let mocks, getters, propsData, wrapper
@@ -18,7 +20,7 @@ describe('SearchResults', () => {
     const store = new Vuex.Store({
       getters,
     })
-    return mount(SearchResults, { mocks, localVue, propsData, store })
+    return mount(SearchResults, { mocks, localVue, propsData, store, stubs })
   }
 
   beforeEach(() => {
