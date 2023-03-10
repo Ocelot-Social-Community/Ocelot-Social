@@ -1,62 +1,106 @@
 <template>
-  <ds-table v-if="notifications && notifications.length" :data="notifications" :fields="fields">
-    <template #icon="scope">
-      <base-icon
-        v-if="scope.row.from.post"
-        name="comment"
-        v-tooltip="{ content: $t('notifications.comment'), placement: 'right' }"
-      />
-      <base-icon
-        v-else
-        name="bookmark"
-        v-tooltip="{ content: $t('notifications.post'), placement: 'right' }"
-      />
-    </template>
-    <template #user="scope">
-      <ds-space margin-bottom="base">
-        <client-only>
-          <user-teaser
-            :user="scope.row.from.author"
-            :date-time="scope.row.from.createdAt"
-            :class="{ 'notification-status': scope.row.read }"
-          />
-        </client-only>
-      </ds-space>
-      <ds-text :class="{ 'notification-status': scope.row.read, reason: true }">
-        {{ $t(`notifications.reason.${scope.row.reason}`) }}
-      </ds-text>
-    </template>
-    <template #post="scope">
-      <nuxt-link
-        class="notification-mention-post"
-        :class="{ 'notification-status': scope.row.read }"
-        :to="{
-          name: 'post-id-slug',
-          params: params(scope.row.from),
-          hash: hashParam(scope.row.from),
-        }"
-        @click.native="markNotificationAsRead(scope.row.from.id)"
+  <div class="notification-grid" v-if="notifications && notifications.length">
+    <ds-grid>
+      <ds-grid-item v-if="!isMobile" column-span="fullWidth">
+        <ds-grid class="header-grid">
+          <ds-grid-item v-for="f in fields" :key="f.label" class="ds-table-head-col">
+            {{ f.label }}
+          </ds-grid-item>
+        </ds-grid>
+      </ds-grid-item>
+      <ds-grid-item
+        v-for="n in notifications"
+        :key="n.id"
+        column-span="fullWidth"
+        class="notification-grid-row"
       >
-        <b>{{ scope.row.from.title || scope.row.from.post.title | truncate(50) }}</b>
-      </nuxt-link>
-    </template>
-    <template #content="scope">
-      <b :class="{ 'notification-status': scope.row.read }">
-        {{ scope.row.from.contentExcerpt | removeHtml }}
-      </b>
-    </template>
-  </ds-table>
+        <ds-grid>
+          <ds-grid-item>
+            <ds-flex class="user-section">
+              <ds-flex-item :width="{ base: '20%' }">
+                <div>
+                  <base-card :wide-content="true">
+                    <base-icon
+                      v-if="n.from.post"
+                      name="comment"
+                      v-tooltip="{ content: $t('notifications.comment'), placement: 'right' }"
+                    />
+                    <base-icon
+                      v-else
+                      name="bookmark"
+                      v-tooltip="{ content: $t('notifications.post'), placement: 'right' }"
+                    />
+                  </base-card>
+                </div>
+              </ds-flex-item>
+              <ds-flex-item>
+                <div>
+                  <base-card :wide-content="true">
+                    <ds-space margin-bottom="base">
+                      <client-only>
+                        <user-teaser
+                          :user="n.from.author"
+                          :date-time="n.from.createdAt"
+                          :class="{ 'notification-status': n.read }"
+                        />
+                      </client-only>
+                    </ds-space>
+                    <ds-text :class="{ 'notification-status': n.read, reason: true }">
+                      {{ $t(`notifications.reason.${n.reason}`) }}
+                    </ds-text>
+                  </base-card>
+                </div>
+              </ds-flex-item>
+            </ds-flex>
+          </ds-grid-item>
+          <ds-grid-item>
+            <ds-flex class="content-section" :direction="{ base: 'column', xs: 'row' }">
+              <ds-flex-item>
+                <base-card :wide-content="true">
+                  <nuxt-link
+                    class="notification-mention-post"
+                    :class="{ 'notification-status': n.read }"
+                    :to="{
+                      name: 'post-id-slug',
+                      params: params(n.from),
+                      hash: hashParam(n.from),
+                    }"
+                    @click.native="markNotificationAsRead(n.from.id)"
+                  >
+                    <b>{{ n.from.title || n.from.post.title | truncate(50) }}</b>
+                  </nuxt-link>
+                </base-card>
+              </ds-flex-item>
+              <ds-flex-item>
+                <base-card :wide-content="true">
+                  <b :class="{ 'notification-status': n.read }">
+                    {{ n.from.contentExcerpt | removeHtml }}
+                  </b>
+                </base-card>
+              </ds-flex-item>
+            </ds-flex>
+          </ds-grid-item>
+        </ds-grid>
+      </ds-grid-item>
+    </ds-grid>
+  </div>
   <hc-empty v-else icon="alert" :message="$t('notifications.empty')" />
 </template>
 <script>
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcEmpty from '~/components/Empty/Empty'
+import BaseCard from '../_new/generic/BaseCard/BaseCard.vue'
+import mobile from '~/mixins/mobile'
+
+const maxMobileWidth = 768 // at this point the table breaks down
 
 export default {
   components: {
     UserTeaser,
     HcEmpty,
+    BaseCard,
   },
+  mixins: [mobile(maxMobileWidth)],
   props: {
     notifications: { type: Array, default: () => [] },
   },
@@ -105,5 +149,40 @@ export default {
 <style lang="scss">
 .notification-status {
   opacity: $opacity-soft;
+}
+/* fix to override flex-wrap style of ds flex component */
+.notification-grid .content-section {
+  flex-wrap: nowrap;
+}
+.notification-grid .ds-grid.header-grid {
+  grid-template-columns: 1fr 4fr 3fr 3fr !important;
+}
+.notification-grid-row {
+  border-top: 1px dotted #e5e3e8;
+}
+.notification-grid .base-card {
+  border-radius: 0;
+  box-shadow: none;
+  padding: 16px 4px;
+}
+/* dirty fix to override broken styleguide inline-styles */
+.notification-grid .ds-grid {
+  grid-template-columns: 5fr 6fr !important;
+  grid-auto-rows: auto !important;
+  grid-template-rows: 1fr;
+  gap: 0px !important;
+}
+@media screen and (max-width: 768px) {
+  .notification-grid .ds-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .notification-grid .content-section {
+    border-top: 1px dotted #e5e3e8;
+  }
+  .notification-grid-row {
+    box-shadow: 0px 12px 26px -4px rgb(0 0 0 / 10%);
+    margin-top: 5px;
+    border-top: none;
+  }
 }
 </style>
