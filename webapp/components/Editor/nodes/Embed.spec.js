@@ -42,7 +42,7 @@ describe('Embed.vue', () => {
         propsData.node = { attrs: { href: 'https://www.youtube.com/watch?v=qkdXAtO40Fo' } }
         const wrapper = Wrapper({ propsData })
         await wrapper.html()
-        expect(wrapper.contains('embed-component-stub')).toBe(true)
+        expect(wrapper.find('embed-component-stub').exists()).toBe(true)
       })
     })
 

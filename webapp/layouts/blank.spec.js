@@ -1,9 +1,13 @@
-import { config, shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import Blank from './blank.vue'
 
 const localVue = global.localVue
 
-config.stubs.nuxt = '<span><slot /></span>'
+const stubs = {
+  nuxt: {
+    template: '<span><slot /></span>',
+  },
+}
 
 describe('blank.vue', () => {
   let wrapper
@@ -20,6 +24,7 @@ describe('blank.vue', () => {
       return shallowMount(Blank, {
         mocks,
         localVue,
+        stubs,
       })
     }
 
@@ -28,7 +33,7 @@ describe('blank.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('.layout-blank')).toBe(true)
+      expect(wrapper.classes('layout-blank')).toBe(true)
     })
   })
 })

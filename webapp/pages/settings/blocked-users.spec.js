@@ -1,4 +1,4 @@
-import { config, mount, createLocalVue } from '@vue/test-utils'
+import { mount, createLocalVue } from '@vue/test-utils'
 import BlockedUsers from './blocked-users.vue'
 import Styleguide from '@human-connection/styleguide'
 import Filters from '~/plugins/vue-filters'
@@ -9,7 +9,9 @@ const localVue = createLocalVue()
 localVue.use(Styleguide)
 localVue.use(Filters)
 
-config.stubs['nuxt-link'] = '<span><slot /></span>'
+const stubs = {
+  'nuxt-link': true,
+}
 
 describe('blocked-users.vue', () => {
   let wrapper
@@ -35,7 +37,7 @@ describe('blocked-users.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(BlockedUsers, { mocks, localVue })
+      return mount(BlockedUsers, { mocks, localVue, stubs })
     }
 
     beforeEach(() => {
@@ -43,7 +45,7 @@ describe('blocked-users.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('div')).toBe(true)
+      expect(wrapper.element.tagName).toBe('DIV')
     })
 
     describe('given a list of blocked users', () => {

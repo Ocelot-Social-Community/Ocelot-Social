@@ -1,4 +1,4 @@
-import { config, mount, RouterLinkStub } from '@vue/test-utils'
+import { mount, RouterLinkStub } from '@vue/test-utils'
 
 import Vuex from 'vuex'
 import NotificationsTable from './NotificationsTable'
@@ -7,8 +7,6 @@ import { notifications } from '~/components/utils/Notifications'
 const localVue = global.localVue
 
 localVue.filter('truncate', (string) => string)
-
-config.stubs['client-only'] = '<span><slot /></span>'
 
 describe('NotificationsTable.vue', () => {
   let wrapper, mocks, propsData, stubs
@@ -21,6 +19,7 @@ describe('NotificationsTable.vue', () => {
     }
     stubs = {
       NuxtLink: RouterLinkStub,
+      'client-only': true,
     }
     propsData = {}
   })

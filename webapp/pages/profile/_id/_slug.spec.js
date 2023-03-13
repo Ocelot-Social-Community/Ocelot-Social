@@ -1,15 +1,18 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import ProfileSlug from './_slug.vue'
 
 const localVue = global.localVue
 
 localVue.filter('date', (d) => d)
 
-config.stubs['client-only'] = '<span><slot /></span>'
-config.stubs['v-popover'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
-config.stubs['infinite-loading'] = '<span><slot /></span>'
-config.stubs['follow-list'] = '<span><slot /></span>'
+const stubs = {
+  'client-only': true,
+  'v-popover': true,
+  'nuxt-link': true,
+  'infinite-loading': true,
+  'follow-list': true,
+  'router-link': true,
+}
 
 describe('ProfileSlug', () => {
   let wrapper
@@ -51,6 +54,7 @@ describe('ProfileSlug', () => {
       return mount(ProfileSlug, {
         mocks,
         localVue,
+        stubs,
       })
     }
 

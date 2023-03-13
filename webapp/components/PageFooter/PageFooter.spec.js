@@ -1,10 +1,14 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import PageFooter from './PageFooter.vue'
 import linksDefault from '~/constants/links.js'
 
 const localVue = global.localVue
 
-config.stubs['nuxt-link'] = '<span class="nuxt-link"><slot /></span>'
+const stubs = {
+  'nuxt-link': {
+    template: '<span class="nuxt-link"><slot /></span>',
+  },
+}
 
 describe('PageFooter.vue', () => {
   let mocks
@@ -21,7 +25,7 @@ describe('PageFooter.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(PageFooter, { mocks, localVue })
+      return mount(PageFooter, { mocks, localVue, stubs })
     }
 
     describe('links.js', () => {
