@@ -447,7 +447,8 @@
     "in": "in",
     "joinLeaveButton": {
       "iAmMember": "Bin Mitglied",
-      "join": "Beitreten"
+      "join": "Beitreten",
+      "pendingMember": "Ausstehendes Mitglied"
     },
     "labelSlug": "Eindeutiger Gruppenname",
     "leaveModal": {
