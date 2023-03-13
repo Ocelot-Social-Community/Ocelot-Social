@@ -43,65 +43,30 @@
               &nbsp;
               <base-icon class="my-filter-button" :name="filterButtonIcon"></base-icon>
             </base-button>
-            <span v-if="postsFilter['categories_some']">
-              <base-button
-                class="my-filter-button my-filter-button-selected"
-                right
-                @click="showFilter = !showFilter"
-                filled
-              >
-                {{ $t('contribution.filterMasonryGrid.myTopics') }}
-              </base-button>
-              <base-button
-                class="filter-remove"
-                @click="resetCategories"
-                icon="close"
-                :title="$t('filter-menu.deleteFilter')"
-                size="small"
-                circle
-                filled
-              />
-            </span>
-            <span v-if="postsFilter['author']">
-              <base-button
-                class="my-filter-button my-filter-button-selected"
-                right
-                @click="showFilter = !showFilter"
-                filled
-              >
-                {{ $t('contribution.filterMasonryGrid.myFriends') }}
-              </base-button>
-              <base-button
-                class="filter-remove"
-                @click="resetByFollowed"
-                icon="close"
-                :title="$t('filter-menu.deleteFilter')"
-                size="small"
-                circle
-                filled
-              />
-            </span>
 
-            <span v-if="postsFilter['postsInMyGroups']">
-              <base-button
-                class="my-filter-button my-filter-button-selected"
-                right
-                @click="showFilter = !showFilter"
-                filled
-              >
-                {{ $t('contribution.filterMasonryGrid.myGroups') }}
-              </base-button>
-              <base-button
-                class="filter-remove"
-                @click="resetByGroups"
-                icon="close"
-                :title="$t('filter-menu.deleteFilter')"
-                size="small"
-                circle
-                filled
-              />
-            </span>
+            <header-button
+              v-if="postsFilter['categories_some']"
+              :title="$t('contribution.filterMasonryGrid.myTopics')"
+              :clickButton="openFilterMenu"
+              :titleRemove="$t('filter-menu.deleteFilter')"
+              :clickRemove="resetCategories"
+            />
 
+            <header-button
+              v-if="postsFilter['author']"
+              :title="$t('contribution.filterMasonryGrid.myFriends')"
+              :clickButton="openFilterMenu"
+              :titleRemove="$t('filter-menu.deleteFilter')"
+              :clickRemove="resetByFollowed"
+            />
+
+            <header-button
+              v-if="postsFilter['postsInMyGroups']"
+              :title="$t('contribution.filterMasonryGrid.myGroups')"
+              :clickButton="openFilterMenu"
+              :titleRemove="$t('filter-menu.deleteFilter')"
+              :clickRemove="resetByGroups"
+            />
             <div id="my-filter" v-if="showFilter">
               <div @mouseleave="showFilter = false">
                 <filter-menu-component @showFilterMenu="showFilterMenu" />
@@ -160,6 +125,7 @@ import HcEmpty from '~/components/Empty/Empty'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
+import HeaderButton from '~/components/FilterMenu/HeaderButton'
 import { mapGetters, mapMutations } from 'vuex'
 import { DonationsQuery } from '~/graphql/Donations'
 import { filterPosts } from '~/graphql/PostQuery.js'
@@ -177,6 +143,7 @@ export default {
     MasonryGrid,
     MasonryGridItem,
     FilterMenuComponent,
+    HeaderButton,
   },
   mixins: [postListActions],
   data() {
@@ -243,6 +210,9 @@ export default {
       resetCategories: 'posts/RESET_CATEGORIES',
       toggleCategory: 'posts/TOGGLE_CATEGORY',
     }),
+    openFilterMenu() {
+      this.showFilter = !this.showFilter
+    },
     showFilterMenu(e) {
       if (!e || (!e.target.closest('#my-filter') && !e.target.closest('.my-filter-button'))) {
         if (!this.showFilter) return
@@ -342,17 +312,6 @@ export default {
 
 .box-add-button-top {
   float: right;
-}
-
-.my-filter-button-selected {
-  padding-right: 30px;
-  margin-left: 8px;
-}
-
-.base-button.filter-remove {
-  position: relative;
-  margin-left: -31px;
-  top: -5px;
 }
 
 .base-button.--circle.post-add-button-bottom {
