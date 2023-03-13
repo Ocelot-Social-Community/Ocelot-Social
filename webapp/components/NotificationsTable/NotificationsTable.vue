@@ -39,9 +39,9 @@
                     <ds-space margin-bottom="base">
                       <client-only>
                         <user-teaser
-                          :user="n.from.author"
-                          :date-time="n.from.createdAt"
-                          :class="{ 'notification-status': n.read }"
+                          :user="notification.from.author"
+                          :date-time="notification.from.createdAt"
+                          :class="{ 'notification-status': notification.read }"
                         />
                       </client-only>
                     </ds-space>
