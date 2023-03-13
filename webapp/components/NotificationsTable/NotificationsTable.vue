@@ -9,8 +9,8 @@
         </ds-grid>
       </ds-grid-item>
       <ds-grid-item
-        v-for="n in notifications"
-        :key="n.id"
+        v-for="notification in notifications"
+        :key="notification.id"
         column-span="fullWidth"
         class="notification-grid-row"
       >
