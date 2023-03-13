@@ -342,12 +342,11 @@ export default {
   align-items: center;
 }
 .filterButtonMenu {
-  width: 81%;
+  width: 95%;
   position: fixed;
   z-index: 6;
   margin-top: -35px;
   padding: 20px 10px 5px 10px;
-  border-radius: 7px;
   background-color: #f5f4f6;
 }
 @media screen and (max-width: 656px) {
