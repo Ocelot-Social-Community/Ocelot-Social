@@ -350,6 +350,11 @@ export default {
   border-radius: 7px;
   background-color: #f5f4f6;
 }
+@media screen and (max-width: 656px) {
+  .filterButtonMenu {
+    margin-top: -50px;
+  }
+}
 #my-filter {
   background-color: white;
   box-shadow: rgb(189 189 189) 1px 9px 15px 1px;
