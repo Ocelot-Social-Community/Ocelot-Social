@@ -3,8 +3,8 @@
     <ds-grid>
       <ds-grid-item v-if="!isMobile" column-span="fullWidth">
         <ds-grid class="header-grid">
-          <ds-grid-item v-for="f in fields" :key="f.label" class="ds-table-head-col">
-            {{ f.label }}
+          <ds-grid-item v-for="field in fields" :key="field.label" class="ds-table-head-col">
+            {{ field.label }}
           </ds-grid-item>
         </ds-grid>
       </ds-grid-item>
