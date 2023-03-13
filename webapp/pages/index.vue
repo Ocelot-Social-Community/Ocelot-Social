@@ -383,7 +383,7 @@ export default {
   align-items: center;
 }
 .filterButtonMenu {
-  width: 70%;
+  width: 81%;
   position: fixed;
   z-index: 6;
   margin-top: -35px;
