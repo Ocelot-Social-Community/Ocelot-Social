@@ -483,7 +483,7 @@
       "admin": "Administrator",
       "owner": "Inhaber",
       "pending": "Ausstehendes Mitglied",
-      "usual": "Einfaches Mitglied"
+      "usual": "Mitglied"
     },
     "save": "Neue Gruppe anlegen",
     "type": "Öffentlichkeit der Gruppe",
