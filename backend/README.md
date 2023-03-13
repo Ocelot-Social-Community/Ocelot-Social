@@ -81,7 +81,7 @@ More details about our GraphQL playground and how to use it with ocelot.social c
 
 ### Database Indices and Constraints
 
-Database indices and constraints need to be created and upgraded when the database and the backend are running:
+Database indexes and constraints need to be created and upgraded when the database and the backend are running:
 
 {% tabs %}
 {% tab title="Docker" %}
