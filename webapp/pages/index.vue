@@ -83,10 +83,10 @@
             </span>
 
             <span v-if="postsFilter['postsInMyGroups']">
-              <base-button 
-                class="my-filter-button my-filter-button-selected" 
-                right 
-                @click="showFilter = !showFilter" 
+              <base-button
+                class="my-filter-button my-filter-button-selected"
+                right
+                @click="showFilter = !showFilter"
                 filled
               >
                 {{ $t('contribution.filterMasonryGrid.myGroups') }}
