@@ -333,9 +333,9 @@ jobs:
           yarn install
           yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
       ##########################################################################
-      # UPLOAD SCREENSHOTS & VIDEO #############################################
+      # UPLOAD SCREENSHOTS - IF TESTS FAIL #####################################
       ##########################################################################
-      - name: Upload Artifact
+      - name: Full stack tests | if any test failed, upload screenshots
         uses: actions/upload-artifact@v3
         with:
           name: cypress-screenshots
