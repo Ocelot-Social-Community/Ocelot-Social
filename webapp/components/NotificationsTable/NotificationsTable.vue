@@ -45,8 +45,8 @@
                         />
                       </client-only>
                     </ds-space>
-                    <ds-text :class="{ 'notification-status': n.read, reason: true }">
-                      {{ $t(`notifications.reason.${n.reason}`) }}
+                    <ds-text :class="{ 'notification-status': notification.read, reason: true }">
+                      {{ $t(`notifications.reason.${notification.reason}`) }}
                     </ds-text>
                   </base-card>
                 </div>
