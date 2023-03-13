@@ -24,6 +24,7 @@ export default {
     group: { type: Object, required: true },
     userId: { type: String, required: true },
     isMember: { type: Boolean, required: true },
+    isNonePendingMember: { type: Boolean, required: true },
     disabled: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
   },
@@ -35,15 +36,24 @@ export default {
   },
   computed: {
     icon() {
-      if (this.isMember && this.hovered) {
-        return 'close'
+      if (this.isMember) {
+        if (this.hovered) {
+          return 'close'
+        } else if (this.isNonePendingMember) {
+          return 'check'
+        } else {
+          return 'question-circle'
+        }
       } else {
-        return this.isMember ? 'check' : 'plus'
+        return 'plus'
       }
     },
     label() {
       if (this.isMember) {
-        return this.$t('group.joinLeaveButton.iAmMember')
+        if (this.isNonePendingMember) {
+          return this.$t('group.joinLeaveButton.iAmMember')
+        }
+        return this.$t('group.joinLeaveButton.pendingMember')
       } else {
         return this.$t('group.joinLeaveButton.join')
       }
