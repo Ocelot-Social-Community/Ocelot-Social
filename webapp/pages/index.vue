@@ -30,7 +30,11 @@
           <div class="filterButtonMenu" :class="{ 'hide-filter': hideByScroll }">
             <base-button
               class="my-filter-button"
-              v-if="!postsFilter['categories_some'] && !postsFilter['author']"
+              v-if="
+                !postsFilter['categories_some'] &&
+                !postsFilter['author'] &&
+                !postsFilter['postsInMyGroups']
+              "
               right
               @click="showFilter = !showFilter"
               filled
@@ -78,6 +82,20 @@
               />
             </span>
 
+            <span v-if="postsFilter['postsInMyGroups']">
+              <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
+                {{ $t('contribution.filterMasonryGrid.myGroups') }}
+              </base-button>
+              <base-button
+                class="filter-remove"
+                @click="resetByGroups"
+                icon="close"
+                :title="$t('filter-menu.deleteFilter')"
+                style="margin-left: -8px"
+                filled
+              />
+            </span>
+
             <div id="my-filter" v-if="showFilter">
               <div @mouseleave="showFilter = false">
                 <filter-menu-component @showFilterMenu="showFilterMenu" />
@@ -86,16 +104,16 @@
           </div>
         </div>
       </ds-grid-item>
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
+      <!-- Placeholder/Space Row -->
+      <ds-grid-item :row-span="1" column-span="fullWidth" />
+      <!-- hashtag filter -->
       <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </ds-grid-item>
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
       <!-- donation info -->
       <ds-grid-item v-if="showDonations" class="top-info-bar" :row-span="1" column-span="fullWidth">
         <donation-info :goal="goal" :progress="progress" />
       </ds-grid-item>
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
       <!-- news feed -->
       <template v-if="hasResults">
         <masonry-grid-item
@@ -215,6 +233,7 @@ export default {
   methods: {
     ...mapMutations({
       resetByFollowed: 'posts/TOGGLE_FILTER_BY_FOLLOWED',
+      resetByGroups: 'posts/TOGGLE_FILTER_BY_MY_GROUPS',
       resetCategories: 'posts/RESET_CATEGORIES',
       toggleCategory: 'posts/TOGGLE_CATEGORY',
     }),
@@ -422,6 +441,9 @@ export default {
     width: 44px;
     font-size: 23px;
     z-index: 10;
+  }
+  .ds-grid {
+    padding-top: 1em;
   }
 }
 </style>
