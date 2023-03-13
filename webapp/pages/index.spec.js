@@ -131,15 +131,15 @@ describe('PostIndex', () => {
     })
 
     describe('donation-info', () => {
-      it('shows donation-info on default', () => {
+      it('hides donation-info on default', () => {
         wrapper = Wrapper()
-        expect(wrapper.find('.top-info-bar').exists()).toBe(true)
+        expect(wrapper.find('.top-info-bar').exists()).toBe(false)
       })
 
-      it('hides donation-info if not "showDonations"', async () => {
+      it('shows donation-info if "showDonations"', async () => {
         wrapper = Wrapper()
-        await wrapper.setData({ showDonations: false })
-        expect(wrapper.find('.top-info-bar').exists()).toBe(false)
+        await wrapper.setData({ showDonations: true })
+        expect(wrapper.find('.top-info-bar').exists()).toBe(true)
       })
     })
   })
