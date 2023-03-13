@@ -79,7 +79,7 @@ More details about our GraphQL playground and how to use it with ocelot.social c
 
 ![GraphQL Playground](../.gitbook/assets/graphql-playground.png)
 
-### Database Indices and Constraints
+### Database Indexes and Constraints
 
 Database indexes and constraints need to be created and upgraded when the database and the backend are running:
 
