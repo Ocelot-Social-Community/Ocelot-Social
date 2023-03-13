@@ -15,7 +15,16 @@
         <img :src="post.image | proxyApiUrl" class="image" />
       </template>
       <client-only>
-        <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" />
+        <div class="post-user-row">
+          <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" />
+          <hc-ribbon
+            :class="[
+              (isPinned) ? '--pinned' : '',
+              (post.image) ? 'post-ribbon-w-img' : 'post-ribbon'              
+             ]"
+            :text="isPinned ? $t('post.pinned') : $t('post.name')"
+          />
+        </div>
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
       <!-- TODO: replace editor content with tiptap render view -->
@@ -73,10 +82,6 @@
         </client-only>
       </footer>
     </base-card>
-    <hc-ribbon
-      :class="{ '--pinned': isPinned }"
-      :text="isPinned ? $t('post.pinned') : $t('post.name')"
-    />
   </nuxt-link>
 </template>
 
@@ -192,18 +197,37 @@ export default {
   display: block;
   height: 100%;
   color: $text-color-base;
+}
 
-  > .ribbon {
+.post-user-row{
+  position: relative;
+
+  > .post-ribbon-w-img {
     position: absolute;
-    top: 50%;
-    right: -7px;
+    // 14px (~height of ribbon element) + 24px(=margin of hero image)
+    top: -38px;
+    // 7px+24px(=padding of parent)
+    right: -31px;
+  }
+  > .post-ribbon {
+    position: absolute;
+    // 14px (~height of ribbon element) + 24px(=margin of hero image)
+    top: -24px;
+    // 7px(=offset)+24px(=margin of parent)
+    right: -31px;
   }
 }
 
 .post-teaser > .base-card {
   display: flex;
   flex-direction: column;
+  overflow: visible;
   height: 100%;
+
+  > .hero-image{
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+  }
 
   &.--blur-image > .hero-image > .image {
     filter: blur($blur-radius);
