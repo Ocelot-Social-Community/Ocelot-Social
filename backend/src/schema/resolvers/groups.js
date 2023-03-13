@@ -15,7 +15,8 @@ export default {
   Query: {
     Group: async (_object, params, context, _resolveInfo) => {
       const { isMember, id, slug, first, offset } = params
-      let pagination = '', orderBy = 'ORDER BY group.createdAt DESC'
+      let pagination = ''
+      const orderBy = 'ORDER BY group.createdAt DESC'
       if (first !== undefined && offset !== undefined) pagination = `SKIP ${offset} LIMIT ${first}`
       const matchParams = { id, slug }
       removeUndefinedNullValuesFromObject(matchParams)
