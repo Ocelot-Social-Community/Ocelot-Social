@@ -40,7 +40,12 @@
               <base-icon class="my-filter-button" :name="filterButtonIcon"></base-icon>
             </base-button>
             <span v-if="postsFilter['categories_some']">
-              <base-button class="my-filter-button my-filter-button-selected" right @click="showFilter = !showFilter" filled>
+              <base-button
+                class="my-filter-button my-filter-button-selected"
+                right
+                @click="showFilter = !showFilter"
+                filled
+              >
                 {{ $t('contribution.filterMasonryGrid.myTopics') }}
               </base-button>
               <base-button
@@ -54,7 +59,12 @@
               />
             </span>
             <span v-if="postsFilter['author']">
-              <base-button class="my-filter-button my-filter-button-selected" right @click="showFilter = !showFilter" filled>
+              <base-button
+                class="my-filter-button my-filter-button-selected"
+                right
+                @click="showFilter = !showFilter"
+                filled
+              >
                 {{ $t('contribution.filterMasonryGrid.myFriends') }}
               </base-button>
               <base-button
