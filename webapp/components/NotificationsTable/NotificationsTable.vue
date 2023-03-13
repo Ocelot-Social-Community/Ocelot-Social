@@ -59,15 +59,15 @@
                 <base-card :wide-content="true">
                   <nuxt-link
                     class="notification-mention-post"
-                    :class="{ 'notification-status': n.read }"
+                    :class="{ 'notification-status': notification.read }"
                     :to="{
                       name: 'post-id-slug',
-                      params: params(n.from),
-                      hash: hashParam(n.from),
+                      params: params(notification.from),
+                      hash: hashParam(notification.from),
                     }"
-                    @click.native="markNotificationAsRead(n.from.id)"
+                    @click.native="markNotificationAsRead(notification.from.id)"
                   >
-                    <b>{{ n.from.title || n.from.post.title | truncate(50) }}</b>
+                    <b>{{ notification.from.title || notification.from.post.title | truncate(50) }}</b>
                   </nuxt-link>
                 </base-card>
               </ds-flex-item>
