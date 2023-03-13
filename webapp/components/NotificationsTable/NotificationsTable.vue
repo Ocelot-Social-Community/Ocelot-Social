@@ -21,7 +21,7 @@
                 <div>
                   <base-card :wide-content="true">
                     <base-icon
-                      v-if="n.from.post"
+                      v-if="notification.from.post"
                       name="comment"
                       v-tooltip="{ content: $t('notifications.comment'), placement: 'right' }"
                     />
