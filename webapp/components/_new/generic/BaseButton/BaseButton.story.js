@@ -21,7 +21,7 @@ storiesOf('Generic/BaseButton', module)
     template: `
       <div>
         <base-button icon="edit">With Text</base-button>
-        <base-button icon="bullhorn" />
+        <base-button icon="heart-o" />
         <base-button icon="trash" disabled />
         <base-button icon="trash" loading />
       </div>
