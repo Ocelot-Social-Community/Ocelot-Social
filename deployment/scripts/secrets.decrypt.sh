@@ -12,7 +12,6 @@ CONFIGURATION=${CONFIGURATION:-"example"}
 SECRET=${SECRET}
 SECRET_FILE=${SCRIPT_DIR}/../configurations/${CONFIGURATION}/SECRET
 FILES=(\
-    "${SCRIPT_DIR}/../configurations/${CONFIGURATION}/.env" \
     "${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubeconfig.yaml" \
     "${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubernetes/values.yaml" \
     "${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubernetes/dns.values.yaml" \
