@@ -67,7 +67,9 @@
                     }"
                     @click.native="markNotificationAsRead(notification.from.id)"
                   >
-                    <b>{{ notification.from.title || notification.from.post.title | truncate(50) }}</b>
+                    <b>
+                      {{ notification.from.title || notification.from.post.title | truncate(50) }}
+                    </b>
                   </nuxt-link>
                 </base-card>
               </ds-flex-item>
