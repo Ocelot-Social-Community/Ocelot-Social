@@ -30,6 +30,7 @@ export default {
   }
 }
 .filterActive {
-  background-color: $color-success-active;
+  color: $color-primary-inverse;
+  background-color: $color-primary-active;
 }
 </style>
