@@ -44,7 +44,7 @@ for development, spin up a
 [hosted Neo4j Sandbox instance](https://neo4j.com/download/), run Neo4j in one
 of the [many cloud options](https://neo4j.com/developer/guide-cloud-deployment/),
 [spin up Neo4j in a Docker container](https://neo4j.com/developer/docker/),
-on Archlinux you can install [neo4j-community from AUR](https://aur.archlinux.org/packages/neo4j-community/)
+on Arch linux you can install [neo4j-community from AUR](https://aur.archlinux.org/packages/neo4j-community/)
 or on Debian-based systems install [Neo4j from the Debian Repository](http://debian.neo4j.org/).
 Just be sure to update the Neo4j connection string and credentials accordingly
 in `backend/.env`.
