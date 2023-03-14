@@ -15,7 +15,27 @@
       @markNotificationAsRead="markNotificationAsRead"
       :notifications="notifications"
     />
-    <pagination-buttons :hasNext="hasNext" :hasPrevious="hasPrevious" @back="back" @next="next" />
+
+    <ds-flex class="notifications-footer">
+      <ds-flex-item :width="{ base: 'auto' }" centered>
+        <pagination-buttons
+          :hasNext="hasNext"
+          :hasPrevious="hasPrevious"
+          @back="back"
+          @next="next"
+        />
+      </ds-flex-item>
+      <ds-flex-item class="notifications-footer-button" :width="{ base: 'auto' }" centered>
+        <ds-button
+          primary
+          :disabled="unreadNotificationsCount === 0"
+          @click="markAllAsRead"
+          data-test="markAllAsRead-button"
+        >
+          {{ $t('notifications.markAllAsRead') }}
+        </ds-button>
+      </ds-flex-item>
+    </ds-flex>
   </base-card>
 </template>
 
@@ -23,7 +43,7 @@
 import NotificationsTable from '~/components/NotificationsTable/NotificationsTable'
 import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
-import { notificationQuery, markAsReadMutation } from '~/graphql/User'
+import { notificationQuery, markAsReadMutation, markAllAsReadMutation } from '~/graphql/User'
 
 export default {
   components: {
@@ -54,6 +74,15 @@ export default {
         { label: this.$t('notifications.filterLabel.unread'), value: false },
       ]
     },
+    hasNotifications() {
+      return this.notifications.length
+    },
+    unreadNotificationsCount() {
+      const result = this.notifications.reduce((count, notification) => {
+        return notification.read ? count : count + 1
+      }, 0)
+      return result
+    },
   },
   methods: {
     filter(option) {
@@ -76,6 +105,20 @@ export default {
     },
     next() {
       this.offset += this.pageSize
+    },
+    async markAllAsRead() {
+      if (!this.hasNotifications) {
+        return
+      }
+
+      try {
+        await this.$apollo.mutate({
+          mutation: markAllAsReadMutation(this.$i18n),
+        })
+        this.$apollo.queries.notifications.refresh()
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
     },
   },
   apollo: {
@@ -111,5 +154,9 @@ export default {
 <style lang="scss">
 .notifications-page-flex {
   justify-content: space-between;
+}
+
+.notifications-footer {
+  justify-content: space-evenly;
 }
 </style>

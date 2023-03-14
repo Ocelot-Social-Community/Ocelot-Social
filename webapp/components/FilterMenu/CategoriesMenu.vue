@@ -3,7 +3,7 @@
     <a href="#" slot="default" slot-scope="{ toggleMenu }" @click.prevent="toggleMenu()">
       <ds-text bold size="large">{{ $t('admin.categories.name') }}</ds-text>
     </a>
-    <template slot="popover">
+    <template #popover>
       <div class="category-menu-options">
         <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
         <categories-filter v-if="categoriesActive" />

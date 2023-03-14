@@ -108,7 +108,7 @@ export const mapUserQuery = (i18n) => {
   `
 }
 
-export const notificationQuery = (i18n) => {
+export const notificationQuery = (_i18n) => {
   return gql`
     ${userFragment}
     ${commentFragment}
@@ -147,7 +147,7 @@ export const notificationQuery = (i18n) => {
   `
 }
 
-export const markAsReadMutation = (i18n) => {
+export const markAsReadMutation = (_i18n) => {
   return gql`
     ${userFragment}
     ${commentFragment}
@@ -155,6 +155,42 @@ export const markAsReadMutation = (i18n) => {
 
     mutation ($id: ID!) {
       markAsRead(id: $id) {
+        id
+        read
+        reason
+        createdAt
+        updatedAt
+        from {
+          __typename
+          ... on Post {
+            ...post
+            author {
+              ...user
+            }
+          }
+          ... on Comment {
+            ...comment
+            post {
+              ...post
+              author {
+                ...user
+              }
+            }
+          }
+        }
+      }
+    }
+  `
+}
+
+export const markAllAsReadMutation = (_i18n) => {
+  return gql`
+    ${userFragment}
+    ${commentFragment}
+    ${postFragment}
+
+    mutation {
+      markAllAsRead {
         id
         read
         reason
