@@ -4,7 +4,7 @@
       :loading="loading"
       :disabled="disabled"
       :filled="shouted"
-      icon="bullhorn"
+      icon="heart-o"
       circle
       @click="toggle"
     />

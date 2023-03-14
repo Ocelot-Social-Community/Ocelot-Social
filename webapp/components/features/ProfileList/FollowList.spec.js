@@ -74,7 +74,9 @@ describe('FollowList.vue', () => {
 
           expect(wrapper.vm.allConnectionsCount).toBe(user.followingCount)
           expect(wrapper.findAll('.user-teaser')).toHaveLength(user.following.length)
-          expect(wrapper.emitted('fetchAllConnections')).toEqual([['following']])
+          expect(wrapper.emitted('fetchAllConnections')).toEqual([
+            ['following', user.followingCount],
+          ])
         })
       })
 
@@ -85,7 +87,9 @@ describe('FollowList.vue', () => {
 
           expect(wrapper.vm.allConnectionsCount).toBe(user.followedByCount)
           expect(wrapper.findAll('.user-teaser')).toHaveLength(user.followedBy.length)
-          expect(wrapper.emitted('fetchAllConnections')).toEqual([['followedBy']])
+          expect(wrapper.emitted('fetchAllConnections')).toEqual([
+            ['followedBy', user.followedByCount],
+          ])
         })
       })
     })

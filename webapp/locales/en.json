@@ -270,7 +270,7 @@
     "filterFollow": "Filter contributions from users I follow",
     "filterMasonryGrid": {
       "myFriends": "Users I follow",
-      "myGroups": "My groups",
+      "myGroups": "By my groups",
       "myTopics": "My topics",
       "noFilter": "Filter posts"
     },
@@ -455,6 +455,7 @@
       "message": "Leaving a group may be irreversible!<br>Leave group <b>“{name}”</b>!",
       "title": "Do you really want to leave the group?"
     },
+    "memberRemoved": "User “{name}” was removed from group!",
     "members": "Members",
     "membersAdministrationList": {
       "avatar": "Avatar",
@@ -514,10 +515,13 @@
     "no-results": "No contributions found."
   },
   "invite-codes": {
-    "copy-code": "Code:",
+    "button": {
+      "tooltip": "Invite your friends"
+    },
+    "copy-code": "Copy Invite Link",
     "copy-success": "Invite code copied to clipboard",
     "not-available": "You have no valid invite code available!",
-    "your-code": "Copy your invite code to the clipboard:"
+    "your-code": "Send this link per e-mail or in social media to invite your friends:"
   },
   "login": {
     "email": "Your E-mail",
@@ -639,6 +643,7 @@
       "read": "Read",
       "unread": "Unread"
     },
+    "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
     "post": "Post",
     "reason": {
