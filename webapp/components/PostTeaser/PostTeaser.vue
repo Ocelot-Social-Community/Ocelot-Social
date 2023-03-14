@@ -18,10 +18,7 @@
         <div class="post-user-row">
           <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" />
           <hc-ribbon
-            :class="[
-              (isPinned) ? '--pinned' : '',
-              (post.image) ? 'post-ribbon-w-img' : 'post-ribbon'              
-             ]"
+            :class="[isPinned ? '--pinned' : '', post.image ? 'post-ribbon-w-img' : 'post-ribbon']"
             :text="isPinned ? $t('post.pinned') : $t('post.name')"
           />
         </div>
@@ -199,7 +196,7 @@ export default {
   color: $text-color-base;
 }
 
-.post-user-row{
+.post-user-row {
   position: relative;
 
   > .post-ribbon-w-img {
@@ -224,9 +221,9 @@ export default {
   overflow: visible;
   height: 100%;
 
-  > .hero-image{
-     border-top-left-radius: 5px;
-     border-top-right-radius: 5px;
+  > .hero-image {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
   }
 
   &.--blur-image > .hero-image > .image {
