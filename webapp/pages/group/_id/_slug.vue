@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isGroupVisible">
+  <div class="group-profile" v-if="isGroupVisible">
     <ds-space />
     <ds-flex v-if="group" :width="{ base: '100%' }" gutter="base">
       <ds-flex-item :width="{ base: '100%', sm: 2, md: 2, lg: 1 }">

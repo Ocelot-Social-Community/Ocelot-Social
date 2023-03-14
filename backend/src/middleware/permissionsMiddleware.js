@@ -253,6 +253,42 @@ const isMemberOfGroup = rule({
   }
 })
 
+const canRemoveUserFromGroup = rule({
+  cache: 'no_cache',
+})(async (_parent, args, { user, driver }) => {
+  if (!(user && user.id)) return false
+  const { groupId, userId } = args
+  const currentUserId = user.id
+  if (currentUserId === userId) return false
+  const session = driver.session()
+  const readTxPromise = session.readTransaction(async (transaction) => {
+    const transactionResponse = await transaction.run(
+      `
+        MATCH (User {id: $currentUserId})-[currentUserMembership:MEMBER_OF]->(group:Group {id: $groupId})
+        OPTIONAL MATCH (group)<-[userMembership:MEMBER_OF]-(user:User { id: $userId })
+        RETURN currentUserMembership.role AS currentUserRole, userMembership.role AS userRole
+      `,
+      { currentUserId, groupId, userId },
+    )
+    return {
+      currentUserRole: transactionResponse.records.map((record) =>
+        record.get('currentUserRole'),
+      )[0],
+      userRole: transactionResponse.records.map((record) => record.get('userRole'))[0],
+    }
+  })
+  try {
+    const { currentUserRole, userRole } = await readTxPromise
+    return (
+      currentUserRole && ['owner'].includes(currentUserRole) && userRole && userRole !== 'owner'
+    )
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+})
+
 const canCommentPost = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
@@ -382,6 +418,7 @@ export default shield(
       JoinGroup: isAllowedToJoinGroup,
       LeaveGroup: isAllowedToLeaveGroup,
       ChangeGroupMemberRole: isAllowedToChangeGroupMemberRole,
+      RemoveUserFromGroup: canRemoveUserFromGroup,
       CreatePost: and(isAuthenticated, isMemberOfGroup),
       UpdatePost: isAuthor,
       DeletePost: isAuthor,
@@ -412,6 +449,7 @@ export default shield(
       blockUser: isAuthenticated,
       unblockUser: isAuthenticated,
       markAsRead: isAuthenticated,
+      markAllAsRead: isAuthenticated,
       AddEmailAddress: isAuthenticated,
       VerifyEmailAddress: isAuthenticated,
       pinPost: isAdmin,

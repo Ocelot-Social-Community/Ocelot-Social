@@ -89,6 +89,12 @@ Database indexes and constraints need to be created and upgraded when the databa
 ```bash
 # in main folder while docker-compose is running
 $ docker exec backend yarn run db:migrate init
+
+# only once: init admin user and create indexes and constraints in Neo4j database
+# for development
+$ docker compose exec backend yarn prod:migrate init
+# in production mode use command
+$ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
 ```
 
 ```bash
