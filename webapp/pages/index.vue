@@ -92,16 +92,16 @@
           </div>
         </div>
       </ds-grid-item>
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
+      <!-- Placeholder/Space Row -->
+      <ds-grid-item :row-span="1" column-span="fullWidth" />
+      <!-- hashtag filter -->
       <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </ds-grid-item>
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
       <!-- donation info -->
       <ds-grid-item v-if="showDonations" class="top-info-bar" :row-span="1" column-span="fullWidth">
         <donation-info :goal="goal" :progress="progress" />
       </ds-grid-item>
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
       <!-- news feed -->
       <template v-if="hasResults">
         <masonry-grid-item
@@ -417,6 +417,9 @@ export default {
     width: 44px;
     font-size: 23px;
     z-index: 10;
+  }
+  .ds-grid {
+    padding-top: 1em;
   }
 }
 </style>
