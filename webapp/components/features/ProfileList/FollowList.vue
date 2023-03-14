@@ -6,7 +6,7 @@
     :allProfilesCount="allConnectionsCount"
     :profiles="connections"
     :loading="loading"
-    @fetchAllProfiles="$emit('fetchAllConnections', type)"
+    @fetchAllProfiles="$emit('fetchAllConnections', type, allConnectionsCount)"
   />
 </template>
 
