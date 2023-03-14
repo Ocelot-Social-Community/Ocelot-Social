@@ -24,7 +24,7 @@ $ docker compose -f docker-compose.yml -f docker-compose.apple-m1.override.yml u
 # for production testing Docker images from DockerHub
 $ docker compose -f docker-compose.ocelotsocial-branded.yml -f docker-compose.apple-m1.override.yml up
 
-# only once: init admin user and create indexes and contraints in Neo4j database
+# only once: init admin user and create indexes and constraints in Neo4j database
 $ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
 ```
 

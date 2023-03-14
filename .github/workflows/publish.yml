@@ -1,64 +1,36 @@
-name: ocelot.social publish CI
+name: publish
 
 on:
   push:
     branches:
       - master
-      # - 5059-epic-groups # for testing while developing
-      # template branches in repo
-      # - template--separate-branch-auto-deployment--5059-epic-groups
 
 jobs:
-  ##############################################################################
-  # JOB: PREPARE ###############################################################
-  ##############################################################################
-  prepare:
-    name: Prepare
-    runs-on: ubuntu-latest
-    # needs: [nothing]
-    steps:
-      ##########################################################################
-      # CHECKOUT CODE ##########################################################
-      ##########################################################################
-      - name: Checkout code
-        uses: actions/checkout@v3
-      ##########################################################################
-      # TODO: DO STUFF ??? #####################################################
-      ##########################################################################
-      - name: Check translation files
-        run: |
-          scripts/translations/sort.sh
-          scripts/translations/missing-keys.sh
-
   ##############################################################################
   # JOB: DOCKER BUILD COMMUNITY NEO4J ##########################################
   ##############################################################################
   build_production_neo4j:
     name: Docker Build Production - Neo4J
     runs-on: ubuntu-latest
-    needs: [prepare]
     steps:
-      ##########################################################################
-      # CHECKOUT CODE ##########################################################
-      ##########################################################################
       - name: Checkout code
         uses: actions/checkout@v3
-      ##########################################################################
-      # SET ENVS ###############################################################
-      ##########################################################################
-      - name: ENV - VERSION
-        run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
-      - name: ENV - BUILD_DATE
-        run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
-      - name: ENV - BUILD_VERSION
-        run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
-      - name: ENV - BUILD_COMMIT
-        run: echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
-      ##########################################################################
-      # NEO4J ##################################################################
-      ##########################################################################
+      - name: Setup env
+        run: |
+          echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+          echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
+      - run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       - name: Neo4J | Build `community` image
-        run: docker build --target community -t "ocelotsocialnetwork/neo4j-community:latest" -t "ocelotsocialnetwork/neo4j-community:${VERSION}" -t "ocelotsocialnetwork/neo4j-community:${BUILD_VERSION}" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT neo4j/
+        run: |
+          docker build --target community \
+            --tag "ocelotsocialnetwork/neo4j-community:latest" \
+            --tag "ocelotsocialnetwork/neo4j-community:${VERSION}" \
+            --tag "ocelotsocialnetwork/neo4j-community:${BUILD_VERSION}" \
+            --build-arg BBUILD_DATE=$BUILD_DATE \
+            --build-arg BBUILD_VERSION=$BUILD_VERSION \
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
+            neo4j/
       - name: Neo4J | Save docker image 
         run: docker save "ocelotsocialnetwork/neo4j-community" > /tmp/neo4j.tar
       - name: Upload Artifact
@@ -73,32 +45,41 @@ jobs:
   build_production_backend:
     name: Docker Build Production - Backend
     runs-on: ubuntu-latest
-    needs: [prepare]
     steps:
-      ##########################################################################
-      # CHECKOUT CODE ##########################################################
-      ##########################################################################
       - name: Checkout code
         uses: actions/checkout@v3
-      ##########################################################################
-      # SET ENVS ###############################################################
-      ##########################################################################
-      - name: ENV - VERSION
-        run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
-      - name: ENV - BUILD_DATE
-        run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
-      - name: ENV - BUILD_VERSION
-        run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
-      - name: ENV - BUILD_COMMIT
-        run: echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
-      ##########################################################################
-      # BUILD BACKEND DOCKER IMAGE (production) ################################
-      ##########################################################################
+      - name: Setup env
+        run: |
+          echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+          echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
+      - run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       - name: Backend | Build `production` image
         run: |
-          docker build --target base -t "ocelotsocialnetwork/backend:latest-base" -t "ocelotsocialnetwork/backend:${VERSION}-base" -t "ocelotsocialnetwork/backend:${BUILD_VERSION}-base" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT backend/
-          docker build --target code -t "ocelotsocialnetwork/backend:latest-code" -t "ocelotsocialnetwork/backend:${VERSION}-code" -t "ocelotsocialnetwork/backend:${BUILD_VERSION}-code" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT backend/
-          docker build --target production -t "ocelotsocialnetwork/backend:latest" -t "ocelotsocialnetwork/backend:${VERSION}" -t "ocelotsocialnetwork/backend:${BUILD_VERSION}" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT backend/
+          docker build --target base \
+            --tag "ocelotsocialnetwork/backend:latest-base" \
+            --tag "ocelotsocialnetwork/backend:${VERSION}-base" \
+            --tag "ocelotsocialnetwork/backend:${BUILD_VERSION}-base" \
+            --build-arg BBUILD_DATE=$BUILD_DATE \
+            --build-arg BBUILD_VERSION=$BUILD_VERSION \
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
+            backend/
+          docker build --target code \
+            --tag "ocelotsocialnetwork/backend:latest-code" \
+            --tag "ocelotsocialnetwork/backend:${VERSION}-code" \
+            --tag "ocelotsocialnetwork/backend:${BUILD_VERSION}-code" \
+            --build-arg BBUILD_DATE=$BUILD_DATE \
+            --build-arg BBUILD_VERSION=$BUILD_VERSION \
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
+            backend/
+          docker build --target production \
+            --tag "ocelotsocialnetwork/backend:latest" \
+            --tag "ocelotsocialnetwork/backend:${VERSION}" \
+            --tag "ocelotsocialnetwork/backend:${BUILD_VERSION}" \
+            --build-arg BBUILD_DATE=$BUILD_DATE \
+            --build-arg BBUILD_VERSION=$BUILD_VERSION \
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
+            backend/
       - name: Backend | Save docker image
         run: docker save "ocelotsocialnetwork/backend" > /tmp/backend.tar
       - name: Upload Artifact
@@ -113,32 +94,41 @@ jobs:
   build_production_webapp:
     name: Docker Build Production - WebApp
     runs-on: ubuntu-latest
-    needs: [prepare]
     steps:
-      ##########################################################################
-      # CHECKOUT CODE ##########################################################
-      ##########################################################################
       - name: Checkout code
         uses: actions/checkout@v3
-      ##########################################################################
-      # SET ENVS ###############################################################
-      ##########################################################################
-      - name: ENV - VERSION
-        run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
-      - name: ENV - BUILD_DATE
-        run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
-      - name: ENV - BUILD_VERSION
-        run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
-      - name: ENV - BUILD_COMMIT
-        run: echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
-      ##########################################################################
-      # BUILD WEBAPP DOCKER IMAGE (build) ######################################
-      ##########################################################################
+      - name: Setup env
+        run: |
+          echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+          echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
+      - run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       - name: Webapp | Build `production` image
         run: |
-          docker build --target base -t "ocelotsocialnetwork/webapp:latest-base" -t "ocelotsocialnetwork/webapp:${VERSION}-base" -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}-base" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/
-          docker build --target code -t "ocelotsocialnetwork/webapp:latest-code" -t "ocelotsocialnetwork/webapp:${VERSION}-code" -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}-code" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/
-          docker build --target production -t "ocelotsocialnetwork/webapp:latest" -t "ocelotsocialnetwork/webapp:${VERSION}" -t "ocelotsocialnetwork/webapp:${BUILD_VERSION}" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/
+          docker build --target base \
+            --tag "ocelotsocialnetwork/webapp:latest-base" \
+            --tag "ocelotsocialnetwork/webapp:${VERSION}-base" \
+            --tag "ocelotsocialnetwork/webapp:${BUILD_VERSION}-base" \
+            --build-arg BBUILD_DATE=$BUILD_DATE \
+            --build-arg BBUILD_VERSION=$BUILD_VERSION \
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
+            webapp/
+          docker build --target code \
+            --tag "ocelotsocialnetwork/webapp:latest-code" \
+            --tag "ocelotsocialnetwork/webapp:${VERSION}-code" \
+            --tag "ocelotsocialnetwork/webapp:${BUILD_VERSION}-code" \
+            --build-arg BBUILD_DATE=$BUILD_DATE \
+            --build-arg BBUILD_VERSION=$BUILD_VERSION \
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
+            webapp/
+          docker build --target production \
+            --tag "ocelotsocialnetwork/webapp:latest" \
+            --tag "ocelotsocialnetwork/webapp:${VERSION}" \
+            --tag "ocelotsocialnetwork/webapp:${BUILD_VERSION}" \
+            --build-arg BBUILD_DATE=$BUILD_DATE \
+            --build-arg BBUILD_VERSION=$BUILD_VERSION \
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
+            webapp/
       - name: Webapp | Save docker image
         run: docker save "ocelotsocialnetwork/webapp" > /tmp/webapp.tar
       - name: Upload Artifact
@@ -153,32 +143,44 @@ jobs:
   build_production_maintenance:
     name: Docker Build Production - Maintenance
     runs-on: ubuntu-latest
-    needs: [prepare]
     steps:
-      ##########################################################################
-      # CHECKOUT CODE ##########################################################
-      ##########################################################################
       - name: Checkout code
         uses: actions/checkout@v3
-      ##########################################################################
-      # SET ENVS ###############################################################
-      ##########################################################################
-      - name: ENV - VERSION
-        run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
-      - name: ENV - BUILD_DATE
-        run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
-      - name: ENV - BUILD_VERSION
-        run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
-      - name: ENV - BUILD_COMMIT
-        run: echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
-      ##########################################################################
-      # BUILD MAINTENANCE DOCKER IMAGE (build) #################################
-      ##########################################################################
+      - name: Setup env
+        run: |
+          echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+          echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
+      - run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       - name: Maintenance | Build `production` image
         run: |
-          docker build --target base -t "ocelotsocialnetwork/maintenance:latest-base" -t "ocelotsocialnetwork/maintenance:${VERSION}-base" -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}-base" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/ -f webapp/Dockerfile.maintenance
-          docker build --target code -t "ocelotsocialnetwork/maintenance:latest-code" -t "ocelotsocialnetwork/maintenance:${VERSION}-code" -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}-code" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/ -f webapp/Dockerfile.maintenance
-          docker build --target production -t "ocelotsocialnetwork/maintenance:latest" -t "ocelotsocialnetwork/maintenance:${VERSION}" -t "ocelotsocialnetwork/maintenance:${BUILD_VERSION}" --build-arg BBUILD_DATE=$BUILD_DATE --build-arg BBUILD_VERSION=$BUILD_VERSION --build-arg BBUILD_COMMIT=$BUILD_COMMIT webapp/ -f webapp/Dockerfile.maintenance
+          docker build --target base \
+            --tag "ocelotsocialnetwork/maintenance:latest-base" \
+            --tag "ocelotsocialnetwork/maintenance:${VERSION}-base" \
+            --tag "ocelotsocialnetwork/maintenance:${BUILD_VERSION}-base" \
+            --build-arg BBUILD_DATE=$BUILD_DATE \
+            --build-arg BBUILD_VERSION=$BUILD_VERSION \
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
+            -f webapp/Dockerfile.maintenance \
+            webapp/ 
+          docker build --target code \
+            --tag "ocelotsocialnetwork/maintenance:latest-code" \
+            --tag "ocelotsocialnetwork/maintenance:${VERSION}-code" \
+            --tag "ocelotsocialnetwork/maintenance:${BUILD_VERSION}-code" \
+            --build-arg BBUILD_DATE=$BUILD_DATE \
+            --build-arg BBUILD_VERSION=$BUILD_VERSION \
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
+            -f webapp/Dockerfile.maintenance \
+            webapp/
+          docker build --target production \
+            --tag "ocelotsocialnetwork/maintenance:latest" \
+            --tag "ocelotsocialnetwork/maintenance:${VERSION}" \
+            --tag "ocelotsocialnetwork/maintenance:${BUILD_VERSION}" \
+            --build-arg BBUILD_DATE=$BUILD_DATE \
+            --build-arg BBUILD_VERSION=$BUILD_VERSION \
+            --build-arg BBUILD_COMMIT=$BUILD_COMMIT \
+            -f webapp/Dockerfile.maintenance \
+            webapp/
       - name: Maintenance | Save docker image
         run: docker save "ocelotsocialnetwork/maintenance" > /tmp/maintenance.tar
       - name: Upload Artifact
@@ -198,130 +200,39 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
-      ##########################################################################
-      # CHECKOUT CODE ##########################################################
-      ##########################################################################
-      - name: Checkout code
-        uses: actions/checkout@v3
-      ##########################################################################
-      # DOWNLOAD DOCKER IMAGES #################################################
-      ##########################################################################
       - name: Download Docker Image (Neo4J)
         uses: actions/download-artifact@v3
         with:
           name: docker-neo4j-community
           path: /tmp
-      - name: Load Docker Image
-        run: docker load < /tmp/neo4j.tar
+      - run: docker load < /tmp/neo4j.tar
       - name: Download Docker Image (Backend)
         uses: actions/download-artifact@v3
         with:
           name: docker-backend-production
           path: /tmp
-      - name: Load Docker Image
-        run: docker load < /tmp/backend.tar
+      - run: docker load < /tmp/backend.tar
       - name: Download Docker Image (WebApp)
         uses: actions/download-artifact@v3
         with:
           name: docker-webapp-production
           path: /tmp
-      - name: Load Docker Image
-        run: docker load < /tmp/webapp.tar
+      - run: docker load < /tmp/webapp.tar
       - name: Download Docker Image (Maintenance)
         uses: actions/download-artifact@v3
         with:
           name: docker-maintenance-production
           path: /tmp
-      - name: Load Docker Image
-        run: docker load < /tmp/maintenance.tar
-      ##########################################################################
-      # Upload #################################################################
-      ##########################################################################
+      - run: docker load < /tmp/maintenance.tar
+      
       - name: login to dockerhub
         run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-      - name: Push neo4j
-        run: docker push --all-tags ocelotsocialnetwork/neo4j-community
-      - name: Push backend
-        run: docker push --all-tags ocelotsocialnetwork/backend
-      - name: Push webapp
-        run: docker push --all-tags ocelotsocialnetwork/webapp
-      - name: Push maintenance
-        run: docker push --all-tags ocelotsocialnetwork/maintenance
-
-  ##############################################################################
-  # JOB: KUBERNETES DEPLOY ACTUAL/LATEST VERSION ######################################
-  ##############################################################################
-  kubernetes_deploy:
-    # see example https://github.com/do-community/example-doctl-action
-    # see example https://github.com/do-community/example-doctl-action/blob/main/.github/workflows/workflow.yaml
-    name: Kubernetes deploy of latest version to stage.ocelot.social cluster at DigitalOcean
-    runs-on: ubuntu-latest
-    needs: [upload_to_dockerhub]
-    steps:
-      ##########################################################################
-      # CHECKOUT CODE ##########################################################
-      ##########################################################################
-      - name: Checkout code
-        uses: actions/checkout@v3
-      ##########################################################################
-      # SET ENVS ###############################################################
-      ##########################################################################
-      - name: ENV - VERSION
-        run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
-      - name: ENV - BUILD_VERSION
-        run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
-      ##########################################################################
-      # Install DigitalOceans doctl and set kubeconfig #########################
-      ##########################################################################
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-      - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 cluster-stage-ocelot-social
-      ##########################################################################
-      # Deploy new Docker images to DigitalOcean Kubernetes cluster ############
-      ##########################################################################
-      # - name: Deploy 'latest' to DigitalOcean Kubernetes
-      #   run: |
-      #     kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:latest
-      #     kubectl -n default rollout restart deployment/ocelot-webapp
-      #     kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:latest
-      #     kubectl -n default rollout restart deployment/ocelot-backend
-      #     kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:latest
-      #     kubectl -n default rollout restart deployment/ocelot-maintenance
-      #     kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:latest
-      #     kubectl -n default rollout restart deployment/ocelot-neo4j
-      - name: Deploy actual version '$BUILD_VERSION' to DigitalOcean Kubernetes
+      - name: Push images
         run: |
-          kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:$BUILD_VERSION
-          kubectl -n default rollout restart deployment/ocelot-webapp
-          kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:$BUILD_VERSION
-          kubectl -n default rollout restart deployment/ocelot-backend
-          kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:$BUILD_VERSION
-          kubectl -n default rollout restart deployment/ocelot-maintenance
-          kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:$BUILD_VERSION
-          kubectl -n default rollout restart deployment/ocelot-neo4j
-      # because this step 'kubectl -n default rollout status deployment/* --timeout=600s' does not work as expected
-      #   and we need the pods to be up again for cleaning and seeding the Neo4j database and the backend.
-      #   !!! this is not a perfect solution !!!
-      # deployments are regularly up again after 3 minutes and 10 seconds
-      - name: Sleep for 4 minutes, means 240 seconds
-        run: sleep 240s
-        shell: bash
-      - name: Verify deployment and wait for the pods of each deployment to get ready for cleaning and seeding of the database
-        run: |
-          kubectl -n default rollout status deployment/ocelot-backend --timeout=600s
-          kubectl -n default rollout status deployment/ocelot-neo4j --timeout=600s
-          kubectl -n default rollout status deployment/ocelot-maintenance --timeout=600s
-          kubectl -n default rollout status deployment/ocelot-webapp --timeout=600s
-      - name: Run migrations for Neo4j database via backend for staging
-        run: |
-          kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "yarn prod:migrate up"
-      - name: Reset and seed Neo4j database via backend for staging
-        # db cleaning and seeding is only possible in production if env 'PRODUCTION_DB_CLEAN_ALLOW=true' is set in deployment
-        run: |
-          kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "node --experimental-repl-await dist/db/clean.js && node --experimental-repl-await dist/db/seed.js"
+          docker push --all-tags ocelotsocialnetwork/neo4j-community
+          docker push --all-tags ocelotsocialnetwork/backend
+          docker push --all-tags ocelotsocialnetwork/webapp
+          docker push --all-tags ocelotsocialnetwork/maintenance
 
   ##############################################################################
   # JOB: GITHUB TAG LATEST VERSION #############################################
@@ -331,39 +242,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: [upload_to_dockerhub]
     steps:
-      ##########################################################################
-      # CHECKOUT CODE ##########################################################
-      ##########################################################################
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Fetch full History for changelog
-      ##########################################################################
-      # SET ENVS ###############################################################
-      ##########################################################################
-      - name: ENV - VERSION
-        run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
-      - name: ENV - BUILD_DATE
-        run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
-      - name: ENV - BUILD_VERSION
-        run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
-      - name: ENV - BUILD_COMMIT
-        run: echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
-      ##########################################################################
-      # Push version tag to GitHub #############################################
-      ##########################################################################
-      # TODO: this will error on duplicate
-      #- name: package-version-to-git-tag
-      #  uses: pkgdeps/git-tag-action@v2
-      #  with:
-      #    github_token: ${{ secrets.GITHUB_TOKEN }}
-      #    github_repo: ${{ github.repository }}
-      #    version: ${{ env.VERSION }}
-      #    git_commit_sha: ${{ github.sha }}
-      #    git_tag_prefix: "v"
-      ##########################################################################
-      # Push build tag to GitHub ###############################################
-      ##########################################################################
+      - name: Setup env
+        run: |
+          echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+          echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
+      - run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       - name: package-version-to-git-tag + build number
         uses: pkgdeps/git-tag-action@v2
         with:
@@ -372,13 +260,10 @@ jobs:
           version: ${{ env.BUILD_VERSION }}
           git_commit_sha: ${{ github.sha }}
           git_tag_prefix: "b"
-      ##########################################################################
-      # Push release tag to GitHub #############################################
-      ##########################################################################
-      - name: yarn install
-        run: yarn install
-      - name: generate changelog
-        run: yarn auto-changelog --latest-version ${{ env.VERSION }} --unreleased-only
+      - name: Generate changelog
+        run: |
+          yarn install
+          yarn auto-changelog --latest-version ${{ env.VERSION }} --unreleased-only
       - name: package-version-to-git-release
         continue-on-error: true # Will fail if tag exists
         id: create_release
@@ -391,3 +276,101 @@ jobs:
           body_path: ./CHANGELOG.md
           draft: false
           prerelease: false
+
+  build_trigger:
+    name: Trigger successful build
+    runs-on: ubuntu-latest
+    needs: [github_tag]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch full History for changelog
+      - name: Setup env
+        run: |
+          echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+          echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
+      - run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ github.token }}
+          event-type: trigger-build-success
+          repository: ${{ github.repository }}
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "VERSION": "${VERSION}", "BUILD_DATE": "${BUILD_DATE}", "BUILD_COMMIT": "${BUILD_COMMIT}", "BUILD_VERSION": "${BUILD_VERSION}"}'
+
+  # ##############################################################################
+  # # JOB: KUBERNETES DEPLOY ACTUAL/LATEST VERSION ######################################
+  # ##############################################################################
+  # kubernetes_deploy:
+  #   # see example https://github.com/do-community/example-doctl-action
+  #   # see example https://github.com/do-community/example-doctl-action/blob/main/.github/workflows/workflow.yaml
+  #   name: Kubernetes deploy of latest version to stage.ocelot.social cluster at DigitalOcean
+  #   runs-on: ubuntu-latest
+  #   needs: [upload_to_dockerhub]
+  #   steps:
+  #     ##########################################################################
+  #     # CHECKOUT CODE ##########################################################
+  #     ##########################################################################
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+  #     ##########################################################################
+  #     # SET ENVS ###############################################################
+  #     ##########################################################################
+  #     - name: ENV - VERSION
+  #       run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+  #     - name: ENV - BUILD_VERSION
+  #       run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+  #     ##########################################################################
+  #     # Install DigitalOceans doctl and set kubeconfig #########################
+  #     ##########################################################################
+  #     - name: Install doctl
+  #       uses: digitalocean/action-doctl@v2
+  #       with:
+  #         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+  #     - name: Save DigitalOcean kubeconfig with short-lived credentials
+  #       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 cluster-stage-ocelot-social
+  #     ##########################################################################
+  #     # Deploy new Docker images to DigitalOcean Kubernetes cluster ############
+  #     ##########################################################################
+  #     # - name: Deploy 'latest' to DigitalOcean Kubernetes
+  #     #   run: |
+  #     #     kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:latest
+  #     #     kubectl -n default rollout restart deployment/ocelot-webapp
+  #     #     kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:latest
+  #     #     kubectl -n default rollout restart deployment/ocelot-backend
+  #     #     kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:latest
+  #     #     kubectl -n default rollout restart deployment/ocelot-maintenance
+  #     #     kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:latest
+  #     #     kubectl -n default rollout restart deployment/ocelot-neo4j
+  #     - name: Deploy actual version '$BUILD_VERSION' to DigitalOcean Kubernetes
+  #       run: |
+  #         kubectl -n default set image deployment/ocelot-webapp container-ocelot-webapp=ocelotsocialnetwork/webapp:$BUILD_VERSION
+  #         kubectl -n default rollout restart deployment/ocelot-webapp
+  #         kubectl -n default set image deployment/ocelot-backend container-ocelot-backend=ocelotsocialnetwork/backend:$BUILD_VERSION
+  #         kubectl -n default rollout restart deployment/ocelot-backend
+  #         kubectl -n default set image deployment/ocelot-maintenance container-ocelot-maintenance=ocelotsocialnetwork/maintenance:$BUILD_VERSION
+  #         kubectl -n default rollout restart deployment/ocelot-maintenance
+  #         kubectl -n default set image deployment/ocelot-neo4j container-ocelot-neo4j=ocelotsocialnetwork/neo4j-community:$BUILD_VERSION
+  #         kubectl -n default rollout restart deployment/ocelot-neo4j
+  #     # because this step 'kubectl -n default rollout status deployment/* --timeout=600s' does not work as expected
+  #     #   and we need the pods to be up again for cleaning and seeding the Neo4j database and the backend.
+  #     #   !!! this is not a perfect solution !!!
+  #     # deployments are regularly up again after 3 minutes and 10 seconds
+  #     - name: Sleep for 4 minutes, means 240 seconds
+  #       run: sleep 240s
+  #       shell: bash
+  #     - name: Verify deployment and wait for the pods of each deployment to get ready for cleaning and seeding of the database
+  #       run: |
+  #         kubectl -n default rollout status deployment/ocelot-backend --timeout=600s
+  #         kubectl -n default rollout status deployment/ocelot-neo4j --timeout=600s
+  #         kubectl -n default rollout status deployment/ocelot-maintenance --timeout=600s
+  #         kubectl -n default rollout status deployment/ocelot-webapp --timeout=600s
+  #     - name: Run migrations for Neo4j database via backend for staging
+  #       run: |
+  #         kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "yarn prod:migrate up"
+  #     - name: Reset and seed Neo4j database via backend for staging
+  #       # db cleaning and seeding is only possible in production if env 'PRODUCTION_DB_CLEAN_ALLOW=true' is set in deployment
+  #       run: |
+  #         kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "node --experimental-repl-await dist/db/clean.js && node --experimental-repl-await dist/db/seed.js"
