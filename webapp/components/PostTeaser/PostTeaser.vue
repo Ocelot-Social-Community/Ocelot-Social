@@ -26,7 +26,7 @@
         v-observe-visibility="(isVisible, entry) => visibilityChanged(isVisible, entry, post.id)"
       >
         <div class="categories" v-if="categoriesActive">
-          <hc-category
+          <category
             v-for="category in post.categories"
             :key="category.id"
             v-tooltip="{
@@ -42,7 +42,7 @@
         </div>
         <div v-else class="categories-placeholder"></div>
         <counter-icon
-          icon="bullhorn"
+          icon="heart-o"
           :count="post.shoutedCount"
           :title="$t('contribution.amount-shouts', { amount: post.shoutedCount })"
         />
@@ -81,11 +81,11 @@
 </template>
 
 <script>
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import Category from '~/components/Category'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import HcRibbon from '~/components/Ribbon'
-import HcCategory from '~/components/Category'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
+import HcRibbon from '~/components/Ribbon'
+import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
 import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostHelpers'
@@ -93,11 +93,11 @@ import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostH
 export default {
   name: 'PostTeaser',
   components: {
-    UserTeaser,
-    HcCategory,
-    HcRibbon,
+    Category,
     ContentMenu,
     CounterIcon,
+    HcRibbon,
+    UserTeaser,
   },
   props: {
     post: {
