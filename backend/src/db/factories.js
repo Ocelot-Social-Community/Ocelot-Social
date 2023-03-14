@@ -20,11 +20,10 @@ export const cleanDatabase = async (options = {}) => {
   const session = driver.session()
   try {
     await session.writeTransaction((transaction) => {
-      return transaction.run(
-        `
-          MATCH (everything)
-          DETACH DELETE everything
-        `,
+      Promise.all([
+        'MATCH (everything) DETACH DELETE everything',
+        'CALL apoc.schema.assert({},{},true)' // drop all indices and constraints
+      ].map((statement) => transaction.run(statement)),
       )
     })
   } finally {
