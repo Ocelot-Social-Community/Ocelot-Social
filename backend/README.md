@@ -81,8 +81,7 @@ More details about our GraphQL playground and how to use it with ocelot.social c
 
 ### Database Indexes and Constraints
 
-Database indexes and constraints need to be created when the database and the
-backend is running:
+Database indexes and constraints need to be created and upgraded when the database and the backend are running:
 
 {% tabs %}
 {% tab title="Docker" %}
@@ -98,6 +97,11 @@ $ docker compose exec backend yarn prod:migrate init
 $ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
 ```
 
+```bash
+# in main folder with docker compose running
+$ docker exec backend yarn run db:migrate up
+```
+
 {% endtab %}
 {% tab title="Without Docker" %}
 
@@ -105,6 +109,11 @@ $ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
 # in folder backend/ while database is running
 # make sure your database is running on http://localhost:7474/browser/
 yarn run db:migrate init
+```
+
+```bash
+# in backend/ with database running (In docker or local)
+yarn run db:migrate up
 ```
 
 {% endtab %}
@@ -134,6 +143,8 @@ $ docker exec backend yarn run db:reset
 $ docker-compose down -v
 # if container is not running, run this command to set up your database indexes and constraints
 $ docker exec backend yarn run db:migrate init
+# And then upgrade the indexes and const
+$ docker exec backend yarn run db:migrate up
 ```
 
 {% endtab %}
