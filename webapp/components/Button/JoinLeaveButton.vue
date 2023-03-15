@@ -6,6 +6,7 @@
     :icon="icon"
     :filled="isMember && !hovered"
     :danger="isMember && hovered"
+    v-tooltip="tooltip"
     @mouseenter.native="onHover"
     @mouseleave.native="hovered = false"
     @click.prevent="toggle"
@@ -37,27 +38,32 @@ export default {
   computed: {
     icon() {
       if (this.isMember) {
-        if (this.hovered) {
-          return 'close'
-        } else if (this.isNonePendingMember) {
-          return 'check'
+        if (this.isNonePendingMember) {
+          return this.hovered ? 'close' : 'check'
         } else {
-          return 'question-circle'
+          return this.hovered ? 'close' : 'question-circle'
         }
-      } else {
-        return 'plus'
       }
+      return 'plus'
     },
     label() {
       if (this.isMember) {
         if (this.isNonePendingMember) {
-          return this.$t('group.joinLeaveButton.iAmMember')
+          return this.hovered ? this.$t('group.joinLeaveButton.leave') : this.$t('group.joinLeaveButton.iAmMember')
+        } else {
+          return this.$t('group.joinLeaveButton.pendingMember')
         }
-        return this.$t('group.joinLeaveButton.pendingMember')
-      } else {
-        return this.$t('group.joinLeaveButton.join')
       }
+      return this.$t('group.joinLeaveButton.join')
     },
+    tooltip() {
+      return {
+        content: this.$t('group.joinLeaveButton.tooltip'),
+        placement: 'right',
+        show: this.isMember && !this.isNonePendingMember && this.hovered,
+        trigger: this.isMember && !this.isNonePendingMember ? 'hover' : 'manual'
+      }
+    }
   },
   watch: {
     isMember() {
