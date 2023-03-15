@@ -4,6 +4,7 @@
       v-for="group in groups"
       :key="group.id"
       :width="{ base: '98%', sm: '98%', md: '48%' }"
+      class="group-item"
     >
       <group-teaser :group="group" />
     </ds-flex-item>
@@ -24,7 +25,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.ds-flex-item {
+.group-item {
   margin: 0 1% 2% 1%;
 }
 </style>
