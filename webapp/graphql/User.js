@@ -6,6 +6,7 @@ import {
   userFragment,
   postFragment,
   commentFragment,
+  groupFragment,
 } from './Fragments'
 
 export const profileUserQuery = (i18n) => {
@@ -113,6 +114,7 @@ export const notificationQuery = (_i18n) => {
     ${userFragment}
     ${commentFragment}
     ${postFragment}
+    ${groupFragment}
 
     query ($read: Boolean, $orderBy: NotificationOrdering, $first: Int, $offset: Int) {
       notifications(read: $read, orderBy: $orderBy, first: $first, offset: $offset) {
@@ -121,6 +123,9 @@ export const notificationQuery = (_i18n) => {
         reason
         createdAt
         updatedAt
+        to {
+          ...user
+        }
         from {
           __typename
           ... on Post {
@@ -140,6 +145,9 @@ export const notificationQuery = (_i18n) => {
                 ...user
               }
             }
+          }
+          ... on Group {
+            ...group
           }
         }
       }
