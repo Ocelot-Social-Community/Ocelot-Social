@@ -23,7 +23,7 @@ export default {
   },
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .ds-flex-item {
   margin: 0 1% 2% 1%;
 }
