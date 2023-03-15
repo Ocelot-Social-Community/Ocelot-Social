@@ -3,7 +3,7 @@
     <ds-flex-item 
       v-for="group in groups"
       :key="group.id" 
-      :width="{ base: '47%' }">
+      :width="{ base: '98%', sm: '98%', md: '48%' }">
       <group-teaser :group="group" />
     </ds-flex-item>
   </ds-flex>
@@ -24,6 +24,6 @@ export default {
 </script>
 <style lang="scss">
 .ds-flex-item {
-  margin: 0em 1em 2em 1em;
+  margin: 0 1% 2% 1%;
 }
 </style>
