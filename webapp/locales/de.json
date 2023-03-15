@@ -448,7 +448,9 @@
     "joinLeaveButton": {
       "iAmMember": "Bin Mitglied",
       "join": "Beitreten",
-      "pendingMember": "Ausstehendes Mitglied"
+      "leave": "Verlassen",
+      "pendingMember": "Ausstehendes Mitglied",
+      "tooltip": "Der Inhaber muss dich noch bestätigen."
     },
     "labelSlug": "Eindeutiger Gruppenname",
     "leaveModal": {

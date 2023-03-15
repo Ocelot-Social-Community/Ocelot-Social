@@ -448,7 +448,9 @@
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
       "join": "Join",
-      "pendingMember": "Pending member"
+      "leave": "Leave",
+      "pendingMember": "Pending member",
+      "tooltip": "The owner has yet to confirm you."
     },
     "labelSlug": "Unique group name",
     "leaveModal": {
