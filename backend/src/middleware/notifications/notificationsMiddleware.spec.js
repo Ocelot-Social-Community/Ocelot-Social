@@ -3,6 +3,14 @@ import { cleanDatabase } from '../../db/factories'
 import { createTestClient } from 'apollo-server-testing'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer, { pubsub } from '../../server'
+import {
+  createGroupMutation,
+  joinGroupMutation,
+  leaveGroupMutation,
+  changeGroupMemberRoleMutation,
+  removeUserFromGroupMutation,
+} from '../../graphql/groups'
+
 
 let server, query, mutate, notifiedUser, authenticatedUser
 let publishSpy
@@ -101,6 +109,9 @@ describe('notifications', () => {
           ... on Comment {
             id
             content
+          }
+          ... on Group {
+            id
           }
         }
       }
@@ -612,6 +623,74 @@ describe('notifications', () => {
             )
             expect(publishSpy).toHaveBeenCalledTimes(1)
           })
+        })
+      })
+    })
+  })
+
+  describe('group notifications', () => {
+    let groupOwner
+    let group
+    
+    beforeEach(async () => {
+      groupOwner = await neode.create(
+        'User',
+        {
+          id: 'group-owner',
+          name: 'Group Owner',
+          slug: 'group-owner',
+        },
+        {
+          email: 'owner@example.org',
+          password: '1234',
+        },
+      )
+      authenticatedUser = await groupOwner.toJson()
+      await mutate({
+        mutation: createGroupMutation(),
+        variables: {
+          id: 'closed-group',
+          name: 'The Closed Group',
+          about: 'Will test the closed group!',
+          description: 'Some description' + Array(50).join('_'),
+          groupType: 'public',
+          actionRadius: 'regional',
+          categoryIds,
+        },
+      })
+    })
+
+    describe('user joins group', () => {
+      beforeEach(async () => {
+        authenticatedUser = await notifiedUser.toJson()
+        await mutate({
+          mutation: joinGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: authenticatedUser.id,
+          },
+        })
+        authenticatedUser = await groupOwner.toJson()
+      })
+
+      it('works', async () => {
+        await expect(query({
+          query: notificationQuery,
+        })).resolves.toMatchObject({
+          data: {
+            notifications: [
+              {
+                read: false,
+                reason: 'user_joined_group',
+                createdAt: expect.any(String),
+                from: {
+                  __typename: 'Group',
+                  id: 'closed-group',
+                }
+              },
+            ],
+          },
+          errors: undefined,
         })
       })
     })

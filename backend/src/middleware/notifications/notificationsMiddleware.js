@@ -51,6 +51,19 @@ const publishNotifications = async (context, promises) => {
   })
 }
 
+
+const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
+  const { groupId } = args
+  const user = await resolve(root, args, context, resolveInfo)
+  if (user) {
+    await publishNotifications(
+      context,
+      [notifyOwnersOfGroup(groupId, 'user_joined_group', context)]
+    )
+  }
+  return user
+}
+
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
@@ -89,6 +102,36 @@ const postAuthorOfComment = async (commentId, { context }) => {
       )
     })
     return postAuthorId.records.map((record) => record.get('authorId'))
+  } finally {
+    session.close()
+  }
+}
+
+const notifyOwnersOfGroup = async (groupId, reason, context) => {
+  const cypher = `
+    MATCH (group:Group { id: $groupId })<-[membership:MEMBER_OF]-(owner:User)
+    WHERE membership.role = 'owner'
+    WITH owner, group
+    MERGE (group)-[notification:NOTIFIED {reason: $reason}]->(owner)
+    WITH group, owner, notification
+    SET notification.read = FALSE
+    SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
+    SET notification.updatedAt = toString(datetime())
+    RETURN notification {.*, from: group, to: properties(owner)}
+  `
+  const session = context.driver.session()
+  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+    const notificationTransactionResponse = await transaction.run(cypher, {
+      groupId,
+      reason,
+    })
+    return notificationTransactionResponse.records.map((record) => record.get('notification'))
+  })
+  try {
+    const notifications = await writeTxResultPromise
+    return notifications
+  } catch (error) {
+    throw new Error(error)    
   } finally {
     session.close()
   }
@@ -188,5 +231,6 @@ export default {
     UpdatePost: handleContentDataOfPost,
     CreateComment: handleContentDataOfComment,
     UpdateComment: handleContentDataOfComment,
+    JoinGroup: handleJoinGroup,
   },
 }
