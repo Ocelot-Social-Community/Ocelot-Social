@@ -450,7 +450,7 @@
       "join": "Join",
       "leave": "Leave",
       "pendingMember": "Pending member",
-      "tooltip": "The owner has yet to confirm you."
+      "tooltip": "The group owner has yet to confirm you."
     },
     "labelSlug": "Unique group name",
     "leaveModal": {
