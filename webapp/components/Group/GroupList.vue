@@ -1,9 +1,10 @@
 <template>
   <ds-flex class="group-list">
-    <ds-flex-item 
+    <ds-flex-item
       v-for="group in groups"
-      :key="group.id" 
-      :width="{ base: '98%', sm: '98%', md: '48%' }">
+      :key="group.id"
+      :width="{ base: '98%', sm: '98%', md: '48%' }"
+    >
       <group-teaser :group="group" />
     </ds-flex-item>
   </ds-flex>
