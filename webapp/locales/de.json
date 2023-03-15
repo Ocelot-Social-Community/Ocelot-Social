@@ -450,7 +450,7 @@
       "join": "Beitreten",
       "leave": "Verlassen",
       "pendingMember": "Ausstehendes Mitglied",
-      "tooltip": "Der Inhaber muss dich noch bestätigen."
+      "tooltip": "Der Gruppeninhaber muss dich noch bestätigen."
     },
     "labelSlug": "Eindeutiger Gruppenname",
     "leaveModal": {
