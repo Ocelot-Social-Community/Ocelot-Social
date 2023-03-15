@@ -40,7 +40,7 @@
                       <client-only>
                         <user-teaser
                           :user="
-                            isGroup(notification.from) ? notification.to : notification.from.author
+                            isGroup(notification.from) ? notification.relatedUser : notification.from.author
                           "
                           :date-time="notification.from.createdAt"
                           :class="{ 'notification-status': notification.read }"
@@ -63,7 +63,7 @@
                     class="notification-mention-post"
                     :class="{ 'notification-status': notification.read }"
                     :to="{
-                      name: isGroup(notification.from) ? 'group' : 'post-id-slug',
+                      name: isGroup(notification.from) ? 'group-id-slug' : 'post-id-slug',
                       params: params(notification.from),
                       hash: hashParam(notification.from),
                     }"

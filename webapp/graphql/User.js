@@ -150,6 +150,9 @@ export const notificationQuery = (_i18n) => {
             ...group
           }
         }
+        relatedUser {
+          ...user
+        }
       }
     }
   `

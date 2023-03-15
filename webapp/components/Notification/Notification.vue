@@ -1,12 +1,12 @@
 <template>
   <article :class="{ '--read': notification.read, notification: true }">
     <client-only>
-      <user-teaser :user="isGroup ? to : from.author" :date-time="from.createdAt" />
+      <user-teaser :user="isGroup ? notification.relatedUser : from.author" :date-time="from.createdAt" />
     </client-only>
     <p class="description">{{ $t(`notifications.reason.${notification.reason}`) }}</p>
     <nuxt-link
       class="link"
-      :to="{ name: isGroup ? 'group' : 'post-id-slug', params, hashParam }"
+      :to="{ name: isGroup ? 'group-id-slug' : 'post-id-slug', params, hashParam }"
       @click.native="$emit('read')"
     >
       <base-card wideContent>
@@ -37,9 +37,6 @@ export default {
   computed: {
     from() {
       return this.notification.from
-    },
-    to() {
-      return this.notification.to
     },
     isComment() {
       return this.from.__typename === 'Comment'
