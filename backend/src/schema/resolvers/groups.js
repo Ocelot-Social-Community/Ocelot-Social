@@ -16,6 +16,7 @@ export default {
     Group: async (_object, params, context, _resolveInfo) => {
       const { isMember, id, slug, first, offset } = params
       let pagination = ''
+      const orderBy = 'ORDER BY group.createdAt DESC'
       if (first !== undefined && offset !== undefined) pagination = `SKIP ${offset} LIMIT ${first}`
       const matchParams = { id, slug }
       removeUndefinedNullValuesFromObject(matchParams)
@@ -29,6 +30,7 @@ export default {
             WITH group, membership
             WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
             RETURN group {.*, myRole: membership.role}
+            ${orderBy}
             ${pagination}
           `
         } else {
@@ -39,6 +41,7 @@ export default {
               WITH group
               WHERE group.groupType IN ['public', 'closed']
               RETURN group {.*, myRole: NULL}
+              ${orderBy}
               ${pagination}
             `
           } else {
@@ -48,6 +51,7 @@ export default {
               WITH group, membership
               WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
               RETURN group {.*, myRole: membership.role}
+              ${orderBy}
               ${pagination}
             `
           }

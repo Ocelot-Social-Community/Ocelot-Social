@@ -384,9 +384,9 @@ export default {
       this.user.followedByCurrentUser = followedByCurrentUser
       this.user.followedBy = followedBy
     },
-    fetchAllConnections(type) {
-      if (type === 'following') this.followingCount = Infinity
-      if (type === 'followedBy') this.followedByCount = Infinity
+    fetchAllConnections(type, count) {
+      if (type === 'following') this.followingCount = count
+      if (type === 'followedBy') this.followedByCount = count
     },
   },
   apollo: {
