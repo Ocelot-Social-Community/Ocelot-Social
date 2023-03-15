@@ -6,11 +6,10 @@ import createServer, { pubsub } from '../../server'
 import {
   createGroupMutation,
   joinGroupMutation,
-  leaveGroupMutation,
-  changeGroupMemberRoleMutation,
-  removeUserFromGroupMutation,
+  //  leaveGroupMutation,
+  //  changeGroupMemberRoleMutation,
+  //  removeUserFromGroupMutation,
 } from '../../graphql/groups'
-
 
 let server, query, mutate, notifiedUser, authenticatedUser
 let publishSpy
@@ -100,6 +99,9 @@ describe('notifications', () => {
         read
         reason
         createdAt
+        relatedUser {
+          id
+        }
         from {
           __typename
           ... on Post {
@@ -196,6 +198,7 @@ describe('notifications', () => {
                       id: 'c47',
                       content: commentContent,
                     },
+                    relatedUser: null,
                   },
                 ],
               },
@@ -368,6 +371,7 @@ describe('notifications', () => {
                       id: 'p47',
                       content: expectedUpdatedContent,
                     },
+                    relatedUser: null,
                   },
                 ],
               },
@@ -524,6 +528,7 @@ describe('notifications', () => {
                       id: 'c47',
                       content: commentContent,
                     },
+                    relatedUser: null,
                   },
                 ],
               },
@@ -558,6 +563,7 @@ describe('notifications', () => {
                       id: 'c47',
                       content: commentContent,
                     },
+                    relatedUser: null,
                   },
                 ],
               },
@@ -630,8 +636,7 @@ describe('notifications', () => {
 
   describe('group notifications', () => {
     let groupOwner
-    let group
-    
+
     beforeEach(async () => {
       groupOwner = await neode.create(
         'User',
@@ -673,10 +678,12 @@ describe('notifications', () => {
         authenticatedUser = await groupOwner.toJson()
       })
 
-      it('works', async () => {
-        await expect(query({
-          query: notificationQuery,
-        })).resolves.toMatchObject({
+      it('has the notification in database', async () => {
+        await expect(
+          query({
+            query: notificationQuery,
+          }),
+        ).resolves.toMatchObject({
           data: {
             notifications: [
               {
@@ -686,7 +693,10 @@ describe('notifications', () => {
                 from: {
                   __typename: 'Group',
                   id: 'closed-group',
-                }
+                },
+                relatedUser: {
+                  id: 'you',
+                },
               },
             ],
           },

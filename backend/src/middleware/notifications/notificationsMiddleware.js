@@ -51,15 +51,13 @@ const publishNotifications = async (context, promises) => {
   })
 }
 
-
 const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
-  const { groupId } = args
+  const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
-    await publishNotifications(
-      context,
-      [notifyOwnersOfGroup(groupId, 'user_joined_group', context)]
-    )
+    await publishNotifications(context, [
+      notifyOwnersOfGroup(groupId, userId, 'user_joined_group', context),
+    ])
   }
   return user
 }
@@ -107,7 +105,7 @@ const postAuthorOfComment = async (commentId, { context }) => {
   }
 }
 
-const notifyOwnersOfGroup = async (groupId, reason, context) => {
+const notifyOwnersOfGroup = async (groupId, userId, reason, context) => {
   const cypher = `
     MATCH (group:Group { id: $groupId })<-[membership:MEMBER_OF]-(owner:User)
     WHERE membership.role = 'owner'
@@ -117,6 +115,7 @@ const notifyOwnersOfGroup = async (groupId, reason, context) => {
     SET notification.read = FALSE
     SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
     SET notification.updatedAt = toString(datetime())
+    SET notification.relatedUserId = $userId
     RETURN notification {.*, from: group, to: properties(owner)}
   `
   const session = context.driver.session()
@@ -124,6 +123,7 @@ const notifyOwnersOfGroup = async (groupId, reason, context) => {
     const notificationTransactionResponse = await transaction.run(cypher, {
       groupId,
       reason,
+      userId,
     })
     return notificationTransactionResponse.records.map((record) => record.get('notification'))
   })
@@ -131,7 +131,7 @@ const notifyOwnersOfGroup = async (groupId, reason, context) => {
     const notifications = await writeTxResultPromise
     return notifications
   } catch (error) {
-    throw new Error(error)    
+    throw new Error(error)
   } finally {
     session.close()
   }

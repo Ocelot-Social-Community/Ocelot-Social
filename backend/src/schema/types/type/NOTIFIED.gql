@@ -6,6 +6,7 @@ type NOTIFIED {
   updatedAt: String!
   read: Boolean
   reason: NotificationReason
+  relatedUser: User
 }
 
 union NotificationSource = Post | Comment | Group
