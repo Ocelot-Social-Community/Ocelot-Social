@@ -1,9 +1,12 @@
 <template>
-  <div class="group-list">
-    <ds-space margin-bottom="small" v-for="group in groups" :key="group.id">
+  <ds-flex class="group-list">
+    <ds-flex-item 
+      v-for="group in groups"
+      :key="group.id" 
+      :width="{ base: '47%' }">
       <group-teaser :group="group" />
-    </ds-space>
-  </div>
+    </ds-flex-item>
+  </ds-flex>
 </template>
 
 <script>
@@ -19,3 +22,8 @@ export default {
   },
 }
 </script>
+<style lang="scss">
+.ds-flex-item {
+  margin: 0em 1em 2em 1em;
+}
+</style>
