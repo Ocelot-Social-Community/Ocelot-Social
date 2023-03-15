@@ -645,7 +645,7 @@
     },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
-    "post": "Post",
+    "post": "Post or Group",
     "reason": {
       "commented_on_post": "Commented on your post …",
       "mentioned_in_comment": "Mentioned you in a comment …",

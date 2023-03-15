@@ -39,7 +39,9 @@
                     <ds-space margin-bottom="base">
                       <client-only>
                         <user-teaser
-                          :user="notification.from.author"
+                          :user="
+                            isGroup(notification.from) ? notification.to : notification.from.author
+                          "
                           :date-time="notification.from.createdAt"
                           :class="{ 'notification-status': notification.read }"
                         />
@@ -61,14 +63,18 @@
                     class="notification-mention-post"
                     :class="{ 'notification-status': notification.read }"
                     :to="{
-                      name: 'post-id-slug',
+                      name: isGroup(notification.from) ? 'group' : 'post-id-slug',
                       params: params(notification.from),
                       hash: hashParam(notification.from),
                     }"
                     @click.native="markNotificationAsRead(notification.from.id)"
                   >
                     <b>
-                      {{ notification.from.title || notification.from.post.title | truncate(50) }}
+                      {{
+                        notification.from.title ||
+                        notification.from.groupName ||
+                        notification.from.post.title | truncate(50)
+                      }}
                     </b>
                   </nuxt-link>
                 </base-card>
@@ -132,11 +138,16 @@ export default {
     isComment(notificationSource) {
       return notificationSource.__typename === 'Comment'
     },
+    isGroup(notificationSource) {
+      return notificationSource.__typename === 'Group'
+    },
     params(notificationSource) {
-      const post = this.isComment(notificationSource) ? notificationSource.post : notificationSource
+      const target = this.isComment(notificationSource)
+        ? notificationSource.post
+        : notificationSource
       return {
-        id: post.id,
-        slug: post.slug,
+        id: target.id,
+        slug: target.slug,
       }
     },
     hashParam(notificationSource) {
