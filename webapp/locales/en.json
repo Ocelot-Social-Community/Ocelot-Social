@@ -448,7 +448,10 @@
     "in": "in",
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
-      "join": "Join"
+      "join": "Join",
+      "leave": "Leave",
+      "pendingMember": "Pending member",
+      "tooltip": "The group owner has yet to confirm you."
     },
     "labelSlug": "Unique group name",
     "leaveModal": {
@@ -483,7 +486,7 @@
       "admin": "Administrator",
       "owner": "Owner",
       "pending": "Pending Member",
-      "usual": "Simple Member"
+      "usual": "Member"
     },
     "save": "Create new group",
     "type": "Visibility of the group",

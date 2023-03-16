@@ -448,7 +448,10 @@
     "in": "in",
     "joinLeaveButton": {
       "iAmMember": "Bin Mitglied",
-      "join": "Beitreten"
+      "join": "Beitreten",
+      "leave": "Verlassen",
+      "pendingMember": "Ausstehendes Mitglied",
+      "tooltip": "Der Gruppeninhaber muss dich noch bestätigen."
     },
     "labelSlug": "Eindeutiger Gruppenname",
     "leaveModal": {
@@ -483,7 +486,7 @@
       "admin": "Administrator",
       "owner": "Inhaber",
       "pending": "Ausstehendes Mitglied",
-      "usual": "Einfaches Mitglied"
+      "usual": "Mitglied"
     },
     "save": "Neue Gruppe anlegen",
     "type": "Öffentlichkeit der Gruppe",
