@@ -650,7 +650,8 @@
       "commented_on_post": "Hat Deinen Beitrag kommentiert …",
       "mentioned_in_comment": "Hat Dich in einem Kommentar erwähnt …",
       "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …",
-      "user_joined_group": "Ist Deiner Gruppe beigetreten …"
+      "user_joined_group": "Ist Deiner Gruppe beigetreten …",
+      "user_left_group": "Left your group …"
     },
     "title": "Benachrichtigungen",
     "user": "Nutzer"
