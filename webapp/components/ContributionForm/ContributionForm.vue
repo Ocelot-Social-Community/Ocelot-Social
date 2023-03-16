@@ -74,8 +74,8 @@
             />
             <!-- eslint-enable vue/no-v-text-v-html-on-component -->
           </ds-flex-item>
-          <ds-flex-item width="0.25" />
-          <ds-flex-item style="align-self: flex-end">
+          <ds-flex-item width="0.15" />
+          <ds-flex-item class="action-buttons-group" width="2">
             <base-button
               data-test="cancel-button"
               :disabled="loading"
@@ -84,8 +84,6 @@
             >
               {{ $t('actions.cancel') }}
             </base-button>
-          </ds-flex-item>
-          <ds-flex-item style="align-self: flex-end">
             <base-button type="submit" icon="check" :loading="loading" :disabled="errors" filled>
               {{ $t('actions.save') }}
             </base-button>
@@ -310,9 +308,45 @@ export default {
   }
 
   > .buttons-footer {
+    justify-content: flex-end;
     align-self: flex-end;
-    width: 85%;
+    width: 100%;
     margin-top: $space-base;
+
+    > .action-buttons-group {
+      margin-left: auto; 
+      display: flex; 
+      justify-content: flex-end;
+
+      > button {
+        margin-left: 1em;
+        min-width: fit-content;
+      }
+    }
+  }
+
+  @media screen and (max-width: 656px) {
+    > .buttons-footer {
+      flex-direction: column;
+      margin-top: 5px;
+
+      > .action-buttons-group {
+        > button {
+          margin-left: 1em;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 280px) {
+    > .buttons-footer {
+      > .action-buttons-group {
+        flex-direction: column;
+        > button {
+          margin-bottom: 5px;
+        }
+      }
+    }
   }
 
   .blur-toggle {
