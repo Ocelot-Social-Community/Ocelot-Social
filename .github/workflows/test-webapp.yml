@@ -1,0 +1,86 @@
+name: ocelot.social webapp test CI
+
+
+on: [push]
+
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Check translation files
+        run: |
+          scripts/translations/sort.sh
+          scripts/translations/missing-keys.sh
+          
+  build_test_webapp:
+    name: Docker Build Test - WebApp
+    runs-on: ubuntu-latest
+    needs: [prepare]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: webapp | Build 'test' image
+        run: |
+          docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
+          docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-webapp-test
+          path: /tmp/webapp.tar
+
+  lint_webapp:
+    name: Lint webapp
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: webapp | Lint
+        run: cd webapp && yarn && yarn run lint
+
+  unit_test_webapp:
+    name: Unit tests - webapp
+    runs-on: ubuntu-latest
+    needs: [build_test_webapp]
+    permissions: 
+      checks: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download Docker Image (Webapp)
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-webapp-test
+          path: /tmp
+
+      - name: Load Docker Image
+        run: docker load < /tmp/webapp.tar
+
+      - name: backend | copy env files webapp
+        run: cp webapp/.env.template webapp/.env
+
+      - name: backend | copy env files backend
+        run: cp backend/.env.template backend/.env
+
+      - name: backend | docker-compose
+        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
+
+      - name: webapp | Unit tests
+        run: docker-compose exec -T webapp yarn test
+
+      - name: webapp | Coverage check
+        uses: webcraftmedia/coverage-check-action@master
+        with:
+          report_name: Coverage Webapp
+          type: lcov
+          result_path: ./coverage/lcov.info
+          min_coverage: 83
+          token: ${{ github.token }}

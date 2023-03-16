@@ -1,0 +1,106 @@
+name: ocelot.social test CI
+
+
+on: [push]
+
+jobs:
+  build_test_neo4j:
+    name: Docker Build Test - Neo4J
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Neo4J | Build 'community' image
+        run: |
+          docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
+          docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/neo4j.tar
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-neo4j-image
+          path: /tmp/neo4j.tar
+
+  build_test_backend:
+    name: Docker Build Test - Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: backend | Build 'test' image
+        run: |
+          docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
+          docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-backend-test
+          path: /tmp/backend.tar
+
+  lint_backend:
+    name: Lint backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: backend | Lint
+        run: cd backend && yarn && yarn run lint
+
+  unit_test_backend:
+    name: Unit tests - backend
+    runs-on: ubuntu-latest
+    needs: [build_test_neo4j,build_test_backend]
+    permissions: 
+      checks: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download Docker Image (Neo4J)
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-neo4j-image
+          path: /tmp
+
+      - name: Load Docker Image
+        run: docker load < /tmp/neo4j.tar
+
+      - name: Download Docker Image (Backend)
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-backend-test
+          path: /tmp
+
+      - name: Load Docker Image
+        run: docker load < /tmp/backend.tar
+
+      # - name: backend | copy env files webapp
+      #   run: cp webapp/.env.template webapp/.env
+
+      - name: backend | copy env files backend
+        run: cp backend/.env.template backend/.env
+
+      - name: backend | docker-compose
+        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps neo4j backend
+
+      - name: backend | Initialize Database
+        run: docker-compose exec -T backend yarn db:migrate init
+
+      - name: backend | Migrate Database Up
+        run: docker-compose exec -T backend yarn db:migrate up
+
+      - name: backend | Unit test
+        run: docker-compose exec -T backend yarn test
+
+      - name: backend | Coverage check
+        uses: webcraftmedia/coverage-check-action@master
+        with:
+          report_name: Coverage Backend
+          type: lcov
+          result_path: ./coverage/lcov.info
+          min_coverage: 57
+          token: ${{ github.token }}
