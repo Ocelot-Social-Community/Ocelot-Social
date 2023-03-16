@@ -859,6 +859,6 @@ describe('notifications', () => {
           errors: undefined,
         })
       })
-    })    
+    })
   })
 })
