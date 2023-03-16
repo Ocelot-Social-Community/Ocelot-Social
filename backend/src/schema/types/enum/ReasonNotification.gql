@@ -1,6 +1,0 @@
-enum ReasonNotification {
-  mentioned_in_post
-  mentioned_in_comment
-  commented_on_post
-  user_joined_group
-}
