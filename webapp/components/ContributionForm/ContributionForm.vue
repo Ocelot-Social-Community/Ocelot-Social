@@ -172,6 +172,9 @@ export default {
     groupId() {
       return this.group && this.group.id
     },
+    showGroupHint() {
+      return this.grouupId && ['closed', 'hidden'].includes(this.group.groupType)
+    },
     groupName() {
       return this.group && this.group.name
     },
