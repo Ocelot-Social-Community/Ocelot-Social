@@ -49,7 +49,9 @@ export default {
     label() {
       if (this.isMember) {
         if (this.isNonePendingMember) {
-          return this.hovered ? this.$t('group.joinLeaveButton.leave') : this.$t('group.joinLeaveButton.iAmMember')
+          return this.hovered
+            ? this.$t('group.joinLeaveButton.leave')
+            : this.$t('group.joinLeaveButton.iAmMember')
         } else {
           return this.$t('group.joinLeaveButton.pendingMember')
         }
@@ -61,9 +63,9 @@ export default {
         content: this.$t('group.joinLeaveButton.tooltip'),
         placement: 'right',
         show: this.isMember && !this.isNonePendingMember && this.hovered,
-        trigger: this.isMember && !this.isNonePendingMember ? 'hover' : 'manual'
+        trigger: this.isMember && !this.isNonePendingMember ? 'hover' : 'manual',
       }
-    }
+    },
   },
   watch: {
     isMember() {
