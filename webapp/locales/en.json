@@ -647,10 +647,11 @@
     "pageLink": "All notifications",
     "post": "Post or Group",
     "reason": {
-      "changed_group_member_role": "Your role in group changed …",
+      "changed_group_member_role": "Changed your role in group …",
       "commented_on_post": "Commented on your post …",
       "mentioned_in_comment": "Mentioned you in a comment …",
       "mentioned_in_post": "Mentioned you in a post …",
+      "removed_user_from_group": "Removed you from group …",
       "user_joined_group": "Joined your group …",
       "user_left_group": "Left your group …"
     },
