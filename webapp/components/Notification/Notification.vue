@@ -1,7 +1,10 @@
 <template>
   <article :class="{ '--read': notification.read, notification: true }">
     <client-only>
-      <user-teaser :user="isGroup ? notification.relatedUser : from.author" :date-time="from.createdAt" />
+      <user-teaser
+        :user="isGroup ? notification.relatedUser : from.author"
+        :date-time="from.createdAt"
+      />
     </client-only>
     <p class="description">{{ $t(`notifications.reason.${notification.reason}`) }}</p>
     <nuxt-link

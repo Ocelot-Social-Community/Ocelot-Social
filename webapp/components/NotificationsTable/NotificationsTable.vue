@@ -40,7 +40,9 @@
                       <client-only>
                         <user-teaser
                           :user="
-                            isGroup(notification.from) ? notification.relatedUser : notification.from.author
+                            isGroup(notification.from)
+                              ? notification.relatedUser
+                              : notification.from.author
                           "
                           :date-time="notification.from.createdAt"
                           :class="{ 'notification-status': notification.read }"
