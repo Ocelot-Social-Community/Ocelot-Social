@@ -68,7 +68,7 @@
           <ds-flex-item width="3.5" style="margin-right: 16px; margin-bottom: 6px">
             <!-- eslint-disable vue/no-v-text-v-html-on-component -->
             <ds-text
-              v-if="groupId"
+              v-if="showGroupHint"
               v-html="$t('contribution.visibleOnlyForMembersOfGroup', { name: groupName })"
             />
             <!-- eslint-enable vue/no-v-text-v-html-on-component -->
@@ -170,6 +170,9 @@ export default {
     },
     groupId() {
       return this.group && this.group.id
+    },
+    showGroupHint() {
+      return this.grouupId && ['closed', 'hidden'].includes(this.group.groupType)
     },
     groupName() {
       return this.group && this.group.name
