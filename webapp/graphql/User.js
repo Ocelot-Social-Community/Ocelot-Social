@@ -163,6 +163,7 @@ export const markAsReadMutation = (_i18n) => {
     ${userFragment}
     ${commentFragment}
     ${postFragment}
+    ${groupFragment}
 
     mutation ($id: ID!) {
       markAsRead(id: $id) {
@@ -188,6 +189,9 @@ export const markAsReadMutation = (_i18n) => {
               }
             }
           }
+          ... on Group {
+            ...group
+          }
         }
       }
     }
@@ -199,6 +203,7 @@ export const markAllAsReadMutation = (_i18n) => {
     ${userFragment}
     ${commentFragment}
     ${postFragment}
+    ${groupFragment}
 
     mutation {
       markAllAsRead {
@@ -223,6 +228,9 @@ export const markAllAsReadMutation = (_i18n) => {
                 ...user
               }
             }
+          }
+          ... on Group {
+            ...group
           }
         }
       }
