@@ -1,4 +1,4 @@
-name: ocelot.social test CI
+name: ocelot.social backend test CI
 
 
 on: [push]
