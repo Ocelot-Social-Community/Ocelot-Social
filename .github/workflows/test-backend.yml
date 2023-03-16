@@ -78,9 +78,6 @@ jobs:
       - name: Load Docker Image
         run: docker load < /tmp/backend.tar
 
-      # - name: backend | copy env files webapp
-      #   run: cp webapp/.env.template webapp/.env
-
       - name: backend | copy env files backend
         run: cp backend/.env.template backend/.env
 
@@ -93,14 +90,5 @@ jobs:
       - name: backend | Migrate Database Up
         run: docker-compose exec -T backend yarn db:migrate up
 
-      - name: backend | Unit test
+      - name: backend | Unit test incl. coverage check
         run: docker-compose exec -T backend yarn test
-
-      - name: backend | Coverage check
-        uses: webcraftmedia/coverage-check-action@master
-        with:
-          report_name: Coverage Backend
-          type: lcov
-          result_path: ./coverage/lcov.info
-          min_coverage: 57
-          token: ${{ github.token }}
