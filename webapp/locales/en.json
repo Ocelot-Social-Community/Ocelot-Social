@@ -647,6 +647,7 @@
     "pageLink": "All notifications",
     "post": "Post or Group",
     "reason": {
+      "changed_group_member_role": "Your role in group changed …",
       "commented_on_post": "Commented on your post …",
       "mentioned_in_comment": "Mentioned you in a comment …",
       "mentioned_in_post": "Mentioned you in a post …",
