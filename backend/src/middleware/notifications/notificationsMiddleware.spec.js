@@ -8,7 +8,7 @@ import {
   joinGroupMutation,
   leaveGroupMutation,
   changeGroupMemberRoleMutation,
-  //  removeUserFromGroupMutation,
+  removeUserFromGroupMutation,
 } from '../../graphql/groups'
 
 let server, query, mutate, notifiedUser, authenticatedUser
@@ -803,7 +803,7 @@ describe('notifications', () => {
                   id: 'closed-group',
                 },
                 relatedUser: {
-                  id: 'you',
+                  id: 'group-owner',
                 },
               },
             ],
@@ -812,5 +812,53 @@ describe('notifications', () => {
         })
       })
     })
+
+    describe('user is removed from group', () => {
+      beforeEach(async () => {
+        authenticatedUser = await notifiedUser.toJson()
+        await mutate({
+          mutation: joinGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: authenticatedUser.id,
+          },
+        })
+        authenticatedUser = await groupOwner.toJson()
+        await mutate({
+          mutation: removeUserFromGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: 'you',
+          },
+        })
+        authenticatedUser = await notifiedUser.toJson()
+      })
+
+      it('has notification in database', async () => {
+        await expect(
+          query({
+            query: notificationQuery,
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            notifications: [
+              {
+                read: false,
+                reason: 'removed_user_from_group',
+                createdAt: expect.any(String),
+                from: {
+                  __typename: 'Group',
+                  id: 'closed-group',
+                },
+                relatedUser: {
+                  id: 'group-owner',
+                },
+              },
+            ],
+          },
+          errors: undefined,
+        })
+      })
+    })    
   })
 })

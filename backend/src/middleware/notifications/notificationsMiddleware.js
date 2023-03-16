@@ -84,6 +84,17 @@ const handleChangeGroupMemberRole = async (resolve, root, args, context, resolve
   return user
 }
 
+const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveInfo) => {
+  const { groupId, userId } = args
+  const user = await resolve(root, args, context, resolveInfo)
+  if (user) {
+    await publishNotifications(context, [
+      notifyMemberOfGroup(groupId, userId, 'removed_user_from_group', context),
+    ])
+  }
+  return user
+}
+
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
@@ -160,15 +171,17 @@ const notifyOwnersOfGroup = async (groupId, userId, reason, context) => {
 }
 
 const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
+  const { user: owner } = context
   const cypher = `
-    MATCH (group:Group { id: $groupId })<-[membership:MEMBER_OF]-(user:User { id: $userId })
+    MATCH (user:User { id: $userId })
+    MATCH (group:Group { id: $groupId })
     WITH user, group
     MERGE (group)-[notification:NOTIFIED {reason: $reason}]->(user)
     WITH group, user, notification
     SET notification.read = FALSE
     SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
     SET notification.updatedAt = toString(datetime())
-    SET notification.relatedUserId = $userId
+    SET notification.relatedUserId = $ownerId
     RETURN notification {.*, from: group, to: properties(user)}
   `
   const session = context.driver.session()
@@ -177,6 +190,7 @@ const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
       groupId,
       reason,
       userId,
+      ownerId: owner.id,
     })
     return notificationTransactionResponse.records.map((record) => record.get('notification'))
   })
@@ -287,5 +301,6 @@ export default {
     JoinGroup: handleJoinGroup,
     LeaveGroup: handleLeaveGroup,
     ChangeGroupMemberRole: handleChangeGroupMemberRole,
+    RemoveUserFromGroup: handleRemoveUserFromGroup,
   },
 }
