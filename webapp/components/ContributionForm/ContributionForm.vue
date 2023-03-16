@@ -65,11 +65,10 @@
           <base-icon v-if="errors && errors.categoryIds" name="warning" />
         </ds-chip>
         <ds-flex class="buttons-footer" gutter="xxx-small">
-          <ds-flex-item width="3.5">
+          <ds-flex-item width="3.5" style="margin-right: 16px; margin-bottom: 6px">
             <!-- eslint-disable vue/no-v-text-v-html-on-component -->
             <ds-text
               v-if="groupId"
-              class="info-text"
               v-html="$t('contribution.visibleOnlyForMembersOfGroup', { name: groupName })"
             />
             <!-- eslint-enable vue/no-v-text-v-html-on-component -->
@@ -314,14 +313,23 @@ export default {
     margin-top: $space-base;
 
     > .action-buttons-group {
-      margin-left: auto; 
-      display: flex; 
+      margin-left: auto;
+      display: flex;
       justify-content: flex-end;
 
       > button {
         margin-left: 1em;
         min-width: fit-content;
       }
+    }
+  }
+
+  .blur-toggle {
+    text-align: right;
+    margin-bottom: $space-base;
+
+    > .link {
+      display: block;
     }
   }
 
@@ -342,25 +350,12 @@ export default {
     > .buttons-footer {
       > .action-buttons-group {
         flex-direction: column;
+
         > button {
           margin-bottom: 5px;
         }
       }
     }
-  }
-
-  .blur-toggle {
-    text-align: right;
-    margin-bottom: $space-base;
-
-    > .link {
-      display: block;
-    }
-  }
-
-  .info-text {
-    display: inline;
-    vertical-align: middle;
   }
 }
 </style>
