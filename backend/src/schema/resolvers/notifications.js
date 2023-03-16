@@ -47,7 +47,8 @@ export default {
           ` 
           MATCH (resource {deleted: false, disabled: false})-[notification:NOTIFIED]->(user:User {id:$id})
           ${whereClause}
-          OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(relatedUser:User { id: notification.relatedUserId })
+          OPTIONAL MATCH (relatedUser:User { id: notification.relatedUserId })
+          OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(relatedUser)
           WITH user, notification, resource, membership, relatedUser,
           [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
           [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post {.*, author: properties(author)} ] AS posts

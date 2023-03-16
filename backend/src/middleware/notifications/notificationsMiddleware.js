@@ -62,6 +62,17 @@ const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
   return user
 }
 
+const handleLeaveGroup = async (resolve, root, args, context, resolveInfo) => {
+  const { groupId, userId } = args
+  const user = await resolve(root, args, context, resolveInfo)
+  if (user) {
+    await publishNotifications(context, [
+      notifyOwnersOfGroup(groupId, userId, 'user_left_group', context),
+    ])
+  }
+  return user
+}
+
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
@@ -232,5 +243,6 @@ export default {
     CreateComment: handleContentDataOfComment,
     UpdateComment: handleContentDataOfComment,
     JoinGroup: handleJoinGroup,
+    LeaveGroup: handleLeaveGroup,
   },
 }

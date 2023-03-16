@@ -23,6 +23,7 @@ enum NotificationReason {
   mentioned_in_comment
   commented_on_post
   user_joined_group
+  user_left_group
 }
 
 type Query {

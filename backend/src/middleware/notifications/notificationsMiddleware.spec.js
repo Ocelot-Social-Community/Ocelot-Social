@@ -6,7 +6,7 @@ import createServer, { pubsub } from '../../server'
 import {
   createGroupMutation,
   joinGroupMutation,
-  //  leaveGroupMutation,
+  leaveGroupMutation,
   //  changeGroupMemberRoleMutation,
   //  removeUserFromGroupMutation,
 } from '../../graphql/groups'
@@ -686,6 +686,65 @@ describe('notifications', () => {
         ).resolves.toMatchObject({
           data: {
             notifications: [
+              {
+                read: false,
+                reason: 'user_joined_group',
+                createdAt: expect.any(String),
+                from: {
+                  __typename: 'Group',
+                  id: 'closed-group',
+                },
+                relatedUser: {
+                  id: 'you',
+                },
+              },
+            ],
+          },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('user leaves group', () => {
+      beforeEach(async () => {
+        authenticatedUser = await notifiedUser.toJson()
+        await mutate({
+          mutation: joinGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: authenticatedUser.id,
+          },
+        })
+        await mutate({
+          mutation: leaveGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: authenticatedUser.id,
+          },
+        })
+        authenticatedUser = await groupOwner.toJson()
+      })
+
+      it('has two the notification in database', async () => {
+        await expect(
+          query({
+            query: notificationQuery,
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            notifications: [
+              {
+                read: false,
+                reason: 'user_left_group',
+                createdAt: expect.any(String),
+                from: {
+                  __typename: 'Group',
+                  id: 'closed-group',
+                },
+                relatedUser: {
+                  id: 'you',
+                },
+              },
               {
                 read: false,
                 reason: 'user_joined_group',
