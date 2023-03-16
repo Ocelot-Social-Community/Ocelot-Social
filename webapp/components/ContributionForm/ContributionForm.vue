@@ -68,7 +68,7 @@
           <ds-flex-item width="3.5">
             <!-- eslint-disable vue/no-v-text-v-html-on-component -->
             <ds-text
-              v-if="groupId"
+              v-if="showGroupHint"
               class="info-text"
               v-html="$t('contribution.visibleOnlyForMembersOfGroup', { name: groupName })"
             />
