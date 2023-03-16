@@ -4,7 +4,7 @@
       <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" />
     </ds-space>
     <ds-space margin="large" />
-    <ds-container>
+    <ds-space>
       <!-- create group -->
       <ds-space centered>
         <nuxt-link :to="{ name: 'group-create' }">
@@ -49,7 +49,7 @@
           @next="nextResults"
         />
       </ds-space>
-    </ds-container>
+    </ds-space>
   </div>
 </template>
 

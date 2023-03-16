@@ -300,6 +300,14 @@ jobs:
           repository: ${{ github.repository }}
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "VERSION": "${VERSION}", "BUILD_DATE": "${BUILD_DATE}", "BUILD_COMMIT": "${BUILD_COMMIT}", "BUILD_VERSION": "${BUILD_VERSION}"}'
 
+      - name: Repository Dispatch stage.ocelot.social
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ github.token }}
+          event-type: trigger-build-success
+          repository: 'Ocelot-Social-Community/stage.ocelot.social'
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "VERSION": "${VERSION}", "BUILD_DATE": "${BUILD_DATE}", "BUILD_COMMIT": "${BUILD_COMMIT}", "BUILD_VERSION": "${BUILD_VERSION}"}'
+
   # ##############################################################################
   # # JOB: KUBERNETES DEPLOY ACTUAL/LATEST VERSION ######################################
   # ##############################################################################
