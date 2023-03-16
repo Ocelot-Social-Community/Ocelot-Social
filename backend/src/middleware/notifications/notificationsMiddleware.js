@@ -73,6 +73,17 @@ const handleLeaveGroup = async (resolve, root, args, context, resolveInfo) => {
   return user
 }
 
+const handleChangeGroupMemberRole = async (resolve, root, args, context, resolveInfo) => {
+  const { groupId, userId } = args
+  const user = await resolve(root, args, context, resolveInfo)
+  if (user) {
+    await publishNotifications(context, [
+      notifyMemberOfGroup(groupId, userId, 'changed_group_member_role', context),
+    ])
+  }
+  return user
+}
+
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
@@ -128,6 +139,37 @@ const notifyOwnersOfGroup = async (groupId, userId, reason, context) => {
     SET notification.updatedAt = toString(datetime())
     SET notification.relatedUserId = $userId
     RETURN notification {.*, from: group, to: properties(owner)}
+  `
+  const session = context.driver.session()
+  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+    const notificationTransactionResponse = await transaction.run(cypher, {
+      groupId,
+      reason,
+      userId,
+    })
+    return notificationTransactionResponse.records.map((record) => record.get('notification'))
+  })
+  try {
+    const notifications = await writeTxResultPromise
+    return notifications
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+}
+
+const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
+  const cypher = `
+    MATCH (group:Group { id: $groupId })<-[membership:MEMBER_OF]-(user:User { id: $userId })
+    WITH user, group
+    MERGE (group)-[notification:NOTIFIED {reason: $reason}]->(user)
+    WITH group, user, notification
+    SET notification.read = FALSE
+    SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
+    SET notification.updatedAt = toString(datetime())
+    SET notification.relatedUserId = $userId
+    RETURN notification {.*, from: group, to: properties(user)}
   `
   const session = context.driver.session()
   const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -244,5 +286,6 @@ export default {
     UpdateComment: handleContentDataOfComment,
     JoinGroup: handleJoinGroup,
     LeaveGroup: handleLeaveGroup,
+    ChangeGroupMemberRole: handleChangeGroupMemberRole,
   },
 }

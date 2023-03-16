@@ -24,6 +24,7 @@ enum NotificationReason {
   commented_on_post
   user_joined_group
   user_left_group
+  changed_group_member_role
 }
 
 type Query {

@@ -7,7 +7,7 @@ import {
   createGroupMutation,
   joinGroupMutation,
   leaveGroupMutation,
-  //  changeGroupMemberRoleMutation,
+  changeGroupMemberRoleMutation,
   //  removeUserFromGroupMutation,
 } from '../../graphql/groups'
 
@@ -748,6 +748,55 @@ describe('notifications', () => {
               {
                 read: false,
                 reason: 'user_joined_group',
+                createdAt: expect.any(String),
+                from: {
+                  __typename: 'Group',
+                  id: 'closed-group',
+                },
+                relatedUser: {
+                  id: 'you',
+                },
+              },
+            ],
+          },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('user role in group changes', () => {
+      beforeEach(async () => {
+        authenticatedUser = await notifiedUser.toJson()
+        await mutate({
+          mutation: joinGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: authenticatedUser.id,
+          },
+        })
+        authenticatedUser = await groupOwner.toJson()
+        await mutate({
+          mutation: changeGroupMemberRoleMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: 'you',
+            roleInGroup: 'admin',
+          },
+        })
+        authenticatedUser = await notifiedUser.toJson()
+      })
+
+      it('has notification in database', async () => {
+        await expect(
+          query({
+            query: notificationQuery,
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            notifications: [
+              {
+                read: false,
+                reason: 'changed_group_member_role',
                 createdAt: expect.any(String),
                 from: {
                   __typename: 'Group',
