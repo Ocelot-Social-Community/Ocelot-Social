@@ -41,7 +41,7 @@
           {{ formData.title.length }}/{{ formSchema.title.max }}
           <base-icon v-if="errors && errors.title" name="warning" />
         </ds-chip>
-        <hc-editor
+        <editor
           :users="users"
           :value="formData.content"
           :hashtags="hashtags"
@@ -64,14 +64,30 @@
           {{ formData.categoryIds.length }} / 3
           <base-icon v-if="errors && errors.categoryIds" name="warning" />
         </ds-chip>
-        <div class="buttons">
-          <base-button data-test="cancel-button" :disabled="loading" @click="$router.back()" danger>
-            {{ $t('actions.cancel') }}
-          </base-button>
-          <base-button type="submit" icon="check" :loading="loading" :disabled="errors" filled>
-            {{ $t('actions.save') }}
-          </base-button>
-        </div>
+        <ds-flex class="buttons-footer" gutter="xxx-small">
+          <ds-flex-item width="3.5" style="margin-right: 16px; margin-bottom: 6px">
+            <!-- eslint-disable vue/no-v-text-v-html-on-component -->
+            <ds-text
+              v-if="showGroupHint"
+              v-html="$t('contribution.visibleOnlyForMembersOfGroup', { name: groupName })"
+            />
+            <!-- eslint-enable vue/no-v-text-v-html-on-component -->
+          </ds-flex-item>
+          <ds-flex-item width="0.15" />
+          <ds-flex-item class="action-buttons-group" width="2">
+            <base-button
+              data-test="cancel-button"
+              :disabled="loading"
+              @click="$router.back()"
+              danger
+            >
+              {{ $t('actions.cancel') }}
+            </base-button>
+            <base-button type="submit" icon="check" :loading="loading" :disabled="errors" filled>
+              {{ $t('actions.save') }}
+            </base-button>
+          </ds-flex-item>
+        </ds-flex>
       </base-card>
     </template>
   </ds-form>
@@ -80,7 +96,7 @@
 <script>
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
-import HcEditor from '~/components/Editor/Editor'
+import Editor from '~/components/Editor/Editor'
 import PostMutations from '~/graphql/PostMutations.js'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import ImageUploader from '~/components/Uploader/ImageUploader'
@@ -89,7 +105,7 @@ import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParams
 
 export default {
   components: {
-    HcEditor,
+    Editor,
     ImageUploader,
     PageParamsLink,
     CategoriesSelect,
@@ -99,8 +115,8 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    groupId: {
-      type: String,
+    group: {
+      type: Object,
       default: () => null,
     },
   },
@@ -151,6 +167,15 @@ export default {
     }),
     contentLength() {
       return this.$filters.removeHtml(this.formData.content).length
+    },
+    groupId() {
+      return this.group && this.group.id
+    },
+    showGroupHint() {
+      return this.groupId && ['closed', 'hidden'].includes(this.group.groupType)
+    },
+    groupName() {
+      return this.group && this.group.name
     },
   },
   methods: {
@@ -284,9 +309,22 @@ export default {
     align-self: flex-end;
   }
 
-  > .buttons {
+  > .buttons-footer {
+    justify-content: flex-end;
     align-self: flex-end;
+    width: 100%;
     margin-top: $space-base;
+
+    > .action-buttons-group {
+      margin-left: auto;
+      display: flex;
+      justify-content: flex-end;
+
+      > button {
+        margin-left: 1em;
+        min-width: fit-content;
+      }
+    }
   }
 
   .blur-toggle {
@@ -295,6 +333,31 @@ export default {
 
     > .link {
       display: block;
+    }
+  }
+
+  @media screen and (max-width: 656px) {
+    > .buttons-footer {
+      flex-direction: column;
+      margin-top: 5px;
+
+      > .action-buttons-group {
+        > button {
+          margin-left: 1em;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 280px) {
+    > .buttons-footer {
+      > .action-buttons-group {
+        flex-direction: column;
+
+        > button {
+          margin-bottom: 5px;
+        }
+      }
     }
   }
 }

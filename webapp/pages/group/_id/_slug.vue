@@ -102,6 +102,7 @@
               :group="group || {}"
               :userId="currentUser.id"
               :isMember="isGroupMember"
+              :isNonePendingMember="isGroupMemberNonePending"
               :disabled="isGroupOwner"
               :loading="$apollo.loading"
               @prepare="prepareJoinLeave"

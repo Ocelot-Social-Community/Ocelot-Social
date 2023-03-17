@@ -43,47 +43,30 @@
               &nbsp;
               <base-icon class="my-filter-button" :name="filterButtonIcon"></base-icon>
             </base-button>
-            <span v-if="postsFilter['categories_some']">
-              <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
-                {{ $t('contribution.filterMasonryGrid.myTopics') }}
-              </base-button>
-              <base-button
-                class="filter-remove"
-                @click="resetCategories"
-                icon="close"
-                :title="$t('filter-menu.deleteFilter')"
-                style="margin-left: -8px"
-                filled
-              />
-            </span>
-            <span v-if="postsFilter['author']">
-              <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
-                {{ $t('contribution.filterMasonryGrid.myFriends') }}
-              </base-button>
-              <base-button
-                class="filter-remove"
-                @click="resetByFollowed"
-                icon="close"
-                :title="$t('filter-menu.deleteFilter')"
-                style="margin-left: -8px"
-                filled
-              />
-            </span>
 
-            <span v-if="postsFilter['postsInMyGroups']">
-              <base-button class="my-filter-button" right @click="showFilter = !showFilter" filled>
-                {{ $t('contribution.filterMasonryGrid.myGroups') }}
-              </base-button>
-              <base-button
-                class="filter-remove"
-                @click="resetByGroups"
-                icon="close"
-                :title="$t('filter-menu.deleteFilter')"
-                style="margin-left: -8px"
-                filled
-              />
-            </span>
+            <header-button
+              v-if="postsFilter['categories_some']"
+              :title="$t('contribution.filterMasonryGrid.myTopics')"
+              :clickButton="openFilterMenu"
+              :titleRemove="$t('filter-menu.deleteFilter')"
+              :clickRemove="resetCategories"
+            />
 
+            <header-button
+              v-if="postsFilter['author']"
+              :title="$t('contribution.filterMasonryGrid.myFriends')"
+              :clickButton="openFilterMenu"
+              :titleRemove="$t('filter-menu.deleteFilter')"
+              :clickRemove="resetByFollowed"
+            />
+
+            <header-button
+              v-if="postsFilter['postsInMyGroups']"
+              :title="$t('contribution.filterMasonryGrid.myGroups')"
+              :clickButton="openFilterMenu"
+              :titleRemove="$t('filter-menu.deleteFilter')"
+              :clickRemove="resetByGroups"
+            />
             <div id="my-filter" v-if="showFilter">
               <div @mouseleave="showFilter = false">
                 <filter-menu-component @showFilterMenu="showFilterMenu" />
@@ -92,16 +75,16 @@
           </div>
         </div>
       </ds-grid-item>
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
+      <!-- Placeholder/Space Row -->
+      <ds-grid-item :row-span="1" column-span="fullWidth" />
+      <!-- hashtag filter -->
       <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </ds-grid-item>
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
       <!-- donation info -->
       <ds-grid-item v-if="showDonations" class="top-info-bar" :row-span="1" column-span="fullWidth">
         <donation-info :goal="goal" :progress="progress" />
       </ds-grid-item>
-      <ds-space :margin-bottom="{ base: 'small', md: 'base', lg: 'large' }" />
       <!-- news feed -->
       <template v-if="hasResults">
         <masonry-grid-item
@@ -142,6 +125,7 @@ import HcEmpty from '~/components/Empty/Empty'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
+import HeaderButton from '~/components/FilterMenu/HeaderButton'
 import { mapGetters, mapMutations } from 'vuex'
 import { DonationsQuery } from '~/graphql/Donations'
 import { filterPosts } from '~/graphql/PostQuery.js'
@@ -159,6 +143,7 @@ export default {
     MasonryGrid,
     MasonryGridItem,
     FilterMenuComponent,
+    HeaderButton,
   },
   mixins: [postListActions],
   data() {
@@ -167,7 +152,7 @@ export default {
       hideByScroll: false,
       revScrollpos: 0,
       showFilter: false,
-      showDonations: true,
+      showDonations: false,
       goal: 15000,
       progress: 7000,
       posts: [],
@@ -225,6 +210,9 @@ export default {
       resetCategories: 'posts/RESET_CATEGORIES',
       toggleCategory: 'posts/TOGGLE_CATEGORY',
     }),
+    openFilterMenu() {
+      this.showFilter = !this.showFilter
+    },
     showFilterMenu(e) {
       if (!e || (!e.target.closest('#my-filter') && !e.target.closest('.my-filter-button'))) {
         if (!this.showFilter) return
@@ -354,12 +342,17 @@ export default {
   align-items: center;
 }
 .filterButtonMenu {
+  width: 95%;
   position: fixed;
   z-index: 6;
   margin-top: -35px;
-  padding: 20px 10px 5px 10px;
-  border-radius: 7px;
+  padding: 20px 10px 20px 10px;
   background-color: #f5f4f6;
+}
+@media screen and (max-width: 656px) {
+  .filterButtonMenu {
+    margin-top: -50px;
+  }
 }
 #my-filter {
   background-color: white;
@@ -417,6 +410,9 @@ export default {
     width: 44px;
     font-size: 23px;
     z-index: 10;
+  }
+  .ds-grid {
+    padding-top: 1em;
   }
 }
 </style>
