@@ -17,13 +17,10 @@
           />
         </nuxt-link>
       </client-only>
-    </div>
-    <masonry-grid>
-      <!--Filter Button-->
-      <ds-grid-item
-        v-if="categoriesActive && SHOW_CONTENT_FILTER_MASONRY_GRID"
-        :row-span="1"
-        column-span="fullWidth"
+    </div>    
+    <div>
+      <div
+        v-if="categoriesActive && SHOW_CONTENT_FILTER_MASONRY_GRID"        
         class="top-filter-menu"
       >
         <div class="filterButtonBox">
@@ -74,17 +71,19 @@
             </div>
           </div>
         </div>
-      </ds-grid-item>
-      <!-- Placeholder/Space Row -->
-      <ds-grid-item :row-span="1" column-span="fullWidth" />
-      <!-- hashtag filter -->
-      <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
+      </div>
+    </div>
+
+    <div v-if="hashtag || showDonations" class="newsfeed-controls">      
+      <div v-if="hashtag">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
-      </ds-grid-item>
-      <!-- donation info -->
-      <ds-grid-item v-if="showDonations" class="top-info-bar" :row-span="1" column-span="fullWidth">
+      </div>
+      <div v-if="showDonations" class="top-info-bar">
         <donation-info :goal="goal" :progress="progress" />
-      </ds-grid-item>
+      </div>
+    </div>
+    <!-- content grid -->
+    <masonry-grid>
       <!-- news feed -->
       <template v-if="hasResults">
         <masonry-grid-item
@@ -336,6 +335,10 @@ export default {
   box-shadow: $box-shadow-x-large;
 }
 
+.top-filter-menu{
+  margin-top: 16px;
+}
+
 .top-info-bar,
 .top-filter-menu {
   display: flex;
@@ -345,9 +348,12 @@ export default {
   width: 95%;
   position: fixed;
   z-index: 6;
-  margin-top: -35px;
-  padding: 20px 10px 20px 10px;
+  margin-top: -45px;
+  padding: 30px 0px 20px 0px;
   background-color: #f5f4f6;
+}
+.newsfeed-controls{
+  margin-top: 46px;
 }
 @media screen and (max-width: 656px) {
   .filterButtonMenu {
@@ -414,5 +420,14 @@ export default {
   .ds-grid {
     padding-top: 1em;
   }
+}
+@media screen and (max-width: 650px) {
+//    .top-filter-menu{
+//     margin-top: 24px;
+//   }
+
+.newsfeed-controls{
+  margin-top: 32px;
+}
 }
 </style>
