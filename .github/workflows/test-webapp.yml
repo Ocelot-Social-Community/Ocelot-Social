@@ -5,11 +5,11 @@ on: [push]
 
 jobs:
   files-changed:
-    name: Detect File Changes - Wepapp
+    name: Detect File Changes - Webapp
     runs-on: ubuntu-latest
     outputs:
       docker: ${{ steps.changes.outputs.docker }}
-      webbapp: ${{ steps.changes.outputs.webbapp }}
+      webapp: ${{ steps.changes.outputs.webapp }}
     steps:
       - uses: actions/checkout@v3.3.0
 
@@ -23,7 +23,7 @@ jobs:
 
   prepare:
     name: Prepare
-    if: needs.files-changed.outputs.webbapp
+    if: needs.files-changed.outputs.webapp
     needs: files-changed
     runs-on: ubuntu-latest
     steps:
@@ -36,8 +36,8 @@ jobs:
           scripts/translations/missing-keys.sh
           
   build_test_webapp:
-    name: Docker Build Test - WebApp
-    if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webbapp
+    name: Docker Build Test - Webapp
+    if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp
     needs: [files-changed, prepare]
     runs-on: ubuntu-latest
     steps:
@@ -57,7 +57,7 @@ jobs:
 
   lint_webapp:
     name: Lint webapp
-    if: needs.files-changed.outputs.webbapp
+    if: needs.files-changed.outputs.webapp
     needs: files-changed
     runs-on: ubuntu-latest
     steps:
@@ -69,7 +69,7 @@ jobs:
 
   unit_test_webapp:
     name: Unit tests - webapp
-    if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webbapp
+    if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp
     needs: [files-changed, build_test_webapp]
     runs-on: ubuntu-latest
     permissions: 
