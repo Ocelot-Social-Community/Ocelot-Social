@@ -17,6 +17,8 @@
         <p>
           <strong v-if="isComment" class="comment">{{ $t(`notifications.comment`) }}:</strong>
           {{ from.contentExcerpt | removeHtml }}
+          <strong v-if="isGroup" class="comment">{{ $t(`notifications.group`) }}:</strong>
+          {{ from.descriptionExcerpt | removeHtml }}
         </p>
       </base-card>
     </nuxt-link>
