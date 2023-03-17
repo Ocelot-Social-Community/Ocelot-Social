@@ -289,7 +289,8 @@
       },
       "supportedFormats": "Insert a picture of file format JPG, PNG or GIF"
     },
-    "title": "Title"
+    "title": "Title",
+    "visibleOnlyForMembersOfGroup": "This post will only be visible to members of the “<b>{name}</b>” group."
   },
   "delete": {
     "cancel": "Cancel",
@@ -447,7 +448,10 @@
     "in": "in",
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
-      "join": "Join"
+      "join": "Join",
+      "leave": "Leave",
+      "pendingMember": "Pending member",
+      "tooltip": "The group owner has yet to confirm you."
     },
     "labelSlug": "Unique group name",
     "leaveModal": {
@@ -482,7 +486,7 @@
       "admin": "Administrator",
       "owner": "Owner",
       "pending": "Pending Member",
-      "usual": "Simple Member"
+      "usual": "Member"
     },
     "save": "Create new group",
     "type": "Visibility of the group",
