@@ -21,6 +21,23 @@ jobs:
           filters: .github/file-filters.yml
           list-files: shell
 
+  files-changed:
+    name: Detect File Changes - Backend
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.changes.outputs.backend }}
+      docker: ${{ steps.changes.outputs.docker }}
+    steps:
+      - uses: actions/checkout@v3.3.0
+
+      - name: Check for frontend file changes
+        uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          token: ${{ github.token }}
+          filters: .github/file-filters.yml
+          list-files: shell
+
   build_test_neo4j:
     name: Docker Build Test - Neo4J
     if: needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true'
@@ -76,9 +93,8 @@ jobs:
   unit_test_backend:
     name: Unit tests - backend
     if: needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true'
-    needs: files-changed
+    needs: [files-changed, build_test_neo4j, build_test_backend]
     runs-on: ubuntu-latest
-    needs: [build_test_neo4j,build_test_backend]
     permissions: 
       checks: write
     steps:
