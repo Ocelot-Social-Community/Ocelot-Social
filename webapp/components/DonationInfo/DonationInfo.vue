@@ -46,6 +46,6 @@ export default {
 .donation-info {
   display: flex;
   flex: 1;
-  margin-bottom: $space-x-small;
+  margin-bottom: 3vh;
 }
 </style>
