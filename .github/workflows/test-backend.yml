@@ -78,6 +78,8 @@ jobs:
       - name: Load Docker Image
         run: docker load < /tmp/backend.tar
 
+      - name: backend | copy env files webapp
+        run: cp webapp/.env.template webapp/.env
       - name: backend | copy env files backend
         run: cp backend/.env.template backend/.env
 
