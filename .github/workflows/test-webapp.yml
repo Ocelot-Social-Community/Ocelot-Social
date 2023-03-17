@@ -5,7 +5,7 @@ on: [push]
 
 jobs:
   files-changed:
-    name: Detect File Changes - Backend
+    name: Detect File Changes - Wepapp
     runs-on: ubuntu-latest
     outputs:
       docker: ${{ steps.changes.outputs.docker }}
