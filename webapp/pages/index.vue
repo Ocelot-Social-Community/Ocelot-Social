@@ -75,6 +75,8 @@
           </div>
         </div>
       </ds-grid-item>
+      <!-- Placeholder/Space Row -->
+      <ds-grid-item :row-span="1" column-span="fullWidth" />
       <!-- hashtag filter -->
       <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
@@ -344,7 +346,7 @@ export default {
   position: fixed;
   z-index: 6;
   margin-top: -35px;
-  padding: 20px 10px 16px 10px;
+  padding: 20px 0 16px 0;
   background-color: #f5f4f6;
 }
 @media screen and (max-width: 656px) {
