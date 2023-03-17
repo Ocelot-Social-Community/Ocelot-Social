@@ -9,7 +9,10 @@
     <ds-space margin="large" />
     <ds-flex :width="{ base: '100%' }" gutter="base">
       <ds-flex-item :width="{ base: '100%', md: 3 }">
-        <contribution-form :contribution="contribution" />
+        <contribution-form
+          :contribution="contribution"
+          :group="contribution && contribution.group ? contribution.group : null"
+        />
       </ds-flex-item>
       <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
     </ds-flex>

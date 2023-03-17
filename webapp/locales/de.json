@@ -289,7 +289,8 @@
       },
       "supportedFormats": "Füge ein Bild im Dateiformat JPG, PNG oder GIF ein"
     },
-    "title": "Titel"
+    "title": "Titel",
+    "visibleOnlyForMembersOfGroup": "Dieser Beitrag wird nur für Mitglieder der Gruppe „<b>{name}</b>“ sichtbar sein."
   },
   "delete": {
     "cancel": "Abbrechen",
