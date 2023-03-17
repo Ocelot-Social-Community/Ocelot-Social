@@ -14,6 +14,6 @@ When("I click on {string}", element => {
   }
 
   cy.get(elementSelectors[element])
-    .click({force: true})
+    .click()
     .wait(750);
 });
