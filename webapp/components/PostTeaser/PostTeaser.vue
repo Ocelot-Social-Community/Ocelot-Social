@@ -194,6 +194,7 @@ export default {
   display: block;
   height: 100%;
   color: $text-color-base;
+  padding-top: 2vh;
 }
 
 .post-user-row {
