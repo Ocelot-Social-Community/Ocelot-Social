@@ -84,7 +84,10 @@
               <ds-flex-item>
                 <base-card :wide-content="true">
                   <b :class="{ 'notification-status': notification.read }">
-                    {{ notification.from.contentExcerpt | removeHtml }}
+                    {{
+                      notification.from.contentExcerpt ||
+                      notification.from.descriptionExcerpt | removeHtml
+                    }}
                   </b>
                 </base-card>
               </ds-flex-item>

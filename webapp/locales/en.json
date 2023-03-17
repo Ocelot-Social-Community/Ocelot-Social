@@ -636,7 +636,7 @@
   },
   "notifications": {
     "comment": "Comment",
-    "content": "Content",
+    "content": "Content or Description",
     "empty": "Sorry, you don't have any notifications at the moment.",
     "filterLabel": {
       "all": "All",

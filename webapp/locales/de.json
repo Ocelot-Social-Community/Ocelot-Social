@@ -636,7 +636,7 @@
   },
   "notifications": {
     "comment": "Kommentar",
-    "content": "Inhalt",
+    "content": "Inhalt oder Beschreibung",
     "empty": "Bedaure, Du hast momentan keinerlei Benachrichtigungen.",
     "filterLabel": {
       "all": "Alle",
