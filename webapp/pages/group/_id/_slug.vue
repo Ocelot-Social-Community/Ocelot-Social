@@ -564,7 +564,7 @@ export default {
     // },
     prepareJoinLeave() {
       // "membersCountStartValue" is updated to avoid counting from 0 when join/leave
-      this.membersCountStartValue = this.GroupMembers.length
+      this.membersCountStartValue = (this.GroupMembers && this.GroupMembers.length) || 0
     },
     updateJoinLeave({ myRoleInGroup }) {
       this.Group[0].myRole = myRoleInGroup
