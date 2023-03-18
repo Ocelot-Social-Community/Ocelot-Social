@@ -640,20 +640,25 @@
   },
   "notifications": {
     "comment": "Kommentar",
-    "content": "Inhalt",
+    "content": "Inhalt oder Beschreibung",
     "empty": "Bedaure, Du hast momentan keinerlei Benachrichtigungen.",
     "filterLabel": {
       "all": "Alle",
       "read": "Gelesen",
       "unread": "Ungelesen"
     },
+    "group": "Beschreibung",
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
-    "post": "Beitrag",
+    "post": "Beitrag oder Gruppe",
     "reason": {
+      "changed_group_member_role": "Hat Deine Rolle in der Gruppe geändert …",
       "commented_on_post": "Hat Deinen Beitrag kommentiert …",
       "mentioned_in_comment": "Hat Dich in einem Kommentar erwähnt …",
-      "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …"
+      "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …",
+      "removed_user_from_group": "Hat Dich aus der Gruppe entfernt …",
+      "user_joined_group": "Ist Deiner Gruppe beigetreten …",
+      "user_left_group": "Hat deine Gruppe verlassen …"
     },
     "title": "Benachrichtigungen",
     "user": "Nutzer"
