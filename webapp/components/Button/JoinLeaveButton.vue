@@ -58,6 +58,14 @@ export default {
       }
       return this.$t('group.joinLeaveButton.join')
     },
+    tooltip() {
+      return {
+        content: this.$t('group.joinLeaveButton.tooltip'),
+        placement: 'right',
+        show: this.isMember && !this.isNonePendingMember && this.hovered,
+        trigger: 'manual',
+      }
+    },
   },
   watch: {
     isMember() {
@@ -72,14 +80,6 @@ export default {
     ...mapMutations({
       commitModalData: 'modal/SET_OPEN',
     }),
-    tooltip() {
-      return {
-        content: this.$t('group.joinLeaveButton.tooltip'),
-        placement: 'right',
-        show: this.isMember && !this.isNonePendingMember && this.hovered,
-        trigger: this.isMember && !this.isNonePendingMember ? 'hover' : 'manual',
-      }
-    },
     onHover() {
       if (!this.disabled && !this.localLoading) {
         this.hovered = true
