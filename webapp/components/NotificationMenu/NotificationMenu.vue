@@ -12,22 +12,27 @@
         <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
       </base-button>
     </template>
-    <template #popover>
+    <template #popover="{ closeMenu }">
       <div class="notifications-menu-popover">
         <notification-list :notifications="notifications" @markAsRead="markAsRead" />
       </div>
       <ds-flex class="notifications-link-container">
-        <ds-flex-item :width="{ base: 'auto' }" centered>
+        <ds-flex-item class="notifications-link-container-item" :width="{ base: '100%' }" centered>
           <nuxt-link :to="{ name: 'notifications' }">
-            <ds-button ghost primary>
+            <base-button ghost primary>
               {{ $t('notifications.pageLink') }}
-            </ds-button>
+            </base-button>
           </nuxt-link>
         </ds-flex-item>
-        <ds-flex-item :width="{ base: 'auto' }" centered>
-          <ds-button ghost primary @click="markAllAsRead" data-test="markAllAsRead-button">
+        <ds-flex-item class="notifications-link-container-item" :width="{ base: '100%' }" centered>
+          <base-button
+            ghost
+            primary
+            @click="markAllAsRead(closeMenu)"
+            data-test="markAllAsRead-button"
+          >
             {{ $t('notifications.markAllAsRead') }}
-          </ds-button>
+          </base-button>
         </ds-flex-item>
       </ds-flex>
     </template>
@@ -74,11 +79,12 @@ export default {
         this.$toast.error(error.message)
       }
     },
-    async markAllAsRead() {
+    async markAllAsRead(closeMenu) {
       if (!this.hasNotifications) {
         return
       }
 
+      closeMenu()
       try {
         await this.$apollo.mutate({
           mutation: markAllAsReadMutation(this.$i18n),
@@ -144,16 +150,15 @@ export default {
 <style lang="scss">
 .notifications-menu-popover {
   max-width: 500px;
-  margin-bottom: $size-height-base;
 }
 .notifications-link-container {
   background-color: $background-color-softer-active;
   justify-content: center;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: $size-height-base;
   padding: $space-x-small;
+  flex-direction: row;
+}
+.notifications-link-container-item {
+  justify-content: center;
+  display: flex;
 }
 </style>
