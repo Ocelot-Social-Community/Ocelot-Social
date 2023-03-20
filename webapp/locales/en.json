@@ -289,7 +289,8 @@
       },
       "supportedFormats": "Insert a picture of file format JPG, PNG or GIF"
     },
-    "title": "Title"
+    "title": "Title",
+    "visibleOnlyForMembersOfGroup": "This post will only be visible to members of the “<b>{name}</b>” group."
   },
   "delete": {
     "cancel": "Cancel",
@@ -639,20 +640,25 @@
   },
   "notifications": {
     "comment": "Comment",
-    "content": "Content",
+    "content": "Content or Description",
     "empty": "Sorry, you don't have any notifications at the moment.",
     "filterLabel": {
       "all": "All",
       "read": "Read",
       "unread": "Unread"
     },
+    "group": "Description",
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
-    "post": "Post",
+    "post": "Post or Group",
     "reason": {
+      "changed_group_member_role": "Changed your role in group …",
       "commented_on_post": "Commented on your post …",
       "mentioned_in_comment": "Mentioned you in a comment …",
-      "mentioned_in_post": "Mentioned you in a post …"
+      "mentioned_in_post": "Mentioned you in a post …",
+      "removed_user_from_group": "Removed you from group …",
+      "user_joined_group": "Joined your group …",
+      "user_left_group": "Left your group …"
     },
     "title": "Notifications",
     "user": "User"
