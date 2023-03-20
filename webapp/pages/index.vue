@@ -17,12 +17,9 @@
           />
         </nuxt-link>
       </client-only>
-    </div>    
+    </div>
     <div>
-      <div
-        v-if="categoriesActive && SHOW_CONTENT_FILTER_MASONRY_GRID"        
-        class="top-filter-menu"
-      >
+      <div v-if="categoriesActive && SHOW_CONTENT_FILTER_MASONRY_GRID" class="top-filter-menu">
         <div class="filterButtonBox">
           <div class="filterButtonMenu" :class="{ 'hide-filter': hideByScroll }">
             <base-button
@@ -74,7 +71,7 @@
       </div>
     </div>
 
-    <div v-if="hashtag || showDonations" class="newsfeed-controls">      
+    <div v-if="hashtag || showDonations" class="newsfeed-controls">
       <div v-if="hashtag">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </div>
@@ -83,7 +80,7 @@
       </div>
     </div>
     <!-- content grid -->
-    <masonry-grid>
+    <masonry-grid :class="[!hashtag && !showDonations ? 'grid-margin-top' : '']">
       <!-- news feed -->
       <template v-if="hasResults">
         <masonry-grid-item
@@ -335,7 +332,7 @@ export default {
   box-shadow: $box-shadow-x-large;
 }
 
-.top-filter-menu{
+.top-filter-menu {
   margin-top: 16px;
 }
 
@@ -352,7 +349,7 @@ export default {
   padding: 30px 0px 20px 0px;
   background-color: #f5f4f6;
 }
-.newsfeed-controls{
+.newsfeed-controls {
   margin-top: 46px;
 }
 @media screen and (max-width: 656px) {
@@ -366,6 +363,9 @@ export default {
   max-height: 950px;
   overflow: auto;
   padding-bottom: 0px;
+}
+.grid-margin-top {
+  margin-top: 26px;
 }
 @media screen and (min-height: 401px) {
   #my-filter {
@@ -422,12 +422,16 @@ export default {
   }
 }
 @media screen and (max-width: 650px) {
-//    .top-filter-menu{
-//     margin-top: 24px;
-//   }
+  //    .top-filter-menu{
+  //     margin-top: 24px;
+  //   }
 
-.newsfeed-controls{
-  margin-top: 32px;
-}
+  .newsfeed-controls {
+    margin-top: 32px;
+  }
+
+  .grid-margin-top {
+    margin-top: 6px;
+  }
 }
 </style>
