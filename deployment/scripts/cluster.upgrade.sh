@@ -18,7 +18,7 @@ DOCKERHUB_OCELOT_TAG=${DOCKERHUB_OCELOT_TAG:-"latest"}
 # upgrade with helm
 helm --kubeconfig=${KUBECONFIG} upgrade ocelot \
   --values ${VALUES} \
-  --set appVersion="${DOCKERHUB_OCELOT_TAG}"
+  --set appVersion="${DOCKERHUB_OCELOT_TAG}" \
   ${SCRIPT_DIR}/../src/kubernetes/ \
   --debug \
   --timeout 10m
