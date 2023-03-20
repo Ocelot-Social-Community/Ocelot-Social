@@ -12,7 +12,7 @@
         <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
       </base-button>
     </template>
-    <template #popover>
+    <template #popover="{ closeMenu }">
       <div class="notifications-menu-popover">
         <notification-list :notifications="notifications" @markAsRead="markAsRead" />
       </div>
@@ -25,7 +25,7 @@
           </nuxt-link>
         </ds-flex-item>
         <ds-flex-item :width="{ base: 'auto' }" centered>
-          <ds-button ghost primary @click="markAllAsRead" data-test="markAllAsRead-button">
+          <ds-button ghost primary @click="markAllAsRead(closeMenu)" data-test="markAllAsRead-button">
             {{ $t('notifications.markAllAsRead') }}
           </ds-button>
         </ds-flex-item>
@@ -74,11 +74,12 @@ export default {
         this.$toast.error(error.message)
       }
     },
-    async markAllAsRead() {
+    async markAllAsRead(closeMenu) {
       if (!this.hasNotifications) {
         return
       }
 
+      closeMenu()
       try {
         await this.$apollo.mutate({
           mutation: markAllAsReadMutation(this.$i18n),
