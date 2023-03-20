@@ -165,13 +165,13 @@ export default {
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
-    color: #70677e
+    color: #70677e;
   }
 
-  .text {   
+  .text {
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis; 
+    text-overflow: ellipsis;
 
     > .ds-text {
       display: inline;
