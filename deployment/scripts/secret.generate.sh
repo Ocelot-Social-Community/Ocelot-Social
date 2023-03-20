@@ -7,8 +7,13 @@
 SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
+# check CONFIGURATION
+if [ -z ${CONFIGURATION} ]; then
+  echo "You must provide a `CONFIGURATION` via environment variable"
+  exit 1
+fi
+
 # configuration
-CONFIGURATION=${CONFIGURATION:-"example"}
 SECRET_FILE=${SCRIPT_DIR}/../configurations/${CONFIGURATION}/SECRET
 
 openssl rand -base64 32 > ${SECRET_FILE}
