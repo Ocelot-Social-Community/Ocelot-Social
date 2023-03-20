@@ -12,7 +12,7 @@ fi
 
 # configuration
 KUBECONFIG=${KUBECONFIG:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubeconfig.yaml}
-VALUES=${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubernetes/values.
+VALUES=${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubernetes/values.yaml
 DOCKERHUB_OCELOT_TAG=${DOCKERHUB_OCELOT_TAG:-"latest"}
 
 # upgrade with helm
