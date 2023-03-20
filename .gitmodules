@@ -1,3 +1,6 @@
 [submodule "styleguide"]
 	path = styleguide
 	url = https://github.com/Human-Connection/Nitro-Styleguide.git
+[submodule "deployment/configurations/stage.ocelot.social"]
+	path = deployment/configurations/stage.ocelot.social
+	url = git@github.com:Ocelot-Social-Community/stage.ocelot.social.git
