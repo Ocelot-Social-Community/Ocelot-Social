@@ -1,4 +1,4 @@
-import { gql } from '../helpers/jest'
+import gql from 'graphql-tag'
 import { cleanDatabase } from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
 import { createTestClient } from 'apollo-server-testing'
@@ -24,6 +24,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
+  driver.close()
 })
 
 beforeEach(async () => {

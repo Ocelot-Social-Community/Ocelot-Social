@@ -1,12 +1,14 @@
 import Vuex from 'vuex'
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import TermsAndConditionsConfirm from './terms-and-conditions-confirm.vue'
 import VueMeta from 'vue-meta'
 
 const localVue = global.localVue
 localVue.use(VueMeta, { keyName: 'head' })
 
-config.stubs['nuxt-link'] = '<span class="nuxt-link"><slot /></span>'
+const stubs = {
+  'nuxt-link': true,
+}
 
 describe('terms-and-conditions-confirm.vue', () => {
   let wrapper
@@ -45,12 +47,13 @@ describe('terms-and-conditions-confirm.vue', () => {
       return mount(TermsAndConditionsConfirm, {
         mocks,
         localVue,
+        stubs,
       })
     }
 
     it('renders', async () => {
       wrapper = await Wrapper()
-      expect(wrapper.is('div')).toBe(true)
+      expect(wrapper.element.tagName).toBe('DIV')
     })
 
     it('has correct <head> content', async () => {

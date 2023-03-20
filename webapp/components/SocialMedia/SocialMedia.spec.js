@@ -1,8 +1,10 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import SocialMedia from './SocialMedia.vue'
 
-config.stubs['ds-space'] = '<span><slot /></span>'
-config.stubs['ds-text'] = '<span><slot /></span>'
+const stubs = {
+  'ds-space': true,
+  'ds-text': true,
+}
 
 describe('SocialMedia.vue', () => {
   let propsData
@@ -18,7 +20,7 @@ describe('SocialMedia.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(SocialMedia, { propsData, mocks })
+      return mount(SocialMedia, { propsData, mocks, stubs })
     }
 
     describe('socialMedia card title', () => {

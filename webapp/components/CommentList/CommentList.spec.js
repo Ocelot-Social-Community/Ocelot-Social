@@ -1,4 +1,4 @@
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import CommentList from './CommentList'
 import Vuex from 'vuex'
 import Vue from 'vue'
@@ -7,10 +7,6 @@ const localVue = global.localVue
 
 localVue.filter('truncate', (string) => string)
 localVue.directive('scrollTo', jest.fn())
-
-config.stubs['v-popover'] = '<span><slot /></span>'
-config.stubs['nuxt-link'] = '<span><slot /></span>'
-config.stubs['client-only'] = '<span><slot /></span>'
 
 describe('CommentList.vue', () => {
   let mocks, store, wrapper, propsData, stubs
@@ -72,7 +68,10 @@ describe('CommentList.vue', () => {
         },
       }
       stubs = {
-        EditorContent: "<div class='stub'></div>",
+        EditorContent: true,
+        'v-popover': true,
+        'nuxt-link': true,
+        'client-only': true,
       }
     })
 
@@ -92,7 +91,9 @@ describe('CommentList.vue', () => {
     })
 
     describe('scrollToAnchor mixin', () => {
-      beforeEach(jest.useFakeTimers)
+      beforeEach(() => {
+        jest.useFakeTimers()
+      })
 
       describe('$route.hash !== `#comments`', () => {
         it('skips $scrollTo', () => {

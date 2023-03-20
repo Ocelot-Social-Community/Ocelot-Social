@@ -1,26 +1,29 @@
 import gql from 'graphql-tag'
 import {
   userCountsFragment,
-  locationAndBadgesFragment,
+  locationFragment,
+  badgesFragment,
   userFragment,
   postFragment,
   commentFragment,
+  groupFragment,
 } from './Fragments'
 
-export default (i18n) => {
+export const profileUserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
     ${userFragment}
     ${userCountsFragment}
-    ${locationAndBadgesFragment(lang)}
+    ${locationFragment(lang)}
+    ${badgesFragment}
 
-    query User($id: ID!, $followedByCount: Int, $followingCount: Int) {
+    query User($id: ID!, $followedByCount: Int!, $followingCount: Int!) {
       User(id: $id) {
         ...user
         ...userCounts
-        ...locationAndBadges
+        ...location
+        ...badges
         about
-        locationName
         createdAt
         followedByCurrentUser
         isMuted
@@ -29,12 +32,14 @@ export default (i18n) => {
         following(first: $followingCount) {
           ...user
           ...userCounts
-          ...locationAndBadges
+          ...location
+          ...badges
         }
         followedBy(first: $followedByCount) {
           ...user
           ...userCounts
-          ...locationAndBadges
+          ...location
+          ...badges
         }
         socialMedia {
           id
@@ -62,11 +67,54 @@ export const minimisedUserQuery = () => {
   `
 }
 
-export const notificationQuery = (i18n) => {
+export const adminUserQuery = () => {
+  return gql`
+    query ($filter: _UserFilter, $first: Int, $offset: Int, $email: String) {
+      User(
+        email: $email
+        filter: $filter
+        first: $first
+        offset: $offset
+        orderBy: createdAt_desc
+      ) {
+        id
+        name
+        slug
+        email
+        role
+        createdAt
+        contributionsCount
+        commentedCount
+        shoutedCount
+      }
+    }
+  `
+}
+
+export const mapUserQuery = (i18n) => {
+  const lang = i18n.locale().toUpperCase()
+  return gql`
+    ${userFragment}
+    ${locationFragment(lang)}
+    ${badgesFragment}
+
+    query {
+      User {
+        ...user
+        about
+        ...location
+        ...badges
+      }
+    }
+  `
+}
+
+export const notificationQuery = (_i18n) => {
   return gql`
     ${userFragment}
     ${commentFragment}
     ${postFragment}
+    ${groupFragment}
 
     query ($read: Boolean, $orderBy: NotificationOrdering, $first: Int, $offset: Int) {
       notifications(read: $read, orderBy: $orderBy, first: $first, offset: $offset) {
@@ -75,6 +123,9 @@ export const notificationQuery = (i18n) => {
         reason
         createdAt
         updatedAt
+        to {
+          ...user
+        }
         from {
           __typename
           ... on Post {
@@ -95,17 +146,24 @@ export const notificationQuery = (i18n) => {
               }
             }
           }
+          ... on Group {
+            ...group
+          }
+        }
+        relatedUser {
+          ...user
         }
       }
     }
   `
 }
 
-export const markAsReadMutation = (i18n) => {
+export const markAsReadMutation = (_i18n) => {
   return gql`
     ${userFragment}
     ${commentFragment}
     ${postFragment}
+    ${groupFragment}
 
     mutation ($id: ID!) {
       markAsRead(id: $id) {
@@ -130,6 +188,49 @@ export const markAsReadMutation = (i18n) => {
                 ...user
               }
             }
+          }
+          ... on Group {
+            ...group
+          }
+        }
+      }
+    }
+  `
+}
+
+export const markAllAsReadMutation = (_i18n) => {
+  return gql`
+    ${userFragment}
+    ${commentFragment}
+    ${postFragment}
+    ${groupFragment}
+
+    mutation {
+      markAllAsRead {
+        id
+        read
+        reason
+        createdAt
+        updatedAt
+        from {
+          __typename
+          ... on Post {
+            ...post
+            author {
+              ...user
+            }
+          }
+          ... on Comment {
+            ...comment
+            post {
+              ...post
+              author {
+                ...user
+              }
+            }
+          }
+          ... on Group {
+            ...group
           }
         }
       }

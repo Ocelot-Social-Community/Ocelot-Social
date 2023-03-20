@@ -15,6 +15,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
+  driver.close()
 })
 
 beforeEach(async () => {
@@ -78,7 +79,7 @@ describe('deleteImage', () => {
         await expect(someString).toEqual('Hello')
       })
 
-      it('rolls back the transaction in case of errors', async (done) => {
+      it('rolls back the transaction in case of errors', async () => {
         await expect(neode.all('Image')).resolves.toHaveLength(1)
         const session = driver.session()
         try {
@@ -93,7 +94,6 @@ describe('deleteImage', () => {
           // nothing has been deleted
           await expect(neode.all('Image')).resolves.toHaveLength(1)
           // all good
-          done()
         } finally {
           session.close()
         }
@@ -239,7 +239,7 @@ describe('mergeImage', () => {
           })
         })
 
-        it('rolls back the transaction in case of errors', async (done) => {
+        it('rolls back the transaction in case of errors', async () => {
           const session = driver.session()
           try {
             await session.writeTransaction(async (transaction) => {
@@ -254,7 +254,6 @@ describe('mergeImage', () => {
             // nothing has been created
             await expect(neode.all('Image')).resolves.toHaveLength(0)
             // all good
-            done()
           } finally {
             session.close()
           }

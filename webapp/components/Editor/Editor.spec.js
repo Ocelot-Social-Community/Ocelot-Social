@@ -35,7 +35,7 @@ describe('Editor.vue', () => {
 
   describe('mount', () => {
     it('renders', () => {
-      expect(Wrapper().is('div')).toBe(true)
+      expect(Wrapper().element.tagName).toBe('DIV')
     })
 
     describe('given a piece of text', () => {

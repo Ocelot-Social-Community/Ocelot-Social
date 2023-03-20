@@ -83,7 +83,9 @@
           <template v-if="user.about">
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
-              <ds-text color="soft" size="small" class="hyphenate-text">{{ user.about }}</ds-text>
+              <ds-text align="center" color="soft" size="small" class="hyphenate-text">
+                {{ user.about }}
+              </ds-text>
             </ds-space>
           </template>
         </base-card>
@@ -184,8 +186,7 @@ import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import { profilePagePosts } from '~/graphql/PostQuery'
-import UserQuery from '~/graphql/User'
-import { updateUserMutation } from '~/graphql/User.js'
+import { profileUserQuery, updateUserMutation } from '~/graphql/User'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 import UpdateQuery from '~/components/utils/UpdateQuery'
@@ -383,9 +384,9 @@ export default {
       this.user.followedByCurrentUser = followedByCurrentUser
       this.user.followedBy = followedBy
     },
-    fetchAllConnections(type) {
-      if (type === 'following') this.followingCount = Infinity
-      if (type === 'followedBy') this.followedByCount = Infinity
+    fetchAllConnections(type, count) {
+      if (type === 'following') this.followingCount = count
+      if (type === 'followedBy') this.followedByCount = count
     },
   },
   apollo: {
@@ -408,7 +409,7 @@ export default {
     },
     User: {
       query() {
-        return UserQuery(this.$i18n)
+        return profileUserQuery(this.$i18n)
       },
       variables() {
         return {

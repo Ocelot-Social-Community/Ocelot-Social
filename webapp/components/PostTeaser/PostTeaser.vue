@@ -15,7 +15,13 @@
         <img :src="post.image | proxyApiUrl" class="image" />
       </template>
       <client-only>
-        <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" />
+        <div class="post-user-row">
+          <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" />
+          <hc-ribbon
+            :class="[isPinned ? '--pinned' : '', post.image ? 'post-ribbon-w-img' : 'post-ribbon']"
+            :text="isPinned ? $t('post.pinned') : $t('post.name')"
+          />
+        </div>
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
       <!-- TODO: replace editor content with tiptap render view -->
@@ -26,19 +32,23 @@
         v-observe-visibility="(isVisible, entry) => visibilityChanged(isVisible, entry, post.id)"
       >
         <div class="categories" v-if="categoriesActive">
-          <hc-category
+          <category
             v-for="category in post.categories"
             :key="category.id"
             v-tooltip="{
-              content: $t(`contribution.category.description.${category.slug}`),
+              content: `
+                ${$t(`contribution.category.name.${category.slug}`)}: 
+                ${$t(`contribution.category.description.${category.slug}`)}
+              `,
               placement: 'bottom-start',
             }"
             :icon="category.icon"
+            :filterActive="postsFilter ? postsFilter.id_in.includes(category.id) : false"
           />
         </div>
         <div v-else class="categories-placeholder"></div>
         <counter-icon
-          icon="bullhorn"
+          icon="heart-o"
           :count="post.shoutedCount"
           :title="$t('contribution.amount-shouts', { amount: post.shoutedCount })"
         />
@@ -69,19 +79,15 @@
         </client-only>
       </footer>
     </base-card>
-    <hc-ribbon
-      :class="{ '--pinned': isPinned }"
-      :text="isPinned ? $t('post.pinned') : $t('post.name')"
-    />
   </nuxt-link>
 </template>
 
 <script>
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import Category from '~/components/Category'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import HcRibbon from '~/components/Ribbon'
-import HcCategory from '~/components/Category'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
+import HcRibbon from '~/components/Ribbon'
+import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
 import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostHelpers'
@@ -89,11 +95,11 @@ import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostH
 export default {
   name: 'PostTeaser',
   components: {
-    UserTeaser,
-    HcCategory,
-    HcRibbon,
+    Category,
     ContentMenu,
     CounterIcon,
+    HcRibbon,
+    UserTeaser,
   },
   props: {
     post: {
@@ -101,6 +107,10 @@ export default {
       required: true,
     },
     width: {
+      type: Object,
+      default: () => {},
+    },
+    postsFilter: {
       type: Object,
       default: () => {},
     },
@@ -184,18 +194,37 @@ export default {
   display: block;
   height: 100%;
   color: $text-color-base;
+}
 
-  > .ribbon {
+.post-user-row {
+  position: relative;
+
+  > .post-ribbon-w-img {
     position: absolute;
-    top: 50%;
-    right: -7px;
+    // 14px (~height of ribbon element) + 24px(=margin of hero image)
+    top: -38px;
+    // 7px+24px(=padding of parent)
+    right: -31px;
+  }
+  > .post-ribbon {
+    position: absolute;
+    // 14px (~height of ribbon element) + 24px(=margin of hero image)
+    top: -24px;
+    // 7px(=offset)+24px(=margin of parent)
+    right: -31px;
   }
 }
 
 .post-teaser > .base-card {
   display: flex;
   flex-direction: column;
+  overflow: visible;
   height: 100%;
+
+  > .hero-image {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
 
   &.--blur-image > .hero-image > .image {
     filter: blur($blur-radius);

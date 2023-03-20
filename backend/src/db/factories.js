@@ -23,6 +23,7 @@ export const cleanDatabase = async (options = {}) => {
       return transaction.run(
         `
           MATCH (everything)
+          WHERE NOT 'Migration' IN labels(everything)
           DETACH DELETE everything
         `,
       )
@@ -65,7 +66,6 @@ Factory.define('basicUser')
     name: faker.name.findName,
     password: '1234',
     role: 'user',
-    about: faker.lorem.paragraph,
     termsAndConditionsAgreedVersion: '0.0.1',
     termsAndConditionsAgreedAt: '2019-08-01T10:47:19.212Z',
     allowEmbedIframes: false,
@@ -82,12 +82,28 @@ Factory.define('basicUser')
 
 Factory.define('userWithoutEmailAddress')
   .extend('basicUser')
+  .option('about', faker.lorem.paragraph)
+  .after(async (buildObject, options) => {
+    return neode.create('User', buildObject)
+  })
+
+Factory.define('userWithAboutNull')
+  .extend('basicUser')
+  .option('about', null)
+  .after(async (buildObject, options) => {
+    return neode.create('User', buildObject)
+  })
+
+Factory.define('userWithAboutEmpty')
+  .extend('basicUser')
+  .option('about', '')
   .after(async (buildObject, options) => {
     return neode.create('User', buildObject)
   })
 
 Factory.define('user')
   .extend('basicUser')
+  .option('about', faker.lorem.paragraph)
   .option('email', faker.internet.exampleEmail)
   .option('avatar', () =>
     Factory.build('image', {

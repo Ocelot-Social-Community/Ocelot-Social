@@ -6,6 +6,7 @@
     :icon="icon"
     :filled="isMember && !hovered"
     :danger="isMember && hovered"
+    v-tooltip="tooltip"
     @mouseenter.native="onHover"
     @mouseleave.native="hovered = false"
     @click.prevent="toggle"
@@ -24,6 +25,7 @@ export default {
     group: { type: Object, required: true },
     userId: { type: String, required: true },
     isMember: { type: Boolean, required: true },
+    isNonePendingMember: { type: Boolean, required: true },
     disabled: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
   },
@@ -35,17 +37,33 @@ export default {
   },
   computed: {
     icon() {
-      if (this.isMember && this.hovered) {
-        return 'close'
-      } else {
-        return this.isMember ? 'check' : 'plus'
+      if (this.isMember) {
+        if (this.isNonePendingMember) {
+          return this.hovered ? 'close' : 'check'
+        } else {
+          return this.hovered ? 'close' : 'question-circle'
+        }
       }
+      return 'plus'
     },
     label() {
       if (this.isMember) {
-        return this.$t('group.joinLeaveButton.iAmMember')
-      } else {
-        return this.$t('group.joinLeaveButton.join')
+        if (this.isNonePendingMember) {
+          return this.hovered
+            ? this.$t('group.joinLeaveButton.leave')
+            : this.$t('group.joinLeaveButton.iAmMember')
+        } else {
+          return this.$t('group.joinLeaveButton.pendingMember')
+        }
+      }
+      return this.$t('group.joinLeaveButton.join')
+    },
+    tooltip() {
+      return {
+        content: this.$t('group.joinLeaveButton.tooltip'),
+        placement: 'right',
+        show: this.isMember && !this.isNonePendingMember && this.hovered,
+        trigger: this.isMember && !this.isNonePendingMember ? 'hover' : 'manual',
       }
     },
   },

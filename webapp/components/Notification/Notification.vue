@@ -1,19 +1,24 @@
 <template>
   <article :class="{ '--read': notification.read, notification: true }">
     <client-only>
-      <user-teaser :user="from.author" :date-time="from.createdAt" />
+      <user-teaser
+        :user="isGroup ? notification.relatedUser : from.author"
+        :date-time="from.createdAt"
+      />
     </client-only>
     <p class="description">{{ $t(`notifications.reason.${notification.reason}`) }}</p>
     <nuxt-link
       class="link"
-      :to="{ name: 'post-id-slug', params, ...hashParam }"
+      :to="{ name: isGroup ? 'group-id-slug' : 'post-id-slug', params, hashParam }"
       @click.native="$emit('read')"
     >
       <base-card wideContent>
-        <h2 class="title">{{ from.title || from.post.title }}</h2>
+        <h2 class="title">{{ from.title || from.groupName || from.post.title }}</h2>
         <p>
           <strong v-if="isComment" class="comment">{{ $t(`notifications.comment`) }}:</strong>
           {{ from.contentExcerpt | removeHtml }}
+          <strong v-if="isGroup" class="comment">{{ $t(`notifications.group`) }}:</strong>
+          {{ from.descriptionExcerpt | removeHtml }}
         </p>
       </base-card>
     </nuxt-link>
@@ -41,11 +46,14 @@ export default {
     isComment() {
       return this.from.__typename === 'Comment'
     },
+    isGroup() {
+      return this.from.__typename === 'Group'
+    },
     params() {
-      const post = this.isComment ? this.from.post : this.from
+      const target = this.isComment ? this.from.post : this.from
       return {
-        id: post.id,
-        slug: post.slug,
+        id: target.id,
+        slug: target.slug,
       }
     },
     hashParam() {

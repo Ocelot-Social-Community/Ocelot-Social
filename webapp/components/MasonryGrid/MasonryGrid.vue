@@ -29,8 +29,8 @@ export default {
 <style lang="scss">
 /* dirty fix to override broken styleguide inline-styles */
 .ds-grid {
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
-  gap: 16px !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)) !important;
+  gap: 32px 16px !important;
   grid-auto-rows: 20px;
 }
 

@@ -10,6 +10,15 @@
           @click="toggleFilteredByFollowed(currentUser.id)"
         />
       </li>
+      <li class="item posts-in-my-groups-item">
+        <labeled-button
+          icon="users"
+          :label="$t('filter-menu.my-groups')"
+          :filled="filteredByPostsInMyGroups"
+          :title="$t('contribution.filterMyGroups')"
+          @click="toggleFilteredByMyGroups()"
+        />
+      </li>
     </template>
   </filter-menu-section>
 </template>
@@ -28,12 +37,14 @@ export default {
   computed: {
     ...mapGetters({
       filteredByUsersFollowed: 'posts/filteredByUsersFollowed',
+      filteredByPostsInMyGroups: 'posts/filteredByPostsInMyGroups',
       currentUser: 'auth/user',
     }),
   },
   methods: {
     ...mapMutations({
       toggleFilteredByFollowed: 'posts/TOGGLE_FILTER_BY_FOLLOWED',
+      toggleFilteredByMyGroups: 'posts/TOGGLE_FILTER_BY_MY_GROUPS',
     }),
   },
 }

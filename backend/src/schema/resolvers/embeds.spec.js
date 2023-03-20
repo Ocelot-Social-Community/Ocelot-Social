@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { createTestClient } from 'apollo-server-testing'
 import createServer from '../../server'
-import { gql } from '../../helpers/jest'
+import gql from 'graphql-tag'
 
 jest.mock('node-fetch')
 const { Response } = jest.requireActual('node-fetch')
@@ -96,7 +96,7 @@ describe('Query', () => {
               description: null,
               html: null,
               image: null,
-              lang: null,
+              lang: 'false',
               publisher: null,
               sources: ['resource'],
               title: null,

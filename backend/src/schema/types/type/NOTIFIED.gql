@@ -6,9 +6,10 @@ type NOTIFIED {
   updatedAt: String!
   read: Boolean
   reason: NotificationReason
+  relatedUser: User
 }
 
-union NotificationSource = Post | Comment
+union NotificationSource = Post | Comment | Group
 
 enum NotificationOrdering {
   createdAt_asc
@@ -21,6 +22,10 @@ enum NotificationReason {
   mentioned_in_post
   mentioned_in_comment
   commented_on_post
+  user_joined_group
+  user_left_group
+  changed_group_member_role
+  removed_user_from_group
 }
 
 type Query {
@@ -29,6 +34,7 @@ type Query {
   
 type Mutation {
   markAsRead(id: ID!): NOTIFIED
+  markAllAsRead: [NOTIFIED]
 }
 
 type Subscription {

@@ -316,7 +316,8 @@
     "goal": null,
     "joinLeaveButton": {
       "iAmMember": null,
-      "join": null
+      "join": null,
+      "pendingMember": null
     },
     "membersCount": null,
     "membersListTitle": null
@@ -426,6 +427,7 @@
       "read": "Прочитанные",
       "unread": "Непрочитанные"
     },
+    "markAllAsRead": "Отметить все как прочитанное",
     "pageLink": "Все уведомления",
     "post": "Пост",
     "reason": {

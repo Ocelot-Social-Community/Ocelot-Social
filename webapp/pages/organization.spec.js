@@ -10,6 +10,10 @@ const assignMock = jest.fn()
 delete window.location
 window.location = { assign: assignMock }
 
+const openMock = jest.fn()
+delete window.open
+window.open = openMock
+
 describe('organization.vue', () => {
   let wrapper
   let mocks
@@ -33,7 +37,7 @@ describe('organization.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.is('div')).toBeTruthy()
+      expect(wrapper.element.tagName).toBe('DIV')
     })
 
     it('has correct <head> content', () => {

@@ -291,7 +291,8 @@
     "goal": null,
     "joinLeaveButton": {
       "iAmMember": null,
-      "join": null
+      "join": null,
+      "pendingMember": null
     },
     "membersCount": null,
     "membersListTitle": null
@@ -401,6 +402,7 @@
       "read": "Lire",
       "unread": "Non lu"
     },
+    "markAllAsRead": "Tout marquer comme lu",
     "pageLink": "Toutes les notifications",
     "post": "Post",
     "reason": {

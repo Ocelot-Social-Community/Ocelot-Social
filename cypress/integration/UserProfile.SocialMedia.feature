@@ -13,29 +13,29 @@ Feature: User profile - list social media accounts
     When I navigate to page "/settings/my-social-media"
     Then I am on page "/settings/my-social-media"
     When I add a social media link
-    Then I see a toaster with "Added social media"
+    Then I see a toaster with status "success"
     And the new social media link shows up on the page
 
   Scenario: Other users viewing my Social Media
-    Given I have added a social media link
+    Given I have added the social media link "https://freeradical.zone/peter-pan"
     When I navigate to page "/profile/peter-pan"
     Then they should be able to see my social media links
 
   Scenario: Deleting Social Media
     When I navigate to page "/settings/my-social-media"
     Then I am on page "/settings/my-social-media"
-    Given I have added a social media link
-    When I delete a social media link
-    Then I see a toaster with "Deleted social media"
+    Given I have added the social media link "https://freeradical.zone/peter-pan"
+    When I delete the social media link "https://freeradical.zone/peter-pan"
+    Then I see a toaster with status "success"
 
   Scenario: Editing Social Media
     When I navigate to page "/settings/my-social-media"
     Then I am on page "/settings/my-social-media"
-    Given I have added a social media link
+    Given I have added the social media link "https://freeradical.zone/peter-pan"
     When I start editing a social media link
     Then I can cancel editing
     When I start editing a social media link
     And I edit and save the link
-    Then I see a toaster with "Added social media"
+    Then I see a toaster with status "success"
     And the new url is displayed
     But the old url is not displayed

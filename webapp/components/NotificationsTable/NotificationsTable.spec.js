@@ -1,4 +1,4 @@
-import { config, mount, RouterLinkStub } from '@vue/test-utils'
+import { mount, RouterLinkStub } from '@vue/test-utils'
 
 import Vuex from 'vuex'
 import NotificationsTable from './NotificationsTable'
@@ -7,8 +7,6 @@ import { notifications } from '~/components/utils/Notifications'
 const localVue = global.localVue
 
 localVue.filter('truncate', (string) => string)
-
-config.stubs['client-only'] = '<span><slot /></span>'
 
 describe('NotificationsTable.vue', () => {
   let wrapper, mocks, propsData, stubs
@@ -21,6 +19,7 @@ describe('NotificationsTable.vue', () => {
     }
     stubs = {
       NuxtLink: RouterLinkStub,
+      'client-only': true,
     }
     propsData = {}
   })
@@ -60,8 +59,8 @@ describe('NotificationsTable.vue', () => {
         wrapper = Wrapper()
       })
 
-      it('renders a table', () => {
-        expect(wrapper.find('.ds-table').exists()).toBe(true)
+      it('renders a grid table', () => {
+        expect(wrapper.find('.notification-grid').exists()).toBe(true)
       })
 
       describe('renders 4 columns', () => {
@@ -85,7 +84,7 @@ describe('NotificationsTable.vue', () => {
       describe('Post', () => {
         let firstRowNotification
         beforeEach(() => {
-          firstRowNotification = wrapper.findAll('tbody tr').at(0)
+          firstRowNotification = wrapper.findAll('.notification-grid-row').at(0)
         })
 
         it('renders the author', () => {
@@ -118,7 +117,7 @@ describe('NotificationsTable.vue', () => {
       describe('Comment', () => {
         let secondRowNotification
         beforeEach(() => {
-          secondRowNotification = wrapper.findAll('tbody tr').at(1)
+          secondRowNotification = wrapper.findAll('.notification-grid-row').at(1)
         })
 
         it('renders the author', () => {

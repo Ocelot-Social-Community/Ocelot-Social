@@ -16,6 +16,7 @@ export default {
     Group: async (_object, params, context, _resolveInfo) => {
       const { isMember, id, slug, first, offset } = params
       let pagination = ''
+      const orderBy = 'ORDER BY group.createdAt DESC'
       if (first !== undefined && offset !== undefined) pagination = `SKIP ${offset} LIMIT ${first}`
       const matchParams = { id, slug }
       removeUndefinedNullValuesFromObject(matchParams)
@@ -29,6 +30,7 @@ export default {
             WITH group, membership
             WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
             RETURN group {.*, myRole: membership.role}
+            ${orderBy}
             ${pagination}
           `
         } else {
@@ -39,6 +41,7 @@ export default {
               WITH group
               WHERE group.groupType IN ['public', 'closed']
               RETURN group {.*, myRole: NULL}
+              ${orderBy}
               ${pagination}
             `
           } else {
@@ -48,6 +51,7 @@ export default {
               WITH group, membership
               WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
               RETURN group {.*, myRole: membership.role}
+              ${orderBy}
               ${pagination}
             `
           }
@@ -295,25 +299,8 @@ export default {
     LeaveGroup: async (_parent, params, context, _resolveInfo) => {
       const { groupId, userId } = params
       const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const leaveGroupCypher = `
-          MATCH (member:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
-          DELETE membership
-          WITH member, group
-          OPTIONAL MATCH (p:Post)-[:IN]->(group)
-          WHERE NOT group.groupType = 'public' 
-          WITH member, group, collect(p) AS posts
-          FOREACH (post IN posts |
-            MERGE (member)-[:CANNOT_SEE]->(post))
-          RETURN member {.*, myRoleInGroup: NULL}
-        `
-
-        const transactionResponse = await transaction.run(leaveGroupCypher, { groupId, userId })
-        const [member] = await transactionResponse.records.map((record) => record.get('member'))
-        return member
-      })
       try {
-        return await writeTxResultPromise
+        return await removeUserFromGroupWriteTxResultPromise(session, groupId, userId)
       } catch (error) {
         throw new Error(error)
       } finally {
@@ -368,6 +355,17 @@ export default {
         session.close()
       }
     },
+    RemoveUserFromGroup: async (_parent, params, context, _resolveInfo) => {
+      const { groupId, userId } = params
+      const session = context.driver.session()
+      try {
+        return await removeUserFromGroupWriteTxResultPromise(session, groupId, userId)
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
   },
   Group: {
     ...Resolver('Group', {
@@ -382,4 +380,28 @@ export default {
       },
     }),
   },
+}
+
+const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId) => {
+  return session.writeTransaction(async (transaction) => {
+    const removeUserFromGroupCypher = `
+      MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
+      DELETE membership
+      WITH user, group
+      OPTIONAL MATCH (author:User)-[:WROTE]->(p:Post)-[:IN]->(group)
+      WHERE NOT group.groupType = 'public' 
+        AND NOT author.id = $userId
+      WITH user, collect(p) AS posts
+      FOREACH (post IN posts |
+        MERGE (user)-[:CANNOT_SEE]->(post))
+      RETURN user {.*, myRoleInGroup: NULL}
+    `
+
+    const transactionResponse = await transaction.run(removeUserFromGroupCypher, {
+      groupId,
+      userId,
+    })
+    const [user] = await transactionResponse.records.map((record) => record.get('user'))
+    return user
+  })
 }

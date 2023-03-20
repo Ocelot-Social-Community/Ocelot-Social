@@ -1,11 +1,13 @@
 import Vuex from 'vuex'
-import { config, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import login from './login.vue'
 
 const localVue = global.localVue
 
-config.stubs['client-only'] = '<span class="client-only"><slot /></span>'
-config.stubs['nuxt-link'] = '<span class="nuxt-link"><slot /></span>'
+const stubs = {
+  'client-only': true,
+  'nuxt-link': true,
+}
 
 describe('Login.vue', () => {
   let store
@@ -50,6 +52,7 @@ describe('Login.vue', () => {
         store,
         mocks,
         localVue,
+        stubs,
       })
     }
 

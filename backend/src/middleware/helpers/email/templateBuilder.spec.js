@@ -80,14 +80,6 @@ const testEmailData = (emailTemplate, templateBuilder, templateData, texts) => {
   return emailTemplate
 }
 
-// beforeAll(async () => {
-//   await cleanDatabase()
-// })
-
-// afterAll(async () => {
-//   await cleanDatabase()
-// })
-
 describe('templateBuilder', () => {
   describe('signupTemplate', () => {
     describe('multi language', () => {

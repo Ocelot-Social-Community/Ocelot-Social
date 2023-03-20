@@ -2,7 +2,7 @@
   <ds-space v-if="user.socialMedia && user.socialMedia.length" margin="large">
     <base-card class="social-media-bc">
       <ds-space margin="x-small">
-        <ds-text tag="h5" color="soft">
+        <ds-text tag="h5" color="soft" data-test="social-media-list-headline">
           {{ $t('profile.socialMedia') }} {{ userName | truncate(15) }}?
         </ds-text>
         <template>

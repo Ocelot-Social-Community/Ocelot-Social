@@ -19,12 +19,19 @@ Wait a little until your backend is up and running at [http://localhost:4000/](h
 ## Installation without Docker
 
 For the local installation you need a recent version of
-[node](https://nodejs.org/en/) (&gt;= `v10.12.0`). We are using
-`12.19.0` and therefore we recommend to use the same version
+[Node](https://nodejs.org/en/) (&gt;= `v16.19.0`). We are using
+`v19.4.0` and therefore we recommend to use the same version
 ([see](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4082)
 some known problems with more recent node versions). You can use the
-[node version manager](https://github.com/nvm-sh/nvm) to switch
-between different local node versions.
+[node version manager](https://github.com/nvm-sh/nvm) `nvm` to switch
+between different local Node versions:
+
+```bash
+# install Node
+$ cd backend
+$ nvm install v19.4.0
+$ nvm use v19.4.0
+```
 
 Install node dependencies with [yarn](https://yarnpkg.com/en/):
 
@@ -32,6 +39,10 @@ Install node dependencies with [yarn](https://yarnpkg.com/en/):
 # in main folder
 $ cd backend
 $ yarn install
+# or just
+$ yarn
+# or just later on to use version of ".nvmrc" file
+$ nvm use && yarn
 ```
 
 Copy Environment Variables:
@@ -68,17 +79,27 @@ More details about our GraphQL playground and how to use it with ocelot.social c
 
 ![GraphQL Playground](../.gitbook/assets/graphql-playground.png)
 
-### Database Indices and Constraints
+### Database Indexes and Constraints
 
-Database indices and constraints need to be created when the database and the
-backend is running:
+Database indexes and constraints need to be created and upgraded when the database and the backend are running:
 
 {% tabs %}
 {% tab title="Docker" %}
 
 ```bash
 # in main folder while docker-compose is running
-$ docker-compose exec backend yarn run db:migrate init
+$ docker exec backend yarn run db:migrate init
+
+# only once: init admin user and create indexes and constraints in Neo4j database
+# for development
+$ docker compose exec backend yarn prod:migrate init
+# in production mode use command
+$ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
+```
+
+```bash
+# in main folder with docker compose running
+$ docker exec backend yarn run db:migrate up
 ```
 
 {% endtab %}
@@ -88,6 +109,11 @@ $ docker-compose exec backend yarn run db:migrate init
 # in folder backend/ while database is running
 # make sure your database is running on http://localhost:7474/browser/
 yarn run db:migrate init
+```
+
+```bash
+# in backend/ with database running (In docker or local)
+yarn run db:migrate up
 ```
 
 {% endtab %}
@@ -105,18 +131,20 @@ In another terminal run:
 
 ```bash
 # in main folder while docker-compose is running
-$ docker-compose exec backend yarn run db:seed
+$ docker exec backend yarn run db:seed
 ```
 
 To reset the database run:
 
 ```bash
 # in main folder while docker-compose is running
-$ docker-compose exec backend yarn run db:reset
+$ docker exec backend yarn run db:reset
 # you could also wipe out your neo4j database and delete all volumes with:
 $ docker-compose down -v
-# if container is not running, run this command to set up your database indeces and contstraints
-$ docker-compose exec backend yarn run db:migrate init
+# if container is not running, run this command to set up your database indexes and constraints
+$ docker exec backend yarn run db:migrate init
+# And then upgrade the indexes and const
+$ docker exec backend yarn run db:migrate up
 ```
 
 {% endtab %}
@@ -159,7 +187,7 @@ To run the migration:
 
 ```bash
 # in main folder while docker-compose is running
-$ docker-compose exec backend yarn run db:migrate up
+$ docker exec backend yarn run db:migrate up
 ```
 
 {% endtab %}
@@ -195,7 +223,7 @@ Run the unit tests:
 
 ```bash
 # in main folder while docker-compose is running
-$ docker-compose exec backend yarn run test
+$ docker exec backend yarn run test
 ```
 
 {% endtab %}
