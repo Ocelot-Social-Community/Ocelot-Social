@@ -19,15 +19,15 @@
       <ds-flex class="notifications-link-container">
         <ds-flex-item :width="{ base: 'auto' }" centered>
           <nuxt-link :to="{ name: 'notifications' }">
-            <ds-button ghost primary>
+            <base-button ghost primary>
               {{ $t('notifications.pageLink') }}
-            </ds-button>
+            </base-button>
           </nuxt-link>
         </ds-flex-item>
         <ds-flex-item :width="{ base: 'auto' }" centered>
-          <ds-button ghost primary @click="markAllAsRead" data-test="markAllAsRead-button">
+          <base-button ghost primary @click="markAllAsRead" data-test="markAllAsRead-button">
             {{ $t('notifications.markAllAsRead') }}
-          </ds-button>
+          </base-button>
         </ds-flex-item>
       </ds-flex>
     </template>
@@ -144,16 +144,15 @@ export default {
 <style lang="scss">
 .notifications-menu-popover {
   max-width: 500px;
-  margin-bottom: $size-height-base;
 }
 .notifications-link-container {
   background-color: $background-color-softer-active;
   justify-content: center;
-  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: $size-height-base;
+  height: 62px;
   padding: $space-x-small;
+  flex-direction: column;
 }
 </style>
