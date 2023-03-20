@@ -13,9 +13,15 @@ export async function up(next) {
     await transaction.run(`CALL db.index.fulltext.drop("post_fulltext_search")`)
     await transaction.run(`CALL db.index.fulltext.drop("tag_fulltext_search")`)
     // Create indexes
-    await transaction.run(`CALL db.index.fulltext.createNodeIndex("user_fulltext_search",["User"],["name", "slug"])`)
-    await transaction.run(`CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"])`)
-    await transaction.run(`CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"])`)
+    await transaction.run(
+      `CALL db.index.fulltext.createNodeIndex("user_fulltext_search",["User"],["name", "slug"])`,
+    )
+    await transaction.run(
+      `CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"])`,
+    )
+    await transaction.run(
+      `CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"])`,
+    )
     await transaction.commit()
     next()
   } catch (error) {
