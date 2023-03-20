@@ -17,14 +17,14 @@
         <notification-list :notifications="notifications" @markAsRead="markAsRead" />
       </div>
       <ds-flex class="notifications-link-container">
-        <ds-flex-item :width="{ base: 'auto' }" centered>
+        <ds-flex-item class="notifications-link-container-item" :width="{ base: '100%' }" centered>
           <nuxt-link :to="{ name: 'notifications' }">
             <base-button ghost primary>
               {{ $t('notifications.pageLink') }}
             </base-button>
           </nuxt-link>
         </ds-flex-item>
-        <ds-flex-item :width="{ base: 'auto' }" centered>
+        <ds-flex-item class="notifications-link-container-item" :width="{ base: '100%' }" centered>
           <base-button ghost primary @click="markAllAsRead" data-test="markAllAsRead-button">
             {{ $t('notifications.markAllAsRead') }}
           </base-button>
@@ -148,11 +148,11 @@ export default {
 .notifications-link-container {
   background-color: $background-color-softer-active;
   justify-content: center;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 62px;
   padding: $space-x-small;
-  flex-direction: column;
+  flex-direction: row;
+}
+.notifications-link-container-item {
+  justify-content: center;
+  display: flex;
 }
 </style>

@@ -33,7 +33,7 @@ export default {
   data() {
     return {
       isPopoverOpen: false,
-      developerNoAutoClosing: false, // stops automatic closing of menu for developer purposes: default is 'false'
+      developerNoAutoClosing: true, // stops automatic closing of menu for developer purposes: default is 'false'
     }
   },
   computed: {
