@@ -8,10 +8,19 @@ export async function up(next) {
   const transaction = session.beginTransaction()
 
   try {
-    // Drop all indexes because due to legacy code they might be set already
-    await transaction.run(`CALL db.index.fulltext.drop("user_fulltext_search")`)
-    await transaction.run(`CALL db.index.fulltext.drop("post_fulltext_search")`)
-    await transaction.run(`CALL db.index.fulltext.drop("tag_fulltext_search")`)
+    // Drop indexes if they exist because due to legacy code they might be set already
+    const indexesResponse = await transaction.run(`CALL db.indexes()`)
+    const indexes = indexesResponse.records.map((record) => record.get('indexName'))
+    console.log(indexes)
+    if(indexes.indexOf('user_fulltext_search') > -1){
+      await transaction.run(`CALL db.index.fulltext.drop("user_fulltext_search")`)
+    }
+    if(indexes.indexOf('post_fulltext_search') > -1){
+      await transaction.run(`CALL db.index.fulltext.drop("post_fulltext_search")`)
+    }
+    if(indexes.indexOf('tag_fulltext_search') > -1){
+      await transaction.run(`CALL db.index.fulltext.drop("tag_fulltext_search")`)
+    }
     // Create indexes
     await transaction.run(
       `CALL db.index.fulltext.createNodeIndex("user_fulltext_search",["User"],["name", "slug"])`,
