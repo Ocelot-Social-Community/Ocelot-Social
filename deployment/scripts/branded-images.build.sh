@@ -14,6 +14,7 @@ if [ -z ${CONFIGURATION} ]; then
   echo "You must provide a `CONFIGURATION` via environment variable"
   exit 1
 fi
+echo "Using CONFIGURATION=${CONFIGURATION}"
 
 # configuration
 DOCKERHUB_ORGANISATION=${DOCKERHUB_ORGANISATION:-"ocelotsocialnetwork"}

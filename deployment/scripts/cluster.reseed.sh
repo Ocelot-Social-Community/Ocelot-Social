@@ -9,6 +9,7 @@ if [ -z ${CONFIGURATION} ]; then
   echo "You must provide a `CONFIGURATION` via environment variable"
   exit 1
 fi
+echo "Using CONFIGURATION=${CONFIGURATION}"
 
 # configuration
 KUBECONFIG=${KUBECONFIG:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubeconfig.yaml}
