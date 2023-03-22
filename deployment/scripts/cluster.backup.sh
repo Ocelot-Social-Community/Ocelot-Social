@@ -19,15 +19,8 @@ BACKUP_FOLDER=${BACKUP_FOLDER:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/
 mkdir -p ${BACKUP_FOLDER}
 
 # maintenance mode on
-${SCRIPT_DIR}/cluster.maintenance.sh on
-
-# shutdown database
-kubectl --kubeconfig=${KUBECONFIG} get deployment ocelot-neo4j -o json \
-    | jq '.spec.template.spec.containers[] += {"command": ["tail", "-f", "/dev/null"]}' \
-    | kubectl --kubeconfig=${KUBECONFIG} apply -f -
-
-# wait for the container to restart
-sleep 60
+# set Neo4j in offline mode (maintenance)
+${SCRIPT_DIR}/cluster.neo4j.sh offline-mode
 
 # database backup
 kubectl --kubeconfig=${KUBECONFIG} -n default exec -it \
@@ -40,13 +33,6 @@ kubectl --kubeconfig=${KUBECONFIG} cp \
 kubectl --kubeconfig=${KUBECONFIG} cp \
     default/$(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-backend |awk '{ print $1 }'):/app/public/uploads $BACKUP_FOLDER/public-uploads
 
-# restart database
-kubectl --kubeconfig=${KUBECONFIG} get deployment ocelot-neo4j -o json \
-    | jq 'del(.spec.template.spec.containers[].command)' \
-    | kubectl --kubeconfig=${KUBECONFIG} apply -f -
-
-# wait for the container to restart
-sleep 60
-
+# set Neo4j in online mode
 # maintenance mode off
-${SCRIPT_DIR}/cluster.maintenance.sh off
+${SCRIPT_DIR}/cluster.neo4j.sh online-mode
