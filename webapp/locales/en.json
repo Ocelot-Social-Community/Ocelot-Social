@@ -510,6 +510,9 @@
   },
   "header": {
     "avatarMenu": {
+      "button": {
+        "tooltip": "My profile"
+      },
       "Groups": "Groups",
       "myProfile": "My profile"
     }
