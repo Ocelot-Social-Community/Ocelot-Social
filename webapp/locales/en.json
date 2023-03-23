@@ -523,7 +523,7 @@
   },
   "invite-codes": {
     "button": {
-      "tooltip": "Invite your friends"
+      "tooltip": "Invite friends"
     },
     "copy-code": "Copy Invite Link",
     "copy-success": "Invite code copied to clipboard",

@@ -523,7 +523,7 @@
   },
   "invite-codes": {
     "button": {
-      "tooltip": "Lade deine Freunde ein"
+      "tooltip": "Freunde einladen"
     },
     "copy-code": "Einladungslink kopieren",
     "copy-success": "Einladungscode erfolgreich in die Zwischenablage kopiert",
