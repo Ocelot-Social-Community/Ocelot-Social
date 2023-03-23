@@ -530,6 +530,9 @@
     "not-available": "Du hast keinen Einladungscode zur Verfügung!",
     "your-code": "Sende diesen Link per E-Mail oder in sozialen Medien, um deine Freunde einzuladen:"
   },
+  "localeSwitch": {
+    "tooltip": "Sprache wählen"
+  },
   "login": {
     "email": "Deine E-Mail",
     "failure": "Fehlerhafte E-Mail-Adresse oder Passwort.",

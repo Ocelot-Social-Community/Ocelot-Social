@@ -530,6 +530,9 @@
     "not-available": "You have no valid invite code available!",
     "your-code": "Send this link per e-mail or in social media to invite your friends:"
   },
+  "localeSwitch": {
+    "tooltip": "Choose language"
+  },
   "login": {
     "email": "Your E-mail",
     "failure": "Incorrect email address or password.",
