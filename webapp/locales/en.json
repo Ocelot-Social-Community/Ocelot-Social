@@ -513,7 +513,7 @@
       "button": {
         "tooltip": "My profile"
       },
-      "Groups": "Groups",
+      "groups": "Groups",
       "myProfile": "My profile"
     }
   },
