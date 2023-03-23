@@ -4,11 +4,27 @@
     class="notifications-menu"
     :to="{ name: 'notifications' }"
   >
-    <base-button icon="bell" ghost circle />
+    <base-button
+      icon="bell"
+      ghost
+      circle
+      v-tooltip="{
+        content: $t('notifications.headerMenuButton.tooltip'),
+        placement: 'bottom-start',
+      }"
+    />
   </nuxt-link>
   <dropdown v-else class="notifications-menu" offset="8" :placement="placement">
     <template #default="{ toggleMenu }">
-      <base-button @click="toggleMenu" ghost circle>
+      <base-button
+        ghost
+        circle
+        v-tooltip="{
+          content: $t('notifications.headerMenuButton.tooltip'),
+          placement: 'bottom-start',
+        }"
+        @click="toggleMenu"
+      >
         <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
       </base-button>
     </template>
