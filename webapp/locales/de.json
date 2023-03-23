@@ -510,7 +510,10 @@
   },
   "header": {
     "avatarMenu": {
-      "Groups": "Gruppen",
+      "button": {
+        "tooltip": "Mein Profil"
+      },
+      "groups": "Gruppen",
       "myProfile": "Mein Profil"
     }
   },
@@ -520,12 +523,15 @@
   },
   "invite-codes": {
     "button": {
-      "tooltip": "Lade deine Freunde ein"
+      "tooltip": "Freunde einladen"
     },
     "copy-code": "Einladungslink kopieren",
     "copy-success": "Einladungscode erfolgreich in die Zwischenablage kopiert",
     "not-available": "Du hast keinen Einladungscode zur Verfügung!",
     "your-code": "Sende diesen Link per E-Mail oder in sozialen Medien, um deine Freunde einzuladen:"
+  },
+  "localeSwitch": {
+    "tooltip": "Sprache wählen"
   },
   "login": {
     "email": "Deine E-Mail",
@@ -648,6 +654,9 @@
       "unread": "Ungelesen"
     },
     "group": "Beschreibung",
+    "headerMenuButton": {
+      "tooltip": "Meine Benachrichtigungen"
+    },
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",

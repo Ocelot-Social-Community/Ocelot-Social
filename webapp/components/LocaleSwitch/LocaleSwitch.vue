@@ -2,7 +2,15 @@
   <client-only>
     <dropdown ref="menu" :placement="placement" :offset="offset">
       <template #default="{ toggleMenu }">
-        <a class="locale-menu" href="#" @click.prevent="toggleMenu()">
+        <a
+          class="locale-menu"
+          href="#"
+          v-tooltip="{
+            content: $t('localeSwitch.tooltip'),
+            placement: 'bottom-start',
+          }"
+          @click.prevent="toggleMenu()"
+        >
           <!-- <base-icon name="globe" /> -->
           <span class="label">{{ current.code.toUpperCase() }}</span>
           <base-icon class="dropdown-arrow" name="angle-down" />
