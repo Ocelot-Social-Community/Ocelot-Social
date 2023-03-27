@@ -63,7 +63,7 @@ export default {
         content: this.$t('group.joinLeaveButton.tooltip'),
         placement: 'right',
         show: this.isMember && !this.isNonePendingMember && this.hovered,
-        trigger: this.isMember && !this.isNonePendingMember ? 'hover' : 'manual',
+        trigger: 'manual',
       }
     },
   },

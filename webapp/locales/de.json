@@ -289,7 +289,8 @@
       },
       "supportedFormats": "Füge ein Bild im Dateiformat JPG, PNG oder GIF ein"
     },
-    "title": "Titel"
+    "title": "Titel",
+    "visibleOnlyForMembersOfGroup": "Dieser Beitrag wird nur für Mitglieder der Gruppe „<b>{name}</b>“ sichtbar sein."
   },
   "delete": {
     "cancel": "Abbrechen",
@@ -509,7 +510,10 @@
   },
   "header": {
     "avatarMenu": {
-      "Groups": "Gruppen",
+      "button": {
+        "tooltip": "Mein Profil"
+      },
+      "groups": "Gruppen",
       "myProfile": "Mein Profil"
     }
   },
@@ -519,12 +523,15 @@
   },
   "invite-codes": {
     "button": {
-      "tooltip": "Lade deine Freunde ein"
+      "tooltip": "Freunde einladen"
     },
     "copy-code": "Einladungslink kopieren",
     "copy-success": "Einladungscode erfolgreich in die Zwischenablage kopiert",
     "not-available": "Du hast keinen Einladungscode zur Verfügung!",
     "your-code": "Sende diesen Link per E-Mail oder in sozialen Medien, um deine Freunde einzuladen:"
+  },
+  "localeSwitch": {
+    "tooltip": "Sprache wählen"
   },
   "login": {
     "email": "Deine E-Mail",
@@ -639,20 +646,28 @@
   },
   "notifications": {
     "comment": "Kommentar",
-    "content": "Inhalt",
+    "content": "Inhalt oder Beschreibung",
     "empty": "Bedaure, Du hast momentan keinerlei Benachrichtigungen.",
     "filterLabel": {
       "all": "Alle",
       "read": "Gelesen",
       "unread": "Ungelesen"
     },
+    "group": "Beschreibung",
+    "headerMenuButton": {
+      "tooltip": "Meine Benachrichtigungen"
+    },
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
-    "post": "Beitrag",
+    "post": "Beitrag oder Gruppe",
     "reason": {
+      "changed_group_member_role": "Hat Deine Rolle in der Gruppe geändert …",
       "commented_on_post": "Hat Deinen Beitrag kommentiert …",
       "mentioned_in_comment": "Hat Dich in einem Kommentar erwähnt …",
-      "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …"
+      "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …",
+      "removed_user_from_group": "Hat Dich aus der Gruppe entfernt …",
+      "user_joined_group": "Ist Deiner Gruppe beigetreten …",
+      "user_left_group": "Hat deine Gruppe verlassen …"
     },
     "title": "Benachrichtigungen",
     "user": "Nutzer"
