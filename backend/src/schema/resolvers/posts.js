@@ -184,7 +184,16 @@ export default {
         `
       }
 
-      updatePostCypher += `RETURN post {.*}`
+      if (params.postType) {
+        updatePostCypher += `
+          REMOVE post:Article
+          REMOVE post:Event
+          SET post:${params.postType}
+          WITH post
+        `
+      }
+
+      updatePostCypher += `RETURN post {.*, postType: filter(l IN labels(post) WHERE NOT l = "Post")}`
       const updatePostVariables = { categoryIds, params }
       try {
         const writeTxResultPromise = session.writeTransaction(async (transaction) => {

@@ -354,6 +354,7 @@ describe('UpdatePost', () => {
       $content: String!
       $image: ImageInput
       $categoryIds: [ID]
+      $postType: PostType
     ) {
       UpdatePost(
         id: $id
@@ -361,6 +362,7 @@ describe('UpdatePost', () => {
         content: $content
         image: $image
         categoryIds: $categoryIds
+        postType: $postType
       ) {
         id
         title
@@ -374,6 +376,7 @@ describe('UpdatePost', () => {
         categories {
           id
         }
+        postType
       }
     }
   `
@@ -492,6 +495,22 @@ describe('UpdatePost', () => {
         await expect(mutate({ mutation: updatePostMutation, variables })).resolves.toMatchObject(
           expected,
         )
+      })
+    })
+
+    describe('post type', () => {
+      it.only('changes the post type', async () => {
+        await expect(
+          mutate({ mutation: updatePostMutation, variables: { ...variables, postType: 'Event' } }),
+        ).resolves.toMatchObject({
+          data: {
+            UpdatePost: {
+              id: newlyCreatedPost.id,
+              postType: ['Event'],
+            },
+          },
+          errors: undefined,
+        })
       })
     })
 
