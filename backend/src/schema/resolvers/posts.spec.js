@@ -34,6 +34,7 @@ const createPostMutation = gql`
       author {
         name
       }
+      postType
     }
   }
 `
@@ -323,6 +324,12 @@ describe('CreatePost', () => {
       await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
         expected,
       )
+    })
+
+    it('has label "Article" as default', async () => {
+      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject({
+        data: { CreatePost: { postType: ['Article'] } },
+      })
     })
   })
 })

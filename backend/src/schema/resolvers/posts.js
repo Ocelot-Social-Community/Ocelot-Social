@@ -131,7 +131,7 @@ export default {
             MERGE (post)<-[:WROTE]-(author)
             ${categoriesCypher}
             ${groupCypher}
-            RETURN post {.*}
+            RETURN post {.*, postType: filter(l IN labels(post) WHERE NOT l = "Post") }
           `,
           { userId: context.user.id, categoryIds, groupId, params },
         )
