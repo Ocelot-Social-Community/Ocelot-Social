@@ -4,6 +4,9 @@ import gql from 'graphql-tag'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
 import { createPostMutation } from '../../graphql/posts'
+import CONFIG from '../../config'
+
+CONFIG.CATEGORIES_ACTIVE = true
 
 const driver = getDriver()
 const neode = getNeode()
@@ -345,8 +348,20 @@ describe('CreatePost', () => {
 describe('UpdatePost', () => {
   let author, newlyCreatedPost
   const updatePostMutation = gql`
-    mutation ($id: ID!, $title: String!, $content: String!, $image: ImageInput) {
-      UpdatePost(id: $id, title: $title, content: $content, image: $image) {
+    mutation (
+      $id: ID!
+      $title: String!
+      $content: String!
+      $image: ImageInput
+      $categoryIds: [ID]
+    ) {
+      UpdatePost(
+        id: $id
+        title: $title
+        content: $content
+        image: $image
+        categoryIds: $categoryIds
+      ) {
         id
         title
         content
@@ -356,6 +371,9 @@ describe('UpdatePost', () => {
         }
         createdAt
         updatedAt
+        categories {
+          id
+        }
       }
     }
   `
@@ -439,12 +457,12 @@ describe('UpdatePost', () => {
       expect(newlyCreatedPost.updatedAt).not.toEqual(UpdatePost.updatedAt)
     })
 
-    /* describe('no new category ids provided for update', () => {
+    describe('no new category ids provided for update', () => {
       it('resolves and keeps current categories', async () => {
         const expected = {
           data: {
             UpdatePost: {
-              id: 'p9876',
+              id: newlyCreatedPost.id,
               categories: expect.arrayContaining([{ id: 'cat9' }, { id: 'cat4' }, { id: 'cat15' }]),
             },
           },
@@ -454,9 +472,9 @@ describe('UpdatePost', () => {
           expected,
         )
       })
-    }) */
+    })
 
-    /* describe('given category ids', () => {
+    describe('given category ids', () => {
       beforeEach(() => {
         variables = { ...variables, categoryIds: ['cat27'] }
       })
@@ -465,7 +483,7 @@ describe('UpdatePost', () => {
         const expected = {
           data: {
             UpdatePost: {
-              id: 'p9876',
+              id: newlyCreatedPost.id,
               categories: expect.arrayContaining([{ id: 'cat27' }]),
             },
           },
@@ -475,7 +493,7 @@ describe('UpdatePost', () => {
           expected,
         )
       })
-    }) */
+    })
 
     describe.skip('params.image', () => {
       describe('is object', () => {

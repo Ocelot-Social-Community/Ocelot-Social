@@ -32,6 +32,9 @@ export const createPostMutation = () => {
         author {
           name
         }
+        categories {
+          id
+        }
       }
     }
   `
