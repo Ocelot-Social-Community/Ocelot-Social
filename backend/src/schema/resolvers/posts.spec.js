@@ -3,6 +3,7 @@ import Factory, { cleanDatabase } from '../../db/factories'
 import gql from 'graphql-tag'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
+import { createPostMutation } from '../../graphql/posts'
 
 const driver = getDriver()
 const neode = getNeode()
@@ -14,30 +15,6 @@ let user
 
 const categoryIds = ['cat9', 'cat4', 'cat15']
 let variables
-
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $content: String!, $language: String, $categoryIds: [ID]) {
-    CreatePost(
-      id: $id
-      title: $title
-      content: $content
-      language: $language
-      categoryIds: $categoryIds
-    ) {
-      id
-      title
-      content
-      slug
-      disabled
-      deleted
-      language
-      author {
-        name
-      }
-      postType
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -282,7 +259,7 @@ describe('CreatePost', () => {
 
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
-      const { errors } = await mutate({ mutation: createPostMutation, variables })
+      const { errors } = await mutate({ mutation: createPostMutation(), variables })
       expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -297,7 +274,7 @@ describe('CreatePost', () => {
         data: { CreatePost: { title: 'I am a title', content: 'Some content' } },
         errors: undefined,
       }
-      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
+      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
         expected,
       )
     })
@@ -314,21 +291,52 @@ describe('CreatePost', () => {
         },
         errors: undefined,
       }
-      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
+      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
         expected,
       )
     })
 
     it('`disabled` and `deleted` default to `false`', async () => {
       const expected = { data: { CreatePost: { disabled: false, deleted: false } } }
-      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
+      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
         expected,
       )
     })
 
     it('has label "Article" as default', async () => {
-      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject({
         data: { CreatePost: { postType: ['Article'] } },
+      })
+    })
+
+    describe('with post type "Event"', () => {
+      it('has label "Event" set', async () => {
+        await expect(
+          mutate({
+            mutation: createPostMutation(),
+            variables: { ...variables, postType: 'Event' },
+          }),
+        ).resolves.toMatchObject({
+          data: { CreatePost: { postType: ['Event'] } },
+        })
+      })
+    })
+
+    describe('with invalid post type', () => {
+      it('throws an error', async () => {
+        await expect(
+          mutate({
+            mutation: createPostMutation(),
+            variables: { ...variables, postType: 'not-valid' },
+          }),
+        ).resolves.toMatchObject({
+          errors: [
+            {
+              message:
+                'Variable "$postType" got invalid value "not-valid"; Expected type PostType.',
+            },
+          ],
+        })
       })
     })
   })
