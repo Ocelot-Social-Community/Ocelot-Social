@@ -171,6 +171,8 @@ type Post {
     @cypher(statement: "MATCH (this)<-[emoted:EMOTED]-(:User) RETURN COUNT(DISTINCT emoted)")
 
   group: Group @relation(name: "IN", direction: "OUT")
+  postType: [PostType]
+    @cypher(statement: "RETURN filter(l IN labels(this) WHERE NOT l = 'Post')")
 }
 
 input _PostInput {
