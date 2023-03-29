@@ -125,6 +125,7 @@ export default {
             SET post.updatedAt = toString(datetime())
             SET post.clickedCount = 0
             SET post.viewedTeaserCount = 0
+            SET post:${params.postType}
             WITH post
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)

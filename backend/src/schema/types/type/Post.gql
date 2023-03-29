@@ -189,6 +189,7 @@ type Mutation {
     categoryIds: [ID]
     contentExcerpt: String
     groupId: ID
+    postType: PostType = Article
   ): Post
   UpdatePost(
     id: ID!
@@ -200,6 +201,7 @@ type Mutation {
     visibility: Visibility
     language: String
     categoryIds: [ID]
+    postType: PostType
   ): Post
   DeletePost(id: ID!): Post
   AddPostEmotions(to: _PostInput!, data: _EMOTEDInput!): EMOTED
