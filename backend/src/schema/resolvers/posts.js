@@ -7,6 +7,8 @@ import Resolver from './helpers/Resolver'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
+import { validateEventParams } from './helpers/events'
+import { createOrUpdateLocations } from './users/location'
 import CONFIG from '../../config'
 
 const maintainPinnedPosts = (params) => {
@@ -81,6 +83,15 @@ export default {
     CreatePost: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds, groupId } = params
       const { image: imageInput } = params
+
+      if (params.postType && params.postType === 'Event') {
+        validateEventParams(params)
+      }
+      delete params.eventInput
+
+      const locationName = params.eventLocation ? params.eventLocation : null
+      delete params.eventLoaction
+
       delete params.categoryIds
       delete params.image
       delete params.groupId
@@ -143,6 +154,9 @@ export default {
       })
       try {
         const post = await writeTxResultPromise
+        if (locationName) {
+          await createOrUpdateLocations('Post', post.id, locationName, session)
+        }
         return post
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
