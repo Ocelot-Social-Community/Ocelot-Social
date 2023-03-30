@@ -89,8 +89,15 @@ export default {
       }
       delete params.eventInput
 
-      const locationName = params.eventLocation ? params.eventLocation : null
-      delete params.eventLoaction
+      let locationName
+      if (params.eventLocation) {
+        params.eventLocationName = params.eventLocation
+        locationName = params.eventLocation
+      } else {
+        params.eventLocationName = null
+        locationName = null
+      }
+      delete params.eventLocation
 
       delete params.categoryIds
       delete params.image
@@ -406,7 +413,17 @@ export default {
   },
   Post: {
     ...Resolver('Post', {
-      undefinedToNull: ['activityId', 'objectId', 'language', 'pinnedAt', 'pinned'],
+      undefinedToNull: [
+        'activityId',
+        'objectId',
+        'language',
+        'pinnedAt',
+        'pinned',
+        'eventVenue',
+        'eventLocation',
+        'eventLocationName',
+        'eventStart',
+      ],
       hasMany: {
         tags: '-[:TAGGED]->(related:Tag)',
         categories: '-[:CATEGORIZED]->(related:Category)',
@@ -419,6 +436,7 @@ export default {
         pinnedBy: '<-[:PINNED]-(related:User)',
         image: '-[:HERO_IMAGE]->(related:Image)',
         group: '-[:IN]->(related:Group)',
+        eventLocation: '-[:IS_IN]->(related:Location)',
       },
       count: {
         commentsCount:

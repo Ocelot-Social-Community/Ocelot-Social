@@ -12,6 +12,7 @@ export const createPostMutation = () => {
       $categoryIds: [ID]
       $groupId: ID
       $postType: PostType
+      $eventInput: _EventInput
     ) {
       CreatePost(
         id: $id
@@ -21,6 +22,7 @@ export const createPostMutation = () => {
         categoryIds: $categoryIds
         groupId: $groupId
         postType: $postType
+        eventInput: $eventInput
       ) {
         id
         slug
@@ -34,6 +36,13 @@ export const createPostMutation = () => {
         }
         categories {
           id
+        }
+        eventStart
+        eventLocationName
+        eventVenue
+        eventLocation {
+          lng
+          lat
         }
       }
     }
