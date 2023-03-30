@@ -499,7 +499,7 @@ describe('UpdatePost', () => {
     })
 
     describe('post type', () => {
-      it.only('changes the post type', async () => {
+      it('changes the post type', async () => {
         await expect(
           mutate({ mutation: updatePostMutation, variables: { ...variables, postType: 'Event' } }),
         ).resolves.toMatchObject({
