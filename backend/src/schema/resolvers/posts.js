@@ -84,20 +84,7 @@ export default {
       const { categoryIds, groupId } = params
       const { image: imageInput } = params
 
-      if (params.postType && params.postType === 'Event') {
-        validateEventParams(params)
-      }
-      delete params.eventInput
-
-      let locationName
-      if (params.eventLocation) {
-        params.eventLocationName = params.eventLocation
-        locationName = params.eventLocation
-      } else {
-        params.eventLocationName = null
-        locationName = null
-      }
-      delete params.eventLocation
+      const locationName = validateEventParams(params)
 
       delete params.categoryIds
       delete params.image
@@ -176,6 +163,9 @@ export default {
     UpdatePost: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds } = params
       const { image: imageInput } = params
+
+      const locationName = validateEventParams(params)
+
       delete params.categoryIds
       delete params.image
       const session = context.driver.session()
@@ -227,6 +217,9 @@ export default {
           return post
         })
         const post = await writeTxResultPromise
+        if (locationName) {
+          await createOrUpdateLocations('Post', post.id, locationName, session)
+        }
         return post
       } finally {
         session.close()
