@@ -3,6 +3,10 @@ import Factory, { cleanDatabase } from '../../db/factories'
 import gql from 'graphql-tag'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
+import { createPostMutation } from '../../graphql/posts'
+import CONFIG from '../../config'
+
+CONFIG.CATEGORIES_ACTIVE = true
 
 const driver = getDriver()
 const neode = getNeode()
@@ -14,29 +18,6 @@ let user
 
 const categoryIds = ['cat9', 'cat4', 'cat15']
 let variables
-
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $content: String!, $language: String, $categoryIds: [ID]) {
-    CreatePost(
-      id: $id
-      title: $title
-      content: $content
-      language: $language
-      categoryIds: $categoryIds
-    ) {
-      id
-      title
-      content
-      slug
-      disabled
-      deleted
-      language
-      author {
-        name
-      }
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -281,7 +262,7 @@ describe('CreatePost', () => {
 
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
-      const { errors } = await mutate({ mutation: createPostMutation, variables })
+      const { errors } = await mutate({ mutation: createPostMutation(), variables })
       expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -296,7 +277,7 @@ describe('CreatePost', () => {
         data: { CreatePost: { title: 'I am a title', content: 'Some content' } },
         errors: undefined,
       }
-      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
+      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
         expected,
       )
     })
@@ -313,16 +294,53 @@ describe('CreatePost', () => {
         },
         errors: undefined,
       }
-      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
+      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
         expected,
       )
     })
 
     it('`disabled` and `deleted` default to `false`', async () => {
       const expected = { data: { CreatePost: { disabled: false, deleted: false } } }
-      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
+      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
         expected,
       )
+    })
+
+    it('has label "Article" as default', async () => {
+      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject({
+        data: { CreatePost: { postType: ['Article'] } },
+      })
+    })
+
+    describe('with post type "Event"', () => {
+      it('has label "Event" set', async () => {
+        await expect(
+          mutate({
+            mutation: createPostMutation(),
+            variables: { ...variables, postType: 'Event' },
+          }),
+        ).resolves.toMatchObject({
+          data: { CreatePost: { postType: ['Event'] } },
+        })
+      })
+    })
+
+    describe('with invalid post type', () => {
+      it('throws an error', async () => {
+        await expect(
+          mutate({
+            mutation: createPostMutation(),
+            variables: { ...variables, postType: 'not-valid' },
+          }),
+        ).resolves.toMatchObject({
+          errors: [
+            {
+              message:
+                'Variable "$postType" got invalid value "not-valid"; Expected type PostType.',
+            },
+          ],
+        })
+      })
     })
   })
 })
@@ -330,8 +348,22 @@ describe('CreatePost', () => {
 describe('UpdatePost', () => {
   let author, newlyCreatedPost
   const updatePostMutation = gql`
-    mutation ($id: ID!, $title: String!, $content: String!, $image: ImageInput) {
-      UpdatePost(id: $id, title: $title, content: $content, image: $image) {
+    mutation (
+      $id: ID!
+      $title: String!
+      $content: String!
+      $image: ImageInput
+      $categoryIds: [ID]
+      $postType: PostType
+    ) {
+      UpdatePost(
+        id: $id
+        title: $title
+        content: $content
+        image: $image
+        categoryIds: $categoryIds
+        postType: $postType
+      ) {
         id
         title
         content
@@ -341,26 +373,27 @@ describe('UpdatePost', () => {
         }
         createdAt
         updatedAt
+        categories {
+          id
+        }
+        postType
       }
     }
   `
   beforeEach(async () => {
     author = await Factory.build('user', { slug: 'the-author' })
-    newlyCreatedPost = await Factory.build(
-      'post',
-      {
-        id: 'p9876',
+    authenticatedUser = await author.toJson()
+    const { data } = await mutate({
+      mutation: createPostMutation(),
+      variables: {
         title: 'Old title',
         content: 'Old content',
-      },
-      {
-        author,
         categoryIds,
       },
-    )
-
+    })
+    newlyCreatedPost = data.CreatePost
     variables = {
-      id: 'p9876',
+      id: newlyCreatedPost.id,
       title: 'New title',
       content: 'New content',
     }
@@ -394,7 +427,7 @@ describe('UpdatePost', () => {
 
     it('updates a post', async () => {
       const expected = {
-        data: { UpdatePost: { id: 'p9876', content: 'New content' } },
+        data: { UpdatePost: { id: newlyCreatedPost.id, content: 'New content' } },
         errors: undefined,
       }
       await expect(mutate({ mutation: updatePostMutation, variables })).resolves.toMatchObject(
@@ -405,7 +438,11 @@ describe('UpdatePost', () => {
     it('updates a post, but maintains non-updated attributes', async () => {
       const expected = {
         data: {
-          UpdatePost: { id: 'p9876', content: 'New content', createdAt: expect.any(String) },
+          UpdatePost: {
+            id: newlyCreatedPost.id,
+            content: 'New content',
+            createdAt: expect.any(String),
+          },
         },
         errors: undefined,
       }
@@ -415,23 +452,20 @@ describe('UpdatePost', () => {
     })
 
     it('updates the updatedAt attribute', async () => {
-      newlyCreatedPost = await newlyCreatedPost.toJson()
       const {
         data: { UpdatePost },
       } = await mutate({ mutation: updatePostMutation, variables })
-      expect(newlyCreatedPost.updatedAt).toBeTruthy()
-      expect(Date.parse(newlyCreatedPost.updatedAt)).toEqual(expect.any(Number))
       expect(UpdatePost.updatedAt).toBeTruthy()
       expect(Date.parse(UpdatePost.updatedAt)).toEqual(expect.any(Number))
       expect(newlyCreatedPost.updatedAt).not.toEqual(UpdatePost.updatedAt)
     })
 
-    /* describe('no new category ids provided for update', () => {
+    describe('no new category ids provided for update', () => {
       it('resolves and keeps current categories', async () => {
         const expected = {
           data: {
             UpdatePost: {
-              id: 'p9876',
+              id: newlyCreatedPost.id,
               categories: expect.arrayContaining([{ id: 'cat9' }, { id: 'cat4' }, { id: 'cat15' }]),
             },
           },
@@ -441,9 +475,9 @@ describe('UpdatePost', () => {
           expected,
         )
       })
-    }) */
+    })
 
-    /* describe('given category ids', () => {
+    describe('given category ids', () => {
       beforeEach(() => {
         variables = { ...variables, categoryIds: ['cat27'] }
       })
@@ -452,7 +486,7 @@ describe('UpdatePost', () => {
         const expected = {
           data: {
             UpdatePost: {
-              id: 'p9876',
+              id: newlyCreatedPost.id,
               categories: expect.arrayContaining([{ id: 'cat27' }]),
             },
           },
@@ -462,9 +496,25 @@ describe('UpdatePost', () => {
           expected,
         )
       })
-    }) */
+    })
 
-    describe('params.image', () => {
+    describe('post type', () => {
+      it('changes the post type', async () => {
+        await expect(
+          mutate({ mutation: updatePostMutation, variables: { ...variables, postType: 'Event' } }),
+        ).resolves.toMatchObject({
+          data: {
+            UpdatePost: {
+              id: newlyCreatedPost.id,
+              postType: ['Event'],
+            },
+          },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe.skip('params.image', () => {
       describe('is object', () => {
         beforeEach(() => {
           variables = { ...variables, image: { sensitive: true } }

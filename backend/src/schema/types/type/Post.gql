@@ -171,6 +171,8 @@ type Post {
     @cypher(statement: "MATCH (this)<-[emoted:EMOTED]-(:User) RETURN COUNT(DISTINCT emoted)")
 
   group: Group @relation(name: "IN", direction: "OUT")
+  postType: [PostType]
+    @cypher(statement: "RETURN filter(l IN labels(this) WHERE NOT l = 'Post')")
 }
 
 input _PostInput {
@@ -189,6 +191,7 @@ type Mutation {
     categoryIds: [ID]
     contentExcerpt: String
     groupId: ID
+    postType: PostType = Article
   ): Post
   UpdatePost(
     id: ID!
@@ -200,6 +203,7 @@ type Mutation {
     visibility: Visibility
     language: String
     categoryIds: [ID]
+    postType: PostType
   ): Post
   DeletePost(id: ID!): Post
   AddPostEmotions(to: _PostInput!, data: _EMOTEDInput!): EMOTED

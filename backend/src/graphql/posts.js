@@ -11,6 +11,7 @@ export const createPostMutation = () => {
       $content: String!
       $categoryIds: [ID]
       $groupId: ID
+      $postType: PostType
     ) {
       CreatePost(
         id: $id
@@ -19,11 +20,21 @@ export const createPostMutation = () => {
         content: $content
         categoryIds: $categoryIds
         groupId: $groupId
+        postType: $postType
       ) {
         id
         slug
         title
         content
+        disabled
+        deleted
+        postType
+        author {
+          name
+        }
+        categories {
+          id
+        }
       }
     }
   `

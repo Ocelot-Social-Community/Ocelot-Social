@@ -125,12 +125,13 @@ export default {
             SET post.updatedAt = toString(datetime())
             SET post.clickedCount = 0
             SET post.viewedTeaserCount = 0
+            SET post:${params.postType}
             WITH post
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
             ${categoriesCypher}
             ${groupCypher}
-            RETURN post {.*}
+            RETURN post {.*, postType: filter(l IN labels(post) WHERE NOT l = "Post") }
           `,
           { userId: context.user.id, categoryIds, groupId, params },
         )
@@ -183,7 +184,16 @@ export default {
         `
       }
 
-      updatePostCypher += `RETURN post {.*}`
+      if (params.postType) {
+        updatePostCypher += `
+          REMOVE post:Article
+          REMOVE post:Event
+          SET post:${params.postType}
+          WITH post
+        `
+      }
+
+      updatePostCypher += `RETURN post {.*, postType: filter(l IN labels(post) WHERE NOT l = "Post")}`
       const updatePostVariables = { categoryIds, params }
       try {
         const writeTxResultPromise = session.writeTransaction(async (transaction) => {
