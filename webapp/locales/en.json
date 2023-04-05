@@ -278,6 +278,7 @@
     "inappropriatePicture": "This image may be inappropriate for some people.",
     "languageSelectLabel": "Language of your contribution",
     "languageSelectText": "Select Language",
+    "newEvent": "Create a new Event",
     "newPost": "Create a new Post",
     "success": "Saved!",
     "teaserImage": {
@@ -684,6 +685,12 @@
       "submitted": "Comment submitted!",
       "updated": "Changes saved!"
     },
+    "createNewEvent": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Create A New Event"
+    },
     "createNewPost": {
       "forGroup": {
         "title": "For The Group “{name}”"
@@ -706,6 +713,7 @@
       "unpinnedSuccessfully": "Post unpinned successfully!"
     },
     "name": "Post",
+    "event":"Event",
     "pinned": "Announcement",
     "takeAction": {
       "name": "Take action"

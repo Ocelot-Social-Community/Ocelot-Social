@@ -278,6 +278,7 @@
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache Deines Beitrags",
     "languageSelectText": "Sprache wählen",
+    "newEvent": "Erstelle einen neue Veranstaltung",
     "newPost": "Erstelle einen neuen Beitrag",
     "success": "Gespeichert!",
     "teaserImage": {
@@ -684,6 +685,12 @@
       "submitted": "Kommentar gesendet",
       "updated": "Änderungen gespeichert"
     },
+    "createNewEvent": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Erstelle ein neues Event"
+    },
     "createNewPost": {
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
@@ -706,6 +713,7 @@
       "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!"
     },
     "name": "Beitrag",
+    "event":"Veranstaltung",
     "pinned": "Meldung",
     "takeAction": {
       "name": "Aktiv werden"

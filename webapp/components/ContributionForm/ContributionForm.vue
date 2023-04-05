@@ -30,6 +30,15 @@
             <base-icon name="question-circle" />
           </page-params-link>
         </div>
+        <div>
+          <h1 class="text-h1" v-if="creatEvent">Start, End Datum</h1>
+          <h1 class="text-h1" v-if="creatEvent">Location</h1>
+          <h1 class="text-h1" v-if="creatEvent">Strasse</h1>
+          <h1 class="text-h1" v-if="creatEvent">Nr.</h1>
+          <h1 class="text-h1" v-if="creatEvent">PLZ</h1>
+          <h1 class="text-h1" v-if="creatEvent">Ort</h1>
+        </div>
+       
         <ds-input
           model="title"
           :placeholder="$t('contribution.title')"
@@ -119,6 +128,10 @@ export default {
       type: Object,
       default: () => null,
     },
+    creatEvent: {
+      type: Boolean,
+      default: false,
+    }
   },
   data() {
     const { title, content, image, categories } = this.contribution
@@ -180,6 +193,10 @@ export default {
   },
   methods: {
     submit() {
+      if (creatEvent) { 
+        alert('EVENT speichern')
+        return
+      }
       let image = null
       const { title, content, categoryIds } = this.formData
       if (this.formData.image) {
