@@ -1,19 +1,21 @@
 <template>
   <div>
     <ds-space margin="small">
-     
-      <ds-grid :min-column-width="200">
-      <ds-grid-item>
-        <ds-heading tag="h1">{{ creatEvent ? $t('post.createNewEvent.title') : $t('post.createNewPost.title') }}</ds-heading>
-        <ds-heading v-if="group" tag="h2">
-        {{ $t('post.createNewPost.forGroup.title', { name: group.name }) }}
-      </ds-heading>
-      </ds-grid-item>
-      <ds-grid-item>
-        <ds-button size="x-large" @click="creatEvent = !creatEvent">{{  creatEvent ? $t('post.name') : $t('post.event')  }}</ds-button>
-      </ds-grid-item>
-    </ds-grid>
-     
+      <ds-grid>
+        <ds-grid-item>
+          <ds-heading tag="h1">
+            {{ creatEvent ? $t('post.createNewEvent.title') : $t('post.createNewPost.title') }}
+          </ds-heading>
+          <ds-heading v-if="group" tag="h2">
+            {{ $t('post.createNewPost.forGroup.title', { name: group.name }) }}
+          </ds-heading>
+        </ds-grid-item>
+        <ds-grid-item>
+          <ds-button size="x-large" @click="creatEvent = !creatEvent">
+            {{ creatEvent ? $t('post.name') : $t('post.event') }}
+          </ds-button>
+        </ds-grid-item>
+      </ds-grid>
     </ds-space>
     <ds-space margin="large" />
     <ds-flex :width="{ base: '100%' }" gutter="base">

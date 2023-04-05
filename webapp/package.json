@@ -60,6 +60,7 @@
     "vue-observe-visibility": "^1.0.0",
     "vue-scrollto": "^2.20.0",
     "vue-sweetalert-icons": "~4.3.1",
+    "vue2-datepicker": "^3.11.1",
     "vuex-i18n": "~1.13.1",
     "xregexp": "^4.3.0",
     "zxcvbn": "^4.4.2"

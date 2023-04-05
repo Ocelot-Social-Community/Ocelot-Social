@@ -30,15 +30,33 @@
             <base-icon name="question-circle" />
           </page-params-link>
         </div>
-        <div>
-          <h1 class="text-h1" v-if="creatEvent">Start, End Datum</h1>
-          <h1 class="text-h1" v-if="creatEvent">Location</h1>
-          <h1 class="text-h1" v-if="creatEvent">Strasse</h1>
-          <h1 class="text-h1" v-if="creatEvent">Nr.</h1>
-          <h1 class="text-h1" v-if="creatEvent">PLZ</h1>
-          <h1 class="text-h1" v-if="creatEvent">Ort</h1>
-        </div>
+        <div v-if="creatEvent">
+          <div>
+    <!-- <date-picker v-model="eventStart" valueType="format" shortcuts></date-picker> -->
+    <date-picker v-model="formData.eventStart" type="datetime"></date-picker>
+    <date-picker v-model="formData.eventEnd" type="datetime" ></date-picker>
+    <!-- <date-picker v-model="eventStart" range ></date-picker>
+    <date-picker v-model="eventStart" range disabled = "true"></date-picker> -->
+  </div>
+
+          <ds-grid>
+            <ds-grid-item>
+              <ds-input model="eventStart" name="eventStart" placeholder="Start" size="large" />
+            </ds-grid-item>
+            <ds-grid-item>
+              <ds-input model="eventEnd" name="eventEnd" placeholder="End" size="large" />
+            </ds-grid-item>
+          </ds-grid>
+         
        
+          <ds-input model="eventLocation" name="eventStart" placeholder="Location" size="large" />
+
+          <ds-input model="eventVenue" name="eventVenue" placeholder="Ort" size="large" />
+
+          <input type="checkbox" model="eventOnline" value="Online" />
+          Online
+        </div>
+        <ds-space margin-top="base"></ds-space>
         <ds-input
           model="title"
           :placeholder="$t('contribution.title')"
@@ -111,6 +129,8 @@ import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import ImageUploader from '~/components/Uploader/ImageUploader'
 import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
+import DatePicker from 'vue2-datepicker';
+  import 'vue2-datepicker/scss/index.scss';
 
 export default {
   components: {
@@ -118,6 +138,7 @@ export default {
     ImageUploader,
     PageParamsLink,
     CategoriesSelect,
+    DatePicker,
   },
   props: {
     contribution: {
@@ -131,10 +152,28 @@ export default {
     creatEvent: {
       type: Boolean,
       default: false,
-    }
+    },
   },
+
+  //       input _EventInput {
+  //   eventStart: String!
+  //   eventEnd: String!
+  //   eventLocation: String
+  //   eventVenue: String  ort
+  // }
+
   data() {
-    const { title, content, image, categories } = this.contribution
+    const {
+      title,
+      content,
+      image,
+      categories,
+      eventStart,
+      eventEnd,
+      eventLocation,
+      eventVenue,
+      eventOnline,
+    } = this.contribution
     const {
       sensitive: imageBlurred = false,
       aspectRatio: imageAspectRatio = null,
@@ -152,6 +191,14 @@ export default {
         imageType,
         imageBlurred,
         categoryIds: categories ? categories.map((category) => category.id) : [],
+        eventStart: null,
+        eventEnd: new Date(),
+        eventLocation: '',
+        eventVenue: '',
+        eventOnline: true,
+        time1: null, 
+        time2: null,
+        time3: null,
       },
       formSchema: {
         title: { required: true, min: 3, max: 100 },
@@ -159,7 +206,7 @@ export default {
         imageBlurred: { required: false },
         categoryIds: {
           type: 'array',
-          required: this.categoriesActive,
+          required: this.categoriesActive, 
           validator: (_, value = []) => {
             if (this.categoriesActive && (value.length === 0 || value.length > 3)) {
               return [new Error(this.$t('common.validations.categories'))]
@@ -193,11 +240,12 @@ export default {
   },
   methods: {
     submit() {
-      if (creatEvent) { 
+      if (creatEvent) {
         alert('EVENT speichern')
         return
       }
       let image = null
+
       const { title, content, categoryIds } = this.formData
       if (this.formData.image) {
         image = {
@@ -220,6 +268,8 @@ export default {
             id: this.contribution.id || null,
             image,
             groupId: this.groupId,
+            postType: 'Article',
+            eventInput: '$eventInput',
           },
         })
         .then(({ data }) => {
