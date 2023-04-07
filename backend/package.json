@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social-backend",
-  "version": "2.4.0",
+  "version": "2.5.1",
   "description": "GraphQL Backend for ocelot.social",
   "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
   "author": "ocelot.social Community",
@@ -87,7 +87,7 @@
     "mustache": "^4.2.0",
     "neo4j-driver": "^4.0.2",
     "neo4j-graphql-js": "^2.11.5",
-    "neode": "^0.4.8",
+    "neode": "^0.4.9",
     "node-fetch": "~2.6.1",
     "nodemailer": "^6.4.4",
     "nodemailer-html-to-text": "^3.2.0",

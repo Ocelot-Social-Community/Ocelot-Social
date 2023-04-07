@@ -11,7 +11,15 @@
         "
         @click.prevent="toggleMenu"
       >
-        <profile-avatar :profile="user" size="small" />
+        <profile-avatar
+          :profile="user"
+          size="small"
+          :showProfileNameTitle="false"
+          v-tooltip="{
+            content: $t('header.avatarMenu.button.tooltip'),
+            placement: 'bottom-start',
+          }"
+        />
         <base-icon class="dropdown-arrow" name="angle-down" />
       </a>
     </template>
@@ -80,7 +88,7 @@ export default {
           icon: 'user',
         },
         {
-          name: this.$t('header.avatarMenu.Groups'),
+          name: this.$t('header.avatarMenu.groups'),
           path: '/groups',
           icon: 'users',
         },
