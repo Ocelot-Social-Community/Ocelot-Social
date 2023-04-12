@@ -44,3 +44,19 @@ module.exports = defineConfig({
     setupNodeEvents,
   },
 });
+
+module.exports = defineConfig({
+  e2e: {
+    projectId: "qa7fe2",
+    chromeWebSecurity: false,
+    baseUrl: "http://localhost:3000",
+    specPattern: "cypress/e2e/**/*.feature",
+    supportFile: "cypress/support/e2e.js",
+    retries: {
+      runMode: 2,
+      openMode: 0,
+    },
+    video: false,
+    setupNodeEvents,
+  },
+});
