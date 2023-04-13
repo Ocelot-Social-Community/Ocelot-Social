@@ -6,6 +6,7 @@ import {
   userFragment,
   postFragment,
   commentFragment,
+  groupFragment,
 } from './Fragments'
 
 export const profileUserQuery = (i18n) => {
@@ -113,6 +114,7 @@ export const notificationQuery = (_i18n) => {
     ${userFragment}
     ${commentFragment}
     ${postFragment}
+    ${groupFragment}
 
     query ($read: Boolean, $orderBy: NotificationOrdering, $first: Int, $offset: Int) {
       notifications(read: $read, orderBy: $orderBy, first: $first, offset: $offset) {
@@ -121,6 +123,9 @@ export const notificationQuery = (_i18n) => {
         reason
         createdAt
         updatedAt
+        to {
+          ...user
+        }
         from {
           __typename
           ... on Post {
@@ -141,6 +146,12 @@ export const notificationQuery = (_i18n) => {
               }
             }
           }
+          ... on Group {
+            ...group
+          }
+        }
+        relatedUser {
+          ...user
         }
       }
     }
@@ -152,6 +163,7 @@ export const markAsReadMutation = (_i18n) => {
     ${userFragment}
     ${commentFragment}
     ${postFragment}
+    ${groupFragment}
 
     mutation ($id: ID!) {
       markAsRead(id: $id) {
@@ -177,6 +189,9 @@ export const markAsReadMutation = (_i18n) => {
               }
             }
           }
+          ... on Group {
+            ...group
+          }
         }
       }
     }
@@ -188,6 +203,7 @@ export const markAllAsReadMutation = (_i18n) => {
     ${userFragment}
     ${commentFragment}
     ${postFragment}
+    ${groupFragment}
 
     mutation {
       markAllAsRead {
@@ -212,6 +228,9 @@ export const markAllAsReadMutation = (_i18n) => {
                 ...user
               }
             }
+          }
+          ... on Group {
+            ...group
           }
         }
       }

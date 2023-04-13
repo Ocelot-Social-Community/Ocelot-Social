@@ -3,6 +3,13 @@ import { cleanDatabase } from '../../db/factories'
 import { createTestClient } from 'apollo-server-testing'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer, { pubsub } from '../../server'
+import {
+  createGroupMutation,
+  joinGroupMutation,
+  leaveGroupMutation,
+  changeGroupMemberRoleMutation,
+  removeUserFromGroupMutation,
+} from '../../graphql/groups'
 
 let server, query, mutate, notifiedUser, authenticatedUser
 let publishSpy
@@ -92,6 +99,9 @@ describe('notifications', () => {
         read
         reason
         createdAt
+        relatedUser {
+          id
+        }
         from {
           __typename
           ... on Post {
@@ -101,6 +111,9 @@ describe('notifications', () => {
           ... on Comment {
             id
             content
+          }
+          ... on Group {
+            id
           }
         }
       }
@@ -185,6 +198,7 @@ describe('notifications', () => {
                       id: 'c47',
                       content: commentContent,
                     },
+                    relatedUser: null,
                   },
                 ],
               },
@@ -357,6 +371,7 @@ describe('notifications', () => {
                       id: 'p47',
                       content: expectedUpdatedContent,
                     },
+                    relatedUser: null,
                   },
                 ],
               },
@@ -513,6 +528,7 @@ describe('notifications', () => {
                       id: 'c47',
                       content: commentContent,
                     },
+                    relatedUser: null,
                   },
                 ],
               },
@@ -547,6 +563,7 @@ describe('notifications', () => {
                       id: 'c47',
                       content: commentContent,
                     },
+                    relatedUser: null,
                   },
                 ],
               },
@@ -612,6 +629,234 @@ describe('notifications', () => {
             )
             expect(publishSpy).toHaveBeenCalledTimes(1)
           })
+        })
+      })
+    })
+  })
+
+  describe('group notifications', () => {
+    let groupOwner
+
+    beforeEach(async () => {
+      groupOwner = await neode.create(
+        'User',
+        {
+          id: 'group-owner',
+          name: 'Group Owner',
+          slug: 'group-owner',
+        },
+        {
+          email: 'owner@example.org',
+          password: '1234',
+        },
+      )
+      authenticatedUser = await groupOwner.toJson()
+      await mutate({
+        mutation: createGroupMutation(),
+        variables: {
+          id: 'closed-group',
+          name: 'The Closed Group',
+          about: 'Will test the closed group!',
+          description: 'Some description' + Array(50).join('_'),
+          groupType: 'public',
+          actionRadius: 'regional',
+          categoryIds,
+        },
+      })
+    })
+
+    describe('user joins group', () => {
+      beforeEach(async () => {
+        authenticatedUser = await notifiedUser.toJson()
+        await mutate({
+          mutation: joinGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: authenticatedUser.id,
+          },
+        })
+        authenticatedUser = await groupOwner.toJson()
+      })
+
+      it('has the notification in database', async () => {
+        await expect(
+          query({
+            query: notificationQuery,
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            notifications: [
+              {
+                read: false,
+                reason: 'user_joined_group',
+                createdAt: expect.any(String),
+                from: {
+                  __typename: 'Group',
+                  id: 'closed-group',
+                },
+                relatedUser: {
+                  id: 'you',
+                },
+              },
+            ],
+          },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('user leaves group', () => {
+      beforeEach(async () => {
+        authenticatedUser = await notifiedUser.toJson()
+        await mutate({
+          mutation: joinGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: authenticatedUser.id,
+          },
+        })
+        await mutate({
+          mutation: leaveGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: authenticatedUser.id,
+          },
+        })
+        authenticatedUser = await groupOwner.toJson()
+      })
+
+      it('has two the notification in database', async () => {
+        await expect(
+          query({
+            query: notificationQuery,
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            notifications: [
+              {
+                read: false,
+                reason: 'user_left_group',
+                createdAt: expect.any(String),
+                from: {
+                  __typename: 'Group',
+                  id: 'closed-group',
+                },
+                relatedUser: {
+                  id: 'you',
+                },
+              },
+              {
+                read: false,
+                reason: 'user_joined_group',
+                createdAt: expect.any(String),
+                from: {
+                  __typename: 'Group',
+                  id: 'closed-group',
+                },
+                relatedUser: {
+                  id: 'you',
+                },
+              },
+            ],
+          },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('user role in group changes', () => {
+      beforeEach(async () => {
+        authenticatedUser = await notifiedUser.toJson()
+        await mutate({
+          mutation: joinGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: authenticatedUser.id,
+          },
+        })
+        authenticatedUser = await groupOwner.toJson()
+        await mutate({
+          mutation: changeGroupMemberRoleMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: 'you',
+            roleInGroup: 'admin',
+          },
+        })
+        authenticatedUser = await notifiedUser.toJson()
+      })
+
+      it('has notification in database', async () => {
+        await expect(
+          query({
+            query: notificationQuery,
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            notifications: [
+              {
+                read: false,
+                reason: 'changed_group_member_role',
+                createdAt: expect.any(String),
+                from: {
+                  __typename: 'Group',
+                  id: 'closed-group',
+                },
+                relatedUser: {
+                  id: 'group-owner',
+                },
+              },
+            ],
+          },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('user is removed from group', () => {
+      beforeEach(async () => {
+        authenticatedUser = await notifiedUser.toJson()
+        await mutate({
+          mutation: joinGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: authenticatedUser.id,
+          },
+        })
+        authenticatedUser = await groupOwner.toJson()
+        await mutate({
+          mutation: removeUserFromGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: 'you',
+          },
+        })
+        authenticatedUser = await notifiedUser.toJson()
+      })
+
+      it('has notification in database', async () => {
+        await expect(
+          query({
+            query: notificationQuery,
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            notifications: [
+              {
+                read: false,
+                reason: 'removed_user_from_group',
+                createdAt: expect.any(String),
+                from: {
+                  __typename: 'Group',
+                  id: 'closed-group',
+                },
+                relatedUser: {
+                  id: 'group-owner',
+                },
+              },
+            ],
+          },
+          errors: undefined,
         })
       })
     })
