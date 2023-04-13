@@ -7,6 +7,8 @@ import Resolver from './helpers/Resolver'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
+import { validateEventParams } from './helpers/events'
+import { createOrUpdateLocations } from './users/location'
 import CONFIG from '../../config'
 
 const maintainPinnedPosts = (params) => {
@@ -81,6 +83,9 @@ export default {
     CreatePost: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds, groupId } = params
       const { image: imageInput } = params
+
+      const locationName = validateEventParams(params)
+
       delete params.categoryIds
       delete params.image
       delete params.groupId
@@ -143,6 +148,9 @@ export default {
       })
       try {
         const post = await writeTxResultPromise
+        if (locationName) {
+          await createOrUpdateLocations('Post', post.id, locationName, session)
+        }
         return post
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
@@ -155,6 +163,9 @@ export default {
     UpdatePost: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds } = params
       const { image: imageInput } = params
+
+      const locationName = validateEventParams(params)
+
       delete params.categoryIds
       delete params.image
       const session = context.driver.session()
@@ -206,6 +217,9 @@ export default {
           return post
         })
         const post = await writeTxResultPromise
+        if (locationName) {
+          await createOrUpdateLocations('Post', post.id, locationName, session)
+        }
         return post
       } finally {
         session.close()
@@ -392,7 +406,17 @@ export default {
   },
   Post: {
     ...Resolver('Post', {
-      undefinedToNull: ['activityId', 'objectId', 'language', 'pinnedAt', 'pinned'],
+      undefinedToNull: [
+        'activityId',
+        'objectId',
+        'language',
+        'pinnedAt',
+        'pinned',
+        'eventVenue',
+        'eventLocation',
+        'eventLocationName',
+        'eventStart',
+      ],
       hasMany: {
         tags: '-[:TAGGED]->(related:Tag)',
         categories: '-[:CATEGORIZED]->(related:Category)',
@@ -405,6 +429,7 @@ export default {
         pinnedBy: '<-[:PINNED]-(related:User)',
         image: '-[:HERO_IMAGE]->(related:Image)',
         group: '-[:IN]->(related:Group)',
+        eventLocation: '-[:IS_IN]->(related:Location)',
       },
       count: {
         commentsCount:
