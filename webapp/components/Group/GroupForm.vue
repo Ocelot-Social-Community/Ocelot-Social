@@ -123,6 +123,33 @@
         </ds-chip>
 
         <!-- location -->
+        <!--- <Leaflet--->
+          XXX
+          <client-only>
+            <div style="height: 350px">
+              <l-geosearch :use-openstreetmap="true" @results="handleResults" />
+              <l-map
+                ref="map"
+                :zoom="zoom"
+                :center="center"
+                :options="{ zoomControl: true, attributionControl: true }"
+                :marker-zoom-animation="true"
+                @click="addMarker"
+                @update:zoom="zoomUpdated"
+                @update:center="centerUpdated"
+              >
+                <l-tile-layer :url="url" :attribution="attribution" />
+                <v-geosearch :options="geosearchOptions" ></v-geosearch>
+                <l-marker ref="marker" :lat-lng="marker" draggable @update:lat-lng="latLngUpdate">
+                    <l-popup ref="popup">Test</l-popup>
+                </l-marker>
+              </l-map>
+            </div>
+          </client-only>
+
+        <!--- <Leaflet End --->
+
+
         <ds-select
           id="city"
           :label="$t('settings.data.labelCity') + locationNameLabelAddOnOldName"
@@ -188,6 +215,11 @@ import {
 } from '~/constants/groups.js'
 import Editor from '~/components/Editor/Editor'
 import { queryLocations } from '~/graphql/location'
+import { latLng } from "leaflet";
+import { LMap, LTileLayer, LMarker, LPopup } from "vue2-leaflet"
+import { OpenStreetMapProvider } from 'leaflet-geosearch'
+import VGeosearch from 'vue2-leaflet-geosearch'
+import 'leaflet/dist/leaflet.css'
 
 let timeout
 
@@ -196,8 +228,15 @@ export default {
   components: {
     CategoriesSelect,
     Editor,
+    LMap,
+    LTileLayer,
+    LMarker,
+    LPopup,
+    VGeosearch,
   },
   props: {
+    modelValue: { type: Array },
+    title: { type: String },
     update: {
       type: Boolean,
       required: false,
@@ -217,6 +256,13 @@ export default {
       disabled: false,
       groupTypeOptions: ['public', 'closed', 'hidden'],
       actionRadiusOptions: ['regional', 'national', 'continental', 'global'],
+      zoom: 6,
+      resultLatlng: null,
+      center: [50.9356124, 14.1483645],
+      marker: [50.9356124, 14.1483645],
+      markerOptions: { opacity: 0, width: '10px', height: '10px' },
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      attribution: '<a href="http://osm.org/copyright">OpenStreetMap</a>',
       loadingGeo: false,
       cities: [],
       formData: {
@@ -394,6 +440,37 @@ export default {
       this.loadingGeo = false
 
       return this.cities.find((city) => city.value === value)
+    },
+    addMarker(e) {
+      console.log('addMarker', e)
+      console.log('addMarker', e.latlng)
+      this.marker = this.center
+      console.log(this.marker)
+      setTimeout(() => this.$refs.marker.leafletObject.openPopup(), 100)
+    },
+    zoomUpdated(zoom) {
+      this.zoom = zoom
+    },
+    centerUpdated(center) {
+      this.center = center
+    },
+    latLngUpdate(e) {
+      console.log('latLngUpdate', e)
+      console.log('latLngUpdate', [e.lat, e.lng])
+      //this.marker = LatLng(e.latlng)
+      this.$emit('update-lat-lang', e, this.zoom, this.center)
+    },
+    handleResults(result) {
+      // Use the Overpass API to find the corresponding geodatas
+      const query = '[out:json][timeout:25];(node["name"="${result}"];);out body;>;out skel qt;'
+      const url = 'https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}'
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          const lat = data.elements[0].lat;
+          const lon = data.elements[0].lon;
+          this.resultLatlng = [lat, lon];
+        });
     },
   },
 }
