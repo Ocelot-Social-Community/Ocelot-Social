@@ -8,7 +8,7 @@
 import PostDetail from '~/components/PostDetail/PostDetail.vue'
 
 export default {
-  name: 'PostSlug',
+  name: 'EventSlug',
   transition: {
     name: 'slide-up',
     mode: 'out-in',
@@ -18,13 +18,10 @@ export default {
   },
   mixins: [],
   head() {
-    return {
-
-    }
+    
   },
   data() {
-    return {
-
+    return {      
     }
   },
   mounted() {
