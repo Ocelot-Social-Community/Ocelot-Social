@@ -40,5 +40,10 @@ spec:
             name: configmap-{{ .Release.Name }}-webapp
         - secretRef:
             name: secret-{{ .Release.Name }}-webapp
+        resources:
+          requests:
+            memory: {{ .Values.WEBAPP.RESOURCE_REQUESTS_MEMORY | default "1G" | quote }}
+          limits:
+            memory: {{ .Values.WEBAPP.RESOURCE_LIMITS_MEMORY | default "2G" | quote }}
       restartPolicy: {{ .Values.WEBAPP.CONTAINER_RESTART_POLICY }}
       terminationGracePeriodSeconds: {{ .Values.WEBAPP.CONTAINER_TERMINATION_GRACE_PERIOD_SECONDS }}
