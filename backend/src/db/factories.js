@@ -165,7 +165,7 @@ Factory.define('post')
   })
   .after(async (buildObject, options) => {
     const [post, author, image, /* categories, */ tags] = await Promise.all([
-      neode.create('Post', buildObject),
+      neode.create('Article', buildObject),
       options.author,
       options.image,
       // options.categories,
