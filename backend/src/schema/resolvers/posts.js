@@ -416,6 +416,8 @@ export default {
         'eventLocation',
         'eventLocationName',
         'eventStart',
+        'eventEnd',
+        'eventIsOnline',
       ],
       hasMany: {
         tags: '-[:TAGGED]->(related:Tag)',
