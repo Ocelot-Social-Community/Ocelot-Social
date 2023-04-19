@@ -41,9 +41,9 @@ spec:
             name: secret-{{ .Release.Name }}-backend
         resources:
           requests:
-            memory: {{ .Values.BACKEND.RESOURCE_REQUESTS_MEMORY | default "1G" | quote }}
+            memory: {{ .Values.BACKEND.RESOURCE_REQUESTS_MEMORY | default "500M" | quote }}
           limits:
-            memory: {{ .Values.BACKEND.RESOURCE_LIMITS_MEMORY | default "2G" | quote }}
+            memory: {{ .Values.BACKEND.RESOURCE_LIMITS_MEMORY | default "1G" | quote }}
         ports:
         - containerPort: 4000
           protocol: TCP
