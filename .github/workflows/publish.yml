@@ -308,7 +308,7 @@ jobs:
           repository: 'Ocelot-Social-Community/stage.ocelot.social'
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "GITHUB_RUN_NUMBER": "${{ env.GITHUB_RUN_NUMBER }}", "VERSION": "${VERSION}", "BUILD_DATE": "${BUILD_DATE}", "BUILD_COMMIT": "${BUILD_COMMIT}", "BUILD_VERSION": "${BUILD_VERSION}"}'
       
-        name: Repository Dispatch stage.yunite.me
+      - name: Repository Dispatch stage.yunite.me
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.OCELOT_PUBLISH_EVENT_PAT }} # this token is required to access the other repository
