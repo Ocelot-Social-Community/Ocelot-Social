@@ -1,23 +1,42 @@
 <template>
   <div>
     <ds-space margin="small">
-      <ds-grid>
-        <ds-grid-item>
-          <ds-heading tag="h1">
-            {{ creatEvent ? $t('post.createNewEvent.title') : $t('post.createNewPost.title') }}
-          </ds-heading>
-          <ds-heading v-if="group" tag="h2">
+      <ds-flex :width="{ base: '100%' }" gutter="base">
+        <ds-flex-item :width="{ base: '100%', md: 5 }">
+          <ds-flex gutter="base" :width="{ base: '100%', sm: 1 }">
+            <ds-flex-item>
+              <ds-card header="" :primary="!creatEvent" centered>
+                <template slot="footer">
+                  <ds-heading v-if="!creatEvent" tag="h2">
+                    {{ $t('post.createNewPost.title') }}
+                  </ds-heading>
+                  <ds-button v-if="!!creatEvent" @click="creatEvent = !creatEvent">
+                    {{ $t('post.createNewPost.title') }}
+                  </ds-button>
+                </template>
+              </ds-card>
+            </ds-flex-item>
+            <ds-flex-item>
+              <ds-card header="" :primary="!!creatEvent" centered>
+                <template slot="footer">
+                  <ds-heading v-if="creatEvent" tag="h2">
+                    {{ $t('post.createNewEvent.title') }}
+                  </ds-heading>
+                  <ds-button v-if="!creatEvent" @click="creatEvent = !creatEvent">
+                    {{ $t('post.createNewEvent.title') }}
+                  </ds-button>
+                </template>
+              </ds-card>
+            </ds-flex-item>
+          </ds-flex>
+          <div v-if="group" style="font-size: 30px; text-align: center">
             {{ $t('post.createNewPost.forGroup.title', { name: group.name }) }}
-          </ds-heading>
-        </ds-grid-item>
-        <ds-grid-item>
-          <ds-button size="x-large" @click="creatEvent = !creatEvent">
-            {{ creatEvent ? $t('post.name') : $t('post.event') }}
-          </ds-button>
-        </ds-grid-item>
-      </ds-grid>
+          </div>
+        </ds-flex-item>
+        <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
+      </ds-flex>
     </ds-space>
-    <ds-space margin="large" />
+    <ds-space margin="small" />
     <ds-flex :width="{ base: '100%' }" gutter="base">
       <ds-flex-item :width="{ base: '100%', md: 5 }">
         <contribution-form :group="group" :creatEvent="creatEvent" />

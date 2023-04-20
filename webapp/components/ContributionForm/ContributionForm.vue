@@ -30,31 +30,77 @@
             <base-icon name="question-circle" />
           </page-params-link>
         </div>
-        <div v-if="creatEvent">
-          <div>
-    <!-- <date-picker v-model="eventStart" valueType="format" shortcuts></date-picker> -->
-    <date-picker v-model="formData.eventStart" type="datetime"></date-picker>
-    <date-picker v-model="formData.eventEnd" type="datetime" ></date-picker>
-    <!-- <date-picker v-model="eventStart" range ></date-picker>
-    <date-picker v-model="eventStart" range disabled = "true"></date-picker> -->
-  </div>
-
+        <div v-if="creatEvent" class="eventDatas" style="background-color: #efeef1; padding: 10px">
+          {{ datePickerStart }}, {{ formData.eventStart }}
           <ds-grid>
-            <ds-grid-item>
-              <ds-input model="eventStart" name="eventStart" placeholder="Start" size="large" />
+            <ds-grid-item style="grid-row-end: span 3">
+              <label>Beginn</label>
+              <div style="z-index: 20">
+                <date-picker
+                  name="datePickerStart"
+                  v-model="datePickerStart"
+                  type="datetime"
+                  :hour-options="hours"
+                  value-type="format"
+                  formmat="DD-MM-YYYY HH:mm"
+                  @input="xxx"
+                  style="z-index: 20"
+                ></date-picker>
+                <ds-input
+                  model="datePickerStart"
+                  v-model="formData.datePickerStart"
+                  style="position: absolute; min-width: 300px; margin-top: -38px; z-index: 0"
+                />
+              </div>
+              <div class="chipbox" style="margin-top: 10px">
+                <ds-chip size="base" :color="errors && errors.datePickerStart && 'danger'">
+                  <base-icon v-if="errors && errors.datePickerStart" name="warning" />
+                </ds-chip>
+              </div>
             </ds-grid-item>
-            <ds-grid-item>
-              <ds-input model="eventEnd" name="eventEnd" placeholder="End" size="large" />
+            <ds-grid-item style="grid-row-end: span 3">
+              <label>Ende (optional)</label>
+
+              <date-picker
+                v-model="formData.eventEnd"
+                type="datetime"
+                :minute-step="15"
+                :hour-options="hours"
+                formmat="DD MM YYYY HH:mm"
+              ></date-picker>
             </ds-grid-item>
           </ds-grid>
-         
-       
-          <ds-input model="eventLocation" name="eventStart" placeholder="Location" size="large" />
+          <ds-grid>
+            <ds-grid-item style="grid-row-end: span 3">
+              <ds-input model="eventLocation" name="location" placeholder="Location" size="large" />
+              <div class="chipbox">
+                <ds-chip size="base" :color="errors && errors.eventLocation && 'danger'">
+                  {{ formData.eventLocation.length }}/{{ formSchema.eventLocation.max }}
+                  <base-icon v-if="errors && errors.eventLocation" name="warning" />
+                </ds-chip>
+              </div>
+            </ds-grid-item>
+            <ds-grid-item style="grid-row-end: span 3">
+              <ds-input model="eventVenue" name="venue" placeholder="Ort" size="large" />
+              <div class="chipbox">
+                {{ errors }}
+                <ds-chip size="base" :color="errors && errors.eventVenue && 'danger'">
+                  {{ formData.eventVenue.length }}/{{ formSchema.eventVenue.max }}
+                  <base-icon v-if="errors && errors.eventVenue" name="warning" />
+                </ds-chip>
+              </div>
+            </ds-grid-item>
+          </ds-grid>
 
-          <ds-input model="eventVenue" name="eventVenue" placeholder="Ort" size="large" />
-
-          <input type="checkbox" model="eventOnline" value="Online" />
-          Online
+          <div>
+            <input
+              type="checkbox"
+              model="formData.eventOnline"
+              name="eventOnline"
+              style="font-size: larger"
+            />
+            Online Event
+          </div>
         </div>
         <ds-space margin-top="base"></ds-space>
         <ds-input
@@ -94,6 +140,7 @@
         <ds-flex class="buttons-footer" gutter="xxx-small">
           <ds-flex-item width="3.5" style="margin-right: 16px; margin-bottom: 6px">
             <!-- eslint-disable vue/no-v-text-v-html-on-component -->
+            <!-- TODO => remove v-html! only text ! no html! secrurity first! -->
             <ds-text
               v-if="showGroupHint"
               v-html="$t('contribution.visibleOnlyForMembersOfGroup', { name: groupName })"
@@ -119,7 +166,6 @@
     </template>
   </ds-form>
 </template>
-
 <script>
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
@@ -129,8 +175,8 @@ import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import ImageUploader from '~/components/Uploader/ImageUploader'
 import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
-import DatePicker from 'vue2-datepicker';
-  import 'vue2-datepicker/scss/index.scss';
+import DatePicker from 'vue2-datepicker'
+import 'vue2-datepicker/scss/index.scss'
 
 export default {
   components: {
@@ -173,6 +219,7 @@ export default {
       eventLocation,
       eventVenue,
       eventOnline,
+      datePickerStart,
     } = this.contribution
     const {
       sensitive: imageBlurred = false,
@@ -183,6 +230,8 @@ export default {
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       links,
+      hours: Array.from({ length: 10 }).map((_, i) => i + 8),
+      datePickerStart: null,
       formData: {
         title: title || '',
         content: content || '',
@@ -192,13 +241,11 @@ export default {
         imageBlurred,
         categoryIds: categories ? categories.map((category) => category.id) : [],
         eventStart: null,
-        eventEnd: new Date(),
+        eventEnd: null,
         eventLocation: '',
         eventVenue: '',
         eventOnline: true,
-        time1: null, 
-        time2: null,
-        time3: null,
+        datePickerStart: null,
       },
       formSchema: {
         title: { required: true, min: 3, max: 100 },
@@ -206,7 +253,7 @@ export default {
         imageBlurred: { required: false },
         categoryIds: {
           type: 'array',
-          required: this.categoriesActive, 
+          required: this.categoriesActive,
           validator: (_, value = []) => {
             if (this.categoriesActive && (value.length === 0 || value.length > 3)) {
               return [new Error(this.$t('common.validations.categories'))]
@@ -214,12 +261,18 @@ export default {
             return []
           },
         },
+        datePickerStart: { required: true },
+        eventVenue: { required: true, min: 3, max: 100 },
+        eventLocation: { min: 3, max: 100 },
       },
       loading: false,
       users: [],
       hashtags: [],
       imageUpload: null,
     }
+  },
+  async mounted() {
+    await import(`vue2-datepicker/locale/${this.currentUser.locale}`)
   },
   computed: {
     ...mapGetters({
@@ -237,8 +290,15 @@ export default {
     groupName() {
       return this.group && this.group.name
     },
+    eventStartFake() {
+      return this.formData.eventStart
+    },
   },
   methods: {
+    xxx() {
+      console.log('xxx')
+      this.formData.datePickerStart = this.datePickerStart
+    },
     submit() {
       if (creatEvent) {
         alert('EVENT speichern')
@@ -346,6 +406,17 @@ export default {
 </script>
 
 <style lang="scss">
+.eventDatas {
+  .chipbox {
+    display: flex;
+    justify-content: flex-end;
+
+    > .ds-chip {
+      margin-top: -10px;
+    }
+  }
+}
+
 .contribution-form > .base-card {
   display: flex;
   flex-direction: column;
@@ -426,6 +497,27 @@ export default {
         }
       }
     }
+  }
+
+  .mx-datepicker {
+    width: 100%;
+  }
+  .mx-datepicker input {
+    font-size: 1.25rem;
+    height: calc(1.625rem + 18px);
+    padding: 8px 8px;
+    background-color: #faf9fa;
+    border-color: #c8c8c8;
+  }
+  .mx-datepicker input:hover {
+    border-color: #c8c8c8;
+  }
+  .mx-datepicker input:focus {
+    border-color: #17b53f;
+    background-color: #fff;
+  }
+  .mx-datepicker-error {
+    border-color: #cf2619;
   }
 }
 </style>
