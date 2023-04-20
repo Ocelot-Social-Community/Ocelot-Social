@@ -7,6 +7,8 @@ import Resolver from './helpers/Resolver'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
+import { validateEventParams } from './helpers/events'
+import { createOrUpdateLocations } from './users/location'
 import CONFIG from '../../config'
 
 const maintainPinnedPosts = (params) => {
@@ -81,6 +83,9 @@ export default {
     CreatePost: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds, groupId } = params
       const { image: imageInput } = params
+
+      const locationName = validateEventParams(params)
+
       delete params.categoryIds
       delete params.image
       delete params.groupId
@@ -125,12 +130,13 @@ export default {
             SET post.updatedAt = toString(datetime())
             SET post.clickedCount = 0
             SET post.viewedTeaserCount = 0
+            SET post:${params.postType}
             WITH post
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
             ${categoriesCypher}
             ${groupCypher}
-            RETURN post {.*}
+            RETURN post {.*, postType: filter(l IN labels(post) WHERE NOT l = "Post") }
           `,
           { userId: context.user.id, categoryIds, groupId, params },
         )
@@ -142,6 +148,9 @@ export default {
       })
       try {
         const post = await writeTxResultPromise
+        if (locationName) {
+          await createOrUpdateLocations('Post', post.id, locationName, session)
+        }
         return post
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
@@ -154,6 +163,9 @@ export default {
     UpdatePost: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds } = params
       const { image: imageInput } = params
+
+      const locationName = validateEventParams(params)
+
       delete params.categoryIds
       delete params.image
       const session = context.driver.session()
@@ -183,7 +195,16 @@ export default {
         `
       }
 
-      updatePostCypher += `RETURN post {.*}`
+      if (params.postType) {
+        updatePostCypher += `
+          REMOVE post:Article
+          REMOVE post:Event
+          SET post:${params.postType}
+          WITH post
+        `
+      }
+
+      updatePostCypher += `RETURN post {.*, postType: filter(l IN labels(post) WHERE NOT l = "Post")}`
       const updatePostVariables = { categoryIds, params }
       try {
         const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -196,6 +217,9 @@ export default {
           return post
         })
         const post = await writeTxResultPromise
+        if (locationName) {
+          await createOrUpdateLocations('Post', post.id, locationName, session)
+        }
         return post
       } finally {
         session.close()
@@ -382,7 +406,17 @@ export default {
   },
   Post: {
     ...Resolver('Post', {
-      undefinedToNull: ['activityId', 'objectId', 'language', 'pinnedAt', 'pinned'],
+      undefinedToNull: [
+        'activityId',
+        'objectId',
+        'language',
+        'pinnedAt',
+        'pinned',
+        'eventVenue',
+        'eventLocation',
+        'eventLocationName',
+        'eventStart',
+      ],
       hasMany: {
         tags: '-[:TAGGED]->(related:Tag)',
         categories: '-[:CATEGORIZED]->(related:Category)',
@@ -395,6 +429,7 @@ export default {
         pinnedBy: '<-[:PINNED]-(related:User)',
         image: '-[:HERO_IMAGE]->(related:Image)',
         group: '-[:IN]->(related:Group)',
+        eventLocation: '-[:IS_IN]->(related:Location)',
       },
       count: {
         commentsCount:
