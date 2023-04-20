@@ -126,7 +126,7 @@ describe('Query', () => {
               author: null,
               date: expect.any(String),
               description:
-                'Human Connection, Weilheim an der Teck. Gefällt 24.407 Mal. An upcoming non-profit social network focused on local and global positive change. Twitter accounts : @hc_world (EN), @hc_deutschland (GE),...',
+                'Human Connection, Weilheim an der Teck. Gefällt 24.407 Mal. An upcoming non-profit social network focused on local and global positive change. Twitter accounts : @hc_world (EN), @hc_deutschland (GE),…',
               html: null,
               image:
                 'https://scontent.ftxl3-1.fna.fbcdn.net/v/t1.0-1/c5.0.200.200a/p200x200/12108307_997373093648222_70057205881020137_n.jpg?_nc_cat=110&_nc_oc=AQnPPYQlR0dU556gOfl4xkXr7IPZdRIAUfQeXl3fpUv4DAsFN8T4PfgOjPwuq85GPKGZ5S5E5mWQ8IVV1UiRBAIZ&_nc_ht=scontent.ftxl3-1.fna&oh=90309adddaab38839782f16e7d4b7bcf&oe=5DEEDFE5',
@@ -196,7 +196,7 @@ Have all the information for the brand in separate config files. Set these defau
               publisher: 'YouTube',
               date: expect.any(String),
               description:
-                'She’s incapable of controlling her limbs when her kitty is around. The obsession grows every day. Ps. That’s a sleep sack she’s in. Not a starfish outfit. Al...',
+                'She’s incapable of controlling her limbs when her kitty is around. The obsession grows every day. Ps. That’s a sleep sack she’s in. Not a starfish outfit. Al…',
               url: 'https://www.youtube.com/watch?v=qkdXAtO40Fo',
               image: 'https://i.ytimg.com/vi/qkdXAtO40Fo/maxresdefault.jpg',
               audio: null,
