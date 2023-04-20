@@ -179,8 +179,6 @@ type Post {
   eventLocation: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
   eventVenue: String
   eventStart: String
-  eventEnd: String
-  eventIsOnline: Boolean
 }
 
 input _PostInput {
@@ -191,8 +189,6 @@ input _EventInput {
   eventStart: String!
   eventLocation: String
   eventVenue: String
-  eventEnd: String
-  eventIsOnline: Boolean
 }
 
 type Mutation {
