@@ -110,7 +110,7 @@
             name="warning"
           />
         </ds-chip>
-        
+
         <!-- location -->
         <!-- TODO: move 'ds-select' from styleguide to main code and implement missing translation etc. functionality -->
         <ds-select

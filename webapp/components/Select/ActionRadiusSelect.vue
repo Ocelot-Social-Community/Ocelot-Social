@@ -5,11 +5,7 @@
     :value="value"
     @change="onActionRadiusChange"
   >
-    <option
-      v-for="actionRadius in actionRadiusOptions"
-      :key="actionRadius"
-      :value="actionRadius"
-    >
+    <option v-for="actionRadius in actionRadiusOptions" :key="actionRadius" :value="actionRadius">
       {{ $t(`group.actionRadii.${actionRadius}`) }}
     </option>
   </select>
@@ -20,7 +16,6 @@ export default {
   name: 'ActionRadiusSelect',
   props: ['value'],
   data() {
-    const actionRadius = ''
     return {
       actionRadiusOptions: ['regional', 'national', 'continental', 'global'],
     }
@@ -28,7 +23,7 @@ export default {
   methods: {
     onActionRadiusChange(event) {
       this.$emit('change', event.target.value)
-    }
-  }
+    },
+  },
 }
 </script>
