@@ -123,6 +123,7 @@
         </ds-chip>
 
         <!-- location -->
+        <!-- GroupForm - formData.locationName: {{ formData.locationName }}
         <ds-select
           id="city"
           :label="$t('settings.data.labelCity') + locationNameLabelAddOnOldName"
@@ -144,7 +145,13 @@
         ></base-button>
         <ds-text class="location-hint" color="softer">
           {{ $t('settings.data.labelCityHint') }}
-        </ds-text>
+        </ds-text> -->
+
+        <location-select
+          v-model="formData.locationName"
+          @change.native="changeLocation($event)"
+          @select="selectLocation(event)"
+        />
 
         <ds-space margin-top="small" />
 
@@ -188,6 +195,7 @@ import {
 } from '~/constants/groups.js'
 import Editor from '~/components/Editor/Editor'
 import { queryLocations } from '~/graphql/location'
+import LocationSelect from '~/components/Select/LocationSelect'
 
 let timeout
 
@@ -196,6 +204,7 @@ export default {
   components: {
     CategoriesSelect,
     Editor,
+    LocationSelect,
   },
   props: {
     update: {
@@ -269,11 +278,6 @@ export default {
       },
     }
   },
-  async created() {
-    // set to "requestGeoData" object and fill select menu if possible
-    this.formData.locationName =
-      (await this.requestGeoData(this.formLocationName)) || this.formLocationName
-  },
   computed: {
     formLocationName() {
       const isNestedValue =
@@ -285,9 +289,6 @@ export default {
         : isDirectString
         ? this.formData.locationName
         : ''
-    },
-    locationNameLabelAddOnOldName() {
-      return this.formLocationName !== '' ? ' — ' + this.formLocationName : ''
     },
     descriptionLength() {
       return this.$filters.removeHtml(this.formData.description).length
@@ -332,6 +333,14 @@ export default {
     changeActionRadius(event) {
       this.formData.actionRadius = event.target.value
     },
+    changeLocation(event) {
+      console.log('## in GroupForm: location-select: selected has changed to: ', event.target.value)
+      this.formData.locationName = event.target.value
+    },
+    selectLocation(event) {
+      console.log('## in GroupForm: location-select: selected has changed to: ', event.target.value)
+      this.formData.locationName = event.target.value
+    },
     updateEditorDescription(value) {
       this.$refs.groupForm.update('description', value)
     },
@@ -354,47 +363,47 @@ export default {
           })
         : this.$emit('createGroup', variables)
     },
-    handleCityInput(event) {
-      clearTimeout(timeout)
-      timeout = setTimeout(
-        () => this.requestGeoData(event.target ? event.target.value.trim() : ''),
-        500,
-      )
-    },
-    processLocationsResult(places) {
-      if (!places.length) {
-        return []
-      }
-      const result = []
-      places.forEach((place) => {
-        result.push({
-          label: place.place_name,
-          value: place.place_name,
-          id: place.id,
-        })
-      })
+    // handleCityInput(event) {
+    //   clearTimeout(timeout)
+    //   timeout = setTimeout(
+    //     () => this.requestGeoData(event.target ? event.target.value.trim() : ''),
+    //     500,
+    //   )
+    // },
+    // processLocationsResult(places) {
+    //   if (!places.length) {
+    //     return []
+    //   }
+    //   const result = []
+    //   places.forEach((place) => {
+    //     result.push({
+    //       label: place.place_name,
+    //       value: place.place_name,
+    //       id: place.id,
+    //     })
+    //   })
 
-      return result
-    },
-    async requestGeoData(value) {
-      if (value === '') {
-        this.cities = []
-        return
-      }
-      this.loadingGeo = true
+    //   return result
+    // },
+    // async requestGeoData(value) {
+    //   if (value === '') {
+    //     this.cities = []
+    //     return
+    //   }
+    //   this.loadingGeo = true
 
-      const place = encodeURIComponent(value)
-      const lang = this.$i18n.locale()
+    //   const place = encodeURIComponent(value)
+    //   const lang = this.$i18n.locale()
 
-      const {
-        data: { queryLocations: result },
-      } = await this.$apollo.query({ query: queryLocations(), variables: { place, lang } })
+    //   const {
+    //     data: { queryLocations: result },
+    //   } = await this.$apollo.query({ query: queryLocations(), variables: { place, lang } })
 
-      this.cities = this.processLocationsResult(result)
-      this.loadingGeo = false
+    //   this.cities = this.processLocationsResult(result)
+    //   this.loadingGeo = false
 
-      return this.cities.find((city) => city.value === value)
-    },
+    //   return this.cities.find((city) => city.value === value)
+    // },
   },
 }
 </script>
