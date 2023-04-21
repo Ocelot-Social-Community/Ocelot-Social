@@ -1,18 +1,15 @@
 <template>
   <div>
-    LocationSelect - value: {{ value }}
     <ds-select
       id="city"
       :label="$t('settings.data.labelCity') + addPreviousLocationName"
-      v-model="ownValue"
+      v-model="currentValue"
       :options="cities"
       icon="map-marker"
       :icon-right="null"
       :placeholder="$t('settings.data.labelCity') + ' …'"
       :loading="loadingGeo"
       @input.native="handleCityInput"
-      @changed="onChangeLocation"
-      @selected="onSelectLocation"
     />
     <base-button
       v-if="locationName !== ''"
@@ -36,29 +33,20 @@
  export default {
    name: 'LocationSelect',
    props: {
-     changed: {
-       required: false,
-     },
-     selected: {
-       required: false,
-     },
      value: {
        required: true,
      },
    },
    async created() {
-     console.log('created', this.value)
      // set to "requestGeoData" object and fill select menu if possible
      const result = await this.requestGeoData(this.locationName)
-     console.log('result', result)
      await this.$nextTick(() => {
-       this.ownValue = result || this.locationName
-       console.log('## created() - ownValue:', this.ownValue)
+       this.currentValue = result || this.locationName
      })
    },
    data() {
      return {
-       ownValue: this.value,
+       currentValue: this.value,
        loadingGeo: false,
        cities: [],
      }
@@ -74,16 +62,14 @@
      },
    },
    watch: {
-     ownValue() {
-       console.log('---------------  ownValue', this.ownValue)
-       if (this.ownValue !== this.value) {
-         this.$emit('input', this.ownValue)         
+     currentValue() {
+       if (this.currentValue !== this.value) {
+         this.$emit('input', this.currentValue)         
        }
      },
      value() {
-       console.log('value', this.value)
-       if (this.value !== this.ownValue) {
-         this.ownValue = this.value
+       if (this.value !== this.currentValue) {
+         this.currentValue = this.value
        }
      },
    },
@@ -94,7 +80,6 @@
          () => this.requestGeoData(event.target ? event.target.value.trim() : ''),
          500,
        )
-       console.log('## handleCityInput(event) - ownValue:', this.ownValue)
      },
      processLocationsResult(places) {
        if (!places.length) {
@@ -124,26 +109,11 @@
        const {
          data: { queryLocations: result },
        } = await this.$apollo.query({ query: queryLocations(), variables: { place, lang } })
-
-       console.log('requestGeoData', result)
        
        this.cities = this.processLocationsResult(result)
        this.loadingGeo = false
-
-       console.log('cities', this.cities)
        
        return this.cities.find((city) => city.value === value)
-     },
-     onChangeLocation(event) {
-       console.log('## LocationSelecet.onChangeLocation - this.changed: ', this.changed)
-       console.log('## LocationSelecet.onChangeLocation - vm.changed: ', vm.changed)
-
-       this.$emit('change', event.target.value)
-     },
-     onSelectLocation(event) {
-       console.log('## LocationSelecet.onSelectLoction - this.selected: ', this.selected)
-       console.log('## LocationSelecet.onSelectLoction - vm.selected: ', vm.selected)
-       this.$emit('select', event.target.value)
      },
      clearLocationName(event) {
        event.target.value = ''

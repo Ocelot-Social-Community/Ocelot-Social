@@ -94,7 +94,6 @@
         <ds-text class="select-label">
           {{ $t('group.actionRadius') }}
         </ds-text>
-        <!-- TODO: move 'ds-select' from styleguide to main code and implement missing translation etc. functionality -->
         <select
           class="select ds-input appearance--auto"
           name="actionRadius"
@@ -123,34 +122,8 @@
         </ds-chip>
 
         <!-- location -->
-        <!-- GroupForm - formData.locationName: {{ formData.locationName }}
-        <ds-select
-          id="city"
-          :label="$t('settings.data.labelCity') + locationNameLabelAddOnOldName"
-          v-model="formData.locationName"
-          :options="cities"
-          icon="map-marker"
-          :icon-right="null"
-          :placeholder="$t('settings.data.labelCity') + ' …'"
-          :loading="loadingGeo"
-          @input.native="handleCityInput"
-        />
-        <base-button
-          v-if="formLocationName !== ''"
-          icon="close"
-          ghost
-          size="small"
-          style="position: relative; display: inline-block; right: -96%; top: -33px; width: 26px"
-          @click="formData.locationName = ''"
-        ></base-button>
-        <ds-text class="location-hint" color="softer">
-          {{ $t('settings.data.labelCityHint') }}
-        </ds-text> -->
-
         <location-select
           v-model="formData.locationName"
-          @change.native="changeLocation($event)"
-          @select="selectLocation(event)"
         />
 
         <ds-space margin-top="small" />
@@ -194,10 +167,7 @@
    DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
  } from '~/constants/groups.js'
  import Editor from '~/components/Editor/Editor'
- import { queryLocations } from '~/graphql/location'
  import LocationSelect from '~/components/Select/LocationSelect'
-
- let timeout
 
  export default {
    name: 'GroupForm',
@@ -221,7 +191,6 @@
    data() {
      const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
        this.group
-     console.log('locationName', locationName)
      return {
        categoriesActive: this.$env.CATEGORIES_ACTIVE,
        disabled: false,
@@ -335,11 +304,6 @@
        this.formData.actionRadius = event.target.value
      },
      changeLocation(event) {
-       console.log('## in GroupForm: location-select: selected has changed to: ', event.target.value)
-       this.formData.locationName = event.target.value
-     },
-     selectLocation(event) {
-       console.log('## in GroupForm: location-select: selected has changed to: ', event.target.value)
        this.formData.locationName = event.target.value
      },
      updateEditorDescription(value) {
@@ -364,47 +328,6 @@
                        })
                        : this.$emit('createGroup', variables)
      },
-     // handleCityInput(event) {
-     //   clearTimeout(timeout)
-     //   timeout = setTimeout(
-     //     () => this.requestGeoData(event.target ? event.target.value.trim() : ''),
-     //     500,
-     //   )
-     // },
-     // processLocationsResult(places) {
-     //   if (!places.length) {
-     //     return []
-     //   }
-     //   const result = []
-     //   places.forEach((place) => {
-     //     result.push({
-     //       label: place.place_name,
-     //       value: place.place_name,
-     //       id: place.id,
-     //     })
-     //   })
-
-     //   return result
-     // },
-     // async requestGeoData(value) {
-     //   if (value === '') {
-     //     this.cities = []
-     //     return
-     //   }
-     //   this.loadingGeo = true
-
-     //   const place = encodeURIComponent(value)
-     //   const lang = this.$i18n.locale()
-
-     //   const {
-     //     data: { queryLocations: result },
-     //   } = await this.$apollo.query({ query: queryLocations(), variables: { place, lang } })
-
-     //   this.cities = this.processLocationsResult(result)
-     //   this.loadingGeo = false
-
-     //   return this.cities.find((city) => city.value === value)
-     // },
    },
  }
 </script>
