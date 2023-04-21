@@ -4,7 +4,7 @@
     <ds-select
       id="city"
       :label="$t('settings.data.labelCity') + addPreviousLocationName"
-      :value="ownValue"
+      v-model="ownValue"
       :options="cities"
       icon="map-marker"
       :icon-right="null"
@@ -75,7 +75,7 @@
    },
    watch: {
      ownValue() {
-       console.log('ownValue', this.ownValue)
+       console.log('---------------  ownValue', this.ownValue)
        if (this.ownValue !== this.value) {
          this.$emit('input', this.ownValue)         
        }
