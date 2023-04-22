@@ -1478,19 +1478,19 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@keyvhq/core@^1.6.14":
-  version "1.6.14"
-  resolved "https://registry.yarnpkg.com/@keyvhq/core/-/core-1.6.14.tgz#e0c809ac184c761ffae9bccaf4d0b00eb15c053f"
-  integrity sha512-NQtjFKsZXLYs3SWbeYATdwwJ1fZtzwrV+9YM4Y9JPGGQqLI0q6gyY2sEWI4RvrKBGJ1AXCJPQNXOPr8oAWdEDw==
+"@keyvhq/core@^1.6.26":
+  version "1.6.26"
+  resolved "https://registry.yarnpkg.com/@keyvhq/core/-/core-1.6.26.tgz#d682b8eeebc37842527f392a524b1aa8cdda4795"
+  integrity sha512-0jy/fOVCYdo3MImM3yjdHuFZNkycPmEAq0v+UGt0dRltnXccgQ+7vCdCNbLpgP3688g5Mw8L+0vcRt5MK53UPA==
   dependencies:
     json-buffer "~3.0.1"
 
-"@keyvhq/memoize@~1.6.14":
-  version "1.6.14"
-  resolved "https://registry.yarnpkg.com/@keyvhq/memoize/-/memoize-1.6.14.tgz#6a347b81e9be7040c678f8fc4b9046186484b6fc"
-  integrity sha512-bsFPrpOHEjAK1F7O0lzl5RR6KofA/zCaFzIBFMDRmcvDJk4Jkk5yqo66+DqQO5YBKWM74y/nAN63XCdHWmi91w==
+"@keyvhq/memoize@~1.6.14", "@keyvhq/memoize@~1.6.28":
+  version "1.6.28"
+  resolved "https://registry.yarnpkg.com/@keyvhq/memoize/-/memoize-1.6.28.tgz#eb0c0b0bdae9a5b2dd09e1cb9acd65d26b66a378"
+  integrity sha512-E/0ipFsYqFI8k9Fb4gFEUx8qD/Xic8F7iGCiyLs+DWdJVB20fD06ax8uzjfm6zt/pAnSFYNOIr3MB7LPPXN+hA==
   dependencies:
-    "@keyvhq/core" "^1.6.14"
+    "@keyvhq/core" "^1.6.26"
     mimic-fn "~3.0.0"
 
 "@metascraper/helpers@^4.10.2":
@@ -5474,7 +5474,7 @@ got@^6.7.1:
     unzip-response "^2.0.1"
     url-parse-lax "^1.0.0"
 
-got@~11.8.0, got@~11.8.5:
+got@~11.8.0, got@~11.8.5, got@~11.8.6:
   version "11.8.6"
   resolved "https://registry.yarnpkg.com/got/-/got-11.8.6.tgz#276e827ead8772eddbcfc97170590b841823233a"
   integrity sha512-6tfZ91bOr7bOXnK7PRDCGBLa1H4U080YHNaAQ2KsMGlLEzRbk44nsZF2E1IeRc3vtJHPVbKCYgdFbaGO2ljd8g==
@@ -7538,14 +7538,14 @@ merge2@^1.3.0:
   resolved "https://registry.yarnpkg.com/merge2/-/merge2-1.3.0.tgz#5b366ee83b2f1582c48f87e47cf1a9352103ca81"
   integrity sha512-2j4DAdlBOkiSZIsaXk4mTE3sRS02yBHAtfy127xRV3bQUFqXkjHCHLW6Scv7DwNRbIWNHH8zpnz9zMaKXIdvYw==
 
-metascraper-audio@^5.33.5:
-  version "5.33.5"
-  resolved "https://registry.yarnpkg.com/metascraper-audio/-/metascraper-audio-5.33.5.tgz#5400fab5154636f166aff10e205a429c9e75d9a2"
-  integrity sha512-zO2PyRIVH10RTZlphYXVOAn8U17ZaH/JkY95h1BJ9eMBWfnziuWCtN0tIUUysQ+Ci8vcci65tasYqdG7jfcHKQ==
+metascraper-audio@^5.34.2:
+  version "5.34.2"
+  resolved "https://registry.yarnpkg.com/metascraper-audio/-/metascraper-audio-5.34.2.tgz#24f6652e81db78207b0a7172c1216e1c6628aed3"
+  integrity sha512-mhjn4BSXtZ+b2lJNHt32/2buqpv1ZH/gwRczvHGDDja4Cr4eH9MryxZnihw0UPuw5rhminGU93f64+iErFP33A==
   dependencies:
-    "@keyvhq/memoize" "~1.6.14"
-    "@metascraper/helpers" "^5.33.5"
-    got "~11.8.5"
+    "@keyvhq/memoize" "~1.6.28"
+    "@metascraper/helpers" "^5.34.2"
+    got "~11.8.6"
     p-reflect "~2.1.0"
 
 metascraper-author@^5.33.5:
