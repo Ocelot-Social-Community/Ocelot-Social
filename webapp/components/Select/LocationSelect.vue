@@ -35,7 +35,6 @@
      },
    },
    async created() {
-     // set to "requestGeoData" object and fill select menu if possible
      const result = await this.requestGeoData(this.locationName)
      await this.$nextTick(() => {
        this.currentValue = result || this.locationName
@@ -50,8 +49,6 @@
    },
    computed: {
      locationName() {
-      //  const isNestedValue = typeof this.value === 'object' && typeof this.value.value === 'string'
-      //  const isDirectString = typeof this.value === 'string'
        return typeof this.value === 'object' ? this.value.value : this.value
      },
    },

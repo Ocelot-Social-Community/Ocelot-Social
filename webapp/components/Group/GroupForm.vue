@@ -37,8 +37,6 @@
         <ds-text class="select-label">
           {{ $t('group.type') }}
         </ds-text>
-        <!-- TODO: change it has to be implemented later -->
-        <!-- TODO: move 'ds-select' from style guide to main code and implement missing translation etc. functionality -->
         <select
           class="select ds-input appearance--auto"
           name="groupType"
@@ -204,12 +202,6 @@
          groupType: groupType || '',
          about: about || '',
          description: description || '',
-         // from database 'locationName' comes as "string | null"
-         // 'formData.locationName':
-         //   see 'created': tries to set it to a "requestGeoData" object and fills the menu if possible
-         //   if user selects one from menu we get a "requestGeoData" object here
-         //   "requestGeoData" object: "{ id: String, label: String, value: String }"
-         //   otherwise it's a string: empty or none empty
          locationName: locationName || '',
          actionRadius: actionRadius || '',
          categoryIds: categories ? categories.map((category) => category.id) : [],
