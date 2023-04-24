@@ -138,7 +138,7 @@ describe('Filter Posts', () => {
   })
 
   describe('post type filter set to ["Article", "Event"]', () => {
-    it('finds the articles', async () => {
+    it('finds all posts', async () => {
       const {
         data: { Post: result },
       } = await query({
@@ -154,6 +154,77 @@ describe('Filter Posts', () => {
           expect.objectContaining({ id: 'e2' }),
         ]),
       )
+    })
+  })
+
+  describe('order events by event start descending', () => {
+    it('finds the events orderd accordingly', async () => {
+      const {
+        data: { Post: result },
+      } = await query({
+        query: filterPosts(),
+        variables: { filter: { postType_in: ['Event'] }, orderBy: ['eventStart_desc'] },
+      })
+      expect(result).toHaveLength(2)
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: 'e1',
+          eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+        }),
+        expect.objectContaining({
+          id: 'e2',
+          eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString(),
+        }),
+      ])
+    })
+  })
+
+  describe('order events by event start ascending', () => {
+    it('finds the events orderd accordingly', async () => {
+      const {
+        data: { Post: result },
+      } = await query({
+        query: filterPosts(),
+        variables: { filter: { postType_in: ['Event'] }, orderBy: ['eventStart_asc'] },
+      })
+      expect(result).toHaveLength(2)
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: 'e2',
+          eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString(),
+        }),
+        expect.objectContaining({
+          id: 'e1',
+          eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+        }),
+      ])
+    })
+  })
+
+  describe('filter events by event start date', () => {
+    it('finds only events after given date', async () => {
+      const {
+        data: { Post: result },
+      } = await query({
+        query: filterPosts(),
+        variables: {
+          filter: {
+            postType_in: ['Event'],
+            eventStart_gte: new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate() + 2,
+            ).toISOString(),
+          },
+        },
+      })
+      expect(result).toHaveLength(1)
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: 'e1',
+          eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+        }),
+      ])
     })
   })
 })
