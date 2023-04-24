@@ -4,46 +4,46 @@ export default () => {
   return {
     CreatePost: gql`
       mutation (
-      $id: ID
-      $title: String!
-      $slug: String
-      $content: String!
-      $categoryIds: [ID]
-      $groupId: ID
-      $postType: PostType
-      $eventInput: _EventInput
-    ) {
-      CreatePost(
-        id: $id
-        title: $title
-        slug: $slug
-        content: $content
-        categoryIds: $categoryIds
-        groupId: $groupId
-        postType: $postType
-        eventInput: $eventInput
+        $id: ID
+        $title: String!
+        $slug: String
+        $content: String!
+        $categoryIds: [ID]
+        $groupId: ID
+        $postType: PostType
+        $eventInput: _EventInput
       ) {
-        id
-        slug
-        title
-        content
-        disabled
-        deleted
-        postType
-        author {
-          name
-        }
-        categories {
+        CreatePost(
+          id: $id
+          title: $title
+          slug: $slug
+          content: $content
+          categoryIds: $categoryIds
+          groupId: $groupId
+          postType: $postType
+          eventInput: $eventInput
+        ) {
           id
-        }
-        eventStart
-        eventVenue
-        eventLocation {
-          lng
-          lat
+          slug
+          title
+          content
+          disabled
+          deleted
+          postType
+          author {
+            name
+          }
+          categories {
+            id
+          }
+          eventStart
+          eventVenue
+          eventLocation {
+            lng
+            lat
+          }
         }
       }
-    }
     `,
     UpdatePost: gql`
       mutation (

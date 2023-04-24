@@ -45,11 +45,6 @@
                   formmat="DD-MM-YYYY HH:mm"
                   style="z-index: 20"
                 ></date-picker>
-                <!-- <ds-input
-                  model="formData.eventStart"
-                  v-model="formData.eventStart"
-                  style="position: absolute; min-width: 300px; margin-top: -38px; z-index: 0"
-                /> -->
               </div>
               <div class="chipbox" style="margin-top: 10px">
                 <ds-chip size="base" :color="errors && errors.eventStart && 'danger'">
@@ -71,7 +66,12 @@
           </ds-grid>
           <ds-grid>
             <ds-grid-item style="grid-row-end: span 3">
-              <ds-input model="eventLocationName" name="location" placeholder="Location" size="large" />
+              <ds-input
+                model="eventLocationName"
+                name="location"
+                placeholder="Location"
+                size="large"
+              />
               <div class="chipbox">
                 <ds-chip size="base" :color="errors && errors.eventLocationName && 'danger'">
                   {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
@@ -233,7 +233,7 @@ export default {
         categoryIds: categories ? categories.map((category) => category.id) : [],
         eventStart: eventStart || null,
         eventEnd: eventEnd || null,
-        eventLocation: eventLocation || { lng: 51.0, lat: 17.0},
+        eventLocation: eventLocation || { lng: 51.0, lat: 17.0 },
         eventLocationName: eventLocationName || '',
         eventVenue: eventVenue || '',
         eventIsOnline: eventIsOnline || true,
@@ -252,9 +252,9 @@ export default {
             return []
           },
         },
-        eventStart: { required: this.creatEvent ? true : false },
-        eventVenue: { required: this.creatEvent ? true : false, min: 3, max: 100 },
-        eventLocationName: { required: this.creatEvent ? true : false, min: 3, max: 100 },
+        eventStart: { required: !!this.creatEvent },
+        eventVenue: { required: !!this.creatEvent, min: 3, max: 100 },
+        eventLocationName: { required: !!this.creatEvent, min: 3, max: 100 },
       },
       loading: false,
       users: [],
@@ -270,15 +270,15 @@ export default {
       currentUser: 'auth/user',
     }),
     eventInput() {
-      if ( this.creatEvent ) {
+      if (this.creatEvent) {
         return {
           eventStart: this.formData.eventStart,
           // TODO: eventEnd: this.formData.eventEnd,
           // TODO: eventLocationName: this.formData.eventLocationName,
           eventVenue: this.formData.eventVenue,
           // TODO: eventIsOnline: this.formData.eventIsOnline,
-          eventLocation: JSON.stringify(this.formData.eventLocation)  
-        }  
+          eventLocation: JSON.stringify(this.formData.eventLocation),
+        }
       }
       return undefined
     },
@@ -314,8 +314,7 @@ export default {
         }
       }
       this.loading = true
-      alert(JSON.stringify(this.eventInput))
-      
+
       this.$apollo
         .mutate({
           mutation: this.contribution.id ? PostMutations().UpdatePost : PostMutations().CreatePost,
@@ -331,7 +330,6 @@ export default {
           },
         })
         .then(({ data }) => {
-          console.log(data)
           this.loading = false
           this.$toast.success(this.$t('contribution.success'))
           const result = data[this.contribution.id ? 'UpdatePost' : 'CreatePost']
@@ -342,7 +340,6 @@ export default {
           })
         })
         .catch((err) => {
-          console.error(data)
           this.$toast.error(err.message)
           this.loading = false
         })
