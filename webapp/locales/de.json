@@ -704,6 +704,7 @@
       },
       "title": "Bearbeite deinen Beitrag"
     },
+    "event": "Veranstaltung",
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
@@ -713,7 +714,6 @@
       "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!"
     },
     "name": "Beitrag",
-    "event":"Veranstaltung",
     "pinned": "Meldung",
     "takeAction": {
       "name": "Aktiv werden"

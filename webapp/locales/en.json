@@ -704,6 +704,7 @@
       },
       "title": "Edit Your Post"
     },
+    "event": "Event",
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
@@ -713,7 +714,6 @@
       "unpinnedSuccessfully": "Post unpinned successfully!"
     },
     "name": "Post",
-    "event":"Event",
     "pinned": "Announcement",
     "takeAction": {
       "name": "Take action"
