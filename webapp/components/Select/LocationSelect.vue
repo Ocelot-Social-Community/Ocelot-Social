@@ -54,9 +54,6 @@
       //  const isDirectString = typeof this.value === 'string'
        return typeof this.value === 'object' ? this.value.value : this.value
      },
-     addPreviousLocationName() {
-       return this.locationName !== '' ? ' — ' + this.locationName : ''
-     },
    },
    watch: {
      currentValue() {
