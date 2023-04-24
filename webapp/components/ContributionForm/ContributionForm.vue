@@ -31,30 +31,29 @@
           </page-params-link>
         </div>
         <div v-if="creatEvent" class="eventDatas" style="background-color: #efeef1; padding: 10px">
-          {{ datePickerStart }}, {{ formData.eventStart }}
+          {{ formData.eventStart }}
           <ds-grid>
             <ds-grid-item style="grid-row-end: span 3">
               <label>Beginn</label>
               <div style="z-index: 20">
                 <date-picker
-                  name="datePickerStart"
-                  v-model="datePickerStart"
+                  name="eventStart"
+                  v-model="formData.eventStart"
                   type="datetime"
                   :hour-options="hours"
                   value-type="format"
                   formmat="DD-MM-YYYY HH:mm"
-                  @input="xxx"
                   style="z-index: 20"
                 ></date-picker>
-                <ds-input
-                  model="datePickerStart"
-                  v-model="formData.datePickerStart"
+                <!-- <ds-input
+                  model="formData.eventStart"
+                  v-model="formData.eventStart"
                   style="position: absolute; min-width: 300px; margin-top: -38px; z-index: 0"
-                />
+                /> -->
               </div>
               <div class="chipbox" style="margin-top: 10px">
-                <ds-chip size="base" :color="errors && errors.datePickerStart && 'danger'">
-                  <base-icon v-if="errors && errors.datePickerStart" name="warning" />
+                <ds-chip size="base" :color="errors && errors.eventStart && 'danger'">
+                  <base-icon v-if="errors && errors.eventStart" name="warning" />
                 </ds-chip>
               </div>
             </ds-grid-item>
@@ -72,11 +71,11 @@
           </ds-grid>
           <ds-grid>
             <ds-grid-item style="grid-row-end: span 3">
-              <ds-input model="eventLocation" name="location" placeholder="Location" size="large" />
+              <ds-input model="eventLocationName" name="location" placeholder="Location" size="large" />
               <div class="chipbox">
-                <ds-chip size="base" :color="errors && errors.eventLocation && 'danger'">
-                  {{ formData.eventLocation.length }}/{{ formSchema.eventLocation.max }}
-                  <base-icon v-if="errors && errors.eventLocation" name="warning" />
+                <ds-chip size="base" :color="errors && errors.eventLocationName && 'danger'">
+                  {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
+                  <base-icon v-if="errors && errors.eventLocationName" name="warning" />
                 </ds-chip>
               </div>
             </ds-grid-item>
@@ -95,8 +94,8 @@
           <div>
             <input
               type="checkbox"
-              model="formData.eventOnline"
-              name="eventOnline"
+              model="formData.eventIsOnline"
+              name="eventIsOnline"
               style="font-size: larger"
             />
             Online Event
@@ -201,13 +200,6 @@ export default {
     },
   },
 
-  //       input _EventInput {
-  //   eventStart: String!
-  //   eventEnd: String!
-  //   eventLocation: String
-  //   eventVenue: String  ort
-  // }
-
   data() {
     const {
       title,
@@ -216,10 +208,10 @@ export default {
       categories,
       eventStart,
       eventEnd,
-      eventLocation,
+      eventLocationName,
       eventVenue,
-      eventOnline,
-      datePickerStart,
+      eventIsOnline,
+      eventLocation,
     } = this.contribution
     const {
       sensitive: imageBlurred = false,
@@ -231,7 +223,6 @@ export default {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       links,
       hours: Array.from({ length: 10 }).map((_, i) => i + 8),
-      datePickerStart: null,
       formData: {
         title: title || '',
         content: content || '',
@@ -240,12 +231,12 @@ export default {
         imageType,
         imageBlurred,
         categoryIds: categories ? categories.map((category) => category.id) : [],
-        eventStart: null,
-        eventEnd: null,
-        eventLocation: '',
-        eventVenue: '',
-        eventOnline: true,
-        datePickerStart: null,
+        eventStart: eventStart || null,
+        eventEnd: eventEnd || null,
+        eventLocation: eventLocation || { lng: 51.0, lat: 17.0},
+        eventLocationName: eventLocationName || '',
+        eventVenue: eventVenue || '',
+        eventIsOnline: eventIsOnline || true,
       },
       formSchema: {
         title: { required: true, min: 3, max: 100 },
@@ -261,9 +252,9 @@ export default {
             return []
           },
         },
-        datePickerStart: { required: true },
-        eventVenue: { required: true, min: 3, max: 100 },
-        eventLocation: { min: 3, max: 100 },
+        eventStart: { required: this.creatEvent ? true : false },
+        eventVenue: { required: this.creatEvent ? true : false, min: 3, max: 100 },
+        eventLocationName: { required: this.creatEvent ? true : false, min: 3, max: 100 },
       },
       loading: false,
       users: [],
@@ -278,6 +269,19 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+    eventInput() {
+      if ( this.creatEvent ) {
+        return {
+          eventStart: this.formData.eventStart,
+          // TODO: eventEnd: this.formData.eventEnd,
+          // TODO: eventLocationName: this.formData.eventLocationName,
+          eventVenue: this.formData.eventVenue,
+          // TODO: eventIsOnline: this.formData.eventIsOnline,
+          eventLocation: JSON.stringify(this.formData.eventLocation)  
+        }  
+      }
+      return undefined
+    },
     contentLength() {
       return this.$filters.removeHtml(this.formData.content).length
     },
@@ -295,15 +299,7 @@ export default {
     },
   },
   methods: {
-    xxx() {
-      console.log('xxx')
-      this.formData.datePickerStart = this.datePickerStart
-    },
     submit() {
-      if (creatEvent) {
-        alert('EVENT speichern')
-        return
-      }
       let image = null
 
       const { title, content, categoryIds } = this.formData
@@ -318,6 +314,8 @@ export default {
         }
       }
       this.loading = true
+      alert(JSON.stringify(this.eventInput))
+      
       this.$apollo
         .mutate({
           mutation: this.contribution.id ? PostMutations().UpdatePost : PostMutations().CreatePost,
@@ -328,11 +326,12 @@ export default {
             id: this.contribution.id || null,
             image,
             groupId: this.groupId,
-            postType: 'Article',
-            eventInput: '$eventInput',
+            postType: !this.creatEvent ? 'Article' : 'Event',
+            eventInput: this.eventInput,
           },
         })
         .then(({ data }) => {
+          console.log(data)
           this.loading = false
           this.$toast.success(this.$t('contribution.success'))
           const result = data[this.contribution.id ? 'UpdatePost' : 'CreatePost']
@@ -343,6 +342,7 @@ export default {
           })
         })
         .catch((err) => {
+          console.error(data)
           this.$toast.error(err.message)
           this.loading = false
         })
