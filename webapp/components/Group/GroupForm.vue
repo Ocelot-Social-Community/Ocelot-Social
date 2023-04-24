@@ -120,9 +120,7 @@
         </ds-chip>
 
         <!-- location -->
-        <location-select
-          v-model="formData.locationName"
-        />
+        <location-select v-model="formData.locationName" />
 
         <ds-space margin-top="small" />
 
@@ -157,171 +155,171 @@
 </template>
 
 <script>
- import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
- import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
- import {
-   NAME_LENGTH_MIN,
-   NAME_LENGTH_MAX,
-   DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
- } from '~/constants/groups.js'
- import Editor from '~/components/Editor/Editor'
- import LocationSelect from '~/components/Select/LocationSelect'
+import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
+import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
+import {
+  NAME_LENGTH_MIN,
+  NAME_LENGTH_MAX,
+  DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
+} from '~/constants/groups.js'
+import Editor from '~/components/Editor/Editor'
+import LocationSelect from '~/components/Select/LocationSelect'
 
- export default {
-   name: 'GroupForm',
-   components: {
-     CategoriesSelect,
-     Editor,
-     LocationSelect,
-   },
-   props: {
-     update: {
-       type: Boolean,
-       required: false,
-       default: false,
-     },
-     group: {
-       type: Object,
-       required: false,
-       default: () => ({}),
-     },
-   },
-   data() {
-     const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
-       this.group
-     return {
-       categoriesActive: this.$env.CATEGORIES_ACTIVE,
-       disabled: false,
-       groupTypeOptions: ['public', 'closed', 'hidden'],
-       actionRadiusOptions: ['regional', 'national', 'continental', 'global'],
-       loadingGeo: false,
-       cities: [],
-       formData: {
-         name: name || '',
-         slug: slug || '',
-         groupType: groupType || '',
-         about: about || '',
-         description: description || '',
-         locationName: locationName || '',
-         actionRadius: actionRadius || '',
-         categoryIds: categories ? categories.map((category) => category.id) : [],
-       },
-       formSchema: {
-         name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
-         slug: { required: false, min: NAME_LENGTH_MIN },
-         groupType: { required: true, min: 1 },
-         about: { required: false },
-         description: {
-           type: 'string',
-           required: true,
-           min: DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
-           validator: (_, value = '') => {
-             if (this.$filters.removeHtml(value).length < this.formSchema.description.min) {
-               return [new Error()]
-             }
-             return []
-           },
-         },
-         actionRadius: { required: true, min: 1 },
-         locationName: { required: false },
-         categoryIds: {
-           type: 'array',
-           required: this.categoriesActive,
-           validator: (_, value = []) => {
-             if (
-               this.categoriesActive &&
-               (value.length < CATEGORIES_MIN || value.length > CATEGORIES_MAX)
-             ) {
-               return [new Error(this.$t('common.validations.categories'))]
-             }
-             return []
-           },
-         },
-       },
-     }
-   },
-   computed: {
-     formLocationName() {
-       const isNestedValue =
-         typeof this.formData.locationName === 'object' &&
-         typeof this.formData.locationName.value === 'string'
-       const isDirectString = typeof this.formData.locationName === 'string'
-       return isNestedValue
-            ? this.formData.locationName.value
-            : isDirectString
-            ? this.formData.locationName
-            : ''
-     },
-     descriptionLength() {
-       return this.$filters.removeHtml(this.formData.description).length
-     },
-     sameLocation() {
-       const dbLocationName = this.group.locationName || ''
-       return dbLocationName === this.formLocationName
-     },
-     sameCategories() {
-       if (this.group.categories.length !== this.formData.categoryIds.length) return false
-       const groupCategories = []
-       this.group.categories.forEach((categories) => {
-         groupCategories.push(categories.id)
-         const some = this.formData.categoryIds.some((item) => item === categories.id)
-         if (!some) return false
-       })
+export default {
+  name: 'GroupForm',
+  components: {
+    CategoriesSelect,
+    Editor,
+    LocationSelect,
+  },
+  props: {
+    update: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    group: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+  },
+  data() {
+    const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
+      this.group
+    return {
+      categoriesActive: this.$env.CATEGORIES_ACTIVE,
+      disabled: false,
+      groupTypeOptions: ['public', 'closed', 'hidden'],
+      actionRadiusOptions: ['regional', 'national', 'continental', 'global'],
+      loadingGeo: false,
+      cities: [],
+      formData: {
+        name: name || '',
+        slug: slug || '',
+        groupType: groupType || '',
+        about: about || '',
+        description: description || '',
+        locationName: locationName || '',
+        actionRadius: actionRadius || '',
+        categoryIds: categories ? categories.map((category) => category.id) : [],
+      },
+      formSchema: {
+        name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
+        slug: { required: false, min: NAME_LENGTH_MIN },
+        groupType: { required: true, min: 1 },
+        about: { required: false },
+        description: {
+          type: 'string',
+          required: true,
+          min: DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
+          validator: (_, value = '') => {
+            if (this.$filters.removeHtml(value).length < this.formSchema.description.min) {
+              return [new Error()]
+            }
+            return []
+          },
+        },
+        actionRadius: { required: true, min: 1 },
+        locationName: { required: false },
+        categoryIds: {
+          type: 'array',
+          required: this.categoriesActive,
+          validator: (_, value = []) => {
+            if (
+              this.categoriesActive &&
+              (value.length < CATEGORIES_MIN || value.length > CATEGORIES_MAX)
+            ) {
+              return [new Error(this.$t('common.validations.categories'))]
+            }
+            return []
+          },
+        },
+      },
+    }
+  },
+  computed: {
+    formLocationName() {
+      const isNestedValue =
+        typeof this.formData.locationName === 'object' &&
+        typeof this.formData.locationName.value === 'string'
+      const isDirectString = typeof this.formData.locationName === 'string'
+      return isNestedValue
+        ? this.formData.locationName.value
+        : isDirectString
+        ? this.formData.locationName
+        : ''
+    },
+    descriptionLength() {
+      return this.$filters.removeHtml(this.formData.description).length
+    },
+    sameLocation() {
+      const dbLocationName = this.group.locationName || ''
+      return dbLocationName === this.formLocationName
+    },
+    sameCategories() {
+      if (this.group.categories.length !== this.formData.categoryIds.length) return false
+      const groupCategories = []
+      this.group.categories.forEach((categories) => {
+        groupCategories.push(categories.id)
+        const some = this.formData.categoryIds.some((item) => item === categories.id)
+        if (!some) return false
+      })
 
-       return true
-     },
-     disableButtonByUpdate() {
-       if (!this.update) return true
-       return (
-         this.group.name === this.formData.name &&
-         this.group.slug === this.formData.slug &&
-         this.group.about === this.formData.about &&
-         this.group.description === this.formData.description &&
-         this.group.actionRadius === this.formData.actionRadius &&
-         this.sameLocation &&
-         this.sameCategories
-       )
-     },
-   },
-   methods: {
-     checkFormError(error) {
-       if (!this.update && error && !!error && this.disableButtonByUpdate) return true
-       if (this.update && !error && this.disableButtonByUpdate) return true
-       return false
-     },
-     changeGroupType(event) {
-       this.formData.groupType = event.target.value
-     },
-     changeActionRadius(event) {
-       this.formData.actionRadius = event.target.value
-     },
-     changeLocation(event) {
-       this.formData.locationName = event.target.value
-     },
-     updateEditorDescription(value) {
-       this.$refs.groupForm.update('description', value)
-     },
-     submit() {
-       const { name, slug, about, description, groupType, actionRadius, categoryIds } = this.formData
-       const variables = {
-         name,
-         slug,
-         about,
-         description,
-         groupType,
-         actionRadius,
-         locationName: this.formLocationName,
-         categoryIds,
-       }
-       this.update
-                       ? this.$emit('updateGroup', {
-                         ...variables,
-                         id: this.group.id,
-                       })
-                       : this.$emit('createGroup', variables)
-     },
-   },
- }
+      return true
+    },
+    disableButtonByUpdate() {
+      if (!this.update) return true
+      return (
+        this.group.name === this.formData.name &&
+        this.group.slug === this.formData.slug &&
+        this.group.about === this.formData.about &&
+        this.group.description === this.formData.description &&
+        this.group.actionRadius === this.formData.actionRadius &&
+        this.sameLocation &&
+        this.sameCategories
+      )
+    },
+  },
+  methods: {
+    checkFormError(error) {
+      if (!this.update && error && !!error && this.disableButtonByUpdate) return true
+      if (this.update && !error && this.disableButtonByUpdate) return true
+      return false
+    },
+    changeGroupType(event) {
+      this.formData.groupType = event.target.value
+    },
+    changeActionRadius(event) {
+      this.formData.actionRadius = event.target.value
+    },
+    changeLocation(event) {
+      this.formData.locationName = event.target.value
+    },
+    updateEditorDescription(value) {
+      this.$refs.groupForm.update('description', value)
+    },
+    submit() {
+      const { name, slug, about, description, groupType, actionRadius, categoryIds } = this.formData
+      const variables = {
+        name,
+        slug,
+        about,
+        description,
+        groupType,
+        actionRadius,
+        locationName: this.formLocationName,
+        categoryIds,
+      }
+      this.update
+        ? this.$emit('updateGroup', {
+            ...variables,
+            id: this.group.id,
+          })
+        : this.$emit('createGroup', variables)
+    },
+  },
+}
 </script>
 
 <style lang="scss">
