@@ -1,8 +1,8 @@
 <template>
   <div>
+    <label class="ds-input-label">{{ `${$t('settings.data.labelCity')}` }}<span v-if="locationName">{{ `- ${locationName}` }}</span></label>
     <ds-select
       id="city"
-      :label="$t('settings.data.labelCity') + addPreviousLocationName"
       v-model="currentValue"
       :options="cities"
       icon="map-marker"
@@ -16,12 +16,9 @@
       icon="close"
       ghost
       size="small"
-      style="position: relative; display: inline-block; right: -96%; top: -33px; width: 26px"
+      style="position: relative; display: inline-block; right: -94%; top: -48px; width: 29px;"
       @click.native="clearLocationName"
     ></base-button>
-    <ds-text class="location-hint" color="softer">
-      {{ $t('settings.data.labelCityHint') }}
-    </ds-text>
   </div>
 </template>
 
@@ -53,9 +50,9 @@
    },
    computed: {
      locationName() {
-       const isNestedValue = typeof this.value === 'object' && typeof this.value.value === 'string'
-       const isDirectString = typeof this.value === 'string'
-       return isNestedValue ? this.value.value : isDirectString ? this.value : ''
+      //  const isNestedValue = typeof this.value === 'object' && typeof this.value.value === 'string'
+      //  const isDirectString = typeof this.value === 'string'
+       return typeof this.value === 'object' ? this.value.value : this.value
      },
      addPreviousLocationName() {
        return this.locationName !== '' ? ' — ' + this.locationName : ''
