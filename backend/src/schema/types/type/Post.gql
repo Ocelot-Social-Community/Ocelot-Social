@@ -83,6 +83,7 @@ input _PostFilter {
   emotions_every: _PostEMOTEDFilter
   group: _GroupFilter
   postsInMyGroups: Boolean
+  postType_in: [PostType]
 }
 
 enum _PostOrdering {
