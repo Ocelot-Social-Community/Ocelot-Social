@@ -43,6 +43,14 @@ export default {
       selectedCategoryIds: this.existingCategoryIds,
     }
   },
+  watch: {
+    existingCategoryIds() {
+      if (!this.selectedCategoryIds.length && this.existingCategoryIds.length) {
+        this.selectedCategoryIds = this.existingCategoryIds
+        this.$forceUpdate()
+      }
+    },
+  },
   computed: {
     selectedCount() {
       return this.selectedCategoryIds.length
