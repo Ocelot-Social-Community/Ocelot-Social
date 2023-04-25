@@ -33,7 +33,7 @@ const matchSomeWordsExactly = (str, boost = 2) => {
 const matchBeginningOfWords = (str) => {
   return str
     .split(' ')
-    .filter((s) => s) // remove falsy values
+    .filter((s) => s.length >= 3)
     .map((s) => s + '*')
     .join(' ')
 }
