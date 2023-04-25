@@ -84,13 +84,16 @@ export default {
   },
   computed: {
     emptyText() {
-      return this.isActive && !this.loading ? this.$t('search.failed') : this.$t('search.hint')
+      return !this.loading && this.isSearchable() ? this.$t('search.failed') : this.$t('search.hint')
     },
     isActive() {
       return !isEmpty(this.value)
     },
   },
   methods: {
+    isSearchable(){
+      return !isEmpty(this.value) && typeof this.value === 'string' && this.value.replace(/\s+/g, '').length >= 3
+    },
     isFirstOfType(option) {
       return (
         this.options.findIndex((o) => o === option) ===
@@ -103,8 +106,8 @@ export default {
     onInput(event) {
       clearTimeout(this.searchProcess)
       this.value = event.target ? event.target.value.replace(/\s+/g, ' ').trim() : ''
-      if (isEmpty(this.value) || this.value.replace(/\s+/g, '').length < 3) {
-        this.clear()
+      if (!this.isSearchable()) {
+        this.$emit('clearSearch')
         return
       }
       this.searchProcess = setTimeout(() => {
@@ -120,7 +123,6 @@ export default {
     },
     clear() {
       this.value = ''
-      this.valueBackup = ''
       this.$emit('clearSearch')
       clearTimeout(this.searchProcess)
     },
