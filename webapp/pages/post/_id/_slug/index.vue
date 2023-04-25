@@ -57,7 +57,7 @@
             <ds-space margin-bottom="small" />
             <content-viewer class="content hyphenate-text" :content="post.content" />
             <!-- Eventdata -->
-            <ds-space v-if="post.postType[0] === 'Event'" margin-bottom="small">
+            <ds-space v-if="post && post.postType[0] === 'Event'" margin-bottom="small">
               <ds-flex>
                 <ds-flex-item width="200px">Start:</ds-flex-item>
                 <ds-flex-item>{{ post.eventStart }}</ds-flex-item>
@@ -192,7 +192,7 @@ export default {
   data() {
     return {
       links,
-      post: {postType: ['Article']},
+      post: null,
       ready: false,
       title: 'loading',
       showNewCommentForm: true,
@@ -237,7 +237,7 @@ export default {
       ]
     },
     heading() {
-      if (this.post.postType[0] === 'Event') return this.$t('post.viewEvent.title')
+      if (this.post?.postType[0] === 'Event') return this.$t('post.viewEvent.title')
       return this.$t('post.viewPost.title')
     },
     menuModalsData() {
