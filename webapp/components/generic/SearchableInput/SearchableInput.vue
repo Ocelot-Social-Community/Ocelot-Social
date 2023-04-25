@@ -103,10 +103,8 @@ export default {
       clearTimeout(this.searchProcess)
     },
     onInput(event) {
-      console.log('input', event)
       clearTimeout(this.searchProcess)
       this.value = event.target ? event.target.value.replace(/\s+/g, ' ').trim() : ''
-      console.log('input', this.value)
       this.unprocessedSearchInput = this.value
       if (isEmpty(this.value) || this.value.replace(/\s+/g, '').length < 3) {
         this.clear()
