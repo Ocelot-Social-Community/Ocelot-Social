@@ -1,11 +1,17 @@
 <template>
   <transition name="fade" appear>
     <div>
-      <ds-space margin="small">
+      {{post}}
+      <ds-space v-if="post.postType && post.postType == 'Article'" margin="small">
         <ds-heading tag="h1">{{ $t('post.viewPost.title') }}</ds-heading>
         <ds-heading v-if="post && post.group" tag="h2">
           {{ $t('post.viewPost.forGroup.title', { name: post.group.name }) }}
         </ds-heading>
+      </ds-space>
+      <ds-space v-else margin="small">
+        <!-- <ds-heading tag="h1">{{ $t('post.viewPost.title') }}</ds-heading> -->
+        <!-- TODO uebersetzung -->
+        <ds-heading tag="h1">Event</ds-heading>
       </ds-space>
       <ds-space margin="large" />
       <ds-flex gutter="small">
@@ -54,6 +60,40 @@
             </section>
             <ds-space margin-bottom="small" />
             <h2 class="title hyphenate-text">{{ post.title }}</h2>
+            
+            <!-- add event infos if event post-type -->
+            <section v-if="post.postType && post.postType == 'Event'" class="event">
+              <ds-text v-if="!post.eventIsOnline" align="left" color="soft">
+                <base-icon name="map-marker" data-test="map-marker" />
+                <span v-if="post.eventVenue">{{ post.eventVenue }}</span>
+                <span v-if="post.eventLocationName">
+                  <span v-if="post.eventVenue">
+                    <!-- TODO maybe find better solution? computed? -->
+                    -
+                  </span>
+                  {{ post.eventLocationName }}
+                </span>                
+              </ds-text>              
+              <ds-text v-else align="left" color="soft">
+                <base-icon name="map-marker" data-test="map-marker" />                
+                <span v-if="post.eventVenue">
+                  {{ post.eventVenue }} -
+                </span>
+                <span>
+                  <!-- TODO translate -->
+                  Online-Event
+                </span>                
+              </ds-text>
+
+              <ds-text v-if="post.eventStart" align="left" color="soft">
+                <base-icon name="clock" data-test="clock" />
+                  <span>{{ post.eventStart }}</span>                
+                  <span v-if="post.eventEnd">                  
+                    - {{ post.eventEnd }}
+                  </span>
+              </ds-text>
+            </section>
+
             <ds-space margin-bottom="small" />
             <content-viewer class="content hyphenate-text" :content="post.content" />
             <!-- Categories -->
@@ -119,7 +159,8 @@
             </ds-section>
           </base-card>
         </ds-flex-item>
-        <ds-flex-item :width="{ base: '200px' }">
+        <!-- only show next/prev object if article post type -->
+        <ds-flex-item v-if="post.postType == 'Article'" :width="{ base: '200px' }">
           <ds-menu :routes="routes" class="post-side-navigation" />
         </ds-flex-item>
       </ds-flex>
