@@ -78,7 +78,6 @@ export default {
     return {
       searchValue: '',
       value: '',
-      unprocessedSearchInput: '',
       searchProcess: null,
       previousSearchTerm: '',
       delay: 300,
@@ -105,7 +104,6 @@ export default {
     onInput(event) {
       clearTimeout(this.searchProcess)
       this.value = event.target ? event.target.value.replace(/\s+/g, ' ').trim() : ''
-      this.unprocessedSearchInput = this.value
       if (isEmpty(this.value) || this.value.replace(/\s+/g, '').length < 3) {
         this.clear()
         return
@@ -118,12 +116,11 @@ export default {
     onEnter(event) {
       this.$router.push({
         path: '/search/search-results',
-        query: { search: this.unprocessedSearchInput },
+        query: { search: this.value },
       })
       this.$emit('clearSearch')
     },
     clear() {
-      this.unprocessedSearchInput = ''
       this.previousSearchTerm = ''
       this.searchValue = ''
       this.$emit('clearSearch')
