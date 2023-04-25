@@ -94,197 +94,197 @@
 </template>
 
 <script>
- import gql from 'graphql-tag'
- import { mapGetters } from 'vuex'
- import Editor from '~/components/Editor/Editor'
- import PostMutations from '~/graphql/PostMutations.js'
- import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
- import ImageUploader from '~/components/Uploader/ImageUploader'
- import links from '~/constants/links.js'
- import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
+import gql from 'graphql-tag'
+import { mapGetters } from 'vuex'
+import Editor from '~/components/Editor/Editor'
+import PostMutations from '~/graphql/PostMutations.js'
+import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
+import ImageUploader from '~/components/Uploader/ImageUploader'
+import links from '~/constants/links.js'
+import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 
- export default {
-   components: {
-     Editor,
-     ImageUploader,
-     PageParamsLink,
-     CategoriesSelect,
-   },
-   props: {
-     contribution: {
-       type: Object,
-       default: () => ({}),
-     },
-     group: {
-       type: Object,
-       default: () => null,
-     },
-   },
-   data() {
-     const { title, content, image, categories } = this.contribution
-     const {
-       sensitive: imageBlurred = false,
-       aspectRatio: imageAspectRatio = null,
-       type: imageType = null,
-     } = image || {}
+export default {
+  components: {
+    Editor,
+    ImageUploader,
+    PageParamsLink,
+    CategoriesSelect,
+  },
+  props: {
+    contribution: {
+      type: Object,
+      default: () => ({}),
+    },
+    group: {
+      type: Object,
+      default: () => null,
+    },
+  },
+  data() {
+    const { title, content, image, categories } = this.contribution
+    const {
+      sensitive: imageBlurred = false,
+      aspectRatio: imageAspectRatio = null,
+      type: imageType = null,
+    } = image || {}
 
-     return {
-       categoriesActive: this.$env.CATEGORIES_ACTIVE,
-       links,
-       formData: {
-         title: title || '',
-         content: content || '',
-         image: image || null,
-         imageAspectRatio,
-         imageType,
-         imageBlurred,
-         categoryIds: categories ? categories.map((category) => category.id) : []
-       },
-       formSchema: {
-         title: { required: true, min: 3, max: 100 },
-         content: { required: true },
-         imageBlurred: { required: false },
-         categoryIds: {
-           type: 'array',
-           required: this.categoriesActive,
-           validator: (_, value = []) => {
-             if (this.categoriesActive && (value.length === 0 || value.length > 3)) {
-               return [new Error(this.$t('common.validations.categories'))]
-             }
-             return []
-           },
-         },
-       },
-       loading: false,
-       users: [],
-       hashtags: [],
-       imageUpload: null,
-     }
-   },
-   computed: {
-     ...mapGetters({
-       currentUser: 'auth/user',
-     }),
-     contentLength() {
-       return this.$filters.removeHtml(this.formData.content).length
-     },
-     groupId() {
-       return this.group && this.group.id
-     },
-     showGroupHint() {
-       return this.groupId && ['closed', 'hidden'].includes(this.group.groupType)
-     },
-     groupName() {
-       return this.group && this.group.name
-     },
-     groupCategories() {
-       return this.group && this.group.categories
-     },
-   },
-   watch: {
-     groupCategories() {
-       console.log('groupCategories', this.groupCategories)
-       if (!this.formData.categoryIds && this.groupCategories) this.formData.categoryIds = this.groupCategories
-     },
-   },
-   methods: {
-     submit() {
-       let image = null
-       const { title, content, categoryIds } = this.formData
-       if (this.formData.image) {
-         image = {
-           sensitive: this.formData.imageBlurred,
-         }
-         if (this.imageUpload) {
-           image.upload = this.imageUpload
-           image.aspectRatio = this.formData.imageAspectRatio
-           image.type = this.formData.imageType
-         }
-       }
-       this.loading = true
-       this.$apollo
-           .mutate({
-             mutation: this.contribution.id ? PostMutations().UpdatePost : PostMutations().CreatePost,
-             variables: {
-               title,
-               content,
-               categoryIds,
-               id: this.contribution.id || null,
-               image,
-               groupId: this.groupId,
-             },
-           })
-           .then(({ data }) => {
-             this.loading = false
-             this.$toast.success(this.$t('contribution.success'))
-             const result = data[this.contribution.id ? 'UpdatePost' : 'CreatePost']
+    return {
+      categoriesActive: this.$env.CATEGORIES_ACTIVE,
+      links,
+      formData: {
+        title: title || '',
+        content: content || '',
+        image: image || null,
+        imageAspectRatio,
+        imageType,
+        imageBlurred,
+        categoryIds: categories ? categories.map((category) => category.id) : [], // : this.groupCategories.map((cat) => cat.id) || [],
+      },
+      formSchema: {
+        title: { required: true, min: 3, max: 100 },
+        content: { required: true },
+        imageBlurred: { required: false },
+        categoryIds: {
+          type: 'array',
+          required: this.categoriesActive,
+          validator: (_, value = []) => {
+            if (this.categoriesActive && (value.length === 0 || value.length > 3)) {
+              return [new Error(this.$t('common.validations.categories'))]
+            }
+            return []
+          },
+        },
+      },
+      loading: false,
+      users: [],
+      hashtags: [],
+      imageUpload: null,
+    }
+  },
+  computed: {
+    ...mapGetters({
+      currentUser: 'auth/user',
+    }),
+    contentLength() {
+      return this.$filters.removeHtml(this.formData.content).length
+    },
+    groupId() {
+      return this.group && this.group.id
+    },
+    showGroupHint() {
+      return this.groupId && ['closed', 'hidden'].includes(this.group.groupType)
+    },
+    groupName() {
+      return this.group && this.group.name
+    },
+    groupCategories() {
+      return this.group && this.group.categories //  && group.categories.map((cat) => cat.id )
+    },
+  },
+  watch: {
+    groupCategories() {
+      if (!this.formData.categoryIds.length && this.groupCategories)
+        this.formData.categoryIds = this.groupCategories.map((cat) => cat.id)
+    },
+  },
+  methods: {
+    submit() {
+      let image = null
+      const { title, content, categoryIds } = this.formData
+      if (this.formData.image) {
+        image = {
+          sensitive: this.formData.imageBlurred,
+        }
+        if (this.imageUpload) {
+          image.upload = this.imageUpload
+          image.aspectRatio = this.formData.imageAspectRatio
+          image.type = this.formData.imageType
+        }
+      }
+      this.loading = true
+      this.$apollo
+        .mutate({
+          mutation: this.contribution.id ? PostMutations().UpdatePost : PostMutations().CreatePost,
+          variables: {
+            title,
+            content,
+            categoryIds,
+            id: this.contribution.id || null,
+            image,
+            groupId: this.groupId,
+          },
+        })
+        .then(({ data }) => {
+          this.loading = false
+          this.$toast.success(this.$t('contribution.success'))
+          const result = data[this.contribution.id ? 'UpdatePost' : 'CreatePost']
 
-             this.$router.push({
-               name: 'post-id-slug',
-               params: { id: result.id, slug: result.slug },
-             })
-           })
-           .catch((err) => {
-             this.$toast.error(err.message)
-             this.loading = false
-           })
-     },
-     updateEditorContent(value) {
-       this.$refs.contributionForm.update('content', value)
-     },
-     addHeroImage(file) {
-       this.formData.image = null
-       if (file) {
-         const reader = new FileReader()
-         reader.onload = ({ target }) => {
-           this.formData.image = {
-             ...this.formData.image,
-             url: target.result,
-           }
-         }
-         reader.readAsDataURL(file)
-         this.imageUpload = file
-       }
-     },
-     addImageAspectRatio(aspectRatio) {
-       this.formData.imageAspectRatio = aspectRatio
-     },
-     addImageType(imageType) {
-       this.formData.imageType = imageType
-     },
-   },
-   apollo: {
-     User: {
-       query() {
-         return gql`
-           query {
-             User(orderBy: slug_asc) {
-               id
-               slug
-             }
-           }
-         `
-       },
-       result({ data: { User } }) {
-         this.users = User
-       },
-     },
-     Tag: {
-       query() {
-         return gql`
-           query {
-             Tag(orderBy: id_asc) {
-               id
-             }
-           }
-         `
-       },
-       result({ data: { Tag } }) {
-         this.hashtags = Tag
-       },
-     },
-   },
- }
+          this.$router.push({
+            name: 'post-id-slug',
+            params: { id: result.id, slug: result.slug },
+          })
+        })
+        .catch((err) => {
+          this.$toast.error(err.message)
+          this.loading = false
+        })
+    },
+    updateEditorContent(value) {
+      this.$refs.contributionForm.update('content', value)
+    },
+    addHeroImage(file) {
+      this.formData.image = null
+      if (file) {
+        const reader = new FileReader()
+        reader.onload = ({ target }) => {
+          this.formData.image = {
+            ...this.formData.image,
+            url: target.result,
+          }
+        }
+        reader.readAsDataURL(file)
+        this.imageUpload = file
+      }
+    },
+    addImageAspectRatio(aspectRatio) {
+      this.formData.imageAspectRatio = aspectRatio
+    },
+    addImageType(imageType) {
+      this.formData.imageType = imageType
+    },
+  },
+  apollo: {
+    User: {
+      query() {
+        return gql`
+          query {
+            User(orderBy: slug_asc) {
+              id
+              slug
+            }
+          }
+        `
+      },
+      result({ data: { User } }) {
+        this.users = User
+      },
+    },
+    Tag: {
+      query() {
+        return gql`
+          query {
+            Tag(orderBy: id_asc) {
+              id
+            }
+          }
+        `
+      },
+      result({ data: { Tag } }) {
+        this.hashtags = Tag
+      },
+    },
+  },
+}
 </script>
 
 <style lang="scss">
