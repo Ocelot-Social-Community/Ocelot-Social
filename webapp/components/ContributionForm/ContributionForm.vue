@@ -138,7 +138,7 @@ export default {
         imageAspectRatio,
         imageType,
         imageBlurred,
-        categoryIds: categories ? categories.map((category) => category.id) : [], // : this.groupCategories.map((cat) => cat.id) || [],
+        categoryIds: categories ? categories.map((category) => category.id) : [],
       },
       formSchema: {
         title: { required: true, min: 3, max: 100 },
@@ -178,7 +178,7 @@ export default {
       return this.group && this.group.name
     },
     groupCategories() {
-      return this.group && this.group.categories //  && group.categories.map((cat) => cat.id )
+      return this.group && this.group.categories
     },
   },
   watch: {
