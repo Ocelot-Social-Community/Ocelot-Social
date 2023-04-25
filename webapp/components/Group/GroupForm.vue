@@ -37,8 +37,6 @@
         <ds-text class="select-label">
           {{ $t('group.type') }}
         </ds-text>
-        <!-- TODO: change it has to be implemented later -->
-        <!-- TODO: move 'ds-select' from style guide to main code and implement missing translation etc. functionality -->
         <select
           class="select ds-input appearance--auto"
           name="groupType"
