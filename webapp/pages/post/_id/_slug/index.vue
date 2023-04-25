@@ -82,7 +82,6 @@
                 <ds-flex-item width="200px">Online Event:</ds-flex-item>
                 <ds-flex-item>{{ post.eventIsOnline }}</ds-flex-item>
               </ds-flex>
-              
             </ds-space>
             <!-- Categories -->
             <div v-if="categoriesActive" class="categories">

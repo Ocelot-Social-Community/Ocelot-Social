@@ -718,22 +718,19 @@
     "takeAction": {
       "name": "Aktiv werden"
     },
+    "viewEvent": {
+      "eventEnd": "Ende",
+      "eventIsOnline": "Online Veranstaltung",
+      "eventLocationName": "Stadt",
+      "eventStart": "Beginn",
+      "eventVenue": "Veranstaltungsort",
+      "title": "Veranstaltung"
+    },
     "viewPost": {
       "forGroup": {
         "title": "In der Gruppe „{name}“"
       },
       "title": "Beitrag"
-    },
-    "viewEvent": {
-      "forGroup": {
-        "title": "In der Gruppe „{name}“"
-      },
-      "title": "Veranstaltung",
-      "eventStart":"Beginn",
-      "eventEnd":"Ende",
-      "eventVenue":"Veranstaltungsort",
-      "eventLocationName":"Stadt",
-      "eventIsOnline":"Online Veranstaltung"
     }
   },
   "profile": {

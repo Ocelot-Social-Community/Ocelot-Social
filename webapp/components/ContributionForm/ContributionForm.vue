@@ -52,11 +52,11 @@
           {{ contentLength }}
           <base-icon v-if="errors && errors.content" name="warning" />
         </ds-chip>
-       
+
         <!-- Eventdata -->
         <div v-if="creatEvent" class="eventDatas">
-          <hr>
-        <ds-space margin-top="x-small" />
+          <hr />
+          <ds-space margin-top="x-small" />
           <ds-grid>
             <ds-grid-item style="grid-row-end: span 3">
               <!-- <label>Beginn</label> -->
@@ -107,7 +107,11 @@
               </div>
             </ds-grid-item>
             <ds-grid-item style="grid-row-end: span 3">
-              <ds-input model="eventLocationName" name="venue" :placeholder="$t('post.viewEvent.eventLocationName')" />
+              <ds-input
+                model="eventLocationName"
+                name="venue"
+                :placeholder="$t('post.viewEvent.eventLocationName')"
+              />
               <div class="chipbox">
                 <ds-chip size="base" :color="errors && errors.eventLocationName && 'danger'">
                   {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
@@ -126,8 +130,6 @@
             />
             {{ $t('post.viewEvent.eventIsOnline') }}
           </div>
-          
-        
         </div>
         <ds-space margin-top="x-small" />
         <categories-select

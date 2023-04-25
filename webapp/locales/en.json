@@ -718,19 +718,19 @@
     "takeAction": {
       "name": "Take action"
     },
+    "viewEvent": {
+      "eventEnd": "End",
+      "eventIsOnline": "Online Event",
+      "eventLocationName": "City",
+      "eventStart": "Start",
+      "eventVenue": "Venue",
+      "title": "Event"
+    },
     "viewPost": {
       "forGroup": {
         "title": "In The Group “{name}”"
       },
       "title": "Post"
-    },
-    "viewEvent": {
-      "title": "Event",
-      "eventStart":"Start",
-      "eventEnd":"End",
-      "eventVenue":"Venue",
-      "eventLocationName":"City",
-      "eventIsOnline":"Online Event"
     }
   },
   "profile": {

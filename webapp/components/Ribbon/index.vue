@@ -1,5 +1,5 @@
 <template>
-  <aside class="ribbon" :class="typ === 'Event' ? 'eventBg': ''">
+  <aside class="ribbon" :class="typ === 'Event' ? 'eventBg' : ''">
     <p>{{ text }}</p>
   </aside>
 </template>
@@ -14,8 +14,8 @@ export default {
     },
     typ: {
       type: String,
-      default: 'blue'
-    }
+      default: 'blue',
+    },
   },
 }
 </script>
@@ -51,7 +51,7 @@ export default {
   background-color: $color-success-active;
 
   &::before {
-      border-color: $color-success-active transparent transparent $color-success-active;
-    }
+    border-color: $color-success-active transparent transparent $color-success-active;
+  }
 }
 </style>
