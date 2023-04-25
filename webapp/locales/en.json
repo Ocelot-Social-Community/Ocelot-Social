@@ -723,6 +723,9 @@
         "title": "In The Group “{name}”"
       },
       "title": "Post"
+    },
+    "viewEvent": {
+      "title": "Event"
     }
   },
   "profile": {

@@ -723,6 +723,12 @@
         "title": "In der Gruppe „{name}“"
       },
       "title": "Beitrag"
+    },
+    "viewEvent": {
+      "forGroup": {
+        "title": "In der Gruppe „{name}“"
+      },
+      "title": "Event"
     }
   },
   "profile": {

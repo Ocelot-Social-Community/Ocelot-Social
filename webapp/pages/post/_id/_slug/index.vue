@@ -2,7 +2,7 @@
   <transition name="fade" appear>
     <div>
       <ds-space margin="small">
-        <ds-heading tag="h1">{{ $t('post.viewPost.title') }}</ds-heading>
+        <ds-heading tag="h1">{{ heading }}</ds-heading>
         <ds-heading v-if="post && post.group" tag="h2">
           {{ $t('post.viewPost.forGroup.title', { name: post.group.name }) }}
         </ds-heading>
@@ -56,6 +56,24 @@
             <h2 class="title hyphenate-text">{{ post.title }}</h2>
             <ds-space margin-bottom="small" />
             <content-viewer class="content hyphenate-text" :content="post.content" />
+            <!-- Eventdata -->
+            <ds-space v-if="post.postType[0] === 'Event'" margin-bottom="small">
+              <ds-flex>
+                <ds-flex-item width="200px">Start:</ds-flex-item>
+                <ds-flex-item>{{ post.eventStart }}</ds-flex-item>
+              </ds-flex>
+              <ds-space margin-bottom="small" />
+              <ds-flex>
+                <ds-flex-item width="200px">Veranstaltungsort:</ds-flex-item>
+                <ds-flex-item class="text-bold">{{ post.eventLocationName }}</ds-flex-item>
+              </ds-flex>
+              <ds-space margin-bottom="small" />
+              <ds-flex>
+                <ds-flex-item width="200px">Stadt:</ds-flex-item>
+                <ds-flex-item>{{ post.eventVenue }}</ds-flex-item>
+              </ds-flex>
+              
+            </ds-space>
             <!-- Categories -->
             <div v-if="categoriesActive" class="categories">
               <ds-space margin="xx-large" />
@@ -174,7 +192,7 @@ export default {
   data() {
     return {
       links,
-      post: null,
+      post: {postType: ['Article']},
       ready: false,
       title: 'loading',
       showNewCommentForm: true,
@@ -217,6 +235,10 @@ export default {
           ],
         },
       ]
+    },
+    heading() {
+      if (this.post.postType[0] === 'Event') return this.$t('post.viewEvent.title')
+      return this.$t('post.viewPost.title')
     },
     menuModalsData() {
       return postMenuModalsData(

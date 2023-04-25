@@ -154,7 +154,6 @@ export default {
       return this.post && this.post.pinned
     },
     ribbonText() {
-      console.log(this.post)
       if (this.post.pinned) return this.$t('post.pinned')
       if (this.post.postType[0] === "Event") return this.$t('post.event')
       return this.$t('post.name')
