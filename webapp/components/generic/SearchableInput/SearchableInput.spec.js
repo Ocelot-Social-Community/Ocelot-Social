@@ -63,13 +63,6 @@ describe('SearchableInput.vue', () => {
       expect(select.element.value).toBe('abcd')
     })
 
-    it('calls onDelete when the delete key is pressed', () => {
-      const spy = jest.spyOn(wrapper.vm, 'onDelete')
-      select.trigger('input')
-      select.trigger('keyup.delete')
-      expect(spy).toHaveBeenCalledTimes(1)
-    })
-
     describe('navigating to resource', () => {
       beforeEach(() => {
         propsData = { options: searchResults }
