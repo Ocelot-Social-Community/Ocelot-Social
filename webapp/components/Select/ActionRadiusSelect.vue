@@ -14,7 +14,11 @@
 <script>
 export default {
   name: 'ActionRadiusSelect',
-  props: ['value'],
+  props: {
+    value: {
+      required: true,
+    }
+  },
   data() {
     return {
       actionRadiusOptions: ['regional', 'national', 'continental', 'global'],
