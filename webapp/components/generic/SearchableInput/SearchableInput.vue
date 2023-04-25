@@ -92,7 +92,11 @@ export default {
   },
   methods: {
     isSearchable(){
-      return !isEmpty(this.value) && typeof this.value === 'string' && this.value.replace(/\s+/g, '').length >= 3
+      return (
+        !isEmpty(this.value) &&
+        typeof this.value === 'string' &&
+        this.value.replace(/\s+/g, '').length >= 3
+      )
     },
     isFirstOfType(option) {
       return (
