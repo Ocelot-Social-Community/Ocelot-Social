@@ -58,11 +58,21 @@
             <content-viewer class="content hyphenate-text" :content="post.content" />
             <!-- Eventdata -->
             <ds-space v-if="post.postType[0] === 'Event'" margin-bottom="small">
-              <ds-list size="small" style="background-color: beige; padding: 10px;">
-                <ds-list-item><span style="width: 100px">Start:</span> {{ post.eventStart }}</ds-list-item>
-                <ds-list-item><span style="width: 100px">Location:</span> {{ post.eventLocationName }}</ds-list-item>
-                <ds-list-item><span style="width: 100px">Ort:</span> {{ post.eventVenue }}</ds-list-item>
-              </ds-list>
+              <ds-flex>
+                <ds-flex-item width="200px">Start:</ds-flex-item>
+                <ds-flex-item>{{ post.eventStart }}</ds-flex-item>
+              </ds-flex>
+              <ds-space margin-bottom="small" />
+              <ds-flex>
+                <ds-flex-item width="200px">Veranstaltungsort:</ds-flex-item>
+                <ds-flex-item class="text-bold">{{ post.eventLocationName }}</ds-flex-item>
+              </ds-flex>
+              <ds-space margin-bottom="small" />
+              <ds-flex>
+                <ds-flex-item width="200px">Stadt:</ds-flex-item>
+                <ds-flex-item>{{ post.eventVenue }}</ds-flex-item>
+              </ds-flex>
+              
             </ds-space>
             <!-- Categories -->
             <div v-if="categoriesActive" class="categories">

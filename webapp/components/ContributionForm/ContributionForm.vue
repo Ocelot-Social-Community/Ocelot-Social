@@ -52,7 +52,6 @@
           {{ contentLength }}
           <base-icon v-if="errors && errors.content" name="warning" />
         </ds-chip>
-        <ds-space margin-top="base" />
         <!-- Eventdata -->
         <div v-if="creatEvent" class="eventDatas" style="background-color: #efeef1; padding: 10px">
           {{ formData.eventStart }}
