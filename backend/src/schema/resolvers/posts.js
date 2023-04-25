@@ -310,6 +310,7 @@ export default {
             `
             MATCH (user:User {id: $userId}) WHERE user.role = 'admin'
             MATCH (post:Post {id: $params.id})
+            WHERE NOT((post)-[:IN]->(:Group))
             MERGE (user)-[pinned:PINNED {createdAt: toString(datetime())}]->(post)
             SET post.pinned = true
             RETURN post, pinned.createdAt as pinnedAt
@@ -322,10 +323,12 @@ export default {
           }))
         })
         const [transactionResult] = await writeTxResultPromise
-        const { pinnedPost, pinnedAt } = transactionResult
-        pinnedPostWithNestedAttributes = {
-          ...pinnedPost,
-          pinnedAt,
+        if (transactionResult) {
+          const { pinnedPost, pinnedAt } = transactionResult
+          pinnedPostWithNestedAttributes = {
+            ...pinnedPost,
+            pinnedAt,
+          }
         }
       } finally {
         session.close()
