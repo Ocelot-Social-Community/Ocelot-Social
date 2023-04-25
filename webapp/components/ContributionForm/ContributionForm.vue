@@ -273,10 +273,10 @@ export default {
       if (this.creatEvent) {
         return {
           eventStart: this.formData.eventStart,
-          // TODO: eventEnd: this.formData.eventEnd,
-          // TODO: eventLocationName: this.formData.eventLocationName,
+          eventEnd: this.formData.eventEnd,
+          eventLocationName: this.formData.eventLocationName,
           eventVenue: this.formData.eventVenue,
-          // TODO: eventIsOnline: this.formData.eventIsOnline,
+          eventIsOnline: this.formData.eventIsOnline,
           eventLocation: JSON.stringify(this.formData.eventLocation),
         }
       }
