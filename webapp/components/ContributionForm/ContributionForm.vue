@@ -52,12 +52,14 @@
           {{ contentLength }}
           <base-icon v-if="errors && errors.content" name="warning" />
         </ds-chip>
+       
         <!-- Eventdata -->
-        <div v-if="creatEvent" class="eventDatas" style="background-color: #efeef1; padding: 10px">
-          {{ formData.eventStart }}
+        <div v-if="creatEvent" class="eventDatas">
+          <hr>
+        <ds-space margin-top="x-small" />
           <ds-grid>
             <ds-grid-item style="grid-row-end: span 3">
-              <label>Beginn</label>
+              <!-- <label>Beginn</label> -->
               <div style="z-index: 20">
                 <date-picker
                   name="eventStart"
@@ -67,6 +69,7 @@
                   value-type="format"
                   formmat="DD-MM-YYYY HH:mm"
                   style="z-index: 20"
+                  :placeholder="$t('post.viewEvent.eventStart')"
                 ></date-picker>
               </div>
               <div class="chipbox" style="margin-top: 10px">
@@ -76,7 +79,7 @@
               </div>
             </ds-grid-item>
             <ds-grid-item style="grid-row-end: span 3">
-              <label>Ende (optional)</label>
+              <!-- <label>Ende (optional)</label> -->
 
               <date-picker
                 v-model="formData.eventEnd"
@@ -84,31 +87,31 @@
                 :minute-step="15"
                 :hour-options="hours"
                 formmat="DD MM YYYY HH:mm"
+                :placeholder="$t('post.viewEvent.eventEnd')"
+                style="font-size: larger"
               ></date-picker>
             </ds-grid-item>
           </ds-grid>
           <ds-grid>
             <ds-grid-item style="grid-row-end: span 3">
               <ds-input
-                model="eventLocationName"
+                model="eventVenue"
                 name="location"
-                placeholder="Location"
-                size="large"
+                :placeholder="$t('post.viewEvent.eventVenue')"
               />
               <div class="chipbox">
-                <ds-chip size="base" :color="errors && errors.eventLocationName && 'danger'">
-                  {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
-                  <base-icon v-if="errors && errors.eventLocationName" name="warning" />
+                <ds-chip size="base" :color="errors && errors.eventVenue && 'danger'">
+                  {{ formData.eventVenue.length }}/{{ formSchema.eventVenue.max }}
+                  <base-icon v-if="errors && errors.eventVenue" name="warning" />
                 </ds-chip>
               </div>
             </ds-grid-item>
             <ds-grid-item style="grid-row-end: span 3">
-              <ds-input model="eventVenue" name="venue" placeholder="Ort" size="large" />
+              <ds-input model="eventLocationName" name="venue" :placeholder="$t('post.viewEvent.eventLocationName')" />
               <div class="chipbox">
-                {{ errors }}
-                <ds-chip size="base" :color="errors && errors.eventVenue && 'danger'">
-                  {{ formData.eventVenue.length }}/{{ formSchema.eventVenue.max }}
-                  <base-icon v-if="errors && errors.eventVenue" name="warning" />
+                <ds-chip size="base" :color="errors && errors.eventLocationName && 'danger'">
+                  {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
+                  <base-icon v-if="errors && errors.eventLocationName" name="warning" />
                 </ds-chip>
               </div>
             </ds-grid-item>
@@ -121,10 +124,12 @@
               name="eventIsOnline"
               style="font-size: larger"
             />
-            Online Event
+            {{ $t('post.viewEvent.eventIsOnline') }}
           </div>
+          
+        
         </div>
-        <ds-space margin-top="base" />
+        <ds-space margin-top="x-small" />
         <categories-select
           v-if="categoriesActive"
           model="categoryIds"
@@ -234,7 +239,7 @@ export default {
         categoryIds: categories ? categories.map((category) => category.id) : [],
         eventStart: eventStart || null,
         eventEnd: eventEnd || null,
-        eventLocation: eventLocation || 'Dresden, Saxony, Germany',
+        eventLocation: eventLocation || '',
         eventLocationName: eventLocationName || '',
         eventVenue: eventVenue || '',
         eventIsOnline: eventIsOnline || true,
@@ -272,7 +277,6 @@ export default {
     }),
     eventInput() {
       if (this.creatEvent) {
-        alert(typeof this.formData.eventStart)
         return {
           eventStart: this.formData.eventStart,
           eventLocation: this.formData.eventLocation,
@@ -501,11 +505,12 @@ export default {
     width: 100%;
   }
   .mx-datepicker input {
-    font-size: 1.25rem;
+    font-size: 1rem;
     height: calc(1.625rem + 18px);
     padding: 8px 8px;
     background-color: #faf9fa;
     border-color: #c8c8c8;
+    color: #4b4554;
   }
   .mx-datepicker input:hover {
     border-color: #c8c8c8;

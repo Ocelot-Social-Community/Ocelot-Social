@@ -725,7 +725,12 @@
       "title": "Post"
     },
     "viewEvent": {
-      "title": "Event"
+      "title": "Event",
+      "eventStart":"Start",
+      "eventEnd":"End",
+      "eventVenue":"Venue",
+      "eventLocationName":"City",
+      "eventIsOnline":"Online Event"
     }
   },
   "profile": {

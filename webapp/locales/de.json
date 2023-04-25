@@ -728,7 +728,12 @@
       "forGroup": {
         "title": "In der Gruppe „{name}“"
       },
-      "title": "Event"
+      "title": "Veranstaltung",
+      "eventStart":"Beginn",
+      "eventEnd":"Ende",
+      "eventVenue":"Veranstaltungsort",
+      "eventLocationName":"Stadt",
+      "eventIsOnline":"Online Veranstaltung"
     }
   },
   "profile": {
