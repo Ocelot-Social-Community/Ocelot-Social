@@ -83,6 +83,8 @@ input _PostFilter {
   emotions_every: _PostEMOTEDFilter
   group: _GroupFilter
   postsInMyGroups: Boolean
+  postType_in: [PostType]
+  eventStart_gte: String 
 }
 
 enum _PostOrdering {
@@ -104,6 +106,8 @@ enum _PostOrdering {
   language_desc
   pinned_asc
   pinned_desc
+  eventStart_asc
+  eventStart_desc
 }
 
 

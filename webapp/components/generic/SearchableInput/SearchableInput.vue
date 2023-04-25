@@ -1,9 +1,10 @@
 <template>
   <div class="searchable-input" aria-label="search" role="search">
     <ds-select
+      ref="select"
       type="search"
       icon="search"
-      v-model="searchValue"
+      v-model="value"
       :id="id"
       label-prop="id"
       :icon-right="null"
@@ -11,12 +12,11 @@
       :loading="loading"
       :filter="(item) => item"
       :no-options-available="emptyText"
-      :auto-reset-search="!searchValue"
+      :auto-reset-search="!value"
       :placeholder="$t('search.placeholder')"
       @focus.capture.native="onFocus"
-      @input.native="handleInput"
+      @input.native="onInput"
       @keyup.enter.native="onEnter"
-      @keyup.delete.native="onDelete"
       @keyup.esc.native="clear"
       @blur.capture.native="onBlur"
       @input.exact="onSelect"
@@ -77,23 +77,29 @@ export default {
   },
   data() {
     return {
-      searchValue: '',
       value: '',
-      unprocessedSearchInput: '',
       searchProcess: null,
-      previousSearchTerm: '',
       delay: 300,
     }
   },
   computed: {
     emptyText() {
-      return this.isActive && !this.loading ? this.$t('search.failed') : this.$t('search.hint')
+      return !this.loading && this.isSearchable()
+        ? this.$t('search.failed')
+        : this.$t('search.hint')
     },
     isActive() {
-      return !isEmpty(this.previousSearchTerm)
+      return !isEmpty(this.value)
     },
   },
   methods: {
+    isSearchable() {
+      return (
+        !isEmpty(this.value) &&
+        typeof this.value === 'string' &&
+        this.value.replace(/\s+/g, '').length >= 3
+      )
+    },
     isFirstOfType(option) {
       return (
         this.options.findIndex((o) => o === option) ===
@@ -103,49 +109,36 @@ export default {
     onFocus(event) {
       clearTimeout(this.searchProcess)
     },
-    handleInput(event) {
+    onInput(event) {
       clearTimeout(this.searchProcess)
       this.value = event.target ? event.target.value.replace(/\s+/g, ' ').trim() : ''
-      this.unprocessedSearchInput = this.value
-      if (isEmpty(this.value) || this.value.replace(/\s+/g, '').length < 3) {
+      if (!this.isSearchable()) {
+        this.$emit('clearSearch')
         return
       }
       this.searchProcess = setTimeout(() => {
-        this.previousSearchTerm = this.value
         this.$emit('query', this.value)
       }, this.delay)
     },
     onEnter(event) {
       this.$router.push({
         path: '/search/search-results',
-        query: { search: this.unprocessedSearchInput },
+        query: { search: this.value },
       })
-      this.$emit('clearSearch')
-    },
-    onDelete(event) {
-      clearTimeout(this.searchProcess)
-      const value = event.target ? event.target.value.trim() : ''
-      if (isEmpty(value)) {
-        this.clear()
-      } else {
-        this.handleInput(event)
-      }
+      this.$refs.select.close()
     },
     clear() {
-      this.unprocessedSearchInput = ''
-      this.previousSearchTerm = ''
-      this.searchValue = ''
+      this.value = ''
       this.$emit('clearSearch')
       clearTimeout(this.searchProcess)
     },
     onBlur(event) {
-      this.searchValue = this.previousSearchTerm
       clearTimeout(this.searchProcess)
     },
     onSelect(item) {
       this.goToResource(item)
       this.$nextTick(() => {
-        this.searchValue = this.previousSearchTerm
+        this.value = this.$refs.select.$data.searchString
       })
     },
     getRouteName(item) {
