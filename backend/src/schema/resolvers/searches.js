@@ -223,7 +223,7 @@ export default {
     },
     searchResults: async (_parent, args, context, _resolveInfo) => {
       const { query, limit } = args
-      let userId = context.user?.id || null 
+      const userId = context.user?.id || null 
 
       const searchType = query.replace(/^([!@#&]?).*$/, '$1')
       const searchString = query.replace(/^([!@#&])/, '')
