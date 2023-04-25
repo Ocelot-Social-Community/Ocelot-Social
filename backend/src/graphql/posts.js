@@ -38,10 +38,8 @@ export const createPostMutation = () => {
           id
         }
         eventStart
-        eventEnd
         eventLocationName
         eventVenue
-        eventIsOnline
         eventLocation {
           lng
           lat
