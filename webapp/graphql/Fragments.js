@@ -67,7 +67,6 @@ export const postFragment = gql`
     }
     pinnedAt
     pinned
-    postType
   }
 `
 

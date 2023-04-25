@@ -24,6 +24,7 @@ export default (i18n) => {
 
     query Post($id: ID!) {
       Post(id: $id) {
+        postType
         ...post
         ...postCounts
         ...tagsCategoriesAndPinned
@@ -66,6 +67,7 @@ export const filterPosts = (i18n) => {
 
     query Post($filter: _PostFilter, $first: Int, $offset: Int, $orderBy: [_PostOrdering]) {
       Post(filter: $filter, first: $first, offset: $offset, orderBy: $orderBy) {
+        postType
         ...post
         ...postCounts
         ...tagsCategoriesAndPinned
@@ -103,6 +105,7 @@ export const profilePagePosts = (i18n) => {
       $orderBy: [_PostOrdering]
     ) {
       profilePagePosts(filter: $filter, first: $first, offset: $offset, orderBy: $orderBy) {
+        postType
         ...post
         ...postCounts
         ...tagsCategoriesAndPinned
