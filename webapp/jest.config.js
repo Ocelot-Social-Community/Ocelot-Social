@@ -15,7 +15,11 @@ module.exports = {
     '!**/.prettierrc.js',
     '!**/nuxt.config.js',
   ],
-  coverageReporters: ['lcov', 'text'],
+  coverageThreshold: {
+    global: {
+      lines: 83,
+    },
+  },
   setupFiles: ['<rootDir>/test/registerContext.js', '<rootDir>/test/testSetup.js'],
   transform: {
     '.*\\.(vue)$': 'vue-jest',

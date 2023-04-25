@@ -1,0 +1,9 @@
+backend: &backend
+  - 'backend/**/*'
+  - 'neo4j/**/*'
+
+docker: &docker
+  - 'docker-compose.*'
+
+webapp: &webapp
+  - 'webapp/**/*'
