@@ -11,8 +11,6 @@
       }"
       :highlight="isPinned"
     >
-    ss
-   
       <template v-if="post.image" #heroImage>
         <img :src="post.image | proxyApiUrl" class="image" />
       </template>
