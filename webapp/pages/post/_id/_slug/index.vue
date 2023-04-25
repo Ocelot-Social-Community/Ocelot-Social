@@ -2,7 +2,7 @@
   <transition name="fade" appear>
     <div>
       <ds-space margin="small">
-        <ds-heading tag="h1">{{ $t('post.viewPost.title') }}</ds-heading>
+        <ds-heading tag="h1">{{ heading }}</ds-heading>
         <ds-heading v-if="post && post.group" tag="h2">
           {{ $t('post.viewPost.forGroup.title', { name: post.group.name }) }}
         </ds-heading>
@@ -56,6 +56,14 @@
             <h2 class="title hyphenate-text">{{ post.title }}</h2>
             <ds-space margin-bottom="small" />
             <content-viewer class="content hyphenate-text" :content="post.content" />
+            <!-- Eventdata -->
+            <ds-space v-if="post.postType[0] === 'Event'" margin-bottom="small">
+              <ds-list size="small" style="background-color: beige; padding: 10px;">
+                <ds-list-item><span style="width: 100px">Start:</span> {{ post.eventStart }}</ds-list-item>
+                <ds-list-item><span style="width: 100px">Location:</span> {{ post.eventLocationName }}</ds-list-item>
+                <ds-list-item><span style="width: 100px">Ort:</span> {{ post.eventVenue }}</ds-list-item>
+              </ds-list>
+            </ds-space>
             <!-- Categories -->
             <div v-if="categoriesActive" class="categories">
               <ds-space margin="xx-large" />
@@ -174,7 +182,7 @@ export default {
   data() {
     return {
       links,
-      post: null,
+      post: {postType: ['Article']},
       ready: false,
       title: 'loading',
       showNewCommentForm: true,
@@ -217,6 +225,10 @@ export default {
           ],
         },
       ]
+    },
+    heading() {
+      if (this.post.postType[0] === 'Event') return this.$t('post.viewEvent.title')
+      return this.$t('post.viewPost.title')
     },
     menuModalsData() {
       return postMenuModalsData(

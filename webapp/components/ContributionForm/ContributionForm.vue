@@ -30,6 +30,30 @@
             <base-icon name="question-circle" />
           </page-params-link>
         </div>
+        <ds-space margin-top="base" />
+        <ds-input
+          model="title"
+          :placeholder="$t('contribution.title')"
+          name="title"
+          autofocus
+          size="large"
+        />
+        <ds-chip size="base" :color="errors && errors.title && 'danger'">
+          {{ formData.title.length }}/{{ formSchema.title.max }}
+          <base-icon v-if="errors && errors.title" name="warning" />
+        </ds-chip>
+        <editor
+          :users="users"
+          :value="formData.content"
+          :hashtags="hashtags"
+          @input="updateEditorContent"
+        />
+        <ds-chip size="base" :color="errors && errors.content && 'danger'">
+          {{ contentLength }}
+          <base-icon v-if="errors && errors.content" name="warning" />
+        </ds-chip>
+        <ds-space margin-top="base" />
+        <!-- Eventdata -->
         <div v-if="creatEvent" class="eventDatas" style="background-color: #efeef1; padding: 10px">
           {{ formData.eventStart }}
           <ds-grid>
@@ -101,28 +125,7 @@
             Online Event
           </div>
         </div>
-        <ds-space margin-top="base"></ds-space>
-        <ds-input
-          model="title"
-          :placeholder="$t('contribution.title')"
-          name="title"
-          autofocus
-          size="large"
-        />
-        <ds-chip size="base" :color="errors && errors.title && 'danger'">
-          {{ formData.title.length }}/{{ formSchema.title.max }}
-          <base-icon v-if="errors && errors.title" name="warning" />
-        </ds-chip>
-        <editor
-          :users="users"
-          :value="formData.content"
-          :hashtags="hashtags"
-          @input="updateEditorContent"
-        />
-        <ds-chip size="base" :color="errors && errors.content && 'danger'">
-          {{ contentLength }}
-          <base-icon v-if="errors && errors.content" name="warning" />
-        </ds-chip>
+        <ds-space margin-top="base" />
         <categories-select
           v-if="categoriesActive"
           model="categoryIds"
