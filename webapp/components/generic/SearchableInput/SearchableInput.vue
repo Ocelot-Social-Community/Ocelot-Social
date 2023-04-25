@@ -14,9 +14,8 @@
       :auto-reset-search="!searchValue"
       :placeholder="$t('search.placeholder')"
       @focus.capture.native="onFocus"
-      @input.native="handleInput"
+      @input.native="onInput"
       @keyup.enter.native="onEnter"
-      @keyup.delete.native="onDelete"
       @keyup.esc.native="clear"
       @blur.capture.native="onBlur"
       @input.exact="onSelect"
@@ -103,11 +102,14 @@ export default {
     onFocus(event) {
       clearTimeout(this.searchProcess)
     },
-    handleInput(event) {
+    onInput(event) {
+      console.log('input', event)
       clearTimeout(this.searchProcess)
       this.value = event.target ? event.target.value.replace(/\s+/g, ' ').trim() : ''
+      console.log('input', this.value)
       this.unprocessedSearchInput = this.value
       if (isEmpty(this.value) || this.value.replace(/\s+/g, '').length < 3) {
+        this.clear()
         return
       }
       this.searchProcess = setTimeout(() => {
@@ -121,15 +123,6 @@ export default {
         query: { search: this.unprocessedSearchInput },
       })
       this.$emit('clearSearch')
-    },
-    onDelete(event) {
-      clearTimeout(this.searchProcess)
-      const value = event.target ? event.target.value.trim() : ''
-      if (isEmpty(value)) {
-        this.clear()
-      } else {
-        this.handleInput(event)
-      }
     },
     clear() {
       this.unprocessedSearchInput = ''
