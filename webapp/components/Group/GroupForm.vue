@@ -318,10 +318,10 @@ export default {
       return false
     },
     changeGroupType(event) {
-      this.formData.groupType = event.target.value
+      this.$refs.groupForm.update('groupType', event.target.value)
     },
     changeActionRadius(event) {
-      this.formData.actionRadius = event.target.value
+      this.$refs.groupForm.update('actionRadius', event.target.value)
     },
     updateEditorDescription(value) {
       this.$refs.groupForm.update('description', value)
