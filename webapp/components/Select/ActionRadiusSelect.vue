@@ -21,7 +21,7 @@ export default {
   },
   data() {
     return {
-      actionRadiusOptions: ['regional', 'national', 'continental', 'global', 'interplanetary'],
+      actionRadiusOptions: ['regional', 'national', 'continental', 'global'],
     }
   },
   methods: {
