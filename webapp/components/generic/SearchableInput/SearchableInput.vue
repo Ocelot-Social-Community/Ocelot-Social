@@ -1,9 +1,10 @@
 <template>
   <div class="searchable-input" aria-label="search" role="search">
     <ds-select
+      ref="select"
       type="search"
       icon="search"
-      v-model="searchValue"
+      v-model="value"
       :id="id"
       label-prop="id"
       :icon-right="null"
@@ -11,7 +12,7 @@
       :loading="loading"
       :filter="(item) => item"
       :no-options-available="emptyText"
-      :auto-reset-search="!searchValue"
+      :auto-reset-search="!value"
       :placeholder="$t('search.placeholder')"
       @focus.capture.native="onFocus"
       @input.native="onInput"
@@ -76,10 +77,8 @@ export default {
   },
   data() {
     return {
-      searchValue: '',
       value: '',
       searchProcess: null,
-      previousSearchTerm: '',
       delay: 300,
     }
   },
@@ -88,7 +87,7 @@ export default {
       return this.isActive && !this.loading ? this.$t('search.failed') : this.$t('search.hint')
     },
     isActive() {
-      return !isEmpty(this.previousSearchTerm)
+      return !isEmpty(this.value)
     },
   },
   methods: {
@@ -109,7 +108,6 @@ export default {
         return
       }
       this.searchProcess = setTimeout(() => {
-        this.previousSearchTerm = this.value
         this.$emit('query', this.value)
       }, this.delay)
     },
@@ -118,22 +116,21 @@ export default {
         path: '/search/search-results',
         query: { search: this.value },
       })
-      this.$emit('clearSearch')
+      this.$refs.select.close()
     },
     clear() {
-      this.previousSearchTerm = ''
-      this.searchValue = ''
+      this.value = ''
+      this.valueBackup = ''
       this.$emit('clearSearch')
       clearTimeout(this.searchProcess)
     },
     onBlur(event) {
-      this.searchValue = this.previousSearchTerm
       clearTimeout(this.searchProcess)
     },
     onSelect(item) {
       this.goToResource(item)
       this.$nextTick(() => {
-        this.searchValue = this.previousSearchTerm
+        this.value = this.$refs.select.$data.searchString
       })
     },
     getRouteName(item) {
