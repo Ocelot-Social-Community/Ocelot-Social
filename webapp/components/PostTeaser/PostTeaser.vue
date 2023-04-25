@@ -20,6 +20,7 @@
           <hc-ribbon
             :class="[isPinned ? '--pinned' : '', post.image ? 'post-ribbon-w-img' : 'post-ribbon']"
             :text="ribbonText"
+            :typ="post.postType[0]"
           />
         </div>
       </client-only>
@@ -155,7 +156,7 @@ export default {
     ribbonText() {
       console.log(this.post)
       if (this.post.pinned) return this.$t('post.pinned')
-      if (this.post && this.post.postType === "Event") return this.$t('post.event')
+      if (this.post.postType[0] === "Event") return this.$t('post.event')
       return this.$t('post.name')
     },
   },

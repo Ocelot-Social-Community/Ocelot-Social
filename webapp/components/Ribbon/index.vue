@@ -1,5 +1,5 @@
 <template>
-  <aside class="ribbon">
+  <aside class="ribbon" :class="typ === 'Event' ? 'eventBg': ''">
     <p>{{ text }}</p>
   </aside>
 </template>
@@ -12,6 +12,10 @@ export default {
       type: String,
       default: '',
     },
+    typ: {
+      type: String,
+      default: 'blue'
+    }
   },
 }
 </script>
@@ -42,5 +46,12 @@ export default {
       border-color: $color-warning transparent transparent $color-warning;
     }
   }
+}
+.eventBg {
+  background-color: $color-success-active;
+
+  &::before {
+      border-color: $color-success-active transparent transparent $color-success-active;
+    }
 }
 </style>
