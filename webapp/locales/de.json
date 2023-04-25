@@ -377,9 +377,11 @@
   },
   "filter-menu": {
     "all": "Alle",
+    "article": "Artikel",
     "categories": "Themen",
     "deleteFilter": "Filter löschen",
     "emotions": "Emotionen",
+    "events": "Veranstaltungen",
     "filter-by": "Filtern nach ...",
     "following": "Nutzer denen ich folge",
     "languages": "Sprachen",
@@ -395,6 +397,7 @@
       }
     },
     "order-by": "Sortieren nach ...",
+    "post-type": "Beitrags-Typ",
     "save": {
       "error": "Themen konnten nicht gespeichert werden!",
       "success": "Themen gespeichert!"
