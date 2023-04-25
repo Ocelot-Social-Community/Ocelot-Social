@@ -8,7 +8,11 @@ module.exports = {
     '!**/dist/**',
     '!**/src/**/?(*.)+(spec|test).js?(x)'
   ],
-  coverageReporters: ['lcov', 'text'],
+  coverageThreshold: {
+    global: {
+      lines: 57,
+    },
+  },
   testMatch: ['**/src/**/?(*.)+(spec|test).js?(x)'],
   setupFilesAfterEnv: ['<rootDir>/test/setup.js']
 }
