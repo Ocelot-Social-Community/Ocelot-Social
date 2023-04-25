@@ -218,7 +218,6 @@ export default {
       aspectRatio: imageAspectRatio = null,
       type: imageType = null,
     } = image || {}
-
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       links,

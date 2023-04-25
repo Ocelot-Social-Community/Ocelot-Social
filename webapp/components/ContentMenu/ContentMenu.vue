@@ -80,7 +80,7 @@ export default {
           })
         }
 
-        if (this.isAdmin) {
+        if (this.isAdmin && !this.resource.group) {
           if (!this.resource.pinnedBy) {
             routes.push({
               label: this.$t(`post.menu.pin`),
