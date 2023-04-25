@@ -70,6 +70,7 @@ export const filterPosts = () => {
         id
         title
         content
+        eventStart
       }
     }
   `
