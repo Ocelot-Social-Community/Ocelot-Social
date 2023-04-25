@@ -84,7 +84,7 @@ export default {
   },
   computed: {
     emptyText() {
-      return !this.loading && this.isSearchable() 
+      return !this.loading && this.isSearchable()
         ? this.$t('search.failed')
         : this.$t('search.hint')
     },
