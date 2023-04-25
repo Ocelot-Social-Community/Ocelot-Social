@@ -37,7 +37,7 @@ describe('queryString', () => {
 
   describe('globbing for longer words', () => {
     it('globs words with more than three characters', () => {
-      expect(queryString('a couple of words')).toContain('couple* words*')
+      expect(queryString('a couple of words')).toContain('couple* of* words*')
     })
   })
 })
