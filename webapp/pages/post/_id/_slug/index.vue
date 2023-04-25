@@ -64,13 +64,23 @@
               </ds-flex>
               <ds-space margin-bottom="small" />
               <ds-flex>
+                <ds-flex-item width="200px">End:</ds-flex-item>
+                <ds-flex-item>{{ post.eventEnd }}</ds-flex-item>
+              </ds-flex>
+              <ds-space margin-bottom="small" />
+              <ds-flex>
                 <ds-flex-item width="200px">Veranstaltungsort:</ds-flex-item>
-                <ds-flex-item class="text-bold">{{ post.eventLocationName }}</ds-flex-item>
+                <ds-flex-item class="text-bold">{{ post.eventVenue }}</ds-flex-item>
               </ds-flex>
               <ds-space margin-bottom="small" />
               <ds-flex>
                 <ds-flex-item width="200px">Stadt:</ds-flex-item>
-                <ds-flex-item>{{ post.eventVenue }}</ds-flex-item>
+                <ds-flex-item>{{ post.eventLocationName }}</ds-flex-item>
+              </ds-flex>
+              <ds-space margin-bottom="small" />
+              <ds-flex>
+                <ds-flex-item width="200px">Online Event:</ds-flex-item>
+                <ds-flex-item>{{ post.eventIsOnline }}</ds-flex-item>
               </ds-flex>
               
             </ds-space>

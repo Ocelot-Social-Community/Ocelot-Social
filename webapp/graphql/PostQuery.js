@@ -26,8 +26,10 @@ export default (i18n) => {
       Post(id: $id) {
         postType
         eventStart
+        eventEnd
         eventVenue
         eventLocationName
+        eventIsOnline
         ...post
         ...postCounts
         ...tagsCategoriesAndPinned
