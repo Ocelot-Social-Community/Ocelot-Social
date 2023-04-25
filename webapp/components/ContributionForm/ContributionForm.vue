@@ -233,7 +233,7 @@ export default {
         categoryIds: categories ? categories.map((category) => category.id) : [],
         eventStart: eventStart || null,
         eventEnd: eventEnd || null,
-        eventLocation: eventLocation || { lng: 51.0, lat: 17.0 },
+        eventLocation: eventLocation || 'Dresden, Saxony, Germany',
         eventLocationName: eventLocationName || '',
         eventVenue: eventVenue || '',
         eventIsOnline: eventIsOnline || true,
@@ -271,13 +271,13 @@ export default {
     }),
     eventInput() {
       if (this.creatEvent) {
+        alert(typeof this.formData.eventStart)
         return {
           eventStart: this.formData.eventStart,
-          eventEnd: this.formData.eventEnd,
-          eventLocationName: this.formData.eventLocationName,
+          eventLocation: this.formData.eventLocation,
           eventVenue: this.formData.eventVenue,
+          eventEnd: this.formData.eventEnd,
           eventIsOnline: this.formData.eventIsOnline,
-          eventLocation: JSON.stringify(this.formData.eventLocation),
         }
       }
       return undefined
