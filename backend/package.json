@@ -103,7 +103,7 @@
     "xregexp": "^4.3.0"
   },
   "devDependencies": {
-    "@faker-js/faker": "5.1.0",
+    "@faker-js/faker": "7.6.0",
     "apollo-server-testing": "~2.11.0",
     "chai": "~4.2.0",
     "cucumber": "~6.0.5",
