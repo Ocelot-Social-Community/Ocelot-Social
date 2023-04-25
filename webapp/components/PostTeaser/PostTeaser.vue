@@ -11,6 +11,8 @@
       }"
       :highlight="isPinned"
     >
+    ss
+   
       <template v-if="post.image" #heroImage>
         <img :src="post.image | proxyApiUrl" class="image" />
       </template>
@@ -19,7 +21,7 @@
           <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" />
           <hc-ribbon
             :class="[isPinned ? '--pinned' : '', post.image ? 'post-ribbon-w-img' : 'post-ribbon']"
-            :text="isPinned ? $t('post.pinned') : $t('post.name')"
+            :text="ribbonText"
           />
         </div>
       </client-only>
@@ -151,6 +153,12 @@ export default {
     },
     isPinned() {
       return this.post && this.post.pinned
+    },
+    ribbonText() {
+      console.log(this.post)
+      if (this.post.pinned) return this.$t('post.pinned')
+     //  if (this.post.postType === "Event") return this.$t('post.event')
+      return this.$t('post.name')
     },
   },
   methods: {
