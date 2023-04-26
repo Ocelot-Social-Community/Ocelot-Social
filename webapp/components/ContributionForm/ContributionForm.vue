@@ -65,12 +65,13 @@
                   name="eventStart"
                   v-model="formData.eventStart"
                   type="datetime"
-                  :hour-options="hours"
                   value-type="format"
+                  :minute-step="15"
                   formmat="DD-MM-YYYY HH:mm"
                   style="z-index: 20"
                   :placeholder="$t('post.viewEvent.eventStart')"
                   :disabled-date="notBeforeToday"
+                  :show-second="false"
                 ></date-picker>
               </div>
               <div class="chipbox" style="margin-top: 10px">
@@ -86,11 +87,12 @@
                 v-model="formData.eventEnd"
                 type="datetime"
                 :minute-step="15"
-                :hour-options="hours"
+                :seconds-step="0"
                 formmat="DD MM YYYY HH:mm"
                 :placeholder="$t('post.viewEvent.eventEnd')"
                 style="font-size: larger"
                 :disabled-date="notBeforeToday"
+                :show-second="false"
               ></date-picker>
             </ds-grid-item>
           </ds-grid>
@@ -232,7 +234,6 @@ export default {
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       links,
-      hours: Array.from({ length: 10 }).map((_, i) => i + 8),
       formData: {
         title: title || '',
         content: content || '',
@@ -262,7 +263,7 @@ export default {
             return []
           },
         },
-        eventStart: { required: !!this.creatEvent },
+        eventStart: { required: !this.creatEvent },
         eventVenue: { required: !!this.creatEvent, min: 3, max: 100 },
         eventLocationName: { required: !!this.creatEvent, min: 3, max: 100 },
       },
@@ -279,9 +280,6 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
-    notBeforeToday(date) {
-      return date < new Date(new Date().setHours(0, 0, 0, 0));
-    },
     eventInput() {
       if (this.creatEvent) {
         return {
@@ -311,6 +309,9 @@ export default {
     },
   },
   methods: {
+    notBeforeToday(date) {
+      return date < new Date(new Date().setHours(0, 0, 0, 0));
+    },
     submit() {
       let image = null
 
