@@ -378,9 +378,11 @@
   },
   "filter-menu": {
     "all": "All",
+    "article": "Article",
     "categories": "Topics",
     "deleteFilter": "Delete filter",
     "emotions": "Emotions",
+    "events": "Events",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
     "languages": "Languages",
@@ -396,6 +398,7 @@
       }
     },
     "order-by": "Order by ...",
+    "post-type": "Post type",
     "save": {
       "error": "Failed saving topic settings!",
       "success": "Topics saved!"
