@@ -1,41 +1,53 @@
 <template>
   <div>
-
-      <ds-flex :width="{ base: '100%' }" >
-        <ds-flex-item :width="{ base: '100%', md: 5 }">
-          <ds-flex gutter="base" :width="{ base: '100%', sm: 1 }">
-            <ds-flex-item>
-              <ds-card :primary="!creatEvent" centered>
-                <div>
-                  <ds-button v-if="!creatEvent" ghost fullwidth size="x-large" style="background-color: #ff000000; color: whitesmoke">
-                    {{ $t('post.createNewPost.title') }}
-                  </ds-button>
-                  <ds-button  v-else ghost fullwidth size="x-large" @click="creatEvent = !creatEvent">
-                    {{ $t('post.createNewPost.title') }}
-                  </ds-button>
-                </div>
-              </ds-card>
-            </ds-flex-item>
-            <ds-flex-item>
-              <ds-card :primary="!!creatEvent" centered>
-                <div >
-                  <ds-button ghost fullwidth size="x-large" v-if="creatEvent" hover="false" style="background-color: #ff000000; color: whitesmoke">
-                    {{ $t('post.createNewEvent.title') }}
+    <ds-flex :width="{ base: '100%' }">
+      <ds-flex-item :width="{ base: '100%', md: 5 }">
+        <ds-flex gutter="base" :width="{ base: '100%', sm: 1 }">
+          <ds-flex-item>
+            <ds-card :primary="!creatEvent" centered>
+              <div>
+                <ds-button
+                  v-if="!creatEvent"
+                  ghost
+                  fullwidth
+                  size="x-large"
+                  style="background-color: #ff000000; color: whitesmoke"
+                >
+                  {{ $t('post.createNewPost.title') }}
                 </ds-button>
-                  <ds-button ghost fullwidth size="x-large" v-else @click="creatEvent = !creatEvent">
-                    {{ $t('post.createNewEvent.title') }}
+                <ds-button v-else ghost fullwidth size="x-large" @click="creatEvent = !creatEvent">
+                  {{ $t('post.createNewPost.title') }}
                 </ds-button>
               </div>
-              </ds-card>
-            </ds-flex-item>
-          </ds-flex>
-          <div v-if="group" style="font-size: 30px; text-align: center">
-            {{ $t('post.createNewPost.forGroup.title', { name: group.name }) }}
-          </div>
-        </ds-flex-item>
-        <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
-      </ds-flex>
-   
+            </ds-card>
+          </ds-flex-item>
+          <ds-flex-item>
+            <ds-card :primary="!!creatEvent" centered>
+              <div>
+                <ds-button
+                  ghost
+                  fullwidth
+                  size="x-large"
+                  v-if="creatEvent"
+                  hover="false"
+                  style="background-color: #ff000000; color: whitesmoke"
+                >
+                  {{ $t('post.createNewEvent.title') }}
+                </ds-button>
+                <ds-button ghost fullwidth size="x-large" v-else @click="creatEvent = !creatEvent">
+                  {{ $t('post.createNewEvent.title') }}
+                </ds-button>
+              </div>
+            </ds-card>
+          </ds-flex-item>
+        </ds-flex>
+        <div v-if="group" style="font-size: 30px; text-align: center">
+          {{ $t('post.createNewPost.forGroup.title', { name: group.name }) }}
+        </div>
+      </ds-flex-item>
+      <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
+    </ds-flex>
+
     <ds-flex :width="{ base: '100%' }" gutter="base">
       <ds-flex-item :width="{ base: '100%', md: 5 }">
         <contribution-form :group="group" :creatEvent="creatEvent" />

@@ -57,7 +57,11 @@
             <ds-space margin-bottom="small" />
             <content-viewer class="content hyphenate-text" :content="post.content" />
             <!-- Eventdata -->
-            <ds-space v-if="post && post.postType[0] === 'Event'" margin-bottom="small" style="padding: 10px; border-top: solid #f5f4f6 3px;">
+            <ds-space
+              v-if="post && post.postType[0] === 'Event'"
+              margin-bottom="small"
+              style="padding: 10px; border-top: solid #f5f4f6 3px"
+            >
               <ds-flex>
                 <ds-flex-item width="200px">{{ $t('post.viewEvent.eventStart') }}:</ds-flex-item>
                 <ds-flex-item>{{ post.eventStart }}</ds-flex-item>
@@ -74,7 +78,9 @@
               </ds-flex>
               <ds-space margin-bottom="x-small" />
               <ds-flex>
-                <ds-flex-item width="200px">{{ $t('post.viewEvent.eventLocationName') }}:</ds-flex-item>
+                <ds-flex-item width="200px">
+                  {{ $t('post.viewEvent.eventLocationName') }}:
+                </ds-flex-item>
                 <ds-flex-item>{{ post.eventLocationName }}</ds-flex-item>
               </ds-flex>
               <ds-space margin-bottom="x-small" />
