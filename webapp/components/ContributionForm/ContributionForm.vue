@@ -70,6 +70,7 @@
                   formmat="DD-MM-YYYY HH:mm"
                   style="z-index: 20"
                   :placeholder="$t('post.viewEvent.eventStart')"
+                  :disabled-date="notBeforeToday"
                 ></date-picker>
               </div>
               <div class="chipbox" style="margin-top: 10px">
@@ -89,6 +90,7 @@
                 formmat="DD MM YYYY HH:mm"
                 :placeholder="$t('post.viewEvent.eventEnd')"
                 style="font-size: larger"
+                :disabled-date="notBeforeToday"
               ></date-picker>
             </ds-grid-item>
           </ds-grid>
@@ -277,6 +279,9 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+    notBeforeToday(date) {
+      return date < new Date(new Date().setHours(0, 0, 0, 0));
+    },
     eventInput() {
       if (this.creatEvent) {
         return {
