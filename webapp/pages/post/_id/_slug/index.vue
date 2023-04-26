@@ -57,29 +57,29 @@
             <ds-space margin-bottom="small" />
             <content-viewer class="content hyphenate-text" :content="post.content" />
             <!-- Eventdata -->
-            <ds-space v-if="post && post.postType[0] === 'Event'" margin-bottom="small">
+            <ds-space v-if="post && post.postType[0] === 'Event'" margin-bottom="small" style="padding: 10px; border-top: solid #f5f4f6 3px;">
               <ds-flex>
-                <ds-flex-item width="200px">Start:</ds-flex-item>
+                <ds-flex-item width="200px">{{ $t('post.viewEvent.eventStart') }}:</ds-flex-item>
                 <ds-flex-item>{{ post.eventStart }}</ds-flex-item>
               </ds-flex>
-              <ds-space margin-bottom="small" />
+              <ds-space margin-bottom="x-small" />
               <ds-flex>
-                <ds-flex-item width="200px">End:</ds-flex-item>
+                <ds-flex-item width="200px">{{ $t('post.viewEvent.eventEnd') }}:</ds-flex-item>
                 <ds-flex-item>{{ post.eventEnd }}</ds-flex-item>
               </ds-flex>
-              <ds-space margin-bottom="small" />
+              <ds-space margin-bottom="x-small" />
               <ds-flex>
-                <ds-flex-item width="200px">Veranstaltungsort:</ds-flex-item>
+                <ds-flex-item width="200px">{{ $t('post.viewEvent.eventVenue') }}:</ds-flex-item>
                 <ds-flex-item class="text-bold">{{ post.eventVenue }}</ds-flex-item>
               </ds-flex>
-              <ds-space margin-bottom="small" />
+              <ds-space margin-bottom="x-small" />
               <ds-flex>
-                <ds-flex-item width="200px">Stadt:</ds-flex-item>
+                <ds-flex-item width="200px">{{ $t('post.viewEvent.eventLocationName') }}:</ds-flex-item>
                 <ds-flex-item>{{ post.eventLocationName }}</ds-flex-item>
               </ds-flex>
-              <ds-space margin-bottom="small" />
+              <ds-space margin-bottom="x-small" />
               <ds-flex>
-                <ds-flex-item width="200px">Online Event:</ds-flex-item>
+                <ds-flex-item width="200px">{{ $t('post.viewEvent.eventIsOnline') }}:</ds-flex-item>
                 <ds-flex-item>{{ post.eventIsOnline }}</ds-flex-item>
               </ds-flex>
             </ds-space>
