@@ -10,6 +10,13 @@
 SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
+# check DOCKERHUB_BRAND_VARRIANT
+if [ -z ${DOCKERHUB_BRAND_VARRIANT} ]; then
+  echo "You must provide a `DOCKERHUB_BRAND_VARRIANT` via environment variable"
+  exit 1
+fi
+echo "Using DOCKERHUB_BRAND_VARRIANT=${DOCKERHUB_BRAND_VARRIANT}"
+
 # configuration
 DOCKERHUB_ORGANISATION=${DOCKERHUB_ORGANISATION:-"ocelotsocialnetwork"}
 OCELOT_VERSION=${OCELOT_VERSION:-$(node -p -e "require('${SCRIPT_DIR}/../../package.json').version")}
@@ -23,22 +30,22 @@ BUILD_VERSION=${BRANDED_VERSION}-ocelot.social${OCELOT_VERSION_BUILD}
 echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
 
 # push backend images
-docker push ${DOCKERHUB_ORGANISATION}/backend-branded:latest
-docker push ${DOCKERHUB_ORGANISATION}/backend-branded:${OCELOT_VERSION}
-docker push ${DOCKERHUB_ORGANISATION}/backend-branded:${OCELOT_VERSION_BUILD}
-docker push ${DOCKERHUB_ORGANISATION}/backend-branded:${BUILD_VERSION_BASE}
-docker push ${DOCKERHUB_ORGANISATION}/backend-branded:${BUILD_VERSION}
+docker push ${DOCKERHUB_ORGANISATION}/backend-${DOCKERHUB_BRAND_VARRIANT}:latest
+docker push ${DOCKERHUB_ORGANISATION}/backend-${DOCKERHUB_BRAND_VARRIANT}:${OCELOT_VERSION}
+docker push ${DOCKERHUB_ORGANISATION}/backend-${DOCKERHUB_BRAND_VARRIANT}:${OCELOT_VERSION_BUILD}
+docker push ${DOCKERHUB_ORGANISATION}/backend-${DOCKERHUB_BRAND_VARRIANT}:${BUILD_VERSION_BASE}
+docker push ${DOCKERHUB_ORGANISATION}/backend-${DOCKERHUB_BRAND_VARRIANT}:${BUILD_VERSION}
 
 # push webapp images
-docker push ${DOCKERHUB_ORGANISATION}/webapp-branded:latest
-docker push ${DOCKERHUB_ORGANISATION}/webapp-branded:${OCELOT_VERSION}
-docker push ${DOCKERHUB_ORGANISATION}/webapp-branded:${OCELOT_VERSION_BUILD}
-docker push ${DOCKERHUB_ORGANISATION}/webapp-branded:${BUILD_VERSION_BASE}
-docker push ${DOCKERHUB_ORGANISATION}/webapp-branded:${BUILD_VERSION}
+docker push ${DOCKERHUB_ORGANISATION}/webapp-${DOCKERHUB_BRAND_VARRIANT}:latest
+docker push ${DOCKERHUB_ORGANISATION}/webapp-${DOCKERHUB_BRAND_VARRIANT}:${OCELOT_VERSION}
+docker push ${DOCKERHUB_ORGANISATION}/webapp-${DOCKERHUB_BRAND_VARRIANT}:${OCELOT_VERSION_BUILD}
+docker push ${DOCKERHUB_ORGANISATION}/webapp-${DOCKERHUB_BRAND_VARRIANT}:${BUILD_VERSION_BASE}
+docker push ${DOCKERHUB_ORGANISATION}/webapp-${DOCKERHUB_BRAND_VARRIANT}:${BUILD_VERSION}
 
 # push maintenance images
-docker push ${DOCKERHUB_ORGANISATION}/maintenance-branded:latest
-docker push ${DOCKERHUB_ORGANISATION}/maintenance-branded:${OCELOT_VERSION}
-docker push ${DOCKERHUB_ORGANISATION}/maintenance-branded:${OCELOT_VERSION_BUILD}
-docker push ${DOCKERHUB_ORGANISATION}/maintenance-branded:${BUILD_VERSION_BASE}
-docker push ${DOCKERHUB_ORGANISATION}/maintenance-branded:${BUILD_VERSION}
+docker push ${DOCKERHUB_ORGANISATION}/maintenance-${DOCKERHUB_BRAND_VARRIANT}:latest
+docker push ${DOCKERHUB_ORGANISATION}/maintenance-${DOCKERHUB_BRAND_VARRIANT}:${OCELOT_VERSION}
+docker push ${DOCKERHUB_ORGANISATION}/maintenance-${DOCKERHUB_BRAND_VARRIANT}:${OCELOT_VERSION_BUILD}
+docker push ${DOCKERHUB_ORGANISATION}/maintenance-${DOCKERHUB_BRAND_VARRIANT}:${BUILD_VERSION_BASE}
+docker push ${DOCKERHUB_ORGANISATION}/maintenance-${DOCKERHUB_BRAND_VARRIANT}:${BUILD_VERSION}

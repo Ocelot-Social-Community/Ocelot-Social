@@ -92,20 +92,10 @@
         <ds-text class="select-label">
           {{ $t('group.actionRadius') }}
         </ds-text>
-        <select
-          class="select ds-input appearance--auto"
-          name="actionRadius"
-          :value="formData.actionRadius"
-          @change="changeActionRadius($event)"
-        >
-          <option
-            v-for="actionRadius in actionRadiusOptions"
-            :key="actionRadius"
-            :value="actionRadius"
-          >
-            {{ $t(`group.actionRadii.${actionRadius}`) }}
-          </option>
-        </select>
+        <action-radius-select
+          v-model="formData.actionRadius"
+          @change.native="changeActionRadius($event)"
+        />
         <ds-chip
           size="base"
           :color="
@@ -163,13 +153,16 @@ import {
   DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
 } from '~/constants/groups.js'
 import Editor from '~/components/Editor/Editor'
+import ActionRadiusSelect from '~/components/Select/ActionRadiusSelect'
 import LocationSelect from '~/components/Select/LocationSelect'
+import { queryLocations } from '~/graphql/location'
 
 export default {
   name: 'GroupForm',
   components: {
     CategoriesSelect,
     Editor,
+    ActionRadiusSelect,
     LocationSelect,
   },
   props: {
@@ -191,7 +184,6 @@ export default {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
       groupTypeOptions: ['public', 'closed', 'hidden'],
-      actionRadiusOptions: ['regional', 'national', 'continental', 'global'],
       loadingGeo: false,
       cities: [],
       formData: {
@@ -288,10 +280,10 @@ export default {
       return false
     },
     changeGroupType(event) {
-      this.formData.groupType = event.target.value
+      this.$refs.groupForm.update('groupType', event.target.value)
     },
     changeActionRadius(event) {
-      this.formData.actionRadius = event.target.value
+      this.$refs.groupForm.update('actionRadius', event.target.value)
     },
     changeLocation(event) {
       this.formData.locationName = event.target.value
