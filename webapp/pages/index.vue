@@ -417,9 +417,6 @@ export default {
     font-size: 23px;
     z-index: 10;
   }
-  .ds-grid {
-    padding-top: 1em;
-  }
 }
 @media screen and (max-width: 650px) {
   //    .top-filter-menu{
@@ -428,10 +425,6 @@ export default {
 
   .newsfeed-controls {
     margin-top: 32px;
-  }
-
-  .grid-margin-top {
-    margin-top: 6px;
   }
 }
 </style>
