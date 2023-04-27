@@ -177,6 +177,15 @@ export default {
     groupName() {
       return this.group && this.group.name
     },
+    groupCategories() {
+      return this.group && this.group.categories
+    },
+  },
+  watch: {
+    groupCategories() {
+      if (!this.formData.categoryIds.length && this.groupCategories)
+        this.formData.categoryIds = this.groupCategories.map((cat) => cat.id)
+    },
   },
   methods: {
     submit() {

@@ -47,12 +47,22 @@ export default {
           ` 
           MATCH (resource {deleted: false, disabled: false})-[notification:NOTIFIED]->(user:User {id:$id})
           ${whereClause}
-          WITH user, notification, resource,
+          OPTIONAL MATCH (relatedUser:User { id: notification.relatedUserId })
+          OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(relatedUser)
+          WITH user, notification, resource, membership, relatedUser,
           [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
-          [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author)} ] AS posts
-          WITH resource, user, notification, authors, posts,
-          resource {.*, __typename: labels(resource)[0], author: authors[0], post: posts[0]} AS finalResource
-          RETURN notification {.*, from: finalResource, to: properties(user)}
+          [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post {.*, author: properties(author)} ] AS posts
+          WITH resource, user, notification, authors, posts, relatedUser, membership,
+          resource {.*,
+            __typename: labels(resource)[0],
+            author: authors[0],
+            post: posts[0],
+            myRole: membership.role } AS finalResource
+          RETURN notification {.*,
+            from: finalResource,
+            to: properties(user),
+            relatedUser: properties(relatedUser)
+          }
           ${orderByClause}
           ${offset} ${limit}
           `,
@@ -81,8 +91,9 @@ export default {
             WITH user, notification, resource,
             [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
             [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author)} ] AS posts
-            WITH resource, user, notification, authors, posts,
-            resource {.*, __typename: labels(resource)[0], author: authors[0], post: posts[0]} AS finalResource
+            OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
+            WITH resource, user, notification, authors, posts, membership,
+            resource {.*, __typename: labels(resource)[0], author: authors[0], post: posts[0], myRole: membership.role } AS finalResource
             RETURN notification {.*, from: finalResource, to: properties(user)}
           `,
           { resourceId: args.id, id: currentUser.id },
@@ -110,8 +121,9 @@ export default {
             WITH user, notification, resource,
             [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
             [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author)} ] AS posts
-            WITH resource, user, notification, authors, posts,
-            resource {.*, __typename: labels(resource)[0], author: authors[0], post: posts[0]} AS finalResource
+            OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
+            WITH resource, user, notification, authors, posts, membership,
+            resource {.*, __typename: labels(resource)[0], author: authors[0], post: posts[0], myRole: membership.role} AS finalResource
             RETURN notification {.*, from: finalResource, to: properties(user)}
           `,
           { id: currentUser.id },

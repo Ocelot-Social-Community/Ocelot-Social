@@ -86,13 +86,6 @@ class Store {
     if (CONFIG.CATEGORIES_ACTIVE) await createCategories(session)
     const writeTxResultPromise = session.writeTransaction(async (txc) => {
       await txc.run('CALL apoc.schema.assert({},{},true)') // drop all indices and constraints
-      return Promise.all(
-        [
-          'CALL db.index.fulltext.createNodeIndex("user_fulltext_search",["User"],["name", "slug"])',
-          'CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"])',
-          'CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"])',
-        ].map((statement) => txc.run(statement)),
-      )
     })
     try {
       await writeTxResultPromise

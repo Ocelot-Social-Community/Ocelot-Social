@@ -207,6 +207,9 @@ export const groupMembersQuery = () => {
         name
         slug
         myRoleInGroup
+        avatar {
+          url
+        }
       }
     }
   `

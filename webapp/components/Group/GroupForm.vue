@@ -37,8 +37,6 @@
         <ds-text class="select-label">
           {{ $t('group.type') }}
         </ds-text>
-        <!-- TODO: change it has to be implemented later -->
-        <!-- TODO: move 'ds-select' from style guide to main code and implement missing translation etc. functionality -->
         <select
           class="select ds-input appearance--auto"
           name="groupType"
@@ -94,21 +92,10 @@
         <ds-text class="select-label">
           {{ $t('group.actionRadius') }}
         </ds-text>
-        <!-- TODO: move 'ds-select' from styleguide to main code and implement missing translation etc. functionality -->
-        <select
-          class="select ds-input appearance--auto"
-          name="actionRadius"
-          :value="formData.actionRadius"
-          @change="changeActionRadius($event)"
-        >
-          <option
-            v-for="actionRadius in actionRadiusOptions"
-            :key="actionRadius"
-            :value="actionRadius"
-          >
-            {{ $t(`group.actionRadii.${actionRadius}`) }}
-          </option>
-        </select>
+        <action-radius-select
+          v-model="formData.actionRadius"
+          @change.native="changeActionRadius($event)"
+        />
         <ds-chip
           size="base"
           :color="
@@ -123,6 +110,7 @@
         </ds-chip>
 
         <!-- location -->
+        <!-- TODO: move 'ds-select' from styleguide to main code and implement missing translation etc. functionality -->
         <ds-select
           id="city"
           :label="$t('settings.data.labelCity') + locationNameLabelAddOnOldName"
@@ -187,6 +175,7 @@ import {
   DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
 } from '~/constants/groups.js'
 import Editor from '~/components/Editor/Editor'
+import ActionRadiusSelect from '~/components/Select/ActionRadiusSelect'
 import { queryLocations } from '~/graphql/location'
 
 let timeout
@@ -196,6 +185,7 @@ export default {
   components: {
     CategoriesSelect,
     Editor,
+    ActionRadiusSelect,
   },
   props: {
     update: {
@@ -216,7 +206,6 @@ export default {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
       groupTypeOptions: ['public', 'closed', 'hidden'],
-      actionRadiusOptions: ['regional', 'national', 'continental', 'global'],
       loadingGeo: false,
       cities: [],
       formData: {
@@ -327,10 +316,10 @@ export default {
       return false
     },
     changeGroupType(event) {
-      this.formData.groupType = event.target.value
+      this.$refs.groupForm.update('groupType', event.target.value)
     },
     changeActionRadius(event) {
-      this.formData.actionRadius = event.target.value
+      this.$refs.groupForm.update('actionRadius', event.target.value)
     },
     updateEditorDescription(value) {
       this.$refs.groupForm.update('description', value)
