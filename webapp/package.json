@@ -70,7 +70,7 @@
     "@babel/preset-env": "^7.20.2",
     "@faker-js/faker": "5.1.0",
     "@nuxtjs/composition-api": "0.32.0",
-    "@storybook/addon-a11y": "^6.3.6",
+    "@storybook/addon-a11y": "^7.0.9",
     "@storybook/addon-actions": "^5.3.21",
     "@storybook/addon-notes": "^5.3.18",
     "@storybook/vue": "~6.3.6",
