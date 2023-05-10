@@ -71,14 +71,14 @@
                   <span v-if="post.eventVenue">-</span>
                   {{ $t('post.viewEvent.eventIsOnline') }}
                 </span>
-              </ds-text>              
+              </ds-text>
               <ds-text align="left" color="soft" class="event-info">
                 <base-icon name="calendar" data-test="calendar" />
-                <span>{{getEventDateString}}</span>
+                <span>{{ getEventDateString }}</span>
               </ds-text>
               <ds-text align="left" color="soft" class="event-info">
                 <base-icon name="clock" data-test="calendar" />
-                <span>{{getEventTimeString}}</span>
+                <span>{{ getEventTimeString }}</span>
               </ds-text>
             </ds-space>
             <ds-space margin-bottom="small" />
