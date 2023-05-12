@@ -10,7 +10,7 @@
             params: { id: scope.row.id, slug: scope.row.slug },
           }"
         >
-          <ds-avatar online size="small" :name="scope.row.name"></ds-avatar>
+          <profile-avatar :profile="scope.row" size="small" />
         </nuxt-link>
       </template>
       <template #name="scope">
@@ -80,9 +80,13 @@
 </template>
 <script>
 import { changeGroupMemberRoleMutation, removeUserFromGroupMutation } from '~/graphql/groups.js'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 
 export default {
   name: 'GroupMember',
+  components: {
+    ProfileAvatar,
+  },
   props: {
     groupId: {
       type: String,
