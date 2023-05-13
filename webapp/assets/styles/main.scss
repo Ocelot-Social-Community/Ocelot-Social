@@ -95,7 +95,7 @@ blockquote {
   box-shadow: $box-shadow-base;
   position: fixed;
   width: 100%;
-  z-index: 10;
+  z-index: $z-index-page-submenu;
 
   a {
     outline: none;
@@ -131,7 +131,7 @@ hr {
   left: 0;
   position: fixed;
   background: rgba(0, 0, 0, 0.15);
-  z-index: 99;
+  z-index: $z-index-overlay;
   pointer-events: none;
   transition: opacity 150ms ease-out;
   transition-delay: 50ms;
