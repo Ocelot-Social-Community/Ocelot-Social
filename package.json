@@ -34,7 +34,7 @@
     "cypress": "^7.0.1",
     "cypress-cucumber-preprocessor": "^2.2.1",
     "cypress-file-upload": "^3.5.3",
-    "date-fns": "^2.25.0",
+    "date-fns": "^2.30.0",
     "dotenv": "^8.2.0",
     "expect": "^29.5.0",
     "graphql-request": "^2.0.0",
