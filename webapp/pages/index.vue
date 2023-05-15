@@ -80,7 +80,12 @@
       </div>
     </div>
     <!-- content grid -->
-    <masonry-grid :class="[!hashtag && !showDonations ? 'grid-margin-top' : '']">
+    <masonry-grid
+      :class="[
+        !hashtag && !showDonations ? 'grid-margin-top' : '',
+        !isMobile && posts.length <= 2 ? 'grid-column-helper' : '',
+      ]"
+    >
       <!-- news feed -->
       <template v-if="hasResults">
         <masonry-grid-item
@@ -129,6 +134,7 @@ import UpdateQuery from '~/components/utils/UpdateQuery'
 import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import { SHOW_CONTENT_FILTER_MASONRY_GRID } from '~/constants/filter.js'
 import { POST_ADD_BUTTON_POSITION_TOP } from '~/constants/posts.js'
+import mobile from '~/mixins/mobile'
 
 export default {
   components: {
@@ -141,7 +147,7 @@ export default {
     FilterMenuComponent,
     HeaderButton,
   },
-  mixins: [postListActions],
+  mixins: [postListActions, mobile()],
   data() {
     const { hashtag = null } = this.$route.query
     return {
@@ -352,6 +358,10 @@ export default {
 .newsfeed-controls {
   margin-top: 46px;
 }
+.main-container .grid-column-helper {
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 357px)) !important;
+}
+
 @media screen and (max-width: 656px) {
   .filterButtonMenu {
     margin-top: -50px;
