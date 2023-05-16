@@ -29,7 +29,7 @@ export default {
        * It's suggested to use query builder feature (https://github.com/adam-cowley/neode/issues/67)
        * However, pure cypher query looks cleaner IMO
        */
-      await neode.cypher(
+      await neode.writeCypher(
         `MATCH (user:User {id: $currentUser.id})-[relation:FOLLOWS]->(followedUser:User {id: $followedUserId})
           DELETE relation
           RETURN COUNT(relation) > 0 as isFollowed`,
