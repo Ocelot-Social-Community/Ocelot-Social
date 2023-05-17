@@ -288,6 +288,7 @@ export default {
           eventVenue: this.formData.eventVenue,
           eventEnd: this.formData.eventEnd,
           eventIsOnline: this.formData.eventIsOnline,
+          eventLocationName: this.formData.eventLocationName
         }
       }
       return undefined

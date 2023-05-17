@@ -196,6 +196,7 @@ input _EventInput {
   eventEnd: String
   eventLocation: String
   eventVenue: String
+  eventLocationName: String
   eventIsOnline: Boolean
 }
 
