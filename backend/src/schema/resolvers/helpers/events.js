@@ -9,23 +9,21 @@ export const validateEventParams = (params) => {
       validateEventEnd(eventInput.eventStart, eventInput.eventEnd)
       params.eventEnd = eventInput.eventEnd
     }
-    if (eventInput.eventLocation && !eventInput.eventVenue) {
+    if (eventInput.eventLocationName && !eventInput.eventVenue) {
       throw new UserInputError('Event venue must be present if event location is given!')
     }
     params.eventVenue = eventInput.eventVenue
-    params.eventLocation = eventInput.eventLocation
+    params.eventLocationName = eventInput.eventLocationName
     params.eventIsOnline = !!eventInput.eventIsOnline
   }
   delete params.eventInput
   let locationName
-  if (params.eventLocation) {
-    params.eventLocationName = params.eventLocation
-    locationName = params.eventLocation
+  if (params.eventLocationName) {
+    locationName = params.eventLocationName
   } else {
     params.eventLocationName = null
     locationName = null
   }
-  delete params.eventLocation
   return locationName
 }
 

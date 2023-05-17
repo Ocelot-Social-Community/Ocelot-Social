@@ -247,7 +247,7 @@ export default {
         eventLocation: eventLocation || '',
         eventLocationName: eventLocationName || '',
         eventVenue: eventVenue || '',
-        eventIsOnline: eventIsOnline || true,
+        eventIsOnline: eventIsOnline || false,
       },
       formSchema: {
         title: { required: true, min: 3, max: 100 },
@@ -284,7 +284,6 @@ export default {
       if (this.creatEvent) {
         return {
           eventStart: this.formData.eventStart,
-          eventLocation: this.formData.eventLocation,
           eventVenue: this.formData.eventVenue,
           eventEnd: this.formData.eventEnd,
           eventIsOnline: this.formData.eventIsOnline,

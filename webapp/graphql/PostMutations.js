@@ -46,6 +46,7 @@ export default () => {
           }
           eventStart
           eventVenue
+          eventLocationName
           eventLocation {
             lng
             lat

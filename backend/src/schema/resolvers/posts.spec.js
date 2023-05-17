@@ -505,7 +505,7 @@ describe('CreatePost', () => {
         })
       })
 
-      describe('event location is given but event venue is missing', () => {
+      describe('event location name is given but event venue is missing', () => {
         it('throws an error', async () => {
           const now = new Date()
           await expect(
@@ -516,7 +516,7 @@ describe('CreatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
-                  eventLocation: 'Berlin',
+                  eventLocationName: 'Berlin',
                 },
               },
             }),
@@ -557,7 +557,7 @@ describe('CreatePost', () => {
         })
       })
 
-      describe('valid event input with location', () => {
+      describe('valid event input with location name', () => {
         it('has label "Event" set', async () => {
           const now = new Date()
           await expect(
@@ -568,7 +568,7 @@ describe('CreatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
-                  eventLocation: 'Leipzig',
+                  eventLocationName: 'Leipzig',
                   eventVenue: 'Connewitzer Kreuz',
                 },
               },
@@ -821,7 +821,7 @@ describe('UpdatePost', () => {
         })
       })
 
-      describe('event location is given but event venue is missing', () => {
+      describe('event location name is given but event venue is missing', () => {
         it('throws an error', async () => {
           const now = new Date()
           await expect(
@@ -832,7 +832,7 @@ describe('UpdatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
-                  eventLocation: 'Berlin',
+                  eventLocationName: 'Berlin',
                 },
               },
             }),
@@ -846,7 +846,7 @@ describe('UpdatePost', () => {
         })
       })
 
-      describe('valid event input without location', () => {
+      describe('valid event input without location name', () => {
         it('has label "Event" set', async () => {
           const now = new Date()
           await expect(
@@ -872,7 +872,7 @@ describe('UpdatePost', () => {
         })
       })
 
-      describe('valid event input with location', () => {
+      describe('valid event input with location name', () => {
         it('has label "Event" set', async () => {
           const now = new Date()
           await expect(
@@ -883,7 +883,7 @@ describe('UpdatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
-                  eventLocation: 'Leipzig',
+                  eventLocationName: 'Leipzig',
                   eventVenue: 'Connewitzer Kreuz',
                 },
               },
