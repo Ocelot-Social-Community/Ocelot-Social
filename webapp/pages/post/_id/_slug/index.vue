@@ -76,7 +76,7 @@
                 <base-icon name="calendar" data-test="calendar" />
                 <span>{{ getEventDateString }}</span>
               </ds-text>
-              <ds-text align="left" color="soft" class="event-info">
+              <ds-text v-if="getEventTimeString" align="left" color="soft" class="event-info">
                 <base-icon name="clock" data-test="calendar" />
                 <span>{{ getEventTimeString }}</span>
               </ds-text>
@@ -292,16 +292,19 @@ export default {
       if (this.post.eventEnd) {
         const eventStart = format(new Date(this.post.eventStart), 'dd.MM.')
         const eventEnd = format(new Date(this.post.eventEnd), 'dd.MM.yyyy')
-        return eventStart + ' - ' + eventEnd
+        return `${eventStart} - ${eventEnd}`
       } else {
         return format(new Date(this.post.eventStart), 'dd.MM.yyyy')
       }
     },
     getEventTimeString() {
       if (this.post.eventEnd) {
-        const eventStart = format(new Date(this.post.eventStart), 'HH:mm')
-        const eventEnd = format(new Date(this.post.eventEnd), 'HH:mm')
-        return eventStart + ' - ' + eventEnd
+        const eventStartTime = format(new Date(this.post.eventStart), 'HH:mm')
+        const eventEndTime = format(new Date(this.post.eventEnd), 'HH:mm')
+        /*  assumption that if e.g. 00:00 == 00:00 is saved, 
+            it's not realistic because they are the default values, so don't show the time info.
+        */
+        return eventStartTime !== eventEndTime ? `${eventStartTime} - ${eventEndTime}` : ''
       } else {
         return format(new Date(this.post.eventStart), 'HH:mm')
       }
