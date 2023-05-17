@@ -65,10 +65,10 @@ services:
   
   backend:
     image: ocelotsocialnetwork/backend-branded:local-${CONFIGURATION}
-    container_name: backend
+    container_name: backend-branded
     build:
       dockerfile: src/docker/backend.Dockerfile
-      target: branded-branded
+      target: branded
       context: .
       args:
         - CONFIGURATION=$CONFIGURATION
@@ -143,7 +143,7 @@ services:
 
   neo4j:
     image: ocelotsocialnetwork/neo4j-community:latest
-    container_name: neo4j
+    container_name: neo4j-branded
     networks:
       - test-network
     volumes:
