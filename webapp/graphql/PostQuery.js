@@ -74,8 +74,10 @@ export const filterPosts = (i18n) => {
       Post(filter: $filter, first: $first, offset: $offset, orderBy: $orderBy) {
         postType
         eventStart
+        eventEnd
         eventVenue
         eventLocationName
+        eventIsOnline
         ...post
         ...postCounts
         ...tagsCategoriesAndPinned
