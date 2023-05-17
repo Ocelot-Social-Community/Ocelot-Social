@@ -25,6 +25,18 @@ describe('getters', () => {
     })
   })
 
+  describe('filteredPostTypes', () => {
+    it('returns post types if filter is set', () => {
+      state = { filter: { postType_in: ['Article', 'Event'] } }
+      expect(getters.filteredPostTypes(state)).toEqual(['Article', 'Event'])
+    })
+
+    it('returns empty array if post type filter is not set', () => {
+      state = { filter: { author: { followedBy_some: { id: 7 } } } }
+      expect(getters.filteredPostTypes(state)).toEqual([])
+    })
+  })
+
   describe('filteredLanguageCodes', () => {
     it('returns category ids if filter is set', () => {
       state = { filter: { language_in: ['en', 'de', 'pt'] } }
@@ -210,6 +222,46 @@ describe('mutations', () => {
         },
       }
       expect(testMutation(23)).toEqual({ author: { followedBy_some: { id: 7 } } })
+    })
+  })
+
+  describe('TOGGLE_POST_TYPE', () => {
+    beforeEach(() => {
+      testMutation = (postType) => {
+        mutations.TOGGLE_POST_TYPE(state, postType)
+        return getters.filter(state)
+      }
+    })
+
+    it('creates post type filter if empty', () => {
+      state = { filter: {} }
+      expect(testMutation('Event')).toEqual({ postType_in: ['Event'] })
+    })
+
+    it('adds post type not present', () => {
+      state = { filter: { postType_in: ['Event'] } }
+      expect(testMutation('Article')).toEqual({ postType_in: ['Event', 'Article'] })
+    })
+
+    it('removes category id if present', () => {
+      state = { filter: { postType_in: ['Event', 'Article'] } }
+      const result = testMutation('Event')
+      expect(result).toEqual({ postType_in: ['Article'] })
+    })
+
+    it('removes category filter if empty', () => {
+      state = { filter: { postType_in: ['Event'] } }
+      expect(testMutation('Event')).toEqual({})
+    })
+
+    it('does not get in the way of other filters', () => {
+      state = {
+        filter: {
+          author: { followedBy_some: { id: 7 } },
+          postType_in: ['Event'],
+        },
+      }
+      expect(testMutation('Event')).toEqual({ author: { followedBy_some: { id: 7 } } })
     })
   })
 

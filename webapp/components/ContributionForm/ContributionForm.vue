@@ -30,6 +30,7 @@
             <base-icon name="question-circle" />
           </page-params-link>
         </div>
+        <ds-space margin-top="base" />
         <ds-input
           model="title"
           :placeholder="$t('contribution.title')"
@@ -51,6 +52,90 @@
           {{ contentLength }}
           <base-icon v-if="errors && errors.content" name="warning" />
         </ds-chip>
+
+        <!-- Eventdata -->
+        <div v-if="creatEvent" class="eventDatas">
+          <hr />
+          <ds-space margin-top="x-small" />
+          <ds-grid>
+            <ds-grid-item style="grid-row-end: span 3">
+              <!-- <label>Beginn</label> -->
+              <div style="z-index: 20">
+                <date-picker
+                  name="eventStart"
+                  v-model="formData.eventStart"
+                  type="datetime"
+                  value-type="format"
+                  :minute-step="15"
+                  formmat="DD-MM-YYYY HH:mm"
+                  style="z-index: 20"
+                  :placeholder="$t('post.viewEvent.eventStart')"
+                  :disabled-date="notBeforeToday"
+                  :show-second="false"
+                ></date-picker>
+              </div>
+              <div class="chipbox" style="margin-top: 10px">
+                <ds-chip size="base" :color="errors && errors.eventStart && 'danger'">
+                  <base-icon v-if="errors && errors.eventStart" name="warning" />
+                </ds-chip>
+              </div>
+            </ds-grid-item>
+            <ds-grid-item style="grid-row-end: span 3">
+              <!-- <label>Ende (optional)</label> -->
+
+              <date-picker
+                v-model="formData.eventEnd"
+                type="datetime"
+                :minute-step="15"
+                :seconds-step="0"
+                formmat="DD MM YYYY HH:mm"
+                :placeholder="$t('post.viewEvent.eventEnd')"
+                style="font-size: larger"
+                :disabled-date="notBeforeToday"
+                :show-second="false"
+              ></date-picker>
+            </ds-grid-item>
+          </ds-grid>
+          <ds-grid>
+            <ds-grid-item style="grid-row-end: span 3">
+              <ds-input
+                model="eventVenue"
+                name="location"
+                :placeholder="$t('post.viewEvent.eventVenue')"
+              />
+              <div class="chipbox">
+                <ds-chip size="base" :color="errors && errors.eventVenue && 'danger'">
+                  {{ formData.eventVenue.length }}/{{ formSchema.eventVenue.max }}
+                  <base-icon v-if="errors && errors.eventVenue" name="warning" />
+                </ds-chip>
+              </div>
+            </ds-grid-item>
+            <ds-grid-item style="grid-row-end: span 3">
+              <ds-input
+                model="eventLocationName"
+                name="venue"
+                :placeholder="$t('post.viewEvent.eventLocationName')"
+              />
+              <div class="chipbox">
+                <ds-chip size="base" :color="errors && errors.eventLocationName && 'danger'">
+                  {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
+                  <base-icon v-if="errors && errors.eventLocationName" name="warning" />
+                </ds-chip>
+              </div>
+            </ds-grid-item>
+          </ds-grid>
+
+          <div>
+            <input
+              type="checkbox"
+              model="formData.eventIsOnline"
+              name="eventIsOnline"
+              style="font-size: larger"
+            />
+            {{ $t('post.viewEvent.eventIsOnline') }}
+          </div>
+        </div>
+        <ds-space margin-top="x-small" />
         <categories-select
           v-if="categoriesActive"
           model="categoryIds"
@@ -67,6 +152,7 @@
         <ds-flex class="buttons-footer" gutter="xxx-small">
           <ds-flex-item width="3.5" style="margin-right: 16px; margin-bottom: 6px">
             <!-- eslint-disable vue/no-v-text-v-html-on-component -->
+            <!-- TODO => remove v-html! only text ! no html! secrurity first! -->
             <ds-text
               v-if="showGroupHint"
               v-html="$t('contribution.visibleOnlyForMembersOfGroup', { name: groupName })"
@@ -92,7 +178,6 @@
     </template>
   </ds-form>
 </template>
-
 <script>
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
@@ -102,6 +187,8 @@ import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import ImageUploader from '~/components/Uploader/ImageUploader'
 import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
+import DatePicker from 'vue2-datepicker'
+import 'vue2-datepicker/scss/index.scss'
 
 export default {
   components: {
@@ -109,6 +196,7 @@ export default {
     ImageUploader,
     PageParamsLink,
     CategoriesSelect,
+    DatePicker,
   },
   props: {
     contribution: {
@@ -119,15 +207,30 @@ export default {
       type: Object,
       default: () => null,
     },
+    creatEvent: {
+      type: Boolean,
+      default: false,
+    },
   },
+
   data() {
-    const { title, content, image, categories } = this.contribution
+    const {
+      title,
+      content,
+      image,
+      categories,
+      eventStart,
+      eventEnd,
+      eventLocationName,
+      eventVenue,
+      eventIsOnline,
+      eventLocation,
+    } = this.contribution
     const {
       sensitive: imageBlurred = false,
       aspectRatio: imageAspectRatio = null,
       type: imageType = null,
     } = image || {}
-
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
       links,
@@ -139,6 +242,12 @@ export default {
         imageType,
         imageBlurred,
         categoryIds: categories ? categories.map((category) => category.id) : [],
+        eventStart: eventStart || null,
+        eventEnd: eventEnd || null,
+        eventLocation: eventLocation || '',
+        eventLocationName: eventLocationName || '',
+        eventVenue: eventVenue || '',
+        eventIsOnline: eventIsOnline || true,
       },
       formSchema: {
         title: { required: true, min: 3, max: 100 },
@@ -154,6 +263,9 @@ export default {
             return []
           },
         },
+        eventStart: { required: !!this.creatEvent },
+        eventVenue: { required: !!this.creatEvent, min: 3, max: 100 },
+        eventLocationName: { required: !!this.creatEvent, min: 3, max: 100 },
       },
       loading: false,
       users: [],
@@ -161,10 +273,25 @@ export default {
       imageUpload: null,
     }
   },
+  async mounted() {
+    await import(`vue2-datepicker/locale/${this.currentUser.locale}`)
+  },
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+    eventInput() {
+      if (this.creatEvent) {
+        return {
+          eventStart: this.formData.eventStart,
+          eventLocation: this.formData.eventLocation,
+          eventVenue: this.formData.eventVenue,
+          eventEnd: this.formData.eventEnd,
+          eventIsOnline: this.formData.eventIsOnline,
+        }
+      }
+      return undefined
+    },
     contentLength() {
       return this.$filters.removeHtml(this.formData.content).length
     },
@@ -188,8 +315,12 @@ export default {
     },
   },
   methods: {
+    notBeforeToday(date) {
+      return date < new Date(new Date().setHours(0, 0, 0, 0))
+    },
     submit() {
       let image = null
+
       const { title, content, categoryIds } = this.formData
       if (this.formData.image) {
         image = {
@@ -202,6 +333,7 @@ export default {
         }
       }
       this.loading = true
+
       this.$apollo
         .mutate({
           mutation: this.contribution.id ? PostMutations().UpdatePost : PostMutations().CreatePost,
@@ -212,6 +344,8 @@ export default {
             id: this.contribution.id || null,
             image,
             groupId: this.groupId,
+            postType: !this.creatEvent ? 'Article' : 'Event',
+            eventInput: this.eventInput,
           },
         })
         .then(({ data }) => {
@@ -288,6 +422,17 @@ export default {
 </script>
 
 <style lang="scss">
+.eventDatas {
+  .chipbox {
+    display: flex;
+    justify-content: flex-end;
+
+    > .ds-chip {
+      margin-top: -10px;
+    }
+  }
+}
+
 .contribution-form > .base-card {
   display: flex;
   flex-direction: column;
@@ -368,6 +513,28 @@ export default {
         }
       }
     }
+  }
+
+  .mx-datepicker {
+    width: 100%;
+  }
+  .mx-datepicker input {
+    font-size: 1rem;
+    height: calc(1.625rem + 18px);
+    padding: 8px 8px;
+    background-color: #faf9fa;
+    border-color: #c8c8c8;
+    color: #4b4554;
+  }
+  .mx-datepicker input:hover {
+    border-color: #c8c8c8;
+  }
+  .mx-datepicker input:focus {
+    border-color: #17b53f;
+    background-color: #fff;
+  }
+  .mx-datepicker-error {
+    border-color: #cf2619;
   }
 }
 </style>

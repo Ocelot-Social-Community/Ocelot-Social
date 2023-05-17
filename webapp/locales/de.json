@@ -278,6 +278,7 @@
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache Deines Beitrags",
     "languageSelectText": "Sprache wählen",
+    "newEvent": "Erstelle einen neue Veranstaltung",
     "newPost": "Erstelle einen neuen Beitrag",
     "success": "Gespeichert!",
     "teaserImage": {
@@ -377,9 +378,11 @@
   },
   "filter-menu": {
     "all": "Alle",
+    "article": "Artikel",
     "categories": "Themen",
     "deleteFilter": "Filter löschen",
     "emotions": "Emotionen",
+    "events": "Veranstaltungen",
     "filter-by": "Filtern nach ...",
     "following": "Nutzer denen ich folge",
     "languages": "Sprachen",
@@ -395,6 +398,7 @@
       }
     },
     "order-by": "Sortieren nach ...",
+    "post-type": "Beitrags-Typ",
     "save": {
       "error": "Themen konnten nicht gespeichert werden!",
       "success": "Themen gespeichert!"
@@ -684,6 +688,12 @@
       "submitted": "Kommentar gesendet",
       "updated": "Änderungen gespeichert"
     },
+    "createNewEvent": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Erstelle ein neues Event"
+    },
     "createNewPost": {
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
@@ -697,6 +707,7 @@
       },
       "title": "Bearbeite deinen Beitrag"
     },
+    "event": "Veranstaltung",
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
@@ -709,6 +720,14 @@
     "pinned": "Meldung",
     "takeAction": {
       "name": "Aktiv werden"
+    },
+    "viewEvent": {
+      "eventEnd": "Ende",
+      "eventIsOnline": "Online Veranstaltung",
+      "eventLocationName": "Stadt",
+      "eventStart": "Beginn",
+      "eventVenue": "Veranstaltungsort",
+      "title": "Veranstaltung"
     },
     "viewPost": {
       "forGroup": {
