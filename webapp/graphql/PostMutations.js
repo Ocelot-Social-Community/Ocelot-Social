@@ -9,6 +9,7 @@ export default () => {
         $slug: String
         $content: String!
         $categoryIds: [ID]
+        $image: ImageInput
         $groupId: ID
         $postType: PostType
         $eventInput: _EventInput
@@ -19,6 +20,7 @@ export default () => {
           slug: $slug
           content: $content
           categoryIds: $categoryIds
+          image: $image
           groupId: $groupId
           postType: $postType
           eventInput: $eventInput
@@ -27,6 +29,12 @@ export default () => {
           slug
           title
           content
+          contentExcerpt
+          language
+          image {
+            url
+            sensitive
+          }
           disabled
           deleted
           postType

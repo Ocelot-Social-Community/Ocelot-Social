@@ -11,6 +11,7 @@
       }"
       :highlight="isPinned"
     >
+    <!-- {{ post }} -->
       <template v-if="post.image" #heroImage>
         <img :src="post.image | proxyApiUrl" class="image" />
       </template>
@@ -188,7 +189,7 @@ export default {
       if (this.post.eventEnd) {
         const eventStart = format(new Date(this.post.eventStart), 'dd.MM.')
         const eventEnd = format(new Date(this.post.eventEnd), 'dd.MM.yyyy')
-        return eventStart + ' - ' + eventEnd
+        return `${eventStart} - ${eventEnd}`
       } else {
         return format(new Date(this.post.eventStart), 'dd.MM.yyyy')
       }

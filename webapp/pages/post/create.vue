@@ -29,7 +29,7 @@
                   fullwidth
                   size="x-large"
                   v-if="creatEvent"
-                  hover="false"
+                  hover
                   style="background-color: #ff000000; color: whitesmoke"
                 >
                   {{ $t('post.createNewEvent.title') }}

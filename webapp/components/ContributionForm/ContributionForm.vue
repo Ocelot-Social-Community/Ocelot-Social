@@ -263,7 +263,7 @@ export default {
             return []
           },
         },
-        eventStart: { required: !this.creatEvent },
+        eventStart: { required: !!this.creatEvent },
         eventVenue: { required: !!this.creatEvent, min: 3, max: 100 },
         eventLocationName: { required: !!this.creatEvent, min: 3, max: 100 },
       },
