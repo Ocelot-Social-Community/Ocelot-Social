@@ -54,41 +54,35 @@
             </section>
             <ds-space margin-bottom="small" />
             <h2 class="title hyphenate-text">{{ post.title }}</h2>
-            <ds-space margin-bottom="small" />
-            <content-viewer class="content hyphenate-text" :content="post.content" />
             <!-- Eventdata -->
             <ds-space
               v-if="post && post.postType[0] === 'Event'"
               margin-bottom="small"
-              style="padding: 10px; border-top: solid #f5f4f6 3px"
+              style="padding: 10px"
             >
-              <ds-flex>
-                <ds-flex-item width="200px">{{ $t('post.viewEvent.eventStart') }}:</ds-flex-item>
-                <ds-flex-item>{{ post.eventStart }}</ds-flex-item>
-              </ds-flex>
-              <ds-space margin-bottom="x-small" />
-              <ds-flex>
-                <ds-flex-item width="200px">{{ $t('post.viewEvent.eventEnd') }}:</ds-flex-item>
-                <ds-flex-item>{{ post.eventEnd }}</ds-flex-item>
-              </ds-flex>
-              <ds-space margin-bottom="x-small" />
-              <ds-flex>
-                <ds-flex-item width="200px">{{ $t('post.viewEvent.eventVenue') }}:</ds-flex-item>
-                <ds-flex-item class="text-bold">{{ post.eventVenue }}</ds-flex-item>
-              </ds-flex>
-              <ds-space margin-bottom="x-small" />
-              <ds-flex>
-                <ds-flex-item width="200px">
-                  {{ $t('post.viewEvent.eventLocationName') }}:
-                </ds-flex-item>
-                <ds-flex-item>{{ post.eventLocationName }}</ds-flex-item>
-              </ds-flex>
-              <ds-space margin-bottom="x-small" />
-              <ds-flex>
-                <ds-flex-item width="200px">{{ $t('post.viewEvent.eventIsOnline') }}:</ds-flex-item>
-                <ds-flex-item>{{ post.eventIsOnline }}</ds-flex-item>
-              </ds-flex>
+              <ds-text align="left" color="soft">
+                <base-icon name="map-marker" data-test="map-marker" />
+                <span v-if="post.eventVenue">{{ post.eventVenue }}</span>
+                <span v-if="!post.eventIsOnline">
+                  <span v-if="post.eventVenue">-</span>
+                  {{ post.eventLocationName }}
+                </span>
+                <span v-else>
+                  <span v-if="post.eventVenue">-</span>
+                  {{ $t('post.viewEvent.eventIsOnline') }}
+                </span>
+              </ds-text>
+              <ds-text align="left" color="soft" class="event-info">
+                <base-icon name="calendar" data-test="calendar" />
+                <span>{{ getEventDateString }}</span>
+              </ds-text>
+              <ds-text align="left" color="soft" class="event-info">
+                <base-icon name="clock" data-test="calendar" />
+                <span>{{ getEventTimeString }}</span>
+              </ds-text>
             </ds-space>
+            <ds-space margin-bottom="small" />
+            <content-viewer class="content hyphenate-text" :content="post.content" />
             <!-- Categories -->
             <div v-if="categoriesActive" class="categories">
               <ds-space margin="xx-large" />
@@ -180,6 +174,7 @@ import { groupQuery } from '~/graphql/groups'
 import PostMutations from '~/graphql/PostMutations'
 import links from '~/constants/links.js'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
+import { format } from 'date-fns'
 
 export default {
   name: 'PostSlug',
@@ -292,6 +287,24 @@ export default {
       return (
         !this.post.group || (this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole))
       )
+    },
+    getEventDateString() {
+      if (this.post.eventEnd) {
+        const eventStart = format(new Date(this.post.eventStart), 'dd.MM.')
+        const eventEnd = format(new Date(this.post.eventEnd), 'dd.MM.yyyy')
+        return eventStart + ' - ' + eventEnd
+      } else {
+        return format(new Date(this.post.eventStart), 'dd.MM.yyyy')
+      }
+    },
+    getEventTimeString() {
+      if (this.post.eventEnd) {
+        const eventStart = format(new Date(this.post.eventStart), 'HH:mm')
+        const eventEnd = format(new Date(this.post.eventEnd), 'HH:mm')
+        return eventStart + ' - ' + eventEnd
+      } else {
+        return format(new Date(this.post.eventStart), 'HH:mm')
+      }
     },
   },
   methods: {
@@ -409,6 +422,12 @@ export default {
 
   &.--blur-image > .hero-image > .image {
     filter: blur($blur-radius);
+  }
+
+  & .event-info {
+    display: flex;
+    align-items: center;
+    gap: 2px;
   }
 
   .blur-toggle {
