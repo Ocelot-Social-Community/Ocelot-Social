@@ -82,7 +82,11 @@ const createServer = (options) => {
   const app = express()
 
   app.set('driver', driver)
-  app.use(helmet())
+  // TODO: this exception is required for the graphql playground, since the playground loads external resources
+  // See: https://github.com/graphql/graphql-playground/issues/1283
+  app.use(
+    helmet(CONFIG.DEBUG && { contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }),
+  )
   app.use('/.well-known/', webfinger())
   app.use(express.static('public'))
   app.use(bodyParser.json({ limit: '10mb' }))
