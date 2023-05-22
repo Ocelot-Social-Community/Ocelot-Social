@@ -13,7 +13,7 @@ export default {
             MATCH (resource {id: $resourceId})
             WHERE resource:User OR resource:Post OR resource:Comment
             MERGE (resource)<-[:BELONGS_TO]-(report:Report {closed: false})
-            ON CREATE SET report.id = randomUUID(), report.createdAt = $createdAt, report.updatedAt = report.createdAt, report.rule = 'latestReviewUpdatedAtRules', report.disable = resource.disabled, report.closed = false
+            ON CREATE SET report.id = randomUUID(), report.createdAt = $createdAt, report.updatedAt = $createdAt, report.rule = 'latestReviewUpdatedAtRules', report.disable = resource.disabled, report.closed = false
             WITH submitter, resource, report
             CREATE (report)<-[filed:FILED {createdAt: $createdAt, reasonCategory: $reasonCategory, reasonDescription: $reasonDescription}]-(submitter)
 
