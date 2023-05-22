@@ -214,10 +214,20 @@ type Mutation {
 
   muteUser(id: ID!): User
   unmuteUser(id: ID!): User
+
   blockUser(id: ID!): User
   unblockUser(id: ID!): User
+
+  followUser(id: ID!): User
+  unfollowUser(id: ID!): User
 
   switchUserRole(role: UserRole!, id: ID!): User
 
   saveCategorySettings(activeCategories: [String]): Boolean
+
+  requestPasswordReset(email: String!): Boolean
+  resetPassword(nonce: String!, email: String!, newPassword: String!): Boolean
+  changePassword(oldPassword: String!, newPassword: String!): User
+
+  login(email: String!, password: String!): User
 }

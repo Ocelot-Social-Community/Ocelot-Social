@@ -207,6 +207,9 @@ type Mutation {
   pinPost(id: ID!): Post
   unpinPost(id: ID!): Post
   markTeaserAsViewed(id: ID!): Post
+
+  shout(id: ID!, type: String): Boolean
+  unshout(id: ID!, type: String): Boolean
 }
 
 type Query {
