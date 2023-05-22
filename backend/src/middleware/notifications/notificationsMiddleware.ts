@@ -15,7 +15,7 @@ const queryNotificationEmails = async (context, notificationUserIds) => {
     RETURN emailAddress {.email}
   `
   const session = context.driver.session()
-  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+  const writeTxResultPromise = session.readTransaction(async (transaction) => {
     const emailAddressTransactionResponse = await transaction.run(userEmailCypher, {
       notificationUserIds,
     })
