@@ -98,7 +98,7 @@
     "subscriptions-transport-ws": "^0.9.19",
     "trunc-html": "~1.1.2",
     "uuid": "~8.3.2",
-    "validator": "^13.0.0",
+    "validator": "^13.9.0",
     "wait-on": "~4.0.1",
     "xregexp": "^4.3.0"
   },
