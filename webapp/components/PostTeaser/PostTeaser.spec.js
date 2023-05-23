@@ -28,7 +28,7 @@ describe('PostTeaser', () => {
         author: {
           id: 'u1',
         },
-        postType: 'Article',
+        postType: ['Article'],
       },
     }
     stubs = {
