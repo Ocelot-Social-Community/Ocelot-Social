@@ -398,7 +398,7 @@ describe('CreatePost', () => {
         })
       })
 
-      describe('event location is given but event venue is missing', () => {
+      describe('with valid start date and invalid end date', () => {
         it('throws an error', async () => {
           const now = new Date()
           await expect(
@@ -409,7 +409,114 @@ describe('CreatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
-                  eventLocation: 'Berlin',
+                  eventEnd: 'not-valid',
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event end date must be a valid date!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('with valid start date and end date before start date', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 2).toISOString(),
+                  eventEnd: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event end date must be a after event start date!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('with valid start date and valid end date', () => {
+        it('creates the event', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventEnd: new Date(now.getFullYear(), now.getMonth() + 2).toISOString(),
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              CreatePost: {
+                postType: ['Event'],
+                eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                eventEnd: new Date(now.getFullYear(), now.getMonth() + 2).toISOString(),
+                eventIsOnline: false,
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('with valid start date and event is online', () => {
+        it('creates the event', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventIsOnline: true,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              CreatePost: {
+                postType: ['Event'],
+                eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                eventIsOnline: true,
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('event location name is given but event venue is missing', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
                 },
               },
             }),
@@ -442,6 +549,7 @@ describe('CreatePost', () => {
               CreatePost: {
                 postType: ['Event'],
                 eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                eventIsOnline: false,
               },
             },
             errors: undefined,
@@ -449,7 +557,7 @@ describe('CreatePost', () => {
         })
       })
 
-      describe('valid event input with location', () => {
+      describe('valid event input with location name', () => {
         it('has label "Event" set', async () => {
           const now = new Date()
           await expect(
@@ -460,7 +568,7 @@ describe('CreatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
-                  eventLocation: 'Leipzig',
+                  eventLocationName: 'Leipzig',
                   eventVenue: 'Connewitzer Kreuz',
                 },
               },
@@ -713,7 +821,7 @@ describe('UpdatePost', () => {
         })
       })
 
-      describe('event location is given but event venue is missing', () => {
+      describe('event location name is given but event venue is missing', () => {
         it('throws an error', async () => {
           const now = new Date()
           await expect(
@@ -724,7 +832,7 @@ describe('UpdatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
-                  eventLocation: 'Berlin',
+                  eventLocationName: 'Berlin',
                 },
               },
             }),
@@ -738,7 +846,7 @@ describe('UpdatePost', () => {
         })
       })
 
-      describe('valid event input without location', () => {
+      describe('valid event input without location name', () => {
         it('has label "Event" set', async () => {
           const now = new Date()
           await expect(
@@ -764,7 +872,7 @@ describe('UpdatePost', () => {
         })
       })
 
-      describe('valid event input with location', () => {
+      describe('valid event input with location name', () => {
         it('has label "Event" set', async () => {
           const now = new Date()
           await expect(
@@ -775,7 +883,7 @@ describe('UpdatePost', () => {
                 postType: 'Event',
                 eventInput: {
                   eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
-                  eventLocation: 'Leipzig',
+                  eventLocationName: 'Leipzig',
                   eventVenue: 'Connewitzer Kreuz',
                 },
               },

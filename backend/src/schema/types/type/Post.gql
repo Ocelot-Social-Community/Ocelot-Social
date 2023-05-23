@@ -83,6 +83,8 @@ input _PostFilter {
   emotions_every: _PostEMOTEDFilter
   group: _GroupFilter
   postsInMyGroups: Boolean
+  postType_in: [PostType]
+  eventStart_gte: String 
 }
 
 enum _PostOrdering {
@@ -104,6 +106,8 @@ enum _PostOrdering {
   language_desc
   pinned_asc
   pinned_desc
+  eventStart_asc
+  eventStart_desc
 }
 
 
@@ -179,6 +183,8 @@ type Post {
   eventLocation: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
   eventVenue: String
   eventStart: String
+  eventEnd: String
+  eventIsOnline: Boolean
 }
 
 input _PostInput {
@@ -187,8 +193,10 @@ input _PostInput {
 
 input _EventInput {
   eventStart: String!
-  eventLocation: String
+  eventEnd: String
   eventVenue: String
+  eventLocationName: String
+  eventIsOnline: Boolean
 }
 
 type Mutation {

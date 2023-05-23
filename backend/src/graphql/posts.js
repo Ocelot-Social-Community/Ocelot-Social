@@ -38,8 +38,10 @@ export const createPostMutation = () => {
           id
         }
         eventStart
+        eventEnd
         eventLocationName
         eventVenue
+        eventIsOnline
         eventLocation {
           lng
           lat
@@ -70,6 +72,7 @@ export const filterPosts = () => {
         id
         title
         content
+        eventStart
       }
     }
   `

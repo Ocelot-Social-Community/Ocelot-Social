@@ -336,10 +336,12 @@ $ease-in-sharp: cubic-bezier(0.895, 0.03, 0.685, 0.22);
  */
 
 $z-index-modal: 9999;
+$z-index-overlay: 9000;
 $z-index-dropdown: 8888;
 $z-index-page-submenu: 2500;
 $z-index-page-header: 2000;
 $z-index-page-sidebar: 1500;
+$z-index-sticky-float: 150;
 $z-index-sticky: 100;
 $z-index-post-teaser-link: 5;
 $z-index-surface: 1;

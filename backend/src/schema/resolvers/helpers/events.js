@@ -5,22 +5,25 @@ export const validateEventParams = (params) => {
     const { eventInput } = params
     validateEventDate(eventInput.eventStart)
     params.eventStart = eventInput.eventStart
-    if (eventInput.eventLocation && !eventInput.eventVenue) {
+    if (eventInput.eventEnd) {
+      validateEventEnd(eventInput.eventStart, eventInput.eventEnd)
+      params.eventEnd = eventInput.eventEnd
+    }
+    if (eventInput.eventLocationName && !eventInput.eventVenue) {
       throw new UserInputError('Event venue must be present if event location is given!')
     }
     params.eventVenue = eventInput.eventVenue
-    params.eventLocation = eventInput.eventLocation
+    params.eventLocationName = eventInput.eventLocationName
+    params.eventIsOnline = !!eventInput.eventIsOnline
   }
   delete params.eventInput
   let locationName
-  if (params.eventLocation) {
-    params.eventLocationName = params.eventLocation
-    locationName = params.eventLocation
+  if (params.eventLocationName) {
+    locationName = params.eventLocationName
   } else {
     params.eventLocationName = null
     locationName = null
   }
-  delete params.eventLocation
   return locationName
 }
 
@@ -32,4 +35,13 @@ const validateEventDate = (dateString) => {
   if (date.getTime() < now.getTime()) {
     throw new UserInputError('Event start date must be in the future!')
   }
+}
+
+const validateEventEnd = (start, end) => {
+  const endDate = new Date(end)
+  if (endDate.toString() === 'Invalid Date')
+    throw new UserInputError('Event end date must be a valid date!')
+  const startDate = new Date(start)
+  if (endDate < startDate)
+    throw new UserInputError('Event end date must be a after event start date!')
 }

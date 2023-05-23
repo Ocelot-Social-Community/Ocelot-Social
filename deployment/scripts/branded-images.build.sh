@@ -16,6 +16,13 @@ if [ -z ${CONFIGURATION} ]; then
 fi
 echo "Using CONFIGURATION=${CONFIGURATION}"
 
+# check DOCKERHUB_BRAND_VARRIANT
+if [ -z ${DOCKERHUB_BRAND_VARRIANT} ]; then
+  echo "You must provide a `DOCKERHUB_BRAND_VARRIANT` via environment variable"
+  exit 1
+fi
+echo "Using DOCKERHUB_BRAND_VARRIANT=${DOCKERHUB_BRAND_VARRIANT}"
+
 # configuration
 DOCKERHUB_ORGANISATION=${DOCKERHUB_ORGANISATION:-"ocelotsocialnetwork"}
 OCELOT_VERSION=${OCELOT_VERSION:-$(node -p -e "require('${SCRIPT_DIR}/../../package.json').version")}
@@ -29,11 +36,11 @@ BUILD_COMMIT=${GITHUB_SHA:-"0000000"}
 
 # backend
 docker build --target branded \
-    -t "${DOCKERHUB_ORGANISATION}/backend-branded:latest" \
-    -t "${DOCKERHUB_ORGANISATION}/backend-branded:${OCELOT_VERSION}" \
-    -t "${DOCKERHUB_ORGANISATION}/backend-branded:${OCELOT_VERSION_BUILD}" \
-    -t "${DOCKERHUB_ORGANISATION}/backend-branded:${BUILD_VERSION_BASE}" \
-    -t "${DOCKERHUB_ORGANISATION}/backend-branded:${BUILD_VERSION}" \
+    -t "${DOCKERHUB_ORGANISATION}/backend-${DOCKERHUB_BRAND_VARRIANT}:latest" \
+    -t "${DOCKERHUB_ORGANISATION}/backend-${DOCKERHUB_BRAND_VARRIANT}:${OCELOT_VERSION}" \
+    -t "${DOCKERHUB_ORGANISATION}/backend-${DOCKERHUB_BRAND_VARRIANT}:${OCELOT_VERSION_BUILD}" \
+    -t "${DOCKERHUB_ORGANISATION}/backend-${DOCKERHUB_BRAND_VARRIANT}:${BUILD_VERSION_BASE}" \
+    -t "${DOCKERHUB_ORGANISATION}/backend-${DOCKERHUB_BRAND_VARRIANT}:${BUILD_VERSION}" \
     -f "${SCRIPT_DIR}/../src/docker/backend.Dockerfile" \
     --build-arg "CONFIGURATION=${CONFIGURATION}" \
     --build-arg "APP_IMAGE_TAG_CODE=${OCELOT_VERSION}-code" \
@@ -42,11 +49,11 @@ docker build --target branded \
 
 # webapp
 docker build --target branded \
-    -t "${DOCKERHUB_ORGANISATION}/webapp-branded:latest" \
-    -t "${DOCKERHUB_ORGANISATION}/webapp-branded:${OCELOT_VERSION}" \
-    -t "${DOCKERHUB_ORGANISATION}/webapp-branded:${OCELOT_VERSION_BUILD}" \
-    -t "${DOCKERHUB_ORGANISATION}/webapp-branded:${BUILD_VERSION_BASE}" \
-    -t "${DOCKERHUB_ORGANISATION}/webapp-branded:${BUILD_VERSION}" \
+    -t "${DOCKERHUB_ORGANISATION}/webapp-${DOCKERHUB_BRAND_VARRIANT}:latest" \
+    -t "${DOCKERHUB_ORGANISATION}/webapp-${DOCKERHUB_BRAND_VARRIANT}:${OCELOT_VERSION}" \
+    -t "${DOCKERHUB_ORGANISATION}/webapp-${DOCKERHUB_BRAND_VARRIANT}:${OCELOT_VERSION_BUILD}" \
+    -t "${DOCKERHUB_ORGANISATION}/webapp-${DOCKERHUB_BRAND_VARRIANT}:${BUILD_VERSION_BASE}" \
+    -t "${DOCKERHUB_ORGANISATION}/webapp-${DOCKERHUB_BRAND_VARRIANT}:${BUILD_VERSION}" \
     -f "${SCRIPT_DIR}/../src/docker/webapp.Dockerfile" \
     --build-arg "CONFIGURATION=${CONFIGURATION}" \
     --build-arg "APP_IMAGE_TAG_CODE=${OCELOT_VERSION}-code" \
@@ -55,11 +62,11 @@ docker build --target branded \
 
 # mainteance
 docker build --target branded \
-    -t "${DOCKERHUB_ORGANISATION}/maintenance-branded:latest" \
-    -t "${DOCKERHUB_ORGANISATION}/maintenance-branded:${OCELOT_VERSION}" \
-    -t "${DOCKERHUB_ORGANISATION}/maintenance-branded:${OCELOT_VERSION_BUILD}" \
-    -t "${DOCKERHUB_ORGANISATION}/maintenance-branded:${BUILD_VERSION_BASE}" \
-    -t "${DOCKERHUB_ORGANISATION}/maintenance-branded:${BUILD_VERSION}" \
+    -t "${DOCKERHUB_ORGANISATION}/maintenance-${DOCKERHUB_BRAND_VARRIANT}:latest" \
+    -t "${DOCKERHUB_ORGANISATION}/maintenance-${DOCKERHUB_BRAND_VARRIANT}:${OCELOT_VERSION}" \
+    -t "${DOCKERHUB_ORGANISATION}/maintenance-${DOCKERHUB_BRAND_VARRIANT}:${OCELOT_VERSION_BUILD}" \
+    -t "${DOCKERHUB_ORGANISATION}/maintenance-${DOCKERHUB_BRAND_VARRIANT}:${BUILD_VERSION_BASE}" \
+    -t "${DOCKERHUB_ORGANISATION}/maintenance-${DOCKERHUB_BRAND_VARRIANT}:${BUILD_VERSION}" \
     -f "${SCRIPT_DIR}/../src/docker/maintenance.Dockerfile" \
     --build-arg "CONFIGURATION=${CONFIGURATION}" \
     --build-arg "APP_IMAGE_TAG_CODE=${OCELOT_VERSION}-code" \
