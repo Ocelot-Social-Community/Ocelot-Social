@@ -20,6 +20,7 @@ describe('FilterMenu.vue', () => {
 
   const stubs = {
     FollowingFilter: true,
+    PostTypeFilter: true,
     CategoriesFilter: true,
     EmotionsFilter: true,
     LanguagesFilter: true,
