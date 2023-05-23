@@ -225,9 +225,10 @@ type Mutation {
 
   saveCategorySettings(activeCategories: [String]): Boolean
 
-  requestPasswordReset(email: String!): Boolean
-  resetPassword(nonce: String!, email: String!, newPassword: String!): Boolean
-  changePassword(oldPassword: String!, newPassword: String!): String
+  requestPasswordReset(email: String!): Boolean!
+  resetPassword(email: String!, nonce: String!, newPassword: String!): Boolean!
+  changePassword(oldPassword: String!, newPassword: String!): String!
 
-  login(email: String!, password: String!): String
+  # Get a JWT Token for the given Email and password
+  login(email: String!, password: String!): String!
 }

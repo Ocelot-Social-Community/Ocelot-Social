@@ -1,19 +1,16 @@
-type Embed {
-  type: String
-  title: String
-  author: String
-  publisher: String
-  date: String
-  description: String
-  url: String
-  image: String
-  audio: String
-  video: String
-  lang: String
-  html: String
-  sources: [String]
+enum ShoutTypeEnum {
+  Post
 }
 
-type Query {
-  embed(url: String!): Embed
+type Reward {
+  id: ID!
+  user: User @relation(name: "REWARDED", direction: "IN")
+  rewarderId: ID
+  createdAt: String
+  badge: Badge @relation(name: "REWARDED", direction: "OUT")
+}
+
+type SharedInboxEndpoint {
+  id: ID!
+  uri: String
 }
