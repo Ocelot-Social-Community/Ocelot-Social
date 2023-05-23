@@ -270,7 +270,6 @@ describe('login', () => {
 
         it('responds with "Incorrect email address or password."', async () => {
           await respondsWith({
-            data: null,
             errors: [{ message: 'Incorrect email address or password.' }],
           })
         })
@@ -283,7 +282,6 @@ describe('login', () => {
 
         it('responds with "Your account has been disabled."', async () => {
           await respondsWith({
-            data: null,
             errors: [{ message: 'Your account has been disabled.' }],
           })
         })

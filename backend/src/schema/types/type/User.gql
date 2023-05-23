@@ -227,7 +227,7 @@ type Mutation {
 
   requestPasswordReset(email: String!): Boolean
   resetPassword(nonce: String!, email: String!, newPassword: String!): Boolean
-  changePassword(oldPassword: String!, newPassword: String!): User
+  changePassword(oldPassword: String!, newPassword: String!): String
 
-  login(email: String!, password: String!): User
+  login(email: String!, password: String!): String
 }

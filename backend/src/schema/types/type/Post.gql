@@ -208,8 +208,8 @@ type Mutation {
   unpinPost(id: ID!): Post
   markTeaserAsViewed(id: ID!): Post
 
-  shout(id: ID!, type: String): Boolean
-  unshout(id: ID!, type: String): Boolean
+  shout(id: ID!, type: String!): Boolean
+  unshout(id: ID!, type: String!): Boolean
 }
 
 type Query {

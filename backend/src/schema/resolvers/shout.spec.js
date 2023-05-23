@@ -10,12 +10,12 @@ const driver = getDriver()
 
 const mutationShoutPost = gql`
   mutation ($id: ID!) {
-    shout(id: $id, type: Post)
+    shout(id: $id, type: "Post")
   }
 `
 const mutationUnshoutPost = gql`
   mutation ($id: ID!) {
-    unshout(id: $id, type: Post)
+    unshout(id: $id, type: "Post")
   }
 `
 const queryPost = gql`
