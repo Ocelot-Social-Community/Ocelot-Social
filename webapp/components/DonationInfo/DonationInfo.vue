@@ -47,5 +47,6 @@ export default {
   display: flex;
   flex: 1;
   margin-bottom: $space-x-small;
+  margin-top: 16px;
 }
 </style>
