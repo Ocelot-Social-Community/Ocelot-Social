@@ -320,7 +320,7 @@ export default {
   height: 54px;
   width: 54px;
   font-size: 26px;
-  z-index: 100;
+  z-index: $z-index-sticky-float;
   position: fixed;
   bottom: -5px;
   left: 98vw;
@@ -332,7 +332,7 @@ export default {
   height: 54px;
   width: 54px;
   font-size: 26px;
-  z-index: 100;
+  z-index: $z-index-sticky-float;
   position: fixed;
   top: 80px;
   box-shadow: $box-shadow-x-large;
@@ -350,7 +350,7 @@ export default {
 .filterButtonMenu {
   width: 95%;
   position: fixed;
-  z-index: 6;
+  z-index: $z-index-sticky;
   margin-top: -45px;
   padding: 30px 0px 20px 0px;
   background-color: #f5f4f6;
@@ -374,6 +374,7 @@ export default {
   max-height: 950px;
   overflow: auto;
   padding-bottom: 0px;
+  z-index: $z-index-page-submenu;
 }
 .grid-margin-top {
   margin-top: 26px;
@@ -426,7 +427,6 @@ export default {
     height: 44px;
     width: 44px;
     font-size: 23px;
-    z-index: 10;
   }
 }
 @media screen and (max-width: 650px) {
