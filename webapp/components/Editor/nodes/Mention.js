@@ -17,7 +17,7 @@ export default class Mention extends TipTapMention {
             'data-mention-id': node.attrs.id,
             target: '_blank',
           },
-          `${this.options.matcher.char}${node.attrs.label}`,
+          `${this.options.matcher.char}${node.attrs.label} `,
         ]
       },
       parseDOM: [
