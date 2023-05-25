@@ -152,7 +152,7 @@
         <ds-flex class="buttons-footer" gutter="xxx-small">
           <ds-flex-item width="3.5" style="margin-right: 16px; margin-bottom: 6px">
             <!-- eslint-disable vue/no-v-text-v-html-on-component -->
-            <!-- TODO => remove v-html! only text ! no html! secrurity first! -->
+            <!-- TODO => remove v-html! only text ! no html! security first! -->
             <ds-text
               v-if="showGroupHint"
               v-html="$t('contribution.visibleOnlyForMembersOfGroup', { name: groupName })"
