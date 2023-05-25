@@ -11,7 +11,7 @@
                   ghost
                   fullwidth
                   size="x-large"
-                  style="background-color: #ff000000; color: whitesmoke"
+                  class="inactive-tab-button"
                 >
                   {{ $t('post.createNewPost.title') }}
                 </ds-button>
@@ -30,8 +30,7 @@
                   size="x-large"
                   v-if="creatEvent"
                   hover
-                  style="background-color: #ff000000; color: whitesmoke"
-                >
+                  class="inactive-tab-button"               >
                   {{ $t('post.createNewEvent.title') }}
                 </ds-button>
                 <ds-button ghost fullwidth size="x-large" v-else @click="creatEvent = !creatEvent">
@@ -41,7 +40,7 @@
             </ds-card>
           </ds-flex-item>
         </ds-flex>
-        <div v-if="group" style="font-size: 30px; text-align: center">
+        <div v-if="group" class="group-create-title">
           {{ $t('post.createNewPost.forGroup.title', { name: group.name }) }}
         </div>
       </ds-flex-item>
@@ -100,3 +99,13 @@ export default {
   },
 }
 </script>
+<style lang="scss">
+.inactive-tab-button {
+  background-color: #ff000000 !important;
+  color: "whitesmoke" !important;
+}
+.group-create-title {
+  font-size: 30px;
+  text-align: center;
+}
+</style>
