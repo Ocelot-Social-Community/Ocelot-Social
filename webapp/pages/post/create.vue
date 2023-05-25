@@ -30,7 +30,8 @@
                   size="x-large"
                   v-if="creatEvent"
                   hover
-                  class="inactive-tab-button"               >
+                  class="inactive-tab-button"
+                >
                   {{ $t('post.createNewEvent.title') }}
                 </ds-button>
                 <ds-button ghost fullwidth size="x-large" v-else @click="creatEvent = !creatEvent">
@@ -102,7 +103,7 @@ export default {
 <style lang="scss">
 .inactive-tab-button {
   background-color: #ff000000 !important;
-  color: "whitesmoke" !important;
+  color: 'whitesmoke' !important;
 }
 .group-create-title {
   font-size: 30px;

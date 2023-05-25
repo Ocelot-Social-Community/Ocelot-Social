@@ -325,7 +325,7 @@ export default {
       return date < new Date()
     },
     notBeforeEventDay(date) {
-      return date < new Date(this.formData.eventStart).setHours(0,0,0,0)
+      return date < new Date(this.formData.eventStart).setHours(0, 0, 0, 0)
     },
     notBeforeEvent(date) {
       return date <= new Date(this.formData.eventStart)
