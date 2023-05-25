@@ -1,6 +1,6 @@
 import { getDriver } from '../../db/neo4j'
 
-export const description = ''
+export const description = 'Add to all existing posts the Article label'
 
 export async function up(next) {
   const driver = getDriver()

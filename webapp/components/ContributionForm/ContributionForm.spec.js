@@ -15,6 +15,7 @@ const stubs = {
   'client-only': true,
   'nuxt-link': true,
   'v-popover': true,
+  'date-picker': true,
 }
 
 describe('ContributionForm.vue', () => {
@@ -45,6 +46,7 @@ describe('ContributionForm.vue', () => {
               slug: 'this-is-a-title-for-a-post',
               content: postContent,
               contentExcerpt: postContent,
+              postType: ['Article'],
             },
           },
         }),
@@ -142,6 +144,7 @@ describe('ContributionForm.vue', () => {
               id: null,
               image: null,
               groupId: null,
+              postType: 'Article',
             },
           }
           postTitleInput = wrapper.find('.ds-input')
@@ -268,6 +271,7 @@ describe('ContributionForm.vue', () => {
               image: {
                 sensitive: false,
               },
+              postType: 'Article',
             },
           }
         })
