@@ -53,6 +53,3 @@ jobs:
           name: cypress-videos
           path: cypress/videos/
 
-          name: cypress-videos
-          path: cypress/videos/
-
