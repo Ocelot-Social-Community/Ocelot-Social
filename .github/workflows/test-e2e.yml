@@ -45,6 +45,11 @@ jobs:
         with:
           name: cypress-screenshots
           path: cypress/screenshots/
+      
+      - name: Full stack tests | if any test failed, upload videos
+        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
+        uses: actions/upload-artifact@v3
+        with:
           name: cypress-videos
           path: cypress/videos/
 
