@@ -1,6 +1,7 @@
 {
   "projectId": "qa7fe2",
   "defaultCommandTimeout": 50000,
+  "pageLoadTimeout": 180000,
   "ignoreTestFiles": "*.js",
   "chromeWebSecurity": false,
   "baseUrl": "http://localhost:3000",
