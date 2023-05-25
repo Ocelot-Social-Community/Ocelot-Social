@@ -236,6 +236,7 @@ export default {
   display: block;
   height: 100%;
   color: $text-color-base;
+  padding-top: 16px;
 }
 
 .post-user-row {
