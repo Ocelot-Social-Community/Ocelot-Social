@@ -1,5 +1,7 @@
 # GraphQL Playground
 
+***Attention:** For using the GraphQL Playground set `DEBUG=true` in your backend `.env`, see `.env.template`!*
+
 To use GraphQL Playground, we need to know some basics:
 
 ## How To Login?
