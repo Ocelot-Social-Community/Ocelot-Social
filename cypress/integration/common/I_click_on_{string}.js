@@ -1,4 +1,5 @@
 import { When } from "cypress-cucumber-preprocessor/steps";
+import 'cypress-network-idle';
 
 When("I click on {string}", element => {
   const elementSelectors = {
@@ -16,4 +17,5 @@ When("I click on {string}", element => {
   cy.get(elementSelectors[element])
     .click()
     .wait(750);
+  cy.waitForNetworkIdle(2000);
 });

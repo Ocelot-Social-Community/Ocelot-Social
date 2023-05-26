@@ -7,7 +7,6 @@ Given('somebody reported the following posts:', table => {
     method: 'POST',
     url: '/',
     hostname: 'localhost',
-    port: 4000,
   }).as('postToLocalhost')
 
   table.hashes().forEach(({ submitterEmail, resourceId, reasonCategory, reasonDescription }) => {
@@ -31,16 +30,12 @@ Given('somebody reported the following posts:', table => {
         cy.wrap(interception.response.statusCode).should('eq', 200)
       })
       cy.wait(['@postToLocalhost']).then((interception) => {
-        cy.wrap(interception.response.statusCode).should('eq', 200)
-      })
-      cy.wait(['@postToLocalhost']).then((interception) => {
         console.log('Cypress interception:', interception)
         cy.wrap(interception.response.statusCode).should('eq', 200)
         cy.wrap(interception.response.body)
           .should('have.nested.property', 'data.fileReport.reportId')
           .and('match', reportIdRegex)
       })
-      console.log('Cypress waited for fileReport request')
       cy.waitForNetworkIdle(2000)
   })
 })
