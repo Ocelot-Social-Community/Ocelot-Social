@@ -51,7 +51,7 @@ Cypress.Commands.add(
   (graphQLClient, mutation, variables, response) => {
     return new Cypress.Promise(async (resolve, reject) => {
       const response = await graphQLClient.request(mutation, variables)
-      console.log('Cypress command mutate:', data)
+      console.log('Cypress command mutate:', response)
       graphQLClient.request(mutation, variables).then(() => resolve(graphQLClient))
 
     })
