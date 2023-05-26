@@ -7,11 +7,20 @@
     <template #filter-follower>
       <li class="item article-item">
         <labeled-button
+          icon="check"
+          :label="$t('filter-menu.all')"
+          :filled="noneSet"
+          :title="$t('filter-menu.all')"
+          @click="setUnsetPostTypeFilter('All')"
+        />
+      </li>
+      <li class="item article-item">
+        <labeled-button
           icon="book"
           :label="$t('filter-menu.article')"
           :filled="articleSet"
           :title="$t('filter-menu.article')"
-          @click="setPostTypeFilter('Article')"
+          @click="setUnsetPostTypeFilter('Article')"
         />
       </li>
       <li class="item event-item">
@@ -20,7 +29,7 @@
           :label="$t('filter-menu.event')"
           :filled="eventSet"
           :title="$t('filter-menu.event')"
-          @click="setPostTypeFilter('Event')"
+          @click="setUnsetPostTypeFilter('Event')"
         />
       </li>
     </template>
@@ -62,13 +71,20 @@ export default {
     ...mapMutations({
       toggleFilterPostType: 'posts/TOGGLE_POST_TYPE',
     }),
-    setPostTypeFilter(setPostType) {
+    unsetAll() {
+      this.postTypes.forEach((postType) => {
+        if (this.filteredPostTypes.includes(postType)) this.toggleFilterPostType(postType)
+      })
+    },
+    setUnsetPostTypeFilter(setPostType) {
       if (this.noneSet) {
         if (setPostType !== 'All') this.toggleFilterPostType(setPostType)
       } else {
         if (setPostType !== 'All') {
-          // if not set then set and unset all others
-          if (!this.filteredPostTypes.includes(setPostType)) {
+          if (this.filteredPostTypes.includes(setPostType)) {
+            this.unsetAll()
+          } else {
+            // if not set then set and unset all others
             this.toggleFilterPostType(setPostType)
             this.postTypes.forEach((postType) => {
               if (postType !== setPostType)
@@ -76,10 +92,7 @@ export default {
             })
           }
         } else {
-          // unset all
-          this.postTypes.forEach((postType) => {
-            if (this.filteredPostTypes.includes(postType)) this.toggleFilterPostType(postType)
-          })
+          this.unsetAll()
         }
       }
     },
