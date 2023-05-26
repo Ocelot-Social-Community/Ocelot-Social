@@ -8,7 +8,7 @@ Given('somebody reported the following posts:', table => {
     url: '/',
     hostname: 'localhost',
     port: 4000,
-  }).as('postToLocalhoast')
+  }).as('postToLocalhost')
 
   table.hashes().forEach(({ submitterEmail, resourceId, reasonCategory, reasonDescription }) => {
     const submitter = {
@@ -27,13 +27,13 @@ Given('somebody reported the following posts:', table => {
         reasonCategory,
         reasonDescription
       })
-      cy.wait(['@postToLocalhoast']).then((interception) => {
+      cy.wait(['@postToLocalhost']).then((interception) => {
         cy.wrap(interception.response.statusCode).should('eq', 200)
       })
-      cy.wait(['@postToLocalhoast']).then((interception) => {
+      cy.wait(['@postToLocalhost']).then((interception) => {
         cy.wrap(interception.response.statusCode).should('eq', 200)
       })
-      cy.wait(['@postToLocalhoast']).then((interception) => {
+      cy.wait(['@postToLocalhost']).then((interception) => {
         console.log('Cypress interception:', interception)
         cy.wrap(interception.response.statusCode).should('eq', 200)
         cy.wrap(interception.response.body)
