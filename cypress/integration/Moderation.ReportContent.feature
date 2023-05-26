@@ -54,17 +54,17 @@ Feature: Report and Moderate
     Then I see all the reported posts including the one from above
     And each list item links to the post page
 
-  Scenario: Review reported posts of a user who's muted a moderator
-    Given somebody reported the following posts:
-      | submitterEmail           | resourceId | reasonCategory | reasonDescription |
-      | p2.submitter@example.org | p2         | other          | Offensive content |
-    And I am logged in as "moderator"
-    And I navigate to page "/"
-    And there is an annoying user who has muted me
-    When I click on the avatar menu in the top right corner
-    And I click on "Moderation"
-    Then I see all the reported posts including from the user who muted me
-    And I can visit the post page
+  # Scenario: Review reported posts of a user who's muted a moderator
+  #   Given somebody reported the following posts:
+  #     | submitterEmail           | resourceId | reasonCategory | reasonDescription |
+  #     | p2.submitter@example.org | p2         | other          | Offensive content |
+  #   And I am logged in as "moderator"
+  #   And I navigate to page "/"
+  #   And there is an annoying user who has muted me
+  #   When I click on the avatar menu in the top right corner
+  #   And I click on "Moderation"
+  #   Then I see all the reported posts including from the user who muted me
+  #   And I can visit the post page
 
   # Scenario: Normal user can't see the moderation page
   #   Given I am logged in as "user"

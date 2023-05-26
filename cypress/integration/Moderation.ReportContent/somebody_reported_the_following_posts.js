@@ -1,4 +1,5 @@
 import { Given } from "cypress-cucumber-preprocessor/steps";
+import 'cypress-network-idle';
 
 Given('somebody reported the following posts:', table => {
   table.hashes().forEach(({ submitterEmail, resourceId, reasonCategory, reasonDescription }) => {
@@ -18,6 +19,6 @@ Given('somebody reported the following posts:', table => {
         reasonCategory,
         reasonDescription
       })
-    cy.wait(120000)
+      cy.waitForNetworkIdle(2000)
   })
 })
