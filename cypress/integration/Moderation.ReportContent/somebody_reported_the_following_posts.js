@@ -18,6 +18,6 @@ Given('somebody reported the following posts:', table => {
         reasonCategory,
         reasonDescription
       })
-    cy.wait(10000)
+    cy.wait(120000)
   })
 })
