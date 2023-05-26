@@ -11,16 +11,16 @@
           :label="$t('filter-menu.article')"
           :filled="articleSet"
           :title="$t('filter-menu.article')"
-          @click="toggleFilterPostType('Article')"
+          @click="setPostTypeFilter('Article')"
         />
       </li>
       <li class="item event-item">
         <labeled-button
           icon="calendar"
-          :label="$t('filter-menu.events')"
+          :label="$t('filter-menu.event')"
           :filled="eventSet"
-          :title="$t('filter-menu.events')"
-          @click="toggleFilterPostType('Event')"
+          :title="$t('filter-menu.event')"
+          @click="setPostTypeFilter('Event')"
         />
       </li>
     </template>
@@ -38,11 +38,19 @@ export default {
     FilterMenuSection,
     LabeledButton,
   },
+  data() {
+    return {
+      postTypes: ['Article', 'Event'],
+    }
+  },
   computed: {
     ...mapGetters({
       filteredPostTypes: 'posts/filteredPostTypes',
       currentUser: 'auth/user',
     }),
+    noneSet() {
+      return !this.articleSet && !this.eventSet
+    },
     articleSet() {
       return this.filteredPostTypes.includes('Article')
     },
@@ -54,6 +62,27 @@ export default {
     ...mapMutations({
       toggleFilterPostType: 'posts/TOGGLE_POST_TYPE',
     }),
+    setPostTypeFilter(setPostType) {
+      if (this.noneSet) {
+        if (setPostType !== 'All') this.toggleFilterPostType(setPostType)
+      } else {
+        if (setPostType !== 'All') {
+          // if not set then set and unset all others
+          if (!this.filteredPostTypes.includes(setPostType)) {
+            this.toggleFilterPostType(setPostType)
+            this.postTypes.forEach((postType) => {
+              if (postType !== setPostType)
+                if (this.filteredPostTypes.includes(postType)) this.toggleFilterPostType(postType)
+            })
+          }
+        } else {
+          // unset all
+          this.postTypes.forEach((postType) => {
+            if (this.filteredPostTypes.includes(postType)) this.toggleFilterPostType(postType)
+          })
+        }
+      }
+    },
   },
 }
 </script>
