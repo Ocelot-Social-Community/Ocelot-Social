@@ -5,9 +5,9 @@ Then('I see all the reported posts including the one from above', () => {
     method: 'POST',
     url: '/api',
     hostname: 'localhost',
-  }).as('postToApi')
+  }).as('getReports')
 
-  cy.wait(['@postToApi']).then((interception) => {
+  cy.wait(['@getReports']).then((interception) => {
     console.log('Cypress interception:', interception)
     cy.wrap(interception.response.statusCode).should('eq', 200)
     cy.wrap(interception.request.body)
@@ -100,7 +100,7 @@ Then('I see all the reported posts including the one from above', () => {
     )
     cy.wrap(interception.response.body)
       .should('have.nested.property', 'data.reports.0')
-      // .and('not.be', null)
+      .and('not.be.null')
   })
 
   cy.get('table tbody').within(() => {
