@@ -99,8 +99,8 @@ Then('I see all the reported posts including the one from above', () => {
 `
     )
     cy.wrap(interception.response.body)
-      .should('have.nested.property', 'data.reports.0')
-      .and('not.be.null')
+      .should('have.nested.property', 'data.reports.0.resource.author.id')
+      .and('equal', 'annoying-user')
   })
 
   cy.get('table tbody').within(() => {
