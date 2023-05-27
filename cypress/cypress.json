@@ -5,7 +5,7 @@
   "ignoreTestFiles": "*.js",
   "chromeWebSecurity": false,
   "baseUrl": "http://localhost:3000",
-  "video": true,
+  "video": false,
   "retries": {
     "runMode": 2,
     "openMode": 0
