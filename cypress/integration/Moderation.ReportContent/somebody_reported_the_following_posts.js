@@ -30,7 +30,6 @@ Given('somebody reported the following posts:', table => {
         cy.wrap(interception.response.statusCode).should('eq', 200)
       })
       cy.wait(['@postToLocalhost']).then((interception) => {
-        console.log('Cypress interception:', interception)
         cy.wrap(interception.response.statusCode).should('eq', 200)
         cy.wrap(interception.response.body)
           .should('have.nested.property', 'data.fileReport.reportId')

@@ -17,5 +17,4 @@ When("I click on {string}", element => {
   cy.get(elementSelectors[element])
     .click()
     .wait(750);
-  cy.waitForNetworkIdle(2000);
 });
