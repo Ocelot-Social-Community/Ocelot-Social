@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.21.8",
-    "@babel/preset-env": "^7.21.5",
+    "@babel/preset-env": "^7.22.2",
     "@babel/register": "^7.12.10",
     "@faker-js/faker": "5.1.0",
     "auto-changelog": "^2.3.0",
