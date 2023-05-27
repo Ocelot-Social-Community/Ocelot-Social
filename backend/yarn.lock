@@ -1491,10 +1491,10 @@
     url-regex "~4.1.1"
     video-extensions "~1.1.0"
 
-"@metascraper/helpers@^5.33.5", "@metascraper/helpers@^5.34.2", "@metascraper/helpers@^5.34.4":
-  version "5.34.4"
-  resolved "https://registry.yarnpkg.com/@metascraper/helpers/-/helpers-5.34.4.tgz#59faf01466938b26aa8df147f97c7f9f4d739d28"
-  integrity sha512-OZdXkfxJXH5dW+aoptLJzxN56Xj+ABzbqZ9NDuKn908zW4tvLBPD6go3qdd3GXXQZH7TxvWpETn9i1AxzoyKmQ==
+"@metascraper/helpers@^5.33.5", "@metascraper/helpers@^5.34.2", "@metascraper/helpers@^5.34.4", "@metascraper/helpers@^5.34.6":
+  version "5.34.6"
+  resolved "https://registry.yarnpkg.com/@metascraper/helpers/-/helpers-5.34.6.tgz#77305528340b1feac3e08f12eef741300f643d82"
+  integrity sha512-df4Z0VolRgeC0tD5cd6LXhoiw28erKB1GxFGFM6HPv9pHQlXJlzfg4N4xnYn3pQxIZ59QXq3NTz1eM+uHr1uiw==
   dependencies:
     audio-extensions "0.0.0"
     chrono-node "~2.6.2"
@@ -1513,7 +1513,7 @@
     microsoft-capitalize "~1.0.5"
     mime "~3.0.0"
     normalize-url "~6.1.0"
-    re2 "~1.18.0"
+    re2 "~1.19.0"
     smartquotes "~2.3.2"
     tldts "~6.0.1"
     url-regex-safe "~3.0.0"
@@ -5858,10 +5858,10 @@ insane@2.6.1:
     assignment "2.0.0"
     he "0.5.0"
 
-install-artifact-from-github@^1.3.1:
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/install-artifact-from-github/-/install-artifact-from-github-1.3.2.tgz#1a16d9508e40330523a3017ae0d4713ccc64de82"
-  integrity sha512-yCFcLvqk0yQdxx0uJz4t9Z3adDMLAYrcGYv546uRXCSvxE+GqNYhhz/KmrGcUKGI/gVLR9n/e/zM9jX/+ASMJQ==
+install-artifact-from-github@^1.3.3:
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/install-artifact-from-github/-/install-artifact-from-github-1.3.3.tgz#57d89bacfa0f47d7307fe41b6247cda9f9a8079c"
+  integrity sha512-x79SL0d8WOi1ZjXSTUqqs0GPQZ92YArJAN9O46wgU9wdH2U9ecyyhB9YGDbPe2OLV4ptmt6AZYRQZ2GydQZosQ==
 
 invariant@^2.2.2, invariant@^2.2.4:
   version "2.2.4"
@@ -7244,13 +7244,13 @@ merge2@^1.3.0:
   resolved "https://registry.yarnpkg.com/merge2/-/merge2-1.3.0.tgz#5b366ee83b2f1582c48f87e47cf1a9352103ca81"
   integrity sha512-2j4DAdlBOkiSZIsaXk4mTE3sRS02yBHAtfy127xRV3bQUFqXkjHCHLW6Scv7DwNRbIWNHH8zpnz9zMaKXIdvYw==
 
-metascraper-audio@^5.34.4:
-  version "5.34.4"
-  resolved "https://registry.yarnpkg.com/metascraper-audio/-/metascraper-audio-5.34.4.tgz#84437c3962a9186cda69510229f6b68e6a25563a"
-  integrity sha512-Z/BzT0KLq8H6Zc0wm4PqKlSeI7O54ZsD2QhV9GgkJNz5jGj0Rs4P3OOvoa+FEtDyRKGfIzYuldAuhQMVmo1WMA==
+metascraper-audio@^5.34.6:
+  version "5.34.6"
+  resolved "https://registry.yarnpkg.com/metascraper-audio/-/metascraper-audio-5.34.6.tgz#1549bb4a54670226728d44d6006efcbbfe7f7fe6"
+  integrity sha512-FAVn7pI4h0bBALoMMVJ62uEgKSqX7n3yjjbrPtRKpCuhp5ovlvoaw1fAwfODmc/J0bweZzo5q+7RQ3lbDpKiEA==
   dependencies:
     "@keyvhq/memoize" "~2.0.0"
-    "@metascraper/helpers" "^5.34.4"
+    "@metascraper/helpers" "^5.34.6"
     got "~11.8.6"
     p-reflect "~2.1.0"
 
@@ -7789,7 +7789,7 @@ node-fetch@^2.1.2, node-fetch@^2.2.0, node-fetch@^2.6.0, node-fetch@~2.6.1:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
-node-gyp@^9.3.0:
+node-gyp@^9.3.1:
   version "9.3.1"
   resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-9.3.1.tgz#1e19f5f290afcc9c46973d68700cbd21a96192e4"
   integrity sha512-4Q16ZCqq3g8awk6UplT7AuxQ35XN4R/yf/+wSAwcBUAjg7l58RTactWaP8fIDTi0FzI7YcVLujwExakZlfWkXg==
@@ -8646,14 +8646,14 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-re2@~1.18.0:
-  version "1.18.0"
-  resolved "https://registry.yarnpkg.com/re2/-/re2-1.18.0.tgz#6d6f47c5aaa436eb7a7d68b260f8cf25d7948619"
-  integrity sha512-MoCYZlJ9YUgksND9asyNF2/x532daXU/ARp1UeJbQ5flMY6ryKNEhrWt85aw3YluzOJlC3vXpGgK2a1jb0b4GA==
+re2@~1.19.0:
+  version "1.19.0"
+  resolved "https://registry.yarnpkg.com/re2/-/re2-1.19.0.tgz#6d867404fe3c63d874c7d7bfdc0c9d4add059c87"
+  integrity sha512-y0LcLZgBF3L7mDtNfbghb7dCmChYQO2QsUGklNueAJUH+HAZO8UZUubgNsf6OxRTAQpeE4KMPR7vcpK3+Q+GiA==
   dependencies:
-    install-artifact-from-github "^1.3.1"
+    install-artifact-from-github "^1.3.3"
     nan "^2.17.0"
-    node-gyp "^9.3.0"
+    node-gyp "^9.3.1"
 
 reachable-url@~1.7.1:
   version "1.7.1"
