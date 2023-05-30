@@ -6,13 +6,13 @@ export default {
       filteredPostTypes: 'posts/filteredPostTypes',
       currentUser: 'auth/user',
     }),
-    noneSet() {
-      return !this.articleSet && !this.eventSet
+    noneSetInPostTypeFilter() {
+      return !this.articleSetInPostTypeFilter && !this.eventSetInPostTypeFilter
     },
-    articleSet() {
+    articleSetInPostTypeFilter() {
       return this.filteredPostTypes.includes('Article')
     },
-    eventSet() {
+    eventSetInPostTypeFilter() {
       return this.filteredPostTypes.includes('Event')
     },
   },

@@ -9,7 +9,7 @@
         <labeled-button
           icon="check"
           :label="$t('filter-menu.all')"
-          :filled="noneSet"
+          :filled="noneSetInPostTypeFilter"
           :title="$t('filter-menu.all')"
           @click="setUnsetPostTypeFilter('All')"
         />
@@ -18,7 +18,7 @@
         <labeled-button
           icon="book"
           :label="$t('filter-menu.article')"
-          :filled="articleSet"
+          :filled="articleSetInPostTypeFilter"
           :title="$t('filter-menu.article')"
           @click="setUnsetPostTypeFilter('Article')"
         />
@@ -27,7 +27,7 @@
         <labeled-button
           icon="calendar"
           :label="$t('filter-menu.event')"
-          :filled="eventSet"
+          :filled="eventSetInPostTypeFilter"
           :title="$t('filter-menu.event')"
           @click="setUnsetPostTypeFilter('Event')"
         />
@@ -60,7 +60,7 @@ export default {
       })
     },
     setUnsetPostTypeFilter(setPostType) {
-      if (this.noneSet) {
+      if (this.noneSetInPostTypeFilter) {
         if (setPostType !== 'All') this.toggleFilterPostType(setPostType)
       } else {
         if (setPostType !== 'All') {

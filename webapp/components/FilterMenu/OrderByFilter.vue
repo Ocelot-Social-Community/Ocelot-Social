@@ -1,5 +1,6 @@
 <template>
   <filter-menu-section
+    v-if="noneSetInPostTypeFilter || articleSetInPostTypeFilter"
     class="order-by-filter"
     :title="$t('filter-menu.creationDate')"
     :divider="false"
@@ -31,6 +32,7 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
+import FilterMenuMixin from '~/mixins/filterMenuMixin.js'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
 
@@ -40,9 +42,9 @@ export default {
     FilterMenuSection,
     LabeledButton,
   },
+  mixins: [FilterMenuMixin],
   computed: {
     ...mapGetters({
-      filteredPostTypes: 'posts/filteredPostTypes',
       orderBy: 'posts/orderBy',
     }),
   },
