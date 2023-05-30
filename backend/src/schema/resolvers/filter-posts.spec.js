@@ -158,7 +158,7 @@ describe('Filter Posts', () => {
   })
 
   describe('order events by event start descending', () => {
-    it('finds the events orderd accordingly', async () => {
+    it('finds the events ordered accordingly', async () => {
       const {
         data: { Post: result },
       } = await query({
@@ -180,7 +180,7 @@ describe('Filter Posts', () => {
   })
 
   describe('order events by event start ascending', () => {
-    it('finds the events orderd accordingly', async () => {
+    it('finds the events ordered accordingly', async () => {
       const {
         data: { Post: result },
       } = await query({
