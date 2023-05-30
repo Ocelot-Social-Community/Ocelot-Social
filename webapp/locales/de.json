@@ -380,7 +380,7 @@
     "all": "Alle",
     "article": "Beitrag",
     "categories": "Themen",
-    "creationDate": "Erstellungsdatum",
+    "creationDate": "Erstellungszeitpunkt",
     "deleteFilter": "Filter löschen",
     "emotions": "Emotionen",
     "event": "Veranstaltung",
@@ -389,9 +389,17 @@
     "languages": "Sprachen",
     "my-groups": "Meinen Gruppen",
     "order": {
+      "last": {
+        "hint": "Sortiere die Letzten nach vorn",
+        "label": "Letzte zuerst"
+      },
       "newest": {
         "hint": "Sortiere die Neuesten nach vorn",
         "label": "Neueste zuerst"
+      },
+      "next": {
+        "hint": "Sortiere die Nächsten nach vorn",
+        "label": "Nächste zuerst"
       },
       "oldest": {
         "hint": "Sortiere die Ältesten nach vorn",
@@ -403,7 +411,8 @@
     "save": {
       "error": "Themen konnten nicht gespeichert werden!",
       "success": "Themen gespeichert!"
-    }
+    },
+    "startDate": "Anfangszeitpunkt"
   },
   "followButton": {
     "follow": "Folgen",
