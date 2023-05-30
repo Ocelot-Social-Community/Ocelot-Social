@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import FilterMenuMixin from '~/mixins/filterMenuMixin.js'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
 
@@ -47,32 +47,15 @@ export default {
     FilterMenuSection,
     LabeledButton,
   },
+  mixins: [FilterMenuMixin],
   data() {
     return {
-      postTypes: ['Article', 'Event'],
+      filterPostTypes: ['Article', 'Event'],
     }
   },
-  computed: {
-    ...mapGetters({
-      filteredPostTypes: 'posts/filteredPostTypes',
-      currentUser: 'auth/user',
-    }),
-    noneSet() {
-      return !this.articleSet && !this.eventSet
-    },
-    articleSet() {
-      return this.filteredPostTypes.includes('Article')
-    },
-    eventSet() {
-      return this.filteredPostTypes.includes('Event')
-    },
-  },
   methods: {
-    ...mapMutations({
-      toggleFilterPostType: 'posts/TOGGLE_POST_TYPE',
-    }),
-    unsetAll() {
-      this.postTypes.forEach((postType) => {
+    unsetAllPostTypeFilters() {
+      this.filterPostTypes.forEach((postType) => {
         if (this.filteredPostTypes.includes(postType)) this.toggleFilterPostType(postType)
       })
     },
@@ -82,17 +65,17 @@ export default {
       } else {
         if (setPostType !== 'All') {
           if (this.filteredPostTypes.includes(setPostType)) {
-            this.unsetAll()
+            this.unsetAllPostTypeFilters()
           } else {
-            // if not set then set and unset all others
+            // if 'setPostType' is not set then set it and unset all others
             this.toggleFilterPostType(setPostType)
-            this.postTypes.forEach((postType) => {
+            this.filterPostTypes.forEach((postType) => {
               if (postType !== setPostType)
                 if (this.filteredPostTypes.includes(postType)) this.toggleFilterPostType(postType)
             })
           }
         } else {
-          this.unsetAll()
+          this.unsetAllPostTypeFilters()
         }
       }
     },
