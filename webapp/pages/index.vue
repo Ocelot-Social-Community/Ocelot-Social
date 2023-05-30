@@ -154,7 +154,8 @@ export default {
       hideByScroll: false,
       revScrollpos: 0,
       showFilter: false,
-      developerNoAutoClosingFilterMenu: false, // stops automatic closing of filter menu for developer purposes: default is 'false'
+      // Wolle
+      developerNoAutoClosingFilterMenu: true, // stops automatic closing of filter menu for developer purposes: default is 'false'
       showDonations: false,
       goal: 15000,
       progress: 7000,
