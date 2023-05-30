@@ -62,7 +62,7 @@
               :clickRemove="resetByGroups"
             />
             <div id="my-filter" v-if="showFilter">
-              <div @mouseleave="showFilter = false">
+              <div @mouseleave="mouseLeaveFilterMenu">
                 <filter-menu-component @showFilterMenu="showFilterMenu" />
               </div>
             </div>
@@ -154,6 +154,7 @@ export default {
       hideByScroll: false,
       revScrollpos: 0,
       showFilter: false,
+      developerNoAutoClosingFilterMenu: false, // stops automatic closing of filter menu for developer purposes: default is 'false'
       showDonations: false,
       goal: 15000,
       progress: 7000,
@@ -214,6 +215,10 @@ export default {
     }),
     openFilterMenu() {
       this.showFilter = !this.showFilter
+    },
+    mouseLeaveFilterMenu() {
+      if (this.developerNoAutoClosingFilterMenu) return
+      this.showFilter = false
     },
     showFilterMenu(e) {
       if (!e || (!e.target.closest('#my-filter') && !e.target.closest('.my-filter-button'))) {
