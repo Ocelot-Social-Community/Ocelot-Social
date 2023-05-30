@@ -17,7 +17,6 @@ const metascraper = Metascraper([
   require('metascraper-lang')(),
   require('metascraper-lang-detector')(),
   require('metascraper-logo')(),
-  // require('metascraper-clearbit-logo')(),
   require('metascraper-publisher')(),
   require('metascraper-title')(),
   require('metascraper-url')(),
