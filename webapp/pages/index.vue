@@ -160,7 +160,7 @@ export default {
       progress: 7000,
       posts: [],
       hasMore: true,
-      // Initialize your apollo data
+      // initialize your apollo data
       offset: 0,
       pageSize: 12,
       hashtag,
