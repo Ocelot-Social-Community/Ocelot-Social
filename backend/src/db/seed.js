@@ -2,7 +2,7 @@ import sample from 'lodash/sample'
 import { createTestClient } from 'apollo-server-testing'
 import CONFIG from '../config'
 import createServer from '../server'
-import faker from '@faker-js/faker'
+import { faker } from '@faker-js/faker'
 import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
 import {
@@ -173,6 +173,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           },
           {
             email: 'moderator@example.org',
+            avatar: null,
           },
         ),
         Factory.build(
@@ -209,6 +210,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           },
           {
             email: 'dewey@example.org',
+            avatar: null,
           },
         ),
         Factory.build(
