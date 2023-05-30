@@ -389,9 +389,17 @@
     "languages": "Languages",
     "my-groups": "My groups",
     "order": {
+      "last": {
+        "hint": "Sort posts by the last first",
+        "label": "Last first"
+      },
       "newest": {
         "hint": "Sort posts by the newest first",
         "label": "Newest first"
+      },
+      "next": {
+        "hint": "Sort posts by the next first",
+        "label": "Next first"
       },
       "oldest": {
         "hint": "Sort posts by the oldest first",
@@ -403,7 +411,8 @@
     "save": {
       "error": "Failed saving topic settings!",
       "success": "Topics saved!"
-    }
+    },
+    "startDate": "Start date"
   },
   "followButton": {
     "follow": "Follow",

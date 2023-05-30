@@ -48,37 +48,5 @@ export default {
     LabeledButton,
   },
   mixins: [FilterMenuMixin],
-  data() {
-    return {
-      filterPostTypes: ['Article', 'Event'],
-    }
-  },
-  methods: {
-    unsetAllPostTypeFilters() {
-      this.filterPostTypes.forEach((postType) => {
-        if (this.filteredPostTypes.includes(postType)) this.toggleFilterPostType(postType)
-      })
-    },
-    setUnsetPostTypeFilter(setPostType) {
-      if (this.noneSetInPostTypeFilter) {
-        if (setPostType !== 'All') this.toggleFilterPostType(setPostType)
-      } else {
-        if (setPostType !== 'All') {
-          if (this.filteredPostTypes.includes(setPostType)) {
-            this.unsetAllPostTypeFilters()
-          } else {
-            // if 'setPostType' is not set then set it and unset all others
-            this.toggleFilterPostType(setPostType)
-            this.filterPostTypes.forEach((postType) => {
-              if (postType !== setPostType)
-                if (this.filteredPostTypes.includes(postType)) this.toggleFilterPostType(postType)
-            })
-          }
-        } else {
-          this.unsetAllPostTypeFilters()
-        }
-      }
-    },
-  },
 }
 </script>
