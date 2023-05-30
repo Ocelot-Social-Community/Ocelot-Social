@@ -1,5 +1,9 @@
 <template>
-  <filter-menu-section :divider="false" class="order-by-filter">
+  <filter-menu-section
+    class="order-by-filter"
+    :title="$t('filter-menu.creationDate')"
+    :divider="false"
+  >
     <template #filter-list>
       <li class="item">
         <labeled-button
@@ -38,6 +42,7 @@ export default {
   },
   computed: {
     ...mapGetters({
+      filteredPostTypes: 'posts/filteredPostTypes',
       orderBy: 'posts/orderBy',
     }),
   },
