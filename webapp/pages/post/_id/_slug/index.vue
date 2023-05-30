@@ -2,7 +2,7 @@
   <transition name="fade" appear>
     <div>
       <ds-space margin="small">
-        <ds-heading tag="h1">{{ $t('post.viewPost.title') }}</ds-heading>
+        <ds-heading tag="h1">{{ heading }}</ds-heading>
         <ds-heading v-if="post && post.group" tag="h2">
           {{ $t('post.viewPost.forGroup.title', { name: post.group.name }) }}
         </ds-heading>
@@ -54,6 +54,33 @@
             </section>
             <ds-space margin-bottom="small" />
             <h2 class="title hyphenate-text">{{ post.title }}</h2>
+            <!-- Eventdata -->
+            <ds-space
+              v-if="post && post.postType[0] === 'Event'"
+              margin-bottom="small"
+              style="padding: 10px"
+            >
+              <ds-text align="left" color="soft">
+                <base-icon name="map-marker" data-test="map-marker" />
+                <span v-if="post.eventVenue">{{ post.eventVenue }}</span>
+                <span v-if="!post.eventIsOnline">
+                  <span v-if="post.eventVenue">-</span>
+                  {{ post.eventLocationName }}
+                </span>
+                <span v-else>
+                  <span v-if="post.eventVenue">-</span>
+                  {{ $t('post.viewEvent.eventIsOnline') }}
+                </span>
+              </ds-text>
+              <ds-text align="left" color="soft" class="event-info">
+                <base-icon name="calendar" data-test="calendar" />
+                <span>{{ getEventDateString }}</span>
+              </ds-text>
+              <ds-text v-if="getEventTimeString" align="left" color="soft" class="event-info">
+                <base-icon name="clock" data-test="calendar" />
+                <span>{{ getEventTimeString }}</span>
+              </ds-text>
+            </ds-space>
             <ds-space margin-bottom="small" />
             <content-viewer class="content hyphenate-text" :content="post.content" />
             <!-- Categories -->
@@ -147,6 +174,7 @@ import { groupQuery } from '~/graphql/groups'
 import PostMutations from '~/graphql/PostMutations'
 import links from '~/constants/links.js'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
+import { format } from 'date-fns'
 
 export default {
   name: 'PostSlug',
@@ -218,6 +246,10 @@ export default {
         },
       ]
     },
+    heading() {
+      if (this.post?.postType[0] === 'Event') return this.$t('post.viewEvent.title')
+      return this.$t('post.viewPost.title')
+    },
     menuModalsData() {
       return postMenuModalsData(
         // "this.post" may not always be defined at the beginning …
@@ -255,6 +287,27 @@ export default {
       return (
         !this.post.group || (this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole))
       )
+    },
+    getEventDateString() {
+      if (this.post.eventEnd) {
+        const eventStart = format(new Date(this.post.eventStart), 'dd.MM.')
+        const eventEnd = format(new Date(this.post.eventEnd), 'dd.MM.yyyy')
+        return `${eventStart} - ${eventEnd}`
+      } else {
+        return format(new Date(this.post.eventStart), 'dd.MM.yyyy')
+      }
+    },
+    getEventTimeString() {
+      if (this.post.eventEnd) {
+        const eventStartTime = format(new Date(this.post.eventStart), 'HH:mm')
+        const eventEndTime = format(new Date(this.post.eventEnd), 'HH:mm')
+        /*  assumption that if e.g. 00:00 == 00:00 is saved, 
+            it's not realistic because they are the default values, so don't show the time info.
+        */
+        return eventStartTime !== eventEndTime ? `${eventStartTime} - ${eventEndTime}` : ''
+      } else {
+        return format(new Date(this.post.eventStart), 'HH:mm')
+      }
     },
   },
   methods: {
@@ -372,6 +425,12 @@ export default {
 
   &.--blur-image > .hero-image > .image {
     filter: blur($blur-radius);
+  }
+
+  & .event-info {
+    display: flex;
+    align-items: center;
+    gap: 2px;
   }
 
   .blur-toggle {

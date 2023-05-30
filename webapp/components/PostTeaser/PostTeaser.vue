@@ -11,6 +11,7 @@
       }"
       :highlight="isPinned"
     >
+      <!-- {{ post }} -->
       <template v-if="post.image" #heroImage>
         <img :src="post.image | proxyApiUrl" class="image" />
       </template>
@@ -19,11 +20,37 @@
           <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" />
           <hc-ribbon
             :class="[isPinned ? '--pinned' : '', post.image ? 'post-ribbon-w-img' : 'post-ribbon']"
-            :text="isPinned ? $t('post.pinned') : $t('post.name')"
+            :text="ribbonText"
+            :typ="post.postType[0]"
           />
         </div>
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
+      <ds-space
+        v-if="post && post.postType[0] === 'Event'"
+        margin-bottom="small"
+        style="padding: 5px"
+      >
+        <ds-flex>
+          <ds-flex-item>
+            <ds-text align="left" size="small" color="soft" class="event-info">
+              <base-icon name="map-marker" data-test="map-marker" />
+              <span v-if="post.eventIsOnline">
+                {{ $t('post.viewEvent.eventIsOnline') }}
+              </span>
+              <span v-else-if="post.eventLocationName">
+                {{ post.eventLocationName }}
+              </span>
+            </ds-text>
+          </ds-flex-item>
+          <ds-flex-item>
+            <ds-text align="left" color="soft" size="small" class="event-info">
+              <base-icon name="calendar" data-test="calendar" />
+              <span>{{ getEventDateString }}</span>
+            </ds-text>
+          </ds-flex-item>
+        </ds-flex>
+      </ds-space>
       <!-- TODO: replace editor content with tiptap render view -->
       <!-- eslint-disable-next-line vue/no-v-html -->
       <div class="content hyphenate-text" v-html="excerpt" />
@@ -91,6 +118,7 @@ import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
 import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostHelpers'
+import { format } from 'date-fns'
 
 export default {
   name: 'PostTeaser',
@@ -151,6 +179,20 @@ export default {
     },
     isPinned() {
       return this.post && this.post.pinned
+    },
+    ribbonText() {
+      if (this.post.pinned) return this.$t('post.pinned')
+      if (this.post.postType[0] === 'Event') return this.$t('post.event')
+      return this.$t('post.name')
+    },
+    getEventDateString() {
+      if (this.post.eventEnd) {
+        const eventStart = format(new Date(this.post.eventStart), 'dd.MM.')
+        const eventEnd = format(new Date(this.post.eventEnd), 'dd.MM.yyyy')
+        return `${eventStart} - ${eventEnd}`
+      } else {
+        return format(new Date(this.post.eventStart), 'dd.MM.yyyy')
+      }
     },
   },
   methods: {
@@ -234,6 +276,12 @@ export default {
   > .content {
     flex-grow: 1;
     margin-bottom: $space-small;
+  }
+
+  & .event-info {
+    display: flex;
+    align-items: center;
+    gap: 2px;
   }
 
   > .footer {
