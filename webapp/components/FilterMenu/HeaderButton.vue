@@ -44,13 +44,12 @@ export default {
 </script>
 <style lang="scss">
 .my-filter-button-selected {
-  padding-right: 30px;
-  margin-top: 4px;
+  padding-right: 36px;
 }
 
 .base-button.filter-remove {
   position: relative;
-  margin-left: -31px;
+  margin-left: -37px;
   top: -5px;
   margin-right: 8px;
 }
