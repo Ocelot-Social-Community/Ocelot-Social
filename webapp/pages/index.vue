@@ -25,6 +25,8 @@
             <base-button
               class="my-filter-button"
               v-if="
+                !articleSetInPostTypeFilter &&
+                !eventSetInPostTypeFilter &&
                 !postsFilter['categories_some'] &&
                 !postsFilter['author'] &&
                 !postsFilter['postsInMyGroups']
@@ -37,6 +39,22 @@
               &nbsp;
               <base-icon class="my-filter-button" :name="filterButtonIcon"></base-icon>
             </base-button>
+
+            <header-button
+              v-if="articleSetInPostTypeFilter"
+              :title="$t('contribution.filterMasonryGrid.onlyArticles')"
+              :clickButton="openFilterMenu"
+              :titleRemove="$t('filter-menu.deleteFilter')"
+              :clickRemove="unsetAllPostTypeFilters"
+            />
+
+            <header-button
+              v-if="eventSetInPostTypeFilter"
+              :title="$t('contribution.filterMasonryGrid.onlyEvents')"
+              :clickButton="openFilterMenu"
+              :titleRemove="$t('filter-menu.deleteFilter')"
+              :clickRemove="unsetAllPostTypeFilters"
+            />
 
             <header-button
               v-if="postsFilter['categories_some']"
@@ -120,6 +138,8 @@
 
 <script>
 import postListActions from '~/mixins/postListActions'
+import FilterMenuMixin from '~/mixins/filterMenuMixin.js'
+import mobile from '~/mixins/mobile'
 import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter.vue'
 import HcEmpty from '~/components/Empty/Empty'
@@ -134,7 +154,6 @@ import UpdateQuery from '~/components/utils/UpdateQuery'
 import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import { SHOW_CONTENT_FILTER_MASONRY_GRID } from '~/constants/filter.js'
 import { POST_ADD_BUTTON_POSITION_TOP } from '~/constants/posts.js'
-import mobile from '~/mixins/mobile'
 
 export default {
   components: {
@@ -147,7 +166,7 @@ export default {
     FilterMenuComponent,
     HeaderButton,
   },
-  mixins: [postListActions, mobile()],
+  mixins: [postListActions, FilterMenuMixin, mobile()],
   data() {
     const { hashtag = null } = this.$route.query
     return {
@@ -172,13 +191,9 @@ export default {
   computed: {
     ...mapGetters({
       postsFilter: 'posts/filter',
-      orderBy: 'posts/orderBy',
     }),
     filterButtonIcon() {
-      if (Object.keys(this.postsFilter).length === 0) {
-        return this.showFilter ? 'angle-up' : 'angle-down'
-      }
-      return 'close'
+      return this.showFilter ? 'angle-up' : 'angle-down'
     },
     finalFilters() {
       let filter = this.postsFilter
