@@ -197,11 +197,10 @@ export default {
     },
     finalFilters() {
       let filter = this.postsFilter
-      if (this.hashtag) {
-        filter = {
-          ...filter,
-          tags_some: { id: this.hashtag },
-        }
+      filter = {
+        ...filter,
+        tags_some: this.hashtag ? { id: this.hashtag } : undefined,
+        eventStart_gte: this.eventsEnded === 'eventStart_gte' ? new Date() : undefined,
       }
       return filter
     },

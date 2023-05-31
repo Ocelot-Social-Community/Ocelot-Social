@@ -6,6 +6,10 @@
       <post-type-filter />
       <categories-filter v-if="categoriesActive" @showFilterMenu="$emit('showFilterMenu')" />
     </div>
+    <div v-if="eventSetInPostTypeFilter" class="filter-menu-options">
+      <h2 class="title">{{ $t('filter-menu.eventsBy') }}</h2>
+      <events-by-filter />
+    </div>
     <div class="filter-menu-options">
       <h2 class="title">{{ $t('filter-menu.order-by') }}</h2>
       <order-by-filter />
@@ -14,6 +18,8 @@
 </template>
 
 <script>
+import EventsByFilter from './EventsByFilter'
+import FilterMenuMixin from '~/mixins/filterMenuMixin.js'
 import PostTypeFilter from './PostTypeFilter'
 import FollowingFilter from './FollowingFilter'
 import OrderByFilter from './OrderByFilter'
@@ -21,11 +27,13 @@ import CategoriesFilter from './CategoriesFilter'
 
 export default {
   components: {
+    EventsByFilter,
     FollowingFilter,
     OrderByFilter,
     CategoriesFilter,
     PostTypeFilter,
   },
+  mixins: [FilterMenuMixin],
   data() {
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,

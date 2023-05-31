@@ -14,6 +14,7 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
       filteredPostTypes: 'posts/filteredPostTypes',
+      eventsEnded: 'posts/eventsEnded',
       orderBy: 'posts/orderBy',
     }),
     noneSetInPostTypeFilter() {
@@ -32,15 +33,19 @@ export default {
   methods: {
     ...mapMutations({
       toggleFilterPostType: 'posts/TOGGLE_POST_TYPE',
+      toggleEventsEnded: 'posts/TOGGLE_EVENTS_ENDED',
       toggleOrder: 'posts/TOGGLE_ORDER',
     }),
     unsetAllPostTypeFilters() {
+      const beforeEventSetInPostTypeFilter = this.eventSetInPostTypeFilter
       this.filterPostTypes.forEach((postType) => {
         if (this.filteredPostTypes.includes(postType)) this.toggleFilterPostType(postType)
       })
+      this.adjustEventsEnded(beforeEventSetInPostTypeFilter)
       this.adjustOrder()
     },
     setUnsetPostTypeFilter(setPostType) {
+      const beforeEventSetInPostTypeFilter = this.eventSetInPostTypeFilter
       if (this.noneSetInPostTypeFilter) {
         if (setPostType !== 'All') this.toggleFilterPostType(setPostType)
       } else {
@@ -59,10 +64,23 @@ export default {
           this.unsetAllPostTypeFilters()
         }
       }
+      this.adjustEventsEnded(beforeEventSetInPostTypeFilter)
       this.adjustOrder()
+    },
+    setEventsEnded(newEventsEnded) {
+      this.toggleEventsEnded(newEventsEnded)
     },
     setOrder(newOrder) {
       this.toggleOrder(newOrder)
+    },
+    adjustEventsEnded(beforeEventSetInPostTypeFilter) {
+      if (this.eventSetInPostTypeFilter !== beforeEventSetInPostTypeFilter) {
+        if (this.eventSetInPostTypeFilter) {
+          this.setEventsEnded('eventStart_gte')
+        } else {
+          this.setEventsEnded('')
+        }
+      }
     },
     adjustOrder() {
       if (this.orderedByCreationDate) {
