@@ -12,6 +12,7 @@
         <contribution-form
           :contribution="contribution"
           :group="contribution && contribution.group ? contribution.group : null"
+          :creatEvent="contribution && contribution.postType[0] === 'Event'"
         />
       </ds-flex-item>
       <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
