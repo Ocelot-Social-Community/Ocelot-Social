@@ -18,9 +18,13 @@ describe('create.vue', () => {
     },
   }
 
+  const stubs = {
+    ContributionForm: true,
+  }
+
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(create, { mocks, localVue })
+      return mount(create, { mocks, localVue, stubs })
     }
 
     beforeEach(() => {
@@ -28,7 +32,7 @@ describe('create.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.findAll('.contribution-form')).toHaveLength(1)
+      expect(wrapper.findComponent({ name: 'ContributionForm' }).exists()).toBe(true)
     })
   })
 })
