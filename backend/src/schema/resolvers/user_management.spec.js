@@ -283,6 +283,7 @@ describe('login', () => {
 
         it('responds with "Your account has been disabled."', async () => {
           await respondsWith({
+            data: null,
             errors: [{ message: 'Your account has been disabled.' }],
           })
         })
