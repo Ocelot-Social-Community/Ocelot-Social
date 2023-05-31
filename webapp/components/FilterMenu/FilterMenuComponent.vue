@@ -3,6 +3,7 @@
     <div class="filter-menu-options">
       <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
       <following-filter />
+      <post-type-filter />
       <categories-filter v-if="categoriesActive" @showFilterMenu="$emit('showFilterMenu')" />
     </div>
     <div class="filter-menu-options">
@@ -13,6 +14,7 @@
 </template>
 
 <script>
+import PostTypeFilter from './PostTypeFilter'
 import FollowingFilter from './FollowingFilter'
 import OrderByFilter from './OrderByFilter'
 import CategoriesFilter from './CategoriesFilter'
@@ -22,6 +24,7 @@ export default {
     FollowingFilter,
     OrderByFilter,
     CategoriesFilter,
+    PostTypeFilter,
   },
   data() {
     return {

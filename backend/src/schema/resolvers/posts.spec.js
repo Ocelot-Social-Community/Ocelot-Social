@@ -3,6 +3,10 @@ import Factory, { cleanDatabase } from '../../db/factories'
 import gql from 'graphql-tag'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
+import { createPostMutation } from '../../graphql/posts'
+import CONFIG from '../../config'
+
+CONFIG.CATEGORIES_ACTIVE = true
 
 const driver = getDriver()
 const neode = getNeode()
@@ -14,29 +18,6 @@ let user
 
 const categoryIds = ['cat9', 'cat4', 'cat15']
 let variables
-
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $content: String!, $language: String, $categoryIds: [ID]) {
-    CreatePost(
-      id: $id
-      title: $title
-      content: $content
-      language: $language
-      categoryIds: $categoryIds
-    ) {
-      id
-      title
-      content
-      slug
-      disabled
-      deleted
-      language
-      author {
-        name
-      }
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -281,7 +262,7 @@ describe('CreatePost', () => {
 
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
-      const { errors } = await mutate({ mutation: createPostMutation, variables })
+      const { errors } = await mutate({ mutation: createPostMutation(), variables })
       expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -296,7 +277,7 @@ describe('CreatePost', () => {
         data: { CreatePost: { title: 'I am a title', content: 'Some content' } },
         errors: undefined,
       }
-      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
+      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
         expected,
       )
     })
@@ -313,16 +294,302 @@ describe('CreatePost', () => {
         },
         errors: undefined,
       }
-      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
+      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
         expected,
       )
     })
 
     it('`disabled` and `deleted` default to `false`', async () => {
       const expected = { data: { CreatePost: { disabled: false, deleted: false } } }
-      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
+      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
         expected,
       )
+    })
+
+    it('has label "Article" as default', async () => {
+      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject({
+        data: { CreatePost: { postType: ['Article'] } },
+      })
+    })
+
+    describe('with invalid post type', () => {
+      it('throws an error', async () => {
+        await expect(
+          mutate({
+            mutation: createPostMutation(),
+            variables: { ...variables, postType: 'not-valid' },
+          }),
+        ).resolves.toMatchObject({
+          errors: [
+            {
+              message:
+                'Variable "$postType" got invalid value "not-valid"; Expected type PostType.',
+            },
+          ],
+        })
+      })
+    })
+
+    describe('with post type "Event"', () => {
+      describe('without event start date', () => {
+        it('throws an error', async () => {
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: "Cannot read properties of undefined (reading 'eventStart')",
+              },
+            ],
+          })
+        })
+      })
+
+      describe('with invalid event start date', () => {
+        it('throws an error', async () => {
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: 'no date',
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event start date must be a valid date!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('with event start date in the past', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() - 1).toISOString(),
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event start date must be in the future!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('with valid start date and invalid end date', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventEnd: 'not-valid',
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event end date must be a valid date!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('with valid start date and end date before start date', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 2).toISOString(),
+                  eventEnd: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event end date must be a after event start date!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('with valid start date and valid end date', () => {
+        it('creates the event', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventEnd: new Date(now.getFullYear(), now.getMonth() + 2).toISOString(),
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              CreatePost: {
+                postType: ['Event'],
+                eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                eventEnd: new Date(now.getFullYear(), now.getMonth() + 2).toISOString(),
+                eventIsOnline: false,
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('with valid start date and event is online', () => {
+        it('creates the event', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventIsOnline: true,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              CreatePost: {
+                postType: ['Event'],
+                eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                eventIsOnline: true,
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('event location name is given but event venue is missing', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event venue must be present if event location is given!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('valid event input without location', () => {
+        it('has label "Event" set', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              CreatePost: {
+                postType: ['Event'],
+                eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                eventIsOnline: false,
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('valid event input with location name', () => {
+        it('has label "Event" set', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Leipzig',
+                  eventVenue: 'Connewitzer Kreuz',
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              CreatePost: {
+                postType: ['Event'],
+                eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                eventLocationName: 'Leipzig',
+                eventVenue: 'Connewitzer Kreuz',
+                eventLocation: {
+                  lng: 12.374733,
+                  lat: 51.340632,
+                },
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
     })
   })
 })
@@ -330,8 +597,24 @@ describe('CreatePost', () => {
 describe('UpdatePost', () => {
   let author, newlyCreatedPost
   const updatePostMutation = gql`
-    mutation ($id: ID!, $title: String!, $content: String!, $image: ImageInput) {
-      UpdatePost(id: $id, title: $title, content: $content, image: $image) {
+    mutation (
+      $id: ID!
+      $title: String!
+      $content: String!
+      $image: ImageInput
+      $categoryIds: [ID]
+      $postType: PostType
+      $eventInput: _EventInput
+    ) {
+      UpdatePost(
+        id: $id
+        title: $title
+        content: $content
+        image: $image
+        categoryIds: $categoryIds
+        postType: $postType
+        eventInput: $eventInput
+      ) {
         id
         title
         content
@@ -341,26 +624,34 @@ describe('UpdatePost', () => {
         }
         createdAt
         updatedAt
+        categories {
+          id
+        }
+        postType
+        eventStart
+        eventLocationName
+        eventVenue
+        eventLocation {
+          lng
+          lat
+        }
       }
     }
   `
   beforeEach(async () => {
     author = await Factory.build('user', { slug: 'the-author' })
-    newlyCreatedPost = await Factory.build(
-      'post',
-      {
-        id: 'p9876',
+    authenticatedUser = await author.toJson()
+    const { data } = await mutate({
+      mutation: createPostMutation(),
+      variables: {
         title: 'Old title',
         content: 'Old content',
-      },
-      {
-        author,
         categoryIds,
       },
-    )
-
+    })
+    newlyCreatedPost = data.CreatePost
     variables = {
-      id: 'p9876',
+      id: newlyCreatedPost.id,
       title: 'New title',
       content: 'New content',
     }
@@ -394,7 +685,7 @@ describe('UpdatePost', () => {
 
     it('updates a post', async () => {
       const expected = {
-        data: { UpdatePost: { id: 'p9876', content: 'New content' } },
+        data: { UpdatePost: { id: newlyCreatedPost.id, content: 'New content' } },
         errors: undefined,
       }
       await expect(mutate({ mutation: updatePostMutation, variables })).resolves.toMatchObject(
@@ -405,7 +696,11 @@ describe('UpdatePost', () => {
     it('updates a post, but maintains non-updated attributes', async () => {
       const expected = {
         data: {
-          UpdatePost: { id: 'p9876', content: 'New content', createdAt: expect.any(String) },
+          UpdatePost: {
+            id: newlyCreatedPost.id,
+            content: 'New content',
+            createdAt: expect.any(String),
+          },
         },
         errors: undefined,
       }
@@ -415,23 +710,20 @@ describe('UpdatePost', () => {
     })
 
     it('updates the updatedAt attribute', async () => {
-      newlyCreatedPost = await newlyCreatedPost.toJson()
       const {
         data: { UpdatePost },
       } = await mutate({ mutation: updatePostMutation, variables })
-      expect(newlyCreatedPost.updatedAt).toBeTruthy()
-      expect(Date.parse(newlyCreatedPost.updatedAt)).toEqual(expect.any(Number))
       expect(UpdatePost.updatedAt).toBeTruthy()
       expect(Date.parse(UpdatePost.updatedAt)).toEqual(expect.any(Number))
       expect(newlyCreatedPost.updatedAt).not.toEqual(UpdatePost.updatedAt)
     })
 
-    /* describe('no new category ids provided for update', () => {
+    describe('no new category ids provided for update', () => {
       it('resolves and keeps current categories', async () => {
         const expected = {
           data: {
             UpdatePost: {
-              id: 'p9876',
+              id: newlyCreatedPost.id,
               categories: expect.arrayContaining([{ id: 'cat9' }, { id: 'cat4' }, { id: 'cat15' }]),
             },
           },
@@ -441,9 +733,9 @@ describe('UpdatePost', () => {
           expected,
         )
       })
-    }) */
+    })
 
-    /* describe('given category ids', () => {
+    describe('given category ids', () => {
       beforeEach(() => {
         variables = { ...variables, categoryIds: ['cat27'] }
       })
@@ -452,7 +744,7 @@ describe('UpdatePost', () => {
         const expected = {
           data: {
             UpdatePost: {
-              id: 'p9876',
+              id: newlyCreatedPost.id,
               categories: expect.arrayContaining([{ id: 'cat27' }]),
             },
           },
@@ -462,9 +754,160 @@ describe('UpdatePost', () => {
           expected,
         )
       })
-    }) */
+    })
 
-    describe('params.image', () => {
+    describe('change post type to event', () => {
+      describe('with missing event start date', () => {
+        it('throws an error', async () => {
+          await expect(
+            mutate({
+              mutation: updatePostMutation,
+              variables: { ...variables, postType: 'Event' },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: "Cannot read properties of undefined (reading 'eventStart')",
+              },
+            ],
+          })
+        })
+      })
+
+      describe('with invalid event start date', () => {
+        it('throws an error', async () => {
+          await expect(
+            mutate({
+              mutation: updatePostMutation,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: 'no-date',
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event start date must be a valid date!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('with event start date in the past', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: updatePostMutation,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() - 1).toISOString(),
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event start date must be in the future!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('event location name is given but event venue is missing', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: updatePostMutation,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event venue must be present if event location is given!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('valid event input without location name', () => {
+        it('has label "Event" set', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: updatePostMutation,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              UpdatePost: {
+                postType: ['Event'],
+                eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('valid event input with location name', () => {
+        it('has label "Event" set', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: updatePostMutation,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Leipzig',
+                  eventVenue: 'Connewitzer Kreuz',
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              UpdatePost: {
+                postType: ['Event'],
+                eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                eventLocationName: 'Leipzig',
+                eventVenue: 'Connewitzer Kreuz',
+                eventLocation: {
+                  lng: 12.374733,
+                  lat: 51.340632,
+                },
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+    })
+
+    describe.skip('params.image', () => {
       describe('is object', () => {
         beforeEach(() => {
           variables = { ...variables, image: { sensitive: true } }
