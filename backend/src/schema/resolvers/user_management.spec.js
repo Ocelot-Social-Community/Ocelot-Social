@@ -270,6 +270,7 @@ describe('login', () => {
 
         it('responds with "Incorrect email address or password."', async () => {
           await respondsWith({
+            data: null,
             errors: [{ message: 'Incorrect email address or password.' }],
           })
         })
