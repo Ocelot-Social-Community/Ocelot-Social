@@ -272,7 +272,9 @@
       "myFriends": "Users I follow",
       "myGroups": "By my groups",
       "myTopics": "My topics",
-      "noFilter": "Filter content"
+      "noFilter": "Filter content",
+      "onlyArticles": "Only articles",
+      "onlyEvents": "Only events"
     },
     "filterMyGroups": "Contributions in my groups",
     "inappropriatePicture": "This image may be inappropriate for some people.",
