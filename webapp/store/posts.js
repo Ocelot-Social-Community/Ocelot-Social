@@ -63,6 +63,12 @@ export const mutations = {
     if (isEmpty(get(filter, 'categories_some.id_in'))) delete filter.categories_some
     state.filter = filter
   },
+  TOGGLE_POST_TYPE(state, postType) {
+    const filter = clone(state.filter)
+    update(filter, 'postType_in', (postTypes) => xor(postTypes, [postType]))
+    if (isEmpty(get(filter, 'postType_in'))) delete filter.postType_in
+    state.filter = filter
+  },
   TOGGLE_LANGUAGE(state, languageCode) {
     const filter = clone(state.filter)
     update(filter, 'language_in', (languageCodes) => xor(languageCodes, [languageCode]))
@@ -89,6 +95,9 @@ export const getters = {
   },
   filteredCategoryIds(state) {
     return get(state.filter, 'categories_some.id_in') || []
+  },
+  filteredPostTypes(state) {
+    return get(state.filter, 'postType_in') || []
   },
   filteredLanguageCodes(state) {
     return get(state.filter, 'language_in') || []
