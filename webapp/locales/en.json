@@ -385,7 +385,19 @@
     "creationDate": "Creation date",
     "deleteFilter": "Delete filter",
     "emotions": "Emotions",
+    "ended": {
+      "all": {
+        "hint": "Show all, also ended",
+        "label": "All"
+      },
+      "onlyEnded": {
+        "hint": "Show only not ended",
+        "label": "Not ended"
+      }
+    },
     "event": "Event",
+    "eventsBy": "Events – show ...",
+    "eventsEnded": "Ended",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
     "languages": "Languages",

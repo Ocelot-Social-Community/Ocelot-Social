@@ -385,7 +385,19 @@
     "creationDate": "Erstellungszeitpunkt",
     "deleteFilter": "Filter löschen",
     "emotions": "Emotionen",
+    "ended": {
+      "all": {
+        "hint": "Zeige alle, auch beendete",
+        "label": "Alle"
+      },
+      "onlyEnded": {
+        "hint": "Zeige nur noch nicht beendete",
+        "label": "Nicht beendete"
+      }
+    },
     "event": "Veranstaltung",
+    "eventsBy": "Veranstaltungen – zeige ...",
+    "eventsEnded": "Beendet",
     "filter-by": "Filtern nach ...",
     "following": "Nutzer denen ich folge",
     "languages": "Sprachen",

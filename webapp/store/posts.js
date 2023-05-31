@@ -13,6 +13,7 @@ export const state = () => {
       ...defaultFilter,
     },
     order: 'createdAt_desc',
+    eventsEnded: '',
   }
 }
 
@@ -84,6 +85,9 @@ export const mutations = {
   TOGGLE_ORDER(state, value) {
     state.order = value
   },
+  TOGGLE_EVENTS_ENDED(state, value) {
+    state.eventsEnded = value
+  },
 }
 
 export const getters = {
@@ -110,6 +114,9 @@ export const getters = {
   },
   filteredByEmotions(state) {
     return get(state.filter, 'emotions_some.emotion_in') || []
+  },
+  eventsEnded(state) {
+    return state.eventsEnded
   },
   orderBy(state) {
     return state.order
