@@ -15,6 +15,7 @@ describe('FilterMenu.vue', () => {
 
   const getters = {
     'posts/isActive': () => false,
+    'posts/filteredPostTypes': () => [],
     'posts/orderBy': () => 'createdAt_desc',
   }
 
