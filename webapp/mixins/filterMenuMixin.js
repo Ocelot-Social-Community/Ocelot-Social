@@ -56,8 +56,8 @@ export default {
             // if 'setPostType' is not set then set it and unset all others
             this.toggleFilterPostType(setPostType)
             this.filterPostTypes.forEach((postType) => {
-              if (postType !== setPostType)
-                if (this.filteredPostTypes.includes(postType)) this.toggleFilterPostType(postType)
+              if (postType !== setPostType && this.filteredPostTypes.includes(postType))
+                this.toggleFilterPostType(postType)
             })
           }
         } else {
