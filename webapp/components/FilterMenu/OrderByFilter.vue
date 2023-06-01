@@ -7,7 +7,7 @@
           :label="buttonLabel('desc')"
           :filled="orderBy === orderedDesc"
           :title="buttonTitle('desc')"
-          @click="setOrder(orderedDesc)"
+          @click="toggleOrder(orderedDesc)"
           data-test="newest-button"
         />
       </li>
@@ -17,7 +17,7 @@
           :label="buttonLabel('asc')"
           :filled="orderBy === orderedAsc"
           :title="buttonTitle('asc')"
-          @click="setOrder(orderedAsc)"
+          @click="toggleOrder(orderedAsc)"
           data-test="oldest-button"
         />
       </li>
