@@ -7,6 +7,22 @@ import clone from 'lodash/clone'
 
 const defaultFilter = {}
 
+const filteredPostTypes = (state) => {
+  return get(state.filter, 'postType_in') || []
+}
+const noneSetInPostTypeFilter = (state) => {
+  return !articleSetInPostTypeFilter(state) && !eventSetInPostTypeFilter(state)
+}
+const articleSetInPostTypeFilter = (state) => {
+  return filteredPostTypes(state).includes('Article')
+}
+const eventSetInPostTypeFilter = (state) => {
+  return filteredPostTypes(state).includes('Event')
+}
+const orderedByCreationDate = (state) => {
+  return noneSetInPostTypeFilter(state) || articleSetInPostTypeFilter(state)
+}
+
 export const state = () => {
   return {
     filter: {
@@ -100,9 +116,7 @@ export const getters = {
   filteredCategoryIds(state) {
     return get(state.filter, 'categories_some.id_in') || []
   },
-  filteredPostTypes(state) {
-    return get(state.filter, 'postType_in') || []
-  },
+  filteredPostTypes,
   filteredLanguageCodes(state) {
     return get(state.filter, 'language_in') || []
   },
@@ -115,6 +129,10 @@ export const getters = {
   filteredByEmotions(state) {
     return get(state.filter, 'emotions_some.emotion_in') || []
   },
+  noneSetInPostTypeFilter,
+  articleSetInPostTypeFilter,
+  eventSetInPostTypeFilter,
+  orderedByCreationDate,
   eventsEnded(state) {
     return state.eventsEnded
   },
