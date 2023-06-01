@@ -28,8 +28,6 @@ const TOGGLE_POST_TYPE = (state, postType) => {
   if (isEmpty(get(filter, 'postType_in'))) delete filter.postType_in
   state.filter = filter
 }
-
-// Wolle
 const TOGGLE_UNSET_ALL_POST_TYPES_FILTERS = (state) => {
   const beforeEventSetInPostTypeFilter = eventSetInPostTypeFilter(state)
   filterPostTypes.forEach((postType) => {
@@ -38,29 +36,29 @@ const TOGGLE_UNSET_ALL_POST_TYPES_FILTERS = (state) => {
   adjustEventsEnded(state, beforeEventSetInPostTypeFilter)
   adjustOrder(state)
 }
-// const setUnsetPostTypeFilter = (state, setPostType) => {
-//   const beforeEventSetInPostTypeFilter = this.eventSetInPostTypeFilter
-//   if (this.noneSetInPostTypeFilter) {
-//     if (setPostType !== 'All') this.toggleFilterPostType(setPostType)
-//   } else {
-//     if (setPostType !== 'All') {
-//       if (this.filteredPostTypes.includes(setPostType)) {
-//         TOGGLE_UNSET_ALL_POST_TYPES_FILTERS(state)
-//       } else {
-//         // if 'setPostType' is not set then set it and unset all others
-//         this.toggleFilterPostType(setPostType)
-//         this.filterPostTypes.forEach((postType) => {
-//           if (postType !== setPostType && this.filteredPostTypes.includes(postType))
-//             this.toggleFilterPostType(postType)
-//         })
-//       }
-//     } else {
-//       TOGGLE_UNSET_ALL_POST_TYPES_FILTERS(state)
-//     }
-//   }
-//   this.adjustEventsEnded(beforeEventSetInPostTypeFilter)
-//   this.adjustOrder()
-// }
+const TOGGLE_SET_UNSET_POST_TYPE_FILTER = (state, setPostType) => {
+  const beforeEventSetInPostTypeFilter = eventSetInPostTypeFilter(state)
+  if (noneSetInPostTypeFilter(state)) {
+    if (setPostType !== 'All') TOGGLE_POST_TYPE(state, setPostType)
+  } else {
+    if (setPostType !== 'All') {
+      if (filteredPostTypes(state).includes(setPostType)) {
+        TOGGLE_UNSET_ALL_POST_TYPES_FILTERS(state)
+      } else {
+        // if 'setPostType' is not set then set it and unset all others
+        TOGGLE_POST_TYPE(state, setPostType)
+        filterPostTypes.forEach((postType) => {
+          if (postType !== setPostType && filteredPostTypes(state).includes(postType))
+            TOGGLE_POST_TYPE(state, postType)
+        })
+      }
+    } else {
+      TOGGLE_UNSET_ALL_POST_TYPES_FILTERS(state)
+    }
+  }
+  adjustEventsEnded(state, beforeEventSetInPostTypeFilter)
+  adjustOrder(state)
+}
 const TOGGLE_EVENTS_ENDED = (state, value) => {
   state.eventsEnded = value
 }
@@ -168,6 +166,7 @@ export const mutations = {
   },
   TOGGLE_POST_TYPE,
   TOGGLE_UNSET_ALL_POST_TYPES_FILTERS,
+  TOGGLE_SET_UNSET_POST_TYPE_FILTER,
   TOGGLE_EVENTS_ENDED,
   TOGGLE_ORDER,
 }
