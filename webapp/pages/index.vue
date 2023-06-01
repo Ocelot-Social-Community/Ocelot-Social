@@ -191,6 +191,7 @@ export default {
   computed: {
     ...mapGetters({
       postsFilter: 'posts/filter',
+      eventsEnded: 'posts/eventsEnded',
     }),
     filterButtonIcon() {
       return this.showFilter ? 'angle-up' : 'angle-down'
