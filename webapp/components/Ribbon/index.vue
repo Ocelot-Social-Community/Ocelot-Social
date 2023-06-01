@@ -48,10 +48,10 @@ export default {
   }
 }
 .eventBg {
-  background-color: $color-success-active;
+  background-color: $color-third;
 
   &::before {
-    border-color: $color-success-active transparent transparent $color-success-active;
+    border-color: $color-third transparent transparent $color-third;
   }
 }
 </style>
