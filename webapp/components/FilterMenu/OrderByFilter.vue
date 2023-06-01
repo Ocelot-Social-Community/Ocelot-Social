@@ -63,28 +63,14 @@ export default {
       }
     },
     buttonTitle(buttonType) {
-      let title
       switch (buttonType) {
         case 'asc':
-          if (this.orderedByCreationDate) {
-            title = this.$t('filter-menu.order.oldest.hint')
-          } else {
-            title = this.$t('filter-menu.order.last.hint')
-          }
-          break
+          return this.orderedByCreationDate ? this.$t('filter-menu.order.oldest.hint') : this.$t('filter-menu.order.last.hint')
         case 'desc':
-          if (this.orderedByCreationDate) {
-            title = this.$t('filter-menu.order.newest.hint')
-          } else {
-            title = this.$t('filter-menu.order.next.hint')
-          }
-          break
-
+          return this.orderedByCreationDate ? this.$t('filter-menu.order.newest.hint') : this.$t('filter-menu.order.next.hint')
         default:
-          title = ''
-          break
+          return ''
       }
-      return title
     },
   },
 }
