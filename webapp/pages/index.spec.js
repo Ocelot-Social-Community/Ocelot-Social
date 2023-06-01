@@ -28,6 +28,7 @@ describe('PostIndex', () => {
     store = new Vuex.Store({
       getters: {
         'posts/filter': () => ({}),
+        'posts/filteredPostTypes': () => [],
         'posts/orderBy': () => 'createdAt_desc',
         'auth/user': () => {
           return { id: 'u23' }
