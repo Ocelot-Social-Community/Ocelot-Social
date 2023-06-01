@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import FilterMenuMixin from '~/mixins/filterMenuMixin.js'
+import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
 
@@ -47,6 +47,17 @@ export default {
     FilterMenuSection,
     LabeledButton,
   },
-  mixins: [FilterMenuMixin],
+  computed: {
+    ...mapGetters({
+      noneSetInPostTypeFilter: 'posts/noneSetInPostTypeFilter',
+      articleSetInPostTypeFilter: 'posts/articleSetInPostTypeFilter',
+      eventSetInPostTypeFilter: 'posts/eventSetInPostTypeFilter',
+    }),
+  },
+  methods: {
+    ...mapMutations({
+      toggleSetUnsetPostTypeFilter: 'posts/TOGGLE_SET_UNSET_POST_TYPE_FILTER',
+    }),
+  },
 }
 </script>

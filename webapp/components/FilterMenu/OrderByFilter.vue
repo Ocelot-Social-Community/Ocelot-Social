@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import FilterMenuMixin from '~/mixins/filterMenuMixin.js'
+import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
 
@@ -36,8 +36,11 @@ export default {
     FilterMenuSection,
     LabeledButton,
   },
-  mixins: [FilterMenuMixin],
   computed: {
+    ...mapGetters({
+      orderedByCreationDate: 'posts/orderedByCreationDate',
+      orderBy: 'posts/orderBy',
+    }),
     orderedAsc() {
       return this.orderedByCreationDate ? 'createdAt_asc' : 'eventStart_desc'
     },
@@ -51,6 +54,9 @@ export default {
     },
   },
   methods: {
+    ...mapMutations({
+      toggleOrder: 'posts/TOGGLE_ORDER',
+    }),
     buttonLabel(buttonType) {
       switch (buttonType) {
         case 'asc':

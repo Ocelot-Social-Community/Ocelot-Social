@@ -138,7 +138,6 @@
 
 <script>
 import postListActions from '~/mixins/postListActions'
-import FilterMenuMixin from '~/mixins/filterMenuMixin.js'
 import mobile from '~/mixins/mobile'
 import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter.vue'
@@ -166,7 +165,7 @@ export default {
     FilterMenuComponent,
     HeaderButton,
   },
-  mixins: [postListActions, FilterMenuMixin, mobile()],
+  mixins: [postListActions, mobile()],
   data() {
     const { hashtag = null } = this.$route.query
     return {
@@ -191,7 +190,10 @@ export default {
   computed: {
     ...mapGetters({
       postsFilter: 'posts/filter',
+      articleSetInPostTypeFilter: 'posts/articleSetInPostTypeFilter',
+      eventSetInPostTypeFilter: 'posts/eventSetInPostTypeFilter',
       eventsEnded: 'posts/eventsEnded',
+      orderBy: 'posts/orderBy',
     }),
     filterButtonIcon() {
       return this.showFilter ? 'angle-up' : 'angle-down'
@@ -223,6 +225,8 @@ export default {
   },
   methods: {
     ...mapMutations({
+      toggleUnsetAllPostTypeFilters: 'posts/TOGGLE_UNSET_ALL_POST_TYPES_FILTERS',
+      toggleSetUnsetPostTypeFilter: 'posts/TOGGLE_SET_UNSET_POST_TYPE_FILTER',
       resetByFollowed: 'posts/TOGGLE_FILTER_BY_FOLLOWED',
       resetByGroups: 'posts/TOGGLE_FILTER_BY_MY_GROUPS',
       resetCategories: 'posts/RESET_CATEGORIES',
