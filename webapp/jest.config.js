@@ -20,7 +20,7 @@ module.exports = {
       lines: 83,
     },
   },
-  coverageProvider: "v8",
+  coverageProvider: 'v8',
   setupFiles: ['<rootDir>/test/registerContext.js', '<rootDir>/test/testSetup.js'],
   transform: {
     '.*\\.(vue)$': '@vue/vue2-jest',
