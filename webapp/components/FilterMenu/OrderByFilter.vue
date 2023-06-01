@@ -55,25 +55,12 @@ export default {
       let title
       switch (buttonType) {
         case 'asc':
-          if (this.orderedByCreationDate) {
-            title = this.$t('filter-menu.order.oldest.label')
-          } else {
-            title = this.$t('filter-menu.order.last.label')
-          }
-          break
+          return this.orderedByCreationDate ? this.$t('filter-menu.order.oldest.label') : this.$t('filter-menu.order.last.label')
         case 'desc':
-          if (this.orderedByCreationDate) {
-            title = this.$t('filter-menu.order.newest.label')
-          } else {
-            title = this.$t('filter-menu.order.next.label')
-          }
-          break
-
+          return this.orderedByCreationDate ? this.$t('filter-menu.order.newest.label') : this.$t('filter-menu.order.next.label')
         default:
-          title = ''
-          break
+          return ''
       }
-      return title
     },
     buttonTitle(buttonType) {
       let title
