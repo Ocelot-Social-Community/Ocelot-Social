@@ -6,6 +6,87 @@ import isEqual from 'lodash/isEqual'
 import clone from 'lodash/clone'
 
 const defaultFilter = {}
+const filterPostTypes = ['Article', 'Event']
+const orderByTypes = {
+  creationDate: ['createdAt_asc', 'createdAt_desc'],
+  startDate: ['eventStart_asc', 'eventStart_desc'],
+}
+
+export const state = () => {
+  return {
+    filter: {
+      ...defaultFilter,
+    },
+    order: 'createdAt_desc',
+    eventsEnded: '',
+  }
+}
+
+const TOGGLE_POST_TYPE = (state, postType) => {
+  const filter = clone(state.filter)
+  update(filter, 'postType_in', (postTypes) => xor(postTypes, [postType]))
+  if (isEmpty(get(filter, 'postType_in'))) delete filter.postType_in
+  state.filter = filter
+}
+
+// Wolle
+const TOGGLE_UNSET_ALL_POST_TYPES_FILTERS = (state) => {
+  const beforeEventSetInPostTypeFilter = eventSetInPostTypeFilter(state)
+  filterPostTypes.forEach((postType) => {
+    if (filteredPostTypes(state).includes(postType)) TOGGLE_POST_TYPE(state, postType)
+  })
+  adjustEventsEnded(state, beforeEventSetInPostTypeFilter)
+  adjustOrder(state)
+}
+// const setUnsetPostTypeFilter = (state, setPostType) => {
+//   const beforeEventSetInPostTypeFilter = this.eventSetInPostTypeFilter
+//   if (this.noneSetInPostTypeFilter) {
+//     if (setPostType !== 'All') this.toggleFilterPostType(setPostType)
+//   } else {
+//     if (setPostType !== 'All') {
+//       if (this.filteredPostTypes.includes(setPostType)) {
+//         TOGGLE_UNSET_ALL_POST_TYPES_FILTERS(state)
+//       } else {
+//         // if 'setPostType' is not set then set it and unset all others
+//         this.toggleFilterPostType(setPostType)
+//         this.filterPostTypes.forEach((postType) => {
+//           if (postType !== setPostType && this.filteredPostTypes.includes(postType))
+//             this.toggleFilterPostType(postType)
+//         })
+//       }
+//     } else {
+//       TOGGLE_UNSET_ALL_POST_TYPES_FILTERS(state)
+//     }
+//   }
+//   this.adjustEventsEnded(beforeEventSetInPostTypeFilter)
+//   this.adjustOrder()
+// }
+const TOGGLE_EVENTS_ENDED = (state, value) => {
+  state.eventsEnded = value
+}
+const TOGGLE_ORDER = (state, value) => {
+  state.order = value
+}
+const adjustEventsEnded = (state, beforeEventSetInPostTypeFilter) => {
+  if (eventSetInPostTypeFilter(state) !== beforeEventSetInPostTypeFilter) {
+    if (eventSetInPostTypeFilter(state)) {
+      TOGGLE_EVENTS_ENDED(state, 'eventStart_gte')
+    } else {
+      TOGGLE_EVENTS_ENDED(state, '')
+    }
+  }
+}
+const adjustOrder = (state) => {
+  if (orderedByCreationDate(state)) {
+    if (!orderByTypes.creationDate.includes(orderBy(state))) {
+      TOGGLE_ORDER(state, 'createdAt_desc')
+    }
+  } else {
+    if (!orderByTypes.startDate.includes(orderBy(state))) {
+      TOGGLE_ORDER(state, 'eventStart_asc')
+    }
+  }
+}
 
 const filteredPostTypes = (state) => {
   return get(state.filter, 'postType_in') || []
@@ -22,15 +103,8 @@ const eventSetInPostTypeFilter = (state) => {
 const orderedByCreationDate = (state) => {
   return noneSetInPostTypeFilter(state) || articleSetInPostTypeFilter(state)
 }
-
-export const state = () => {
-  return {
-    filter: {
-      ...defaultFilter,
-    },
-    order: 'createdAt_desc',
-    eventsEnded: '',
-  }
+const orderBy = (state) => {
+  return state.order
 }
 
 export const mutations = {
@@ -80,12 +154,6 @@ export const mutations = {
     if (isEmpty(get(filter, 'categories_some.id_in'))) delete filter.categories_some
     state.filter = filter
   },
-  TOGGLE_POST_TYPE(state, postType) {
-    const filter = clone(state.filter)
-    update(filter, 'postType_in', (postTypes) => xor(postTypes, [postType]))
-    if (isEmpty(get(filter, 'postType_in'))) delete filter.postType_in
-    state.filter = filter
-  },
   TOGGLE_LANGUAGE(state, languageCode) {
     const filter = clone(state.filter)
     update(filter, 'language_in', (languageCodes) => xor(languageCodes, [languageCode]))
@@ -98,12 +166,10 @@ export const mutations = {
     if (isEmpty(get(filter, 'emotions_some.emotion_in'))) delete filter.emotions_some
     state.filter = filter
   },
-  TOGGLE_ORDER(state, value) {
-    state.order = value
-  },
-  TOGGLE_EVENTS_ENDED(state, value) {
-    state.eventsEnded = value
-  },
+  TOGGLE_POST_TYPE,
+  TOGGLE_UNSET_ALL_POST_TYPES_FILTERS,
+  TOGGLE_EVENTS_ENDED,
+  TOGGLE_ORDER,
 }
 
 export const getters = {
@@ -136,7 +202,5 @@ export const getters = {
   eventsEnded(state) {
     return state.eventsEnded
   },
-  orderBy(state) {
-    return state.order
-  },
+  orderBy,
 }

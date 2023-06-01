@@ -25,17 +25,19 @@ export default {
   methods: {
     ...mapMutations({
       toggleFilterPostType: 'posts/TOGGLE_POST_TYPE',
+      toggleUnsetAllPostTypeFilters: 'posts/TOGGLE_UNSET_ALL_POST_TYPES_FILTERS',
       toggleEventsEnded: 'posts/TOGGLE_EVENTS_ENDED',
       toggleOrder: 'posts/TOGGLE_ORDER',
     }),
-    unsetAllPostTypeFilters() {
-      const beforeEventSetInPostTypeFilter = this.eventSetInPostTypeFilter
-      this.filterPostTypes.forEach((postType) => {
-        if (this.filteredPostTypes.includes(postType)) this.toggleFilterPostType(postType)
-      })
-      this.adjustEventsEnded(beforeEventSetInPostTypeFilter)
-      this.adjustOrder()
-    },
+    // Wolle
+    // unsetAllPostTypeFilters() {
+    //   const beforeEventSetInPostTypeFilter = this.eventSetInPostTypeFilter
+    //   this.filterPostTypes.forEach((postType) => {
+    //     if (this.filteredPostTypes.includes(postType)) this.toggleFilterPostType(postType)
+    //   })
+    //   this.adjustEventsEnded(beforeEventSetInPostTypeFilter)
+    //   this.adjustOrder()
+    // },
     setUnsetPostTypeFilter(setPostType) {
       const beforeEventSetInPostTypeFilter = this.eventSetInPostTypeFilter
       if (this.noneSetInPostTypeFilter) {
@@ -43,7 +45,7 @@ export default {
       } else {
         if (setPostType !== 'All') {
           if (this.filteredPostTypes.includes(setPostType)) {
-            this.unsetAllPostTypeFilters()
+            this.toggleUnsetAllPostTypeFilters()
           } else {
             // if 'setPostType' is not set then set it and unset all others
             this.toggleFilterPostType(setPostType)
@@ -53,7 +55,7 @@ export default {
             })
           }
         } else {
-          this.unsetAllPostTypeFilters()
+          this.toggleUnsetAllPostTypeFilters()
         }
       }
       this.adjustEventsEnded(beforeEventSetInPostTypeFilter)
@@ -65,6 +67,7 @@ export default {
     setOrder(newOrder) {
       this.toggleOrder(newOrder)
     },
+    // Wolle
     adjustEventsEnded(beforeEventSetInPostTypeFilter) {
       if (this.eventSetInPostTypeFilter !== beforeEventSetInPostTypeFilter) {
         if (this.eventSetInPostTypeFilter) {
