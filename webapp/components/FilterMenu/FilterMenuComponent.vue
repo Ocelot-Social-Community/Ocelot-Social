@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import FilterMenuMixin from '~/mixins/filterMenuMixin.js'
+import { mapGetters } from 'vuex'
 import EventsByFilter from './EventsByFilter'
 import PostTypeFilter from './PostTypeFilter'
 import FollowingFilter from './FollowingFilter'
@@ -33,11 +33,15 @@ export default {
     CategoriesFilter,
     PostTypeFilter,
   },
-  mixins: [FilterMenuMixin],
   data() {
     return {
       categoriesActive: this.$env.CATEGORIES_ACTIVE,
     }
+  },
+  computed: {
+    ...mapGetters({
+      eventSetInPostTypeFilter: 'posts/eventSetInPostTypeFilter',
+    }),
   },
 }
 </script>
