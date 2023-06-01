@@ -7,7 +7,7 @@
           :label="$t('filter-menu.ended.all.label')"
           :filled="eventsEnded === ''"
           :title="$t('filter-menu.ended.all.hint')"
-          @click="setEventsEnded('')"
+          @click="toggleEventsEnded('')"
           data-test="all-button"
         />
       </li>
@@ -17,7 +17,7 @@
           :label="$t('filter-menu.ended.onlyEnded.label')"
           :filled="eventsEnded === 'eventStart_gte'"
           :title="$t('filter-menu.ended.onlyEnded.hint')"
-          @click="setEventsEnded('eventStart_gte')"
+          @click="toggleEventsEnded('eventStart_gte')"
           data-test="not-ended-button"
         />
       </li>
