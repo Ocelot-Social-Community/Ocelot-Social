@@ -45,7 +45,7 @@
               :title="$t('contribution.filterMasonryGrid.onlyArticles')"
               :clickButton="openFilterMenu"
               :titleRemove="$t('filter-menu.deleteFilter')"
-              :clickRemove="unsetAllPostTypeFilters"
+              :clickRemove="toggleUnsetAllPostTypeFilters"
             />
 
             <header-button
@@ -53,7 +53,7 @@
               :title="$t('contribution.filterMasonryGrid.onlyEvents')"
               :clickButton="openFilterMenu"
               :titleRemove="$t('filter-menu.deleteFilter')"
-              :clickRemove="unsetAllPostTypeFilters"
+              :clickRemove="toggleUnsetAllPostTypeFilters"
             />
 
             <header-button
