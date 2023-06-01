@@ -11,7 +11,7 @@
           :label="$t('filter-menu.all')"
           :filled="noneSetInPostTypeFilter"
           :title="$t('filter-menu.all')"
-          @click="setUnsetPostTypeFilter('All')"
+          @click="toggleSetUnsetPostTypeFilter('All')"
         />
       </li>
       <li class="item article-item">
@@ -20,7 +20,7 @@
           :label="$t('filter-menu.article')"
           :filled="articleSetInPostTypeFilter"
           :title="$t('filter-menu.article')"
-          @click="setUnsetPostTypeFilter('Article')"
+          @click="toggleSetUnsetPostTypeFilter('Article')"
         />
       </li>
       <li class="item event-item">
@@ -29,7 +29,7 @@
           :label="$t('filter-menu.event')"
           :filled="eventSetInPostTypeFilter"
           :title="$t('filter-menu.event')"
-          @click="setUnsetPostTypeFilter('Event')"
+          @click="toggleSetUnsetPostTypeFilter('Event')"
         />
       </li>
     </template>
