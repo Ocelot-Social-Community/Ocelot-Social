@@ -15,7 +15,7 @@
                 >
                   {{ $t('post.createNewPost.title') }}
                 </ds-button>
-                <ds-button v-else ghost fullwidth size="x-large" @click="createEvent = !createEvent">
+                <ds-button v-else ghost fullwidth size="x-large" @click="switchPostType()">
                   {{ $t('post.createNewPost.title') }}
                 </ds-button>
               </div>
@@ -34,7 +34,7 @@
                 >
                   {{ $t('post.createNewEvent.title') }}
                 </ds-button>
-                <ds-button ghost fullwidth size="x-large" v-else @click="createEvent = !createEvent">
+                <ds-button ghost fullwidth size="x-large" v-else @click="switchPostType()">
                   {{ $t('post.createNewEvent.title') }}
                 </ds-button>
               </div>
@@ -96,6 +96,11 @@ export default {
         this.$toast.error(error.message)
       },
       fetchPolicy: 'cache-and-network',
+    },
+  },
+  methods: {
+    switchPostType() {
+      this.createEvent = !this.createEvent
     },
   },
 }
