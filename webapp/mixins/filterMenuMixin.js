@@ -14,21 +14,13 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
       filteredPostTypes: 'posts/filteredPostTypes',
+      noneSetInPostTypeFilter: 'posts/noneSetInPostTypeFilter',
+      articleSetInPostTypeFilter: 'posts/articleSetInPostTypeFilter',
+      eventSetInPostTypeFilter: 'posts/eventSetInPostTypeFilter',
+      orderedByCreationDate: 'posts/orderedByCreationDate',
       eventsEnded: 'posts/eventsEnded',
       orderBy: 'posts/orderBy',
     }),
-    noneSetInPostTypeFilter() {
-      return !this.articleSetInPostTypeFilter && !this.eventSetInPostTypeFilter
-    },
-    articleSetInPostTypeFilter() {
-      return this.filteredPostTypes.includes('Article')
-    },
-    eventSetInPostTypeFilter() {
-      return this.filteredPostTypes.includes('Event')
-    },
-    orderedByCreationDate() {
-      return this.noneSetInPostTypeFilter || this.articleSetInPostTypeFilter
-    },
   },
   methods: {
     ...mapMutations({
