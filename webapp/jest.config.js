@@ -20,9 +20,10 @@ module.exports = {
       lines: 83,
     },
   },
+  coverageProvider: "v8",
   setupFiles: ['<rootDir>/test/registerContext.js', '<rootDir>/test/testSetup.js'],
   transform: {
-    '.*\\.(vue)$': 'vue-jest',
+    '.*\\.(vue)$': '@vue/vue2-jest',
     '^.+\\.js$': 'babel-jest',
   },
   testMatch: ['**/?(*.)+(spec|test).js?(x)'],
