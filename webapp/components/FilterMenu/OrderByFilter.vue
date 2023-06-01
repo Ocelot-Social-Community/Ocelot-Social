@@ -52,7 +52,6 @@ export default {
   },
   methods: {
     buttonLable(buttonType) {
-      let title
       switch (buttonType) {
         case 'asc':
           return this.orderedByCreationDate ? this.$t('filter-menu.order.oldest.label') : this.$t('filter-menu.order.last.label')
