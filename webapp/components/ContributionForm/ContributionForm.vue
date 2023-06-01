@@ -54,7 +54,7 @@
         </ds-chip>
 
         <!-- Eventdata -->
-        <div v-if="creatEvent" class="eventDatas">
+        <div v-if="createEvent" class="eventDatas">
           <hr />
           <ds-space margin-top="x-small" />
           <ds-grid>
@@ -210,7 +210,7 @@ export default {
       type: Object,
       default: () => null,
     },
-    creatEvent: {
+    createEvent: {
       type: Boolean,
       default: false,
     },
@@ -266,9 +266,9 @@ export default {
             return []
           },
         },
-        eventStart: { required: !!this.creatEvent },
-        eventVenue: { required: !!this.creatEvent, min: 3, max: 100 },
-        eventLocationName: { required: !!this.creatEvent, min: 3, max: 100 },
+        eventStart: { required: !!this.createEvent },
+        eventVenue: { required: !!this.createEvent, min: 3, max: 100 },
+        eventLocationName: { required: !!this.createEvent, min: 3, max: 100 },
       },
       loading: false,
       users: [],
@@ -284,7 +284,7 @@ export default {
       currentUser: 'auth/user',
     }),
     eventInput() {
-      if (this.creatEvent) {
+      if (this.createEvent) {
         return {
           eventStart: this.formData.eventStart,
           eventVenue: this.formData.eventVenue,
@@ -356,7 +356,7 @@ export default {
             id: this.contribution.id || null,
             image,
             groupId: this.groupId,
-            postType: !this.creatEvent ? 'Article' : 'Event',
+            postType: !this.createEvent ? 'Article' : 'Event',
             eventInput: this.eventInput,
           },
         })

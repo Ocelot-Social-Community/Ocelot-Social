@@ -4,10 +4,10 @@
       <ds-flex-item :width="{ base: '100%', md: 5 }">
         <ds-flex gutter="base" :width="{ base: '100%', sm: 1 }">
           <ds-flex-item>
-            <ds-card :primary="!creatEvent" centered>
+            <ds-card :primary="!createEvent" centered>
               <div>
                 <ds-button
-                  v-if="!creatEvent"
+                  v-if="!createEvent"
                   ghost
                   fullwidth
                   size="x-large"
@@ -15,26 +15,26 @@
                 >
                   {{ $t('post.createNewPost.title') }}
                 </ds-button>
-                <ds-button v-else ghost fullwidth size="x-large" @click="creatEvent = !creatEvent">
+                <ds-button v-else ghost fullwidth size="x-large" @click="createEvent = !createEvent">
                   {{ $t('post.createNewPost.title') }}
                 </ds-button>
               </div>
             </ds-card>
           </ds-flex-item>
           <ds-flex-item>
-            <ds-card :primary="!!creatEvent" centered>
+            <ds-card :primary="!!createEvent" centered>
               <div>
                 <ds-button
                   ghost
                   fullwidth
                   size="x-large"
-                  v-if="creatEvent"
+                  v-if="createEvent"
                   hover
                   class="inactive-tab-button"
                 >
                   {{ $t('post.createNewEvent.title') }}
                 </ds-button>
-                <ds-button ghost fullwidth size="x-large" v-else @click="creatEvent = !creatEvent">
+                <ds-button ghost fullwidth size="x-large" v-else @click="createEvent = !createEvent">
                   {{ $t('post.createNewEvent.title') }}
                 </ds-button>
               </div>
@@ -50,7 +50,7 @@
 
     <ds-flex :width="{ base: '100%' }" gutter="base">
       <ds-flex-item :width="{ base: '100%', md: 5 }">
-        <contribution-form :group="group" :creatEvent="creatEvent" />
+        <contribution-form :group="group" :createEvent="createEvent" />
       </ds-flex-item>
       <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
     </ds-flex>
@@ -69,7 +69,7 @@ export default {
     const { groupId = null } = this.$route.query
     return {
       groupId,
-      creatEvent: false,
+      createEvent: false,
     }
   },
   computed: {
