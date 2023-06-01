@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import EventsByFilter from './EventsByFilter'
 import FilterMenuMixin from '~/mixins/filterMenuMixin.js'
+import EventsByFilter from './EventsByFilter'
 import PostTypeFilter from './PostTypeFilter'
 import FollowingFilter from './FollowingFilter'
 import OrderByFilter from './OrderByFilter'
