@@ -21,9 +21,6 @@ export default {
       toggleEventsEnded: 'posts/TOGGLE_EVENTS_ENDED',
       toggleOrder: 'posts/TOGGLE_ORDER',
     }),
-    setEventsEnded(newEventsEnded) {
-      this.toggleEventsEnded(newEventsEnded)
-    },
     setOrder(newOrder) {
       this.toggleOrder(newOrder)
     },
