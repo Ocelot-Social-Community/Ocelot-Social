@@ -278,6 +278,7 @@
     "inappropriatePicture": "This image may be inappropriate for some people.",
     "languageSelectLabel": "Language of your contribution",
     "languageSelectText": "Select Language",
+    "newEvent": "Create a new Event",
     "newPost": "Create a new Post",
     "success": "Saved!",
     "teaserImage": {
@@ -377,9 +378,11 @@
   },
   "filter-menu": {
     "all": "All",
+    "article": "Article",
     "categories": "Topics",
     "deleteFilter": "Delete filter",
     "emotions": "Emotions",
+    "events": "Events",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
     "languages": "Languages",
@@ -395,6 +398,7 @@
       }
     },
     "order-by": "Order by ...",
+    "post-type": "Post type",
     "save": {
       "error": "Failed saving topic settings!",
       "success": "Topics saved!"
@@ -684,6 +688,12 @@
       "submitted": "Comment submitted!",
       "updated": "Changes saved!"
     },
+    "createNewEvent": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Create A New Event"
+    },
     "createNewPost": {
       "forGroup": {
         "title": "For The Group “{name}”"
@@ -697,6 +707,7 @@
       },
       "title": "Edit Your Post"
     },
+    "event": "Event",
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
@@ -709,6 +720,14 @@
     "pinned": "Announcement",
     "takeAction": {
       "name": "Take action"
+    },
+    "viewEvent": {
+      "eventEnd": "End",
+      "eventIsOnline": "Online Event",
+      "eventLocationName": "City",
+      "eventStart": "Start",
+      "eventVenue": "Venue",
+      "title": "Event"
     },
     "viewPost": {
       "forGroup": {

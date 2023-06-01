@@ -22,7 +22,7 @@ const locales = ['en', 'de', 'fr', 'nl', 'it', 'es', 'pt', 'pl', 'ru']
 
 const createLocation = async (session, mapboxData) => {
   const data = {
-    id: mapboxData.id,
+    id: mapboxData.id + (mapboxData.address ? `-${mapboxData.address}` : ''),
     nameEN: mapboxData.text_en,
     nameDE: mapboxData.text_de,
     nameFR: mapboxData.text_fr,
@@ -33,6 +33,7 @@ const createLocation = async (session, mapboxData) => {
     namePL: mapboxData.text_pl,
     nameRU: mapboxData.text_ru,
     type: mapboxData.id.split('.')[0].toLowerCase(),
+    address: mapboxData.address,
     lng: mapboxData.center && mapboxData.center.length ? mapboxData.center[0] : null,
     lat: mapboxData.center && mapboxData.center.length ? mapboxData.center[1] : null,
   }
@@ -54,6 +55,10 @@ const createLocation = async (session, mapboxData) => {
   if (data.lat && data.lng) {
     mutation += ', l.lat = $lat, l.lng = $lng'
   }
+  if (data.address) {
+    mutation += ', l.address = $address'
+  }
+
   mutation += ' RETURN l.id'
 
   await session.writeTransaction((transaction) => {
@@ -72,7 +77,7 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
         locationName,
       )}.json?access_token=${
         CONFIG.MAPBOX_TOKEN
-      }&types=region,place,country&language=${locales.join(',')}`,
+      }&types=region,place,country,address&language=${locales.join(',')}`,
     )
 
     debug(res)
@@ -102,6 +107,10 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
     await createLocation(session, data)
 
     let parent = data
+
+    if (parent.address) {
+      parent.id += `-${parent.address}`
+    }
 
     if (data.context) {
       await asyncForEach(data.context, async (ctx) => {
