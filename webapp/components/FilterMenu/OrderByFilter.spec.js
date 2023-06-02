@@ -12,6 +12,7 @@ describe('OrderByFilter', () => {
   }
   const getters = {
     'posts/filteredPostTypes': () => [],
+    'posts/orderedByCreationDate': () => true,
     'posts/orderBy': () => 'createdAt_desc',
   }
 
