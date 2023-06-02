@@ -3,7 +3,7 @@ import encode from '../../../../backend/src/jwt/encode'
 
 Given("I am logged in as {string}", slug => {
   cy.neode()
-    .first("User", { slug })
+    .firstOf("User", { slug })
     .then(user => {
       return new Cypress.Promise((resolve, reject) => {
         if(!user) {
