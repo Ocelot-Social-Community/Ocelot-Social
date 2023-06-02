@@ -22,5 +22,6 @@ Feature: User authentication
 
   Scenario: Log out
     Given I am logged in as "peter-pan"
-    When I log out
+    When I navigate to page "/"
+    And I log out
     Then I am on page "login"
