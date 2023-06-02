@@ -289,6 +289,27 @@ describe('mutations', () => {
     })
   })
 
+  describe('RESET_POST_TYPE', () => {
+    beforeEach(() => {
+      testMutation = () => {
+        mutations.RESET_POST_TYPE(state)
+        return getters.filter(state)
+      }
+    })
+
+    it('resets the post type filter, event start and order', () => {
+      state = {
+        filter: {
+          postType_in: ['Event'],
+          eventStart_gte: new Date(),
+        },
+        order: 'eventStart_asc',
+      }
+      expect(testMutation()).toEqual({})
+      expect(getters.orderBy(state)).toEqual('createdAt_desc')
+    })
+  })
+
   describe('TOGGLE_EVENTS_ENDED', () => {
     beforeEach(() => {
       testMutation = (postType) => {
