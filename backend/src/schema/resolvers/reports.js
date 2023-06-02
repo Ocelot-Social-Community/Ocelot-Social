@@ -106,7 +106,7 @@ export default {
       })
       try {
         const reports = await reportsReadTxPromise
-        return reports
+        return reports || []
       } finally {
         session.close()
       }
