@@ -9,7 +9,7 @@
         <labeled-button
           icon="check"
           :label="$t('filter-menu.all')"
-          :filled="filteredPostTypes === []"
+          :filled="filteredPostTypes.length === 0"
           :title="$t('filter-menu.all')"
           @click="togglePostType(null)"
         />

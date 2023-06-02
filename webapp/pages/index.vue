@@ -188,8 +188,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      postsFilter: 'posts/filter',
       filteredPostTypes: 'posts/filteredPostTypes',
+      postsFilter: 'posts/filter',
       orderBy: 'posts/orderBy',
     }),
     filterButtonIcon() {
