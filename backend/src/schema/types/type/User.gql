@@ -214,10 +214,21 @@ type Mutation {
 
   muteUser(id: ID!): User
   unmuteUser(id: ID!): User
+
   blockUser(id: ID!): User
   unblockUser(id: ID!): User
+
+  followUser(id: ID!): User
+  unfollowUser(id: ID!): User
 
   switchUserRole(role: UserRole!, id: ID!): User
 
   saveCategorySettings(activeCategories: [String]): Boolean
+
+  requestPasswordReset(email: String!): Boolean!
+  resetPassword(email: String!, nonce: String!, newPassword: String!): Boolean!
+  changePassword(oldPassword: String!, newPassword: String!): String!
+
+  # Get a JWT Token for the given Email and password
+  login(email: String!, password: String!): String!
 }
