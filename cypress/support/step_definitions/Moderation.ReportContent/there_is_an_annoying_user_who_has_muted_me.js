@@ -7,7 +7,7 @@ Given("there is an annoying user who has muted me", () => {
     })
     .then(mutedUser => {
       cy.neode()
-        .first("User", {
+        .firstOf("User", {
           id: 'user'
         })
       .relateTo(mutedUser, "muted");

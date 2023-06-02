@@ -10,7 +10,7 @@ Cypress.Commands.add('neode', () => {
 })
 
 Cypress.Commands.add(
-  'first',
+  'firstOf',
   { prevSubject: true },
   (neode, model, properties) => {
     return neode.first(model, properties)
