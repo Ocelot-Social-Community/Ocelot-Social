@@ -200,7 +200,7 @@ export default {
       if (this.hashtag) {
         filter = {
           ...filter,
-          tags_some: this.hashtag ? { id: this.hashtag } : undefined,
+          tags_some: { id: this.hashtag },
         }
       }
       return filter
