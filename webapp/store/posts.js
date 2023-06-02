@@ -101,13 +101,15 @@ export const mutations = {
     state.filter = filter
   },
   TOGGLE_EVENTS_ENDED(state) {
-    if (state.filter.eventStart_gte) {
-      delete state.filter.eventStart_gte
+    const filter = clone(state.filter)
+    if (filter.eventStart_gte) {
+      delete filter.eventStart_gte
     } else {
-      if (state.filter.postType_in && state.filter.postType_in.includes('Event')) {
-        state.filter.eventStart_gte = new Date()
+      if (filter.postType_in && filter.postType_in.includes('Event')) {
+        filter.eventStart_gte = new Date()
       }
     }
+    state.filter = filter
   },
   TOGGLE_ORDER(state, value) {
     state.order = value
