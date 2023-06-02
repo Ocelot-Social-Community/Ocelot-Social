@@ -44,7 +44,7 @@
               :title="$t('contribution.filterMasonryGrid.onlyArticles')"
               :clickButton="openFilterMenu"
               :titleRemove="$t('filter-menu.deleteFilter')"
-              :clickRemove="togglePostType(null)"
+              :clickRemove="resetPostType"
             />
 
             <header-button
@@ -52,7 +52,7 @@
               :title="$t('contribution.filterMasonryGrid.onlyEvents')"
               :clickButton="openFilterMenu"
               :titleRemove="$t('filter-menu.deleteFilter')"
-              :clickRemove="togglePostType(null)"
+              :clickRemove="resetPostType"
             />
 
             <header-button
@@ -221,7 +221,7 @@ export default {
   },
   methods: {
     ...mapMutations({
-      togglePostType: 'posts/TOGGLE_TYPE',
+      resetPostType: 'posts/RESET_POST_TYPE',
       resetByFollowed: 'posts/TOGGLE_FILTER_BY_FOLLOWED',
       resetByGroups: 'posts/TOGGLE_FILTER_BY_MY_GROUPS',
       resetCategories: 'posts/RESET_CATEGORIES',
