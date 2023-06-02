@@ -181,7 +181,6 @@ export const getters = {
   filteredCategoryIds(state) {
     return get(state.filter, 'categories_some.id_in') || []
   },
-  filteredPostTypes,
   filteredLanguageCodes(state) {
     return get(state.filter, 'language_in') || []
   },
@@ -194,6 +193,7 @@ export const getters = {
   filteredByEmotions(state) {
     return get(state.filter, 'emotions_some.emotion_in') || []
   },
+  filteredPostTypes,
   noneSetInPostTypeFilter,
   articleSetInPostTypeFilter,
   eventSetInPostTypeFilter,
