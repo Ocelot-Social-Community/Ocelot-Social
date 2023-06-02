@@ -57,13 +57,6 @@ export const mutations = {
     delete filter.language_in
     state.filter = filter
   },
-  RESET_POST_TYPE(state) {
-    const filter = clone(state.filter)
-    delete filter.eventStart_gte
-    delete filter.postType_in
-    state.order = 'createdAt_desc'
-    state.filter = filter
-  },
   TOGGLE_CATEGORY(state, categoryId) {
     const filter = clone(state.filter)
     update(filter, 'categories_some.id_in', (categoryIds) => xor(categoryIds, [categoryId]))
@@ -80,6 +73,13 @@ export const mutations = {
     const filter = clone(state.filter)
     update(filter, 'emotions_some.emotion_in', (emotions) => xor(emotions, [emotion]))
     if (isEmpty(get(filter, 'emotions_some.emotion_in'))) delete filter.emotions_some
+    state.filter = filter
+  },
+  RESET_POST_TYPE(state) {
+    const filter = clone(state.filter)
+    delete filter.eventStart_gte
+    delete filter.postType_in
+    state.order = 'createdAt_desc'
     state.filter = filter
   },
   TOGGLE_POST_TYPE(state, postType) {
@@ -124,14 +124,14 @@ export const getters = {
   filteredCategoryIds(state) {
     return get(state.filter, 'categories_some.id_in') || []
   },
+  filteredPostTypes(state) {
+    return get(state.filter, 'postType_in') || []
+  },
   filteredLanguageCodes(state) {
     return get(state.filter, 'language_in') || []
   },
   filteredByUsersFollowed(state) {
     return !!get(state.filter, 'author.followedBy_some.id')
-  },
-  filteredPostTypes(state) {
-    return get(state.filter, 'postType_in') || []
   },
   filteredByPostsInMyGroups(state) {
     return !!get(state.filter, 'postsInMyGroups')
