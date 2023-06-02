@@ -1233,10 +1233,10 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
-"@faker-js/faker@5.1.0":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-5.1.0.tgz#cee1d77ada0d0dbbe77201d18b1ebabf432d9c0f"
-  integrity sha512-0VonSKh7fBCqvY+V2FLN2ZW4pR4ZtWJalWmwSaiaB7yK7y4qp8vDfuaq9QdLjf/cdZGx3M7Wc4Q+x4fZHxI21Q==
+"@faker-js/faker@7.6.0":
+  version "7.6.0"
+  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-7.6.0.tgz#9ea331766084288634a9247fcd8b84f16ff4ba07"
+  integrity sha512-XK6BTq1NDMo9Xqw/YkYyGjSsg44fbNwYRx7QK2CuoQgyy+f1rrTDHoExVM5PsyXCtfl2vs2vVJ0MN0yN6LppRw==
 
 "@hapi/address@2.x.x":
   version "2.0.0"
@@ -2623,6 +2623,11 @@ cypress-file-upload@^3.5.3:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/cypress-file-upload/-/cypress-file-upload-3.5.3.tgz#cd706485de3fb2cbd4a8c2dd90fe96d537bb4311"
   integrity sha512-S/czzqAj1BYz6Xxnfpx2aSc6hXsj76fd8/iuycJ2RxoxCcQMliw8eQV0ugzVlkzr1GD5dKGviNFGYqv3nRJ+Tg==
+
+cypress-network-idle@^1.14.2:
+  version "1.14.2"
+  resolved "https://registry.yarnpkg.com/cypress-network-idle/-/cypress-network-idle-1.14.2.tgz#0837100861feeb5a18f4c2d9815be079f8590f4d"
+  integrity sha512-xAdR8dH58KFPv8eCDWjviScITrJOcUpuMXYfYTc175nk2/NvnJ+I6ylSn1CM7yZmoV/gLbFa36QLiH5NfNEaLQ==
 
 cypress@^7.0.1:
   version "7.0.1"
