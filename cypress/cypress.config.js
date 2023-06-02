@@ -1,3 +1,4 @@
+const dotenv = require('dotenv')
 const { defineConfig } = require("cypress");
 const browserify = require("@badeball/cypress-cucumber-preprocessor/browserify");
 const { addCucumberPreprocessorPlugin } = require("@badeball/cypress-cucumber-preprocessor");
@@ -30,6 +31,9 @@ async function setupNodeEvents(on, config) {
   return config;
 }
 
+// Import backend .env (smart)?
+const { parsed } = dotenv.config({ path: '../backend/.env' })
+
 module.exports = defineConfig({
   e2e: {
     projectId: "qa7fe2",
@@ -59,4 +63,5 @@ module.exports = defineConfig({
     video: false,
     setupNodeEvents,
   },
+  env: parsed
 });
