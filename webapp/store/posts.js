@@ -18,7 +18,7 @@ export const state = () => {
       ...defaultFilter,
     },
     order: 'createdAt_desc',
-    eventsEnded: '',
+    eventsEnded: null,
   }
 }
 
@@ -60,7 +60,7 @@ const TOGGLE_SET_UNSET_POST_TYPE_FILTER = (state, setPostType) => {
   adjustOrder(state)
 }
 const TOGGLE_EVENTS_ENDED = (state, value) => {
-  state.eventsEnded = value
+  state.eventsEnded = value ? new Date() : null
 }
 const TOGGLE_ORDER = (state, value) => {
   state.order = value
@@ -68,9 +68,9 @@ const TOGGLE_ORDER = (state, value) => {
 const adjustEventsEnded = (state, beforeEventSetInPostTypeFilter) => {
   if (eventSetInPostTypeFilter(state) !== beforeEventSetInPostTypeFilter) {
     if (eventSetInPostTypeFilter(state)) {
-      TOGGLE_EVENTS_ENDED(state, 'eventStart_gte')
+      TOGGLE_EVENTS_ENDED(state, true)
     } else {
-      TOGGLE_EVENTS_ENDED(state, '')
+      TOGGLE_EVENTS_ENDED(state, false)
     }
   }
 }
