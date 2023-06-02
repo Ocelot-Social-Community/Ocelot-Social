@@ -5,7 +5,7 @@ module.exports = {
     '**/*.js',
     '!**/node_modules/**',
     '!**/test/**',
-    '!**/dist/**',
+    '!**/build/**',
     '!**/src/**/?(*.)+(spec|test).js?(x)'
   ],
   coverageThreshold: {
