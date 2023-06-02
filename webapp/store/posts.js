@@ -24,10 +24,23 @@ export const state = () => {
 
 const TOGGLE_POST_TYPE = (state, postType) => {
   const filter = clone(state.filter)
-  update(filter, 'postType_in', (postTypes) => xor(postTypes, [postType]))
-  if (isEmpty(get(filter, 'postType_in'))) delete filter.postType_in
+  if (postType && !(filter.postType_in && filter.postType_in.includes(postType))) {
+    filter.postType_in = [postType]
+    if (postType === 'Event') {
+      filter.eventStart_gte = new Date()
+      state.order = 'eventStart_asc'
+    } else {
+      delete filter.eventStart_gte
+      state.order = 'createdAt_desc'
+    }
+  } else {
+    delete filter.eventStart_gte
+    delete filter.postType_in
+    state.order = 'createdAt_desc'
+  }
   state.filter = filter
 }
+
 const TOGGLE_UNSET_ALL_POST_TYPES_FILTERS = (state) => {
   const beforeEventSetInPostTypeFilter = eventSetInPostTypeFilter(state)
   filterPostTypes.forEach((postType) => {
@@ -59,9 +72,16 @@ const TOGGLE_SET_UNSET_POST_TYPE_FILTER = (state, setPostType) => {
   adjustEventsEnded(state, beforeEventSetInPostTypeFilter)
   adjustOrder(state)
 }
-const TOGGLE_EVENTS_ENDED = (state, value) => {
-  state.eventsEnded = value ? new Date() : null
+const TOGGLE_EVENTS_ENDED = (state) => {
+  if (state.filter.eventStart_gte) {
+    delete state.filter.eventStart_gte
+  } else {
+    if (state.filter.postType_in && state.filter.postType_in.includes('Event')) {
+      state.filter.eventStart_gte = new Date()
+    }
+  }
 }
+
 const TOGGLE_ORDER = (state, value) => {
   state.order = value
 }
