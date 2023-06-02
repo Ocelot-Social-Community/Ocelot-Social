@@ -3,7 +3,7 @@ node_modules/
 .vscode
 .idea
 yarn-error.log
-dist/*
+build/*
 coverage.lcov
 .nyc_output/
 public/uploads/*

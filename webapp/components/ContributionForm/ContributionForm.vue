@@ -67,10 +67,11 @@
                   type="datetime"
                   value-type="format"
                   :minute-step="15"
-                  formmat="DD-MM-YYYY HH:mm"
+                  Xformat="DD-MM-YYYY HH:mm"
                   style="z-index: 20"
                   :placeholder="$t('post.viewEvent.eventStart')"
                   :disabled-date="notBeforeToday"
+                  :disabled-time="notBeforeNow"
                   :show-second="false"
                 ></date-picker>
               </div>
@@ -86,12 +87,14 @@
               <date-picker
                 v-model="formData.eventEnd"
                 type="datetime"
+                value-type="format"
                 :minute-step="15"
                 :seconds-step="0"
-                formmat="DD MM YYYY HH:mm"
+                Xformat="DD-MM-YYYY HH:mm"
                 :placeholder="$t('post.viewEvent.eventEnd')"
                 style="font-size: larger"
-                :disabled-date="notBeforeToday"
+                :disabled-date="notBeforeEventDay"
+                :disabled-time="notBeforeEvent"
                 :show-second="false"
               ></date-picker>
             </ds-grid-item>
@@ -152,7 +155,7 @@
         <ds-flex class="buttons-footer" gutter="xxx-small">
           <ds-flex-item width="3.5" style="margin-right: 16px; margin-bottom: 6px">
             <!-- eslint-disable vue/no-v-text-v-html-on-component -->
-            <!-- TODO => remove v-html! only text ! no html! secrurity first! -->
+            <!-- TODO => remove v-html! only text ! no html! security first! -->
             <ds-text
               v-if="showGroupHint"
               v-html="$t('contribution.visibleOnlyForMembersOfGroup', { name: groupName })"
@@ -316,7 +319,16 @@ export default {
   },
   methods: {
     notBeforeToday(date) {
-      return date < new Date(new Date().setHours(0, 0, 0, 0))
+      return date < new Date().setHours(0, 0, 0, 0)
+    },
+    notBeforeNow(date) {
+      return date < new Date()
+    },
+    notBeforeEventDay(date) {
+      return date < new Date(this.formData.eventStart).setHours(0, 0, 0, 0)
+    },
+    notBeforeEvent(date) {
+      return date <= new Date(this.formData.eventStart)
     },
     submit() {
       let image = null
