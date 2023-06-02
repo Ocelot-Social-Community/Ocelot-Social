@@ -213,6 +213,11 @@ export default {
     },
   },
   watchQuery: ['hashtag'],
+  watch: {
+    postsFilter() {
+      this.resetPostList()
+    },
+  },
   mounted() {
     if (this.categoryId) {
       this.resetCategories()
