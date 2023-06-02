@@ -11,7 +11,7 @@
     "__migrate": "migrate --compiler 'js:@babel/register' --migrations-dir ./src/db/migrations",
     "prod:migrate": "migrate --migrations-dir ./build/db/migrations --store ./build/db/migrate/store.js",
     "start": "node build/",
-    "build": "tsc && ./scripts/build.copy.files.sh",
+    "build": "tsc && scripts/build.copy.files.sh",
     "dev": "nodemon --exec ts-node src/ -e js,ts,gql",
     "dev:debug": "nodemon --exec babel-node --inspect=0.0.0.0:9229 src/ -e js,gql",
     "lint": "eslint src --config .eslintrc.js",
