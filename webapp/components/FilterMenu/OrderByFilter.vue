@@ -38,9 +38,12 @@ export default {
   },
   computed: {
     ...mapGetters({
-      orderedByCreationDate: 'posts/orderedByCreationDate',
+      filteredPostTypes: 'posts/filteredPostTypes',
       orderBy: 'posts/orderBy',
     }),
+    orderedByCreationDate() {
+      return !this.filteredPostTypes.includes('Event')
+    },
     orderedAsc() {
       return this.orderedByCreationDate ? 'createdAt_asc' : 'eventStart_desc'
     },
