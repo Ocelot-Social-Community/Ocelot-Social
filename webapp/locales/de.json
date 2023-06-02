@@ -278,6 +278,7 @@
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache Deines Beitrags",
     "languageSelectText": "Sprache wählen",
+    "newEvent": "Erstelle einen neue Veranstaltung",
     "newPost": "Erstelle einen neuen Beitrag",
     "success": "Gespeichert!",
     "teaserImage": {
@@ -377,9 +378,11 @@
   },
   "filter-menu": {
     "all": "Alle",
+    "article": "Artikel",
     "categories": "Themen",
     "deleteFilter": "Filter löschen",
     "emotions": "Emotionen",
+    "events": "Veranstaltungen",
     "filter-by": "Filtern nach ...",
     "following": "Nutzer denen ich folge",
     "languages": "Sprachen",
@@ -395,6 +398,7 @@
       }
     },
     "order-by": "Sortieren nach ...",
+    "post-type": "Beitrags-Typ",
     "save": {
       "error": "Themen konnten nicht gespeichert werden!",
       "success": "Themen gespeichert!"
@@ -510,7 +514,10 @@
   },
   "header": {
     "avatarMenu": {
-      "Groups": "Gruppen",
+      "button": {
+        "tooltip": "Mein Profil"
+      },
+      "groups": "Gruppen",
       "myProfile": "Mein Profil"
     }
   },
@@ -520,12 +527,15 @@
   },
   "invite-codes": {
     "button": {
-      "tooltip": "Lade deine Freunde ein"
+      "tooltip": "Freunde einladen"
     },
     "copy-code": "Einladungslink kopieren",
     "copy-success": "Einladungscode erfolgreich in die Zwischenablage kopiert",
     "not-available": "Du hast keinen Einladungscode zur Verfügung!",
     "your-code": "Sende diesen Link per E-Mail oder in sozialen Medien, um deine Freunde einzuladen:"
+  },
+  "localeSwitch": {
+    "tooltip": "Sprache wählen"
   },
   "login": {
     "email": "Deine E-Mail",
@@ -640,20 +650,28 @@
   },
   "notifications": {
     "comment": "Kommentar",
-    "content": "Inhalt",
+    "content": "Inhalt oder Beschreibung",
     "empty": "Bedaure, Du hast momentan keinerlei Benachrichtigungen.",
     "filterLabel": {
       "all": "Alle",
       "read": "Gelesen",
       "unread": "Ungelesen"
     },
+    "group": "Beschreibung",
+    "headerMenuButton": {
+      "tooltip": "Meine Benachrichtigungen"
+    },
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
-    "post": "Beitrag",
+    "post": "Beitrag oder Gruppe",
     "reason": {
+      "changed_group_member_role": "Hat Deine Rolle in der Gruppe geändert …",
       "commented_on_post": "Hat Deinen Beitrag kommentiert …",
       "mentioned_in_comment": "Hat Dich in einem Kommentar erwähnt …",
-      "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …"
+      "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …",
+      "removed_user_from_group": "Hat Dich aus der Gruppe entfernt …",
+      "user_joined_group": "Ist Deiner Gruppe beigetreten …",
+      "user_left_group": "Hat deine Gruppe verlassen …"
     },
     "title": "Benachrichtigungen",
     "user": "Nutzer"
@@ -670,6 +688,12 @@
       "submitted": "Kommentar gesendet",
       "updated": "Änderungen gespeichert"
     },
+    "createNewEvent": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Erstelle ein neues Event"
+    },
     "createNewPost": {
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
@@ -683,6 +707,7 @@
       },
       "title": "Bearbeite deinen Beitrag"
     },
+    "event": "Veranstaltung",
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
@@ -695,6 +720,14 @@
     "pinned": "Meldung",
     "takeAction": {
       "name": "Aktiv werden"
+    },
+    "viewEvent": {
+      "eventEnd": "Ende",
+      "eventIsOnline": "Online Veranstaltung",
+      "eventLocationName": "Stadt",
+      "eventStart": "Beginn",
+      "eventVenue": "Veranstaltungsort",
+      "title": "Veranstaltung"
     },
     "viewPost": {
       "forGroup": {

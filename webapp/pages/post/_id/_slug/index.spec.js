@@ -19,6 +19,7 @@ describe('PostSlug', () => {
       post: {
         id: '1',
         author,
+        postType: ['Article'],
         comments: [
           {
             id: 'comment134',
@@ -111,6 +112,7 @@ describe('PostSlug', () => {
             id: '1',
             author: null,
             comments: [],
+            postType: ['Article'],
           },
           ready: true,
         }

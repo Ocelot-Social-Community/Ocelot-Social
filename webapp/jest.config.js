@@ -15,7 +15,11 @@ module.exports = {
     '!**/.prettierrc.js',
     '!**/nuxt.config.js',
   ],
-  coverageReporters: ['lcov', 'text'],
+  coverageThreshold: {
+    global: {
+      lines: 83,
+    },
+  },
   setupFiles: ['<rootDir>/test/registerContext.js', '<rootDir>/test/testSetup.js'],
   transform: {
     '.*\\.(vue)$': 'vue-jest',
@@ -25,8 +29,9 @@ module.exports = {
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
   moduleNameMapper: {
     '\\.(svg)$': '<rootDir>/test/fileMock.js',
-    '\\.(css|less)$': 'identity-obj-proxy',
+    '\\.(scss|css|less)$': 'identity-obj-proxy',
     '@mapbox/mapbox-gl-geocoder': 'identity-obj-proxy',
+    'vue2-datepicker/locale/undefined': 'vue2-datepicker/locale/en',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^~/(.*)$': '<rootDir>/$1',
   },

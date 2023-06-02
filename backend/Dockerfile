@@ -1,7 +1,7 @@
 ##################################################################################
 # BASE (Is pushed to DockerHub for rebranding) ###################################
 ##################################################################################
-FROM node:19.4.0-alpine3.17 as base
+FROM node:20.2.0-alpine3.17 as base
 
 # ENVs
 ## DOCKER_WORKDIR would be a classical ARG, but that is not multi layer persistent - shame
@@ -90,7 +90,7 @@ CMD /bin/sh -c "yarn run dev"
 FROM base as production
 
 # Copy "binary"-files from build image
-COPY --from=build ${DOCKER_WORKDIR}/dist ./dist
+COPY --from=build ${DOCKER_WORKDIR}/build ./build
 COPY --from=build ${DOCKER_WORKDIR}/node_modules ./node_modules
 # Copy static files
 # TODO - externalize the uploads so we can copy the whole folder

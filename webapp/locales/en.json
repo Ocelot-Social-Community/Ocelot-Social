@@ -278,6 +278,7 @@
     "inappropriatePicture": "This image may be inappropriate for some people.",
     "languageSelectLabel": "Language of your contribution",
     "languageSelectText": "Select Language",
+    "newEvent": "Create a new Event",
     "newPost": "Create a new Post",
     "success": "Saved!",
     "teaserImage": {
@@ -377,9 +378,11 @@
   },
   "filter-menu": {
     "all": "All",
+    "article": "Article",
     "categories": "Topics",
     "deleteFilter": "Delete filter",
     "emotions": "Emotions",
+    "events": "Events",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
     "languages": "Languages",
@@ -395,6 +398,7 @@
       }
     },
     "order-by": "Order by ...",
+    "post-type": "Post type",
     "save": {
       "error": "Failed saving topic settings!",
       "success": "Topics saved!"
@@ -510,7 +514,10 @@
   },
   "header": {
     "avatarMenu": {
-      "Groups": "Groups",
+      "button": {
+        "tooltip": "My profile"
+      },
+      "groups": "Groups",
       "myProfile": "My profile"
     }
   },
@@ -520,12 +527,15 @@
   },
   "invite-codes": {
     "button": {
-      "tooltip": "Invite your friends"
+      "tooltip": "Invite friends"
     },
     "copy-code": "Copy Invite Link",
     "copy-success": "Invite code copied to clipboard",
     "not-available": "You have no valid invite code available!",
     "your-code": "Send this link per e-mail or in social media to invite your friends:"
+  },
+  "localeSwitch": {
+    "tooltip": "Choose language"
   },
   "login": {
     "email": "Your E-mail",
@@ -640,20 +650,28 @@
   },
   "notifications": {
     "comment": "Comment",
-    "content": "Content",
+    "content": "Content or Description",
     "empty": "Sorry, you don't have any notifications at the moment.",
     "filterLabel": {
       "all": "All",
       "read": "Read",
       "unread": "Unread"
     },
+    "group": "Description",
+    "headerMenuButton": {
+      "tooltip": "My notifications"
+    },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
-    "post": "Post",
+    "post": "Post or Group",
     "reason": {
+      "changed_group_member_role": "Changed your role in group …",
       "commented_on_post": "Commented on your post …",
       "mentioned_in_comment": "Mentioned you in a comment …",
-      "mentioned_in_post": "Mentioned you in a post …"
+      "mentioned_in_post": "Mentioned you in a post …",
+      "removed_user_from_group": "Removed you from group …",
+      "user_joined_group": "Joined your group …",
+      "user_left_group": "Left your group …"
     },
     "title": "Notifications",
     "user": "User"
@@ -670,6 +688,12 @@
       "submitted": "Comment submitted!",
       "updated": "Changes saved!"
     },
+    "createNewEvent": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Create A New Event"
+    },
     "createNewPost": {
       "forGroup": {
         "title": "For The Group “{name}”"
@@ -683,6 +707,7 @@
       },
       "title": "Edit Your Post"
     },
+    "event": "Event",
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
@@ -695,6 +720,14 @@
     "pinned": "Announcement",
     "takeAction": {
       "name": "Take action"
+    },
+    "viewEvent": {
+      "eventEnd": "End",
+      "eventIsOnline": "Online Event",
+      "eventLocationName": "City",
+      "eventStart": "Start",
+      "eventVenue": "Venue",
+      "title": "Event"
     },
     "viewPost": {
       "forGroup": {

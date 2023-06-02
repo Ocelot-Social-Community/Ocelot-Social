@@ -18,14 +18,8 @@
         </nuxt-link>
       </client-only>
     </div>
-    <masonry-grid>
-      <!--Filter Button-->
-      <ds-grid-item
-        v-if="categoriesActive && SHOW_CONTENT_FILTER_MASONRY_GRID"
-        :row-span="1"
-        column-span="fullWidth"
-        class="top-filter-menu"
-      >
+    <div>
+      <div v-if="categoriesActive && SHOW_CONTENT_FILTER_MASONRY_GRID" class="top-filter-menu">
         <div class="filterButtonBox">
           <div class="filterButtonMenu" :class="{ 'hide-filter': hideByScroll }">
             <base-button
@@ -74,17 +68,24 @@
             </div>
           </div>
         </div>
-      </ds-grid-item>
-      <!-- Placeholder/Space Row -->
-      <ds-grid-item :row-span="1" column-span="fullWidth" />
-      <!-- hashtag filter -->
-      <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
+      </div>
+    </div>
+
+    <div v-if="hashtag || showDonations" class="newsfeed-controls">
+      <div v-if="hashtag">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
-      </ds-grid-item>
-      <!-- donation info -->
-      <ds-grid-item v-if="showDonations" class="top-info-bar" :row-span="1" column-span="fullWidth">
+      </div>
+      <div v-if="showDonations" class="top-info-bar">
         <donation-info :goal="goal" :progress="progress" />
-      </ds-grid-item>
+      </div>
+    </div>
+    <!-- content grid -->
+    <masonry-grid
+      :class="[
+        !hashtag && !showDonations ? 'grid-margin-top' : '',
+        !isMobile && posts.length <= 2 ? 'grid-column-helper' : '',
+      ]"
+    >
       <!-- news feed -->
       <template v-if="hasResults">
         <masonry-grid-item
@@ -133,6 +134,7 @@ import UpdateQuery from '~/components/utils/UpdateQuery'
 import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import { SHOW_CONTENT_FILTER_MASONRY_GRID } from '~/constants/filter.js'
 import { POST_ADD_BUTTON_POSITION_TOP } from '~/constants/posts.js'
+import mobile from '~/mixins/mobile'
 
 export default {
   components: {
@@ -145,7 +147,7 @@ export default {
     FilterMenuComponent,
     HeaderButton,
   },
-  mixins: [postListActions],
+  mixins: [postListActions, mobile()],
   data() {
     const { hashtag = null } = this.$route.query
     return {
@@ -318,7 +320,7 @@ export default {
   height: 54px;
   width: 54px;
   font-size: 26px;
-  z-index: 100;
+  z-index: $z-index-sticky-float;
   position: fixed;
   bottom: -5px;
   left: 98vw;
@@ -330,10 +332,14 @@ export default {
   height: 54px;
   width: 54px;
   font-size: 26px;
-  z-index: 100;
+  z-index: $z-index-sticky-float;
   position: fixed;
   top: 80px;
   box-shadow: $box-shadow-x-large;
+}
+
+.top-filter-menu {
+  margin-top: 16px;
 }
 
 .top-info-bar,
@@ -344,22 +350,34 @@ export default {
 .filterButtonMenu {
   width: 95%;
   position: fixed;
-  z-index: 6;
-  margin-top: -35px;
-  padding: 20px 10px 20px 10px;
+  z-index: $z-index-sticky;
+  margin-top: -45px;
+  padding: 30px 0px 20px 0px;
   background-color: #f5f4f6;
 }
+.newsfeed-controls {
+  margin-top: 46px;
+}
+.main-container .grid-column-helper {
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 357px)) !important;
+}
+
 @media screen and (max-width: 656px) {
   .filterButtonMenu {
     margin-top: -50px;
   }
 }
 #my-filter {
+  max-width: 1028px;
   background-color: white;
   box-shadow: rgb(189 189 189) 1px 9px 15px 1px;
   max-height: 950px;
   overflow: auto;
   padding-bottom: 0px;
+  z-index: $z-index-page-submenu;
+}
+.grid-margin-top {
+  margin-top: 26px;
 }
 @media screen and (min-height: 401px) {
   #my-filter {
@@ -409,10 +427,15 @@ export default {
     height: 44px;
     width: 44px;
     font-size: 23px;
-    z-index: 10;
   }
-  .ds-grid {
-    padding-top: 1em;
+}
+@media screen and (max-width: 650px) {
+  //    .top-filter-menu{
+  //     margin-top: 24px;
+  //   }
+
+  .newsfeed-controls {
+    margin-top: 32px;
   }
 }
 </style>
