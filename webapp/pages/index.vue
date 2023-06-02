@@ -197,9 +197,11 @@ export default {
     },
     finalFilters() {
       let filter = this.postsFilter
-      filter = {
-        ...filter,
-        tags_some: this.hashtag ? { id: this.hashtag } : undefined,
+      if (this.hashtag) {
+        filter = {
+          ...filter,
+          tags_some: this.hashtag ? { id: this.hashtag } : undefined,
+        }
       }
       return filter
     },
