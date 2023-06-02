@@ -40,8 +40,11 @@ export default {
   },
   computed: {
     ...mapGetters({
-      eventSetInPostTypeFilter: 'posts/eventSetInPostTypeFilter',
+      filteredPostTypes: 'posts/filteredPostTypes',
     }),
+    eventSetInPostTypeFilter() {
+      return this.filteredPostTypes.includes('Event')
+    },
   },
 }
 </script>

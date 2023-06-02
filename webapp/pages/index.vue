@@ -25,8 +25,7 @@
             <base-button
               class="my-filter-button"
               v-if="
-                !articleSetInPostTypeFilter &&
-                !eventSetInPostTypeFilter &&
+                !postsFilter['postType_in'] &&
                 !postsFilter['categories_some'] &&
                 !postsFilter['author'] &&
                 !postsFilter['postsInMyGroups']
@@ -41,19 +40,19 @@
             </base-button>
 
             <header-button
-              v-if="articleSetInPostTypeFilter"
+              v-if="filteredPostTypes.includes('Article')"
               :title="$t('contribution.filterMasonryGrid.onlyArticles')"
               :clickButton="openFilterMenu"
               :titleRemove="$t('filter-menu.deleteFilter')"
-              :clickRemove="toggleUnsetAllPostTypeFilters"
+              :clickRemove="togglePostType(null)"
             />
 
             <header-button
-              v-if="eventSetInPostTypeFilter"
+              v-if="filteredPostTypes.includes('Event')"
               :title="$t('contribution.filterMasonryGrid.onlyEvents')"
               :clickButton="openFilterMenu"
               :titleRemove="$t('filter-menu.deleteFilter')"
-              :clickRemove="toggleUnsetAllPostTypeFilters"
+              :clickRemove="togglePostType(null)"
             />
 
             <header-button
@@ -190,9 +189,7 @@ export default {
   computed: {
     ...mapGetters({
       postsFilter: 'posts/filter',
-      articleSetInPostTypeFilter: 'posts/articleSetInPostTypeFilter',
-      eventSetInPostTypeFilter: 'posts/eventSetInPostTypeFilter',
-      eventsEnded: 'posts/eventsEnded',
+      filteredPostTypes: 'posts/filteredPostTypes',
       orderBy: 'posts/orderBy',
     }),
     filterButtonIcon() {
@@ -203,7 +200,6 @@ export default {
       filter = {
         ...filter,
         tags_some: this.hashtag ? { id: this.hashtag } : undefined,
-        eventStart_gte: this.eventsEnded,
       }
       return filter
     },
@@ -225,8 +221,7 @@ export default {
   },
   methods: {
     ...mapMutations({
-      toggleUnsetAllPostTypeFilters: 'posts/TOGGLE_UNSET_ALL_POST_TYPES_FILTERS',
-      toggleSetUnsetPostTypeFilter: 'posts/TOGGLE_SET_UNSET_POST_TYPE_FILTER',
+      togglePostType: 'posts/TOGGLE_TYPE',
       resetByFollowed: 'posts/TOGGLE_FILTER_BY_FOLLOWED',
       resetByGroups: 'posts/TOGGLE_FILTER_BY_MY_GROUPS',
       resetCategories: 'posts/RESET_CATEGORIES',

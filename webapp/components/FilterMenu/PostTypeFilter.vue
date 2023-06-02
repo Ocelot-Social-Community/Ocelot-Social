@@ -9,27 +9,27 @@
         <labeled-button
           icon="check"
           :label="$t('filter-menu.all')"
-          :filled="noneSetInPostTypeFilter"
+          :filled="filteredPostTypes === []"
           :title="$t('filter-menu.all')"
-          @click="toggleSetUnsetPostTypeFilter('All')"
+          @click="togglePostType(null)"
         />
       </li>
       <li class="item article-item">
         <labeled-button
           icon="book"
           :label="$t('filter-menu.article')"
-          :filled="articleSetInPostTypeFilter"
+          :filled="filteredPostTypes.includes('Article')"
           :title="$t('filter-menu.article')"
-          @click="toggleSetUnsetPostTypeFilter('Article')"
+          @click="togglePostType('Article')"
         />
       </li>
       <li class="item event-item">
         <labeled-button
           icon="calendar"
           :label="$t('filter-menu.event')"
-          :filled="eventSetInPostTypeFilter"
+          :filled="filteredPostTypes.includes('Event')"
           :title="$t('filter-menu.event')"
-          @click="toggleSetUnsetPostTypeFilter('Event')"
+          @click="togglePostType('Event')"
         />
       </li>
     </template>
@@ -49,14 +49,12 @@ export default {
   },
   computed: {
     ...mapGetters({
-      noneSetInPostTypeFilter: 'posts/noneSetInPostTypeFilter',
-      articleSetInPostTypeFilter: 'posts/articleSetInPostTypeFilter',
-      eventSetInPostTypeFilter: 'posts/eventSetInPostTypeFilter',
+      filteredPostTypes: 'posts/filteredPostTypes',
     }),
   },
   methods: {
     ...mapMutations({
-      toggleSetUnsetPostTypeFilter: 'posts/TOGGLE_SET_UNSET_POST_TYPE_FILTER',
+      togglePostType: 'posts/TOGGLE_POST_TYPE',
     }),
   },
 }
