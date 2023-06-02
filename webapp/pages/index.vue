@@ -203,7 +203,7 @@ export default {
       filter = {
         ...filter,
         tags_some: this.hashtag ? { id: this.hashtag } : undefined,
-        eventStart_gte: this.eventsEnded === 'eventStart_gte' ? new Date() : undefined,
+        eventStart_gte: this.eventsEnded,
       }
       return filter
     },

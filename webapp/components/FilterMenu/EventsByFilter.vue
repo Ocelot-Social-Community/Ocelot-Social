@@ -5,9 +5,9 @@
         <labeled-button
           icon="check"
           :label="$t('filter-menu.ended.all.label')"
-          :filled="eventsEnded === ''"
+          :filled="!eventsEnded"
           :title="$t('filter-menu.ended.all.hint')"
-          @click="toggleEventsEnded('')"
+          @click="toggleEventsEnded(false)"
           data-test="all-button"
         />
       </li>
@@ -15,9 +15,9 @@
         <labeled-button
           icon="calendar"
           :label="$t('filter-menu.ended.onlyEnded.label')"
-          :filled="eventsEnded === 'eventStart_gte'"
+          :filled="!!eventsEnded"
           :title="$t('filter-menu.ended.onlyEnded.hint')"
-          @click="toggleEventsEnded('eventStart_gte')"
+          @click="toggleEventsEnded(true)"
           data-test="not-ended-button"
         />
       </li>
