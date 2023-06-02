@@ -18,7 +18,6 @@ export const state = () => {
       ...defaultFilter,
     },
     order: 'createdAt_desc',
-    eventsEnded: null,
   }
 }
 
@@ -164,6 +163,13 @@ export const mutations = {
   RESET_LANGUAGES(state) {
     const filter = clone(state.filter)
     delete filter.language_in
+    state.filter = filter
+  },
+  RESET_POST_TYPE(state) {
+    const filter = clone(state.filter)
+    delete filter.eventStart_gte
+    delete filter.postType_in
+    state.order = 'createdAt_desc'
     state.filter = filter
   },
   TOGGLE_CATEGORY(state, categoryId) {

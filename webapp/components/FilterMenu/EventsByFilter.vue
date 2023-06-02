@@ -15,7 +15,7 @@
         <labeled-button
           icon="calendar"
           :label="$t('filter-menu.ended.onlyEnded.label')"
-          :filled="!!eventsEnded"
+          :filled="eventsEnded"
           :title="$t('filter-menu.ended.onlyEnded.hint')"
           @click="toggleEventsEnded"
           data-test="not-ended-button"
@@ -38,11 +38,14 @@ export default {
   },
   computed: {
     ...mapGetters({
-      eventsEnded: 'posts/eventsEnded',
+      postFilter: 'posts/filter',
     }),
     sectionTitle() {
       // return $t('filter-menu.eventsEnded')
       return null
+    },
+    eventsEnded() {
+      return !!this.postFilter.eventStart_gte
     },
   },
   methods: {
