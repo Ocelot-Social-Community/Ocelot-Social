@@ -37,6 +37,7 @@ const { parsed } = dotenv.config({ path: '../backend/.env' })
 module.exports = defineConfig({
   e2e: {
     projectId: "qa7fe2",
+    defaultCommandTimeout: 10000,
     chromeWebSecurity: false,
     baseUrl: "http://localhost:3000",
     specPattern: "cypress/e2e/**/*.feature",
