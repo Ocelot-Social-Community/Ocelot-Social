@@ -10,7 +10,7 @@ Given('somebody reported the following posts:', table => {
     cy.factory()
       .build('user', {}, submitter)
       .authenticateAs(submitter)
-      .mutate(gql`mutation($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
+      .mutate(`mutation($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
         fileReport(resourceId: $resourceId, reasonCategory: $reasonCategory, reasonDescription: $reasonDescription) {
           reportId
         }
