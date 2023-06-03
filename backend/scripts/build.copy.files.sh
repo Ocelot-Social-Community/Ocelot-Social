@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # html files
 mkdir -p build/middleware/helpers/email/templates/
