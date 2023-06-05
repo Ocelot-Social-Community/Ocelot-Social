@@ -99,7 +99,7 @@
               ></date-picker>
             </ds-grid-item>
           </ds-grid>
-          <ds-grid>
+          <ds-grid class="event-location-grid">
             <ds-grid-item style="grid-row-end: span 3">
               <ds-input
                 model="eventVenue"
@@ -113,7 +113,7 @@
                 </ds-chip>
               </div>
             </ds-grid-item>
-            <ds-grid-item style="grid-row-end: span 3">
+            <ds-grid-item v-show="!formData.eventIsOnline" style="grid-row-end: span 3">
               <ds-input
                 model="eventLocationName"
                 name="venue"
@@ -131,7 +131,7 @@
           <div>
             <input
               type="checkbox"
-              model="formData.eventIsOnline"
+              v-model="formData.eventIsOnline"
               name="eventIsOnline"
               style="font-size: larger"
             />
@@ -443,6 +443,11 @@ export default {
       margin-top: -10px;
     }
   }
+  // style override to handle dynamic inputs
+  .event-location-grid{
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
 }
 
 .contribution-form > .base-card {
