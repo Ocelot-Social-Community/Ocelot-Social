@@ -272,7 +272,9 @@
       "myFriends": "Nutzer denen ich folge",
       "myGroups": "Aus meinen Gruppen",
       "myTopics": "Meine Themen",
-      "noFilter": "Beiträge filtern"
+      "noFilter": "Inhalt filtern",
+      "onlyArticles": "Nur Beiträge",
+      "onlyEvents": "Nur Veranstaltungen"
     },
     "filterMyGroups": "Beiträge in meinen Gruppen",
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
@@ -378,19 +380,40 @@
   },
   "filter-menu": {
     "all": "Alle",
-    "article": "Artikel",
+    "article": "Beitrag",
     "categories": "Themen",
+    "creationDate": "Erstellungszeitpunkt",
     "deleteFilter": "Filter löschen",
     "emotions": "Emotionen",
-    "events": "Veranstaltungen",
+    "ended": {
+      "all": {
+        "hint": "Zeige alle, auch beendete",
+        "label": "Alle"
+      },
+      "onlyEnded": {
+        "hint": "Zeige nur noch nicht beendete",
+        "label": "Nicht beendete"
+      }
+    },
+    "event": "Veranstaltung",
+    "eventsBy": "Veranstaltungen – zeige ...",
+    "eventsEnded": "Beendet",
     "filter-by": "Filtern nach ...",
     "following": "Nutzer denen ich folge",
     "languages": "Sprachen",
     "my-groups": "Meinen Gruppen",
     "order": {
+      "last": {
+        "hint": "Sortiere die Letzten nach vorn",
+        "label": "Letzte zuerst"
+      },
       "newest": {
         "hint": "Sortiere die Neuesten nach vorn",
         "label": "Neueste zuerst"
+      },
+      "next": {
+        "hint": "Sortiere die Nächsten nach vorn",
+        "label": "Nächste zuerst"
       },
       "oldest": {
         "hint": "Sortiere die Ältesten nach vorn",
@@ -398,11 +421,12 @@
       }
     },
     "order-by": "Sortieren nach ...",
-    "post-type": "Beitrags-Typ",
+    "post-type": "Inhaltstyp",
     "save": {
       "error": "Themen konnten nicht gespeichert werden!",
       "success": "Themen gespeichert!"
-    }
+    },
+    "startDate": "Anfangszeitpunkt"
   },
   "followButton": {
     "follow": "Folgen",
