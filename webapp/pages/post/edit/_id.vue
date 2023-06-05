@@ -33,6 +33,9 @@ export default {
       user: 'auth/user',
     }),
   },
+  data() {
+    return { contribution: {} }
+  },
   async asyncData(context) {
     const {
       app,
