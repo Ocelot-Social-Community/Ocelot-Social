@@ -1,5 +1,4 @@
 import { Given } from "@badeball/cypress-cucumber-preprocessor";
-import { gql } from '../../../../backend/src/helpers/jest'
 
 Given('somebody reported the following posts:', table => {
   table.hashes().forEach(({ submitterEmail, resourceId, reasonCategory, reasonDescription }) => {
