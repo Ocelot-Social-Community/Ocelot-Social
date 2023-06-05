@@ -705,7 +705,8 @@
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
-      "title": "Bearbeite deinen Beitrag"
+      "title": "Bearbeite deinen Beitrag",
+      "event": "Bearbeite deine Veranstaltung"
     },
     "event": "Veranstaltung",
     "menu": {

@@ -705,7 +705,8 @@
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Edit Your Post"
+      "title": "Edit Your Post",
+      "event": "Edit Your Event"
     },
     "event": "Event",
     "menu": {

@@ -1,7 +1,7 @@
 <template>
   <div>
     <ds-space margin="small">
-      <ds-heading tag="h1">{{ $t('post.editPost.title') }}</ds-heading>
+      <ds-heading tag="h1">{{ contribution && contribution.postType[0] === 'Event' ? $t('post.editPost.event') : $t('post.editPost.title') }}</ds-heading>
       <ds-heading v-if="contribution && contribution.group" tag="h2">
         {{ $t('post.editPost.forGroup.title', { name: contribution.group.name }) }}
       </ds-heading>
