@@ -233,6 +233,11 @@ type Mutation {
   pinPost(id: ID!): Post
   unpinPost(id: ID!): Post
   markTeaserAsViewed(id: ID!): Post
+
+  # Shout the given Type and ID
+  shout(id: ID!, type: ShoutTypeEnum): Boolean!
+  # Unshout the given Type and ID
+  unshout(id: ID!, type: ShoutTypeEnum): Boolean!
 }
 
 type Query {
