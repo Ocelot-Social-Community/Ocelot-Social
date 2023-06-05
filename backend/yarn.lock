@@ -1511,10 +1511,10 @@
     url-regex "~4.1.1"
     video-extensions "~1.1.0"
 
-"@metascraper/helpers@^5.33.5", "@metascraper/helpers@^5.34.2", "@metascraper/helpers@^5.34.4":
-  version "5.34.4"
-  resolved "https://registry.yarnpkg.com/@metascraper/helpers/-/helpers-5.34.4.tgz#59faf01466938b26aa8df147f97c7f9f4d739d28"
-  integrity sha512-OZdXkfxJXH5dW+aoptLJzxN56Xj+ABzbqZ9NDuKn908zW4tvLBPD6go3qdd3GXXQZH7TxvWpETn9i1AxzoyKmQ==
+"@metascraper/helpers@^5.33.5", "@metascraper/helpers@^5.34.2", "@metascraper/helpers@^5.34.4", "@metascraper/helpers@^5.34.7":
+  version "5.34.7"
+  resolved "https://registry.yarnpkg.com/@metascraper/helpers/-/helpers-5.34.7.tgz#749a288813e9f61938bb64d34bfb4e2c26689cbe"
+  integrity sha512-h3Kg9xFoVlr3rqxbhpR+o7nzYuThXtiDuk+kiaIWozAguUWT6xvwb3iHKuCdKC9/29PXeJ+UqM9WxBamxbzGmg==
   dependencies:
     audio-extensions "0.0.0"
     chrono-node "~2.6.2"
@@ -1527,13 +1527,13 @@
     is-uri "~1.2.4"
     iso-639-3 "~2.2.0"
     isostring "0.0.1"
-    jsdom "~22.0.0"
+    jsdom "~22.1.0"
     lodash "~4.17.21"
     memoize-one "~6.0.0"
     microsoft-capitalize "~1.0.5"
     mime "~3.0.0"
     normalize-url "~6.1.0"
-    re2 "~1.18.0"
+    re2 "~1.18.3"
     smartquotes "~2.3.2"
     tldts "~6.0.1"
     url-regex-safe "~3.0.0"
@@ -5918,10 +5918,10 @@ insane@2.6.1:
     assignment "2.0.0"
     he "0.5.0"
 
-install-artifact-from-github@^1.3.1:
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/install-artifact-from-github/-/install-artifact-from-github-1.3.2.tgz#1a16d9508e40330523a3017ae0d4713ccc64de82"
-  integrity sha512-yCFcLvqk0yQdxx0uJz4t9Z3adDMLAYrcGYv546uRXCSvxE+GqNYhhz/KmrGcUKGI/gVLR9n/e/zM9jX/+ASMJQ==
+install-artifact-from-github@^1.3.3:
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/install-artifact-from-github/-/install-artifact-from-github-1.3.3.tgz#57d89bacfa0f47d7307fe41b6247cda9f9a8079c"
+  integrity sha512-x79SL0d8WOi1ZjXSTUqqs0GPQZ92YArJAN9O46wgU9wdH2U9ecyyhB9YGDbPe2OLV4ptmt6AZYRQZ2GydQZosQ==
 
 invariant@^2.2.2, invariant@^2.2.4:
   version "2.2.4"
@@ -6807,10 +6807,10 @@ jsbn@~0.1.0:
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
   integrity sha512-UVU9dibq2JcFWxQPA6KCqj5O42VOmAY3zQUfEKxU0KpTGXwNoCjkX1e13eHNvw/xPynt6pU0rZ1htjWTNTSXsg==
 
-jsdom@~22.0.0:
-  version "22.0.0"
-  resolved "https://registry.yarnpkg.com/jsdom/-/jsdom-22.0.0.tgz#3295c6992c70089c4b8f5cf060489fddf7ee9816"
-  integrity sha512-p5ZTEb5h+O+iU02t0GfEjAnkdYPrQSkfuTSMkMYyIoMvUNEHsbG0bHHbfXIcfTqD2UfvjQX7mmgiFsyRwGscVw==
+jsdom@~22.1.0:
+  version "22.1.0"
+  resolved "https://registry.yarnpkg.com/jsdom/-/jsdom-22.1.0.tgz#0fca6d1a37fbeb7f4aac93d1090d782c56b611c8"
+  integrity sha512-/9AVW7xNbsBv6GfWho4TTNjEo9fe6Zhf9O7s0Fhhr3u+awPwAJMKwAMXnkk5vBxflqLW9hTHX/0cs+P3gW+cQw==
   dependencies:
     abab "^2.0.6"
     cssstyle "^3.0.0"
@@ -7385,12 +7385,12 @@ metascraper-soundcloud@^5.34.4:
   dependencies:
     "@metascraper/helpers" "^5.34.4"
 
-metascraper-title@^5.33.5:
-  version "5.33.5"
-  resolved "https://registry.yarnpkg.com/metascraper-title/-/metascraper-title-5.33.5.tgz#2efd6aae03211175fa2e27b4d827cade4c3e35f4"
-  integrity sha512-Vavt/2Yt4BZP+++xsV2ZnUqqQ4WHxRImZq6fZD6Eh8R8nt43kuQdgKrBKTD3Ybk6/qvlCTQ9XY57m/KTIiAMnA==
+metascraper-title@^5.34.7:
+  version "5.34.7"
+  resolved "https://registry.yarnpkg.com/metascraper-title/-/metascraper-title-5.34.7.tgz#d53afa05eb4d5f2d7b8ec772ddfc335733f86a21"
+  integrity sha512-k+eDC12Y1m5n/RE3GhqmWRtNSKH9rDXvAzJ6k2T9+9PyaGeaSN9dWLnc3rK9TYmdFP02kTKhCAV8WerHw/7IqA==
   dependencies:
-    "@metascraper/helpers" "^5.33.5"
+    "@metascraper/helpers" "^5.34.7"
 
 metascraper-url@^5.34.2:
   version "5.34.2"
@@ -7854,7 +7854,7 @@ node-fetch@^2.1.2, node-fetch@^2.2.0, node-fetch@^2.6.0, node-fetch@~2.6.1:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
-node-gyp@^9.3.0:
+node-gyp@^9.3.1:
   version "9.3.1"
   resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-9.3.1.tgz#1e19f5f290afcc9c46973d68700cbd21a96192e4"
   integrity sha512-4Q16ZCqq3g8awk6UplT7AuxQ35XN4R/yf/+wSAwcBUAjg7l58RTactWaP8fIDTi0FzI7YcVLujwExakZlfWkXg==
@@ -8711,14 +8711,14 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-re2@~1.18.0:
-  version "1.18.0"
-  resolved "https://registry.yarnpkg.com/re2/-/re2-1.18.0.tgz#6d6f47c5aaa436eb7a7d68b260f8cf25d7948619"
-  integrity sha512-MoCYZlJ9YUgksND9asyNF2/x532daXU/ARp1UeJbQ5flMY6ryKNEhrWt85aw3YluzOJlC3vXpGgK2a1jb0b4GA==
+re2@~1.18.3:
+  version "1.18.3"
+  resolved "https://registry.yarnpkg.com/re2/-/re2-1.18.3.tgz#64120f3990351e6d71207b095a92ebc41f123c7f"
+  integrity sha512-QAUSIl5znNR/GOXLIUWWao0pPQ2VZU/t9u+0j17x7lXXypPsil8iuYBsSuMDZ3TGx439332tYdh0d9Nt8XGbHg==
   dependencies:
-    install-artifact-from-github "^1.3.1"
+    install-artifact-from-github "^1.3.3"
     nan "^2.17.0"
-    node-gyp "^9.3.0"
+    node-gyp "^9.3.1"
 
 reachable-url@~1.7.1:
   version "1.7.1"
