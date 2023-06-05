@@ -740,7 +740,7 @@
       "unpin": "Unpin post",
       "unpinnedSuccessfully": "Post unpinned successfully!"
     },
-    "name": "Post",
+    "name": "Article",
     "pinned": "Announcement",
     "takeAction": {
       "name": "Take action"
