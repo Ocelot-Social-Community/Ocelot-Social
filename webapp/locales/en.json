@@ -12,7 +12,7 @@
     "categories": {
       "categoryName": "Name",
       "name": "Topics",
-      "postCount": "Articles"
+      "postCount": "Posts"
     },
     "dashboard": {
       "comments": "Comments",
@@ -21,7 +21,7 @@
       "name": "Dashboard",
       "notifications": "Notifications",
       "organizations": "Organizations",
-      "posts": "Articles",
+      "posts": "Posts",
       "projects": "Projects",
       "shouts": "Shouts",
       "users": "Users"
@@ -37,7 +37,7 @@
       "name": "Hashtags",
       "nameOfHashtag": "Name",
       "number": "No.",
-      "tagCount": "Articles",
+      "tagCount": "Posts",
       "tagCountUnique": "Users"
     },
     "invites": {
@@ -105,7 +105,7 @@
     "loadMore": "load more",
     "name": "Name",
     "organization": "Organization ::: Organizations",
-    "post": "Contribution ::: Contributions",
+    "post": "Post ::: Posts",
     "project": "Project ::: Projects",
     "reportContent": "Report",
     "shout": "Shout ::: Shouts",
@@ -272,14 +272,14 @@
       "myFriends": "Users I follow",
       "myGroups": "By my groups",
       "myTopics": "My topics",
-      "noFilter": "Filter articles"
+      "noFilter": "Filter posts"
     },
     "filterMyGroups": "Contributions in my groups",
     "inappropriatePicture": "This image may be inappropriate for some people.",
     "languageSelectLabel": "Language of your contribution",
     "languageSelectText": "Select Language",
     "newEvent": "Create a new Event",
-    "newPost": "Create a new Article",
+    "newPost": "Create a new Post",
     "success": "Saved!",
     "teaserImage": {
       "cropImage": "Crop image",
@@ -291,7 +291,7 @@
       "supportedFormats": "Insert a picture of file format JPG, PNG or GIF"
     },
     "title": "Title",
-    "visibleOnlyForMembersOfGroup": "This contribution will only be visible to members of the “<b>{name}</b>” group."
+    "visibleOnlyForMembersOfGroup": "This post will only be visible to members of the “<b>{name}</b>” group."
   },
   "delete": {
     "cancel": "Cancel",
@@ -370,10 +370,10 @@
     "500-default": "Internal Server Error!",
     "503-default": "Service Unavailable!",
     "back-to-index": "Back to index page!",
-    "cannot-edit-post": "This contribution cannot be edited!",
+    "cannot-edit-post": "This post cannot be edited!",
     "default": "An error occurred!",
     "group-not-found": "This group profile could not be found!",
-    "post-not-found": "This contribution could not be found!",
+    "post-not-found": "This post could not be found!",
     "profile-not-found": "This profile could not be found!"
   },
   "filter-menu": {
@@ -398,7 +398,7 @@
       }
     },
     "order-by": "Order by ...",
-    "post-type": "Article type",
+    "post-type": "Post type",
     "save": {
       "error": "Failed saving topic settings!",
       "success": "Topics saved!"
@@ -500,9 +500,9 @@
       "public": "Public"
     },
     "typesOptions": {
-      "closed": "Closed — All contributions only visible to the group's members",
+      "closed": "Closed — All posts only visible to the group's members",
       "hidden": "Secret — Group (including the name) is completely invisible",
-      "public": "Public — Group and all contributions are visible for all registered users"
+      "public": "Public — Group and all posts are visible for all registered users"
     },
     "update": "Save change",
     "updatedGroup": "The group data has been changed."
@@ -601,12 +601,12 @@
         },
         "Post": {
           "disable": {
-            "message": "Do you really want to let the article \"<b>{name}</b>\" stay <b>disabled</b>?",
-            "title": "Finally Disable Article"
+            "message": "Do you really want to let the post \"<b>{name}</b>\" stay <b>disabled</b>?",
+            "title": "Finally Disable Post"
           },
           "enable": {
-            "message": "Do you really want to let the article \"<b>{name}</b>\" stay <b>enabled</b>?",
-            "title": "Finally Enable Article"
+            "message": "Do you really want to let the post \"<b>{name}</b>\" stay <b>enabled</b>?",
+            "title": "Finally Enable Post"
           }
         },
         "submit": "Confirm decision",
@@ -663,12 +663,12 @@
     },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
-    "post": "Contribution or Group",
+    "post": "Post or Group",
     "reason": {
       "changed_group_member_role": "Changed your role in group …",
-      "commented_on_post": "Commented on your contribution …",
+      "commented_on_post": "Commented on your post …",
       "mentioned_in_comment": "Mentioned you in a comment …",
-      "mentioned_in_post": "Mentioned you in a contribution …",
+      "mentioned_in_post": "Mentioned you in a post …",
       "removed_user_from_group": "Removed you from group …",
       "user_joined_group": "Joined your group …",
       "user_left_group": "Left your group …"
@@ -698,25 +698,25 @@
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Create A New Article"
+      "title": "Create A New Post"
     },
     "edited": "edited",
     "editPost": {
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Edit Your Contribution"
+      "title": "Edit Your Post"
     },
     "event": "Event",
     "menu": {
-      "delete": "Delete contribution",
-      "edit": "Edit contribution",
-      "pin": "Pin contribution",
-      "pinnedSuccessfully": "Contribution pinned successfully!",
-      "unpin": "Unpin contribution",
-      "unpinnedSuccessfully": "Contribution unpinned successfully!"
+      "delete": "Delete post",
+      "edit": "Edit post",
+      "pin": "Pin post",
+      "pinnedSuccessfully": "Post pinned successfully!",
+      "unpin": "Unpin post",
+      "unpinnedSuccessfully": "Post unpinned successfully!"
     },
-    "name": "Article",
+    "name": "Post",
     "pinned": "Announcement",
     "takeAction": {
       "name": "Take action"
@@ -733,7 +733,7 @@
       "forGroup": {
         "title": "In The Group “{name}”"
       },
-      "title": "Article"
+      "title": "Post"
     }
   },
   "profile": {
@@ -802,7 +802,7 @@
     "contribution": {
       "error": "You have already reported the contribution!",
       "message": "Do you really want to report the contribution \"<b>{name}</b>\"?",
-      "title": "Report Contribution",
+      "title": "Report Post",
       "type": "Contribution"
     },
     "reason": {
@@ -812,7 +812,7 @@
         "options": {
           "advert_products_services_commercial": "Advertising products and services with commercial intent.",
           "criminal_behavior_violation_german_law": "Criminal behavior or violation of German law.",
-          "discrimination_etc": "Discriminatory contributions, comments, utterances or insults.",
+          "discrimination_etc": "Discriminatory posts, comments, utterances or insults.",
           "doxing": "The disclosure of others' personal information without their consent or threat there of (\"doxing\").",
           "glorific_trivia_of_cruel_inhuman_acts": "Glorification or trivialization of cruel or inhuman acts of violence.",
           "intentional_intimidation_stalking_persecution": "Intentional intimidation, stalking or persecution.",
@@ -840,11 +840,11 @@
     "for": "Searching for ",
     "heading": {
       "Group": "Group ::: Groups",
-      "Post": "Contribution ::: Contributions",
+      "Post": "Post ::: Posts",
       "Tag": "Hashtag ::: Hashtags",
       "User": "User ::: Users"
     },
-    "hint": "What are you searching for? Use !… for contributions, @… for users, &… for groups, #… for hashtags.",
+    "hint": "What are you searching for? Use !… for posts, @… for users, &… for groups, #… for hashtags.",
     "no-results": "No results found for \"{search}\". Try a different search term!",
     "page": "Page",
     "placeholder": "Search",
@@ -862,7 +862,7 @@
       "empty": "So far, you have not blocked anybody.",
       "explanation": {
         "closing": "This should be sufficient for now so that blocked users can no longer bother you.",
-        "commenting-disabled": "Commenting is not possible at this time on this contribution.",
+        "commenting-disabled": "Commenting is not possible at this time on this post.",
         "commenting-explanation": "This can happen for several reasons, please see our ",
         "intro": "If another user has been blocked by you, this is what happens:",
         "notifications": "Blocked users will no longer receive notifications if they mention each other.",
@@ -885,20 +885,20 @@
       "success": "Your data was successfully updated!"
     },
     "deleteUserAccount": {
-      "accountDescription": "Be aware that your Contributions and Comments are important to our community. If you still choose to delete them, you have to mark them below.",
-      "accountWarning": "You CAN'T MANAGE and CAN'T RECOVER your Account, Contributions, or Comments after deleting your account!",
+      "accountDescription": "Be aware that your Posts and Comments are important to our community. If you still choose to delete them, you have to mark them below.",
+      "accountWarning": "You CAN'T MANAGE and CAN'T RECOVER your Account, Posts, or Comments after deleting your account!",
       "accountWarningAdmin": "The account, contributions or comments can NOT BE ADMINISTERED OR RESTORED after deletion!",
       "accountWarningIsAdmin": "Attention! You are about to delete a user account!",
       "commentedCount": "Delete my {count} comment ::: Delete my {count} comments",
       "confirmDeleting": "Delete user account now",
-      "contributionsCount": "Delete my {count} contribution ::: Delete my {count} contributions",
+      "contributionsCount": "Delete my {count} post ::: Delete my {count} posts",
       "infoAdmin": "All contributions and comments of the user will be deleted additionally!",
       "name": "Delete user account",
       "pleaseConfirm": "Destructive action! Type “{confirm}” to confirm.",
       "success": "Account successfully deleted!"
     },
     "download": {
-      "description": "Click on the button above to download the content of your contributions and comments. To download the images of your contributions, you have to click on the corresponding link below.",
+      "description": "Click on the button above to download the content of your posts and comments. To download the images of your posts, you have to click on the corresponding link below.",
       "json": "as JSON",
       "name": "Download Data"
     },
@@ -954,8 +954,8 @@
       "empty": "So far, you have not muted anybody.",
       "explanation": {
         "intro": "If another user has been muted by you, this is what happens:",
-        "search": "Contributions of muted people disappear from your search results.",
-        "your-perspective": "The muted person's contributions will no longer appear in your news feed."
+        "search": "Posts of muted people disappear from your search results.",
+        "your-perspective": "The muted person's posts will no longer appear in your news feed."
       },
       "how-to": "You can mute other users on their profile page via the content menu.",
       "mute": "Mute user",
