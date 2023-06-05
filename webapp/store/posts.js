@@ -63,12 +63,6 @@ export const mutations = {
     if (isEmpty(get(filter, 'categories_some.id_in'))) delete filter.categories_some
     state.filter = filter
   },
-  TOGGLE_POST_TYPE(state, postType) {
-    const filter = clone(state.filter)
-    update(filter, 'postType_in', (postTypes) => xor(postTypes, [postType]))
-    if (isEmpty(get(filter, 'postType_in'))) delete filter.postType_in
-    state.filter = filter
-  },
   TOGGLE_LANGUAGE(state, languageCode) {
     const filter = clone(state.filter)
     update(filter, 'language_in', (languageCodes) => xor(languageCodes, [languageCode]))
@@ -79,6 +73,42 @@ export const mutations = {
     const filter = clone(state.filter)
     update(filter, 'emotions_some.emotion_in', (emotions) => xor(emotions, [emotion]))
     if (isEmpty(get(filter, 'emotions_some.emotion_in'))) delete filter.emotions_some
+    state.filter = filter
+  },
+  RESET_POST_TYPE(state) {
+    const filter = clone(state.filter)
+    delete filter.eventStart_gte
+    delete filter.postType_in
+    state.order = 'createdAt_desc'
+    state.filter = filter
+  },
+  TOGGLE_POST_TYPE(state, postType) {
+    const filter = clone(state.filter)
+    if (postType && !(filter.postType_in && filter.postType_in.includes(postType))) {
+      filter.postType_in = [postType]
+      if (postType === 'Event') {
+        filter.eventStart_gte = new Date()
+        state.order = 'eventStart_asc'
+      } else {
+        delete filter.eventStart_gte
+        state.order = 'createdAt_desc'
+      }
+    } else {
+      delete filter.eventStart_gte
+      delete filter.postType_in
+      state.order = 'createdAt_desc'
+    }
+    state.filter = filter
+  },
+  TOGGLE_EVENTS_ENDED(state) {
+    const filter = clone(state.filter)
+    if (filter.eventStart_gte) {
+      delete filter.eventStart_gte
+    } else {
+      if (filter.postType_in && filter.postType_in.includes('Event')) {
+        filter.eventStart_gte = new Date()
+      }
+    }
     state.filter = filter
   },
   TOGGLE_ORDER(state, value) {

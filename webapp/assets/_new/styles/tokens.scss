@@ -90,6 +90,9 @@ $background-color-primary-inverse: rgb(241, 253, 244);
 $background-color-secondary: rgb(0, 142, 230);
 $background-color-secondary-active: rgb(10, 161, 255);
 $background-color-secondary-inverse: rgb(240, 249, 255);
+$background-color-third: rgb(126, 82, 204);
+$background-color-third-active: rgb(160, 103, 255);
+$background-color-third-inverse: rgb(239, 230, 255);
 $background-color-success: rgb(23, 181, 63);
 $background-color-success-active: rgb(26, 203, 71);
 $background-color-success-inverse: rgb(241, 253, 244);
@@ -395,3 +398,12 @@ $color-toast-orange: $color-warning;
 $color-toast-yellow: $color-yellow;
 $color-toast-blue: $color-secondary;
 $color-toast-green: $color-success;
+
+/**
+ * @tokens Ribbon Color
+ */
+
+$color-ribbon-event: $background-color-third;
+$color-ribbon-event-active: $background-color-third-active;
+$color-ribbon-article: $background-color-secondary;
+$color-ribbon-article-active: $background-color-secondary-active;
