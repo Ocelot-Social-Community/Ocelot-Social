@@ -12,12 +12,12 @@
       <li class="item item-save-topics">
         <labeled-button filled :label="$t('actions.save')" icon="save" @click="saveCategories" />
       </li>
-      <hr />
-      <ds-space margin="base" />
     </template>
 
     <template #filter-list>
       <div class="category-filter-list">
+        <hr />
+        <ds-space margin="small" />
         <base-button
           v-for="category in categories"
           :key="category.id"
