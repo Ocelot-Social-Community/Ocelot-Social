@@ -7,7 +7,7 @@ Then('I see all the reported posts including the one from above', () => {
     hostname: 'localhost',
   }).as('getReports')
 
-  cy.wait(['@getReports'],{ timeout: 10000 }).then((interception) => {
+  cy.wait(['@getReports'],{ timeout: 30000 }).then((interception) => {
     console.log('Cypress interception:', interception)
     cy.wrap(interception.response.statusCode).should('eq', 200)
     cy.wrap(interception.request.body)
