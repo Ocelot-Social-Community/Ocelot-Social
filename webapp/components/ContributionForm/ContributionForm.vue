@@ -282,7 +282,11 @@ export default {
         },
         eventStart: { required: !!this.createEvent },
         eventVenue: { required: !!this.createEvent, min: 3, max: 100 },
-        eventLocationName: { required: !!this.createEvent && !this.formData.eventIsOnline, min: 3, max: 100 },
+        eventLocationName: {
+          required: !!this.createEvent && !this.formData.eventIsOnline,
+          min: 3,
+          max: 100,
+        },
       }
     },
     eventInput() {
