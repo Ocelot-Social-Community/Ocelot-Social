@@ -5,18 +5,12 @@ jobs:
   fullstack_tests:
     name: Fullstack tests
     runs-on: ubuntu-latest
-    # env:
-    #   jobs: 8
-    # strategy:
-    #   matrix:
-    #     # run copies of the current job in parallel
-    #     job: [1, 2, 3, 4, 5, 6, 7, 8]
-    # env:
-    #   jobs: 8
-    # strategy:
-    #   matrix:
-    #     # run copies of the current job in parallel
-    #     job: [1, 2, 3, 4, 5, 6, 7, 8]
+    env:
+      jobs: 8
+    strategy:
+      matrix:
+        # run copies of the current job in parallel
+        job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -34,7 +28,7 @@ jobs:
         id: e2e-tests
         run: |
           yarn install
-          yarn run cypress:run --spec cypress/integration/Moderation.ReportContent.feature
+          yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
 
       ##########################################################################
       # UPLOAD SCREENSHOTS - IF TESTS FAIL #####################################
