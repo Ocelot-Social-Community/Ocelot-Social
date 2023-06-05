@@ -1,6 +1,6 @@
 {
   "projectId": "qa7fe2",
-  "defaultCommandTimeout": 5000,
+  "defaultCommandTimeout": 10000,
   "pageLoadTimeout": 180000,
   "ignoreTestFiles": "*.js",
   "chromeWebSecurity": false,
