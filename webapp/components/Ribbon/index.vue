@@ -25,7 +25,7 @@ export default {
   padding: $size-ribbon $size-ribbon;
   border-radius: $border-radius-small 0 0 $border-radius-small;
   color: $color-neutral-100;
-  background-color: $background-color-secondary-active;
+  background-color: $color-ribbon-article-active;
   font-size: $font-size-x-small;
   font-weight: $font-weight-bold;
 
@@ -36,7 +36,7 @@ export default {
     bottom: -$size-ribbon;
     border-width: $border-size-large 4px $border-size-large $border-size-large;
     border-style: solid;
-    border-color: $background-color-secondary transparent transparent $background-color-secondary;
+    border-color: $color-ribbon-article transparent transparent $color-ribbon-article;
   }
 
   &.--pinned {
@@ -48,10 +48,10 @@ export default {
   }
 }
 .eventBg {
-  background-color: $color-third;
+  background-color: $color-ribbon-event-active;
 
   &::before {
-    border-color: $color-third transparent transparent $color-third;
+    border-color: $color-ribbon-event transparent transparent $color-ribbon-event;
   }
 }
 </style>
