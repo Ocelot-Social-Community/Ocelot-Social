@@ -279,7 +279,7 @@
     "languageSelectLabel": "Sprache Deines Beitrags",
     "languageSelectText": "Sprache wählen",
     "newEvent": "Erstelle einen neue Veranstaltung",
-    "newPost": "Erstelle einen neuen Beitrag",
+    "newPost": "Erstelle einen neuen Artikel",
     "success": "Gespeichert!",
     "teaserImage": {
       "cropImage": "Bild zuschneiden",
@@ -698,7 +698,7 @@
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
-      "title": "Erstelle einen neuen Beitrag"
+      "title": "Erstelle einen neuen Artikel"
     },
     "edited": "bearbeitet",
     "editPost": {
