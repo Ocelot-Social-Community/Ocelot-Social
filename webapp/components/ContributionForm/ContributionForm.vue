@@ -131,7 +131,7 @@
           <div>
             <input
               type="checkbox"
-              model="formData.eventIsOnline"
+              v-model="formData.eventIsOnline"
               name="eventIsOnline"
               style="font-size: larger"
             />
@@ -252,7 +252,21 @@ export default {
         eventVenue: eventVenue || '',
         eventIsOnline: eventIsOnline || false,
       },
-      formSchema: {
+      loading: false,
+      users: [],
+      hashtags: [],
+      imageUpload: null,
+    }
+  },
+  async mounted() {
+    await import(`vue2-datepicker/locale/${this.currentUser.locale}`)
+  },
+  computed: {
+    ...mapGetters({
+      currentUser: 'auth/user',
+    }),
+    formSchema() {
+      return {
         title: { required: true, min: 3, max: 100 },
         content: { required: true },
         imageBlurred: { required: false },
@@ -268,21 +282,9 @@ export default {
         },
         eventStart: { required: !!this.createEvent },
         eventVenue: { required: !!this.createEvent, min: 3, max: 100 },
-        eventLocationName: { required: !!this.createEvent, min: 3, max: 100 },
-      },
-      loading: false,
-      users: [],
-      hashtags: [],
-      imageUpload: null,
-    }
-  },
-  async mounted() {
-    await import(`vue2-datepicker/locale/${this.currentUser.locale}`)
-  },
-  computed: {
-    ...mapGetters({
-      currentUser: 'auth/user',
-    }),
+        eventLocationName: { required: !!this.createEvent && !this.formData.eventIsOnline, min: 3, max: 100 },
+      }
+    },
     eventInput() {
       if (this.createEvent) {
         return {
