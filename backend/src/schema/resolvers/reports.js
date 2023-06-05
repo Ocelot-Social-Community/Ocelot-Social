@@ -92,7 +92,7 @@ export default {
             [(submitter:User)-[filed:FILED]->(report) |  filed {.*, submitter: properties(submitter)} ] as filed,
             [(moderator:User)-[reviewed:REVIEWED]->(report) |  reviewed {.*, moderator: properties(moderator)} ] as reviewed,
             [(resource)<-[:WROTE]-(author:User) | author {.*} ] as optionalAuthors,
-            [(resource)-[:COMMENTS]->(post:Post) | post {.*, author: properties(optionalAuthors), postType: filter(l IN labels(post) WHERE NOT l = "Post")} ] as optionalCommentedPosts,
+            [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post {.*, author: properties(author), postType: filter(l IN labels(post) WHERE NOT l = "Post")} ] as optionalCommentedPosts,
             resource {.*, __typename: labels(resource)[0] } as resourceWithType
             WITH report, optionalAuthors, optionalCommentedPosts, reviewed, filed,
             resourceWithType {.*, post: optionalCommentedPosts[0], author: optionalAuthors[0] } as finalResource
