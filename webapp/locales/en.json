@@ -702,11 +702,11 @@
     },
     "edited": "edited",
     "editPost": {
+      "event": "Edit Your Event",
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Edit Your Post",
-      "event": "Edit Your Event"
+      "title": "Edit Your Post"
     },
     "event": "Event",
     "menu": {

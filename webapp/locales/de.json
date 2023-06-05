@@ -702,11 +702,11 @@
     },
     "edited": "bearbeitet",
     "editPost": {
+      "event": "Bearbeite deine Veranstaltung",
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
-      "title": "Bearbeite deinen Beitrag",
-      "event": "Bearbeite deine Veranstaltung"
+      "title": "Bearbeite deinen Beitrag"
     },
     "event": "Veranstaltung",
     "menu": {
