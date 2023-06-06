@@ -12,7 +12,6 @@ docker-compose*.yml
 ./*.log
 
 node_modules/
-scripts/
 build/
 
 maintenance-worker/

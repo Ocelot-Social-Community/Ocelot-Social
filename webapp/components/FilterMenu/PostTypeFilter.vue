@@ -5,22 +5,31 @@
     class="following-filter"
   >
     <template #filter-follower>
+      <li class="item all-item">
+        <labeled-button
+          icon="check"
+          :label="$t('filter-menu.all')"
+          :filled="filteredPostTypes.length === 0"
+          :title="$t('filter-menu.all')"
+          @click="togglePostType(null)"
+        />
+      </li>
       <li class="item article-item">
         <labeled-button
           icon="book"
           :label="$t('filter-menu.article')"
-          :filled="articleSet"
+          :filled="filteredPostTypes.includes('Article')"
           :title="$t('filter-menu.article')"
-          @click="toggleFilterPostType('Article')"
+          @click="togglePostType('Article')"
         />
       </li>
       <li class="item event-item">
         <labeled-button
           icon="calendar"
-          :label="$t('filter-menu.events')"
-          :filled="eventSet"
-          :title="$t('filter-menu.events')"
-          @click="toggleFilterPostType('Event')"
+          :label="$t('filter-menu.event')"
+          :filled="filteredPostTypes.includes('Event')"
+          :title="$t('filter-menu.event')"
+          @click="togglePostType('Event')"
         />
       </li>
     </template>
@@ -41,18 +50,11 @@ export default {
   computed: {
     ...mapGetters({
       filteredPostTypes: 'posts/filteredPostTypes',
-      currentUser: 'auth/user',
     }),
-    articleSet() {
-      return this.filteredPostTypes.includes('Article')
-    },
-    eventSet() {
-      return this.filteredPostTypes.includes('Event')
-    },
   },
   methods: {
     ...mapMutations({
-      toggleFilterPostType: 'posts/TOGGLE_POST_TYPE',
+      togglePostType: 'posts/TOGGLE_POST_TYPE',
     }),
   },
 }
