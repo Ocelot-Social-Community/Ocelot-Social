@@ -112,7 +112,7 @@ export default {
 .create-form-btn:not(.ds-card-primary):hover {
   background-color: #faf9fa;
 }
-.create-form-btn .ds-button-ghost:hover{
+.create-form-btn .ds-button-ghost:hover {
   background-color: transparent;
 }
 </style>
