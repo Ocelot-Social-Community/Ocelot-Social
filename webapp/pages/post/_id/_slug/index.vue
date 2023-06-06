@@ -244,7 +244,10 @@ export default {
       const { slug, id } = this.$route.params
       return [
         {
-          name: this.post?.postType[0] === 'Event' ? this.$t('post.viewEvent.title') : this.$t('post.viewPost.title'),
+          name:
+            this.post?.postType[0] === 'Event'
+              ? this.$t('post.viewEvent.title')
+              : this.$t('post.viewPost.title'),
           path: `/post/${id}/${slug}`,
           children: [
             {

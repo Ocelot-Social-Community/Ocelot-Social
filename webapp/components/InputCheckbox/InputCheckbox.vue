@@ -1,10 +1,6 @@
 <template>
   <div>
-    <input
-      type="checkbox"
-      v-model="currentValue"
-      :name="name"
-    />
+    <input type="checkbox" v-model="currentValue" :name="name" />
     {{ label }}
   </div>
 </template>
