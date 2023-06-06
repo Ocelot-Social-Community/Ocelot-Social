@@ -39,7 +39,6 @@ export default {
   },
   watch: {
     currentValue() {
-    //   this.$emit('input', this.currentValue)
       this.$parentForm.update('formData.isOnlineEvent', this.currentValue)
     },
   },
