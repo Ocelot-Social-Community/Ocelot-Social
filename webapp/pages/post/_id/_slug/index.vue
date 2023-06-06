@@ -64,22 +64,41 @@
                 <base-icon name="map-marker" data-test="map-marker" />
                 <span v-if="post.eventVenue">{{ post.eventVenue }}</span>
                 <span v-if="!post.eventIsOnline">
-                  <span v-if="post.eventVenue">-</span>
+                  <span v-if="post.eventVenue">&mdash;</span>
                   {{ post.eventLocationName }}
                 </span>
                 <span v-else>
-                  <span v-if="post.eventVenue">-</span>
+                  <span v-if="post.eventVenue">&mdash;</span>
                   {{ $t('post.viewEvent.eventIsOnline') }}
                 </span>
               </ds-text>
               <ds-text align="left" color="soft" class="event-info">
-                <base-icon name="calendar" data-test="calendar" />
-                <span>{{ getEventDateString }}</span>
+                <div>
+                  <div>
+                    <base-icon name="calendar" data-test="calendar" />
+                    <span>{{ getEventStartDateString }}</span>
+                  </div>
+                  <div>
+                    <base-icon name="clock" data-test="calendar" />
+                    <span>{{ getEventStartTimeString }}</span>
+                  </div>
+                </div>
+                <div v-if="getEventEndDateString">&nbsp;&mdash;&nbsp;</div>
+                <div v-if="getEventEndDateString">
+                  <div>
+                    <base-icon name="calendar" data-test="calendar" />
+                    <span>{{ getEventEndDateString }}</span>
+                  </div>
+                  <div>
+                    <base-icon name="clock" data-test="calendar" />
+                    <span>{{ getEventEndTimeString }}</span>
+                  </div>
+                </div>
               </ds-text>
-              <ds-text v-if="getEventTimeString" align="left" color="soft" class="event-info">
+              <!--ds-text v-if="getEventTimeString" align="left" color="soft" class="event-info">
                 <base-icon name="clock" data-test="calendar" />
                 <span>{{ getEventTimeString }}</span>
-              </ds-text>
+              </ds-text-->
             </ds-space>
             <ds-space margin-bottom="small" />
             <content-viewer class="content hyphenate-text" :content="post.content" />
@@ -288,26 +307,17 @@ export default {
         !this.post.group || (this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole))
       )
     },
-    getEventDateString() {
-      if (this.post.eventEnd) {
-        const eventStart = format(new Date(this.post.eventStart), 'dd.MM.')
-        const eventEnd = format(new Date(this.post.eventEnd), 'dd.MM.yyyy')
-        return `${eventStart} - ${eventEnd}`
-      } else {
-        return format(new Date(this.post.eventStart), 'dd.MM.yyyy')
-      }
+    getEventStartDateString() {
+      return format(new Date(this.post.eventStart), 'dd.MM.yyyy')
     },
-    getEventTimeString() {
-      if (this.post.eventEnd) {
-        const eventStartTime = format(new Date(this.post.eventStart), 'HH:mm')
-        const eventEndTime = format(new Date(this.post.eventEnd), 'HH:mm')
-        /*  assumption that if e.g. 00:00 == 00:00 is saved, 
-            it's not realistic because they are the default values, so don't show the time info.
-        */
-        return eventStartTime !== eventEndTime ? `${eventStartTime} - ${eventEndTime}` : ''
-      } else {
-        return format(new Date(this.post.eventStart), 'HH:mm')
-      }
+    getEventStartTimeString() {
+      return format(new Date(this.post.eventStart), 'HH:mm')
+    },
+    getEventEndDateString() {
+      return this.post.eventEnd ? format(new Date(this.post.eventEnd), 'dd.MM.yyyy') : ''
+    },
+    getEventEndTimeString() {
+      return this.post.eventEnd ? format(new Date(this.post.eventEnd), 'HH:mm') : ''
     },
   },
   methods: {
