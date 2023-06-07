@@ -11,7 +11,7 @@ export const validateEventParams = (params) => {
       validateEventEnd(eventInput.eventStart, eventInput.eventEnd)
       params.eventEnd = eventInput.eventEnd
     } else {
-      params.eventEnd = null 
+      params.eventEnd = null
     }
 
     if (eventInput.eventLocationName && !eventInput.eventVenue) {
