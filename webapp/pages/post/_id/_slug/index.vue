@@ -60,17 +60,12 @@
               margin-bottom="small"
               style="padding: 10px"
             >
-              <ds-text align="left" color="soft">
-                <base-icon name="map-marker" data-test="map-marker" />
-                <span v-if="post.eventVenue">{{ post.eventVenue }}</span>
-                <span v-if="post.eventVenue">&mdash;</span>
-                <span v-if="!post.eventIsOnline">
-                  {{ post.eventLocationName }}
-                </span>
-                <span v-else>
-                  {{ $t('post.viewEvent.eventIsOnline') }}
-                </span>
-              </ds-text>
+              <location-teaser
+                class="event-info"
+                :venue="post.eventVenue"
+                :locationName="post.eventLocationName"
+                :isOnline="post.eventIsOnline"
+              />
               <date-time-range
                 class="event-info"
                 :startDate="post.eventStart"
@@ -155,12 +150,13 @@
 import ContentViewer from '~/components/Editor/ContentViewer'
 import HcCategory from '~/components/Category'
 import HcHashtag from '~/components/Hashtag/Hashtag'
+import CommentForm from '~/components/CommentForm/CommentForm'
+import CommentList from '~/components/CommentList/CommentList'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcShoutButton from '~/components/ShoutButton.vue'
-import CommentForm from '~/components/CommentForm/CommentForm'
-import CommentList from '~/components/CommentList/CommentList'
+import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import {
   postMenuModalsData,
@@ -188,6 +184,7 @@ export default {
     HcCategory,
     HcHashtag,
     HcShoutButton,
+    LocationTeaser,
     PageParamsLink,
     UserTeaser,
   },

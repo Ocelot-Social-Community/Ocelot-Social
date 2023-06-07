@@ -32,15 +32,13 @@
       >
         <ds-flex>
           <ds-flex-item>
-            <ds-text align="left" size="small" color="soft" class="event-info">
-              <base-icon name="map-marker" data-test="map-marker" />
-              <span v-if="post.eventIsOnline">
-                {{ $t('post.viewEvent.eventIsOnline') }}
-              </span>
-              <span v-else-if="post.eventLocationName">
-                {{ post.eventLocationName }}
-              </span>
-            </ds-text>
+            <location-teaser
+              class="event-info"
+              size="small"
+              :venue="post.eventVenue"
+              :locationName="post.eventLocationName"
+              :isOnline="post.eventIsOnline"
+            />
           </ds-flex-item>
           <ds-flex-item>
             <date-time-range
@@ -116,6 +114,7 @@ import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import HcRibbon from '~/components/Ribbon'
+import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
@@ -129,6 +128,7 @@ export default {
     CounterIcon,
     DateTimeRange,
     HcRibbon,
+    LocationTeaser,
     UserTeaser,
   },
   props: {
