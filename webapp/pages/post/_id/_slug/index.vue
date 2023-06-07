@@ -71,7 +71,7 @@
                   {{ $t('post.viewEvent.eventIsOnline') }}
                 </span>
               </ds-text>
-              <date-range
+              <date-time-range
                 class="event-info"
                 :startDate="post.eventStart"
                 :endDate="post.eventEnd"
@@ -156,7 +156,7 @@ import ContentViewer from '~/components/Editor/ContentViewer'
 import HcCategory from '~/components/Category'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import DateRange from '~/components/DateRange/DateRange'
+import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcShoutButton from '~/components/ShoutButton.vue'
 import CommentForm from '~/components/CommentForm/CommentForm'
@@ -184,7 +184,7 @@ export default {
     CommentForm,
     CommentList,
     ContentViewer,
-    DateRange,
+    DateTimeRange,
     HcCategory,
     HcHashtag,
     HcShoutButton,

@@ -32,7 +32,7 @@
 import { format, isSameDay, isSameYear } from 'date-fns'
 
 export default {
-  name: 'DateRange',
+  name: 'DateTimeRange',
   props: {
     /**
      * The size used for the text.

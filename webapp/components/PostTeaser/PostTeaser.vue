@@ -44,7 +44,7 @@
             </ds-text>
           </ds-flex-item>
           <ds-flex-item>
-            <date-range
+            <date-time-range
               class="event-info"
               size="small"
               :startDate="post.eventStart"
@@ -115,7 +115,7 @@
 import Category from '~/components/Category'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
-import DateRange from '~/components/DateRange/DateRange'
+import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import HcRibbon from '~/components/Ribbon'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import { mapGetters } from 'vuex'
@@ -128,7 +128,7 @@ export default {
     Category,
     ContentMenu,
     CounterIcon,
-    DateRange,
+    DateTimeRange,
     HcRibbon,
     UserTeaser,
   },
