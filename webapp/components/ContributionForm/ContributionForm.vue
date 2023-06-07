@@ -291,6 +291,7 @@ export default {
           min: 3,
           max: 100,
           validator: (_, value = '') => {
+            if (!this.createEvent) return []
             if (!value.trim()) {
               return [new Error(this.$t('common.validations.eventVenueNotEmpty'))]
             }
@@ -307,6 +308,7 @@ export default {
           min: 3,
           max: 100,
           validator: (_, value = '') => {
+            if (!this.createEvent) return []
             if (this.formData.eventIsOnline) return []
             if (!value.trim()) {
               return [new Error(this.$t('common.validations.eventLocationNameNotEmpty'))]
