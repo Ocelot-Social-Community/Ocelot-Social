@@ -73,6 +73,7 @@
                   :disabled-date="notBeforeToday"
                   :disabled-time="notBeforeNow"
                   :show-second="false"
+                  @change="changeEventStart($event)"
                 ></date-picker>
               </div>
               <div class="chipbox event-grid-item-margin-helper">
@@ -86,6 +87,7 @@
 
               <date-picker
                 v-model="formData.eventEnd"
+                name="eventEnd"
                 type="datetime"
                 value-type="format"
                 :minute-step="15"
@@ -132,7 +134,7 @@
           <div>
             <input
               type="checkbox"
-              v-model="formData.eventIsOnline"
+              :value="formData.eventIsOnline"
               name="eventIsOnline"
               class="event-grid-item-font-helper"
               @change="changeEventIsOnline($event)"
@@ -387,10 +389,17 @@ export default {
       this.$refs.contributionForm.update('content', value)
     },
     changeEventIsOnline(event) {
+      console.log('EventIsOnline', event)
+      console.log('EventIsOnline', this.formData.eventIsOnline)
       this.$refs.contributionForm.update('eventIsOnline', event.target.value)
     },
     changeEventEnd(event) {
-      this.$refs.contributionForm.update('eventEnd', event.target.value)
+      console.log('EventEnd', event)
+      this.$refs.contributionForm.update('eventEnd', event)
+    },
+    changeEventStart(event) {
+      console.log('EventStart', event)
+      this.$refs.contributionForm.update('eventStart', event)
     },
     addHeroImage(file) {
       this.formData.image = null
