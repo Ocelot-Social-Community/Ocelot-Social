@@ -96,6 +96,7 @@
                 :disabled-date="notBeforeEventDay"
                 :disabled-time="notBeforeEvent"
                 :show-second="false"
+                @change="changeEventEnd($event)"
               ></date-picker>
             </ds-grid-item>
           </ds-grid>
@@ -387,6 +388,9 @@ export default {
     },
     changeEventIsOnline(event) {
       this.$refs.contributionForm.update('eventIsOnline', event.target.value)
+    },
+    changeEventEnd(event) {
+      this.$refs.contributionForm.update('eventEnd', event.target.value)
     },
     addHeroImage(file) {
       this.formData.image = null
