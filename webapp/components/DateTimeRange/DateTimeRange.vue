@@ -8,11 +8,12 @@
       <div>
         <base-icon name="clock" data-test="calendar" />
         {{
-          getStartTimeString + (this.endDateAsDate && isSameDay ? '&mdash;' + getEndTimeString : '')
+          getStartTimeString +
+          (this.endDateAsDate && isSameDayLocal ? '&mdash;' + getEndTimeString : '')
         }}
       </div>
     </div>
-    <template v-if="!isSameDay">
+    <template v-if="!isSameDayLocal">
       &nbsp;&mdash;&nbsp;
       <div>
         <div>
@@ -61,27 +62,31 @@ export default {
     endDateAsDate() {
       return this.endDate ? new Date(this.endDate) : null
     },
-    isSameDay() {
+    isSameDayLocal() {
       return !this.endDateAsDate || isSameDay(this.endDateAsDate, this.startDateAsDate)
     },
-    isSameYear() {
+    isSameYearLocal() {
       return !this.endDateAsDate || isSameYear(this.endDateAsDate, this.startDateAsDate)
     },
     getStartDateString() {
-      let startDateFormat = 'dd.MM.yyyy'
-      if (!this.isSameDay && this.isSameYear) {
-        startDateFormat = 'dd.MM.'
+      let startDateFormat = this.$t('components.dateTimeRange.yearMonthDay')
+      if (!this.isSameDayLocal && this.isSameYearLocal) {
+        startDateFormat = this.$t('components.dateTimeRange.monthDay')
       }
       return format(this.startDateAsDate, startDateFormat)
     },
     getStartTimeString() {
-      return format(new Date(this.startDate), 'HH:mm')
+      return format(new Date(this.startDate), this.$t('components.dateTimeRange.hourMinute'))
     },
     getEndDateString() {
-      return this.endDate ? format(new Date(this.endDate), 'dd.MM.yyyy') : ''
+      return this.endDate
+        ? format(new Date(this.endDate), this.$t('components.dateTimeRange.yearMonthDay'))
+        : ''
     },
     getEndTimeString() {
-      return this.endDate ? format(new Date(this.endDate), 'HH:mm') : ''
+      return this.endDate
+        ? format(new Date(this.endDate), this.$t('components.dateTimeRange.hourMinute'))
+        : ''
     },
   },
 }
