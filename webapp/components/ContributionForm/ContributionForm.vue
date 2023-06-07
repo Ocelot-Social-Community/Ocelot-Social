@@ -134,6 +134,7 @@
               v-model="formData.eventIsOnline"
               name="eventIsOnline"
               class="event-grid-item-font-helper"
+              @change="changeEventIsOnline($event)"
             />
             {{ $t('post.viewEvent.eventIsOnline') }}
           </div>
@@ -383,6 +384,9 @@ export default {
     },
     updateEditorContent(value) {
       this.$refs.contributionForm.update('content', value)
+    },
+    changeEventIsOnline(event) {
+      this.$refs.contributionForm.update('eventIsOnline', event.target.value)
     },
     addHeroImage(file) {
       this.formData.image = null
