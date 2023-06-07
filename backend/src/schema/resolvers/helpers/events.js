@@ -18,7 +18,7 @@ export const validateEventParams = (params) => {
   }
   delete params.eventInput
   let locationName
-  if (params.eventLocationName) {
+  if (params.eventLocationName.trim()) {
     locationName = params.eventLocationName
   } else {
     params.eventLocationName = null
