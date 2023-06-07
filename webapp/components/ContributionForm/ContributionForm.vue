@@ -304,6 +304,7 @@ export default {
           min: 3,
           max: 100,
           validator: (_, value = '') => {
+            if (this.formData.eventIsOnline) return []
             if (!value.trim()) {
               return [new Error(this.$t('common.validations.eventLocationNameNotEmpty'))]
             }
@@ -322,7 +323,7 @@ export default {
           eventVenue: this.formData.eventVenue,
           eventEnd: this.formData.eventEnd,
           eventIsOnline: this.formData.eventIsOnline,
-          eventLocationName: this.formData.eventLocationName,
+          eventLocationName: !this.formData.eventIsOnline ? this.formData.eventLocationName : null,
         }
       }
       return undefined
