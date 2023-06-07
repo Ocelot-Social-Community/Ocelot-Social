@@ -286,7 +286,7 @@ export default {
           },
         },
         eventStart: { required: !!this.createEvent },
-        eventVenue: { 
+        eventVenue: {
           required: !!this.createEvent,
           min: 3,
           max: 100,
@@ -295,10 +295,13 @@ export default {
               return [new Error(this.$t('common.validations.eventVenueNotEmpty'))]
             }
             if (value.length < 3 || value.length > 100) {
-              return [new Error(this.$t('common.validations.eventVenueLength', { min: 3, max: 100 }))]
+              return [
+                new Error(this.$t('common.validations.eventVenueLength', { min: 3, max: 100 })),
+              ]
             }
             return []
-          }, },
+          },
+        },
         eventLocationName: {
           required: !!this.createEvent && !this.formData.eventIsOnline,
           min: 3,
@@ -309,7 +312,11 @@ export default {
               return [new Error(this.$t('common.validations.eventLocationNameNotEmpty'))]
             }
             if (value.length < 3 || value.length > 100) {
-              return [new Error(this.$t('common.validations.eventLocationNameLength', { min: 3, max: 100 }))]
+              return [
+                new Error(
+                  this.$t('common.validations.eventLocationNameLength', { min: 3, max: 100 }),
+                ),
+              ]
             }
             return []
           },
