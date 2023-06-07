@@ -286,11 +286,32 @@ export default {
           },
         },
         eventStart: { required: !!this.createEvent },
-        eventVenue: { required: !!this.createEvent, min: 3, max: 100 },
+        eventVenue: { 
+          required: !!this.createEvent,
+          min: 3,
+          max: 100,
+          validator: (_, value = '') => {
+            if (!value.trim()) {
+              return [new Error(this.$t('common.validations.eventVenueNotEmpty'))]
+            }
+            if (value.length < 3 || value.length > 100) {
+              return [new Error(this.$t('common.validations.eventVenueLength', { min: 3, max: 100 }))]
+            }
+            return []
+          }, },
         eventLocationName: {
           required: !!this.createEvent && !this.formData.eventIsOnline,
           min: 3,
           max: 100,
+          validator: (_, value = '') => {
+            if (!value.trim()) {
+              return [new Error(this.$t('common.validations.eventLocationNameNotEmpty'))]
+            }
+            if (value.length < 3 || value.length > 100) {
+              return [new Error(this.$t('common.validations.eventLocationNameLength', { min: 3, max: 100 }))]
+            }
+            return []
+          },
         },
       }
     },

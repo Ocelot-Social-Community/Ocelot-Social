@@ -115,6 +115,10 @@
     "validations": {
       "categories": "es müssen eine bis drei Themen ausgewählt werden",
       "email": "muss eine gültige E-Mail-Adresse sein",
+      "eventLocationNameLength": "Mindestens {min} Maximal {max}",
+      "eventLocationNameNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
+      "eventVenueLength": "Mindestens {min} Maximal {max}",
+      "eventVenueNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
       "url": "muss eine gültige URL sein"
     },
     "versus": "Versus"

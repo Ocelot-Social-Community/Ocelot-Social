@@ -115,6 +115,10 @@
     "validations": {
       "categories": "at least one and at most three topics must be selected",
       "email": "must be a valid e-mail address",
+      "eventLocationNameLength": "minimal {min} maximal {max}",
+      "eventLocationNameNotEmpty": "only empty characters are not allowed",
+      "eventVenueLength": "minimal {min} maximal {max}",
+      "eventVenueNotEmpty": "only empty characters are not allowed",
       "url": "must be a valid URL"
     },
     "versus": "Versus"
