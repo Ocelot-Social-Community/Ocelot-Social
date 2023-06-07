@@ -1,5 +1,5 @@
 <template>
-  <ds-text class="date-range" align="left" color="soft" :size="size">
+  <ds-text class="date-time-range" align="left" color="soft" :size="size">
     <div>
       <div>
         <base-icon name="calendar" data-test="calendar" />
@@ -88,7 +88,7 @@ export default {
 </script>
 
 <style lang="scss">
-.date-range {
+.date-time-range {
   display: flex;
   align-items: center;
   gap: 2px;
