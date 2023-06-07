@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { format } from 'date-fns'
+import { format, isSameDay } from 'date-fns'
 
 export default {
   name: 'DateRange',
@@ -65,16 +65,8 @@ export default {
       return this.endDate ? new Date(this.endDate) : null
     },
     isSameDateButMayHaveTimeDifference() {
-      return (
-        !this.endDateAsDate ||
-        (this.endDateAsDate.getYear() === this.startDateAsDate.getYear() &&
-          this.endDateAsDate.getMonth() === this.startDateAsDate.getMonth() &&
-          this.endDateAsDate.getDay() === this.startDateAsDate.getDay())
-      )
+      return !this.endDateAsDate || isSameDay(this.endDateAsDate, this.startDateAsDate)
     },
-    // isSameYear() {
-    //   return this.isSameDate || (!this.endDateAsDate || this.endDateAsDate.getYear() === this.startDateAsDate.getYear())
-    // },
     getStartDateString() {
       const isSameYear =
         this.isSameDateButMayHaveTimeDifference ||
