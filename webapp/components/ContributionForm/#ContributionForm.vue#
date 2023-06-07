@@ -187,304 +187,297 @@
   </ds-form>
 </template>
 <script>
-import gql from 'graphql-tag'
-import { mapGetters } from 'vuex'
-import Editor from '~/components/Editor/Editor'
-import PostMutations from '~/graphql/PostMutations.js'
-import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
-import ImageUploader from '~/components/Uploader/ImageUploader'
-import links from '~/constants/links.js'
-import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
-import DatePicker from 'vue2-datepicker'
-import 'vue2-datepicker/scss/index.scss'
+ import gql from 'graphql-tag'
+ import { mapGetters } from 'vuex'
+ import Editor from '~/components/Editor/Editor'
+ import PostMutations from '~/graphql/PostMutations.js'
+ import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
+ import ImageUploader from '~/components/Uploader/ImageUploader'
+ import links from '~/constants/links.js'
+ import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
+ import DatePicker from 'vue2-datepicker'
+ import 'vue2-datepicker/scss/index.scss'
 
-export default {
-  components: {
-    Editor,
-    ImageUploader,
-    PageParamsLink,
-    CategoriesSelect,
-    DatePicker,
-  },
-  props: {
-    contribution: {
-      type: Object,
-      default: () => ({}),
-    },
-    group: {
-      type: Object,
-      default: () => null,
-    },
-    createEvent: {
-      type: Boolean,
-      default: false,
-    },
-  },
+ export default {
+   components: {
+     Editor,
+     ImageUploader,
+     PageParamsLink,
+     CategoriesSelect,
+     DatePicker,
+   },
+   props: {
+     contribution: {
+       type: Object,
+       default: () => ({}),
+     },
+     group: {
+       type: Object,
+       default: () => null,
+     },
+     createEvent: {
+       type: Boolean,
+       default: false,
+     },
+   },
 
-  data() {
-    const {
-      title,
-      content,
-      image,
-      categories,
-      eventStart,
-      eventEnd,
-      eventLocationName,
-      eventVenue,
-      eventIsOnline,
-      eventLocation,
-    } = this.contribution
-    const {
-      sensitive: imageBlurred = false,
-      aspectRatio: imageAspectRatio = null,
-      type: imageType = null,
-    } = image || {}
-    return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
-      links,
-      formData: {
-        title: title || '',
-        content: content || '',
-        image: image || null,
-        imageAspectRatio,
-        imageType,
-        imageBlurred,
-        categoryIds: categories ? categories.map((category) => category.id) : [],
-        eventStart: eventStart || null,
-        eventEnd: eventEnd || null,
-        eventLocation: eventLocation || '',
-        eventLocationName: eventLocationName || '',
-        eventVenue: eventVenue || '',
-        eventIsOnline: eventIsOnline || false,
-      },
-      loading: false,
-      users: [],
-      hashtags: [],
-      imageUpload: null,
-    }
-  },
-  async mounted() {
-    await import(`vue2-datepicker/locale/${this.currentUser.locale}`)
-  },
-  computed: {
-    ...mapGetters({
-      currentUser: 'auth/user',
-    }),
-    formSchema() {
-      return {
-        title: { required: true, min: 3, max: 100 },
-        content: { required: true },
-        imageBlurred: { required: false },
-        categoryIds: {
-          type: 'array',
-          required: this.categoriesActive,
-          validator: (_, value = []) => {
-            if (this.categoriesActive && (value.length === 0 || value.length > 3)) {
-              return [new Error(this.$t('common.validations.categories'))]
-            }
-            return []
-          },
-        },
-        eventStart: { required: !!this.createEvent },
-        eventVenue: {
-          required: !!this.createEvent,
-          min: 3,
-          max: 100,
-          validator: (_, value = '') => {
-            if (!this.createEvent) return []
-            if (!value.trim()) {
-              return [new Error(this.$t('common.validations.eventVenueNotEmpty'))]
-            }
-            if (value.length < 3 || value.length > 100) {
-              return [
-                new Error(this.$t('common.validations.eventVenueLength', { min: 3, max: 100 })),
-              ]
-            }
-            return []
-          },
-        },
-        eventLocationName: {
-          required: !!this.createEvent && !this.formData.eventIsOnline,
-          min: 3,
-          max: 100,
-          validator: (_, value = '') => {
-            if (!this.createEvent) return []
-            if (this.formData.eventIsOnline) return []
-            if (!value.trim()) {
-              return [new Error(this.$t('common.validations.eventLocationNameNotEmpty'))]
-            }
-            if (value.length < 3 || value.length > 100) {
-              return [
-                new Error(
-                  this.$t('common.validations.eventLocationNameLength', { min: 3, max: 100 }),
-                ),
-              ]
-            }
-            return []
-          },
-        },
-      }
-    },
-    eventInput() {
-      if (this.createEvent) {
-        return {
-          eventStart: this.formData.eventStart,
-          eventVenue: this.formData.eventVenue,
-          eventEnd: this.formData.eventEnd,
-          eventIsOnline: this.formData.eventIsOnline,
-          eventLocationName: !this.formData.eventIsOnline ? this.formData.eventLocationName : null,
-        }
-      }
-      return undefined
-    },
-    contentLength() {
-      return this.$filters.removeHtml(this.formData.content).length
-    },
-    groupId() {
-      return this.group && this.group.id
-    },
-    showGroupHint() {
-      return this.groupId && ['closed', 'hidden'].includes(this.group.groupType)
-    },
-    groupName() {
-      return this.group && this.group.name
-    },
-    groupCategories() {
-      return this.group && this.group.categories
-    },
-    showEventLocationName() {
-      return !this.formData.eventIsOnline
-    },
-  },
-  watch: {
-    groupCategories() {
-      if (!this.formData.categoryIds.length && this.groupCategories)
-        this.formData.categoryIds = this.groupCategories.map((cat) => cat.id)
-    },
-  },
-  methods: {
-    notBeforeToday(date) {
-      return date < new Date().setHours(0, 0, 0, 0)
-    },
-    notBeforeNow(date) {
-      return date < new Date()
-    },
-    notBeforeEventDay(date) {
-      return date < new Date(this.formData.eventStart).setHours(0, 0, 0, 0)
-    },
-    notBeforeEvent(date) {
-      return date <= new Date(this.formData.eventStart)
-    },
-    submit() {
-      let image = null
+   data() {
+     const {
+       title,
+       content,
+       image,
+       categories,
+       eventStart,
+       eventEnd,
+       eventLocationName,
+       eventVenue,
+       eventIsOnline,
+       eventLocation,
+     } = this.contribution
+     const {
+       sensitive: imageBlurred = false,
+       aspectRatio: imageAspectRatio = null,
+       type: imageType = null,
+     } = image || {}
+     return {
+       categoriesActive: this.$env.CATEGORIES_ACTIVE,
+       links,
+       formData: {
+         title: title || '',
+         content: content || '',
+         image: image || null,
+         imageAspectRatio,
+         imageType,
+         imageBlurred,
+         categoryIds: categories ? categories.map((category) => category.id) : [],
+         eventStart: eventStart || null,
+         eventEnd: eventEnd || null,
+         eventLocation: eventLocation || '',
+         eventLocationName: eventLocationName || '',
+         eventVenue: eventVenue || '',
+         eventIsOnline: eventIsOnline || false,
+       },
+       loading: false,
+       users: [],
+       hashtags: [],
+       imageUpload: null,
+     }
+   },
+   async mounted() {
+     await import(`vue2-datepicker/locale/${this.currentUser.locale}`)
+   },
+   computed: {
+     ...mapGetters({
+       currentUser: 'auth/user',
+     }),
+     formSchema() {
+       return {
+         title: { required: true, min: 3, max: 100 },
+         content: { required: true },
+         imageBlurred: { required: false },
+         categoryIds: {
+           type: 'array',
+           required: this.categoriesActive,
+           validator: (_, value = []) => {
+             if (this.categoriesActive && (value.length === 0 || value.length > 3)) {
+               return [new Error(this.$t('common.validations.categories'))]
+             }
+             return []
+           },
+         },
+         eventStart: { required: !!this.createEvent },
+         eventVenue: { 
+           required: !!this.createEvent,
+           min: 3,
+           max: 100,
+           validator: (_, value = '') => {
+             if (!this.createEvent) return []
+             if (!value.trim()) {
+               return [new Error(this.$t('common.validations.eventVenueNotEmpty'))]
+             }
+             if (value.length < 3 || value.length > 100) {
+               return [new Error(this.$t('common.validations.eventVenueLength', { min: 3, max: 100 }))]
+             }
+             return []
+           }, },
+         eventLocationName: {
+           required: !!this.createEvent && !this.formData.eventIsOnline,
+           min: 3,
+           max: 100,
+           validator: (_, value = '') => {
+             if (!this.createEvent) return []
+             if (this.formData.eventIsOnline) return []
+             if (!value.trim()) {
+               return [new Error(this.$t('common.validations.eventLocationNameNotEmpty'))]
+             }
+             if (value.length < 3 || value.length > 100) {
+               return [new Error(this.$t('common.validations.eventLocationNameLength', { min: 3, max: 100 }))]
+             }
+             return []
+           },
+         },
+       }
+     },
+     eventInput() {
+       if (this.createEvent) {
+         return {
+           eventStart: this.formData.eventStart,
+           eventVenue: this.formData.eventVenue,
+           eventEnd: this.formData.eventEnd,
+           eventIsOnline: this.formData.eventIsOnline,
+           eventLocationName: !this.formData.eventIsOnline ? this.formData.eventLocationName : null,
+         }
+       }
+       return undefined
+     },
+     contentLength() {
+       return this.$filters.removeHtml(this.formData.content).length
+     },
+     groupId() {
+       return this.group && this.group.id
+     },
+     showGroupHint() {
+       return this.groupId && ['closed', 'hidden'].includes(this.group.groupType)
+     },
+     groupName() {
+       return this.group && this.group.name
+     },
+     groupCategories() {
+       return this.group && this.group.categories
+     },
+     showEventLocationName() {
+       return !this.formData.eventIsOnline
+     },
+   },
+   watch: {
+     groupCategories() {
+       if (!this.formData.categoryIds.length && this.groupCategories)
+         this.formData.categoryIds = this.groupCategories.map((cat) => cat.id)
+     },
+   },
+   methods: {
+     notBeforeToday(date) {
+       return date < new Date().setHours(0, 0, 0, 0)
+     },
+     notBeforeNow(date) {
+       return date < new Date()
+     },
+     notBeforeEventDay(date) {
+       return date < new Date(this.formData.eventStart).setHours(0, 0, 0, 0)
+     },
+     notBeforeEvent(date) {
+       return date <= new Date(this.formData.eventStart)
+     },
+     submit() {
+       let image = null
 
-      const { title, content, categoryIds } = this.formData
-      if (this.formData.image) {
-        image = {
-          sensitive: this.formData.imageBlurred,
-        }
-        if (this.imageUpload) {
-          image.upload = this.imageUpload
-          image.aspectRatio = this.formData.imageAspectRatio
-          image.type = this.formData.imageType
-        }
-      }
-      this.loading = true
+       const { title, content, categoryIds } = this.formData
+       if (this.formData.image) {
+         image = {
+           sensitive: this.formData.imageBlurred,
+         }
+         if (this.imageUpload) {
+           image.upload = this.imageUpload
+           image.aspectRatio = this.formData.imageAspectRatio
+           image.type = this.formData.imageType
+         }
+       }
+       this.loading = true
 
-      this.$apollo
-        .mutate({
-          mutation: this.contribution.id ? PostMutations().UpdatePost : PostMutations().CreatePost,
-          variables: {
-            title,
-            content,
-            categoryIds,
-            id: this.contribution.id || null,
-            image,
-            groupId: this.groupId,
-            postType: !this.createEvent ? 'Article' : 'Event',
-            eventInput: this.eventInput,
-          },
-        })
-        .then(({ data }) => {
-          this.loading = false
-          this.$toast.success(this.$t('contribution.success'))
-          const result = data[this.contribution.id ? 'UpdatePost' : 'CreatePost']
+       this.$apollo
+           .mutate({
+             mutation: this.contribution.id ? PostMutations().UpdatePost : PostMutations().CreatePost,
+             variables: {
+               title,
+               content,
+               categoryIds,
+               id: this.contribution.id || null,
+               image,
+               groupId: this.groupId,
+               postType: !this.createEvent ? 'Article' : 'Event',
+               eventInput: this.eventInput,
+             },
+           })
+           .then(({ data }) => {
+             this.loading = false
+             this.$toast.success(this.$t('contribution.success'))
+             const result = data[this.contribution.id ? 'UpdatePost' : 'CreatePost']
 
-          this.$router.push({
-            name: 'post-id-slug',
-            params: { id: result.id, slug: result.slug },
-          })
-        })
-        .catch((err) => {
-          this.$toast.error(err.message)
-          this.loading = false
-        })
-    },
-    updateEditorContent(value) {
-      this.$refs.contributionForm.update('content', value)
-    },
-    changeEventIsOnline(event) {
-      this.$refs.contributionForm.update('eventIsOnline', this.formData.eventIsOnline)
-    },
-    changeEventEnd(event) {
-      this.$refs.contributionForm.update('eventEnd', event)
-    },
-    changeEventStart(event) {
-      this.$refs.contributionForm.update('eventStart', event)
-    },
-    addHeroImage(file) {
-      this.formData.image = null
-      if (file) {
-        const reader = new FileReader()
-        reader.onload = ({ target }) => {
-          this.formData.image = {
-            ...this.formData.image,
-            url: target.result,
-          }
-        }
-        reader.readAsDataURL(file)
-        this.imageUpload = file
-      }
-    },
-    addImageAspectRatio(aspectRatio) {
-      this.formData.imageAspectRatio = aspectRatio
-    },
-    addImageType(imageType) {
-      this.formData.imageType = imageType
-    },
-  },
-  apollo: {
-    User: {
-      query() {
-        return gql`
-          query {
-            User(orderBy: slug_asc) {
-              id
-              slug
-            }
-          }
-        `
-      },
-      result({ data: { User } }) {
-        this.users = User
-      },
-    },
-    Tag: {
-      query() {
-        return gql`
-          query {
-            Tag(orderBy: id_asc) {
-              id
-            }
-          }
-        `
-      },
-      result({ data: { Tag } }) {
-        this.hashtags = Tag
-      },
-    },
-  },
-}
+             this.$router.push({
+               name: 'post-id-slug',
+               params: { id: result.id, slug: result.slug },
+             })
+           })
+           .catch((err) => {
+             this.$toast.error(err.message)
+             this.loading = false
+           })
+     },
+     updateEditorContent(value) {
+       this.$refs.contributionForm.update('content', value)
+     },
+     changeEventIsOnline(event) {
+       this.$refs.contributionForm.update('eventIsOnline', this.formData.eventIsOnline)
+     },
+     changeEventEnd(event) {
+       this.$refs.contributionForm.update('eventEnd', event)
+     },
+     changeEventStart(event) {
+       this.$refs.contributionForm.update('eventStart', event)
+           },
+           addHeroImage(file) {
+             this.formData.image = null
+             if (file) {
+               const reader = new FileReader()
+               reader.onload = ({ target }) => {
+                 this.formData.image = {
+                   ...this.formData.image,
+                   url: target.result,
+                 }
+               }
+               reader.readAsDataURL(file)
+               this.imageUpload = file
+             }
+           },
+           addImageAspectRatio(aspectRatio) {
+             this.formData.imageAspectRatio = aspectRatio
+           },
+           addImageType(imageType) {
+             this.formData.imageType = imageType
+           },
+         },
+         apollo: {
+           User: {
+             query() {
+               return gql`
+                 query {
+                   User(orderBy: slug_asc) {
+                     id
+                     slug
+                   }
+                 }
+               `
+             },
+             result({ data: { User } }) {
+               this.users = User
+             },
+           },
+           Tag: {
+             query() {
+               return gql`
+                 query {
+                   Tag(orderBy: id_asc) {
+                     id
+                   }
+                 }
+               `
+             },
+             result({ data: { Tag } }) {
+               this.hashtags = Tag
+             },
+           },
+         },
+       }
 </script>
 
 <style lang="scss">
