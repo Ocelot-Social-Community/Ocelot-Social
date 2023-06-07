@@ -8,6 +8,9 @@ import SearchResults from '~/components/_new/features/SearchResults/SearchResult
 export default {
   layout: 'default',
   watchQuery: ['search'],
+  data() {
+    return { search: null }
+  },
   head() {
     return {
       title: this.$t('search.title'),
