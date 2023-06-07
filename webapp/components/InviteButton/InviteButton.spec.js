@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils'
 import InviteButton from './InviteButton.vue'
 
+const localVue = global.localVue
+
 const stubs = {
   'v-popover': {
     template: '<span><slot /></span>',
@@ -26,7 +28,7 @@ describe('InviteButton.vue', () => {
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(InviteButton, { mocks, propsData, stubs })
+      return mount(InviteButton, { mocks, localVue, propsData, stubs })
     }
 
     beforeEach(() => {
