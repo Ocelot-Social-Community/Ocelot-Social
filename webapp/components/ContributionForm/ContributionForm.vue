@@ -106,7 +106,7 @@
             <ds-grid-item class="event-grid-item">
               <ds-input
                 model="eventVenue"
-                name="location"
+                name="eventVenue"
                 :placeholder="$t('post.viewEvent.eventVenue')"
               />
               <div class="chipbox">
@@ -119,7 +119,7 @@
             <ds-grid-item v-if="showEventLocationName" class="event-grid-item">
               <ds-input
                 model="eventLocationName"
-                name="venue"
+                name="eventLocationName"
                 :placeholder="$t('post.viewEvent.eventLocationName')"
               />
               <div class="chipbox">
