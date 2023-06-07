@@ -58,9 +58,9 @@
           <hr />
           <ds-space margin-top="x-small" />
           <ds-grid>
-            <ds-grid-item style="grid-row-end: span 3">
+            <ds-grid-item class="event-grid-item">
               <!-- <label>Beginn</label> -->
-              <div style="z-index: 20">
+              <div class="event-grid-item-z-helper">
                 <date-picker
                   name="eventStart"
                   v-model="formData.eventStart"
@@ -68,20 +68,20 @@
                   value-type="format"
                   :minute-step="15"
                   Xformat="DD-MM-YYYY HH:mm"
-                  style="z-index: 20"
+                  class="event-grid-item-z-helper"
                   :placeholder="$t('post.viewEvent.eventStart')"
                   :disabled-date="notBeforeToday"
                   :disabled-time="notBeforeNow"
                   :show-second="false"
                 ></date-picker>
               </div>
-              <div class="chipbox" style="margin-top: 10px">
+              <div class="chipbox event-grid-item-margin-helper">
                 <ds-chip size="base" :color="errors && errors.eventStart && 'danger'">
                   <base-icon v-if="errors && errors.eventStart" name="warning" />
                 </ds-chip>
               </div>
             </ds-grid-item>
-            <ds-grid-item style="grid-row-end: span 3">
+            <ds-grid-item class="event-grid-item">
               <!-- <label>Ende (optional)</label> -->
 
               <date-picker
@@ -92,15 +92,15 @@
                 :seconds-step="0"
                 Xformat="DD-MM-YYYY HH:mm"
                 :placeholder="$t('post.viewEvent.eventEnd')"
-                style="font-size: larger"
+                class="event-grid-item-font-helper"
                 :disabled-date="notBeforeEventDay"
                 :disabled-time="notBeforeEvent"
                 :show-second="false"
               ></date-picker>
             </ds-grid-item>
           </ds-grid>
-          <ds-grid>
-            <ds-grid-item style="grid-row-end: span 3">
+          <ds-grid class="event-location-grid">
+            <ds-grid-item class="event-grid-item">
               <ds-input
                 model="eventVenue"
                 name="location"
@@ -113,7 +113,7 @@
                 </ds-chip>
               </div>
             </ds-grid-item>
-            <ds-grid-item style="grid-row-end: span 3">
+            <ds-grid-item v-show="!formData.eventIsOnline" class="event-grid-item">
               <ds-input
                 model="eventLocationName"
                 name="venue"
@@ -133,7 +133,7 @@
               type="checkbox"
               v-model="formData.eventIsOnline"
               name="eventIsOnline"
-              style="font-size: larger"
+              class="event-grid-item-font-helper"
             />
             {{ $t('post.viewEvent.eventIsOnline') }}
           </div>
@@ -153,7 +153,7 @@
           <base-icon v-if="errors && errors.categoryIds" name="warning" />
         </ds-chip>
         <ds-flex class="buttons-footer" gutter="xxx-small">
-          <ds-flex-item width="3.5" style="margin-right: 16px; margin-bottom: 6px">
+          <ds-flex-item width="3.5" class="buttons-footer-helper">
             <!-- eslint-disable vue/no-v-text-v-html-on-component -->
             <!-- TODO => remove v-html! only text ! no html! security first! -->
             <ds-text
@@ -449,6 +449,24 @@ export default {
       margin-top: -10px;
     }
   }
+  // style override to handle dynamic inputs
+  .event-location-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .event-grid-item {
+    // important needed because of component inline style
+    grid-row-end: span 3 !important;
+  }
+  .event-grid-item-z-helper {
+    z-index: 20;
+  }
+  .event-grid-item-margin-helper {
+    margin-top: 10px;
+  }
+  .event-grid-item-font-helper {
+    font-size: larger;
+  }
 }
 
 .contribution-form > .base-card {
@@ -496,6 +514,12 @@ export default {
         margin-left: 1em;
         min-width: fit-content;
       }
+    }
+
+    > .buttons-footer-helper {
+      margin-right: 16px;
+      // important needed because of component inline style
+      margin-bottom: 6px !important;
     }
   }
 
