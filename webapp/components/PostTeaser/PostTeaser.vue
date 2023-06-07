@@ -44,10 +44,12 @@
             </ds-text>
           </ds-flex-item>
           <ds-flex-item>
-            <ds-text align="left" color="soft" size="small" class="event-info">
-              <base-icon name="calendar" data-test="calendar" />
-              <span>{{ getEventDateString }}</span>
-            </ds-text>
+            <date-range
+              class="event-info"
+              size="small"
+              :startDate="post.eventStart"
+              :endDate="post.eventEnd"
+            />
           </ds-flex-item>
         </ds-flex>
       </ds-space>
@@ -113,12 +115,12 @@
 import Category from '~/components/Category'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
+import DateRange from '~/components/DateRange/DateRange'
 import HcRibbon from '~/components/Ribbon'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
 import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostHelpers'
-import { format } from 'date-fns'
 
 export default {
   name: 'PostTeaser',
@@ -126,6 +128,7 @@ export default {
     Category,
     ContentMenu,
     CounterIcon,
+    DateRange,
     HcRibbon,
     UserTeaser,
   },
@@ -185,15 +188,6 @@ export default {
       if (this.post.postType[0] === 'Event') return this.$t('post.event')
       return this.$t('post.name')
     },
-    getEventDateString() {
-      if (this.post.eventEnd) {
-        const eventStart = format(new Date(this.post.eventStart), 'dd.MM.')
-        const eventEnd = format(new Date(this.post.eventEnd), 'dd.MM.yyyy')
-        return `${eventStart} - ${eventEnd}`
-      } else {
-        return format(new Date(this.post.eventStart), 'dd.MM.yyyy')
-      }
-    },
   },
   methods: {
     async deletePostCallback() {
@@ -228,6 +222,7 @@ export default {
   },
 }
 </script>
+
 <style lang="scss">
 .post-teaser,
 .post-teaser:hover,
