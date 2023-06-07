@@ -5,10 +5,10 @@ export const validateEventParams = (params) => {
     const { eventInput } = params
     validateEventDate(eventInput.eventStart)
     params.eventStart = eventInput.eventStart
-    if (eventInput.eventEnd) {
-      validateEventEnd(eventInput.eventStart, eventInput.eventEnd)
-      params.eventEnd = eventInput.eventEnd
-    }
+
+    validateEventEnd(eventInput.eventStart, eventInput.eventEnd)
+    params.eventEnd = eventInput.eventEnd
+
     if (eventInput.eventLocationName && !eventInput.eventVenue) {
       throw new UserInputError('Event venue must be present if event location is given!')
     }
@@ -38,6 +38,7 @@ const validateEventDate = (dateString) => {
 }
 
 const validateEventEnd = (start, end) => {
+  if (end === null) return
   const endDate = new Date(end)
   if (endDate.toString() === 'Invalid Date')
     throw new UserInputError('Event end date must be a valid date!')
