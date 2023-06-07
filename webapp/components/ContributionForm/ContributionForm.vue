@@ -116,7 +116,7 @@
                 </ds-chip>
               </div>
             </ds-grid-item>
-            <ds-grid-item v-show="!formData.eventIsOnline" class="event-grid-item">
+            <ds-grid-item v-if="showEventLocationName" class="event-grid-item">
               <ds-input
                 model="eventLocationName"
                 name="venue"
@@ -134,7 +134,8 @@
           <div>
             <input
               type="checkbox"
-              :value="formData.eventIsOnline"
+              v-model="formData.eventIsOnline"
+              model="eventIsOnline"
               name="eventIsOnline"
               class="event-grid-item-font-helper"
               @change="changeEventIsOnline($event)"
@@ -320,6 +321,9 @@ export default {
     groupCategories() {
       return this.group && this.group.categories
     },
+    showEventLocationName() {
+      return !this.formData.eventIsOnline
+    },
   },
   watch: {
     groupCategories() {
@@ -389,16 +393,12 @@ export default {
       this.$refs.contributionForm.update('content', value)
     },
     changeEventIsOnline(event) {
-      console.log('EventIsOnline', event)
-      console.log('EventIsOnline', this.formData.eventIsOnline)
-      this.$refs.contributionForm.update('eventIsOnline', event.target.value)
+      this.$refs.contributionForm.update('eventIsOnline', this.formData.eventIsOnline)
     },
     changeEventEnd(event) {
-      console.log('EventEnd', event)
       this.$refs.contributionForm.update('eventEnd', event)
     },
     changeEventStart(event) {
-      console.log('EventStart', event)
       this.$refs.contributionForm.update('eventStart', event)
     },
     addHeroImage(file) {
