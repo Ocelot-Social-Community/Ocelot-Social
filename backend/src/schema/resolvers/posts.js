@@ -21,12 +21,22 @@ const maintainPinnedPosts = (params) => {
   return params
 }
 
+const filterEventDates = (params) => {
+  if (params.filter.eventStart_gte) {
+    const date = params.filter.eventStart_gte
+    delete params.filter.eventStart_gte
+    params.filter = { ...params.filter, OR: [{ eventStart_gte: date }, { eventEnd_gte: date }] }
+  }
+  return params
+}
+
 export default {
   Query: {
     Post: async (object, params, context, resolveInfo) => {
       params = await filterPostsOfMyGroups(params, context)
       params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
+      params = filterEventDates(params)
       params = await maintainPinnedPosts(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
