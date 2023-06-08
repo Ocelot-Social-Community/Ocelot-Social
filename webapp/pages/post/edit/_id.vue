@@ -41,10 +41,10 @@ export default {
     }),
   },
   data() {
-    return { 
+    return {
       contribution: {
         postType: ['Article'],
-      } 
+      },
     }
   },
   async asyncData(context) {
