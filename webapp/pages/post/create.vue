@@ -1,13 +1,13 @@
 <template>
   <div>
     <ds-flex :width="{ base: '100%' }">
-      <ds-flex-item :width="{ base: '100%', md: 5 }">
+      <ds-flex-item :width="{ base: '100%' }">
         <ds-flex gutter="base" :width="{ base: '100%', sm: 1 }">
           <ds-flex-item>
-            <ds-card :primary="!creatEvent" centered>
+            <ds-card class="create-form-btn" :primary="!createEvent" centered>
               <div>
                 <ds-button
-                  v-if="!creatEvent"
+                  v-if="!createEvent"
                   ghost
                   fullwidth
                   size="x-large"
@@ -15,26 +15,26 @@
                 >
                   {{ $t('post.createNewPost.title') }}
                 </ds-button>
-                <ds-button v-else ghost fullwidth size="x-large" @click="creatEvent = !creatEvent">
+                <ds-button v-else ghost fullwidth size="x-large" @click="switchPostType()">
                   {{ $t('post.createNewPost.title') }}
                 </ds-button>
               </div>
             </ds-card>
           </ds-flex-item>
           <ds-flex-item>
-            <ds-card :primary="!!creatEvent" centered>
+            <ds-card class="create-form-btn" :primary="!!createEvent" centered>
               <div>
                 <ds-button
                   ghost
                   fullwidth
                   size="x-large"
-                  v-if="creatEvent"
+                  v-if="createEvent"
                   hover
                   class="inactive-tab-button"
                 >
                   {{ $t('post.createNewEvent.title') }}
                 </ds-button>
-                <ds-button ghost fullwidth size="x-large" v-else @click="creatEvent = !creatEvent">
+                <ds-button ghost fullwidth size="x-large" v-else @click="switchPostType()">
                   {{ $t('post.createNewEvent.title') }}
                 </ds-button>
               </div>
@@ -45,14 +45,12 @@
           {{ $t('post.createNewPost.forGroup.title', { name: group.name }) }}
         </div>
       </ds-flex-item>
-      <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
     </ds-flex>
 
     <ds-flex :width="{ base: '100%' }" gutter="base">
-      <ds-flex-item :width="{ base: '100%', md: 5 }">
-        <contribution-form :group="group" :creatEvent="creatEvent" />
+      <ds-flex-item :width="{ base: '100%' }">
+        <contribution-form :group="group" :createEvent="createEvent" />
       </ds-flex-item>
-      <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
     </ds-flex>
   </div>
 </template>
@@ -69,7 +67,7 @@ export default {
     const { groupId = null } = this.$route.query
     return {
       groupId,
-      creatEvent: false,
+      createEvent: false,
     }
   },
   computed: {
@@ -98,6 +96,11 @@ export default {
       fetchPolicy: 'cache-and-network',
     },
   },
+  methods: {
+    switchPostType() {
+      this.createEvent = !this.createEvent
+    },
+  },
 }
 </script>
 <style lang="scss">
@@ -108,5 +111,13 @@ export default {
 .group-create-title {
   font-size: 30px;
   text-align: center;
+}
+
+// copy hover effect from ghost button to use for ds-card
+.create-form-btn:not(.ds-card-primary):hover {
+  background-color: #faf9fa;
+}
+.create-form-btn .ds-button-ghost:hover {
+  background-color: transparent;
 }
 </style>
