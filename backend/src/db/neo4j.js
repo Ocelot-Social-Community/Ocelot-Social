@@ -23,6 +23,7 @@ export function getNeode(options = {}) {
   if (!neodeInstance) {
     const { uri, username, password } = { ...defaultOptions, ...options }
     neodeInstance = new Neode(uri, username, password).with(models)
+    neodeInstance.extend('Post', 'Article', {})
     return neodeInstance
   }
   return neodeInstance
