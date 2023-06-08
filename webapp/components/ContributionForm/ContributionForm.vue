@@ -76,9 +76,9 @@
                   @change="changeEventStart($event)"
                 ></date-picker>
               </div>
-              <div class="chipbox event-grid-item-margin-helper">
+              <div v-if="errors && errors.eventStart" class="chipbox event-grid-item-margin-helper">
                 <ds-chip size="base" :color="errors && errors.eventStart && 'danger'">
-                  <base-icon v-if="errors && errors.eventStart" name="warning" />
+                  <base-icon name="warning" />
                 </ds-chip>
               </div>
             </ds-grid-item>
