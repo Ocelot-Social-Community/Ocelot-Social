@@ -40,6 +40,13 @@ export default {
       user: 'auth/user',
     }),
   },
+  data() {
+    return {
+      contribution: {
+        postType: ['Article'],
+      },
+    }
+  },
   async asyncData(context) {
     const {
       app,
