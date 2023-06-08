@@ -128,7 +128,6 @@ export default {
               MERGE (post)-[:CATEGORIZED]->(category)`
             : ''
 
-
         const createPostTransactionResponse = await transaction.run(
           `
             CREATE (post:Post)
@@ -176,6 +175,11 @@ export default {
       delete params.categoryIds
       delete params.image
       const session = context.driver.session()
+
+      // extract postType and delete it from params
+      const postType = params.postType
+      delete params.postType
+
       let updatePostCypher = `
         MATCH (post:Post {id: $params.id})
         SET post += $params
@@ -202,11 +206,11 @@ export default {
         `
       }
 
-      if (params.postType) {
+      if (postType) {
         updatePostCypher += `
           REMOVE post:Article
           REMOVE post:Event
-          SET post:${params.postType}
+          SET post:${postType}
           WITH post
         `
       }
