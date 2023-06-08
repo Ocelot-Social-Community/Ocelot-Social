@@ -64,7 +64,7 @@ const validateReview = async (resolve, root, args, context, info) => {
         WHERE resource:User OR resource:Post OR resource:Comment
         OPTIONAL MATCH (:User)-[filed:FILED]->(:Report {closed: false})-[:BELONGS_TO]->(resource)
         OPTIONAL MATCH (resource)<-[:WROTE]-(author:User)
-        RETURN labels(resource)[0] AS label, author, filed
+        RETURN filter(l IN labels(resource) WHERE l IN ['Post', 'Comment', 'User'])[0] AS label, author, filed
       `,
       {
         resourceId,

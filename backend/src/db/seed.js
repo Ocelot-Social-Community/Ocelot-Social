@@ -596,7 +596,79 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       }),
     ])
 
-    // Create Posts
+    // Create Events (by peter lustig)
+    authenticatedUser = await peterLustig.toJson()
+    const now = new Date()
+
+    await Promise.all([
+      mutate({
+        mutation: createPostMutation(),
+        variables: {
+          id: 'e0',
+          title: 'Illegaler Kindergeburtstag',
+          content: 'Elli hat nächste Woche Geburtstag. Wir feiern das!',
+          categoryIds: ['cat4'],
+          postType: 'Event',
+          eventInput: {
+            eventStart: new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate() + 7,
+            ).toISOString(),
+            eventVenue: 'Ellis Kinderzimmer',
+            eventLocationName: 'Deutschland',
+          },
+        },
+      }),
+      mutate({
+        mutation: createPostMutation(),
+        variables: {
+          id: 'e1',
+          title: 'Wir Schützen den Stuttgarter Schlossgarten',
+          content: 'Kein Baum wird gefällt werden!',
+          categoryIds: ['cat5'],
+          postType: 'Event',
+          eventInput: {
+            eventStart: new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate() + 1,
+            ).toISOString(),
+            eventVenue: 'Schlossgarten',
+            eventLocationName: 'Stuttgart',
+          },
+        },
+      }),
+      mutate({
+        mutation: createPostMutation(),
+        variables: {
+          id: 'e2',
+          title: 'IT 4 Change Treffen',
+          content: 'Wir sitzen eine Woche zusammen rum und glotzen uns blöde an.',
+          categoryIds: ['cat5'],
+          postType: 'Event',
+          eventInput: {
+            eventStart: new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate() + 1,
+            ).toISOString(),
+            eventEnd: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 4).toISOString(),
+            eventVenue: 'Ferienlager',
+            eventLocationName: 'Bahra, Sachsen',
+          },
+        },
+      }),
+    ])
+
+    let passedEvent = await neode.find('Post', 'e1')
+    await passedEvent.update({ eventStart: new Date(2010, 8, 30, 10).toISOString() })
+    passedEvent = await neode.find('Post', 'e2')
+    await passedEvent.update({
+      eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 3).toISOString(),
+    })
+
+    // Create Posts (Articles)
 
     const [p0, p1, p3, p4, p5, p6, p9, p10, p11, p13, p14, p15] = await Promise.all([
       Factory.build(
