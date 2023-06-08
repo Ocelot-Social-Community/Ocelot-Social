@@ -38,6 +38,7 @@ module.exports = defineConfig({
   e2e: {
     projectId: "qa7fe2",
     defaultCommandTimeout: 10000,
+    pageLoadTimeout: 180000,
     chromeWebSecurity: false,
     baseUrl: "http://localhost:3000",
     specPattern: "cypress/e2e/**/*.feature",
