@@ -757,7 +757,7 @@
     },
     "viewEvent": {
       "eventEnd": "Ende",
-      "eventIsOnline": "Online Veranstaltung",
+      "eventIsOnline": "Online",
       "eventLocationName": "Stadt",
       "eventStart": "Beginn",
       "eventVenue": "Veranstaltungsort",
