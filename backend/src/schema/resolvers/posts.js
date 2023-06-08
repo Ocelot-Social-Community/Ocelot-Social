@@ -22,7 +22,7 @@ const maintainPinnedPosts = (params) => {
 }
 
 const filterEventDates = (params) => {
-  if (params.filter.eventStart_gte) {
+  if (params.filter?.eventStart_gte) {
     const date = params.filter.eventStart_gte
     delete params.filter.eventStart_gte
     params.filter = { ...params.filter, OR: [{ eventStart_gte: date }, { eventEnd_gte: date }] }
