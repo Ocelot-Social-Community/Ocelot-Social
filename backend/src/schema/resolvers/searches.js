@@ -38,7 +38,7 @@ const searchPostsSetup = {
   [(resource)<-[:SHOUTED]-(user:User) | user] AS shouter`,
   returnClause: `resource {
     .*,
-    __typename: labels(resource)[0],
+    __typename: 'Post',
     author: properties(author),
     commentsCount: toString(size(comments)),
     shoutedCount: toString(size(shouter)),
@@ -53,7 +53,7 @@ const searchUsersSetup = {
   match: 'MATCH (resource:User)',
   whereClause: simpleWhereClause,
   withClause: '',
-  returnClause: 'resource {.*, __typename: labels(resource)[0]}',
+  returnClause: `resource {.*, __typename: 'User'}`,
   limit: 'LIMIT $limit',
 }
 
@@ -62,7 +62,7 @@ const searchHashtagsSetup = {
   match: 'MATCH (resource:Tag)',
   whereClause: simpleWhereClause,
   withClause: '',
-  returnClause: 'resource {.*, __typename: labels(resource)[0]}',
+  returnClause: `resource {.*, __typename: 'Tag'}`,
   limit: 'LIMIT $limit',
 }
 
@@ -77,7 +77,7 @@ const searchGroupsSetup = {
                 AND (resource.groupType IN ['public', 'closed']
                   OR membership.role IN ['usual', 'admin', 'owner'])`,
   withClause: 'WITH resource, membership',
-  returnClause: 'resource { .*, myRole: membership.role, __typename: labels(resource)[0] }',
+  returnClause: `resource { .*, myRole: membership.role, __typename: 'Group' }`,
   limit: 'LIMIT $limit',
 }
 
