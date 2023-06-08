@@ -90,6 +90,11 @@ export default {
       delete params.image
       delete params.groupId
       params.id = params.id || uuid()
+      
+      // extract postType and delete it from params
+      const postType = params.postType
+      delete params.postType
+
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         let groupCypher = ''
@@ -122,6 +127,8 @@ export default {
               MATCH (category:Category {id: categoryId})
               MERGE (post)-[:CATEGORIZED]->(category)`
             : ''
+
+
         const createPostTransactionResponse = await transaction.run(
           `
             CREATE (post:Post)
@@ -130,7 +137,7 @@ export default {
             SET post.updatedAt = toString(datetime())
             SET post.clickedCount = 0
             SET post.viewedTeaserCount = 0
-            SET post:${params.postType}
+            SET post:${postType}
             WITH post
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
