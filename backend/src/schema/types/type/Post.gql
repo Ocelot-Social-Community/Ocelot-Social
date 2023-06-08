@@ -85,6 +85,7 @@ input _PostFilter {
   postsInMyGroups: Boolean
   postType_in: [PostType]
   eventStart_gte: String 
+  eventEnd_gte: String 
 }
 
 enum _PostOrdering {
