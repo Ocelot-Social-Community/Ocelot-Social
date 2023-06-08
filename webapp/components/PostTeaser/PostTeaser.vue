@@ -30,25 +30,19 @@
         margin-bottom="small"
         style="padding: 5px"
       >
-        <ds-flex>
-          <ds-flex-item>
-            <location-teaser
-              class="event-info"
-              size="small"
-              :venue="post.eventVenue"
-              :locationName="post.eventLocationName"
-              :isOnline="post.eventIsOnline"
-            />
-          </ds-flex-item>
-          <ds-flex-item>
-            <date-time-range
-              class="event-info"
-              size="small"
-              :startDate="post.eventStart"
-              :endDate="post.eventEnd"
-            />
-          </ds-flex-item>
-        </ds-flex>
+        <location-teaser
+          class="event-info"
+          size="small"
+          :venue="post.eventVenue"
+          :locationName="post.eventLocationName"
+          :isOnline="post.eventIsOnline"
+        />
+        <date-time-range
+          class="event-info"
+          size="small"
+          :startDate="post.eventStart"
+          :endDate="post.eventEnd"
+        />
       </ds-space>
       <!-- TODO: replace editor content with tiptap render view -->
       <!-- eslint-disable-next-line vue/no-v-html -->
