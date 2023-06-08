@@ -124,6 +124,11 @@
     "versus": "Versus"
   },
   "components": {
+    "dateTimeRange": {
+      "hourMinute": "HH:mm",
+      "monthDay": "MM/dd/",
+      "yearMonthDay": "MM/dd/yyyy"
+    },
     "password-reset": {
       "change-password": {
         "error": "Changing your password failed. Maybe the security code was not correct?",
@@ -752,7 +757,7 @@
     },
     "viewEvent": {
       "eventEnd": "End",
-      "eventIsOnline": "Online Event",
+      "eventIsOnline": "Online",
       "eventLocationName": "City",
       "eventStart": "Start",
       "eventVenue": "Venue",
