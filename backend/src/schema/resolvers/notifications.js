@@ -54,7 +54,7 @@ export default {
           [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post {.*, author: properties(author), postType: filter(l IN labels(post) WHERE NOT l = "Post")} ] AS posts
           WITH resource, user, notification, authors, posts, relatedUser, membership,
           resource {.*,
-            __typename: labels(resource)[0],
+            __typename: filter(l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group'])[0],
             author: authors[0],
             post: posts[0],
             myRole: membership.role } AS finalResource
@@ -93,7 +93,7 @@ export default {
             [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author), postType: filter(l IN labels(post) WHERE NOT l = "Post")} ] AS posts
             OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
             WITH resource, user, notification, authors, posts, membership,
-            resource {.*, __typename: labels(resource)[0], author: authors[0], post: posts[0], myRole: membership.role } AS finalResource
+            resource {.*, __typename: filter(l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group'])[0], author: authors[0], post: posts[0], myRole: membership.role } AS finalResource
             RETURN notification {.*, from: finalResource, to: properties(user)}
           `,
           { resourceId: args.id, id: currentUser.id },
@@ -123,7 +123,7 @@ export default {
             [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author), postType: filter(l IN labels(post) WHERE NOT l = "Post")} ] AS posts
             OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
             WITH resource, user, notification, authors, posts, membership,
-            resource {.*, __typename: labels(resource)[0], author: authors[0], post: posts[0], myRole: membership.role} AS finalResource
+            resource {.*, __typename: filter(l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group'])[0], author: authors[0], post: posts[0], myRole: membership.role} AS finalResource
             RETURN notification {.*, from: finalResource, to: properties(user)}
           `,
           { id: currentUser.id },
