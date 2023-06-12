@@ -1,5 +1,6 @@
 // NOTE: We cannot use `fs` here to clean up the code. Cypress breaks on any npm
 // module that is not browser-compatible. Node's `fs` module is server-side only
+declare var Cypress: any | undefined
 export default {
   Image: typeof Cypress !== 'undefined' ? require('./Image.js') : require('./Image.js').default,
   Badge: typeof Cypress !== 'undefined' ? require('./Badge.js') : require('./Badge.js').default,
