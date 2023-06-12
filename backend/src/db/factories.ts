@@ -15,7 +15,7 @@ const uniqueImageUrl = (imageUrl) => {
   return newUrl.toString()
 }
 
-export const cleanDatabase = async (options = {}) => {
+export const cleanDatabase = async (options: any = {}) => {
   const { driver = getDriver() } = options
   const session = driver.session()
   try {
