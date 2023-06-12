@@ -101,7 +101,7 @@ export function signAndSend(activity, fromName, targetDomain, url) {
               } else {
                 debug('Response Headers:', JSON.stringify(response.headers, null, 2))
                 debug('Response Body:', JSON.stringify(response.body, null, 2))
-                resolve()
+                resolve(response)
               }
             },
           )

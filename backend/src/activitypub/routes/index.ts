@@ -11,8 +11,8 @@ export default function () {
     cors(),
     express.json({
       type: ['application/activity+json', 'application/ld+json', 'application/json'],
-    }),
-    express.urlencoded({ extended: true }),
+    }) as any,
+    express.urlencoded({ extended: true }) as any,
     user,
   )
   router.use(
@@ -20,8 +20,8 @@ export default function () {
     cors(),
     express.json({
       type: ['application/activity+json', 'application/ld+json', 'application/json'],
-    }),
-    express.urlencoded({ extended: true }),
+    }) as any,
+    express.urlencoded({ extended: true }) as any,
     verify,
     inbox,
   )

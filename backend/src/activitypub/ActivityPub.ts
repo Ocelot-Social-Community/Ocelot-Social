@@ -11,11 +11,15 @@ import { v4 as uuid } from 'uuid'
 import CONFIG from '../config'
 const debug = require('debug')('ea')
 
-let activityPub = null
+let activityPub: any = null
 
 export { activityPub }
 
 export default class ActivityPub {
+  endpoint: any
+  dataSource: any
+  collections: any
+  host: any
   constructor(activityPubEndpointUri, internalGraphQlUri) {
     this.endpoint = activityPubEndpointUri
     this.dataSource = new NitroDataSource(internalGraphQlUri)
@@ -211,16 +215,16 @@ export default class ActivityPub {
       // serve the rest
       activity.to.map(async (recipient) => {
         debug('serve rest')
-        const actorObject = await this.getActorObject(recipient)
+        const actorObject: any = await this.getActorObject(recipient)
         return this.trySend(activity, fromName, new URL(recipient).host, actorObject.inbox)
       })
     } else if (typeof activity.to === 'string') {
       debug('is string')
-      const actorObject = await this.getActorObject(activity.to)
+      const actorObject: any = await this.getActorObject(activity.to)
       return this.trySend(activity, fromName, new URL(activity.to).host, actorObject.inbox)
     } else if (Array.isArray(activity.to)) {
       activity.to.map(async (recipient) => {
-        const actorObject = await this.getActorObject(recipient)
+        const actorObject: any = await this.getActorObject(recipient)
         return this.trySend(activity, fromName, new URL(recipient).host, actorObject.inbox)
       })
     }
@@ -231,7 +235,7 @@ export default class ActivityPub {
       return await signAndSend(activity, fromName, host, url)
     } catch (e) {
       if (tries > 0) {
-        setTimeout(function () {
+        setTimeout(() => {
           return this.trySend(activity, fromName, host, url, --tries)
         }, 20000)
       }

@@ -8,7 +8,7 @@ const debug = require('debug')('ea:security')
 // TODO Does this reference a local config? Why?
 // dotenv.config({ path: resolve('src', 'activitypub', '.env') })
 
-export function generateRsaKeyPair(options = {}) {
+export function generateRsaKeyPair(options: any = {}) {
   const { passphrase = CONFIG.PRIVATE_KEY_PASSPHRASE } = options
   return crypto.generateKeyPairSync('rsa', {
     modulusLength: 4096,
