@@ -3,7 +3,7 @@ import { existsSync, createReadStream } from 'fs'
 import path from 'path'
 import { S3 } from 'aws-sdk'
 import mime from 'mime-types'
-import { s3Configs } from '../../config'
+import s3Configs from '../../config'
 import https from 'https'
 
 export const description = `

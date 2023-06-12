@@ -12,7 +12,7 @@ export function up(next) {
   rxSession
     .beginTransaction()
     .pipe(
-      flatMap((transaction) =>
+      flatMap((transaction: any) =>
         concat(
           transaction
             .run(
@@ -23,7 +23,7 @@ export function up(next) {
             )
             .records()
             .pipe(
-              map((record) => {
+              map((record: any) => {
                 const { id: locationId } = record.get('location')
                 return { locationId }
               }),
@@ -40,7 +40,7 @@ export function up(next) {
                   )
                   .records()
                   .pipe(
-                    map((record) => ({
+                    map((record: any) => ({
                       location: record.get('location'),
                       updatedLocation: record.get('updatedLocation'),
                     })),

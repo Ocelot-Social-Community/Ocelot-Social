@@ -18,13 +18,13 @@ export function up(next) {
   rxSession
     .beginTransaction()
     .pipe(
-      flatMap((txc) =>
+      flatMap((txc: any) =>
         concat(
           txc
             .run('MATCH (email:EmailAddress) RETURN email {.email}')
             .records()
             .pipe(
-              map((record) => {
+              map((record: any) => {
                 const { email } = record.get('email')
                 const normalizedEmail = normalizeEmail(email)
                 return { email, normalizedEmail }
@@ -45,7 +45,7 @@ export function up(next) {
                   )
                   .records()
                   .pipe(
-                    map((r) => ({
+                    map((r: any) => ({
                       oldEmail: email,
                       email: r.get('email'),
                       user: r.get('user'),
