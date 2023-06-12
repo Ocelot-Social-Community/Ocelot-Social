@@ -4,8 +4,8 @@ import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
 import { faker } from '@faker-js/faker'
 import { getDriver, getNeode } from './neo4j'
-import CONFIG from '../config/index.js'
-import generateInviteCode from '../schema/resolvers/helpers/generateInviteCode.js'
+import CONFIG from '../config/index'
+import generateInviteCode from '../schema/resolvers/helpers/generateInviteCode'
 
 const neode = getNeode()
 

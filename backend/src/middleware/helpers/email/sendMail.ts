@@ -1,5 +1,5 @@
 import CONFIG from '../../../config'
-import { cleanHtml } from '../../../middleware/helpers/cleanHtml.js'
+import { cleanHtml } from '../../../middleware/helpers/cleanHtml'
 import nodemailer from 'nodemailer'
 import { htmlToText } from 'nodemailer-html-to-text'
 

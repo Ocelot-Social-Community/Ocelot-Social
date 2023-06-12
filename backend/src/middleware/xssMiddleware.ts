@@ -1,5 +1,5 @@
 import walkRecursive from '../helpers/walkRecursive'
-import { cleanHtml } from '../middleware/helpers/cleanHtml.js'
+import { cleanHtml } from '../middleware/helpers/cleanHtml'
 
 // exclamation mark separetes field names, that should not be sanitized
 const fields = [

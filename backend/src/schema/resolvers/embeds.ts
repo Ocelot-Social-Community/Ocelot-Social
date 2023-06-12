@@ -1,4 +1,4 @@
-import scrape from './embeds/scraper.js'
+import scrape from './embeds/scraper'
 import { undefinedToNullResolver } from './helpers/Resolver'
 
 export default {

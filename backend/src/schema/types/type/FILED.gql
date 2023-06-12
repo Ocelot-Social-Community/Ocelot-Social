@@ -5,7 +5,7 @@ type FILED {
   submitter: User
 }
 
-# this list equals the strings of an array in file "webapp/constants/modals.js"
+# this list equals the strings of an array in file "webapp/constants/modals"
 enum ReasonCategory {
   other
   discrimination_etc
