@@ -58,7 +58,7 @@ export const context = async (options) => {
   }
 }
 
-const createServer = (options) => {
+const createServer = (options?) => {
   const defaults = {
     context,
     schema: middleware(schema),
