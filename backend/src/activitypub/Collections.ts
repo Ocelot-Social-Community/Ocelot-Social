@@ -1,4 +1,5 @@
 export default class Collections {
+  dataSource: any
   constructor(dataSource) {
     this.dataSource = dataSource
   }

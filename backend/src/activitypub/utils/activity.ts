@@ -100,18 +100,19 @@ export async function getActorId(name) {
 // }
 
 export function isPublicAddressed(postObject) {
+  const result: { to: any[]} = { to: []}
   if (typeof postObject.to === 'string') {
-    postObject.to = [postObject.to]
+    result.to = [postObject.to]
   }
   if (typeof postObject === 'string') {
-    postObject.to = [postObject]
+    result.to = [postObject]
   }
   if (Array.isArray(postObject)) {
-    postObject.to = postObject
+    result.to = postObject
   }
   return (
-    postObject.to.includes('Public') ||
-    postObject.to.includes('as:Public') ||
-    postObject.to.includes('https://www.w3.org/ns/activitystreams#Public')
+    result.to.includes('Public') ||
+    result.to.includes('as:Public') ||
+    result.to.includes('https://www.w3.org/ns/activitystreams#Public')
   )
 }

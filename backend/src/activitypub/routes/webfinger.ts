@@ -54,6 +54,6 @@ export async function handler(req, res) {
 
 export default function () {
   const router = express.Router()
-  router.use('/webfinger', cors(), express.urlencoded({ extended: true }), handler)
+  router.use('/webfinger', cors(), express.urlencoded({ extended: true }) as any, handler)
   return router
 }

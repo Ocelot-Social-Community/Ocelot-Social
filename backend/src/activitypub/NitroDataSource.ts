@@ -17,15 +17,17 @@ import trunc from 'trunc-html'
 const debug = require('debug')('ea:datasource')
 
 export default class NitroDataSource {
+  client: any
+  uri: any
   constructor(uri) {
     this.uri = uri
-    const defaultOptions = {
+    const defaultOptions: any = {
       query: {
         fetchPolicy: 'network-only',
         errorPolicy: 'all',
       },
     }
-    const link = createHttpLink({ uri: this.uri, fetch: fetch }) // eslint-disable-line
+    const link = createHttpLink({ uri: this.uri, fetch: fetch } as any) // eslint-disable-line
     const cache = new InMemoryCache()
     const authLink = setContext((_, { headers }) => {
       // generate the authentication token (maybe from env? Which user?)
@@ -95,7 +97,7 @@ export default class NitroDataSource {
       const followers = actor.followedBy
       const followersCount = actor.followedByCount
 
-      const followersCollection = createOrderedCollectionPage(slug, 'followers')
+      const followersCollection: any = createOrderedCollectionPage(slug, 'followers')
       followersCollection.totalItems = followersCount
       debug(`followers = ${JSON.stringify(followers, null, 2)}`)
       await Promise.all(
@@ -157,7 +159,7 @@ export default class NitroDataSource {
       const following = actor.following
       const followingCount = actor.followingCount
 
-      const followingCollection = createOrderedCollectionPage(slug, 'following')
+      const followingCollection: any = createOrderedCollectionPage(slug, 'following')
       followingCollection.totalItems = followingCount
 
       await Promise.all(
@@ -235,7 +237,7 @@ export default class NitroDataSource {
       const actor = result.data.User[0]
       const posts = actor.contributions
 
-      const outboxCollection = createOrderedCollectionPage(slug, 'outbox')
+      const outboxCollection: any = createOrderedCollectionPage(slug, 'outbox')
       outboxCollection.totalItems = posts.length
       await Promise.all(
         posts.map(async (post) => {
