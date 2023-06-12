@@ -1,7 +1,7 @@
 import { sentry } from 'graphql-middleware-sentry'
 import CONFIG from '../config'
 
-let sentryMiddleware = (resolve, root, args, context, resolveInfo) =>
+let sentryMiddleware: any = (resolve, root, args, context, resolveInfo) =>
   resolve(root, args, context, resolveInfo)
 
 if (CONFIG.SENTRY_DSN_BACKEND) {
@@ -12,7 +12,7 @@ if (CONFIG.SENTRY_DSN_BACKEND) {
       release: CONFIG.COMMIT,
       environment: CONFIG.NODE_ENV,
     },
-    withScope: (scope, error, context) => {
+    withScope: (scope, error, context: any) => {
       scope.setUser({
         id: context.user && context.user.id,
       })

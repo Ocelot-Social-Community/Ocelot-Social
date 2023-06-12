@@ -18,7 +18,7 @@ export default function (content) {
       return $(el).attr('data-hashtag-id')
     })
     .get()
-  const hashtags = []
+  const hashtags: any = []
   ids.forEach((id) => {
     const match = exec(id, regX)
     if (match != null) {
