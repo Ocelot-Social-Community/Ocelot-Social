@@ -5,7 +5,7 @@
  * @property fieldName String
  * @property callback Function
  */
-function walkRecursive(data, fields, fieldName, callback, _key) {
+function walkRecursive(data, fields, fieldName, callback, _key?) {
   if (!Array.isArray(fields)) {
     throw new Error('please provide an fields array for the walkRecursive helper')
   }
