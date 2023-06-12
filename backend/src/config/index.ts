@@ -15,10 +15,11 @@ if (require.resolve) {
 }
 
 // Use Cypress env or process.env
+declare var Cypress: any | undefined
 const env = typeof Cypress !== 'undefined' ? Cypress.env() : process.env // eslint-disable-line no-undef
 
 const environment = {
-  NODE_ENV: env.NODE_ENV || process.NODE_ENV,
+  NODE_ENV: env.NODE_ENV || process.env.NODE_ENV,
   DEBUG: env.NODE_ENV !== 'production' && env.DEBUG,
   TEST: env.NODE_ENV === 'test',
   PRODUCTION: env.NODE_ENV === 'production',
@@ -90,14 +91,11 @@ const options = {
 }
 
 // Check if all required configs are present
-if (require.resolve) {
-  // are we in a nodejs environment?
-  Object.entries(required).map((entry) => {
-    if (!entry[1]) {
-      throw new Error(`ERROR: "${entry[0]}" env variable is missing.`)
-    }
-  })
-}
+Object.entries(required).map((entry) => {
+  if (!entry[1]) {
+    throw new Error(`ERROR: "${entry[0]}" env variable is missing.`)
+  }
+})
 
 export default {
   ...environment,
