@@ -87,12 +87,12 @@ const createServer = (options) => {
   app.use(
     helmet(
       (CONFIG.DEBUG && { contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }) || {},
-    ),
+    ) as any,
   )
   app.use('/.well-known/', webfinger())
   app.use(express.static('public'))
-  app.use(bodyParser.json({ limit: '10mb' }))
-  app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }))
+  app.use(bodyParser.json({ limit: '10mb' }) as any)
+  app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }) as any)
   app.use(graphqlUploadExpress())
   server.applyMiddleware({ app, path: '/' })
   const httpServer = http.createServer(app)
