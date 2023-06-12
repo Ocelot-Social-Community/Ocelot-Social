@@ -10,7 +10,7 @@ export const undefinedToNullResolver = (list) => {
   return resolvers
 }
 
-export default function Resolver(type, options = {}) {
+export default function Resolver(type, options: any = {}) {
   const {
     idAttribute = 'id',
     undefinedToNull = [],
@@ -44,7 +44,7 @@ export default function Resolver(type, options = {}) {
     }
   }
 
-  const booleanResolver = (obj) => {
+  const booleanResolver = (obj: any[]) => {
     const resolvers = {}
     for (const [key, condition] of Object.entries(obj)) {
       resolvers[key] = async (parent, params, { cypherParams, driver }, resolveInfo) => {

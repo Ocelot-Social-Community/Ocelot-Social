@@ -244,7 +244,7 @@ export default {
         ]
 
       params.limit = 15
-      const type = multiSearchMap.find((obj) => obj.symbol === searchType)
+      const type: any = multiSearchMap.find((obj) => obj.symbol === searchType)
       return getSearchResults(context, type.setup, params)
     },
   },

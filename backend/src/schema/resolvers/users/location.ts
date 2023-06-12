@@ -72,7 +72,7 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
   let locationId
 
   if (locationName !== null) {
-    const res = await fetch(
+    const res: any = await fetch(
       `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
         locationName,
       )}.json?access_token=${
@@ -155,7 +155,7 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
 }
 
 export const queryLocations = async ({ place, lang }) => {
-  const res = await fetch(
+  const res: any = await fetch(
     `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${CONFIG.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
   )
   // Return empty array if no location found or error occurred

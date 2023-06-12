@@ -4,7 +4,7 @@ import CONSTANTS_REGISTRATION from './../../../constants/registration'
 export default function generateNonce() {
   return Array.from(
     { length: CONSTANTS_REGISTRATION.NONCE_LENGTH },
-    (n = Math.floor(Math.random() * 10)) => {
+    (n: number = Math.floor(Math.random() * 10)) => {
       return String.fromCharCode(n + 48)
     },
   ).join('')

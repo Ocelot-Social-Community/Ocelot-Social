@@ -4,7 +4,7 @@ export default {
   Query: {
     statistics: async (_parent, _args, { driver }) => {
       const session = driver.session()
-      const counts = {}
+      const counts: any = {}
       try {
         const mapping = {
           countUsers: 'User',
