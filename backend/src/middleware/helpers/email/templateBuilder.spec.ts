@@ -1,5 +1,5 @@
 import CONFIG from '../../../config'
-import logosWebapp from '../../../config/logos.js'
+import logosWebapp from '../../../config/logos'
 import {
   signupTemplate,
   emailVerificationTemplate,

@@ -107,5 +107,5 @@
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
   "include": ["./src/**/*"],
-  "exclude": ["./src/**/*.spec.ts", "./src/**/*.spec.js"]
+  "exclude": ["./src/**/*.spec.ts"]
 }

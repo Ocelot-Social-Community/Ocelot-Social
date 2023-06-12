@@ -1,4 +1,4 @@
-import { getMutedUsers } from '../users.js'
+import { getMutedUsers } from '../users'
 import { mergeWith, isArray } from 'lodash'
 
 export const filterForMutedUsers = async (params, context) => {

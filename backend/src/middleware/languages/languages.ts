@@ -1,5 +1,5 @@
 import LanguageDetect from 'languagedetect'
-import { removeHtmlTags } from '../helpers/cleanHtml.js'
+import { removeHtmlTags } from '../helpers/cleanHtml'
 
 const setPostLanguage = (text) => {
   const lngDetector = new LanguageDetect()

@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
-import emails from './emails.js'
-import metadata from './metadata.js'
+import emails from './emails'
+import metadata from './metadata'
 
 // Load env file
 if (require.resolve) {

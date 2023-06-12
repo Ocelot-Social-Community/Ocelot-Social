@@ -1,4 +1,4 @@
-// this file is duplicated in `backend/src/config/metadata.js` and `webapp/constants/metadata.js` and replaced on rebranding
+// this file is duplicated in `backend/src/config/metadata` and `webapp/constants/metadata.js` and replaced on rebranding
 export default {
   APPLICATION_NAME: 'ocelot.social',
   APPLICATION_SHORT_NAME: 'ocelot',
