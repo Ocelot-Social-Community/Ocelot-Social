@@ -1,7 +1,13 @@
 <template>
   <div>
     <ds-space margin="small">
-      <ds-heading tag="h1">{{ $t('post.editPost.title') }}</ds-heading>
+      <ds-heading tag="h1">
+        {{
+          contribution && contribution.postType[0] === 'Event'
+            ? $t('post.editPost.event')
+            : $t('post.editPost.title')
+        }}
+      </ds-heading>
       <ds-heading v-if="contribution && contribution.group" tag="h2">
         {{ $t('post.editPost.forGroup.title', { name: contribution.group.name }) }}
       </ds-heading>
@@ -12,6 +18,7 @@
         <contribution-form
           :contribution="contribution"
           :group="contribution && contribution.group ? contribution.group : null"
+          :createEvent="contribution && contribution.postType[0] === 'Event'"
         />
       </ds-flex-item>
       <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
@@ -34,7 +41,11 @@ export default {
     }),
   },
   data() {
-    return { contribution: {} }
+    return {
+      contribution: {
+        postType: ['Article'],
+      },
+    }
   },
   async asyncData(context) {
     const {

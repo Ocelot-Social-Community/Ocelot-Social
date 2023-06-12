@@ -1,29 +1,32 @@
 import { UserInputError } from 'apollo-server'
 
 export const validateEventParams = (params) => {
+  let locationName = null
   if (params.postType && params.postType === 'Event') {
     const { eventInput } = params
     validateEventDate(eventInput.eventStart)
     params.eventStart = eventInput.eventStart
+
     if (eventInput.eventEnd) {
       validateEventEnd(eventInput.eventStart, eventInput.eventEnd)
       params.eventEnd = eventInput.eventEnd
+    } else {
+      params.eventEnd = null
     }
+
     if (eventInput.eventLocationName && !eventInput.eventVenue) {
       throw new UserInputError('Event venue must be present if event location is given!')
     }
     params.eventVenue = eventInput.eventVenue
-    params.eventLocationName = eventInput.eventLocationName
+    params.eventLocationName = eventInput.eventLocationName && eventInput.eventLocationName.trim()
+    if (params.eventLocationName) {
+      locationName = params.eventLocationName
+    } else {
+      params.eventLocationName = null
+    }
     params.eventIsOnline = !!eventInput.eventIsOnline
   }
   delete params.eventInput
-  let locationName
-  if (params.eventLocationName) {
-    locationName = params.eventLocationName
-  } else {
-    params.eventLocationName = null
-    locationName = null
-  }
   return locationName
 }
 

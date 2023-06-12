@@ -115,11 +115,20 @@
     "validations": {
       "categories": "at least one and at most three topics must be selected",
       "email": "must be a valid e-mail address",
+      "eventLocationNameLength": "minimum {min} or maximum {max} characters",
+      "eventLocationNameNotEmpty": "only empty characters are not allowed",
+      "eventVenueLength": "minimum {min} or maximum {max} characters",
+      "eventVenueNotEmpty": "only empty characters are not allowed",
       "url": "must be a valid URL"
     },
     "versus": "Versus"
   },
   "components": {
+    "dateTimeRange": {
+      "hourMinute": "HH:mm",
+      "monthDay": "MM/dd/",
+      "yearMonthDay": "MM/dd/yyyy"
+    },
     "password-reset": {
       "change-password": {
         "error": "Changing your password failed. Maybe the security code was not correct?",
@@ -722,10 +731,11 @@
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Create A New Post"
+      "title": "Create A New Article"
     },
     "edited": "edited",
     "editPost": {
+      "event": "Edit Your Event",
       "forGroup": {
         "title": "For The Group “{name}”"
       },
@@ -747,7 +757,7 @@
     },
     "viewEvent": {
       "eventEnd": "End",
-      "eventIsOnline": "Online Event",
+      "eventIsOnline": "Online",
       "eventLocationName": "City",
       "eventStart": "Start",
       "eventVenue": "Venue",

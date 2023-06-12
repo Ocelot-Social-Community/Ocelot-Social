@@ -61,6 +61,8 @@ export default () => {
         $content: String!
         $image: ImageInput
         $categoryIds: [ID]
+        $postType: PostType
+        $eventInput: _EventInput
       ) {
         UpdatePost(
           id: $id
@@ -68,6 +70,8 @@ export default () => {
           content: $content
           image: $image
           categoryIds: $categoryIds
+          postType: $postType
+          eventInput: $eventInput
         ) {
           id
           title
@@ -84,6 +88,14 @@ export default () => {
             id
             name
             role
+          }
+          postType
+          eventStart
+          eventLocationName
+          eventVenue
+          eventLocation {
+            lng
+            lat
           }
         }
       }

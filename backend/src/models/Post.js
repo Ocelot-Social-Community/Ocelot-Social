@@ -57,4 +57,5 @@ export default {
     },
   },
   pinned: { type: 'boolean', default: null, valid: [null, true] },
+  postType: { type: 'string', default: 'Article', valid: ['Article', 'Event'] },
 }
