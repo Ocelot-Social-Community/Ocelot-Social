@@ -6,7 +6,7 @@ import { htmlToText } from 'nodemailer-html-to-text'
 const hasEmailConfig = CONFIG.SMTP_HOST && CONFIG.SMTP_PORT
 const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD
 
-let sendMailCallback = async () => {}
+let sendMailCallback: any = async () => {}
 if (!hasEmailConfig) {
   if (!CONFIG.TEST) {
     // eslint-disable-next-line no-console
@@ -29,7 +29,7 @@ if (!hasEmailConfig) {
         cleanHtml(templateArgs.html, 'dummyKey', {
           allowedTags: ['a'],
           allowedAttributes: { a: ['href'] },
-        }).replace(/&amp;/g, '&'),
+        } as any).replace(/&amp;/g, '&'),
       )
     }
   }
