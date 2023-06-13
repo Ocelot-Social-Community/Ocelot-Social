@@ -6,7 +6,7 @@ import createServer from '../../server'
 import gql from 'graphql-tag'
 
 jest.mock('node-fetch')
-const mockedFetch =  jest.mocked(fetch)
+const mockedFetch = jest.mocked(fetch)
 const { Response } = jest.requireActual('node-fetch')
 
 afterEach(() => {
