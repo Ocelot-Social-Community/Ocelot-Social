@@ -6,7 +6,7 @@ import createServer from '../../server'
 import gql from 'graphql-tag'
 
 jest.mock('node-fetch')
-const mockedFetch = fetch as jest.Mocked<typeof fetch>
+const mockedFetch =  jest.mocked(fetch)
 const { Response } = jest.requireActual('node-fetch')
 
 afterEach(() => {
@@ -83,7 +83,7 @@ describe('Query', () => {
       beforeEach(() => {
         mockedFetch
           .mockReturnValueOnce(Promise.resolve(new Response('')))
-          .mockReturnValueOnce(Promise.resolve(JSON.stringify({})))
+          .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify({}))))
         variables = { url: 'https://www.w3schools.com/html/mov_bbb.mp4' }
       })
 
@@ -115,7 +115,7 @@ describe('Query', () => {
       beforeEach(() => {
         mockedFetch
           .mockReturnValueOnce(Promise.resolve(new Response(HumanConnectionOrg)))
-          .mockReturnValueOnce(Promise.resolve('invalid json'))
+          .mockReturnValueOnce(Promise.resolve(new Response('invalid json')))
         variables = { url: 'https://www.facebook.com/HumanConnectionOrg/' }
       })
 
@@ -149,7 +149,7 @@ describe('Query', () => {
       beforeEach(() => {
         mockedFetch
           .mockReturnValueOnce(Promise.resolve(new Response(pr3934)))
-          .mockReturnValueOnce(Promise.resolve(JSON.stringify({})))
+          .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify({}))))
         variables = { url: 'https://github.com/Human-Connection/Human-Connection/pull/960' }
       })
 
