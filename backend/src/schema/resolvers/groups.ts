@@ -3,7 +3,7 @@ import { UserInputError } from 'apollo-server'
 import CONFIG from '../../config'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '../../constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
-import { removeHtmlTags } from '../../middleware/helpers/cleanHtml.js'
+import { removeHtmlTags } from '../../middleware/helpers/cleanHtml'
 import Resolver, {
   removeUndefinedNullValuesFromObject,
   convertObjectToCypherMapLiteral,

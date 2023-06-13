@@ -119,7 +119,7 @@ describe('passwordReset', () => {
 })
 
 describe('resetPassword', () => {
-  const setup = async (options = {}) => {
+  const setup = async (options: any = {}) => {
     const { email = 'user@example.org', issuedAt = new Date(), nonce = '12345' } = options
     await createPasswordReset({ driver, email, issuedAt, nonce })
   }
