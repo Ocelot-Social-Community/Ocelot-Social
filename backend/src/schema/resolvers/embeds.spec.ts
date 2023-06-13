@@ -6,10 +6,11 @@ import createServer from '../../server'
 import gql from 'graphql-tag'
 
 jest.mock('node-fetch')
+const mockedFetch = fetch as jest.Mocked<typeof fetch>
 const { Response } = jest.requireActual('node-fetch')
 
 afterEach(() => {
-  fetch.mockRestore()
+  mockedFetch.mockRestore()
 })
 
 let variables = {}
@@ -80,7 +81,7 @@ describe('Query', () => {
 
     describe('given a video link', () => {
       beforeEach(() => {
-        fetch
+        mockedFetch
           .mockReturnValueOnce(Promise.resolve(new Response('')))
           .mockReturnValueOnce(Promise.resolve(JSON.stringify({})))
         variables = { url: 'https://www.w3schools.com/html/mov_bbb.mp4' }
@@ -112,7 +113,7 @@ describe('Query', () => {
 
     describe('given a Facebook link', () => {
       beforeEach(() => {
-        fetch
+        mockedFetch
           .mockReturnValueOnce(Promise.resolve(new Response(HumanConnectionOrg)))
           .mockReturnValueOnce(Promise.resolve('invalid json'))
         variables = { url: 'https://www.facebook.com/HumanConnectionOrg/' }
@@ -146,7 +147,7 @@ describe('Query', () => {
 
     describe('given a Github link', () => {
       beforeEach(() => {
-        fetch
+        mockedFetch
           .mockReturnValueOnce(Promise.resolve(new Response(pr3934)))
           .mockReturnValueOnce(Promise.resolve(JSON.stringify({})))
         variables = { url: 'https://github.com/Human-Connection/Human-Connection/pull/960' }
@@ -180,7 +181,7 @@ Have all the information for the brand in separate config files. Set these defau
 
     describe('given a youtube link', () => {
       beforeEach(() => {
-        fetch
+        mockedFetch
           .mockReturnValueOnce(Promise.resolve(new Response(babyLovesCat)))
           .mockReturnValueOnce(Promise.resolve(babyLovesCatEmbedResponse))
         variables = { url: 'https://www.youtube.com/watch?v=qkdXAtO40Fo&t=18s' }
