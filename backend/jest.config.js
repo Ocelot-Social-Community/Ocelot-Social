@@ -1,5 +1,6 @@
 module.exports = {
   verbose: true,
+  preset: 'ts-jest',
   collectCoverage: true,
   collectCoverageFrom: [
     '**/*.ts',
