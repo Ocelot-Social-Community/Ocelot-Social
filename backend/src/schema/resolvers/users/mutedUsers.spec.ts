@@ -59,7 +59,7 @@ describe('mutedUsers', () => {
   it('throws permission error', async () => {
     const { query } = createTestClient(server)
     const result = await query({ query: mutedUserQuery })
-    expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+    expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
   })
 
   describe('authenticated and given a muted user', () => {

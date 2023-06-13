@@ -576,7 +576,7 @@ describe('notifications', () => {
                   read: false,
                 },
               }),
-            ).resolves.toMatchObject(expected, { errors: undefined })
+            ).resolves.toMatchObject({ ...expected, errors: undefined })
           })
         })
 
