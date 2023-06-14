@@ -1,9 +1,7 @@
 input _RoomFilter {
   AND: [_RoomFilter!]
   OR: [_RoomFilter!]
-  users: _UserFilter
-  users_in: [_UserFilter!]
-  users_some: [_UserFilter!]
+  users_some: _UserFilter
 }
 
 type Room {
@@ -11,7 +9,7 @@ type Room {
   createdAt: String
   updatedAt: String
 
-  users: [User!]! @relation(name: "CHATS_IN", direction: "IN")  
+  users: [User]! @relation(name: "CHATS_IN", direction: "IN")  
 }
 
 type Mutation {

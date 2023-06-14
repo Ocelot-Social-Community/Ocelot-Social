@@ -406,6 +406,7 @@ export default shield(
       queryLocations: isAuthenticated,
       availableRoles: isAdmin,
       getInviteCode: isAuthenticated, // and inviteRegistration
+      Room: isAuthenticated,
     },
     Mutation: {
       '*': deny,
