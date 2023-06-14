@@ -459,6 +459,7 @@ export default shield(
       switchUserRole: isAdmin,
       markTeaserAsViewed: allow,
       saveCategorySettings: isAuthenticated,
+      CreateRoom: isAuthenticated,
     },
     User: {
       email: or(isMyOwn, isAdmin),
