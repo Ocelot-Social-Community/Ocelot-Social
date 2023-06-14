@@ -1,6 +1,16 @@
 import { v4 as uuid } from 'uuid'
+import { neo4jgraphql } from 'neo4j-graphql-js'
 
 export default {
+  Query: {
+    Room:  async (object, params, context, resolveInfo) => {
+      if (!params.filter) params.filter = {}
+      params.filter.users_some = {
+        id: context.user.id,
+      }
+      return neo4jgraphql(object, params, context, resolveInfo)
+    },
+  },
   Mutation: {
     CreateRoom: async (_parent, params, context, _resolveInfo) => {
       const { userId } = params
@@ -33,6 +43,6 @@ export default {
       } finally {
         session.close()
       }      
-    }
-  }
+    },
+  },
 }

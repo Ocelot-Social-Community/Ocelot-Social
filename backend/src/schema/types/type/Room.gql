@@ -1,3 +1,11 @@
+input _RoomFilter {
+  AND: [_RoomFilter!]
+  OR: [_RoomFilter!]
+  users: _UserFilter
+  users_in: [_UserFilter!]
+  users_some: [_UserFilter!]
+}
+
 type Room {
   id: ID!
   createdAt: String
@@ -10,4 +18,8 @@ type Mutation {
   CreateRoom(
     userId: ID!
   ): Room
+}
+
+type Query {
+  Room: [Room]
 }
