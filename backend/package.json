@@ -6,9 +6,9 @@
   "author": "ocelot.social Community",
   "license": "MIT",
   "private": false,
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "__migrate": "migrate --compiler 'js:@babel/register' --migrations-dir ./src/db/migrations",
+    "__migrate": "migrate --compiler 'ts:./src/db/compiler.ts' --migrations-dir ./src/db/migrations",
     "prod:migrate": "migrate --migrations-dir ./build/db/migrations --store ./build/db/migrate/store.js",
     "start": "node build/",
     "build": "tsc && ./scripts/build.copy.files.sh",
@@ -16,11 +16,11 @@
     "dev:debug": "nodemon --exec babel-node --inspect=0.0.0.0:9229 src/ -e js,gql",
     "lint": "eslint src --config .eslintrc.js",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--max-old-space-size=8192 jest --runInBand --coverage --forceExit --detectOpenHandles",
-    "db:clean": "babel-node src/db/clean.js",
+    "db:clean": "ts-node src/db/clean.ts",
     "db:reset": "yarn run db:clean",
-    "db:seed": "babel-node src/db/seed.js",
-    "db:migrate": "yarn run __migrate --store ./src/db/migrate/store.js",
-    "db:migrate:create": "yarn run __migrate --template-file ./src/db/migrate/template.js --date-format 'yyyymmddHHmmss' create"
+    "db:seed": "ts-node src/db/seed.ts",
+    "db:migrate": "yarn run __migrate --store ./src/db/migrate/store.ts",
+    "db:migrate:create": "yarn run __migrate --template-file ./src/db/migrate/template.ts --date-format 'yyyymmddHHmmss' create"
   },
   "dependencies": {
     "@babel/cli": "~7.8.4",
@@ -76,7 +76,7 @@
     "metascraper-url": "^5.34.2",
     "metascraper-video": "^5.33.5",
     "metascraper-youtube": "^5.33.5",
-    "migrate": "^1.7.0",
+    "migrate": "^2.0.0",
     "mime-types": "^2.1.26",
     "minimatch": "^3.0.4",
     "mustache": "^4.2.0",
@@ -97,6 +97,8 @@
   },
   "devDependencies": {
     "@faker-js/faker": "7.6.0",
+    "@types/jest": "^29.5.2",
+    "@types/node": "^20.2.5",
     "apollo-server-testing": "~2.11.0",
     "chai": "~4.2.0",
     "cucumber": "~6.0.5",
@@ -113,6 +115,7 @@
     "nodemon": "~2.0.2",
     "prettier": "~2.3.2",
     "rosie": "^2.0.1",
+    "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },

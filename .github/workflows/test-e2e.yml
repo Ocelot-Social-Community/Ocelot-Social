@@ -27,6 +27,10 @@ jobs:
       - name: cypress | Fullstack tests
         id: e2e-tests
         run: |
+          cd backend
+          yarn install
+          yarn build
+          cd ..
           yarn install
           yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
 
