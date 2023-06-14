@@ -24,7 +24,7 @@ export default {
           MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
           MERGE (currentUser)-[:CREATED]->(message:Message)-[:INSIDE]->(room)
           SET message.createdAt = toString(datetime()),
-          message.id = $messageId
+          message.id = $messageId,
           message.content = $content
           RETURN message { .* }
         `
