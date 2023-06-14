@@ -407,6 +407,7 @@ export default shield(
       availableRoles: isAdmin,
       getInviteCode: isAuthenticated, // and inviteRegistration
       Room: isAuthenticated,
+      Message: isAuthenticated,
     },
     Mutation: {
       '*': deny,
@@ -461,6 +462,7 @@ export default shield(
       markTeaserAsViewed: allow,
       saveCategorySettings: isAuthenticated,
       CreateRoom: isAuthenticated,
+      CreateMessage: isAuthenticated,
     },
     User: {
       email: or(isMyOwn, isAdmin),
