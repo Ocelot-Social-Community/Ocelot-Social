@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid'
 import { neo4jgraphql } from 'neo4j-graphql-js'
+import Resolver from './helpers/Resolver'
 
 export default {
   Query: {
@@ -45,4 +46,11 @@ export default {
       }      
     },
   },
+  Room: {
+    ...Resolver('Room', {
+      hasMany: {
+        users: '<-[:CHATS_IN]-(related:User)',
+      }
+    }),
+  }  
 }
