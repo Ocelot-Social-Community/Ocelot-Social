@@ -5,7 +5,7 @@ import { expect } from 'chai'
 import { GraphQLClient } from 'graphql-request'
 import Factory from '../../../src/db/factories'
 const debug = require('debug')('ea:test:steps')
-
+const host: any = null
 const client = new GraphQLClient(host)
 
 function createUser (slug) {
