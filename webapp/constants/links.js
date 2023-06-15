@@ -2,6 +2,20 @@
 
 import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 
+const CHAT = defaultPageParamsPages.CHAT.overwrite({
+  // externalLink: null, // if defined it's dominating
+
+  internalPage: {
+    // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
+    // headTitleIdent: 'site.faq', // localized string identifier, if undefined default is used
+    // headlineIdent: 'site.faq', // on null default is used, on empty string it's hidden
+    hasContainer: true,
+    hasBaseCard: true,
+    hasLoginInHeader: true,
+    // in case internal page content is here 'webapp/locales/html/'
+  },
+})
+
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
   // if defined it's dominating
   externalLink: {
@@ -130,6 +144,7 @@ export default {
   // you can find and store templates for 👇🏼 at https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/tree/master/branding/templates/
 
   ORGANIZATION,
+  CHAT,
   DONATE,
   IMPRINT,
   TERMS_AND_CONDITIONS,
@@ -140,6 +155,7 @@ export default {
 
   FOOTER_LINK_LIST: [
     ORGANIZATION,
+    CHAT,
     TERMS_AND_CONDITIONS,
     CODE_OF_CONDUCT,
     DATA_PRIVACY,

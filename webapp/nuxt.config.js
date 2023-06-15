@@ -248,6 +248,14 @@ export default {
      ** You can extend webpack config here
      */
     extend(config, ctx) {
+      // Add the compilerOptions
+      ctx.loaders.vue.compilerOptions = {
+        // Add your compilerOptions here
+        isCustomElement: (tagName) => {
+          return tagName === 'vue-advanced-chat' || tagName === 'emoji-picker'
+        },
+      }
+
       if (CONFIG.STYLEGUIDE_DEV) {
         config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/src/system`)
         config.module.rules.push({
