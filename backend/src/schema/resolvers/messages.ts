@@ -5,18 +5,15 @@ import Resolver from './helpers/Resolver'
 export default {
   Query: {
     Message: async (object, params, context, resolveInfo) => {
-      console.log('message query', params)
       const { roomId } = params
-      // if (!params.filter) params.filter = {}
-      /*
+      delete params.roomId
+      if (!params.filter) params.filter = {}
       params.filter.room = {
-        id_in: [roomId],
+        id: roomId,
         users_some: {
           id: context.user.id,
         },
       }
-      */
-      console.log(params.filter)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
   },

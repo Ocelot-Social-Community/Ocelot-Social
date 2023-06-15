@@ -2,7 +2,6 @@ input _RoomFilter {
   AND: [_RoomFilter!]
   OR: [_RoomFilter!]
   id: ID
-  id_in: [ID!]
   users_some: _UserFilter
 }
 

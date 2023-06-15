@@ -183,8 +183,7 @@ describe('Message', () => {
       })
 
       describe('room exists with authenticated user chatting', () => {
-        it('returns null', async () => {
-          console.log(roomId)
+        it('returns the messages', async () => {
           await expect(query({
             query: messageQuery(),
             variables: {
@@ -203,7 +202,27 @@ describe('Message', () => {
             },
           })
         })
-      })      
+      })
+
+      describe('room exists, authenticated user not in room', () => {
+        beforeAll(async () => {
+          authenticatedUser = await notChattingUser.toJson()
+        })
+
+        it('returns null', async () => {
+          await expect(query({
+            query: messageQuery(),
+            variables: {
+              roomId,
+            },
+          })).resolves.toMatchObject({
+            errors: undefined,
+            data: {
+              Message: [],
+            },
+          })
+        })
+      }) 
     })
   })
 })
