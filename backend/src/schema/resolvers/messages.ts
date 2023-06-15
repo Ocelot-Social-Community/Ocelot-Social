@@ -1,15 +1,22 @@
 import { v4 as uuid } from 'uuid'
 import { neo4jgraphql } from 'neo4j-graphql-js'
+import Resolver from './helpers/Resolver'
 
 export default {
   Query: {
-    Message:  async (object, params, context, resolveInfo) => {
-      if (!params.filter) params.filter = {}
+    Message: async (object, params, context, resolveInfo) => {
+      console.log('message query', params)
+      const { roomId } = params
+      // if (!params.filter) params.filter = {}
+      /*
       params.filter.room = {
+        id_in: [roomId],
         users_some: {
           id: context.user.id,
         },
       }
+      */
+      console.log(params.filter)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
   },
@@ -47,4 +54,12 @@ export default {
       } 
     },
   },
+  Message: {
+    ...Resolver('Message', {
+      hasOne: {
+        author: '<-[:CREATED]-(related:User)',
+        room: '-[:INSIDE]->(related:Room)',
+      }
+    }),
+  }  
 }

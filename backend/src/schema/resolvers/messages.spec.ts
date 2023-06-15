@@ -36,6 +36,8 @@ afterAll(async () => {
 
 
 describe('Message', () => {
+  let roomId: string
+
   beforeAll(async () => {
     ;[chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
       Factory.build(
@@ -88,6 +90,120 @@ describe('Message', () => {
             })
         })
       })
+
+      describe('room exists', () => {
+        beforeAll(async () => {
+          const room = await mutate({
+            mutation: createRoomMutation(),
+            variables: {
+              userId: 'other-chatting-user',
+            },
+          })
+          roomId = room.data.CreateRoom.id
+        })
+
+        describe('user chats in room', () => {
+          it('returns the message', async () => {
+            await expect(mutate({
+              mutation: createMessageMutation(),
+              variables: {
+                roomId,
+                content: 'Some nice message to other chatting user',
+              } })).resolves.toMatchObject({
+                errors: undefined,
+                data: {
+                  CreateMessage: {
+                    id: expect.any(String),
+                    content: 'Some nice message to other chatting user',
+                  },
+                },
+              })
+          })
+        })
+
+        describe('user does not chat in room', () => {
+          beforeAll(async () => {
+            authenticatedUser = await notChattingUser.toJson()
+          })
+          
+          it('returns null', async () => {
+            await expect(mutate({
+              mutation: createMessageMutation(),
+              variables: {
+                roomId,
+                content: 'I have no access to this room!',
+              } })).resolves.toMatchObject({
+                errors: undefined,
+                data: {
+                  CreateMessage: null,
+                },
+              })
+          })
+        })
+      })
+    })
+  })
+
+  describe('message query', () => {
+    describe('unauthenticated', () => {
+      beforeAll(() => {
+        authenticatedUser = null
+      })
+
+      it('throws authorization error', async () => {
+        await expect(query({
+          query: messageQuery(),
+          variables: {
+            roomId: 'some-id' }
+        })).resolves.toMatchObject({
+          errors: [{ message: 'Not Authorized!' }],
+        })
+      })  
+    })
+
+    describe('authenticated', () => {
+      beforeAll(async () => {
+        authenticatedUser = await otherChattingUser.toJson()
+      })
+
+      describe('room does not exists', () => {
+        it('returns null', async () => {
+          await expect(query({
+            query: messageQuery(),
+            variables: {
+              roomId: 'some-id'
+            },
+          })).resolves.toMatchObject({
+            errors: undefined,
+            data: {
+              Message: [],
+            },
+          })
+        })
+      })
+
+      describe('room exists with authenticated user chatting', () => {
+        it('returns null', async () => {
+          console.log(roomId)
+          await expect(query({
+            query: messageQuery(),
+            variables: {
+              roomId,
+            },
+          })).resolves.toMatchObject({
+            errors: undefined,
+            data: {
+              Message: [{
+                id: expect.any(String),
+                content: 'Some nice message to other chatting user',
+                author: {
+                  id: 'chatting-user',
+                },
+              }],
+            },
+          })
+        })
+      })      
     })
   })
 })
