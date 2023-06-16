@@ -22,6 +22,7 @@ export const roomQuery = () => {
         id
         roomId
         users {
+          _id
           id
         }
       }

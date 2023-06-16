@@ -143,9 +143,11 @@ describe('Room', () => {
                   roomId: result.data.Room[0].id,
                   users: expect.arrayContaining([
                     {
+                      _id: expect.any(String),
                       id: 'chatting-user',
                     },
                     {
+                      _id: expect.any(String),
                       id: 'other-chatting-user',
                     },
                   ]),
@@ -172,9 +174,11 @@ describe('Room', () => {
                   roomId: result.data.Room[0].id,
                   users: expect.arrayContaining([
                     {
+                      _id: expect.any(String),
                       id: 'chatting-user',
                     },
                     {
+                      _id: expect.any(String),
                       id: 'other-chatting-user',
                     },
                   ]),
