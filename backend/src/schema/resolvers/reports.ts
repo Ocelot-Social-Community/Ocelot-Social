@@ -17,7 +17,7 @@ export default {
             WITH submitter, resource, report
             CREATE (report)<-[filed:FILED {createdAt: $createdAt, reasonCategory: $reasonCategory, reasonDescription: $reasonDescription}]-(submitter)
 
-            WITH filed, report, resource {.*, __typename: filter(l IN labels(resource) WHERE l IN ['Post', 'Comment', 'User'])[0]} AS finalResource
+            WITH filed, report, resource {.*, __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'User']][0]} AS finalResource
             RETURN filed {.*, reportId: report.id, resource: properties(finalResource)} AS filedReport
           `,
           {
@@ -92,8 +92,8 @@ export default {
             [(submitter:User)-[filed:FILED]->(report) |  filed {.*, submitter: properties(submitter)} ] as filed,
             [(moderator:User)-[reviewed:REVIEWED]->(report) |  reviewed {.*, moderator: properties(moderator)} ] as reviewed,
             [(resource)<-[:WROTE]-(author:User) | author {.*} ] as optionalAuthors,
-            [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post {.*, author: properties(author), postType: filter(l IN labels(post) WHERE NOT l = "Post")} ] as optionalCommentedPosts,
-            resource {.*, __typename: filter(l IN labels(resource) WHERE l IN ['Post', 'Comment', 'User'])[0] } as resourceWithType
+            [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post {.*, author: properties(author), postType: [l IN labels(post) WHERE NOT l = "Post")] ] as optionalCommentedPosts,
+            resource {.*, __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'User']][0] } as resourceWithType
             WITH report, optionalAuthors, optionalCommentedPosts, reviewed, filed,
             resourceWithType {.*, post: optionalCommentedPosts[0], author: optionalAuthors[0] } as finalResource
             RETURN report {.*, resource: finalResource, filed: filed, reviewed: reviewed }
