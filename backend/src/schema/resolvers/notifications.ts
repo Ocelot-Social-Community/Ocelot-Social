@@ -51,7 +51,7 @@ export default {
           OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(relatedUser)
           WITH user, notification, resource, membership, relatedUser,
           [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
-          [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post {.*, author: properties(author), postType: [l IN labels(post) WHERE NOT l = "Post"]} ] AS posts
+          [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post {.*, author: properties(author), postType: [l IN labels(post) WHERE NOT l = 'Post']} ] AS posts
           WITH resource, user, notification, authors, posts, relatedUser, membership,
           resource {.*,
             __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group']][0],
@@ -90,7 +90,7 @@ export default {
             SET notification.read = TRUE
             WITH user, notification, resource,
             [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
-            [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author), postType: [l IN labels(post) WHERE NOT l = "Post"]} ] AS posts
+            [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author), postType: [l IN labels(post) WHERE NOT l = 'Post']} ] AS posts
             OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
             WITH resource, user, notification, authors, posts, membership,
             resource {.*, __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group']][0], author: authors[0], post: posts[0], myRole: membership.role } AS finalResource
@@ -120,7 +120,7 @@ export default {
             SET notification.read = TRUE
             WITH user, notification, resource,
             [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
-            [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author), postType: [l IN labels(post) WHERE NOT l = "Post"]} ] AS posts
+            [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author), postType: [l IN labels(post) WHERE NOT l = 'Post']} ] AS posts
             OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
             WITH resource, user, notification, authors, posts, membership,
             resource {.*, __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group']][0], author: authors[0], post: posts[0], myRole: membership.role} AS finalResource
