@@ -24,6 +24,10 @@ export const roomQuery = () => {
         users {
           _id
           id
+          name
+          avatar {
+            url
+          }
         }
       }
     }

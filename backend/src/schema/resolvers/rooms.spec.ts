@@ -145,10 +145,18 @@ describe('Room', () => {
                     {
                       _id: 'chatting-user',
                       id: 'chatting-user',
+                      name: 'Chatting User',
+                      avatar: {
+                        url: expect.any(String),
+                      },
                     },
                     {
                       _id: 'other-chatting-user',
                       id: 'other-chatting-user',
+                      name: 'Other Chatting User',
+                      avatar: {
+                        url: expect.any(String),
+                      },
                     },
                   ]),
                 },
@@ -176,10 +184,18 @@ describe('Room', () => {
                     {
                       _id: 'chatting-user',
                       id: 'chatting-user',
+                      name: 'Chatting User',
+                      avatar: {
+                        url: expect.any(String),
+                      },
                     },
                     {
                       _id: 'other-chatting-user',
                       id: 'other-chatting-user',
+                      name: 'Other Chatting User',
+                      avatar: {
+                        url: expect.any(String),
+                      },
                     },
                   ]),
                 },
