@@ -93,16 +93,18 @@ describe('Room', () => {
       
       describe('user id exists', () => {
         it('returns the id of the room', async () => {
-          await expect(mutate({
+          const result = await mutate({
             mutation: createRoomMutation(),
             variables: {
               userId: 'other-chatting-user',
             },
-          })).resolves.toMatchObject({
+          })
+          expect(result).toMatchObject({
             errors: undefined,
             data: {
               CreateRoom: {
                 id: expect.any(String),
+                roomId: result.data.CreateRoom.id,
               },
             },
           })
@@ -131,12 +133,14 @@ describe('Room', () => {
         })
 
         it('returns the room', async () => {
-          await expect(query({ query: roomQuery() })).resolves.toMatchObject({
+          const result = await query({ query: roomQuery() })
+          expect(result).toMatchObject({
             errors: undefined,
             data: {
               Room: [
                 {
                   id: expect.any(String),
+                  roomId: result.data.Room[0].id,
                   users: expect.arrayContaining([
                     {
                       id: 'chatting-user',
@@ -158,12 +162,14 @@ describe('Room', () => {
         })
 
         it('returns the room', async () => {
-          await expect(query({ query: roomQuery() })).resolves.toMatchObject({
+          const result = await query({ query: roomQuery() }) 
+          expect(result).toMatchObject({
             errors: undefined,
             data: {
               Room: [
                 {
                   id: expect.any(String),
+                  roomId: result.data.Room[0].id,
                   users: expect.arrayContaining([
                     {
                       id: 'chatting-user',

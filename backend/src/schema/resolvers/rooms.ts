@@ -38,6 +38,9 @@ export default {
       })
       try {
         const room = await writeTxResultPromise
+        if (room) {
+          room.roomId = room.id
+        }
         return room
       } catch (error) {
         throw new Error(error)

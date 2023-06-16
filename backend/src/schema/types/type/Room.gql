@@ -10,7 +10,9 @@ type Room {
   createdAt: String
   updatedAt: String
 
-  users: [User]! @relation(name: "CHATS_IN", direction: "IN")  
+  users: [User]! @relation(name: "CHATS_IN", direction: "IN")
+
+  roomId: String! @cypher(statement: "RETURN this.id")
 }
 
 type Mutation {
