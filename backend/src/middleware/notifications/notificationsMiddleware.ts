@@ -238,7 +238,7 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
     [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
     [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author)} ] AS posts
     WITH resource, user, notification, authors, posts,
-    resource {.*, __typename: filter(l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group'])[0], author: authors[0], post: posts[0]} AS finalResource
+    resource {.*, __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group']][0], author: authors[0], post: posts[0]} AS finalResource
     SET notification.read = FALSE
     SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
     SET notification.updatedAt = toString(datetime())

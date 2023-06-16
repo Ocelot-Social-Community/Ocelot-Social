@@ -18,7 +18,7 @@ export default {
             SET report.updatedAt = $dateTime, report.disable = review.disable, report.closed = $params.closed
             SET resource.disabled = report.disable
 
-            WITH review, report, resource {.*, __typename: filter(l IN labels(resource) WHERE l IN ['Post', 'Comment', 'User'])[0]} AS finalResource
+            WITH review, report, resource {.*, __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'User']][0]} AS finalResource
             RETURN review {.*, report: properties(report), resource: properties(finalResource)}
           `
         const reviewWriteTxResultPromise = session.writeTransaction(async (txc) => {
