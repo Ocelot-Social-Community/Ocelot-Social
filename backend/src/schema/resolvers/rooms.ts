@@ -13,6 +13,7 @@ export default {
       if (resolved) {
         resolved.forEach((room) => {
           if (room.users) {
+            room.roomName = room.users.filter((user) => user.id !== context.user.id)[0].name
             room.users.forEach((user) => {
               user._id = user.id
             })

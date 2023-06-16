@@ -141,6 +141,7 @@ describe('Room', () => {
                 {
                   id: expect.any(String),
                   roomId: result.data.Room[0].id,
+                  roomName: 'Other Chatting User',
                   users: expect.arrayContaining([
                     {
                       _id: 'chatting-user',
@@ -180,6 +181,7 @@ describe('Room', () => {
                 {
                   id: expect.any(String),
                   roomId: result.data.Room[0].id,
+                  roomName: 'Chatting User',
                   users: expect.arrayContaining([
                     {
                       _id: 'chatting-user',

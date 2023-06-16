@@ -13,6 +13,7 @@ type Room {
   users: [User]! @relation(name: "CHATS_IN", direction: "IN")
 
   roomId: String! @cypher(statement: "RETURN this.id")
+  roomName: String! ## @cypher(statement: "MATCH (this)<-[:CHATS_IN]-(user:User) WHERE NOT user.id = $cypherParams.currentUserId RETURN user[0].name")
 }
 
 type Mutation {
