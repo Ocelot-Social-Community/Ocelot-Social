@@ -3,7 +3,7 @@ import { getNeode } from '../../backend/build/db/neo4j'
 
 const neodeInstance = getNeode()
 
-beforeEach(() => cy.then(() => neodeInstance.cypher('MATCH (everything) DETACH DELETE everything;')))
+beforeEach(() => cy.then(() => neodeInstance.writeCypher('MATCH (everything) DETACH DELETE everything;')))
 
 Cypress.Commands.add('neode', () => {
   return neodeInstance

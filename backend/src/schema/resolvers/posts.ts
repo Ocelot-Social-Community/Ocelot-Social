@@ -146,7 +146,7 @@ export default {
             MERGE (post)<-[:WROTE]-(author)
             ${categoriesCypher}
             ${groupCypher}
-            RETURN post {.*, postType: filter(l IN labels(post) WHERE NOT l = "Post") }
+            RETURN post {.*, postType: [l IN labels(post) WHERE NOT l = 'Post'] }
           `,
           { userId: context.user.id, categoryIds, groupId, params },
         )
@@ -214,7 +214,7 @@ export default {
         `
       }
 
-      updatePostCypher += `RETURN post {.*, postType: filter(l IN labels(post) WHERE NOT l = "Post")}`
+      updatePostCypher += `RETURN post {.*, postType: [l IN labels(post) WHERE NOT l = 'Post']}`
       const updatePostVariables = { categoryIds, params }
       try {
         const writeTxResultPromise = session.writeTransaction(async (transaction) => {

@@ -12,13 +12,13 @@ export default {
             MATCH (resource {id: $params.resourceId})<-[:BELONGS_TO]-(report:Report {closed: false})
             WHERE resource:User OR resource:Post OR resource:Comment
             MERGE (report)<-[review:REVIEWED]-(moderator)
-            ON CREATE SET review.createdAt = $dateTime, review.updatedAt = review.createdAt
+            ON CREATE SET review.createdAt = $dateTime, review.updatedAt = $dateTime
             ON MATCH SET review.updatedAt = $dateTime
             SET review.disable = $params.disable
             SET report.updatedAt = $dateTime, report.disable = review.disable, report.closed = $params.closed
             SET resource.disabled = report.disable
 
-            WITH review, report, resource {.*, __typename: filter(l IN labels(resource) WHERE l IN ['Post', 'Comment', 'User'])[0]} AS finalResource
+            WITH review, report, resource {.*, __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'User']][0]} AS finalResource
             RETURN review {.*, report: properties(report), resource: properties(finalResource)}
           `
         const reviewWriteTxResultPromise = session.writeTransaction(async (txc) => {
