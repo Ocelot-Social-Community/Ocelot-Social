@@ -18,6 +18,6 @@ data:
   NEO4J_dbms_memory_heap_max__size: "{{ .Values.NEO4J.DBMS_MEMORY_HEAP_MAX_SIZE }}"
   NEO4J_dbms_memory_pagecache_size: "{{ .Values.NEO4J.DBMS_MEMORY_PAGECACHE_SIZE }}"
   NEO4J_dbms_security_procedures_unrestricted: "{{ .Values.NEO4J.DBMS_SECURITY_PROCEDURES_UNRESTRICTED }}"
-  NEO4J_dbms_allow__format__migration: true
-  NEO4J_dbms_allow__upgrade: true
+  NEO4J_dbms_allow__format__migration: "true"
+  NEO4J_dbms_allow__upgrade: "true"
   NEO4J_apoc_import_file_enabled: "{{ .Values.NEO4J.APOC_IMPORT_FILE_ENABLED }}" 
