@@ -1,4 +1,4 @@
-<script setup>
+ <script setup>
 import { register } from 'vue-advanced-chat'
 register()
 //  import { register } from 'vue-advanced-chat/dist/vue-advanced-chat.es.js'
@@ -10,7 +10,7 @@ register()
     <vue-advanced-chat
       :current-user-id="currentUserId"
       :template-actions="JSON.stringify(templatesText)"
-	  :text-messages="JSON.stringify(textMessages)"
+      :text-messages="JSON.stringify(textMessages)"
       :menu-actions="JSON.stringify(menuActions)"
       :rooms="JSON.stringify(rooms)"
       :messages="JSON.stringify(messages)"
@@ -18,7 +18,7 @@ register()
       :rooms-loaded="true"
       show-files="false"
       show-audio="false"
-	  :show-footer="true"
+      :show-footer="true"
       :messages-loaded="messagesLoaded"
       @send-message="sendMessage($event.detail[0])"
       @fetch-messages="fetchMessages($event.detail[0])"
@@ -78,20 +78,20 @@ export default {
           text: 'This is the action',
         },
       ],
-	  textMessages:{
-		ROOMS_EMPTY: 'Aucune conversation',
-		ROOM_EMPTY: 'Aucune conversation sélectionnée',
-		NEW_MESSAGES: 'Nouveaux messages',
-		MESSAGE_DELETED: 'Ce message a été supprimé',
-		MESSAGES_EMPTY: 'Aucun message',
-		CONVERSATION_STARTED: 'La conversation a commencée le :',
-		TYPE_MESSAGE: 'Tapez votre message',
-		SEARCH: 'Rechercher',
-		IS_ONLINE: 'est en ligne',
-		LAST_SEEN: 'dernière connexion ',
-		IS_TYPING: 'est en train de taper...',
-		CANCEL_SELECT_MESSAGE: 'Annuler Sélection'
-		},
+      textMessages: {
+        ROOMS_EMPTY: 'Aucune conversation',
+        ROOM_EMPTY: 'Aucune conversation sélectionnée',
+        NEW_MESSAGES: 'Nouveaux messages',
+        MESSAGE_DELETED: 'Ce message a été supprimé',
+        MESSAGES_EMPTY: 'Aucun message',
+        CONVERSATION_STARTED: 'La conversation a commencée le :',
+        TYPE_MESSAGE: 'Tapez votre message',
+        SEARCH: 'Rechercher',
+        IS_ONLINE: 'est en ligne',
+        LAST_SEEN: 'dernière connexion ',
+        IS_TYPING: 'est en train de taper...',
+        CANCEL_SELECT_MESSAGE: 'Annuler Sélection',
+      },
       roomActions: [
         {
           name: 'archiveRoom',
