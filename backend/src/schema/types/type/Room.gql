@@ -1,8 +1,8 @@
-input _RoomFilter {
-  AND: [_RoomFilter!]
-  OR: [_RoomFilter!]
-  users_some: _UserFilter
-}
+# input _RoomFilter {
+#   AND: [_RoomFilter!]
+#   OR: [_RoomFilter!]
+#   users_some: _UserFilter
+# }
 
 type Room {
   id: ID!
