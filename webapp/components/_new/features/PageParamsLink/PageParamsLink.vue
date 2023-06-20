@@ -1,6 +1,6 @@
 <template>
   <nuxt-link
-    v-if="!forceTargetBlank && pageParams.isInternalPage"
+    v-if="isInternalLink"
     :to="pageParams.internalPage.pageRoute"
     :data-test="pageParams.name + '-nuxt-link'"
   >
@@ -8,12 +8,8 @@
   </nuxt-link>
   <a
     v-else
-    :href="
-      pageParams.isInternalPage ? pageParams.internalPage.pageRoute : pageParams.externalLink.url
-    "
-    :target="
-      forceTargetBlank ? '_blank' : pageParams.isInternalPage ? '' : pageParams.externalLink.target
-    "
+    :href="href"
+    :target="target"
     :data-test="pageParams.name + '-link'"
   >
     <slot />
@@ -27,5 +23,16 @@ export default {
     pageParams: { type: Object, required: true },
     forceTargetBlank: { type: Boolean, default: false },
   },
+  computed: {
+    href() {
+      return pageParams.isInternalPage ? pageParams.internalPage.pageRoute : pageParams.externalLink.url
+    },
+    target() {
+      return forceTargetBlank ? '_blank' : !pageParams.isInternalPage ? pageParams.externalLink.target : ''
+    },
+    isInternalLink() {
+      return !forceTargetBlank && pageParams.isInternalPage
+    },
+  }
 }
 </script>
