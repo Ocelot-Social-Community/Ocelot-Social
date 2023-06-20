@@ -11,13 +11,13 @@ export async function up(next) {
   const transaction = session.beginTransaction()
 
   try {
-    // Implement your migration here.
-    await transaction.run(`
-      CREATE CONSTRAINT ON ( group:Group ) ASSERT group.id IS UNIQUE
-    `)
-    await transaction.run(`
-      CREATE CONSTRAINT ON ( group:Group ) ASSERT group.slug IS UNIQUE
-    `)
+    // Those two indexes already exist
+    // await transaction.run(`
+    //   CREATE CONSTRAINT ON ( group:Group ) ASSERT group.id IS UNIQUE
+    // `)
+    // await transaction.run(`
+    //   CREATE CONSTRAINT ON ( group:Group ) ASSERT group.slug IS UNIQUE
+    // `)
     await transaction.run(`
       CALL db.index.fulltext.createNodeIndex("group_fulltext_search",["Group"],["name", "slug", "about", "description"])
     `)

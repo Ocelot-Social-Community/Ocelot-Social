@@ -4,6 +4,11 @@ import request from 'request'
 const debug = require('debug')('ea:test:world')
 
 class CustomWorld {
+  lastResponses: any
+  lastContentType: any
+  lastInboxUrl: any
+  lastActivity: any
+  statusCode: any
   constructor () {
     // webFinger.feature
     this.lastResponses = []

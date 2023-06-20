@@ -81,7 +81,7 @@ export default {
     muteUser: async (_parent, params, context, _resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === params.id) return null
-      await neode.cypher(
+      await neode.writeCypher(
         `
           MATCH(u:User {id: $currentUser.id})-[previousRelationship:FOLLOWS]->(b:User {id: $params.id})
           DELETE previousRelationship
@@ -98,7 +98,7 @@ export default {
     unmuteUser: async (_parent, params, context, _resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === params.id) return null
-      await neode.cypher(
+      await neode.writeCypher(
         `
           MATCH(u:User {id: $currentUser.id})-[previousRelationship:MUTED]->(b:User {id: $params.id})
           DELETE previousRelationship
@@ -319,7 +319,7 @@ export default {
     email: async (parent, params, context, resolveInfo) => {
       if (typeof parent.email !== 'undefined') return parent.email
       const { id } = parent
-      const statement = `MATCH(u:User {id: {id}})-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e`
+      const statement = `MATCH(u:User {id: $id})-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e`
       const result = await neode.cypher(statement, { id })
       const [{ email }] = result.records.map((r) => r.get('e').properties)
       return email
