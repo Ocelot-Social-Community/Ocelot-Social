@@ -1,6 +1,6 @@
-input _MessageFilter {
-  room: _RoomFilter
-}
+# input _MessageFilter {
+#   room: _RoomFilter
+# }
 
 type Message {
   id: ID!
