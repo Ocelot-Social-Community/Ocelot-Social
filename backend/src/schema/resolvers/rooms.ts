@@ -26,7 +26,7 @@ export default {
           room.id = apoc.create.uuid()
           RETURN room { .* }
         `
-        const createRommTxResponse = await await transaction.run(
+        const createRommTxResponse = await transaction.run(
           createRoomCypher,
           { userId, currentUserId }
         )
