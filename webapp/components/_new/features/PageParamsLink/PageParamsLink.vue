@@ -6,12 +6,7 @@
   >
     <slot />
   </nuxt-link>
-  <a
-    v-else
-    :href="href"
-    :target="target"
-    :data-test="pageParams.name + '-link'"
-  >
+  <a v-else :href="href" :target="target" :data-test="pageParams.name + '-link'">
     <slot />
   </a>
 </template>
@@ -25,14 +20,20 @@ export default {
   },
   computed: {
     href() {
-      return pageParams.isInternalPage ? pageParams.internalPage.pageRoute : pageParams.externalLink.url
+      return this.pageParams.isInternalPage
+        ? this.pageParams.internalPage.pageRoute
+        : this.pageParams.externalLink.url
     },
     target() {
-      return forceTargetBlank ? '_blank' : !pageParams.isInternalPage ? pageParams.externalLink.target : ''
+      return this.forceTargetBlank
+        ? '_blank'
+        : !this.pageParams.isInternalPage
+        ? this.pageParams.externalLink.target
+        : ''
     },
     isInternalLink() {
-      return !forceTargetBlank && pageParams.isInternalPage
+      return !this.forceTargetBlank && this.pageParams.isInternalPage
     },
-  }
+  },
 }
 </script>
