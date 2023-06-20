@@ -39,7 +39,7 @@ describe('Message', () => {
   let roomId: string
 
   beforeAll(async () => {
-    ;[chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
+    [chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
       Factory.build(
         'user',
         {
