@@ -35,7 +35,7 @@ afterAll(async () => {
 
 describe('Room', () => {
   beforeAll(async () => {
-    ;[chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
+    [chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
       Factory.build(
         'user',
         {
