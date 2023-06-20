@@ -1,7 +1,7 @@
 ##################################################################################
 # COMMUNITY ######################################################################
 ##################################################################################
-FROM amd64/neo4j:3.5.14 as community
+FROM amd64/neo4j:4.4-community as community
 
 # ENVs
 ## We Cannot do `$(date -u +'%Y-%m-%dT%H:%M:%SZ')` here so we use unix timestamp=0
@@ -31,15 +31,15 @@ LABEL maintainer="devops@ocelot.social"
 ## install: wget, htop (TODO: why do we need htop?)
 RUN apt-get update && apt-get -y install wget htop
 ## install: apoc plugin for neo4j
-RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.5.0.4/apoc-3.5.0.4-all.jar -P plugins/
+RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/4.4.0.17/apoc-4.4.0.17-all.jar -P plugins/
 
 ##################################################################################
 # ENTERPRISE #####################################################################
 ##################################################################################
-FROM neo4j:3.5.14-enterprise as enterprise
+FROM neo4j:4.4-enterprise as enterprise
 
 # Install Additional Software
 ## install: wget, htop (TODO: why do we need htop?)
 RUN apt-get update && apt-get -y install wget htop
 ## install: apoc plugin for neo4j
-RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.5.0.4/apoc-3.5.0.4-all.jar -P plugins/
+RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/4.4.0.17/apoc-4.4.0.17-all.jar -P plugins/
