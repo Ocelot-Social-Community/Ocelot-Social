@@ -24,11 +24,11 @@ export default {
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const createMessageCypher = `
           MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
-          MERGE (currentUser)-[:CREATED]->(message:Message)-[:INSIDE]->(room)
-          ON CREATE SET
-            message.createdAt = toString(datetime()),
-            message.id = apoc.create.uuid(),
-            message.content = $content
+          CREATE (currentUser)-[:CREATED]->(message:Message {
+            createdAt: toString(datetime()),
+            id: apoc.create.uuid(),
+            content: $content
+          })-[:INSIDE]->(room)
           RETURN message { .* }
         `
         const createMessageTxResponse = await transaction.run(
