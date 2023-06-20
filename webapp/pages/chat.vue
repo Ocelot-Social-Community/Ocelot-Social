@@ -36,6 +36,7 @@ register()
 import links from '~/constants/links.js'
 import { internalPageMixins } from '~/mixins/internalPageMixins'
 import BaseButton from '../components/_new/generic/BaseButton/BaseButton.vue'
+import { RoomQuery } from '~/graphql/Rooms'
 
 export default {
   components: { BaseButton },
@@ -102,25 +103,25 @@ export default {
         { name: 'deleteRoom', title: 'Delete Room' },
       ],
       rooms: [
-        {
-          roomId: '1',
-          roomName: 'John Snow',
-          avatar: 'https://66.media.tumblr.com/avatar_c6a8eae4303e_512.pnj',
-          users: [
-            { _id: '1234', username: 'John Doe' },
-            { _id: '4321', username: 'John Snow' },
-          ],
-        },
-        {
-          roomId: '2',
-          roomName: 'Max J. Mustermann',
-          avatar:
-            'https://64.media.tumblr.com/8889b6e26370f4e3837584c1c59721a6/f4f76ed6b0249d08-4b/s1280x1920/810e9e5fa724366d26c10c0fa22ba97dad8778d1.pnj',
-          users: [
-            { _id: '1234', username: 'Johnx Doe' },
-            { _id: '43210', username: 'Max J. Mustermann' },
-          ],
-        },
+        // {
+        //   roomId: '1',
+        //   roomName: 'John Snow',
+        //   avatar: 'https://66.media.tumblr.com/avatar_c6a8eae4303e_512.pnj',
+        //   users: [
+        //     { _id: '1234', username: 'John Doe' },
+        //     { _id: '4321', username: 'John Snow' },
+        //   ],
+        // },
+        // {
+        //   roomId: '2',
+        //   roomName: 'Max J. Mustermann',
+        //   avatar:
+        //     'https://64.media.tumblr.com/8889b6e26370f4e3837584c1c59721a6/f4f76ed6b0249d08-4b/s1280x1920/810e9e5fa724366d26c10c0fa22ba97dad8778d1.pnj',
+        //   users: [
+        //     { _id: '1234', username: 'Johnx Doe' },
+        //     { _id: '43210', username: 'Max J. Mustermann' },
+        //   ],
+        // },
       ],
       messages: [],
       messagesLoaded: false,
@@ -194,6 +195,28 @@ export default {
           },
         ]
       }, 2000)
+    },
+  },
+  apollo: {
+    Rooms: {
+      query() {
+        return RoomQuery()
+      },
+      update({ Room }) {
+        console.log('Rooms', Room)
+        if (!Room) {
+          this.rooms = []
+          return
+        }  
+    
+        this.rooms = Room
+       
+      },
+      error(error) {
+        this.rooms = []
+        this.$toast.error(error.message)
+      },
+      fetchPolicy: 'cache-and-network',
     },
   },
 }
