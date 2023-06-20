@@ -71,6 +71,8 @@ describe('Room', () => {
     })
 
     describe('authenticated', () => {
+      let roomId: string
+      
       beforeAll(async () => {
         authenticatedUser = await chattingUser.toJson()
       })
@@ -93,12 +95,14 @@ describe('Room', () => {
       
       describe('user id exists', () => {
         it('returns the id of the room', async () => {
-          await expect(mutate({
+          const result = await mutate({
             mutation: createRoomMutation(),
             variables: {
               userId: 'other-chatting-user',
             },
-          })).resolves.toMatchObject({
+          })
+          roomId = result.data.CreateRoom.id
+          await expect(result).toMatchObject({
             errors: undefined,
             data: {
               CreateRoom: {
@@ -108,6 +112,24 @@ describe('Room', () => {
           })
         })
       })
+
+      describe('create room with same user id', () => {
+        it('returns the id of the room', async () => {
+          await expect(mutate({
+            mutation: createRoomMutation(),
+            variables: {
+              userId: 'other-chatting-user',
+            },
+          })).resolves.toMatchObject({
+            errors: undefined,
+            data: {
+              CreateRoom: {
+                id: roomId,
+              },
+            },
+          })
+        })
+      })      
     })
   })
 
