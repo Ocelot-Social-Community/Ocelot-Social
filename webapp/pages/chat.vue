@@ -36,7 +36,8 @@ register()
 import links from '~/constants/links.js'
 import { internalPageMixins } from '~/mixins/internalPageMixins'
 import BaseButton from '../components/_new/generic/BaseButton/BaseButton.vue'
-import { RoomQuery } from '~/graphql/Rooms'
+import { roomQuery } from '~/graphql/Rooms'
+import { messageQuery } from '~/graphql/Messages'
 
 export default {
   components: { BaseButton },
@@ -132,19 +133,36 @@ export default {
   },
 
   methods: {
-    fetchMessages({ options = {} }) {
-      setTimeout(() => {
+    fetchMessages({ room, options = {} }) {
+      console.log(room, options)
+      this.messagesLoaded = false
+      setTimeout(async () => {
         if (options.reset) {
-          this.messages = this.addMessages(true)
+          console.log('reset messages')
+          this.messages = [] // this.addMessages(true)
         } else {
-          this.messages = [...this.addMessages(), ...this.messages]
-          this.messagesLoaded = true
+          try {
+            const {
+          data: { Message },
+        } = await this.$apollo.query({
+              query: messageQuery(),
+              variables: {
+                roomId: room.id,
+              }
+            })
+            console.log('Messages', Message)
+                this.messages = Message
+          } catch (error) {
+            console.log('Error', error)
+            this.messages = [] //this.addMessages(true)
+            this.$toast.error(error.message)
+          }
         }
-        // this.addNewMessage()
+        this.messagesLoaded = true
       })
     },
 
-    addMessages(reset) {
+    /* addMessages(reset) {
       const messages = []
 
       for (let i = 0; i < 30; i++) {
@@ -167,7 +185,7 @@ export default {
       })
 
       return messages
-    },
+    }, */
 
     sendMessage(message) {
       this.messages = [
@@ -200,7 +218,7 @@ export default {
   apollo: {
     Rooms: {
       query() {
-        return RoomQuery()
+        return roomQuery()
       },
       update({ Room }) {
         console.log('Rooms', Room)

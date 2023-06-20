@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 
-export const RoomQuery = () => gql`
+export const roomQuery = () => gql`
  query {
         Room {
           id
