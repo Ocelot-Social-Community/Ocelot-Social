@@ -12,7 +12,7 @@ const cypherTemplate = (setup) => `
   RETURN 
   ${setup.returnClause}
   AS result
-  SKIP $skip
+  SKIP toInteger($skip)
   ${setup.limit}
 `
 
@@ -45,7 +45,7 @@ const searchPostsSetup = {
     clickedCount: toString(resource.clickedCount),
     viewedTeaserCount: toString(resource.viewedTeaserCount)
   }`,
-  limit: 'LIMIT $limit',
+  limit: 'LIMIT toInteger($limit)',
 }
 
 const searchUsersSetup = {
@@ -54,7 +54,7 @@ const searchUsersSetup = {
   whereClause: simpleWhereClause,
   withClause: '',
   returnClause: `resource {.*, __typename: 'User'}`,
-  limit: 'LIMIT $limit',
+  limit: 'LIMIT toInteger($limit)',
 }
 
 const searchHashtagsSetup = {
@@ -63,7 +63,7 @@ const searchHashtagsSetup = {
   whereClause: simpleWhereClause,
   withClause: '',
   returnClause: `resource {.*, __typename: 'Tag'}`,
-  limit: 'LIMIT $limit',
+  limit: 'LIMIT toInteger($limit)',
 }
 
 const searchGroupsSetup = {
@@ -78,7 +78,7 @@ const searchGroupsSetup = {
                   OR membership.role IN ['usual', 'admin', 'owner'])`,
   withClause: 'WITH resource, membership',
   returnClause: `resource { .*, myRole: membership.role, __typename: 'Group' }`,
-  limit: 'LIMIT $limit',
+  limit: 'LIMIT toInteger($limit)',
 }
 
 const countSetup = {
