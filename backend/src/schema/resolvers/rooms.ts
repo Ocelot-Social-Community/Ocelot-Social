@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import Resolver from './helpers/Resolver'
 
@@ -27,20 +26,20 @@ export default {
     CreateRoom: async (_parent, params, context, _resolveInfo) => {
       const { userId } = params
       const { user: { id: currentUserId } } = context
-      const roomId = uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const createRoomCypher = `
           MATCH (currentUser:User { id: $currentUserId })
           MATCH (user:User { id: $userId })
           MERGE (currentUser)-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user)
-          SET room.createdAt = toString(datetime()),
-          room.id = $roomId
+          ON CREATE SET
+            room.createdAt = toString(datetime()),
+            room.id = apoc.create.uuid()
           RETURN room { .* }
         `
-        const createRommTxResponse = await await transaction.run(
+        const createRommTxResponse = await transaction.run(
           createRoomCypher,
-          { userId, currentUserId, roomId }
+          { userId, currentUserId }
         )
         const [room] = await createRommTxResponse.records.map((record) =>
                                                               record.get('room'),

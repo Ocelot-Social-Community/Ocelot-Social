@@ -29,13 +29,13 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  // await cleanDatabase()
+  await cleanDatabase()
   driver.close()
 })
 
 describe('Room', () => {
   beforeAll(async () => {
-    ;[chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
+    [chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
       Factory.build(
         'user',
         {
@@ -71,6 +71,8 @@ describe('Room', () => {
     })
 
     describe('authenticated', () => {
+      let roomId: string
+      
       beforeAll(async () => {
         authenticatedUser = await chattingUser.toJson()
       })
@@ -99,6 +101,7 @@ describe('Room', () => {
               userId: 'other-chatting-user',
             },
           })
+          roomId = result.data.CreateRoom.id
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -110,6 +113,24 @@ describe('Room', () => {
           })
         })
       })
+
+      describe('create room with same user id', () => {
+        it('returns the id of the room', async () => {
+          await expect(mutate({
+            mutation: createRoomMutation(),
+            variables: {
+              userId: 'other-chatting-user',
+            },
+          })).resolves.toMatchObject({
+            errors: undefined,
+            data: {
+              CreateRoom: {
+                id: roomId,
+              },
+            },
+          })
+        })
+      })      
     })
   })
 
@@ -127,7 +148,7 @@ describe('Room', () => {
     })
 
     describe('authenticated', () => {
-      describe('as creater of room', () => {
+      describe('as creator of room', () => {
         beforeAll(async () => {
           authenticatedUser = await chattingUser.toJson()
         })

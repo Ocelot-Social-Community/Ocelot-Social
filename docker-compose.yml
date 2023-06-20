@@ -111,6 +111,8 @@ services:
       # TODO: This sounds scary for a production environment
       - NEO4J_AUTH=none
       - NEO4J_dbms_security_procedures_unrestricted=algo.*,apoc.*
+      - NEO4J_dbms_allow__format__migration=true
+      - NEO4J_dbms_allow__upgrade=true
       # Uncomment following line for Neo4j Enterprise version instead of Community version
       # TODO: clarify if that is the only thing needed to unlock the Enterprise version
       # - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes

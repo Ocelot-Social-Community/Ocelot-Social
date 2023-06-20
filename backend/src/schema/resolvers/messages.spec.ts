@@ -30,7 +30,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  // await cleanDatabase()
+  await cleanDatabase()
   driver.close()
 })
 
@@ -39,7 +39,7 @@ describe('Message', () => {
   let roomId: string
 
   beforeAll(async () => {
-    ;[chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
+    [chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
       Factory.build(
         'user',
         {
@@ -202,6 +202,47 @@ describe('Message', () => {
             },
           })
         })
+
+        describe('more messages', () => {
+          beforeAll(async () => {
+            await mutate({
+              mutation: createMessageMutation(),
+              variables: {
+                roomId,
+                content: 'Another nice message to other chatting user',
+              }
+            })
+          })
+          
+          it('returns the messages', async () => {
+            await expect(query({
+              query: messageQuery(),
+              variables: {
+                roomId,
+              },
+            })).resolves.toMatchObject({
+              errors: undefined,
+              data: {
+                Message: [
+                  {
+                    id: expect.any(String),
+                    content: 'Some nice message to other chatting user',
+                    author: {
+                      id: 'chatting-user',
+                    },
+                  },
+                  {
+                    id: expect.any(String),
+                    content: 'Another nice message to other chatting user',
+                    author: {
+                      id: 'other-chatting-user',
+                    },
+                  }             
+                ],
+              },
+            })
+          })
+        })              
       })
 
       describe('room exists, authenticated user not in room', () => {
