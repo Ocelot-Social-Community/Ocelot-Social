@@ -1,0 +1,23 @@
+# input _RoomFilter {
+#   AND: [_RoomFilter!]
+#   OR: [_RoomFilter!]
+#   users_some: _UserFilter
+# }
+
+type Room {
+  id: ID!
+  createdAt: String
+  updatedAt: String
+
+  users: [User]! @relation(name: "CHATS_IN", direction: "IN")  
+}
+
+type Mutation {
+  CreateRoom(
+    userId: ID!
+  ): Room
+}
+
+type Query {
+  Room: [Room]
+}
