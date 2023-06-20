@@ -89,11 +89,11 @@
           <label for="checkbox0">
             {{ $t('components.registration.create-user-account.termsAndCondsEtcConfirmed') }}
             <br />
-            <page-params-link :pageParams="links.TERMS_AND_CONDITIONS" :forceTargetBlank="true">
+            <page-params-link :pageParams="links.TERMS_AND_CONDITIONS" forceTargetBlank>
               {{ $t('site.termsAndConditions') }}
             </page-params-link>
             <br />
-            <page-params-link :pageParams="links.DATA_PRIVACY" :forceTargetBlank="true">
+            <page-params-link :pageParams="links.DATA_PRIVACY" forceTargetBlank>
               {{ $t('site.data-privacy') }}
             </page-params-link>
           </label>
