@@ -125,7 +125,7 @@ describe('Room', () => {
     })
 
     describe('authenticated', () => {
-      describe('as creater of room', () => {
+      describe('as creator of room', () => {
         beforeAll(async () => {
           authenticatedUser = await chattingUser.toJson()
         })
