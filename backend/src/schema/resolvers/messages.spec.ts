@@ -209,9 +209,17 @@ describe('Message', () => {
               mutation: createMessageMutation(),
               variables: {
                 roomId,
-                content: 'Another nice message to other chatting user',
+                content: 'A nice response message to chatting user',
               }
             })
+            authenticatedUser = await chattingUser.toJson()
+            await mutate({
+              mutation: createMessageMutation(),
+              variables: {
+                roomId,
+                content: 'And another nice message to other chatting user',
+              }
+            })            
           })
           
           it('returns the messages', async () => {
@@ -233,11 +241,18 @@ describe('Message', () => {
                   },
                   {
                     id: expect.any(String),
-                    content: 'Another nice message to other chatting user',
+                    content: 'A nice response message to chatting user',
                     author: {
                       id: 'other-chatting-user',
                     },
-                  }             
+                  },
+                  {
+                    id: expect.any(String),
+                    content: 'And another nice message to other chatting user',
+                    author: {
+                      id: 'chatting-user',
+                    },
+                  }                               
                 ],
               },
             })
