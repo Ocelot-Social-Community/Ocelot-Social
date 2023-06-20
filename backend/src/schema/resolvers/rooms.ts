@@ -22,8 +22,8 @@ export default {
           MATCH (user:User { id: $userId })
           MERGE (currentUser)-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user)
           ON CREATE SET
-          room.createdAt = toString(datetime()),
-          room.id = apoc.create.uuid()
+            room.createdAt = toString(datetime()),
+            room.id = apoc.create.uuid()
           RETURN room { .* }
         `
         const createRommTxResponse = await transaction.run(
