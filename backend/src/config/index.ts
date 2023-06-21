@@ -15,7 +15,7 @@ if (require.resolve) {
 }
 
 // Use Cypress env or process.env
-declare var Cypress: any | undefined
+declare let Cypress: any | undefined
 const env = typeof Cypress !== 'undefined' ? Cypress.env() : process.env // eslint-disable-line no-undef
 
 const environment = {
@@ -95,6 +95,7 @@ Object.entries(required).map((entry) => {
   if (!entry[1]) {
     throw new Error(`ERROR: "${entry[0]}" env variable is missing.`)
   }
+  return entry
 })
 
 export default {
