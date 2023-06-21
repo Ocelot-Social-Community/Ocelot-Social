@@ -13,7 +13,13 @@ export default {
           id: context.user.id,
         },
       }
-      return neo4jgraphql(object, params, context, resolveInfo)
+      const resolved = await neo4jgraphql(object, params, context, resolveInfo)
+      if (resolved) {
+        resolved.forEach((message) => {
+          message._id = message.id
+        })
+      }
+      return resolved
     },
   },
   Mutation: {
