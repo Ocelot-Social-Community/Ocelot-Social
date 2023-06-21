@@ -1100,7 +1100,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       huey.relateTo(p9, 'shouted'),
       louie.relateTo(p10, 'shouted'),
     ])
-    
     const reports = await Promise.all([
       Factory.build('report'),
       Factory.build('report'),
