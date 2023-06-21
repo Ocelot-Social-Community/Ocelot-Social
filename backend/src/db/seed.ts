@@ -1100,7 +1100,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       huey.relateTo(p9, 'shouted'),
       louie.relateTo(p10, 'shouted'),
     ])
-
+    
     const reports = await Promise.all([
       Factory.build('report'),
       Factory.build('report'),
@@ -1113,32 +1113,31 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     const reportAgainstDewey = reports[3]
 
     // report resource first time
-    await Promise.all([
-      reportAgainstDagobert.relateTo(jennyRostock, 'filed', {
-        resourceId: 'u7',
-        reasonCategory: 'discrimination_etc',
-        reasonDescription: 'This user is harassing me with bigoted remarks!',
-      }),
-      reportAgainstDagobert.relateTo(dagobert, 'belongsTo'),
-      reportAgainstTrollingPost.relateTo(jennyRostock, 'filed', {
-        resourceId: 'p2',
-        reasonCategory: 'doxing',
-        reasonDescription: "This shouldn't be shown to anybody else! It's my private thing!",
-      }),
-      reportAgainstTrollingPost.relateTo(p2, 'belongsTo'),
-      reportAgainstTrollingComment.relateTo(huey, 'filed', {
-        resourceId: 'c1',
-        reasonCategory: 'other',
-        reasonDescription: 'This comment is bigoted',
-      }),
-      reportAgainstTrollingComment.relateTo(trollingComment, 'belongsTo'),
-      reportAgainstDewey.relateTo(dagobert, 'filed', {
-        resourceId: 'u5',
-        reasonCategory: 'discrimination_etc',
-        reasonDescription: 'This user is harassing me!',
-      }),
-      reportAgainstDewey.relateTo(dewey, 'belongsTo'),
-    ])
+    
+    await reportAgainstDagobert.relateTo(jennyRostock, 'filed', {
+      resourceId: 'u7',
+      reasonCategory: 'discrimination_etc',
+      reasonDescription: 'This user is harassing me with bigoted remarks!',
+    })
+    await reportAgainstDagobert.relateTo(dagobert, 'belongsTo')
+    await reportAgainstTrollingPost.relateTo(jennyRostock, 'filed', {
+      resourceId: 'p2',
+      reasonCategory: 'doxing',
+      reasonDescription: "This shouldn't be shown to anybody else! It's my private thing!",
+    })
+    await reportAgainstTrollingPost.relateTo(p2, 'belongsTo')
+    await reportAgainstTrollingComment.relateTo(huey, 'filed', {
+      resourceId: 'c1',
+      reasonCategory: 'other',
+      reasonDescription: 'This comment is bigoted',
+    })
+    await reportAgainstTrollingComment.relateTo(trollingComment, 'belongsTo')
+    await reportAgainstDewey.relateTo(dagobert, 'filed', {
+      resourceId: 'u5',
+      reasonCategory: 'discrimination_etc',
+      reasonDescription: 'This user is harassing me!',
+    })
+    await reportAgainstDewey.relateTo(dewey, 'belongsTo')
 
     // report resource a second time
     await Promise.all([
