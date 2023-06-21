@@ -1,7 +1,5 @@
 import { applyMiddleware } from 'graphql-middleware'
 import CONFIG from './../config'
-
-import activityPub from './activityPubMiddleware'
 import softDelete from './softDelete/softDeleteMiddleware'
 import sluggify from './sluggifyMiddleware'
 import excerpt from './excerptMiddleware'
@@ -22,7 +20,6 @@ export default (schema) => {
     sentry,
     permissions,
     xss,
-    activityPub,
     validation,
     sluggify,
     excerpt,
