@@ -203,7 +203,7 @@ module.exports = {
       files: ['*.spec.ts'],
       plugins: ['jest'],
       env: {
-        jest: true
+        jest: true,
       },
       rules: {
         'jest/no-disabled-tests': 'error',
@@ -212,7 +212,7 @@ module.exports = {
         'jest/prefer-to-have-length': 'error',
         'jest/valid-expect': 'error',
         '@typescript-eslint/unbound-method': 'off',
-        //'jest/unbound-method': 'error',
+        // 'jest/unbound-method': 'error',
       },
     },
   ],
