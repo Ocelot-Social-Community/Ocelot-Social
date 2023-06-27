@@ -66,6 +66,7 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import { mapGetters } from 'vuex'
 import { profileUserQuery, mapUserQuery } from '~/graphql/User'
 import { groupQuery } from '~/graphql/groups'
+import { filterPosts } from '~/graphql/PostQuery.js'
 import mobile from '~/mixins/mobile'
 import Empty from '~/components/Empty/Empty'
 import MapStylesButtons from '~/components/Map/MapStylesButtons'
@@ -95,6 +96,7 @@ export default {
       currentUserCoordinates: null,
       users: null,
       groups: null,
+      posts: null,
       markers: {
         icons: [
           {
@@ -480,6 +482,29 @@ export default {
       update({ Group }) {
         this.groups = Group
         this.addMarkersOnCheckPrepared()
+      },
+      fetchPolicy: 'cache-and-network',
+    },
+    Post: {
+      query() {
+        return filterPosts(this.$i18n)
+      },
+      variables() {
+        return {
+          // Wolle: postType: 'Event',
+          filter: {
+            postType_in: ['Event'],
+            eventLocation: true,
+            eventStart_gte: new Date(),
+          },
+          // Wolle first: this.pageSize,
+          // Wolle orderBy: ['pinned_asc', this.orderBy],
+          // Wolle offset: 0,
+        }
+      },
+      update({ Post }) {
+        this.posts = Post
+        console.log('this.posts: ', this.posts)
       },
       fetchPolicy: 'cache-and-network',
     },
