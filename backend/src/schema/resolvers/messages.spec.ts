@@ -184,20 +184,23 @@ describe('Message', () => {
 
       describe('room exists with authenticated user chatting', () => {
         it('returns the messages', async () => {
-          await expect(query({
+          const result = await query({
             query: messageQuery(),
             variables: {
               roomId,
             },
-          })).resolves.toMatchObject({
+          })
+          expect(result).toMatchObject({
             errors: undefined,
             data: {
               Message: [{
                 id: expect.any(String),
+                _id: result.data.Message[0].id,
                 content: 'Some nice message to other chatting user',
-                author: {
-                  id: 'chatting-user',
-                },
+                senderId: 'chatting-user',
+                username: 'Chatting User',
+                avatar: expect.any(String),
+                date: expect.any(String),
               }],
             },
           })
@@ -209,9 +212,17 @@ describe('Message', () => {
               mutation: createMessageMutation(),
               variables: {
                 roomId,
-                content: 'Another nice message to other chatting user',
+                content: 'A nice response message to chatting user',
               }
             })
+            authenticatedUser = await chattingUser.toJson()
+            await mutate({
+              mutation: createMessageMutation(),
+              variables: {
+                roomId,
+                content: 'And another nice message to other chatting user',
+              }
+            })            
           })
           
           it('returns the messages', async () => {
@@ -227,22 +238,32 @@ describe('Message', () => {
                   {
                     id: expect.any(String),
                     content: 'Some nice message to other chatting user',
-                    author: {
-                      id: 'chatting-user',
-                    },
+                    senderId: 'chatting-user',
+                    username: 'Chatting User',
+                    avatar: expect.any(String),
+                    date: expect.any(String),
                   },
                   {
                     id: expect.any(String),
-                    content: 'Another nice message to other chatting user',
-                    author: {
-                      id: 'other-chatting-user',
-                    },
-                  }             
+                    content: 'A nice response message to chatting user',
+                    senderId: 'other-chatting-user',
+                    username: 'Other Chatting User',
+                    avatar: expect.any(String),
+                    date: expect.any(String),
+                  },
+                  {
+                    id: expect.any(String),
+                    content: 'And another nice message to other chatting user',
+                    senderId: 'chatting-user',
+                    username: 'Chatting User',
+                    avatar: expect.any(String),
+                    date: expect.any(String),
+                  },
                 ],
               },
             })
           })
-        })              
+        })   
       })
 
       describe('room exists, authenticated user not in room', () => {

@@ -9,6 +9,7 @@ export const createRoomMutation = () => {
         userId: $userId
       ) {
         id
+        roomId
       }
     }
   `
@@ -19,8 +20,15 @@ export const roomQuery = () => {
     query {
       Room {
         id
+        roomId
+        roomName
         users {
+          _id
           id
+          name
+          avatar {
+            url
+          }
         }
       }
     }

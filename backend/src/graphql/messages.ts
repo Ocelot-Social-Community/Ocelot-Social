@@ -21,11 +21,13 @@ export const messageQuery = () => {
   return gql`
     query($roomId: ID!) {
       Message(roomId: $roomId) {
+        _id
         id
         content
-        author {
-          id
-        }
+        senderId
+        username
+        avatar
+        date
       }
     }
   `
