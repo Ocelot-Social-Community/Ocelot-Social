@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid'
 import { neo4jgraphql } from 'neo4j-graphql-js'
-import { isEmpty } from 'lodash'
+import { isEmpty, cloneDeep } from 'lodash'
 import { UserInputError } from 'apollo-server'
 import { mergeImage, deleteImage } from './images/images'
 import Resolver from './helpers/Resolver'
@@ -12,12 +12,15 @@ import { createOrUpdateLocations } from './users/location'
 import CONFIG from '../../config'
 
 const maintainPinnedPosts = (params) => {
+  const filter = cloneDeep(params.filter)
   const pinnedPostFilter = { pinned: true }
   if (isEmpty(params.filter)) {
     params.filter = { OR: [pinnedPostFilter, {}] }
   } else {
-    params.filter = { OR: [pinnedPostFilter, { ...params.filter }] }
+    console.log('maintainPinnedPosts before: ', {...filter})
+    params.filter = { OR: [pinnedPostFilter, { ...filter }] }
   }
+  console.log('maintainPinnedPosts after: ', {...filter})
   return params
 }
 
@@ -38,6 +41,8 @@ export default {
       params = await filterForMutedUsers(params, context)
       params = filterEventDates(params)
       params = await maintainPinnedPosts(params)
+      console.log('maintainPinnedPosts filter.OR[1].eventLocation: ', params.filter.OR[1].eventLocation)
+      console.log('maintainPinnedPosts filter: ', params.filter)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
     profilePagePosts: async (object, params, context, resolveInfo) => {

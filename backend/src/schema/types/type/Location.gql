@@ -1,3 +1,10 @@
+input _LocationFilter {
+  NOT: _LocationFilter
+  id: ID
+  id_not: ID
+  name: String
+}
+
 type Location {
   id: ID!
   name: String!
@@ -25,4 +32,3 @@ type LocationMapBox {
 type Query {
   queryLocations(place: String!, lang: String!): [LocationMapBox]!
 }
-
