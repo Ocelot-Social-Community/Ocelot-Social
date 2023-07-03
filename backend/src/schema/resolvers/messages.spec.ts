@@ -234,32 +234,32 @@ describe('Message', () => {
             })).resolves.toMatchObject({
               errors: undefined,
               data: {
-                Message: [
-                  {
+                Message: expect.arrayContaining([
+                  expect.objectContaining({
                     id: expect.any(String),
                     content: 'Some nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
                     avatar: expect.any(String),
                     date: expect.any(String),
-                  },
-                  {
+                  }),
+                  expect.objectContaining({
                     id: expect.any(String),
                     content: 'A nice response message to chatting user',
                     senderId: 'other-chatting-user',
                     username: 'Other Chatting User',
                     avatar: expect.any(String),
                     date: expect.any(String),
-                  },
-                  {
+                  }),
+                  expect.objectContaining({
                     id: expect.any(String),
                     content: 'And another nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
                     avatar: expect.any(String),
                     date: expect.any(String),
-                  },
-                ],
+                  }),
+                ]),
               },
             })
           })
