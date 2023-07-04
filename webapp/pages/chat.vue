@@ -1,34 +1,30 @@
- <script setup>
-import { register } from 'vue-advanced-chat'
-register()
-//  import { register } from 'vue-advanced-chat/dist/vue-advanced-chat.es.js'
-//  window['vue-advanced-chat'].register()
-</script>
 <template>
   <div>
-    <internal-page :pageParams="pageParams" />
-    <vue-advanced-chat
-      :current-user-id="currentUserId"
-      :template-actions="JSON.stringify(templatesText)"
-      :text-messages="JSON.stringify(textMessages)"
-      :menu-actions="JSON.stringify(menuActions)"
-      :rooms="JSON.stringify(rooms)"
-      :messages="JSON.stringify(messages)"
-      :room-actions="JSON.stringify(roomActions)"
-      :rooms-loaded="true"
-      show-files="false"
-      show-audio="false"
-      :show-footer="true"
-      :messages-loaded="messagesLoaded"
-      @send-message="sendMessage($event.detail[0])"
-      @fetch-messages="fetchMessages($event.detail[0])"
-      :theme="theme"
-      :is-device="isDevice"
-      @show-demo-options="showDemoOptions = $event"
-    />
-    <base-button @click="theme = theme === 'light' ? 'dark' : 'light'">
-      change style mode
-    </base-button>
+    <client-only>
+      <internal-page :pageParams="pageParams" />
+      <vue-advanced-chat
+        :current-user-id="currentUserId"
+        :template-actions="JSON.stringify(templatesText)"
+        :text-messages="JSON.stringify(textMessages)"
+        :menu-actions="JSON.stringify(menuActions)"
+        :rooms="JSON.stringify(rooms)"
+        :messages="JSON.stringify(messages)"
+        :room-actions="JSON.stringify(roomActions)"
+        :rooms-loaded="true"
+        show-files="false"
+        show-audio="false"
+        :show-footer="true"
+        :messages-loaded="messagesLoaded"
+        @send-message="sendMessage($event.detail[0])"
+        @fetch-messages="fetchMessages($event.detail[0])"
+        :theme="theme"
+        :is-device="isDevice"
+        @show-demo-options="showDemoOptions = $event"
+      />
+      <base-button @click="theme = theme === 'light' ? 'dark' : 'light'">
+        change style mode
+      </base-button>
+    </client-only>
   </div>
 </template>
 

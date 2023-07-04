@@ -127,6 +127,7 @@ export default {
     { src: '~/plugins/vue-infinite-loading.js', ssr: false },
     { src: '~/plugins/vue-observe-visibility.js', ssr: false },
     { src: '~/plugins/v-mapbox.js', mode: 'client' },
+    { src: '~/plugins/vue-advanced-chat.js', mode: 'client' },
   ],
 
   router: {
