@@ -13,6 +13,9 @@
     <client-only>
       <modal />
     </client-only>
+    <client-only>
+      <div v-if="true" class="chat-modul" ><chat-modul :singleRoom="true"/></div>
+    </client-only>
   </div>
 </template>
 
@@ -22,12 +25,14 @@ import mobile from '~/mixins/mobile'
 import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
 import Modal from '~/components/Modal'
 import PageFooter from '~/components/PageFooter/PageFooter'
+import ChatModul from '~/components/Chat/Chat.vue'
 
 export default {
   components: {
     HeaderMenu,
     Modal,
     PageFooter,
+    ChatModul,
   },
   mixins: [seo, mobile()],
 }
@@ -40,5 +45,15 @@ export default {
 .main-container {
   padding-top: 6rem;
   padding-bottom: 5rem;
+}
+
+.chat-modul {
+  background-color: red;
+  height: 594px;
+  width: 355px;
+  position: absolute;
+  bottom: 45px;
+  right: 0;
+  z-index: 10000;
 }
 </style>

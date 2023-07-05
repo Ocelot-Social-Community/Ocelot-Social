@@ -79,6 +79,14 @@
               @optimistic="optimisticFollow"
               @update="updateFollow"
             />
+            <base-button
+             
+              v-tooltip="{
+                content: $t('notifications.headerMenuButton.chat'),
+                placement: 'bottom-start',
+              }"
+            ><img src="/img/empty/chat-bubble.svg" height="20"/>
+            </base-button>
           </div>
           <template v-if="user.about">
             <hr />
