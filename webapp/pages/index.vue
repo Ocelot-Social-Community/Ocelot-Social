@@ -18,19 +18,14 @@
         </nuxt-link>
       </client-only>
     </div>
-    <masonry-grid>
-      <!--Filter Button-->
-      <ds-grid-item
-        v-if="categoriesActive && SHOW_CONTENT_FILTER_MASONRY_GRID"
-        :row-span="1"
-        column-span="fullWidth"
-        class="top-filter-menu"
-      >
+    <div>
+      <div v-if="categoriesActive && SHOW_CONTENT_FILTER_MASONRY_GRID" class="top-filter-menu">
         <div class="filterButtonBox">
           <div class="filterButtonMenu" :class="{ 'hide-filter': hideByScroll }">
             <base-button
               class="my-filter-button"
               v-if="
+                !postsFilter['postType_in'] &&
                 !postsFilter['categories_some'] &&
                 !postsFilter['author'] &&
                 !postsFilter['postsInMyGroups']
@@ -43,6 +38,22 @@
               &nbsp;
               <base-icon class="my-filter-button" :name="filterButtonIcon"></base-icon>
             </base-button>
+
+            <header-button
+              v-if="filteredPostTypes.includes('Article')"
+              :title="$t('contribution.filterMasonryGrid.onlyArticles')"
+              :clickButton="openFilterMenu"
+              :titleRemove="$t('filter-menu.deleteFilter')"
+              :clickRemove="resetPostType"
+            />
+
+            <header-button
+              v-if="filteredPostTypes.includes('Event')"
+              :title="$t('contribution.filterMasonryGrid.onlyEvents')"
+              :clickButton="openFilterMenu"
+              :titleRemove="$t('filter-menu.deleteFilter')"
+              :clickRemove="resetPostType"
+            />
 
             <header-button
               v-if="postsFilter['categories_some']"
@@ -68,23 +79,30 @@
               :clickRemove="resetByGroups"
             />
             <div id="my-filter" v-if="showFilter">
-              <div @mouseleave="showFilter = false">
+              <div @mouseleave="mouseLeaveFilterMenu">
                 <filter-menu-component @showFilterMenu="showFilterMenu" />
               </div>
             </div>
           </div>
         </div>
-      </ds-grid-item>
-      <!-- Placeholder/Space Row -->
-      <ds-grid-item :row-span="1" column-span="fullWidth" />
-      <!-- hashtag filter -->
-      <ds-grid-item v-if="hashtag" :row-span="2" column-span="fullWidth">
+      </div>
+    </div>
+
+    <div v-if="hashtag || showDonations" class="newsfeed-controls">
+      <div v-if="hashtag">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
-      </ds-grid-item>
-      <!-- donation info -->
-      <ds-grid-item v-if="showDonations" class="top-info-bar" :row-span="1" column-span="fullWidth">
+      </div>
+      <div v-if="showDonations" class="top-info-bar">
         <donation-info :goal="goal" :progress="progress" />
-      </ds-grid-item>
+      </div>
+    </div>
+    <!-- content grid -->
+    <masonry-grid
+      :class="[
+        !hashtag && !showDonations ? 'grid-margin-top' : '',
+        !isMobile && posts.length <= 2 ? 'grid-column-helper' : '',
+      ]"
+    >
       <!-- news feed -->
       <template v-if="hasResults">
         <masonry-grid-item
@@ -119,6 +137,7 @@
 
 <script>
 import postListActions from '~/mixins/postListActions'
+import mobile from '~/mixins/mobile'
 import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter.vue'
 import HcEmpty from '~/components/Empty/Empty'
@@ -145,19 +164,20 @@ export default {
     FilterMenuComponent,
     HeaderButton,
   },
-  mixins: [postListActions],
+  mixins: [postListActions, mobile()],
   data() {
     const { hashtag = null } = this.$route.query
     return {
       hideByScroll: false,
       revScrollpos: 0,
       showFilter: false,
+      developerNoAutoClosingFilterMenu: false, // stops automatic closing of filter menu for developer purposes: default is 'false'
       showDonations: false,
       goal: 15000,
       progress: 7000,
       posts: [],
       hasMore: true,
-      // Initialize your apollo data
+      // initialize your apollo data
       offset: 0,
       pageSize: 12,
       hashtag,
@@ -168,14 +188,12 @@ export default {
   },
   computed: {
     ...mapGetters({
+      filteredPostTypes: 'posts/filteredPostTypes',
       postsFilter: 'posts/filter',
       orderBy: 'posts/orderBy',
     }),
     filterButtonIcon() {
-      if (Object.keys(this.postsFilter).length === 0) {
-        return this.showFilter ? 'angle-up' : 'angle-down'
-      }
-      return 'close'
+      return this.showFilter ? 'angle-up' : 'angle-down'
     },
     finalFilters() {
       let filter = this.postsFilter
@@ -195,6 +213,11 @@ export default {
     },
   },
   watchQuery: ['hashtag'],
+  watch: {
+    postsFilter() {
+      this.resetPostList()
+    },
+  },
   mounted() {
     if (this.categoryId) {
       this.resetCategories()
@@ -205,6 +228,7 @@ export default {
   },
   methods: {
     ...mapMutations({
+      resetPostType: 'posts/RESET_POST_TYPE',
       resetByFollowed: 'posts/TOGGLE_FILTER_BY_FOLLOWED',
       resetByGroups: 'posts/TOGGLE_FILTER_BY_MY_GROUPS',
       resetCategories: 'posts/RESET_CATEGORIES',
@@ -212,6 +236,10 @@ export default {
     }),
     openFilterMenu() {
       this.showFilter = !this.showFilter
+    },
+    mouseLeaveFilterMenu() {
+      if (this.developerNoAutoClosingFilterMenu) return
+      this.showFilter = false
     },
     showFilterMenu(e) {
       if (!e || (!e.target.closest('#my-filter') && !e.target.closest('.my-filter-button'))) {
@@ -318,7 +346,7 @@ export default {
   height: 54px;
   width: 54px;
   font-size: 26px;
-  z-index: 100;
+  z-index: $z-index-sticky-float;
   position: fixed;
   bottom: -5px;
   left: 98vw;
@@ -330,10 +358,14 @@ export default {
   height: 54px;
   width: 54px;
   font-size: 26px;
-  z-index: 100;
+  z-index: $z-index-sticky-float;
   position: fixed;
   top: 80px;
   box-shadow: $box-shadow-x-large;
+}
+
+.top-filter-menu {
+  margin-top: 16px;
 }
 
 .top-info-bar,
@@ -344,11 +376,18 @@ export default {
 .filterButtonMenu {
   width: 95%;
   position: fixed;
-  z-index: 6;
-  margin-top: -35px;
-  padding: 20px 10px 20px 10px;
+  z-index: $z-index-sticky;
+  margin-top: -45px;
+  padding: 30px 0px 20px 0px;
   background-color: #f5f4f6;
 }
+.newsfeed-controls {
+  margin-top: 46px;
+}
+.main-container .grid-column-helper {
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 357px)) !important;
+}
+
 @media screen and (max-width: 656px) {
   .filterButtonMenu {
     margin-top: -50px;
@@ -361,6 +400,10 @@ export default {
   max-height: 950px;
   overflow: auto;
   padding-bottom: 0px;
+  z-index: $z-index-page-submenu;
+}
+.grid-margin-top {
+  margin-top: 26px;
 }
 @media screen and (min-height: 401px) {
   #my-filter {
@@ -410,10 +453,15 @@ export default {
     height: 44px;
     width: 44px;
     font-size: 23px;
-    z-index: 10;
   }
-  .ds-grid {
-    padding-top: 1em;
+}
+@media screen and (max-width: 650px) {
+  //    .top-filter-menu{
+  //     margin-top: 24px;
+  //   }
+
+  .newsfeed-controls {
+    margin-top: 32px;
   }
 }
 </style>

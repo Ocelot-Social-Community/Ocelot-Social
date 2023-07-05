@@ -115,11 +115,20 @@
     "validations": {
       "categories": "at least one and at most three topics must be selected",
       "email": "must be a valid e-mail address",
+      "eventLocationNameLength": "minimum {min} or maximum {max} characters",
+      "eventLocationNameNotEmpty": "only empty characters are not allowed",
+      "eventVenueLength": "minimum {min} or maximum {max} characters",
+      "eventVenueNotEmpty": "only empty characters are not allowed",
       "url": "must be a valid URL"
     },
     "versus": "Versus"
   },
   "components": {
+    "dateTimeRange": {
+      "hourMinute": "HH:mm",
+      "monthDay": "MM/dd/",
+      "yearMonthDay": "MM/dd/yyyy"
+    },
     "password-reset": {
       "change-password": {
         "error": "Changing your password failed. Maybe the security code was not correct?",
@@ -272,12 +281,15 @@
       "myFriends": "Users I follow",
       "myGroups": "By my groups",
       "myTopics": "My topics",
-      "noFilter": "Filter posts"
+      "noFilter": "Filter content",
+      "onlyArticles": "Only articles",
+      "onlyEvents": "Only events"
     },
     "filterMyGroups": "Contributions in my groups",
     "inappropriatePicture": "This image may be inappropriate for some people.",
     "languageSelectLabel": "Language of your contribution",
     "languageSelectText": "Select Language",
+    "newEvent": "Create a new Event",
     "newPost": "Create a new Post",
     "success": "Saved!",
     "teaserImage": {
@@ -377,17 +389,40 @@
   },
   "filter-menu": {
     "all": "All",
+    "article": "Article",
     "categories": "Topics",
+    "creationDate": "Creation date",
     "deleteFilter": "Delete filter",
     "emotions": "Emotions",
+    "ended": {
+      "all": {
+        "hint": "Show all, also ended",
+        "label": "All"
+      },
+      "onlyEnded": {
+        "hint": "Show only not ended",
+        "label": "Not ended"
+      }
+    },
+    "event": "Event",
+    "eventsBy": "Events – show ...",
+    "eventsEnded": "Ended",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
     "languages": "Languages",
     "my-groups": "My groups",
     "order": {
+      "last": {
+        "hint": "Sort posts by the last first",
+        "label": "Last first"
+      },
       "newest": {
         "hint": "Sort posts by the newest first",
         "label": "Newest first"
+      },
+      "next": {
+        "hint": "Sort posts by the next first",
+        "label": "Next first"
       },
       "oldest": {
         "hint": "Sort posts by the oldest first",
@@ -395,10 +430,12 @@
       }
     },
     "order-by": "Order by ...",
+    "post-type": "Content type",
     "save": {
       "error": "Failed saving topic settings!",
       "success": "Topics saved!"
-    }
+    },
+    "startDate": "Start date"
   },
   "followButton": {
     "follow": "Follow",
@@ -684,19 +721,27 @@
       "submitted": "Comment submitted!",
       "updated": "Changes saved!"
     },
+    "createNewEvent": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Create A New Event"
+    },
     "createNewPost": {
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Create A New Post"
+      "title": "Create A New Article"
     },
     "edited": "edited",
     "editPost": {
+      "event": "Edit Your Event",
       "forGroup": {
         "title": "For The Group “{name}”"
       },
       "title": "Edit Your Post"
     },
+    "event": "Event",
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
@@ -705,10 +750,18 @@
       "unpin": "Unpin post",
       "unpinnedSuccessfully": "Post unpinned successfully!"
     },
-    "name": "Post",
+    "name": "Article",
     "pinned": "Announcement",
     "takeAction": {
       "name": "Take action"
+    },
+    "viewEvent": {
+      "eventEnd": "End",
+      "eventIsOnline": "Online",
+      "eventLocationName": "City",
+      "eventStart": "Start",
+      "eventVenue": "Venue",
+      "title": "Event"
     },
     "viewPost": {
       "forGroup": {

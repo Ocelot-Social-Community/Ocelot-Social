@@ -25,6 +25,18 @@ describe('getters', () => {
     })
   })
 
+  describe('filteredPostTypes', () => {
+    it('returns post types if filter is set', () => {
+      state = { filter: { postType_in: ['Article', 'Event'] } }
+      expect(getters.filteredPostTypes(state)).toEqual(['Article', 'Event'])
+    })
+
+    it('returns empty array if post type filter is not set', () => {
+      state = { filter: { author: { followedBy_some: { id: 7 } } } }
+      expect(getters.filteredPostTypes(state)).toEqual([])
+    })
+  })
+
   describe('filteredLanguageCodes', () => {
     it('returns category ids if filter is set', () => {
       state = { filter: { language_in: ['en', 'de', 'pt'] } }
@@ -210,6 +222,131 @@ describe('mutations', () => {
         },
       }
       expect(testMutation(23)).toEqual({ author: { followedBy_some: { id: 7 } } })
+    })
+  })
+
+  describe('TOGGLE_POST_TYPE', () => {
+    beforeEach(() => {
+      testMutation = (postType) => {
+        mutations.TOGGLE_POST_TYPE(state, postType)
+        return getters.filter(state)
+      }
+    })
+
+    it('creates post type filter if empty, sets event start filter and event start order', () => {
+      state = { filter: {} }
+      expect(testMutation('Event')).toEqual({
+        postType_in: ['Event'],
+        eventStart_gte: expect.any(Date),
+      })
+      expect(getters.orderBy(state)).toEqual('eventStart_asc')
+    })
+
+    it('changes post type if present, resets filter event start and order', () => {
+      state = {
+        filter: {
+          postType_in: ['Event'],
+          eventStart_gte: new Date(),
+        },
+        order: 'eventStart_asc',
+      }
+      expect(testMutation('Article')).toEqual({ postType_in: ['Article'] })
+      expect(getters.orderBy(state)).toEqual('createdAt_desc')
+    })
+
+    it('removes post type filter if same post type is present and sets order', () => {
+      state = {
+        filter: {
+          postType_in: ['Event'],
+          eventStart_gte: new Date(),
+        },
+        order: 'eventStart_asc',
+      }
+      expect(testMutation('Event')).toEqual({})
+      expect(getters.orderBy(state)).toEqual('createdAt_desc')
+    })
+
+    it('removes post type filter if called with null', () => {
+      state = {
+        filter: {
+          postType_in: ['Event'],
+          eventStart_gte: new Date(),
+        },
+        order: 'eventStart_asc',
+      }
+      expect(testMutation(null)).toEqual({})
+      expect(getters.orderBy(state)).toEqual('createdAt_desc')
+    })
+
+    it('does not get in the way of other filters', () => {
+      state = {
+        filter: {
+          author: { followedBy_some: { id: 7 } },
+          postType_in: ['Event'],
+        },
+      }
+      expect(testMutation('Event')).toEqual({ author: { followedBy_some: { id: 7 } } })
+    })
+  })
+
+  describe('RESET_POST_TYPE', () => {
+    beforeEach(() => {
+      testMutation = () => {
+        mutations.RESET_POST_TYPE(state)
+        return getters.filter(state)
+      }
+    })
+
+    it('resets the post type filter, event start and order', () => {
+      state = {
+        filter: {
+          postType_in: ['Event'],
+          eventStart_gte: new Date(),
+        },
+        order: 'eventStart_asc',
+      }
+      expect(testMutation()).toEqual({})
+      expect(getters.orderBy(state)).toEqual('createdAt_desc')
+    })
+  })
+
+  describe('TOGGLE_EVENTS_ENDED', () => {
+    beforeEach(() => {
+      testMutation = (postType) => {
+        mutations.TOGGLE_EVENTS_ENDED(state, postType)
+        return getters.filter(state)
+      }
+    })
+
+    it('does not set events ended when post type is not Event', () => {
+      state = {
+        filter: {},
+      }
+      expect(testMutation()).toEqual({})
+    })
+
+    it('sets events ended when post type is Event', () => {
+      state = {
+        filter: {
+          postType_in: ['Event'],
+        },
+      }
+      expect(testMutation()).toEqual({
+        postType_in: ['Event'],
+        eventStart_gte: expect.any(Date),
+      })
+    })
+
+    it('unsets events ended when set', () => {
+      state = {
+        filter: {
+          postType_in: ['Event'],
+          eventStart_gte: new Date(),
+        },
+      }
+      expect(testMutation()).toEqual({
+        postType_in: ['Event'],
+      })
     })
   })
 

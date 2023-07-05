@@ -11,6 +11,8 @@ describe('OrderByFilter', () => {
     'posts/TOGGLE_ORDER': jest.fn(),
   }
   const getters = {
+    'posts/filteredPostTypes': () => [],
+    'posts/orderedByCreationDate': () => true,
     'posts/orderBy': () => 'createdAt_desc',
   }
 

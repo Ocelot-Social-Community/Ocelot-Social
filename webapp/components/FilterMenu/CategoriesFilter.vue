@@ -12,23 +12,27 @@
       <li class="item item-save-topics">
         <labeled-button filled :label="$t('actions.save')" icon="save" @click="saveCategories" />
       </li>
-      <hr />
-      <ds-space margin="base" />
     </template>
 
     <template #filter-list>
-      <li v-for="category in categories" :key="category.id" class="item item-category">
-        <labeled-button
-          :icon="category.icon"
-          :filled="filteredCategoryIds.includes(category.id)"
-          :label="$t(`contribution.category.name.${category.slug}`)"
+      <div class="category-filter-list">
+        <hr />
+        <ds-space margin="small" />
+        <base-button
+          v-for="category in categories"
+          :key="category.id"
           @click="toggleCategory(category.id)"
+          :filled="filteredCategoryIds.includes(category.id)"
+          :icon="category.icon"
+          size="small"
           v-tooltip="{
             content: $t(`contribution.category.description.${category.slug}`),
             placement: 'bottom-start',
           }"
-        />
-      </li>
+        >
+          {{ $t(`contribution.category.name.${category.slug}`) }}
+        </base-button>
+      </div>
     </template>
   </filter-menu-section>
 </template>
@@ -95,3 +99,13 @@ export default {
   },
 }
 </script>
+<style lang="scss">
+.category-filter-list {
+  margin-left: $space-xx-large;
+
+  > .base-button {
+    margin-right: $space-xx-small;
+    margin-bottom: $space-xx-small;
+  }
+}
+</style>

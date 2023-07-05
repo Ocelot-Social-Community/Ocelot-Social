@@ -78,7 +78,7 @@ export default {
       Group: [],
       groupFilter: { isMember: true },
       tabActive: 'myGroups',
-      pageSize: 5,
+      pageSize: 6,
       activePage: 0,
       myGroupsCount: 0,
       allGroupsCount: 0,

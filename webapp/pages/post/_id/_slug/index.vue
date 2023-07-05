@@ -2,7 +2,7 @@
   <transition name="fade" appear>
     <div>
       <ds-space margin="small">
-        <ds-heading tag="h1">{{ $t('post.viewPost.title') }}</ds-heading>
+        <ds-heading tag="h1">{{ heading }}</ds-heading>
         <ds-heading v-if="post && post.group" tag="h2">
           {{ $t('post.viewPost.forGroup.title', { name: post.group.name }) }}
         </ds-heading>
@@ -54,9 +54,28 @@
             </section>
             <ds-space margin-bottom="small" />
             <h2 class="title hyphenate-text">{{ post.title }}</h2>
+            <!-- event data -->
+            <ds-space
+              v-if="post && post.postType[0] === 'Event'"
+              margin-bottom="small"
+              style="padding: 10px"
+            >
+              <location-teaser
+                class="event-info"
+                :venue="post.eventVenue"
+                :locationName="post.eventLocationName"
+                :isOnline="post.eventIsOnline"
+              />
+              <date-time-range
+                class="event-info"
+                :startDate="post.eventStart"
+                :endDate="post.eventEnd"
+              />
+            </ds-space>
             <ds-space margin-bottom="small" />
+            <!-- content -->
             <content-viewer class="content hyphenate-text" :content="post.content" />
-            <!-- Categories -->
+            <!-- categories -->
             <div v-if="categoriesActive" class="categories">
               <ds-space margin="xx-large" />
               <ds-space margin="xx-small" />
@@ -131,11 +150,13 @@
 import ContentViewer from '~/components/Editor/ContentViewer'
 import HcCategory from '~/components/Category'
 import HcHashtag from '~/components/Hashtag/Hashtag'
-import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
-import HcShoutButton from '~/components/ShoutButton.vue'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentList from '~/components/CommentList/CommentList'
+import ContentMenu from '~/components/ContentMenu/ContentMenu'
+import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
+import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import HcShoutButton from '~/components/ShoutButton.vue'
+import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import {
   postMenuModalsData,
@@ -159,9 +180,11 @@ export default {
     CommentForm,
     CommentList,
     ContentViewer,
+    DateTimeRange,
     HcCategory,
     HcHashtag,
     HcShoutButton,
+    LocationTeaser,
     PageParamsLink,
     UserTeaser,
   },
@@ -197,7 +220,10 @@ export default {
       const { slug, id } = this.$route.params
       return [
         {
-          name: this.$t('common.post', null, 1),
+          name:
+            this.post?.postType[0] === 'Event'
+              ? this.$t('post.viewEvent.title')
+              : this.$t('post.viewPost.title'),
           path: `/post/${id}/${slug}`,
           children: [
             {
@@ -217,6 +243,10 @@ export default {
           ],
         },
       ]
+    },
+    heading() {
+      if (this.post?.postType[0] === 'Event') return this.$t('post.viewEvent.title')
+      return this.$t('post.viewPost.title')
     },
     menuModalsData() {
       return postMenuModalsData(
@@ -337,6 +367,7 @@ export default {
   },
 }
 </script>
+
 <style lang="scss">
 .post-side-navigation {
   position: sticky;
@@ -372,6 +403,12 @@ export default {
 
   &.--blur-image > .hero-image > .image {
     filter: blur($blur-radius);
+  }
+
+  & .event-info {
+    display: flex;
+    align-items: center;
+    gap: 2px;
   }
 
   .blur-toggle {

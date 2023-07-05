@@ -15,7 +15,7 @@
 /* globals Cypress cy */
 import "cypress-file-upload";
 import { GraphQLClient, request } from 'graphql-request'
-import config from '../../backend/src/config'
+import CONFIG from '../../backend/build/config'
 
 const authenticatedHeaders = (variables) => {
   const mutation = `
@@ -24,7 +24,7 @@ const authenticatedHeaders = (variables) => {
     }
   `
   return new Cypress.Promise((resolve, reject) => {
-    request(config.GRAPHQL_URI, mutation, variables).then((response) => {
+    request(CONFIG.GRAPHQL_URI, mutation, variables).then((response) => {
       resolve({ authorization: `Bearer ${response.login}` })
     })
   })
@@ -40,7 +40,7 @@ Cypress.Commands.add(
   ({email, password}) => {
     return new Cypress.Promise((resolve, reject) => {
       authenticatedHeaders({ email, password }).then((headers) => {
-        resolve(new GraphQLClient(config.GRAPHQL_URI, { headers }))
+        resolve(new GraphQLClient(CONFIG.GRAPHQL_URI, { headers }))
       })
     })
   })
@@ -48,9 +48,10 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   'mutate',
   { prevSubject: true },
-  (graphQLClient, mutation, variables) => {
-    return new Cypress.Promise((resolve, reject) => {
+  (graphQLClient, mutation, variables, response) => {
+    return new Cypress.Promise(async (resolve, reject) => {
       graphQLClient.request(mutation, variables).then(() => resolve(graphQLClient))
+
     })
   })
 

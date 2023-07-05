@@ -115,11 +115,20 @@
     "validations": {
       "categories": "es müssen eine bis drei Themen ausgewählt werden",
       "email": "muss eine gültige E-Mail-Adresse sein",
+      "eventLocationNameLength": "Minimum {min}, Maximum {max} Zeichen",
+      "eventLocationNameNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
+      "eventVenueLength": "Minimum {min}, Maximum {max} Zeichen",
+      "eventVenueNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
       "url": "muss eine gültige URL sein"
     },
     "versus": "Versus"
   },
   "components": {
+    "dateTimeRange": {
+      "hourMinute": "HH:mm",
+      "monthDay": "dd.MM.",
+      "yearMonthDay": "dd.MM.yyyy"
+    },
     "password-reset": {
       "change-password": {
         "error": "Passwort Änderung fehlgeschlagen. Möglicherweise falscher Sicherheitscode?",
@@ -272,12 +281,15 @@
       "myFriends": "Nutzer denen ich folge",
       "myGroups": "Aus meinen Gruppen",
       "myTopics": "Meine Themen",
-      "noFilter": "Beiträge filtern"
+      "noFilter": "Inhalt filtern",
+      "onlyArticles": "Nur Beiträge",
+      "onlyEvents": "Nur Veranstaltungen"
     },
     "filterMyGroups": "Beiträge in meinen Gruppen",
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache Deines Beitrags",
     "languageSelectText": "Sprache wählen",
+    "newEvent": "Erstelle einen neue Veranstaltung",
     "newPost": "Erstelle einen neuen Beitrag",
     "success": "Gespeichert!",
     "teaserImage": {
@@ -377,17 +389,40 @@
   },
   "filter-menu": {
     "all": "Alle",
+    "article": "Beitrag",
     "categories": "Themen",
+    "creationDate": "Erstellungszeitpunkt",
     "deleteFilter": "Filter löschen",
     "emotions": "Emotionen",
+    "ended": {
+      "all": {
+        "hint": "Zeige alle, auch beendete",
+        "label": "Alle"
+      },
+      "onlyEnded": {
+        "hint": "Zeige nur noch nicht beendete",
+        "label": "Nicht beendete"
+      }
+    },
+    "event": "Veranstaltung",
+    "eventsBy": "Veranstaltungen – zeige ...",
+    "eventsEnded": "Beendet",
     "filter-by": "Filtern nach ...",
     "following": "Nutzer denen ich folge",
     "languages": "Sprachen",
     "my-groups": "Meinen Gruppen",
     "order": {
+      "last": {
+        "hint": "Sortiere die Letzten nach vorn",
+        "label": "Letzte zuerst"
+      },
       "newest": {
         "hint": "Sortiere die Neuesten nach vorn",
         "label": "Neueste zuerst"
+      },
+      "next": {
+        "hint": "Sortiere die Nächsten nach vorn",
+        "label": "Nächste zuerst"
       },
       "oldest": {
         "hint": "Sortiere die Ältesten nach vorn",
@@ -395,10 +430,12 @@
       }
     },
     "order-by": "Sortieren nach ...",
+    "post-type": "Inhaltstyp",
     "save": {
       "error": "Themen konnten nicht gespeichert werden!",
       "success": "Themen gespeichert!"
-    }
+    },
+    "startDate": "Anfangszeitpunkt"
   },
   "followButton": {
     "follow": "Folgen",
@@ -684,6 +721,12 @@
       "submitted": "Kommentar gesendet",
       "updated": "Änderungen gespeichert"
     },
+    "createNewEvent": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Erstelle ein neues Event"
+    },
     "createNewPost": {
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
@@ -692,11 +735,13 @@
     },
     "edited": "bearbeitet",
     "editPost": {
+      "event": "Bearbeite deine Veranstaltung",
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
       "title": "Bearbeite deinen Beitrag"
     },
+    "event": "Veranstaltung",
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
@@ -709,6 +754,14 @@
     "pinned": "Meldung",
     "takeAction": {
       "name": "Aktiv werden"
+    },
+    "viewEvent": {
+      "eventEnd": "Ende",
+      "eventIsOnline": "Online",
+      "eventLocationName": "Stadt",
+      "eventStart": "Beginn",
+      "eventVenue": "Veranstaltungsort",
+      "title": "Veranstaltung"
     },
     "viewPost": {
       "forGroup": {

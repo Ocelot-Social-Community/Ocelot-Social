@@ -34,7 +34,7 @@ FROM $APP_IMAGE_BASE as branded
 
 # TODO - do all copying with one COPY command to have one layer
 # Copy "binary"-files from build image
-COPY --from=build ${DOCKER_WORKDIR}/dist ./dist
+COPY --from=build ${DOCKER_WORKDIR}/build ./build
 COPY --from=build ${DOCKER_WORKDIR}/node_modules ./node_modules
 # TODO - externalize the uploads so we can copy the whole folder
 COPY --from=build ${DOCKER_WORKDIR}/public/img/ ./public/img/
