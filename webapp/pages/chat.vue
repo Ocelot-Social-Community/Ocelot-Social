@@ -1,9 +1,9 @@
 <template>
   <div>
-     <chat :theme="theme"/>
-     <base-button @click="theme = theme === 'light' ? 'dark' : 'light'">
-        change style mode
-      </base-button>
+    <chat :theme="theme" />
+    <base-button @click="theme = theme === 'light' ? 'dark' : 'light'">
+      change style mode
+    </base-button>
   </div>
 </template>
 

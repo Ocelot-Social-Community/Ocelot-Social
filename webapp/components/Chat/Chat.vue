@@ -30,12 +30,12 @@ import { roomQuery } from '~/graphql/Rooms'
 import { messageQuery } from '~/graphql/Messages'
 
 export default {
-    name: 'Chat',
-    props: {
-        theme: {
-            type: String,
-        }
+  name: 'Chat',
+  props: {
+    theme: {
+      type: String,
     },
+  },
   data() {
     return {
       currentUserId: '1234',
@@ -126,27 +126,27 @@ export default {
 
   methods: {
     fetchMessages({ room, options = {} }) {
-      console.log(room, options)
+      // console.log(room, options)
       this.messagesLoaded = false
       setTimeout(async () => {
         if (options.reset) {
-          console.log('reset messages')
+          // console.log('reset messages')
           this.messages = [] // this.addMessages(true)
         } else {
           try {
             const {
-          data: { Message },
-        } = await this.$apollo.query({
+              data: { Message },
+            } = await this.$apollo.query({
               query: messageQuery(),
               variables: {
                 roomId: room.id,
-              }
+              },
             })
-            console.log('Messages', Message)
-                this.messages = Message
+            // console.log('Messages', Message)
+            this.messages = Message
           } catch (error) {
-            console.log('Error', error)
-            this.messages = [] //this.addMessages(true)
+            // console.log('Error', error)
+            this.messages = [] // this.addMessages(true)
             this.$toast.error(error.message)
           }
         }
@@ -217,10 +217,8 @@ export default {
         if (!Room) {
           this.rooms = []
           return
-        }  
-    
+        }
         this.rooms = Room
-       
       },
       error(error) {
         this.rooms = []

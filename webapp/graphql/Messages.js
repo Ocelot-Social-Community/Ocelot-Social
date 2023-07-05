@@ -2,7 +2,7 @@ import gql from 'graphql-tag'
 
 export const messageQuery = () => {
   return gql`
-    query($roomId: ID!) {
+    query ($roomId: ID!) {
       Message(roomId: $roomId) {
         id
         content
@@ -13,4 +13,3 @@ export const messageQuery = () => {
     }
   `
 }
-
