@@ -57,14 +57,14 @@
 <script>
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import Dropdown from '~/components/Dropdown'
-import NotificationList from '../NotificationList/NotificationList'
+// import NotificationList from '../NotificationList/NotificationList'
 
 export default {
   name: 'ChatNotificationMenu',
   components: {
     CounterIcon,
     Dropdown,
-    NotificationList,
+    // NotificationList,
   },
   data() {
     return {

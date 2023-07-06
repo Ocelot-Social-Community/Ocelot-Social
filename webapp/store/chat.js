@@ -7,7 +7,6 @@ export const state = () => {
 
 export const mutations = {
   SET_OPEN_CHAT(state, ctx) {
-    console.log('SET_OPEN_CHAT', ctx)
     state.showChat = ctx.showChat || false
     state.roomID = ctx.roomID || 'u0'
   },

@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { roomQuery } from '~/graphql/Rooms'
+// import { roomQuery } from '~/graphql/Rooms'
 import { messageQuery } from '~/graphql/Messages'
 
 export default {
