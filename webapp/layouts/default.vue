@@ -13,10 +13,10 @@
     <client-only>
       <modal />
     </client-only>  
-    <div v-if="$store.getters['chat-modul/showChatModul'].showChatModul" class="chat-modul" >
+    <div v-if="$store.getters['chat/showChat'].showChat" class="chat-modul" >
       <ds-text align="right" class="close">
-        RoomID: {{ $store.getters['chat-modul/showChatModul'].roomID }}
-        <ds-button  @click="$store.commit('chat-modul/SET_OPEN_CHAT_MODUL', { showChatModul: false , roomID: 'u0' })">x</ds-button>
+        RoomID: {{ $store.getters['chat/showChat'].roomID }}
+        <ds-button  @click="$store.commit('chat/SET_OPEN_CHAT', { showChat: false , roomID: 'u0' })">x</ds-button>
       </ds-text>
       <chat-modul :singleRoom="true"/>
     </div>    

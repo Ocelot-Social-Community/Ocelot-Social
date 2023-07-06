@@ -1,20 +1,20 @@
 export const state = () => {
   return {
-    showChatModul: false,
+    showChat: false,
     roomID: 'u0'
   }
 }
 
 export const mutations = {
-  SET_OPEN_CHAT_MODUL(state, ctx) {
-    console.log('SET_OPEN_CHAT_MODUL', ctx)
-    state.showChatModul = ctx.showChatModul || false
+  SET_OPEN_CHAT(state, ctx) {
+    console.log('SET_OPEN_CHAT', ctx)
+    state.showChat = ctx.showChat || false
     state.roomID = ctx.roomID || 'u0'
   },
 }
 
 export const getters = {
-    showChatModul(state) {
+    showChat(state) {
         console.log('getter', state)
         return state
     },

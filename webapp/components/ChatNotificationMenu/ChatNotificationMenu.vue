@@ -37,7 +37,7 @@
             
             <ds-space>
 
-             <div class="notifications-menu-popover-item" @click="$store.commit('chat-modul/SET_OPEN_CHAT_MODUL', { showChatModul: true , roomID: notification.roomid })">
+             <div class="notifications-menu-popover-item" @click="$store.commit('chat/SET_OPEN_CHAT', { showChat: true , roomID: notification.roomid })">
             <p>{{ notification.name }}</p>
             {{ notification.title }}</div>
             </ds-space>
