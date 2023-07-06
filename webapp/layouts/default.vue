@@ -14,7 +14,7 @@
       <modal />
     </client-only>
     <client-only>
-      <ds-card space="xx-small" header="sfdfsdf">
+      <ds-card space="xx-small">
         <div v-if="$store.getters['chat-modul/showChatModul'].showChatModul" class="chat-modul" >
          
          <ds-text align="right" class="close">
