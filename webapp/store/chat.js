@@ -1,7 +1,7 @@
 export const state = () => {
   return {
     showChat: false,
-    roomID: 'u0'
+    roomID: 'u0',
   }
 }
 
@@ -14,10 +14,10 @@ export const mutations = {
 }
 
 export const getters = {
-    showChat(state) {
-        return state
-    },
-    roomID(state) {
-        return state
-    },
+  showChat(state) {
+    return state
+  },
+  roomID(state) {
+    return state
+  },
 }

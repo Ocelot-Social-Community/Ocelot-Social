@@ -10,18 +10,14 @@
         :text-messages="JSON.stringify(textMessages)"
         :messages="JSON.stringify(messages)"
         :messages-loaded="messagesLoaded"
-       
         :rooms="JSON.stringify(rooms)"
-        
         :room-actions="JSON.stringify(roomActions)"
         :rooms-loaded="true"
         show-files="false"
         show-audio="false"
         :show-footer="true"
-        
         @send-message="sendMessage($event.detail[0])"
         @fetch-messages="fetchMessages($event.detail[0])"
-        
         :responsive-breakpoint="responsiveBreakpoint"
         :single-room="singleRoom"
         @show-demo-options="showDemoOptions = $event"
@@ -43,7 +39,7 @@ export default {
     singleRoom: {
       type: Boolean,
       default: false,
-    }
+    },
   },
   data() {
     return {
@@ -216,26 +212,26 @@ export default {
       }, 2000)
     },
   },
-//   apollo: {
-//     Rooms: {
-//       query() {
-//         return roomQuery()
-//       },
-//       update({ Room }) {
-//         console.log('Rooms', Room)
-//         if (!Room) {
-//           this.rooms = []
-//           return
-//         }
-//         this.rooms = Room
-//       },
-//       error(error) {
-//         this.rooms = []
-//         this.$toast.error(error.message)
-//       },
-//       fetchPolicy: 'cache-and-network',
-//     },
-//   },
+  //   apollo: {
+  //     Rooms: {
+  //       query() {
+  //         return roomQuery()
+  //       },
+  //       update({ Room }) {
+  //         console.log('Rooms', Room)
+  //         if (!Room) {
+  //           this.rooms = []
+  //           return
+  //         }
+  //         this.rooms = Room
+  //       },
+  //       error(error) {
+  //         this.rooms = []
+  //         this.$toast.error(error.message)
+  //       },
+  //       fetchPolicy: 'cache-and-network',
+  //     },
+  //   },
 }
 </script>
 <style lang="scss">
