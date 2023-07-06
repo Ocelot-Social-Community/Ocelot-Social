@@ -18,7 +18,7 @@
         RoomID: {{ $store.getters['chat/showChat'].roomID }}
         <ds-button  @click="$store.commit('chat/SET_OPEN_CHAT', { showChat: false , roomID: 'u0' })">x</ds-button>
       </ds-text>
-      <chat-modul :singleRoom="true"/>
+      <chat-module :singleRoom="true"/>
     </div>    
      >
   </div>
@@ -29,14 +29,14 @@ import mobile from '~/mixins/mobile'
 import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
 import Modal from '~/components/Modal'
 import PageFooter from '~/components/PageFooter/PageFooter'
-import ChatModul from '~/components/Chat/Chat.vue'
+import ChatModule from '~/components/Chat/Chat.vue'
 
 export default {
   components: {
     HeaderMenu,
     Modal,
     PageFooter,
-    ChatModul,
+    ChatModule,
   },
   mixins: [seo, mobile()],
 }
