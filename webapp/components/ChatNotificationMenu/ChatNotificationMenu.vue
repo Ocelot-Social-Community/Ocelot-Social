@@ -15,7 +15,7 @@
     </base-button>
   
   </nuxt-link>
-  <dropdown v-else class="notifications-menu" offset="8" :placement="placement">
+  <dropdown v-else class="notifications-menu" offset="8">
     <template #default="{ toggleMenu }">
       <base-button
         ghost
