@@ -1,7 +1,6 @@
 <template>
   <div>
     <client-only>
-      <internal-page :pageParams="pageParams" />
       <vue-advanced-chat
         :theme="theme"
         :current-user-id="currentUserId"
