@@ -12,21 +12,15 @@
     <div id="overlay" />
     <client-only>
       <modal />
-    </client-only>
-    <client-only>
-      
-        <div v-if="$store.getters['chat-modul/showChatModul'].showChatModul" class="chat-modul" >
-         
-         <ds-text align="right" class="close">
-           RoomID: {{ $store.getters['chat-modul/showChatModul'].roomID }}
-          <ds-button  @click="$store.commit('chat-modul/SET_OPEN_CHAT_MODUL', { showChatModul: false , roomID: 'u0' })">x</ds-button>
-         </ds-text>
-         
-         <chat-modul :singleRoom="true"/>
-       </div>
- 
-     
-    </client-only>
+    </client-only>  
+    <div v-if="$store.getters['chat-modul/showChatModul'].showChatModul" class="chat-modul" >
+      <ds-text align="right" class="close">
+        RoomID: {{ $store.getters['chat-modul/showChatModul'].roomID }}
+        <ds-button  @click="$store.commit('chat-modul/SET_OPEN_CHAT_MODUL', { showChatModul: false , roomID: 'u0' })">x</ds-button>
+      </ds-text>
+      <chat-modul :singleRoom="true"/>
+    </div>    
+     >
   </div>
 </template>
 <script>

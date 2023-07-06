@@ -97,7 +97,6 @@ export default {
     max-width: 500px;
 }
 .vue-popover-theme {
- 
   z-index: 1000000;
 }
  

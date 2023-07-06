@@ -1,27 +1,6 @@
 import { PageParams } from '~/components/utils/PageParams.js'
 
 export const defaultPageParamsPages = {
-  CHAT: new PageParams({
-    name: 'chat',
-
-    // externalLink: {
-    //   url: 'https://ocelot.social',
-    //   target: '_blank',
-    // },
-    externalLink: null, // if defined it's dominating
-
-    internalPage: {
-      pageRoute: '/chat', // static, don't change! internal page in case no external is defined
-      footerIdent: 'chatX', // localized string identifier
-      headTitleIdent: 'chatX', // localized string identifier
-      headlineIdent: 'chatX', // localized string identifier. on null it's hidden, on empty string default is used
-      hasContainer: true,
-      hasBaseCard: true,
-      hasLoginInHeader: true,
-      // in case internal page content is here 'webapp/locales/html/'
-      // htmlIdent: 'html.chat',
-    },
-  }),
   ORGANIZATION: new PageParams({
     name: 'organization',
 
