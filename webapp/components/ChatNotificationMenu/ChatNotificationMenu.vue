@@ -26,7 +26,7 @@
         }"
         @click="toggleMenu"
       >
-      <counter-icon icon="" :count="unreadChatNotificationsCount" danger />
+      <counter-icon icon="envelope" :count="unreadChatNotificationsCount" danger />
       <img src="/img/empty/chat-bubble.svg"/>
        
       </base-button>
