@@ -102,11 +102,12 @@ describe('Room', () => {
             },
           })
           roomId = result.data.CreateRoom.id
-          await expect(result).toMatchObject({
+          expect(result).toMatchObject({
             errors: undefined,
             data: {
               CreateRoom: {
                 id: expect.any(String),
+                roomId: result.data.CreateRoom.id,
               },
             },
           })
@@ -153,18 +154,31 @@ describe('Room', () => {
         })
 
         it('returns the room', async () => {
-          await expect(query({ query: roomQuery() })).resolves.toMatchObject({
+          const result = await query({ query: roomQuery() })
+          expect(result).toMatchObject({
             errors: undefined,
             data: {
               Room: [
                 {
                   id: expect.any(String),
+                  roomId: result.data.Room[0].id,
+                  roomName: 'Other Chatting User',
                   users: expect.arrayContaining([
                     {
+                      _id: 'chatting-user',
                       id: 'chatting-user',
+                      name: 'Chatting User',
+                      avatar: {
+                        url: expect.any(String),
+                      },
                     },
                     {
+                      _id: 'other-chatting-user',
                       id: 'other-chatting-user',
+                      name: 'Other Chatting User',
+                      avatar: {
+                        url: expect.any(String),
+                      },
                     },
                   ]),
                 },
@@ -180,18 +194,31 @@ describe('Room', () => {
         })
 
         it('returns the room', async () => {
-          await expect(query({ query: roomQuery() })).resolves.toMatchObject({
+          const result = await query({ query: roomQuery() }) 
+          expect(result).toMatchObject({
             errors: undefined,
             data: {
               Room: [
                 {
                   id: expect.any(String),
+                  roomId: result.data.Room[0].id,
+                  roomName: 'Chatting User',
                   users: expect.arrayContaining([
                     {
+                      _id: 'chatting-user',
                       id: 'chatting-user',
+                      name: 'Chatting User',
+                      avatar: {
+                        url: expect.any(String),
+                      },
                     },
                     {
+                      _id: 'other-chatting-user',
                       id: 'other-chatting-user',
+                      name: 'Other Chatting User',
+                      avatar: {
+                        url: expect.any(String),
+                      },
                     },
                   ]),
                 },
