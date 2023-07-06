@@ -80,7 +80,7 @@
               @update="updateFollow"
             />
             <base-button
-              @click="$store.commit('chat-modul/SET_OPEN_CHAT_MODUL', true)"
+              @click="$store.commit('chat-modul/SET_OPEN_CHAT_MODUL', { showChatModul: true , roomID: user.id })"
               v-tooltip="{
                 content: $t('notifications.headerMenuButton.chat'),
                 placement: 'bottom-start',

@@ -14,9 +14,18 @@
       <modal />
     </client-only>
     <client-only>
-      <div v-if="$store.getters['chat-modul/showChatModul'].showChatModul" class="chat-modul" >
-        <div  class="close" @click="$store.commit('chat-modul/SET_OPEN_CHAT_MODUL', false)">x close chat</div>
-        <chat-modul :singleRoom="true"/></div>
+      <ds-card space="xx-small" header="sfdfsdf">
+        <div v-if="$store.getters['chat-modul/showChatModul'].showChatModul" class="chat-modul" >
+         
+         <ds-text align="right" class="close">
+           RoomID: {{ $store.getters['chat-modul/showChatModul'].roomID }}
+          <ds-button  @click="$store.commit('chat-modul/SET_OPEN_CHAT_MODUL', { showChatModul: false , roomID: 'u0' })">x</ds-button>
+         </ds-text>
+         
+         <chat-modul :singleRoom="true"/>
+       </div>
+    </ds-card>
+     
     </client-only>
   </div>
 </template>
@@ -50,7 +59,7 @@ export default {
 
 .chat-modul {
   background-color: rgb(233, 228, 228);
-  height: 634px;
+  height: 667px;
   width: 355px;
   position: fixed;
   bottom: 45px;
