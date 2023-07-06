@@ -14,11 +14,12 @@
       <modal />
     </client-only>
     <client-only>
-      <div v-if="true" class="chat-modul" ><chat-modul :singleRoom="true"/></div>
+      <div v-if="$store.getters['chat-modul/showChatModul'].showChatModul" class="chat-modul" >
+        <div  class="close" @click="$store.commit('chat-modul/SET_OPEN_CHAT_MODUL', false)">x close chat</div>
+        <chat-modul :singleRoom="true"/></div>
     </client-only>
   </div>
 </template>
-
 <script>
 import seo from '~/mixins/seo'
 import mobile from '~/mixins/mobile'
@@ -48,12 +49,17 @@ export default {
 }
 
 .chat-modul {
-  background-color: red;
-  height: 594px;
+  background-color: rgb(233, 228, 228);
+  height: 634px;
   width: 355px;
-  position: absolute;
+  position: fixed;
   bottom: 45px;
   right: 0;
   z-index: 10000;
+  .close {
+    padding: 10px; 
+    color: blue; 
+    cursor: pointer;
+  }
 }
 </style>
