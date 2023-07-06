@@ -36,7 +36,9 @@ describe('default.vue', () => {
     store = new Vuex.Store({
       getters: {
         'auth/isLoggedIn': () => true,
-        'chat/showChat': () => { return { showChat: false, roomID: 'u0' }}
+        'chat/showChat': () => {
+          return { showChat: false, roomID: 'u0' }
+        },
       },
     })
   })
