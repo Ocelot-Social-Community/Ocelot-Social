@@ -15,11 +15,9 @@ export const mutations = {
 
 export const getters = {
     showChat(state) {
-        console.log('getter', state)
         return state
     },
     roomID(state) {
-        console.log('getter', state)
         return state
     },
 }
