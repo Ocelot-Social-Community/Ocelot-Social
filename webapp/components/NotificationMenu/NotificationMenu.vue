@@ -149,7 +149,7 @@ export default {
           return {
             notifications: unionBy(
               [newNotification],
-              previousResult.notifications,
+              previousResult?.notifications,
               (notification) => notification.id,
             ).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)),
           }
