@@ -170,6 +170,7 @@ describe('mergeImage', () => {
         })
       })
 
+      // eslint-disable-next-line jest/no-disabled-tests
       it.skip('automatically creates different image sizes', async () => {
         await expect(
           mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback }),

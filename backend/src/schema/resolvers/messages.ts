@@ -25,7 +25,9 @@ export default {
   Mutation: {
     CreateMessage: async (_parent, params, context, _resolveInfo) => {
       const { roomId, content } = params
-      const { user: { id: currentUserId } } = context
+      const {
+        user: { id: currentUserId },
+      } = context
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const createMessageCypher = `
@@ -37,13 +39,14 @@ export default {
           })-[:INSIDE]->(room)
           RETURN message { .* }
         `
-        const createMessageTxResponse = await transaction.run(
-          createMessageCypher,
-          { currentUserId, roomId, content }
-        )
+        const createMessageTxResponse = await transaction.run(createMessageCypher, {
+          currentUserId,
+          roomId,
+          content,
+        })
         const [message] = await createMessageTxResponse.records.map((record) =>
-                                                                    record.get('message'),
-                                                                   )
+          record.get('message'),
+        )
         return message
       })
       try {
@@ -53,7 +56,7 @@ export default {
         throw new Error(error)
       } finally {
         session.close()
-      } 
+      }
     },
   },
   Message: {
@@ -61,7 +64,7 @@ export default {
       hasOne: {
         author: '<-[:CREATED]-(related:User)',
         room: '-[:INSIDE]->(related:Room)',
-      }
+      },
     }),
-  }  
+  },
 }
