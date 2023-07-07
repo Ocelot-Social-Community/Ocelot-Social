@@ -728,7 +728,7 @@ describe('file a report on a resource', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
-        expect(query({ query: reportsQuery })).resolves.toMatchObject({
+        await expect(query({ query: reportsQuery })).resolves.toMatchObject({
           data: { reports: null },
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -738,7 +738,7 @@ describe('file a report on a resource', () => {
     describe('authenticated', () => {
       it('role "user" gets no reports', async () => {
         authenticatedUser = await currentUser.toJson()
-        expect(query({ query: reportsQuery })).resolves.toMatchObject({
+        await expect(query({ query: reportsQuery })).resolves.toMatchObject({
           data: { reports: null },
           errors: [{ message: 'Not Authorized!' }],
         })

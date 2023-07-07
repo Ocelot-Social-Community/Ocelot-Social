@@ -144,7 +144,7 @@ export default {
       params.locationName = params.locationName === '' ? null : params.locationName
       const { termsAndConditionsAgreedVersion } = params
       if (termsAndConditionsAgreedVersion) {
-        const regEx = new RegExp(/^[0-9]+\.[0-9]+\.[0-9]+$/g)
+        const regEx = /^[0-9]+\.[0-9]+\.[0-9]+$/g
         if (!regEx.test(termsAndConditionsAgreedVersion)) {
           throw new ForbiddenError('Invalid version format!')
         }

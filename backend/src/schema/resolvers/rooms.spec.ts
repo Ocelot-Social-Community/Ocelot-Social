@@ -35,56 +35,55 @@ afterAll(async () => {
 
 describe('Room', () => {
   beforeAll(async () => {
-    [chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
-      Factory.build(
-        'user',
-        {
-          id: 'chatting-user',
-          name: 'Chatting User',
-        },
-      ),
-      Factory.build(
-        'user',
-        {
-          id: 'other-chatting-user',
-          name: 'Other Chatting User',
-        },
-      ),
-      Factory.build(
-        'user',
-        {
-          id: 'not-chatting-user',
-          name: 'Not Chatting User',
-        },
-      ),
+    ;[chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
+      Factory.build('user', {
+        id: 'chatting-user',
+        name: 'Chatting User',
+      }),
+      Factory.build('user', {
+        id: 'other-chatting-user',
+        name: 'Other Chatting User',
+      }),
+      Factory.build('user', {
+        id: 'not-chatting-user',
+        name: 'Not Chatting User',
+      }),
     ])
   })
 
   describe('create room', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
-        await expect(mutate({ mutation: createRoomMutation(), variables: {
-          userId: 'some-id' } })).resolves.toMatchObject({
-            errors: [{ message: 'Not Authorized!' }],
-          })
+        await expect(
+          mutate({
+            mutation: createRoomMutation(),
+            variables: {
+              userId: 'some-id',
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: [{ message: 'Not Authorized!' }],
+        })
       })
     })
 
     describe('authenticated', () => {
       let roomId: string
-      
+
       beforeAll(async () => {
         authenticatedUser = await chattingUser.toJson()
       })
 
       describe('user id does not exist', () => {
         it('returns null', async () => {
-          await expect(mutate({
-            mutation: createRoomMutation(),
-            variables: {
-              userId: 'not-existing-user',
-            },
-          })).resolves.toMatchObject({
+          await expect(
+            mutate({
+              mutation: createRoomMutation(),
+              variables: {
+                userId: 'not-existing-user',
+              },
+            }),
+          ).resolves.toMatchObject({
             errors: undefined,
             data: {
               CreateRoom: null,
@@ -92,7 +91,7 @@ describe('Room', () => {
           })
         })
       })
-      
+
       describe('user id exists', () => {
         it('returns the id of the room', async () => {
           const result = await mutate({
@@ -116,12 +115,14 @@ describe('Room', () => {
 
       describe('create room with same user id', () => {
         it('returns the id of the room', async () => {
-          await expect(mutate({
-            mutation: createRoomMutation(),
-            variables: {
-              userId: 'other-chatting-user',
-            },
-          })).resolves.toMatchObject({
+          await expect(
+            mutate({
+              mutation: createRoomMutation(),
+              variables: {
+                userId: 'other-chatting-user',
+              },
+            }),
+          ).resolves.toMatchObject({
             errors: undefined,
             data: {
               CreateRoom: {
@@ -130,7 +131,7 @@ describe('Room', () => {
             },
           })
         })
-      })      
+      })
     })
   })
 
@@ -139,11 +140,11 @@ describe('Room', () => {
       beforeAll(() => {
         authenticatedUser = null
       })
-      
+
       it('throws authorization error', async () => {
         await expect(query({ query: roomQuery() })).resolves.toMatchObject({
-            errors: [{ message: 'Not Authorized!' }],
-          })
+          errors: [{ message: 'Not Authorized!' }],
+        })
       })
     })
 
@@ -194,7 +195,7 @@ describe('Room', () => {
         })
 
         it('returns the room', async () => {
-          const result = await query({ query: roomQuery() }) 
+          const result = await query({ query: roomQuery() })
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -241,7 +242,7 @@ describe('Room', () => {
             },
           })
         })
-      })      
+      })
     })
   })
 })
