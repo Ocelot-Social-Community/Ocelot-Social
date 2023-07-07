@@ -44,7 +44,11 @@
         <!-- <notification-list :notifications="notifications" /> -->
       </div>
       <ds-flex class="chat-notifications-link-container">
-        <ds-flex-item class="chat-notifications-link-container-item" :width="{ base: '100%' }" centered>
+        <ds-flex-item
+          class="chat-notifications-link-container-item"
+          :width="{ base: '100%' }"
+          centered
+        >
           <nuxt-link :to="{ name: 'chat' }">
             <base-button ghost primary>All Chat Messages</base-button>
           </nuxt-link>
