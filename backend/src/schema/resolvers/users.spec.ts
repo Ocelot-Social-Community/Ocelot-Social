@@ -590,7 +590,7 @@ describe('save category settings', () => {
   beforeEach(async () => {
     await Promise.all(
       categories.map(({ icon, name }, index) => {
-        Factory.build('category', {
+        return Factory.build('category', {
           id: `cat${index + 1}`,
           slug: name,
           name,
