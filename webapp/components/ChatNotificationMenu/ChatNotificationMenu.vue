@@ -11,7 +11,7 @@
       <img src="/img/empty/chat-bubble.svg" />
     </base-button>
   </nuxt-link>
-  <dropdown v-else class="notifications-menu" offset="8">
+  <dropdown v-else class="chat-notifications-menu" offset="8">
     <template #default="{ toggleMenu }">
       <base-button
         ghost
@@ -27,11 +27,11 @@
       </base-button>
     </template>
     <template #popover="{}">
-      <div class="notifications-menu-popover">
+      <div class="chat-notifications-menu-popover">
         <div v-for="notification in notifications" v-bind:key="notification.roomid">
           <ds-space>
             <div
-              class="notifications-menu-popover-item"
+              class="chat-notifications-menu-popover-item"
               @click="
                 $store.commit('chat/SET_OPEN_CHAT', { showChat: true, roomID: notification.roomid })
               "
@@ -43,8 +43,8 @@
         </div>
         <!-- <notification-list :notifications="notifications" /> -->
       </div>
-      <ds-flex class="notifications-link-container">
-        <ds-flex-item class="notifications-link-container-item" :width="{ base: '100%' }" centered>
+      <ds-flex class="chat-notifications-link-container">
+        <ds-flex-item class="chat-notifications-link-container-item" :width="{ base: '100%' }" centered>
           <nuxt-link :to="{ name: 'chat' }">
             <base-button ghost primary>All Chat Messages</base-button>
           </nuxt-link>
@@ -89,7 +89,7 @@ export default {
 }
 </script>
 <style lang="scss">
-.notifications-menu {
+.chat-notifications-menu {
   max-width: 500px;
 }
 .vue-popover-theme {
