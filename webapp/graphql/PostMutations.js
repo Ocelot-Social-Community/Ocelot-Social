@@ -39,6 +39,7 @@ export default () => {
           deleted
           postType
           author {
+            id
             name
           }
           categories {
