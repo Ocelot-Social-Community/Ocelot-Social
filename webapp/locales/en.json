@@ -77,6 +77,20 @@
       }
     }
   },
+  "chat": {    
+    "roomsEmpty" : "No rooms",
+    "roomEmpty" : "No room selected",
+    "newMessages" : "New Messages",
+    "messageDeleted": "This message was deleted",
+    "messagesEmpty": "No messages",
+    "conversationStarted": "Conversation started on:",
+    "typeMessage": "Type message",
+    "search": "Search",
+    "isOnline": "is online",
+    "lastSeen": "last seen ",
+    "isTyping": "is writing...",
+    "cancelSelectMessage": "Cancel"    
+  },
   "client-only": {
     "loading": "Loading …"
   },
