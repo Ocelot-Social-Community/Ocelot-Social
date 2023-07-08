@@ -407,3 +407,8 @@ $color-ribbon-event: $background-color-third;
 $color-ribbon-event-active: $background-color-third-active;
 $color-ribbon-article: $background-color-secondary;
 $color-ribbon-article-active: $background-color-secondary-active;
+
+
+:export {
+    colorYellow: $color-yellow;
+}

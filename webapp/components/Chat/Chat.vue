@@ -15,6 +15,7 @@
         :rooms-loaded="true"
         show-files="false"
         show-audio="false"
+        :styles="JSON.stringify(computedChatStyle)"
         :show-footer="true"
         @send-message="sendMessage($event.detail[0])"
         @fetch-messages="fetchMessages($event.detail[0])"
@@ -29,6 +30,7 @@
 <script>
 // import { roomQuery } from '~/graphql/Rooms'
 import { messageQuery } from '~/graphql/Messages'
+import chatStyle from '~/constants/chat.js'
 
 export default {
   name: 'Chat',
@@ -129,6 +131,12 @@ export default {
     }
   },
 
+  computed: {
+    computedChatStyle(){
+      // return this.theme === 'light' ? chatStyle.STYLE.light : chatStyle.STYLE.dark
+      return chatStyle.STYLE.light
+    }
+  },
   methods: {
     fetchMessages({ room, options = {} }) {
       // console.log(room, options)
