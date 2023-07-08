@@ -278,7 +278,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     await Promise.all(
       categories.map(({ icon, name }, index) => {
-        Factory.build('category', {
+        return Factory.build('category', {
           id: `cat${index + 1}`,
           slug: name,
           name,
@@ -1112,7 +1112,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     const reportAgainstDewey = reports[3]
 
     // report resource first time
-    
+
     await reportAgainstDagobert.relateTo(jennyRostock, 'filed', {
       resourceId: 'u7',
       reasonCategory: 'discrimination_etc',

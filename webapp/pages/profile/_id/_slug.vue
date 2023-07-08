@@ -79,6 +79,15 @@
               @optimistic="optimisticFollow"
               @update="updateFollow"
             />
+            <base-button
+              @click="$store.commit('chat/SET_OPEN_CHAT', { showChat: true, roomID: user.id })"
+              v-tooltip="{
+                content: $t('notifications.headerMenuButton.chat'),
+                placement: 'bottom-start',
+              }"
+            >
+              <img src="/img/empty/chat-bubble.svg" height="20" />
+            </base-button>
           </div>
           <template v-if="user.about">
             <hr />

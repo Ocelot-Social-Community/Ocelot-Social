@@ -50,7 +50,7 @@ beforeAll(async () => {
     context: () => {
       return {
         user: authenticatedUser,
-        neode: neode,
+        neode,
         driver,
       }
     },
