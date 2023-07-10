@@ -12,7 +12,11 @@ export default {
       if (resolved) {
         resolved.forEach((room) => {
           if (room.users) {
+            // buggy, you must query the username for this to function correctly
             room.roomName = room.users.filter((user) => user.id !== context.user.id)[0].name
+            room.avatar =
+              room.users.filter((user) => user.id !== context.user.id)[0].avatar?.url ||
+              'default-avatar'
             room.users.forEach((user) => {
               user._id = user.id
             })
