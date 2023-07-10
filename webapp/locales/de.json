@@ -580,7 +580,7 @@
     "moreInfo": "Was ist {APPLICATION_NAME}?",
     "moreInfoHint": "zur Präsentationsseite",
     "no-account": "Du hast noch kein Nutzerkonto?",
-    "no-cookie": "Es kann kein Cookie angelegt werden. Du must Cookies akzeptieren.",
+    "no-cookie": "Es kann kein Cookie angelegt werden. Du musst Cookies akzeptieren.",
     "password": "Dein Passwort",
     "register": "Nutzerkonto erstellen",
     "success": "Du bist eingeloggt!"
