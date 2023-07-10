@@ -126,23 +126,23 @@ export default {
       messagesLoaded: true,
       showDemoOptions: true,
       responsiveBreakpoint: 600,
-      singleRoom: !!this.singleRoomId || false
+      singleRoom: !!this.singleRoomId || false,
     }
   },
   mounted() {
-    if(this.singleRoom){
+    if (this.singleRoom) {
       this.$apollo
         .mutate({
           mutation: createRoom(),
           variables: {
-            userId: this.singleRoomId
+            userId: this.singleRoomId,
           },
         })
-        .then((res) => {
+        .then(() => {
           this.$apollo.queries.Rooms.refetch()
         })
-        .catch(() => {
-          console.log(error)
+        .catch((error) => {
+          this.$toast.error(error)
         })
         .finally(() => {
           // this.loading = false
@@ -234,33 +234,40 @@ export default {
   },
   apollo: {
     Rooms: {
-       query() {
-          return roomQuery()
-        },
-        update({ Room }) {
-          console.log('Rooms', Room)
-          if (!Room) {
-            this.rooms = []
-            return
-          }
-
-          // Backend result needs mapping of the following values
-          // room[i].users[j].name -> room[i].users[j].username
-          // room[i].users[j].avatar.url -> room[i].users[j].avatar
-          // also filter rooms for the single room
-          this.rooms = Room.map((r) => {
-            return {...r, users: r.users.map((u) => { return {...u, username: u.name, avatar: u.avatar?.url}})}
-          }).filter((r) => this.singleRoom ? r.users.filter((u) => u.id === this.singleRoomId ).length > 0 : true)
-          
-          console.log(this.rooms)
-        },
-       error(error) {
-          this.rooms = []
-           this.$toast.error(error.message)
-        },
-        fetchPolicy: 'cache-and-network',
+      query() {
+        return roomQuery()
       },
+      update({ Room }) {
+        // console.log('Rooms', Room)
+        if (!Room) {
+          this.rooms = []
+          return
+        }
+
+        // Backend result needs mapping of the following values
+        // room[i].users[j].name -> room[i].users[j].username
+        // room[i].users[j].avatar.url -> room[i].users[j].avatar
+        // also filter rooms for the single room
+        this.rooms = Room.map((r) => {
+          return {
+            ...r,
+            users: r.users.map((u) => {
+              return { ...u, username: u.name, avatar: u.avatar?.url }
+            }),
+          }
+        }).filter((r) =>
+          this.singleRoom ? r.users.filter((u) => u.id === this.singleRoomId).length > 0 : true,
+        )
+
+        // console.log(this.rooms)
+      },
+      error(error) {
+        this.rooms = []
+        this.$toast.error(error.message)
+      },
+      fetchPolicy: 'cache-and-network',
     },
+  },
 }
 </script>
 <style lang="scss">
