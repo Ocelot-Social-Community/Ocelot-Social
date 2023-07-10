@@ -9,11 +9,7 @@
     </span>
     <!-- powered by -->
     {{ $t('footer.poweredBy') }}
-    <a
-      href="https://www.ocelot.social/"
-      target="_blank"
-      data-test="ocelot-link"
-    >
+    <a href="https://www.ocelot.social/" target="_blank" data-test="ocelot-link">
       {{ $t('footer.ocelotSocial') }}
     </a>
     <a
