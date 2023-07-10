@@ -441,6 +441,10 @@
     "follow": "Follow",
     "following": "Following"
   },
+  "footer": {
+    "poweredBy": "Powered by",
+    "ocelotSocial": "ocelot.social"
+  },
   "group": {
     "actionRadii": {
       "continental": "Continental",

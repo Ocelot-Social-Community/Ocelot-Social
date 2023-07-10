@@ -7,13 +7,21 @@
       </page-params-link>
       <span class="division-space">&nbsp;</span>
     </span>
-    <!-- version -->
+    <!-- powered by -->
+    {{ $t('footer.poweredBy') }}
+    <a
+      href="https://www.ocelot.social/"
+      target="_blank"
+      data-test="ocelot-link"
+    >
+      {{ $t('footer.ocelotSocial') }}
+    </a>
     <a
       href="https://github.com/Ocelot-Social-Community/Ocelot-Social/releases"
       target="_blank"
       data-test="version-link"
     >
-      {{ version }}
+      {{ VERSION }}
     </a>
   </div>
 </template>
@@ -27,7 +35,7 @@ export default {
     PageParamsLink,
   },
   data() {
-    return { links, version: `v${this.$env.VERSION}` }
+    return { links, VERSION: `v${this.$env.VERSION}` }
   },
 }
 </script>
