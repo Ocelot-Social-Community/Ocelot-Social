@@ -23,7 +23,7 @@ jobs:
 
   prepare:
     name: Prepare
-    if: needs.files-changed.outputs.webapp == 'true
+    if: needs.files-changed.outputs.webapp == 'true'
     needs: files-changed
     runs-on: ubuntu-latest
     steps:
@@ -37,7 +37,7 @@ jobs:
           
   build_test_webapp:
     name: Docker Build Test - Webapp
-    if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true
+    if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true'
     needs: [files-changed, prepare]
     runs-on: ubuntu-latest
     steps:
@@ -57,7 +57,7 @@ jobs:
 
   lint_webapp:
     name: Lint Webapp
-    if: needs.files-changed.outputs.webapp == 'true
+    if: needs.files-changed.outputs.webapp == 'true'
     needs: files-changed
     runs-on: ubuntu-latest
     steps:
@@ -69,7 +69,7 @@ jobs:
 
   unit_test_webapp:
     name: Unit Tests - Webapp
-    if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true
+    if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true'
     needs: [files-changed, build_test_webapp]
     runs-on: ubuntu-latest
     permissions: 
