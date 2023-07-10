@@ -20,7 +20,7 @@
           x
         </ds-button>
       </ds-text>
-      <chat-module :singleRoom="true" />
+      <chat-module :singleRoomId="$store.getters['chat/showChat'].roomID" />
     </div>
     >
   </div>
