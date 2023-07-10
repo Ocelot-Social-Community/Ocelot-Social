@@ -759,9 +759,9 @@
     "viewEvent": {
       "eventEnd": "End",
       "eventIsOnline": "Online",
-      "eventLocationName": "City",
+      "eventLocationName": "City - e.g. Example street 1, 12345 City",
       "eventStart": "Start",
-      "eventVenue": "Venue",
+      "eventVenue": "Venue - e.g. Backyard, 1st Floor, ...",
       "title": "Event"
     },
     "viewPost": {
