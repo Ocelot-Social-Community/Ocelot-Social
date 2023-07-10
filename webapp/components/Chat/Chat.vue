@@ -93,35 +93,17 @@ export default {
         CANCEL_SELECT_MESSAGE: 'Annuler Sélection',
       },
       roomActions: [
-        /* {
+        /*
+        {
           name: 'archiveRoom',
           title: 'Archive Room',
-        }, */
-        // { name: 'inviteUser', title: 'Invite User' },
-        // { name: 'removeUser', title: 'Remove User' },
-        // { name: 'deleteRoom', title: 'Delete Room' },
-      ],
-      rooms: [
-        /* {
-          roomId: '1',
-          roomName: 'John Snow',
-          avatar: 'https://66.media.tumblr.com/avatar_c6a8eae4303e_512.pnj',
-          users: [
-            { _id: '1234', username: 'John Doe' },
-            { _id: '4321', username: 'John Snow' },
-          ],
         },
-        {
-          roomId: '2',
-          roomName: 'Max J. Mustermann',
-          avatar:
-            'https://64.media.tumblr.com/8889b6e26370f4e3837584c1c59721a6/f4f76ed6b0249d08-4b/s1280x1920/810e9e5fa724366d26c10c0fa22ba97dad8778d1.pnj',
-          users: [
-            { _id: '1234', username: 'Johnx Doe' },
-            { _id: '43210', username: 'Max J. Mustermann' },
-          ],
-        }, */
+        { name: 'inviteUser', title: 'Invite User' },
+        { name: 'removeUser', title: 'Remove User' },
+        { name: 'deleteRoom', title: 'Delete Room' },
+        */
       ],
+      rooms: [],
       messages: [],
       messagesLoaded: true,
       showDemoOptions: true,
