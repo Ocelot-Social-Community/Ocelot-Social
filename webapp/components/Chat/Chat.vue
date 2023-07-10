@@ -3,7 +3,7 @@
     <client-only>
       <vue-advanced-chat
         :theme="theme"
-        :current-user-id="currentUserId"
+        :current-user-id="currentUser.id"
         :room-id="null"
         :template-actions="JSON.stringify(templatesText)"
         :menu-actions="JSON.stringify(menuActions)"
@@ -29,6 +29,7 @@
 <script>
 import { roomQuery, createRoom } from '~/graphql/Rooms'
 import { messageQuery, createMessageMutation } from '~/graphql/Messages'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Chat',
@@ -43,7 +44,6 @@ export default {
   },
   data() {
     return {
-      currentUserId: this.$store.getters['auth/user'].id,
       menuActions: [
         /* {
           name: 'inviteUser',
@@ -130,6 +130,11 @@ export default {
           // this.loading = false
         })
     }
+  },
+  computed: {
+    ...mapGetters({
+      currentUser: 'auth/user',
+    }),
   },
   methods: {
     fetchMessages({ room, options = {} }) {
