@@ -27,7 +27,7 @@
 </template>
 
 <script>
-// import { roomQuery } from '~/graphql/Rooms'
+import { roomQuery, createRoom } from '~/graphql/Rooms'
 import { messageQuery } from '~/graphql/Messages'
 
 export default {
@@ -36,16 +36,16 @@ export default {
     theme: {
       type: String,
     },
-    singleRoom: {
-      type: Boolean,
-      default: false,
+    singleRoomId: {
+      type: String,
+      default: null,
     },
   },
   data() {
     return {
       currentUserId: '1234',
       menuActions: [
-        {
+        /* {
           name: 'inviteUser',
           title: 'Invite User',
         },
@@ -56,7 +56,7 @@ export default {
         {
           name: 'deleteRoom',
           title: 'Delete Room',
-        },
+        }, */
       ],
       messageActions: [
         {
@@ -93,16 +93,16 @@ export default {
         CANCEL_SELECT_MESSAGE: 'Annuler Sélection',
       },
       roomActions: [
-        {
+        /* {
           name: 'archiveRoom',
           title: 'Archive Room',
-        },
-        { name: 'inviteUser', title: 'Invite User' },
-        { name: 'removeUser', title: 'Remove User' },
-        { name: 'deleteRoom', title: 'Delete Room' },
+        }, */
+        // { name: 'inviteUser', title: 'Invite User' },
+        // { name: 'removeUser', title: 'Remove User' },
+        // { name: 'deleteRoom', title: 'Delete Room' },
       ],
       rooms: [
-        {
+        /* {
           roomId: '1',
           roomName: 'John Snow',
           avatar: 'https://66.media.tumblr.com/avatar_c6a8eae4303e_512.pnj',
@@ -120,15 +120,35 @@ export default {
             { _id: '1234', username: 'Johnx Doe' },
             { _id: '43210', username: 'Max J. Mustermann' },
           ],
-        },
+        }, */
       ],
       messages: [],
       messagesLoaded: true,
       showDemoOptions: true,
       responsiveBreakpoint: 600,
+      singleRoom: !!this.singleRoomId || false
     }
   },
-
+  mounted() {
+    if(this.singleRoom){
+      this.$apollo
+        .mutate({
+          mutation: createRoom(),
+          variables: {
+            userId: this.singleRoomId
+          },
+        })
+        .then((res) => {
+          this.$apollo.queries.Rooms.refetch()
+        })
+        .catch(() => {
+          console.log(error)
+        })
+        .finally(() => {
+          // this.loading = false
+        })
+    }
+  },
   methods: {
     fetchMessages({ room, options = {} }) {
       // console.log(room, options)
@@ -212,26 +232,35 @@ export default {
       }, 2000)
     },
   },
-  //   apollo: {
-  //     Rooms: {
-  //       query() {
-  //         return roomQuery()
-  //       },
-  //       update({ Room }) {
-  //         console.log('Rooms', Room)
-  //         if (!Room) {
-  //           this.rooms = []
-  //           return
-  //         }
-  //         this.rooms = Room
-  //       },
-  //       error(error) {
-  //         this.rooms = []
-  //         this.$toast.error(error.message)
-  //       },
-  //       fetchPolicy: 'cache-and-network',
-  //     },
-  //   },
+  apollo: {
+    Rooms: {
+       query() {
+          return roomQuery()
+        },
+        update({ Room }) {
+          console.log('Rooms', Room)
+          if (!Room) {
+            this.rooms = []
+            return
+          }
+
+          // Backend result needs mapping of the following values
+          // room[i].users[j].name -> room[i].users[j].username
+          // room[i].users[j].avatar.url -> room[i].users[j].avatar
+          // also filter rooms for the single room
+          this.rooms = Room.map((r) => {
+            return {...r, users: r.users.map((u) => { return {...u, username: u.name, avatar: u.avatar?.url}})}
+          }).filter((r) => this.singleRoom ? r.users.filter((u) => u.id === this.singleRoomId ).length > 0 : true)
+          
+          console.log(this.rooms)
+        },
+       error(error) {
+          this.rooms = []
+           this.$toast.error(error.message)
+        },
+        fetchPolicy: 'cache-and-network',
+      },
+    },
 }
 </script>
 <style lang="scss">
