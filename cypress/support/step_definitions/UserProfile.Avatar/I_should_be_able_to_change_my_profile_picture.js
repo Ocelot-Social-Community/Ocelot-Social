@@ -4,9 +4,9 @@ Then("I should be able to change my profile picture", () => {
   const avatarUpload = "onourjourney.png";
   
   cy.fixture(avatarUpload, "base64").then(fileContent => {
-    cy.get("#customdropzone").upload(
-      { fileContent, fileName: avatarUpload, mimeType: "image/png" },
-      { subjectType: "drag-n-drop", force: true }
+    cy.get("#customdropzone").selectFile(
+      { fileName: avatarUpload, mimeType: "image/png" },
+      { action: 'drag-drop' }
     );
   });
   cy.get(".profile-page-avatar img")
