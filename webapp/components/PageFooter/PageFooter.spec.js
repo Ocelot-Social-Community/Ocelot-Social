@@ -54,6 +54,10 @@ describe('PageFooter.vue', () => {
       it('renders version', () => {
         expect(wrapper.find('a[data-test="version-link"]').exists()).toBeTruthy()
       })
+
+      it('renders ocelot.social link', () => {
+        expect(wrapper.find('a[data-test="ocelot-link"]').exists()).toBeTruthy()
+      })
     })
 
     describe('flexible links not set', () => {
