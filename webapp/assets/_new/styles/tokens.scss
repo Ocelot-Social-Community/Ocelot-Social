@@ -410,5 +410,24 @@ $color-ribbon-article-active: $background-color-secondary-active;
 
 
 :export {
-    colorYellow: $color-yellow;
+    colorPrimary: $color-primary;
+    colorPrimaryActive: $color-primary-active;
+    colorPrimaryLight: $color-primary-light;
+
+    borderColorSoft: $border-color-soft;
+
+    borderRadiusBase: $border-radius-base;
+
+    textColorBase: $text-color-base;
+    textColorSoft: $text-color-soft;
+    textColorInverse: $text-color-inverse;
+
+    boxShadowBase: $box-shadow-base;
+
+    backgroundColorBase: $background-color-base;
+    backgroundColorSoft: $background-color-soft;
+    backgroundColorSoftest: $background-color-softest;
+    backgroundColorPrimary: $background-color-primary;
+
+    colorNeutral30: $color-neutral-30;
 }

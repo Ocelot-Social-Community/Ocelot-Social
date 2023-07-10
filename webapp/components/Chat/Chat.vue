@@ -92,7 +92,7 @@ export default {
         IS_ONLINE: this.$t('chat.isOnline'),
         LAST_SEEN: this.$t('chat.lastSeen'),
         IS_TYPING: this.$t('chat.isTyping'),
-        CANCEL_SELECT_MESSAGE: this.$t('chat.cancelSelectMessage')
+        CANCEL_SELECT_MESSAGE: this.$t('chat.cancelSelectMessage'),
       },
       roomActions: [
         {
@@ -132,10 +132,11 @@ export default {
   },
 
   computed: {
-    computedChatStyle(){
+    computedChatStyle() {
+      // TODO light/dark theme still needed?
       // return this.theme === 'light' ? chatStyle.STYLE.light : chatStyle.STYLE.dark
       return chatStyle.STYLE.light
-    }
+    },
   },
   methods: {
     fetchMessages({ room, options = {} }) {
