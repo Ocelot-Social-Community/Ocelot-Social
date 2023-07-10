@@ -33,7 +33,6 @@
     "cross-env": "^7.0.3",
     "cucumber": "^6.0.5",
     "cypress": "^12.6.0",
-    "cypress-file-upload": "^3.5.3",
     "date-fns": "^2.30.0",
     "dotenv": "^8.2.0",
     "expect": "^29.5.0",
