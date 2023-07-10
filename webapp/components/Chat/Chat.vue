@@ -1,0 +1,259 @@
+<template>
+  <div>
+    <client-only>
+      <vue-advanced-chat
+        :theme="theme"
+        :current-user-id="currentUserId"
+        :room-id="null"
+        :template-actions="JSON.stringify(templatesText)"
+        :menu-actions="JSON.stringify(menuActions)"
+        :text-messages="JSON.stringify(textMessages)"
+        :messages="JSON.stringify(messages)"
+        :messages-loaded="messagesLoaded"
+        :rooms="JSON.stringify(rooms)"
+        :room-actions="JSON.stringify(roomActions)"
+        :rooms-loaded="true"
+        show-files="false"
+        show-audio="false"
+        :show-footer="true"
+        @send-message="sendMessage($event.detail[0])"
+        @fetch-messages="fetchMessages($event.detail[0])"
+        :responsive-breakpoint="responsiveBreakpoint"
+        :single-room="singleRoom"
+        @show-demo-options="showDemoOptions = $event"
+      />
+    </client-only>
+  </div>
+</template>
+
+<script>
+import { roomQuery, createRoom } from '~/graphql/Rooms'
+import { messageQuery } from '~/graphql/Messages'
+
+export default {
+  name: 'Chat',
+  props: {
+    theme: {
+      type: String,
+    },
+    singleRoomId: {
+      type: String,
+      default: null,
+    },
+  },
+  data() {
+    return {
+      currentUserId: '1234',
+      menuActions: [
+        /* {
+          name: 'inviteUser',
+          title: 'Invite User',
+        },
+        {
+          name: 'removeUser',
+          title: 'Remove User',
+        },
+        {
+          name: 'deleteRoom',
+          title: 'Delete Room',
+        }, */
+      ],
+      messageActions: [
+        {
+          name: 'addMessageToFavorite',
+          title: 'Add To Favorite',
+        },
+        {
+          name: 'shareMessage',
+          title: 'Share Message',
+        },
+      ],
+      templatesText: [
+        {
+          tag: 'help',
+          text: 'This is the help',
+        },
+        {
+          tag: 'action',
+          text: 'This is the action',
+        },
+      ],
+      textMessages: {
+        ROOMS_EMPTY: 'Aucune conversation',
+        ROOM_EMPTY: 'Aucune conversation sélectionnée',
+        NEW_MESSAGES: 'Nouveaux messages',
+        MESSAGE_DELETED: 'Ce message a été supprimé',
+        MESSAGES_EMPTY: 'Aucun message',
+        CONVERSATION_STARTED: 'La conversation a commencée le :',
+        TYPE_MESSAGE: 'Tapez votre message',
+        SEARCH: 'Rechercher',
+        IS_ONLINE: 'est en ligne',
+        LAST_SEEN: 'dernière connexion ',
+        IS_TYPING: 'est en train de taper...',
+        CANCEL_SELECT_MESSAGE: 'Annuler Sélection',
+      },
+      roomActions: [
+        /*
+        {
+          name: 'archiveRoom',
+          title: 'Archive Room',
+        },
+        { name: 'inviteUser', title: 'Invite User' },
+        { name: 'removeUser', title: 'Remove User' },
+        { name: 'deleteRoom', title: 'Delete Room' },
+        */
+      ],
+      rooms: [],
+      messages: [],
+      messagesLoaded: true,
+      showDemoOptions: true,
+      responsiveBreakpoint: 600,
+      singleRoom: !!this.singleRoomId || false,
+    }
+  },
+  mounted() {
+    if (this.singleRoom) {
+      this.$apollo
+        .mutate({
+          mutation: createRoom(),
+          variables: {
+            userId: this.singleRoomId,
+          },
+        })
+        .then(() => {
+          this.$apollo.queries.Rooms.refetch()
+        })
+        .catch((error) => {
+          this.$toast.error(error)
+        })
+        .finally(() => {
+          // this.loading = false
+        })
+    }
+  },
+  methods: {
+    fetchMessages({ room, options = {} }) {
+      // console.log(room, options)
+      this.messagesLoaded = false
+      setTimeout(async () => {
+        if (options.reset) {
+          // console.log('reset messages')
+          this.messages = [] // this.addMessages(true)
+        } else {
+          try {
+            const {
+              data: { Message },
+            } = await this.$apollo.query({
+              query: messageQuery(),
+              variables: {
+                roomId: room.id,
+              },
+            })
+            // console.log('Messages', Message)
+            this.messages = Message
+          } catch (error) {
+            // console.log('Error', error)
+            this.messages = [] // this.addMessages(true)
+            this.$toast.error(error.message)
+          }
+        }
+        this.messagesLoaded = true
+      })
+    },
+
+    /* addMessages(reset) {
+      const messages = []
+
+      for (let i = 0; i < 30; i++) {
+        messages.push({
+          _id: reset ? i : this.messages.length + i,
+          content: `${reset ? '' : 'paginated'} message ${i + 1}`,
+          senderId: '4321',
+          username: 'John Doe',
+          date: '13 November',
+          timestamp: '10:20',
+        })
+      }
+      messages.push({
+        _id: '31',
+        content: `Hallo Welt`,
+        senderId: '1234',
+        username: 'John Doe',
+        date: '13 November',
+        timestamp: '10:20',
+      })
+
+      return messages
+    }, */
+
+    sendMessage(message) {
+      this.messages = [
+        ...this.messages,
+        {
+          _id: this.messages.length,
+          content: message.content,
+          senderId: this.currentUserId,
+          timestamp: new Date().toString().substring(16, 21),
+          date: new Date().toDateString(),
+        },
+      ]
+    },
+
+    addNewMessage() {
+      setTimeout(() => {
+        this.messages = [
+          ...this.messages,
+          {
+            _id: this.messages.length,
+            content: 'NEW MESSAGE',
+            senderId: '1234',
+            timestamp: new Date().toString().substring(16, 21),
+            date: new Date().toDateString(),
+          },
+        ]
+      }, 2000)
+    },
+  },
+  apollo: {
+    Rooms: {
+      query() {
+        return roomQuery()
+      },
+      update({ Room }) {
+        // console.log('Rooms', Room)
+        if (!Room) {
+          this.rooms = []
+          return
+        }
+
+        // Backend result needs mapping of the following values
+        // room[i].users[j].name -> room[i].users[j].username
+        // room[i].users[j].avatar.url -> room[i].users[j].avatar
+        // also filter rooms for the single room
+        this.rooms = Room.map((r) => {
+          return {
+            ...r,
+            users: r.users.map((u) => {
+              return { ...u, username: u.name, avatar: u.avatar?.url }
+            }),
+          }
+        }).filter((r) =>
+          this.singleRoom ? r.users.filter((u) => u.id === this.singleRoomId).length > 0 : true,
+        )
+
+        // console.log(this.rooms)
+      },
+      error(error) {
+        this.rooms = []
+        this.$toast.error(error.message)
+      },
+      fetchPolicy: 'cache-and-network',
+    },
+  },
+}
+</script>
+<style lang="scss">
+body {
+  font-family: 'Quicksand', sans-serif;
+}
+</style>

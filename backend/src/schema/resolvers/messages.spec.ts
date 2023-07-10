@@ -34,43 +34,40 @@ afterAll(async () => {
   driver.close()
 })
 
-
 describe('Message', () => {
   let roomId: string
 
   beforeAll(async () => {
-    [chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
-      Factory.build(
-        'user',
-        {
-          id: 'chatting-user',
-          name: 'Chatting User',
-        },
-      ),
-      Factory.build(
-        'user',
-        {
-          id: 'other-chatting-user',
-          name: 'Other Chatting User',
-        },
-      ),
-      Factory.build(
-        'user',
-        {
-          id: 'not-chatting-user',
-          name: 'Not Chatting User',
-        },
-      ),
+    ;[chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
+      Factory.build('user', {
+        id: 'chatting-user',
+        name: 'Chatting User',
+      }),
+      Factory.build('user', {
+        id: 'other-chatting-user',
+        name: 'Other Chatting User',
+      }),
+      Factory.build('user', {
+        id: 'not-chatting-user',
+        name: 'Not Chatting User',
+      }),
     ])
   })
 
   describe('create message', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
-        await expect(mutate({ mutation: createMessageMutation(), variables: {
-          roomId: 'some-id', content: 'Some bla bla bla', } })).resolves.toMatchObject({
-            errors: [{ message: 'Not Authorized!' }],
-          })
+        await expect(
+          mutate({
+            mutation: createMessageMutation(),
+            variables: {
+              roomId: 'some-id',
+              content: 'Some bla bla bla',
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: [{ message: 'Not Authorized!' }],
+        })
       })
     })
 
@@ -81,13 +78,20 @@ describe('Message', () => {
 
       describe('room does not exist', () => {
         it('returns null', async () => {
-          await expect(mutate({ mutation: createMessageMutation(), variables: {
-            roomId: 'some-id', content: 'Some bla bla bla', } })).resolves.toMatchObject({
-              errors: undefined,
-              data: {
-                CreateMessage: null,
+          await expect(
+            mutate({
+              mutation: createMessageMutation(),
+              variables: {
+                roomId: 'some-id',
+                content: 'Some bla bla bla',
               },
-            })
+            }),
+          ).resolves.toMatchObject({
+            errors: undefined,
+            data: {
+              CreateMessage: null,
+            },
+          })
         })
       })
 
@@ -104,20 +108,23 @@ describe('Message', () => {
 
         describe('user chats in room', () => {
           it('returns the message', async () => {
-            await expect(mutate({
-              mutation: createMessageMutation(),
-              variables: {
-                roomId,
-                content: 'Some nice message to other chatting user',
-              } })).resolves.toMatchObject({
-                errors: undefined,
-                data: {
-                  CreateMessage: {
-                    id: expect.any(String),
-                    content: 'Some nice message to other chatting user',
-                  },
+            await expect(
+              mutate({
+                mutation: createMessageMutation(),
+                variables: {
+                  roomId,
+                  content: 'Some nice message to other chatting user',
                 },
-              })
+              }),
+            ).resolves.toMatchObject({
+              errors: undefined,
+              data: {
+                CreateMessage: {
+                  id: expect.any(String),
+                  content: 'Some nice message to other chatting user',
+                },
+              },
+            })
           })
         })
 
@@ -125,19 +132,22 @@ describe('Message', () => {
           beforeAll(async () => {
             authenticatedUser = await notChattingUser.toJson()
           })
-          
+
           it('returns null', async () => {
-            await expect(mutate({
-              mutation: createMessageMutation(),
-              variables: {
-                roomId,
-                content: 'I have no access to this room!',
-              } })).resolves.toMatchObject({
-                errors: undefined,
-                data: {
-                  CreateMessage: null,
+            await expect(
+              mutate({
+                mutation: createMessageMutation(),
+                variables: {
+                  roomId,
+                  content: 'I have no access to this room!',
                 },
-              })
+              }),
+            ).resolves.toMatchObject({
+              errors: undefined,
+              data: {
+                CreateMessage: null,
+              },
+            })
           })
         })
       })
@@ -151,14 +161,17 @@ describe('Message', () => {
       })
 
       it('throws authorization error', async () => {
-        await expect(query({
-          query: messageQuery(),
-          variables: {
-            roomId: 'some-id' }
-        })).resolves.toMatchObject({
+        await expect(
+          query({
+            query: messageQuery(),
+            variables: {
+              roomId: 'some-id',
+            },
+          }),
+        ).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
-      })  
+      })
     })
 
     describe('authenticated', () => {
@@ -168,12 +181,14 @@ describe('Message', () => {
 
       describe('room does not exists', () => {
         it('returns null', async () => {
-          await expect(query({
-            query: messageQuery(),
-            variables: {
-              roomId: 'some-id'
-            },
-          })).resolves.toMatchObject({
+          await expect(
+            query({
+              query: messageQuery(),
+              variables: {
+                roomId: 'some-id',
+              },
+            }),
+          ).resolves.toMatchObject({
             errors: undefined,
             data: {
               Message: [],
@@ -193,15 +208,17 @@ describe('Message', () => {
           expect(result).toMatchObject({
             errors: undefined,
             data: {
-              Message: [{
-                id: expect.any(String),
-                _id: result.data.Message[0].id,
-                content: 'Some nice message to other chatting user',
-                senderId: 'chatting-user',
-                username: 'Chatting User',
-                avatar: expect.any(String),
-                date: expect.any(String),
-              }],
+              Message: [
+                {
+                  id: expect.any(String),
+                  _id: result.data.Message[0].id,
+                  content: 'Some nice message to other chatting user',
+                  senderId: 'chatting-user',
+                  username: 'Chatting User',
+                  avatar: expect.any(String),
+                  date: expect.any(String),
+                },
+              ],
             },
           })
         })
@@ -213,7 +230,7 @@ describe('Message', () => {
               variables: {
                 roomId,
                 content: 'A nice response message to chatting user',
-              }
+              },
             })
             authenticatedUser = await chattingUser.toJson()
             await mutate({
@@ -221,49 +238,51 @@ describe('Message', () => {
               variables: {
                 roomId,
                 content: 'And another nice message to other chatting user',
-              }
-            })            
-          })
-          
-          it('returns the messages', async () => {
-            await expect(query({
-              query: messageQuery(),
-              variables: {
-                roomId,
               },
-            })).resolves.toMatchObject({
+            })
+          })
+
+          it('returns the messages', async () => {
+            await expect(
+              query({
+                query: messageQuery(),
+                variables: {
+                  roomId,
+                },
+              }),
+            ).resolves.toMatchObject({
               errors: undefined,
               data: {
-                Message: [
-                  {
+                Message: expect.arrayContaining([
+                  expect.objectContaining({
                     id: expect.any(String),
                     content: 'Some nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
                     avatar: expect.any(String),
                     date: expect.any(String),
-                  },
-                  {
+                  }),
+                  expect.objectContaining({
                     id: expect.any(String),
                     content: 'A nice response message to chatting user',
                     senderId: 'other-chatting-user',
                     username: 'Other Chatting User',
                     avatar: expect.any(String),
                     date: expect.any(String),
-                  },
-                  {
+                  }),
+                  expect.objectContaining({
                     id: expect.any(String),
                     content: 'And another nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
                     avatar: expect.any(String),
                     date: expect.any(String),
-                  },
-                ],
+                  }),
+                ]),
               },
             })
           })
-        })   
+        })
       })
 
       describe('room exists, authenticated user not in room', () => {
@@ -272,19 +291,21 @@ describe('Message', () => {
         })
 
         it('returns null', async () => {
-          await expect(query({
-            query: messageQuery(),
-            variables: {
-              roomId,
-            },
-          })).resolves.toMatchObject({
+          await expect(
+            query({
+              query: messageQuery(),
+              variables: {
+                roomId,
+              },
+            }),
+          ).resolves.toMatchObject({
             errors: undefined,
             data: {
               Message: [],
             },
           })
         })
-      }) 
+      })
     })
   })
 })

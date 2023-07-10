@@ -14,6 +14,7 @@ ARG CONFIGURATION=example
 # copy public constants into the Docker image to brand it
 COPY configurations/${CONFIGURATION}/branding/static/ static/
 COPY configurations/${CONFIGURATION}/branding/constants/ constants/
+RUN /bin/sh -c 'cd constants && for f in *.ts; do mv -- "$f" "${f%.ts}.js"; done'
 COPY configurations/${CONFIGURATION}/branding/locales/html/ locales/html/
 COPY configurations/${CONFIGURATION}/branding/assets/styles/imports/ assets/styles/imports/
 COPY configurations/${CONFIGURATION}/branding/assets/fonts/ assets/fonts/

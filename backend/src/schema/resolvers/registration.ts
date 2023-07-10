@@ -28,7 +28,7 @@ export default {
     },
     SignupVerification: async (_parent, args, context) => {
       const { termsAndConditionsAgreedVersion } = args
-      const regEx = new RegExp(/^[0-9]+\.[0-9]+\.[0-9]+$/g)
+      const regEx = /^[0-9]+\.[0-9]+\.[0-9]+$/g
       if (!regEx.test(termsAndConditionsAgreedVersion)) {
         throw new UserInputError('Invalid version format!')
       }
