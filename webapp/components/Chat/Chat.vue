@@ -28,7 +28,7 @@
 
 <script>
 import { roomQuery, createRoom } from '~/graphql/Rooms'
-import { messageQuery } from '~/graphql/Messages'
+import { messageQuery, createMessageMutation } from '~/graphql/Messages'
 
 export default {
   name: 'Chat',
@@ -43,7 +43,7 @@ export default {
   },
   data() {
     return {
-      currentUserId: '1234',
+      currentUserId: this.$store.getters['auth/user'].id,
       menuActions: [
         /* {
           name: 'inviteUser',
@@ -133,85 +133,44 @@ export default {
   },
   methods: {
     fetchMessages({ room, options = {} }) {
-      // console.log(room, options)
       this.messagesLoaded = false
       setTimeout(async () => {
-        if (options.reset) {
-          // console.log('reset messages')
-          this.messages = [] // this.addMessages(true)
-        } else {
-          try {
-            const {
-              data: { Message },
-            } = await this.$apollo.query({
-              query: messageQuery(),
-              variables: {
-                roomId: room.id,
-              },
-            })
-            // console.log('Messages', Message)
-            this.messages = Message
-          } catch (error) {
-            // console.log('Error', error)
-            this.messages = [] // this.addMessages(true)
-            this.$toast.error(error.message)
-          }
+        try {
+          const {
+            data: { Message },
+          } = await this.$apollo.query({
+            query: messageQuery(),
+            variables: {
+              roomId: room.id,
+            },
+            fetchPolicy: 'no-cache',
+          })
+          this.messages = Message
+        } catch (error) {
+          this.messages = []
+          this.$toast.error(error.message)
         }
         this.messagesLoaded = true
       })
     },
 
-    /* addMessages(reset) {
-      const messages = []
-
-      for (let i = 0; i < 30; i++) {
-        messages.push({
-          _id: reset ? i : this.messages.length + i,
-          content: `${reset ? '' : 'paginated'} message ${i + 1}`,
-          senderId: '4321',
-          username: 'John Doe',
-          date: '13 November',
-          timestamp: '10:20',
-        })
-      }
-      messages.push({
-        _id: '31',
-        content: `Hallo Welt`,
-        senderId: '1234',
-        username: 'John Doe',
-        date: '13 November',
-        timestamp: '10:20',
-      })
-
-      return messages
-    }, */
-
-    sendMessage(message) {
-      this.messages = [
-        ...this.messages,
-        {
-          _id: this.messages.length,
-          content: message.content,
-          senderId: this.currentUserId,
-          timestamp: new Date().toString().substring(16, 21),
-          date: new Date().toDateString(),
-        },
-      ]
+    refetchMessage(roomId) {
+      this.fetchMessages({room: this.rooms.find((r) => r.roomId === roomId)})
     },
 
-    addNewMessage() {
-      setTimeout(() => {
-        this.messages = [
-          ...this.messages,
-          {
-            _id: this.messages.length,
-            content: 'NEW MESSAGE',
-            senderId: '1234',
-            timestamp: new Date().toString().substring(16, 21),
-            date: new Date().toDateString(),
+    async sendMessage(message) {
+      try {
+        const result = await this.$apollo.mutate({
+          mutation: createMessageMutation(),
+          variables: {
+            roomId: message.roomId,
+            content: message.content
           },
-        ]
-      }, 2000)
+        })
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+      this.refetchMessage(message.roomId)
     },
   },
   apollo: {
@@ -220,7 +179,6 @@ export default {
         return roomQuery()
       },
       update({ Room }) {
-        // console.log('Rooms', Room)
         if (!Room) {
           this.rooms = []
           return
@@ -240,14 +198,12 @@ export default {
         }).filter((r) =>
           this.singleRoom ? r.users.filter((u) => u.id === this.singleRoomId).length > 0 : true,
         )
-
-        // console.log(this.rooms)
       },
       error(error) {
         this.rooms = []
         this.$toast.error(error.message)
       },
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'no-cache',
     },
   },
 }
