@@ -92,6 +92,10 @@
               <client-only v-if="!isEmpty(this.$env.MAPBOX_TOKEN)">
                 <map-button />
               </client-only>
+              <!-- chat menü -->
+              <client-only>
+                <chat-notification-menu placement="top" />
+              </client-only>
               <!-- avatar menu -->
               <client-only>
                 <avatar-menu placement="top" />
@@ -265,6 +269,7 @@ import SearchField from '~/components/features/SearchField/SearchField.vue'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
 import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
+import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotificationMenu'
 
 export default {
   components: {
@@ -278,6 +283,7 @@ export default {
     NotificationMenu,
     PageParamsLink,
     SearchField,
+    ChatNotificationMenu,
   },
   props: {
     showMobileMenu: { type: Boolean, default: false },

@@ -2,14 +2,8 @@ import gql from 'graphql-tag'
 
 export const createMessageMutation = () => {
   return gql`
-    mutation (
-      $roomId: ID!
-      $content: String!
-    ) {
-      CreateMessage(
-        roomId: $roomId
-        content: $content
-      ) {
+    mutation ($roomId: ID!, $content: String!) {
+      CreateMessage(roomId: $roomId, content: $content) {
         id
         content
       }
@@ -19,7 +13,7 @@ export const createMessageMutation = () => {
 
 export const messageQuery = () => {
   return gql`
-    query($roomId: ID!) {
+    query ($roomId: ID!) {
       Message(roomId: $roomId) {
         _id
         id

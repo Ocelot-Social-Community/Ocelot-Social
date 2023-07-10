@@ -1,22 +1,22 @@
 import uniqueSlug from './uniqueSlug'
 
 describe('uniqueSlug', () => {
-  it('slugifies given string', () => {
+  it('slugifies given string', async () => {
     const string = 'Hello World'
     const isUnique = jest.fn().mockResolvedValue(true)
-    expect(uniqueSlug(string, isUnique)).resolves.toEqual('hello-world')
+    await expect(uniqueSlug(string, isUnique)).resolves.toEqual('hello-world')
   })
 
-  it('increments slugified string until unique', () => {
+  it('increments slugified string until unique', async () => {
     const string = 'Hello World'
     const isUnique = jest.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true)
-    expect(uniqueSlug(string, isUnique)).resolves.toEqual('hello-world-1')
+    await expect(uniqueSlug(string, isUnique)).resolves.toEqual('hello-world-1')
   })
 
-  it('slugify null string', () => {
+  it('slugify null string', async () => {
     const string = null
     const isUnique = jest.fn().mockResolvedValue(true)
-    expect(uniqueSlug(string, isUnique)).resolves.toEqual('anonymous')
+    await expect(uniqueSlug(string, isUnique)).resolves.toEqual('anonymous')
   })
 
   it('Converts umlaut to a two letter equivalent', async () => {

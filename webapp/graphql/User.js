@@ -243,6 +243,7 @@ export const notificationAdded = () => {
     ${userFragment}
     ${commentFragment}
     ${postFragment}
+    ${groupFragment}
 
     subscription notifications($userId: ID!) {
       notificationAdded(userId: $userId) {
@@ -251,6 +252,9 @@ export const notificationAdded = () => {
         reason
         createdAt
         updatedAt
+        to {
+          ...user
+        }
         from {
           __typename
           ... on Post {
@@ -271,6 +275,12 @@ export const notificationAdded = () => {
               }
             }
           }
+          ... on Group {
+            ...group
+          }
+        }
+        relatedUser {
+          ...user
         }
       }
     }

@@ -692,6 +692,7 @@
     },
     "group": "Description",
     "headerMenuButton": {
+      "chat": "My Chat",
       "tooltip": "My notifications"
     },
     "markAllAsRead": "Mark all as read",
