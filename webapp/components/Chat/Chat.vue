@@ -155,16 +155,16 @@ export default {
     },
 
     refetchMessage(roomId) {
-      this.fetchMessages({room: this.rooms.find((r) => r.roomId === roomId)})
+      this.fetchMessages({ room: this.rooms.find((r) => r.roomId === roomId) })
     },
 
     async sendMessage(message) {
       try {
-        const result = await this.$apollo.mutate({
+        await this.$apollo.mutate({
           mutation: createMessageMutation(),
           variables: {
             roomId: message.roomId,
-            content: message.content
+            content: message.content,
           },
         })
       } catch (error) {
