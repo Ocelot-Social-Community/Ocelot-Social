@@ -442,8 +442,8 @@
     "following": "Folge Ich"
   },
   "footer": {
-    "poweredBy": "Powered by",
-    "ocelotSocial": "ocelot.social"
+    "ocelotSocial": "ocelot.social",
+    "poweredBy": "Powered by"
   },
   "group": {
     "actionRadii": {
