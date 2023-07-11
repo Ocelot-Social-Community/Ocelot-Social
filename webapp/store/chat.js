@@ -1,14 +1,14 @@
 export const state = () => {
   return {
     showChat: false,
-    roomID: 'u0',
+    roomID: null,
   }
 }
 
 export const mutations = {
   SET_OPEN_CHAT(state, ctx) {
     state.showChat = ctx.showChat || false
-    state.roomID = ctx.roomID || 'u0'
+    state.roomID = ctx.roomID || null
   },
 }
 
