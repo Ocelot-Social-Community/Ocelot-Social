@@ -29,7 +29,7 @@ jobs:
           wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
           chmod +x /opt/cucumber-json-formatter
           sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
-          cd e2e-tests/
+          cd cypress/
           yarn
 
       - name: cypress | Fullstack tests
