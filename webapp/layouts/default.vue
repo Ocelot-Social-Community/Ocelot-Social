@@ -13,14 +13,14 @@
     <client-only>
       <modal />
     </client-only>
-    <div v-if="$store.getters['chat/showChat'].showChat" class="chat-modul">
+    <div v-if="showChat.showChat" class="chat-modul">
       <ds-text align="right" class="close">
-        RoomID: {{ $store.getters['chat/showChat'].roomID }}
-        <ds-button @click="$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: 'u0' })">
+        RoomID: {{ showChat.roomID }}
+        <ds-button @click="SET_OPEN_CHAT({ showChat: false, roomID: null })">
           x
         </ds-button>
       </ds-text>
-      <chat-module :singleRoomId="$store.getters['chat/showChat'].roomID" />
+      <chat-module :singleRoomId="showChat.roomID" />
     </div>
     >
   </div>
@@ -32,6 +32,7 @@ import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
 import Modal from '~/components/Modal'
 import PageFooter from '~/components/PageFooter/PageFooter'
 import ChatModule from '~/components/Chat/Chat.vue'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   components: {
@@ -41,6 +42,14 @@ export default {
     ChatModule,
   },
   mixins: [seo, mobile()],
+  computed: {
+    ...mapGetters({
+      showChat: 'chat/showChat',
+    }),
+    ...mapMutations({
+      SET_OPEN_CHAT: 'chat/SET_OPEN_CHAT'
+    })
+  },
 }
 </script>
 
