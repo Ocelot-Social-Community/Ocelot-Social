@@ -15,12 +15,9 @@
     </client-only>
     <div v-if="$store.getters['chat/showChat'].showChat" class="chat-modul">
       <ds-text align="right" class="close">
-        RoomID: {{ $store.getters['chat/showChat'].roomID }}
-        <ds-button @click="$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: 'u0' })">
-          x
-        </ds-button>
+        RoomID: {{ $store.getters['chat/showChat'].roomID }}        
       </ds-text>
-      <chat-module :singleRoomId="$store.getters['chat/showChat'].roomID" />
+      <chat-module v-on:close-single-room="closeSingleRoom" :singleRoomId="$store.getters['chat/showChat'].roomID" />
     </div>
     >
   </div>
@@ -41,6 +38,11 @@ export default {
     ChatModule,
   },
   mixins: [seo, mobile()],
+  methods: {
+    closeSingleRoom(){
+      this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: 'u0' });
+    }
+  }
 }
 </script>
 

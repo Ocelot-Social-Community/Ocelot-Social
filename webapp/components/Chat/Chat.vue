@@ -22,7 +22,13 @@
         :responsive-breakpoint="responsiveBreakpoint"
         :single-room="singleRoom"
         @show-demo-options="showDemoOptions = $event"
-      />
+      >
+        <div slot="menu-icon" @click.prevent.stop="$emit('close-single-room', true)">
+          <div v-if="singleRoom">
+            <ds-icon name="close"></ds-icon>
+          </div>
+        </div>
+      </vue-advanced-chat>
     </client-only>
   </div>
 </template>
@@ -47,7 +53,12 @@ export default {
   data() {
     return {
       menuActions: [
-        /* {
+        // NOTE: if menuActions is empty, the related slot is not shown
+        {
+          name: 'dummyItem',
+          title: 'Just a dummy item',
+        }
+        /*{
           name: 'inviteUser',
           title: 'Invite User',
         },
