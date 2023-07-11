@@ -12,7 +12,11 @@ export default {
       if (resolved) {
         resolved.forEach((room) => {
           if (room.users) {
+            // buggy, you must query the username for this to function correctly
             room.roomName = room.users.filter((user) => user.id !== context.user.id)[0].name
+            room.avatar =
+              room.users.filter((user) => user.id !== context.user.id)[0].avatar?.url ||
+              'default-avatar'
             room.users.forEach((user) => {
               user._id = user.id
             })
@@ -28,6 +32,9 @@ export default {
       const {
         user: { id: currentUserId },
       } = context
+      if (userId === currentUserId) {
+        throw new Error('Cannot create a room with self')
+      }
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const createRoomCypher = `
