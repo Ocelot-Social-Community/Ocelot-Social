@@ -14,9 +14,6 @@
       <modal />
     </client-only>
     <div v-if="$store.getters['chat/showChat'].showChat" class="chat-modul">
-      <ds-text align="right" class="close">
-        RoomID: {{ $store.getters['chat/showChat'].roomID }}        
-      </ds-text>
       <chat-module v-on:close-single-room="closeSingleRoom" :singleRoomId="$store.getters['chat/showChat'].roomID" />
     </div>
   </div>
@@ -56,7 +53,6 @@ export default {
 
 .chat-modul {
   background-color: rgb(233, 228, 228);
-  height: 667px;
   width: 355px;
   position: fixed;
   bottom: 45px;
