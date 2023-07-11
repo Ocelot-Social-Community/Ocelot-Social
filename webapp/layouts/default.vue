@@ -14,7 +14,10 @@
       <modal />
     </client-only>
     <div v-if="$store.getters['chat/showChat'].showChat" class="chat-modul">
-      <chat-module v-on:close-single-room="closeSingleRoom" :singleRoomId="$store.getters['chat/showChat'].roomID" />
+      <chat-module
+        v-on:close-single-room="closeSingleRoom"
+        :singleRoomId="$store.getters['chat/showChat'].roomID"
+      />
     </div>
   </div>
 </template>
@@ -35,10 +38,10 @@ export default {
   },
   mixins: [seo, mobile()],
   methods: {
-    closeSingleRoom(){
-      this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: 'u0' });
-    }
-  }
+    closeSingleRoom() {
+      this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: 'u0' })
+    },
+  },
 }
 </script>
 
