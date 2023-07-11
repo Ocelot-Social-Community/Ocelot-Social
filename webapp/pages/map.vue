@@ -6,15 +6,32 @@
       <small>
         <div>
           <img
-            alt="my position"
+            :alt="$t('map.legend.theUser')"
             src="/img/mapbox/marker-icons/mapbox-marker-icon-orange.svg"
             width="15"
           />
-          {{ $t('position.my') }}
-          <img alt="user" src="/img/mapbox/marker-icons/mapbox-marker-icon-green.svg" width="15" />
-          {{ $t('position.user') }}
-          <img alt="group" src="/img/mapbox/marker-icons/mapbox-marker-icon-blue.svg" width="15" />
-          {{ $t('position.group') }}
+          {{ $t('map.legend.theUser') }}
+          &nbsp;&nbsp;
+          <img
+            :alt="$t('map.legend.user')"
+            src="/img/mapbox/marker-icons/mapbox-marker-icon-green.svg"
+            width="15"
+          />
+          {{ $t('map.legend.user') }}
+          &nbsp;&nbsp;
+          <img
+            :alt="$t('map.legend.group')"
+            src="/img/mapbox/marker-icons/mapbox-marker-icon-blue.svg"
+            width="15"
+          />
+          {{ $t('map.legend.group') }}
+          &nbsp;&nbsp;
+          <img
+            :alt="$t('map.legend.event')"
+            src="/img/mapbox/marker-icons/mapbox-marker-icon-purple.svg"
+            width="15"
+          />
+          {{ $t('map.legend.event') }}
         </div>
       </small>
     </ds-space>
