@@ -37,7 +37,7 @@ describe('default.vue', () => {
       getters: {
         'auth/isLoggedIn': () => true,
         'chat/showChat': () => {
-          return { showChat: false, roomID: 'u0' }
+          return { showChat: false, roomID: null }
         },
       },
     })
