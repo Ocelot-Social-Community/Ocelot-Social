@@ -10,7 +10,19 @@
     "url": "https://github.com/Ocelot-Social-Community/Ocelot-Social.git"
   },
   "cypress-cucumber-preprocessor": {
-    "nonGlobalStepDefinitions": true
+    "stepDefinitions": "cypress/support/step_definitions/*.ts",
+    "json": {
+      "enabled": true,
+      "output": "cypress/reports/json_logs/cucumber_log.json",
+      "formatter": "cucumber-json-formatter"
+    },
+    "messages": {
+      "enabled": true,
+      "output": "cypress/reports/json_logs/messages.ndjson"
+    },
+    "html": {
+      "enabled": false
+    }
   },
   "scripts": {
     "db:seed": "cd backend && yarn run db:seed",
