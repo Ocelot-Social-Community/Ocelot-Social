@@ -290,11 +290,11 @@ export default {
           </div>
            `
         description +=
-          e.features[0].properties.about && e.features[0].properties.about.length > 0
+          e.features[0].properties.description && e.features[0].properties.description.length > 0
             ? `
             <hr>
             <div>
-              ${e.features[0].properties.about}
+              ${e.features[0].properties.description}
             </div>`
             : ''
 
@@ -372,7 +372,7 @@ export default {
                 id: user.id,
                 slug: user.slug,
                 name: user.name,
-                about: user.about ? user.about : undefined,
+                description: user.about ? user.about : undefined,
               },
               geometry: {
                 type: 'Point',
@@ -392,7 +392,7 @@ export default {
               id: this.currentUser.id,
               slug: this.currentUser.slug,
               name: this.currentUser.name,
-              about: this.currentUser.about ? this.currentUser.about : undefined,
+              description: this.currentUser.about ? this.currentUser.about : undefined,
             },
             geometry: {
               type: 'Point',
@@ -412,7 +412,7 @@ export default {
                 id: group.id,
                 slug: group.slug,
                 name: group.name,
-                about: group.about ? group.about : undefined,
+                description: group.about ? group.about : undefined,
               },
               geometry: {
                 type: 'Point',
@@ -433,7 +433,7 @@ export default {
                 id: post.id,
                 slug: post.slug,
                 name: post.title,
-                about: post.contentExcerpt,
+                description: post.contentExcerpt,
               },
               geometry: {
                 type: 'Point',
