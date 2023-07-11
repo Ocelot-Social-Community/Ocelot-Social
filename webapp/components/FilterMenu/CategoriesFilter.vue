@@ -16,7 +16,6 @@
 
     <template #filter-list>
       <div class="category-filter-list">
-        <hr />
         <ds-space margin="small" />
         <base-button
           v-for="category in categories"
