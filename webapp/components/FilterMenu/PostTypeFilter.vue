@@ -5,7 +5,7 @@
     class="following-filter"
   >
     <template #filter-follower>
-      <li class="item all-item">        
+      <li class="item all-item">
         <base-button
           icon="check"
           :label="$t('filter-menu.all')"

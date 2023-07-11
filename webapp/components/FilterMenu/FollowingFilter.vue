@@ -1,11 +1,12 @@
 <template>
-  <filter-menu-section 
+  <filter-menu-section
     :title="$t('filter-menu.following-title')"
-    :divider="false" 
-    class="following-filter">
+    :divider="false"
+    class="following-filter"
+  >
     <template #filter-follower>
       <li class="item follower-item">
-        <base-button        
+        <base-button
           icon="user-plus"
           :label="$t('filter-menu.following')"
           :filled="filteredByUsersFollowed"
@@ -33,13 +34,11 @@
 <script>
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
-import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
 
 export default {
   name: 'FollowingFilter',
   components: {
     FilterMenuSection,
-    LabeledButton,
   },
   computed: {
     ...mapGetters({
