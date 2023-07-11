@@ -5,33 +5,15 @@
       <ds-heading tag="h1">{{ $t('map.pageTitle') }}</ds-heading>
       <small>
         <div>
-          <img
-            :alt="$t('map.legend.theUser')"
-            src="/img/mapbox/marker-icons/mapbox-marker-icon-orange.svg"
-            width="15"
-          />
-          {{ $t('map.legend.theUser') }}
-          &nbsp;&nbsp;
-          <img
-            :alt="$t('map.legend.user')"
-            src="/img/mapbox/marker-icons/mapbox-marker-icon-green.svg"
-            width="15"
-          />
-          {{ $t('map.legend.user') }}
-          &nbsp;&nbsp;
-          <img
-            :alt="$t('map.legend.group')"
-            src="/img/mapbox/marker-icons/mapbox-marker-icon-blue.svg"
-            width="15"
-          />
-          {{ $t('map.legend.group') }}
-          &nbsp;&nbsp;
-          <img
-            :alt="$t('map.legend.event')"
-            src="/img/mapbox/marker-icons/mapbox-marker-icon-purple.svg"
-            width="15"
-          />
-          {{ $t('map.legend.event') }}
+          <span v-for="type in markers.types" :key="type.id">
+            <img
+              :alt="$t('map.legend.' + type.id)"
+              :src="'/img/mapbox/marker-icons/' + type.icon.legendName"
+              width="15"
+            />
+            {{ $t('map.legend.' + type.id) }}
+            &nbsp;&nbsp;
+          </span>
         </div>
       </small>
     </ds-space>
@@ -115,22 +97,38 @@ export default {
       groups: null,
       posts: null,
       markers: {
-        icons: [
+        types: [
           {
-            id: 'marker-blue',
-            name: 'mapbox-marker-icon-20px-blue.png',
+            id: 'theUser',
+            icon: {
+              id: 'marker-orange',
+              legendName: 'mapbox-marker-icon-orange.svg',
+              mapName: 'mapbox-marker-icon-20px-orange.png',
+            },
           },
           {
-            id: 'marker-green',
-            name: 'mapbox-marker-icon-20px-green.png',
+            id: 'user',
+            icon: {
+              id: 'marker-green',
+              legendName: 'mapbox-marker-icon-green.svg',
+              mapName: 'mapbox-marker-icon-20px-green.png',
+            },
           },
           {
-            id: 'marker-orange',
-            name: 'mapbox-marker-icon-20px-orange.png',
+            id: 'group',
+            icon: {
+              id: 'marker-blue',
+              legendName: 'mapbox-marker-icon-blue.svg',
+              mapName: 'mapbox-marker-icon-20px-blue.png',
+            },
           },
           {
-            id: 'marker-purple',
-            name: 'mapbox-marker-icon-20px-purple.png',
+            id: 'event',
+            icon: {
+              id: 'marker-purple',
+              legendName: 'mapbox-marker-icon-purple.svg',
+              mapName: 'mapbox-marker-icon-20px-purple.png',
+            },
           },
         ],
         isImagesLoaded: false,
@@ -339,15 +337,18 @@ export default {
     },
     loadMarkersIconsAndAddMarkers() {
       Promise.all(
-        this.markers.icons.map(
+        this.markers.types.map(
           (marker) =>
             new Promise((resolve, reject) => {
               // our images have to be in the 'static/img/*' folder otherwise they are not reachable via URL
-              this.map.loadImage('img/mapbox/marker-icons/' + marker.name, (error, image) => {
-                if (error) throw error
-                this.map.addImage(marker.id, image)
-                resolve()
-              })
+              this.map.loadImage(
+                'img/mapbox/marker-icons/' + marker.icon.mapName,
+                (error, image) => {
+                  if (error) throw error
+                  this.map.addImage(marker.icon.id, image)
+                  resolve()
+                },
+              )
             }),
         ),
       ).then(() => {
