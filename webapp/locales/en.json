@@ -282,8 +282,8 @@
       "myGroups": "By my groups",
       "myTopics": "My topics",
       "noFilter": "Filter content",
-      "onlyArticles": "Only articles",
-      "onlyEvents": "Only events"
+      "onlyArticles": "Articles",
+      "onlyEvents": "Events"
     },
     "filterMyGroups": "Contributions in my groups",
     "inappropriatePicture": "This image may be inappropriate for some people.",
@@ -409,6 +409,7 @@
     "eventsEnded": "Ended",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
+    "following-title": "Sources",
     "languages": "Languages",
     "my-groups": "My groups",
     "order": {
