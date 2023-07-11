@@ -28,6 +28,28 @@
             <ds-icon name="close"></ds-icon>
           </div>
         </div>
+
+        <div slot="room-header-avatar">
+          <div
+            v-if="selectedRoom && selectedRoom.avatar && selectedRoom.avatar !== 'default-avatar'"
+            class="vac-avatar"
+            :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
+          />          
+          <div v-else-if="selectedRoom" class="vac-avatar">
+            <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
+          </div>
+        </div>
+
+        <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
+          <div
+            v-if="room.avatar && room.avatar !== 'default-avatar'"
+            class="vac-avatar"
+            :style="{ 'background-image': `url('${room.avatar}')` }"
+          />
+          <div v-else class="vac-avatar">
+            <span class="initials">{{ getInitialsName(room.roomName) }}</span>
+          </div>
+        </div>
       </vue-advanced-chat>
     </client-only>
   </div>
@@ -122,6 +144,7 @@ export default {
       showDemoOptions: true,
       responsiveBreakpoint: 600,
       singleRoom: !!this.singleRoomId || false,
+      selectedRoom: null,
     }
   },
   mounted() {
@@ -174,6 +197,8 @@ export default {
           this.$toast.error(error.message)
         }
         this.messagesLoaded = true
+        
+        this.selectedRoom = room
       })
     },
 
@@ -195,6 +220,11 @@ export default {
       }
       this.refetchMessage(message.roomId)
     },
+
+    getInitialsName(fullname){
+      if(!fullname) return
+      return fullname.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
+    }
   },
   apollo: {
     Rooms: {
@@ -234,5 +264,26 @@ export default {
 <style lang="scss">
 body {
   font-family: 'Quicksand', sans-serif;
+}
+.vac-avatar {
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-color: $color-primary-dark;
+    color: $text-color-primary-inverse;
+    height: 42px;
+    width: 42px;
+    min-height: 42px;
+    min-width: 42px;
+    margin-right: 15px;
+    border-radius: 50%;
+    position: relative;
+
+     > .initials{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
 }
 </style>

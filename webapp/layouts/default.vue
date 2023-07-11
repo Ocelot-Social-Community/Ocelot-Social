@@ -19,7 +19,6 @@
       </ds-text>
       <chat-module v-on:close-single-room="closeSingleRoom" :singleRoomId="$store.getters['chat/showChat'].roomID" />
     </div>
-    >
   </div>
 </template>
 <script>
