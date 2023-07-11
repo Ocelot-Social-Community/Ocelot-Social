@@ -33,7 +33,7 @@ export default {
         user: { id: currentUserId },
       } = context
       if (userId === currentUserId) {
-        throw new Error('Cannot create a room with yourself')
+        throw new Error('Cannot create a room with self')
       }
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
