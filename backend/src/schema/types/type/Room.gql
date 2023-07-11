@@ -1,0 +1,28 @@
+# input _RoomFilter {
+#   AND: [_RoomFilter!]
+#   OR: [_RoomFilter!]
+#   id: ID
+#   users_some: _UserFilter
+# }
+
+type Room {
+  id: ID!
+  createdAt: String
+  updatedAt: String
+
+  users: [User]! @relation(name: "CHATS_IN", direction: "IN")
+
+  roomId: String! @cypher(statement: "RETURN this.id")
+  roomName: String! ## @cypher(statement: "MATCH (this)<-[:CHATS_IN]-(user:User) WHERE NOT user.id = $cypherParams.currentUserId RETURN user[0].name")
+  avatar: String! ## @cypher match not own user in users array
+}
+
+type Mutation {
+  CreateRoom(
+    userId: ID!
+  ): Room
+}
+
+type Query {
+  Room: [Room]
+}

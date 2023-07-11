@@ -12,9 +12,9 @@ FROM $APP_IMAGE_CODE as code
 ARG CONFIGURATION=example
 
 # copy public constants and email templates into the Docker image to brand it
-COPY configurations/${CONFIGURATION}/branding/constants/emails.js src/config/
-COPY configurations/${CONFIGURATION}/branding/constants/logos.js src/config/
-COPY configurations/${CONFIGURATION}/branding/constants/metadata.js src/config/
+COPY configurations/${CONFIGURATION}/branding/constants/emails.ts src/config/
+COPY configurations/${CONFIGURATION}/branding/constants/logos.ts src/config/
+COPY configurations/${CONFIGURATION}/branding/constants/metadata.ts src/config/
 COPY configurations/${CONFIGURATION}/branding/email/ src/middleware/helpers/email/
 
 ##################################################################################
@@ -38,7 +38,7 @@ COPY --from=build ${DOCKER_WORKDIR}/build ./build
 COPY --from=build ${DOCKER_WORKDIR}/node_modules ./node_modules
 # TODO - externalize the uploads so we can copy the whole folder
 COPY --from=build ${DOCKER_WORKDIR}/public/img/ ./public/img/
-COPY --from=build ${DOCKER_WORKDIR}/public/providers.json ./public/providers.json
+COPY --from=build ${DOCKER_WORKDIR}/public/providers.json ./build/public/providers.json
 # Copy package.json for script definitions (lock file should not be needed)
 COPY --from=build ${DOCKER_WORKDIR}/package.json ./package.json
 

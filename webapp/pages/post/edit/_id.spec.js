@@ -29,7 +29,12 @@ describe('post/_id.vue', () => {
           defaultClient: {
             query: jest.fn().mockResolvedValue({
               data: {
-                Post: [{ author: { id: authorId } }],
+                Post: [
+                  {
+                    author: { id: authorId },
+                    postType: ['Article'],
+                  },
+                ],
               },
             }),
           },

@@ -85,6 +85,7 @@ input _PostFilter {
   postsInMyGroups: Boolean
   postType_in: [PostType]
   eventStart_gte: String 
+  eventEnd_gte: String 
 }
 
 enum _PostOrdering {
@@ -177,7 +178,7 @@ type Post {
   group: Group @relation(name: "IN", direction: "OUT")
 
   postType: [PostType]
-    @cypher(statement: "RETURN filter(l IN labels(this) WHERE NOT l = 'Post')")
+    @cypher(statement: "RETURN [l IN labels(this) WHERE NOT l = 'Post']")
 
   eventLocationName: String
   eventLocation: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")

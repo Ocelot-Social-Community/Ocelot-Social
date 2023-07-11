@@ -14,7 +14,7 @@
 
 /* globals Cypress cy */
 import { GraphQLClient, request } from 'graphql-request'
-import CONFIG from '../../backend/src/config'
+import CONFIG from '../../backend/build/src/config'
 
 const authenticatedHeaders = (variables) => {
   const mutation = `
@@ -47,9 +47,10 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   'mutate',
   { prevSubject: true },
-  (graphQLClient, mutation, variables) => {
-    return new Cypress.Promise((resolve, reject) => {
+  (graphQLClient, mutation, variables, response) => {
+    return new Cypress.Promise(async (resolve, reject) => {
       graphQLClient.request(mutation, variables).then(() => resolve(graphQLClient))
+
     })
   })
 

@@ -54,13 +54,13 @@
         </ds-chip>
 
         <!-- Eventdata -->
-        <div v-if="creatEvent" class="eventDatas">
+        <div v-if="createEvent" class="eventDatas">
           <hr />
           <ds-space margin-top="x-small" />
           <ds-grid>
-            <ds-grid-item style="grid-row-end: span 3">
+            <ds-grid-item class="event-grid-item">
               <!-- <label>Beginn</label> -->
-              <div style="z-index: 20">
+              <div class="event-grid-item-z-helper">
                 <date-picker
                   name="eventStart"
                   v-model="formData.eventStart"
@@ -68,42 +68,45 @@
                   value-type="format"
                   :minute-step="15"
                   Xformat="DD-MM-YYYY HH:mm"
-                  style="z-index: 20"
+                  class="event-grid-item-z-helper"
                   :placeholder="$t('post.viewEvent.eventStart')"
                   :disabled-date="notBeforeToday"
                   :disabled-time="notBeforeNow"
                   :show-second="false"
+                  @change="changeEventStart($event)"
                 ></date-picker>
               </div>
-              <div class="chipbox" style="margin-top: 10px">
+              <div v-if="errors && errors.eventStart" class="chipbox event-grid-item-margin-helper">
                 <ds-chip size="base" :color="errors && errors.eventStart && 'danger'">
-                  <base-icon v-if="errors && errors.eventStart" name="warning" />
+                  <base-icon name="warning" />
                 </ds-chip>
               </div>
             </ds-grid-item>
-            <ds-grid-item style="grid-row-end: span 3">
+            <ds-grid-item class="event-grid-item">
               <!-- <label>Ende (optional)</label> -->
 
               <date-picker
                 v-model="formData.eventEnd"
+                name="eventEnd"
                 type="datetime"
                 value-type="format"
                 :minute-step="15"
                 :seconds-step="0"
                 Xformat="DD-MM-YYYY HH:mm"
                 :placeholder="$t('post.viewEvent.eventEnd')"
-                style="font-size: larger"
+                class="event-grid-item-font-helper"
                 :disabled-date="notBeforeEventDay"
                 :disabled-time="notBeforeEvent"
                 :show-second="false"
+                @change="changeEventEnd($event)"
               ></date-picker>
             </ds-grid-item>
           </ds-grid>
-          <ds-grid>
-            <ds-grid-item style="grid-row-end: span 3">
+          <ds-grid class="event-location-grid">
+            <ds-grid-item class="event-grid-item">
               <ds-input
                 model="eventVenue"
-                name="location"
+                name="eventVenue"
                 :placeholder="$t('post.viewEvent.eventVenue')"
               />
               <div class="chipbox">
@@ -113,10 +116,10 @@
                 </ds-chip>
               </div>
             </ds-grid-item>
-            <ds-grid-item style="grid-row-end: span 3">
+            <ds-grid-item v-if="showEventLocationName" class="event-grid-item">
               <ds-input
                 model="eventLocationName"
-                name="venue"
+                name="eventLocationName"
                 :placeholder="$t('post.viewEvent.eventLocationName')"
               />
               <div class="chipbox">
@@ -131,9 +134,11 @@
           <div>
             <input
               type="checkbox"
-              model="formData.eventIsOnline"
+              v-model="formData.eventIsOnline"
+              model="eventIsOnline"
               name="eventIsOnline"
-              style="font-size: larger"
+              class="event-grid-item-font-helper"
+              @change="changeEventIsOnline($event)"
             />
             {{ $t('post.viewEvent.eventIsOnline') }}
           </div>
@@ -153,7 +158,7 @@
           <base-icon v-if="errors && errors.categoryIds" name="warning" />
         </ds-chip>
         <ds-flex class="buttons-footer" gutter="xxx-small">
-          <ds-flex-item width="3.5" style="margin-right: 16px; margin-bottom: 6px">
+          <ds-flex-item width="3.5" class="buttons-footer-helper">
             <!-- eslint-disable vue/no-v-text-v-html-on-component -->
             <!-- TODO => remove v-html! only text ! no html! security first! -->
             <ds-text
@@ -210,7 +215,7 @@ export default {
       type: Object,
       default: () => null,
     },
-    creatEvent: {
+    createEvent: {
       type: Boolean,
       default: false,
     },
@@ -252,24 +257,6 @@ export default {
         eventVenue: eventVenue || '',
         eventIsOnline: eventIsOnline || false,
       },
-      formSchema: {
-        title: { required: true, min: 3, max: 100 },
-        content: { required: true },
-        imageBlurred: { required: false },
-        categoryIds: {
-          type: 'array',
-          required: this.categoriesActive,
-          validator: (_, value = []) => {
-            if (this.categoriesActive && (value.length === 0 || value.length > 3)) {
-              return [new Error(this.$t('common.validations.categories'))]
-            }
-            return []
-          },
-        },
-        eventStart: { required: !!this.creatEvent },
-        eventVenue: { required: !!this.creatEvent, min: 3, max: 100 },
-        eventLocationName: { required: !!this.creatEvent, min: 3, max: 100 },
-      },
       loading: false,
       users: [],
       hashtags: [],
@@ -283,14 +270,69 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+    formSchema() {
+      return {
+        title: { required: true, min: 3, max: 100 },
+        content: { required: true },
+        imageBlurred: { required: false },
+        categoryIds: {
+          type: 'array',
+          required: this.categoriesActive,
+          validator: (_, value = []) => {
+            if (this.categoriesActive && (value.length === 0 || value.length > 3)) {
+              return [new Error(this.$t('common.validations.categories'))]
+            }
+            return []
+          },
+        },
+        eventStart: { required: !!this.createEvent },
+        eventVenue: {
+          required: !!this.createEvent,
+          min: 3,
+          max: 100,
+          validator: (_, value = '') => {
+            if (!this.createEvent) return []
+            if (!value.trim()) {
+              return [new Error(this.$t('common.validations.eventVenueNotEmpty'))]
+            }
+            if (value.length < 3 || value.length > 100) {
+              return [
+                new Error(this.$t('common.validations.eventVenueLength', { min: 3, max: 100 })),
+              ]
+            }
+            return []
+          },
+        },
+        eventLocationName: {
+          required: !!this.createEvent && !this.formData.eventIsOnline,
+          min: 3,
+          max: 100,
+          validator: (_, value = '') => {
+            if (!this.createEvent) return []
+            if (this.formData.eventIsOnline) return []
+            if (!value.trim()) {
+              return [new Error(this.$t('common.validations.eventLocationNameNotEmpty'))]
+            }
+            if (value.length < 3 || value.length > 100) {
+              return [
+                new Error(
+                  this.$t('common.validations.eventLocationNameLength', { min: 3, max: 100 }),
+                ),
+              ]
+            }
+            return []
+          },
+        },
+      }
+    },
     eventInput() {
-      if (this.creatEvent) {
+      if (this.createEvent) {
         return {
           eventStart: this.formData.eventStart,
           eventVenue: this.formData.eventVenue,
           eventEnd: this.formData.eventEnd,
           eventIsOnline: this.formData.eventIsOnline,
-          eventLocationName: this.formData.eventLocationName,
+          eventLocationName: !this.formData.eventIsOnline ? this.formData.eventLocationName : null,
         }
       }
       return undefined
@@ -309,6 +351,9 @@ export default {
     },
     groupCategories() {
       return this.group && this.group.categories
+    },
+    showEventLocationName() {
+      return !this.formData.eventIsOnline
     },
   },
   watch: {
@@ -356,7 +401,7 @@ export default {
             id: this.contribution.id || null,
             image,
             groupId: this.groupId,
-            postType: !this.creatEvent ? 'Article' : 'Event',
+            postType: !this.createEvent ? 'Article' : 'Event',
             eventInput: this.eventInput,
           },
         })
@@ -377,6 +422,15 @@ export default {
     },
     updateEditorContent(value) {
       this.$refs.contributionForm.update('content', value)
+    },
+    changeEventIsOnline(event) {
+      this.$refs.contributionForm.update('eventIsOnline', this.formData.eventIsOnline)
+    },
+    changeEventEnd(event) {
+      this.$refs.contributionForm.update('eventEnd', event)
+    },
+    changeEventStart(event) {
+      this.$refs.contributionForm.update('eventStart', event)
     },
     addHeroImage(file) {
       this.formData.image = null
@@ -443,6 +497,24 @@ export default {
       margin-top: -10px;
     }
   }
+  // style override to handle dynamic inputs
+  .event-location-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .event-grid-item {
+    // important needed because of component inline style
+    grid-row-end: span 3 !important;
+  }
+  .event-grid-item-z-helper {
+    z-index: 20;
+  }
+  .event-grid-item-margin-helper {
+    margin-top: 10px;
+  }
+  .event-grid-item-font-helper {
+    font-size: larger;
+  }
 }
 
 .contribution-form > .base-card {
@@ -490,6 +562,12 @@ export default {
         margin-left: 1em;
         min-width: fit-content;
       }
+    }
+
+    > .buttons-footer-helper {
+      margin-right: 16px;
+      // important needed because of component inline style
+      margin-bottom: 6px !important;
     }
   }
 
