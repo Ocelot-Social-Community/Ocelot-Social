@@ -16,9 +16,7 @@
     <div v-if="showChat.showChat" class="chat-modul">
       <ds-text align="right" class="close">
         RoomID: {{ showChat.roomID }}
-        <ds-button @click="SET_OPEN_CHAT({ showChat: false, roomID: null })">
-          x
-        </ds-button>
+        <ds-button @click="SET_OPEN_CHAT({ showChat: false, roomID: null })">x</ds-button>
       </ds-text>
       <chat-module :singleRoomId="showChat.roomID" />
     </div>
@@ -47,8 +45,8 @@ export default {
       showChat: 'chat/showChat',
     }),
     ...mapMutations({
-      SET_OPEN_CHAT: 'chat/SET_OPEN_CHAT'
-    })
+      SET_OPEN_CHAT: 'chat/SET_OPEN_CHAT',
+    }),
   },
 }
 </script>
