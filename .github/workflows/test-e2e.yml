@@ -47,7 +47,7 @@ jobs:
       - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         run: |
-          cd e2e-tests/
+          cd cypress/
           node create-cucumber-html-report.js
   
       - name: End-to-end tests | if tests failed, upload report
