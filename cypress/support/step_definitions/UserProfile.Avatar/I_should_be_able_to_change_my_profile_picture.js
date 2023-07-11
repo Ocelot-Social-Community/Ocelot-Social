@@ -5,7 +5,7 @@ Then("I should be able to change my profile picture", () => {
   
   cy.fixture(avatarUpload, "base64").then(fileContent => {
     cy.get("#customdropzone").selectFile(
-      { contents: `../../../fixtures/${avatarUpload}`, fileName: avatarUpload, mimeType: "image/png" },
+      { contents: `cypress/fixtures/${avatarUpload}`, fileName: avatarUpload, mimeType: "image/png" },
       { action: "drag-drop" }
     );
   });
