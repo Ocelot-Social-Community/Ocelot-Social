@@ -121,12 +121,16 @@ export default {
             name: 'mapbox-marker-icon-20px-blue.png',
           },
           {
+            id: 'marker-green',
+            name: 'mapbox-marker-icon-20px-green.png',
+          },
+          {
             id: 'marker-orange',
             name: 'mapbox-marker-icon-20px-orange.png',
           },
           {
-            id: 'marker-green',
-            name: 'mapbox-marker-icon-20px-green.png',
+            id: 'marker-purple',
+            name: 'mapbox-marker-icon-20px-purple.png',
           },
         ],
         isImagesLoaded: false,
@@ -156,7 +160,8 @@ export default {
         this.markers.isImagesLoaded &&
         this.currentUser &&
         this.users &&
-        this.groups
+        this.groups &&
+        this.posts
       )
     },
     styles() {
@@ -255,17 +260,27 @@ export default {
 
         // Copy coordinates array.
         const coordinates = e.features[0].geometry.coordinates.slice()
-        const markerTypeLabel =
-          e.features[0].properties.type === 'group'
-            ? this.$t('map.markerTypes.group')
-            : e.features[0].properties.type === 'user'
-            ? this.$t('map.markerTypes.user')
-            : this.$t('map.markerTypes.theUser')
-        const markerProfileLinkTitle =
-          (e.features[0].properties.type === 'group' ? '&' : '@') + e.features[0].properties.slug
-        const markerProfileLink =
-          (e.features[0].properties.type === 'group' ? '/group' : '/profile') +
-          `/${e.features[0].properties.id}/${e.features[0].properties.slug}`
+        const markerTypeLabel = this.$t(`map.markerTypes.${e.features[0].properties.type}`)
+        const markerProfile = {
+          theUser: {
+            linkTitle: '@' + e.features[0].properties.slug,
+            link: `/profile/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
+          },
+          user: {
+            linkTitle: '@' + e.features[0].properties.slug,
+            link: `/profile/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
+          },
+          group: {
+            linkTitle: '&' + e.features[0].properties.slug,
+            link: `/group/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
+          },
+          event: {
+            linkTitle: e.features[0].properties.slug,
+            link: `/post/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
+          },
+        }
+        const markerProfileLinkTitle = markerProfile[e.features[0].properties.type].linkTitle
+        const markerProfileLink = markerProfile[e.features[0].properties.type].link
         let description = `
           <div>
             <div>
@@ -365,6 +380,25 @@ export default {
             })
           }
         })
+        // add marker for "currentUser"
+        if (this.currentUserCoordinates) {
+          this.markers.geoJSON.push({
+            type: 'Feature',
+            properties: {
+              type: 'theUser',
+              iconName: 'marker-orange',
+              iconRotate: 45.0,
+              id: this.currentUser.id,
+              slug: this.currentUser.slug,
+              name: this.currentUser.name,
+              about: this.currentUser.about ? this.currentUser.about : undefined,
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: this.currentUserCoordinates,
+            },
+          })
+        }
         // add markers for "groups"
         this.groups.forEach((group) => {
           if (group.location) {
@@ -386,25 +420,27 @@ export default {
             })
           }
         })
-        // add marker for "currentUser"
-        if (this.currentUserCoordinates) {
-          this.markers.geoJSON.push({
-            type: 'Feature',
-            properties: {
-              type: 'theUser',
-              iconName: 'marker-orange',
-              iconRotate: 45.0,
-              id: this.currentUser.id,
-              slug: this.currentUser.slug,
-              name: this.currentUser.name,
-              about: this.currentUser.about ? this.currentUser.about : undefined,
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: this.currentUserCoordinates,
-            },
-          })
-        }
+        // add markers for "posts", post type "Event" with location coordinates
+        this.posts.forEach((post) => {
+          if (post.postType.includes('Event') && post.eventLocation) {
+            this.markers.geoJSON.push({
+              type: 'Feature',
+              properties: {
+                type: 'event',
+                iconName: 'marker-purple',
+                iconRotate: 0.0,
+                id: post.id,
+                slug: post.slug,
+                name: post.title,
+                about: post.contentExcerpt,
+              },
+              geometry: {
+                type: 'Point',
+                coordinates: this.getCoordinates(post.eventLocation),
+              },
+            })
+          }
+        })
 
         this.markers.isGeoJSON = true
       }
@@ -508,20 +544,15 @@ export default {
       },
       variables() {
         return {
-          // Wolle: postType: 'Event',
           filter: {
             postType_in: ['Event'],
-            eventLocation: true,
             eventStart_gte: new Date(),
+            // would be good to just query for events with defined "eventLocation". couldn't get it working
           },
-          // Wolle first: this.pageSize,
-          // Wolle orderBy: ['pinned_asc', this.orderBy],
-          // Wolle offset: 0,
         }
       },
       update({ Post }) {
         this.posts = Post
-        console.log('this.posts: ', this.posts)
       },
       fetchPolicy: 'cache-and-network',
     },
