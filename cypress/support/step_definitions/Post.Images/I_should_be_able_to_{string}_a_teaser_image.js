@@ -16,7 +16,7 @@ Then("I should be able to {string} a teaser image", condition => {
     case "add":
       postTeaserImage = "onourjourney.png"
       cy.get("#postdropzone").selectFile(
-        { contents: `cypress/fixtures/${this.postTeaserImage}`, fileName: postTeaserImage, mimeType: "image/png" },
+        { contents: `cypress/fixtures/${postTeaserImage}`, fileName: postTeaserImage, mimeType: "image/png" },
         { action: "drag-drop" }
       ).wait(750);
       break;
