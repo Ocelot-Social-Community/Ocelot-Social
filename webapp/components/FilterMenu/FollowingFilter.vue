@@ -5,22 +5,26 @@
     class="following-filter">
     <template #filter-follower>
       <li class="item follower-item">
-        <labeled-button
+        <base-button        
           icon="user-plus"
           :label="$t('filter-menu.following')"
           :filled="filteredByUsersFollowed"
           :title="$t('contribution.filterFollow')"
           @click="toggleFilteredByFollowed(currentUser.id)"
-        />
+        >
+          {{ $t('contribution.filterFollow') }}
+        </base-button>
       </li>
       <li class="item posts-in-my-groups-item">
-        <labeled-button
+        <base-button
           icon="users"
           :label="$t('filter-menu.my-groups')"
           :filled="filteredByPostsInMyGroups"
           :title="$t('contribution.filterMyGroups')"
           @click="toggleFilteredByMyGroups()"
-        />
+        >
+          {{ $t('contribution.filterMyGroups') }}
+        </base-button>
       </li>
     </template>
   </filter-menu-section>

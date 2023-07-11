@@ -5,14 +5,16 @@
     class="following-filter"
   >
     <template #filter-follower>
-      <li class="item all-item">
-        <labeled-button
+      <li class="item all-item">        
+        <base-button
           icon="check"
           :label="$t('filter-menu.all')"
           :filled="filteredPostTypes.length === 0"
           :title="$t('filter-menu.all')"
           @click="togglePostType(null)"
-        />
+        >
+          {{ $t('filter-menu.all') }}
+        </base-button>
       </li>
       <li class="item article-item">
         <labeled-button
