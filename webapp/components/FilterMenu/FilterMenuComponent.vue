@@ -2,8 +2,8 @@
   <div>
     <div class="filter-menu-options">
       <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
-      <following-filter />
       <post-type-filter />
+      <following-filter />
       <categories-filter v-if="categoriesActive" @showFilterMenu="$emit('showFilterMenu')" />
     </div>
     <div v-if="eventSetInPostTypeFilter" class="filter-menu-options">
