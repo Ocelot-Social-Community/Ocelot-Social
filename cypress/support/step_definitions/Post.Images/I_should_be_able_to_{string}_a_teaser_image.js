@@ -10,14 +10,14 @@ Then("I should be able to {string} a teaser image", condition => {
         .click()
       cy.get("#postdropzone").selectFile(
         { contents: `cypress/fixtures/${postTeaserImage}`, fileName: postTeaserImage, mimeType: "image/png" },
-        { action: "drag-drop" }
+        { action: "drag-drop", force: true }
       ).wait(750);
       break;
     case "add":
       postTeaserImage = "onourjourney.png"
       cy.get("#postdropzone").selectFile(
         { contents: `cypress/fixtures/${postTeaserImage}`, fileName: postTeaserImage, mimeType: "image/png" },
-        { action: "drag-drop" }
+        { action: "drag-drop", force: true }
       ).wait(750);
       break;
     case "remove":
