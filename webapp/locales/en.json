@@ -276,7 +276,7 @@
       "happy": "Happy",
       "surprised": "Surprised"
     },
-    "filterFollow": "Filter contributions from users I follow",
+    "filterFollow": "Users I follow",
     "filterMasonryGrid": {
       "myFriends": "Users I follow",
       "myGroups": "By my groups",
@@ -285,7 +285,7 @@
       "onlyArticles": "Articles",
       "onlyEvents": "Events"
     },
-    "filterMyGroups": "Contributions in my groups",
+    "filterMyGroups": "My groups",
     "inappropriatePicture": "This image may be inappropriate for some people.",
     "languageSelectLabel": "Language of your contribution",
     "languageSelectText": "Select Language",
