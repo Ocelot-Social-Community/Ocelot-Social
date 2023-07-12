@@ -45,7 +45,8 @@ export default {
   data() {
     return {
       menuActions: [
-        /* {
+        /*
+        {
           name: 'inviteUser',
           title: 'Invite User',
         },
@@ -56,9 +57,11 @@ export default {
         {
           name: 'deleteRoom',
           title: 'Delete Room',
-        }, */
+        },
+        */
       ],
       messageActions: [
+        /*
         {
           name: 'addMessageToFavorite',
           title: 'Add To Favorite',
@@ -67,6 +70,7 @@ export default {
           name: 'shareMessage',
           title: 'Share Message',
         },
+        */
       ],
       templatesText: [
         {
@@ -109,6 +113,11 @@ export default {
       showDemoOptions: true,
       responsiveBreakpoint: 600,
       singleRoom: !!this.singleRoomId || false,
+      messagePage: 0,
+      messagePageSize: 20,
+      roomPage: 0,
+      roomPageSize: 999, //TODO pagination is a problem with single rooms - cant use
+      lastRoom: null
     }
   },
   mounted() {
@@ -138,7 +147,13 @@ export default {
   },
   methods: {
     fetchMessages({ room, options = {} }) {
+      if(this.lastRoom != room.id) {
+        this.messages = []
+        this.messagePage = 0,
+        this.lastRoom = room.id
+      }
       this.messagesLoaded = false
+      const offset = (options.refetch ? 0 : this.messagePage) *  this.messagePageSize
       setTimeout(async () => {
         try {
           const {
@@ -147,20 +162,32 @@ export default {
             query: messageQuery(),
             variables: {
               roomId: room.id,
+              first: this.messagePageSize,
+              offset,
             },
             fetchPolicy: 'no-cache',
           })
-          this.messages = Message
+          
+          const msgs = []
+          ;[...this.messages, ...Message].forEach((m) => {
+            msgs[m.indexId] = m
+          })
+          this.messages = msgs.filter( Boolean )
+
+
+          if(Message.length < this.messagePageSize){
+            this.messagesLoaded = true
+          }
+          this.messagePage += 1
         } catch (error) {
           this.messages = []
           this.$toast.error(error.message)
         }
-        this.messagesLoaded = true
       })
     },
 
     refetchMessage(roomId) {
-      this.fetchMessages({ room: this.rooms.find((r) => r.roomId === roomId) })
+      this.fetchMessages({ room: this.rooms.find((r) => r.roomId === roomId), options: { refetch: true} })
     },
 
     async sendMessage(message) {
@@ -182,6 +209,12 @@ export default {
     Rooms: {
       query() {
         return roomQuery()
+      },
+      variables() {
+        return {
+          first: this.roomPageSize,
+          offset: this.roomPage* this.roomPageSize,
+        }
       },
       update({ Room }) {
         if (!Room) {
