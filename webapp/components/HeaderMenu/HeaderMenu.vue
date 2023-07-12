@@ -74,6 +74,10 @@
             <!-- locale switch -->
             <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
             <template v-if="isLoggedIn">
+              <!-- chat menu -->
+              <client-only>
+                <chat-notification-menu placement="top" />
+              </client-only>
               <!-- notification menu -->
               <client-only>
                 <notification-menu placement="top" />
@@ -91,10 +95,6 @@
               <!-- map button -->
               <client-only v-if="!isEmpty(this.$env.MAPBOX_TOKEN)">
                 <map-button />
-              </client-only>
-              <!-- chat menü -->
-              <client-only>
-                <chat-notification-menu placement="top" />
               </client-only>
               <!-- avatar menu -->
               <client-only>
@@ -131,10 +131,16 @@
           <!-- mobile hamburger menu -->
           <ds-flex-item class="mobile-hamburger-menu">
             <client-only>
+              <!-- chat menu -->
+              <div style="display: inline-flex">
+                <chat-notification-menu />
+              </div>
+              <!-- notification menu -->
               <div style="display: inline-flex; padding-right: 20px">
                 <notification-menu />
               </div>
             </client-only>
+            <!-- hamburger menu -->
             <base-button icon="bars" @click="toggleMobileMenuView" circle />
           </ds-flex-item>
         </ds-flex>
