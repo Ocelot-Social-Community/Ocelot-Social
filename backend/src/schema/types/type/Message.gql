@@ -2,8 +2,14 @@
 #   room: _RoomFilter
 # }
 
+enum _MessageOrdering {
+  createdAt_asc
+  createdAt_desc
+}
+
 type Message {
   id: ID!
+  indexId: String!
   createdAt: String
   updatedAt: String
 
@@ -26,5 +32,10 @@ type Mutation {
 }
 
 type Query {
-  Message(roomId: ID!): [Message]
+  Message(
+    roomId: ID!,
+    first: Int
+    offset: Int
+    orderBy: [_MessageOrdering]
+  ): [Message]
 }
