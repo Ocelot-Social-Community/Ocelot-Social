@@ -32,3 +32,11 @@ export const messageQuery = () => {
     }
   `
 }
+
+export const markMessagesAsSeen = () => {
+  return gql`
+    mutation ($messageIds: [String!]) {
+      MarkMessagesAsSeen(messageIds: $messageIds)
+    }
+  `
+}

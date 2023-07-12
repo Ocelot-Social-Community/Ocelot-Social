@@ -27,6 +27,8 @@ type Mutation {
     roomId: ID!
     content: String!
   ): Message
+
+  MarkMessagesAsSeen(messageIds: [String!]): Boolean
 }
 
 type Query {

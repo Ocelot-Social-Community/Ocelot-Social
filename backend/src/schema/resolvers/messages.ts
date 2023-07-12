@@ -89,6 +89,29 @@ export default {
         session.close()
       }
     },
+    MarkMessagesAsSeen: async (_parent, params, context, _resolveInfo) => {
+      const { messageIds } = params
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const setSeenCypher = `
+          MATCH (m:Message) WHERE m.id IN $messageIds
+          SET m.seen = true
+          RETURN m { .* }
+        `
+        const setSeenTxResponse = await transaction.run(setSeenCypher, {
+          messageIds,
+        })
+        const messages = await setSeenTxResponse.records.map((record) => record.get('m'))
+        return messages
+      })
+      try {
+        await writeTxResultPromise
+        // send subscription to author to updated the messages
+        return true
+      } finally {
+        session.close()
+      }
+    },
   },
   Message: {
     ...Resolver('Message', {
