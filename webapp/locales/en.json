@@ -77,19 +77,19 @@
       }
     }
   },
-  "chat": {    
-    "roomsEmpty" : "No rooms",
-    "roomEmpty" : "No room selected",
-    "newMessages" : "New Messages",
+  "chat": {
+    "cancelSelectMessage": "Cancel",
+    "conversationStarted": "Conversation started on:",
+    "isOnline": "is online",
+    "isTyping": "is writing...",
+    "lastSeen": "last seen ",
     "messageDeleted": "This message was deleted",
     "messagesEmpty": "No messages",
-    "conversationStarted": "Conversation started on:",
-    "typeMessage": "Type message",
+    "newMessages": "New Messages",
+    "roomEmpty": "No room selected",
+    "roomsEmpty": "No rooms",
     "search": "Search",
-    "isOnline": "is online",
-    "lastSeen": "last seen ",
-    "isTyping": "is writing...",
-    "cancelSelectMessage": "Cancel"    
+    "typeMessage": "Type message"
   },
   "client-only": {
     "loading": "Loading …"

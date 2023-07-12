@@ -77,19 +77,19 @@
       }
     }
   },
-  "chat": {    
-    "roomsEmpty" : "Keine Räume",
-    "roomEmpty" : "Keinen Raum selektiert",
-    "newMessages" : "Neue Nachrichten",
+  "chat": {
+    "cancelSelectMessage": "Abbrechen",
+    "conversationStarted": "Unterhaltung startete am:",
+    "isOnline": "online",
+    "isTyping": "tippt...",
+    "lastSeen": "zuletzt gesehen ",
     "messageDeleted": "Diese Nachricht wuerde gelöscht",
     "messagesEmpty": "Keine Nachrichten",
-    "conversationStarted": "Unterhaltung startete am:",
-    "typeMessage": "Nachricht schreiben",
+    "newMessages": "Neue Nachrichten",
+    "roomEmpty": "Keinen Raum selektiert",
+    "roomsEmpty": "Keine Räume",
     "search": "Suche",
-    "isOnline": "online",
-    "lastSeen": "zuletzt gesehen ",
-    "isTyping": "tippt...",
-    "cancelSelectMessage": "Abbrechen"    
+    "typeMessage": "Nachricht schreiben"
   },
   "client-only": {
     "loading": "Lade …"
