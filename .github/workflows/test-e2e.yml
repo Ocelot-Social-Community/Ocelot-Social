@@ -1,16 +1,13 @@
 name: ocelot.social end-to-end test CI
-on: push
+on:
+  push:
+    branches:
+      - cache-docker-images-in-e2e-github-flow
 
 jobs:
-  fullstack_tests:
-    name: Fullstack tests
+  docker_preparation:
+    name: Fullstack test preparation
     runs-on: ubuntu-latest
-    env:
-      jobs: 8
-    strategy:
-      matrix:
-        # run copies of the current job in parallel
-        job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -20,26 +17,11 @@ jobs:
 
       - name: backend | copy env file
         run: cp backend/.env.template backend/.env
-
-      - name: boot up test system | docker-compose
-        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp neo4j backend
-
-      - name: cypress | Fullstack tests
-        id: e2e-tests
+      
+      - name: build docker images (no volumes)
+        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml build webapp neo4j backend
+      
+      - name: check existence of docker images images
         run: |
-          cd backend
-          yarn install
-          yarn build
-          cd ..
-          yarn install
-          yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
-
-      ##########################################################################
-      # UPLOAD SCREENSHOTS - IF TESTS FAIL #####################################
-      ##########################################################################
-      - name: Full stack tests | if any test failed, upload screenshots
-        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots/
+          docker images
+          sudo ls -l /var/lib/docker/overlay2 
