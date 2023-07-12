@@ -408,6 +408,15 @@ $color-ribbon-event-active: $background-color-third-active;
 $color-ribbon-article: $background-color-secondary;
 $color-ribbon-article-active: $background-color-secondary-active;
 
+/**
+ * @tokens Chat Color
+ */
+
+$chat-message-bg-me: $color-primary-light;
+$chat-message-color: $text-color-base;
+$chat-message-bg-others: $color-neutral-80;
+$chat-sidemenu-bg: $color-secondary-active;
+$chat-new-message-color: $color-secondary-active;
 
 :export {
   colorPrimary: $color-primary;
@@ -430,4 +439,11 @@ $color-ribbon-article-active: $background-color-secondary-active;
   backgroundColorPrimary: $background-color-primary;
 
   colorNeutral30: $color-neutral-30;
+  
+  chatMessageColor: $chat-message-color;
+  
+  chatMessageBgMe: $chat-message-bg-me;
+  chatMessageBgOthers: $chat-message-bg-others;
+
+  chatNewMessageColor: $chat-new-message-color;
 }

@@ -57,9 +57,9 @@ const STYLE = {
     },
 
     message: {
-      background: styleData.backgroundColorBase,
-      backgroundMe: styleData.colorPrimaryLight,
-      color: styleData.textColorBase,
+      background: styleData.chatMessageBgOthers,
+      backgroundMe: styleData.chatMessageBgMe,
+      color: styleData.chatMessageColor,
       colorStarted: '#9ca6af',
       backgroundDeleted: '#dadfe2',
       backgroundSelected: '#c2dcf2',
@@ -76,7 +76,7 @@ const STYLE = {
       colorReply: '#6e6e6e',
       colorTag: '#0d579c',
       backgroundImage: '#ddd',
-      colorNewMessages: '#1976d2',
+      colorNewMessages: styleData.chatNewMessageColor,
       backgroundScrollCounter: '#0696c7',
       colorScrollCounter: '#fff',
       backgroundReaction: '#eee',
