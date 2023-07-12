@@ -7,7 +7,6 @@ on:
 jobs:
   docker_preparation:
     name: Fullstack test preparation
-    id: preparation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -41,16 +40,15 @@ jobs:
           sudo ls -l /var/lib/docker/overlay2
 
       - name: cache docker images
-        uses: actions/cache/save@v3
+        uses: actions/cache/save/save@v3
         with:
           path: |
             pwd
             /var/lib/docker/overlay2
-          key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
   
   fullstack_tests:
     name: Fullstack tests
-    if: ${{ needs.preparation.outputs.cache-hit == 'true' }}
+    if: ${{ needs.docker_preparation.outputs.cache-hit == 'true' }}
     needs: preparation
     runs-on: ubuntu-latest
     steps:
