@@ -8,7 +8,7 @@ jobs:
   docker_preparation:
     name: Fullstack test preparation
     runs-on: ubuntu-latest
-    permissions: read-all|write-all
+    permissions: read-all
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
