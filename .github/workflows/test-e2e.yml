@@ -44,6 +44,7 @@ jobs:
           path: |
             pwd
             /var/lib/docker/overlay2
+          key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
   
   fullstack_tests:
     name: Fullstack tests
@@ -61,6 +62,8 @@ jobs:
       # TODO remove after test phase
       - name: Check existence of docker images images
         run: |
+          pwd
+          ls -l
           docker images
           sudo ls -l /var/lib/docker/overlay2
 
