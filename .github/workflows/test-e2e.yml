@@ -49,7 +49,7 @@ jobs:
   fullstack_tests:
     name: Fullstack tests
     if: ${{ needs.docker_preparation.outputs.cache-hit == 'true' }}
-    needs: preparation
+    needs: docker_preparation
     runs-on: ubuntu-latest
     steps:
       - name: Restore cache
