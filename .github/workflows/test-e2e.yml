@@ -41,9 +41,32 @@ jobs:
           sudo ls -l /var/lib/docker/overlay2
 
       - name: cache docker images
-        uses: actions/cache@v3
+        uses: actions/cache/save@v3
         with:
           path: |
             pwd
             /var/lib/docker/overlay2
           key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
+  
+  fullstack_tests:
+    name: Fullstack tests
+    if: ${{ needs.preparation.outputs.cache-hit == 'true' }}
+    needs: preparation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore cache
+        uses: actions/cache/restore@v3
+        id: cache
+        with:
+          path: path/to/dependencies
+          key: e2e-preparation-cache-pr
+
+      # TODO remove after test phase
+      - name: Check existence of docker images images
+        run: |
+          docker images
+          sudo ls -l /var/lib/docker/overlay2
+
+      # - name: Fullstack tests | run tests
+      #   run: yarn run cypress:run --spec cypress/e2e/Admin.PinPost.feature,cypress/e2e/Post.Images.feature
+
