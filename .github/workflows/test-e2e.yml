@@ -55,6 +55,6 @@ jobs:
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         uses: actions/upload-artifact@v3
         with:
-          name: cypress-report-pr${{ steps.pr.outputs.number }}
+          name: ocelot-e2e-test-report-pr${{ steps.pr.outputs.number }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
 
