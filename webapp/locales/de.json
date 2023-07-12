@@ -77,6 +77,12 @@
       }
     }
   },
+  "chat": {
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chatte mit diesem Nutzer"
+    }
+  },
   "client-only": {
     "loading": "Lade …"
   },

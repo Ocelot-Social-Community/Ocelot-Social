@@ -77,6 +77,12 @@
       }
     }
   },
+  "chat": {
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chat with the user"
+    }
+  },
   "client-only": {
     "loading": "Loading …"
   },
@@ -694,10 +700,6 @@
       "unread": "Unread"
     },
     "group": "Description",
-    "headerMenuButton": {
-      "chat": "My Chat",
-      "tooltip": "My notifications"
-    },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
     "post": "Post or Group",

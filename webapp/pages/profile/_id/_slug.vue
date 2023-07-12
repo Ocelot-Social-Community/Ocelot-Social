@@ -80,13 +80,14 @@
               @update="updateFollow"
             />
             <base-button
-              @click="$store.commit('chat/SET_OPEN_CHAT', { showChat: true, roomID: user.id })"
+              icon="chat-bubble"
               v-tooltip="{
-                content: $t('notifications.headerMenuButton.chat'),
+                content: $t('chat.userProfileButton.tooltip'),
                 placement: 'bottom-start',
               }"
+              @click="$store.commit('chat/SET_OPEN_CHAT', { showChat: true, roomID: user.id })"
             >
-              <img src="/img/empty/chat-bubble.svg" height="20" />
+              {{ $t('chat.userProfileButton.label') }}
             </base-button>
           </div>
           <template v-if="user.about">
