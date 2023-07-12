@@ -5,24 +5,24 @@ jobs:
   fullstack_tests:
     name: Fullstack tests
     runs-on: ubuntu-latest
-    # env:
-    #   jobs: 8
-    # strategy:
-    #   matrix:
-    #     # run copies of the current job in parallel
-    #     job: [1, 2, 3, 4, 5, 6, 7, 8]
+    env:
+      jobs: 8
+    strategy:
+      matrix:
+        # run copies of the current job in parallel
+        job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # - name: webapp | copy env file
-      #   run: cp webapp/.env.template webapp/.env
+      - name: webapp | copy env file
+        run: cp webapp/.env.template webapp/.env
 
-      # - name: backend | copy env file
-      #   run: cp backend/.env.template backend/.env
+      - name: backend | copy env file
+        run: cp backend/.env.template backend/.env
 
-      # - name: boot up test system | docker-compose
-      #   run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp neo4j backend
+      - name: boot up test system | docker-compose
+        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp neo4j backend
 
       - name: Full stack tests | prepare
         run: |
@@ -37,11 +37,8 @@ jobs:
 
       - name: Full stack tests | run tests
         id: e2e-tests
-        run: yarn run cypress:run --spec cypress/e2e/Internationalization.feature,cypress/e2e/Post.Comment.feature
+        run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
 
-      ##########################################################################
-      # UPLOAD SCREENSHOTS - IF TESTS FAIL #####################################
-      ##########################################################################
       - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         run: |
@@ -54,5 +51,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-report-pr${{ steps.pr.outputs.number }}
-          path: /home/runner/work/gradido/gradido/e2e-tests/cypress/reports/cucumber_html_report
+          path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
 
