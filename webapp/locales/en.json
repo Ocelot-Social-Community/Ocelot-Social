@@ -552,6 +552,9 @@
       },
       "groups": "Groups",
       "myProfile": "My profile"
+    },
+    "chat": {
+      "tooltip": "My chats"
     }
   },
   "index": {

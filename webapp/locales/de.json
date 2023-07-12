@@ -552,6 +552,9 @@
       },
       "groups": "Gruppen",
       "myProfile": "Mein Profil"
+    },
+    "chat": {
+      "tooltip": "Meine Chats"
     }
   },
   "index": {
@@ -691,10 +694,6 @@
       "unread": "Ungelesen"
     },
     "group": "Beschreibung",
-    "headerMenuButton": {
-      "chat": "Meine Chat",
-      "tooltip": "Meine Benachrichtigungen"
-    },
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",
