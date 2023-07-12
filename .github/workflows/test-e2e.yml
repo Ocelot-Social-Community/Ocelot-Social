@@ -30,7 +30,6 @@ jobs:
       
       - name: Get pr number
         id: pr
-        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         uses: 8BitJonny/gh-get-current-pr@2.2.0
       
       # TODO remove after test phase
