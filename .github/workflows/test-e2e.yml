@@ -7,21 +7,43 @@ on:
 jobs:
   docker_preparation:
     name: Fullstack test preparation
+    id: preparation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: webapp | copy env file
-        run: cp webapp/.env.template webapp/.env
-
-      - name: backend | copy env file
-        run: cp backend/.env.template backend/.env
+      - name: Copy env files
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.template backend/.env
       
-      - name: build docker images (no volumes)
+      - name: Install for test tool
+        run: |
+          cd backend
+          yarn install
+          yarn build
+          cd ..
+          yarn install
+
+      - name: Build docker images (no volumes)
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml build webapp neo4j backend
       
-      - name: check existence of docker images images
+      - name: Get pr number
+        id: pr
+        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
+        uses: 8BitJonny/gh-get-current-pr@2.2.0
+      
+      # TODO remove after test phase
+      - name: Check existence of docker images images
         run: |
           docker images
-          sudo ls -l /var/lib/docker/overlay2 
+          sudo ls -l /var/lib/docker/overlay2
+
+      - name: cache docker images
+        uses: actions/cache@v3
+        with:
+          path: |
+            pwd
+            /var/lib/docker/overlay2
+          key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
