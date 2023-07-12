@@ -13,11 +13,32 @@ export default {
           id: context.user.id,
         },
       }
+      // this does not work
+      // params.orderBy = ['createdAt_desc']
       const resolved = await neo4jgraphql(object, params, context, resolveInfo)
+
       if (resolved) {
-        resolved.forEach((message) => {
-          message._id = message.id
+        const session = context.driver.session()
+        const countMessageTxPromise = session.readTransaction(async (transaction) => {
+          const countMessageCypher = `
+          MATCH((message:Message)-[:INSIDE]->(:Room { id: $roomId })) RETURN COUNT(message) AS count
+          `
+          const countMessageTxResponse = await transaction.run(countMessageCypher, {
+            roomId,
+          })
+          return await countMessageTxResponse.records[0].get('count')
         })
+        try {
+          const count = await countMessageTxPromise
+          for (let i = 0; i < resolved.length; i++) {
+            resolved[i]._id = resolved[i].id
+            resolved[i].indexId = count - 1 - params.offset - i
+          }
+        } catch (error) {
+          throw new Error(error)
+        } finally {
+          session.close()
+        }
       }
       return resolved
     },
