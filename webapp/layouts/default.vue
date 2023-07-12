@@ -41,6 +41,9 @@ export default {
     closeSingleRoom() {
       this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: 'u0' })
     },
+  }
+  beforeCreate() {
+    this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: null })
   },
 }
 </script>
