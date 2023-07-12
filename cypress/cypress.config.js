@@ -22,6 +22,12 @@ async function setupNodeEvents(on, config) {
     },
   });
 
+  on("after:run", (results) => {
+    if (results) {
+      console.log(results.status);
+    }
+  });
+  
   return config;
 }
 
