@@ -18,7 +18,7 @@ Feature: User profile - change password
 
   Scenario: Incorrect Old Password
     When I fill the password form with:
-      | Your old password    | incorrect |
+      | Your old password    | exposed |
       | Your new password    | secure    |
       | Confirm new password | secure    |
     And I submit the form
@@ -50,6 +50,6 @@ Feature: User profile - change password
     Then I fill in my credentials "peterpan@example.org" "exposed"
     And I click on "submit button"
     And I cannot login anymore
-    But I fill in my credentials "peterpan@example.org" "secure"
+    But I fill in my credentials "peterpan@example.org" "secu"
     And I click on "submit button"
     And I can login successfully
