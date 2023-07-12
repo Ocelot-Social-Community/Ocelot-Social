@@ -117,9 +117,9 @@ export default {
           {
             id: 'group',
             icon: {
-              id: 'marker-blue',
-              legendName: 'mapbox-marker-icon-blue.svg',
-              mapName: 'mapbox-marker-icon-20px-blue.png',
+              id: 'marker-red',
+              legendName: 'mapbox-marker-icon-red.svg',
+              mapName: 'mapbox-marker-icon-20px-red.png',
             },
           },
           {
@@ -407,7 +407,7 @@ export default {
               type: 'Feature',
               properties: {
                 type: 'group',
-                iconName: 'marker-blue',
+                iconName: 'marker-red',
                 iconRotate: 0.0,
                 id: group.id,
                 slug: group.slug,
