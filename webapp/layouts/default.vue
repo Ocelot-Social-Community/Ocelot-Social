@@ -39,9 +39,9 @@ export default {
   mixins: [seo, mobile()],
   methods: {
     closeSingleRoom() {
-      this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: 'u0' })
+      this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: null })
     },
-  }
+  },
   beforeCreate() {
     this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: null })
   },
