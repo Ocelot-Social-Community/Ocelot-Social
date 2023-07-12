@@ -14,9 +14,37 @@ export default {
         },
       }
       const resolved = await neo4jgraphql(object, params, context, resolveInfo)
+
       if (resolved) {
+        const undistributedMessagesIds = resolved
+          .filter((msg) => !msg.distributed && msg.senderId !== context.user.id)
+          .map((msg) => msg.id)
+        if (undistributedMessagesIds.length > 0) {
+          const session = context.driver.session()
+          const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+            const setDistributedCypher = `
+              MATCH (m:Message) WHERE m.id IN $undistributedMessagesIds
+              SET m.distributed = true
+              RETURN m { .* }
+            `
+            const setDistributedTxResponse = await transaction.run(setDistributedCypher, {
+              undistributedMessagesIds,
+            })
+            const messages = await setDistributedTxResponse.records.map((record) => record.get('m'))
+            return messages
+          })
+          try {
+            await writeTxResultPromise
+          } finally {
+            session.close()
+          }
+          // send subscription to author to updated the messages
+        }
         resolved.forEach((message) => {
           message._id = message.id
+          if (message.senderId !== context.user.id) {
+            message.distributed = true
+          }
         })
       }
       return resolved
@@ -35,7 +63,10 @@ export default {
           CREATE (currentUser)-[:CREATED]->(message:Message {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
-            content: $content
+            content: $content,
+            saved: true,
+            distributed: false,
+            seen: false
           })-[:INSIDE]->(room)
           RETURN message { .* }
         `
