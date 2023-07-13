@@ -44,7 +44,7 @@ jobs:
       
       - name: cache docker images
         id: cache
-        uses: actions/cache/save@v3
+        uses: actions/cache@v3
         with:
           path: |
             pwd
@@ -58,10 +58,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Restore cache
-        uses: actions/cache/restore@v3
+        uses: actions/cache@v3
         id: cache
         with:
-          path: /tmp/images/
+          path: |
+            pwd
+            /tmp/images/
           key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
           restore-keys: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
           fail-on-cache-miss: true
