@@ -1,190 +1,203 @@
 <template>
-  <ds-form
-    class="contribution-form"
-    ref="contributionForm"
-    v-model="formData"
-    :schema="formSchema"
-    @submit="submit"
-  >
-    <template #default="{ errors }">
-      <base-card>
-        <template #heroImage>
-          <img
-            v-if="formData.image"
-            :src="formData.image | proxyApiUrl"
-            :class="['image', formData.imageBlurred && '--blur-image']"
+  <div>
+    <div>
+      <h1 v-if="!createEvent" class="title">
+        {{ $t('post.createNewPost.title') }}
+      </h1>
+      <h1 v-else class="title">
+        {{ $t('post.createNewEvent.title') }}
+      </h1>
+    </div>
+    <ds-form
+      class="contribution-form"
+      ref="contributionForm"
+      v-model="formData"
+      :schema="formSchema"
+      @submit="submit"
+    >
+      <template #default="{ errors }">
+        <base-card>
+          <template #heroImage>
+            <img
+              v-if="formData.image"
+              :src="formData.image | proxyApiUrl"
+              :class="['image', formData.imageBlurred && '--blur-image']"
+            />
+            <image-uploader
+              :hasImage="!!formData.image"
+              :class="[formData.imageBlurred && '--blur-image']"
+              @addHeroImage="addHeroImage"
+              @addImageAspectRatio="addImageAspectRatio"
+              @addImageType="addImageType"
+            />
+          </template>
+          <div v-if="formData.image" class="blur-toggle">
+            <label for="blur-img">{{ $t('contribution.inappropriatePicture') }}</label>
+            <input type="checkbox" id="blur-img" v-model="formData.imageBlurred" />
+            <page-params-link class="link" :pageParams="links.FAQ">
+              {{ $t('contribution.inappropriatePicture') }}
+              <base-icon name="question-circle" />
+            </page-params-link>
+          </div>
+          <ds-space margin-top="base" />
+          <ds-input
+            model="title"
+            :placeholder="$t('contribution.title')"
+            name="title"
+            autofocus
+            size="large"
           />
-          <image-uploader
-            :hasImage="!!formData.image"
-            :class="[formData.imageBlurred && '--blur-image']"
-            @addHeroImage="addHeroImage"
-            @addImageAspectRatio="addImageAspectRatio"
-            @addImageType="addImageType"
+          <ds-chip size="base" :color="errors && errors.title && 'danger'">
+            {{ formData.title.length }}/{{ formSchema.title.max }}
+            <base-icon v-if="errors && errors.title" name="warning" />
+          </ds-chip>
+          <editor
+            :users="users"
+            :value="formData.content"
+            :hashtags="hashtags"
+            @input="updateEditorContent"
           />
-        </template>
-        <div v-if="formData.image" class="blur-toggle">
-          <label for="blur-img">{{ $t('contribution.inappropriatePicture') }}</label>
-          <input type="checkbox" id="blur-img" v-model="formData.imageBlurred" />
-          <page-params-link class="link" :pageParams="links.FAQ">
-            {{ $t('contribution.inappropriatePicture') }}
-            <base-icon name="question-circle" />
-          </page-params-link>
-        </div>
-        <ds-space margin-top="base" />
-        <ds-input
-          model="title"
-          :placeholder="$t('contribution.title')"
-          name="title"
-          autofocus
-          size="large"
-        />
-        <ds-chip size="base" :color="errors && errors.title && 'danger'">
-          {{ formData.title.length }}/{{ formSchema.title.max }}
-          <base-icon v-if="errors && errors.title" name="warning" />
-        </ds-chip>
-        <editor
-          :users="users"
-          :value="formData.content"
-          :hashtags="hashtags"
-          @input="updateEditorContent"
-        />
-        <ds-chip size="base" :color="errors && errors.content && 'danger'">
-          {{ contentLength }}
-          <base-icon v-if="errors && errors.content" name="warning" />
-        </ds-chip>
+          <ds-chip size="base" :color="errors && errors.content && 'danger'">
+            {{ contentLength }}
+            <base-icon v-if="errors && errors.content" name="warning" />
+          </ds-chip>
 
-        <!-- Eventdata -->
-        <div v-if="createEvent" class="eventDatas">
-          <hr />
-          <ds-space margin-top="x-small" />
-          <ds-grid>
-            <ds-grid-item class="event-grid-item">
-              <!-- <label>Beginn</label> -->
-              <div class="event-grid-item-z-helper">
+          <!-- Eventdata -->
+          <div v-if="createEvent" class="eventDatas">
+            <hr />
+            <ds-space margin-top="x-small" />
+            <ds-grid>
+              <ds-grid-item class="event-grid-item">
+                <!-- <label>Beginn</label> -->
+                <div class="event-grid-item-z-helper">
+                  <date-picker
+                    name="eventStart"
+                    v-model="formData.eventStart"
+                    type="datetime"
+                    value-type="format"
+                    :minute-step="15"
+                    Xformat="DD-MM-YYYY HH:mm"
+                    class="event-grid-item-z-helper"
+                    :placeholder="$t('post.viewEvent.eventStart')"
+                    :disabled-date="notBeforeToday"
+                    :disabled-time="notBeforeNow"
+                    :show-second="false"
+                    @change="changeEventStart($event)"
+                  ></date-picker>
+                </div>
+                <div
+                  v-if="errors && errors.eventStart"
+                  class="chipbox event-grid-item-margin-helper"
+                >
+                  <ds-chip size="base" :color="errors && errors.eventStart && 'danger'">
+                    <base-icon name="warning" />
+                  </ds-chip>
+                </div>
+              </ds-grid-item>
+              <ds-grid-item class="event-grid-item">
+                <!-- <label>Ende (optional)</label> -->
+
                 <date-picker
-                  name="eventStart"
-                  v-model="formData.eventStart"
+                  v-model="formData.eventEnd"
+                  name="eventEnd"
                   type="datetime"
                   value-type="format"
                   :minute-step="15"
+                  :seconds-step="0"
                   Xformat="DD-MM-YYYY HH:mm"
-                  class="event-grid-item-z-helper"
-                  :placeholder="$t('post.viewEvent.eventStart')"
-                  :disabled-date="notBeforeToday"
-                  :disabled-time="notBeforeNow"
+                  :placeholder="$t('post.viewEvent.eventEnd')"
+                  class="event-grid-item-font-helper"
+                  :disabled-date="notBeforeEventDay"
+                  :disabled-time="notBeforeEvent"
                   :show-second="false"
-                  @change="changeEventStart($event)"
+                  @change="changeEventEnd($event)"
                 ></date-picker>
-              </div>
-              <div v-if="errors && errors.eventStart" class="chipbox event-grid-item-margin-helper">
-                <ds-chip size="base" :color="errors && errors.eventStart && 'danger'">
-                  <base-icon name="warning" />
-                </ds-chip>
-              </div>
-            </ds-grid-item>
-            <ds-grid-item class="event-grid-item">
-              <!-- <label>Ende (optional)</label> -->
+              </ds-grid-item>
+            </ds-grid>
+            <ds-grid class="event-location-grid">
+              <ds-grid-item class="event-grid-item">
+                <ds-input
+                  model="eventVenue"
+                  name="eventVenue"
+                  :placeholder="$t('post.viewEvent.eventVenue')"
+                />
+                <div class="chipbox">
+                  <ds-chip size="base" :color="errors && errors.eventVenue && 'danger'">
+                    {{ formData.eventVenue.length }}/{{ formSchema.eventVenue.max }}
+                    <base-icon v-if="errors && errors.eventVenue" name="warning" />
+                  </ds-chip>
+                </div>
+              </ds-grid-item>
+              <ds-grid-item v-if="showEventLocationName" class="event-grid-item">
+                <ds-input
+                  model="eventLocationName"
+                  name="eventLocationName"
+                  :placeholder="$t('post.viewEvent.eventLocationName')"
+                />
+                <div class="chipbox">
+                  <ds-chip size="base" :color="errors && errors.eventLocationName && 'danger'">
+                    {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
+                    <base-icon v-if="errors && errors.eventLocationName" name="warning" />
+                  </ds-chip>
+                </div>
+              </ds-grid-item>
+            </ds-grid>
 
-              <date-picker
-                v-model="formData.eventEnd"
-                name="eventEnd"
-                type="datetime"
-                value-type="format"
-                :minute-step="15"
-                :seconds-step="0"
-                Xformat="DD-MM-YYYY HH:mm"
-                :placeholder="$t('post.viewEvent.eventEnd')"
+            <div>
+              <input
+                type="checkbox"
+                v-model="formData.eventIsOnline"
+                model="eventIsOnline"
+                name="eventIsOnline"
                 class="event-grid-item-font-helper"
-                :disabled-date="notBeforeEventDay"
-                :disabled-time="notBeforeEvent"
-                :show-second="false"
-                @change="changeEventEnd($event)"
-              ></date-picker>
-            </ds-grid-item>
-          </ds-grid>
-          <ds-grid class="event-location-grid">
-            <ds-grid-item class="event-grid-item">
-              <ds-input
-                model="eventVenue"
-                name="eventVenue"
-                :placeholder="$t('post.viewEvent.eventVenue')"
+                @change="changeEventIsOnline($event)"
               />
-              <div class="chipbox">
-                <ds-chip size="base" :color="errors && errors.eventVenue && 'danger'">
-                  {{ formData.eventVenue.length }}/{{ formSchema.eventVenue.max }}
-                  <base-icon v-if="errors && errors.eventVenue" name="warning" />
-                </ds-chip>
-              </div>
-            </ds-grid-item>
-            <ds-grid-item v-if="showEventLocationName" class="event-grid-item">
-              <ds-input
-                model="eventLocationName"
-                name="eventLocationName"
-                :placeholder="$t('post.viewEvent.eventLocationName')"
-              />
-              <div class="chipbox">
-                <ds-chip size="base" :color="errors && errors.eventLocationName && 'danger'">
-                  {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
-                  <base-icon v-if="errors && errors.eventLocationName" name="warning" />
-                </ds-chip>
-              </div>
-            </ds-grid-item>
-          </ds-grid>
-
-          <div>
-            <input
-              type="checkbox"
-              v-model="formData.eventIsOnline"
-              model="eventIsOnline"
-              name="eventIsOnline"
-              class="event-grid-item-font-helper"
-              @change="changeEventIsOnline($event)"
-            />
-            {{ $t('post.viewEvent.eventIsOnline') }}
+              {{ $t('post.viewEvent.eventIsOnline') }}
+            </div>
           </div>
-        </div>
-        <ds-space margin-top="x-small" />
-        <categories-select
-          v-if="categoriesActive"
-          model="categoryIds"
-          :existingCategoryIds="formData.categoryIds"
-        />
-        <ds-chip
-          v-if="categoriesActive"
-          size="base"
-          :color="errors && errors.categoryIds && 'danger'"
-        >
-          {{ formData.categoryIds.length }} / 3
-          <base-icon v-if="errors && errors.categoryIds" name="warning" />
-        </ds-chip>
-        <ds-flex class="buttons-footer" gutter="xxx-small">
-          <ds-flex-item width="3.5" class="buttons-footer-helper">
-            <!-- eslint-disable vue/no-v-text-v-html-on-component -->
-            <!-- TODO => remove v-html! only text ! no html! security first! -->
-            <ds-text
-              v-if="showGroupHint"
-              v-html="$t('contribution.visibleOnlyForMembersOfGroup', { name: groupName })"
-            />
-            <!-- eslint-enable vue/no-v-text-v-html-on-component -->
-          </ds-flex-item>
-          <ds-flex-item width="0.15" />
-          <ds-flex-item class="action-buttons-group" width="2">
-            <base-button
-              data-test="cancel-button"
-              :disabled="loading"
-              @click="$router.back()"
-              danger
-            >
-              {{ $t('actions.cancel') }}
-            </base-button>
-            <base-button type="submit" icon="check" :loading="loading" :disabled="errors" filled>
-              {{ $t('actions.save') }}
-            </base-button>
-          </ds-flex-item>
-        </ds-flex>
-      </base-card>
-    </template>
-  </ds-form>
+          <ds-space margin-top="x-small" />
+          <categories-select
+            v-if="categoriesActive"
+            model="categoryIds"
+            :existingCategoryIds="formData.categoryIds"
+          />
+          <ds-chip
+            v-if="categoriesActive"
+            size="base"
+            :color="errors && errors.categoryIds && 'danger'"
+          >
+            {{ formData.categoryIds.length }} / 3
+            <base-icon v-if="errors && errors.categoryIds" name="warning" />
+          </ds-chip>
+          <ds-flex class="buttons-footer" gutter="xxx-small">
+            <ds-flex-item width="3.5" class="buttons-footer-helper">
+              <!-- eslint-disable vue/no-v-text-v-html-on-component -->
+              <!-- TODO => remove v-html! only text ! no html! security first! -->
+              <ds-text
+                v-if="showGroupHint"
+                v-html="$t('contribution.visibleOnlyForMembersOfGroup', { name: groupName })"
+              />
+              <!-- eslint-enable vue/no-v-text-v-html-on-component -->
+            </ds-flex-item>
+            <ds-flex-item width="0.15" />
+            <ds-flex-item class="action-buttons-group" width="2">
+              <base-button
+                data-test="cancel-button"
+                :disabled="loading"
+                @click="$router.back()"
+                danger
+              >
+                {{ $t('actions.cancel') }}
+              </base-button>
+              <base-button type="submit" icon="check" :loading="loading" :disabled="errors" filled>
+                {{ $t('actions.save') }}
+              </base-button>
+            </ds-flex-item>
+          </ds-flex>
+        </base-card>
+      </template>
+    </ds-form>
+  </div>
 </template>
 <script>
 import gql from 'graphql-tag'
