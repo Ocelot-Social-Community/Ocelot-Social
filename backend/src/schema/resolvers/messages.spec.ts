@@ -212,7 +212,7 @@ describe('Message', () => {
                 {
                   id: expect.any(String),
                   _id: result.data.Message[0].id,
-                  indexId: '0',
+                  indexId: 0,
                   content: 'Some nice message to other chatting user',
                   senderId: 'chatting-user',
                   username: 'Chatting User',
