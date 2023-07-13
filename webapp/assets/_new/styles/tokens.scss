@@ -417,33 +417,3 @@ $chat-message-color: $text-color-base;
 $chat-message-bg-others: $color-neutral-80;
 $chat-sidemenu-bg: $color-secondary-active;
 $chat-new-message-color: $color-secondary-active;
-
-:export {
-  colorPrimary: $color-primary;
-  colorPrimaryActive: $color-primary-active;
-  colorPrimaryLight: $color-primary-light;
-
-  borderColorSoft: $border-color-soft;
-
-  borderRadiusBase: $border-radius-base;
-
-  textColorBase: $text-color-base;
-  textColorSoft: $text-color-soft;
-  textColorInverse: $text-color-inverse;
-
-  boxShadowBase: $box-shadow-base;
-
-  backgroundColorBase: $background-color-base;
-  backgroundColorSoft: $background-color-soft;
-  backgroundColorSoftest: $background-color-softest;
-  backgroundColorPrimary: $background-color-primary;
-
-  colorNeutral30: $color-neutral-30;
-  
-  chatMessageColor: $chat-message-color;
-  
-  chatMessageBgMe: $chat-message-bg-me;
-  chatMessageBgOthers: $chat-message-bg-others;
-
-  chatNewMessageColor: $chat-new-message-color;
-}
