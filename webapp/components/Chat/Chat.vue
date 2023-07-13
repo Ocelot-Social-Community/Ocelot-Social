@@ -8,6 +8,7 @@
         :template-actions="JSON.stringify(templatesText)"
         :menu-actions="JSON.stringify(menuActions)"
         :text-messages="JSON.stringify(textMessages)"
+        :message-actions="messageActions"
         :messages="JSON.stringify(messages)"
         :messages-loaded="messagesLoaded"
         :rooms="JSON.stringify(rooms)"
@@ -59,14 +60,14 @@ export default {
         }, */
       ],
       messageActions: [
-        {
-          name: 'addMessageToFavorite',
-          title: 'Add To Favorite',
-        },
-        {
-          name: 'shareMessage',
-          title: 'Share Message',
-        },
+        // {
+        //   name: 'addMessageToFavorite',
+        //   title: 'Add To Favorite',
+        // },
+        // {
+        //   name: 'shareMessage',
+        //   title: 'Share Message',
+        // },
       ],
       templatesText: [
         {
