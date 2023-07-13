@@ -165,8 +165,7 @@ export default {
           fetchPolicy: 'no-cache',
         })
         .then(({ data: { Message } }) => {
-          const msgIds = Message.map((m) => m.id)
-          const msgs = [...Message, ...this.messages.filter((m) => !msgIds.includes(m.id))]
+          const msgs = [...Message, ...this.messages]
           this.messages = msgs
 
           if (Message.length < this.messagePageSize) {
