@@ -116,8 +116,8 @@ export default {
       messagePage: 0,
       messagePageSize: 20,
       roomPage: 0,
-      roomPageSize: 999, //TODO pagination is a problem with single rooms - cant use
-      lastRoom: null
+      roomPageSize: 999, // TODO pagination is a problem with single rooms - cant use
+      lastRoom: null,
     }
   },
   mounted() {
@@ -147,13 +147,13 @@ export default {
   },
   methods: {
     fetchMessages({ room, options = {} }) {
-      if(this.lastRoom != room.id) {
+      if (this.lastRoom !== room.id) {
         this.messages = []
-        this.messagePage = 0,
+        this.messagePage = 0
         this.lastRoom = room.id
       }
       this.messagesLoaded = false
-      const offset = (options.refetch ? 0 : this.messagePage) *  this.messagePageSize
+      const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
       setTimeout(async () => {
         try {
           const {
@@ -167,15 +167,14 @@ export default {
             },
             fetchPolicy: 'no-cache',
           })
-          
+
           const msgs = []
           ;[...this.messages, ...Message].forEach((m) => {
             msgs[m.indexId] = m
           })
-          this.messages = msgs.filter( Boolean )
+          this.messages = msgs.filter(Boolean)
 
-
-          if(Message.length < this.messagePageSize){
+          if (Message.length < this.messagePageSize) {
             this.messagesLoaded = true
           }
           this.messagePage += 1
@@ -187,7 +186,10 @@ export default {
     },
 
     refetchMessage(roomId) {
-      this.fetchMessages({ room: this.rooms.find((r) => r.roomId === roomId), options: { refetch: true} })
+      this.fetchMessages({
+        room: this.rooms.find((r) => r.roomId === roomId),
+        options: { refetch: true },
+      })
     },
 
     async sendMessage(message) {
@@ -213,7 +215,7 @@ export default {
       variables() {
         return {
           first: this.roomPageSize,
-          offset: this.roomPage* this.roomPageSize,
+          offset: this.roomPage * this.roomPageSize,
         }
       },
       update({ Room }) {
