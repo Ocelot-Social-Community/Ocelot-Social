@@ -164,7 +164,7 @@ export default {
       return chatStyle.STYLE.light
     },
     textMessages() {
-      return{
+      return {
         ROOMS_EMPTY: this.$t('chat.roomsEmpty'),
         ROOM_EMPTY: this.$t('chat.roomEmpty'),
         NEW_MESSAGES: this.$t('chat.newMessages'),
@@ -178,7 +178,7 @@ export default {
         IS_TYPING: this.$t('chat.isTyping'),
         CANCEL_SELECT_MESSAGE: this.$t('chat.cancelSelectMessage'),
       }
-    }
+    },
   },
   methods: {
     fetchMessages({ room, options = {} }) {
