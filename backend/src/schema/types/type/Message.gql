@@ -9,7 +9,7 @@ enum _MessageOrdering {
 
 type Message {
   id: ID!
-  indexId: String!
+  indexId: Int!
   createdAt: String
   updatedAt: String
 
