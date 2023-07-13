@@ -89,7 +89,11 @@
     "roomEmpty": "No room selected",
     "roomsEmpty": "No rooms",
     "search": "Search",
-    "typeMessage": "Type message"
+    "typeMessage": "Type message",
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chat with “{name}”"
+    }
   },
   "client-only": {
     "loading": "Loading …"
@@ -566,6 +570,9 @@
       },
       "groups": "Groups",
       "myProfile": "My profile"
+    },
+    "chat": {
+      "tooltip": "My chats"
     }
   },
   "index": {
@@ -705,10 +712,6 @@
       "unread": "Unread"
     },
     "group": "Description",
-    "headerMenuButton": {
-      "chat": "My Chat",
-      "tooltip": "My notifications"
-    },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
     "post": "Post or Group",

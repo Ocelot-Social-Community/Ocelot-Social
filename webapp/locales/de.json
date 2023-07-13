@@ -89,7 +89,11 @@
     "roomEmpty": "Keinen Raum selektiert",
     "roomsEmpty": "Keine Räume",
     "search": "Suche",
-    "typeMessage": "Nachricht schreiben"
+    "typeMessage": "Nachricht schreiben",
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chatte mit „{name}“"
+    }
   },
   "client-only": {
     "loading": "Lade …"
@@ -566,6 +570,9 @@
       },
       "groups": "Gruppen",
       "myProfile": "Mein Profil"
+    },
+    "chat": {
+      "tooltip": "Meine Chats"
     }
   },
   "index": {
@@ -705,10 +712,6 @@
       "unread": "Ungelesen"
     },
     "group": "Beschreibung",
-    "headerMenuButton": {
-      "chat": "Meine Chat",
-      "tooltip": "Meine Benachrichtigungen"
-    },
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",
