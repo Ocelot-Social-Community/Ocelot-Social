@@ -146,7 +146,7 @@ export default {
     }),
   },
   methods: {
-    fetchMessages({ room, options = {} }) {
+    async fetchMessages({ room, options = {} }) {
       if (this.lastRoom !== room.id) {
         this.messages = []
         this.messagePage = 0
@@ -154,35 +154,33 @@ export default {
       }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
       const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
-      setTimeout(async () => {
-        try {
-          const {
-            data: { Message },
-          } = await this.$apollo.query({
-            query: messageQuery(),
-            variables: {
-              roomId: room.id,
-              first: this.messagePageSize,
-              offset,
-            },
-            fetchPolicy: 'no-cache',
-          })
+      try {
+        const {
+          data: { Message },
+        } = await this.$apollo.query({
+          query: messageQuery(),
+          variables: {
+            roomId: room.id,
+            first: this.messagePageSize,
+            offset,
+          },
+          fetchPolicy: 'no-cache',
+        })
 
-          const msgs = []
-          ;[...this.messages, ...Message].forEach((m) => {
-            msgs[m.indexId] = m
-          })
-          this.messages = msgs.filter(Boolean)
+        const msgs = []
+        ;[...this.messages, ...Message].forEach((m) => {
+          msgs[m.indexId] = m
+        })
+        this.messages = msgs.filter(Boolean)
 
-          if (Message.length < this.messagePageSize) {
-            this.messagesLoaded = true
-          }
-          this.messagePage += 1
-        } catch (error) {
-          this.messages = []
-          this.$toast.error(error.message)
+        if (Message.length < this.messagePageSize) {
+          this.messagesLoaded = true
         }
-      })
+        this.messagePage += 1
+      } catch (error) {
+        this.messages = []
+        this.$toast.error(error.message)
+      }
     },
 
     refetchMessage(roomId) {
