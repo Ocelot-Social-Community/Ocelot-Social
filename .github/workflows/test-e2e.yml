@@ -49,7 +49,7 @@ jobs:
           path: |
             pwd
             /tmp/images/
-          key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
+          key: e2e-preparation-cache-pr # ${{ steps.pr.outputs.number }}
   
   fullstack_tests:
     name: Fullstack tests
@@ -69,9 +69,7 @@ jobs:
         run: |
           pwd
           ls -l
-          docker images
-          sudo ls -l /var/lib/docker/overlay2
+          ls -l /tmp/images/
 
       # - name: Fullstack tests | run tests
       #   run: yarn run cypress:run --spec cypress/e2e/Admin.PinPost.feature,cypress/e2e/Post.Images.feature
-
