@@ -8,7 +8,8 @@ jobs:
   docker_preparation:
     name: Fullstack test preparation
     runs-on: ubuntu-latest
-    permissions: read-all
+    outputs:
+      cache-hit: ${{ steps.cache.outputs.cache-hit }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -37,11 +38,12 @@ jobs:
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/images/webapp.tar
       
       # TODO reuse the retrieved pr number in following jobs
-      - name: Get pr number
-        id: pr
-        uses: 8BitJonny/gh-get-current-pr@2.2.0
+      # - name: Get pr number
+      #   id: pr
+      #   uses: 8BitJonny/gh-get-current-pr@2.2.0
       
       - name: cache docker images
+        id: cache
         uses: actions/cache/save@v3
         with:
           path: |
@@ -51,7 +53,7 @@ jobs:
   
   fullstack_tests:
     name: Fullstack tests
-    if: ${{ needs.docker_preparation.outputs.cache-hit == 'true' }}
+    if: needs.docker_preparation.outputs.cache-hit == 'true'
     needs: docker_preparation
     runs-on: ubuntu-latest
     steps:
