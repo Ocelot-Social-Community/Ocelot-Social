@@ -17,6 +17,7 @@ export const messageQuery = () => {
       Message(roomId: $roomId) {
         _id
         id
+        indexId
         content
         senderId
         username

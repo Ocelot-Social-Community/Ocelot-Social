@@ -212,6 +212,7 @@ describe('Message', () => {
                 {
                   id: expect.any(String),
                   _id: result.data.Message[0].id,
+                  indexId: '0',
                   content: 'Some nice message to other chatting user',
                   senderId: 'chatting-user',
                   username: 'Chatting User',
@@ -256,6 +257,7 @@ describe('Message', () => {
                 Message: expect.arrayContaining([
                   expect.objectContaining({
                     id: expect.any(String),
+                    indexId: '0',
                     content: 'Some nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
@@ -264,6 +266,7 @@ describe('Message', () => {
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
+                    indexId: '1',
                     content: 'A nice response message to chatting user',
                     senderId: 'other-chatting-user',
                     username: 'Other Chatting User',
@@ -272,6 +275,72 @@ describe('Message', () => {
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
+                    indexId: '2',
+                    content: 'And another nice message to other chatting user',
+                    senderId: 'chatting-user',
+                    username: 'Chatting User',
+                    avatar: expect.any(String),
+                    date: expect.any(String),
+                  }),
+                ]),
+              },
+            })
+          })
+
+          it('returns the messages paginated', async () => {
+            await expect(
+              query({
+                query: messageQuery(),
+                variables: {
+                  roomId,
+                  first: 2,
+                  offset: 0,
+                  orderBy: 'created_desc',
+                },
+              }),
+            ).resolves.toMatchObject({
+              errors: undefined,
+              data: {
+                Message: expect.arrayContaining([
+                  expect.objectContaining({
+                    id: expect.any(String),
+                    indexId: '0',
+                    content: 'Some nice message to other chatting user',
+                    senderId: 'chatting-user',
+                    username: 'Chatting User',
+                    avatar: expect.any(String),
+                    date: expect.any(String),
+                  }),
+                  expect.objectContaining({
+                    id: expect.any(String),
+                    indexId: '1',
+                    content: 'A nice response message to chatting user',
+                    senderId: 'other-chatting-user',
+                    username: 'Other Chatting User',
+                    avatar: expect.any(String),
+                    date: expect.any(String),
+                  }),
+                ]),
+              },
+            })
+
+            await expect(
+              query({
+                query: messageQuery(),
+                variables: {
+                  roomId,
+                  first: 2,
+                  offset: 2,
+                  orderBy: 'created_desc',
+                },
+              }),
+            ).resolves.toMatchObject({
+              errors: undefined,
+              data: {
+                Message: expect.arrayContaining([
+                  expect.objectContaining({
+                    id: expect.any(String),
+                    indexId: '2',
                     content: 'And another nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
