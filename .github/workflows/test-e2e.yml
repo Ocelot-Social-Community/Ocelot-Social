@@ -19,14 +19,6 @@ jobs:
         run: |
           cp webapp/.env.template webapp/.env
           cp backend/.env.template backend/.env
-      
-      - name: Install for test tool
-        run: |
-          cd backend
-          yarn install
-          yarn build
-          cd ..
-          yarn install
 
       - name: Build docker images
         run: |
@@ -68,18 +60,21 @@ jobs:
           restore-keys: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
           fail-on-cache-miss: true
 
-      # TODO remove after test phase
-      - name: Check existence of docker images images
+      - name: Install for test tool
         run: |
-          pwd
-          ls -l
-          ls -l /tmp/images/
+          cd backend
+          yarn install
+          yarn build
+          cd ..
+          yarn install
 
       - name: load docker images
         run: |
           docker load < /tmp/images/neo4j.tar
           docker load < /tmp/images/backend.tar
           docker load < /tmp/images/webapp.tar    
+      
+      
       
       # - name: Fullstack tests | run tests
       #   run: yarn run cypress:run --spec cypress/e2e/Admin.PinPost.feature,cypress/e2e/Post.Images.feature
