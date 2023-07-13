@@ -254,7 +254,7 @@ describe('Message', () => {
             ).resolves.toMatchObject({
               errors: undefined,
               data: {
-                Message: expect.arrayContaining([
+                Message: [
                   expect.objectContaining({
                     id: expect.any(String),
                     indexId: '0',
@@ -282,7 +282,7 @@ describe('Message', () => {
                     avatar: expect.any(String),
                     date: expect.any(String),
                   }),
-                ]),
+                ],
               },
             })
           })
@@ -295,22 +295,12 @@ describe('Message', () => {
                   roomId,
                   first: 2,
                   offset: 0,
-                  orderBy: 'created_desc',
                 },
               }),
             ).resolves.toMatchObject({
               errors: undefined,
               data: {
-                Message: expect.arrayContaining([
-                  expect.objectContaining({
-                    id: expect.any(String),
-                    indexId: '0',
-                    content: 'Some nice message to other chatting user',
-                    senderId: 'chatting-user',
-                    username: 'Chatting User',
-                    avatar: expect.any(String),
-                    date: expect.any(String),
-                  }),
+                Message: [
                   expect.objectContaining({
                     id: expect.any(String),
                     indexId: '1',
@@ -320,7 +310,16 @@ describe('Message', () => {
                     avatar: expect.any(String),
                     date: expect.any(String),
                   }),
-                ]),
+                  expect.objectContaining({
+                    id: expect.any(String),
+                    indexId: '2',
+                    content: 'And another nice message to other chatting user',
+                    senderId: 'chatting-user',
+                    username: 'Chatting User',
+                    avatar: expect.any(String),
+                    date: expect.any(String),
+                  }),
+                ],
               },
             })
 
@@ -331,23 +330,22 @@ describe('Message', () => {
                   roomId,
                   first: 2,
                   offset: 2,
-                  orderBy: 'created_desc',
                 },
               }),
             ).resolves.toMatchObject({
               errors: undefined,
               data: {
-                Message: expect.arrayContaining([
+                Message: [
                   expect.objectContaining({
                     id: expect.any(String),
-                    indexId: '2',
-                    content: 'And another nice message to other chatting user',
+                    indexId: '0',
+                    content: 'Some nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
                     avatar: expect.any(String),
                     date: expect.any(String),
                   }),
-                ]),
+                ],
               },
             })
           })
