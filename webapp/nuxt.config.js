@@ -105,6 +105,7 @@ export default {
       styleguideStyles,
       '~assets/_new/styles/tokens.scss',
       '~assets/styles/imports/_branding.scss',
+      '~assets/_new/styles/export.scss',
     ],
   },
 
