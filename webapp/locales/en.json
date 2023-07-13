@@ -616,9 +616,16 @@
     "button": {
       "tooltip": "Show map"
     },
+    "legend": {
+      "event": "Event",
+      "group": "Group",
+      "theUser": "My position",
+      "user": "User"
+    },
     "markerTypes": {
+      "event": "event",
       "group": "group",
-      "theUser": "your position",
+      "theUser": "my position",
       "user": "user"
     },
     "pageTitle": "Map",
@@ -725,11 +732,6 @@
       "user_left_group": "Left your group …"
     },
     "title": "Notifications",
-    "user": "User"
-  },
-  "position": {
-    "group": "Group",
-    "my": "My position",
     "user": "User"
   },
   "post": {
