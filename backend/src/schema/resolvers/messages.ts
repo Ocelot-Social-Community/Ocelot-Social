@@ -18,9 +18,9 @@ export default {
       const resolved = await neo4jgraphql(object, params, context, resolveInfo)
 
       if (resolved) {
-        for (let i = 0; i < resolved.length; i++) {
-          resolved[i]._id = resolved[i].id
-        }
+        resolved.forEach((message) => {
+          message._id = message.id
+        })
       }
       return resolved
     },
