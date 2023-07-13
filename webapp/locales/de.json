@@ -80,7 +80,7 @@
   "chat": {
     "userProfileButton": {
       "label": "Chat",
-      "tooltip": "Chatte mit {USERNAME}"
+      "tooltip": "Chatte mit „{name}“"
     }
   },
   "client-only": {

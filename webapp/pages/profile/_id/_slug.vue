@@ -82,7 +82,7 @@
             <base-button
               icon="chat-bubble"
               v-tooltip="{
-                content: $t('chat.userProfileButton.tooltip', {'USERNAME': userName}),
+                content: $t('chat.userProfileButton.tooltip', { name: userName }),
                 placement: 'bottom-start',
               }"
               @click="$store.commit('chat/SET_OPEN_CHAT', { showChat: true, roomID: user.id })"
