@@ -18,26 +18,8 @@ export default {
       const resolved = await neo4jgraphql(object, params, context, resolveInfo)
 
       if (resolved) {
-        const session = context.driver.session()
-        const countMessageTxPromise = session.readTransaction(async (transaction) => {
-          const countMessageCypher = `
-          MATCH((message:Message)-[:INSIDE]->(:Room { id: $roomId })) RETURN COUNT(message) AS count
-          `
-          const countMessageTxResponse = await transaction.run(countMessageCypher, {
-            roomId,
-          })
-          return await countMessageTxResponse.records[0].get('count')
-        })
-        try {
-          const count = await countMessageTxPromise
-          for (let i = 0; i < resolved.length; i++) {
-            resolved[i]._id = resolved[i].id
-            resolved[i].indexId = count - 1 - params.offset - i
-          }
-        } catch (error) {
-          throw new Error(error)
-        } finally {
-          session.close()
+        for (let i = 0; i < resolved.length; i++) {
+          resolved[i]._id = resolved[i].id
         }
       }
       return resolved
@@ -53,9 +35,12 @@ export default {
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const createMessageCypher = `
           MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+          OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
+          WITH MAX(m.indexId) as maxIndex, room, currentUser
           CREATE (currentUser)-[:CREATED]->(message:Message {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
+            indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
             content: $content
           })-[:INSIDE]->(room)
           RETURN message { .* }
