@@ -72,13 +72,16 @@ jobs:
 
       - name: Install for test tool
         run: |
+          wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+          chmod +x /opt/cucumber-json-formatter
+          sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
           cd backend
           yarn install
           yarn build
           cd ..
           yarn install
 
-      - name: load docker images
+      - name: Load docker images
         run: |
           docker load < /tmp/images/neo4j.tar
           docker load < /tmp/images/backend.tar
@@ -87,7 +90,7 @@ jobs:
       - name: Fullstack tests | run tests
         id: e2e-tests
         run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
-      
+
       - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         run: |
