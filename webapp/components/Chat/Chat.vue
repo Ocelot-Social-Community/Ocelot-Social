@@ -20,6 +20,7 @@
         @fetch-messages="fetchMessages($event.detail[0])"
         :responsive-breakpoint="responsiveBreakpoint"
         :single-room="singleRoom"
+        show-reaction-emojis="false"
         @show-demo-options="showDemoOptions = $event"
       />
     </client-only>
