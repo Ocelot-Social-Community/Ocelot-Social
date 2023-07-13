@@ -38,9 +38,7 @@ jobs:
         id: cache
         uses: actions/cache@v3
         with:
-          path: |
-            pwd
-            /tmp/images/
+          path: /tmp/images/
           key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
   
   fullstack_tests:
@@ -48,14 +46,26 @@ jobs:
     # if: needs.docker_preparation.outputs.cache-hit == 'true'
     needs: docker_preparation
     runs-on: ubuntu-latest
+    env:
+      jobs: 8
+    strategy:
+      matrix:
+        # run copies of the current job in parallel
+        job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Copy env file
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.template backend/.env
+        
       - name: Restore cache
         uses: actions/cache@v3
         id: cache
         with:
-          path: |
-            pwd
-            /tmp/images/
+          path: /tmp/images/
           key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
           restore-keys: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
           fail-on-cache-miss: true
@@ -73,8 +83,21 @@ jobs:
           docker load < /tmp/images/neo4j.tar
           docker load < /tmp/images/backend.tar
           docker load < /tmp/images/webapp.tar    
+
+      - name: Fullstack tests | run tests
+        id: e2e-tests
+        run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
       
-      
-      
-      # - name: Fullstack tests | run tests
-      #   run: yarn run cypress:run --spec cypress/e2e/Admin.PinPost.feature,cypress/e2e/Post.Images.feature
+      - name: Full stack tests | if tests failed, compile html report
+        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
+        run: |
+          cd cypress/
+          node create-cucumber-html-report.js
+
+      - name: End-to-end tests | if tests failed, upload report
+        id: e2e-report
+        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
+          path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
