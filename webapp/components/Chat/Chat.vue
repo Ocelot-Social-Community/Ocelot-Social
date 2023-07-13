@@ -152,7 +152,7 @@ export default {
         this.messagePage = 0
         this.lastRoom = room.id
       }
-      this.messagesLoaded = false
+      this.messagesLoaded = options.refetch ? this.messagesLoaded : false
       const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
       setTimeout(async () => {
         try {
