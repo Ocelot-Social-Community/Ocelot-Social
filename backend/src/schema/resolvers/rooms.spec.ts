@@ -92,6 +92,21 @@ describe('Room', () => {
         })
       })
 
+      describe('user id is self', () => {
+        it('throws error', async () => {
+          await expect(
+            mutate({
+              mutation: createRoomMutation(),
+              variables: {
+                userId: 'chatting-user',
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [{ message: 'Cannot create a room with self' }],
+          })
+        })
+      })
+
       describe('user id exists', () => {
         it('returns the id of the room', async () => {
           const result = await mutate({
