@@ -8,6 +8,7 @@
         :template-actions="JSON.stringify(templatesText)"
         :menu-actions="JSON.stringify(menuActions)"
         :text-messages="JSON.stringify(textMessages)"
+        :message-actions="messageActions"
         :messages="JSON.stringify(messages)"
         :messages-loaded="messagesLoaded"
         :rooms="JSON.stringify(rooms)"
@@ -15,6 +16,7 @@
         :rooms-loaded="true"
         show-files="false"
         show-audio="false"
+        :styles="JSON.stringify(computedChatStyle)"
         :show-footer="true"
         @send-message="sendMessage($event.detail[0])"
         @fetch-messages="fetchMessages($event.detail[0])"
@@ -22,7 +24,35 @@
         :single-room="singleRoom"
         show-reaction-emojis="false"
         @show-demo-options="showDemoOptions = $event"
-      />
+      >
+        <div slot="menu-icon" @click.prevent.stop="$emit('close-single-room', true)">
+          <div v-if="singleRoom">
+            <ds-icon name="close"></ds-icon>
+          </div>
+        </div>
+
+        <div slot="room-header-avatar">
+          <div
+            v-if="selectedRoom && selectedRoom.avatar && selectedRoom.avatar !== 'default-avatar'"
+            class="vac-avatar"
+            :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
+          />
+          <div v-else-if="selectedRoom" class="vac-avatar">
+            <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
+          </div>
+        </div>
+
+        <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
+          <div
+            v-if="room.avatar && room.avatar !== 'default-avatar'"
+            class="vac-avatar"
+            :style="{ 'background-image': `url('${room.avatar}')` }"
+          />
+          <div v-else class="vac-avatar">
+            <span class="initials">{{ getInitialsName(room.roomName) }}</span>
+          </div>
+        </div>
+      </vue-advanced-chat>
     </client-only>
   </div>
 </template>
@@ -30,6 +60,7 @@
 <script>
 import { roomQuery, createRoom } from '~/graphql/Rooms'
 import { messageQuery, createMessageMutation } from '~/graphql/Messages'
+import chatStyle from '~/constants/chat.js'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -46,6 +77,11 @@ export default {
   data() {
     return {
       menuActions: [
+        // NOTE: if menuActions is empty, the related slot is not shown
+        {
+          name: 'dummyItem',
+          title: 'Just a dummy item',
+        },
         /* {
           name: 'inviteUser',
           title: 'Invite User',
@@ -60,14 +96,14 @@ export default {
         }, */
       ],
       messageActions: [
-        {
-          name: 'addMessageToFavorite',
-          title: 'Add To Favorite',
-        },
-        {
-          name: 'shareMessage',
-          title: 'Share Message',
-        },
+        // {
+        //   name: 'addMessageToFavorite',
+        //   title: 'Add To Favorite',
+        // },
+        // {
+        //   name: 'shareMessage',
+        //   title: 'Share Message',
+        // },
       ],
       templatesText: [
         {
@@ -80,18 +116,18 @@ export default {
         },
       ],
       textMessages: {
-        ROOMS_EMPTY: 'Aucune conversation',
-        ROOM_EMPTY: 'Aucune conversation sélectionnée',
-        NEW_MESSAGES: 'Nouveaux messages',
-        MESSAGE_DELETED: 'Ce message a été supprimé',
-        MESSAGES_EMPTY: 'Aucun message',
-        CONVERSATION_STARTED: 'La conversation a commencée le :',
-        TYPE_MESSAGE: 'Tapez votre message',
-        SEARCH: 'Rechercher',
-        IS_ONLINE: 'est en ligne',
-        LAST_SEEN: 'dernière connexion ',
-        IS_TYPING: 'est en train de taper...',
-        CANCEL_SELECT_MESSAGE: 'Annuler Sélection',
+        ROOMS_EMPTY: this.$t('chat.roomsEmpty'),
+        ROOM_EMPTY: this.$t('chat.roomEmpty'),
+        NEW_MESSAGES: this.$t('chat.newMessages'),
+        MESSAGE_DELETED: this.$t('chat.messageDeleted'),
+        MESSAGES_EMPTY: this.$t('chat.messagesEmpty'),
+        CONVERSATION_STARTED: this.$t('chat.conversationStarted'),
+        TYPE_MESSAGE: this.$t('chat.typeMessage'),
+        SEARCH: this.$t('chat.search'),
+        IS_ONLINE: this.$t('chat.isOnline'),
+        LAST_SEEN: this.$t('chat.lastSeen'),
+        IS_TYPING: this.$t('chat.isTyping'),
+        CANCEL_SELECT_MESSAGE: this.$t('chat.cancelSelectMessage'),
       },
       roomActions: [
         /*
@@ -110,6 +146,7 @@ export default {
       showDemoOptions: true,
       responsiveBreakpoint: 600,
       singleRoom: !!this.singleRoomId || false,
+      selectedRoom: null,
     }
   },
   mounted() {
@@ -136,6 +173,11 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+    computedChatStyle() {
+      // TODO light/dark theme still needed?
+      // return this.theme === 'light' ? chatStyle.STYLE.light : chatStyle.STYLE.dark
+      return chatStyle.STYLE.light
+    },
   },
   methods: {
     fetchMessages({ room, options = {} }) {
@@ -157,6 +199,8 @@ export default {
           this.$toast.error(error.message)
         }
         this.messagesLoaded = true
+
+        this.selectedRoom = room
       })
     },
 
@@ -177,6 +221,11 @@ export default {
         this.$toast.error(error.message)
       }
       this.refetchMessage(message.roomId)
+    },
+
+    getInitialsName(fullname) {
+      if (!fullname) return
+      return fullname.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
     },
   },
   apollo: {
@@ -217,5 +266,26 @@ export default {
 <style lang="scss">
 body {
   font-family: 'Quicksand', sans-serif;
+}
+.vac-avatar {
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: $color-primary-dark;
+  color: $text-color-primary-inverse;
+  height: 42px;
+  width: 42px;
+  min-height: 42px;
+  min-width: 42px;
+  margin-right: 15px;
+  border-radius: 50%;
+  position: relative;
+
+  > .initials {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 </style>
