@@ -46,31 +46,31 @@ export default {
     return {
       menuActions: [
         /*
-        {
-          name: 'inviteUser',
-          title: 'Invite User',
-        },
-        {
-          name: 'removeUser',
-          title: 'Remove User',
-        },
-        {
-          name: 'deleteRoom',
-          title: 'Delete Room',
-        },
-        */
+            {
+            name: 'inviteUser',
+            title: 'Invite User',
+            },
+            {
+            name: 'removeUser',
+            title: 'Remove User',
+            },
+            {
+            name: 'deleteRoom',
+            title: 'Delete Room',
+            },
+          */
       ],
       messageActions: [
         /*
-        {
-          name: 'addMessageToFavorite',
-          title: 'Add To Favorite',
-        },
-        {
-          name: 'shareMessage',
-          title: 'Share Message',
-        },
-        */
+            {
+            name: 'addMessageToFavorite',
+            title: 'Add To Favorite',
+            },
+            {
+            name: 'shareMessage',
+            title: 'Share Message',
+            },
+          */
       ],
       templatesText: [
         {
@@ -98,14 +98,14 @@ export default {
       },
       roomActions: [
         /*
-        {
-          name: 'archiveRoom',
-          title: 'Archive Room',
-        },
-        { name: 'inviteUser', title: 'Invite User' },
-        { name: 'removeUser', title: 'Remove User' },
-        { name: 'deleteRoom', title: 'Delete Room' },
-        */
+            {
+            name: 'archiveRoom',
+            title: 'Archive Room',
+            },
+            { name: 'inviteUser', title: 'Invite User' },
+            { name: 'removeUser', title: 'Remove User' },
+            { name: 'deleteRoom', title: 'Delete Room' },
+          */
       ],
       rooms: [],
       messages: [],
@@ -146,7 +146,7 @@ export default {
     }),
   },
   methods: {
-    async fetchMessages({ room, options = {} }) {
+    fetchMessages({ room, options = {} }) {
       if (this.lastRoom !== room.id) {
         this.messages = []
         this.messagePage = 0
@@ -154,10 +154,8 @@ export default {
       }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
       const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
-      try {
-        const {
-          data: { Message },
-        } = await this.$apollo.query({
+      this.$apollo
+        .query({
           query: messageQuery(),
           variables: {
             roomId: room.id,
@@ -166,23 +164,21 @@ export default {
           },
           fetchPolicy: 'no-cache',
         })
+        .then(({ data: { Message } }) => {
+          const msgIds = Message.map((m) => m.id)
+          const msgs = [...Message, ...this.messages.filter((m) => !msgIds.includes(m.id))]
+          this.messages = msgs
 
-        const msgs = []
-        ;[...this.messages, ...Message].forEach((m) => {
-          msgs[m.indexId] = m
+          if (Message.length < this.messagePageSize) {
+            this.messagesLoaded = true
+          }
+          this.messagePage += 1
         })
-        this.messages = msgs.filter(Boolean)
-
-        if (Message.length < this.messagePageSize) {
-          this.messagesLoaded = true
-        }
-        this.messagePage += 1
-      } catch (error) {
-        this.messages = []
-        this.$toast.error(error.message)
-      }
+        .catch((error) => {
+          this.messages = []
+          this.$toast.error(error.message)
+        })
     },
-
     refetchMessage(roomId) {
       this.fetchMessages({
         room: this.rooms.find((r) => r.roomId === roomId),
