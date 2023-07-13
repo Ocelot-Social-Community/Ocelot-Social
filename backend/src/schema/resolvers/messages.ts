@@ -68,6 +68,7 @@ export default {
             distributed: false,
             seen: false
           })-[:INSIDE]->(room)
+          SET room.lastMessageAt = toString(datetime())
           RETURN message { .* }
         `
         const createMessageTxResponse = await transaction.run(createMessageCypher, {

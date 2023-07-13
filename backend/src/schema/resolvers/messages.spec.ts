@@ -1,7 +1,7 @@
 import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../../db/factories'
 import { getNeode, getDriver } from '../../db/neo4j'
-import { createRoomMutation } from '../../graphql/rooms'
+import { createRoomMutation, roomQuery } from '../../graphql/rooms'
 import { createMessageMutation, messageQuery, markMessagesAsSeen } from '../../graphql/messages'
 import createServer from '../../server'
 
@@ -127,6 +127,21 @@ describe('Message', () => {
                   seen: false,
                 },
               },
+            })
+          })
+
+          describe('room is updated as well', () => {
+            it('has last message at set', async () => {
+              await expect(query({ query: roomQuery() })).resolves.toMatchObject({
+                errors: undefined,
+                data: {
+                  Room: [
+                    expect.objectContaining({
+                      lastMessageAt: expect.any(String),
+                    }),
+                  ],
+                },
+              })
             })
           })
         })
