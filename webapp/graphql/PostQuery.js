@@ -77,6 +77,10 @@ export const filterPosts = (i18n) => {
         eventEnd
         eventVenue
         eventLocationName
+        eventLocation {
+          lng
+          lat
+        }
         eventIsOnline
         ...post
         ...postCounts

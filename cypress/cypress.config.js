@@ -21,13 +21,7 @@ async function setupNodeEvents(on, config) {
       return testStore[name]
     },
   });
-
-  on("after:run", (results) => {
-    if (results) {
-      console.log(results.status);
-    }
-  });
-
+  
   return config;
 }
 

@@ -78,6 +78,18 @@
     }
   },
   "chat": {
+    "cancelSelectMessage": "Abbrechen",
+    "conversationStarted": "Unterhaltung startete am:",
+    "isOnline": "online",
+    "isTyping": "tippt...",
+    "lastSeen": "zuletzt gesehen ",
+    "messageDeleted": "Diese Nachricht wuerde gelöscht",
+    "messagesEmpty": "Keine Nachrichten",
+    "newMessages": "Neue Nachrichten",
+    "roomEmpty": "Keinen Raum selektiert",
+    "roomsEmpty": "Keine Räume",
+    "search": "Suche",
+    "typeMessage": "Nachricht schreiben",
     "userProfileButton": {
       "label": "Chat",
       "tooltip": "Chatte mit „{name}“"
@@ -604,9 +616,16 @@
     "button": {
       "tooltip": "Landkarte anzeigen"
     },
-    "markerTypes": {
+    "legend": {
+      "event": "Veranstaltung",
       "group": "Gruppe",
-      "theUser": "deine Position",
+      "theUser": "Meine Position",
+      "user": "Nutzer"
+    },
+    "markerTypes": {
+      "event": "Veranstaltung",
+      "group": "Gruppe",
+      "theUser": "meine Position",
       "user": "Nutzer"
     },
     "pageTitle": "Landkarte",
@@ -713,11 +732,6 @@
       "user_left_group": "Hat deine Gruppe verlassen …"
     },
     "title": "Benachrichtigungen",
-    "user": "Nutzer"
-  },
-  "position": {
-    "group": "Gruppe",
-    "my": "Meine Position",
     "user": "Nutzer"
   },
   "post": {
