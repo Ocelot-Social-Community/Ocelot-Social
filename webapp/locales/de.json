@@ -78,6 +78,9 @@
     }
   },
   "chat": {
+    "page": {
+      "headline": "Chat"
+    },
     "userProfileButton": {
       "label": "Chat",
       "tooltip": "Chatte mit „{name}“"
