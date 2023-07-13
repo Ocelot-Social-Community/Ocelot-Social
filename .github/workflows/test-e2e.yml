@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       cache-hit: ${{ steps.cache.outputs.cache-hit }}
+      pr-number: ${{ steps.pr.outputs.number }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -53,7 +54,7 @@ jobs:
   
   fullstack_tests:
     name: Fullstack tests
-    if: needs.docker_preparation.outputs.cache-hit == 'true'
+    # if: needs.docker_preparation.outputs.cache-hit == 'true'
     needs: docker_preparation
     runs-on: ubuntu-latest
     steps:
@@ -62,7 +63,7 @@ jobs:
         id: cache
         with:
           path: /tmp/images/
-          key: e2e-preparation-cache-pr
+          key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
 
       # TODO remove after test phase
       - name: Check existence of docker images images
