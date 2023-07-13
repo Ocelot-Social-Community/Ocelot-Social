@@ -604,9 +604,16 @@
     "button": {
       "tooltip": "Landkarte anzeigen"
     },
-    "markerTypes": {
+    "legend": {
+      "event": "Veranstaltung",
       "group": "Gruppe",
-      "theUser": "deine Position",
+      "theUser": "Meine Position",
+      "user": "Nutzer"
+    },
+    "markerTypes": {
+      "event": "Veranstaltung",
+      "group": "Gruppe",
+      "theUser": "meine Position",
       "user": "Nutzer"
     },
     "pageTitle": "Landkarte",
@@ -713,11 +720,6 @@
       "user_left_group": "Hat deine Gruppe verlassen …"
     },
     "title": "Benachrichtigungen",
-    "user": "Nutzer"
-  },
-  "position": {
-    "group": "Gruppe",
-    "my": "Meine Position",
     "user": "Nutzer"
   },
   "post": {
