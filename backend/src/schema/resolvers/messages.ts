@@ -34,12 +34,9 @@ export default {
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const createMessageCypher = `
           MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
-          OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
-          WITH MAX(m.indexId) as maxIndex, room, currentUser
           CREATE (currentUser)-[:CREATED]->(message:Message {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
-            indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
             content: $content
           })-[:INSIDE]->(room)
           RETURN message { .* }
