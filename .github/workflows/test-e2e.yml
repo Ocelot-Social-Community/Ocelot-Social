@@ -37,11 +37,7 @@ jobs:
           docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/images/webapp.tar
       
-<<<<<<< HEAD
-      TODO reuse the retrieved pr number in following jobs
-=======
       # TODO reuse the retrieved pr number in following jobs
->>>>>>> 5447f8d7a (use pr number in e2e test flow)
       - name: Get pr number
         id: pr
         uses: 8BitJonny/gh-get-current-pr@2.2.0
