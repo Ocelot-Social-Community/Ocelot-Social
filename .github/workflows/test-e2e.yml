@@ -26,25 +26,27 @@ jobs:
           cd ..
           yarn install
 
-      - name: Build docker images (no volumes)
-        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml build webapp neo4j backend
+      - name: Build docker images
+        run: |
+          mkdir /tmp/images
+          docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
+          docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/images/neo4j.tar
+          docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
+          docker save "ocelotsocialnetwork/backend:test" > /tmp/images/backend.tar
+          docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
+          docker save "ocelotsocialnetwork/webapp:test" > /tmp/images/webapp.tar
       
+      # TODO reuse the retrieved pr number in following jobs
       - name: Get pr number
         id: pr
         uses: 8BitJonny/gh-get-current-pr@2.2.0
       
-      # TODO remove after test phase
-      - name: Check existence of docker images images
-        run: |
-          docker images
-          sudo ls -l /var/lib/docker/overlay2
-
       - name: cache docker images
         uses: actions/cache/save@v3
         with:
           path: |
             pwd
-            /var/lib/docker/overlay2
+            /tmp/images/
           key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
   
   fullstack_tests:
@@ -57,7 +59,7 @@ jobs:
         uses: actions/cache/restore@v3
         id: cache
         with:
-          path: path/to/dependencies
+          path: /tmp/images/
           key: e2e-preparation-cache-pr
 
       # TODO remove after test phase
