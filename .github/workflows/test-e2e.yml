@@ -62,7 +62,7 @@ jobs:
         id: cache
         with:
           path: /tmp/images/
-          # key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
+          key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
           restore-keys: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
           fail-on-cache-miss: true
 
