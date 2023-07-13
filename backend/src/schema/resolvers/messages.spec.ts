@@ -2,7 +2,7 @@ import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../../db/factories'
 import { getNeode, getDriver } from '../../db/neo4j'
 import { createRoomMutation } from '../../graphql/rooms'
-import { createMessageMutation, messageQuery } from '../../graphql/messages'
+import { createMessageMutation, messageQuery, markMessagesAsSeen } from '../../graphql/messages'
 import createServer from '../../server'
 
 const driver = getDriver()
@@ -122,6 +122,9 @@ describe('Message', () => {
                 CreateMessage: {
                   id: expect.any(String),
                   content: 'Some nice message to other chatting user',
+                  saved: true,
+                  distributed: false,
+                  seen: false,
                 },
               },
             })
@@ -217,6 +220,9 @@ describe('Message', () => {
                   username: 'Chatting User',
                   avatar: expect.any(String),
                   date: expect.any(String),
+                  saved: true,
+                  distributed: true,
+                  seen: false,
                 },
               ],
             },
@@ -261,6 +267,9 @@ describe('Message', () => {
                     username: 'Chatting User',
                     avatar: expect.any(String),
                     date: expect.any(String),
+                    saved: true,
+                    distributed: true,
+                    seen: false,
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
@@ -269,6 +278,9 @@ describe('Message', () => {
                     username: 'Other Chatting User',
                     avatar: expect.any(String),
                     date: expect.any(String),
+                    saved: true,
+                    distributed: true,
+                    seen: false,
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
@@ -277,6 +289,9 @@ describe('Message', () => {
                     username: 'Chatting User',
                     avatar: expect.any(String),
                     date: expect.any(String),
+                    saved: true,
+                    distributed: false,
+                    seen: false,
                   }),
                 ]),
               },
@@ -304,6 +319,76 @@ describe('Message', () => {
               Message: [],
             },
           })
+        })
+      })
+    })
+  })
+
+  describe('marks massges as seen', () => {
+    describe('unauthenticated', () => {
+      beforeAll(() => {
+        authenticatedUser = null
+      })
+
+      it('throws authorization error', async () => {
+        await expect(
+          mutate({
+            mutation: markMessagesAsSeen(),
+            variables: {
+              messageIds: ['some-id'],
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: [{ message: 'Not Authorized!' }],
+        })
+      })
+    })
+
+    describe('authenticated', () => {
+      const messageIds: string[] = []
+      beforeAll(async () => {
+        authenticatedUser = await otherChattingUser.toJson()
+        const msgs = await query({
+          query: messageQuery(),
+          variables: {
+            roomId,
+          },
+        })
+        msgs.data.Message.forEach((m) => messageIds.push(m.id))
+      })
+
+      it('returns true', async () => {
+        await expect(
+          mutate({
+            mutation: markMessagesAsSeen(),
+            variables: {
+              messageIds,
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: undefined,
+          data: {
+            MarkMessagesAsSeen: true,
+          },
+        })
+      })
+
+      it('has seen prop set to true', async () => {
+        await expect(
+          query({
+            query: messageQuery(),
+            variables: {
+              roomId,
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            Message: [
+              expect.objectContaining({ seen: true }),
+              expect.objectContaining({ seen: false }),
+              expect.objectContaining({ seen: true }),
+            ],
+          },
         })
       })
     })
