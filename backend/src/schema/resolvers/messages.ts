@@ -13,8 +13,7 @@ export default {
           id: context.user.id,
         },
       }
-      // this does not work
-      // params.orderBy = ['createdAt_desc']
+
       const resolved = await neo4jgraphql(object, params, context, resolveInfo)
 
       if (resolved) {
@@ -22,7 +21,7 @@ export default {
           message._id = message.id
         })
       }
-      return resolved
+      return resolved.reverse()
     },
   },
   Mutation: {
