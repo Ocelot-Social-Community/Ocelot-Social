@@ -116,4 +116,4 @@ jobs:
         run: |
           gh extension install actions/gh-actions-cache
           KEY="e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}"
-          gh actions-cache delete $KEY --confirm
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
