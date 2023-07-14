@@ -6,6 +6,9 @@ export const createMessageMutation = () => {
       CreateMessage(roomId: $roomId, content: $content) {
         id
         content
+        saved
+        distributed
+        seen
       }
     }
   `
@@ -23,7 +26,18 @@ export const messageQuery = () => {
         username
         avatar
         date
+        saved
+        distributed
+        seen
       }
+    }
+  `
+}
+
+export const markMessagesAsSeen = () => {
+  return gql`
+    mutation ($messageIds: [String!]) {
+      MarkMessagesAsSeen(messageIds: $messageIds)
     }
   `
 }

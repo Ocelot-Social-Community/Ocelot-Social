@@ -78,6 +78,18 @@
     }
   },
   "chat": {
+    "cancelSelectMessage": "Cancel",
+    "conversationStarted": "Conversation started on:",
+    "isOnline": "is online",
+    "isTyping": "is writing...",
+    "lastSeen": "last seen ",
+    "messageDeleted": "This message was deleted",
+    "messagesEmpty": "No messages",
+    "newMessages": "New Messages",
+    "roomEmpty": "No room selected",
+    "roomsEmpty": "No rooms",
+    "search": "Search",
+    "typeMessage": "Type message",
     "userProfileButton": {
       "label": "Chat",
       "tooltip": "Chat with “{name}”"
@@ -604,9 +616,16 @@
     "button": {
       "tooltip": "Show map"
     },
+    "legend": {
+      "event": "Event",
+      "group": "Group",
+      "theUser": "My position",
+      "user": "User"
+    },
     "markerTypes": {
+      "event": "event",
       "group": "group",
-      "theUser": "your position",
+      "theUser": "my position",
       "user": "user"
     },
     "pageTitle": "Map",
@@ -713,11 +732,6 @@
       "user_left_group": "Left your group …"
     },
     "title": "Notifications",
-    "user": "User"
-  },
-  "position": {
-    "group": "Group",
-    "my": "My position",
     "user": "User"
   },
   "post": {

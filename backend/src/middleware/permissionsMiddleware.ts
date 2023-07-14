@@ -463,6 +463,7 @@ export default shield(
       saveCategorySettings: isAuthenticated,
       CreateRoom: isAuthenticated,
       CreateMessage: isAuthenticated,
+      MarkMessagesAsSeen: isAuthenticated,
     },
     User: {
       email: or(isMyOwn, isAdmin),

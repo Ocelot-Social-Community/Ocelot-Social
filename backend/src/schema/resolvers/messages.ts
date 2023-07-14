@@ -17,8 +17,35 @@ export default {
       const resolved = await neo4jgraphql(object, params, context, resolveInfo)
 
       if (resolved) {
+        const undistributedMessagesIds = resolved
+          .filter((msg) => !msg.distributed && msg.senderId !== context.user.id)
+          .map((msg) => msg.id)
+        if (undistributedMessagesIds.length > 0) {
+          const session = context.driver.session()
+          const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+            const setDistributedCypher = `
+              MATCH (m:Message) WHERE m.id IN $undistributedMessagesIds
+              SET m.distributed = true
+              RETURN m { .* }
+            `
+            const setDistributedTxResponse = await transaction.run(setDistributedCypher, {
+              undistributedMessagesIds,
+            })
+            const messages = await setDistributedTxResponse.records.map((record) => record.get('m'))
+            return messages
+          })
+          try {
+            await writeTxResultPromise
+          } finally {
+            session.close()
+          }
+          // send subscription to author to updated the messages
+        }
         resolved.forEach((message) => {
           message._id = message.id
+          if (message.senderId !== context.user.id) {
+            message.distributed = true
+          }
         })
       }
       return resolved.reverse()
@@ -40,7 +67,10 @@ export default {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
             indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
-            content: $content
+            content: $content,
+            saved: true,
+            distributed: false,
+            seen: false
           })-[:INSIDE]->(room)
           RETURN message { .* }
         `
@@ -59,6 +89,32 @@ export default {
         return message
       } catch (error) {
         throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    MarkMessagesAsSeen: async (_parent, params, context, _resolveInfo) => {
+      const { messageIds } = params
+      const currentUserId = context.user.id
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const setSeenCypher = `
+          MATCH (m:Message)<-[:CREATED]-(user:User)
+          WHERE m.id IN $messageIds AND NOT user.id = $currentUserId
+          SET m.seen = true
+          RETURN m { .* }
+        `
+        const setSeenTxResponse = await transaction.run(setSeenCypher, {
+          messageIds,
+          currentUserId,
+        })
+        const messages = await setSeenTxResponse.records.map((record) => record.get('m'))
+        return messages
+      })
+      try {
+        await writeTxResultPromise
+        // send subscription to author to updated the messages
+        return true
       } finally {
         session.close()
       }
