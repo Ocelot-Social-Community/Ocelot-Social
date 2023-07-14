@@ -107,6 +107,6 @@ jobs:
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
 
       - name: Delete cache
-        - uses: snnaplab/delete-branch-cache-action@v1
+        uses: snnaplab/delete-branch-cache-action@v1
           with:
             key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
