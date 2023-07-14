@@ -40,6 +40,7 @@ jobs:
         with:
           path: /tmp/images/
           key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
+          restore-keys: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
           fail-on-cache-miss: true
           enableCrossOsArchive: true
   
@@ -69,6 +70,7 @@ jobs:
         with:
           path: /tmp/images/
           key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
+          restore-keys: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
           fail-on-cache-miss: true
           enableCrossOsArchive: true
 
