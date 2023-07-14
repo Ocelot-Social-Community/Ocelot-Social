@@ -1591,7 +1591,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         userId: (await jennyRostock.toJson()).id,
       },
     })
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 1000; i++) {
       authenticatedUser = await huey.toJson()
       await mutate({
         mutation: createMessageMutation(),
