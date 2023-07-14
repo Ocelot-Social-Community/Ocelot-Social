@@ -33,11 +33,11 @@ export default {
       const readTxResultPromise = session.readTransaction(async (transaction) => {
         const unreadRoomsCypher = `
           MATCH (:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(user:User)
-          WHERE NOT message.seen AND NOT user.id = $currentUserId
-          RETURN toString(COUNT(room)) AS count
+          WHERE NOT user.id = $currentUserId AND NOT message.seen
+          RETURN toString(COUNT(DISTINCT room)) AS count
         `
         const unreadRoomsTxResponse = await transaction.run(unreadRoomsCypher, { currentUserId })
-        return unreadRoomsTxResponse.records.map((record) => record.get('count'))
+        return unreadRoomsTxResponse.records.map((record) => record.get('count'))[0]
       })
       try {
         const count = await readTxResultPromise
