@@ -1619,7 +1619,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       })
 
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 29; i++) {
         authenticatedUser = await jennyRostock.toJson()
         await mutate({
           mutation: createMessageMutation(),
