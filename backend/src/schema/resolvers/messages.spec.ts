@@ -125,6 +125,10 @@ describe('Message', () => {
                 CreateMessage: {
                   id: expect.any(String),
                   content: 'Some nice message to other chatting user',
+                  senderId: 'chatting-user',
+                  username: 'Chatting User',
+                  avatar: expect.any(String),
+                  date: expect.any(String),
                   saved: true,
                   distributed: false,
                   seen: false,

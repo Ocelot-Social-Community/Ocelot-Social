@@ -40,12 +40,6 @@ export default {
           }
           // send subscription to author to updated the messages
         }
-        resolved.forEach((message) => {
-          message._id = message.id
-          if (message.senderId !== context.user.id) {
-            message.distributed = true
-          }
-        })
       }
       return resolved
     },
@@ -60,6 +54,7 @@ export default {
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const createMessageCypher = `
           MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+          OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
           CREATE (currentUser)-[:CREATED]->(message:Message {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
@@ -69,7 +64,13 @@ export default {
             seen: false
           })-[:INSIDE]->(room)
           SET room.lastMessageAt = toString(datetime())
-          RETURN message { .* }
+          RETURN message {
+            .*,
+            senderId: currentUser.id,
+            username: currentUser.name,
+            avatar: image.url,
+            date: message.createdAt
+          }
         `
         const createMessageTxResponse = await transaction.run(createMessageCypher, {
           currentUserId,

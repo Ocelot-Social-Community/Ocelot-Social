@@ -6,6 +6,10 @@ export const createMessageMutation = () => {
       CreateMessage(roomId: $roomId, content: $content) {
         id
         content
+        senderId
+        username
+        avatar
+        date
         saved
         distributed
         seen
