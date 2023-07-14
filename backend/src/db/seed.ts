@@ -11,6 +11,8 @@ import {
   changeGroupMemberRoleMutation,
 } from '../graphql/groups'
 import { createPostMutation } from '../graphql/posts'
+import { createRoomMutation } from '../graphql/rooms'
+import { createMessageMutation } from '../graphql/messages'
 import { createCommentMutation } from '../graphql/comments'
 import { categories } from '../constants/categories'
 
@@ -1553,6 +1555,90 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     )
 
     await Factory.build('donations')
+
+    // Chat
+    authenticatedUser = await huey.toJson()
+    const { data: roomHueyPeter } = await mutate({
+      mutation: createRoomMutation(),
+      variables: {
+        userId: (await peterLustig.toJson()).id,
+      },
+    })
+
+    for (let i = 0; i < 30; i++) {
+      authenticatedUser = await huey.toJson()
+      await mutate({
+        mutation: createMessageMutation(),
+        variables: {
+          roomId: roomHueyPeter?.CreateRoom.id,
+          content: faker.lorem.sentence(),
+        },
+      })
+      authenticatedUser = await peterLustig.toJson()
+      await mutate({
+        mutation: createMessageMutation(),
+        variables: {
+          roomId: roomHueyPeter?.CreateRoom.id,
+          content: faker.lorem.sentence(),
+        },
+      })
+    }
+
+    authenticatedUser = await huey.toJson()
+    const { data: roomHueyJenny } = await mutate({
+      mutation: createRoomMutation(),
+      variables: {
+        userId: (await jennyRostock.toJson()).id,
+      },
+    })
+    for (let i = 0; i < 10000; i++) {
+      authenticatedUser = await huey.toJson()
+      await mutate({
+        mutation: createMessageMutation(),
+        variables: {
+          roomId: roomHueyJenny?.CreateRoom.id,
+          content: faker.lorem.sentence(),
+        },
+      })
+      authenticatedUser = await jennyRostock.toJson()
+      await mutate({
+        mutation: createMessageMutation(),
+        variables: {
+          roomId: roomHueyJenny?.CreateRoom.id,
+          content: faker.lorem.sentence(),
+        },
+      })
+    }
+
+    for (const user of additionalUsers) {
+      authenticatedUser = await jennyRostock.toJson()
+      const { data: room } = await mutate({
+        mutation: createRoomMutation(),
+        variables: {
+          userId: (await user.toJson()).id,
+        },
+      })
+
+      for (let i = 0; i < 30; i++) {
+        authenticatedUser = await jennyRostock.toJson()
+        await mutate({
+          mutation: createMessageMutation(),
+          variables: {
+            roomId: room?.CreateRoom.id,
+            content: faker.lorem.sentence(),
+          },
+        })
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: createMessageMutation(),
+          variables: {
+            roomId: room?.CreateRoom.id,
+            content: faker.lorem.sentence(),
+          },
+        })
+      }
+    }
+
     /* eslint-disable-next-line no-console */
     console.log('Seeded Data...')
     await driver.close()
