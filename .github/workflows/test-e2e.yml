@@ -1,4 +1,4 @@
-name: Ocelot.social end-to-end test CI
+name: ocelot.social end-to-end test CI
 on:
   push:
     branches:
