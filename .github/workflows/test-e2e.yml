@@ -106,7 +106,11 @@ jobs:
           name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
 
+  cleanup:
+    name: Cleanup
+    runs-on: ubuntu-latest
+    steps:
       - name: Delete cache
-        uses: snnaplab/delete-branch-cache-action@v1
-        with:
-          key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
+        run: |
+          gh extension install actions/gh-actions-cache
+          gh actions-cache delete e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }} --confirm
