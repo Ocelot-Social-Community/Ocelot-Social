@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
 export const roomQuery = () => gql`
-  query {
-    Room {
+  query Room($first: Int, $offset: Int) {
+    Room(first: $first, offset: $offset) {
       id
       roomId
       roomName
