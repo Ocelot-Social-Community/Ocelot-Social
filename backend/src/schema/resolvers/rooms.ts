@@ -29,7 +29,13 @@ export default {
           ON CREATE SET
             room.createdAt = toString(datetime()),
             room.id = apoc.create.uuid()
-          RETURN room { .* }
+          WITH room, user, currentUser,
+          user.name AS roomName
+          RETURN room {
+            .*,
+            users: [properties(currentUser), properties(user)],
+            roomName: roomName
+          }
         `
         const createRommTxResponse = await transaction.run(createRoomCypher, {
           userId,

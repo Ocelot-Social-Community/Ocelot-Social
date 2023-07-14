@@ -6,6 +6,16 @@ export const createRoomMutation = () => {
       CreateRoom(userId: $userId) {
         id
         roomId
+        roomName
+        lastMessageAt
+        users {
+          _id
+          id
+          name
+          avatar {
+            url
+          }
+        }
       }
     }
   `
