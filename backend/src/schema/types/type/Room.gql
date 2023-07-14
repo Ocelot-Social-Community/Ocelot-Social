@@ -23,6 +23,13 @@ type Room {
     WITH message ORDER BY message.createdAt DESC LIMIT 1
     RETURN message
   """)
+
+  unreadCount: Int @cypher(statement: """
+    MATCH (this)<-[:INSIDE]-(message:Message)<-[:CREATED]-(user:User)
+    WHERE NOT user.id = $cypherParams.currentUserId
+      AND NOT message.seen 
+    RETURN count(message)
+  """)
 }
 
 type Mutation {

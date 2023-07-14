@@ -34,7 +34,8 @@ export default {
           RETURN room {
             .*,
             users: [properties(currentUser), properties(user)],
-            roomName: roomName
+            roomName: roomName,
+            unreadCount: toString(0)
           }
         `
         const createRommTxResponse = await transaction.run(createRoomCypher, {
