@@ -173,7 +173,6 @@
               data-test="cancel-button"
               :disabled="loading"
               @click="$router.back()"
-              danger
             >
               {{ $t('actions.cancel') }}
             </base-button>
