@@ -25,4 +25,5 @@ type Mutation {
 
 type Query {
   Room: [Room]
+  UnreadRooms: Int
 }

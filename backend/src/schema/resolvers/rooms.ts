@@ -25,6 +25,27 @@ export default {
       }
       return resolved
     },
+    UnreadRooms: async (object, params, context, resolveInfo) => {
+      const {
+        user: { id: currentUserId },
+      } = context
+      const session = context.driver.session()
+      const readTxResultPromise = session.readTransaction(async (transaction) => {
+        const unreadRoomsCypher = `
+          MATCH (:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(user:User)
+          WHERE NOT message.seen AND NOT user.id = $currentUserId
+          RETURN toString(COUNT(room)) AS count
+        `
+        const unreadRoomsTxResponse = await transaction.run(unreadRoomsCypher, { currentUserId })
+        return unreadRoomsTxResponse.records.map((record) => record.get('count'))
+      })
+      try {
+        const count = await readTxResultPromise
+        return count
+      } finally {
+        session.close()
+      }
+    },
   },
   Mutation: {
     CreateRoom: async (_parent, params, context, _resolveInfo) => {
