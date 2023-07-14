@@ -18,7 +18,11 @@ type Room {
 
   lastMessageAt: String
 
-  lastMessage: Message @cypher(statement: "MATCH (this)<-[:INSIDE]-(message:Message) RETURN message ORDER BY message.createdAt DESC LIMIT 1")
+  lastMessage: Message @cypher(statement: """
+    MATCH (this)<-[:INSIDE]-(message:Message)
+    WITH message ORDER BY message.createdAt DESC LIMIT 1
+    RETURN message
+  """)
 }
 
 type Mutation {

@@ -19,6 +19,18 @@ export const roomQuery = () => {
         roomId
         roomName
         lastMessageAt
+        lastMessage {
+          _id
+          id
+          content
+          senderId
+          username
+          avatar
+          date
+          saved
+          distributed
+          seen
+        }
         users {
           _id
           id

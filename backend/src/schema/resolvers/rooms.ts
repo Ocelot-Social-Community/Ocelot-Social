@@ -8,17 +8,7 @@ export default {
       params.filter.users_some = {
         id: context.user.id,
       }
-      const resolved = await neo4jgraphql(object, params, context, resolveInfo)
-      if (resolved) {
-        resolved.forEach((room) => {
-          if (room.users) {
-            room.users.forEach((user) => {
-              user._id = user.id
-            })
-          }
-        })
-      }
-      return resolved
+      return neo4jgraphql(object, params, context, resolveInfo)
     },
   },
   Mutation: {

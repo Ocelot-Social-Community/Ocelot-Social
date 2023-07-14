@@ -22,6 +22,9 @@ beforeAll(async () => {
         driver,
         neode,
         user: authenticatedUser,
+        cypherParams: {
+          currentUserId: authenticatedUser ? authenticatedUser.id : null,
+        },
       }
     },
   })
@@ -132,16 +135,25 @@ describe('Message', () => {
 
           describe('room is updated as well', () => {
             it('has last message set', async () => {
-              await expect(query({ query: roomQuery() })).resolves.toMatchObject({
+              const result = await query({ query: roomQuery() })
+              await expect(result).toMatchObject({
                 errors: undefined,
                 data: {
                   Room: [
                     expect.objectContaining({
                       lastMessageAt: expect.any(String),
                       lastMessage: expect.objectContaining({
+                        _id: result.data.Room[0].lastMessage.id,
                         id: expect.any(String),
                         content: 'Some nice message to other chatting user',
-                      })
+                        senderId: 'chatting-user',
+                        username: 'Chatting User',
+                        avatar: expect.any(String),
+                        date: expect.any(String),
+                        saved: true,
+                        distributed: false,
+                        seen: false,
+                      }),
                     }),
                   ],
                 },
