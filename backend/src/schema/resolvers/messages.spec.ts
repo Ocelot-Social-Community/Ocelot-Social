@@ -142,8 +142,38 @@ describe('Message', () => {
                   Room: [
                     expect.objectContaining({
                       lastMessageAt: expect.any(String),
+                      unreadCount: 0,
                       lastMessage: expect.objectContaining({
                         _id: result.data.Room[0].lastMessage.id,
+                        id: expect.any(String),
+                        content: 'Some nice message to other chatting user',
+                        senderId: 'chatting-user',
+                        username: 'Chatting User',
+                        avatar: expect.any(String),
+                        date: expect.any(String),
+                        saved: true,
+                        distributed: false,
+                        seen: false,
+                      }),
+                    }),
+                  ],
+                },
+              })
+            })
+          })
+
+          describe('unread count for other user', () => {
+            it('has unread count = 1', async () => {
+              authenticatedUser = await otherChattingUser.toJson()
+              await expect(query({ query: roomQuery() })).resolves.toMatchObject({
+                errors: undefined,
+                data: {
+                  Room: [
+                    expect.objectContaining({
+                      lastMessageAt: expect.any(String),
+                      unreadCount: 1,
+                      lastMessage: expect.objectContaining({
+                        _id: expect.any(String),
                         id: expect.any(String),
                         content: 'Some nice message to other chatting user',
                         senderId: 'chatting-user',
