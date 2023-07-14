@@ -43,7 +43,7 @@ jobs:
   
   fullstack_tests:
     name: Fullstack tests
-    # if: needs.docker_preparation.outputs.cache-hit == 'true'
+    if: needs.docker_preparation.outputs.cache-hit == 'true'
     needs: docker_preparation
     runs-on: ubuntu-latest
     env:
