@@ -111,6 +111,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete cache
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh extension install actions/gh-actions-cache
-          gh actions-cache delete e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }} --confirm
+          KEY="e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}"
+          gh actions-cache delete $KEY --confirm
