@@ -2,7 +2,7 @@ import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../../db/factories'
 import { getNeode, getDriver } from '../../db/neo4j'
 import { createRoomMutation } from '../../graphql/rooms'
-import { createMessageMutation, messageQuery } from '../../graphql/messages'
+import { createMessageMutation, messageQuery, markMessagesAsSeen } from '../../graphql/messages'
 import createServer from '../../server'
 
 const driver = getDriver()
@@ -122,6 +122,9 @@ describe('Message', () => {
                 CreateMessage: {
                   id: expect.any(String),
                   content: 'Some nice message to other chatting user',
+                  saved: true,
+                  distributed: false,
+                  seen: false,
                 },
               },
             })
@@ -212,11 +215,15 @@ describe('Message', () => {
                 {
                   id: expect.any(String),
                   _id: result.data.Message[0].id,
+                  indexId: 0,
                   content: 'Some nice message to other chatting user',
                   senderId: 'chatting-user',
                   username: 'Chatting User',
                   avatar: expect.any(String),
                   date: expect.any(String),
+                  saved: true,
+                  distributed: true,
+                  seen: false,
                 },
               ],
             },
@@ -253,17 +260,65 @@ describe('Message', () => {
             ).resolves.toMatchObject({
               errors: undefined,
               data: {
-                Message: expect.arrayContaining([
+                Message: [
                   expect.objectContaining({
                     id: expect.any(String),
+                    indexId: 0,
                     content: 'Some nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
                     avatar: expect.any(String),
                     date: expect.any(String),
+                    saved: true,
+                    distributed: true,
+                    seen: false,
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
+                    indexId: 1,
+                    content: 'A nice response message to chatting user',
+                    senderId: 'other-chatting-user',
+                    username: 'Other Chatting User',
+                    avatar: expect.any(String),
+                    date: expect.any(String),
+                    saved: true,
+                    distributed: true,
+                    seen: false,
+                  }),
+                  expect.objectContaining({
+                    id: expect.any(String),
+                    indexId: 2,
+                    content: 'And another nice message to other chatting user',
+                    senderId: 'chatting-user',
+                    username: 'Chatting User',
+                    avatar: expect.any(String),
+                    date: expect.any(String),
+                    saved: true,
+                    distributed: false,
+                    seen: false,
+                  }),
+                ],
+              },
+            })
+          })
+
+          it('returns the messages paginated', async () => {
+            await expect(
+              query({
+                query: messageQuery(),
+                variables: {
+                  roomId,
+                  first: 2,
+                  offset: 0,
+                },
+              }),
+            ).resolves.toMatchObject({
+              errors: undefined,
+              data: {
+                Message: [
+                  expect.objectContaining({
+                    id: expect.any(String),
+                    indexId: 1,
                     content: 'A nice response message to chatting user',
                     senderId: 'other-chatting-user',
                     username: 'Other Chatting User',
@@ -272,13 +327,40 @@ describe('Message', () => {
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
+                    indexId: 2,
                     content: 'And another nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
                     avatar: expect.any(String),
                     date: expect.any(String),
                   }),
-                ]),
+                ],
+              },
+            })
+
+            await expect(
+              query({
+                query: messageQuery(),
+                variables: {
+                  roomId,
+                  first: 2,
+                  offset: 2,
+                },
+              }),
+            ).resolves.toMatchObject({
+              errors: undefined,
+              data: {
+                Message: [
+                  expect.objectContaining({
+                    id: expect.any(String),
+                    indexId: 0,
+                    content: 'Some nice message to other chatting user',
+                    senderId: 'chatting-user',
+                    username: 'Chatting User',
+                    avatar: expect.any(String),
+                    date: expect.any(String),
+                  }),
+                ],
               },
             })
           })
@@ -304,6 +386,76 @@ describe('Message', () => {
               Message: [],
             },
           })
+        })
+      })
+    })
+  })
+
+  describe('marks massges as seen', () => {
+    describe('unauthenticated', () => {
+      beforeAll(() => {
+        authenticatedUser = null
+      })
+
+      it('throws authorization error', async () => {
+        await expect(
+          mutate({
+            mutation: markMessagesAsSeen(),
+            variables: {
+              messageIds: ['some-id'],
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: [{ message: 'Not Authorized!' }],
+        })
+      })
+    })
+
+    describe('authenticated', () => {
+      const messageIds: string[] = []
+      beforeAll(async () => {
+        authenticatedUser = await otherChattingUser.toJson()
+        const msgs = await query({
+          query: messageQuery(),
+          variables: {
+            roomId,
+          },
+        })
+        msgs.data.Message.forEach((m) => messageIds.push(m.id))
+      })
+
+      it('returns true', async () => {
+        await expect(
+          mutate({
+            mutation: markMessagesAsSeen(),
+            variables: {
+              messageIds,
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: undefined,
+          data: {
+            MarkMessagesAsSeen: true,
+          },
+        })
+      })
+
+      it('has seen prop set to true', async () => {
+        await expect(
+          query({
+            query: messageQuery(),
+            variables: {
+              roomId,
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            Message: [
+              expect.objectContaining({ seen: true }),
+              expect.objectContaining({ seen: false }),
+              expect.objectContaining({ seen: true }),
+            ],
+          },
         })
       })
     })

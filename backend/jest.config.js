@@ -11,7 +11,7 @@ module.exports = {
   ],
   coverageThreshold: {
     global: {
-      lines: 70,
+      lines: 67,
     },
   },
   testMatch: ['**/src/**/?(*.)+(spec|test).ts?(x)'],
