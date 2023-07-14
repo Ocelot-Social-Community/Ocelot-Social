@@ -17,6 +17,8 @@ type Room {
   avatar: String! @cypher(statement: "MATCH (this)<-[:CHATS_IN]-(user:User) WHERE NOT user.id = $cypherParams.currentUserId RETURN user.avatar.url")
 
   lastMessageAt: String
+
+  lastMessage: Message @cypher(statement: "MATCH (this)<-[:INSIDE]-(message:Message) RETURN message ORDER BY message.createdAt DESC LIMIT 1")
 }
 
 type Mutation {

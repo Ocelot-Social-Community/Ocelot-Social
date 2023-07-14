@@ -131,13 +131,17 @@ describe('Message', () => {
           })
 
           describe('room is updated as well', () => {
-            it('has last message at set', async () => {
+            it('has last message set', async () => {
               await expect(query({ query: roomQuery() })).resolves.toMatchObject({
                 errors: undefined,
                 data: {
                   Room: [
                     expect.objectContaining({
                       lastMessageAt: expect.any(String),
+                      lastMessage: expect.objectContaining({
+                        id: expect.any(String),
+                        content: 'Some nice message to other chatting user',
+                      })
                     }),
                   ],
                 },
