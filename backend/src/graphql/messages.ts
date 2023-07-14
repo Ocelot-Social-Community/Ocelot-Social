@@ -20,10 +20,11 @@ export const createMessageMutation = () => {
 
 export const messageQuery = () => {
   return gql`
-    query ($roomId: ID!) {
-      Message(roomId: $roomId) {
+    query ($roomId: ID!, $first: Int, $offset: Int) {
+      Message(roomId: $roomId, first: $first, offset: $offset, orderBy: createdAt_desc) {
         _id
         id
+        indexId
         content
         senderId
         username

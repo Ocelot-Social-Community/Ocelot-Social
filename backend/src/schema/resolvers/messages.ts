@@ -13,6 +13,7 @@ export default {
           id: context.user.id,
         },
       }
+
       const resolved = await neo4jgraphql(object, params, context, resolveInfo)
 
       if (resolved) {
@@ -41,7 +42,7 @@ export default {
           // send subscription to author to updated the messages
         }
       }
-      return resolved
+      return resolved.reverse()
     },
   },
   Mutation: {
@@ -55,9 +56,12 @@ export default {
         const createMessageCypher = `
           MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
           OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
+          OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
+          WITH MAX(m.indexId) as maxIndex, room, currentUser, image
           CREATE (currentUser)-[:CREATED]->(message:Message {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
+            indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
             content: $content,
             saved: true,
             distributed: false,

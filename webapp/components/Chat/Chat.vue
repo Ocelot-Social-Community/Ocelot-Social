@@ -8,6 +8,7 @@
         :template-actions="JSON.stringify(templatesText)"
         :menu-actions="JSON.stringify(menuActions)"
         :text-messages="JSON.stringify(textMessages)"
+        :message-actions="messageActions"
         :messages="JSON.stringify(messages)"
         :messages-loaded="messagesLoaded"
         :rooms="JSON.stringify(rooms)"
@@ -21,6 +22,7 @@
         @fetch-messages="fetchMessages($event.detail[0])"
         :responsive-breakpoint="responsiveBreakpoint"
         :single-room="singleRoom"
+        show-reaction-emojis="false"
         @show-demo-options="showDemoOptions = $event"
       >
         <div slot="menu-icon" @click.prevent.stop="$emit('close-single-room', true)">
@@ -91,9 +93,11 @@ export default {
         {
           name: 'deleteRoom',
           title: 'Delete Room',
-        }, */
+        },
+        */
       ],
       messageActions: [
+        /*
         {
           name: 'addMessageToFavorite',
           title: 'Add To Favorite',
@@ -102,6 +106,7 @@ export default {
           name: 'shareMessage',
           title: 'Share Message',
         },
+        */
       ],
       templatesText: [
         {
@@ -144,6 +149,10 @@ export default {
       showDemoOptions: true,
       responsiveBreakpoint: 600,
       singleRoom: !!this.singleRoomId || false,
+      messagePage: 0,
+      messagePageSize: 20,
+      roomPage: 0,
+      roomPageSize: 999, // TODO pagination is a problem with single rooms - cant use
       selectedRoom: null,
     }
   },
@@ -178,32 +187,48 @@ export default {
     },
   },
   methods: {
-    fetchMessages({ room, options = {} }) {
-      this.messagesLoaded = false
-      setTimeout(async () => {
-        try {
-          const {
-            data: { Message },
-          } = await this.$apollo.query({
-            query: messageQuery(),
-            variables: {
-              roomId: room.id,
-            },
-            fetchPolicy: 'no-cache',
-          })
-          this.messages = Message
-        } catch (error) {
-          this.messages = []
-          this.$toast.error(error.message)
-        }
-        this.messagesLoaded = true
+    async fetchMessages({ room, options = {} }) {
+      if (this.selectedRoom !== room.id) {
+        this.messages = []
+        this.messagePage = 0
+        this.selectedRoom = room.id
+      }
+      this.messagesLoaded = options.refetch ? this.messagesLoaded : false
+      const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
+      try {
+        const {
+          data: { Message },
+        } = await this.$apollo.query({
+          query: messageQuery(),
+          variables: {
+            roomId: room.id,
+            first: this.messagePageSize,
+            offset,
+          },
+          fetchPolicy: 'no-cache',
+        })
 
-        this.selectedRoom = room
-      })
+        const msgs = []
+        ;[...this.messages, ...Message].forEach((m) => {
+          msgs[m.indexId] = m
+        })
+        this.messages = msgs.filter(Boolean)
+
+        if (Message.length < this.messagePageSize) {
+          this.messagesLoaded = true
+        }
+        this.messagePage += 1
+      } catch (error) {
+        this.messages = []
+        this.$toast.error(error.message)
+      }
     },
 
     refetchMessage(roomId) {
-      this.fetchMessages({ room: this.rooms.find((r) => r.roomId === roomId) })
+      this.fetchMessages({
+        room: this.rooms.find((r) => r.roomId === roomId),
+        options: { refetch: true },
+      })
     },
 
     async sendMessage(message) {
@@ -230,6 +255,12 @@ export default {
     Rooms: {
       query() {
         return roomQuery()
+      },
+      variables() {
+        return {
+          first: this.roomPageSize,
+          offset: this.roomPage * this.roomPageSize,
+        }
       },
       update({ Room }) {
         if (!Room) {
