@@ -78,7 +78,6 @@ export default {
     return {
       menuActions: [
         // NOTE: if menuActions is empty, the related slot is not shown
-        /*
         {
           name: 'dummyItem',
           title: 'Just a dummy item',
