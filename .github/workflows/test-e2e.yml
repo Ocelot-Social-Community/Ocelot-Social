@@ -34,7 +34,7 @@ jobs:
         id: pr
         uses: 8BitJonny/gh-get-current-pr@2.2.0
       
-      - name: cache docker images
+      - name: Cache docker images
         id: cache
         uses: actions/cache@v3
         with:
@@ -91,7 +91,7 @@ jobs:
       - name: Fullstack tests | run tests
         id: e2e-tests
         run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
-
+      
       - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         run: |
@@ -105,3 +105,8 @@ jobs:
         with:
           name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
+
+      -name: Delete cache
+        - uses: snnaplab/delete-branch-cache-action@v1
+          with:
+            key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
