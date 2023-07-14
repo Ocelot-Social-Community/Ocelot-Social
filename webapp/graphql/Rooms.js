@@ -27,3 +27,11 @@ export const createRoom = () => gql`
     }
   }
 `
+
+export const unreadRoomsQuery = () => {
+  return gql`
+    query {
+      UnreadRooms
+    }
+  `
+}
