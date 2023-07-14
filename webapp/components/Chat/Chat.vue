@@ -59,7 +59,7 @@
 
 <script>
 import { roomQuery, createRoom } from '~/graphql/Rooms'
-import { messageQuery, createMessageMutation } from '~/graphql/Messages'
+import { messageQuery, createMessageMutation, markMessagesAsSeen } from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
 import { mapGetters } from 'vuex'
 
@@ -83,30 +83,30 @@ export default {
           title: 'Just a dummy item',
         },
         /* {
-          name: 'inviteUser',
-          title: 'Invite User',
-        },
-        {
-          name: 'removeUser',
-          title: 'Remove User',
-        },
-        {
-          name: 'deleteRoom',
-          title: 'Delete Room',
-        },
-        */
+            name: 'inviteUser',
+            title: 'Invite User',
+            },
+            {
+            name: 'removeUser',
+            title: 'Remove User',
+            },
+            {
+            name: 'deleteRoom',
+            title: 'Delete Room',
+            },
+          */
       ],
       messageActions: [
         /*
-        {
-          name: 'addMessageToFavorite',
-          title: 'Add To Favorite',
-        },
-        {
-          name: 'shareMessage',
-          title: 'Share Message',
-        },
-        */
+            {
+            name: 'addMessageToFavorite',
+            title: 'Add To Favorite',
+            },
+            {
+            name: 'shareMessage',
+            title: 'Share Message',
+            },
+          */
       ],
       templatesText: [
         {
@@ -134,14 +134,14 @@ export default {
       },
       roomActions: [
         /*
-        {
-          name: 'archiveRoom',
-          title: 'Archive Room',
-        },
-        { name: 'inviteUser', title: 'Invite User' },
-        { name: 'removeUser', title: 'Remove User' },
-        { name: 'deleteRoom', title: 'Delete Room' },
-        */
+            {
+            name: 'archiveRoom',
+            title: 'Archive Room',
+            },
+            { name: 'inviteUser', title: 'Invite User' },
+            { name: 'removeUser', title: 'Remove User' },
+            { name: 'deleteRoom', title: 'Delete Room' },
+          */
       ],
       rooms: [],
       messages: [],
@@ -208,8 +208,19 @@ export default {
           fetchPolicy: 'no-cache',
         })
 
+        const newMsgIds = Message.filter((m) => m.seen === false).map((m) => m.id)
+        if (newMsgIds.length) {
+          this.$apollo.mutate({
+            mutation: markMessagesAsSeen(),
+            variables: {
+              messageIds: newMsgIds,
+            },
+          })
+        }
+
         const msgs = []
         ;[...this.messages, ...Message].forEach((m) => {
+          m.seen = true
           msgs[m.indexId] = m
         })
         this.messages = msgs.filter(Boolean)
