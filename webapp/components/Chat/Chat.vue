@@ -268,13 +268,6 @@ export default {
       }
     },
 
-    refetchMessage(roomId) {
-      this.fetchMessages({
-        room: this.rooms.find((r) => r.roomId === roomId),
-        options: { refetch: true },
-      })
-    },
-
     async sendMessage(message) {
       try {
         await this.$apollo.mutate({
@@ -287,7 +280,10 @@ export default {
       } catch (error) {
         this.$toast.error(error.message)
       }
-      this.refetchMessage(message.roomId)
+      this.fetchMessages({
+        room: this.rooms.find((r) => r.roomId === roomId),
+        options: { refetch: true },
+      })
     },
 
     getInitialsName(fullname) {
