@@ -36,7 +36,7 @@ jobs:
       
       - name: Cache docker images
         id: cache
-        uses: actions/cache/save@3
+        uses: actions/cache/save@v3.3.1
         with:
           path: /tmp/images/
           key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
@@ -64,7 +64,7 @@ jobs:
           cp backend/.env.template backend/.env
       
       - name: Connect to cache
-        uses: actions/cache/save@3
+        uses: actions/cache/save@v3.3.1
         id: cache
         with:
           path: /tmp/images/
