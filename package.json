@@ -51,7 +51,7 @@
     "expect": "^29.5.0",
     "graphql-request": "^2.0.0",
     "import": "^0.0.6",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.1",
     "mock-socket": "^9.0.3",
     "multiple-cucumber-html-reporter": "^3.4.0",
     "neo4j-driver": "^4.3.4",
