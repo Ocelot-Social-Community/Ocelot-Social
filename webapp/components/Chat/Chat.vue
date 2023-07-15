@@ -281,7 +281,7 @@ export default {
         this.$toast.error(error.message)
       }
       this.fetchMessages({
-        room: this.rooms.find((r) => r.roomId === roomId),
+        room: this.rooms.find((r) => r.roomId === message.roomId),
         options: { refetch: true },
       })
     },
