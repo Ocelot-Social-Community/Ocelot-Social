@@ -20,6 +20,9 @@ jobs:
           cp webapp/.env.template webapp/.env
           cp backend/.env.template backend/.env
 
+      - name: TEMPORARY act workaround
+        run: sudo apt update && sudo apt install -y zstd
+
       - name: Build docker images
         run: |
           mkdir /tmp/images
@@ -40,7 +43,7 @@ jobs:
         with:
           path: /tmp/images/
           key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
-          restore-keys: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
+          # restore-keys: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
           fail-on-cache-miss: true
           enableCrossOsArchive: true
   
@@ -64,13 +67,16 @@ jobs:
           cp webapp/.env.template webapp/.env
           cp backend/.env.template backend/.env
         
+      - name: TEMPORARY act workaround
+        run: sudo apt update && sudo apt install -y zstd
+      
       - name: Connect to cache
         uses: actions/cache@v3.2.6
         id: cache
         with:
           path: /tmp/images/
           key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
-          restore-keys: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
+          # restore-keys: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
           fail-on-cache-miss: true
           enableCrossOsArchive: true
 
