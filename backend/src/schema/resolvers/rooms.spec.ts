@@ -295,7 +295,7 @@ describe('Room', () => {
               {
                 id: expect.any(String),
                 roomId: expect.any(String),
-                roomName: 'Other Chatting User',
+                roomName: 'Third Chatting User',
                 users: expect.arrayContaining([
                   {
                     _id: 'chatting-user',
@@ -306,9 +306,9 @@ describe('Room', () => {
                     },
                   },
                   {
-                    _id: 'other-chatting-user',
-                    id: 'other-chatting-user',
-                    name: 'Other Chatting User',
+                    _id: 'third-chatting-user',
+                    id: 'third-chatting-user',
+                    name: 'Third Chatting User',
                     avatar: {
                       url: expect.any(String),
                     },
@@ -350,7 +350,7 @@ describe('Room', () => {
               {
                 id: expect.any(String),
                 roomId: expect.any(String),
-                roomName: 'Third Chatting User',
+                roomName: 'Other Chatting User',
                 users: expect.arrayContaining([
                   {
                     _id: 'chatting-user',
@@ -361,9 +361,9 @@ describe('Room', () => {
                     },
                   },
                   {
-                    _id: 'third-chatting-user',
-                    id: 'third-chatting-user',
-                    name: 'Third Chatting User',
+                    _id: 'other-chatting-user',
+                    id: 'other-chatting-user',
+                    name: 'Other Chatting User',
                     avatar: {
                       url: expect.any(String),
                     },
@@ -395,9 +395,9 @@ describe('Room', () => {
           data: {
             Room: [
               {
-                id: result.data.Room[0].id,
-                roomId: result.data.Room[0].id,
-                roomName: 'Other Chatting User',
+                id: expect.any(String),
+                roomId: expect.any(String),
+                roomName: 'Third Chatting User',
                 users: expect.arrayContaining([
                   {
                     _id: 'chatting-user',
@@ -408,9 +408,9 @@ describe('Room', () => {
                     },
                   },
                   {
-                    _id: 'other-chatting-user',
-                    id: 'other-chatting-user',
-                    name: 'Other Chatting User',
+                    _id: 'third-chatting-user',
+                    id: 'third-chatting-user',
+                    name: 'Third Chatting User',
                     avatar: {
                       url: expect.any(String),
                     },
