@@ -145,7 +145,7 @@ export default {
         { name: 'deleteRoom', title: 'Delete Room' },
         */
       ],
-      
+
       showDemoOptions: true,
       responsiveBreakpoint: 600,
       rooms: [],
@@ -170,8 +170,8 @@ export default {
             userId: this.singleRoomId,
           },
         })
-        .then(({data: { CreateRoom }}) => {
-          this.fetchRooms({room: CreateRoom})
+        .then(({ data: { CreateRoom } }) => {
+          this.fetchRooms({ room: CreateRoom })
         })
         .catch((error) => {
           this.$toast.error(error)
@@ -192,8 +192,7 @@ export default {
     },
   },
   methods: {
-    async fetchRooms({ room } = {}){
-      console.log(room)
+    async fetchRooms({ room } = {}) {
       this.roomsLoaded = false
       const offset = this.roomPage * this.roomPageSize
       try {
@@ -209,8 +208,6 @@ export default {
           fetchPolicy: 'no-cache',
         })
 
-        console.log(Room)
-        const rooms = []
         const newRooms = Room.map((r) => {
           return {
             ...r,
