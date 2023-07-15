@@ -24,5 +24,5 @@ type Mutation {
 }
 
 type Query {
-  Room: [Room]
+  Room(id: ID): [Room]
 }
