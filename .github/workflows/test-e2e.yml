@@ -29,7 +29,7 @@ jobs:
           docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/images/webapp.tar
 
-      - name: Install cucumber-json-formatter
+      - name: Install cypress requirements
         run: |
           wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
           cd backend
@@ -69,9 +69,11 @@ jobs:
         id: cache
         with:
           path: |
+            /opt/cucumber-json-formatter
             /home/runner/work/Ocelot-Social/Ocelot-Social
             /tmp/images/
           key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
+          fail-on-cache-miss: true
 
       - name: Boot up test system | docker-compose
         run: |
