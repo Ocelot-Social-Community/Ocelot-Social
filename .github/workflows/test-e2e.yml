@@ -73,6 +73,8 @@ jobs:
 
       - name: Boot up test system | docker-compose
         run: |
+          /home/runner/work/Ocelot-Social/Ocelot-Social
+          ls -l
           docker load < /tmp/images/neo4j.tar
       #    docker load < /tmp/images/backend.tar
       #    docker load < /tmp/images/webapp.tar
