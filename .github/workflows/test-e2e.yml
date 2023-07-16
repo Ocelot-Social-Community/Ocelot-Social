@@ -73,7 +73,7 @@ jobs:
 
       - name: Boot up test system | docker-compose
         run: |
-          /home/runner/work/Ocelot-Social/Ocelot-Social
+          cd /home/runner/work/Ocelot-Social/Ocelot-Social
           ls -l
           docker load < /tmp/images/neo4j.tar
       #    docker load < /tmp/images/backend.tar
@@ -111,6 +111,7 @@ jobs:
 
   cleanup:
     name: Cleanup
+    if: always()
     needs: [docker_preparation, fullstack_tests]
     runs-on: ubuntu-latest
     steps:
