@@ -37,7 +37,9 @@ jobs:
         id: cache
         uses: actions/cache/save@v3.3.1
         with:
-          path: /tmp/images/
+          path: |
+            /home/runner/work/Ocelot-Social/Ocelot-Social
+            /tmp/images/
           key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
   
   fullstack_tests:
@@ -52,19 +54,21 @@ jobs:
         # run copies of the current job in parallel
         job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # - name: Checkout code
+      #   uses: actions/checkout@v3
 
-      - name: Copy env files
-        run: |
-          cp webapp/.env.template webapp/.env
-          cp backend/.env.template backend/.env
+      # - name: Copy env files
+      #   run: |
+      #     cp webapp/.env.template webapp/.env
+      #     cp backend/.env.template backend/.env
       
       - name: Restore cache
         uses: actions/cache/restore@v3.3.1
         id: cache
         with:
-          path: /tmp/images/
+          path: |
+            /home/runner/work/Ocelot-Social/Ocelot-Social
+            /tmp/images/
           key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
 
       - name: Boot up test system | docker-compose
