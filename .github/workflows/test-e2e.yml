@@ -48,6 +48,7 @@ jobs:
         with:
           path: |
             /opt/cucumber-json-formatter
+            /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
             /tmp/images/
           key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
@@ -70,6 +71,7 @@ jobs:
         with:
           path: |
             /opt/cucumber-json-formatter
+            /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
             /tmp/images/
           key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
