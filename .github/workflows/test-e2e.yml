@@ -29,11 +29,9 @@ jobs:
           docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/images/webapp.tar
 
-      - name: Install cypress | yarn install
+      - name: Install cucumber-json-formatter
         run: |
           wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
-          chmod +x /opt/cucumber-json-formatter
-          sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
           cd backend
           yarn install
           yarn build
@@ -49,6 +47,7 @@ jobs:
         uses: actions/cache/save@v3.3.1
         with:
           path: |
+            /opt/cucumber-json-formatter
             /home/runner/work/Ocelot-Social/Ocelot-Social
             /tmp/images/
           key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
@@ -76,8 +75,8 @@ jobs:
 
       - name: Boot up test system | docker-compose
         run: |
-          pwd
-          cd /home/runner/work/Ocelot-Social/Ocelot-Social
+          chmod +x /opt/cucumber-json-formatter
+          sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
           docker load < /tmp/images/neo4j.tar
           docker load < /tmp/images/backend.tar
           docker load < /tmp/images/webapp.tar
