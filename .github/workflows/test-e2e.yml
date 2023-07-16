@@ -43,8 +43,8 @@ jobs:
 
       - name: print caching output
         run: |
-          echo achtion/cache/save output (cache-hit):
-          echo ${{ steps.cache.outputs.cache-hit }}
+          echo achtion/cache/save outputs.cache-hit:
+          echo $cache-hit
   
   fullstack_tests:
     name: Fullstack tests
