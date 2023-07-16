@@ -61,7 +61,7 @@ jobs:
           cp backend/.env.template backend/.env
       
       - name: Restore cache
-        uses: actions/cache/save@v3.3.1
+        uses: actions/cache/restore@v3.3.1
         id: cache
         with:
           path: /tmp/images/
