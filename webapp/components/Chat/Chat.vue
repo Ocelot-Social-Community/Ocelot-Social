@@ -190,10 +190,10 @@ export default {
   },
   methods: {
     async fetchMessages({ room, options = {} }) {
-      if (this.selectedRoom !== room.id) {
+      if (this.selectedRoom?.id !== room.id) {
         this.messages = []
         this.messagePage = 0
-        this.selectedRoom = room.id
+        this.selectedRoom = room
       }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
       const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
