@@ -26,6 +26,8 @@ jobs:
     if: needs.files-changed.outputs.webapp == 'true'
     needs: files-changed
     runs-on: ubuntu-latest
+    outputs:
+      pr-number: ${{ steps.pr.outputs.number }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -34,7 +36,11 @@ jobs:
         run: |
           scripts/translations/sort.sh
           scripts/translations/missing-keys.sh
-          
+
+      - name: Get pr number
+        id: pr
+        uses: 8BitJonny/gh-get-current-pr@2.2.0
+
   build_test_webapp:
     name: Docker Build Test - Webapp
     if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true'
@@ -44,16 +50,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: webapp | Build 'test' image
+      - name: Webapp | Build 'test' image
         run: |
           docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      - name: Cache docker image
+        uses: actions/cache/save@v3.3.1
         with:
-          name: docker-webapp-test
           path: /tmp/webapp.tar
+          key: webapp-cache-pr${{ needs.prepare.outputs.pr-number }}
 
   lint_webapp:
     name: Lint Webapp
