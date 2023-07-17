@@ -102,10 +102,7 @@ export default {
           const roomCountUpdated = await getUnreadRoomsCount(message.recipientId, session)
 
           // send subscriptions
-          await pubsub.publish(ROOM_COUNT_UPDATED, {
-            roomCountUpdated,
-            userId: message.recipientId,
-          })
+          await pubsub.publish(ROOM_COUNT_UPDATED, { roomCountUpdated, userId: message.recipientId })
         }
 
         return message
