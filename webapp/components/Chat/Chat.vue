@@ -260,19 +260,22 @@ export default {
 
         const newMsgIds = Message.filter((m) => m.seen === false).map((m) => m.id)
         if (newMsgIds.length) {
-          await this.$apollo.mutate({
-            mutation: markMessagesAsSeen(),
-            variables: {
-              messageIds: newMsgIds,
-            },
-          })
           this.$apollo
-            .query({
-              query: unreadRoomsQuery(),
-              fetchPolicy: 'network-only',
+            .mutate({
+              mutation: markMessagesAsSeen(),
+              variables: {
+                messageIds: newMsgIds,
+              },
             })
-            .then(({ data: { UnreadRooms } }) => {
-              this.commitUnreadRoomCount(UnreadRooms)
+            .then(() => {
+              this.$apollo
+                .query({
+                  query: unreadRoomsQuery(),
+                  fetchPolicy: 'network-only',
+                })
+                .then(({ data: { UnreadRooms } }) => {
+                  this.commitUnreadRoomCount(UnreadRooms)
+                })
             })
         }
 
