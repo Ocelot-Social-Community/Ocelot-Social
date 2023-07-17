@@ -7,11 +7,17 @@ export const messageQuery = () => {
         _id
         id
         indexId
-        senderId
         content
+        senderId
         author {
           id
         }
+        username
+        avatar
+        date
+        saved
+        distributed
+        seen
       }
     }
   `
