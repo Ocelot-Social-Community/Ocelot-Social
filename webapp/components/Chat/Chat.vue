@@ -13,13 +13,15 @@
         :messages-loaded="messagesLoaded"
         :rooms="JSON.stringify(rooms)"
         :room-actions="JSON.stringify(roomActions)"
-        :rooms-loaded="true"
+        :rooms-loaded="roomsLoaded"
+        :loading-rooms="loadingRooms"
         show-files="false"
         show-audio="false"
         :styles="JSON.stringify(computedChatStyle)"
         :show-footer="true"
         @send-message="sendMessage($event.detail[0])"
         @fetch-messages="fetchMessages($event.detail[0])"
+        @fetch-more-rooms="fetchRooms"
         :responsive-breakpoint="responsiveBreakpoint"
         :single-room="singleRoom"
         show-reaction-emojis="false"
@@ -143,17 +145,20 @@ export default {
         { name: 'deleteRoom', title: 'Delete Room' },
         */
       ],
-      rooms: [],
-      messages: [],
-      messagesLoaded: true,
+
       showDemoOptions: true,
       responsiveBreakpoint: 600,
+      rooms: [],
+      roomsLoaded: false,
+      roomPage: 0,
+      roomPageSize: 10, // TODO pagination is a problem with single rooms - cant use
       singleRoom: !!this.singleRoomId || false,
+      selectedRoom: null,
+      loadingRooms: true,
+      messagesLoaded: false,
       messagePage: 0,
       messagePageSize: 20,
-      roomPage: 0,
-      roomPageSize: 999, // TODO pagination is a problem with single rooms - cant use
-      selectedRoom: null,
+      messages: [],
     }
   },
   mounted() {
@@ -165,8 +170,8 @@ export default {
             userId: this.singleRoomId,
           },
         })
-        .then(() => {
-          this.$apollo.queries.Rooms.refetch()
+        .then(({ data: { CreateRoom } }) => {
+          this.fetchRooms({ room: CreateRoom })
         })
         .catch((error) => {
           this.$toast.error(error)
@@ -174,6 +179,8 @@ export default {
         .finally(() => {
           // this.loading = false
         })
+    } else {
+      this.fetchRooms()
     }
   },
   computed: {
@@ -181,17 +188,54 @@ export default {
       currentUser: 'auth/user',
     }),
     computedChatStyle() {
-      // TODO light/dark theme still needed?
-      // return this.theme === 'light' ? chatStyle.STYLE.light : chatStyle.STYLE.dark
       return chatStyle.STYLE.light
     },
   },
   methods: {
+    async fetchRooms({ room } = {}) {
+      this.roomsLoaded = false
+      const offset = this.roomPage * this.roomPageSize
+      try {
+        const {
+          data: { Room },
+        } = await this.$apollo.query({
+          query: roomQuery(),
+          variables: {
+            id: room?.id,
+            first: this.roomPageSize,
+            offset,
+          },
+          fetchPolicy: 'no-cache',
+        })
+
+        const newRooms = Room.map((r) => {
+          return {
+            ...r,
+            users: r.users.map((u) => {
+              return { ...u, username: u.name, avatar: u.avatar?.url }
+            }),
+          }
+        })
+
+        this.rooms = [...this.rooms, ...newRooms]
+
+        if (Room.length < this.roomPageSize) {
+          this.roomsLoaded = true
+        }
+        this.roomPage += 1
+      } catch (error) {
+        this.rooms = []
+        this.$toast.error(error.message)
+      }
+      // must be set false after initial rooms are loaded and never changed again
+      this.loadingRooms = false
+    },
+
     async fetchMessages({ room, options = {} }) {
-      if (this.selectedRoom !== room.id) {
+      if (this.selectedRoom?.id !== room.id) {
         this.messages = []
         this.messagePage = 0
-        this.selectedRoom = room.id
+        this.selectedRoom = room
       }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
       const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
@@ -224,13 +268,6 @@ export default {
       }
     },
 
-    refetchMessage(roomId) {
-      this.fetchMessages({
-        room: this.rooms.find((r) => r.roomId === roomId),
-        options: { refetch: true },
-      })
-    },
-
     async sendMessage(message) {
       try {
         await this.$apollo.mutate({
@@ -243,51 +280,15 @@ export default {
       } catch (error) {
         this.$toast.error(error.message)
       }
-      this.refetchMessage(message.roomId)
+      this.fetchMessages({
+        room: this.rooms.find((r) => r.roomId === message.roomId),
+        options: { refetch: true },
+      })
     },
 
     getInitialsName(fullname) {
       if (!fullname) return
       return fullname.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
-    },
-  },
-  apollo: {
-    Rooms: {
-      query() {
-        return roomQuery()
-      },
-      variables() {
-        return {
-          first: this.roomPageSize,
-          offset: this.roomPage * this.roomPageSize,
-        }
-      },
-      update({ Room }) {
-        if (!Room) {
-          this.rooms = []
-          return
-        }
-
-        // Backend result needs mapping of the following values
-        // room[i].users[j].name -> room[i].users[j].username
-        // room[i].users[j].avatar.url -> room[i].users[j].avatar
-        // also filter rooms for the single room
-        this.rooms = Room.map((r) => {
-          return {
-            ...r,
-            users: r.users.map((u) => {
-              return { ...u, username: u.name, avatar: u.avatar?.url }
-            }),
-          }
-        }).filter((r) =>
-          this.singleRoom ? r.users.filter((u) => u.id === this.singleRoomId).length > 0 : true,
-        )
-      },
-      error(error) {
-        this.rooms = []
-        this.$toast.error(error.message)
-      },
-      fetchPolicy: 'no-cache',
     },
   },
 }

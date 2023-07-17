@@ -5,6 +5,11 @@
 #   users_some: _UserFilter
 # }
 
+# TODO change this to last message date
+enum _RoomOrdering {
+  createdAt_desc
+}
+
 type Room {
   id: ID!
   createdAt: String
@@ -24,6 +29,9 @@ type Mutation {
 }
 
 type Query {
-  Room: [Room]
+  Room(
+    id: ID
+    orderBy: [_RoomOrdering]
+  ): [Room]
   UnreadRooms: Int
 }
