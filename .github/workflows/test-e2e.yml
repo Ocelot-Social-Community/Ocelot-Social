@@ -26,6 +26,15 @@ jobs:
           docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/images/webapp.tar
 
+      - name: Install cypress requirements
+        run: |
+          wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+          cd backend
+          yarn install
+          yarn build
+          cd ..
+          yarn install
+
       - name: Get pr number
         id: pr
         uses: 8BitJonny/gh-get-current-pr@2.2.0
@@ -35,6 +44,9 @@ jobs:
         uses: actions/cache/save@v3.3.1
         with:
           path: |
+            /opt/cucumber-json-formatter
+            /home/runner/.cache/Cypress
+            /home/runner/work/Ocelot-Social/Ocelot-Social
             /tmp/images/
           key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
 
@@ -50,28 +62,8 @@ jobs:
         # run copies of the current job in parallel
         job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: webapp | copy env file
-        run: cp webapp/.env.template webapp/.env
-
-      - name: backend | copy env file
-        run: cp backend/.env.template backend/.env
-
       - name: boot up test system | docker-compose
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp neo4j backend
-
-      - name: Full stack tests | prepare
-        run: |
-          wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
-          chmod +x /opt/cucumber-json-formatter
-          sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
-          cd backend
-          yarn install
-          yarn build
-          cd ..
-          yarn install
 
       - name: Full stack tests | run tests
         id: e2e-tests
