@@ -58,13 +58,18 @@ jobs:
       - name: backend | Build 'test' image
         run: |
           docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
-          docker save "ocelotsocialnetwork/backend:test" > /tmp/images/backend.tar
+          docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      - name: Get pr number
+        id: pr
+        uses: 8BitJonny/gh-get-current-pr@2.2.0
+      
+      - name: Cache docker images
+        id: cache-backend
+        uses: actions/cache/save@v3.3.1
         with:
-          name: docker-backend-test
-          path: /tmp/images/backend.tar
+          path: /tmp/backend.tar
+          key: backend-cache-pr${{ steps.pr.outputs.number }}
 
   lint_backend:
     name: Lint Backend
