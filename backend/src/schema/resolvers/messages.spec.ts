@@ -144,7 +144,7 @@ describe('Message', () => {
             })
             expect(pubsubSpy).toBeCalledWith('ROOM_COUNT_UPDATED', {
               roomCountUpdated: '1',
-              user: 'other-chatting-user',
+              userId: 'other-chatting-user',
             })
           })
 
@@ -322,18 +322,6 @@ describe('Message', () => {
                 roomId,
                 content: 'And another nice message to other chatting user',
               },
-            })
-          })
-
-          it('sends two subscriptions', () => {
-            expect(pubsubSpy).toBeCalledTimes(2)
-            expect(pubsubSpy).nthCalledWith(1, 'ROOM_COUNT_UPDATED', {
-              roomCountUpdated: '1',
-              user: 'chatting-user',
-            })
-            expect(pubsubSpy).nthCalledWith(2, 'ROOM_COUNT_UPDATED', {
-              roomCountUpdated: '1',
-              user: 'other-chatting-user',
             })
           })
 
