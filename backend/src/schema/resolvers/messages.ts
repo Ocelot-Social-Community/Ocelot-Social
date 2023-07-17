@@ -73,7 +73,7 @@ export default {
           RETURN message {
             .*,
             room: properties(room)
-            otherUser: properties(otherUser)
+            otherUser: properties(otherUser),
             senderId: currentUser.id,
             username: currentUser.name,
             avatar: image.url,
