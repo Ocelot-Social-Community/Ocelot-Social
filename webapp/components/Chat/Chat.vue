@@ -267,7 +267,7 @@ export default {
 
         const msgs = []
         ;[...this.messages, ...Message].forEach((m) => {
-          m.seen = true
+          if (m.senderId !== this.currentUser.id) m.seen = true
           m.date = new Date(m.date).toDateString()
           msgs[m.indexId] = m
         })
