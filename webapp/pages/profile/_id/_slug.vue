@@ -79,6 +79,16 @@
               @optimistic="optimisticFollow"
               @update="updateFollow"
             />
+            <base-button
+              icon="chat-bubble"
+              v-tooltip="{
+                content: $t('chat.userProfileButton.tooltip', { name: userName }),
+                placement: 'bottom-start',
+              }"
+              @click="showChat({ showChat: true, roomID: user.id })"
+            >
+              {{ $t('chat.userProfileButton.label') }}
+            </base-button>
           </div>
           <template v-if="user.about">
             <hr />
@@ -172,6 +182,7 @@
 
 <script>
 import uniqBy from 'lodash/uniqBy'
+import { mapMutations } from 'vuex'
 import postListActions from '~/mixins/postListActions'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import HcFollowButton from '~/components/Button/FollowButton'
@@ -281,6 +292,10 @@ export default {
     },
   },
   methods: {
+    ...mapMutations({
+      commitModalData: 'modal/SET_OPEN',
+      showChat: 'chat/SET_OPEN_CHAT',
+    }),
     handleTab(tab) {
       if (this.tabActive !== tab) {
         this.tabActive = tab
@@ -356,7 +371,7 @@ export default {
       }
     },
     async deleteUser(userdata) {
-      this.$store.commit('modal/SET_OPEN', {
+      this.commitModalData({
         name: 'delete',
         data: {
           userdata: userdata,

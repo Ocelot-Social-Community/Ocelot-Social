@@ -77,6 +77,24 @@
       }
     }
   },
+  "chat": {
+    "cancelSelectMessage": "Cancel",
+    "conversationStarted": "Conversation started on:",
+    "isOnline": "is online",
+    "isTyping": "is writing...",
+    "lastSeen": "last seen ",
+    "messageDeleted": "This message was deleted",
+    "messagesEmpty": "No messages",
+    "newMessages": "New Messages",
+    "roomEmpty": "No room selected",
+    "roomsEmpty": "No rooms",
+    "search": "Search",
+    "typeMessage": "Type message",
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chat with “{name}”"
+    }
+  },
   "client-only": {
     "loading": "Loading …"
   },
@@ -115,11 +133,20 @@
     "validations": {
       "categories": "at least one and at most three topics must be selected",
       "email": "must be a valid e-mail address",
+      "eventLocationNameLength": "minimum {min} or maximum {max} characters",
+      "eventLocationNameNotEmpty": "only empty characters are not allowed",
+      "eventVenueLength": "minimum {min} or maximum {max} characters",
+      "eventVenueNotEmpty": "only empty characters are not allowed",
       "url": "must be a valid URL"
     },
     "versus": "Versus"
   },
   "components": {
+    "dateTimeRange": {
+      "hourMinute": "HH:mm",
+      "monthDay": "MM/dd/",
+      "yearMonthDay": "MM/dd/yyyy"
+    },
     "password-reset": {
       "change-password": {
         "error": "Changing your password failed. Maybe the security code was not correct?",
@@ -543,6 +570,9 @@
       },
       "groups": "Groups",
       "myProfile": "My profile"
+    },
+    "chat": {
+      "tooltip": "My chats"
     }
   },
   "index": {
@@ -586,9 +616,16 @@
     "button": {
       "tooltip": "Show map"
     },
+    "legend": {
+      "event": "Event",
+      "group": "Group",
+      "theUser": "My position",
+      "user": "User"
+    },
     "markerTypes": {
+      "event": "event",
       "group": "group",
-      "theUser": "your position",
+      "theUser": "my position",
       "user": "user"
     },
     "pageTitle": "Map",
@@ -682,9 +719,6 @@
       "unread": "Unread"
     },
     "group": "Description",
-    "headerMenuButton": {
-      "tooltip": "My notifications"
-    },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
     "post": "Post or Group",
@@ -698,11 +732,6 @@
       "user_left_group": "Left your group …"
     },
     "title": "Notifications",
-    "user": "User"
-  },
-  "position": {
-    "group": "Group",
-    "my": "My position",
     "user": "User"
   },
   "post": {
@@ -722,10 +751,11 @@
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Create A New Post"
+      "title": "Create A New Article"
     },
     "edited": "edited",
     "editPost": {
+      "event": "Edit Your Event",
       "forGroup": {
         "title": "For The Group “{name}”"
       },
@@ -747,10 +777,10 @@
     },
     "viewEvent": {
       "eventEnd": "End",
-      "eventIsOnline": "Online Event",
-      "eventLocationName": "City",
+      "eventIsOnline": "Online",
+      "eventLocationName": "City - e.g. Example street 1, 12345 City",
       "eventStart": "Start",
-      "eventVenue": "Venue",
+      "eventVenue": "Venue - e.g. Backyard, 1st Floor, ...",
       "title": "Event"
     },
     "viewPost": {

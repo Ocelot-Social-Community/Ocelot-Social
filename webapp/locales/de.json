@@ -77,6 +77,24 @@
       }
     }
   },
+  "chat": {
+    "cancelSelectMessage": "Abbrechen",
+    "conversationStarted": "Unterhaltung startete am:",
+    "isOnline": "online",
+    "isTyping": "tippt...",
+    "lastSeen": "zuletzt gesehen ",
+    "messageDeleted": "Diese Nachricht wuerde gelöscht",
+    "messagesEmpty": "Keine Nachrichten",
+    "newMessages": "Neue Nachrichten",
+    "roomEmpty": "Keinen Raum selektiert",
+    "roomsEmpty": "Keine Räume",
+    "search": "Suche",
+    "typeMessage": "Nachricht schreiben",
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chatte mit „{name}“"
+    }
+  },
   "client-only": {
     "loading": "Lade …"
   },
@@ -115,11 +133,20 @@
     "validations": {
       "categories": "es müssen eine bis drei Themen ausgewählt werden",
       "email": "muss eine gültige E-Mail-Adresse sein",
+      "eventLocationNameLength": "Minimum {min}, Maximum {max} Zeichen",
+      "eventLocationNameNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
+      "eventVenueLength": "Minimum {min}, Maximum {max} Zeichen",
+      "eventVenueNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
       "url": "muss eine gültige URL sein"
     },
     "versus": "Versus"
   },
   "components": {
+    "dateTimeRange": {
+      "hourMinute": "HH:mm",
+      "monthDay": "dd.MM.",
+      "yearMonthDay": "dd.MM.yyyy"
+    },
     "password-reset": {
       "change-password": {
         "error": "Passwort Änderung fehlgeschlagen. Möglicherweise falscher Sicherheitscode?",
@@ -543,6 +570,9 @@
       },
       "groups": "Gruppen",
       "myProfile": "Mein Profil"
+    },
+    "chat": {
+      "tooltip": "Meine Chats"
     }
   },
   "index": {
@@ -571,7 +601,7 @@
     "moreInfo": "Was ist {APPLICATION_NAME}?",
     "moreInfoHint": "zur Präsentationsseite",
     "no-account": "Du hast noch kein Nutzerkonto?",
-    "no-cookie": "Es kann kein Cookie angelegt werden. Du must Cookies akzeptieren.",
+    "no-cookie": "Es kann kein Cookie angelegt werden. Du musst Cookies akzeptieren.",
     "password": "Dein Passwort",
     "register": "Nutzerkonto erstellen",
     "success": "Du bist eingeloggt!"
@@ -586,9 +616,16 @@
     "button": {
       "tooltip": "Landkarte anzeigen"
     },
-    "markerTypes": {
+    "legend": {
+      "event": "Veranstaltung",
       "group": "Gruppe",
-      "theUser": "deine Position",
+      "theUser": "Meine Position",
+      "user": "Nutzer"
+    },
+    "markerTypes": {
+      "event": "Veranstaltung",
+      "group": "Gruppe",
+      "theUser": "meine Position",
       "user": "Nutzer"
     },
     "pageTitle": "Landkarte",
@@ -682,9 +719,6 @@
       "unread": "Ungelesen"
     },
     "group": "Beschreibung",
-    "headerMenuButton": {
-      "tooltip": "Meine Benachrichtigungen"
-    },
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",
@@ -698,11 +732,6 @@
       "user_left_group": "Hat deine Gruppe verlassen …"
     },
     "title": "Benachrichtigungen",
-    "user": "Nutzer"
-  },
-  "position": {
-    "group": "Gruppe",
-    "my": "Meine Position",
     "user": "Nutzer"
   },
   "post": {
@@ -726,6 +755,7 @@
     },
     "edited": "bearbeitet",
     "editPost": {
+      "event": "Bearbeite deine Veranstaltung",
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
@@ -747,10 +777,10 @@
     },
     "viewEvent": {
       "eventEnd": "Ende",
-      "eventIsOnline": "Online Veranstaltung",
-      "eventLocationName": "Stadt",
+      "eventIsOnline": "Online",
+      "eventLocationName": "Stadt - z.B. Musterstraße 1, 12345 Musterstadt",
       "eventStart": "Beginn",
-      "eventVenue": "Veranstaltungsort",
+      "eventVenue": "Veranstaltungsort - z.B. Hinterhof, 1. OG, ...",
       "title": "Veranstaltung"
     },
     "viewPost": {

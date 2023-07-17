@@ -1,0 +1,46 @@
+# input _MessageFilter {
+#   room: _RoomFilter
+# }
+
+enum _MessageOrdering {
+  indexId_desc
+}
+
+type Message {
+  id: ID!
+  indexId: Int!
+  createdAt: String
+  updatedAt: String
+
+  content: String!
+  
+  author: User! @relation(name: "CREATED", direction: "IN")
+  room: Room! @relation(name: "INSIDE", direction: "OUT")
+
+  senderId: String! @cypher(statement: "MATCH (this)<-[:CREATED]-(user:User) RETURN user.id")
+  username: String! @cypher(statement: "MATCH (this)<-[:CREATED]-(user:User) RETURN user.name")
+  avatar: String @cypher(statement: "MATCH (this)<-[:CREATED]-(:User)-[:AVATAR_IMAGE]->(image:Image) RETURN image.url")
+  date: String!  @cypher(statement: "RETURN this.createdAt")
+
+  saved: Boolean
+  distributed: Boolean
+  seen: Boolean
+}
+
+type Mutation {
+  CreateMessage(
+    roomId: ID!
+    content: String!
+  ): Message
+
+  MarkMessagesAsSeen(messageIds: [String!]): Boolean
+}
+
+type Query {
+  Message(
+    roomId: ID!,
+    first: Int
+    offset: Int
+    orderBy: [_MessageOrdering]
+  ): [Message]
+}

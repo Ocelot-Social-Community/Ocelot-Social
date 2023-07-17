@@ -54,36 +54,28 @@
             </section>
             <ds-space margin-bottom="small" />
             <h2 class="title hyphenate-text">{{ post.title }}</h2>
-            <!-- Eventdata -->
+            <!-- event data -->
             <ds-space
               v-if="post && post.postType[0] === 'Event'"
               margin-bottom="small"
               style="padding: 10px"
             >
-              <ds-text align="left" color="soft">
-                <base-icon name="map-marker" data-test="map-marker" />
-                <span v-if="post.eventVenue">{{ post.eventVenue }}</span>
-                <span v-if="!post.eventIsOnline">
-                  <span v-if="post.eventVenue">-</span>
-                  {{ post.eventLocationName }}
-                </span>
-                <span v-else>
-                  <span v-if="post.eventVenue">-</span>
-                  {{ $t('post.viewEvent.eventIsOnline') }}
-                </span>
-              </ds-text>
-              <ds-text align="left" color="soft" class="event-info">
-                <base-icon name="calendar" data-test="calendar" />
-                <span>{{ getEventDateString }}</span>
-              </ds-text>
-              <ds-text v-if="getEventTimeString" align="left" color="soft" class="event-info">
-                <base-icon name="clock" data-test="calendar" />
-                <span>{{ getEventTimeString }}</span>
-              </ds-text>
+              <location-teaser
+                class="event-info"
+                :venue="post.eventVenue"
+                :locationName="post.eventLocationName"
+                :isOnline="post.eventIsOnline"
+              />
+              <date-time-range
+                class="event-info"
+                :startDate="post.eventStart"
+                :endDate="post.eventEnd"
+              />
             </ds-space>
             <ds-space margin-bottom="small" />
+            <!-- content -->
             <content-viewer class="content hyphenate-text" :content="post.content" />
-            <!-- Categories -->
+            <!-- categories -->
             <div v-if="categoriesActive" class="categories">
               <ds-space margin="xx-large" />
               <ds-space margin="xx-small" />
@@ -158,11 +150,13 @@
 import ContentViewer from '~/components/Editor/ContentViewer'
 import HcCategory from '~/components/Category'
 import HcHashtag from '~/components/Hashtag/Hashtag'
-import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
-import HcShoutButton from '~/components/ShoutButton.vue'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentList from '~/components/CommentList/CommentList'
+import ContentMenu from '~/components/ContentMenu/ContentMenu'
+import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
+import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import HcShoutButton from '~/components/ShoutButton.vue'
+import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import {
   postMenuModalsData,
@@ -174,7 +168,6 @@ import { groupQuery } from '~/graphql/groups'
 import PostMutations from '~/graphql/PostMutations'
 import links from '~/constants/links.js'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
-import { format } from 'date-fns'
 
 export default {
   name: 'PostSlug',
@@ -187,9 +180,11 @@ export default {
     CommentForm,
     CommentList,
     ContentViewer,
+    DateTimeRange,
     HcCategory,
     HcHashtag,
     HcShoutButton,
+    LocationTeaser,
     PageParamsLink,
     UserTeaser,
   },
@@ -225,7 +220,10 @@ export default {
       const { slug, id } = this.$route.params
       return [
         {
-          name: this.$t('common.post', null, 1),
+          name:
+            this.post?.postType[0] === 'Event'
+              ? this.$t('post.viewEvent.title')
+              : this.$t('post.viewPost.title'),
           path: `/post/${id}/${slug}`,
           children: [
             {
@@ -287,27 +285,6 @@ export default {
       return (
         !this.post.group || (this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole))
       )
-    },
-    getEventDateString() {
-      if (this.post.eventEnd) {
-        const eventStart = format(new Date(this.post.eventStart), 'dd.MM.')
-        const eventEnd = format(new Date(this.post.eventEnd), 'dd.MM.yyyy')
-        return `${eventStart} - ${eventEnd}`
-      } else {
-        return format(new Date(this.post.eventStart), 'dd.MM.yyyy')
-      }
-    },
-    getEventTimeString() {
-      if (this.post.eventEnd) {
-        const eventStartTime = format(new Date(this.post.eventStart), 'HH:mm')
-        const eventEndTime = format(new Date(this.post.eventEnd), 'HH:mm')
-        /*  assumption that if e.g. 00:00 == 00:00 is saved, 
-            it's not realistic because they are the default values, so don't show the time info.
-        */
-        return eventStartTime !== eventEndTime ? `${eventStartTime} - ${eventEndTime}` : ''
-      } else {
-        return format(new Date(this.post.eventStart), 'HH:mm')
-      }
     },
   },
   methods: {
@@ -390,6 +367,7 @@ export default {
   },
 }
 </script>
+
 <style lang="scss">
 .post-side-navigation {
   position: sticky;

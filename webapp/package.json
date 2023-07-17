@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social-webapp",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "ocelot.social Frontend",
   "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
   "author": "ocelot.social Community",
@@ -54,6 +54,7 @@
     "v-mapbox": "^1.11.2",
     "v-tooltip": "~2.1.3",
     "validator": "^13.0.0",
+    "vue-advanced-chat": "^2.0.7",
     "vue-count-to": "~1.0.13",
     "vue-infinite-loading": "^2.4.5",
     "vue-izitoast": "^1.2.1",

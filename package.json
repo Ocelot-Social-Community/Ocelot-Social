@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "Free and open source software program code available to run social networks.",
   "author": "ocelot.social Community",
   "license": "MIT",
@@ -10,19 +10,31 @@
     "url": "https://github.com/Ocelot-Social-Community/Ocelot-Social.git"
   },
   "cypress-cucumber-preprocessor": {
-    "nonGlobalStepDefinitions": true
+    "stepDefinitions": "cypress/support/step_definitions/**/*.js",
+    "json": {
+      "enabled": true,
+      "output": "cypress/reports/json_logs/cucumber_log.json",
+      "formatter": "cucumber-json-formatter"
+    },
+    "messages": {
+      "enabled": true,
+      "output": "cypress/reports/json_logs/messages.ndjson"
+    },
+    "html": {
+      "enabled": false
+    }
   },
   "scripts": {
     "db:seed": "cd backend && yarn run db:seed",
     "db:reset": "cd backend && yarn run db:reset",
-    "cypress:run": "cypress run --browser electron --config-file ./cypress/cypress.config.js",
-    "cypress:open": "cypress open --browser electron --config-file ./cypress/cypress.config.js",
+    "cypress:run": "cypress run --e2e --browser electron --config-file ./cypress/cypress.config.js",
+    "cypress:open": "cypress open --e2e --browser electron --config-file ./cypress/cypress.config.js",
     "cucumber:setup": "cd backend && yarn run dev",
     "cucumber": "wait-on tcp:4000 && cucumber-js --require-module @babel/register --exit",
     "release": "yarn version --no-git-tag-version --no-commit-hooks --no-commit && auto-changelog --latest-version $(node -p -e \"require('./package.json').version\") && cd backend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp/maintenance/source && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../../../package.json').version\")"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.8",
+    "@babel/core": "^7.22.5",
     "@babel/preset-env": "^7.22.4",
     "@babel/register": "^7.12.10",
     "@badeball/cypress-cucumber-preprocessor": "^18.0.1",

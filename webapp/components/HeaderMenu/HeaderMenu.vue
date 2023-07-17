@@ -74,6 +74,10 @@
             <!-- locale switch -->
             <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
             <template v-if="isLoggedIn">
+              <!-- chat menu -->
+              <client-only>
+                <chat-notification-menu placement="top" />
+              </client-only>
               <!-- notification menu -->
               <client-only>
                 <notification-menu placement="top" />
@@ -127,10 +131,16 @@
           <!-- mobile hamburger menu -->
           <ds-flex-item class="mobile-hamburger-menu">
             <client-only>
+              <!-- chat menu -->
+              <div style="display: inline-flex">
+                <chat-notification-menu />
+              </div>
+              <!-- notification menu -->
               <div style="display: inline-flex; padding-right: 20px">
                 <notification-menu />
               </div>
             </client-only>
+            <!-- hamburger menu -->
             <base-button icon="bars" @click="toggleMobileMenuView" circle />
           </ds-flex-item>
         </ds-flex>
@@ -253,10 +263,11 @@ import isEmpty from 'lodash/isEmpty'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
 import { SHOW_CONTENT_FILTER_HEADER_MENU } from '~/constants/filter.js'
 import LOGOS from '~/constants/logos.js'
-import headerMenu from '~/constants/headerMenu.js'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
+import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotificationMenu'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import GroupButton from '~/components/Group/GroupButton'
+import headerMenu from '~/constants/headerMenu.js'
 import InviteButton from '~/components/InviteButton/InviteButton'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
@@ -278,6 +289,7 @@ export default {
     NotificationMenu,
     PageParamsLink,
     SearchField,
+    ChatNotificationMenu,
   },
   props: {
     showMobileMenu: { type: Boolean, default: false },

@@ -89,13 +89,13 @@
           <label for="checkbox0">
             {{ $t('components.registration.create-user-account.termsAndCondsEtcConfirmed') }}
             <br />
-            <a :href="'/terms-and-conditions'" target="_blank">
+            <page-params-link :pageParams="links.TERMS_AND_CONDITIONS" forceTargetBlank>
               {{ $t('site.termsAndConditions') }}
-            </a>
+            </page-params-link>
             <br />
-            <a :href="'/data-privacy'" target="_blank">
+            <page-params-link :pageParams="links.DATA_PRIVACY" forceTargetBlank>
               {{ $t('site.data-privacy') }}
-            </a>
+            </page-params-link>
           </label>
         </ds-text>
         <ds-text>
@@ -123,20 +123,22 @@
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import links from '~/constants/links'
 import emails from '~/constants/emails'
+import { SignupVerificationMutation } from '~/graphql/Registration.js'
+import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordStrength from '~/components/Password/Strength'
 import EmailDisplayAndVerify from './EmailDisplayAndVerify'
-import { SweetalertIcon } from 'vue-sweetalert-icons'
+import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
-import { SignupVerificationMutation } from '~/graphql/Registration.js'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
 
 export default {
   name: 'RegistrationSlideCreate',
   components: {
-    PasswordStrength,
     EmailDisplayAndVerify,
-    SweetalertIcon,
+    PageParamsLink,
+    PasswordStrength,
     ShowPassword,
+    SweetalertIcon,
   },
   props: {
     sliderData: { type: Object, required: true },

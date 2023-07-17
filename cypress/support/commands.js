@@ -13,9 +13,8 @@
 // Cypress.Commands.add('login', (email, password) => { ... })
 
 /* globals Cypress cy */
-import "cypress-file-upload";
 import { GraphQLClient, request } from 'graphql-request'
-import CONFIG from '../../backend/src/config'
+import CONFIG from '../../backend/build/src/config'
 
 const authenticatedHeaders = (variables) => {
   const mutation = `
