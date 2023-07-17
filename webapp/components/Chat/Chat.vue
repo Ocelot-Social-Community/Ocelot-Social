@@ -254,6 +254,7 @@ export default {
 
         const msgs = []
         ;[...this.messages, ...Message].forEach((m) => {
+          m.date = new Date(m.date).toDateString()
           msgs[m.indexId] = m
         })
         this.messages = msgs.filter(Boolean)

@@ -374,7 +374,7 @@ describe('Room', () => {
           ).resolves.toMatchObject({
             data: {
               UnreadRooms: 2,
-            }
+            },
           })
         })
       })
