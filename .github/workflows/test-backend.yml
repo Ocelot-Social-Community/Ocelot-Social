@@ -126,3 +126,19 @@ jobs:
 
       - name: backend | Unit test incl. coverage check
         run: docker-compose exec -T backend yarn test
+
+  cleanup:
+    name: Cleanup
+    if: always()
+    needs: [files-changed, unit_test_backend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete cache
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh extension install actions/gh-actions-cache
+          KEY="backend-neo4j-cache-pr${{ needs.files-changed.outputs.pr-number }}"
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
+          KEY="backend-cache-pr${{ needs.files-changed.outputs.pr-number }}"
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm

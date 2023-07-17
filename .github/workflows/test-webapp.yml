@@ -92,15 +92,28 @@ jobs:
       - name: Load Docker Image
         run: docker load < /tmp/webapp.tar
 
-      - name: backend | copy env files webapp
-        run: cp webapp/.env.template webapp/.env
-
-      - name: backend | copy env files backend
-        run: cp backend/.env.template backend/.env
+      - name: Copy env files
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.template backend/.env
 
       - name: backend | docker-compose
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
 
       - name: webapp | Unit tests incl. coverage check
         run: docker-compose exec -T webapp yarn test
+
+  cleanup:
+    name: Cleanup
+    if: always()
+    needs: [files-changed, unit_test_webapp]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete cache
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh extension install actions/gh-actions-cache
+          KEY="webapp-cache-pr${{ needs.files-changed.outputs.pr-number }}"
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
 
