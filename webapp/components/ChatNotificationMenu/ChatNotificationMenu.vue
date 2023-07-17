@@ -49,7 +49,6 @@ export default {
           }
         },
         updateQuery: (previousResult, { subscriptionData }) => {
-          console.log(subscriptionData)
           return { UnreadRooms: subscriptionData.data.roomCountUpdated }
         },
       },
