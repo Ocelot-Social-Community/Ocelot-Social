@@ -20,7 +20,7 @@ type Room {
 
   lastMessage: Message @cypher(statement: """
     MATCH (this)<-[:INSIDE]-(message:Message)
-    WITH message ORDER BY message.createdAt DESC LIMIT 1
+    WITH message ORDER BY message.indexId DESC LIMIT 1
     RETURN message
   """)
 
