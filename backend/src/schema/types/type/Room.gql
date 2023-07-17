@@ -35,3 +35,7 @@ type Query {
   ): [Room]
   UnreadRooms: Int
 }
+
+type Subscription {
+  roomCountUpdated(userId: ID!): Int
+}
