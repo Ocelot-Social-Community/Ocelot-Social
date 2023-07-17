@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3.3.0
 
-      - name: Check for frontend file changes
+      - name: Check for backend file changes
         uses: dorny/paths-filter@v2.11.1
         id: changes
         with:
@@ -93,11 +93,11 @@ jobs:
       - name: Load Docker Image
         run: docker load < /tmp/neo4j.tar
 
-      - name: Download Docker Image (Backend)
-        uses: actions/download-artifact@v3
-        with:
-          name: docker-backend-test
-          path: /tmp
+      # - name: Download Docker Image (Backend)
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: docker-backend-test
+      #     path: /tmp
 
       - name: Load Docker Image
         run: docker load < /tmp/backend.tar
