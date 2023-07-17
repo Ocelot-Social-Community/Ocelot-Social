@@ -22,6 +22,9 @@ beforeAll(async () => {
         driver,
         neode,
         user: authenticatedUser,
+        cypherParams: {
+          currentUserId: authenticatedUser ? authenticatedUser.id : null,
+        },
       }
     },
   })
@@ -131,6 +134,26 @@ describe('Room', () => {
               CreateRoom: {
                 id: expect.any(String),
                 roomId: result.data.CreateRoom.id,
+                roomName: 'Other Chatting User',
+                unreadCount: 0,
+                users: expect.arrayContaining([
+                  {
+                    _id: 'chatting-user',
+                    id: 'chatting-user',
+                    name: 'Chatting User',
+                    avatar: {
+                      url: expect.any(String),
+                    },
+                  },
+                  {
+                    _id: 'other-chatting-user',
+                    id: 'other-chatting-user',
+                    name: 'Other Chatting User',
+                    avatar: {
+                      url: expect.any(String),
+                    },
+                  },
+                ]),
               },
             },
           })
@@ -228,6 +251,7 @@ describe('Room', () => {
                   id: expect.any(String),
                   roomId: result.data.Room[0].id,
                   roomName: 'Chatting User',
+                  unreadCount: 0,
                   users: expect.arrayContaining([
                     {
                       _id: 'chatting-user',
