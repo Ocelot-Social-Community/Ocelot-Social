@@ -1,7 +1,31 @@
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import Resolver from './helpers/Resolver'
+import { pubsub, ROOM_COUNT_UPDATED } from '../../server'
+import { withFilter } from 'graphql-subscriptions'
+
+export const getUnreadRoomsCount = async (userId, session) => {
+  return session.readTransaction(async (transaction) => {
+    const unreadRoomsCypher = `
+      MATCH (:User { id: $userId })-[:CHATS_IN]->(room:Room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
+      WHERE NOT sender.id = $userId AND NOT message.seen
+      RETURN toString(COUNT(DISTINCT room)) AS count
+    `
+    const unreadRoomsTxResponse = await transaction.run(unreadRoomsCypher, { userId })
+    return unreadRoomsTxResponse.records.map((record) => record.get('count'))[0]
+  })
+}
 
 export default {
+  Subscription: {
+    roomCountUpdated: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(ROOM_COUNT_UPDATED),
+        (payload, variables) => {
+          return payload.userId === variables.userId
+        },
+      ),
+    },
+  },
   Query: {
     Room: async (object, params, context, resolveInfo) => {
       if (!params.filter) params.filter = {}
@@ -15,17 +39,8 @@ export default {
         user: { id: currentUserId },
       } = context
       const session = context.driver.session()
-      const readTxResultPromise = session.readTransaction(async (transaction) => {
-        const unreadRoomsCypher = `
-          MATCH (:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
-          WHERE NOT sender.id = $currentUserId AND NOT message.seen
-          RETURN toString(COUNT(DISTINCT room)) AS count
-        `
-        const unreadRoomsTxResponse = await transaction.run(unreadRoomsCypher, { currentUserId })
-        return unreadRoomsTxResponse.records.map((record) => record.get('count'))[0]
-      })
       try {
-        const count = await readTxResultPromise
+        const count = await getUnreadRoomsCount(currentUserId, session)
         return count
       } finally {
         session.close()

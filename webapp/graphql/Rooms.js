@@ -35,3 +35,11 @@ export const unreadRoomsQuery = () => {
     }
   `
 }
+
+export const roomCountUpdated = () => {
+  return gql`
+    subscription roomCountUpdated($userId: ID!) {
+      roomCountUpdated(userId: $userId)
+    }
+  `
+}

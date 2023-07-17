@@ -60,10 +60,10 @@
 </template>
 
 <script>
-import { roomQuery, createRoom } from '~/graphql/Rooms'
+import { roomQuery, createRoom, unreadRoomsQuery } from '~/graphql/Rooms'
 import { messageQuery, createMessageMutation, markMessagesAsSeen } from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'Chat',
@@ -85,31 +85,31 @@ export default {
           title: 'Just a dummy item',
         },
         /*
-        {
-          name: 'inviteUser',
-          title: 'Invite User',
-        },
-        {
-          name: 'removeUser',
-          title: 'Remove User',
-        },
-        {
-          name: 'deleteRoom',
-          title: 'Delete Room',
-        },
-        */
+            {
+            name: 'inviteUser',
+            title: 'Invite User',
+            },
+            {
+            name: 'removeUser',
+            title: 'Remove User',
+            },
+            {
+            name: 'deleteRoom',
+            title: 'Delete Room',
+            },
+          */
       ],
       messageActions: [
         /*
-        {
-          name: 'addMessageToFavorite',
-          title: 'Add To Favorite',
-        },
-        {
-          name: 'shareMessage',
-          title: 'Share Message',
-        },
-        */
+            {
+            name: 'addMessageToFavorite',
+            title: 'Add To Favorite',
+            },
+            {
+            name: 'shareMessage',
+            title: 'Share Message',
+            },
+          */
       ],
       templatesText: [
         {
@@ -123,14 +123,14 @@ export default {
       ],
       roomActions: [
         /*
-        {
-          name: 'archiveRoom',
-          title: 'Archive Room',
-        },
-        { name: 'inviteUser', title: 'Invite User' },
-        { name: 'removeUser', title: 'Remove User' },
-        { name: 'deleteRoom', title: 'Delete Room' },
-        */
+            {
+            name: 'archiveRoom',
+            title: 'Archive Room',
+            },
+            { name: 'inviteUser', title: 'Invite User' },
+            { name: 'removeUser', title: 'Remove User' },
+            { name: 'deleteRoom', title: 'Delete Room' },
+          */
       ],
 
       showDemoOptions: true,
@@ -195,6 +195,9 @@ export default {
     },
   },
   methods: {
+    ...mapMutations({
+      commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
+    }),
     async fetchRooms({ room } = {}) {
       this.roomsLoaded = false
       const offset = this.roomPage * this.roomPageSize
@@ -257,12 +260,23 @@ export default {
 
         const newMsgIds = Message.filter((m) => m.seen === false).map((m) => m.id)
         if (newMsgIds.length) {
-          this.$apollo.mutate({
-            mutation: markMessagesAsSeen(),
-            variables: {
-              messageIds: newMsgIds,
-            },
-          })
+          this.$apollo
+            .mutate({
+              mutation: markMessagesAsSeen(),
+              variables: {
+                messageIds: newMsgIds,
+              },
+            })
+            .then(() => {
+              this.$apollo
+                .query({
+                  query: unreadRoomsQuery(),
+                  fetchPolicy: 'network-only',
+                })
+                .then(({ data: { UnreadRooms } }) => {
+                  this.commitUnreadRoomCount(UnreadRooms)
+                })
+            })
         }
 
         const msgs = []
