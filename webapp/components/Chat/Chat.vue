@@ -85,30 +85,30 @@ export default {
           title: 'Just a dummy item',
         },
         /* {
-          name: 'inviteUser',
-          title: 'Invite User',
-        },
-        {
-          name: 'removeUser',
-          title: 'Remove User',
-        },
-        {
-          name: 'deleteRoom',
-          title: 'Delete Room',
-        },
-        */
+            name: 'inviteUser',
+            title: 'Invite User',
+            },
+            {
+            name: 'removeUser',
+            title: 'Remove User',
+            },
+            {
+            name: 'deleteRoom',
+            title: 'Delete Room',
+            },
+          */
       ],
       messageActions: [
         /*
-        {
-          name: 'addMessageToFavorite',
-          title: 'Add To Favorite',
-        },
-        {
-          name: 'shareMessage',
-          title: 'Share Message',
-        },
-        */
+            {
+            name: 'addMessageToFavorite',
+            title: 'Add To Favorite',
+            },
+            {
+            name: 'shareMessage',
+            title: 'Share Message',
+            },
+          */
       ],
       templatesText: [
         {
@@ -122,14 +122,14 @@ export default {
       ],
       roomActions: [
         /*
-        {
-          name: 'archiveRoom',
-          title: 'Archive Room',
-        },
-        { name: 'inviteUser', title: 'Invite User' },
-        { name: 'removeUser', title: 'Remove User' },
-        { name: 'deleteRoom', title: 'Delete Room' },
-        */
+            {
+            name: 'archiveRoom',
+            title: 'Archive Room',
+            },
+            { name: 'inviteUser', title: 'Invite User' },
+            { name: 'removeUser', title: 'Remove User' },
+            { name: 'deleteRoom', title: 'Delete Room' },
+          */
       ],
 
       showDemoOptions: true,
