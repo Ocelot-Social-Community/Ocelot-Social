@@ -13,8 +13,8 @@ export const createRoomMutation = () => {
 
 export const roomQuery = () => {
   return gql`
-    query {
-      Room {
+    query Room($first: Int, $offset: Int, $id: ID) {
+      Room(first: $first, offset: $offset, id: $id, orderBy: createdAt_desc) {
         id
         roomId
         roomName
@@ -27,6 +27,14 @@ export const roomQuery = () => {
           }
         }
       }
+    }
+  `
+}
+
+export const unreadRoomsQuery = () => {
+  return gql`
+    query {
+      UnreadRooms
     }
   `
 }
