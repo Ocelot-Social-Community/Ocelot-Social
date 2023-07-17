@@ -45,3 +45,7 @@ type Query {
     orderBy: [_MessageOrdering]
   ): [Message]
 }
+
+type Subscription {
+  chatMessageAdded(userId: ID!): Message
+}

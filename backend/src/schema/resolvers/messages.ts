@@ -1,9 +1,21 @@
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import Resolver from './helpers/Resolver'
 import RoomResolver from './rooms'
-import { pubsub, ROOM_COUNT_UPDATED } from '../../server'
+import { pubsub, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '../../server'
+import { withFilter } from 'graphql-subscriptions'
 
 export default {
+  Subscription: {
+    chatMessageAdded: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
+        (payload, variables) => {
+          console.log('chatMessageAdded', payload, variables)
+          return true // payload.user.id === variables.userId
+        },
+      ),
+    },
+  },
   Query: {
     Message: async (object, params, context, resolveInfo) => {
       const { roomId } = params
@@ -91,6 +103,10 @@ export default {
 
         // send subscriptions
         await pubsub.publish(ROOM_COUNT_UPDATED, { roomCountUpdated, user: message.otherUser })
+        await pubsub.publish(CHAT_MESSAGE_ADDED, {
+          chatMessageAdded: message,
+          user: message.otherUser,
+        })
 
         return message
       })
