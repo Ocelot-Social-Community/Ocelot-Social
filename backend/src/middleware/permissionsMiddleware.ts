@@ -408,6 +408,7 @@ export default shield(
       getInviteCode: isAuthenticated, // and inviteRegistration
       Room: isAuthenticated,
       Message: isAuthenticated,
+      UnreadRooms: isAuthenticated,
     },
     Mutation: {
       '*': deny,

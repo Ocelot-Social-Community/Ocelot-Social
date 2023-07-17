@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
 export const roomQuery = () => gql`
-  query Room($first: Int, $offset: Int) {
-    Room(first: $first, offset: $offset) {
+  query Room($first: Int, $offset: Int, $id: ID) {
+    Room(first: $first, offset: $offset, id: $id, orderBy: createdAt_desc) {
       id
       roomId
       roomName
@@ -27,3 +27,11 @@ export const createRoom = () => gql`
     }
   }
 `
+
+export const unreadRoomsQuery = () => {
+  return gql`
+    query {
+      UnreadRooms
+    }
+  `
+}
