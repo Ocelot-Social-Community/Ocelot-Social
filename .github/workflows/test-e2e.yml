@@ -94,12 +94,12 @@ jobs:
           cd cypress/
           node create-cucumber-html-report.js
   
-      - name: End-to-end tests | if tests failed, get pr number
+      - name: Full stack tests | if tests failed, get pr number
         id: pr
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         uses: 8BitJonny/gh-get-current-pr@2.2.0
 
-      - name: End-to-end tests | if tests failed, upload report
+      - name: Full stack tests | if tests failed, upload report
         id: e2e-report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         uses: actions/upload-artifact@v3
