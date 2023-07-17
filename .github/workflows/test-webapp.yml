@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       docker: ${{ steps.changes.outputs.docker }}
+      pr-number: ${{ steps.pr.outputs.number }}
       webapp: ${{ steps.changes.outputs.webapp }}
     steps:
       - uses: actions/checkout@v3.3.0
@@ -21,13 +22,15 @@ jobs:
           filters: .github/file-filters.yml
           list-files: shell
 
+      - name: Get pr number
+        id: pr
+        uses: 8BitJonny/gh-get-current-pr@2.2.0
+
   prepare:
     name: Prepare
     if: needs.files-changed.outputs.webapp == 'true'
     needs: files-changed
     runs-on: ubuntu-latest
-    outputs:
-      pr-number: ${{ steps.pr.outputs.number }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -36,10 +39,6 @@ jobs:
         run: |
           scripts/translations/sort.sh
           scripts/translations/missing-keys.sh
-
-      - name: Get pr number
-        id: pr
-        uses: 8BitJonny/gh-get-current-pr@2.2.0
 
   build_test_webapp:
     name: Docker Build Test - Webapp
@@ -59,7 +58,7 @@ jobs:
         uses: actions/cache/save@v3.3.1
         with:
           path: /tmp/webapp.tar
-          key: webapp-cache-pr${{ needs.prepare.outputs.pr-number }}
+          key: webapp-cache-pr${{ needs.files-changed.outputs.pr-number }}
 
   lint_webapp:
     name: Lint Webapp
@@ -84,11 +83,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Download Docker Image (Webapp)
-        uses: actions/download-artifact@v3
+      - name: Restore webapp cache
+        uses: actions/cache/restore@v3.3.1
         with:
-          name: docker-webapp-test
-          path: /tmp
+          path: /tmp/webapp.tar
+          key: webapp-cache-pr${{ needs.files-changed.outputs.pr-number }}
 
       - name: Load Docker Image
         run: docker load < /tmp/webapp.tar
