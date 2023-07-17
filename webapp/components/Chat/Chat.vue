@@ -120,20 +120,6 @@ export default {
           text: 'This is the action',
         },
       ],
-      textMessages: {
-        ROOMS_EMPTY: this.$t('chat.roomsEmpty'),
-        ROOM_EMPTY: this.$t('chat.roomEmpty'),
-        NEW_MESSAGES: this.$t('chat.newMessages'),
-        MESSAGE_DELETED: this.$t('chat.messageDeleted'),
-        MESSAGES_EMPTY: this.$t('chat.messagesEmpty'),
-        CONVERSATION_STARTED: this.$t('chat.conversationStarted'),
-        TYPE_MESSAGE: this.$t('chat.typeMessage'),
-        SEARCH: this.$t('chat.search'),
-        IS_ONLINE: this.$t('chat.isOnline'),
-        LAST_SEEN: this.$t('chat.lastSeen'),
-        IS_TYPING: this.$t('chat.isTyping'),
-        CANCEL_SELECT_MESSAGE: this.$t('chat.cancelSelectMessage'),
-      },
       roomActions: [
         /*
         {
@@ -189,6 +175,22 @@ export default {
     }),
     computedChatStyle() {
       return chatStyle.STYLE.light
+    },
+    textMessages() {
+      return {
+        ROOMS_EMPTY: this.$t('chat.roomsEmpty'),
+        ROOM_EMPTY: this.$t('chat.roomEmpty'),
+        NEW_MESSAGES: this.$t('chat.newMessages'),
+        MESSAGE_DELETED: this.$t('chat.messageDeleted'),
+        MESSAGES_EMPTY: this.$t('chat.messagesEmpty'),
+        CONVERSATION_STARTED: this.$t('chat.conversationStarted'),
+        TYPE_MESSAGE: this.$t('chat.typeMessage'),
+        SEARCH: this.$t('chat.search'),
+        IS_ONLINE: this.$t('chat.isOnline'),
+        LAST_SEEN: this.$t('chat.lastSeen'),
+        IS_TYPING: this.$t('chat.isTyping'),
+        CANCEL_SELECT_MESSAGE: this.$t('chat.cancelSelectMessage'),
+      }
     },
   },
   methods: {
