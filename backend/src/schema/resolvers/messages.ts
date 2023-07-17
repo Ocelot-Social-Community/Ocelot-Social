@@ -1,6 +1,6 @@
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import Resolver from './helpers/Resolver'
-import RoomResolver from './rooms'
+import { getUnreadRoomsCount } from './rooms'
 import { pubsub, ROOM_COUNT_UPDATED } from '../../server'
 
 export default {
@@ -90,16 +90,16 @@ export default {
           record.get('message'),
         )
 
-        // TODO change user in context - mark message as seen - chattingUser is the correct user.
-        const roomCountUpdated = await RoomResolver.Query.UnreadRooms(null, null, context, null)
-
-        // send subscriptions
-        await pubsub.publish(ROOM_COUNT_UPDATED, { roomCountUpdated, user: message.otherUser })
-
         return message
       })
       try {
         const message = await writeTxResultPromise
+
+        const roomCountUpdated = await getUnreadRoomsCount(currentUserId, session)
+
+        // send subscriptions
+        await pubsub.publish(ROOM_COUNT_UPDATED, { roomCountUpdated, user: message.otherUser })
+
         return message
       } catch (error) {
         throw new Error(error)
