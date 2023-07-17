@@ -14,8 +14,10 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import { unreadRoomsQuery } from '~/graphql/Rooms'
+import { chatMessageAdded } from '~/graphql/Messages'
 
 export default {
   name: 'ChatNotificationMenu',
@@ -27,6 +29,11 @@ export default {
       count: 0,
     }
   },
+  computed: {
+    ...mapGetters({
+      user: 'auth/user',
+    }),
+  },
   apollo: {
     UnreadRooms: {
       query() {
@@ -34,6 +41,18 @@ export default {
       },
       update({ UnreadRooms }) {
         this.count = UnreadRooms
+      },
+      subscribeToMore: {
+        document: chatMessageAdded(),
+        variables() {
+          return {
+            userId: this.user.id,
+          }
+        },
+        updateQuery: (previousResult, { subscriptionData }) => {
+          // TODO emit chat reload
+          return { UnreadRooms: previousResult.UnreadRooms + 1}
+        },
       },
     },
   },

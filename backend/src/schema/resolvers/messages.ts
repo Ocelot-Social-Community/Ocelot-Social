@@ -1,7 +1,19 @@
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import Resolver from './helpers/Resolver'
+import { withFilter } from 'graphql-subscriptions'
+import { pubsub, CHAT_MESSAGE_ADDED } from '../../server'
 
 export default {
+  Subscription: {
+    chatMessageAdded: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
+        (payload, variables) => {
+          return payload.chatMessageAdded.senderId !== variables.userId
+        },
+      ),
+    },
+  },
   Query: {
     Message: async (object, params, context, resolveInfo) => {
       const { roomId } = params
@@ -72,7 +84,7 @@ export default {
             distributed: false,
             seen: false
           })-[:INSIDE]->(room)
-          RETURN message { .* }
+          RETURN message { .*, room: properties(room), senderId: currentUser.id }
         `
         const createMessageTxResponse = await transaction.run(createMessageCypher, {
           currentUserId,
@@ -82,6 +94,10 @@ export default {
         const [message] = await createMessageTxResponse.records.map((record) =>
           record.get('message'),
         )
+
+        // send subscriptions
+        await pubsub.publish(CHAT_MESSAGE_ADDED, { chatMessageAdded: message })
+
         return message
       })
       try {

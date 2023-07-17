@@ -27,3 +27,16 @@ export const createMessageMutation = () => {
     }
   `
 }
+
+export const chatMessageAdded = () => {
+  return gql`
+    subscription chatMessageAdded($userId: ID!) {
+      chatMessageAdded(userId: $userId) {
+        id
+        room {
+          id
+        }
+      }
+    }
+  `
+}

@@ -14,6 +14,7 @@ import bodyParser from 'body-parser'
 import { graphqlUploadExpress } from 'graphql-upload'
 
 export const NOTIFICATION_ADDED = 'NOTIFICATION_ADDED'
+export const CHAT_MESSAGE_ADDED = 'CHAT_MESSAGE_ADDED'
 const { REDIS_DOMAIN, REDIS_PORT, REDIS_PASSWORD } = CONFIG
 let prodPubsub, devPubsub
 const options = {
