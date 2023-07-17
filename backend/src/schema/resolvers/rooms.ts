@@ -9,8 +9,7 @@ export default {
       subscribe: withFilter(
         () => pubsub.asyncIterator(ROOM_COUNT_UPDATED),
         (payload, variables) => {
-          console.log('sub', payload, variables)
-          return true // payload.chatMessageAdded.senderId !== variables.userId
+          return payload.user.id === variables.userId
         },
       ),
     },

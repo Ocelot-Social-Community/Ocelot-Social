@@ -63,8 +63,8 @@ export default {
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const createMessageCypher = `
           MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
-          OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
-          WITH MAX(m.indexId) as maxIndex, room, currentUser
+          OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)<-[:CHATS_IN]-(otherUser:User)
+          WITH MAX(m.indexId) as maxIndex, room, currentUser, otherUser
           CREATE (currentUser)-[:CREATED]->(message:Message {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
@@ -74,7 +74,7 @@ export default {
             distributed: false,
             seen: false
           })-[:INSIDE]->(room)
-          RETURN message { .*, room: properties(room), senderId: currentUser.id }
+          RETURN message { .*, room: properties(room), senderId: currentUser.id, otherUser: properties(otherUser) }
         `
         const createMessageTxResponse = await transaction.run(createMessageCypher, {
           currentUserId,
@@ -86,11 +86,11 @@ export default {
           record.get('message'),
         )
 
-        // TODO change user in context - mark message as seen
+        // TODO change user in context - mark message as seen - chattingUser is the correct user.
         const roomCountUpdated = await RoomResolver.Query.UnreadRooms(null, null, context, null)
 
         // send subscriptions
-        await pubsub.publish(ROOM_COUNT_UPDATED, { roomCountUpdated })
+        await pubsub.publish(ROOM_COUNT_UPDATED, { roomCountUpdated, user: message.otherUser })
 
         return message
       })
