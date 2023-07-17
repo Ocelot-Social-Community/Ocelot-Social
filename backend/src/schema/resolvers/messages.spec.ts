@@ -325,6 +325,18 @@ describe('Message', () => {
             })
           })
 
+          it('sends two subscriptions', () => {
+            expect(pubsubSpy).toBeCalledTimes(2)
+            expect(pubsubSpy).nthCalledWith(1, 'ROOM_COUNT_UPDATED', {
+              roomCountUpdated: '1',
+              user: 'chatting-user',
+            })
+            expect(pubsubSpy).nthCalledWith(2, 'ROOM_COUNT_UPDATED', {
+              roomCountUpdated: '1',
+              user: 'other-chatting-user',
+            })
+          })
+
           it('returns the messages', async () => {
             await expect(
               query({
