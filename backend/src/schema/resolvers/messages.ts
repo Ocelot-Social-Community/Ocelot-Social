@@ -58,8 +58,10 @@ export default {
         const createMessageCypher = `
           MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
           OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
-          OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)<-[:CHATS_IN]-(otherUser:User)
-          WITH MAX(m.indexId) as maxIndex, room, currentUser, image, otherUser
+          OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
+          OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
+            WHERE NOT recipientUser.id = $currentUserId
+          WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser 
           CREATE (currentUser)-[:CREATED]->(message:Message {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
@@ -72,8 +74,7 @@ export default {
           SET room.lastMessageAt = toString(datetime())
           RETURN message {
             .*,
-            room: properties(room),
-            otherUser: properties(otherUser),
+            recipientId: recipientUser.id,
             senderId: currentUser.id,
             username: currentUser.name,
             avatar: image.url,
@@ -94,11 +95,12 @@ export default {
       })
       try {
         const message = await writeTxResultPromise
+        if (message) {
+          const roomCountUpdated = await getUnreadRoomsCount(message.recipientId, session)
 
-        const roomCountUpdated = await getUnreadRoomsCount(currentUserId, session)
-
-        // send subscriptions
-        await pubsub.publish(ROOM_COUNT_UPDATED, { roomCountUpdated, user: message.otherUser })
+          // send subscriptions
+          await pubsub.publish(ROOM_COUNT_UPDATED, { roomCountUpdated, user: message.recipientId })
+        }
 
         return message
       } catch (error) {
