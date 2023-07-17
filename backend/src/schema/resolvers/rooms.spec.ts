@@ -399,7 +399,7 @@ describe('Room', () => {
     })
 
     it('returns the rooms paginated', async () => {
-      expect(await query({ query: roomQuery(), variables: { first: 2, offset: 0 } })).toMatchObject(
+      expect(await query({ query: roomQuery(), variables: { first: 3, offset: 0 } })).toMatchObject(
         {
           errors: undefined,
           data: {
@@ -450,11 +450,34 @@ describe('Room', () => {
                   },
                 ]),
               },
+              {
+                id: expect.any(String),
+                roomId: expect.any(String),
+                roomName: 'Not Chatting User',
+                users: expect.arrayContaining([
+                  {
+                    _id: 'chatting-user',
+                    id: 'chatting-user',
+                    name: 'Chatting User',
+                    avatar: {
+                      url: expect.any(String),
+                    },
+                  },
+                  {
+                    _id: 'not-chatting-user',
+                    id: 'not-chatting-user',
+                    name: 'Not Chatting User',
+                    avatar: {
+                      url: expect.any(String),
+                    },
+                  },
+                ]),
+              },
             ],
           },
         },
       )
-      expect(await query({ query: roomQuery(), variables: { first: 2, offset: 2 } })).toMatchObject(
+      expect(await query({ query: roomQuery(), variables: { first: 3, offset: 3 } })).toMatchObject(
         {
           errors: undefined,
           data: {
