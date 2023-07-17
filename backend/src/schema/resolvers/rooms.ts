@@ -21,7 +21,7 @@ export default {
       subscribe: withFilter(
         () => pubsub.asyncIterator(ROOM_COUNT_UPDATED),
         (payload, variables) => {
-          return payload.user.id === variables.userId
+          return true // payload.user.id === variables.userId
         },
       ),
     },

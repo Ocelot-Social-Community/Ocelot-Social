@@ -3,6 +3,21 @@ import Resolver from './helpers/Resolver'
 import { getUnreadRoomsCount } from './rooms'
 import { pubsub, ROOM_COUNT_UPDATED } from '../../server'
 
+const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
+  return session.writeTransaction(async (transaction) => {
+    const setDistributedCypher = `
+      MATCH (m:Message) WHERE m.id IN $undistributedMessagesIds
+      SET m.distributed = true
+      RETURN m { .* }
+    `
+    const setDistributedTxResponse = await transaction.run(setDistributedCypher, {
+      undistributedMessagesIds,
+    })
+    const messages = await setDistributedTxResponse.records.map((record) => record.get('m'))
+    return messages
+  })
+}
+
 export default {
   Query: {
     Message: async (object, params, context, resolveInfo) => {
@@ -18,31 +33,27 @@ export default {
 
       const resolved = await neo4jgraphql(object, params, context, resolveInfo)
 
+      console.log(resolved)
+
       if (resolved) {
         const undistributedMessagesIds = resolved
           .filter((msg) => !msg.distributed && msg.senderId !== context.user.id)
           .map((msg) => msg.id)
-        if (undistributedMessagesIds.length > 0) {
-          const session = context.driver.session()
-          const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-            const setDistributedCypher = `
-              MATCH (m:Message) WHERE m.id IN $undistributedMessagesIds
-              SET m.distributed = true
-              RETURN m { .* }
-            `
-            const setDistributedTxResponse = await transaction.run(setDistributedCypher, {
-              undistributedMessagesIds,
-            })
-            const messages = await setDistributedTxResponse.records.map((record) => record.get('m'))
-            return messages
-          })
-          try {
-            await writeTxResultPromise
-          } finally {
-            session.close()
+        const session = context.driver.session()
+        try {
+          if (undistributedMessagesIds.length > 0) {
+            await setMessagesAsDistributed(undistributedMessagesIds, session)
           }
-          // send subscription to author to updated the messages
+          const roomCountUpdated = await getUnreadRoomsCount(context.user.id, session)
+          console.log(roomCountUpdated)
+
+          // send subscriptions
+          console.log({ roomCountUpdated, user: context.user.id })
+          await pubsub.publish(ROOM_COUNT_UPDATED, { roomCountUpdated, user: context.user.id })
+        } finally {
+          session.close()
         }
+        // send subscription to author to updated the messages
       }
       return resolved.reverse()
     },
@@ -99,6 +110,7 @@ export default {
           const roomCountUpdated = await getUnreadRoomsCount(message.recipientId, session)
 
           // send subscriptions
+          console.log({ roomCountUpdated, user: message.recipientId })
           await pubsub.publish(ROOM_COUNT_UPDATED, { roomCountUpdated, user: message.recipientId })
         }
 
