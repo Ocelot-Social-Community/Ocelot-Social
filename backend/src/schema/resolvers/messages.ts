@@ -72,7 +72,7 @@ export default {
           SET room.lastMessageAt = toString(datetime())
           RETURN message {
             .*,
-            room: properties(room)
+            room: properties(room),
             otherUser: properties(otherUser),
             senderId: currentUser.id,
             username: currentUser.name,
