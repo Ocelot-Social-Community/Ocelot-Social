@@ -7,4 +7,5 @@ docker: &docker
   - 'docker-compose.*'
 
 webapp: &webapp
+  - '.github/workflows/test-webapp.yml'
   - 'webapp/**/*'
