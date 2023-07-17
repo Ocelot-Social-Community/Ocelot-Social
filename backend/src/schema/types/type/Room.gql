@@ -22,7 +22,7 @@ type Room {
   avatar: String @cypher(statement: """
     MATCH (this)<-[:CHATS_IN]-(user:User)
     WHERE NOT user.id = $cypherParams.currentUserId
-    OPTIONAL MATCH (:User)-[:AVATAR_IMAGE]->(image:Image)
+    OPTIONAL MATCH (user)-[:AVATAR_IMAGE]->(image:Image)
     RETURN image.url
   """)
 
