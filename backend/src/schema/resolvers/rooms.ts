@@ -29,13 +29,16 @@ export default {
           ON CREATE SET
             room.createdAt = toString(datetime()),
             room.id = apoc.create.uuid()
-          WITH room, user, currentUser,
+          WITH room, user, currentUser
+          OPTIONAL MATCH (room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
+          WHERE NOT sender.id = $currentUserId AND NOT message.seen
+          WITH room, user, currentUser, message,
           user.name AS roomName
           RETURN room {
             .*,
             users: [properties(currentUser), properties(user)],
             roomName: roomName,
-            unreadCount: toString(0)
+            unreadCount: toString(COUNT(DISTINCT message))
           }
         `
         const createRommTxResponse = await transaction.run(createRoomCypher, {
