@@ -55,3 +55,11 @@ export const roomQuery = () => {
     }
   `
 }
+
+export const unreadRoomsQuery = () => {
+  return gql`
+    query {
+      UnreadRooms
+    }
+  `
+}

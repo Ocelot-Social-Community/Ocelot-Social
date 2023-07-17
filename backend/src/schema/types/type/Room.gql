@@ -48,4 +48,5 @@ type Query {
     id: ID
     orderBy: [_RoomOrdering]
   ): [Room]
+  UnreadRooms: Int
 }

@@ -10,6 +10,27 @@ export default {
       }
       return neo4jgraphql(object, params, context, resolveInfo)
     },
+    UnreadRooms: async (object, params, context, resolveInfo) => {
+      const {
+        user: { id: currentUserId },
+      } = context
+      const session = context.driver.session()
+      const readTxResultPromise = session.readTransaction(async (transaction) => {
+        const unreadRoomsCypher = `
+          MATCH (:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
+          WHERE NOT sender.id = $currentUserId AND NOT message.seen
+          RETURN toString(COUNT(DISTINCT room)) AS count
+        `
+        const unreadRoomsTxResponse = await transaction.run(unreadRoomsCypher, { currentUserId })
+        return unreadRoomsTxResponse.records.map((record) => record.get('count'))[0]
+      })
+      try {
+        const count = await readTxResultPromise
+        return count
+      } finally {
+        session.close()
+      }
+    },
   },
   Mutation: {
     CreateRoom: async (_parent, params, context, _resolveInfo) => {
