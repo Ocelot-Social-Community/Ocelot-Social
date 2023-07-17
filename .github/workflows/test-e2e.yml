@@ -93,11 +93,6 @@ jobs:
         run: |
           cd cypress/
           node create-cucumber-html-report.js
-  
-      - name: Full stack tests | if tests failed, get pr number
-        id: pr
-        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
-        uses: 8BitJonny/gh-get-current-pr@2.2.0
 
       - name: Full stack tests | if tests failed, upload report
         id: e2e-report
@@ -107,3 +102,16 @@ jobs:
           name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
 
+  cleanup:
+    name: Cleanup
+    if: always()
+    needs: [docker_preparation, fullstack_tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete cache
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh extension install actions/gh-actions-cache
+          KEY="e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}"
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
