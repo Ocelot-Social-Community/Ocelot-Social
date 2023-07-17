@@ -1,4 +1,5 @@
 backend: &backend
+  - '.github/workflows/test-backend.yml'
   - 'backend/**/*'
   - 'neo4j/**/*'
 
