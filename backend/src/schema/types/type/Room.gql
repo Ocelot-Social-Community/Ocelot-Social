@@ -25,7 +25,7 @@ type Room {
     OPTIONAL MATCH (user)-[:AVATAR_IMAGE]->(image:Image)
     RETURN image.url
   """)
-  
+
   lastMessageAt: String
 
   lastMessage: Message @cypher(statement: """
