@@ -32,8 +32,8 @@ export default {
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (transaction) => {
         const unreadRoomsCypher = `
-          MATCH (:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(user:User)
-          WHERE NOT user.id = $currentUserId AND NOT message.seen
+          MATCH (:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
+          WHERE NOT sender.id = $currentUserId AND NOT message.seen
           RETURN toString(COUNT(DISTINCT room)) AS count
         `
         const unreadRoomsTxResponse = await transaction.run(unreadRoomsCypher, { currentUserId })
