@@ -100,7 +100,7 @@ jobs:
 
   cleanup:
     name: Cleanup
-    if: always()
+    if: success()
     needs: [files-changed, unit_test_webapp]
     runs-on: ubuntu-latest
     continue-on-error: true
