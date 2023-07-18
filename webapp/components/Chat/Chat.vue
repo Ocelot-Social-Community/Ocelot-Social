@@ -60,10 +60,10 @@
 </template>
 
 <script>
-import { roomQuery, createRoom } from '~/graphql/Rooms'
-import { messageQuery, createMessageMutation } from '~/graphql/Messages'
+import { roomQuery, createRoom, unreadRoomsQuery } from '~/graphql/Rooms'
+import { messageQuery, createMessageMutation, markMessagesAsSeen } from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'Chat',
@@ -84,31 +84,32 @@ export default {
           name: 'dummyItem',
           title: 'Just a dummy item',
         },
-        /* {
-          name: 'inviteUser',
-          title: 'Invite User',
-        },
-        {
-          name: 'removeUser',
-          title: 'Remove User',
-        },
-        {
-          name: 'deleteRoom',
-          title: 'Delete Room',
-        },
-        */
+        /*
+            {
+            name: 'inviteUser',
+            title: 'Invite User',
+            },
+            {
+            name: 'removeUser',
+            title: 'Remove User',
+            },
+            {
+            name: 'deleteRoom',
+            title: 'Delete Room',
+            },
+          */
       ],
       messageActions: [
         /*
-        {
-          name: 'addMessageToFavorite',
-          title: 'Add To Favorite',
-        },
-        {
-          name: 'shareMessage',
-          title: 'Share Message',
-        },
-        */
+            {
+            name: 'addMessageToFavorite',
+            title: 'Add To Favorite',
+            },
+            {
+            name: 'shareMessage',
+            title: 'Share Message',
+            },
+          */
       ],
       templatesText: [
         {
@@ -120,30 +121,16 @@ export default {
           text: 'This is the action',
         },
       ],
-      textMessages: {
-        ROOMS_EMPTY: this.$t('chat.roomsEmpty'),
-        ROOM_EMPTY: this.$t('chat.roomEmpty'),
-        NEW_MESSAGES: this.$t('chat.newMessages'),
-        MESSAGE_DELETED: this.$t('chat.messageDeleted'),
-        MESSAGES_EMPTY: this.$t('chat.messagesEmpty'),
-        CONVERSATION_STARTED: this.$t('chat.conversationStarted'),
-        TYPE_MESSAGE: this.$t('chat.typeMessage'),
-        SEARCH: this.$t('chat.search'),
-        IS_ONLINE: this.$t('chat.isOnline'),
-        LAST_SEEN: this.$t('chat.lastSeen'),
-        IS_TYPING: this.$t('chat.isTyping'),
-        CANCEL_SELECT_MESSAGE: this.$t('chat.cancelSelectMessage'),
-      },
       roomActions: [
         /*
-        {
-          name: 'archiveRoom',
-          title: 'Archive Room',
-        },
-        { name: 'inviteUser', title: 'Invite User' },
-        { name: 'removeUser', title: 'Remove User' },
-        { name: 'deleteRoom', title: 'Delete Room' },
-        */
+            {
+            name: 'archiveRoom',
+            title: 'Archive Room',
+            },
+            { name: 'inviteUser', title: 'Invite User' },
+            { name: 'removeUser', title: 'Remove User' },
+            { name: 'deleteRoom', title: 'Delete Room' },
+          */
       ],
 
       showDemoOptions: true,
@@ -151,7 +138,7 @@ export default {
       rooms: [],
       roomsLoaded: false,
       roomPage: 0,
-      roomPageSize: 10, // TODO pagination is a problem with single rooms - cant use
+      roomPageSize: 10,
       singleRoom: !!this.singleRoomId || false,
       selectedRoom: null,
       loadingRooms: true,
@@ -190,8 +177,27 @@ export default {
     computedChatStyle() {
       return chatStyle.STYLE.light
     },
+    textMessages() {
+      return {
+        ROOMS_EMPTY: this.$t('chat.roomsEmpty'),
+        ROOM_EMPTY: this.$t('chat.roomEmpty'),
+        NEW_MESSAGES: this.$t('chat.newMessages'),
+        MESSAGE_DELETED: this.$t('chat.messageDeleted'),
+        MESSAGES_EMPTY: this.$t('chat.messagesEmpty'),
+        CONVERSATION_STARTED: this.$t('chat.conversationStarted'),
+        TYPE_MESSAGE: this.$t('chat.typeMessage'),
+        SEARCH: this.$t('chat.search'),
+        IS_ONLINE: this.$t('chat.isOnline'),
+        LAST_SEEN: this.$t('chat.lastSeen'),
+        IS_TYPING: this.$t('chat.isTyping'),
+        CANCEL_SELECT_MESSAGE: this.$t('chat.cancelSelectMessage'),
+      }
+    },
   },
   methods: {
+    ...mapMutations({
+      commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
+    }),
     async fetchRooms({ room } = {}) {
       this.roomsLoaded = false
       const offset = this.roomPage * this.roomPageSize
@@ -252,8 +258,30 @@ export default {
           fetchPolicy: 'no-cache',
         })
 
+        const newMsgIds = Message.filter((m) => m.seen === false).map((m) => m.id)
+        if (newMsgIds.length) {
+          this.$apollo
+            .mutate({
+              mutation: markMessagesAsSeen(),
+              variables: {
+                messageIds: newMsgIds,
+              },
+            })
+            .then(() => {
+              this.$apollo
+                .query({
+                  query: unreadRoomsQuery(),
+                  fetchPolicy: 'network-only',
+                })
+                .then(({ data: { UnreadRooms } }) => {
+                  this.commitUnreadRoomCount(UnreadRooms)
+                })
+            })
+        }
+
         const msgs = []
         ;[...this.messages, ...Message].forEach((m) => {
+          if (m.senderId !== this.currentUser.id) m.seen = true
           m.date = new Date(m.date).toDateString()
           msgs[m.indexId] = m
         })
@@ -270,6 +298,12 @@ export default {
     },
 
     async sendMessage(message) {
+      // check for usersTag and change userid to username
+      message.usersTag.forEach((userTag) => {
+        const needle = `<usertag>${userTag.id}</usertag>`
+        const replacement = `<usertag>@${userTag.name.replaceAll(' ', '-').toLowerCase()}</usertag>`
+        message.content = message.content.replaceAll(needle, replacement)
+      })
       try {
         await this.$apollo.mutate({
           mutation: createMessageMutation(),
