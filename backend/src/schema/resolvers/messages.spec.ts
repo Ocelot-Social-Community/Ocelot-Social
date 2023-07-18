@@ -117,7 +117,7 @@ describe('Message', () => {
         })
 
         describe('user chats in room', () => {
-          it('returns the message and publishes subscription', async () => {
+          it('returns the message and publishes subscriptions', async () => {
             await expect(
               mutate({
                 mutation: createMessageMutation(),
@@ -144,6 +144,20 @@ describe('Message', () => {
             })
             expect(pubsubSpy).toBeCalledWith('ROOM_COUNT_UPDATED', {
               roomCountUpdated: '1',
+              userId: 'other-chatting-user',
+            })
+            expect(pubsubSpy).toBeCalledWith('CHAT_MESSAGE_ADDED', {
+              chatMessageAdded: expect.objectContaining({
+                id: expect.any(String),
+                content: 'Some nice message to other chatting user',
+                senderId: 'chatting-user',
+                username: 'Chatting User',
+                avatar: expect.any(String),
+                date: expect.any(String),
+                saved: true,
+                distributed: false,
+                seen: false,
+              }),
               userId: 'other-chatting-user',
             })
           })
