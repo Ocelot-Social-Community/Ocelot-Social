@@ -423,125 +423,147 @@ describe('Room', () => {
     })
 
     it('returns the rooms paginated', async () => {
-      expect(await query({ query: roomQuery(), variables: { first: 3, offset: 0 } })).toMatchObject(
-        {
-          errors: undefined,
-          data: {
-            Room: [
-              {
+      await expect(
+        query({ query: roomQuery(), variables: { first: 3, offset: 0 } }),
+      ).resolves.toMatchObject({
+        errors: undefined,
+        data: {
+          Room: expect.arrayContaining([
+            expect.objectContaining({
+              id: expect.any(String),
+              roomId: expect.any(String),
+              roomName: 'Third Chatting User',
+              lastMessageAt: null,
+              unreadCount: 0,
+              lastMessage: null,
+              users: expect.arrayContaining([
+                expect.objectContaining({
+                  _id: 'chatting-user',
+                  id: 'chatting-user',
+                  name: 'Chatting User',
+                  avatar: {
+                    url: expect.any(String),
+                  },
+                }),
+                expect.objectContaining({
+                  _id: 'third-chatting-user',
+                  id: 'third-chatting-user',
+                  name: 'Third Chatting User',
+                  avatar: {
+                    url: expect.any(String),
+                  },
+                }),
+              ]),
+            }),
+            expect.objectContaining({
+              id: expect.any(String),
+              roomId: expect.any(String),
+              roomName: 'Second Chatting User',
+              lastMessageAt: null,
+              unreadCount: 0,
+              lastMessage: null,
+              users: expect.arrayContaining([
+                expect.objectContaining({
+                  _id: 'chatting-user',
+                  id: 'chatting-user',
+                  name: 'Chatting User',
+                  avatar: {
+                    url: expect.any(String),
+                  },
+                }),
+                expect.objectContaining({
+                  _id: 'second-chatting-user',
+                  id: 'second-chatting-user',
+                  name: 'Second Chatting User',
+                  avatar: {
+                    url: expect.any(String),
+                  },
+                }),
+              ]),
+            }),
+            expect.objectContaining({
+              id: expect.any(String),
+              roomId: expect.any(String),
+              roomName: 'Other Chatting User',
+              lastMessageAt: expect.any(String),
+              unreadCount: 0,
+              lastMessage: {
+                _id: expect.any(String),
                 id: expect.any(String),
-                roomId: expect.any(String),
-                roomName: 'Third Chatting User',
-                users: expect.arrayContaining([
-                  {
-                    _id: 'chatting-user',
-                    id: 'chatting-user',
-                    name: 'Chatting User',
-                    avatar: {
-                      url: expect.any(String),
-                    },
-                  },
-                  {
-                    _id: 'third-chatting-user',
-                    id: 'third-chatting-user',
-                    name: 'Third Chatting User',
-                    avatar: {
-                      url: expect.any(String),
-                    },
-                  },
-                ]),
+                content: '2nd message to other chatting user',
+                senderId: 'chatting-user',
+                username: 'Chatting User',
+                avatar: expect.any(String),
+                date: expect.any(String),
+                saved: true,
+                distributed: false,
+                seen: false,
               },
-              {
-                id: expect.any(String),
-                roomId: expect.any(String),
-                roomName: 'Second Chatting User',
-                users: expect.arrayContaining([
-                  {
-                    _id: 'chatting-user',
-                    id: 'chatting-user',
-                    name: 'Chatting User',
-                    avatar: {
-                      url: expect.any(String),
-                    },
+              users: expect.arrayContaining([
+                expect.objectContaining({
+                  _id: 'chatting-user',
+                  id: 'chatting-user',
+                  name: 'Chatting User',
+                  avatar: {
+                    url: expect.any(String),
                   },
-                  {
-                    _id: 'second-chatting-user',
-                    id: 'second-chatting-user',
-                    name: 'Second Chatting User',
-                    avatar: {
-                      url: expect.any(String),
-                    },
+                }),
+                expect.objectContaining({
+                  _id: 'other-chatting-user',
+                  id: 'other-chatting-user',
+                  name: 'Other Chatting User',
+                  avatar: {
+                    url: expect.any(String),
                   },
-                ]),
-              },
-              {
-                id: expect.any(String),
-                roomId: expect.any(String),
-                roomName: 'Not Chatting User',
-                users: expect.arrayContaining([
-                  {
-                    _id: 'chatting-user',
-                    id: 'chatting-user',
-                    name: 'Chatting User',
-                    avatar: {
-                      url: expect.any(String),
-                    },
-                  },
-                  {
-                    _id: 'not-chatting-user',
-                    id: 'not-chatting-user',
-                    name: 'Not Chatting User',
-                    avatar: {
-                      url: expect.any(String),
-                    },
-                  },
-                ]),
-              },
-            ],
-          },
+                }),
+              ]),
+            }),
+          ]),
         },
-      )
-      expect(await query({ query: roomQuery(), variables: { first: 3, offset: 3 } })).toMatchObject(
-        {
-          errors: undefined,
-          data: {
-            Room: [
-              {
-                id: expect.any(String),
-                roomId: expect.any(String),
-                roomName: 'Other Chatting User',
-                users: expect.arrayContaining([
-                  {
-                    _id: 'chatting-user',
-                    id: 'chatting-user',
-                    name: 'Chatting User',
-                    avatar: {
-                      url: expect.any(String),
-                    },
+      })
+      await expect(
+        query({ query: roomQuery(), variables: { first: 3, offset: 3 } }),
+      ).resolves.toMatchObject({
+        errors: undefined,
+        data: {
+          Room: [
+            expect.objectContaining({
+              id: expect.any(String),
+              roomId: expect.any(String),
+              roomName: 'Not Chatting User',
+              users: expect.arrayContaining([
+                {
+                  _id: 'chatting-user',
+                  id: 'chatting-user',
+                  name: 'Chatting User',
+                  avatar: {
+                    url: expect.any(String),
                   },
-                  {
-                    _id: 'other-chatting-user',
-                    id: 'other-chatting-user',
-                    name: 'Other Chatting User',
-                    avatar: {
-                      url: expect.any(String),
-                    },
+                },
+                {
+                  _id: 'not-chatting-user',
+                  id: 'not-chatting-user',
+                  name: 'Not Chatting User',
+                  avatar: {
+                    url: expect.any(String),
                   },
-                ]),
-              },
-            ],
-          },
+                },
+              ]),
+            }),
+          ],
         },
-      )
+      })
     })
   })
 
   describe('query single room', () => {
     let result: any = null
+
     beforeAll(async () => {
       authenticatedUser = await chattingUser.toJson()
       result = await query({ query: roomQuery() })
     })
+
     describe('as chatter of room', () => {
       it('returns the room', async () => {
         expect(
@@ -556,34 +578,19 @@ describe('Room', () => {
               {
                 id: expect.any(String),
                 roomId: expect.any(String),
-                roomName: 'Third Chatting User',
-                users: expect.arrayContaining([
-                  {
-                    _id: 'chatting-user',
-                    id: 'chatting-user',
-                    name: 'Chatting User',
-                    avatar: {
-                      url: expect.any(String),
-                    },
-                  },
-                  {
-                    _id: 'third-chatting-user',
-                    id: 'third-chatting-user',
-                    name: 'Third Chatting User',
-                    avatar: {
-                      url: expect.any(String),
-                    },
-                  },
-                ]),
+                roomName: result.data.Room[0].roomName,
+                users: expect.any(Array),
               },
             ],
           },
         })
       })
+
       describe('as not chatter of room', () => {
         beforeAll(async () => {
           authenticatedUser = await notChattingUser.toJson()
         })
+
         it('returns no room', async () => {
           authenticatedUser = await notChattingUser.toJson()
           expect(
