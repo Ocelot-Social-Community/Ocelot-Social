@@ -100,7 +100,7 @@ jobs:
 
   cleanup:
     name: Cleanup
-    if: success()
+    if: (needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true') || success()
     needs: [files-changed, unit_test_webapp]
     runs-on: ubuntu-latest
     continue-on-error: true
