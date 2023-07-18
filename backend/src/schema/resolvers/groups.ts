@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid'
+import { v4TEST as uuid } from 'uuid'
 import { UserInputError } from 'apollo-server'
 import CONFIG from '../../config'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '../../constants/categories'
