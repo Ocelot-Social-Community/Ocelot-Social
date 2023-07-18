@@ -82,8 +82,6 @@ export default {
     },
   },
   data() {
-    // Wolle console.log('this.singleRoom: ', this.singleRoom)
-    // console.log('this.roomId: ', this.roomId)
     return {
       menuActions: [
         // NOTE: if menuActions is empty, the related slot is not shown
