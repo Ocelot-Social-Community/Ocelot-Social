@@ -269,17 +269,17 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await dagobert.relateTo(louie, 'blocked')
 
     // categories
-    await Promise.all(
-      categories.map(({ icon, name }, index) => {
-        return Factory.build('category', {
-          id: `cat${index + 1}`,
-          slug: name,
-          name,
-          icon,
-        })
-      }),
-    )
+    let i = 0
+    for (const category of categories) {
+      await Factory.build('category', {
+        id: `cat${i++}`,
+        slug: category.name,
+        naem: category.name,
+        icon: category.icon,
+      })
+    }
 
+    // tags
     const environment = await Factory.build('tag', {
       id: 'Environment',
     })
@@ -295,361 +295,324 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // groups
     authenticatedUser = await peterLustig.toJson()
-    await Promise.all([
-      mutate({
-        mutation: createGroupMutation(),
-        variables: {
-          id: 'g0',
-          name: 'Investigative Journalism',
-          about: 'Investigative journalists share ideas and insights and can collaborate.',
-          description: `<p class=""><em>English:</em></p><p class="">This group is hidden.</p><h3>What is our group for?</h3><p>This group was created to allow investigative journalists to share and collaborate.</p><h3>How does it work?</h3><p>Here you can internally share posts and comments about them.</p><p><br></p><p><em>Deutsch:</em></p><p class="">Diese Gruppe ist verborgen.</p><h3>Wofür ist unsere Gruppe?</h3><p class="">Diese Gruppe wurde geschaffen, um investigativen Journalisten den Austausch und die Zusammenarbeit zu ermöglichen.</p><h3>Wie funktioniert das?</h3><p class="">Hier könnt ihr euch intern über Beiträge und Kommentare zu ihnen austauschen.</p>`,
-          groupType: 'hidden',
-          actionRadius: 'global',
-          categoryIds: ['cat6', 'cat12', 'cat16'],
-          locationName: 'Hamburg, Germany',
-        },
-      }),
-    ])
-    await Promise.all([
-      mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g0',
-          userId: 'u2',
-        },
-      }),
-      mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g0',
-          userId: 'u4',
-        },
-      }),
-      mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g0',
-          userId: 'u6',
-        },
-      }),
-    ])
-    await Promise.all([
-      mutate({
-        mutation: changeGroupMemberRoleMutation(),
-        variables: {
-          groupId: 'g0',
-          userId: 'u2',
-          roleInGroup: 'usual',
-        },
-      }),
-      mutate({
-        mutation: changeGroupMemberRoleMutation(),
-        variables: {
-          groupId: 'g0',
-          userId: 'u4',
-          roleInGroup: 'admin',
-        },
-      }),
-    ])
+    await mutate({
+      mutation: createGroupMutation(),
+      variables: {
+        id: 'g0',
+        name: 'Investigative Journalism',
+        about: 'Investigative journalists share ideas and insights and can collaborate.',
+        description: `<p class=""><em>English:</em></p><p class="">This group is hidden.</p><h3>What is our group for?</h3><p>This group was created to allow investigative journalists to share and collaborate.</p><h3>How does it work?</h3><p>Here you can internally share posts and comments about them.</p><p><br></p><p><em>Deutsch:</em></p><p class="">Diese Gruppe ist verborgen.</p><h3>Wofür ist unsere Gruppe?</h3><p class="">Diese Gruppe wurde geschaffen, um investigativen Journalisten den Austausch und die Zusammenarbeit zu ermöglichen.</p><h3>Wie funktioniert das?</h3><p class="">Hier könnt ihr euch intern über Beiträge und Kommentare zu ihnen austauschen.</p>`,
+        groupType: 'hidden',
+        actionRadius: 'global',
+        categoryIds: ['cat6', 'cat12', 'cat16'],
+        locationName: 'Hamburg, Germany',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g0',
+        userId: 'u2',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g0',
+        userId: 'u4',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g0',
+        userId: 'u6',
+      },
+    })
+
+    await mutate({
+      mutation: changeGroupMemberRoleMutation(),
+      variables: {
+        groupId: 'g0',
+        userId: 'u2',
+        roleInGroup: 'usual',
+      },
+    })
+
+    await mutate({
+      mutation: changeGroupMemberRoleMutation(),
+      variables: {
+        groupId: 'g0',
+        userId: 'u4',
+        roleInGroup: 'admin',
+      },
+    })
 
     // post into group
-    await Promise.all([
-      mutate({
-        mutation: createPostMutation(),
-        variables: {
-          id: 'p0-g0',
-          groupId: 'g0',
-          title: `What happend in Shanghai?`,
-          content: 'A sack of rise dropped in Shanghai. Should we further investigate?',
-          categoryIds: ['cat6'],
-        },
-      }),
-    ])
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'p0-g0',
+        groupId: 'g0',
+        title: `What happend in Shanghai?`,
+        content: 'A sack of rise dropped in Shanghai. Should we further investigate?',
+        categoryIds: ['cat6'],
+      },
+    })
+
     authenticatedUser = await bobDerBaumeister.toJson()
-    await Promise.all([
-      mutate({
-        mutation: createPostMutation(),
-        variables: {
-          id: 'p1-g0',
-          groupId: 'g0',
-          title: `The man on the moon`,
-          content: 'We have to further investigate about the stories of a man living on the moon.',
-          categoryIds: ['cat12', 'cat16'],
-        },
-      }),
-    ])
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'p1-g0',
+        groupId: 'g0',
+        title: `The man on the moon`,
+        content: 'We have to further investigate about the stories of a man living on the moon.',
+        categoryIds: ['cat12', 'cat16'],
+      },
+    })
 
     authenticatedUser = await jennyRostock.toJson()
-    await Promise.all([
-      mutate({
-        mutation: createGroupMutation(),
-        variables: {
-          id: 'g1',
-          name: 'School For Citizens',
-          about: 'Our children shall receive education for life.',
-          description: `<p class=""><em>English</em></p><h3>Our goal</h3><p>Only those who enjoy learning and do not lose their curiosity can obtain a good education for life and continue to learn with joy throughout their lives.</p><h3>Curiosity</h3><p>For this we need a school that takes up the curiosity of the children, the people, and satisfies it through a lot of experience.</p><p><br></p><p><em>Deutsch</em></p><h3>Unser Ziel</h3><p class="">Nur wer Spaß am Lernen hat und seine Neugier nicht verliert, kann gute Bildung für's Leben erlangen und sein ganzes Leben mit Freude weiter lernen.</p><h3>Neugier</h3><p class="">Dazu benötigen wir eine Schule, die die Neugier der Kinder, der Menschen, aufnimmt und durch viel Erfahrung befriedigt.</p>`,
-          groupType: 'closed',
-          actionRadius: 'national',
-          categoryIds: ['cat8', 'cat14'],
-          locationName: 'France',
-        },
-      }),
-    ])
-    await Promise.all([
-      mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g1',
-          userId: 'u1',
-        },
-      }),
-      mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g1',
-          userId: 'u2',
-        },
-      }),
-      mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g1',
-          userId: 'u5',
-        },
-      }),
-      mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g1',
-          userId: 'u6',
-        },
-      }),
-      mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g1',
-          userId: 'u7',
-        },
-      }),
-    ])
-    await Promise.all([
-      mutate({
-        mutation: changeGroupMemberRoleMutation(),
-        variables: {
-          groupId: 'g1',
-          userId: 'u1',
-          roleInGroup: 'usual',
-        },
-      }),
-      mutate({
-        mutation: changeGroupMemberRoleMutation(),
-        variables: {
-          groupId: 'g1',
-          userId: 'u5',
-          roleInGroup: 'admin',
-        },
-      }),
-      mutate({
-        mutation: changeGroupMemberRoleMutation(),
-        variables: {
-          groupId: 'g1',
-          userId: 'u6',
-          roleInGroup: 'owner',
-        },
-      }),
-    ])
+    await mutate({
+      mutation: createGroupMutation(),
+      variables: {
+        id: 'g1',
+        name: 'School For Citizens',
+        about: 'Our children shall receive education for life.',
+        description: `<p class=""><em>English</em></p><h3>Our goal</h3><p>Only those who enjoy learning and do not lose their curiosity can obtain a good education for life and continue to learn with joy throughout their lives.</p><h3>Curiosity</h3><p>For this we need a school that takes up the curiosity of the children, the people, and satisfies it through a lot of experience.</p><p><br></p><p><em>Deutsch</em></p><h3>Unser Ziel</h3><p class="">Nur wer Spaß am Lernen hat und seine Neugier nicht verliert, kann gute Bildung für's Leben erlangen und sein ganzes Leben mit Freude weiter lernen.</p><h3>Neugier</h3><p class="">Dazu benötigen wir eine Schule, die die Neugier der Kinder, der Menschen, aufnimmt und durch viel Erfahrung befriedigt.</p>`,
+        groupType: 'closed',
+        actionRadius: 'national',
+        categoryIds: ['cat8', 'cat14'],
+        locationName: 'France',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g1',
+        userId: 'u1',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g1',
+        userId: 'u2',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g1',
+        userId: 'u5',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g1',
+        userId: 'u6',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g1',
+        userId: 'u7',
+      },
+    })
+
+    await mutate({
+      mutation: changeGroupMemberRoleMutation(),
+      variables: {
+        groupId: 'g1',
+        userId: 'u1',
+        roleInGroup: 'usual',
+      },
+    })
+    await mutate({
+      mutation: changeGroupMemberRoleMutation(),
+      variables: {
+        groupId: 'g1',
+        userId: 'u5',
+        roleInGroup: 'admin',
+      },
+    })
+    await mutate({
+      mutation: changeGroupMemberRoleMutation(),
+      variables: {
+        groupId: 'g1',
+        userId: 'u6',
+        roleInGroup: 'owner',
+      },
+    })
     // post into group
-    await Promise.all([
-      mutate({
-        mutation: createPostMutation(),
-        variables: {
-          id: 'p0-g1',
-          groupId: 'g1',
-          title: `Can we use ocelot for education?`,
-          content: 'I like the concept of this school. Can we use our software in this?',
-          categoryIds: ['cat8'],
-        },
-      }),
-    ])
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'p0-g1',
+        groupId: 'g1',
+        title: `Can we use ocelot for education?`,
+        content: 'I like the concept of this school. Can we use our software in this?',
+        categoryIds: ['cat8'],
+      },
+    })
     authenticatedUser = await peterLustig.toJson()
-    await Promise.all([
-      mutate({
-        mutation: createPostMutation(),
-        variables: {
-          id: 'p1-g1',
-          groupId: 'g1',
-          title: `Can we push this idea out of France?`,
-          content: 'This idea is too inportant to have the scope only on France.',
-          categoryIds: ['cat14'],
-        },
-      }),
-    ])
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'p1-g1',
+        groupId: 'g1',
+        title: `Can we push this idea out of France?`,
+        content: 'This idea is too inportant to have the scope only on France.',
+        categoryIds: ['cat14'],
+      },
+    })
 
     authenticatedUser = await bobDerBaumeister.toJson()
-    await Promise.all([
-      mutate({
-        mutation: createGroupMutation(),
-        variables: {
-          id: 'g2',
-          name: 'Yoga Practice',
-          about: 'We do yoga around the clock.',
-          description: `<h3>What Is yoga?</h3><p>Yoga is not just about practicing asanas. It's about how we do it.</p><p class="">And practicing asanas doesn't have to be yoga, it can be more athletic than yogic.</p><h3>What makes practicing asanas yogic?</h3><p class="">The important thing is:</p><ul><li><p>Use the exercises (consciously) for your personal development.</p></li></ul>`,
-          groupType: 'public',
-          actionRadius: 'interplanetary',
-          categoryIds: ['cat4', 'cat5', 'cat17'],
-        },
-      }),
-    ])
-    await Promise.all([
-      mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g2',
-          userId: 'u3',
-        },
-      }),
-      mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g2',
-          userId: 'u4',
-        },
-      }),
-      mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g2',
-          userId: 'u5',
-        },
-      }),
-      mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g2',
-          userId: 'u6',
-        },
-      }),
-      mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g2',
-          userId: 'u7',
-        },
-      }),
-    ])
-    await Promise.all([
-      mutate({
-        mutation: changeGroupMemberRoleMutation(),
-        variables: {
-          groupId: 'g2',
-          userId: 'u3',
-          roleInGroup: 'usual',
-        },
-      }),
-      mutate({
-        mutation: changeGroupMemberRoleMutation(),
-        variables: {
-          groupId: 'g2',
-          userId: 'u4',
-          roleInGroup: 'pending',
-        },
-      }),
-      mutate({
-        mutation: changeGroupMemberRoleMutation(),
-        variables: {
-          groupId: 'g2',
-          userId: 'u5',
-          roleInGroup: 'admin',
-        },
-      }),
-      mutate({
-        mutation: changeGroupMemberRoleMutation(),
-        variables: {
-          groupId: 'g2',
-          userId: 'u6',
-          roleInGroup: 'usual',
-        },
-      }),
-    ])
+    await mutate({
+      mutation: createGroupMutation(),
+      variables: {
+        id: 'g2',
+        name: 'Yoga Practice',
+        about: 'We do yoga around the clock.',
+        description: `<h3>What Is yoga?</h3><p>Yoga is not just about practicing asanas. It's about how we do it.</p><p class="">And practicing asanas doesn't have to be yoga, it can be more athletic than yogic.</p><h3>What makes practicing asanas yogic?</h3><p class="">The important thing is:</p><ul><li><p>Use the exercises (consciously) for your personal development.</p></li></ul>`,
+        groupType: 'public',
+        actionRadius: 'interplanetary',
+        categoryIds: ['cat4', 'cat5', 'cat17'],
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g2',
+        userId: 'u3',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g2',
+        userId: 'u4',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g2',
+        userId: 'u5',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g2',
+        userId: 'u6',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g2',
+        userId: 'u7',
+      },
+    })
+
+    await mutate({
+      mutation: changeGroupMemberRoleMutation(),
+      variables: {
+        groupId: 'g2',
+        userId: 'u3',
+        roleInGroup: 'usual',
+      },
+    })
+    await mutate({
+      mutation: changeGroupMemberRoleMutation(),
+      variables: {
+        groupId: 'g2',
+        userId: 'u4',
+        roleInGroup: 'pending',
+      },
+    })
+    await mutate({
+      mutation: changeGroupMemberRoleMutation(),
+      variables: {
+        groupId: 'g2',
+        userId: 'u5',
+        roleInGroup: 'admin',
+      },
+    })
+    await mutate({
+      mutation: changeGroupMemberRoleMutation(),
+      variables: {
+        groupId: 'g2',
+        userId: 'u6',
+        roleInGroup: 'usual',
+      },
+    })
 
     authenticatedUser = await louie.toJson()
-    await Promise.all([
-      mutate({
-        mutation: createPostMutation(),
-        variables: {
-          id: 'p0-g2',
-          groupId: 'g2',
-          title: `I am a Noob`,
-          content: 'I am new to Yoga and did not join this group so far.',
-          categoryIds: ['cat4'],
-        },
-      }),
-    ])
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'p0-g2',
+        groupId: 'g2',
+        title: `I am a Noob`,
+        content: 'I am new to Yoga and did not join this group so far.',
+        categoryIds: ['cat4'],
+      },
+    })
 
     // Create Events (by peter lustig)
     authenticatedUser = await peterLustig.toJson()
     const now = new Date()
 
-    await Promise.all([
-      mutate({
-        mutation: createPostMutation(),
-        variables: {
-          id: 'e0',
-          title: 'Illegaler Kindergeburtstag',
-          content: 'Elli hat nächste Woche Geburtstag. Wir feiern das!',
-          categoryIds: ['cat4'],
-          postType: 'Event',
-          eventInput: {
-            eventStart: new Date(
-              now.getFullYear(),
-              now.getMonth(),
-              now.getDate() + 7,
-            ).toISOString(),
-            eventVenue: 'Ellis Kinderzimmer',
-            eventLocationName: 'Deutschland',
-          },
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'e0',
+        title: 'Illegaler Kindergeburtstag',
+        content: 'Elli hat nächste Woche Geburtstag. Wir feiern das!',
+        categoryIds: ['cat4'],
+        postType: 'Event',
+        eventInput: {
+          eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7).toISOString(),
+          eventVenue: 'Ellis Kinderzimmer',
+          eventLocationName: 'Deutschland',
         },
-      }),
-      mutate({
-        mutation: createPostMutation(),
-        variables: {
-          id: 'e1',
-          title: 'Wir Schützen den Stuttgarter Schlossgarten',
-          content: 'Kein Baum wird gefällt werden!',
-          categoryIds: ['cat5'],
-          postType: 'Event',
-          eventInput: {
-            eventStart: new Date(
-              now.getFullYear(),
-              now.getMonth(),
-              now.getDate() + 1,
-            ).toISOString(),
-            eventVenue: 'Schlossgarten',
-            eventLocationName: 'Stuttgart',
-          },
+      },
+    })
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'e1',
+        title: 'Wir Schützen den Stuttgarter Schlossgarten',
+        content: 'Kein Baum wird gefällt werden!',
+        categoryIds: ['cat5'],
+        postType: 'Event',
+        eventInput: {
+          eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString(),
+          eventVenue: 'Schlossgarten',
+          eventLocationName: 'Stuttgart',
         },
-      }),
-      mutate({
-        mutation: createPostMutation(),
-        variables: {
-          id: 'e2',
-          title: 'IT 4 Change Treffen',
-          content: 'Wir sitzen eine Woche zusammen rum und glotzen uns blöde an.',
-          categoryIds: ['cat5'],
-          postType: 'Event',
-          eventInput: {
-            eventStart: new Date(
-              now.getFullYear(),
-              now.getMonth(),
-              now.getDate() + 1,
-            ).toISOString(),
-            eventEnd: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 4).toISOString(),
-            eventVenue: 'Ferienlager',
-            eventLocationName: 'Bahra, Sachsen',
-          },
+      },
+    })
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'e2',
+        title: 'IT 4 Change Treffen',
+        content: 'Wir sitzen eine Woche zusammen rum und glotzen uns blöde an.',
+        categoryIds: ['cat5'],
+        postType: 'Event',
+        eventInput: {
+          eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString(),
+          eventEnd: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 4).toISOString(),
+          eventVenue: 'Ferienlager',
+          eventLocationName: 'Bahra, Sachsen',
         },
-      }),
-    ])
+      },
+    })
 
     let passedEvent = await neode.find('Post', 'e1')
     await passedEvent.update({ eventStart: new Date(2010, 8, 30, 10).toISOString() })
@@ -836,48 +799,49 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     const hashtagAndMention1 =
       'The new physics of <a class="hashtag" data-hashtag-id="QuantenFlussTheorie" href="/?hashtag=QuantenFlussTheorie">#QuantenFlussTheorie</a> can explain <a class="hashtag" data-hashtag-id="QuantumGravity" href="/?hashtag=QuantumGravity">#QuantumGravity</a>! <a class="mention" data-mention-id="u1" href="/profile/u1">@peter-lustig</a> got that already. ;-)'
 
-    await Promise.all([
-      mutate({
-        mutation: createPostMutation(),
-        variables: {
-          id: 'p2',
-          title: `Nature Philosophy Yoga`,
-          content: hashtag1,
-          categoryIds: ['cat2'],
-        },
-      }),
-      mutate({
-        mutation: createPostMutation(),
-        variables: {
-          id: 'p7',
-          title: 'This is post #7',
-          content: `${mention1} ${faker.lorem.paragraph()}`,
-          categoryIds: ['cat7'],
-        },
-      }),
-      mutate({
-        mutation: createPostMutation(),
-        variables: {
-          id: 'p8',
-          image: faker.image.unsplash.nature(),
-          title: `Quantum Flow Theory explains Quantum Gravity`,
-          content: hashtagAndMention1,
-          categoryIds: ['cat8'],
-        },
-      }),
-      mutate({
-        mutation: createPostMutation(),
-        variables: {
-          id: 'p12',
-          title: 'This is post #12',
-          content: `${mention2} ${faker.lorem.paragraph()}`,
-          categoryIds: ['cat12'],
-        },
-      }),
-    ])
-    const [p2, p7, p8, p12] = await Promise.all(
-      ['p2', 'p7', 'p8', 'p12'].map((id) => neode.find('Post', id)),
-    )
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'p2',
+        title: `Nature Philosophy Yoga`,
+        content: hashtag1,
+        categoryIds: ['cat2'],
+      },
+    })
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'p7',
+        title: 'This is post #7',
+        content: `${mention1} ${faker.lorem.paragraph()}`,
+        categoryIds: ['cat7'],
+      },
+    })
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'p8',
+        image: faker.image.unsplash.nature(),
+        title: `Quantum Flow Theory explains Quantum Gravity`,
+        content: hashtagAndMention1,
+        categoryIds: ['cat8'],
+      },
+    })
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'p12',
+        title: 'This is post #12',
+        content: `${mention2} ${faker.lorem.paragraph()}`,
+        categoryIds: ['cat12'],
+      },
+    })
+
+    const p2 = await neode.find('Post', 'p2')
+    const p7 = await neode.find('Post', 'p7')
+    const p8 = await neode.find('Post', 'p8')
+    const p12 = await neode.find('Post', 'p12')
+
     authenticatedUser = null
 
     authenticatedUser = await dewey.toJson()
@@ -885,31 +849,30 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       'I heard <a class="mention" data-mention-id="u3" href="/profile/u3">@jenny-rostock</a> has practiced it for 3 years now.'
     const mentionInComment2 =
       'Did <a class="mention" data-mention-id="u1" href="/profile/u1">@peter-lustig</a> tell you?'
-    await Promise.all([
-      mutate({
-        mutation: createCommentMutation,
-        variables: {
-          id: 'c4',
-          postId: 'p2',
-          content: mentionInComment1,
-        },
-      }),
-      mutate({
-        mutation: createCommentMutation,
-        variables: {
-          id: 'c4-1',
-          postId: 'p2',
-          content: mentionInComment2,
-        },
-      }),
-      mutate({
-        mutation: createCommentMutation,
-        variables: {
-          postId: 'p14',
-          content: faker.lorem.paragraph(),
-        },
-      }), // should send a notification
-    ])
+    await mutate({
+      mutation: createCommentMutation,
+      variables: {
+        id: 'c4',
+        postId: 'p2',
+        content: mentionInComment1,
+      },
+    })
+    await mutate({
+      mutation: createCommentMutation,
+      variables: {
+        id: 'c4-1',
+        postId: 'p2',
+        content: mentionInComment2,
+      },
+    })
+    await mutate({
+      mutation: createCommentMutation,
+      variables: {
+        postId: 'p14',
+        content: faker.lorem.paragraph(),
+      },
+    }) // should send a notification
+
     authenticatedUser = null
 
     const comments: any[] = []
@@ -1193,366 +1156,324 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       closed: true,
     })
 
-    const additionalUsers = await Promise.all(
-      [...Array(30).keys()].map(() => Factory.build('user')),
-    )
+    const additionalUsers: any[] = []
+    for (let i = 0; i < 30; i++) {
+      const user = await Factory.build('user')
+      await jennyRostock.relateTo(user, 'following')
+      await user.relateTo(jennyRostock, 'following')
+      additionalUsers.push(user)
+    }
 
-    await Promise.all(
-      additionalUsers.map(async (user) => {
-        await jennyRostock.relateTo(user, 'following')
-        await user.relateTo(jennyRostock, 'following')
-      }),
-    )
+    // Jenny users
+    for (let i = 0; i < 30; i++) {
+      await Factory.build('user', { name: `Jenny${i}` })
+    }
 
-    await Promise.all(
-      [...Array(30).keys()].map((index) => Factory.build('user', { name: `Jenny${index}` })),
-    )
+    // Jenny posts
+    for (let i = 0; i < 30; i++) {
+      await Factory.build(
+        'post',
+        { content: `Jenny ${faker.lorem.sentence()}` },
+        {
+          categoryIds: ['cat1'],
+          author: jennyRostock,
+          image: Factory.build('image', {
+            url: faker.image.unsplash.objects(),
+          }),
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(30).keys()].map(() =>
-        Factory.build(
-          'post',
-          { content: `Jenny ${faker.lorem.sentence()}` },
-          {
-            categoryIds: ['cat1'],
-            author: jennyRostock,
-            image: Factory.build('image', {
-              url: faker.image.unsplash.objects(),
-            }),
-          },
-        ),
-      ),
-    )
+    // comments on p2 jenny
+    for (let i = 0; i < 6; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: jennyRostock,
+          postId: 'p2',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(30).keys()].map(() =>
-        Factory.build(
-          'post',
-          {},
-          {
-            categoryIds: ['cat1'],
-            author: jennyRostock,
-            image: Factory.build('image', {
-              url: faker.image.unsplash.objects(),
-            }),
-          },
-        ),
-      ),
-    )
+    // comments on p15 jenny
+    for (let i = 0; i < 4; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: jennyRostock,
+          postId: 'p15',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(6).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: jennyRostock,
-            postId: 'p2',
-          },
-        ),
-      ),
-    )
+    // comments on p4 jenny
+    for (let i = 0; i < 2; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: jennyRostock,
+          postId: 'p4',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(4).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: jennyRostock,
-            postId: 'p15',
-          },
-        ),
-      ),
-    )
+    // Posts Peter Lustig
+    for (let i = 0; i < 21; i++) {
+      await Factory.build(
+        'post',
+        {},
+        {
+          categoryIds: ['cat1'],
+          author: peterLustig,
+          image: Factory.build('image', {
+            url: faker.image.unsplash.buildings(),
+          }),
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(2).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: jennyRostock,
-            postId: 'p4',
-          },
-        ),
-      ),
-    )
+    // comments p4 peter
+    for (let i = 0; i < 3; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: peterLustig,
+          postId: 'p4',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(21).keys()].map(() =>
-        Factory.build(
-          'post',
-          {},
-          {
-            categoryIds: ['cat1'],
-            author: peterLustig,
-            image: Factory.build('image', {
-              url: faker.image.unsplash.buildings(),
-            }),
-          },
-        ),
-      ),
-    )
+    // comments p14 peter
+    for (let i = 0; i < 3; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: peterLustig,
+          postId: 'p14',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(3).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: peterLustig,
-            postId: 'p4',
-          },
-        ),
-      ),
-    )
+    // comments p0 peter
+    for (let i = 0; i < 3; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: peterLustig,
+          postId: 'p0',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(3).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: peterLustig,
-            postId: 'p14',
-          },
-        ),
-      ),
-    )
+    // Posts dewey
+    for (let i = 0; i < 11; i++) {
+      await Factory.build(
+        'post',
+        {},
+        {
+          categoryIds: ['cat1'],
+          author: dewey,
+          image: Factory.build('image', {
+            url: faker.image.unsplash.food(),
+          }),
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(6).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: peterLustig,
-            postId: 'p0',
-          },
-        ),
-      ),
-    )
+    // Comments p2 dewey
+    for (let i = 0; i < 7; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: dewey,
+          postId: 'p2',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(11).keys()].map(() =>
-        Factory.build(
-          'post',
-          {},
-          {
-            categoryIds: ['cat1'],
-            author: dewey,
-            image: Factory.build('image', {
-              url: faker.image.unsplash.food(),
-            }),
-          },
-        ),
-      ),
-    )
+    // Comments p6 dewey
+    for (let i = 0; i < 5; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: dewey,
+          postId: 'p6',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(7).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: dewey,
-            postId: 'p2',
-          },
-        ),
-      ),
-    )
+    // Comments p9 dewey
+    for (let i = 0; i < 2; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: dewey,
+          postId: 'p9',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(5).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: dewey,
-            postId: 'p6',
-          },
-        ),
-      ),
-    )
+    // Posts louie
+    for (let i = 0; i < 16; i++) {
+      await Factory.build(
+        'post',
+        {},
+        {
+          categoryIds: ['cat1'],
+          author: louie,
+          image: Factory.build('image', {
+            url: faker.image.unsplash.technology(),
+          }),
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(2).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: dewey,
-            postId: 'p9',
-          },
-        ),
-      ),
-    )
+    // Comments p1 louie
+    for (let i = 0; i < 4; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          postId: 'p1',
+          author: louie,
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(16).keys()].map(() =>
-        Factory.build(
-          'post',
-          {},
-          {
-            categoryIds: ['cat1'],
-            author: louie,
-            image: Factory.build('image', {
-              url: faker.image.unsplash.technology(),
-            }),
-          },
-        ),
-      ),
-    )
+    // Comments p10 louie
+    for (let i = 0; i < 8; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: louie,
+          postId: 'p10',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(4).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            postId: 'p1',
-            author: louie,
-          },
-        ),
-      ),
-    )
+    // Comments p13 louie
+    for (let i = 0; i < 5; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: louie,
+          postId: 'p13',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(8).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: louie,
-            postId: 'p10',
-          },
-        ),
-      ),
-    )
+    // Posts Bob der Baumeister
+    for (let i = 0; i < 45; i++) {
+      await Factory.build(
+        'post',
+        {},
+        {
+          categoryIds: ['cat1'],
+          author: bobDerBaumeister,
+          image: Factory.build('image', {
+            url: faker.image.unsplash.people(),
+          }),
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(5).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: louie,
-            postId: 'p13',
-          },
-        ),
-      ),
-    )
+    // Comments p2 bob
+    for (let i = 0; i < 2; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: bobDerBaumeister,
+          postId: 'p2',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(45).keys()].map(() =>
-        Factory.build(
-          'post',
-          {},
-          {
-            categoryIds: ['cat1'],
-            author: bobDerBaumeister,
-            image: Factory.build('image', {
-              url: faker.image.unsplash.people(),
-            }),
-          },
-        ),
-      ),
-    )
+    // Comments p12 bob
+    for (let i = 0; i < 3; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: bobDerBaumeister,
+          postId: 'p12',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(2).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: bobDerBaumeister,
-            postId: 'p2',
-          },
-        ),
-      ),
-    )
+    // Comments p13 bob
+    for (let i = 0; i < 7; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: bobDerBaumeister,
+          postId: 'p13',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(3).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: bobDerBaumeister,
-            postId: 'p12',
-          },
-        ),
-      ),
-    )
+    // Posts huey
+    for (let i = 0; i < 8; i++) {
+      await Factory.build(
+        'post',
+        {},
+        {
+          categoryIds: ['cat1'],
+          author: huey,
+          image: Factory.build('image', {
+            url: faker.image.unsplash.nature(),
+          }),
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(7).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: bobDerBaumeister,
-            postId: 'p13',
-          },
-        ),
-      ),
-    )
+    // Comments p0 huey
+    for (let i = 0; i < 6; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: huey,
+          postId: 'p0',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(8).keys()].map(() =>
-        Factory.build(
-          'post',
-          {},
-          {
-            categoryIds: ['cat1'],
-            author: huey,
-            image: Factory.build('image', {
-              url: faker.image.unsplash.nature(),
-            }),
-          },
-        ),
-      ),
-    )
+    // Comments p13 huey
+    for (let i = 0; i < 8; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: huey,
+          postId: 'p13',
+        },
+      )
+    }
 
-    await Promise.all(
-      [...Array(6).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: huey,
-            postId: 'p0',
-          },
-        ),
-      ),
-    )
-
-    await Promise.all(
-      [...Array(8).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: huey,
-            postId: 'p13',
-          },
-        ),
-      ),
-    )
-
-    await Promise.all(
-      [...Array(8).keys()].map(() =>
-        Factory.build(
-          'comment',
-          {},
-          {
-            author: huey,
-            postId: 'p15',
-          },
-        ),
-      ),
-    )
+    // Comments p15 huey
+    for (let i = 0; i < 8; i++) {
+      await Factory.build(
+        'comment',
+        {},
+        {
+          author: huey,
+          postId: 'p15',
+        },
+      )
+    }
 
     await Factory.build('donations')
 
