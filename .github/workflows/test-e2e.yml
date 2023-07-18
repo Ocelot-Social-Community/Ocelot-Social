@@ -5,8 +5,6 @@ jobs:
   docker_preparation:
     name: Fullstack test preparation
     runs-on: ubuntu-latest
-    outputs:
-      pr-number: ${{ steps.pr.outputs.number }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -34,10 +32,6 @@ jobs:
           yarn build
           cd ..
           yarn install
-
-      - name: Get pr number
-        id: pr
-        uses: 8BitJonny/gh-get-current-pr@2.2.0
       
       - name: Cache docker images
         id: cache
@@ -48,7 +42,7 @@ jobs:
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
             /tmp/images/
-          key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
+          key: e2e-preparation-cache-${{ GITHUB_RUN_NUMBER }}
 
   fullstack_tests:
     name: Fullstack tests
@@ -71,7 +65,7 @@ jobs:
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
             /tmp/images/
-          key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
+          key: e2e-preparation-cache-${{ GITHUB_RUN_NUMBER }}
           fail-on-cache-miss: true
 
       - name: Boot up test system | docker-compose
@@ -107,12 +101,12 @@ jobs:
     if: always()
     needs: [docker_preparation, fullstack_tests]
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Delete cache
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh extension install actions/gh-actions-cache
-          set +e
-          KEY="e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}"
+          KEY="e2e-preparation-cache-${{ GITHUB_RUN_NUMBER }}"
           gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm

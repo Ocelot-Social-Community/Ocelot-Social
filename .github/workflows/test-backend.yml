@@ -10,7 +10,6 @@ jobs:
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
       docker: ${{ steps.changes.outputs.docker }}
-      pr-number: ${{ steps.pr.outputs.number }}
     steps:
       - uses: actions/checkout@v3.3.0
 
@@ -21,10 +20,6 @@ jobs:
           token: ${{ github.token }}
           filters: .github/file-filters.yml
           list-files: shell
-
-      - name: Get pr number
-        id: pr
-        uses: 8BitJonny/gh-get-current-pr@2.2.0
 
   build_test_neo4j:
     name: Docker Build Test - Neo4J
@@ -45,7 +40,7 @@ jobs:
         uses: actions/cache/save@v3.3.1
         with:
           path: /tmp/neo4j.tar
-          key: backend-neo4j-cache-pr${{ needs.files-changed.outputs.pr-number }}
+          key: backend-neo4j-cache-${{ GITHUB_RUN_NUMBER }}
 
   build_test_backend:
     name: Docker Build Test - Backend
@@ -66,7 +61,7 @@ jobs:
         uses: actions/cache/save@v3.3.1
         with:
           path: /tmp/backend.tar
-          key: backend-cache-pr${{ needs.files-changed.outputs.pr-number }}
+          key: backend-cache-${{ GITHUB_RUN_NUMBER }}
 
   lint_backend:
     name: Lint Backend
@@ -95,14 +90,14 @@ jobs:
         uses: actions/cache/restore@v3.3.1
         with:
           path: /tmp/neo4j.tar
-          key: backend-neo4j-cache-pr${{ needs.files-changed.outputs.pr-number }}
+          key: backend-neo4j-cache-${{ GITHUB_RUN_NUMBER }}
           fail-on-cache-miss: true
 
       - name: Restore Backend cache
         uses: actions/cache/restore@v3.3.1
         with:
           path: /tmp/backend.tar
-          key: backend-cache-pr${{ needs.files-changed.outputs.pr-number }}
+          key: backend-cache-${{ GITHUB_RUN_NUMBER }}
           fail-on-cache-miss: true
 
       - name: Load Docker Images
@@ -132,14 +127,14 @@ jobs:
     if: always()
     needs: [files-changed, unit_test_backend]
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Delete cache
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh extension install actions/gh-actions-cache
-          set +e
-          KEY="backend-neo4j-cache-pr${{ needs.files-changed.outputs.pr-number }}"
+          KEY="backend-neo4j-cache-${{ GITHUB_RUN_NUMBER }}"
           gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
-          KEY="backend-cache-pr${{ needs.files-changed.outputs.pr-number }}"
+          KEY="backend-cache-${{ GITHUB_RUN_NUMBER }}"
           gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
