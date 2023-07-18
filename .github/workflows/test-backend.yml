@@ -1,10 +1,7 @@
 name: ocelot.social backend test CI
 
 
-on:
-  push:
-    branches:
-      - fix-runner
+on: push
 
 jobs:
   files-changed:

@@ -1,4 +1,5 @@
 name: ocelot.social end-to-end test CI
+
 on: push
 
 jobs:
