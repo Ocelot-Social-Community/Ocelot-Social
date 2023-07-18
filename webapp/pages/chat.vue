@@ -14,6 +14,11 @@ export default {
   mounted() {
     this.showChat({ showChat: false, roomID: null })
   },
+  data() {
+    return {
+      // former,
+    }
+  },
   methods: {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',

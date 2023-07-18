@@ -14,9 +14,9 @@
       <modal />
     </client-only>
     <div v-if="$store.getters['chat/showChat'].showChat" class="chat-modul">
-      <chat-module
-        v-on:close-single-room="closeSingleRoom"
+      <chat
         :singleRoomId="$store.getters['chat/showChat'].roomID"
+        @close-single-room="closeSingleRoom"
       />
     </div>
   </div>
@@ -27,14 +27,14 @@ import mobile from '~/mixins/mobile'
 import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
 import Modal from '~/components/Modal'
 import PageFooter from '~/components/PageFooter/PageFooter'
-import ChatModule from '~/components/Chat/Chat.vue'
+import Chat from '~/components/Chat/Chat.vue'
 
 export default {
   components: {
     HeaderMenu,
     Modal,
     PageFooter,
-    ChatModule,
+    Chat,
   },
   mixins: [seo, mobile()],
   methods: {
