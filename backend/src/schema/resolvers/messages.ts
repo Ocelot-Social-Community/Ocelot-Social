@@ -26,7 +26,6 @@ export default {
       subscribe: withFilter(
         () => pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
         (payload, variables) => {
-          console.log('chatMessageAdded', payload, variables)
           return true // payload.user.id === variables.userId
         },
       ),

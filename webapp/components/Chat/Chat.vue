@@ -314,12 +314,13 @@ export default {
     },
 
     async chatMessageAdded({data}){
-      console.log(data)
       if(data.chatMessageAdded.room.id === this.selectedRoom?.id){
-        this.fetchMessages({ room: this.selectedRoom}, { refetch: true})
+        this.fetchMessages({ room: this.selectedRoom, options: { refetch: true }})
       } else {
         // TODO this might be optimized selectively (first page vs rest)
         this.rooms = []
+        this.roomPage = 0
+        this.roomsLoaded = false
         this.fetchRooms()
       }
     },
