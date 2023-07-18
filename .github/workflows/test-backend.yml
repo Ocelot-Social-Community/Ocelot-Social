@@ -10,16 +10,21 @@ jobs:
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
       docker: ${{ steps.changes.outputs.docker }}
+      pr-number: ${{ steps.pr.outputs.number }}
     steps:
       - uses: actions/checkout@v3.3.0
 
-      - name: Check for frontend file changes
+      - name: Check for backend file changes
         uses: dorny/paths-filter@v2.11.1
         id: changes
         with:
           token: ${{ github.token }}
           filters: .github/file-filters.yml
           list-files: shell
+
+      - name: Get pr number
+        id: pr
+        uses: 8BitJonny/gh-get-current-pr@2.2.0
 
   build_test_neo4j:
     name: Docker Build Test - Neo4J
@@ -34,12 +39,13 @@ jobs:
         run: |
           docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
           docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/neo4j.tar
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      
+      - name: Cache docker images
+        id: cache-neo4j
+        uses: actions/cache/save@v3.3.1
         with:
-          name: docker-neo4j-image
           path: /tmp/neo4j.tar
+          key: backend-neo4j-cache-pr${{ needs.files-changed.outputs.pr-number }}
 
   build_test_backend:
     name: Docker Build Test - Backend
@@ -54,12 +60,13 @@ jobs:
         run: |
           docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
           docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      
+      - name: Cache docker images
+        id: cache-backend
+        uses: actions/cache/save@v3.3.1
         with:
-          name: docker-backend-test
           path: /tmp/backend.tar
+          key: backend-cache-pr${{ needs.files-changed.outputs.pr-number }}
 
   lint_backend:
     name: Lint Backend
@@ -84,28 +91,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Download Docker Image (Neo4J)
-        uses: actions/download-artifact@v3
+      - name: Restore Neo4J cache
+        uses: actions/cache/restore@v3.3.1
         with:
-          name: docker-neo4j-image
-          path: /tmp
+          path: /tmp/neo4j.tar
+          key: backend-neo4j-cache-pr${{ needs.files-changed.outputs.pr-number }}
+          fail-on-cache-miss: true
 
-      - name: Load Docker Image
-        run: docker load < /tmp/neo4j.tar
-
-      - name: Download Docker Image (Backend)
-        uses: actions/download-artifact@v3
+      - name: Restore Backend cache
+        uses: actions/cache/restore@v3.3.1
         with:
-          name: docker-backend-test
-          path: /tmp
+          path: /tmp/backend.tar
+          key: backend-cache-pr${{ needs.files-changed.outputs.pr-number }}
+          fail-on-cache-miss: true
 
-      - name: Load Docker Image
-        run: docker load < /tmp/backend.tar
+      - name: Load Docker Images
+        run: |
+          docker load < /tmp/neo4j.tar
+          docker load < /tmp/backend.tar
 
-      - name: backend | copy env files webapp
-        run: cp webapp/.env.template webapp/.env
-      - name: backend | copy env files backend
-        run: cp backend/.env.template backend/.env
+      - name: backend | copy env files
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.template backend/.env
 
       - name: backend | docker-compose
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps neo4j backend
@@ -118,3 +126,20 @@ jobs:
 
       - name: backend | Unit test incl. coverage check
         run: docker-compose exec -T backend yarn test
+
+  cleanup:
+    name: Cleanup
+    if: always()
+    needs: [files-changed, unit_test_backend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete cache
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh extension install actions/gh-actions-cache
+          set +e
+          KEY="backend-neo4j-cache-pr${{ needs.files-changed.outputs.pr-number }}"
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
+          KEY="backend-cache-pr${{ needs.files-changed.outputs.pr-number }}"
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
