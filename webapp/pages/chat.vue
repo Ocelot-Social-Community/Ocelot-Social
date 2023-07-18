@@ -1,5 +1,8 @@
 <template>
-  <chat />
+  <div>
+    <ds-heading tag="h1">{{ $t('chat.page.headline') }}</ds-heading>
+    <chat />
+  </div>
 </template>
 
 <script>
