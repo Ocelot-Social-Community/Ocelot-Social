@@ -61,7 +61,12 @@
 
 <script>
 import { roomQuery, createRoom, unreadRoomsQuery } from '~/graphql/Rooms'
-import { messageQuery, createMessageMutation, markMessagesAsSeen } from '~/graphql/Messages'
+import {
+  messageQuery,
+  createMessageMutation,
+  chatMessageAdded,
+  markMessagesAsSeen,
+} from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
 import { mapGetters, mapMutations } from 'vuex'
 
@@ -169,6 +174,21 @@ export default {
     } else {
       this.fetchRooms()
     }
+
+    // Subscriptions
+    const observer = this.$apollo.subscribe({
+      query: chatMessageAdded(),
+      variables: {
+        userId: this.currentUser.id,
+      },
+    })
+
+    observer.subscribe({
+      next: this.chatMessageAdded,
+      error(error) {
+        this.$toast.error(error)
+      },
+    })
   },
   computed: {
     ...mapGetters({
@@ -294,6 +314,18 @@ export default {
       } catch (error) {
         this.messages = []
         this.$toast.error(error.message)
+      }
+    },
+
+    async chatMessageAdded({ data }) {
+      if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
+        this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
+      } else {
+        // TODO this might be optimized selectively (first page vs rest)
+        this.rooms = []
+        this.roomPage = 0
+        this.roomsLoaded = false
+        this.fetchRooms()
       }
     },
 
