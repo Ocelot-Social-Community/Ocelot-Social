@@ -26,7 +26,7 @@ export default {
       subscribe: withFilter(
         () => pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
         (payload, variables) => {
-          return true // payload.user.id === variables.userId
+          return payload.userId === variables.userId
         },
       ),
     },
@@ -114,13 +114,13 @@ export default {
           const roomCountUpdated = await getUnreadRoomsCount(message.recipientId, session)
 
           // send subscriptions
-          await pubsub.publish(ROOM_COUNT_UPDATED, {
+          void pubsub.publish(ROOM_COUNT_UPDATED, {
             roomCountUpdated,
             userId: message.recipientId,
           })
-          await pubsub.publish(CHAT_MESSAGE_ADDED, {
+          void pubsub.publish(CHAT_MESSAGE_ADDED, {
             chatMessageAdded: message,
-            user: message.recipientId,
+            userId: message.recipientId,
           })
         }
 
