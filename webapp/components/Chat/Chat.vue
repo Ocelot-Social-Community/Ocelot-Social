@@ -4,7 +4,7 @@
       <vue-advanced-chat
         :theme="theme"
         :current-user-id="currentUser.id"
-        :room-id="null"
+        :room-id="!singleRoom ? roomId : null"
         :template-actions="JSON.stringify(templatesText)"
         :menu-actions="JSON.stringify(menuActions)"
         :text-messages="JSON.stringify(textMessages)"
@@ -70,13 +70,20 @@ export default {
   props: {
     theme: {
       type: String,
+      default: 'light',
     },
-    singleRoomId: {
+    singleRoom: {
+      type: Boolean,
+      default: false,
+    },
+    roomId: {
       type: String,
       default: null,
     },
   },
   data() {
+    // Wolle console.log('this.singleRoom: ', this.singleRoom)
+    // console.log('this.roomId: ', this.roomId)
     return {
       menuActions: [
         // NOTE: if menuActions is empty, the related slot is not shown
@@ -139,8 +146,7 @@ export default {
       roomsLoaded: false,
       roomPage: 0,
       roomPageSize: 10,
-      singleRoom: !!this.singleRoomId || false,
-      selectedRoom: null,
+      selectedRoom: this.roomId,
       loadingRooms: true,
       messagesLoaded: false,
       messagePage: 0,
@@ -154,7 +160,7 @@ export default {
         .mutate({
           mutation: createRoom(),
           variables: {
-            userId: this.singleRoomId,
+            userId: this.roomId,
           },
         })
         .then(({ data: { CreateRoom } }) => {

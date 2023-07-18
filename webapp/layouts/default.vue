@@ -13,15 +13,14 @@
     <client-only>
       <modal />
     </client-only>
-    <div v-if="$store.getters['chat/showChat'].showChat" class="chat-modul">
-      <chat
-        :singleRoomId="$store.getters['chat/showChat'].roomID"
-        @close-single-room="closeSingleRoom"
-      />
+    <div v-if="getShowChat.showChat" class="chat-modul">
+      <chat singleRoom :roomId="getShowChat.roomID" @close-single-room="closeSingleRoom" />
     </div>
   </div>
 </template>
+
 <script>
+import { mapGetters } from 'vuex'
 import seo from '~/mixins/seo'
 import mobile from '~/mixins/mobile'
 import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
@@ -37,6 +36,11 @@ export default {
     Chat,
   },
   mixins: [seo, mobile()],
+  computed: {
+    ...mapGetters({
+      getShowChat: 'chat/showChat',
+    }),
+  },
   methods: {
     closeSingleRoom() {
       this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: null })

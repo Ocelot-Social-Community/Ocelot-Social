@@ -1,12 +1,12 @@
 <template>
   <div>
     <ds-heading tag="h1">{{ $t('chat.page.headline') }}</ds-heading>
-    <chat />
+    <chat :roomId="getShowChat.showChat ? getShowChat.roomID : null" />
   </div>
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import Chat from '../components/Chat/Chat.vue'
 
 export default {
@@ -14,10 +14,10 @@ export default {
   mounted() {
     this.showChat({ showChat: false, roomID: null })
   },
-  data() {
-    return {
-      // former,
-    }
+  computed: {
+    ...mapGetters({
+      getShowChat: 'chat/showChat',
+    }),
   },
   methods: {
     ...mapMutations({
