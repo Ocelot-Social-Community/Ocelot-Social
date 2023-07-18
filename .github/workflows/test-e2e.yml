@@ -61,7 +61,7 @@ jobs:
         id: cache
         with:
           path: |
-            /opt/cucumber-json-formatter
+            /opt/cucumber-json-formatterTEST
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
             /tmp/images/
