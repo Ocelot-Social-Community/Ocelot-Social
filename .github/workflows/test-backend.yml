@@ -100,7 +100,7 @@ jobs:
         uses: actions/cache/restore@v3.3.1
         with:
           path: /tmp/backend.tar
-          key: ${{ github.run_id }}backend-cache
+          key: ${{ github.run_id }}-backend-cache
           fail-on-cache-miss: true
 
       - name: Load Docker Images
