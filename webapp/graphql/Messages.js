@@ -34,6 +34,32 @@ export const messageQuery = () => {
   `
 }
 
+export const chatMessageAdded = () => {
+  return gql`
+    subscription chatMessageAdded($userId: ID!) {
+      chatMessageAdded(userId: $userId) {
+        _id
+        id
+        indexId
+        content
+        senderId
+        author {
+          id
+        }
+        username
+        avatar
+        date
+        room {
+          id
+        }
+        saved
+        distributed
+        seen
+      }
+    }
+  `
+}
+
 export const markMessagesAsSeen = () => {
   return gql`
     mutation ($messageIds: [String!]) {
