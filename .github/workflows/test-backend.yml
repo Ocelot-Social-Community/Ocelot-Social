@@ -40,7 +40,7 @@ jobs:
         uses: actions/cache/save@v3.3.1
         with:
           path: /tmp/neo4j.tar
-          key: backend-neo4j-cache-${{ GITHUB_RUN_NUMBER }}
+          key: backend-neo4j-cache-${{ env.GITHUB_RUN_NUMBER }}
 
   build_test_backend:
     name: Docker Build Test - Backend
@@ -61,7 +61,7 @@ jobs:
         uses: actions/cache/save@v3.3.1
         with:
           path: /tmp/backend.tar
-          key: backend-cache-${{ GITHUB_RUN_NUMBER }}
+          key: backend-cache-${{ env.GITHUB_RUN_NUMBER }}
 
   lint_backend:
     name: Lint Backend
@@ -90,14 +90,14 @@ jobs:
         uses: actions/cache/restore@v3.3.1
         with:
           path: /tmp/neo4j.tar
-          key: backend-neo4j-cache-${{ GITHUB_RUN_NUMBER }}
+          key: backend-neo4j-cache-${{ env.GITHUB_RUN_NUMBER }}
           fail-on-cache-miss: true
 
       - name: Restore Backend cache
         uses: actions/cache/restore@v3.3.1
         with:
           path: /tmp/backend.tar
-          key: backend-cache-${{ GITHUB_RUN_NUMBER }}
+          key: backend-cache-${{ env.GITHUB_RUN_NUMBER }}
           fail-on-cache-miss: true
 
       - name: Load Docker Images
@@ -134,7 +134,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh extension install actions/gh-actions-cache
-          KEY="backend-neo4j-cache-${{ GITHUB_RUN_NUMBER }}"
+          KEY="backend-neo4j-cache-${{ env.GITHUB_RUN_NUMBER }}"
           gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
-          KEY="backend-cache-${{ GITHUB_RUN_NUMBER }}"
+          KEY="backend-cache-${{ env.GITHUB_RUN_NUMBER }}"
           gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
