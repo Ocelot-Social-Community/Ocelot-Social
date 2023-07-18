@@ -70,7 +70,7 @@ jobs:
 
       - name: Boot up test system | docker-compose
         run: |
-          chmod +x /opt/cucumber-json-formatterTEST
+          chmod +x /opt/cucumber-json-formatter
           sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
           docker load < /tmp/images/neo4j.tar
           docker load < /tmp/images/backend.tar
