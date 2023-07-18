@@ -84,7 +84,7 @@ jobs:
       - name: Restore webapp cache
         uses: actions/cache/restore@v3.3.1
         with:
-          path: /tmp/webapp.tarTEST
+          path: /tmp/webapp.tar
           key: ${{ github.run_id }}-webapp-cache
 
       - name: Load Docker Image
