@@ -42,7 +42,7 @@ jobs:
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
             /tmp/images/
-          key: e2e-preparation-cache-$GITHUB_RUN_NUMBER
+          key: e2e-preparation-cache-${{github.run_id}}
 
   fullstack_tests:
     name: Fullstack tests
@@ -65,7 +65,7 @@ jobs:
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
             /tmp/images/
-          key: e2e-preparation-cache-$GITHUB_RUN_NUMBER
+          key: e2e-preparation-cache-${{github.run_id}}
           fail-on-cache-miss: true
 
       - name: Boot up test system | docker-compose
@@ -108,5 +108,5 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh extension install actions/gh-actions-cache
-          KEY="e2e-preparation-cache-$GITHUB_RUN_NUMBER"
+          KEY="e2e-preparation-cache-$(($GITHUB_RUN_NUMBER))"
           gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
