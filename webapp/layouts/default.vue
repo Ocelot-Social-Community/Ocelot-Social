@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import seo from '~/mixins/seo'
 import mobile from '~/mixins/mobile'
 import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
@@ -42,8 +42,11 @@ export default {
     }),
   },
   methods: {
+    ...mapMutations({
+      showChat: 'chat/SET_OPEN_CHAT',
+    }),
     closeSingleRoom() {
-      this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: null })
+      this.showChat({ showChat: false, roomID: null })
     },
   },
   beforeCreate() {
