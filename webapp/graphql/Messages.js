@@ -38,17 +38,17 @@ export const chatMessageAdded = () => {
   return gql`
     subscription chatMessageAdded($userId: ID!) {
       chatMessageAdded(userId: $userId) {
-        #_id
+        _id
         id
-        # indexId
+        indexId
         content
         senderId
-        #author {
-        #  id
-        #}
-        #username
-        #avatar
-        #date
+        author {
+          id
+        }
+        username
+        avatar
+        date
         room {
           id
         }
