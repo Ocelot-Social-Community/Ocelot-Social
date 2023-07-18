@@ -123,7 +123,7 @@ jobs:
         run: docker-compose exec -T backend yarn db:migrate up
 
       - name: backend | Unit test incl. coverage check
-        run: docker-compose exec -T backend yarn test src/schema/resolvers/groups.spec.ts
+        run: docker-compose exec -T backend yarn test
 
   cleanup:
     name: Cleanup
