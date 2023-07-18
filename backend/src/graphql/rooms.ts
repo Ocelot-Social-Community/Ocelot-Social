@@ -9,6 +9,7 @@ export const createRoomMutation = () => {
         roomName
         lastMessageAt
         unreadCount
+        #avatar
         users {
           _id
           id
@@ -29,6 +30,7 @@ export const roomQuery = () => {
         id
         roomId
         roomName
+        avatar
         lastMessageAt
         unreadCount
         lastMessage {

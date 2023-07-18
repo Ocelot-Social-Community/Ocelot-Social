@@ -27,6 +27,9 @@ export const messageQuery = () => {
         indexId
         content
         senderId
+        author {
+          id
+        }
         username
         avatar
         date
