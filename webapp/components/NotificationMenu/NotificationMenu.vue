@@ -146,6 +146,7 @@ export default {
           const {
             data: { notificationAdded: newNotification },
           } = subscriptionData
+
           return {
             notifications: unionBy(
               [newNotification],

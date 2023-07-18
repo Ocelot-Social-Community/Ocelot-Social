@@ -3,8 +3,7 @@
 # }
 
 enum _MessageOrdering {
-  createdAt_asc
-  createdAt_desc
+  indexId_desc
 }
 
 type Message {
