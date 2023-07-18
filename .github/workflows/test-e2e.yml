@@ -2,8 +2,58 @@ name: ocelot.social end-to-end test CI
 on: push
 
 jobs:
+  docker_preparation:
+    name: Fullstack test preparation
+    runs-on: ubuntu-latest
+    outputs:
+      pr-number: ${{ steps.pr.outputs.number }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Copy env files
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.template backend/.env
+
+      - name: Build docker images
+        run: |
+          mkdir /tmp/images
+          docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
+          docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/images/neo4j.tar
+          docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
+          docker save "ocelotsocialnetwork/backend:test" > /tmp/images/backend.tar
+          docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
+          docker save "ocelotsocialnetwork/webapp:test" > /tmp/images/webapp.tar
+
+      - name: Install cypress requirements
+        run: |
+          wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+          cd backend
+          yarn install
+          yarn build
+          cd ..
+          yarn install
+
+      - name: Get pr number
+        id: pr
+        uses: 8BitJonny/gh-get-current-pr@2.2.0
+      
+      - name: Cache docker images
+        id: cache
+        uses: actions/cache/save@v3.3.1
+        with:
+          path: |
+            /opt/cucumber-json-formatter
+            /home/runner/.cache/Cypress
+            /home/runner/work/Ocelot-Social/Ocelot-Social
+            /tmp/images/
+          key: e2e-preparation-cache-pr${{ steps.pr.outputs.number }}
+
   fullstack_tests:
     name: Fullstack tests
+    if: success()
+    needs: docker_preparation
     runs-on: ubuntu-latest
     env:
       jobs: 8
@@ -12,28 +62,27 @@ jobs:
         # run copies of the current job in parallel
         job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Restore cache
+        uses: actions/cache/restore@v3.3.1
+        id: cache
+        with:
+          path: |
+            /opt/cucumber-json-formatter
+            /home/runner/.cache/Cypress
+            /home/runner/work/Ocelot-Social/Ocelot-Social
+            /tmp/images/
+          key: e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}
+          fail-on-cache-miss: true
 
-      - name: webapp | copy env file
-        run: cp webapp/.env.template webapp/.env
-
-      - name: backend | copy env file
-        run: cp backend/.env.template backend/.env
-
-      - name: boot up test system | docker-compose
-        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp neo4j backend
-
-      - name: Full stack tests | prepare
+      - name: Boot up test system | docker-compose
         run: |
-          wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
           chmod +x /opt/cucumber-json-formatter
           sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
-          cd backend
-          yarn install
-          yarn build
-          cd ..
-          yarn install
+          docker load < /tmp/images/neo4j.tar
+          docker load < /tmp/images/backend.tar
+          docker load < /tmp/images/webapp.tar
+          docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp neo4j backend
+          sleep 90s
 
       - name: Full stack tests | run tests
         id: e2e-tests
@@ -44,17 +93,26 @@ jobs:
         run: |
           cd cypress/
           node create-cucumber-html-report.js
-  
-      - name: End-to-end tests | if tests failed, get pr number
-        id: pr
-        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
-        uses: 8BitJonny/gh-get-current-pr@2.2.0
 
-      - name: End-to-end tests | if tests failed, upload report
+      - name: Full stack tests | if tests failed, upload report
         id: e2e-report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         uses: actions/upload-artifact@v3
         with:
-          name: ocelot-e2e-test-report-pr${{ steps.pr.outputs.number }}
+          name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
 
+  cleanup:
+    name: Cleanup
+    if: always()
+    needs: [docker_preparation, fullstack_tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete cache
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh extension install actions/gh-actions-cache
+          set +e
+          KEY="e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}"
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
