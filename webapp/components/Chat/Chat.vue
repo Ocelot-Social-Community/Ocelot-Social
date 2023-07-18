@@ -61,7 +61,12 @@
 
 <script>
 import { roomQuery, createRoom, unreadRoomsQuery } from '~/graphql/Rooms'
-import { messageQuery, createMessageMutation, chatMessageAdded, markMessagesAsSeen } from '~/graphql/Messages'
+import {
+  messageQuery,
+  createMessageMutation,
+  chatMessageAdded,
+  markMessagesAsSeen,
+} from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
 import { mapGetters, mapMutations } from 'vuex'
 
@@ -180,11 +185,10 @@ export default {
 
     observer.subscribe({
       next: this.chatMessageAdded,
-      error (error) {
-        console.error(error)
+      error(error) {
+        this.$toast.error(error)
       },
     })
-
   },
   computed: {
     ...mapGetters({
@@ -313,9 +317,9 @@ export default {
       }
     },
 
-    async chatMessageAdded({data}){
-      if(data.chatMessageAdded.room.id === this.selectedRoom?.id){
-        this.fetchMessages({ room: this.selectedRoom, options: { refetch: true }})
+    async chatMessageAdded({ data }) {
+      if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
+        this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
       } else {
         // TODO this might be optimized selectively (first page vs rest)
         this.rooms = []

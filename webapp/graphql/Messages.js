@@ -37,7 +37,7 @@ export const createMessageMutation = () => {
 export const chatMessageAdded = () => {
   return gql`
     subscription chatMessageAdded($userId: ID!) {
-      chatMessageAdded(userId: $userId){
+      chatMessageAdded(userId: $userId) {
         #_id
         id
         # indexId
