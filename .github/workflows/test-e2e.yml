@@ -113,5 +113,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh extension install actions/gh-actions-cache
+          set +e
           KEY="e2e-preparation-cache-pr${{ needs.docker_preparation.outputs.pr-number }}"
           gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
