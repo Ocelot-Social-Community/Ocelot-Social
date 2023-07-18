@@ -65,7 +65,7 @@ jobs:
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
             /tmp/images/
-          key: ${{ github.run_id }}e2e-preparation-cache
+          key: ${{ github.run_id }}-e2e-preparation-cache
           fail-on-cache-miss: true
 
       - name: Boot up test system | docker-compose
