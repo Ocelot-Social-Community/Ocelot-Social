@@ -138,6 +138,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh extension install actions/gh-actions-cache
+          set +e
           KEY="backend-neo4j-cache-pr${{ needs.files-changed.outputs.pr-number }}"
           gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
           KEY="backend-cache-pr${{ needs.files-changed.outputs.pr-number }}"
