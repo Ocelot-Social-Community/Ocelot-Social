@@ -6,9 +6,18 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 import Chat from '../components/Chat/Chat.vue'
 
 export default {
   components: { Chat },
+  mounted() {
+    this.showChat({ showChat: false, roomID: null })
+  },
+  methods: {
+    ...mapMutations({
+      showChat: 'chat/SET_OPEN_CHAT',
+    }),
+  },
 }
 </script>
