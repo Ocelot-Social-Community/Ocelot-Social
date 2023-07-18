@@ -9,6 +9,7 @@ export const createRoomMutation = () => {
         roomName
         lastMessageAt
         unreadCount
+        #avatar
         users {
           _id
           id
@@ -25,10 +26,11 @@ export const createRoomMutation = () => {
 export const roomQuery = () => {
   return gql`
     query Room($first: Int, $offset: Int, $id: ID) {
-      Room(first: $first, offset: $offset, id: $id, orderBy: createdAt_desc) {
+      Room(first: $first, offset: $offset, id: $id, orderBy: lastMessageAt_desc) {
         id
         roomId
         roomName
+        avatar
         lastMessageAt
         unreadCount
         lastMessage {
