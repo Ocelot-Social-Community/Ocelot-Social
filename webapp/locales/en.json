@@ -86,6 +86,9 @@
     "messageDeleted": "This message was deleted",
     "messagesEmpty": "No messages",
     "newMessages": "New Messages",
+    "page": {
+      "headline": "Chat"
+    },
     "roomEmpty": "No room selected",
     "roomsEmpty": "No rooms",
     "search": "Filter chat rooms",
