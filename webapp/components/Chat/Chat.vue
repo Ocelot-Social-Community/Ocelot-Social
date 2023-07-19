@@ -244,8 +244,8 @@ export default {
           if (!rmsIds.find((v) => v === r.id)) {
             rms.push({
               ...r,
-              index: r.lastMessage.date,
-              lastMessage: {...r.lastMessage, content: r.lastMessage.content.trim().substring(0,30)},
+              index: r.lastMessage?.date,
+              lastMessage: {...r.lastMessage, content: r.lastMessage?.content.trim().substring(0,30)},
               users: r.users.map((u) => {
                 return { ...u, username: u.name, avatar: u.avatar?.url }
               }),
@@ -339,6 +339,7 @@ export default {
       changedRoom.lastMessage = data.chatMessageAdded
       changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0,30)
       changedRoom.lastMessageAt = data.chatMessageAdded.date
+      changedRoom.unreadCount++ 
       this.rooms[roomIndex] = changedRoom
       if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
         this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
