@@ -245,7 +245,10 @@ export default {
             rms.push({
               ...r,
               index: r.lastMessage?.date,
-              lastMessage: {...r.lastMessage, content: r.lastMessage?.content.trim().substring(0,30)},
+              lastMessage: {
+                ...r.lastMessage,
+                content: r.lastMessage?.content.trim().substring(0, 30),
+              },
               users: r.users.map((u) => {
                 return { ...u, username: u.name, avatar: u.avatar?.url }
               }),
@@ -337,9 +340,9 @@ export default {
       const roomIndex = this.rooms.findIndex((r) => r.id === data.chatMessageAdded.room.id)
       const changedRoom = { ...this.rooms[roomIndex] }
       changedRoom.lastMessage = data.chatMessageAdded
-      changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0,30)
+      changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
       changedRoom.lastMessageAt = data.chatMessageAdded.date
-      changedRoom.unreadCount++ 
+      changedRoom.unreadCount++
       this.rooms[roomIndex] = changedRoom
       if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
         this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
@@ -365,9 +368,8 @@ export default {
         })
         const roomIndex = this.rooms.findIndex((r) => r.id === message.roomId)
         const changedRoom = { ...this.rooms[roomIndex] }
-        console.log(changedRoom)
         changedRoom.lastMessage = message
-        changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0,30)
+        changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
         this.rooms[roomIndex] = changedRoom
       } catch (error) {
         this.$toast.error(error.message)
