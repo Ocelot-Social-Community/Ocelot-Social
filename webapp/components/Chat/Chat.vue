@@ -334,12 +334,6 @@ export default {
     },
 
     async sendMessage(message) {
-      // check for usersTag and change userid to username
-      message.usersTag.forEach((userTag) => {
-        const needle = `<usertag>${userTag.id}</usertag>`
-        const replacement = `<usertag>@${userTag.name.replaceAll(' ', '-').toLowerCase()}</usertag>`
-        message.content = message.content.replaceAll(needle, replacement)
-      })
       try {
         await this.$apollo.mutate({
           mutation: createMessageMutation(),
