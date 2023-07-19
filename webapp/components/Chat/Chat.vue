@@ -425,7 +425,7 @@ body {
   }
 }
 
-.single-chat-bubble {
+.ds-flex-item.single-chat-bubble {
   margin-right: 1em;
 }
 </style>
