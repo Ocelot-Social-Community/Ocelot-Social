@@ -353,7 +353,9 @@ export default {
 
     async sendMessage(message) {
       try {
-        const { data: { CreateMessage: createdMessage }} = await this.$apollo.mutate({
+        const {
+          data: { CreateMessage: createdMessage },
+        } = await this.$apollo.mutate({
           mutation: createMessageMutation(),
           variables: {
             roomId: message.roomId,
