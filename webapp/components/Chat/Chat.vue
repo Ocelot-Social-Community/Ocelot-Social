@@ -238,15 +238,17 @@ export default {
           fetchPolicy: 'no-cache',
         })
 
-
         const rms = []
         const rmsIds = []
         ;[...Room, ...this.rooms].forEach((r) => {
-          if(!rmsIds.find((v) => v === r.id)){
-            rms.push({...r, index: r.lastMessage.date,
-            users: r.users.map((u) => {
-              return { ...u, username: u.name, avatar: u.avatar?.url }
-            })})
+          if (!rmsIds.find((v) => v === r.id)) {
+            rms.push({
+              ...r,
+              index: r.lastMessage.date,
+              users: r.users.map((u) => {
+                return { ...u, username: u.name, avatar: u.avatar?.url }
+              }),
+            })
             rmsIds.push(r.id)
           }
         })
@@ -285,10 +287,12 @@ export default {
           fetchPolicy: 'no-cache',
         })
 
-        const newMsgIds = Message.filter((m) => m.seen === false && m.senderId !== this.currentUser.id).map((m) => m.id)
+        const newMsgIds = Message.filter(
+          (m) => m.seen === false && m.senderId !== this.currentUser.id,
+        ).map((m) => m.id)
         if (newMsgIds.length) {
           const roomIndex = this.rooms.findIndex((r) => r.id === room.id)
-          const changedRoom = {...this.rooms[roomIndex]}
+          const changedRoom = { ...this.rooms[roomIndex] }
           changedRoom.unreadCount = changedRoom.unreadCount - newMsgIds.length
           this.rooms[roomIndex] = changedRoom
           this.$apollo
@@ -330,7 +334,7 @@ export default {
 
     async chatMessageAdded({ data }) {
       const roomIndex = this.rooms.findIndex((r) => r.id === data.chatMessageAdded.room.id)
-      const changedRoom = {...this.rooms[roomIndex]}
+      const changedRoom = { ...this.rooms[roomIndex] }
       changedRoom.lastMessage = data.chatMessageAdded
       changedRoom.lastMessageAt = data.chatMessageAdded.date
       this.rooms[roomIndex] = changedRoom
