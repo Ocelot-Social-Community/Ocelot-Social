@@ -11,12 +11,10 @@
 
 <script>
 import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSearch'
-import UserTeaser from '~/components/UserTeaser/UserTeaser.vue'
 
 export default {
   name: 'AddChatRoomByUserSearch',
   components: {
-    UserTeaser,
     SelectUserSearch,
   },
   props: {

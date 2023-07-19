@@ -29,7 +29,7 @@ export default {
   data() {
     return {
       showUserSearch: false,
-      // chatRooms: [] // Wolle
+      // excludeUsers: [] // Wolle
     }
   },
   mounted() {
@@ -45,7 +45,6 @@ export default {
       showChat: 'chat/SET_OPEN_CHAT',
     }),
     addChatRoom(userID) {
-      console.log('addChatRoom !!! newChatRoomID: ', userID)
       this.$refs.chat.newRoom(userID)
     },
   },

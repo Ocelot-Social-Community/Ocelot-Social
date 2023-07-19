@@ -27,12 +27,10 @@
 <script>
 import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
 import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSearch'
-import UserTeaser from '~/components/UserTeaser/UserTeaser.vue'
 
 export default {
   name: 'AddGroupMember',
   components: {
-    UserTeaser,
     SelectUserSearch,
   },
   props: {
