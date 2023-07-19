@@ -364,7 +364,7 @@ export default {
     },
 
     addRoom() {
-      this.$emit('open-user-search')
+      this.$emit('open-close-user-search')
     },
   },
 }
