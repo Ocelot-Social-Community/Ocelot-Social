@@ -3,7 +3,7 @@ import { cleanHtml } from '../middleware/helpers/cleanHtml'
 
 // exclamation mark separetes field names, that should not be sanitized
 const fields = [
-  { field: 'content', excludes: ['message'] },
+  { field: 'content', excludes: ['CreateMessage', 'Message'] },
   { field: 'contentExcerpt' },
   { field: 'reasonDescription' },
   { field: 'description', excludes: ['embed'] },
