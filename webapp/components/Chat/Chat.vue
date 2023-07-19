@@ -353,7 +353,9 @@ export default {
 
     async sendMessage(message) {
       try {
-        await this.$apollo.mutate({
+        const {
+          data: { CreateMessage: createdMessage },
+        } = await this.$apollo.mutate({
           mutation: createMessageMutation(),
           variables: {
             roomId: message.roomId,
@@ -362,7 +364,7 @@ export default {
         })
         const roomIndex = this.rooms.findIndex((r) => r.id === message.roomId)
         const changedRoom = { ...this.rooms[roomIndex] }
-        changedRoom.lastMessage = message
+        changedRoom.lastMessage = createdMessage
         changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
         this.rooms[roomIndex] = changedRoom
       } catch (error) {
