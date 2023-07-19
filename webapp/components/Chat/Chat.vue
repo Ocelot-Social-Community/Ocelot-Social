@@ -315,12 +315,6 @@ export default {
           this.messagesLoaded = true
         }
         this.messagePage += 1
-
-        // hacky way to make urls clickable for the chat component
-        // --> linkify in the backend is changing the syntax of the url
-        this.messages.forEach((msg) => {
-          msg.content = msg.content.replace(/<\/?a[^>]*>/g, '')
-        })
       } catch (error) {
         this.messages = []
         this.$toast.error(error.message)
