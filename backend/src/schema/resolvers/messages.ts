@@ -89,6 +89,7 @@ export default {
           SET room.lastMessageAt = toString(datetime())
           RETURN message {
             .*,
+            indexId: toString(message.indexId),
             recipientId: recipientUser.id,
             senderId: currentUser.id,
             username: currentUser.name,
