@@ -85,7 +85,7 @@
                 content: $t('chat.userProfileButton.tooltip', { name: userName }),
                 placement: 'bottom-start',
               }"
-              @click="showChat({ showChat: true, roomID: user.id })"
+              @click="showOrChangeChat(user.id)"
             >
               {{ $t('chat.userProfileButton.label') }}
             </base-button>
@@ -182,7 +182,7 @@
 
 <script>
 import uniqBy from 'lodash/uniqBy'
-import { mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import postListActions from '~/mixins/postListActions'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import HcFollowButton from '~/components/Button/FollowButton'
@@ -254,6 +254,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      getShowChat: 'chat/showChat',
+    }),
     myProfile() {
       return this.$route.params.id === this.$store.getters['auth/user'].id
     },
@@ -402,6 +405,12 @@ export default {
     fetchAllConnections(type, count) {
       if (type === 'following') this.followingCount = count
       if (type === 'followedBy') this.followedByCount = count
+    },
+    async showOrChangeChat(roomID) {
+      if (this.getShowChat.showChat) {
+        await this.showChat({ showChat: false, roomID: null })
+      }
+      await this.showChat({ showChat: true, roomID })
     },
   },
   apollo: {

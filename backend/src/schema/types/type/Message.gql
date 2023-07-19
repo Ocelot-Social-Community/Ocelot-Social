@@ -3,8 +3,7 @@
 # }
 
 enum _MessageOrdering {
-  createdAt_asc
-  createdAt_desc
+  indexId_desc
 }
 
 type Message {
@@ -44,4 +43,8 @@ type Query {
     offset: Int
     orderBy: [_MessageOrdering]
   ): [Message]
+}
+
+type Subscription {
+  chatMessageAdded(userId: ID!): Message
 }

@@ -1,7 +1,7 @@
 name: ocelot.social webapp test CI
 
 
-on: [push]
+on: push
 
 jobs:
   files-changed:
@@ -34,7 +34,7 @@ jobs:
         run: |
           scripts/translations/sort.sh
           scripts/translations/missing-keys.sh
-          
+
   build_test_webapp:
     name: Docker Build Test - Webapp
     if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true'
@@ -44,16 +44,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: webapp | Build 'test' image
+      - name: Webapp | Build 'test' image
         run: |
           docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      - name: Cache docker image
+        uses: actions/cache/save@v3.3.1
         with:
-          name: docker-webapp-test
           path: /tmp/webapp.tar
+          key: ${{ github.run_id }}-webapp-cache
 
   lint_webapp:
     name: Lint Webapp
@@ -78,24 +78,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Download Docker Image (Webapp)
-        uses: actions/download-artifact@v3
+      - name: Restore webapp cache
+        uses: actions/cache/restore@v3.3.1
         with:
-          name: docker-webapp-test
-          path: /tmp
+          path: /tmp/webapp.tar
+          key: ${{ github.run_id }}-webapp-cache
 
       - name: Load Docker Image
         run: docker load < /tmp/webapp.tar
 
-      - name: backend | copy env files webapp
-        run: cp webapp/.env.template webapp/.env
-
-      - name: backend | copy env files backend
-        run: cp backend/.env.template backend/.env
+      - name: Copy env files
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.template backend/.env
 
       - name: backend | docker-compose
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
 
       - name: webapp | Unit tests incl. coverage check
         run: docker-compose exec -T webapp yarn test
+
+  cleanup:
+    name: Cleanup
+    if: ${{ needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true' }}
+    needs: [files-changed, unit_test_webapp]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Delete cache
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh extension install actions/gh-actions-cache
+          KEY="${{ github.run_id }}-webapp-cache"
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
 
