@@ -12,6 +12,7 @@
           :filled="filteredByUsersFollowed"
           :title="$t('contribution.filterFollow')"
           @click="toggleFilteredByFollowed(currentUser.id)"
+          size="small"
         >
           {{ $t('contribution.filterFollow') }}
         </base-button>
@@ -23,6 +24,7 @@
           :filled="filteredByPostsInMyGroups"
           :title="$t('contribution.filterMyGroups')"
           @click="toggleFilteredByMyGroups()"
+          size="small"
         >
           {{ $t('contribution.filterMyGroups') }}
         </base-button>

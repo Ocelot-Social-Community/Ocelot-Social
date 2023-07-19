@@ -6,7 +6,7 @@
   >
     <template #filter-follower>
       <li class="item all-item">
-        <base-button
+        <labeled-button
           icon="check"
           :label="$t('filter-menu.all')"
           :filled="filteredPostTypes.length === 0"
@@ -14,7 +14,7 @@
           @click="togglePostType(null)"
         >
           {{ $t('filter-menu.all') }}
-        </base-button>
+        </labeled-button>
       </li>
       <li class="item article-item">
         <labeled-button

@@ -61,7 +61,6 @@ export default {
 
   > .filter-list {
     display: flex;
-    flex-wrap: wrap;
     flex-basis: 100%;
     flex-grow: 1;
 
