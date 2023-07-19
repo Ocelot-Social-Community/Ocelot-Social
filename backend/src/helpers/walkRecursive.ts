@@ -9,10 +9,10 @@ function walkRecursive(data, fields, fieldName, callback, _key?) {
   if (!Array.isArray(fields)) {
     throw new Error('please provide an fields array for the walkRecursive helper')
   }
-  if (data && typeof data === 'string' && fields.includes(_key)) {
-    // well we found what we searched for, lets replace the value with our callback result
-    const key = _key.split('!')
-    if (key.length === 1 || key[1] !== fieldName) data = callback(data, key[0])
+  // console.log(_key)
+  const fieldDef = fields.find((f) => f.field === _key)
+  if (data && typeof data === 'string' && fieldDef) {
+    if (!fieldDef.excludes?.includes(fieldName)) data = callback(data, _key)
   } else if (data && Array.isArray(data)) {
     // go into the rabbit hole and dig through that array
     data.forEach((res, index) => {
