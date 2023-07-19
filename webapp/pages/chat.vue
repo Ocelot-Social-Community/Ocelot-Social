@@ -8,7 +8,10 @@
       @loadGroupMembers="null"
     />
     <ds-space margin-bottom="small" />
-    <chat :roomId="getShowChat.showChat ? getShowChat.roomID : null" @open-user-search="showUserSearch = !showUserSearch" />
+    <chat
+      :roomId="getShowChat.showChat ? getShowChat.roomID : null"
+      @open-user-search="showUserSearch = !showUserSearch"
+    />
   </div>
 </template>
 
@@ -18,7 +21,10 @@ import AddGroupMember from '~/components/Group/AddGroupMember'
 import Chat from '../components/Chat/Chat.vue'
 
 export default {
-  components: { AddGroupMember, Chat },
+  components: {
+    AddGroupMember,
+    Chat,
+  },
   data() {
     return {
       showUserSearch: false,

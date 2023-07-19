@@ -3,33 +3,7 @@
     <h2 class="title">{{ $t('group.addUser') }}</h2>
     <ds-space margin-bottom="small" />
     <ds-space>
-      <ds-select
-        type="search"
-        icon="search"
-        label-prop="id"
-        v-model="query"
-        :id="id"
-        :icon-right="null"
-        :options="users"
-        :loading="$apollo.queries.searchUsers.loading"
-        :filter="(item) => item"
-        :no-options-available="$t('group.addUserNoOptions')"
-        :auto-reset-search="true"
-        :placeholder="$t('group.addUserPlaceholder')"
-        @focus.capture.native="onFocus"
-        @input.native="handleInput"
-        @keyup.enter.native="onEnter"
-        @keyup.delete.native="onDelete"
-        @keyup.esc.native="clear"
-        @blur.capture.native="onBlur"
-        @input.exact="onSelect"
-      >
-        <template #option="{ option }">
-          <p>
-            <user-teaser :user="option" :showPopover="false" :linkToProfile="false" />
-          </p>
-        </template>
-      </ds-select>
+      <select-user-search :id="id" ref="selectUserSearch" @select-user="selectUser" />
       <ds-modal
         v-if="isOpen"
         force
@@ -52,14 +26,14 @@
 
 <script>
 import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
-import { searchUsers } from '~/graphql/Search.js'
+import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSearch'
 import UserTeaser from '~/components/UserTeaser/UserTeaser.vue'
-import { isEmpty } from 'lodash'
 
 export default {
   name: 'AddGroupMember',
   components: {
     UserTeaser,
+    SelectUserSearch,
   },
   props: {
     groupId: {
@@ -73,62 +47,34 @@ export default {
   },
   data() {
     return {
-      users: [],
       id: 'search-user-to-add-to-group',
-      query: '',
       user: {},
       isOpen: false,
     }
   },
-  computed: {
-    startSearch() {
-      return this.query && this.query.length > 3
-    },
-  },
   methods: {
     cancelModal() {
-      this.clear()
+      this.$refs.selectUserSearch.clear()
       this.isOpen = false
     },
     closeModal() {
-      this.clear()
+      this.$refs.selectUserSearch.clear()
       this.isOpen = false
     },
     confirmModal() {
       this.addMemberToGroup()
       this.isOpen = false
-      this.clear()
+      this.$refs.selectUserSearch.clear()
     },
-    onFocus() {},
-    onBlur() {
-      this.query = ''
-    },
-    handleInput(event) {
-      this.query = event.target ? event.target.value.trim() : ''
-    },
-    onDelete(event) {
-      const value = event.target ? event.target.value.trim() : ''
-      if (isEmpty(value)) {
-        this.clear()
-      } else {
-        this.handleInput(event)
-      }
-    },
-    clear() {
-      this.query = ''
-      this.user = {}
-      this.users = []
-    },
-    onSelect(item) {
-      this.user = item
+    selectUser(user) {
+      this.user = user
       if (this.groupMembers.find((member) => member.id === this.user.id)) {
         this.$toast.error(this.$t('group.errors.userAlreadyMember', { name: this.user.name }))
-        this.clear()
+        this.$refs.selectUserSearch.clear()
         return
       }
       this.isOpen = true
     },
-    onEnter() {},
     async addMemberToGroup() {
       const newRole = 'usual'
       const username = this.user.name
@@ -149,29 +95,9 @@ export default {
       }
     },
   },
-  apollo: {
-    searchUsers: {
-      query() {
-        return searchUsers
-      },
-      variables() {
-        return {
-          query: this.query,
-          firstUsers: 5,
-          usersOffset: 0,
-        }
-      },
-      skip() {
-        return !this.startSearch
-      },
-      update({ searchUsers }) {
-        this.users = searchUsers.users
-      },
-      fetchPolicy: 'cache-and-network',
-    },
-  },
 }
 </script>
+
 <style lang="scss">
 .add-group-member {
   background-color: white;
