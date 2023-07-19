@@ -9,7 +9,7 @@
       </div>
       <post-type-filter />
       <following-filter />
-      <categories-filter v-if="categoriesActive" @showFilterMenu="$emit('showFilterMenu')" @updateCategories="updateCategories" />
+      <categories-filter v-if="categoriesActive" @showFilterMenu="$emit('showFilterMenu')" />
     </div>
     <div v-if="eventSetInPostTypeFilter" class="filter-menu-options">
       <h2 class="title">{{ $t('filter-menu.eventsBy') }}</h2>
@@ -39,7 +39,7 @@ export default {
     OrderByFilter,
     CategoriesFilter,
     PostTypeFilter,
-    LabeledButton
+    LabeledButton,
   },
   data() {
     return {
@@ -56,10 +56,7 @@ export default {
     },
   },
   methods: {
-    updateCategories(newCatId){
-      console.log(newCatId);
-    },
-    saveCategories(){      
+    saveCategories() {
       this.$apollo
         .mutate({
           mutation: SaveCategories(),
@@ -72,18 +69,18 @@ export default {
         .catch(() => {
           this.$toast.error(this.$t('filter-menu.save.error'))
         })
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss">
-.filter-header{
+.filter-header {
   display: flex;
   justify-content: space-between;
-  & .labeled-button{
+  & .labeled-button {
     margin-right: 2em;
-  } 
+  }
 }
 .filter-menu-options {
   max-width: $size-max-width-filter-menu;

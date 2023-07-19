@@ -9,14 +9,14 @@
           @click="setResetCategories"
           size="small"
         >
-        {{ $t('filter-menu.all') }}
+          {{ $t('filter-menu.all') }}
         </base-button>
       </div>
       <div class="category-filter-list">
         <!-- <ds-space margin="small" /> -->
         <base-button
           v-for="category in categories"
-          :key="category.id"          
+          :key="category.id"
           @click="saveCategories(category.id)"
           :filled="filteredCategoryIds.includes(category.id)"
           :icon="category.icon"
@@ -37,13 +37,11 @@
 import { mapGetters, mapMutations } from 'vuex'
 import CategoryQuery from '~/graphql/CategoryQuery.js'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
-import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
 
 export default {
   components: {
     FilterMenuSection,
-    LabeledButton,
   },
   mixins: [SortCategories],
   data() {
@@ -67,7 +65,7 @@ export default {
     },
     saveCategories(categoryId) {
       this.toggleCategory(categoryId)
-      this.$emit('updateCategories', categoryId)      
+      this.$emit('updateCategories', categoryId)
     },
   },
   apollo: {

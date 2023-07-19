@@ -4,7 +4,7 @@ import CategoriesFilter from './CategoriesFilter'
 
 const localVue = global.localVue
 
-let wrapper, environmentAndNatureButton, democracyAndPoliticsButton
+let wrapper, environmentAndNatureButton
 
 describe('CategoriesFilter.vue', () => {
   const mutations = {
