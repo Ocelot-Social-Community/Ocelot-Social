@@ -1,7 +1,7 @@
 name: ocelot.social webapp test CI
 
 
-on: [push]
+on: push
 
 jobs:
   files-changed:
@@ -9,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       docker: ${{ steps.changes.outputs.docker }}
-      pr-number: ${{ steps.pr.outputs.number }}
       webapp: ${{ steps.changes.outputs.webapp }}
     steps:
       - uses: actions/checkout@v3.3.0
@@ -21,10 +20,6 @@ jobs:
           token: ${{ github.token }}
           filters: .github/file-filters.yml
           list-files: shell
-
-      - name: Get pr number
-        id: pr
-        uses: 8BitJonny/gh-get-current-pr@2.2.0
 
   prepare:
     name: Prepare
@@ -58,7 +53,7 @@ jobs:
         uses: actions/cache/save@v3.3.1
         with:
           path: /tmp/webapp.tar
-          key: webapp-cache-pr${{ needs.files-changed.outputs.pr-number }}
+          key: ${{ github.run_id }}-webapp-cache
 
   lint_webapp:
     name: Lint Webapp
@@ -87,7 +82,7 @@ jobs:
         uses: actions/cache/restore@v3.3.1
         with:
           path: /tmp/webapp.tar
-          key: webapp-cache-pr${{ needs.files-changed.outputs.pr-number }}
+          key: ${{ github.run_id }}-webapp-cache
 
       - name: Load Docker Image
         run: docker load < /tmp/webapp.tar
@@ -105,16 +100,16 @@ jobs:
 
   cleanup:
     name: Cleanup
-    if: always()
+    if: ${{ needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true' }}
     needs: [files-changed, unit_test_webapp]
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Delete cache
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh extension install actions/gh-actions-cache
-          set +e
-          KEY="webapp-cache-pr${{ needs.files-changed.outputs.pr-number }}"
+          KEY="${{ github.run_id }}-webapp-cache"
           gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
 
