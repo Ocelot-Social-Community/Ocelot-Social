@@ -3,13 +3,14 @@
     <ds-heading tag="h1">{{ $t('chat.page.headline') }}</ds-heading>
     <add-chat-room-by-user-search
       v-if="showUserSearch"
-      @load-chat-rooms="loadChatRooms"
+      @add-chat-room="addChatRoom"
       @close-user-search="showUserSearch = false"
     />
     <!-- Wolle :chatRooms="chatRooms" -->
     <ds-space margin-bottom="small" />
     <chat
       :roomId="getShowChat.showChat ? getShowChat.roomID : null"
+      ref="chat"
       @open-close-user-search="showUserSearch = !showUserSearch"
     />
   </div>
@@ -43,8 +44,9 @@ export default {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
     }),
-    loadChatRooms(newChatRoomID) {
-      console.log('loadChatRooms !!! newChatRoomID: ', newChatRoomID)
+    addChatRoom(userID) {
+      console.log('addChatRoom !!! newChatRoomID: ', userID)
+      this.$refs.chat.newRoom(userID)
     },
   },
 }

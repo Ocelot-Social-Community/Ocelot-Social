@@ -160,22 +160,7 @@ export default {
   },
   mounted() {
     if (this.singleRoom) {
-      this.$apollo
-        .mutate({
-          mutation: createRoom(),
-          variables: {
-            userId: this.roomId,
-          },
-        })
-        .then(({ data: { CreateRoom } }) => {
-          this.fetchRooms({ room: CreateRoom })
-        })
-        .catch((error) => {
-          this.$toast.error(error)
-        })
-        .finally(() => {
-          // this.loading = false
-        })
+      this.newRoom(this.roomId)
     } else {
       this.fetchRooms()
     }
@@ -365,6 +350,25 @@ export default {
 
     addRoom() {
       this.$emit('open-close-user-search')
+    },
+
+    newRoom(userId) {
+      this.$apollo
+        .mutate({
+          mutation: createRoom(),
+          variables: {
+            userId,
+          },
+        })
+        .then(({ data: { CreateRoom } }) => {
+          this.fetchRooms({ room: CreateRoom })
+        })
+        .catch((error) => {
+          this.$toast.error(error)
+        })
+        .finally(() => {
+          // this.loading = false
+        })
     },
   },
 }
