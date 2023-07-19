@@ -33,11 +33,11 @@ export default {
       return [
         {
           name: this.$t('group.general'),
-          path: `/group/edit/${this.group.id}`,
+          path: `/groups/edit/${this.group.id}`,
         },
         {
           name: this.$t('group.members'),
-          path: `/group/edit/${this.group.id}/members`,
+          path: `/groups/edit/${this.group.id}/members`,
         },
       ]
     },

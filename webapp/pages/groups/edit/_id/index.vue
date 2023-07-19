@@ -60,7 +60,7 @@ export default {
         })
         this.$toast.success(this.$t('group.updatedGroup'))
         this.$router.history.push({
-          name: 'group-id-slug',
+          name: 'groups-id-slug',
           params: { id: responseId, slug: responseSlug },
         })
       } catch (error) {
