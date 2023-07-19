@@ -5,6 +5,11 @@
 #   users_some: _UserFilter
 # }
 
+# TODO change this to last message date
+enum _RoomOrdering {
+  lastMessageAt_desc
+}
+
 type Room {
   id: ID!
   createdAt: String
@@ -13,8 +18,28 @@ type Room {
   users: [User]! @relation(name: "CHATS_IN", direction: "IN")
 
   roomId: String! @cypher(statement: "RETURN this.id")
-  roomName: String! ## @cypher(statement: "MATCH (this)<-[:CHATS_IN]-(user:User) WHERE NOT user.id = $cypherParams.currentUserId RETURN user[0].name")
-  avatar: String! ## @cypher match not own user in users array
+  roomName: String! @cypher(statement: "MATCH (this)<-[:CHATS_IN]-(user:User) WHERE NOT user.id = $cypherParams.currentUserId RETURN user.name")
+  avatar: String @cypher(statement: """
+    MATCH (this)<-[:CHATS_IN]-(user:User)
+    WHERE NOT user.id = $cypherParams.currentUserId
+    OPTIONAL MATCH (user)-[:AVATAR_IMAGE]->(image:Image)
+    RETURN image.url
+  """)
+
+  lastMessageAt: String
+
+  lastMessage: Message @cypher(statement: """
+    MATCH (this)<-[:INSIDE]-(message:Message)
+    WITH message ORDER BY message.indexId DESC LIMIT 1
+    RETURN message
+  """)
+
+  unreadCount: Int @cypher(statement: """
+    MATCH (this)<-[:INSIDE]-(message:Message)<-[:CREATED]-(user:User)
+    WHERE NOT user.id = $cypherParams.currentUserId
+      AND NOT message.seen 
+    RETURN count(message)
+  """)
 }
 
 type Mutation {
@@ -24,5 +49,13 @@ type Mutation {
 }
 
 type Query {
-  Room: [Room]
+  Room(
+    id: ID
+    orderBy: [_RoomOrdering]
+  ): [Room]
+  UnreadRooms: Int
+}
+
+type Subscription {
+  roomCountUpdated(userId: ID!): Int
 }

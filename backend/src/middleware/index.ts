@@ -14,6 +14,7 @@ import login from './login/loginMiddleware'
 import sentry from './sentryMiddleware'
 import languages from './languages/languages'
 import userInteractions from './userInteractions'
+import chatMiddleware from './chatMiddleware'
 
 export default (schema) => {
   const middlewares = {
@@ -31,6 +32,7 @@ export default (schema) => {
     orderBy,
     languages,
     userInteractions,
+    chatMiddleware,
   }
 
   let order = [
@@ -49,6 +51,7 @@ export default (schema) => {
     'softDelete',
     'includedFields',
     'orderBy',
+    'chatMiddleware',
   ]
 
   // add permisions middleware at the first position (unless we're seeding)

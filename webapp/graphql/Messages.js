@@ -1,28 +1,87 @@
 import gql from 'graphql-tag'
 
-export const messageQuery = () => {
+export const createMessageMutation = () => {
   return gql`
-    query ($roomId: ID!) {
-      Message(roomId: $roomId) {
-        _id
+    mutation ($roomId: ID!, $content: String!) {
+      CreateMessage(roomId: $roomId, content: $content) {
+        #_id
         id
-        senderId
+        indexId
         content
+        senderId
         author {
           id
         }
+        username
+        avatar
+        date
+        room {
+          id
+        }
+        saved
+        distributed
+        seen
       }
     }
   `
 }
 
-export const createMessageMutation = () => {
+export const messageQuery = () => {
   return gql`
-    mutation ($roomId: ID!, $content: String!) {
-      CreateMessage(roomId: $roomId, content: $content) {
+    query ($roomId: ID!, $first: Int, $offset: Int) {
+      Message(roomId: $roomId, first: $first, offset: $offset, orderBy: indexId_desc) {
+        _id
         id
+        indexId
         content
+        senderId
+        author {
+          id
+        }
+        username
+        avatar
+        date
+        room {
+          id
+        }
+        saved
+        distributed
+        seen
       }
+    }
+  `
+}
+
+export const chatMessageAdded = () => {
+  return gql`
+    subscription chatMessageAdded($userId: ID!) {
+      chatMessageAdded(userId: $userId) {
+        _id
+        id
+        indexId
+        content
+        senderId
+        author {
+          id
+        }
+        username
+        avatar
+        date
+        room {
+          id
+        }
+        saved
+        distributed
+        seen
+      }
+    }
+  `
+}
+
+export const markMessagesAsSeen = () => {
+  return gql`
+    mutation ($messageIds: [String!]) {
+      MarkMessagesAsSeen(messageIds: $messageIds)
     }
   `
 }

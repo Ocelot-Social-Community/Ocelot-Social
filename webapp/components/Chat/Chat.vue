@@ -4,23 +4,27 @@
       <vue-advanced-chat
         :theme="theme"
         :current-user-id="currentUser.id"
-        :room-id="null"
+        :room-id="!singleRoom ? roomId : null"
         :template-actions="JSON.stringify(templatesText)"
         :menu-actions="JSON.stringify(menuActions)"
         :text-messages="JSON.stringify(textMessages)"
+        :message-actions="messageActions"
         :messages="JSON.stringify(messages)"
         :messages-loaded="messagesLoaded"
         :rooms="JSON.stringify(rooms)"
         :room-actions="JSON.stringify(roomActions)"
-        :rooms-loaded="true"
+        :rooms-loaded="roomsLoaded"
+        :loading-rooms="loadingRooms"
         show-files="false"
         show-audio="false"
         :styles="JSON.stringify(computedChatStyle)"
         :show-footer="true"
         @send-message="sendMessage($event.detail[0])"
         @fetch-messages="fetchMessages($event.detail[0])"
+        @fetch-more-rooms="fetchRooms"
         :responsive-breakpoint="responsiveBreakpoint"
         :single-room="singleRoom"
+        show-reaction-emojis="false"
         @show-demo-options="showDemoOptions = $event"
       >
         <div slot="menu-icon" @click.prevent.stop="$emit('close-single-room', true)">
@@ -31,7 +35,7 @@
 
         <div slot="room-header-avatar">
           <div
-            v-if="selectedRoom && selectedRoom.avatar && selectedRoom.avatar !== 'default-avatar'"
+            v-if="selectedRoom && selectedRoom.avatar"
             class="vac-avatar"
             :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
           />
@@ -42,7 +46,7 @@
 
         <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
           <div
-            v-if="room.avatar && room.avatar !== 'default-avatar'"
+            v-if="room.avatar"
             class="vac-avatar"
             :style="{ 'background-image': `url('${room.avatar}')` }"
           />
@@ -56,18 +60,28 @@
 </template>
 
 <script>
-import { roomQuery, createRoom } from '~/graphql/Rooms'
-import { messageQuery, createMessageMutation } from '~/graphql/Messages'
+import { roomQuery, createRoom, unreadRoomsQuery } from '~/graphql/Rooms'
+import {
+  messageQuery,
+  createMessageMutation,
+  chatMessageAdded,
+  markMessagesAsSeen,
+} from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'Chat',
   props: {
     theme: {
       type: String,
+      default: 'light',
     },
-    singleRoomId: {
+    singleRoom: {
+      type: Boolean,
+      default: false,
+    },
+    roomId: {
       type: String,
       default: null,
     },
@@ -80,28 +94,32 @@ export default {
           name: 'dummyItem',
           title: 'Just a dummy item',
         },
-        /* {
-          name: 'inviteUser',
-          title: 'Invite User',
-        },
-        {
-          name: 'removeUser',
-          title: 'Remove User',
-        },
-        {
-          name: 'deleteRoom',
-          title: 'Delete Room',
-        }, */
+        /*
+            {
+            name: 'inviteUser',
+            title: 'Invite User',
+            },
+            {
+            name: 'removeUser',
+            title: 'Remove User',
+            },
+            {
+            name: 'deleteRoom',
+            title: 'Delete Room',
+            },
+          */
       ],
       messageActions: [
-        {
-          name: 'addMessageToFavorite',
-          title: 'Add To Favorite',
-        },
-        {
-          name: 'shareMessage',
-          title: 'Share Message',
-        },
+        /*
+            {
+            name: 'addMessageToFavorite',
+            title: 'Add To Favorite',
+            },
+            {
+            name: 'shareMessage',
+            title: 'Share Message',
+            },
+          */
       ],
       templatesText: [
         {
@@ -113,7 +131,78 @@ export default {
           text: 'This is the action',
         },
       ],
-      textMessages: {
+      roomActions: [
+        /*
+            {
+            name: 'archiveRoom',
+            title: 'Archive Room',
+            },
+            { name: 'inviteUser', title: 'Invite User' },
+            { name: 'removeUser', title: 'Remove User' },
+            { name: 'deleteRoom', title: 'Delete Room' },
+          */
+      ],
+
+      showDemoOptions: true,
+      responsiveBreakpoint: 600,
+      rooms: [],
+      roomsLoaded: false,
+      roomPage: 0,
+      roomPageSize: 10,
+      selectedRoom: this.roomId,
+      loadingRooms: true,
+      messagesLoaded: false,
+      messagePage: 0,
+      messagePageSize: 20,
+      messages: [],
+    }
+  },
+  mounted() {
+    if (this.singleRoom) {
+      this.$apollo
+        .mutate({
+          mutation: createRoom(),
+          variables: {
+            userId: this.roomId,
+          },
+        })
+        .then(({ data: { CreateRoom } }) => {
+          this.fetchRooms({ room: CreateRoom })
+        })
+        .catch((error) => {
+          this.$toast.error(error)
+        })
+        .finally(() => {
+          // this.loading = false
+        })
+    } else {
+      this.fetchRooms()
+    }
+
+    // Subscriptions
+    const observer = this.$apollo.subscribe({
+      query: chatMessageAdded(),
+      variables: {
+        userId: this.currentUser.id,
+      },
+    })
+
+    observer.subscribe({
+      next: this.chatMessageAdded,
+      error(error) {
+        this.$toast.error(error)
+      },
+    })
+  },
+  computed: {
+    ...mapGetters({
+      currentUser: 'auth/user',
+    }),
+    computedChatStyle() {
+      return chatStyle.STYLE.light
+    },
+    textMessages() {
+      return {
         ROOMS_EMPTY: this.$t('chat.roomsEmpty'),
         ROOM_EMPTY: this.$t('chat.roomEmpty'),
         NEW_MESSAGES: this.$t('chat.newMessages'),
@@ -126,137 +215,170 @@ export default {
         LAST_SEEN: this.$t('chat.lastSeen'),
         IS_TYPING: this.$t('chat.isTyping'),
         CANCEL_SELECT_MESSAGE: this.$t('chat.cancelSelectMessage'),
-      },
-      roomActions: [
-        /*
-        {
-          name: 'archiveRoom',
-          title: 'Archive Room',
-        },
-        { name: 'inviteUser', title: 'Invite User' },
-        { name: 'removeUser', title: 'Remove User' },
-        { name: 'deleteRoom', title: 'Delete Room' },
-        */
-      ],
-      rooms: [],
-      messages: [],
-      messagesLoaded: true,
-      showDemoOptions: true,
-      responsiveBreakpoint: 600,
-      singleRoom: !!this.singleRoomId || false,
-      selectedRoom: null,
-    }
-  },
-  mounted() {
-    if (this.singleRoom) {
-      this.$apollo
-        .mutate({
-          mutation: createRoom(),
-          variables: {
-            userId: this.singleRoomId,
-          },
-        })
-        .then(() => {
-          this.$apollo.queries.Rooms.refetch()
-        })
-        .catch((error) => {
-          this.$toast.error(error)
-        })
-        .finally(() => {
-          // this.loading = false
-        })
-    }
-  },
-  computed: {
-    ...mapGetters({
-      currentUser: 'auth/user',
-    }),
-    computedChatStyle() {
-      // TODO light/dark theme still needed?
-      // return this.theme === 'light' ? chatStyle.STYLE.light : chatStyle.STYLE.dark
-      return chatStyle.STYLE.light
+      }
     },
   },
   methods: {
-    fetchMessages({ room, options = {} }) {
-      this.messagesLoaded = false
-      setTimeout(async () => {
-        try {
-          const {
-            data: { Message },
-          } = await this.$apollo.query({
-            query: messageQuery(),
-            variables: {
-              roomId: room.id,
-            },
-            fetchPolicy: 'no-cache',
-          })
-          this.messages = Message
-        } catch (error) {
-          this.messages = []
-          this.$toast.error(error.message)
-        }
-        this.messagesLoaded = true
+    ...mapMutations({
+      commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
+    }),
+    async fetchRooms({ room, options = {} } = {}) {
+      this.roomsLoaded = options.refetch ? this.roomsLoaded : false
+      const offset = (options.refetch ? 0 : this.roomPage) * this.roomPageSize
+      try {
+        const {
+          data: { Room },
+        } = await this.$apollo.query({
+          query: roomQuery(),
+          variables: {
+            id: room?.id,
+            first: this.roomPageSize,
+            offset,
+          },
+          fetchPolicy: 'no-cache',
+        })
 
-        this.selectedRoom = room
-      })
+        const rms = []
+        const rmsIds = []
+        ;[...Room, ...this.rooms].forEach((r) => {
+          if (!rmsIds.find((v) => v === r.id)) {
+            rms.push({
+              ...r,
+              index: r.lastMessage?.date,
+              lastMessage: {
+                ...r.lastMessage,
+                content: r.lastMessage?.content.trim().substring(0, 30),
+              },
+              users: r.users.map((u) => {
+                return { ...u, username: u.name, avatar: u.avatar?.url }
+              }),
+            })
+            rmsIds.push(r.id)
+          }
+        })
+        this.rooms = rms
+
+        if (Room.length < this.roomPageSize) {
+          this.roomsLoaded = true
+        }
+        this.roomPage += 1
+      } catch (error) {
+        this.rooms = []
+        this.$toast.error(error.message)
+      }
+      // must be set false after initial rooms are loaded and never changed again
+      this.loadingRooms = false
     },
 
-    refetchMessage(roomId) {
-      this.fetchMessages({ room: this.rooms.find((r) => r.roomId === roomId) })
+    async fetchMessages({ room, options = {} }) {
+      if (this.selectedRoom?.id !== room.id) {
+        this.messages = []
+        this.messagePage = 0
+        this.selectedRoom = room
+      }
+      this.messagesLoaded = options.refetch ? this.messagesLoaded : false
+      const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
+      try {
+        const {
+          data: { Message },
+        } = await this.$apollo.query({
+          query: messageQuery(),
+          variables: {
+            roomId: room.id,
+            first: this.messagePageSize,
+            offset,
+          },
+          fetchPolicy: 'no-cache',
+        })
+
+        const newMsgIds = Message.filter(
+          (m) => m.seen === false && m.senderId !== this.currentUser.id,
+        ).map((m) => m.id)
+        if (newMsgIds.length) {
+          const roomIndex = this.rooms.findIndex((r) => r.id === room.id)
+          const changedRoom = { ...this.rooms[roomIndex] }
+          changedRoom.unreadCount = changedRoom.unreadCount - newMsgIds.length
+          this.rooms[roomIndex] = changedRoom
+          this.$apollo
+            .mutate({
+              mutation: markMessagesAsSeen(),
+              variables: {
+                messageIds: newMsgIds,
+              },
+            })
+            .then(() => {
+              this.$apollo
+                .query({
+                  query: unreadRoomsQuery(),
+                  fetchPolicy: 'network-only',
+                })
+                .then(({ data: { UnreadRooms } }) => {
+                  this.commitUnreadRoomCount(UnreadRooms)
+                })
+            })
+        }
+
+        const msgs = []
+        ;[...this.messages, ...Message].forEach((m) => {
+          if (m.senderId !== this.currentUser.id) m.seen = true
+          m.date = new Date(m.date).toDateString()
+          msgs[m.indexId] = m
+        })
+        this.messages = msgs.filter(Boolean)
+
+        if (Message.length < this.messagePageSize) {
+          this.messagesLoaded = true
+        }
+        this.messagePage += 1
+      } catch (error) {
+        this.messages = []
+        this.$toast.error(error.message)
+      }
+    },
+
+    async chatMessageAdded({ data }) {
+      const roomIndex = this.rooms.findIndex((r) => r.id === data.chatMessageAdded.room.id)
+      const changedRoom = { ...this.rooms[roomIndex] }
+      changedRoom.lastMessage = data.chatMessageAdded
+      changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
+      changedRoom.lastMessageAt = data.chatMessageAdded.date
+      changedRoom.unreadCount++
+      this.rooms[roomIndex] = changedRoom
+      if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
+        this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
+      } else {
+        this.fetchRooms({ options: { refetch: true } })
+      }
     },
 
     async sendMessage(message) {
       try {
-        await this.$apollo.mutate({
+        const {
+          data: { CreateMessage: createdMessage },
+        } = await this.$apollo.mutate({
           mutation: createMessageMutation(),
           variables: {
             roomId: message.roomId,
             content: message.content,
           },
         })
+        const roomIndex = this.rooms.findIndex((r) => r.id === message.roomId)
+        const changedRoom = { ...this.rooms[roomIndex] }
+        changedRoom.lastMessage = createdMessage
+        changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
+        this.rooms[roomIndex] = changedRoom
       } catch (error) {
         this.$toast.error(error.message)
       }
-      this.refetchMessage(message.roomId)
+      this.fetchMessages({
+        room: this.rooms.find((r) => r.roomId === message.roomId),
+        options: { refetch: true },
+      })
     },
 
     getInitialsName(fullname) {
       if (!fullname) return
       return fullname.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
-    },
-  },
-  apollo: {
-    Rooms: {
-      query() {
-        return roomQuery()
-      },
-      update({ Room }) {
-        if (!Room) {
-          this.rooms = []
-          return
-        }
-
-        // Backend result needs mapping of the following values
-        // room[i].users[j].name -> room[i].users[j].username
-        // room[i].users[j].avatar.url -> room[i].users[j].avatar
-        // also filter rooms for the single room
-        this.rooms = Room.map((r) => {
-          return {
-            ...r,
-            users: r.users.map((u) => {
-              return { ...u, username: u.name, avatar: u.avatar?.url }
-            }),
-          }
-        }).filter((r) =>
-          this.singleRoom ? r.users.filter((u) => u.id === this.singleRoomId).length > 0 : true,
-        )
-      },
-      error(error) {
-        this.rooms = []
-        this.$toast.error(error.message)
-      },
-      fetchPolicy: 'no-cache',
     },
   },
 }

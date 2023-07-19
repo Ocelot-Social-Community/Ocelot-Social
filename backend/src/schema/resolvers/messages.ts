@@ -1,7 +1,36 @@
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import Resolver from './helpers/Resolver'
 
+import { getUnreadRoomsCount } from './rooms'
+import { pubsub, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '../../server'
+import { withFilter } from 'graphql-subscriptions'
+
+const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
+  return session.writeTransaction(async (transaction) => {
+    const setDistributedCypher = `
+      MATCH (m:Message) WHERE m.id IN $undistributedMessagesIds
+      SET m.distributed = true
+      RETURN m { .* }
+    `
+    const setDistributedTxResponse = await transaction.run(setDistributedCypher, {
+      undistributedMessagesIds,
+    })
+    const messages = await setDistributedTxResponse.records.map((record) => record.get('m'))
+    return messages
+  })
+}
+
 export default {
+  Subscription: {
+    chatMessageAdded: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
+        (payload, variables) => {
+          return payload.userId === variables.userId
+        },
+      ),
+    },
+  },
   Query: {
     Message: async (object, params, context, resolveInfo) => {
       const { roomId } = params
@@ -13,41 +42,24 @@ export default {
           id: context.user.id,
         },
       }
+
       const resolved = await neo4jgraphql(object, params, context, resolveInfo)
 
       if (resolved) {
         const undistributedMessagesIds = resolved
           .filter((msg) => !msg.distributed && msg.senderId !== context.user.id)
           .map((msg) => msg.id)
-        if (undistributedMessagesIds.length > 0) {
-          const session = context.driver.session()
-          const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-            const setDistributedCypher = `
-              MATCH (m:Message) WHERE m.id IN $undistributedMessagesIds
-              SET m.distributed = true
-              RETURN m { .* }
-            `
-            const setDistributedTxResponse = await transaction.run(setDistributedCypher, {
-              undistributedMessagesIds,
-            })
-            const messages = await setDistributedTxResponse.records.map((record) => record.get('m'))
-            return messages
-          })
-          try {
-            await writeTxResultPromise
-          } finally {
-            session.close()
+        const session = context.driver.session()
+        try {
+          if (undistributedMessagesIds.length > 0) {
+            await setMessagesAsDistributed(undistributedMessagesIds, session)
           }
-          // send subscription to author to updated the messages
+        } finally {
+          session.close()
         }
-        resolved.forEach((message) => {
-          message._id = message.id
-          if (message.senderId !== context.user.id) {
-            message.distributed = true
-          }
-        })
+        // send subscription to author to updated the messages
       }
-      return resolved
+      return resolved.reverse()
     },
   },
   Mutation: {
@@ -60,28 +72,59 @@ export default {
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const createMessageCypher = `
           MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+          OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
+          OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
+          OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
+            WHERE NOT recipientUser.id = $currentUserId
+          WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser 
           CREATE (currentUser)-[:CREATED]->(message:Message {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
-            content: $content,
+            indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
+            content: LEFT($content,2000),
             saved: true,
             distributed: false,
             seen: false
           })-[:INSIDE]->(room)
-          RETURN message { .* }
+          SET room.lastMessageAt = toString(datetime())
+          RETURN message {
+            .*,
+            indexId: toString(message.indexId),
+            recipientId: recipientUser.id,
+            senderId: currentUser.id,
+            username: currentUser.name,
+            avatar: image.url,
+            date: message.createdAt
+          }
         `
         const createMessageTxResponse = await transaction.run(createMessageCypher, {
           currentUserId,
           roomId,
           content,
         })
+
         const [message] = await createMessageTxResponse.records.map((record) =>
           record.get('message'),
         )
+
         return message
       })
       try {
         const message = await writeTxResultPromise
+        if (message) {
+          const roomCountUpdated = await getUnreadRoomsCount(message.recipientId, session)
+
+          // send subscriptions
+          void pubsub.publish(ROOM_COUNT_UPDATED, {
+            roomCountUpdated,
+            userId: message.recipientId,
+          })
+          void pubsub.publish(CHAT_MESSAGE_ADDED, {
+            chatMessageAdded: message,
+            userId: message.recipientId,
+          })
+        }
+
         return message
       } catch (error) {
         throw new Error(error)
