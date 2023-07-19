@@ -19,12 +19,13 @@
         show-audio="false"
         :styles="JSON.stringify(computedChatStyle)"
         :show-footer="true"
-        @send-message="sendMessage($event.detail[0])"
-        @fetch-messages="fetchMessages($event.detail[0])"
-        @fetch-more-rooms="fetchRooms"
         :responsive-breakpoint="responsiveBreakpoint"
         :single-room="singleRoom"
         show-reaction-emojis="false"
+        @send-message="sendMessage($event.detail[0])"
+        @fetch-messages="fetchMessages($event.detail[0])"
+        @fetch-more-rooms="fetchRooms"
+        @add-room="addRoom"
         @show-demo-options="showDemoOptions = $event"
       >
         <div slot="menu-icon" @click.prevent.stop="$emit('close-single-room', true)">
@@ -361,6 +362,10 @@ export default {
       if (!fullname) return
       return fullname.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
     },
+
+    addRoom() {
+      this.$emit('open-user-search')
+    }
   },
 }
 </script>

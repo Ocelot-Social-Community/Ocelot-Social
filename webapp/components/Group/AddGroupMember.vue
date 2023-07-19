@@ -49,6 +49,7 @@
     </ds-space>
   </div>
 </template>
+
 <script>
 import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
 import { searchUsers } from '~/graphql/Search.js'
