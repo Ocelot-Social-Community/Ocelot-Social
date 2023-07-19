@@ -1,7 +1,7 @@
 <template>
   <div class="add-chat-room-by-user-search">
     <!-- Wolle -->
-    <h2 class="title">{{ $t('group.addUser') }}</h2>
+    <h2 class="title">{{ $t('chat.addRoomHeadline') }}</h2>
     <ds-space margin-bottom="small" />
     <ds-space>
       <select-user-search :id="id" ref="selectUserSearch" @select-user="selectUser" />
