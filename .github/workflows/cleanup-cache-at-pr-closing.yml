@@ -1,0 +1,42 @@
+###############################################################################
+# A Github repo has max 10 GB of cache.
+# https://github.blog/changelog/2021-11-23-github-actions-cache-size-is-now-increased-to-10gb-per-repository/
+#
+# To avoid "cache thrashing" by their cache eviction policy it is recommended
+# to apply a cache cleanup workflow at PR closing to dele cache leftovers of
+# the current branch:
+# https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#force-deleting-cache-entries
+###############################################################################
+
+name: ocelot.social cache cleanup on pr closing
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  clean-branch-cache:
+    name: Cleanup branch cache
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Cleanup
+        run: |
+          gh extension install actions/gh-actions-cache
+          REPO=${{ github.repository }}
+          BRANCH="refs/pull/${{ github.event.pull_request.number }}/merge"
+          echo "Fetching list of cache key"
+          cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH | cut -f 1 )
+          set +e
+          echo "Deleting caches..."
+          for cacheKey in $cacheKeysForPR
+          do
+              gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
+          done
+          echo "Done"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
