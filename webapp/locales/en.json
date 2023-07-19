@@ -77,6 +77,27 @@
       }
     }
   },
+  "chat": {
+    "cancelSelectMessage": "Cancel",
+    "conversationStarted": "Conversation started on:",
+    "isOnline": "is online",
+    "isTyping": "is writing...",
+    "lastSeen": "last seen ",
+    "messageDeleted": "This message was deleted",
+    "messagesEmpty": "No messages",
+    "newMessages": "New Messages",
+    "page": {
+      "headline": "Chat"
+    },
+    "roomEmpty": "No room selected",
+    "roomsEmpty": "No rooms",
+    "search": "Filter chat rooms",
+    "typeMessage": "Type message",
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chat with “{name}”"
+    }
+  },
   "client-only": {
     "loading": "Loading …"
   },
@@ -553,6 +574,9 @@
       },
       "groups": "Groups",
       "myProfile": "My profile"
+    },
+    "chat": {
+      "tooltip": "My chats"
     }
   },
   "index": {
@@ -596,9 +620,16 @@
     "button": {
       "tooltip": "Show map"
     },
+    "legend": {
+      "event": "Event",
+      "group": "Group",
+      "theUser": "My position",
+      "user": "User"
+    },
     "markerTypes": {
+      "event": "event",
       "group": "group",
-      "theUser": "your position",
+      "theUser": "my position",
       "user": "user"
     },
     "pageTitle": "Map",
@@ -692,10 +723,6 @@
       "unread": "Unread"
     },
     "group": "Description",
-    "headerMenuButton": {
-      "chat": "My Chat",
-      "tooltip": "My notifications"
-    },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
     "post": "Post or Group",
@@ -709,11 +736,6 @@
       "user_left_group": "Left your group …"
     },
     "title": "Notifications",
-    "user": "User"
-  },
-  "position": {
-    "group": "Group",
-    "my": "My position",
     "user": "User"
   },
   "post": {
@@ -760,9 +782,9 @@
     "viewEvent": {
       "eventEnd": "End",
       "eventIsOnline": "Online",
-      "eventLocationName": "City",
+      "eventLocationName": "City - e.g. Example street 1, 12345 City",
       "eventStart": "Start",
-      "eventVenue": "Venue",
+      "eventVenue": "Venue - e.g. Backyard, 1st Floor, ...",
       "title": "Event"
     },
     "viewPost": {

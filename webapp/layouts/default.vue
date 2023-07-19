@@ -13,34 +13,42 @@
     <client-only>
       <modal />
     </client-only>
-    <div v-if="$store.getters['chat/showChat'].showChat" class="chat-modul">
-      <ds-text align="right" class="close">
-        RoomID: {{ $store.getters['chat/showChat'].roomID }}
-        <ds-button @click="$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: null })">
-          x
-        </ds-button>
-      </ds-text>
-      <chat-module :singleRoomId="$store.getters['chat/showChat'].roomID" />
+    <div v-if="getShowChat.showChat" class="chat-modul">
+      <chat singleRoom :roomId="getShowChat.roomID" @close-single-room="closeSingleRoom" />
     </div>
-    >
   </div>
 </template>
+
 <script>
+import { mapGetters, mapMutations } from 'vuex'
 import seo from '~/mixins/seo'
 import mobile from '~/mixins/mobile'
 import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
 import Modal from '~/components/Modal'
 import PageFooter from '~/components/PageFooter/PageFooter'
-import ChatModule from '~/components/Chat/Chat.vue'
+import Chat from '~/components/Chat/Chat.vue'
 
 export default {
   components: {
     HeaderMenu,
     Modal,
     PageFooter,
-    ChatModule,
+    Chat,
   },
   mixins: [seo, mobile()],
+  computed: {
+    ...mapGetters({
+      getShowChat: 'chat/showChat',
+    }),
+  },
+  methods: {
+    ...mapMutations({
+      showChat: 'chat/SET_OPEN_CHAT',
+    }),
+    closeSingleRoom() {
+      this.showChat({ showChat: false, roomID: null })
+    },
+  },
   beforeCreate() {
     this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: null })
   },
@@ -58,7 +66,6 @@ export default {
 
 .chat-modul {
   background-color: rgb(233, 228, 228);
-  height: 667px;
   width: 355px;
   position: fixed;
   bottom: 45px;
