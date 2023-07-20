@@ -257,17 +257,7 @@ export default {
         const rmsIds = []
         ;[...Room, ...this.rooms].forEach((r) => {
           if (!rmsIds.find((v) => v === r.id)) {
-            rms.push({
-              ...r,
-              index: r.lastMessage?.date,
-              lastMessage: r.lastMessage ? {
-                ...r.lastMessage,
-                content: r.lastMessage?.content?.trim().substring(0, 30),
-              }: null,
-              users: r.users.map((u) => {
-                return { ...u, username: u.name, avatar: u.avatar?.url }
-              }),
-            })
+            rms.push(this.fixRoomObject(r))
             rmsIds.push(r.id)
           }
         })
@@ -388,6 +378,10 @@ export default {
         const changedRoom = { ...this.rooms[roomIndex] }
         changedRoom.lastMessage = createdMessage
         changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
+        // move current room to top (not 100% working)
+        // const rooms = [...this.rooms]
+        // rooms.splice(roomIndex,1)
+        // this.rooms = [changedRoom, ...rooms]
         this.rooms[roomIndex] = changedRoom
       } catch (error) {
         this.$toast.error(error.message)
@@ -407,6 +401,26 @@ export default {
       this.$emit('toggle-user-search')
     },
 
+    fixRoomObject(room){
+      // This fixes the room object which arrives from the backend
+      const fixedRoom = {
+        ...room,
+        index: room.lastMessage?.date,
+        lastMessage: room.lastMessage ? {
+          ...room.lastMessage,
+          content: room.lastMessage?.content?.trim().substring(0, 30),
+        }: null,
+        users: room.users.map((u) => {
+          return { ...u, username: u.name, avatar: u.avatar?.url }
+        })
+      }
+      if(!fixedRoom.avatar){
+        // as long as we cannot query avatar on CreateRoom
+        fixedRoom.avatar = fixedRoom.users.find((u) => u.id !== this.currentUser.id).avatar
+      }
+      return fixedRoom
+    },
+
     newRoom(userId) {
       this.$apollo
         .mutate({
@@ -417,17 +431,7 @@ export default {
         })
         .then(({ data: { CreateRoom } }) => {
           const roomIndex = this.rooms.findIndex((r) => r.id === CreateRoom.roomId)
-          const room = {...CreateRoom, index: CreateRoom.lastMessage?.date, lastMessage: CreateRoom.lastMessage ? {
-                ...CreateRoom.lastMessage,
-                content: CreateRoom.lastMessage?.content?.trim().substring(0, 30),
-              }: null,
-              users: CreateRoom.users.map((u) => {
-                return { ...u, username: u.name, avatar: u.avatar?.url }
-              })
-            }
-
-          // as long as we cannot query avatar on CreateRoom
-          room.avatar = room.users.find((u) => u.id === this.currentUser.id).avatar
+          const room = this.fixRoomObject(CreateRoom)
 
           if(roomIndex === -1){
             this.rooms = [room, ...this.rooms]
