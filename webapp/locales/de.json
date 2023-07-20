@@ -78,6 +78,7 @@
     }
   },
   "chat": {
+    "addRoomHeadline": "Suche Nutzer für neuen Chat",
     "cancelSelectMessage": "Abbrechen",
     "conversationStarted": "Unterhaltung startete am:",
     "isOnline": "online",
@@ -86,9 +87,12 @@
     "messageDeleted": "Diese Nachricht wuerde gelöscht",
     "messagesEmpty": "Keine Nachrichten",
     "newMessages": "Neue Nachrichten",
+    "page": {
+      "headline": "Chat"
+    },
     "roomEmpty": "Keinen Raum selektiert",
     "roomsEmpty": "Keine Räume",
-    "search": "Suche",
+    "search": "Chat-Räume filtern",
     "typeMessage": "Nachricht schreiben",
     "userProfileButton": {
       "label": "Chat",

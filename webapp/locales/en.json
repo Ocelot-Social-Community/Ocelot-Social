@@ -78,6 +78,7 @@
     }
   },
   "chat": {
+    "addRoomHeadline": "Search User for new Chat",
     "cancelSelectMessage": "Cancel",
     "conversationStarted": "Conversation started on:",
     "isOnline": "is online",
@@ -86,9 +87,12 @@
     "messageDeleted": "This message was deleted",
     "messagesEmpty": "No messages",
     "newMessages": "New Messages",
+    "page": {
+      "headline": "Chat"
+    },
     "roomEmpty": "No room selected",
     "roomsEmpty": "No rooms",
-    "search": "Search",
+    "search": "Filter chat rooms",
     "typeMessage": "Type message",
     "userProfileButton": {
       "label": "Chat",
@@ -472,7 +476,7 @@
     "addMemberToGroupSuccess": "“{name}” was added to the group with the role “{role}”!",
     "addUser": "Add User",
     "addUserNoOptions": "No users found!",
-    "addUserPlaceholder": " Username",
+    "addUserPlaceholder": "User name",
     "allGroups": "All Groups",
     "button": {
       "tooltip": "Show groups"

@@ -1,7 +1,9 @@
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import Resolver from './helpers/Resolver'
+
 import { getUnreadRoomsCount } from './rooms'
-import { pubsub, ROOM_COUNT_UPDATED } from '../../server'
+import { pubsub, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '../../server'
+import { withFilter } from 'graphql-subscriptions'
 
 const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
   return session.writeTransaction(async (transaction) => {
@@ -19,6 +21,16 @@ const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
 }
 
 export default {
+  Subscription: {
+    chatMessageAdded: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
+        (payload, variables) => {
+          return payload.userId === variables.userId
+        },
+      ),
+    },
+  },
   Query: {
     Message: async (object, params, context, resolveInfo) => {
       const { roomId } = params
@@ -69,7 +81,7 @@ export default {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
             indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
-            content: $content,
+            content: LEFT($content,2000),
             saved: true,
             distributed: false,
             seen: false
@@ -77,6 +89,7 @@ export default {
           SET room.lastMessageAt = toString(datetime())
           RETURN message {
             .*,
+            indexId: toString(message.indexId),
             recipientId: recipientUser.id,
             senderId: currentUser.id,
             username: currentUser.name,
@@ -102,8 +115,12 @@ export default {
           const roomCountUpdated = await getUnreadRoomsCount(message.recipientId, session)
 
           // send subscriptions
-          await pubsub.publish(ROOM_COUNT_UPDATED, {
+          void pubsub.publish(ROOM_COUNT_UPDATED, {
             roomCountUpdated,
+            userId: message.recipientId,
+          })
+          void pubsub.publish(CHAT_MESSAGE_ADDED, {
+            chatMessageAdded: message,
             userId: message.recipientId,
           })
         }
