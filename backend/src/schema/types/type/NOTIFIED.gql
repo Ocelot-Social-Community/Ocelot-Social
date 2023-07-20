@@ -38,5 +38,5 @@ type Mutation {
 }
 
 type Subscription {
-  notificationAdded(userId: ID!): NOTIFIED
+  notificationAdded: NOTIFIED
 }
