@@ -405,7 +405,7 @@ export default {
       // This fixes the room object which arrives from the backend
       const fixedRoom = {
         ...room,
-        index: room.lastMessage? room.lastMessage.date : room.createdAt,
+        index: room.lastMessage ? room.lastMessage.date : room.createdAt,
         lastMessage: room.lastMessage
           ? {
               ...room.lastMessage,
