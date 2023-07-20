@@ -1,7 +1,10 @@
 <template>
   <div class="add-chat-room-by-user-search">
     <!-- Wolle -->
-    <h2 class="title">{{ $t('chat.addRoomHeadline') }}</h2>
+    <ds-flex class="headline">
+      <h2 class="title">{{ $t('chat.addRoomHeadline') }}</h2>
+      <base-button class="close-button" icon="close" circle @click="closeUserSearch"/>
+    </ds-flex>
     <ds-space margin-bottom="small" />
     <ds-space>
       <select-user-search :id="id" ref="selectUserSearch" @select-user="selectUser" />
@@ -15,7 +18,7 @@ import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSe
 export default {
   name: 'AddChatRoomByUserSearch',
   components: {
-    SelectUserSearch,
+    SelectUserSearch
   },
   props: {
     // chatRooms: {
@@ -44,6 +47,9 @@ export default {
     async addChatRoom(userId) {
       this.$emit('add-chat-room', userId)
     },
+    closeUserSearch() {
+      this.$emit('close-user-search')
+    },
   },
 }
 </script>
@@ -52,5 +58,11 @@ export default {
 .add-chat-room-by-user-search {
   background-color: white;
   padding: $space-base;
+}
+.ds-flex.headline {
+  justify-content: space-between;
+}
+.ds-flex.headline .close-button {
+  margin-top: -6px;
 }
 </style>
