@@ -44,11 +44,6 @@ export default {
       },
       subscribeToMore: {
         document: roomCountUpdated(),
-        variables() {
-          return {
-            userId: this.user.id,
-          }
-        },
         updateQuery: (previousResult, { subscriptionData }) => {
           return { UnreadRooms: subscriptionData.data.roomCountUpdated }
         },

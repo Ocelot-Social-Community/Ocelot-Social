@@ -7,8 +7,8 @@ export default {
     notificationAdded: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(NOTIFICATION_ADDED),
-        (payload, variables) => {
-          return payload.notificationAdded.to.id === variables.userId
+        (payload, variables, context) => {
+          return payload.notificationAdded.to.id === context.user?.id
         },
       ),
     },
