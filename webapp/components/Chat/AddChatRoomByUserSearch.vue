@@ -2,7 +2,7 @@
   <div class="add-chat-room-by-user-search">
     <ds-flex class="headline">
       <h2 class="title">{{ $t('chat.addRoomHeadline') }}</h2>
-      <base-button class="close-button" icon="close" circle @click="closeUserSearch"/>
+      <base-button class="close-button" icon="close" circle @click="closeUserSearch" />
     </ds-flex>
     <ds-space margin-bottom="small" />
     <ds-space>
@@ -17,7 +17,7 @@ import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSe
 export default {
   name: 'AddChatRoomByUserSearch',
   components: {
-    SelectUserSearch
+    SelectUserSearch,
   },
   props: {
     // chatRooms: {

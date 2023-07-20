@@ -48,7 +48,7 @@ export default {
     },
     showRoom(roomId) {
       this.showChat({ showChat: true, roomID: roomId })
-    }
+    },
   },
 }
 </script>
