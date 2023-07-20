@@ -260,10 +260,10 @@ export default {
             rms.push({
               ...r,
               index: r.lastMessage?.date,
-              lastMessage: {
+              lastMessage: r.lastMessage ? {
                 ...r.lastMessage,
                 content: r.lastMessage?.content?.trim().substring(0, 30),
-              },
+              }: null,
               users: r.users.map((u) => {
                 return { ...u, username: u.name, avatar: u.avatar?.url }
               }),
@@ -416,8 +416,23 @@ export default {
           },
         })
         .then(({ data: { CreateRoom } }) => {
-          this.fetchRooms({ room: CreateRoom, options: { refetch: true } })
-          this.selectedRoom = CreateRoom
+          const roomIndex = this.rooms.findIndex((r) => r.id === CreateRoom.roomId)
+          const room = {...CreateRoom, index: CreateRoom.lastMessage?.date, lastMessage: CreateRoom.lastMessage ? {
+                ...CreateRoom.lastMessage,
+                content: CreateRoom.lastMessage?.content?.trim().substring(0, 30),
+              }: null,
+              users: CreateRoom.users.map((u) => {
+                return { ...u, username: u.name, avatar: u.avatar?.url }
+              })
+            }
+
+          // as long as we cannot query avatar on CreateRoom
+          room.avatar = room.users.find((u) => u.id === this.currentUser.id).avatar
+
+          if(roomIndex === -1){
+            this.rooms = [room, ...this.rooms]
+          }
+          this.fetchMessages({room, options: { refetch: true }})
           this.$emit('show-chat', CreateRoom.id)
         })
         .catch((error) => {
