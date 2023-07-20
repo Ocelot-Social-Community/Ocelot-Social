@@ -261,7 +261,7 @@ export default {
               index: r.lastMessage?.date,
               lastMessage: {
                 ...r.lastMessage,
-                content: r.lastMessage?.content.trim().substring(0, 30),
+                content: r.lastMessage?.content?.trim().substring(0, 30),
               },
               users: r.users.map((u) => {
                 return { ...u, username: u.name, avatar: u.avatar?.url }
@@ -415,7 +415,7 @@ export default {
           },
         })
         .then(({ data: { CreateRoom } }) => {
-          this.fetchRooms({ room: CreateRoom })
+          this.fetchRooms({ room: CreateRoom, options: { refetch: true } })
         })
         .catch((error) => {
           this.$toast.error(error)
