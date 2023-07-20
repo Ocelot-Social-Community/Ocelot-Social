@@ -46,5 +46,5 @@ type Query {
 }
 
 type Subscription {
-  chatMessageAdded(userId: ID!): Message
+  chatMessageAdded: Message
 }

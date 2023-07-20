@@ -195,9 +195,6 @@ export default {
     // Subscriptions
     const observer = this.$apollo.subscribe({
       query: chatMessageAdded(),
-      variables: {
-        userId: this.currentUser.id,
-      },
     })
 
     observer.subscribe({
