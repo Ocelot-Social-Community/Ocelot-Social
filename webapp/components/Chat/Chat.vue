@@ -419,7 +419,7 @@ export default {
           this.fetchRooms({ room: CreateRoom, options: { refetch: true } })
         })
         .catch((error) => {
-          this.$toast.error(error)
+          this.$toast.error(error.message)
         })
         .finally(() => {
           // this.loading = false
