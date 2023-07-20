@@ -7,6 +7,7 @@ export const createRoom = () => gql`
       roomId
       roomName
       lastMessageAt
+      createdAt
       unreadCount
       #avatar
       users {
@@ -29,6 +30,7 @@ export const roomQuery = () => gql`
       roomName
       avatar
       lastMessageAt
+      createdAt
       unreadCount
       lastMessage {
         _id

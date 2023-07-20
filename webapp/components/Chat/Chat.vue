@@ -257,7 +257,7 @@ export default {
         const rmsIds = []
         ;[...Room, ...this.rooms].forEach((r) => {
           if (!rmsIds.find((v) => v === r.id)) {
-            rms.push(this.fixRoomObject(r))
+            rms.unshift(this.fixRoomObject(r))
             rmsIds.push(r.id)
           }
         })
@@ -405,7 +405,7 @@ export default {
       // This fixes the room object which arrives from the backend
       const fixedRoom = {
         ...room,
-        index: room.lastMessage?.date,
+        index: room.lastMessage? room.lastMessage.date : room.createdAt,
         lastMessage: room.lastMessage
           ? {
               ...room.lastMessage,
