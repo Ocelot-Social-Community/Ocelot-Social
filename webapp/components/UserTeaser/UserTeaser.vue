@@ -96,7 +96,7 @@ export default {
     groupLink() {
       const { id, slug } = this.group
       if (!(id && slug)) return ''
-      return { name: 'group-id-slug', params: { slug, id } }
+      return { name: 'groups-id-slug', params: { slug, id } }
     },
     groupSlug() {
       const { slug } = this.group || {}
