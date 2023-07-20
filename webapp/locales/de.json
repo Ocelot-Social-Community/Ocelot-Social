@@ -901,7 +901,7 @@
       "Tag": "Hashtag ::: Hashtags",
       "User": "Nutzer ::: Nutzer"
     },
-    "hint": "Wonach suchst Du? Nutze !… für Beiträge, @… für Mitglieder, &… für Gruppen, #… für Hashtags",
+    "hint": "!... sucht Beiträge, @... sucht Nutzer, &... sucht Gruppen, #… sucht Hashtags",
     "no-results": "Keine Ergebnisse für \"{search}\" gefunden. Versuch' es mit einem anderen Begriff!",
     "page": "Seite",
     "placeholder": "Suchen",
