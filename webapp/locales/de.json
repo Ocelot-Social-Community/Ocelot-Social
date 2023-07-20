@@ -78,6 +78,7 @@
     }
   },
   "chat": {
+    "addRoomHeadline": "Suche Nutzer für neuen Chat",
     "cancelSelectMessage": "Abbrechen",
     "conversationStarted": "Unterhaltung startete am:",
     "isOnline": "online",
