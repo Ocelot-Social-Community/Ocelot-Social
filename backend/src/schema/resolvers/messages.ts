@@ -81,7 +81,7 @@ export default {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
             indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
-            content: $content,
+            content: LEFT($content,2000),
             saved: true,
             distributed: false,
             seen: false

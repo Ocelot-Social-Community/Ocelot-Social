@@ -24,7 +24,7 @@ const options = {
     }
   `,
   message: 'error-pages.group-not-found',
-  path: 'group',
+  path: 'groups',
 }
 const persistentLinks = PersistentLinks(options)
 
