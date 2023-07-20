@@ -1,6 +1,5 @@
 <template>
   <div class="add-chat-room-by-user-search">
-    <!-- Wolle -->
     <ds-flex class="headline">
       <h2 class="title">{{ $t('chat.addRoomHeadline') }}</h2>
       <base-button class="close-button" icon="close" circle @click="closeUserSearch"/>

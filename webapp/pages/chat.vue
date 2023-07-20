@@ -6,7 +6,6 @@
       @add-chat-room="addChatRoom"
       @close-user-search="showUserSearch = false"
     />
-    <!-- Wolle :chatRooms="chatRooms" -->
     <ds-space margin-bottom="small" />
     <chat
       :roomId="getShowChat.showChat ? getShowChat.roomID : null"
@@ -30,7 +29,6 @@ export default {
   data() {
     return {
       showUserSearch: false,
-      // excludeUsers: [] // Wolle
     }
   },
   mounted() {
