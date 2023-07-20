@@ -417,7 +417,7 @@ export default {
         })
         .then(({ data: { CreateRoom } }) => {
           this.fetchRooms({ room: CreateRoom, options: { refetch: true } })
-          this.roomId = CreateRoom.id
+          this.selectedRoom = CreateRoom
           this.$emit('show-chat', CreateRoom.id)
         })
         .catch((error) => {
