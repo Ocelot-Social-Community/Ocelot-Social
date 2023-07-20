@@ -58,7 +58,7 @@ const STYLE = {
 
     message: {
       background: styleData.chatMessageBgOthers,
-      backgroundMe: styleData.chatMessageBgMe,
+      backgroundMe: styleData.colorPrimaryLight,
       color: styleData.chatMessageColor,
       colorStarted: '#9ca6af',
       backgroundDeleted: '#dadfe2',
