@@ -7,7 +7,7 @@
     <ds-space>
       <!-- create group -->
       <ds-space centered>
-        <nuxt-link :to="{ name: 'group-create' }">
+        <nuxt-link :to="{ name: 'groups-create' }">
           <base-button
             class="group-add-button"
             icon="plus"

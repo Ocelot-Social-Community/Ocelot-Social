@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import groups from './groups.vue'
+import groups from './index.vue'
 
 const localVue = global.localVue
 
