@@ -19,12 +19,13 @@
         show-audio="false"
         :styles="JSON.stringify(computedChatStyle)"
         :show-footer="true"
-        @send-message="sendMessage($event.detail[0])"
-        @fetch-messages="fetchMessages($event.detail[0])"
-        @fetch-more-rooms="fetchRooms"
         :responsive-breakpoint="responsiveBreakpoint"
         :single-room="singleRoom"
         show-reaction-emojis="false"
+        @send-message="sendMessage($event.detail[0])"
+        @fetch-messages="fetchMessages($event.detail[0])"
+        @fetch-more-rooms="fetchRooms"
+        @add-room="toggleUserSearch"
         @show-demo-options="showDemoOptions = $event"
       >
         <div
@@ -172,22 +173,7 @@ export default {
   },
   mounted() {
     if (this.singleRoom) {
-      this.$apollo
-        .mutate({
-          mutation: createRoom(),
-          variables: {
-            userId: this.roomId,
-          },
-        })
-        .then(({ data: { CreateRoom } }) => {
-          this.fetchRooms({ room: CreateRoom })
-        })
-        .catch((error) => {
-          this.$toast.error(error)
-        })
-        .finally(() => {
-          // this.loading = false
-        })
+      this.newRoom(this.roomId)
     } else {
       this.fetchRooms()
     }
@@ -250,9 +236,10 @@ export default {
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
       commitRoomIdFromSingleRoom: 'chat/UPDATE_ROOM_ID',
     }),
-    async fetchRooms({ room, options = {} } = {}) {
-      this.roomsLoaded = options.refetch ? this.roomsLoaded : false
-      const offset = (options.refetch ? 0 : this.roomPage) * this.roomPageSize
+
+    async fetchRooms({ room } = {}) {
+      this.roomsLoaded = false
+      const offset = this.roomPage * this.roomPageSize
       try {
         const {
           data: { Room },
@@ -270,17 +257,7 @@ export default {
         const rmsIds = []
         ;[...Room, ...this.rooms].forEach((r) => {
           if (!rmsIds.find((v) => v === r.id)) {
-            rms.push({
-              ...r,
-              index: r.lastMessage?.date,
-              lastMessage: {
-                ...r.lastMessage,
-                content: r.lastMessage?.content.trim().substring(0, 30),
-              },
-              users: r.users.map((u) => {
-                return { ...u, username: u.name, avatar: u.avatar?.url }
-              }),
-            })
+            rms.push(this.fixRoomObject(r))
             rmsIds.push(r.id)
           }
         })
@@ -401,6 +378,10 @@ export default {
         const changedRoom = { ...this.rooms[roomIndex] }
         changedRoom.lastMessage = createdMessage
         changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
+        // move current room to top (not 100% working)
+        // const rooms = [...this.rooms]
+        // rooms.splice(roomIndex,1)
+        // this.rooms = [changedRoom, ...rooms]
         this.rooms[roomIndex] = changedRoom
       } catch (error) {
         this.$toast.error(error.message)
@@ -414,6 +395,58 @@ export default {
     getInitialsName(fullname) {
       if (!fullname) return
       return fullname.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
+    },
+
+    toggleUserSearch() {
+      this.$emit('toggle-user-search')
+    },
+
+    fixRoomObject(room) {
+      // This fixes the room object which arrives from the backend
+      const fixedRoom = {
+        ...room,
+        index: room.lastMessage ? room.lastMessage.date : room.createdAt,
+        lastMessage: room.lastMessage
+          ? {
+              ...room.lastMessage,
+              content: room.lastMessage?.content?.trim().substring(0, 30),
+            }
+          : null,
+        users: room.users.map((u) => {
+          return { ...u, username: u.name, avatar: u.avatar?.url }
+        }),
+      }
+      if (!fixedRoom.avatar) {
+        // as long as we cannot query avatar on CreateRoom
+        fixedRoom.avatar = fixedRoom.users.find((u) => u.id !== this.currentUser.id).avatar
+      }
+      return fixedRoom
+    },
+
+    newRoom(userId) {
+      this.$apollo
+        .mutate({
+          mutation: createRoom(),
+          variables: {
+            userId,
+          },
+        })
+        .then(({ data: { CreateRoom } }) => {
+          const roomIndex = this.rooms.findIndex((r) => r.id === CreateRoom.roomId)
+          const room = this.fixRoomObject(CreateRoom)
+
+          if (roomIndex === -1) {
+            this.rooms = [room, ...this.rooms]
+          }
+          this.fetchMessages({ room, options: { refetch: true } })
+          this.$emit('show-chat', CreateRoom.id)
+        })
+        .catch((error) => {
+          this.$toast.error(error.message)
+        })
+        .finally(() => {
+          // this.loading = false
+        })
     },
   },
 }
