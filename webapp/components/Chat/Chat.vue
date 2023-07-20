@@ -401,20 +401,22 @@ export default {
       this.$emit('toggle-user-search')
     },
 
-    fixRoomObject(room){
+    fixRoomObject(room) {
       // This fixes the room object which arrives from the backend
       const fixedRoom = {
         ...room,
         index: room.lastMessage?.date,
-        lastMessage: room.lastMessage ? {
-          ...room.lastMessage,
-          content: room.lastMessage?.content?.trim().substring(0, 30),
-        }: null,
+        lastMessage: room.lastMessage
+          ? {
+              ...room.lastMessage,
+              content: room.lastMessage?.content?.trim().substring(0, 30),
+            }
+          : null,
         users: room.users.map((u) => {
           return { ...u, username: u.name, avatar: u.avatar?.url }
-        })
+        }),
       }
-      if(!fixedRoom.avatar){
+      if (!fixedRoom.avatar) {
         // as long as we cannot query avatar on CreateRoom
         fixedRoom.avatar = fixedRoom.users.find((u) => u.id !== this.currentUser.id).avatar
       }
@@ -433,10 +435,10 @@ export default {
           const roomIndex = this.rooms.findIndex((r) => r.id === CreateRoom.roomId)
           const room = this.fixRoomObject(CreateRoom)
 
-          if(roomIndex === -1){
+          if (roomIndex === -1) {
             this.rooms = [room, ...this.rooms]
           }
-          this.fetchMessages({room, options: { refetch: true }})
+          this.fetchMessages({ room, options: { refetch: true } })
           this.$emit('show-chat', CreateRoom.id)
         })
         .catch((error) => {
