@@ -56,7 +56,7 @@
         >
           {{ isEditing ? $t('actions.save') : texts.addButton }}
         </base-button>
-        <base-button v-if="isEditing" id="cancel" danger @click="handleCancel()">
+        <base-button v-if="isEditing" id="cancel" @click="handleCancel()">
           {{ $t('actions.cancel') }}
         </base-button>
       </ds-space>
