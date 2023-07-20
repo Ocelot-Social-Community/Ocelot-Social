@@ -2,24 +2,30 @@
   <filter-menu-section class="order-by-filter" :title="sectionTitle" :divider="false">
     <template #filter-list>
       <li class="item">
-        <labeled-button
+        <base-button
           icon="sort-amount-asc"
           :label="buttonLabel('desc')"
           :filled="orderBy === orderedDesc"
           :title="buttonTitle('desc')"
           @click="toggleOrder(orderedDesc)"
           data-test="newest-button"
-        />
+          size="small"
+        >
+          {{ buttonLabel('desc') }}
+        </base-button>
       </li>
       <li class="item">
-        <labeled-button
+        <base-button
           icon="sort-amount-desc"
           :label="buttonLabel('asc')"
           :filled="orderBy === orderedAsc"
           :title="buttonTitle('asc')"
           @click="toggleOrder(orderedAsc)"
           data-test="oldest-button"
-        />
+          size="small"
+        >
+          {{ buttonTitle('asc') }}
+        </base-button>
       </li>
     </template>
   </filter-menu-section>
@@ -28,13 +34,11 @@
 <script>
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
-import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
 
 export default {
   name: 'OrderByFilter',
   components: {
-    FilterMenuSection,
-    LabeledButton,
+    FilterMenuSection
   },
   computed: {
     ...mapGetters({

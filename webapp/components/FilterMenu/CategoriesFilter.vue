@@ -84,7 +84,7 @@ export default {
 </script>
 <style lang="scss">
 .category-filter-list {
-  margin-left: $space-xx-large;
+  margin-left: $space-xx-small;
 
   > .base-button {
     margin-right: $space-xx-small;

@@ -2,7 +2,7 @@
   <filter-menu-section
     :title="$t('filter-menu.post-type')"
     :divider="false"
-    class="following-filter"
+    class="following-filter post-type-filter"
   >
     <template #filter-follower>
       <li class="item all-item">
@@ -61,3 +61,11 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.post-type-filter {  
+  & .item {
+    margin-right: $space-base;
+  }
+}
+</style>
