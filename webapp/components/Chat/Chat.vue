@@ -4,7 +4,7 @@
       <vue-advanced-chat
         :theme="theme"
         :current-user-id="currentUser.id"
-        :room-id="!singleRoom ? roomId : null"
+        :room-id="computedRoomId"
         :template-actions="JSON.stringify(templatesText)"
         :menu-actions="JSON.stringify(menuActions)"
         :text-messages="JSON.stringify(textMessages)"
@@ -27,10 +27,28 @@
         show-reaction-emojis="false"
         @show-demo-options="showDemoOptions = $event"
       >
-        <div slot="menu-icon" @click.prevent.stop="$emit('close-single-room', true)">
-          <div v-if="singleRoom">
-            <ds-icon name="close"></ds-icon>
-          </div>
+        <div
+          v-if="selectedRoom && selectedRoom.roomId"
+          slot="room-options"
+          class="chat-room-options"
+        >
+          <ds-flex v-if="singleRoom">
+            <ds-flex-item centered class="single-chat-bubble">
+              <nuxt-link :to="{ name: 'chat' }">
+                <base-icon name="chat-bubble" />
+              </nuxt-link>
+            </ds-flex-item>
+            <ds-flex-item centered>
+              <div
+                class="vac-svg-button vac-room-options"
+                @click="$emit('close-single-room', true)"
+              >
+                <slot name="menu-icon">
+                  <ds-icon name="close" />
+                </slot>
+              </div>
+            </ds-flex-item>
+          </ds-flex>
         </div>
 
         <div slot="room-header-avatar">
@@ -89,11 +107,6 @@ export default {
   data() {
     return {
       menuActions: [
-        // NOTE: if menuActions is empty, the related slot is not shown
-        {
-          name: 'dummyItem',
-          title: 'Just a dummy item',
-        },
         /*
             {
             name: 'inviteUser',
@@ -197,9 +210,23 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
+      getStoreRoomId: 'chat/roomID',
     }),
     computedChatStyle() {
       return chatStyle.STYLE.light
+    },
+    computedRoomId() {
+      let roomId = null
+
+      if (!this.singleRoom) {
+        roomId = this.roomId
+
+        if (this.getStoreRoomId.roomId) {
+          roomId = this.getStoreRoomId.roomId
+        }
+      }
+
+      return roomId
     },
     textMessages() {
       return {
@@ -221,6 +248,7 @@ export default {
   methods: {
     ...mapMutations({
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
+      commitRoomIdFromSingleRoom: 'chat/UPDATE_ROOM_ID',
     }),
     async fetchRooms({ room, options = {} } = {}) {
       this.roomsLoaded = options.refetch ? this.roomsLoaded : false
@@ -262,6 +290,13 @@ export default {
           this.roomsLoaded = true
         }
         this.roomPage += 1
+
+        if (this.singleRoom && this.rooms.length > 0) {
+          this.commitRoomIdFromSingleRoom(this.rooms[0].roomId)
+        } else if (this.getStoreRoomId.roomId) {
+          // reset store room id
+          this.commitRoomIdFromSingleRoom(null)
+        }
       } catch (error) {
         this.rooms = []
         this.$toast.error(error.message)
@@ -407,5 +442,9 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
   }
+}
+
+.ds-flex-item.single-chat-bubble {
+  margin-right: 1em;
 }
 </style>
