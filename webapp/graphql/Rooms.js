@@ -5,6 +5,18 @@ export const createRoom = () => gql`
     CreateRoom(userId: $userId) {
       id
       roomId
+      roomName
+      lastMessageAt
+      unreadCount
+      #avatar
+      users {
+        _id
+        id
+        name
+        avatar {
+          url
+        }
+      }
     }
   }
 `

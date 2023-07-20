@@ -12,6 +12,7 @@
       :roomId="getShowChat.showChat ? getShowChat.roomID : null"
       ref="chat"
       @toggle-user-search="showUserSearch = !showUserSearch"
+      :show-room="showRoom"
     />
   </div>
 </template>
@@ -47,6 +48,9 @@ export default {
     addChatRoom(userID) {
       this.$refs.chat.newRoom(userID)
     },
+    showRoom(roomId) {
+      this.showChat({ showChat: true, roomID: roomId })
+    }
   },
 }
 </script>

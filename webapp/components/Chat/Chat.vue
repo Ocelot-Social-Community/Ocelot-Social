@@ -417,6 +417,8 @@ export default {
         })
         .then(({ data: { CreateRoom } }) => {
           this.fetchRooms({ room: CreateRoom, options: { refetch: true } })
+          this.roomId = CreateRoom.id
+          this.$emit('show-chat', CreateRoom.id)
         })
         .catch((error) => {
           this.$toast.error(error.message)
