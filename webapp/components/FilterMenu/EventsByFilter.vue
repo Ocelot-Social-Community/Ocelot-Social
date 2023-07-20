@@ -38,7 +38,7 @@ import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 export default {
   name: 'EventsByFilter',
   components: {
-    FilterMenuSection
+    FilterMenuSection,
   },
   computed: {
     ...mapGetters({

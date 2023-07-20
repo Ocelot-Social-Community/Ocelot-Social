@@ -63,7 +63,7 @@ export default {
 </script>
 
 <style lang="scss">
-.post-type-filter {  
+.post-type-filter {
   & .item {
     margin-right: $space-base;
   }
