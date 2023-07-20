@@ -476,7 +476,7 @@
     "addMemberToGroupSuccess": "“{name}” was added to the group with the role “{role}”!",
     "addUser": "Add User",
     "addUserNoOptions": "No users found!",
-    "addUserPlaceholder": " User name",
+    "addUserPlaceholder": "User name",
     "allGroups": "All Groups",
     "button": {
       "tooltip": "Show groups"

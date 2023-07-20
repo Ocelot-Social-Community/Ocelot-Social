@@ -25,7 +25,7 @@
         @send-message="sendMessage($event.detail[0])"
         @fetch-messages="fetchMessages($event.detail[0])"
         @fetch-more-rooms="fetchRooms"
-        @add-room="addRoom"
+        @add-room="toggleUserSearch"
         @show-demo-options="showDemoOptions = $event"
       >
         <div
@@ -236,9 +236,10 @@ export default {
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
       commitRoomIdFromSingleRoom: 'chat/UPDATE_ROOM_ID',
     }),
-    async fetchRooms({ room, options = {} } = {}) {
-      this.roomsLoaded = options.refetch ? this.roomsLoaded : false
-      const offset = (options.refetch ? 0 : this.roomPage) * this.roomPageSize
+
+    async fetchRooms({ room } = {}) {
+      this.roomsLoaded = false
+      const offset = this.roomPage * this.roomPageSize
       try {
         const {
           data: { Room },
@@ -402,8 +403,8 @@ export default {
       return fullname.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
     },
 
-    addRoom() {
-      this.$emit('open-close-user-search')
+    toggleUserSearch() {
+      this.$emit('toggle-user-search')
     },
 
     newRoom(userId) {

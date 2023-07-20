@@ -11,7 +11,7 @@
     <chat
       :roomId="getShowChat.showChat ? getShowChat.roomID : null"
       ref="chat"
-      @open-close-user-search="showUserSearch = !showUserSearch"
+      @toggle-user-search="showUserSearch = !showUserSearch"
     />
   </div>
 </template>
