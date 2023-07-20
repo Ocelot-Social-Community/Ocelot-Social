@@ -1,13 +1,5 @@
 <template>
   <div>
-    <div>
-      <h1 v-if="!createEvent" class="title">
-        {{ $t('post.createNewPost.title') }}
-      </h1>
-      <h1 v-else class="title">
-        {{ $t('post.createNewEvent.title') }}
-      </h1>
-    </div>
     <ds-form
       class="contribution-form"
       ref="contributionForm"

@@ -16,7 +16,17 @@
       </ds-flex-item>
       <ds-flex-item :width="{ base: '100%', md: 1 }">
         <transition name="slide-up" appear>
-          <contribution-form :group="group" :createEvent="createEvent" />
+          <div>
+            <div>
+              <h1 v-if="!createEvent" class="title">
+                {{ $t('post.createNewPost.title') }}
+              </h1>
+              <h1 v-else class="title">
+                {{ $t('post.createNewEvent.title') }}
+              </h1>
+            </div>
+            <contribution-form :group="group" :createEvent="createEvent" />
+          </div>
         </transition>
       </ds-flex-item>
     </ds-flex>
