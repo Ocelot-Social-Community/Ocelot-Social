@@ -109,8 +109,8 @@ const STYLE = {
       colorTimestamp: '#a2aeb8',
       colorStateOnline: '#4caf50',
       colorStateOffline: '#9ca6af',
-      backgroundCounterBadge: '#0696c7',
-      colorCounterBadge: '#fff',
+      backgroundCounterBadge: styleData.chatRoomBackgroundCounterBadge,
+      colorCounterBadge: styleData.chatRoomColorCounterBadge,
     },
 
     emoji: {
