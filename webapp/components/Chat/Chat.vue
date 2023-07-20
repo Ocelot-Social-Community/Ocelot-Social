@@ -257,7 +257,7 @@ export default {
         const rmsIds = []
         ;[...Room, ...this.rooms].forEach((r) => {
           if (!rmsIds.find((v) => v === r.id)) {
-            rms.unshift(this.fixRoomObject(r))
+            rms.push(this.fixRoomObject(r))
             rmsIds.push(r.id)
           }
         })
