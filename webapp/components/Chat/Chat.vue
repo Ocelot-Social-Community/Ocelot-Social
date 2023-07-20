@@ -4,7 +4,7 @@
       <vue-advanced-chat
         :theme="theme"
         :current-user-id="currentUser.id"
-        :room-id="!singleRoom ? roomId : null"
+        :room-id="computedRoomId"
         :template-actions="JSON.stringify(templatesText)"
         :menu-actions="JSON.stringify(menuActions)"
         :text-messages="JSON.stringify(textMessages)"
@@ -28,15 +28,33 @@
         @add-room="addRoom"
         @show-demo-options="showDemoOptions = $event"
       >
-        <div slot="menu-icon" @click.prevent.stop="$emit('close-single-room', true)">
-          <div v-if="singleRoom">
-            <ds-icon name="close"></ds-icon>
-          </div>
+        <div
+          v-if="selectedRoom && selectedRoom.roomId"
+          slot="room-options"
+          class="chat-room-options"
+        >
+          <ds-flex v-if="singleRoom">
+            <ds-flex-item centered class="single-chat-bubble">
+              <nuxt-link :to="{ name: 'chat' }">
+                <base-icon name="chat-bubble" />
+              </nuxt-link>
+            </ds-flex-item>
+            <ds-flex-item centered>
+              <div
+                class="vac-svg-button vac-room-options"
+                @click="$emit('close-single-room', true)"
+              >
+                <slot name="menu-icon">
+                  <ds-icon name="close" />
+                </slot>
+              </div>
+            </ds-flex-item>
+          </ds-flex>
         </div>
 
         <div slot="room-header-avatar">
           <div
-            v-if="selectedRoom && selectedRoom.avatar && selectedRoom.avatar !== 'default-avatar'"
+            v-if="selectedRoom && selectedRoom.avatar"
             class="vac-avatar"
             :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
           />
@@ -47,7 +65,7 @@
 
         <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
           <div
-            v-if="room.avatar && room.avatar !== 'default-avatar'"
+            v-if="room.avatar"
             class="vac-avatar"
             :style="{ 'background-image': `url('${room.avatar}')` }"
           />
@@ -90,11 +108,6 @@ export default {
   data() {
     return {
       menuActions: [
-        // NOTE: if menuActions is empty, the related slot is not shown
-        {
-          name: 'dummyItem',
-          title: 'Just a dummy item',
-        },
         /*
             {
             name: 'inviteUser',
@@ -183,9 +196,23 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
+      getStoreRoomId: 'chat/roomID',
     }),
     computedChatStyle() {
       return chatStyle.STYLE.light
+    },
+    computedRoomId() {
+      let roomId = null
+
+      if (!this.singleRoom) {
+        roomId = this.roomId
+
+        if (this.getStoreRoomId.roomId) {
+          roomId = this.getStoreRoomId.roomId
+        }
+      }
+
+      return roomId
     },
     textMessages() {
       return {
@@ -207,10 +234,11 @@ export default {
   methods: {
     ...mapMutations({
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
+      commitRoomIdFromSingleRoom: 'chat/UPDATE_ROOM_ID',
     }),
-    async fetchRooms({ room } = {}) {
-      this.roomsLoaded = false
-      const offset = this.roomPage * this.roomPageSize
+    async fetchRooms({ room, options = {} } = {}) {
+      this.roomsLoaded = options.refetch ? this.roomsLoaded : false
+      const offset = (options.refetch ? 0 : this.roomPage) * this.roomPageSize
       try {
         const {
           data: { Room },
@@ -224,21 +252,37 @@ export default {
           fetchPolicy: 'no-cache',
         })
 
-        const newRooms = Room.map((r) => {
-          return {
-            ...r,
-            users: r.users.map((u) => {
-              return { ...u, username: u.name, avatar: u.avatar?.url }
-            }),
+        const rms = []
+        const rmsIds = []
+        ;[...Room, ...this.rooms].forEach((r) => {
+          if (!rmsIds.find((v) => v === r.id)) {
+            rms.push({
+              ...r,
+              index: r.lastMessage?.date,
+              lastMessage: {
+                ...r.lastMessage,
+                content: r.lastMessage?.content.trim().substring(0, 30),
+              },
+              users: r.users.map((u) => {
+                return { ...u, username: u.name, avatar: u.avatar?.url }
+              }),
+            })
+            rmsIds.push(r.id)
           }
         })
-
-        this.rooms = [...this.rooms, ...newRooms]
+        this.rooms = rms
 
         if (Room.length < this.roomPageSize) {
           this.roomsLoaded = true
         }
         this.roomPage += 1
+
+        if (this.singleRoom && this.rooms.length > 0) {
+          this.commitRoomIdFromSingleRoom(this.rooms[0].roomId)
+        } else if (this.getStoreRoomId.roomId) {
+          // reset store room id
+          this.commitRoomIdFromSingleRoom(null)
+        }
       } catch (error) {
         this.rooms = []
         this.$toast.error(error.message)
@@ -268,8 +312,14 @@ export default {
           fetchPolicy: 'no-cache',
         })
 
-        const newMsgIds = Message.filter((m) => m.seen === false).map((m) => m.id)
+        const newMsgIds = Message.filter(
+          (m) => m.seen === false && m.senderId !== this.currentUser.id,
+        ).map((m) => m.id)
         if (newMsgIds.length) {
+          const roomIndex = this.rooms.findIndex((r) => r.id === room.id)
+          const changedRoom = { ...this.rooms[roomIndex] }
+          changedRoom.unreadCount = changedRoom.unreadCount - newMsgIds.length
+          this.rooms[roomIndex] = changedRoom
           this.$apollo
             .mutate({
               mutation: markMessagesAsSeen(),
@@ -308,32 +358,36 @@ export default {
     },
 
     async chatMessageAdded({ data }) {
+      const roomIndex = this.rooms.findIndex((r) => r.id === data.chatMessageAdded.room.id)
+      const changedRoom = { ...this.rooms[roomIndex] }
+      changedRoom.lastMessage = data.chatMessageAdded
+      changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
+      changedRoom.lastMessageAt = data.chatMessageAdded.date
+      changedRoom.unreadCount++
+      this.rooms[roomIndex] = changedRoom
       if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
         this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
       } else {
-        // TODO this might be optimized selectively (first page vs rest)
-        this.rooms = []
-        this.roomPage = 0
-        this.roomsLoaded = false
-        this.fetchRooms()
+        this.fetchRooms({ options: { refetch: true } })
       }
     },
 
     async sendMessage(message) {
-      // check for usersTag and change userid to username
-      message.usersTag.forEach((userTag) => {
-        const needle = `<usertag>${userTag.id}</usertag>`
-        const replacement = `<usertag>@${userTag.name.replaceAll(' ', '-').toLowerCase()}</usertag>`
-        message.content = message.content.replaceAll(needle, replacement)
-      })
       try {
-        await this.$apollo.mutate({
+        const {
+          data: { CreateMessage: createdMessage },
+        } = await this.$apollo.mutate({
           mutation: createMessageMutation(),
           variables: {
             roomId: message.roomId,
             content: message.content,
           },
         })
+        const roomIndex = this.rooms.findIndex((r) => r.id === message.roomId)
+        const changedRoom = { ...this.rooms[roomIndex] }
+        changedRoom.lastMessage = createdMessage
+        changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
+        this.rooms[roomIndex] = changedRoom
       } catch (error) {
         this.$toast.error(error.message)
       }
@@ -397,5 +451,9 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
   }
+}
+
+.ds-flex-item.single-chat-bubble {
+  margin-right: 1em;
 }
 </style>
