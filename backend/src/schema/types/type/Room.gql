@@ -58,5 +58,5 @@ type Query {
 }
 
 type Subscription {
-  roomCountUpdated(userId: ID!): Int
+  roomCountUpdated: Int
 }
