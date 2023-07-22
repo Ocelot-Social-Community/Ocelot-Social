@@ -36,7 +36,7 @@ RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/downloa
 ##################################################################################
 # ENTERPRISE #####################################################################
 ##################################################################################
-FROM neo4j:4.4-enterprise as enterprise
+FROM neo4j:5.10-enterprise as enterprise
 
 # Install Additional Software
 ## install: wget, htop (TODO: why do we need htop?)
