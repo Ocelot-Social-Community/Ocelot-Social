@@ -30,6 +30,7 @@
 import { HASHTAG, MENTION } from '../../constants/editor'
 
 export default {
+  name: 'SuggestionList',
   props: {
     suggestionType: String,
     filteredItems: Array,

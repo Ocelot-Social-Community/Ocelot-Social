@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { Editor, EditorContent } from 'tiptap'
 import { History } from 'tiptap-extensions'
 import linkify from 'linkify-it'
@@ -68,6 +69,10 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      currentUser: 'auth/user',
+      isAdmin: 'auth/isAdmin',
+    }),
     placeholder() {
       return this.$t('editor.placeholder')
     },
@@ -78,6 +83,15 @@ export default {
         extensions.push(
           new Mention({
             items: () => {
+              if (this.isAdmin)
+                return [
+                  ...this.users,
+                  {
+                    id: this.currentUser.id,
+                    slug: this.$t('editor.mention.atAllLabel'),
+                    dataMentionId: 'all',
+                  },
+                ]
               return this.users
             },
             onEnter: (props) => this.openSuggestionList(props, MENTION),
@@ -227,6 +241,7 @@ export default {
       const typeAttrs = {
         mention: {
           id: item.id,
+          dataMentionId: item.dataMentionId ?? item.id,
           label: item.slug,
         },
         hashtag: {

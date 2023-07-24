@@ -393,6 +393,7 @@
       "unorderedList": "Unordered list"
     },
     "mention": {
+      "atAllLabel": "all",
       "noUsersFound": "No users found"
     },
     "placeholder": "Leave your inspirational thoughts …"
