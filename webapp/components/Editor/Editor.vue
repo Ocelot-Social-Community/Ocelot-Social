@@ -88,7 +88,7 @@ export default {
                   ...this.users,
                   {
                     id: this.currentUser.id,
-                    slug: this.$t('editor.mention.atAllLabel'),
+                    slug: 'all', // no translation, because of gender problems in Spanish, French etc. and because of blacklisting of user slugs
                     dataMentionId: 'all',
                   },
                 ]
