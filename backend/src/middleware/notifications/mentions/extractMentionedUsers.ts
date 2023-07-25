@@ -1,6 +1,6 @@
 import cheerio from 'cheerio'
 
-const queryAllUserIds = async (context) => {
+export const queryAllUserIds = async (context) => {
   const allUserIdCypher = `
     MATCH (user: User)
     // blocked users are not filtered out
@@ -21,11 +21,11 @@ const queryAllUserIds = async (context) => {
   }
 }
 
-export default async (context, content?) => {
+export const extractMentionedUsers = async (context, content?) => {
   if (!content) return []
   console.log('extractMentionedUsers – content: ', content)
   const $ = cheerio.load(content)
-  let userIds = $('a.mention[data-mention-id]')
+  const userIds = $('a.mention[data-mention-id]')
     .map((_, el) => {
       return $(el).attr('data-mention-id')
     })
@@ -34,9 +34,9 @@ export default async (context, content?) => {
     .filter((id) => !!id)
     .filter((id, index, allIds) => allIds.indexOf(id) === index)
   console.log('extractMentionedUsers – userIds: ', userIds)
-  if (userIds.find((id) => id === 'all')) {
-    userIds = await queryAllUserIds(context)
-    console.log('extractMentionedUsers – all userIds: ', userIds)
-  }
+  // Wolle if (context.user.role === 'admin' && userIds.find((id) => id === 'all')) {
+  //   userIds = await queryAllUserIds(context)
+  //   console.log('extractMentionedUsers – all userIds: ', userIds)
+  // }
   return userIds
 }

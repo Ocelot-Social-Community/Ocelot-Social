@@ -1,5 +1,6 @@
 import { pubsub, NOTIFICATION_ADDED } from '../../server'
-import extractMentionedUsers from './mentions/extractMentionedUsers'
+import { AuthenticationError } from 'apollo-server'
+import { queryAllUserIds, extractMentionedUsers } from './mentions/extractMentionedUsers'
 import { validateNotifyUsers } from '../validation/validationMiddleware'
 import { sendMail } from '../helpers/email/sendMail'
 import { notificationTemplate } from '../helpers/email/templateBuilder'
@@ -51,6 +52,23 @@ const publishNotifications = async (context, promises) => {
   })
 }
 
+const notifyPublishUsersOfMentionInclAll = async (label, id, idsOfUsers, reason, context) => {
+  if (idsOfUsers.find((id) => id === 'all')) {
+    if (context.user.role !== 'admin')
+      throw new AuthenticationError('You are not allowed to use the "@all" mention!')
+
+    idsOfUsers = await queryAllUserIds(context)
+    console.log('handleContentDataOfPost – on @all – idsOfUsers: ', idsOfUsers)
+    await publishNotifications(context, [
+      notifyUsersOfMention(label, id, idsOfUsers, reason, context),
+    ])
+  } else {
+    await publishNotifications(context, [
+      notifyUsersOfMention(label, id, idsOfUsers, reason, context),
+    ])
+  }
+}
+
 const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
@@ -99,9 +117,13 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
   const idsOfUsers = await extractMentionedUsers(context, args.content)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
-    await publishNotifications(context, [
-      notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
-    ])
+    await notifyPublishUsersOfMentionInclAll(
+      'Post',
+      post.id,
+      idsOfUsers,
+      'mentioned_in_post',
+      context,
+    )
   }
   return post
 }
@@ -113,9 +135,15 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
   idsOfUsers = idsOfUsers.filter((id) => id !== postAuthor.id)
   await publishNotifications(context, [
-    notifyUsersOfMention('Comment', comment.id, idsOfUsers, 'mentioned_in_comment', context),
     notifyUsersOfComment('Comment', comment.id, postAuthor.id, 'commented_on_post', context),
   ])
+  await notifyPublishUsersOfMentionInclAll(
+    'Comment',
+    comment.id,
+    idsOfUsers,
+    'mentioned_in_comment',
+    context,
+  )
   return comment
 }
 
