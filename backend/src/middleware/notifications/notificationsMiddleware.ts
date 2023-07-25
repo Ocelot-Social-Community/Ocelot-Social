@@ -62,7 +62,6 @@ const notifyPublishUsersOfMentionInclAll = async (label, id, idsOfUsers, reason,
     let pageOfUserIds = await queryAllUserIds(context, offset, pageSize)
 
     while (pageOfUserIds.length > 0) {
-      console.log('handleContentDataOfPost – on @all – idsOfUsers: ', pageOfUserIds)
       await publishNotifications(context, [
         notifyUsersOfMention(label, id, pageOfUserIds, reason, context),
       ])

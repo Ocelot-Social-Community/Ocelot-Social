@@ -25,7 +25,6 @@ export const queryAllUserIds = async (context, offset = -1, pageSize = -1) => {
 
 export const extractMentionedUsers = async (content?) => {
   if (!content) return []
-  console.log('extractMentionedUsers – content: ', content)
   const $ = cheerio.load(content)
   const userIds = $('a.mention[data-mention-id]')
     .map((_, el) => {
@@ -35,6 +34,5 @@ export const extractMentionedUsers = async (content?) => {
     .map((id) => id.trim())
     .filter((id) => !!id)
     .filter((id, index, allIds) => allIds.indexOf(id) === index)
-  console.log('extractMentionedUsers – userIds: ', userIds)
   return userIds
 }
