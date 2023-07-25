@@ -1,10 +1,12 @@
 import cheerio from 'cheerio'
 
-export const queryAllUserIds = async (context) => {
+export const queryAllUserIds = async (context, offset = -1, pageSize = -1) => {
+  const offsetCypher = offset >= 0 ? ` SKIP ${offset}` : ''
+  const pageSizeCypher = pageSize >= 0 ? ` LIMIT ${pageSize}` : ''
   const allUserIdCypher = `
     MATCH (user: User)
     // blocked users are not filtered out
-    RETURN user {.id}
+    RETURN user {.id}${offsetCypher}${pageSizeCypher}
   `
   const session = context.driver.session()
   const writeTxResultPromise = session.readTransaction(async (transaction) => {
@@ -21,7 +23,7 @@ export const queryAllUserIds = async (context) => {
   }
 }
 
-export const extractMentionedUsers = async (context, content?) => {
+export const extractMentionedUsers = async (content?) => {
   if (!content) return []
   console.log('extractMentionedUsers – content: ', content)
   const $ = cheerio.load(content)
@@ -34,9 +36,5 @@ export const extractMentionedUsers = async (context, content?) => {
     .filter((id) => !!id)
     .filter((id, index, allIds) => allIds.indexOf(id) === index)
   console.log('extractMentionedUsers – userIds: ', userIds)
-  // Wolle if (context.user.role === 'admin' && userIds.find((id) => id === 'all')) {
-  //   userIds = await queryAllUserIds(context)
-  //   console.log('extractMentionedUsers – all userIds: ', userIds)
-  // }
   return userIds
 }

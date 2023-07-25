@@ -1,4 +1,4 @@
-import extractMentionedUsers from './extractMentionedUsers'
+import { extractMentionedUsers } from './extractMentionedUsers'
 
 const contentWithMentions =
   '<p>Something inspirational about <a href="/profile/u2" class="not-a-mention" data-mention-id="bobs-id" target="_blank">@bob-der-baumeister</a> and <a href="/profile/u3/jenny-rostock" class="mention" data-mention-id="u3" target="_blank">@jenny-rostock</a>.</p>'

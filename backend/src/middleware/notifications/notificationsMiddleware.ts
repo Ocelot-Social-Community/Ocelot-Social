@@ -57,11 +57,23 @@ const notifyPublishUsersOfMentionInclAll = async (label, id, idsOfUsers, reason,
     if (context.user.role !== 'admin')
       throw new AuthenticationError('You are not allowed to use the "@all" mention!')
 
-    idsOfUsers = await queryAllUserIds(context)
-    console.log('handleContentDataOfPost – on @all – idsOfUsers: ', idsOfUsers)
-    await publishNotifications(context, [
-      notifyUsersOfMention(label, id, idsOfUsers, reason, context),
-    ])
+    let offset = 0
+    const pageSize = 100
+    let pageOfUserIds = await queryAllUserIds(context, offset, pageSize)
+
+    while (pageOfUserIds.length > 0) {
+      console.log('handleContentDataOfPost – on @all – idsOfUsers: ', pageOfUserIds)
+      await publishNotifications(context, [
+        notifyUsersOfMention(label, id, pageOfUserIds, reason, context),
+      ])
+
+      if (pageOfUserIds.length < pageSize) {
+        pageOfUserIds = []
+      } else {
+        offset += pageSize
+        pageOfUserIds = await queryAllUserIds(context, offset, pageSize)
+      }
+    }
   } else {
     await publishNotifications(context, [
       notifyUsersOfMention(label, id, idsOfUsers, reason, context),
@@ -114,7 +126,7 @@ const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveIn
 }
 
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
-  const idsOfUsers = await extractMentionedUsers(context, args.content)
+  const idsOfUsers = await extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
     await notifyPublishUsersOfMentionInclAll(
@@ -130,7 +142,7 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
 
 const handleContentDataOfComment = async (resolve, root, args, context, resolveInfo) => {
   const { content } = args
-  let idsOfUsers = await extractMentionedUsers(context, content)
+  let idsOfUsers = await extractMentionedUsers(content)
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
   idsOfUsers = idsOfUsers.filter((id) => id !== postAuthor.id)
