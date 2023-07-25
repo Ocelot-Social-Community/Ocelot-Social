@@ -286,7 +286,7 @@ export default {
         this.selectedRoom = room
       }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
-      const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
+
       try {
         const {
           data: { Message },
@@ -295,7 +295,7 @@ export default {
           variables: {
             roomId: room.id,
             first: this.messagePageSize,
-            offset,
+            offset: this.messages.length,
           },
           fetchPolicy: 'no-cache',
         })
@@ -345,47 +345,42 @@ export default {
       }
     },
 
-    async chatMessageAdded({ data }) {
+    addMessageToCurrentRoom(message) {
+      const messages = this.messages
+      console.log(message)
+      console.log(messages)
+      messages.push(message)
+      this.messages = messages
+    },
+
+    chatMessageAdded({ data }) {
       const roomIndex = this.rooms.findIndex((r) => r.id === data.chatMessageAdded.room.id)
       const changedRoom = { ...this.rooms[roomIndex] }
+      
       changedRoom.lastMessage = data.chatMessageAdded
       changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
       changedRoom.lastMessageAt = data.chatMessageAdded.date
       changedRoom.unreadCount++
       this.rooms[roomIndex] = changedRoom
       if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
-        this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
+        // this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
+        this.addMessageToCurrentRoom(data.chatMessageAdded)
       } else {
         this.fetchRooms({ options: { refetch: true } })
       }
     },
 
-    async sendMessage(message) {
-      try {
-        const {
-          data: { CreateMessage: createdMessage },
-        } = await this.$apollo.mutate({
-          mutation: createMessageMutation(),
-          variables: {
-            roomId: message.roomId,
-            content: message.content,
-          },
-        })
-        const roomIndex = this.rooms.findIndex((r) => r.id === message.roomId)
-        const changedRoom = { ...this.rooms[roomIndex] }
-        changedRoom.lastMessage = createdMessage
-        changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
-        // move current room to top (not 100% working)
-        // const rooms = [...this.rooms]
-        // rooms.splice(roomIndex,1)
-        // this.rooms = [changedRoom, ...rooms]
-        this.rooms[roomIndex] = changedRoom
-      } catch (error) {
+    sendMessage(message) {
+      this.$apollo.mutate({
+        mutation: createMessageMutation(),
+        variables: {
+          roomId: message.roomId,
+          content: message.content,
+        },
+      }).then(({ data: { CreateMessage: createdMessage } }) => {
+        this.addMessageToCurrentRoom(createdMessage)
+      }).catch ((error) => {
         this.$toast.error(error.message)
-      }
-      this.fetchMessages({
-        room: this.rooms.find((r) => r.roomId === message.roomId),
-        options: { refetch: true },
       })
     },
 
