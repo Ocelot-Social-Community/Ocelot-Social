@@ -347,8 +347,6 @@ export default {
 
     addMessageToCurrentRoom(message) {
       const messages = this.messages
-      console.log(message)
-      console.log(messages)
       messages.push(message)
       this.messages = messages
     },
@@ -363,7 +361,6 @@ export default {
       changedRoom.unreadCount++
       this.rooms[roomIndex] = changedRoom
       if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
-        // this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
         this.addMessageToCurrentRoom(data.chatMessageAdded)
       } else {
         this.fetchRooms({ options: { refetch: true } })
