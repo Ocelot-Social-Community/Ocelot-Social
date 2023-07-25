@@ -74,6 +74,7 @@ const notifyPublishUsersOfMentionInclAll = async (label, id, idsOfUsers, reason,
       }
     }
   } else {
+    // Wolle console.log('notifyPublishUsersOfMentionInclAll – no all')
     await publishNotifications(context, [
       notifyUsersOfMention(label, id, idsOfUsers, reason, context),
     ])
