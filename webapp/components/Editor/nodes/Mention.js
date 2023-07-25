@@ -13,8 +13,12 @@ export default class Mention extends TipTapMention {
           'a',
           {
             class: this.options.mentionClass,
-            href: `/profile/${node.attrs.id}`,
-            'data-mention-id': node.attrs.dataMentionId,
+            href: `/profile/${node.attrs.id.hrefId}`,
+            'data-mention-id':
+              node.attrs.id.dataMentionId !== undefined ? node.attrs.id.dataMentionId : 'undefined',
+            // better solution that doesn't work, see "webapp/components/Editor/Editor.vue" > "selectItem"
+            // href: `/profile/${node.attrs.id}`,
+            // 'data-mention-id': node.attrs.dataMentionId, // "dataMentionId" is undefined
             target: '_blank',
           },
           `${this.options.matcher.char}${node.attrs.label} `,

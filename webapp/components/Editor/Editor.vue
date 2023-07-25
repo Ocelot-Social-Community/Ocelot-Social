@@ -240,8 +240,10 @@ export default {
     selectItem(item) {
       const typeAttrs = {
         mention: {
-          id: item.id,
-          dataMentionId: item.dataMentionId ?? item.id,
+          id: { hrefId: item.id, dataMentionId: item.dataMentionId ?? item.id },
+          // this solution would better, but "dataMentionId" is then undefined in "webapp/components/Editor/nodes/Mention.js" > "toDOM"
+          // id: item.id,
+          // dataMentionId: item.dataMentionId ?? item.id,
           label: item.slug,
         },
         hashtag: {
