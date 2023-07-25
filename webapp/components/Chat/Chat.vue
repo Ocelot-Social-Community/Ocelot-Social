@@ -157,16 +157,13 @@ export default {
           */
       ],
 
-      showDemoOptions: true,
       responsiveBreakpoint: 600,
       rooms: [],
       roomsLoaded: false,
-      roomPage: 0,
       roomPageSize: 10,
       selectedRoom: this.roomId,
       loadingRooms: true,
       messagesLoaded: false,
-      messagePage: 0,
       messagePageSize: 20,
       messages: [],
     }
@@ -234,77 +231,70 @@ export default {
       commitRoomIdFromSingleRoom: 'chat/UPDATE_ROOM_ID',
     }),
 
-    async fetchRooms({ room } = {}) {
+    fetchRooms({ room } = {}) {
       this.roomsLoaded = false
-      const offset = this.roomPage * this.roomPageSize
-      try {
-        const {
-          data: { Room },
-        } = await this.$apollo.query({
-          query: roomQuery(),
-          variables: {
-            id: room?.id,
-            first: this.roomPageSize,
-            offset,
-          },
-          fetchPolicy: 'no-cache',
-        })
-
+      this.$apollo.query({
+        query: roomQuery(),
+        variables: {
+          id: room?.id,
+          first: this.roomPageSize,
+          offset: this.rooms.length,
+        },
+        fetchPolicy: 'no-cache',
+      }).then(({ data: { Room }})=> {
         const rms = []
         const rmsIds = []
-        ;[...Room, ...this.rooms].forEach((r) => {
+        ;[...this.rooms, ...Room].forEach((r) => {
           if (!rmsIds.find((v) => v === r.id)) {
             rms.push(this.fixRoomObject(r))
             rmsIds.push(r.id)
           }
         })
         this.rooms = rms
-
         if (Room.length < this.roomPageSize) {
           this.roomsLoaded = true
         }
-        this.roomPage += 1
 
         if (this.singleRoom && this.rooms.length > 0) {
           this.commitRoomIdFromSingleRoom(this.rooms[0].roomId)
         } else if (this.getStoreRoomId.roomId) {
           // reset store room id
-          this.commitRoomIdFromSingleRoom(null)
+          this.commitRoomIdFromSingleRoom(this.getStoreRoomId.roomId)
         }
-      } catch (error) {
+      }).catch((error) => {
         this.rooms = []
         this.$toast.error(error.message)
-      }
-      // must be set false after initial rooms are loaded and never changed again
-      this.loadingRooms = false
+      }).finally(() => {
+        // must be set false after initial rooms are loaded and never changed again
+        this.loadingRooms = false
+      })
     },
-
-    async fetchMessages({ room, options = {} }) {
+    
+    fetchMessages({ room, options = {} }) {
       if (this.selectedRoom?.id !== room.id) {
         this.messages = []
-        this.messagePage = 0
         this.selectedRoom = room
       }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
 
-      try {
-        const {
-          data: { Message },
-        } = await this.$apollo.query({
-          query: messageQuery(),
-          variables: {
-            roomId: room.id,
-            first: this.messagePageSize,
-            offset: this.messages.length,
-          },
-          fetchPolicy: 'no-cache',
-        })
-
+      this.$apollo.query({
+        query: messageQuery(),
+        variables: {
+          roomId: room.id,
+          first: this.messagePageSize,
+          offset: this.messages.length,
+        },
+        fetchPolicy: 'no-cache',
+      }).then(({ data: { Message }}) => {
         const newMsgIds = Message.filter(
           (m) => m.seen === false && m.senderId !== this.currentUser.id,
         ).map((m) => m.id)
         if (newMsgIds.length) {
-          const roomIndex = this.rooms.findIndex((r) => r.id === room.id)
+          const roomIndex = this.rooms.findIndex((r) => r.id === room.id) ?? Message.id
+          
+          if (roomIndex === -1) {
+            this.rooms = [room, ...this.rooms]
+          }
           const changedRoom = { ...this.rooms[roomIndex] }
           changedRoom.unreadCount = changedRoom.unreadCount - newMsgIds.length
           this.rooms[roomIndex] = changedRoom
@@ -338,15 +328,15 @@ export default {
         if (Message.length < this.messagePageSize) {
           this.messagesLoaded = true
         }
-        this.messagePage += 1
-      } catch (error) {
+      }).catch((error) => {
         this.messages = []
-        this.$toast.error(error.message)
-      }
+        this.$toast.error(error.message) 
+      })
     },
 
     addMessageToCurrentRoom(message) {
       const messages = this.messages
+      message.date = new Date(message.date).toDateString()
       messages.push(message)
       this.messages = messages
     },
@@ -358,13 +348,13 @@ export default {
       changedRoom.lastMessage = data.chatMessageAdded
       changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
       changedRoom.lastMessageAt = data.chatMessageAdded.date
-      changedRoom.unreadCount++
-      this.rooms[roomIndex] = changedRoom
       if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
         this.addMessageToCurrentRoom(data.chatMessageAdded)
       } else {
-        this.fetchRooms({ options: { refetch: true } })
+        changedRoom.unreadCount++
+        this.fetchRooms({room: this.selectedRoom, options: { refetch: true } })
       }
+      this.rooms[roomIndex] = changedRoom
     },
 
     sendMessage(message) {
@@ -428,13 +418,13 @@ export default {
             this.rooms = [room, ...this.rooms]
           }
           this.fetchMessages({ room, options: { refetch: true } })
-          this.$emit('show-chat', CreateRoom.id)
+          this.$emit('show-room', CreateRoom.id)
         })
         .catch((error) => {
           this.$toast.error(error.message)
         })
         .finally(() => {
-          // this.loading = false
+          this.loadingRooms = false
         })
     },
   },
