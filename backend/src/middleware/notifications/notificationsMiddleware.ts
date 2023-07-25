@@ -96,7 +96,7 @@ const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveIn
 }
 
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
-  const idsOfUsers = extractMentionedUsers(args.content)
+  const idsOfUsers = await extractMentionedUsers(context, args.content)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
     await publishNotifications(context, [
@@ -108,7 +108,7 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
 
 const handleContentDataOfComment = async (resolve, root, args, context, resolveInfo) => {
   const { content } = args
-  let idsOfUsers = extractMentionedUsers(content)
+  let idsOfUsers = await extractMentionedUsers(context, content)
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
   idsOfUsers = idsOfUsers.filter((id) => id !== postAuthor.id)
