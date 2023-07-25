@@ -23,7 +23,7 @@ export const queryAllUserIds = async (context, offset = -1, pageSize = -1) => {
   }
 }
 
-export const extractMentionedUsers = async (content?) => {
+export const extractMentionedUsers = (content?) => {
   if (!content) return []
   const $ = cheerio.load(content)
   const userIds = $('a.mention[data-mention-id]')
