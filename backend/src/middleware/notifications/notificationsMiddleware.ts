@@ -53,6 +53,10 @@ const publishNotifications = async (context, promises) => {
 }
 
 const notifyPublishUsersOfMentionInclAll = async (label, id, idsOfUsers, reason, context) => {
+  console.log('notifyPublishUsersOfMentionInclAll – idsOfUsers: ', label)
+  console.log('notifyPublishUsersOfMentionInclAll – idsOfUsers: ', id)
+  console.log('notifyPublishUsersOfMentionInclAll – idsOfUsers: ', idsOfUsers)
+  console.log('notifyPublishUsersOfMentionInclAll – idsOfUsers: ', reason)
   if (idsOfUsers.find((id) => id === 'all')) {
     if (context.user.role !== 'admin')
       throw new AuthenticationError('You are not allowed to use the "@all" mention!')
@@ -74,7 +78,8 @@ const notifyPublishUsersOfMentionInclAll = async (label, id, idsOfUsers, reason,
       }
     }
   } else {
-    // Wolle console.log('notifyPublishUsersOfMentionInclAll – no all')
+    // Wolle
+    console.log('notifyPublishUsersOfMentionInclAll – no all – idsOfUsers: ', idsOfUsers)
     await publishNotifications(context, [
       notifyUsersOfMention(label, id, idsOfUsers, reason, context),
     ])
@@ -145,10 +150,14 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
   let idsOfUsers = await extractMentionedUsers(content)
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
+  console.log('handleContentDataOfComment – before filter – postAuthor.id: ', postAuthor.id)
+  console.log('handleContentDataOfComment – before filter – idsOfUsers: ', idsOfUsers)
   idsOfUsers = idsOfUsers.filter((id) => id !== postAuthor.id)
+  console.log('handleContentDataOfComment – after filter – idsOfUsers: ', idsOfUsers)
   await publishNotifications(context, [
     notifyUsersOfComment('Comment', comment.id, postAuthor.id, 'commented_on_post', context),
   ])
+  console.log('handleContentDataOfComment – after notifyUsersOfComment – idsOfUsers: ', idsOfUsers)
   await notifyPublishUsersOfMentionInclAll(
     'Comment',
     comment.id,
