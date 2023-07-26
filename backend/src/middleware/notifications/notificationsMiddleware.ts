@@ -53,10 +53,10 @@ const publishNotifications = async (context, promises) => {
 }
 
 const notifyPublishUsersOfMentionInclAll = async (label, id, idsOfUsers, reason, context) => {
-  console.log('notifyPublishUsersOfMentionInclAll – idsOfUsers: ', label)
-  console.log('notifyPublishUsersOfMentionInclAll – idsOfUsers: ', id)
+  console.log('notifyPublishUsersOfMentionInclAll – label: ', label)
+  console.log('notifyPublishUsersOfMentionInclAll – id: ', id)
   console.log('notifyPublishUsersOfMentionInclAll – idsOfUsers: ', idsOfUsers)
-  console.log('notifyPublishUsersOfMentionInclAll – idsOfUsers: ', reason)
+  console.log('notifyPublishUsersOfMentionInclAll – reason: ', reason)
   if (idsOfUsers.find((id) => id === 'all')) {
     if (context.user.role !== 'admin')
       throw new AuthenticationError('You are not allowed to use the "@all" mention!')
@@ -131,7 +131,8 @@ const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveIn
 }
 
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
-  const idsOfUsers = await extractMentionedUsers(args.content)
+  const idsOfUsers = extractMentionedUsers(args.content)
+  console.log('handleContentDataOfPost', idsOfUsers)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
     await notifyPublishUsersOfMentionInclAll(
@@ -147,7 +148,8 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
 
 const handleContentDataOfComment = async (resolve, root, args, context, resolveInfo) => {
   const { content } = args
-  let idsOfUsers = await extractMentionedUsers(content)
+  let idsOfUsers = extractMentionedUsers(content)
+  console.log('handleContentDataOfComment', idsOfUsers)
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
   console.log('handleContentDataOfComment – before filter – postAuthor.id: ', postAuthor.id)
@@ -310,6 +312,7 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
   })
   try {
     const notifications = await writeTxResultPromise
+    console.log(notifications)
     return notifications
   } catch (error) {
     throw new Error(error)
@@ -346,6 +349,7 @@ const notifyUsersOfComment = async (label, commentId, postAuthorId, reason, cont
   })
   try {
     const notifications = await writeTxResultPromise
+    console.log(notifications)
     return notifications
   } finally {
     session.close()
