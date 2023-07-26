@@ -6,7 +6,8 @@
     "edit": "Edit",
     "loading": "loading",
     "loadMore": "load more",
-    "save": "Save"
+    "save": "Save",
+    "saveCategories": "Save topics"
   },
   "admin": {
     "categories": {

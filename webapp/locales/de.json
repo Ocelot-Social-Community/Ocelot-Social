@@ -6,7 +6,8 @@
     "edit": "Bearbeiten",
     "loading": "wird geladen",
     "loadMore": "mehr laden",
-    "save": "Speichern"
+    "save": "Speichern",
+    "saveCategories": "Themen speichern"
   },
   "admin": {
     "categories": {
