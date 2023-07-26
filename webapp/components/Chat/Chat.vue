@@ -40,12 +40,14 @@
               </nuxt-link>
             </ds-flex-item>
             <ds-flex-item centered>
-              <div
-                class="vac-svg-button vac-room-options"
-                @click="$emit('close-single-room', true)"
-              >
+              <div class="vac-svg-button vac-room-options">
                 <slot name="menu-icon">
-                  <base-button icon="close" size="small" circle />
+                  <base-button
+                    icon="close"
+                    size="small"
+                    circle
+                    @click="$emit('close-single-room', true)"
+                  />
                 </slot>
               </div>
             </ds-flex-item>
