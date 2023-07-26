@@ -173,12 +173,7 @@
             </ds-flex-item>
             <ds-flex-item width="0.15" />
             <ds-flex-item class="action-buttons-group" width="2">
-              <base-button
-                data-test="cancel-button"
-                :disabled="loading"
-                @click="$router.back()"
-                danger
-              >
+              <base-button data-test="cancel-button" :disabled="loading" @click="$router.back()">
                 {{ $t('actions.cancel') }}
               </base-button>
               <base-button type="submit" icon="check" :loading="loading" :disabled="errors" filled>

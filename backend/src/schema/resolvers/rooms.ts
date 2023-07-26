@@ -20,8 +20,8 @@ export default {
     roomCountUpdated: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(ROOM_COUNT_UPDATED),
-        (payload, variables) => {
-          return payload.userId === variables.userId
+        (payload, variables, context) => {
+          return payload.userId === context.user?.id
         },
       ),
     },

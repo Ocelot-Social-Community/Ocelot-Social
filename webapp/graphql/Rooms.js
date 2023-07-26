@@ -5,18 +5,32 @@ export const createRoom = () => gql`
     CreateRoom(userId: $userId) {
       id
       roomId
+      roomName
+      lastMessageAt
+      createdAt
+      unreadCount
+      #avatar
+      users {
+        _id
+        id
+        name
+        avatar {
+          url
+        }
+      }
     }
   }
 `
 
 export const roomQuery = () => gql`
   query Room($first: Int, $offset: Int, $id: ID) {
-    Room(first: $first, offset: $offset, id: $id, orderBy: lastMessageAt_desc) {
+    Room(first: $first, offset: $offset, id: $id, orderBy: [createdAt_desc, lastMessageAt_desc]) {
       id
       roomId
       roomName
       avatar
       lastMessageAt
+      createdAt
       unreadCount
       lastMessage {
         _id
@@ -52,8 +66,8 @@ export const unreadRoomsQuery = () => {
 
 export const roomCountUpdated = () => {
   return gql`
-    subscription roomCountUpdated($userId: ID!) {
-      roomCountUpdated(userId: $userId)
+    subscription roomCountUpdated {
+      roomCountUpdated
     }
   `
 }
