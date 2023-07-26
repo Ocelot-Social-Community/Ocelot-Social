@@ -56,7 +56,6 @@ describe('OrderByFilter', () => {
       })
 
       it('don\'t sets "newest-button" attribute `filled`', () => {
-        console.log(wrapper.html())
         expect(
           wrapper
             .find('.order-by-filter .filter-list .base-button[data-test="newest-button"]')
