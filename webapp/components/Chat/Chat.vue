@@ -36,7 +36,7 @@
           <ds-flex v-if="singleRoom">
             <ds-flex-item centered class="single-chat-bubble">
               <nuxt-link :to="{ name: 'chat' }">
-                <base-icon name="chat-bubble" />
+                <base-button icon="expand" circle size="small"/>
               </nuxt-link>
             </ds-flex-item>
             <ds-flex-item centered>
@@ -45,7 +45,7 @@
                 @click="$emit('close-single-room', true)"
               >
                 <slot name="menu-icon">
-                  <ds-icon name="close" />
+                  <base-button icon="close" circle size="small"/>
                 </slot>
               </div>
             </ds-flex-item>
