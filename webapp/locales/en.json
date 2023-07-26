@@ -751,13 +751,13 @@
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Create A New Event"
+      "title": "Create an Event"
     },
     "createNewPost": {
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Create A New Article"
+      "title": "Create an Article"
     },
     "edited": "edited",
     "editPost": {
