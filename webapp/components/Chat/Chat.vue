@@ -36,16 +36,18 @@
           <ds-flex v-if="singleRoom">
             <ds-flex-item centered class="single-chat-bubble">
               <nuxt-link :to="{ name: 'chat' }">
-                <base-icon name="chat-bubble" />
+                <base-button icon="expand" size="small" circle />
               </nuxt-link>
             </ds-flex-item>
             <ds-flex-item centered>
-              <div
-                class="vac-svg-button vac-room-options"
-                @click="$emit('close-single-room', true)"
-              >
+              <div class="vac-svg-button vac-room-options">
                 <slot name="menu-icon">
-                  <ds-icon name="close" />
+                  <base-button
+                    icon="close"
+                    size="small"
+                    circle
+                    @click="$emit('close-single-room', true)"
+                  />
                 </slot>
               </div>
             </ds-flex-item>
