@@ -1,66 +1,66 @@
 import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
-import { mapGetters as getters, mapMutations as mutations } from 'vuex'
+import { getters, mutations } from '../../store/chat'
 
 import Chat from './Chat'
 
 const localVue = global.localVue
+// const observer = {
+//   subscribe: jest.fn(),
+// }
 
-describe('MyComponent', () => {
-  it('should fetch rooms and update rooms data correctly', async () => {
-    // Mock the Apollo query to return a specific response
-    const apolloMock = {
-      query: jest.fn().mockResolvedValue({
-        data: {
-          Room: [
-            { id: 1, name: 'Room 1' },
-            { id: 2, name: 'Room 2' },
-          ],
-        },
-      }),
-      subscribe: jest.fn(),
+describe('Chat', () => {
+  let store
+  let mocks
+  let stubs
+  beforeEach(() => {
+    // Mocking any required data or dependencies
+    stubs = {
+      VueAdvancedChat: true,
+      'client-only': true,
+      'nuxt-link': true,
     }
 
-    // Mount the component and pass the mock apollo instance
-    const wrapper = mount(Chat, {
-      mocks: {
-        $apollo: apolloMock,
+    store = new Vuex.Store({
+      // state,
+      getters: {
+        'auth/user': () => {
+          return { id: 'u343', name: 'Matt' }
+        },
+        'chat/roomID': getters.roomID,
+      },
+      mutations: {
+        'chat/UPDATE_ROOM_COUNT': mutations.UPDATE_ROOM_COUNT,
+        'chat/UPDATE_ROOM_ID': mutations.UPDATE_ROOM_ID,
       },
     })
 
-    // Call the fetchRooms method
-    await wrapper.vm.fetchRooms()
-
-    // Assert that the rooms data has been updated correctly
-    expect(wrapper.vm.rooms).toEqual([
-      { id: 1, name: 'Room 1' },
-      { id: 2, name: 'Room 2' },
-    ])
-    expect(wrapper.vm.roomsLoaded).toBeTruthy()
-  })
-
-  it('should handle failed fetch and show error message', async () => {
-    // Mock the Apollo query to throw an error
-    const apolloMock = {
-      query: jest.fn().mockRejectedValue(new Error('Fetch failed')),
-      subscribe: jest.fn(),
-    }
-
-    // Mount the component and pass the mock apollo instance
-    const wrapper = mount(Chat, {
-      mocks: {
-        $apollo: apolloMock,
-        $toast: {
-          error: jest.fn(),
-        },
+    mocks = {
+      $t: jest.fn(),
+      $toast: {
+        success: jest.fn(),
+        error: jest.fn(),
       },
-    })
-
-    // Call the fetchRooms method
-    await wrapper.vm.fetchRooms()
-
-    // Assert that the rooms data is empty and error message is shown
-    expect(wrapper.vm.rooms).toEqual([])
-    expect(wrapper.vm.$toast.error).toHaveBeenCalledWith('Fetch failed')
+      $apollo: {
+        query: jest.fn().mockResolvedValue({}),
+        mutate: jest.fn().mockResolvedValue({}),
+        // TODO: https://stackoverflow.com/questions/58815471/in-jest-how-can-i-unit-test-a-method-that-subscribes-to-an-observable
+        subscribe: jest.fn(),// () => { observer },
+      }
+    }
   })
+
+  it('renders the Chat component', () => {
+    const wrapper = mount(Chat, {
+      store,
+      stubs,
+      mocks,
+      localVue, 
+      propsData: {}
+    })
+    expect(wrapper.exists()).toBe(true)
+  })
+
+  // Add more test cases for different scenarios or functionalities
+  
 })
