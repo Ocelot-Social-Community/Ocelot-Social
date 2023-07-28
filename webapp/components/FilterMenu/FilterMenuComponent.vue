@@ -13,7 +13,7 @@
         </div>
       </div>
       <post-type-filter />
-      <following-filter />
+      <following-filter @showFilterMenu="$emit('showFilterMenu')" />
       <categories-filter v-if="categoriesActive" @showFilterMenu="$emit('showFilterMenu')" />
     </div>
     <div v-if="eventSetInPostTypeFilter" class="filter-menu-options">

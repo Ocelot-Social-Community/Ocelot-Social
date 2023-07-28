@@ -5,30 +5,43 @@
     class="following-filter"
   >
     <template #filter-follower>
-      <li class="item follower-item">
+      <div class="item item-all-follower">
         <base-button
-          icon="user-plus"
-          :label="$t('filter-menu.following')"
-          :filled="filteredByUsersFollowed"
-          :title="$t('contribution.filterFollow')"
-          @click="toggleFilteredByFollowed(currentUser.id)"
+          :filled="!filteredByUsersFollowed && !filteredByPostsInMyGroups"
+          :label="$t('filter-menu.all')"
+          icon="check"
+          @click="setResetFollowers"
           size="small"
         >
-          {{ $t('contribution.filterFollow') }}
+          {{ $t('filter-menu.all') }}
         </base-button>
-      </li>
-      <li class="item posts-in-my-groups-item">
-        <base-button
-          icon="users"
-          :label="$t('filter-menu.my-groups')"
-          :filled="filteredByPostsInMyGroups"
-          :title="$t('contribution.filterMyGroups')"
-          @click="toggleFilteredByMyGroups()"
-          size="small"
-        >
-          {{ $t('contribution.filterMyGroups') }}
-        </base-button>
-      </li>
+      </div>
+      <div class="follower-filter-list">
+        <li class="item follower-item">
+          <base-button
+            icon="user-plus"
+            :label="$t('filter-menu.following')"
+            :filled="filteredByUsersFollowed"
+            :title="$t('contribution.filterFollow')"
+            @click="toggleFilteredByFollowed(currentUser.id)"
+            size="small"
+          >
+            {{ $t('contribution.filterFollow') }}
+          </base-button>
+        </li>
+        <li class="item posts-in-my-groups-item">
+          <base-button
+            icon="users"
+            :label="$t('filter-menu.my-groups')"
+            :filled="filteredByPostsInMyGroups"
+            :title="$t('contribution.filterMyGroups')"
+            @click="toggleFilteredByMyGroups()"
+            size="small"
+          >
+            {{ $t('contribution.filterMyGroups') }}
+          </base-button>
+        </li>
+      </div>
     </template>
   </filter-menu-section>
 </template>
@@ -51,9 +64,26 @@ export default {
   },
   methods: {
     ...mapMutations({
+      resetFollowers: 'posts/RESET_FOLLOWERS_FILTER',
       toggleFilteredByFollowed: 'posts/TOGGLE_FILTER_BY_FOLLOWED',
       toggleFilteredByMyGroups: 'posts/TOGGLE_FILTER_BY_MY_GROUPS',
     }),
+    setResetFollowers() {
+      this.resetFollowers()
+      this.$emit('showFilterMenu')
+    },
   },
 }
 </script>
+
+<style lang="scss">
+.follower-filter-list {
+  display: flex;
+  margin-left: $space-xx-small;
+
+  & .base-button {
+    margin-right: $space-xx-small;
+    margin-bottom: $space-xx-small;
+  }
+}
+</style>
