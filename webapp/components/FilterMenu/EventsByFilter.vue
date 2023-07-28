@@ -11,7 +11,7 @@
           data-test="all-button"
           size="small"
         >
-          {{ $t('filter-menu.ended.all.hint') }}
+          {{ $t('filter-menu.ended.all.label') }}
         </base-button>
       </li>
       <li class="item">
@@ -24,7 +24,7 @@
           data-test="not-ended-button"
           size="small"
         >
-          {{ $t('filter-menu.ended.onlyEnded.hint') }}
+          {{ $t('filter-menu.ended.onlyEnded.label') }}
         </base-button>
       </li>
     </template>
