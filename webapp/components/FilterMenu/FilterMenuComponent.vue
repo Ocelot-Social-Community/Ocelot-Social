@@ -4,7 +4,12 @@
       <div class="filter-header">
         <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
         <div class="item-save-topics">
-          <labeled-button filled :label="$t('actions.save')" icon="save" @click="saveCategories" />
+          <labeled-button
+            filled
+            :label="$t('actions.saveCategories')"
+            icon="save"
+            @click="saveCategories"
+          />
         </div>
       </div>
       <post-type-filter />

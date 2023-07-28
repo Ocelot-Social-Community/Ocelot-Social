@@ -77,8 +77,8 @@ const STYLE = {
       colorTag: '#0d579c',
       backgroundImage: '#ddd',
       colorNewMessages: styleData.chatNewMessageColor,
-      backgroundScrollCounter: '#0696c7',
-      colorScrollCounter: '#fff',
+      backgroundScrollCounter: styleData.chatRoomBackgroundCounterBadge,
+      colorScrollCounter: styleData.chatRoomColorCounterBadge,
       backgroundReaction: '#eee',
       borderStyleReaction: '1px solid #eee',
       backgroundReactionHover: '#fff',
@@ -109,8 +109,8 @@ const STYLE = {
       colorTimestamp: '#a2aeb8',
       colorStateOnline: '#4caf50',
       colorStateOffline: '#9ca6af',
-      backgroundCounterBadge: '#0696c7',
-      colorCounterBadge: '#fff',
+      backgroundCounterBadge: styleData.chatRoomBackgroundCounterBadge,
+      colorCounterBadge: styleData.chatRoomColorCounterBadge,
     },
 
     emoji: {

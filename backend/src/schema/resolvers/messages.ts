@@ -25,8 +25,8 @@ export default {
     chatMessageAdded: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
-        (payload, variables) => {
-          return payload.userId === variables.userId
+        (payload, variables, context) => {
+          return payload.userId === context.user?.id
         },
       ),
     },

@@ -54,8 +54,8 @@ export const messageQuery = () => {
 
 export const chatMessageAdded = () => {
   return gql`
-    subscription chatMessageAdded($userId: ID!) {
-      chatMessageAdded(userId: $userId) {
+    subscription chatMessageAdded {
+      chatMessageAdded {
         _id
         id
         indexId

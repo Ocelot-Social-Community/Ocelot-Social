@@ -14,6 +14,9 @@ export const mutations = {
   UPDATE_ROOM_COUNT(state, count) {
     state.unreadRoomCount = count
   },
+  UPDATE_ROOM_ID(state, roomid) {
+    state.roomId = roomid || null
+  },
 }
 
 export const getters = {
