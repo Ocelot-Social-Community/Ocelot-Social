@@ -449,12 +449,12 @@ export default {
         })
     },
 
-    redirectToUserProfile({user}){
-      let userID = user.id
-      let userName = user.name.toLowerCase().replaceAll(" ", "-")
-      let url = `/profile/${userID}/${userName}`
-      this.$router.push({ path: url });
-    }
+    redirectToUserProfile({ user }) {
+      const userID = user.id
+      const userName = user.name.toLowerCase().replaceAll(' ', '-')
+      const url = `/profile/${userID}/${userName}`
+      this.$router.push({ path: url })
+    },
   },
 }
 </script>
