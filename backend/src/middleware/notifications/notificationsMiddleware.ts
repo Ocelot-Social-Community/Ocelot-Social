@@ -52,40 +52,6 @@ const publishNotifications = async (context, promises) => {
   })
 }
 
-const notifyPublishUsersOfMentionInclAll = async (label, id, idsOfUsers, reason, context) => {
-  console.log('notifyPublishUsersOfMentionInclAll – label: ', label)
-  console.log('notifyPublishUsersOfMentionInclAll – id: ', id)
-  console.log('notifyPublishUsersOfMentionInclAll – idsOfUsers: ', idsOfUsers)
-  console.log('notifyPublishUsersOfMentionInclAll – reason: ', reason)
-  if (idsOfUsers.find((id) => id === 'all')) {
-    if (context.user.role !== 'admin')
-      throw new AuthenticationError('You are not allowed to use the "@all" mention!')
-
-    let offset = 0
-    const pageSize = 100
-    let pageOfUserIds = await queryAllUserIds(context, offset, pageSize)
-
-    while (pageOfUserIds.length > 0) {
-      await publishNotifications(context, [
-        notifyUsersOfMention(label, id, pageOfUserIds, reason, context),
-      ])
-
-      if (pageOfUserIds.length < pageSize) {
-        pageOfUserIds = []
-      } else {
-        offset += pageSize
-        pageOfUserIds = await queryAllUserIds(context, offset, pageSize)
-      }
-    }
-  } else {
-    // Wolle
-    console.log('notifyPublishUsersOfMentionInclAll – no all – idsOfUsers: ', idsOfUsers)
-    await publishNotifications(context, [
-      notifyUsersOfMention(label, id, idsOfUsers, reason, context),
-    ])
-  }
-}
-
 const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
@@ -132,16 +98,21 @@ const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveIn
 
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
   const idsOfUsers = extractMentionedUsers(args.content)
-  console.log('handleContentDataOfPost', idsOfUsers)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
-    await notifyPublishUsersOfMentionInclAll(
-      'Post',
-      post.id,
-      idsOfUsers,
-      'mentioned_in_post',
-      context,
-    )
+    if (idsOfUsers.includes((id) => id === 'all')) {
+      if (context.user.role !== 'admin') {
+        throw new AuthenticationError('You are not allowed to use the "@all" mention!')
+      }
+      const userToNotify = await queryAllUserIds(context)
+      await publishNotifications(context, [
+        notifyUsersOfMention('Post', post.id, userToNotify, 'mentioned_in_post', context),
+      ])
+    } else {
+      await publishNotifications(context, [
+        notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
+      ])
+    }
   }
   return post
 }
@@ -149,24 +120,24 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
 const handleContentDataOfComment = async (resolve, root, args, context, resolveInfo) => {
   const { content } = args
   let idsOfUsers = extractMentionedUsers(content)
-  console.log('handleContentDataOfComment', idsOfUsers)
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
-  console.log('handleContentDataOfComment – before filter – postAuthor.id: ', postAuthor.id)
-  console.log('handleContentDataOfComment – before filter – idsOfUsers: ', idsOfUsers)
   idsOfUsers = idsOfUsers.filter((id) => id !== postAuthor.id)
-  console.log('handleContentDataOfComment – after filter – idsOfUsers: ', idsOfUsers)
-  await publishNotifications(context, [
-    notifyUsersOfComment('Comment', comment.id, postAuthor.id, 'commented_on_post', context),
-  ])
-  console.log('handleContentDataOfComment – after notifyUsersOfComment – idsOfUsers: ', idsOfUsers)
-  await notifyPublishUsersOfMentionInclAll(
-    'Comment',
-    comment.id,
-    idsOfUsers,
-    'mentioned_in_comment',
-    context,
-  )
+  if (idsOfUsers.includes(idsOfUsers.find((id) => id === 'all'))) {
+    if (context.user.role !== 'admin') {
+      throw new AuthenticationError('You are not allowed to use the "@all" mention!')
+    }
+    let userToNotify = await queryAllUserIds(context)
+    userToNotify = userToNotify.filter((id) => id !== postAuthor.id)
+    await publishNotifications(context, [
+      notifyUsersOfMention('Comment', comment.id, userToNotify, 'mentioned_in_comment', context),
+    ])
+  } else {
+    await publishNotifications(context, [
+      notifyUsersOfMention('Comment', comment.id, idsOfUsers, 'mentioned_in_comment', context),
+      notifyUsersOfComment('Comment', comment.id, postAuthor.id, 'commented_on_post', context),
+    ])
+  }
   return comment
 }
 
@@ -312,7 +283,6 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
   })
   try {
     const notifications = await writeTxResultPromise
-    console.log(notifications)
     return notifications
   } catch (error) {
     throw new Error(error)
@@ -349,7 +319,6 @@ const notifyUsersOfComment = async (label, commentId, postAuthorId, reason, cont
   })
   try {
     const notifications = await writeTxResultPromise
-    console.log(notifications)
     return notifications
   } finally {
     session.close()
