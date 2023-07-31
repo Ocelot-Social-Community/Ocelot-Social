@@ -64,8 +64,10 @@ export default {
 
 <style lang="scss">
 .post-type-filter {
-  & .item {
-    margin-right: $space-base;
+  & .filter-list {
+    display: grid;
+    grid-template-columns: repeat(3, 10%);
+    padding-left: 0px;
   }
 }
 </style>
