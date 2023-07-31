@@ -2,7 +2,7 @@
   <filter-menu-section
     :title="$t('filter-menu.post-type')"
     :divider="false"
-    class="following-filter"
+    class="following-filter post-type-filter"
   >
     <template #filter-follower>
       <li class="item all-item">
@@ -12,7 +12,9 @@
           :filled="filteredPostTypes.length === 0"
           :title="$t('filter-menu.all')"
           @click="togglePostType(null)"
-        />
+        >
+          {{ $t('filter-menu.all') }}
+        </labeled-button>
       </li>
       <li class="item article-item">
         <labeled-button
@@ -59,3 +61,13 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.post-type-filter {
+  & .filter-list {
+    display: grid;
+    grid-template-columns: repeat(3, 10%);
+    padding-left: 0px;
+  }
+}
+</style>

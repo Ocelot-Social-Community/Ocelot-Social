@@ -10,6 +10,7 @@ describe('FollowingFilter', () => {
   const mutations = {
     'posts/TOGGLE_FILTER_BY_FOLLOWED': jest.fn(),
     'posts/TOGGLE_FILTER_BY_MY_GROUPS': jest.fn(),
+    'posts/RESET_FOLLOWERS_FILTER': jest.fn(),
   }
   const getters = {
     'auth/user': () => {
@@ -63,6 +64,16 @@ describe('FollowingFilter', () => {
           .find('.following-filter .filter-list .posts-in-my-groups-item .base-button')
           .trigger('click')
         expect(mutations['posts/TOGGLE_FILTER_BY_MY_GROUPS']).toHaveBeenCalled()
+      })
+    })
+    describe('clears follower filter', () => {
+      it('when all button is clicked', async () => {
+        wrapper = await Wrapper()
+        const clearFollowerButton = wrapper.find(
+          '.following-filter .item-all-follower .base-button',
+        )
+        clearFollowerButton.trigger('click')
+        expect(mutations['posts/RESET_FOLLOWERS_FILTER']).toHaveBeenCalledTimes(1)
       })
     })
   })
