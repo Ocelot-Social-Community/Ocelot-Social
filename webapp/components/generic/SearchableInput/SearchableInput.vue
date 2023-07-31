@@ -148,7 +148,7 @@ export default {
         case 'User':
           return 'profile-id-slug'
         case 'Group':
-          return 'group-id-slug'
+          return 'groups-id-slug'
         default:
           return null
       }

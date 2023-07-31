@@ -30,6 +30,7 @@ const standardSanitizeHtmlOptions = {
     'strike',
     'span',
     'blockquote',
+    'usertag',
   ],
   allowedAttributes: {
     a: ['href', 'class', 'target', 'data-*', 'contenteditable'],
