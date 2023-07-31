@@ -54,7 +54,7 @@ export default {
   },
   computed: {
     startSearch() {
-      return this.query && this.query.length > 3
+      return this.query && this.query.length >= 3
     },
   },
   methods: {

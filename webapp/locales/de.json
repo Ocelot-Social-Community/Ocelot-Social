@@ -6,7 +6,8 @@
     "edit": "Bearbeiten",
     "loading": "wird geladen",
     "loadMore": "mehr laden",
-    "save": "Speichern"
+    "save": "Speichern",
+    "saveCategories": "Themen speichern"
   },
   "admin": {
     "categories": {
@@ -298,16 +299,16 @@
       "happy": "Glücklich",
       "surprised": "Erstaunt"
     },
-    "filterFollow": "Beiträge von Nutzern filtern, denen ich folge",
+    "filterFollow": "Nutzern, denen ich folge",
     "filterMasonryGrid": {
       "myFriends": "Nutzer denen ich folge",
       "myGroups": "Aus meinen Gruppen",
       "myTopics": "Meine Themen",
-      "noFilter": "Inhalt filtern",
-      "onlyArticles": "Nur Beiträge",
-      "onlyEvents": "Nur Veranstaltungen"
+      "noFilter": "Inhalte filtern",
+      "onlyArticles": "Beiträge",
+      "onlyEvents": "Veranstaltungen"
     },
-    "filterMyGroups": "Beiträge in meinen Gruppen",
+    "filterMyGroups": "Meine Gruppen",
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache Deines Beitrags",
     "languageSelectText": "Sprache wählen",
@@ -418,21 +419,22 @@
     "emotions": "Emotionen",
     "ended": {
       "all": {
-        "hint": "Zeige alle, auch beendete",
+        "hint": "Zeige alle, auch zukünftige",
         "label": "Alle"
       },
       "onlyEnded": {
-        "hint": "Zeige nur noch nicht beendete",
-        "label": "Nicht beendete"
+        "hint": "Zeige nur noch zukünftige",
+        "label": "Zukünftige"
       }
     },
     "event": "Veranstaltung",
     "eventsBy": "Veranstaltungen – zeige ...",
     "eventsEnded": "Beendet",
     "filter-by": "Filtern nach ...",
-    "following": "Nutzer denen ich folge",
+    "following": "Nutzer, denen ich folge",
+    "following-title": "Quellen",
     "languages": "Sprachen",
-    "my-groups": "Meinen Gruppen",
+    "my-groups": "Meine Gruppen",
     "order": {
       "last": {
         "hint": "Sortiere die Letzten nach vorn",
@@ -749,13 +751,13 @@
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
-      "title": "Erstelle ein neues Event"
+      "title": "Erstelle eine Veranstaltung"
     },
     "createNewPost": {
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
-      "title": "Erstelle einen neuen Beitrag"
+      "title": "Erstelle einen Beitrag"
     },
     "edited": "bearbeitet",
     "editPost": {
@@ -782,9 +784,9 @@
     "viewEvent": {
       "eventEnd": "Ende",
       "eventIsOnline": "Online",
-      "eventLocationName": "Stadt - z.B. Musterstraße 1, 12345 Musterstadt",
+      "eventLocationName": "Stadt — z.B. Musterstraße 1, 12345 Musterstadt",
       "eventStart": "Beginn",
-      "eventVenue": "Veranstaltungsort - z.B. Hinterhof, 1. OG, ...",
+      "eventVenue": "Veranstaltungsort — z.B. Hinterhof, 1. OG, …",
       "title": "Veranstaltung"
     },
     "viewPost": {
