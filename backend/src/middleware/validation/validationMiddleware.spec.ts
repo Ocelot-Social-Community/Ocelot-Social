@@ -315,14 +315,9 @@ describe('validationMiddleware', () => {
   })
 
   describe('SignupVerification', () => {
-    let userParams, variables, updatingUser
+    let variables
 
     beforeEach(async () => {
-      userParams = {
-        id: 'updating-user',
-        name: 'John Doe',
-      }
-
       variables = {
         id: 'updating-user',
         name: 'John Doughnut',
