@@ -63,6 +63,7 @@ export default {
     display: flex;
     flex-basis: 100%;
     flex-grow: 1;
+    padding-left: $space-base;
 
     > .item {
       // width: 30%;
