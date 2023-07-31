@@ -1,55 +1,33 @@
 <template>
   <div>
-    <ds-flex :width="{ base: '100%' }">
-      <ds-flex-item :width="{ base: '100%' }">
-        <ds-flex gutter="base" :width="{ base: '100%', sm: 1 }">
-          <ds-flex-item>
-            <ds-card class="create-form-btn" :primary="!createEvent" centered>
-              <div>
-                <ds-button
-                  v-if="!createEvent"
-                  ghost
-                  fullwidth
-                  size="x-large"
-                  class="inactive-tab-button"
-                >
-                  {{ $t('post.createNewPost.title') }}
-                </ds-button>
-                <ds-button v-else ghost fullwidth size="x-large" @click="switchPostType()">
-                  {{ $t('post.createNewPost.title') }}
-                </ds-button>
-              </div>
-            </ds-card>
-          </ds-flex-item>
-          <ds-flex-item>
-            <ds-card class="create-form-btn" :primary="!!createEvent" centered>
-              <div>
-                <ds-button
-                  ghost
-                  fullwidth
-                  size="x-large"
-                  v-if="createEvent"
-                  hover
-                  class="inactive-tab-button"
-                >
-                  {{ $t('post.createNewEvent.title') }}
-                </ds-button>
-                <ds-button ghost fullwidth size="x-large" v-else @click="switchPostType()">
-                  {{ $t('post.createNewEvent.title') }}
-                </ds-button>
-              </div>
-            </ds-card>
-          </ds-flex-item>
-        </ds-flex>
-        <div v-if="group" class="group-create-title">
-          {{ $t('post.createNewPost.forGroup.title', { name: group.name }) }}
-        </div>
+    <ds-flex gutter="small">
+      <ds-flex-item :width="{ base: '100%', md: '200px' }">
+        <ds-menu class="post-type-menu" :routes="routes">
+          <ds-menu-item
+            @click.prevent="switchPostType($event, item)"
+            slot="menuitem"
+            slot-scope="item"
+            :route="item.route"
+            class="post-type-menu-item"
+          >
+            {{ item.route.name }}
+          </ds-menu-item>
+        </ds-menu>
       </ds-flex-item>
-    </ds-flex>
-
-    <ds-flex :width="{ base: '100%' }" gutter="base">
-      <ds-flex-item :width="{ base: '100%' }">
-        <contribution-form :group="group" :createEvent="createEvent" />
+      <ds-flex-item :width="{ base: '100%', md: 1 }">
+        <transition name="slide-up" appear>
+          <div>
+            <div>
+              <h1 v-if="!createEvent" class="title">
+                {{ $t('post.createNewPost.title') }}
+              </h1>
+              <h1 v-else class="title">
+                {{ $t('post.createNewEvent.title') }}
+              </h1>
+            </div>
+            <contribution-form :group="group" :createEvent="createEvent" />
+          </div>
+        </transition>
       </ds-flex-item>
     </ds-flex>
   </div>
@@ -74,6 +52,20 @@ export default {
     group() {
       return this.Group && this.Group[0] ? this.Group[0] : null
     },
+    routes() {
+      return [
+        {
+          name: this.$t('post.name'),
+          path: `/post/create`,
+          type: 'post',
+        },
+        {
+          name: this.$t('post.event'),
+          path: `/`,
+          type: 'event',
+        },
+      ]
+    },
   },
   apollo: {
     Group: {
@@ -97,8 +89,18 @@ export default {
     },
   },
   methods: {
-    switchPostType() {
-      this.createEvent = !this.createEvent
+    switchPostType(event, route) {
+      if (route.route.type.toLowerCase() === 'event') {
+        this.createEvent = true
+      } else {
+        this.createEvent = false
+      }
+      // hacky way to set active element
+      const menuItems = document.querySelectorAll('.post-type-menu-item')
+      menuItems.forEach((menuItem) => {
+        menuItem.firstChild.classList.remove('router-link-exact-active', 'router-link-active')
+      })
+      event.target.classList.add('router-link-exact-active')
     },
   },
 }
@@ -119,5 +121,17 @@ export default {
 }
 .create-form-btn .ds-button-ghost:hover {
   background-color: transparent;
+}
+
+.menu-item-active {
+  color: $color-primary;
+  border-left: 2px solid $color-primary;
+  background-color: #faf9fa;
+}
+
+@media screen and (min-width: 768px) {
+  .post-type-menu {
+    margin-top: 39px;
+  }
 }
 </style>
