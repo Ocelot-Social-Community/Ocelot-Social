@@ -1,7 +1,7 @@
 name: ocelot.social backend test CI
 
 
-on: [push]
+on: push
 
 jobs:
   files-changed:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3.3.0
 
-      - name: Check for frontend file changes
+      - name: Check for backend file changes
         uses: dorny/paths-filter@v2.11.1
         id: changes
         with:
@@ -34,12 +34,13 @@ jobs:
         run: |
           docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
           docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/neo4j.tar
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      
+      - name: Cache docker images
+        id: cache-neo4j
+        uses: actions/cache/save@v3.3.1
         with:
-          name: docker-neo4j-image
           path: /tmp/neo4j.tar
+          key: ${{ github.run_id }}-backend-neo4j-cache
 
   build_test_backend:
     name: Docker Build Test - Backend
@@ -54,12 +55,13 @@ jobs:
         run: |
           docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
           docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      
+      - name: Cache docker images
+        id: cache-backend
+        uses: actions/cache/save@v3.3.1
         with:
-          name: docker-backend-test
           path: /tmp/backend.tar
+          key: ${{ github.run_id }}-backend-cache
 
   lint_backend:
     name: Lint Backend
@@ -84,28 +86,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Download Docker Image (Neo4J)
-        uses: actions/download-artifact@v3
+      - name: Restore Neo4J cache
+        uses: actions/cache/restore@v3.3.1
         with:
-          name: docker-neo4j-image
-          path: /tmp
+          path: /tmp/neo4j.tar
+          key: ${{ github.run_id }}-backend-neo4j-cache
+          fail-on-cache-miss: true
 
-      - name: Load Docker Image
-        run: docker load < /tmp/neo4j.tar
-
-      - name: Download Docker Image (Backend)
-        uses: actions/download-artifact@v3
+      - name: Restore Backend cache
+        uses: actions/cache/restore@v3.3.1
         with:
-          name: docker-backend-test
-          path: /tmp
+          path: /tmp/backend.tar
+          key: ${{ github.run_id }}-backend-cache
+          fail-on-cache-miss: true
 
-      - name: Load Docker Image
-        run: docker load < /tmp/backend.tar
+      - name: Load Docker Images
+        run: |
+          docker load < /tmp/neo4j.tar
+          docker load < /tmp/backend.tar
 
-      - name: backend | copy env files webapp
-        run: cp webapp/.env.template webapp/.env
-      - name: backend | copy env files backend
-        run: cp backend/.env.template backend/.env
+      - name: backend | copy env files
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.template backend/.env
 
       - name: backend | docker-compose
         run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps neo4j backend
@@ -118,3 +121,20 @@ jobs:
 
       - name: backend | Unit test incl. coverage check
         run: docker-compose exec -T backend yarn test
+
+  cleanup:
+    name: Cleanup
+    if: ${{ needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true' }}
+    needs: [files-changed, unit_test_backend]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Delete cache
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh extension install actions/gh-actions-cache
+          KEY="${{ github.run_id }}-backend-neo4j-cache"
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
+          KEY="${{ github.run_id }}-backend-cache"
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm

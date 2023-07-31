@@ -13,33 +13,40 @@
     <client-only>
       <modal />
     </client-only>
-    <div v-if="$store.getters['chat/showChat'].showChat" class="chat-modul">
-      <chat-module
-        v-on:close-single-room="closeSingleRoom"
-        :singleRoomId="$store.getters['chat/showChat'].roomID"
-      />
+    <div v-if="getShowChat.showChat" class="chat-modul">
+      <chat singleRoom :roomId="getShowChat.roomID" @close-single-room="closeSingleRoom" />
     </div>
   </div>
 </template>
+
 <script>
+import { mapGetters, mapMutations } from 'vuex'
 import seo from '~/mixins/seo'
 import mobile from '~/mixins/mobile'
 import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
 import Modal from '~/components/Modal'
 import PageFooter from '~/components/PageFooter/PageFooter'
-import ChatModule from '~/components/Chat/Chat.vue'
+import Chat from '~/components/Chat/Chat.vue'
 
 export default {
   components: {
     HeaderMenu,
     Modal,
     PageFooter,
-    ChatModule,
+    Chat,
   },
   mixins: [seo, mobile()],
+  computed: {
+    ...mapGetters({
+      getShowChat: 'chat/showChat',
+    }),
+  },
   methods: {
+    ...mapMutations({
+      showChat: 'chat/SET_OPEN_CHAT',
+    }),
     closeSingleRoom() {
-      this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: null })
+      this.showChat({ showChat: false, roomID: null })
     },
   },
   beforeCreate() {
