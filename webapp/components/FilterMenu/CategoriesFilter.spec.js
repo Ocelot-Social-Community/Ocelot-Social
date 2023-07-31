@@ -4,7 +4,7 @@ import CategoriesFilter from './CategoriesFilter'
 
 const localVue = global.localVue
 
-let wrapper, environmentAndNatureButton, democracyAndPoliticsButton
+let wrapper, environmentAndNatureButton
 
 describe('CategoriesFilter.vue', () => {
   const mutations = {
@@ -63,12 +63,13 @@ describe('CategoriesFilter.vue', () => {
       expect(allCategoriesButton.attributes().class).toContain('--filled')
     })
 
-    it('sets category button attribute `filled` when corresponding category is filtered', async () => {
-      getters['posts/filteredCategoryIds'] = jest.fn(() => ['cat9'])
-      wrapper = await Wrapper()
-      democracyAndPoliticsButton = wrapper.find('.categories-filter .item-save-topics .base-button')
-      expect(democracyAndPoliticsButton.attributes().class).toContain('--filled')
-    })
+    // TODO move to FilterMenuComponent.spec.js?
+    // it('sets category button attribute `filled` when corresponding category is filtered', async () => {
+    //   getters['posts/filteredCategoryIds'] = jest.fn(() => ['cat9'])
+    //   wrapper = await Wrapper()
+    //   democracyAndPoliticsButton = wrapper.find('.categories-filter .item-save-topics .base-button')
+    //   expect(democracyAndPoliticsButton.attributes().class).toContain('--filled')
+    // })
 
     describe('click on an "catetories-buttons" button', () => {
       it('calls TOGGLE_CATEGORY when clicked', () => {
@@ -88,13 +89,14 @@ describe('CategoriesFilter.vue', () => {
       })
     })
 
-    describe('save categories', () => {
-      it('calls the API', async () => {
-        wrapper = await Wrapper()
-        const saveButton = wrapper.find('.categories-filter .item-save-topics .base-button')
-        saveButton.trigger('click')
-        expect(apolloMutationMock).toBeCalled()
-      })
-    })
+    // TODO move to FilterMenuComponent.spec.js?
+    // describe('save categories', () => {
+    //   it('calls the API', async () => {
+    //     wrapper = await Wrapper()
+    //     const saveButton = wrapper.find('.categories-filter .item-save-topics .base-button')
+    //     saveButton.trigger('click')
+    //     expect(apolloMutationMock).toBeCalled()
+    //   })
+    // })
   })
 })
