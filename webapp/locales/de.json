@@ -749,13 +749,13 @@
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
-      "title": "Erstelle ein neues Event"
+      "title": "Erstelle eine Veranstaltung"
     },
     "createNewPost": {
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
-      "title": "Erstelle einen neuen Beitrag"
+      "title": "Erstelle einen Beitrag"
     },
     "edited": "bearbeitet",
     "editPost": {
@@ -782,9 +782,9 @@
     "viewEvent": {
       "eventEnd": "Ende",
       "eventIsOnline": "Online",
-      "eventLocationName": "Stadt - z.B. Musterstraße 1, 12345 Musterstadt",
+      "eventLocationName": "Stadt — z.B. Musterstraße 1, 12345 Musterstadt",
       "eventStart": "Beginn",
-      "eventVenue": "Veranstaltungsort - z.B. Hinterhof, 1. OG, ...",
+      "eventVenue": "Veranstaltungsort — z.B. Hinterhof, 1. OG, …",
       "title": "Veranstaltung"
     },
     "viewPost": {
