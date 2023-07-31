@@ -501,7 +501,7 @@ describe('notifications', () => {
             )
           })
 
-          it.only('sends only one notification with reason mentioned_in_comment', async () => {
+          it('sends only one notification with reason mentioned_in_comment', async () => {
             postAuthor = await neode.create(
               'User',
               {
