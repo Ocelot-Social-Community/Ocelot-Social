@@ -1,12 +1,14 @@
 import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../../db/factories'
 import { getNeode, getDriver } from '../../db/neo4j'
-import { createRoomMutation } from '../../graphql/rooms'
+import { createRoomMutation, roomQuery } from '../../graphql/rooms'
 import { createMessageMutation, messageQuery, markMessagesAsSeen } from '../../graphql/messages'
-import createServer from '../../server'
+import createServer, { pubsub } from '../../server'
 
 const driver = getDriver()
 const neode = getNeode()
+
+const pubsubSpy = jest.spyOn(pubsub, 'publish')
 
 let query
 let mutate
@@ -22,6 +24,9 @@ beforeAll(async () => {
         driver,
         neode,
         user: authenticatedUser,
+        cypherParams: {
+          currentUserId: authenticatedUser ? authenticatedUser.id : null,
+        },
       }
     },
   })
@@ -55,6 +60,10 @@ describe('Message', () => {
   })
 
   describe('create message', () => {
+    beforeEach(() => {
+      jest.clearAllMocks()
+    })
+
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         await expect(
@@ -77,7 +86,7 @@ describe('Message', () => {
       })
 
       describe('room does not exist', () => {
-        it('returns null', async () => {
+        it('returns null and does not publish subscription', async () => {
           await expect(
             mutate({
               mutation: createMessageMutation(),
@@ -92,6 +101,7 @@ describe('Message', () => {
               CreateMessage: null,
             },
           })
+          expect(pubsubSpy).not.toBeCalled()
         })
       })
 
@@ -107,7 +117,7 @@ describe('Message', () => {
         })
 
         describe('user chats in room', () => {
-          it('returns the message', async () => {
+          it('returns the message and publishes subscriptions', async () => {
             await expect(
               mutate({
                 mutation: createMessageMutation(),
@@ -122,11 +132,91 @@ describe('Message', () => {
                 CreateMessage: {
                   id: expect.any(String),
                   content: 'Some nice message to other chatting user',
+                  senderId: 'chatting-user',
+                  username: 'Chatting User',
+                  avatar: expect.any(String),
+                  date: expect.any(String),
                   saved: true,
                   distributed: false,
                   seen: false,
                 },
               },
+            })
+            expect(pubsubSpy).toBeCalledWith('ROOM_COUNT_UPDATED', {
+              roomCountUpdated: '1',
+              userId: 'other-chatting-user',
+            })
+            expect(pubsubSpy).toBeCalledWith('CHAT_MESSAGE_ADDED', {
+              chatMessageAdded: expect.objectContaining({
+                id: expect.any(String),
+                content: 'Some nice message to other chatting user',
+                senderId: 'chatting-user',
+                username: 'Chatting User',
+                avatar: expect.any(String),
+                date: expect.any(String),
+                saved: true,
+                distributed: false,
+                seen: false,
+              }),
+              userId: 'other-chatting-user',
+            })
+          })
+
+          describe('room is updated as well', () => {
+            it('has last message set', async () => {
+              const result = await query({ query: roomQuery() })
+              await expect(result).toMatchObject({
+                errors: undefined,
+                data: {
+                  Room: [
+                    expect.objectContaining({
+                      lastMessageAt: expect.any(String),
+                      unreadCount: 0,
+                      lastMessage: expect.objectContaining({
+                        _id: result.data.Room[0].lastMessage.id,
+                        id: expect.any(String),
+                        content: 'Some nice message to other chatting user',
+                        senderId: 'chatting-user',
+                        username: 'Chatting User',
+                        avatar: expect.any(String),
+                        date: expect.any(String),
+                        saved: true,
+                        distributed: false,
+                        seen: false,
+                      }),
+                    }),
+                  ],
+                },
+              })
+            })
+          })
+
+          describe('unread count for other user', () => {
+            it('has unread count = 1', async () => {
+              authenticatedUser = await otherChattingUser.toJson()
+              await expect(query({ query: roomQuery() })).resolves.toMatchObject({
+                errors: undefined,
+                data: {
+                  Room: [
+                    expect.objectContaining({
+                      lastMessageAt: expect.any(String),
+                      unreadCount: 1,
+                      lastMessage: expect.objectContaining({
+                        _id: expect.any(String),
+                        id: expect.any(String),
+                        content: 'Some nice message to other chatting user',
+                        senderId: 'chatting-user',
+                        username: 'Chatting User',
+                        avatar: expect.any(String),
+                        date: expect.any(String),
+                        saved: true,
+                        distributed: false,
+                        seen: false,
+                      }),
+                    }),
+                  ],
+                },
+              })
             })
           })
         })

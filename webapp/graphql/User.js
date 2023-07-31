@@ -245,8 +245,8 @@ export const notificationAdded = () => {
     ${postFragment}
     ${groupFragment}
 
-    subscription notifications($userId: ID!) {
-      notificationAdded(userId: $userId) {
+    subscription notifications {
+      notificationAdded {
         id
         read
         reason

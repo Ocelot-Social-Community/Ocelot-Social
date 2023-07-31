@@ -58,14 +58,14 @@ export default {
         routes.push({
           label: this.$t('group.contentMenu.visitGroupPage'),
           icon: 'home',
-          name: 'group-id-slug',
+          path: `/groups/${this.group.id}`,
           params: { id: this.group.id, slug: this.group.slug },
         })
       }
       if (this.group.myRole === 'owner') {
         routes.push({
           label: this.$t('admin.settings.name'),
-          path: `/group/edit/${this.group.id}`,
+          path: `/groups/edit/${this.group.id}`,
           icon: 'edit',
         })
       }
