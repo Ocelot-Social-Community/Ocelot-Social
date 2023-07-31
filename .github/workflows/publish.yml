@@ -260,10 +260,38 @@ jobs:
           version: ${{ env.BUILD_VERSION }}
           git_commit_sha: ${{ github.sha }}
           git_tag_prefix: "b"
+
       - name: Generate changelog
-        run: |
-          yarn install
-          yarn auto-changelog --latest-version ${{ env.VERSION }} --unreleased-only
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v4
+        with:
+          configurationJson: |
+            {
+              "pr_template": "- ##{{NUMBER}} #{{TITLE}} #{{ASSIGNEES}}",
+              "categories": [
+                {
+                    "title": "### 🚀 Features",
+                    "labels": ["feat"]
+                },
+                {
+                    "title": "### 🐛 Fixes",
+                    "labels": ["fix"]
+                },
+                {
+                    "title": "### 💬 Refactoring, Documentation & Other",
+                    "labels": ["chore", docs","other","refactor"]
+                },
+                {
+                    "title": "### 📦 Build & Dependencies",
+                    "labels": ["build","bump"]
+                }
+              ],
+              "max_pull_requests": 1000,
+              "max_back_track_time_days": 1000
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: package-version-to-git-release
         continue-on-error: true # Will fail if tag exists
         id: create_release
@@ -273,7 +301,7 @@ jobs:
         with:
           tag_name: ${{ env.VERSION }}
           release_name: ${{ env.VERSION }}
-          body_path: ./CHANGELOG.md
+          body: ${{steps.changelog.outputs.changelog}}
           draft: false
           prerelease: false
 
