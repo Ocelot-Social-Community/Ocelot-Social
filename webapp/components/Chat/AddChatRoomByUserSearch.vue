@@ -2,7 +2,7 @@
   <div class="add-chat-room-by-user-search">
     <ds-flex class="headline">
       <h2 class="title">{{ $t('chat.addRoomHeadline') }}</h2>
-      <base-button class="close-button" icon="close" circle @click="closeUserSearch" />
+      <base-button class="close-button" icon="close" circle size="small" @click="closeUserSearch" />
     </ds-flex>
     <ds-space margin-bottom="small" />
     <ds-space>
@@ -62,6 +62,6 @@ export default {
   justify-content: space-between;
 }
 .ds-flex.headline .close-button {
-  margin-top: -6px;
+  margin-top: -2px;
 }
 </style>
