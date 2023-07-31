@@ -77,6 +77,28 @@
       }
     }
   },
+  "chat": {
+    "addRoomHeadline": "Suche Nutzer für neuen Chat",
+    "cancelSelectMessage": "Abbrechen",
+    "conversationStarted": "Unterhaltung startete am:",
+    "isOnline": "online",
+    "isTyping": "tippt...",
+    "lastSeen": "zuletzt gesehen ",
+    "messageDeleted": "Diese Nachricht wuerde gelöscht",
+    "messagesEmpty": "Keine Nachrichten",
+    "newMessages": "Neue Nachrichten",
+    "page": {
+      "headline": "Chat"
+    },
+    "roomEmpty": "Keinen Raum selektiert",
+    "roomsEmpty": "Keine Räume",
+    "search": "Chat-Räume filtern",
+    "typeMessage": "Nachricht schreiben",
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chatte mit „{name}“"
+    }
+  },
   "client-only": {
     "loading": "Lade …"
   },
@@ -552,6 +574,9 @@
       },
       "groups": "Gruppen",
       "myProfile": "Mein Profil"
+    },
+    "chat": {
+      "tooltip": "Meine Chats"
     }
   },
   "index": {
@@ -580,7 +605,7 @@
     "moreInfo": "Was ist {APPLICATION_NAME}?",
     "moreInfoHint": "zur Präsentationsseite",
     "no-account": "Du hast noch kein Nutzerkonto?",
-    "no-cookie": "Es kann kein Cookie angelegt werden. Du must Cookies akzeptieren.",
+    "no-cookie": "Es kann kein Cookie angelegt werden. Du musst Cookies akzeptieren.",
     "password": "Dein Passwort",
     "register": "Nutzerkonto erstellen",
     "success": "Du bist eingeloggt!"
@@ -595,9 +620,16 @@
     "button": {
       "tooltip": "Landkarte anzeigen"
     },
-    "markerTypes": {
+    "legend": {
+      "event": "Veranstaltung",
       "group": "Gruppe",
-      "theUser": "deine Position",
+      "theUser": "Meine Position",
+      "user": "Nutzer"
+    },
+    "markerTypes": {
+      "event": "Veranstaltung",
+      "group": "Gruppe",
+      "theUser": "meine Position",
       "user": "Nutzer"
     },
     "pageTitle": "Landkarte",
@@ -691,9 +723,6 @@
       "unread": "Ungelesen"
     },
     "group": "Beschreibung",
-    "headerMenuButton": {
-      "tooltip": "Meine Benachrichtigungen"
-    },
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",
@@ -709,11 +738,6 @@
     "title": "Benachrichtigungen",
     "user": "Nutzer"
   },
-  "position": {
-    "group": "Gruppe",
-    "my": "Meine Position",
-    "user": "Nutzer"
-  },
   "post": {
     "comment": {
       "reply": "Antworten",
@@ -725,13 +749,13 @@
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
-      "title": "Erstelle ein neues Event"
+      "title": "Erstelle eine Veranstaltung"
     },
     "createNewPost": {
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
-      "title": "Erstelle einen neuen Beitrag"
+      "title": "Erstelle einen Beitrag"
     },
     "edited": "bearbeitet",
     "editPost": {
@@ -758,9 +782,9 @@
     "viewEvent": {
       "eventEnd": "Ende",
       "eventIsOnline": "Online",
-      "eventLocationName": "Stadt",
+      "eventLocationName": "Stadt — z.B. Musterstraße 1, 12345 Musterstadt",
       "eventStart": "Beginn",
-      "eventVenue": "Veranstaltungsort",
+      "eventVenue": "Veranstaltungsort — z.B. Hinterhof, 1. OG, …",
       "title": "Veranstaltung"
     },
     "viewPost": {
@@ -878,7 +902,7 @@
       "Tag": "Hashtag ::: Hashtags",
       "User": "Nutzer ::: Nutzer"
     },
-    "hint": "Wonach suchst Du? Nutze !… für Beiträge, @… für Mitglieder, &… für Gruppen, #… für Hashtags",
+    "hint": "!... sucht Beiträge, @... sucht Nutzer, &... sucht Gruppen, #… sucht Hashtags",
     "no-results": "Keine Ergebnisse für \"{search}\" gefunden. Versuch' es mit einem anderen Begriff!",
     "page": "Seite",
     "placeholder": "Suchen",

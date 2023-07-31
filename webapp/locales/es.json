@@ -75,6 +75,9 @@
       }
     }
   },
+  "chat": {
+    "search": "Filtrar salas de chat"
+  },
   "code-of-conduct": {
     "subheader": "para la red social de {ORGANIZATION_NAME}"
   },

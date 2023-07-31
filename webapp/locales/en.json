@@ -77,6 +77,28 @@
       }
     }
   },
+  "chat": {
+    "addRoomHeadline": "Search User for new Chat",
+    "cancelSelectMessage": "Cancel",
+    "conversationStarted": "Conversation started on:",
+    "isOnline": "is online",
+    "isTyping": "is writing...",
+    "lastSeen": "last seen ",
+    "messageDeleted": "This message was deleted",
+    "messagesEmpty": "No messages",
+    "newMessages": "New Messages",
+    "page": {
+      "headline": "Chat"
+    },
+    "roomEmpty": "No room selected",
+    "roomsEmpty": "No rooms",
+    "search": "Filter chat rooms",
+    "typeMessage": "Type message",
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chat with “{name}”"
+    }
+  },
   "client-only": {
     "loading": "Loading …"
   },
@@ -454,7 +476,7 @@
     "addMemberToGroupSuccess": "“{name}” was added to the group with the role “{role}”!",
     "addUser": "Add User",
     "addUserNoOptions": "No users found!",
-    "addUserPlaceholder": " Username",
+    "addUserPlaceholder": "User name",
     "allGroups": "All Groups",
     "button": {
       "tooltip": "Show groups"
@@ -552,6 +574,9 @@
       },
       "groups": "Groups",
       "myProfile": "My profile"
+    },
+    "chat": {
+      "tooltip": "My chats"
     }
   },
   "index": {
@@ -595,9 +620,16 @@
     "button": {
       "tooltip": "Show map"
     },
+    "legend": {
+      "event": "Event",
+      "group": "Group",
+      "theUser": "My position",
+      "user": "User"
+    },
     "markerTypes": {
+      "event": "event",
       "group": "group",
-      "theUser": "your position",
+      "theUser": "my position",
       "user": "user"
     },
     "pageTitle": "Map",
@@ -691,9 +723,6 @@
       "unread": "Unread"
     },
     "group": "Description",
-    "headerMenuButton": {
-      "tooltip": "My notifications"
-    },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
     "post": "Post or Group",
@@ -709,11 +738,6 @@
     "title": "Notifications",
     "user": "User"
   },
-  "position": {
-    "group": "Group",
-    "my": "My position",
-    "user": "User"
-  },
   "post": {
     "comment": {
       "reply": "Reply",
@@ -725,13 +749,13 @@
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Create A New Event"
+      "title": "Create an Event"
     },
     "createNewPost": {
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Create A New Article"
+      "title": "Create an Article"
     },
     "edited": "edited",
     "editPost": {
@@ -758,9 +782,9 @@
     "viewEvent": {
       "eventEnd": "End",
       "eventIsOnline": "Online",
-      "eventLocationName": "City",
+      "eventLocationName": "City — e.g. Example Street 1, 12345 City",
       "eventStart": "Start",
-      "eventVenue": "Venue",
+      "eventVenue": "Venue — e.g. Backyard, 1st Floor, …",
       "title": "Event"
     },
     "viewPost": {
@@ -878,7 +902,7 @@
       "Tag": "Hashtag ::: Hashtags",
       "User": "User ::: Users"
     },
-    "hint": "What are you searching for? Use !… for posts, @… for users, &… for groups, #… for hashtags.",
+    "hint": "!... searches posts, @... searches users, &... searches groups, #… searches hashtags",
     "no-results": "No results found for \"{search}\". Try a different search term!",
     "page": "Page",
     "placeholder": "Search",

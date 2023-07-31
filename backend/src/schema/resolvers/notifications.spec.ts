@@ -238,7 +238,7 @@ describe('given some notifications', () => {
             variables: { ...variables, read: false },
           })
           await expect(response).toMatchObject(expected)
-          await expect(response.data.notifications.length).toEqual(2) // double-check
+          await expect(response.data.notifications).toHaveLength(2) // double-check
         })
 
         describe('if a resource gets deleted', () => {

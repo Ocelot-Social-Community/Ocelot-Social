@@ -907,6 +907,7 @@ describe('UpdatePost', () => {
       })
     })
 
+    // eslint-disable-next-line jest/no-disabled-tests
     describe.skip('params.image', () => {
       describe('is object', () => {
         beforeEach(() => {
