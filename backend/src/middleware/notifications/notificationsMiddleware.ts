@@ -100,11 +100,12 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
-    if (idsOfUsers.includes((id) => id === 'all')) {
+    if (idsOfUsers.find((id) => id === 'all')) {
       if (context.user.role !== 'admin') {
         throw new AuthenticationError('You are not allowed to use the "@all" mention!')
       }
-      const userToNotify = await queryAllUserIds(context)
+      let userToNotify = await queryAllUserIds(context)
+      userToNotify = userToNotify.filter((id) => id !== context.user.id)
       await publishNotifications(context, [
         notifyUsersOfMention('Post', post.id, userToNotify, 'mentioned_in_post', context),
       ])
@@ -123,7 +124,7 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
   idsOfUsers = idsOfUsers.filter((id) => id !== postAuthor.id)
-  if (idsOfUsers.includes(idsOfUsers.find((id) => id === 'all'))) {
+  if (idsOfUsers.find((id) => id === 'all')) {
     if (context.user.role !== 'admin') {
       throw new AuthenticationError('You are not allowed to use the "@all" mention!')
     }
