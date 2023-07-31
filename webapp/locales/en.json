@@ -723,6 +723,9 @@
       "unread": "Unread"
     },
     "group": "Description",
+    "headerMenuButton": {
+      "tooltip": "Notifications"
+    },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
     "post": "Post or Group",

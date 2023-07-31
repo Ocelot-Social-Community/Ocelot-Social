@@ -405,6 +405,10 @@
       "read": "Lire",
       "unread": "Non lu"
     },
+    "group": "Description",
+    "headerMenuButton": {
+      "tooltip": "Notifications"
+    },
     "markAllAsRead": "Tout marquer comme lu",
     "pageLink": "Toutes les notifications",
     "post": "Post",
