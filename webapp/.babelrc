@@ -6,7 +6,7 @@
     [
       "@babel/preset-env",
       {
-        "modules": false
+        "corejs": 3
       }
     ]
   ],
@@ -19,7 +19,8 @@
           {
             "targets": {
               "node": "10"
-            }
+            },
+            "corejs": 3
           }
         ]
       ]
