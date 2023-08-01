@@ -140,16 +140,18 @@ const postAuthorOfComment = async (commentId, { context }) => {
 
 const notifyOwnersOfGroup = async (groupId, userId, reason, context) => {
   const cypher = `
+    MATCH (user:User { id: $userId })
     MATCH (group:Group { id: $groupId })<-[membership:MEMBER_OF]-(owner:User)
     WHERE membership.role = 'owner'
-    WITH owner, group
+    WITH owner, group, user, membership
     MERGE (group)-[notification:NOTIFIED {reason: $reason}]->(owner)
-    WITH group, owner, notification
+    WITH group, owner, notification, user, membership
     SET notification.read = FALSE
     SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
     SET notification.updatedAt = toString(datetime())
     SET notification.relatedUserId = $userId
-    RETURN notification {.*, from: group, to: properties(owner)}
+    WITH owner, group { __typename: 'Group', .*, myRole: membership.roleInGroup } AS finalGroup, user, notification
+    RETURN notification {.*, from: finalGroup, to: properties(owner), relatedUser: properties(user) }
   `
   const session = context.driver.session()
   const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -173,16 +175,20 @@ const notifyOwnersOfGroup = async (groupId, userId, reason, context) => {
 const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
   const { user: owner } = context
   const cypher = `
+    MATCH (owner:User { id: $ownerId })
     MATCH (user:User { id: $userId })
     MATCH (group:Group { id: $groupId })
-    WITH user, group
+    OPTIONAL MATCH (user)-[membership:MEMBER_OF]->(group)
+    WITH user, group, owner, membership
     MERGE (group)-[notification:NOTIFIED {reason: $reason}]->(user)
-    WITH group, user, notification
+    WITH group, user, notification, owner, membership
     SET notification.read = FALSE
     SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
     SET notification.updatedAt = toString(datetime())
     SET notification.relatedUserId = $ownerId
-    RETURN notification {.*, from: group, to: properties(user)}
+    WITH group { __typename: 'Group', .*, myRole: membership.roleInGroup } AS finalGroup,
+    notification, user, owner
+    RETURN notification {.*, from: finalGroup, to: properties(user), relatedUser: properties(owner) }
   `
   const session = context.driver.session()
   const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -242,7 +248,7 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
     SET notification.read = FALSE
     SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
     SET notification.updatedAt = toString(datetime())
-    RETURN notification {.*, from: finalResource, to: properties(user)}
+    RETURN notification {.*, from: finalResource, to: properties(user), relatedUser: properties(user) }
   `
   const session = context.driver.session()
   const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -276,9 +282,14 @@ const notifyUsersOfComment = async (label, commentId, postAuthorId, reason, cont
       SET notification.read = FALSE
       SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
       SET notification.updatedAt = toString(datetime())
-      WITH notification, postAuthor, post,
+      WITH notification, postAuthor, post, commenter,
       comment {.*, __typename: labels(comment)[0], author: properties(commenter), post:  post {.*, author: properties(postAuthor) } } AS finalResource
-      RETURN notification {.*, from: finalResource, to: properties(postAuthor)}
+      RETURN notification {
+        .*,
+        from: finalResource,
+        to: properties(postAuthor),
+        relatedUser: properties(commenter)
+      }
     `,
       { commentId, postAuthorId, reason },
     )

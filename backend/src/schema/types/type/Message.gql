@@ -2,8 +2,13 @@
 #   room: _RoomFilter
 # }
 
+enum _MessageOrdering {
+  indexId_desc
+}
+
 type Message {
   id: ID!
+  indexId: Int!
   createdAt: String
   updatedAt: String
 
@@ -16,6 +21,10 @@ type Message {
   username: String! @cypher(statement: "MATCH (this)<-[:CREATED]-(user:User) RETURN user.name")
   avatar: String @cypher(statement: "MATCH (this)<-[:CREATED]-(:User)-[:AVATAR_IMAGE]->(image:Image) RETURN image.url")
   date: String!  @cypher(statement: "RETURN this.createdAt")
+
+  saved: Boolean
+  distributed: Boolean
+  seen: Boolean
 }
 
 type Mutation {
@@ -23,8 +32,19 @@ type Mutation {
     roomId: ID!
     content: String!
   ): Message
+
+  MarkMessagesAsSeen(messageIds: [String!]): Boolean
 }
 
 type Query {
-  Message(roomId: ID!): [Message]
+  Message(
+    roomId: ID!,
+    first: Int
+    offset: Int
+    orderBy: [_MessageOrdering]
+  ): [Message]
+}
+
+type Subscription {
+  chatMessageAdded: Message
 }

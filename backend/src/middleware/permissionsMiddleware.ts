@@ -408,6 +408,7 @@ export default shield(
       getInviteCode: isAuthenticated, // and inviteRegistration
       Room: isAuthenticated,
       Message: isAuthenticated,
+      UnreadRooms: isAuthenticated,
     },
     Mutation: {
       '*': deny,
@@ -463,6 +464,7 @@ export default shield(
       saveCategorySettings: isAuthenticated,
       CreateRoom: isAuthenticated,
       CreateMessage: isAuthenticated,
+      MarkMessagesAsSeen: isAuthenticated,
     },
     User: {
       email: or(isMyOwn, isAdmin),

@@ -407,3 +407,18 @@ $color-ribbon-event: $background-color-third;
 $color-ribbon-event-active: $background-color-third-active;
 $color-ribbon-article: $background-color-secondary;
 $color-ribbon-article-active: $background-color-secondary-active;
+
+/**
+ * @tokens Chat Color
+ */
+
+$chat-message-bg-me: $color-primary-light;
+$chat-message-color: $text-color-base;
+$chat-message-bg-others: $color-neutral-80;
+$chat-sidemenu-bg: $color-secondary-active;
+$chat-new-message-color: $color-secondary-active;
+$chat-message-timestamp: $text-color-soft;
+$chat-message-checkmark-seen: $text-color-secondary;
+$chat-message-checkmark: $text-color-soft;
+$chat-room-color-counter-badge: $text-color-inverse;
+$chat-room-background-counter-badge: $color-secondary;

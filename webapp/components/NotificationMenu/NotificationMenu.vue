@@ -137,19 +137,15 @@ export default {
       },
       subscribeToMore: {
         document: notificationAdded(),
-        variables() {
-          return {
-            userId: this.user.id,
-          }
-        },
         updateQuery: (previousResult, { subscriptionData }) => {
           const {
             data: { notificationAdded: newNotification },
           } = subscriptionData
+
           return {
             notifications: unionBy(
               [newNotification],
-              previousResult.notifications,
+              previousResult?.notifications,
               (notification) => notification.id,
             ).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)),
           }

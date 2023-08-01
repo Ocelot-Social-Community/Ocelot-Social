@@ -6,7 +6,8 @@
     "edit": "Edit",
     "loading": "loading",
     "loadMore": "load more",
-    "save": "Save"
+    "save": "Save",
+    "saveCategories": "Save topics"
   },
   "admin": {
     "categories": {
@@ -75,6 +76,28 @@
           "slug": "Slug"
         }
       }
+    }
+  },
+  "chat": {
+    "addRoomHeadline": "Search User for new Chat",
+    "cancelSelectMessage": "Cancel",
+    "conversationStarted": "Conversation started on:",
+    "isOnline": "is online",
+    "isTyping": "is writing...",
+    "lastSeen": "last seen ",
+    "messageDeleted": "This message was deleted",
+    "messagesEmpty": "No messages",
+    "newMessages": "New Messages",
+    "page": {
+      "headline": "Chat"
+    },
+    "roomEmpty": "No room selected",
+    "roomsEmpty": "No rooms",
+    "search": "Filter chat rooms",
+    "typeMessage": "Type message",
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chat with “{name}”"
     }
   },
   "client-only": {
@@ -276,16 +299,16 @@
       "happy": "Happy",
       "surprised": "Surprised"
     },
-    "filterFollow": "Filter contributions from users I follow",
+    "filterFollow": "Users I follow",
     "filterMasonryGrid": {
       "myFriends": "Users I follow",
       "myGroups": "By my groups",
       "myTopics": "My topics",
       "noFilter": "Filter content",
-      "onlyArticles": "Only articles",
-      "onlyEvents": "Only events"
+      "onlyArticles": "Articles",
+      "onlyEvents": "Events"
     },
-    "filterMyGroups": "Contributions in my groups",
+    "filterMyGroups": "My groups",
     "inappropriatePicture": "This image may be inappropriate for some people.",
     "languageSelectLabel": "Language of your contribution",
     "languageSelectText": "Select Language",
@@ -409,6 +432,7 @@
     "eventsEnded": "Ended",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
+    "following-title": "Sources",
     "languages": "Languages",
     "my-groups": "My groups",
     "order": {
@@ -454,7 +478,7 @@
     "addMemberToGroupSuccess": "“{name}” was added to the group with the role “{role}”!",
     "addUser": "Add User",
     "addUserNoOptions": "No users found!",
-    "addUserPlaceholder": " Username",
+    "addUserPlaceholder": "User name",
     "allGroups": "All Groups",
     "button": {
       "tooltip": "Show groups"
@@ -552,6 +576,9 @@
       },
       "groups": "Groups",
       "myProfile": "My profile"
+    },
+    "chat": {
+      "tooltip": "My chats"
     }
   },
   "index": {
@@ -595,9 +622,16 @@
     "button": {
       "tooltip": "Show map"
     },
+    "legend": {
+      "event": "Event",
+      "group": "Group",
+      "theUser": "My position",
+      "user": "User"
+    },
     "markerTypes": {
+      "event": "event",
       "group": "group",
-      "theUser": "your position",
+      "theUser": "my position",
       "user": "user"
     },
     "pageTitle": "Map",
@@ -691,9 +725,6 @@
       "unread": "Unread"
     },
     "group": "Description",
-    "headerMenuButton": {
-      "tooltip": "My notifications"
-    },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
     "post": "Post or Group",
@@ -709,11 +740,6 @@
     "title": "Notifications",
     "user": "User"
   },
-  "position": {
-    "group": "Group",
-    "my": "My position",
-    "user": "User"
-  },
   "post": {
     "comment": {
       "reply": "Reply",
@@ -725,13 +751,13 @@
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Create A New Event"
+      "title": "Create an Event"
     },
     "createNewPost": {
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Create A New Article"
+      "title": "Create an Article"
     },
     "edited": "edited",
     "editPost": {
@@ -758,9 +784,9 @@
     "viewEvent": {
       "eventEnd": "End",
       "eventIsOnline": "Online",
-      "eventLocationName": "City",
+      "eventLocationName": "City — e.g. Example Street 1, 12345 City",
       "eventStart": "Start",
-      "eventVenue": "Venue",
+      "eventVenue": "Venue — e.g. Backyard, 1st Floor, …",
       "title": "Event"
     },
     "viewPost": {
@@ -878,7 +904,7 @@
       "Tag": "Hashtag ::: Hashtags",
       "User": "User ::: Users"
     },
-    "hint": "What are you searching for? Use !… for posts, @… for users, &… for groups, #… for hashtags.",
+    "hint": "!... searches posts, @... searches users, &... searches groups, #… searches hashtags",
     "no-results": "No results found for \"{search}\". Try a different search term!",
     "page": "Page",
     "placeholder": "Search",
