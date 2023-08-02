@@ -17,7 +17,7 @@ export const queryAllUserIds = async (context, offset = -1, pageSize = -1) => {
     const ids = await writeTxResultPromise
     return ids
   } catch (error) {
-    throw new Error(error)
+    throw new Error(error.message)
   } finally {
     session.close()
   }

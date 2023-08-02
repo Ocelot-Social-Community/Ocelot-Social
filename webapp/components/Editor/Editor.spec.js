@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import Editor from './Editor'
+import Vuex from 'vuex'
 
 import MutationObserver from 'mutation-observer'
 import Vue from 'vue'
@@ -7,6 +8,7 @@ import Vue from 'vue'
 global.MutationObserver = MutationObserver
 
 const localVue = global.localVue
+localVue.use(Vuex)
 
 describe('Editor.vue', () => {
   let wrapper
@@ -14,6 +16,12 @@ describe('Editor.vue', () => {
   let mocks
 
   const Wrapper = () => {
+    const store = new Vuex.Store({ getters: {
+      'auth/user': () => {
+        return { id: 'u343', name: deleteAccountName }
+      },
+      'auth/isAdmin': () => false,
+    }})
     return (wrapper = mount(Editor, {
       mocks,
       propsData,
@@ -22,6 +30,7 @@ describe('Editor.vue', () => {
       stubs: {
         transition: false,
       },
+      store
     }))
   }
 
