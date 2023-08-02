@@ -27,6 +27,7 @@
         @fetch-more-rooms="fetchRooms"
         @add-room="toggleUserSearch"
         @show-demo-options="showDemoOptions = $event"
+        @open-user-tag="redirectToUserProfile($event.detail[0])"
       >
         <div
           v-if="selectedRoom && selectedRoom.roomId"
@@ -446,6 +447,13 @@ export default {
         .finally(() => {
           // this.loading = false
         })
+    },
+
+    redirectToUserProfile({ user }) {
+      const userID = user.id
+      const userName = user.name.toLowerCase().replaceAll(' ', '-')
+      const url = `/profile/${userID}/${userName}`
+      this.$router.push({ path: url })
     },
   },
 }

@@ -1,27 +1,23 @@
 <template>
   <filter-menu-section :title="$t('filter-menu.categories')" class="categories-filter">
-    <template #filter-topics>
-      <li class="item item-all-topics">
-        <labeled-button
+    <template #filter-list>
+      <div class="item item-all-topics">
+        <base-button
           :filled="!filteredCategoryIds.length"
           :label="$t('filter-menu.all')"
           icon="check"
           @click="setResetCategories"
-        />
-      </li>
-      <li class="item item-save-topics">
-        <labeled-button filled :label="$t('actions.save')" icon="save" @click="saveCategories" />
-      </li>
-    </template>
-
-    <template #filter-list>
+          size="small"
+        >
+          {{ $t('filter-menu.all') }}
+        </base-button>
+      </div>
       <div class="category-filter-list">
-        <hr />
-        <ds-space margin="small" />
+        <!-- <ds-space margin="small" /> -->
         <base-button
           v-for="category in categories"
           :key="category.id"
-          @click="toggleCategory(category.id)"
+          @click="saveCategories(category.id)"
           :filled="filteredCategoryIds.includes(category.id)"
           :icon="category.icon"
           size="small"
@@ -40,15 +36,12 @@
 <script>
 import { mapGetters, mapMutations } from 'vuex'
 import CategoryQuery from '~/graphql/CategoryQuery.js'
-import SaveCategories from '~/graphql/SaveCategories.js'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
-import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
 
 export default {
   components: {
     FilterMenuSection,
-    LabeledButton,
   },
   mixins: [SortCategories],
   data() {
@@ -70,19 +63,9 @@ export default {
       this.resetCategories()
       this.$emit('showFilterMenu')
     },
-    saveCategories() {
-      this.$apollo
-        .mutate({
-          mutation: SaveCategories(),
-          variables: { activeCategories: this.filteredCategoryIds },
-        })
-        .then(() => {
-          this.$emit('showFilterMenu')
-          this.$toast.success(this.$t('filter-menu.save.success'))
-        })
-        .catch(() => {
-          this.$toast.error(this.$t('filter-menu.save.error'))
-        })
+    saveCategories(categoryId) {
+      this.toggleCategory(categoryId)
+      this.$emit('updateCategories', categoryId)
     },
   },
   apollo: {
@@ -101,7 +84,7 @@ export default {
 </script>
 <style lang="scss">
 .category-filter-list {
-  margin-left: $space-xx-large;
+  margin-left: $space-xx-small;
 
   > .base-button {
     margin-right: $space-xx-small;
