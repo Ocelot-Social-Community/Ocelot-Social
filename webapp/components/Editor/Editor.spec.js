@@ -16,12 +16,14 @@ describe('Editor.vue', () => {
   let mocks
 
   const Wrapper = () => {
-    const store = new Vuex.Store({ getters: {
-      'auth/user': () => {
-        return { id: 'u343', name: deleteAccountName }
+    const store = new Vuex.Store({
+      getters: {
+        'auth/user': () => {
+          return { id: 'u343', name: 'Max Mustermann' }
+        },
+        'auth/isAdmin': () => false,
       },
-      'auth/isAdmin': () => false,
-    }})
+    })
     return (wrapper = mount(Editor, {
       mocks,
       propsData,
@@ -30,7 +32,7 @@ describe('Editor.vue', () => {
       stubs: {
         transition: false,
       },
-      store
+      store,
     }))
   }
 
