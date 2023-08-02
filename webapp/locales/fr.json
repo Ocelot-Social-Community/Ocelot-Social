@@ -407,7 +407,7 @@
     },
     "group": "Description",
     "headerMenuButton": {
-      "tooltip": "Notifications"
+      "tooltip": "Mes notifications"
     },
     "markAllAsRead": "Tout marquer comme lu",
     "pageLink": "Toutes les notifications",
