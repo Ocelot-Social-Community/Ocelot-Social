@@ -146,6 +146,25 @@ describe('mutations', () => {
     })
   })
 
+  describe('RESET_FOLLOWERS_FILTER', () => {
+    beforeEach(() => {
+      testMutation = () => {
+        mutations.RESET_FOLLOWERS_FILTER(state)
+        return getters.filter(state)
+      }
+    })
+
+    it('resets the categories filter', () => {
+      state = {
+        filter: {
+          author: { followedBy_some: { id: 4711 } },
+          postsInMyGroups: true,
+        },
+      }
+      expect(testMutation()).toEqual({})
+    })
+  })
+
   describe('TOGGLE_LANGUAGE', () => {
     beforeEach(() => {
       testMutation = (languageCode) => {

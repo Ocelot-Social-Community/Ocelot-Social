@@ -7,6 +7,7 @@
 
 # TODO change this to last message date
 enum _RoomOrdering {
+  lastMessageAt_desc
   createdAt_desc
 }
 
@@ -19,7 +20,12 @@ type Room {
 
   roomId: String! @cypher(statement: "RETURN this.id")
   roomName: String! @cypher(statement: "MATCH (this)<-[:CHATS_IN]-(user:User) WHERE NOT user.id = $cypherParams.currentUserId RETURN user.name")
-  avatar: String! @cypher(statement: "MATCH (this)<-[:CHATS_IN]-(user:User) WHERE NOT user.id = $cypherParams.currentUserId RETURN user.avatar.url")
+  avatar: String @cypher(statement: """
+    MATCH (this)<-[:CHATS_IN]-(user:User)
+    WHERE NOT user.id = $cypherParams.currentUserId
+    OPTIONAL MATCH (user)-[:AVATAR_IMAGE]->(image:Image)
+    RETURN image.url
+  """)
 
   lastMessageAt: String
 
@@ -49,4 +55,8 @@ type Query {
     orderBy: [_RoomOrdering]
   ): [Room]
   UnreadRooms: Int
+}
+
+type Subscription {
+  roomCountUpdated: Int
 }

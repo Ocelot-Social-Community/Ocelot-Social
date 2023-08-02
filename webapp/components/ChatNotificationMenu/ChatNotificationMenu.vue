@@ -8,24 +8,31 @@
         placement: 'bottom-start',
       }"
     >
-      <counter-icon icon="chat-bubble" :count="count" danger />
+      <counter-icon icon="chat-bubble" :count="unreadRoomCount" danger />
     </base-button>
   </nuxt-link>
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
-import { unreadRoomsQuery } from '~/graphql/Rooms'
+import { unreadRoomsQuery, roomCountUpdated } from '~/graphql/Rooms'
 
 export default {
   name: 'ChatNotificationMenu',
   components: {
     CounterIcon,
   },
-  data() {
-    return {
-      count: 0,
-    }
+  computed: {
+    ...mapGetters({
+      user: 'auth/user',
+      unreadRoomCount: 'chat/unreadRoomCount',
+    }),
+  },
+  methods: {
+    ...mapMutations({
+      commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
+    }),
   },
   apollo: {
     UnreadRooms: {
@@ -33,7 +40,13 @@ export default {
         return unreadRoomsQuery()
       },
       update({ UnreadRooms }) {
-        this.count = UnreadRooms
+        this.commitUnreadRoomCount(UnreadRooms)
+      },
+      subscribeToMore: {
+        document: roomCountUpdated(),
+        updateQuery: (previousResult, { subscriptionData }) => {
+          return { UnreadRooms: subscriptionData.data.roomCountUpdated }
+        },
       },
     },
   },
