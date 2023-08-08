@@ -334,7 +334,9 @@ export default {
         ;[...this.messages, ...Message].forEach((m) => {
           if (m.senderId !== this.currentUser.id) m.seen = true
           m.date = new Date(m.date).toDateString()
-          m.avatar = this.$filters.proxyApiUrl(m.avatar)
+          if(!m.avatar.startsWith('/api/')){
+            m.avatar = this.$filters.proxyApiUrl(m.avatar)
+          }
           msgs[m.indexId] = m
         })
         this.messages = msgs.filter(Boolean)
