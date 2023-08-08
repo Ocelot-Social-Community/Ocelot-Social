@@ -407,6 +407,7 @@ export default {
       const fixedRoom = {
         ...room,
         index: room.lastMessage ? room.lastMessage.date : room.createdAt,
+        avatar: this.$filters.proxyApiUrl(room.avatar),
         lastMessage: room.lastMessage
           ? {
               ...room.lastMessage,
