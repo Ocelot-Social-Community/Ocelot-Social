@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social-backend",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "GraphQL Backend for ocelot.social",
   "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
   "author": "ocelot.social Community",
