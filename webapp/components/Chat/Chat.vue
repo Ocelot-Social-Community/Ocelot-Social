@@ -462,10 +462,7 @@ export default {
   },
 }
 </script>
-<style lang="scss">
-body {
-  font-family: 'Quicksand', sans-serif;
-}
+<style lang="scss" scoped>
 .vac-avatar {
   background-size: cover;
   background-position: center center;
