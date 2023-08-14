@@ -1,18 +1,18 @@
 <template>
   <ds-space centered>
-    <hc-empty icon="events" :message="$t('components.registration.signup.unavailable')" />
+    <empty icon="events" :message="$t('components.registration.signup.unavailable')" />
     <slot></slot>
     <ds-space margin="xxx-small" />
   </ds-space>
 </template>
 
 <script>
-import HcEmpty from '~/components/Empty/Empty'
+import Empty from '~/components/Empty/Empty'
 
 export default {
   name: 'RegistrationSlideNoPublic',
   components: {
-    HcEmpty,
+    Empty,
   },
   props: {
     sliderData: { type: Object, required: true },

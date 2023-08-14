@@ -90,7 +90,7 @@ describe('Registration', () => {
       it('no "method" query in URI show "RegistrationSlideNoPublic"', async () => {
         mocks.$route.query = {}
         wrapper = await Wrapper()
-        expect(wrapper.find('.hc-empty').exists()).toBe(true)
+        expect(wrapper.find('.empty').exists()).toBe(true)
         expect(wrapper.find('.enter-invite').exists()).toBe(false)
         expect(wrapper.find('.enter-email').exists()).toBe(false)
       })
@@ -127,13 +127,13 @@ describe('Registration', () => {
         it('no "inviteCode" query in URI', async () => {
           mocks.$route.query = { method: 'invite-code' }
           wrapper = await Wrapper()
-          expect(wrapper.find('.hc-empty').exists()).toBe(true)
+          expect(wrapper.find('.empty').exists()).toBe(true)
         })
 
         it('"inviteCode=ABCDEF" query in URI', async () => {
           mocks.$route.query = { method: 'invite-code', inviteCode: 'ABCDEF' }
           wrapper = await Wrapper()
-          expect(wrapper.find('.hc-empty').exists()).toBe(true)
+          expect(wrapper.find('.empty').exists()).toBe(true)
         })
       })
     })

@@ -1,7 +1,7 @@
 import faker from '@faker-js/faker'
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
-import HcEmpty from '~/components/Empty/Empty'
+import Empty from '~/components/Empty/Empty'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem'
 import PostTeaser from '~/components/PostTeaser/PostTeaser'
@@ -66,7 +66,7 @@ storiesOf('TabNavigator', module)
   .add('given search results of posts, users, hashtags', () => ({
     components: {
       TabNavigation,
-      HcEmpty,
+      Empty,
       MasonryGrid,
       MasonryGridItem,
       PostTeaser,
@@ -178,7 +178,7 @@ storiesOf('TabNavigator', module)
             <!-- no results -->
             <ds-grid-item v-else :row-span="7" column-span="fullWidth">
               <ds-space centered>
-                <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
+                <empty icon="tasks" :message="$t('search.no-results', { search })" />
               </ds-space>
             </ds-grid-item>
           </masonry-grid>

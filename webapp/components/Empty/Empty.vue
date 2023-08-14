@@ -1,15 +1,15 @@
 <template>
-  <ds-space class="hc-empty" centered :margin="margin">
+  <ds-space class="empty" centered :margin="margin">
     <ds-text>
       <img
         :src="iconPath"
         width="80"
-        class="hc-empty-icon"
+        class="empty-icon"
         style="margin-bottom: 5px"
         alt="Empty"
       />
       <br />
-      <ds-text v-show="message" class="hc-empty-message" color="softer">
+      <ds-text v-show="message" class="empty-message" color="softer">
         {{ message }}
       </ds-text>
     </ds-text>
@@ -18,7 +18,7 @@
 
 <script>
 export default {
-  name: 'HcEmpty',
+  name: 'Empty',
   props: {
     /**
      * Icon that should be shown
@@ -55,7 +55,7 @@ export default {
 </script>
 
 <style lang="scss">
-.hc-empty-icon {
+.empty-icon {
   padding-bottom: $font-space-large;
 }
 </style>
