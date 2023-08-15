@@ -8,7 +8,7 @@
     "-search",
     "-sharing",
     "hints",
-    "tabs",
+    "tabs2",
     "theme-simple@git+https://github.com/plugins-zander/gitbook-plugin-theme-simple.git",
     "search-pro@git+https://github.com/plugins-zander/gitbook-plugin-search-pro.git",
     "splitter@git+https://github.com/plugins-zander/gitbook-plugin-splitter.git",
