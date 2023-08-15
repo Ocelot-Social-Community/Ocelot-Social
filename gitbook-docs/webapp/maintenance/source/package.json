@@ -1,0 +1,16 @@
+{
+  "name": "@ocelot-social/maintenance",
+  "version": "3.0.1",
+  "description": "Maintenance page for ocelot.social",
+  "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
+  "author": "ocelot.social Community",
+  "license": "MIT",
+  "private": false,
+  "main": "index.js",
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider yarn run nuxt -c nuxt.config.maintenance.js",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider yarn run nuxt build -c nuxt.config.maintenance.js",
+    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider yarn run nuxt start -c nuxt.config.maintenance.js",
+    "generate": "cross-env NODE_OPTIONS=--openssl-legacy-provider yarn run nuxt generate -c nuxt.config.maintenance.js"
+  }
+}

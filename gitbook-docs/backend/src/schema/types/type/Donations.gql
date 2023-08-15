@@ -1,0 +1,16 @@
+type Donations {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  showDonations: Boolean!
+  goal: Int!
+  progress: Int!
+}
+
+type Query {
+  Donations: Donations
+}
+
+type Mutation {
+  UpdateDonations(showDonations: Boolean, goal: Int, progress: Int): Donations
+}

@@ -1,0 +1,68 @@
+version: "3.4"
+
+services:
+
+  ########################################################
+  # WEBAPP ###############################################
+  ########################################################
+  webapp:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/webapp:test
+    build:
+      target: test
+    environment:
+      - NODE_ENV="test"
+    volumes:
+      - ./coverage:/app/coverage 
+
+  ########################################################
+  # BACKEND ##############################################
+  ########################################################
+  backend:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/backend:test
+    build:
+      target: test
+    environment:
+      - NODE_ENV="test"
+    volumes:
+      - ./coverage:/app/coverage 
+
+  ########################################################
+  # MAINTENANCE ##########################################
+  ########################################################
+  maintenance:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/maintenance:test
+
+  ########################################################
+  # NEO4J ################################################
+  ########################################################
+  neo4j:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: ocelotsocialnetwork/neo4j-community:test
+    #environment:
+    #  - NEO4J_dbms_connector_bolt_enabled=true
+    #  - NEO4J_dbms_connector_bolt_tls__level=OPTIONAL
+    #  - NEO4J_dbms_connector_bolt_listen__address=0.0.0.0:7687
+    #  - NEO4J_auth=none
+    #  - NEO4J_dbms_connectors_default__listen__address=0.0.0.0
+    #  - NEO4J_dbms_connector_http_listen__address=0.0.0.0:7474
+    #  - NEO4J_dbms_connector_https_listen__address=0.0.0.0:7473
+    networks:
+      # So we can access the neo4j query browser from our host machine
+      - external-net
+
+  ########################################################
+  # MAILSERVER TO FAKE SMTP ##############################
+  ########################################################
+  mailserver:
+    image: djfarrelly/maildev
+    ports:
+      - 1080:80
+    networks:
+      - external-net
+      
+volumes:
+  webapp_node_modules:
+  backend_node_modules:

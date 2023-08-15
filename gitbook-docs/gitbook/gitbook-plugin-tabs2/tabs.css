@@ -1,0 +1,9 @@
+.markdown-tabs {
+    padding-bottom: .85em;
+    margin-bottom: 1em;
+    border-bottom: 1px solid #ddd;
+}
+
+.markdown-tabs ul , .markdown-tabs .nav-tabs {
+    padding : 0px;
+}

@@ -1,0 +1,6 @@
+node_modules
+dist
+.nuxt
+styleguide/
+**/*.min.js
+static/sw.js

@@ -1,0 +1,140 @@
+name: ocelot.social backend test CI
+
+
+on: push
+
+jobs:
+  files-changed:
+    name: Detect File Changes - Backend
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.changes.outputs.backend }}
+      docker: ${{ steps.changes.outputs.docker }}
+    steps:
+      - uses: actions/checkout@v3.3.0
+
+      - name: Check for backend file changes
+        uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          token: ${{ github.token }}
+          filters: .github/file-filters.yml
+          list-files: shell
+
+  build_test_neo4j:
+    name: Docker Build Test - Neo4J
+    if: needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true'
+    needs: files-changed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Neo4J | Build 'community' image
+        run: |
+          docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
+          docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/neo4j.tar
+      
+      - name: Cache docker images
+        id: cache-neo4j
+        uses: actions/cache/save@v3.3.1
+        with:
+          path: /tmp/neo4j.tar
+          key: ${{ github.run_id }}-backend-neo4j-cache
+
+  build_test_backend:
+    name: Docker Build Test - Backend
+    if: needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true'
+    needs: files-changed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: backend | Build 'test' image
+        run: |
+          docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
+          docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
+      
+      - name: Cache docker images
+        id: cache-backend
+        uses: actions/cache/save@v3.3.1
+        with:
+          path: /tmp/backend.tar
+          key: ${{ github.run_id }}-backend-cache
+
+  lint_backend:
+    name: Lint Backend
+    if: needs.files-changed.outputs.backend == 'true'
+    needs: files-changed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: backend | Lint
+        run: cd backend && yarn && yarn run lint
+
+  unit_test_backend:
+    name: Unit tests - Backend
+    if: needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true'
+    needs: [files-changed, build_test_neo4j, build_test_backend]
+    runs-on: ubuntu-latest
+    permissions: 
+      checks: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Restore Neo4J cache
+        uses: actions/cache/restore@v3.3.1
+        with:
+          path: /tmp/neo4j.tar
+          key: ${{ github.run_id }}-backend-neo4j-cache
+          fail-on-cache-miss: true
+
+      - name: Restore Backend cache
+        uses: actions/cache/restore@v3.3.1
+        with:
+          path: /tmp/backend.tar
+          key: ${{ github.run_id }}-backend-cache
+          fail-on-cache-miss: true
+
+      - name: Load Docker Images
+        run: |
+          docker load < /tmp/neo4j.tar
+          docker load < /tmp/backend.tar
+
+      - name: backend | copy env files
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.template backend/.env
+
+      - name: backend | docker-compose
+        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps neo4j backend
+
+      - name: backend | Initialize Database
+        run: docker-compose exec -T backend yarn db:migrate init
+
+      - name: backend | Migrate Database Up
+        run: docker-compose exec -T backend yarn db:migrate up
+
+      - name: backend | Unit test incl. coverage check
+        run: docker-compose exec -T backend yarn test
+
+  cleanup:
+    name: Cleanup
+    if: ${{ needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true' }}
+    needs: [files-changed, unit_test_backend]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Delete cache
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh extension install actions/gh-actions-cache
+          KEY="${{ github.run_id }}-backend-neo4j-cache"
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
+          KEY="${{ github.run_id }}-backend-cache"
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm

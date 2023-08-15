@@ -1,0 +1,45 @@
+name: 'Gitbook-Action'
+
+on:
+  push:
+    branches:
+      - master
+      - 6689-setup-gitbook-action # just for testing, do remove afterwards
+    paths-ignore:
+      - 'gitbook-docs/**'  # To Avoid Loop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout action
+      uses: actions/checkout@v2
+
+    - name: Gitbook Action # https://github.com/ZanderZhao/gitbook-action/releases
+      uses: ZanderZhao/gitbook-action@master  # -> or ZanderZhao/gitbook-action@v1.2.4, Just example, click above, use latest please
+      with:                                   #    or fork this repo and use YourName/gitbook-action@master
+        token: ${{ secrets.GITBOOK_ACTION_TOKEN }}  # -> remember add this in settings/secrets as https://ZanderZhao.github.io/gitbook-action/
+        # time_zone: Asia/Shanghai
+        # source_branch: master
+        source_branch: 6689-setup-gitbook-action
+        source_dir: "."
+        source_edit_time: true
+        publish_commit_message: ${{ github.event.head_commit.message }}
+        # publish_branch: master
+        publish_branch: docs-ocelot-social-gh-pages
+        publish_dir: gitbook-docs
+        # Some not indicated are default values, eg: publish_repo
+
+    # example2
+    # - name: Gitbook Action
+    #   uses: ZanderZhao/gitbook-action@master
+    #   with:
+    #     token: ${{ secrets.PERSONAL_TOKEN }}
+    #     time_zone: Asia/Shanghai
+    #     source_repo: GitbookIO/gitbook
+    #     source_branch: master
+    #     source_dir: docs
+    #     publish_branch: master
+    #     publish_dir: docs/official
+    #     publish2_repo: gitbook-org/gitbook
+        # Some not indicated are default values, eg: publish_repo
