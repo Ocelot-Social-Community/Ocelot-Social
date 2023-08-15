@@ -24,7 +24,8 @@ jobs:
         source_dir: "."
         source_edit_time: true
         publish_commit_message: ${{ github.event.head_commit.message }}
-        publish_branch: master
+        # publish_branch: master
+        publish_branch: 6689-setup-gitbook-action
         publish_dir: gitbook-docs
         # Some not indicated are default values, eg: publish_repo
 
