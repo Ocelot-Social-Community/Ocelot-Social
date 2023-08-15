@@ -70,9 +70,7 @@ XXX
 
 ### Host On Ocelot-Social GitHub repository
 
-```markdown
-{% hint style="info" %} TODO: How to host on Ocelot-Social GitHub repository ... {% endhint %}
-```
+TODO: How to host on Ocelot-Social GitHub repository ...
 
 ### Quick Solution
 
