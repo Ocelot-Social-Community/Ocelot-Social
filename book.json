@@ -1,0 +1,30 @@
+{
+  "title": "Ocelot.Social – Developer Documentation",
+  "author": "busFaktor() e.V.",
+  "description": "Developer Documentation by Gitbook-Action",
+  "gitbook": "3.2.3",
+  "plugins": [
+    "-lunr",
+    "-search",
+    "-sharing",
+    "theme-simple@git+https://github.com/plugins-zander/gitbook-plugin-theme-simple.git",
+    "search-pro@git+https://github.com/plugins-zander/gitbook-plugin-search-pro.git",
+    "splitter@git+https://github.com/plugins-zander/gitbook-plugin-splitter.git",
+    "edit-link@git+https://github.com/plugins-zander/gitbook-plugin-edit-link.git",
+    "gtag@git+https://github.com/plugins-zander/gitbook-plugin-gtag.git",
+    "chapter-fold@git+https://github.com/plugins-zander/gitbook-plugin-chapter-fold.git",
+    "copy-code-button@git+https://github.com/plugins-zander/gitbook-plugin-copy-code-button.git"
+  ],
+  "pluginsConfig": {
+    "gtag": {
+      "token": ""
+    },
+    "edit-link": {
+      "base": "https://github.com/Ocelot-Social-Community/Ocelot-Social/edit/master/",
+      "label": "EDIT"
+    },
+    "sitemap-general": {
+      "prefix": "https://zlogs.net/gitbook-action/"
+    }
+  }
+}
