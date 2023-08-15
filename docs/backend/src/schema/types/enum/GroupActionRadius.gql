@@ -1,0 +1,7 @@
+enum GroupActionRadius {
+  regional
+  national
+  continental
+  global
+  interplanetary
+}

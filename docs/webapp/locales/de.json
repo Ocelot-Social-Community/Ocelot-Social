@@ -1,0 +1,1114 @@
+{
+  "actions": {
+    "cancel": "Abbrechen",
+    "create": "Erstellen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "loading": "wird geladen",
+    "loadMore": "mehr laden",
+    "save": "Speichern",
+    "saveCategories": "Themen speichern"
+  },
+  "admin": {
+    "categories": {
+      "categoryName": "Name",
+      "name": "Themen",
+      "postCount": "Beiträge"
+    },
+    "dashboard": {
+      "comments": "Kommentare",
+      "follows": "Folgen",
+      "invites": "Einladungen",
+      "name": "Startzentrale",
+      "notifications": "Benachrichtigungen",
+      "organizations": "Organisationen",
+      "posts": "Beiträge",
+      "projects": "Projekte",
+      "shouts": "Empfehlungen",
+      "users": "Nutzer"
+    },
+    "donations": {
+      "goal": "Monatlich benötigte Spenden",
+      "name": "Spendeninfo",
+      "progress": "Bereits gesammelte Spenden",
+      "showDonationsCheckboxLabel": "Spendenfortschritt anzeigen",
+      "successfulUpdate": "Spenden-Info erfolgreich aktualisiert!"
+    },
+    "hashtags": {
+      "name": "Hashtags",
+      "nameOfHashtag": "Name",
+      "number": "Nr.",
+      "tagCount": "Beiträge",
+      "tagCountUnique": "Nutzer"
+    },
+    "invites": {
+      "description": "Einladungen sind eine wunderbare Möglichkeit, Deine Freunde in Deinem Netzwerk zu haben …",
+      "name": "Nutzer einladen",
+      "title": "Leute einladen"
+    },
+    "name": "Systemverwaltung",
+    "notifications": {
+      "name": "Benachrichtigungen"
+    },
+    "organizations": {
+      "name": "Organisationen"
+    },
+    "pages": {
+      "name": "Seiten"
+    },
+    "settings": {
+      "name": "Einstellungen"
+    },
+    "users": {
+      "empty": "Keine Nutzer gefunden",
+      "form": {
+        "placeholder": "E-Mail, Name oder Beschreibung"
+      },
+      "name": "Nutzer",
+      "roleChanged": "Rolle erfolgreich geändert!",
+      "table": {
+        "columns": {
+          "createdAt": "Erstellt am",
+          "email": "E-Mail",
+          "name": "Name",
+          "number": "Nr.",
+          "role": "Rolle",
+          "slug": "Alias"
+        }
+      }
+    }
+  },
+  "chat": {
+    "addRoomHeadline": "Suche Nutzer für neuen Chat",
+    "cancelSelectMessage": "Abbrechen",
+    "conversationStarted": "Unterhaltung startete am:",
+    "isOnline": "online",
+    "isTyping": "tippt...",
+    "lastSeen": "zuletzt gesehen ",
+    "messageDeleted": "Diese Nachricht wuerde gelöscht",
+    "messagesEmpty": "Keine Nachrichten",
+    "newMessages": "Neue Nachrichten",
+    "page": {
+      "headline": "Chat"
+    },
+    "roomEmpty": "Keinen Raum selektiert",
+    "roomsEmpty": "Keine Räume",
+    "search": "Chat-Räume filtern",
+    "typeMessage": "Nachricht schreiben",
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chatte mit „{name}“"
+    }
+  },
+  "client-only": {
+    "loading": "Lade …"
+  },
+  "code-of-conduct": {
+    "subheader": "für das Soziale Netzwerk von {ORGANIZATION_NAME}"
+  },
+  "comment": {
+    "content": {
+      "unavailable-placeholder": "… dieser Kommentar ist nicht mehr verfügbar"
+    },
+    "edited": "bearbeitet",
+    "menu": {
+      "delete": "Kommentar löschen",
+      "edit": "Kommentar bearbeiten"
+    },
+    "show": {
+      "less": "weniger anzeigen",
+      "more": "mehr anzeigen"
+    }
+  },
+  "common": {
+    "category": "Thema ::: Themen",
+    "comment": "Kommentar ::: Kommentare",
+    "letsTalk": "Miteinander reden",
+    "loading": "wird geladen",
+    "loadMore": "mehr laden",
+    "name": "Name",
+    "organization": "Organisation ::: Organisationen",
+    "post": "Beitrag ::: Beiträge",
+    "project": "Projekt ::: Projekte",
+    "reportContent": "Melden",
+    "shout": "Empfehlung ::: Empfehlungen",
+    "tag": "Schlagwort ::: Schlagwörter",
+    "takeAction": "Aktiv werden",
+    "user": "Nutzer ::: Nutzer",
+    "validations": {
+      "categories": "es müssen eine bis drei Themen ausgewählt werden",
+      "email": "muss eine gültige E-Mail-Adresse sein",
+      "eventLocationNameLength": "Minimum {min}, Maximum {max} Zeichen",
+      "eventLocationNameNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
+      "eventVenueLength": "Minimum {min}, Maximum {max} Zeichen",
+      "eventVenueNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
+      "url": "muss eine gültige URL sein"
+    },
+    "versus": "Versus"
+  },
+  "components": {
+    "dateTimeRange": {
+      "hourMinute": "HH:mm",
+      "monthDay": "dd.MM.",
+      "yearMonthDay": "dd.MM.yyyy"
+    },
+    "password-reset": {
+      "change-password": {
+        "error": "Passwort Änderung fehlgeschlagen. Möglicherweise falscher Sicherheitscode?",
+        "help": "Falls Probleme auftreten, schreib uns gerne eine Mail an:",
+        "success": "Änderung des Passworts war erfolgreich!"
+      },
+      "request": {
+        "form": {
+          "description": "Eine E-Mail zum Zurücksetzen des Passworts wird an die angegebene Adresse geschickt.",
+          "submit": "E-Mail anfordern",
+          "submitted": "Eine E-Mail mit weiteren Hinweisen wurde verschickt an <b>{email}</b>"
+        },
+        "title": "Passwort zurücksetzen"
+      }
+    },
+    "registration": {
+      "create-user-account": {
+        "buttonTitle": "Erstellen",
+        "error": "Es konnte kein Nutzerkonto erstellt werden!",
+        "help": "Vielleicht war der Bestätigungscode falsch oder abgelaufen? Wenn das Problem weiterhin besteht, schicke uns gerne eine E-Mail an:",
+        "recieveCommunicationAsEmailsEtcConfirmed": "Ich stimme auch dem Erhalt von E-Mails und anderen Formen der Kommunikation (z.B. Push-Benachrichtigungen) zu.",
+        "success": "Dein Nutzerkonto wurde erstellt!",
+        "termsAndCondsEtcConfirmed": "Ich habe folgendes gelesen, verstanden und stimme zu:",
+        "title": "Nutzerkonto anlegen"
+      },
+      "email": {
+        "buttonTitle": {
+          "resend": "Erneut senden",
+          "send": "Sende E-Mail",
+          "skipResend": "Nicht senden"
+        },
+        "form": {
+          "sendEmailAgain": "E-Mail erneut senden",
+          "success": "Verifikations-E-Mail gesendet an <b>{email}</b>!"
+        },
+        "title": "E-Mail"
+      },
+      "email-display": {
+        "warningFormat": "⚠️ E-Mail hat ein ungültiges Format!",
+        "warningUndef": "⚠️ Keine E-Mail definiert!",
+        "yourEmail": "Deine E-Mail-Adresse:"
+      },
+      "email-nonce": {
+        "buttonTitle": "Bestätigen",
+        "form": {
+          "description": "Öffne Dein E-Mail Postfach und gib den Code ein, den wir geschickt haben.",
+          "next": "Weiter",
+          "nonce": "E-Mail-Code: 32143",
+          "validations": {
+            "error": "Ungültiger Bestätigungs-Code <b>{nonce}</b> für E-Mail <b>{email}</b>!",
+            "length": "muss genau {nonceLength} Buchstaben lang sein",
+            "success": "Gültiger Bestätigungs-Code <b>{nonce}</b> für E-Mail <b>{email}</b>!"
+          }
+        },
+        "title": "E-Mail Bestätigung"
+      },
+      "invite-code": {
+        "buttonTitle": "Weiter",
+        "form": {
+          "description": "Gib den Einladungs-Code ein, den du bekommen hast.",
+          "invite-code": "Einladungs-Code: ACJERB",
+          "next": "Weiter",
+          "validations": {
+            "error": "Ungültiger Einladungs-Code <b>{inviteCode}</b>!",
+            "length": "muss genau {inviteCodeLength} Buchstaben lang sein",
+            "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!"
+          }
+        }
+      },
+      "no-public-registrstion": {
+        "title": "Keine öffentliche Registrierung möglich"
+      },
+      "signup": {
+        "form": {
+          "data-privacy": "Ich habe die Datenschutzerklärung gelesen und verstanden.",
+          "description": "Um loszulegen, kannst Du Dich hier kostenfrei registrieren:",
+          "errors": {
+            "email-exists": "Es gibt schon ein Nutzerkonto mit dieser E-Mail-Adresse!"
+          },
+          "submit": "Konto erstellen",
+          "success": "Eine E-Mail mit einem Link zum Abschließen Deiner Registrierung wurde an <b>{email}</b> geschickt",
+          "terms-and-condition": "Ich stimme den <a href=\"/terms-and-conditions\" target=\"_blank\"><ds-text bold color=\"primary\">Nutzungsbedingungen</ds-text></a> zu."
+        },
+        "title": "Mach mit bei {APPLICATION_NAME}!",
+        "unavailable": "Leider ist die öffentliche Registrierung von Nutzerkonten auf diesem Server derzeit nicht möglich."
+      }
+    }
+  },
+  "contribution": {
+    "amount-clicks": "{amount} clicks",
+    "amount-comments": "{amount} comments",
+    "amount-shouts": "{amount} recommendations",
+    "amount-views": "{amount} views",
+    "categories": {
+      "infoSelectedNoOfMaxCategories": "{chosen} von {max} Themen ausgewählt"
+    },
+    "category": {
+      "description": {
+        "body-and-excercise": "Sport, Yoga, Massage, Tanzen, Entspannung",
+        "children": "Familie, Pädagogik, Schule, Prägung",
+        "culture": "Kunst, Theater, Musik, Fotografie, Film",
+        "economy": "Handel, Konsum, Marketing, Lieferketten",
+        "energy": "Öl, Gas, Kohle, Wind, Wasserkraft, Biogas, Atomenergie",
+        "finance": "Geld, Finanzsystem, Alternativwährungen",
+        "health": "Medizin, Ernährung, WHO, Impfungen, Schadstoffe",
+        "home": "Bauen, Lebensgemeinschaften, Tiny Houses, Gemüsegarten",
+        "it-and-media": "Nachrichten, Manipulation, Datenschutz, Überwachung, Datenkraken, KI, Software, Apps",
+        "law": "Menschenrechte, Gesetze, Verordnungen",
+        "miscellaneous": "Sonstiges",
+        "mobility": "Reise, Verkehr, Elektromobilität",
+        "nature": "Tiere, Pflanzen, Landwirtschaft, Ökologie, Artenvielfalt",
+        "networking": "Kooperation, Aktionsbündnisse, Solidarität, Hilfe",
+        "peace": "Krieg, Militär, soziale Verteidigung, Waffen, Cyberattacken",
+        "politics": "Demokratie, Mitbestimmung, Wahlen, Korruption, Parteien",
+        "psyche": "Seele, Gefühle, Glück",
+        "science": "Bildung, Hochschule, Publikationen",
+        "spirituality": "Religion, Werte, Ethik"
+      },
+      "name": {
+        "body-and-excercise": "Körper & Bewegung",
+        "children": "Kinder",
+        "culture": "Kultur",
+        "economy": "Wirtschaft",
+        "energy": "Energie",
+        "finance": "Finanzen",
+        "health": "Gesundheit",
+        "home": "Wohnen",
+        "it-and-media": "IT & Medien",
+        "law": "Recht",
+        "miscellaneous": "Sonstiges",
+        "mobility": "Mobilität",
+        "nature": "Natur",
+        "networking": "Vernetzung",
+        "peace": "Frieden",
+        "politics": "Politik",
+        "psyche": "Psyche",
+        "science": "Wissenschaft",
+        "spirituality": "Spiritualität"
+      }
+    },
+    "emotions-label": {
+      "angry": "Verärgert",
+      "cry": "Zum Weinen",
+      "funny": "Lustig",
+      "happy": "Glücklich",
+      "surprised": "Erstaunt"
+    },
+    "filterFollow": "Nutzern, denen ich folge",
+    "filterMasonryGrid": {
+      "myFriends": "Nutzer, denen ich folge",
+      "myGroups": "Aus meinen Gruppen",
+      "myTopics": "Meine Themen",
+      "noFilter": "Inhalte filtern",
+      "onlyArticles": "Beiträge",
+      "onlyEvents": "Veranstaltungen"
+    },
+    "filterMyGroups": "Meine Gruppen",
+    "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
+    "languageSelectLabel": "Sprache Deines Beitrags",
+    "languageSelectText": "Sprache wählen",
+    "newEvent": "Erstelle einen neue Veranstaltung",
+    "newPost": "Erstelle einen neuen Beitrag",
+    "success": "Gespeichert!",
+    "teaserImage": {
+      "cropImage": "Bild zuschneiden",
+      "cropperConfirm": "Bestätigen",
+      "errors": {
+        "aspect-ratio-too-small": "Dieses Bild ist zu hoch.",
+        "unSupported-file-format": "Bitte lade ein Bild in den folgenden Formaten hoch: JPG, JPEG, PNG or GIF!"
+      },
+      "supportedFormats": "Füge ein Bild im Dateiformat JPG, PNG oder GIF ein"
+    },
+    "title": "Titel",
+    "visibleOnlyForMembersOfGroup": "Dieser Beitrag wird nur für Mitglieder der Gruppe „<b>{name}</b>“ sichtbar sein."
+  },
+  "delete": {
+    "cancel": "Abbrechen",
+    "comment": {
+      "message": "Bist Du sicher, dass Du den Kommentar „<b>{name}</b>“ löschen möchtest?",
+      "success": "Kommentar erfolgreich gelöscht!",
+      "title": "Lösche Kommentar",
+      "type": "Kommentar"
+    },
+    "contribution": {
+      "message": "Bist Du sicher, dass Du den Beitrag „<b>{name}</b>“ löschen möchtest?",
+      "success": "Beitrag erfolgreich gelöscht!",
+      "title": "Lösche Beitrag",
+      "type": "Beitrag"
+    },
+    "submit": "Löschen"
+  },
+  "disable": {
+    "cancel": "Abbrechen",
+    "comment": {
+      "message": "Bist Du sicher, dass Du den Kommentar „<b>{name}</b>“ deaktivieren möchtest?",
+      "title": "Kommentar sperren",
+      "type": "Kommentar"
+    },
+    "contribution": {
+      "message": "Bist Du sicher, dass Du den Beitrag von „<b>{name}</b>“ deaktivieren möchtest?",
+      "title": "Beitrag sperren",
+      "type": "Beitrag"
+    },
+    "submit": "Deaktivieren",
+    "success": "Erfolgreich deaktiviert",
+    "user": {
+      "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ sperren möchtest?",
+      "title": "Nutzer sperren",
+      "type": "Nutzer"
+    }
+  },
+  "donations": {
+    "amount-of-total": "{amount} von {total} € erreicht",
+    "donate-now": "Jetzt spenden"
+  },
+  "editor": {
+    "embed": {
+      "always_allow": "Einzubettende Inhalte von Drittanbietern immer erlauben (diese Einstellung ist jederzeit änderbar)",
+      "data_privacy_info": "Deine Daten wurden noch nicht an Drittanbieter weitergegeben. Wenn Du diesen Inhalt jetzt abspielst, registriert der folgende Anbieter wahrscheinlich Deine Nutzerdaten:",
+      "data_privacy_warning": "Achte auf Deine Daten!",
+      "play_now": "Jetzt ansehen"
+    },
+    "hashtag": {
+      "addHashtag": "Neuer Hashtag",
+      "addLetter": "Tippe einen Buchstaben",
+      "noHashtagsFound": "Keine Hashtags gefunden"
+    },
+    "legend": {
+      "bold": "Fett",
+      "heading3": "Überschrift 3",
+      "heading4": "Überschrift 4",
+      "italic": "Kursiv",
+      "legendTitle": "Tastaturkürzel und Markdown-Code",
+      "link": "Verlinkung",
+      "orderedList": "Geordnete Liste",
+      "paragraph": "Absatz",
+      "quote": "Zitat",
+      "ruler": "Linie",
+      "underline": "Unterstrichen",
+      "unorderedList": "Ungeordnete Liste"
+    },
+    "mention": {
+      "noUsersFound": "Keine Nutzer gefunden"
+    },
+    "placeholder": "Schreib etwas Inspirierendes …"
+  },
+  "error-pages": {
+    "403-default": "Kein Zugang zu dieser Seite!",
+    "404-default": "Diese Seite konnte nicht gefunden werden!",
+    "500-default": "Internal Server Error!",
+    "503-default": "Dienst steht nicht zur Verfügung!",
+    "back-to-index": "Zurück zur Startseite!",
+    "cannot-edit-post": "Dieser Beitrag kann nicht editiert werden!",
+    "default": "Ein Fehler ist aufgetreten!",
+    "group-not-found": "Dieses Gruppenprofil konnte nicht gefunden werden!",
+    "post-not-found": "Dieser Beitrag konnte nicht gefunden werden!",
+    "profile-not-found": "Dieses Profil konnte nicht gefunden werden!"
+  },
+  "filter-menu": {
+    "all": "Alle",
+    "article": "Beitrag",
+    "categories": "Themen",
+    "creationDate": "Erstellungszeitpunkt",
+    "deleteFilter": "Filter löschen",
+    "emotions": "Emotionen",
+    "ended": {
+      "all": {
+        "hint": "Zeige alle, auch zukünftige",
+        "label": "Alle"
+      },
+      "onlyEnded": {
+        "hint": "Zeige nur noch zukünftige",
+        "label": "Zukünftige"
+      }
+    },
+    "event": "Veranstaltung",
+    "eventsBy": "Veranstaltungen – zeige ...",
+    "eventsEnded": "Beendet",
+    "filter-by": "Filtern nach ...",
+    "following": "Nutzer, denen ich folge",
+    "following-title": "Quellen",
+    "languages": "Sprachen",
+    "my-groups": "Meine Gruppen",
+    "order": {
+      "last": {
+        "hint": "Sortiere die Letzten nach vorn",
+        "label": "Letzte zuerst"
+      },
+      "newest": {
+        "hint": "Sortiere die Neuesten nach vorn",
+        "label": "Neueste zuerst"
+      },
+      "next": {
+        "hint": "Sortiere die Nächsten nach vorn",
+        "label": "Nächste zuerst"
+      },
+      "oldest": {
+        "hint": "Sortiere die Ältesten nach vorn",
+        "label": "Älteste zuerst"
+      }
+    },
+    "order-by": "Sortieren nach ...",
+    "post-type": "Inhaltstyp",
+    "save": {
+      "error": "Themen konnten nicht gespeichert werden!",
+      "success": "Themen gespeichert!"
+    },
+    "startDate": "Anfangszeitpunkt"
+  },
+  "followButton": {
+    "follow": "Folgen",
+    "following": "Folge Ich"
+  },
+  "group": {
+    "actionRadii": {
+      "continental": "Kontinental",
+      "global": "Global oder nur virtuell",
+      "interplanetary": "Interplanetar",
+      "national": "National",
+      "regional": "Regional"
+    },
+    "actionRadius": "Aktionsradius der Gruppe",
+    "addMemberToGroup": "Zur Gruppe hinzufügen",
+    "addMemberToGroupSuccess": "„{name}“ wurde der Gruppe mit der Rolle „{role}“ hinzugefügt!",
+    "addUser": "Nutzer hinzufügen",
+    "addUserNoOptions": "Keine Nutzer gefunden!",
+    "addUserPlaceholder": "Nutzername",
+    "allGroups": "Alle Gruppen",
+    "button": {
+      "tooltip": "Gruppen anzeigen"
+    },
+    "categories": "Thema ::: Themen",
+    "categoriesTitle": "Themen der Gruppe",
+    "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
+    "contentMenu": {
+      "visitGroupPage": "Gruppe anzeigen"
+    },
+    "createNewGroup": {
+      "title": "Erstelle eine neue Gruppe",
+      "tooltip": "Erstelle eine neue Gruppe"
+    },
+    "description": "Beschreibung",
+    "editGroupSettings": {
+      "groupName": "Einstellungen für „{name}“",
+      "title": "Meine Gruppe ändern"
+    },
+    "errors": {
+      "userAlreadyMember": "Nutzer „{name}“ ist bereits Mitglied!"
+    },
+    "follow": "Folge",
+    "foundation": "Gründung",
+    "general": "Allgemein",
+    "goal": "Ziel der Gruppe",
+    "groupCreated": "Die Gruppe wurde angelegt!",
+    "in": "in",
+    "joinLeaveButton": {
+      "iAmMember": "Bin Mitglied",
+      "join": "Beitreten",
+      "leave": "Verlassen",
+      "pendingMember": "Ausstehendes Mitglied",
+      "tooltip": "Der Gruppeninhaber muss dich noch bestätigen."
+    },
+    "labelSlug": "Eindeutiger Gruppenname",
+    "leaveModal": {
+      "confirmButton": "Verlassen",
+      "message": "Eine Gruppe zu verlassen ist möglicherweise nicht rückgängig zu machen!<br>Gruppe <b>„{name}“</b> verlassen!",
+      "title": "Möchtest du wirklich die Gruppe verlassen?"
+    },
+    "memberRemoved": "Nutzer „{name}“ wurde aus der Gruppe entfernt!",
+    "members": "Mitglieder",
+    "membersAdministrationList": {
+      "avatar": "Avatar",
+      "name": "Name",
+      "roleInGroup": "Rolle",
+      "slug": "Eindeutiger Name"
+    },
+    "membersCount": "Mitglied ::: Mitglieder",
+    "membersListTitle": "Gruppenmitglieder",
+    "membersListTitleNotAllowedSeeingGroupMembers": "Gruppenmitglieder unsichtbar",
+    "modal": {
+      "cancel": "Abbrechen",
+      "confirm": "Bestätigen",
+      "confirmAddGroupMemberText": "Nutzer „{name}“ zur Gruppe hinzufügen?",
+      "confirmAddGroupMemberTitle": "Bestätigen"
+    },
+    "myGroups": "Meine Gruppen",
+    "name": "Gruppenname",
+    "radius": "Radius",
+    "removeMember": "Mitglied aus der Gruppe entfernen?",
+    "removeMemberButton": "Entfernen",
+    "role": "Deine Rolle in der Gruppe",
+    "roles": {
+      "admin": "Administrator",
+      "owner": "Inhaber",
+      "pending": "Ausstehendes Mitglied",
+      "usual": "Mitglied"
+    },
+    "save": "Neue Gruppe anlegen",
+    "type": "Öffentlichkeit der Gruppe",
+    "types": {
+      "closed": "Geschlossen",
+      "hidden": "Geheim",
+      "public": "Öffentlich"
+    },
+    "typesOptions": {
+      "closed": "Geschlossen — Alle Beiträge nur für Gruppenmitglieder sichtbar",
+      "hidden": "Geheim — Gruppe (auch der Name) komplett unsichtbar",
+      "public": "Öffentlich — Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
+    },
+    "update": "Änderung speichern",
+    "updatedGroup": "Die Gruppendaten wurden geändert!"
+  },
+  "hashtags-filter": {
+    "clearSearch": "Suche löschen",
+    "hashtag-search": "Suche nach #{hashtag}",
+    "title": "Deine Filterblase"
+  },
+  "header": {
+    "avatarMenu": {
+      "button": {
+        "tooltip": "Mein Profil"
+      },
+      "groups": "Gruppen",
+      "myProfile": "Mein Profil"
+    },
+    "chat": {
+      "tooltip": "Meine Chats"
+    }
+  },
+  "index": {
+    "change-filter-settings": "Verändere die Filter-Einstellungen, um mehr Ergebnisse zu erhalten.",
+    "no-results": "Keine Beiträge gefunden."
+  },
+  "invite-codes": {
+    "button": {
+      "tooltip": "Freunde einladen"
+    },
+    "copy-code": "Einladungslink kopieren",
+    "copy-success": "Einladungscode erfolgreich in die Zwischenablage kopiert",
+    "not-available": "Du hast keinen Einladungscode zur Verfügung!",
+    "your-code": "Sende diesen Link per E-Mail oder in sozialen Medien, um deine Freunde einzuladen:"
+  },
+  "localeSwitch": {
+    "tooltip": "Sprache wählen"
+  },
+  "login": {
+    "email": "Deine E-Mail",
+    "failure": "Fehlerhafte E-Mail-Adresse oder Passwort.",
+    "forgotPassword": "Passwort vergessen?",
+    "hello": "Hallo",
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "moreInfo": "Was ist {APPLICATION_NAME}?",
+    "moreInfoHint": "zur Präsentationsseite",
+    "no-account": "Du hast noch kein Nutzerkonto?",
+    "no-cookie": "Es kann kein Cookie angelegt werden. Du musst Cookies akzeptieren.",
+    "password": "Dein Passwort",
+    "register": "Nutzerkonto erstellen",
+    "success": "Du bist eingeloggt!"
+  },
+  "maintenance": {
+    "explanation": "Derzeit führen wir einige geplante Wartungsarbeiten durch, bitte versuche es später erneut.",
+    "questions": "Bei Fragen oder Problemen erreichst Du uns per E-Mail an",
+    "title": "{APPLICATION_NAME} befindet sich in der Wartung"
+  },
+  "map": {
+    "alertMessage": "Es kann nicht auf die Karte zugegriffen werden: Der Mapbox-Token ist auf dem Server nicht gesetzt!",
+    "button": {
+      "tooltip": "Landkarte anzeigen"
+    },
+    "legend": {
+      "event": "Veranstaltung",
+      "group": "Gruppe",
+      "theUser": "Meine Position",
+      "user": "Nutzer"
+    },
+    "markerTypes": {
+      "event": "Veranstaltung",
+      "group": "Gruppe",
+      "theUser": "meine Position",
+      "user": "Nutzer"
+    },
+    "pageTitle": "Landkarte",
+    "styles": {
+      "dark": "Dunkel",
+      "outdoors": "Landschaft",
+      "satellite": "Satellit",
+      "streets": "Straßen"
+    }
+  },
+  "modals": {
+    "deleteUser": {
+      "created": "Erstellt"
+    }
+  },
+  "moderation": {
+    "name": "Moderation",
+    "reports": {
+      "author": "Autor",
+      "content": "Inhalt",
+      "decideButton": "Bestätige",
+      "decided": "Entschieden",
+      "decideModal": {
+        "cancel": "Abbruch",
+        "Comment": {
+          "disable": {
+            "message": "Möchtest Du den Kommentar „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
+            "title": "Sperre den Kommentar abschließend"
+          },
+          "enable": {
+            "message": "Möchtest Du den Kommentar „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
+            "title": "Entsperre den Kommentar abschließend"
+          }
+        },
+        "Post": {
+          "disable": {
+            "message": "Möchtest Du den Beitrag „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
+            "title": "Sperre den Beitrag abschließend"
+          },
+          "enable": {
+            "message": "Möchtest Du den Beitrag „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
+            "title": "Entsperre den Beitrag abschließend"
+          }
+        },
+        "submit": "Bestätige Entscheidung",
+        "User": {
+          "disable": {
+            "message": "Möchtest Du den Nutzer „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
+            "title": "Sperre den Nutzer abschließend"
+          },
+          "enable": {
+            "message": "Möchtest Du den Nutzer „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
+            "title": "Entsperre den Nutzer abschließend"
+          }
+        }
+      },
+      "decision": "Entscheidung",
+      "DecisionSuccess": "Erfolgreich entschieden!",
+      "disabled": "Gesperrt",
+      "disabledAt": "Gesperrt am",
+      "disabledBy": "Gesperrt von",
+      "empty": "Glückwunsch, es gibt nichts zu moderieren.",
+      "enabled": "Entsperrt",
+      "enabledAt": "Entsperrt am",
+      "enabledBy": "Entsperrt von",
+      "filterLabel": {
+        "all": "Alle",
+        "closed": "Abgeschlossen",
+        "reviewed": "Bearbeitet",
+        "unreviewed": "Nicht bearbeitet"
+      },
+      "moreDetails": "Details öffnen",
+      "name": "Meldungen",
+      "noDecision": "Keine Entscheidung!",
+      "numberOfUsers": "{count} Nutzern",
+      "previousDecision": "Vorherige Entscheidung:",
+      "reasonCategory": "Thema",
+      "reasonDescription": "Beschreibung",
+      "reportedOn": "Datum",
+      "status": "Aktueller Status",
+      "submitter": "Gemeldet von"
+    }
+  },
+  "notifications": {
+    "comment": "Kommentar",
+    "content": "Inhalt oder Beschreibung",
+    "empty": "Bedaure, Du hast momentan keinerlei Benachrichtigungen.",
+    "filterLabel": {
+      "all": "Alle",
+      "read": "Gelesen",
+      "unread": "Ungelesen"
+    },
+    "group": "Beschreibung",
+    "headerMenuButton": {
+      "tooltip": "Meine Banachrichtigungen"
+    },
+    "markAllAsRead": "Markiere alle als gelesen",
+    "pageLink": "Alle Benachrichtigungen",
+    "post": "Beitrag oder Gruppe",
+    "reason": {
+      "changed_group_member_role": "Hat Deine Rolle in der Gruppe geändert …",
+      "commented_on_post": "Hat Deinen Beitrag kommentiert …",
+      "mentioned_in_comment": "Hat Dich in einem Kommentar erwähnt …",
+      "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …",
+      "removed_user_from_group": "Hat Dich aus der Gruppe entfernt …",
+      "user_joined_group": "Ist Deiner Gruppe beigetreten …",
+      "user_left_group": "Hat deine Gruppe verlassen …"
+    },
+    "title": "Benachrichtigungen",
+    "user": "Nutzer"
+  },
+  "post": {
+    "comment": {
+      "reply": "Antworten",
+      "submit": "Kommentiere",
+      "submitted": "Kommentar gesendet",
+      "updated": "Änderungen gespeichert"
+    },
+    "createNewEvent": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Erstelle eine Veranstaltung"
+    },
+    "createNewPost": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Erstelle einen Beitrag"
+    },
+    "edited": "bearbeitet",
+    "editPost": {
+      "event": "Bearbeite deine Veranstaltung",
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Bearbeite deinen Beitrag"
+    },
+    "event": "Veranstaltung",
+    "menu": {
+      "delete": "Beitrag löschen",
+      "edit": "Beitrag bearbeiten",
+      "pin": "Beitrag anheften",
+      "pinnedSuccessfully": "Beitrag erfolgreich angeheftet!",
+      "unpin": "Beitrag loslösen",
+      "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!"
+    },
+    "name": "Beitrag",
+    "pinned": "Meldung",
+    "takeAction": {
+      "name": "Aktiv werden"
+    },
+    "viewEvent": {
+      "eventEnd": "Ende",
+      "eventIsOnline": "Online",
+      "eventLocationName": "Stadt — z.B. Musterstraße 1, 12345 Musterstadt",
+      "eventStart": "Beginn",
+      "eventVenue": "Veranstaltungsort — z.B. Hinterhof, 1. OG, …",
+      "title": "Veranstaltung"
+    },
+    "viewPost": {
+      "forGroup": {
+        "title": "In der Gruppe „{name}“"
+      },
+      "title": "Beitrag"
+    }
+  },
+  "profile": {
+    "avatar": {
+      "submitted": "Erfolgreich hochgeladen!"
+    },
+    "commented": "Kommentiert",
+    "follow": "Folgen",
+    "followers": "Folgen",
+    "following": "Folge Ich",
+    "invites": {
+      "description": "Zur Einladung die E-Mail-Adresse hier eintragen.",
+      "emailPlaceholder": "E-Mail-Adresse für die Einladung",
+      "title": "Lade jemanden zu {APPLICATION_NAME} ein!"
+    },
+    "memberSince": "Mitglied seit",
+    "network": {
+      "andMore": "und {number} weitere …",
+      "followedBy": "wird gefolgt von:",
+      "followedByNobody": "wird von niemandem gefolgt.",
+      "following": "folgt:",
+      "followingNobody": "folgt niemandem.",
+      "title": "Netzwerk"
+    },
+    "shouted": "Empfohlen",
+    "socialMedia": "Wo sonst finde ich",
+    "userAnonym": "Anonymus"
+  },
+  "quotes": {
+    "african": {
+      "author": "Afrikanisches Sprichwort",
+      "quote": "Viele kleine Leute an vielen kleinen Orten, die viele kleine Dinge tun, werden das Antlitz dieser Welt verändern."
+    }
+  },
+  "release": {
+    "cancel": "Abbrechen",
+    "comment": {
+      "error": "Den Kommentar hast Du schon gemeldet!",
+      "message": "Bist Du sicher, dass Du den Kommentar „<b>{name}</b>“ freigeben möchtest?",
+      "title": "Kommentar freigeben",
+      "type": "Kommentar"
+    },
+    "contribution": {
+      "error": "Den Beitrag hast Du schon gemeldet!",
+      "message": "Bist Du sicher, dass Du den Beitrag „<b>{name}</b>“ freigeben möchtest?",
+      "title": "Beitrag freigeben",
+      "type": "Beitrag"
+    },
+    "submit": "freigeben",
+    "success": "Erfolgreich freigegeben!",
+    "user": {
+      "error": "Den Nutzer hast Du schon gemeldet!",
+      "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ freigeben möchtest?",
+      "title": "Nutzer freigeben",
+      "type": "Nutzer"
+    }
+  },
+  "report": {
+    "cancel": "Abbrechen",
+    "comment": {
+      "error": "Du hast den Kommentar bereits gemeldet!",
+      "message": "Bist Du sicher, dass Du den Kommentar von „<b>{name}</b>“ melden möchtest?",
+      "title": "Kommentar melden",
+      "type": "Kommentar"
+    },
+    "contribution": {
+      "error": "Du hast den Beitrag bereits gemeldet!",
+      "message": "Bist Du sicher, dass Du den Beitrag „<b>{name}</b>“ melden möchtest?",
+      "title": "Beitrag melden",
+      "type": "Beitrag"
+    },
+    "reason": {
+      "category": {
+        "invalid": "Bitte wähle ein gültiges Thema aus",
+        "label": "Wähle ein Thema:",
+        "options": {
+          "advert_products_services_commercial": "Bewerben von Produkten und Dienstleistungen mit kommerzieller Absicht.",
+          "criminal_behavior_violation_german_law": "Strafbares Verhalten bzw. Verstoß gegen deutsches Recht.",
+          "discrimination_etc": "Diskriminierende Beiträge, Kommentare, Äußerungen oder Beleidigungen.",
+          "doxing": "Das Veröffentlichen von personenbezogenen Daten anderer ohne deren Einverständnis oder das Androhen dessen („Doxing“).",
+          "glorific_trivia_of_cruel_inhuman_acts": "Verherrlichung oder Verharmlosung grausamer oder unmenschlicher Gewalttätigkeiten.",
+          "intentional_intimidation_stalking_persecution": "Absichtliche Einschüchterung, Stalking oder Verfolgung.",
+          "other": "Andere …",
+          "pornographic_content_links": "Das Senden oder Verlinken eindeutig pornografischen Materials."
+        },
+        "placeholder": "Thema …"
+      },
+      "description": {
+        "label": "Bitte erkläre: Warum möchtest Du dies melden?",
+        "placeholder": "Zusätzliche Information …"
+      }
+    },
+    "submit": "Meldung senden",
+    "success": "Vielen Dank für diese Meldung!",
+    "user": {
+      "error": "Du hast den Nutzer bereits gemeldet!",
+      "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ melden möchtest?",
+      "title": "Nutzer melden",
+      "type": "Nutzer"
+    }
+  },
+  "search": {
+    "failed": "Nichts gefunden",
+    "for": "Suche nach ",
+    "heading": {
+      "Group": "Gruppe ::: Gruppen",
+      "Post": "Beitrag ::: Beiträge",
+      "Tag": "Hashtag ::: Hashtags",
+      "User": "Nutzer ::: Nutzer"
+    },
+    "hint": "!... sucht Beiträge, @... sucht Nutzer, &... sucht Gruppen, #… sucht Hashtags",
+    "no-results": "Keine Ergebnisse für \"{search}\" gefunden. Versuch' es mit einem anderen Begriff!",
+    "page": "Seite",
+    "placeholder": "Suchen",
+    "results": "Ergebnis gefunden ::: Ergebnisse gefunden",
+    "title": "Suchergebnisse"
+  },
+  "settings": {
+    "blocked-users": {
+      "block": "Nutzer blockieren",
+      "columns": {
+        "name": "Name",
+        "slug": "Alias",
+        "unblock": "Entsperren"
+      },
+      "empty": "Bislang hast Du niemanden blockiert.",
+      "explanation": {
+        "closing": "Das sollte fürs Erste genügen, damit blockierte Nutzer Dich nicht mehr länger belästigen können.",
+        "commenting-disabled": "Du kannst den Beitrag derzeit nicht kommentieren.",
+        "commenting-explanation": "Dafür kann es mehrere Gründe geben, bitte schau in unsere ",
+        "intro": "Wenn ein anderer Nutzer durch Dich blockiert wurde, dann passiert Folgendes:",
+        "notifications": "Von Dir blockierte Nutzer werden keine Benachrichtigungen mehr erhalten, falls sie in Deinen Beiträgen erwähnt werden.",
+        "their-perspective": "Umgekehrt das gleiche: Die blockierte Person bekommt auch in ihren Benachrichtigungen Deine Beiträge nicht mehr zu sehen.",
+        "your-perspective": "In Deinen Benachrichtigungen tauchen keine Beiträge der blockierten Person mehr auf."
+      },
+      "how-to": "Du kannst andere Nutzer auf deren Profilseite über das Inhaltsmenü blockieren.",
+      "name": "Blockierte Nutzer",
+      "unblock": "Blockierten Nutzer freigeben",
+      "unblocked": "{name} ist wieder entsperrt"
+    },
+    "data": {
+      "labelBio": "Über Dich",
+      "labelCity": "Deine Stadt oder Region",
+      "labelCityHint": "(zeigt ungefähre Position auf der Landkarte)",
+      "labelName": "Dein Name",
+      "labelSlug": "Dein eindeutiger Nutzername",
+      "name": "Deine Daten",
+      "namePlaceholder": "Petra Lustig",
+      "success": "Deine Daten wurden erfolgreich aktualisiert!"
+    },
+    "deleteUserAccount": {
+      "accountDescription": "Sei dir bewusst, dass deine Beiträge und Kommentare für unsere Community wichtig sind. Wenn du sie trotzdem löschen möchtest, musst du sie unten markieren.",
+      "accountWarning": "Dein Konto, deine Beiträge oder Kommentare kannst du nach dem Löschen WEDER VERWALTEN NOCH WIEDERHERSTELLEN!",
+      "accountWarningAdmin": "Das Konto, die Beiträge oder Kommentare können nach dem Löschen WEDER VERWALTET NOCH WIEDERHERGESTELLT WERDEN!",
+      "accountWarningIsAdmin": "Achtung! Du löschst jetzt ein Nutzerkonto!",
+      "commentedCount": "Meinen {count} Kommentar löschen ::: Meine {count} Kommentare löschen",
+      "confirmDeleting": "Nutzerkonto jetzt löschen",
+      "contributionsCount": "Meinen {count} Beitrag löschen ::: Meine {count} Beiträge löschen",
+      "infoAdmin": "Alle Beiträge und Kommentare des Users werden zusätzlich gelöscht!",
+      "name": "Nutzerkonto löschen",
+      "pleaseConfirm": "Zerstörerische Aktion! Gib „{confirm}“ ein, um zu bestätigen.",
+      "success": "Konto erfolgreich gelöscht!"
+    },
+    "download": {
+      "description": "Klicke auf den Knopf oben, um den Inhalt deiner Beiträge und Kommentare herunterzuladen. Um die Bilder der Beiträge herunterzuladen, musst du auf den jeweiligen Link unten klicken.",
+      "json": "als JSON",
+      "name": "Daten herunterladen"
+    },
+    "email": {
+      "change-successful": "Deine E-Mail-Adresse wurde erfolgreich geändert.",
+      "labelEmail": "E-Mail-Adresse ändern",
+      "labelNewEmail": "Neue E-Mail-Adresse",
+      "labelNonce": "Bestätigungscode eingeben",
+      "name": "Deine E-Mail",
+      "submitted": "Eine E-Mail zur Bestätigung Deiner Adresse wurde an <b>{email}</b> gesendet.",
+      "success": "Eine neue E-Mail-Adresse wurde registriert.",
+      "validation": {
+        "same-email": "Das ist Deine aktuelle E-Mail-Adresse"
+      },
+      "verification-error": {
+        "explanation": "Das kann verschiedene Ursachen haben:",
+        "message": "Deine E-Mail-Adresse konnte nicht verifiziert werden.",
+        "reason": {
+          "invalid-nonce": "Ist der Bestätigungscode falsch?",
+          "no-email-request": "Bist Du Dir sicher, dass Du eine Änderung Deiner E-Mail-Adresse angefragt hattest?"
+        },
+        "support": "Wenn das Problem weiterhin besteht, kontaktiere uns gerne per E-Mail an"
+      }
+    },
+    "embeds": {
+      "info-description": "Hier ist die Liste der Drittanbieter, deren Inhalte, z.B. in Form eingebetteter Videos, mittels Drittanbieter-Programmcode angezeigt werden kann:",
+      "name": "Drittanbieter",
+      "status": {
+        "change": {
+          "allow": "Na klar",
+          "deny": "Lieber nicht",
+          "question": "Soll einzubettender Programmcode der Drittanbieter Dir immer zur Anzeige gebracht werden?"
+        },
+        "description": "Als Grundeinstellung wird Dir der einzubettende Code der Drittanbieter",
+        "disabled": {
+          "off": "zunächst nicht angezeigt",
+          "on": "sofort angezeigt"
+        }
+      }
+    },
+    "invites": {
+      "name": "Einladungen"
+    },
+    "languages": {
+      "name": "Sprachen"
+    },
+    "muted-users": {
+      "columns": {
+        "name": "Name",
+        "slug": "Alias",
+        "unmute": "Entsperren"
+      },
+      "empty": "Bislang hast du niemanden stummgeschaltet.",
+      "explanation": {
+        "intro": "Wenn ein anderer Nutzer von dir stummgeschaltet wurde, dann passiert folgendes:",
+        "search": "Die Beiträge von stummgeschalteten Personen verschwinden aus deinen Suchergebnissen.",
+        "your-perspective": "In deiner Beitragsübersicht tauchen keine Beiträge der stummgeschalteten Person mehr auf."
+      },
+      "how-to": "Du kannst andere Nutzer auf deren Profilseite über das Inhaltsmenü stummschalten.",
+      "mute": "Stumm schalten",
+      "name": "Stummgeschaltete Nutzer",
+      "unmute": "Stummschaltung aufheben",
+      "unmuted": "{name} ist nicht mehr stummgeschaltet"
+    },
+    "name": "Einstellungen",
+    "notifications": {
+      "name": "Benachrichtigungen",
+      "send-email-notifications": "Sende E-Mail-Benachrichtigungen",
+      "success-update": "Benachrichtigungs-Einstellungen gespeichert!"
+    },
+    "organizations": {
+      "name": "Meine Organisationen"
+    },
+    "privacy": {
+      "make-shouts-public": "Teile von mir empfohlene Artikel öffentlich auf meinem Profil",
+      "name": "Privatsphäre",
+      "success-update": "Privatsphäre-Einstellungen gespeichert!"
+    },
+    "security": {
+      "change-password": {
+        "button": "Passwort ändern",
+        "label-new-password": "Dein neues Passwort",
+        "label-new-password-confirm": "Bestätige Dein neues Passwort",
+        "label-old-password": "Dein altes Passwort",
+        "message-new-password-confirm-required": "Bestätige Dein neues Passwort",
+        "message-new-password-missmatch": "Gib dasselbe Passwort nochmals ein",
+        "message-new-password-required": "Gib ein neues Passwort ein",
+        "message-old-password-required": "Gib Dein altes Passwort ein",
+        "passwordSecurity": "Passwortsicherheit",
+        "passwordStrength0": "Sehr unsicheres Passwort",
+        "passwordStrength1": "Unsicheres Passwort",
+        "passwordStrength2": "Mittelmäßiges Passwort",
+        "passwordStrength3": "Sicheres Passwort",
+        "passwordStrength4": "Sehr sicheres Passwort",
+        "success": "Passwort erfolgreich geändert!"
+      },
+      "name": "Sicherheit"
+    },
+    "social-media": {
+      "add-new-link": "Neuen Link hinzufügen",
+      "delete-modal": {
+        "confirm-button": "Löschen",
+        "message": "Lösche „{name}“.",
+        "title": "Möchtest du wirklich deinen Link löschen?"
+      },
+      "edit-link": "Ändere den Link",
+      "name": "Soziale Medien",
+      "placeholder": "Deine Webadresse des Sozialen Netzwerkes",
+      "requireUnique": "Dieser Link existiert bereits",
+      "submit": "Link hinzufügen",
+      "successAdd": "Soziales Netzwerk hinzugefügt. Profil wurde aktualisiert!",
+      "successDelete": "Soziales Netzwerk entfernt. Profil wurde aktualisiert!"
+    },
+    "validation": {
+      "slug": {
+        "alreadyTaken": "Dieser Nutzername ist schon vergeben.",
+        "regex": "Es sind nur Kleinbuchstaben, Zahlen, Unterstriche oder Bindestriche erlaubt."
+      }
+    }
+  },
+  "shoutButton": {
+    "shouted": "empfohlen"
+  },
+  "site": {
+    "back-to-login": "Zurück zur Anmeldung",
+    "bank": "Bankverbindung",
+    "code-of-conduct": "Verhaltenscodex",
+    "contact": "Kontakt",
+    "data-privacy": "Datenschutzerklärung",
+    "director": "Geschäftsführer",
+    "donate": "Spenden",
+    "error-occurred": "Ein Fehler ist aufgetreten.",
+    "faq": "FAQ",
+    "germany": "Deutschland",
+    "imprint": "Impressum",
+    "made": "Mit ❤️ gemacht",
+    "register": "Registernummer",
+    "responsible": "Verantwortlich für Inhalte dieser Seite (§ 55 Abs. 2 RStV)",
+    "support": "Support",
+    "taxident": "Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz (Deutschland)",
+    "termsAndConditions": "Nutzungsbedingungen",
+    "thanks": "Danke!",
+    "tribunal": "Registergericht"
+  },
+  "termsAndConditions": {
+    "newTermsAndConditions": "Neue Nutzungsbedingungen",
+    "termsAndConditionsNewConfirm": "Ich habe die neuen Nutzungsbedingungen durchgelesen und stimme zu.",
+    "termsAndConditionsNewConfirmText": "Bitte lies Dir die neuen Nutzungsbedingungen jetzt durch!"
+  }
+}

@@ -1,0 +1,803 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Feature Specification · Ocelot.Social – Developer Documentation</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        <meta name="author" content="busFaktor() e.V.">
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-hints/plugin-hints.css">
+                
+            
+                
+                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-tabs2/tabs.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search-pro/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-splitter/splitter.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-chapter-fold/chapter-fold.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="../CODE_OF_CONDUCT.html" />
+    
+    
+    <link rel="prev" href="../CONTRIBUTING.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../edit-this-documentation.html">
+            
+                <a href="../edit-this-documentation.html">
+            
+                    
+                    Edit this Documentation
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="../neo4j/">
+            
+                <a href="../neo4j/">
+            
+                    
+                    Neo4J
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="../backend/">
+            
+                <a href="../backend/">
+            
+                    
+                    Backend
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="../backend/graphql.html">
+            
+                <a href="../backend/graphql.html">
+            
+                    
+                    GraphQL
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="../backend/neo4j-graphql-js.html">
+            
+                <a href="../backend/neo4j-graphql-js.html">
+            
+                    
+                    neo4j-graphql-js
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../webapp/">
+            
+                <a href="../webapp/">
+            
+                    
+                    Webapp
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="../webapp/components.html">
+            
+                <a href="../webapp/components.html">
+            
+                    
+                    Components
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="../webapp/html.html">
+            
+                <a href="../webapp/html.html">
+            
+                    
+                    HTML
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="../webapp/scss.html">
+            
+                <a href="../webapp/scss.html">
+            
+                    
+                    SCSS
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="../webapp/vue.html">
+            
+                <a href="../webapp/vue.html">
+            
+                    
+                    Vue
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="../testing.html">
+            
+                <a href="../testing.html">
+            
+                    
+                    Testing Guide
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.6.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    End-to-end tests
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.2" data-path="../webapp/testing.html">
+            
+                <a href="../webapp/testing.html">
+            
+                    
+                    Frontend tests
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.3" data-path="../backend/testing.html">
+            
+                <a href="../backend/testing.html">
+            
+                    
+                    Backend tests
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="../DOCKER_MORE_CLOSELY.html">
+            
+                <a href="../DOCKER_MORE_CLOSELY.html">
+            
+                    
+                    Docker More Closely
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8" >
+            
+                <a target="_blank" href="https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/blob/master/deployment/README.md">
+            
+                    
+                    Deployment
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" data-path="../CONTRIBUTING.html">
+            
+                <a href="../CONTRIBUTING.html">
+            
+                    
+                    Contributing
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.10" data-path="features.html">
+            
+                <a href="features.html">
+            
+                    
+                    Feature Specification
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11" data-path="../CODE_OF_CONDUCT.html">
+            
+                <a href="../CODE_OF_CONDUCT.html">
+            
+                    
+                    Code of conduct
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12" data-path="../LICENSE.html">
+            
+                <a href="../LICENSE.html">
+            
+                    
+                    License
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Feature Specification</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="network-specification">Network Specification</h1>
+<p>ocelot.social is free and open-source social network code that connects information to action and promotes positive local and global change in all areas of life.</p>
+<ul>
+<li><strong>Social</strong>: Interact with other people not just by commenting their posts, but by providing <strong>Pro &amp; Contra</strong> arguments, give a <strong>Versus</strong> or ask them by integrated <strong>Chat</strong> or <strong>Let&apos;s Talk</strong></li>
+<li><strong>Knowledge</strong>: Read articles about interesting topics and find related posts in the <strong>More Info</strong> tab or by <strong>Filtering</strong> based on <strong>Categories</strong> and <strong>Tagging</strong> or by using the <strong>Fulltext Search</strong>.</li>
+<li><strong>Action</strong>: Don&apos;t just read about how to make the world a better place, but come into <strong>Action</strong> by following provided suggestions on the <strong>Action</strong> tab provided by other people or <strong>Organisations</strong>.</li>
+</ul>
+<h2 id="features">Features</h2>
+<p>The following features will be implemented. This gets done in three steps:</p>
+<ol>
+<li>First we will implement a basic feature set and provide a test system to test the basic network functionality.</li>
+<li>In a second step we will make our prototype publicly available with an advanced feature set including the technology and organizational structure to drive a bigger public social network.</li>
+<li>In a third step all the remaining features will be implemented to build the full product.</li>
+</ol>
+<h3 id="user-account">User Account</h3>
+<p><a href="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/user_account" target="_blank">Cucumber Features</a></p>
+<ul>
+<li>Sign-up</li>
+<li>Agree to Data Privacy Statement</li>
+<li>Agree to Terms of Service</li>
+<li>Login</li>
+<li>Logoff</li>
+<li>Change User Name</li>
+<li>Change Email Address</li>
+<li>Change Password</li>
+<li>Delete Account</li>
+<li>Download User&apos;s Content</li>
+<li>GDPR-Information about stored Content</li>
+<li>Choosing Interface Language (e.g. German / English / French)</li>
+<li>Persistent Links</li>
+</ul>
+<h3 id="user-profile">User Profile</h3>
+<p><a href="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/user_profile" target="_blank">Cucumber Features</a></p>
+<ul>
+<li>Upload and Change Avatar</li>
+<li>Upload and Change Profile Picture</li>
+<li>Edit Social Media Accounts</li>
+<li>Edit Locale information</li>
+<li>Show and delete Bookmarks (later)</li>
+<li>Show Posts of a specific User</li>
+<li>Show Comments of a specific User</li>
+</ul>
+<h3 id="dashboard">Dashboard</h3>
+<p><a href="https://preview.uxpin.com/24a2ab8adcd84f9a763d87ed27251351225e0ecd#/pages/99768919/simulate/sitemap?mode=i" target="_blank">Clickdummy</a></p>
+<ul>
+<li>Show Link to own Profile</li>
+<li>Show Friends Widget</li>
+<li>Show Favorites Widget</li>
+<li>Show Get Friends Widget</li>
+<li>Show popular Hashtags Widget</li>
+<li>Show Mini-Statistics Widget (all time)</li>
+<li>Show Chatrooms Widget</li>
+<li>Show List of Let&apos;s Talk requests with online status of requesting people</li>
+</ul>
+<h3 id="posts">Posts</h3>
+<p><a href="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/post" target="_blank">Cucumber Features</a></p>
+<ul>
+<li>Creating Posts</li>
+<li>Persistent Links</li>
+<li>Upload Teaser Picture for Post</li>
+<li>Upload additional Pictures</li>
+<li>Editing Title and Content</li>
+<li>Allow embedded Conten (Videos, Sound, ...)</li>
+<li>Choosing a Category</li>
+<li>Adding Tags</li>
+<li>Choosing Language (e.g. German / English / French)</li>
+<li>Choosing Visibility (Public / Friends / Private)</li>
+<li>Shout Button for Posts</li>
+<li>Bookmark Posts (later)</li>
+<li>Optionally provide Let&apos;s Talk Feature</li>
+<li>Optionally provide Commenting Feature</li>
+</ul>
+<h3 id="comments">Comments</h3>
+<ul>
+<li>Creating Comments</li>
+<li>Deleting Comments</li>
+<li>Editing Comments</li>
+<li>Upvote comments of others</li>
+</ul>
+<h3 id="notifications">Notifications</h3>
+<p><a href="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/notifications" target="_blank">Cucumber features</a></p>
+<ul>
+<li>User @-mentionings</li>
+<li>Notify authors for comments</li>
+<li>Administrative notifications to all users</li>
+</ul>
+<h3 id="contribution-list">Contribution List</h3>
+<ul>
+<li>Show Posts by Tiles</li>
+<li>Show Posts as List</li>
+<li>Filter by Category (Health and Wellbeing, Global Peace &amp; Non-Violence, ...)</li>
+<li>Filter by Mood (Funny, Happy, Surprised, Cry, Angry, ...)</li>
+<li>Filter by Source (Connections, Following, Individuals, Non-Profits, ...)</li>
+<li>Filter by Posts &amp; Tools (Post, Events, CanDos, ...)</li>
+<li>Filter by Format Type (Text, Pictures, Video, ...)</li>
+<li>Extended Filter (Continent, Country, Language, ...)</li>
+<li>Sort Posts by Date</li>
+<li>Sort Posts by Shouts</li>
+<li>Sort Posts by most Comments</li>
+<li>Sort Posts by Emoji-Count (all Types)</li>
+</ul>
+<h3 id="blacklist">Blacklist</h3>
+<p><a href="https://www.youtube.com/watch?v=-uDvvmN8hLQ" target="_blank">Video</a></p>
+<ul>
+<li>Blacklist Users</li>
+<li>Blacklist specific Terms</li>
+<li>Blacklist Tags</li>
+<li>Switch on/off Adult Content</li>
+</ul>
+<h3 id="search">Search</h3>
+<p><a href="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/search" target="_blank">Cucumber Features</a></p>
+<ul>
+<li>Search for Categories</li>
+<li>Search for Tags</li>
+<li>Fulltext Search</li>
+</ul>
+<h3 id="candos">CanDos</h3>
+<ul>
+<li>Creating CanDos</li>
+<li>Editing Title and Content</li>
+<li>Choosing a Category</li>
+<li>Adding Tags</li>
+<li>Choosing Language (e.g. German / English / French)</li>
+<li>Choosing Visibility (Public / Friends / Private)</li>
+<li>Choosing Difficulty</li>
+<li>Editing Why - why should you do this</li>
+<li>Editing Usefulness - what is it good for</li>
+</ul>
+<h3 id="versus-interaction-on-existing-post">Versus (interaction on existing Post)</h3>
+<ul>
+<li>Create / edit / delete Versus</li>
+</ul>
+<h3 id="jobs">Jobs</h3>
+<ul>
+<li>Create, edit and delete Jobs by an User</li>
+<li>Handle Jobs as Part of Projects</li>
+<li>Handle Jobs done by Organizations</li>
+</ul>
+<h3 id="projects">Projects</h3>
+<ul>
+<li>Create, edit and delete Projects</li>
+<li>Edit Title and Description for the Project</li>
+<li>Set Project Type</li>
+<li>Set and Edit Timeline for the Project</li>
+<li>Add Media to the Project</li>
+<li>Chat about the Project</li>
+</ul>
+<h3 id="pro--contra">Pro &amp; Contra</h3>
+<ul>
+<li>Create Pro and Con (2-row)</li>
+<li>Add Arguments on Pro or Con Side</li>
+<li>Rate up Arguments</li>
+<li>Add Tags</li>
+<li>Attach Media</li>
+</ul>
+<h3 id="votes">Votes</h3>
+<ul>
+<li>Create Votes (Surveys with two or more Choices)</li>
+<li>Add Title and Description</li>
+<li>Let Users vote</li>
+<li>Add Tags</li>
+</ul>
+<h3 id="bestlist">Bestlist</h3>
+<ul>
+<li>Create Bestlist</li>
+<li>Create Votes (Surveys)</li>
+<li>Add Title and Description</li>
+<li>Add Tags</li>
+<li>Let Users vote for Best Item</li>
+<li>Set Settings (allow Uploads, allow Links, ...)</li>
+</ul>
+<h3 id="events">Events</h3>
+<ul>
+<li>Create Events</li>
+<li>Add Title and Description</li>
+<li>Choose Date and Location</li>
+<li>Add Tags</li>
+</ul>
+<h3 id="more-info">More Info</h3>
+<p>Shows automatically related information for existing post.</p>
+<ul>
+<li>Show related Posts</li>
+<li>Show Pros and Cons</li>
+<li>Show Bestlist</li>
+<li>Show Votes</li>
+<li>Link to corresponding Chatroom</li>
+</ul>
+<h3 id="take-action">Take Action</h3>
+<p>Shows automatically related actions for existing post.</p>
+<ul>
+<li>Show related Organisations</li>
+<li>Show related CanDos</li>
+<li>Show related Projects</li>
+<li>Show related Jobs</li>
+<li>Show related Events</li>
+<li>Show Map</li>
+</ul>
+<h3 id="badges-system">Badges System</h3>
+<ul>
+<li>Importing Badge Information (CSV)</li>
+<li>Showing Badges</li>
+<li>Badge Administration by Admins</li>
+<li>Choosing Badges to display by User</li>
+</ul>
+<h3 id="chat">Chat</h3>
+<ul>
+<li>Basic 1:1 Chat functionality</li>
+</ul>
+<h3 id="lets-talk">Let&apos;s Talk</h3>
+<ul>
+<li>Request Let&apos;s talk with Author of Post</li>
+<li>Requestor can request private or public Let&apos;s Talk</li>
+<li>Requestor can choose the Chat format (Video, Audio, Text)</li>
+<li>Interact with interested People 1:1</li>
+<li>Approve request from Requestor</li>
+</ul>
+<h3 id="organizations">Organizations</h3>
+<ul>
+<li>Propose Organizations by users</li>
+<li>Set Name and Details</li>
+<li>Set Homepage</li>
+<li>Set Region</li>
+<li>Set Topic</li>
+<li>Commit organizations by HC-Org-Team</li>
+<li>Panel for Organisation Handling by themselfes</li>
+<li>Choose/Mark Users as authorized to manage an Organization</li>
+</ul>
+<h3 id="moderation">Moderation</h3>
+<p><a href="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/moderation" target="_blank">Cucumber Features</a></p>
+<ul>
+<li>Report Button for users for doubtful Content</li>
+<li>Moderator Panel</li>
+<li>List of reported Content (later replaced by User-Moderation)</li>
+<li>Mark verified Users as Moderators</li>
+<li>Show Posts to be moderated highlighted to User-Moderators</li>
+<li>Statistics about kinds of reported Content by Time</li>
+<li>Statistics about Decisions in Moderation</li>
+</ul>
+<h3 id="administration">Administration</h3>
+<p><a href="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/administration" target="_blank">Cucumber Features</a></p>
+<ul>
+<li>Provide Admin-Interface to send Users Invite Code</li>
+<li>Static Pages for Data Privacy Statement ...</li>
+<li>Create, edit and delete Announcements</li>
+<li>Pin a post to inform users</li>
+</ul>
+<h3 id="invitation">Invitation</h3>
+<ul>
+<li>Allow Users to invite others by Email</li>
+<li>Allow Users to register with Invite Code</li>
+<li>Double-opt-in by Email</li>
+</ul>
+<h3 id="internationalization">Internationalization</h3>
+<p><a href="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/internationalization" target="_blank">Cucumber Features</a></p>
+<ul>
+<li>Frontend UI</li>
+<li>Backend Error Messages</li>
+</ul>
+<h3 id="federation">Federation</h3>
+<ul>
+<li>Provide Server-Server ActivityPub-API</li>
+<li>Provide User-Server Activitypub-API</li>
+<li>Receiving public addressed Article and Note Objects</li>
+<li>Receiving Like and Follow Activities</li>
+<li>Receiving Undo and Delete Activities for Articles and Notes</li>
+<li>Serving Webfinger records and Actor Objects</li>
+<li>Serving Followers, Following and Outbox collections</li>
+</ul>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="../CONTRIBUTING.html" class="navigation navigation-prev " aria-label="Previous page: Contributing">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="../CODE_OF_CONDUCT.html" class="navigation navigation-next " aria-label="Next page: Code of conduct">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Feature Specification","level":"1.10","depth":1,"next":{"title":"Code of conduct","level":"1.11","depth":1,"path":"CODE_OF_CONDUCT.md","ref":"CODE_OF_CONDUCT.md","articles":[]},"previous":{"title":"Contributing","level":"1.9","depth":1,"path":"CONTRIBUTING.md","ref":"CONTRIBUTING.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-lunr","-search","-sharing","hints","tabs2","theme-simple@git+https://github.com/plugins-zander/gitbook-plugin-theme-simple.git","search-pro@git+https://github.com/plugins-zander/gitbook-plugin-search-pro.git","splitter@git+https://github.com/plugins-zander/gitbook-plugin-splitter.git","edit-link@git+https://github.com/plugins-zander/gitbook-plugin-edit-link.git","gtag@git+https://github.com/plugins-zander/gitbook-plugin-gtag.git","chapter-fold@git+https://github.com/plugins-zander/gitbook-plugin-chapter-fold.git","copy-code-button@git+https://github.com/plugins-zander/gitbook-plugin-copy-code-button.git"],"styles":{"ebook":"styles/ebook.css","epub":"styles/epub.css","mobi":"styles/mobi.css","pdf":"styles/pdf.css","print":"styles/print.css","website":"styles/website.css"},"pluginsConfig":{"chapter-fold":{},"splitter":{},"search-pro":{},"hints":{"danger":"fa fa-exclamation-circle","info":"fa fa-info-circle","tip":"fa fa-mortar-board","working":"fa fa-wrench"},"sitemap-general":{"prefix":"https://zlogs.net/gitbook-action/"},"fontsettings":{"theme":"white","family":"sans","size":2},"gtag":{"token":""},"tabs2":{},"highlight":{},"theme-simple":{"showLevel":false,"styles":{"ebook":"styles/ebook.css","epub":"styles/epub.css","mobi":"styles/mobi.css","pdf":"styles/pdf.css","print":"styles/print.css","website":"styles/website.css"}},"copy-code-button":{},"edit-link":{"label":"EDIT","base":"https://github.com/Ocelot-Social-Community/Ocelot-Social/edit/master/"},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","author":"busFaktor() e.V.","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Ocelot.Social – Developer Documentation","gitbook":"3.2.3","description":"Developer Documentation by Gitbook-Action"},"file":{"path":"cypress/features.md","mtime":"2021-09-16T08:51:38.000Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2023-08-15T15:04:47.802Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-tabs2/tabs.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search-pro/jquery.mark.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search-pro/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-splitter/splitter.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-edit-link/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-gtag/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-chapter-fold/chapter-fold.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-copy-code-button/toggle.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

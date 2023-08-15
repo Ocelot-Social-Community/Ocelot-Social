@@ -1,0 +1,709 @@
+{
+  "actions": {
+    "cancel": "Annuler",
+    "create": "Créer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "loading": "chargement",
+    "loadMore": "charger plus",
+    "save": "Sauvegarder"
+  },
+  "admin": {
+    "categories": {
+      "categoryName": "Nom",
+      "name": "Catégories",
+      "postCount": "Postes"
+    },
+    "dashboard": {
+      "comments": "Commentaires",
+      "follows": "Suit",
+      "invites": "Invitations",
+      "name": "Tableau de bord",
+      "notifications": "Notifications",
+      "organizations": "Organisations",
+      "posts": "Postes",
+      "projects": "Projets",
+      "shouts": "Cris",
+      "users": "Utilisateurs"
+    },
+    "donations": {
+      "goal": "Dons mensuels requis",
+      "name": "Informations sur les dons",
+      "progress": "Dons recueillis jusqu'à présent",
+      "successfulUpdate": "Les informations sur les dons ont été mises à jour avec succès !"
+    },
+    "hashtags": {
+      "name": "Hashtags",
+      "nameOfHashtag": "Nom",
+      "number": "Num.",
+      "tagCount": "Postes",
+      "tagCountUnique": "Utilisateurs"
+    },
+    "invites": {
+      "description": "Les invitations sont une merveilleuse façon d'avoir vos amis dans votre réseau...",
+      "name": "Inviter des utilisateurs",
+      "title": "Inviter des gens"
+    },
+    "name": "Admin",
+    "notifications": {
+      "name": "Notifications"
+    },
+    "organizations": {
+      "name": "Organisations"
+    },
+    "pages": {
+      "name": "Pages"
+    },
+    "settings": {
+      "name": "Paramètres"
+    },
+    "users": {
+      "empty": "Aucun utilisateur trouvé",
+      "form": {
+        "placeholder": "mail, nom ou description"
+      },
+      "name": "Utilisateurs",
+      "table": {
+        "columns": {
+          "createdAt": "Créé à",
+          "email": "Mail",
+          "name": "Nom",
+          "number": "Num.",
+          "role": "Rôle",
+          "slug": "Slug"
+        }
+      }
+    }
+  },
+  "chat": {
+    "search": "Filtrer les salons de chat"
+  },
+  "code-of-conduct": {
+    "subheader": "pour le réseau social de {ORGANIZATION_NAME}"
+  },
+  "comment": {
+    "content": {
+      "unavailable-placeholder": "… ce commentaire n'est plus disponible"
+    },
+    "edited": "édité",
+    "menu": {
+      "delete": "Supprimer le commentaire",
+      "edit": "Modifier le commentaire"
+    },
+    "show": {
+      "less": "montrer moins",
+      "more": "montrer plus"
+    }
+  },
+  "common": {
+    "category": "Catégorie ::: Catégories",
+    "comment": "Commentaire ::: Commentaires",
+    "letsTalk": "Parlons-en",
+    "loading": "chargement",
+    "loadMore": "charger plus",
+    "name": "Nom",
+    "organization": "Organisation ::: Organisations",
+    "post": "Message ::: Messages",
+    "project": "Projet ::: Projets",
+    "reportContent": "Signaler",
+    "shout": "Partage ::: Partages",
+    "tag": "Tag ::: Tags",
+    "takeAction": "Passer à l'action",
+    "user": "Utilisateur ::: Utilisateurs",
+    "validations": {
+      "categories": "au moins une et au maximum trois catégories doivent être sélectionnées",
+      "email": "Doit être une adresse mail valide",
+      "url": "doit être une URL valide"
+    },
+    "versus": "Versus"
+  },
+  "components": {
+    "password-reset": {
+      "change-password": {
+        "error": "La modification de votre mot de passe a échoué. Peut-être que le code de sécurité n'était pas correct ?",
+        "help": "En cas de problème, n'hésitez pas à nous demander de l'aide en nous envoyant un mail à :",
+        "success": "La modification de votre mot de passe a réussi !"
+      },
+      "request": {
+        "form": {
+          "description": "Un mail de réinitialisation de mot de passe sera envoyé à l'adresse mail indiquée.",
+          "submit": "Demander mail",
+          "submitted": "Un mail avec des instructions supplémentaires a été envoyé à <b>{email}</b>."
+        },
+        "title": "Réinitialiser votre mot de passe"
+      }
+    },
+    "registration": {
+      "create-user-account": {
+        "error": "Compte d'utilisateur n'a pas pu être créé!",
+        "help": " Peut-être que la confirmation n'était pas valide? En cas de problème, n'hésitez pas à nous demander de l'aide en nous envoyant un mail à:",
+        "success": "Votre compte a été créé!",
+        "title": "Créer un compte utilisateur"
+      },
+      "email-nonce": {
+        "form": {
+          "description": "Ouvrez votre boîte de réception et entrez le code que nous vous avons envoyé.",
+          "next": "Continuer",
+          "nonce": "Entrez votre code",
+          "validations": {
+            "length": "doit comporter {nonceLength} caractères"
+          }
+        }
+      },
+      "signup": {
+        "form": {
+          "data-privacy": "J'ai lu et compris la Déclaration de confidentialité.",
+          "description": "Pour commencer, entrez votre adresse mail :",
+          "errors": {
+            "email-exists": "Il existe déjà un compte utilisateur avec cette adresse mail!"
+          },
+          "submit": "Créer un compte",
+          "success": "Un mail avec un lien pour compléter votre inscription a été envoyé à <b>{email}</b>",
+          "terms-and-condition": "Je confirme les Conditions générales."
+        },
+        "title": "Rejoignez {APPLICATION_NAME}!",
+        "unavailable": "Malheureusement, l'enregistrement public des comptes utilisateurs n'est pas encore disponible sur ce serveur."
+      }
+    }
+  },
+  "contribution": {
+    "categories": {
+      "infoSelectedNoOfMaxCategories": "{chosen} de {max} catégories sélectionnées"
+    },
+    "category": {
+      "name": {
+        "animal-protection": "Protection des animaux",
+        "art-culture-sport": "Art, Culture & Sport",
+        "consumption-sustainability": "Consommation & Durabilité",
+        "cooperation-development": "Coopération & Développement",
+        "democracy-politics": "Démocratie & Politique",
+        "economy-finances": "Économie & Finances",
+        "education-sciences": "Éducation & Sciences",
+        "energy-technology": "Énergie & Technologie",
+        "environment-nature": "Environnement & Nature",
+        "freedom-of-speech": "Liberté d'expression",
+        "global-peace-nonviolence": "Paix mondiale & Non-violence",
+        "happiness-values": "Bonheur & Valeurs",
+        "health-wellbeing": "Santé & Bien-être",
+        "human-rights-justice": "Droits de l'homme & Justice",
+        "it-internet-data-privacy": "Informatique, Internet & Confidentialité des données",
+        "just-for-fun": "Juste pour le Fun"
+      }
+    },
+    "emotions-label": {
+      "angry": "En colère",
+      "cry": "Pleurer",
+      "funny": "Marrant",
+      "happy": "Heureux",
+      "surprised": "Surpris"
+    },
+    "filterALL": "Voir toutes les contributions",
+    "filterFollow": "Filtrer les contributions des utilisateurs que je suis",
+    "inappropriatePicture": "Cette image peut être inappropriée pour certaines personnes.",
+    "languageSelectLabel": "Langue",
+    "languageSelectText": "Sélectionner une langue",
+    "newPost": "Créer un nouveau Post",
+    "success": "Enregistré!",
+    "teaserImage": {
+      "cropperConfirm": "Confirmer",
+      "supportedFormats": "Insérer une image au format de fichier JPG, PNG ou GIF!"
+    },
+    "title": "Titre"
+  },
+  "delete": {
+    "cancel": "Annuler",
+    "comment": {
+      "message": "Voulez-vous vraiment supprimer le commentaire de \"<b>{name}</b>\"?",
+      "success": "Commentaire supprimé avec succès !",
+      "title": "Supprimer un commentaire",
+      "type": "Commentaire"
+    },
+    "contribution": {
+      "message": "Voulez-vous vraiment supprimer la contribution  \"<b>{name}</b>\"?",
+      "success": "Contribution supprimée avec succès !",
+      "title": "Supprimer la contribution",
+      "type": "Contribution"
+    },
+    "submit": "Supprimer"
+  },
+  "disable": {
+    "cancel": "Annuler",
+    "comment": {
+      "message": "Souhaitez-vous vraiment désactiver le commentaire de « <b>{name}</b> » ?",
+      "title": "Désactiver le commentaire",
+      "type": "Commentaire"
+    },
+    "contribution": {
+      "message": "Souhaitez-vous vraiment signaler l'entrée « <b> {name} </b> »?",
+      "title": "Désactiver l'apport",
+      "type": "Contribution"
+    },
+    "submit": "Désactiver",
+    "success": "Désactivé avec succès",
+    "user": {
+      "message": "Souhaitez-vous vraiment désactiver l'utilisateur « <b> {name} </b> »?",
+      "title": "Désactiver l'utilisateur",
+      "type": "Utilisateur"
+    }
+  },
+  "donations": {
+    "amount-of-total": "{amount} de {total} € collectés",
+    "donate-now": "Faites un don"
+  },
+  "editor": {
+    "embed": {
+      "always_allow": "Autoriser toujours le contenu intégré par des fournisseurs tiers (ce paramètre peut être modifié à tout moment)",
+      "data_privacy_info": "Vos données n'ont pas encore été partagées avec des fournisseurs tiers. Si vous regardez cette vidéo, le fournisseur suivant recueillera probablement des données utilisateurs:",
+      "data_privacy_warning": "Attention à la confidentialité des données!",
+      "play_now": "Regarder maintenant"
+    },
+    "hashtag": {
+      "addHashtag": "Nouveau hashtag",
+      "addLetter": "Tapez une lettre",
+      "noHashtagsFound": "Aucun hashtag trouvé"
+    },
+    "mention": {
+      "noUsersFound": "Aucun utilisateur trouvé"
+    },
+    "placeholder": "Écrivez quelque chose d'inspirant..."
+  },
+  "filter-menu": {
+    "all": "Toutes",
+    "categories": "Catégories de contenu",
+    "emotions": "Émotions",
+    "filter-by": "Filtrer par ...",
+    "following": "Utilisateurs que je suis",
+    "languages": "Langues",
+    "order": {
+      "newest": {
+        "hint": null,
+        "label": "Plus récent"
+      },
+      "oldest": {
+        "hint": null,
+        "label": "Le plus ancien"
+      }
+    }
+  },
+  "followButton": {
+    "follow": "Suivre",
+    "following": "Je suis les"
+  },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null,
+      "pendingMember": null
+    },
+    "membersCount": null,
+    "membersListTitle": null
+  },
+  "hashtags-filter": {
+    "clearSearch": "Réinitialiser la recherche",
+    "hashtag-search": "Recherche de #{hashtag}",
+    "title": "Votre bulle de filtre"
+  },
+  "index": {
+    "change-filter-settings": "Modifiez les paramètres de filtrage pour obtenir plus de résultats.",
+    "no-results": "Pas de contribution trouvée."
+  },
+  "login": {
+    "email": "Votre mail",
+    "failure": "Adresse mail ou mot de passe incorrect.",
+    "forgotPassword": "Mot de passe oublié?",
+    "hello": "Bonjour",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "moreInfo": "Qu'est-ce que {APPLICATION_NAME}?",
+    "moreInfoHint": "à la page de présentation",
+    "no-account": "Vous n'avez pas de compte?",
+    "password": "Votre mot de passe",
+    "register": "S'inscrire",
+    "success": "Vous êtes connecté!"
+  },
+  "maintenance": {
+    "explanation": "Pour l'instant, nous faisons de la maintenance programmée, veuillez réessayer plus tard.",
+    "questions": "Des questions ou des préoccupations, envoyez un mail à",
+    "title": "{APPLICATION_NAME} est en maintenance"
+  },
+  "moderation": {
+    "name": "Modération",
+    "reports": {
+      "author": "Auteur",
+      "content": "Contenu",
+      "decideButton": "Confirmer",
+      "decided": "Décidé",
+      "decideModal": {
+        "cancel": "Annuler",
+        "Comment": {
+          "disable": {
+            "message": "Voulez-vous vraiment que le commentaire \"<b>{name}</b>\" reste <b>désactivé</b> ?",
+            "title": "Finalement désactiver le commentaire"
+          },
+          "enable": {
+            "message": "Voulez-vous vraiment que le commentaire \"<b>{name}</b>\" reste <b>activé</b>?",
+            "title": "Finalement activer le commentaire"
+          }
+        },
+        "Post": {
+          "disable": {
+            "message": "Voulez-vous vraiment que la publication \"<b>{name}</b>\" reste <b>désactivé</b>?",
+            "title": "Finalement désactiver la publication"
+          },
+          "enable": {
+            "message": "Voulez-vous vraiment que la publication \"<b>{name}</b>\" reste <b>activé</b>?",
+            "title": "Finalement activer le post"
+          }
+        },
+        "submit": "Confirmer la décision",
+        "User": {
+          "disable": {
+            "message": "Voulez-vous vraiment laisser l'utilisateur \"<b>{name}</b>\" <b>désactivé</b>?",
+            "title": "Finalement désactiver l'utilisateur"
+          },
+          "enable": {
+            "message": "Voulez-vous réellement laisser l'utilisateur \"<b>{name}</b>\" <b>activé</b>?",
+            "title": "Finalement activer utilisateur"
+          }
+        }
+      },
+      "decision": "Décision",
+      "DecisionSuccess": "Décidé avec succès!",
+      "disabled": "Désactivé",
+      "disabledAt": "Désactivé le",
+      "disabledBy": "désactivé par",
+      "empty": "Félicitations, rien à modérer.",
+      "enabled": "Activé",
+      "enabledAt": "Activé le",
+      "enabledBy": "Activé par",
+      "filterLabel": {
+        "all": "Tous",
+        "closed": "Fermé",
+        "reviewed": "Revu",
+        "unreviewed": "Non révisé"
+      },
+      "moreDetails": "Voir les détails",
+      "name": "Signalisations",
+      "noDecision": "Pas de décision!",
+      "numberOfUsers": "{count} utilisateurs",
+      "previousDecision": "Décision précédente:",
+      "reasonCategory": "Catégorie",
+      "reasonDescription": "Description",
+      "reportedOn": "Date",
+      "status": "Statut actuel",
+      "submitter": "signalé par"
+    }
+  },
+  "notifications": {
+    "comment": "Commentaire",
+    "content": "Contenu",
+    "empty": "Désolé, vous n'avez pas de notifications pour le moment.",
+    "filterLabel": {
+      "all": "Tous",
+      "read": "Lire",
+      "unread": "Non lu"
+    },
+    "group": "Description",
+    "headerMenuButton": {
+      "tooltip": "Mes notifications"
+    },
+    "markAllAsRead": "Tout marquer comme lu",
+    "pageLink": "Toutes les notifications",
+    "post": "Post",
+    "reason": {
+      "commented_on_post": "Commenté sur votre post…",
+      "mentioned_in_comment": "Vous a mentionné dans un commentaire…",
+      "mentioned_in_post": "Vous a mentionné dans un post…"
+    },
+    "title": "Notifications",
+    "user": "Utilisateur"
+  },
+  "post": {
+    "comment": {
+      "submit": "Commenté",
+      "submitted": "Commentaire soumis",
+      "updated": "Changements sauvegardés"
+    },
+    "edited": "édité",
+    "menu": {
+      "delete": "Supprimer le Post",
+      "edit": "Modifier le Post",
+      "pin": "Épingler le Post",
+      "pinnedSuccessfully": "Poste épinglé avec succès!",
+      "unpin": "Retirer l'épingle du poste",
+      "unpinnedSuccessfully": "Épingle retirer du Post avec succès!"
+    },
+    "name": "Post",
+    "pinned": "Annonce",
+    "takeAction": {
+      "name": "Passez à l'action"
+    }
+  },
+  "profile": {
+    "avatar": {
+      "submitted": "Téléchargement réussi"
+    },
+    "commented": "Commentais",
+    "follow": "Suivre",
+    "followers": "Suiveurs",
+    "following": "Suivant",
+    "invites": {
+      "description": "Entrez leur adresse mail pour l'invitation.",
+      "emailPlaceholder": "Mail d'invitation",
+      "title": "Invitez quelqu'un à {APPLICATION_NAME}!"
+    },
+    "memberSince": "Membre depuis",
+    "name": "Mon profil",
+    "network": {
+      "andMore": "et {number} plus…",
+      "followedBy": "est suivi par:",
+      "followedByNobody": "n'est suivi par personne.",
+      "following": "suit:",
+      "followingNobody": "ne suit personne.",
+      "title": "Réseau"
+    },
+    "shouted": "Recommandé",
+    "socialMedia": "Où d'autre puis-je trouver",
+    "userAnonym": "Anonyme"
+  },
+  "quotes": {
+    "african": {
+      "author": "Proverbe africain",
+      "quote": "Beaucoup de petites personnes dans beaucoup de petits endroits font beaucoup de petites choses, qui peuvent changer la face du monde."
+    }
+  },
+  "release": {
+    "cancel": "Annuler",
+    "comment": {
+      "error": "Vous avez déjà signalé le commentaire!",
+      "message": "Voulez-vous vraiment publier le commentaire de \"<b>{name}</b>\"?",
+      "title": "Publication des commentaires",
+      "type": "Commentaire"
+    },
+    "contribution": {
+      "error": "Vous avez déjà signalé la contribution !!",
+      "message": "Voulez-vous vraiment débloquer la contribution \"<b>{name}</b>\"?",
+      "title": "Versement de la contribution",
+      "type": "Contribution"
+    },
+    "submit": "Relâchez",
+    "success": "Relâchez avec succès!",
+    "user": {
+      "error": "Vous avez déjà signalé l'utilisateur!",
+      "message": "Voulez-vous vraiment libérer l'utilisateur \"<b>{name}</b>\"?",
+      "title": "Validation par l'utilisateur",
+      "type": "Utilisateur"
+    }
+  },
+  "report": {
+    "cancel": "Annuler",
+    "comment": {
+      "error": "Vous avez déjà rapporté le commentaire!",
+      "message": "Souhaitez-vous vraiment signaler l'utilisateur « <b> {name} </b> »?",
+      "title": "Signaler un commentaire",
+      "type": "Commentaire"
+    },
+    "contribution": {
+      "error": "Vous avez déjà rapporté la contribution!",
+      "message": "Souhaitez-vous vraiment signaler l'entrée « <b> {name} </b> »?",
+      "title": "Signaler l'entrée",
+      "type": "Apport"
+    },
+    "reason": {
+      "category": {
+        "invalid": "Veuillez sélectionner une catégorie valide",
+        "label": "Sélectionnez une catégorie:",
+        "options": {
+          "advert_products_services_commercial": "Publicité de produits et de services à des fins commerciaux.",
+          "criminal_behavior_violation_german_law": "Comportement criminel ou violation du droit allemand.",
+          "discrimination_etc": "Posts, commentaires, expressions ou insultes discriminatoires.",
+          "doxing": "La divulgation de renseignements personnels sans le consentement ou la menace de (\"doxing\").",
+          "glorific_trivia_of_cruel_inhuman_acts": "Glorification ou banalisation d'actes de violence cruels ou inhumains.",
+          "intentional_intimidation_stalking_persecution": "L'intimidation, le harcèlement ou la persécution intentionnelle.",
+          "other": "Autres...",
+          "pornographic_content_links": "Publication ou partage de matériel clairement pornographique."
+        },
+        "placeholder": "Catégorie..."
+      },
+      "description": {
+        "label": "S'il vous plaît expliquer: Pourquoi voulez-vous signaler cela?",
+        "placeholder": "Informations complémentaires..."
+      }
+    },
+    "submit": "Envoyer le rapport",
+    "success": "Merci de nous avoir fait part de vos commentaires!",
+    "user": {
+      "error": "Vous avez déjà signalé l'utilisateur!",
+      "message": "Souhaitez-vous vraiment signaler l'utilisateur « <b> {name} </b> »?",
+      "title": "Signaler l'utilisateur",
+      "type": "Utilisateur"
+    }
+  },
+  "search": {
+    "failed": "Rien trouvé",
+    "heading": {
+      "Post": "Posts",
+      "User": "Utilisateurs"
+    },
+    "hint": "Qu'est-ce que vous cherchez? Utiliser !… pour des posts, @… pour des membres, #… pour des hashtag.",
+    "placeholder": "Rechercher"
+  },
+  "settings": {
+    "blocked-users": {
+      "block": "Bloquer l'utilisateur",
+      "columns": {
+        "name": "Nom",
+        "slug": "Slug",
+        "unblock": "Débloquer"
+      },
+      "empty": "Jusqu'à présent, vous n'avez bloqué personne.",
+      "explanation": {
+        "closing": "Ceci devrait être suffisant pour le moment afin que les utilisateurs bloqués ne puissent plus vous déranger.",
+        "intro": "Si vous avez bloqué un autre utilisateur, voici ce qui se passe:",
+        "notifications": "Les utilisateurs bloqués ne recevront plus de notifications s'ils sont mentionnés dans vos postes.",
+        "their-perspective": "Vice versa: la personne bloquée ne verra plus non plus vos postes dans son fil d'actualités.",
+        "your-perspective": "Les postes de la personne bloquée n'apparaîtront dans votre fil d'actualités."
+      },
+      "how-to": "Vous pouvez bloquer d'autres utilisateurs sur leur page de profil via le menu de contenu.",
+      "name": "Utilisateurs bloqués",
+      "unblock": "Débloquer l'utilisateur",
+      "unblocked": "{name} est à nouveau débloqué"
+    },
+    "data": {
+      "labelBio": "À propos de vous",
+      "labelCity": "Votre ville ou région",
+      "labelName": "Votre nom",
+      "labelSlug": "Votre nom d'utilisateur unique",
+      "name": "Vos données",
+      "namePlaceholder": "Fémanon Funny",
+      "success": "Vos données ont été mises à jour avec succès !"
+    },
+    "deleteUserAccount": {
+      "accountDescription": "Sachez que vos postes et commentaires sont importants pour notre communauté. Si vous voulez quand même les supprimer, vous devez les marquer ci-dessous.",
+      "accountWarning": "Vous NE POUVEZ PAS GÉRER et NE POUVEZ PAS RECOUVRIR votre compte, vos messages ou vos commentaires après avoir supprimé votre compte!",
+      "commentedCount": "Supprimer mes {count} commentaires",
+      "contributionsCount": "Supprimer mes {count} postes",
+      "name": "Supprimer un compte utilisateur",
+      "pleaseConfirm": "Action destructive! Saisissez “{confirm}” pour confirmer.",
+      "success": "Compte supprimer avec succès!"
+    },
+    "download": {
+      "name": "Télécharger les données"
+    },
+    "email": {
+      "change-successful": "Votre adresse mail a été modifiée avec succès.",
+      "labelEmail": "Changer votre adresse mail",
+      "labelNewEmail": "Nouvelle adresse mail",
+      "labelNonce": "Entrez votre code",
+      "name": "Votre mail",
+      "submitted": "Un mail pour vérifier votre adresse a été envoyé à <b>{email}</b>.",
+      "success": "Une nouvelle adresse mail a été enregistrée.",
+      "validation": {
+        "same-email": "Voici votre adresse mail actuelle"
+      },
+      "verification-error": {
+        "explanation": "Cela peut avoir différentes causes:",
+        "message": "Votre mail n'a pas pu être changé.",
+        "reason": {
+          "invalid-nonce": "Le code de confirmation est-il invalide?",
+          "no-email-request": "Êtes-vous certain d'avoir demandé un changement d'adresse mail?"
+        },
+        "support": "Si le problème persiste, veuillez nous contacter par mail à l'adresse suivante"
+      }
+    },
+    "embeds": {
+      "info-description": "Voici la liste des fournisseurs tiers dont le contenu peut être affiché sous forme de code tiers, par exemple sous la forme de vidéos intégrées.",
+      "name": "Fournisseurs tiers",
+      "status": {
+        "change": {
+          "allow": "Sûr",
+          "deny": "Non merci",
+          "question": "Est-ce que vous voulez que le code source intégrer vous soit toujours affiché?"
+        },
+        "description": "Par défaut, le code incorporé des fournisseurs tiers est",
+        "disabled": {
+          "off": "initialement non affiché",
+          "on": "affiché immédiatement"
+        }
+      }
+    },
+    "invites": {
+      "name": "Invite"
+    },
+    "languages": {
+      "name": "Langues"
+    },
+    "name": "Paramètres",
+    "organizations": {
+      "name": "Mes organisations"
+    },
+    "privacy": {
+      "make-shouts-public": "Partager les articles que j'ai recommandés sur mon profil",
+      "name": "Confidentialité",
+      "success-update": "Paramètres de confidentialité enregistrés"
+    },
+    "security": {
+      "change-password": {
+        "button": "Modifier le mot de passe",
+        "label-new-password": "Votre nouveau mot de passe",
+        "label-new-password-confirm": "Confirmez votre nouveau mot de passe",
+        "label-old-password": "Votre ancien mot de passe",
+        "message-new-password-confirm-required": "Confirmez votre nouveau mot de passe",
+        "message-new-password-missmatch": "Tapez à nouveau le même mot de passe",
+        "message-new-password-required": "Entrez un nouveau mot de passe",
+        "message-old-password-required": "Entrez votre ancien mot de passe",
+        "passwordSecurity": "Sécurité par mot de passe",
+        "passwordStrength0": "Mot de passe très peu sûr",
+        "passwordStrength1": "Mot de passe non sécurisé",
+        "passwordStrength2": "Mot de passe médiocre",
+        "passwordStrength3": "Mot de passe fort",
+        "passwordStrength4": "Mot de passe très fort",
+        "success": "Mot de passe modifié avec succès !"
+      },
+      "name": "Sécurité"
+    },
+    "social-media": {
+      "name": "Médias sociaux",
+      "placeholder": "Ajouter une URL pour les médias sociaux",
+      "requireUnique": "Vous avez déjà ajouté cette URL",
+      "submit": "Ajouter un lien",
+      "successAdd": "Les médias sociaux ont été ajoutés. Profil mis à jour !",
+      "successDelete": "Médias sociaux supprimé. Profil mis à jour !"
+    },
+    "validation": {
+      "slug": {
+        "alreadyTaken": "Ce nom d'utilisateur est déjà pris.",
+        "regex": "Les caractères autorisés ne sont que les lettres minuscules, les chiffres, les traits de soulignement et les traits d'union."
+      }
+    }
+  },
+  "shoutButton": {
+    "shouted": "recommandé"
+  },
+  "site": {
+    "back-to-login": "Retour à la page de connexion",
+    "bank": "compte bancaire",
+    "code-of-conduct": "Code de conduite",
+    "contact": "Contacter",
+    "data-privacy": "Protection des données",
+    "director": "Directeur Général",
+    "error-occurred": "Une erreur s'est produite.",
+    "faq": "FAQ",
+    "germany": "Allemagne",
+    "imprint": "Mentions légales",
+    "made": "Fabriqué avec ❤️",
+    "register": "Numéro de registre",
+    "responsible": "Responsable selon § 55 Abs. 2 RStV (Allemagne)",
+    "taxident": "Numéro d'identification à la taxe sur la valeur ajoutée selon § 27 a de la loi sur la taxe sur la valeur ajoutée (Allemagne)",
+    "termsAndConditions": "Conditions générales",
+    "thanks": "Merci!",
+    "tribunal": "Tribunal de registre"
+  },
+  "termsAndConditions": {
+    "newTermsAndConditions": "Nouvelles conditions générales",
+    "termsAndConditionsNewConfirm": "J'ai lu et accepté les nouvelles conditions générales.",
+    "termsAndConditionsNewConfirmText": "Veuillez lire les nouvelles conditions d'utilisation dès maintenant !"
+  }
+}

@@ -1,0 +1,607 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Webapp · Ocelot.Social – Developer Documentation</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        <meta name="author" content="busFaktor() e.V.">
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-hints/plugin-hints.css">
+                
+            
+                
+                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-tabs2/tabs.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search-pro/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-splitter/splitter.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-chapter-fold/chapter-fold.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="components.html" />
+    
+    
+    <link rel="prev" href="../backend/neo4j-graphql-js.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../edit-this-documentation.html">
+            
+                <a href="../edit-this-documentation.html">
+            
+                    
+                    Edit this Documentation
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="../neo4j/">
+            
+                <a href="../neo4j/">
+            
+                    
+                    Neo4J
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="../backend/">
+            
+                <a href="../backend/">
+            
+                    
+                    Backend
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="../backend/graphql.html">
+            
+                <a href="../backend/graphql.html">
+            
+                    
+                    GraphQL
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="../backend/neo4j-graphql-js.html">
+            
+                <a href="../backend/neo4j-graphql-js.html">
+            
+                    
+                    neo4j-graphql-js
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.5" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Webapp
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="components.html">
+            
+                <a href="components.html">
+            
+                    
+                    Components
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="html.html">
+            
+                <a href="html.html">
+            
+                    
+                    HTML
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="scss.html">
+            
+                <a href="scss.html">
+            
+                    
+                    SCSS
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="vue.html">
+            
+                <a href="vue.html">
+            
+                    
+                    Vue
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="../testing.html">
+            
+                <a href="../testing.html">
+            
+                    
+                    Testing Guide
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.6.1" data-path="../cypress/">
+            
+                <a href="../cypress/">
+            
+                    
+                    End-to-end tests
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.2" data-path="testing.html">
+            
+                <a href="testing.html">
+            
+                    
+                    Frontend tests
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.3" data-path="../backend/testing.html">
+            
+                <a href="../backend/testing.html">
+            
+                    
+                    Backend tests
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="../DOCKER_MORE_CLOSELY.html">
+            
+                <a href="../DOCKER_MORE_CLOSELY.html">
+            
+                    
+                    Docker More Closely
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8" >
+            
+                <a target="_blank" href="https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/blob/master/deployment/README.md">
+            
+                    
+                    Deployment
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" data-path="../CONTRIBUTING.html">
+            
+                <a href="../CONTRIBUTING.html">
+            
+                    
+                    Contributing
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10" data-path="../cypress/features.html">
+            
+                <a href="../cypress/features.html">
+            
+                    
+                    Feature Specification
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11" data-path="../CODE_OF_CONDUCT.html">
+            
+                <a href="../CODE_OF_CONDUCT.html">
+            
+                    
+                    Code of conduct
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12" data-path="../LICENSE.html">
+            
+                <a href="../LICENSE.html">
+            
+                    
+                    License
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Webapp</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="webapp">Webapp</h1>
+<p><img src="../.gitbook/assets/screenshot.png" alt="UI Screenshot"></p>
+<h2 id="installation">Installation</h2>
+<p>For preparation we need Node and recommend to use <a href="https://github.com/nvm-sh/nvm" target="_blank">node version manager</a> <code>nvm</code> to switch
+between different local Node versions:</p>
+<pre><code class="lang-bash"><span class="hljs-comment"># install Node</span>
+$ <span class="hljs-built_in">cd</span> webapp
+$ nvm install v19.4.0
+$ nvm use v19.4.0
+</code></pre>
+<p>Install node dependencies with <a href="https://yarnpkg.com/en/" target="_blank">yarn</a>:</p>
+<pre><code class="lang-bash"><span class="hljs-comment"># install all dependencies</span>
+$ <span class="hljs-built_in">cd</span> webapp
+$ yarn install
+<span class="hljs-comment"># or just</span>
+$ yarn
+<span class="hljs-comment"># or just later on to use version of &quot;.nvmrc&quot; file</span>
+$ nvm use &amp;&amp; yarn
+</code></pre>
+<p>Copy:</p>
+<pre><code class="lang-text"># in webapp
+cp .env.template .env
+</code></pre>
+<p>Configure the files according to your needs and your local setup.</p>
+<h3 id="build-for-development">Build for Development</h3>
+<pre><code class="lang-bash"><span class="hljs-comment"># serve with hot reload at localhost:3000</span>
+$ yarn dev
+</code></pre>
+<h3 id="build-for-production">Build for Production</h3>
+<pre><code class="lang-bash"><span class="hljs-comment"># build for production and launch server</span>
+$ yarn build
+$ yarn start
+</code></pre>
+<h3 id="run-tests">Run tests</h3>
+<p>We ensure the quality of our frontend code by using</p>
+<ul>
+<li><a href="https://eslint.org/" target="_blank">ESLint</a> for checking our JavaScript code</li>
+<li><a href="https://jestjs.io/" target="_blank">Jest</a> and <a href="https://vue-test-utils.vuejs.org/" target="_blank">Vue Test Utils</a> to unit test our components</li>
+<li><a href="https://storybook.js.org/" target="_blank">Storybook</a> to document and manually test our components in an isolated playground</li>
+</ul>
+<p>For more information see our <a href="testing.html">frontend testing guide</a>. Use these commands to run the tests:</p>
+<p><div class="markdown-tabs"><ul class="nav nav-tabs" role="tablist"><li role="presentation" class="active"><a href="#tab-307" aria-controls="tab-307" role="tab" data-toggle="tab">With Docker</a></li><li role="presentation" class=""><a href="#tab-308" aria-controls="tab-308" role="tab" data-toggle="tab">Without Docker</a></li></ul><div class="tab-content"><div role="tabpanel" class="tab-pane active" id="tab-307"><p>After starting the application following the above guidelines, open new terminal windows for each of these commands:</p><pre><code class="lang-bash"><span class="hljs-comment"># run eslint</span>
+$ docker-compose <span class="hljs-built_in">exec</span> webapp yarn lint</code></pre>
+<pre><code class="lang-bash"><span class="hljs-comment"># run unit tests</span>
+$ docker-compose <span class="hljs-built_in">exec</span> webapp yarn <span class="hljs-built_in">test</span></code></pre>
+<pre><code class="lang-bash"><span class="hljs-comment"># start storybook</span>
+$ docker-compose <span class="hljs-built_in">exec</span> webapp yarn storybook</code></pre>
+<p>You can then visit the Storybook playground on <code>http://localhost:3002</code></p></div><div role="tabpanel" class="tab-pane " id="tab-308"><p>After starting the application following the above guidelines, open new terminal windows and navigate to the <code>/webapp</code> directory for each of these commands:</p><pre><code class="lang-bash"><span class="hljs-comment"># run eslint in /webapp (use option --fix to normalize the files)</span>
+$ yarn lint</code></pre>
+<pre><code class="lang-bash"><span class="hljs-comment"># run unit tests in /webapp</span>
+$ yarn <span class="hljs-built_in">test</span></code></pre>
+<pre><code class="lang-bash"><span class="hljs-comment"># run locales in /webapp (use option --fix to sort the locales)</span>
+$ yarn locales</code></pre>
+<pre><code class="lang-bash"><span class="hljs-comment"># start storybook in /webapp</span>
+$ yarn storybook</code></pre>
+<p>You can then visit the Storybook playground on <code>http://localhost:3002</code></p></div></div></div></p>
+<h2 id="maintenance-mode">Maintenance Mode</h2>
+<p>For installing and running the maintenance mode see <a href="maintenance/README.md">Maintenance Mode</a>.</p>
+<h2 id="styleguide-migration">Styleguide Migration</h2>
+<p>We are currently in the process of migrating our styleguide components and design tokens from the <a href="https://github.com/Ocelot-Social-Community/HC-Styleguide-20201003" target="_blank">Nitro Styleguide</a> into the main <a href="https://github.com/Ocelot-Social-Community/Ocelot-Social" target="_blank">ocelot.social repository</a> and refactoring our components in the process. During this migration, our new components will live in a <code>_new/</code> folder to separate them from the old, yet untouched components.</p>
+<h3 id="folder-structure">Folder Structure</h3>
+<p>The folder structure we are following is <a href="https://nuxtjs.org/guide/directory-structure" target="_blank">prescribed by Nuxt.js</a>:</p>
+<ul>
+<li><strong>assets</strong> contains icons, images and logos in <code>svg</code> format and all shared SCSS files such as <code>tokens</code></li>
+<li><strong>components</strong> separated into two sub-folders:<ul>
+<li><strong>generic</strong> are the generic building blocks of the app &#x2013; small, reusable and usually not coupled to state</li>
+<li><strong>features</strong> are composed of components but tied to a particular function of the app (e.g. <code>comment</code> or <code>post</code>)</li>
+</ul>
+</li>
+<li><strong>layouts</strong> can use components to create layout templates for pages</li>
+<li><strong>pages</strong> are the entry points for all <code>routes</code> in the app and are composed of layouts, features and components</li>
+</ul>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="../backend/neo4j-graphql-js.html" class="navigation navigation-prev " aria-label="Previous page: neo4j-graphql-js">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="components.html" class="navigation navigation-next " aria-label="Next page: Components">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Webapp","level":"1.5","depth":1,"next":{"title":"Components","level":"1.5.1","depth":2,"path":"webapp/components.md","ref":"webapp/components.md","articles":[]},"previous":{"title":"neo4j-graphql-js","level":"1.4.2","depth":2,"path":"backend/neo4j-graphql-js.md","ref":"backend/neo4j-graphql-js.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-lunr","-search","-sharing","hints","tabs2","theme-simple@git+https://github.com/plugins-zander/gitbook-plugin-theme-simple.git","search-pro@git+https://github.com/plugins-zander/gitbook-plugin-search-pro.git","splitter@git+https://github.com/plugins-zander/gitbook-plugin-splitter.git","edit-link@git+https://github.com/plugins-zander/gitbook-plugin-edit-link.git","gtag@git+https://github.com/plugins-zander/gitbook-plugin-gtag.git","chapter-fold@git+https://github.com/plugins-zander/gitbook-plugin-chapter-fold.git","copy-code-button@git+https://github.com/plugins-zander/gitbook-plugin-copy-code-button.git"],"styles":{"ebook":"styles/ebook.css","epub":"styles/epub.css","mobi":"styles/mobi.css","pdf":"styles/pdf.css","print":"styles/print.css","website":"styles/website.css"},"pluginsConfig":{"chapter-fold":{},"splitter":{},"search-pro":{},"hints":{"danger":"fa fa-exclamation-circle","info":"fa fa-info-circle","tip":"fa fa-mortar-board","working":"fa fa-wrench"},"sitemap-general":{"prefix":"https://zlogs.net/gitbook-action/"},"fontsettings":{"theme":"white","family":"sans","size":2},"gtag":{"token":""},"tabs2":{},"highlight":{},"theme-simple":{"showLevel":false,"styles":{"ebook":"styles/ebook.css","epub":"styles/epub.css","mobi":"styles/mobi.css","pdf":"styles/pdf.css","print":"styles/print.css","website":"styles/website.css"}},"copy-code-button":{},"edit-link":{"label":"EDIT","base":"https://github.com/Ocelot-Social-Community/Ocelot-Social/edit/master/"},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","author":"busFaktor() e.V.","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Ocelot.Social – Developer Documentation","gitbook":"3.2.3","description":"Developer Documentation by Gitbook-Action"},"file":{"path":"webapp/README.md","mtime":"2023-02-23T09:02:21.000Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2023-08-15T15:04:47.802Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-tabs2/tabs.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search-pro/jquery.mark.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search-pro/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-splitter/splitter.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-edit-link/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-gtag/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-chapter-fold/chapter-fold.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-copy-code-button/toggle.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

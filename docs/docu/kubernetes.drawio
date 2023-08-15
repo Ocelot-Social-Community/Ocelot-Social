@@ -1,0 +1,121 @@
+<mxfile host="65bd71144e" modified="2021-01-18T00:39:24.755Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) VSCodium/1.52.1 Chrome/83.0.4103.122 Electron/9.3.5 Safari/537.36" version="13.10.0" etag="SoL2k4xa67XojvyFyRGV" type="embed">
+    <diagram id="l5FJ560ARYCXft7RafE-" name="Page-1">
+        <mxGraphModel dx="849" dy="670" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="Namespace: default or kube-manager" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="50" y="90" width="920" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Namespace: wir.social" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="50" y="200" width="600" height="310" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="Namespace: webcraft" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="670" y="200" width="300" height="310" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="Service: Frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#60a917;strokeColor=#2D7600;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="60" y="230" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="Service: Backend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#60a917;strokeColor=#2D7600;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="210" y="230" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="Service: Neo4J" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#60a917;strokeColor=#2D7600;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="360" y="230" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="Service: Ingress" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1ba1e2;strokeColor=#006EAF;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="60" y="120" width="900" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="Service: Maintenance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#60a917;strokeColor=#2D7600;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="510" y="230" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="Service: Mailserver" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#60a917;strokeColor=#2D7600;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="680" y="230" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="60" y="300" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="130" y="300" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="60" y="370" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="130" y="370" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="210" y="300" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="280" y="300" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="210" y="370" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="280" y="370" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="360" y="300" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="430" y="300" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="360" y="370" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="430" y="370" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="510" y="300" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="580" y="300" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="510" y="370" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="580" y="370" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="680" y="300" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="750" y="300" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="680" y="370" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="750" y="370" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="36" value="Volume: Uploads" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a0522d;strokeColor=#6D1F00;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="210" y="440" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="Volume: Neo4J" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a0522d;strokeColor=#6D1F00;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="360" y="440" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" value="Volume: EMails" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a0522d;strokeColor=#6D1F00;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="680" y="440" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" value="Service: JenkinsCI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#60a917;strokeColor=#2D7600;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="827" y="230" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="827" y="300" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="897" y="300" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="827" y="370" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="43" value="Pod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="897" y="370" width="60" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

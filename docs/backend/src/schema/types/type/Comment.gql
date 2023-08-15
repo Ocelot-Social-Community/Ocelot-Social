@@ -1,0 +1,78 @@
+enum _CommentOrdering {
+  id_asc
+  id_desc
+  content_asc
+  content_desc
+  createdAt_asc
+  createdAt_desc
+  updatedAt_asc
+  updatedAt_desc
+}
+
+input _CommentFilter {
+  AND: [_CommentFilter!]
+  OR: [_CommentFilter!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  author: _UserFilter
+  author_not: _UserFilter
+  author_in: [_UserFilter!]
+  author_not_in: [_UserFilter!]
+  content: String
+  content_not: String
+  content_in: [String!]
+  content_not_in: [String!]
+  content_contains: String
+  content_not_contains: String
+  content_starts_with: String
+  content_not_starts_with: String
+  content_ends_with: String
+  content_not_ends_with: String
+  post: _PostFilter
+  post_not: _PostFilter
+  post_in: [_PostFilter!]
+  post_not_in: [_PostFilter!]
+}
+
+type Comment {
+  id: ID!
+  activityId: String
+  author: User @relation(name: "WROTE", direction: "IN")
+  content: String!
+  contentExcerpt: String
+  post: Post @relation(name: "COMMENTS", direction: "OUT")
+  createdAt: String
+  updatedAt: String
+  deleted: Boolean
+  disabled: Boolean
+}
+
+type Query {
+  Comment(
+    id: ID
+    content: String
+    createdAt: String
+    updatedAt: String
+    first: Int
+    offset: Int
+    orderBy: [_CommentOrdering]
+    filter: _CommentFilter
+  ): [Comment]
+}
+
+type Mutation {
+  CreateComment(
+    id: ID
+    postId: ID!
+    content: String!
+    contentExcerpt: String
+  ): Comment
+  UpdateComment(
+    id: ID!
+    content: String!
+    contentExcerpt: String
+  ): Comment
+  DeleteComment(id: ID!): Comment
+}

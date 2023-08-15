@@ -1,0 +1,652 @@
+{
+  "actions": {
+    "cancel": null,
+    "create": "Crea",
+    "delete": "Cancella",
+    "edit": "Modifica",
+    "loading": "Caricamento in corso",
+    "loadMore": "Carica di più",
+    "save": "Salva"
+  },
+  "admin": {
+    "categories": {
+      "categoryName": "Nome",
+      "name": "Categorie",
+      "postCount": "Messaggi"
+    },
+    "dashboard": {
+      "comments": "Commenti",
+      "follows": "Segue",
+      "invites": "Inviti",
+      "name": "Cruscotto",
+      "notifications": "Notifiche",
+      "organizations": "Organizzazioni",
+      "posts": "Messaggi",
+      "projects": "Progetti",
+      "shouts": "Gridi",
+      "users": "Utenti"
+    },
+    "donations": {
+      "goal": "Donazioni mensili necessarie",
+      "name": "Info donazioni",
+      "progress": "Donazioni raccolte finora",
+      "successfulUpdate": "Informazioni sulle donazioni aggiornate con successo!"
+    },
+    "hashtags": {
+      "name": null,
+      "nameOfHashtag": null,
+      "number": null,
+      "tagCount": null,
+      "tagCountUnique": null
+    },
+    "invites": {
+      "description": null,
+      "name": null,
+      "title": null
+    },
+    "name": "Admin",
+    "notifications": {
+      "name": "Notifiche"
+    },
+    "organizations": {
+      "name": "Organizzazioni"
+    },
+    "pages": {
+      "name": "Pagine"
+    },
+    "settings": {
+      "name": "Impostazioni"
+    },
+    "tags": {
+      "name": "Tag",
+      "tagCount": "Messaggi",
+      "tagCountUnique": "Utenti"
+    },
+    "users": {
+      "empty": null,
+      "form": {
+        "placeholder": null
+      },
+      "name": "Utenti",
+      "table": {
+        "columns": {
+          "createdAt": null,
+          "email": null,
+          "name": null,
+          "number": null,
+          "role": null,
+          "slug": null
+        }
+      }
+    }
+  },
+  "code-of-conduct": {
+    "subheader": null
+  },
+  "comment": {
+    "content": {
+      "unavailable-placeholder": null
+    },
+    "delete": null,
+    "edit": null,
+    "edited": null,
+    "menu": {
+      "delete": null,
+      "edit": null
+    },
+    "show": {
+      "less": null,
+      "more": null
+    }
+  },
+  "common": {
+    "category": "Categoria ::: Categorie",
+    "comment": "Commento ::: Commenti",
+    "letsTalk": "Discutiamo",
+    "loading": "Caricamento in corso",
+    "loadMore": "Caricare di più",
+    "name": "Nome",
+    "organization": "Organizzazione ::: Organizzazioni",
+    "post": "Messaggio ::: Messaggi",
+    "project": "Progetto ::: Progetti",
+    "reportContent": null,
+    "shout": "Grido ::: Gridi",
+    "tag": "Tag ::: Tag",
+    "takeAction": "Agire",
+    "user": "Utente ::: Utenti",
+    "validations": {
+      "categories": null,
+      "email": null,
+      "url": null
+    },
+    "versus": "Verso"
+  },
+  "components": {
+    "password-reset": {
+      "change-password": {
+        "error": "Modifica della password non riuscita. Forse il codice di sicurezza non era corretto?",
+        "help": null,
+        "success": null
+      },
+      "request": {
+        "form": {
+          "description": null,
+          "submit": null,
+          "submitted": null
+        },
+        "title": null
+      }
+    },
+    "registration": {
+      "create-user-account": {
+        "error": null,
+        "help": null,
+        "success": null,
+        "title": null
+      },
+      "email-nonce": {
+        "form": {
+          "description": null,
+          "next": null,
+          "nonce": null,
+          "validations": {
+            "length": null
+          }
+        }
+      },
+      "signup": {
+        "form": {
+          "data-privacy": null,
+          "description": null,
+          "errors": {
+            "email-exists": null
+          },
+          "submit": null,
+          "success": null,
+          "terms-and-condition": null
+        },
+        "title": null,
+        "unavailable": null
+      }
+    }
+  },
+  "contribution": {
+    "categories": {
+      "infoSelectedNoOfMaxCategories": null
+    },
+    "category": {
+      "name": {
+        "animal-protection": null,
+        "art-culture-sport": null,
+        "consumption-sustainability": null,
+        "cooperation-development": null,
+        "democracy-politics": null,
+        "economy-finances": null,
+        "education-sciences": null,
+        "energy-technology": null,
+        "environment-nature": null,
+        "freedom-of-speech": null,
+        "global-peace-nonviolence": null,
+        "happiness-values": null,
+        "health-wellbeing": null,
+        "human-rights-justice": null,
+        "it-internet-data-privacy": null,
+        "just-for-fun": null
+      }
+    },
+    "delete": null,
+    "edit": null,
+    "emotions-label": {
+      "angry": null,
+      "cry": null,
+      "funny": null,
+      "happy": null,
+      "surprised": null
+    },
+    "filterALL": null,
+    "filterFollow": null,
+    "languageSelectLabel": null,
+    "languageSelectText": null,
+    "newPost": null,
+    "success": null,
+    "teaserImage": {
+      "cropperConfirm": "Confermare",
+      "supportedFormats": "Inserisci un'immagine in formato file JPG, PNG o GIF!"
+    },
+    "title": null
+  },
+  "delete": {
+    "cancel": null,
+    "comment": {
+      "message": null,
+      "success": null,
+      "title": null,
+      "type": null
+    },
+    "contribution": {
+      "message": null,
+      "success": null,
+      "title": null,
+      "type": null
+    },
+    "submit": null
+  },
+  "disable": {
+    "cancel": null,
+    "comment": {
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "contribution": {
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "submit": null,
+    "success": null,
+    "user": {
+      "message": null,
+      "title": null,
+      "type": null
+    }
+  },
+  "donations": {
+    "amount-of-total": "{amount} of {total} € collezionato",
+    "donate-now": "Dona ora"
+  },
+  "editor": {
+    "embed": {
+      "always_allow": null,
+      "data_privacy_info": "I tuoi dati non sono ancora stati condivisi con fornitori terzi. Se continui a guardare questo video, il seguente fornitore probabilmente raccoglierà i dati dell'utente:",
+      "data_privacy_warning": null,
+      "play_now": null
+    },
+    "hashtag": {
+      "addHashtag": null,
+      "addLetter": null,
+      "noHashtagsFound": null
+    },
+    "mention": {
+      "noUsersFound": null
+    },
+    "placeholder": null
+  },
+  "filter-menu": {
+    "all": null,
+    "categories": null,
+    "emotions": null,
+    "filter-by": null,
+    "following": null,
+    "languages": null,
+    "order": {
+      "newest": {
+        "hint": null,
+        "label": null
+      },
+      "oldest": {
+        "hint": null,
+        "label": null
+      }
+    }
+  },
+  "followButton": {
+    "follow": null,
+    "following": null
+  },
+  "group": {
+    "foundation": null,
+    "goal": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null,
+      "pendingMember": null
+    },
+    "membersCount": null,
+    "membersListTitle": null
+  },
+  "hashtags-filter": {
+    "clearSearch": null,
+    "hashtag-search": null,
+    "title": null
+  },
+  "index": {
+    "change-filter-settings": null,
+    "no-results": null
+  },
+  "login": {
+    "email": "La tua email",
+    "failure": null,
+    "forgotPassword": null,
+    "hello": "Ciao",
+    "login": "Accesso",
+    "logout": "Logout",
+    "moreInfo": "Che cosa è {APPLICATION_NAME}?",
+    "moreInfoHint": null,
+    "no-account": null,
+    "password": "La tua password",
+    "register": null,
+    "success": null
+  },
+  "maintenance": {
+    "explanation": null,
+    "questions": null,
+    "title": null
+  },
+  "moderation": {
+    "name": null,
+    "reports": {
+      "createdAt": null,
+      "disabledBy": null,
+      "empty": null,
+      "name": null,
+      "reasonCategory": null,
+      "reasonDescription": null,
+      "reporter": null,
+      "submitter": null
+    }
+  },
+  "notifications": {
+    "comment": null,
+    "content": null,
+    "empty": null,
+    "filterLabel": {
+      "all": null,
+      "read": null,
+      "unread": null
+    },
+    "markAllAsRead": "Segna tutti come letti",
+    "pageLink": null,
+    "post": null,
+    "reason": {
+      "commented_on_post": null,
+      "mentioned_in_comment": null,
+      "mentioned_in_post": null
+    },
+    "title": null,
+    "user": null
+  },
+  "post": {
+    "comment": {
+      "submit": null,
+      "submitted": null,
+      "updated": null
+    },
+    "edited": null,
+    "menu": {
+      "delete": null,
+      "edit": null,
+      "pin": null,
+      "pinnedSuccessfully": null,
+      "unpin": null,
+      "unpinnedSuccessfully": null
+    },
+    "name": "Messaggio",
+    "pinned": null,
+    "takeAction": {
+      "name": "Agire"
+    }
+  },
+  "profile": {
+    "avatar": {
+      "submitted": null
+    },
+    "commented": "Commentato",
+    "follow": "Seguire",
+    "followers": "Seguenti",
+    "following": "Seguendo",
+    "invites": {
+      "description": null,
+      "emailPlaceholder": null,
+      "title": null
+    },
+    "memberSince": "Membro dal",
+    "name": "Il mio profilo",
+    "network": {
+      "andMore": null,
+      "followedBy": null,
+      "followedByNobody": null,
+      "following": null,
+      "followingNobody": null,
+      "title": null
+    },
+    "shouted": "Gridato",
+    "socialMedia": null,
+    "userAnonym": "Anonymous"
+  },
+  "quotes": {
+    "african": {
+      "author": "Proverbio africano",
+      "quote": "Molte piccole persone in molti piccoli luoghi fanno molte piccole cose, che possono cambiare la faccia del mondo."
+    }
+  },
+  "release": {
+    "cancel": null,
+    "comment": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "contribution": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "submit": null,
+    "success": null,
+    "user": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    }
+  },
+  "report": {
+    "cancel": null,
+    "comment": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "contribution": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "reason": {
+      "category": {
+        "invalid": null,
+        "label": null,
+        "options": {
+          "advert_products_services_commercial": null,
+          "criminal_behavior_violation_german_law": null,
+          "discrimination_etc": null,
+          "doxing": null,
+          "glorific_trivia_of_cruel_inhuman_acts": null,
+          "intentional_intimidation_stalking_persecution": null,
+          "other": null,
+          "pornographic_content_links": null
+        },
+        "placeholder": null
+      },
+      "description": {
+        "label": null,
+        "placeholder": null
+      }
+    },
+    "submit": null,
+    "success": null,
+    "user": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    }
+  },
+  "search": {
+    "failed": "Non è stato trovato nulla",
+    "hint": "Cosa state cercando? Usate !... per i post, @... per gli utenti, #... per gli hashtag.",
+    "placeholder": "Ricerca"
+  },
+  "settings": {
+    "data": {
+      "labelBio": "Su di te",
+      "labelCity": "La tua città o regione",
+      "labelName": "Nome",
+      "labelSlug": null,
+      "name": "I tuoi dati",
+      "namePlaceholder": "Anonymous",
+      "success": null
+    },
+    "delete": {
+      "name": "Elimina Account"
+    },
+    "deleteUserAccount": {
+      "accountDescription": "Essere consapevoli che i tuoi post e commenti sono importanti per la nostra comunità. Se cancelli il tuo account utente, tutto scomparirà per sempre - e sarebbe un vero peccato!",
+      "accountWarning": "Attenzione! Tu NON PUOI GESTIRE e NON PUOI RECUPERARE il tuo account, i tuoi messaggi o commenti dopo aver cancellato il tuo account!",
+      "commentedCount": "Cancella i miei {count} commenti",
+      "contributionsCount": "Cancellare i miei {count} messaggi",
+      "name": "Cancellare l'account utente",
+      "pleaseConfirm": "Azione distruttiva! Digita “{confirm}” per confermare.",
+      "success": "Account eliminato con successo!"
+    },
+    "download": {
+      "name": "Scaricamento dati"
+    },
+    "email": {
+      "change-successful": null,
+      "labelEmail": null,
+      "labelNewEmail": null,
+      "labelNonce": null,
+      "name": null,
+      "submitted": null,
+      "success": null,
+      "validation": {
+        "same-email": null
+      },
+      "verification-error": {
+        "explanation": null,
+        "message": null,
+        "reason": {
+          "invalid-nonce": null,
+          "no-email-request": null
+        },
+        "support": null
+      }
+    },
+    "embeds": {
+      "info-description": "Ecco l'elenco dei fornitori di terze parti i cui contenuti possono essere visualizzati come codice di terze parti, ad esempio sotto forma di video incorporati.",
+      "name": null,
+      "status": {
+        "change": {
+          "allow": null,
+          "deny": null,
+          "question": null
+        },
+        "description": null,
+        "disabled": {
+          "off": null,
+          "on": null
+        }
+      }
+    },
+    "invites": {
+      "name": "Inviti"
+    },
+    "languages": {
+      "name": "Lingue"
+    },
+    "muted-users": {
+      "columns": {
+        "name": null,
+        "slug": null,
+        "unmute": null
+      },
+      "empty": null,
+      "explanation": {
+        "intro": null,
+        "search": null,
+        "your-perspective": null
+      },
+      "how-to": null,
+      "mute": null,
+      "name": null,
+      "unmute": null,
+      "unmuted": null
+    },
+    "name": "Impostazioni",
+    "organizations": {
+      "name": "Mie organizzazioni"
+    },
+    "privacy": {
+      "make-shouts-public": null,
+      "name": null,
+      "success-update": null
+    },
+    "security": {
+      "change-password": {
+        "button": null,
+        "label-new-password": null,
+        "label-new-password-confirm": null,
+        "label-old-password": null,
+        "message-new-password-confirm-required": null,
+        "message-new-password-missmatch": null,
+        "message-new-password-required": null,
+        "message-old-password-required": null,
+        "passwordSecurity": null,
+        "passwordStrength0": null,
+        "passwordStrength1": null,
+        "passwordStrength2": null,
+        "passwordStrength3": null,
+        "passwordStrength4": null,
+        "success": null
+      },
+      "name": "Sicurezza"
+    },
+    "social-media": {
+      "name": null,
+      "placeholder": null,
+      "requireUnique": null,
+      "submit": null,
+      "successAdd": "Social media aggiunti. \nProfilo utente aggiornato ",
+      "successDelete": "Social media cancellati. Profilo utente aggiornato!"
+    },
+    "validation": {
+      "slug": {
+        "alreadyTaken": null,
+        "regex": null
+      }
+    }
+  },
+  "shoutButton": {
+    "shouted": null
+  },
+  "site": {
+    "back-to-login": null,
+    "bank": "conto bancario",
+    "code-of-conduct": null,
+    "contact": "Contatto",
+    "data-privacy": "protezione dei dati",
+    "director": "Direttore Generale",
+    "error-occurred": null,
+    "faq": null,
+    "germany": "Germania",
+    "imprint": "Impressum",
+    "made": "Con ❤️ fatto",
+    "register": "numero di registro",
+    "responsible": "Responsabile ai sensi del § 55 Abs. 2 RStV (Germania)",
+    "taxident": "Numero di identificazione dell'imposta sul valore aggiunto ai sensi del § 27 a Legge sull'imposta sul valore aggiunto (Germania)",
+    "termsAndConditions": null,
+    "thanks": null,
+    "tribunal": "registro tribunale"
+  },
+  "termsAndConditions": {
+    "newTermsAndConditions": "Nuovi Termini e Condizioni",
+    "termsAndConditionsNewConfirm": "Ho letto e accetto le nuove condizioni generali di contratto.",
+    "termsAndConditionsNewConfirmText": "Si prega di leggere le nuove condizioni d'uso ora!"
+  }
+}

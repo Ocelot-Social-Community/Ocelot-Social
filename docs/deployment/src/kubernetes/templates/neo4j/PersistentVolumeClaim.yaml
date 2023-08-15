@@ -1,0 +1,19 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: volume-claim-{{ .Release.Name }}-neo4j
+  labels:
+    app.kubernetes.io/name:	"{{ .Chart.Name }}"
+    app.kubernetes.io/instance:	"{{ .Release.Name }}"
+    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+    app.kubernetes.io/component: "volume-claim-neo4j"
+    app.kubernetes.io/part-of:	"{{ .Chart.Name }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  storageClassName: storage-{{ .Release.Name }}-persistent
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.NEO4J.STORAGE }}

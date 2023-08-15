@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  {{ .Release.Name }}-neo4j
+  labels:
+    app.kubernetes.io/name:	"{{ .Chart.Name }}"
+    app.kubernetes.io/instance:	"{{ .Release.Name }}"
+    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+    app.kubernetes.io/component: "deployment-neo4j"
+    app.kubernetes.io/part-of:	"{{ .Chart.Name }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  replicas: 1
+  revisionHistoryLimit: {{ .Values.NEO4J.REVISIONS_HISTORY_LIMIT }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-neo4j
+  template:
+    metadata:
+      name: neo4j
+      annotations:
+        backup.velero.io/backup-volumes: neo4j-data
+        # make sure the pod is redeployed
+        rollme: {{ randAlphaNum 5 | quote }}
+      labels:
+        app: {{ .Release.Name }}-neo4j
+    spec:
+      containers:
+      - name: container-{{ .Release.Name }}-neo4j
+        image: "{{ .Values.NEO4J.DOCKER_IMAGE_REPO }}:{{ .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.NEO4J.DOCKER_IMAGE_PULL_POLICY }}
+        ports:
+        - containerPort: 7687
+        - containerPort: 7474
+        resources:
+          requests:
+            memory: {{ .Values.NEO4J.RESOURCE_REQUESTS_MEMORY | default "1G" | quote }}
+          limits:
+            memory: {{ .Values.NEO4J.RESOURCE_LIMITS_MEMORY | default "1G" | quote }}
+        envFrom:
+        - configMapRef:
+            name: configmap-{{ .Release.Name }}-neo4j
+        - secretRef:
+            name: secret-{{ .Release.Name }}-neo4j
+        volumeMounts:
+          - mountPath: /data/
+            name: neo4j-data
+      volumes:
+      - name: neo4j-data
+        persistentVolumeClaim:
+          claimName: volume-claim-{{ .Release.Name }}-neo4j
+      restartPolicy: {{ .Values.NEO4J.CONTAINER_RESTART_POLICY }}
+      terminationGracePeriodSeconds: {{ .Values.NEO4J.CONTAINER_TERMINATION_GRACE_PERIOD_SECONDS }}

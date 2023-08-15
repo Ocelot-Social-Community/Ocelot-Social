@@ -1,0 +1,29 @@
+type EmailAddress {
+  email: ID!
+  verifiedAt: String
+  createdAt: String
+}
+
+type Query {
+  VerifyNonce(email: String!, nonce: String!): Boolean!
+}
+
+type Mutation {
+  Signup(email: String!, inviteCode: String = null): EmailAddress
+  SignupVerification(
+    nonce: String!
+    email: String!
+    inviteCode: String = null
+    name: String!
+    password: String!
+    slug: String
+    about: String
+    termsAndConditionsAgreedVersion: String!
+    locale: String
+  ): User
+  AddEmailAddress(email: String!): EmailAddress
+  VerifyEmailAddress(
+    nonce: String!
+    email: String!
+  ): EmailAddress
+}

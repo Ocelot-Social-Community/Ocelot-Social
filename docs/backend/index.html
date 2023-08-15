@@ -1,0 +1,647 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Backend · Ocelot.Social – Developer Documentation</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        <meta name="author" content="busFaktor() e.V.">
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-hints/plugin-hints.css">
+                
+            
+                
+                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-tabs2/tabs.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search-pro/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-splitter/splitter.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-chapter-fold/chapter-fold.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="graphql.html" />
+    
+    
+    <link rel="prev" href="../neo4j/" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../edit-this-documentation.html">
+            
+                <a href="../edit-this-documentation.html">
+            
+                    
+                    Edit this Documentation
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="../neo4j/">
+            
+                <a href="../neo4j/">
+            
+                    
+                    Neo4J
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.4" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Backend
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="graphql.html">
+            
+                <a href="graphql.html">
+            
+                    
+                    GraphQL
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="neo4j-graphql-js.html">
+            
+                <a href="neo4j-graphql-js.html">
+            
+                    
+                    neo4j-graphql-js
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../webapp/">
+            
+                <a href="../webapp/">
+            
+                    
+                    Webapp
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="../webapp/components.html">
+            
+                <a href="../webapp/components.html">
+            
+                    
+                    Components
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="../webapp/html.html">
+            
+                <a href="../webapp/html.html">
+            
+                    
+                    HTML
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="../webapp/scss.html">
+            
+                <a href="../webapp/scss.html">
+            
+                    
+                    SCSS
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="../webapp/vue.html">
+            
+                <a href="../webapp/vue.html">
+            
+                    
+                    Vue
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="../testing.html">
+            
+                <a href="../testing.html">
+            
+                    
+                    Testing Guide
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.6.1" data-path="../cypress/">
+            
+                <a href="../cypress/">
+            
+                    
+                    End-to-end tests
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.2" data-path="../webapp/testing.html">
+            
+                <a href="../webapp/testing.html">
+            
+                    
+                    Frontend tests
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.3" data-path="testing.html">
+            
+                <a href="testing.html">
+            
+                    
+                    Backend tests
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="../DOCKER_MORE_CLOSELY.html">
+            
+                <a href="../DOCKER_MORE_CLOSELY.html">
+            
+                    
+                    Docker More Closely
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8" >
+            
+                <a target="_blank" href="https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/blob/master/deployment/README.md">
+            
+                    
+                    Deployment
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" data-path="../CONTRIBUTING.html">
+            
+                <a href="../CONTRIBUTING.html">
+            
+                    
+                    Contributing
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10" data-path="../cypress/features.html">
+            
+                <a href="../cypress/features.html">
+            
+                    
+                    Feature Specification
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11" data-path="../CODE_OF_CONDUCT.html">
+            
+                <a href="../CODE_OF_CONDUCT.html">
+            
+                    
+                    Code of conduct
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12" data-path="../LICENSE.html">
+            
+                <a href="../LICENSE.html">
+            
+                    
+                    License
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Backend</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="backend">Backend</h1>
+<h2 id="installation-with-docker">Installation with Docker</h2>
+<p>Run the following command to install everything through docker.</p>
+<p>The installation takes a bit longer on the first pass or on rebuild ...</p>
+<pre><code class="lang-bash"><span class="hljs-comment"># in main folder</span>
+$ docker-compose up
+<span class="hljs-comment"># or</span>
+<span class="hljs-comment"># rebuild the containers for a cleanup</span>
+$ docker-compose up --build
+</code></pre>
+<p>Wait a little until your backend is up and running at <a href="http://localhost:4000/" target="_blank">http://localhost:4000/</a>.</p>
+<h2 id="installation-without-docker">Installation without Docker</h2>
+<p>For the local installation you need a recent version of
+<a href="https://nodejs.org/en/" target="_blank">Node</a> (&gt;= <code>v16.19.0</code>). We are using
+<code>v19.4.0</code> and therefore we recommend to use the same version
+(<a href="https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4082" target="_blank">see</a>
+some known problems with more recent node versions). You can use the
+<a href="https://github.com/nvm-sh/nvm" target="_blank">node version manager</a> <code>nvm</code> to switch
+between different local Node versions:</p>
+<pre><code class="lang-bash"><span class="hljs-comment"># install Node</span>
+$ <span class="hljs-built_in">cd</span> backend
+$ nvm install v19.4.0
+$ nvm use v19.4.0
+</code></pre>
+<p>Install node dependencies with <a href="https://yarnpkg.com/en/" target="_blank">yarn</a>:</p>
+<pre><code class="lang-bash"><span class="hljs-comment"># in main folder</span>
+$ <span class="hljs-built_in">cd</span> backend
+$ yarn install
+<span class="hljs-comment"># or just</span>
+$ yarn
+<span class="hljs-comment"># or just later on to use version of &quot;.nvmrc&quot; file</span>
+$ nvm use &amp;&amp; yarn
+</code></pre>
+<p>Copy Environment Variables:</p>
+<pre><code class="lang-bash"><span class="hljs-comment"># in backend/</span>
+$ cp .env.template .env
+</code></pre>
+<p>Configure the new file according to your needs and your local setup. Make sure
+a <a href="http://localhost:7474" target="_blank">local Neo4J</a> instance is up and running.</p>
+<p>Start the backend for development with:</p>
+<pre><code class="lang-bash"><span class="hljs-comment"># in backend/</span>
+$ yarn run dev
+</code></pre>
+<p>or start the backend in production environment with:</p>
+<pre><code class="lang-bash"><span class="hljs-comment"># in backend/</span>
+$ yarn run start
+</code></pre>
+<p>For e-mail delivery, please configure at least <code>SMTP_HOST</code> and <code>SMTP_PORT</code> in
+your <code>.env</code> configuration file.</p>
+<p>Your backend is up and running at <a href="http://localhost:4000/" target="_blank">http://localhost:4000/</a>
+This will start the GraphQL service (by default on localhost:4000) where you
+can issue GraphQL requests or access GraphQL Playground in the browser.
+More details about our GraphQL playground and how to use it with ocelot.social can be found <a href="src/graphql/GraphQL-Playground.md">here</a>.</p>
+<p><img src="../.gitbook/assets/graphql-playground.png" alt="GraphQL Playground"></p>
+<h3 id="database-indexes-and-constraints">Database Indexes and Constraints</h3>
+<p>Database indexes and constraints need to be created and upgraded when the database and the backend are running:</p>
+<p><div class="markdown-tabs"><ul class="nav nav-tabs" role="tablist"><li role="presentation" class="active"><a href="#tab-564" aria-controls="tab-564" role="tab" data-toggle="tab">Docker</a></li><li role="presentation" class=""><a href="#tab-565" aria-controls="tab-565" role="tab" data-toggle="tab">Without Docker</a></li></ul><div class="tab-content"><div role="tabpanel" class="tab-pane active" id="tab-564"><pre><code class="lang-bash"><span class="hljs-comment"># in main folder while docker-compose is running</span>
+$ docker <span class="hljs-built_in">exec</span> backend yarn run db:migrate init
+
+<span class="hljs-comment"># only once: init admin user and create indexes and constraints in Neo4j database</span>
+<span class="hljs-comment"># for development</span>
+$ docker compose <span class="hljs-built_in">exec</span> backend yarn prod:migrate init
+<span class="hljs-comment"># in production mode use command</span>
+$ docker compose <span class="hljs-built_in">exec</span> backend /bin/sh -c <span class="hljs-string">&quot;yarn prod:migrate init&quot;</span></code></pre>
+<pre><code class="lang-bash"><span class="hljs-comment"># in main folder with docker compose running</span>
+$ docker <span class="hljs-built_in">exec</span> backend yarn run db:migrate up</code></pre>
+</div><div role="tabpanel" class="tab-pane " id="tab-565"><pre><code class="lang-bash"><span class="hljs-comment"># in folder backend/ while database is running</span>
+<span class="hljs-comment"># make sure your database is running on http://localhost:7474/browser/</span>
+yarn run db:migrate init</code></pre>
+<pre><code class="lang-bash"><span class="hljs-comment"># in backend/ with database running (In docker or local)</span>
+yarn run db:migrate up</code></pre>
+</div></div></div></p>
+<h4 id="seed-database">Seed Database</h4>
+<p>If you want your backend to return anything else than an empty response, you
+need to seed your database:</p>
+<p><div class="markdown-tabs"><ul class="nav nav-tabs" role="tablist"><li role="presentation" class="active"><a href="#tab-978" aria-controls="tab-978" role="tab" data-toggle="tab">Docker</a></li><li role="presentation" class=""><a href="#tab-979" aria-controls="tab-979" role="tab" data-toggle="tab">Without Docker</a></li></ul><div class="tab-content"><div role="tabpanel" class="tab-pane active" id="tab-978"><p>In another terminal run:</p><pre><code class="lang-bash"><span class="hljs-comment"># in main folder while docker-compose is running</span>
+$ docker <span class="hljs-built_in">exec</span> backend yarn run db:seed</code></pre>
+<p>To reset the database run:</p><pre><code class="lang-bash"><span class="hljs-comment"># in main folder while docker-compose is running</span>
+$ docker <span class="hljs-built_in">exec</span> backend yarn run db:reset
+<span class="hljs-comment"># you could also wipe out your neo4j database and delete all volumes with:</span>
+$ docker-compose down -v
+<span class="hljs-comment"># if container is not running, run this command to set up your database indexes and constraints</span>
+$ docker <span class="hljs-built_in">exec</span> backend yarn run db:migrate init
+<span class="hljs-comment"># And then upgrade the indexes and const</span>
+$ docker <span class="hljs-built_in">exec</span> backend yarn run db:migrate up</code></pre>
+</div><div role="tabpanel" class="tab-pane " id="tab-979"><p>Run:</p><pre><code class="lang-bash"><span class="hljs-comment"># in backend/ while database is running</span>
+$ yarn run db:seed</code></pre>
+<p>To reset the database run:</p><pre><code class="lang-bash"><span class="hljs-comment"># in backend/ while database is running</span>
+$ yarn run db:reset</code></pre>
+</div></div></div></p>
+<h3 id="data-migrations">Data migrations</h3>
+<p>Although Neo4J is schema-less,you might find yourself in a situation in which
+you have to migrate your data e.g. because your data modeling has changed.</p>
+<p><div class="markdown-tabs"><ul class="nav nav-tabs" role="tablist"><li role="presentation" class="active"><a href="#tab-25" aria-controls="tab-25" role="tab" data-toggle="tab">Docker</a></li><li role="presentation" class=""><a href="#tab-26" aria-controls="tab-26" role="tab" data-toggle="tab">Without Docker</a></li></ul><div class="tab-content"><div role="tabpanel" class="tab-pane active" id="tab-25"><p>Generate a data migration file:</p><pre><code class="lang-bash"><span class="hljs-comment"># in main folder while docker-compose is running</span>
+$ docker-compose <span class="hljs-built_in">exec</span> backend yarn run db:migrate:create your_data_migration
+<span class="hljs-comment"># Edit the file in ./src/db/migrations/</span></code></pre>
+<p>To run the migration:</p><pre><code class="lang-bash"><span class="hljs-comment"># in main folder while docker-compose is running</span>
+$ docker <span class="hljs-built_in">exec</span> backend yarn run db:migrate up</code></pre>
+</div><div role="tabpanel" class="tab-pane " id="tab-26"><p>Generate a data migration file:</p><pre><code class="lang-bash"><span class="hljs-comment"># in backend/</span>
+$ yarn run db:migrate:create your_data_migration
+<span class="hljs-comment"># Edit the file in ./src/db/migrations/</span></code></pre>
+<p>To run the migration:</p><pre><code class="lang-bash"><span class="hljs-comment"># in backend/ while database is running</span>
+$ yarn run db:migrate up</code></pre>
+</div></div></div></p>
+<h2 id="testing">Testing</h2>
+<p><strong>Beware</strong>: We have no multiple database setup at the moment. We clean the
+database after each test, running the tests will wipe out all your data!</p>
+<p><div class="markdown-tabs"><ul class="nav nav-tabs" role="tablist"><li role="presentation" class="active"><a href="#tab-366" aria-controls="tab-366" role="tab" data-toggle="tab">Docker</a></li><li role="presentation" class=""><a href="#tab-367" aria-controls="tab-367" role="tab" data-toggle="tab">Without Docker</a></li></ul><div class="tab-content"><div role="tabpanel" class="tab-pane active" id="tab-366"><p>Run the unit tests:</p><pre><code class="lang-bash"><span class="hljs-comment"># in main folder while docker-compose is running</span>
+$ docker <span class="hljs-built_in">exec</span> backend yarn run <span class="hljs-built_in">test</span></code></pre>
+</div><div role="tabpanel" class="tab-pane " id="tab-367"><p>Run the unit tests:</p><pre><code class="lang-bash"><span class="hljs-comment"># in backend/ while database is running</span>
+$ yarn run <span class="hljs-built_in">test</span></code></pre>
+</div></div></div></p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="../neo4j/" class="navigation navigation-prev " aria-label="Previous page: Neo4J">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="graphql.html" class="navigation navigation-next " aria-label="Next page: GraphQL">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Backend","level":"1.4","depth":1,"next":{"title":"GraphQL","level":"1.4.1","depth":2,"path":"backend/graphql.md","ref":"backend/graphql.md","articles":[]},"previous":{"title":"Neo4J","level":"1.3","depth":1,"path":"neo4j/README.md","ref":"neo4j/README.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-lunr","-search","-sharing","hints","tabs2","theme-simple@git+https://github.com/plugins-zander/gitbook-plugin-theme-simple.git","search-pro@git+https://github.com/plugins-zander/gitbook-plugin-search-pro.git","splitter@git+https://github.com/plugins-zander/gitbook-plugin-splitter.git","edit-link@git+https://github.com/plugins-zander/gitbook-plugin-edit-link.git","gtag@git+https://github.com/plugins-zander/gitbook-plugin-gtag.git","chapter-fold@git+https://github.com/plugins-zander/gitbook-plugin-chapter-fold.git","copy-code-button@git+https://github.com/plugins-zander/gitbook-plugin-copy-code-button.git"],"styles":{"ebook":"styles/ebook.css","epub":"styles/epub.css","mobi":"styles/mobi.css","pdf":"styles/pdf.css","print":"styles/print.css","website":"styles/website.css"},"pluginsConfig":{"chapter-fold":{},"splitter":{},"search-pro":{},"hints":{"danger":"fa fa-exclamation-circle","info":"fa fa-info-circle","tip":"fa fa-mortar-board","working":"fa fa-wrench"},"sitemap-general":{"prefix":"https://zlogs.net/gitbook-action/"},"fontsettings":{"theme":"white","family":"sans","size":2},"gtag":{"token":""},"tabs2":{},"highlight":{},"theme-simple":{"showLevel":false,"styles":{"ebook":"styles/ebook.css","epub":"styles/epub.css","mobi":"styles/mobi.css","pdf":"styles/pdf.css","print":"styles/print.css","website":"styles/website.css"}},"copy-code-button":{},"edit-link":{"label":"EDIT","base":"https://github.com/Ocelot-Social-Community/Ocelot-Social/edit/master/"},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","author":"busFaktor() e.V.","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Ocelot.Social – Developer Documentation","gitbook":"3.2.3","description":"Developer Documentation by Gitbook-Action"},"file":{"path":"backend/README.md","mtime":"2023-03-14T07:12:24.000Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2023-08-15T15:04:47.802Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-tabs2/tabs.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search-pro/jquery.mark.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search-pro/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-splitter/splitter.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-edit-link/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-gtag/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-chapter-fold/chapter-fold.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-copy-code-button/toggle.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
