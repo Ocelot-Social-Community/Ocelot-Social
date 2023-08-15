@@ -27,7 +27,7 @@ jobs:
         publish_commit_message: ${{ github.event.head_commit.message }}
         # publish_branch: master
         publish_branch: docs-ocelot-social-gh-pages
-        publish_dir: gitbook-docs
+        publish_dir: docs
         # Some not indicated are default values, eg: publish_repo
 
     # example2
