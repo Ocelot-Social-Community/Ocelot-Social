@@ -68,10 +68,10 @@ XXX
 
 ## Host The Screenshots
 
-### Host On Ocelot-Social \(GitHub\) repository
+### Host On Ocelot-Social GitHub repository
 
 ```markdown
-{% hint style="info" %} TODO: How to host on Ocelot-Social \(GitHub\) repository ... {% endhint %}
+{% hint style="info" %} TODO: How to host on Ocelot-Social GitHub repository ... {% endhint %}
 ```
 
 ### Quick Solution
