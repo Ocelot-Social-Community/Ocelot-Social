@@ -70,9 +70,9 @@ XXX
 
 Often we need screenshots to explain things.
 
-### Host On Ocelot-Social \(GitHub\) repository
+### Host On Ocelot-Social GitHub repository
 
-{% hint style="info" %} TODO: How to host on Ocelot-Social \(GitHub\) repository ... {% endhint %}
+{% hint style="info" %} TODO: How to host on Ocelot-Social GitHub repository ... {% endhint %}
 
 ### Quick Solution
 
