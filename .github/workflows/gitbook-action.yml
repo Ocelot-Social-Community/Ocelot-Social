@@ -24,9 +24,10 @@ jobs:
         source_branch: 6689-setup-gitbook-action
         source_dir: "."
         source_edit_time: true
+        publish_repo: Ocelot-Social-Community/docs.ocelot.social
         publish_commit_message: ${{ github.event.head_commit.message }}
         # publish_branch: master
-        publish_branch: docs-ocelot-social-gh-pages
+        publish_branch: gh-pages
         publish_dir: docs
         # Some not indicated are default values, eg: publish_repo
 
