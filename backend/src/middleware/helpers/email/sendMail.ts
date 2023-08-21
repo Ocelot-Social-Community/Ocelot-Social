@@ -37,6 +37,8 @@ if (!hasEmailConfig) {
   }
 } else {
   sendMailCallback = async (templateArgs) => {
+    console.log('CONFIG.SMTP_DKIM_PRIVATKEY: "' + CONFIG.SMTP_DKIM_PRIVATKEY + '"')
+    console.log('templateArgs: ', templateArgs)
     const transporter = nodemailer.createTransport({
       host: CONFIG.SMTP_HOST,
       port: CONFIG.SMTP_PORT,
