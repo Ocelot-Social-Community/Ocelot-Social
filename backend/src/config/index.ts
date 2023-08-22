@@ -49,10 +49,10 @@ const smtp = {
   SMTP_SECURE: env.SMTP_SECURE === 'true',
   SMTP_USERNAME: env.SMTP_USERNAME,
   SMTP_PASSWORD: env.SMTP_PASSWORD,
-  SMTP_DKIM_DOMAINNAME: hasDKIMData ? env.SMTP_DKIM_DOMAINNAME : undefined,
-  SMTP_DKIM_KEYSELECTOR: hasDKIMData ? env.SMTP_DKIM_KEYSELECTOR : undefined,
+  SMTP_DKIM_DOMAINNAME: hasDKIMData && env.SMTP_DKIM_DOMAINNAME,
+  SMTP_DKIM_KEYSELECTOR: hasDKIMData && env.SMTP_DKIM_KEYSELECTOR,
   // PEM format: https://docs.progress.com/bundle/datadirect-hybrid-data-pipeline-installation-46/page/PEM-file-format.html
-  SMTP_DKIM_PRIVATKEY: hasDKIMData ? env.SMTP_DKIM_PRIVATKEY.replace(/\\n/g, '\n') : undefined, // replace all "\n" in .env string by real line break
+  SMTP_DKIM_PRIVATKEY: hasDKIMData && env.SMTP_DKIM_PRIVATKEY.replace(/\\n/g, '\n'), // replace all "\n" in .env string by real line break
 }
 
 const neo4j = {
