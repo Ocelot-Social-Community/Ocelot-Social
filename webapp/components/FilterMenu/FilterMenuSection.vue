@@ -80,10 +80,6 @@ export default {
   @media only screen and (max-width: 630px) {
     flex-direction: column;
 
-    > .title {
-      text-align: center;
-    }
-
     // > .sidebar {
     //   max-width: none;
     // }
