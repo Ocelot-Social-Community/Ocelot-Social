@@ -4,7 +4,7 @@ When you introduce a new version and branding and deploy it on your network, you
 
 ## Version >= 3.3.0 with 'ocelotDockerVersionTag' 3.3.0-XXX
 
-- We have the new option to configure DKIM for sent e-mails, see [here](deployment.md):
+- We have the new option to configure DKIM for sent e-mails in environment variables (`.env` or `values.yaml`), see [here](deployment.md):
   - `SMTP_DKIM_DOMAINNAME=`
   - `SMTP_DKIM_KEYSELECTOR=`
   - `SMTP_DKIM_PRIVATKEY=`
