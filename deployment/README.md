@@ -6,11 +6,11 @@
 [![Open Source Helpers](https://www.codetriage.com/ocelot-social-community/ocelot-social-deploy-rebranding/badges/users.svg)](https://www.codetriage.com/ocelot-social-community/ocelot-social-deploy-rebranding)
 
 This repository is an in use template to rebrand, configure, and deploy [ocelot.social](https://github.com/Ocelot-Social-Community/Ocelot-Social) networks.
-The forked original repository is [Ocelot-Social-Deploy-Rebranding](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding).
+The forked original repository is [stage.ocelot.social](https://github.com/Ocelot-Social-Community/stage.ocelot.social).
 
 <!-- markdownlint-disable MD033 -->
 <p align="center">
-  <a href="https://ocelot.social" target="_blank"><img src="branding/static/img/custom/logo-squared.svg" alt="Ocelot-Social" width="40%" height="40%"></a>
+  <a href="https://ocelot.social" target="_blank"><img src="../webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%"></a>
 </p>
 <!-- markdownlint-enable MD033 -->
 
@@ -47,7 +47,8 @@ Since all deployment methods described here depend on [Docker](https://docker.co
 
 The next step is:
 
-- [Configure And Branding](/branding/README.md)
+- [Set Environment Variables and Configurations](./deployment-values.md)
+- [Configure And Branding](./configurations/stage.ocelot.social/branding/README.md)
 
 ### Optional: Locally Testing Configuration And Branding
 
@@ -99,7 +100,7 @@ See the login details and browser addresses above.
 
 ### Deployment
 
-Afterwards you can [deploy](/deployment/README.md) it on your server:
+Afterwards you can [deploy](/deployment/deployment.md) it on your server:
 
 - [Kubernetes with Helm](/deployment/kubernetes/README.md)
 

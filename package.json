@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social",
-  "version": "2.7.0",
+  "version": "3.0.2",
   "description": "Free and open source software program code available to run social networks.",
   "author": "ocelot.social Community",
   "license": "MIT",
@@ -34,7 +34,7 @@
     "release": "yarn version --no-git-tag-version --no-commit-hooks --no-commit && auto-changelog --latest-version $(node -p -e \"require('./package.json').version\") && cd backend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp/maintenance/source && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../../../package.json').version\")"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.5",
+    "@babel/core": "^7.22.9",
     "@babel/preset-env": "^7.22.9",
     "@babel/register": "^7.12.10",
     "@badeball/cypress-cucumber-preprocessor": "^15.1.4",
