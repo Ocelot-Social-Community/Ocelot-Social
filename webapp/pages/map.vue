@@ -270,7 +270,7 @@ export default {
           },
           group: {
             linkTitle: '&' + e.features[0].properties.slug,
-            link: `/group/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
+            link: `/groups/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
           },
           event: {
             linkTitle: e.features[0].properties.slug,
