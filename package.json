@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Free and open source software program code available to run social networks.",
   "author": "ocelot.social Community",
   "license": "MIT",
@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.22.9",
-    "@babel/preset-env": "^7.22.4",
+    "@babel/preset-env": "^7.22.9",
     "@babel/register": "^7.12.10",
     "@badeball/cypress-cucumber-preprocessor": "^15.1.4",
     "@cypress/browserify-preprocessor": "^3.0.2",
@@ -47,7 +47,7 @@
     "cypress": "^12.17.0",
     "cypress-network-idle": "^1.14.2",
     "date-fns": "^2.25.0",
-    "dotenv": "^8.2.0",
+    "dotenv": "^16.3.1",
     "expect": "^29.6.4",
     "graphql-request": "^2.0.0",
     "import": "^0.0.6",
