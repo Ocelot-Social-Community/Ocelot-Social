@@ -5,6 +5,8 @@ import { htmlToText } from 'nodemailer-html-to-text'
 
 const hasEmailConfig = CONFIG.SMTP_HOST && CONFIG.SMTP_PORT
 const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD
+const hasDKIMData =
+  CONFIG.SMTP_DKIM_DOMAINNAME && CONFIG.SMTP_DKIM_KEYSELECTOR && CONFIG.SMTP_DKIM_PRIVATKEY
 
 let sendMailCallback: any = async () => {}
 if (!hasEmailConfig) {
@@ -43,6 +45,11 @@ if (!hasEmailConfig) {
       auth: hasAuthData && {
         user: CONFIG.SMTP_USERNAME,
         pass: CONFIG.SMTP_PASSWORD,
+      },
+      dkim: hasDKIMData && {
+        domainName: CONFIG.SMTP_DKIM_DOMAINNAME,
+        keySelector: CONFIG.SMTP_DKIM_KEYSELECTOR,
+        privateKey: CONFIG.SMTP_DKIM_PRIVATKEY,
       },
     })
 

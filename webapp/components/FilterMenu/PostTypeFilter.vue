@@ -2,7 +2,7 @@
   <filter-menu-section
     :title="$t('filter-menu.post-type')"
     :divider="false"
-    class="following-filter post-type-filter"
+    class="post-type-filter"
   >
     <template #filter-follower>
       <li class="item all-item">
@@ -65,9 +65,10 @@ export default {
 <style lang="scss">
 .post-type-filter {
   & .filter-list {
-    display: grid;
-    grid-template-columns: repeat(3, 10%);
-    padding-left: 0px;
+    display: flex;
+    flex-basis: 100%;
+    flex-grow: 1;
+    padding-left: $space-base;
   }
 }
 </style>
