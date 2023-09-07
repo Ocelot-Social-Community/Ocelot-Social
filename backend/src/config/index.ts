@@ -40,6 +40,8 @@ const server = {
   JWT_EXPIRES: env.JWT_EXPIRES || '2y',
 }
 
+const hasDKIMData = env.SMTP_DKIM_DOMAINNAME && env.SMTP_DKIM_KEYSELECTOR && env.SMTP_DKIM_PRIVATKEY
+
 const smtp = {
   SMTP_HOST: env.SMTP_HOST,
   SMTP_PORT: env.SMTP_PORT,
@@ -47,6 +49,10 @@ const smtp = {
   SMTP_SECURE: env.SMTP_SECURE === 'true',
   SMTP_USERNAME: env.SMTP_USERNAME,
   SMTP_PASSWORD: env.SMTP_PASSWORD,
+  SMTP_DKIM_DOMAINNAME: hasDKIMData && env.SMTP_DKIM_DOMAINNAME,
+  SMTP_DKIM_KEYSELECTOR: hasDKIMData && env.SMTP_DKIM_KEYSELECTOR,
+  // PEM format: https://docs.progress.com/bundle/datadirect-hybrid-data-pipeline-installation-46/page/PEM-file-format.html
+  SMTP_DKIM_PRIVATKEY: hasDKIMData && env.SMTP_DKIM_PRIVATKEY.replace(/\\n/g, '\n'), // replace all "\n" in .env string by real line break
 }
 
 const neo4j = {
