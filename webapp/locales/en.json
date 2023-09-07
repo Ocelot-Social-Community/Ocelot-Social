@@ -6,7 +6,8 @@
     "edit": "Edit",
     "loading": "loading",
     "loadMore": "load more",
-    "save": "Save"
+    "save": "Save",
+    "saveCategories": "Save topics"
   },
   "admin": {
     "categories": {
@@ -298,16 +299,16 @@
       "happy": "Happy",
       "surprised": "Surprised"
     },
-    "filterFollow": "Filter contributions from users I follow",
+    "filterFollow": "Users I follow",
     "filterMasonryGrid": {
       "myFriends": "Users I follow",
       "myGroups": "By my groups",
       "myTopics": "My topics",
       "noFilter": "Filter content",
-      "onlyArticles": "Only articles",
-      "onlyEvents": "Only events"
+      "onlyArticles": "Articles",
+      "onlyEvents": "Events"
     },
-    "filterMyGroups": "Contributions in my groups",
+    "filterMyGroups": "My groups",
     "inappropriatePicture": "This image may be inappropriate for some people.",
     "languageSelectLabel": "Language of your contribution",
     "languageSelectText": "Select Language",
@@ -431,6 +432,7 @@
     "eventsEnded": "Ended",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
+    "following-title": "Sources",
     "languages": "Languages",
     "my-groups": "My groups",
     "order": {
@@ -723,6 +725,9 @@
       "unread": "Unread"
     },
     "group": "Description",
+    "headerMenuButton": {
+      "tooltip": "My notifications"
+    },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
     "post": "Post or Group",

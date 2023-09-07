@@ -6,7 +6,8 @@
     "edit": "Bearbeiten",
     "loading": "wird geladen",
     "loadMore": "mehr laden",
-    "save": "Speichern"
+    "save": "Speichern",
+    "saveCategories": "Themen speichern"
   },
   "admin": {
     "categories": {
@@ -298,16 +299,16 @@
       "happy": "Glücklich",
       "surprised": "Erstaunt"
     },
-    "filterFollow": "Beiträge von Nutzern filtern, denen ich folge",
+    "filterFollow": "Nutzern, denen ich folge",
     "filterMasonryGrid": {
-      "myFriends": "Nutzer denen ich folge",
+      "myFriends": "Nutzer, denen ich folge",
       "myGroups": "Aus meinen Gruppen",
       "myTopics": "Meine Themen",
-      "noFilter": "Inhalt filtern",
-      "onlyArticles": "Nur Beiträge",
-      "onlyEvents": "Nur Veranstaltungen"
+      "noFilter": "Inhalte filtern",
+      "onlyArticles": "Beiträge",
+      "onlyEvents": "Veranstaltungen"
     },
-    "filterMyGroups": "Beiträge in meinen Gruppen",
+    "filterMyGroups": "Meine Gruppen",
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache Deines Beitrags",
     "languageSelectText": "Sprache wählen",
@@ -418,21 +419,22 @@
     "emotions": "Emotionen",
     "ended": {
       "all": {
-        "hint": "Zeige alle, auch beendete",
+        "hint": "Zeige alle, auch zukünftige",
         "label": "Alle"
       },
       "onlyEnded": {
-        "hint": "Zeige nur noch nicht beendete",
-        "label": "Nicht beendete"
+        "hint": "Zeige nur noch zukünftige",
+        "label": "Zukünftige"
       }
     },
     "event": "Veranstaltung",
     "eventsBy": "Veranstaltungen – zeige ...",
     "eventsEnded": "Beendet",
     "filter-by": "Filtern nach ...",
-    "following": "Nutzer denen ich folge",
+    "following": "Nutzer, denen ich folge",
+    "following-title": "Quellen",
     "languages": "Sprachen",
-    "my-groups": "Meinen Gruppen",
+    "my-groups": "Meine Gruppen",
     "order": {
       "last": {
         "hint": "Sortiere die Letzten nach vorn",
@@ -723,6 +725,9 @@
       "unread": "Ungelesen"
     },
     "group": "Beschreibung",
+    "headerMenuButton": {
+      "tooltip": "Meine Banachrichtigungen"
+    },
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",
