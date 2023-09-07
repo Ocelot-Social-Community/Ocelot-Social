@@ -24,7 +24,7 @@
           data-test="oldest-button"
           size="small"
         >
-          {{ buttonTitle('asc') }}
+          {{ buttonLabel('asc') }}
         </base-button>
       </li>
     </template>

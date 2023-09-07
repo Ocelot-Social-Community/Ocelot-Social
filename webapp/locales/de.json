@@ -301,7 +301,7 @@
     },
     "filterFollow": "Nutzern, denen ich folge",
     "filterMasonryGrid": {
-      "myFriends": "Nutzer denen ich folge",
+      "myFriends": "Nutzer, denen ich folge",
       "myGroups": "Aus meinen Gruppen",
       "myTopics": "Meine Themen",
       "noFilter": "Inhalte filtern",
@@ -725,6 +725,9 @@
       "unread": "Ungelesen"
     },
     "group": "Beschreibung",
+    "headerMenuButton": {
+      "tooltip": "Meine Banachrichtigungen"
+    },
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",
