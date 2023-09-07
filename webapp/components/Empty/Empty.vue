@@ -1,13 +1,7 @@
 <template>
   <ds-space class="empty" centered :margin="margin">
     <ds-text>
-      <img
-        :src="iconPath"
-        width="80"
-        class="empty-icon"
-        style="margin-bottom: 5px"
-        alt="Empty"
-      />
+      <img :src="iconPath" width="80" class="empty-icon" style="margin-bottom: 5px" alt="Empty" />
       <br />
       <ds-text v-show="message" class="empty-message" color="softer">
         {{ message }}
