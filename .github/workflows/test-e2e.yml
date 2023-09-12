@@ -101,6 +101,7 @@ jobs:
     name: Cleanup
     needs: [docker_preparation, fullstack_tests]
     runs-on: ubuntu-latest
+    permissions: write-all
     continue-on-error: true
     steps:
       - name: Delete cache
