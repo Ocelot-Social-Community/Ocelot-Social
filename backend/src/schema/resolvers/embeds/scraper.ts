@@ -20,7 +20,6 @@ const metascraper = Metascraper([
   require('metascraper-publisher')(),
   require('metascraper-title')(),
   require('metascraper-url')(),
-  require('metascraper-audio')(),
   require('metascraper-soundcloud')(),
   require('metascraper-video')(),
   require('metascraper-youtube')(),

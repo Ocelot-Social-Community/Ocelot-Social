@@ -131,4 +131,25 @@ describe('languagesMiddleware', () => {
       },
     })
   })
+
+  describe('detects no language', () => {
+    it('has default language', async () => {
+      variables = {
+        ...variables,
+        content: '',
+      }
+      await expect(
+        mutate({
+          mutation: createPostMutation,
+          variables,
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          CreatePost: {
+            language: 'en',
+          },
+        },
+      })
+    })
+  })
 })
