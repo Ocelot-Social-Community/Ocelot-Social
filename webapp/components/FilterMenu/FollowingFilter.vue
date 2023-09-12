@@ -22,11 +22,11 @@
             icon="user-plus"
             :label="$t('filter-menu.following')"
             :filled="filteredByUsersFollowed"
-            :title="$t('contribution.filterFollow')"
+            :title="$t('filter-menu.following')"
             @click="toggleFilteredByFollowed(currentUser.id)"
             size="small"
           >
-            {{ $t('contribution.filterFollow') }}
+            {{ $t('filter-menu.following') }}
           </base-button>
         </li>
         <li class="item posts-in-my-groups-item">
