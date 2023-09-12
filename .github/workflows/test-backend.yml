@@ -127,6 +127,7 @@ jobs:
     if: ${{ needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true' }}
     needs: [files-changed, unit_test_backend]
     runs-on: ubuntu-latest
+    permissions: write-all
     continue-on-error: true
     steps:
       - name: Delete cache
