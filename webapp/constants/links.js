@@ -4,10 +4,10 @@ import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
   // if defined it's dominating
-  externalLink: {
-    url: 'https://ocelot.social',
-    target: '_blank',
-  },
+  // externalLink: {
+  //   url: 'https://ocelot.social',
+  //  target: '_blank',
+  // },
 
   internalPage: {
     // footerIdent: 'site.made', // localized string identifier, if undefined default is used
@@ -21,11 +21,11 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
 })
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
   // if defined it's dominating
-  externalLink: {
-    // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-    url: 'https://ocelot-social.herokuapp.com/donations',
-    target: '_blank',
-  },
+  // externalLink: {
+  // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
+  //  url: 'https://ocelot-social.herokuapp.com/donations',
+  //  target: '_blank',
+  // },
 
   internalPage: {
     // footerIdent: 'site.donate', // localized string identifier, if undefined default is used
@@ -38,11 +38,11 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
   },
 })
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
-  externalLink: {
-    // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
-    url: 'https://ocelot-social.herokuapp.com/imprint',
-    target: '_blank',
-  },
+  // externalLink: {
+  // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
+  //  url: 'https://ocelot-social.herokuapp.com/imprint',
+  //  target: '_blank',
+  // },
 
   internalPage: {
     // footerIdent: 'site.imprint', // localized string identifier, if undefined default is used
@@ -97,9 +97,9 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
   // externalLink: null, // if defined it's dominating
 
   internalPage: {
-    // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.faq', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.faq', // on null default is used, on empty string it's hidden
+    footerIdent: 'freilernen.help', // localized string identifier, if undefined default is used
+    headTitleIdent: 'freilernen.help', // localized string identifier, if undefined default is used
+    headlineIdent: 'freilernen.help', // on null default is used, on empty string it's hidden
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
@@ -108,10 +108,10 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
 })
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
   // if defined it's dominating
-  externalLink: {
-    url: 'https://ocelot.social',
-    target: '_blank',
-  },
+  // externalLink: {
+  //  url: 'https://ocelot.social',
+  //  target: '_blank',
+  // },
 
   internalPage: {
     // footerIdent: 'site.support', // localized string identifier, if undefined default is used
@@ -145,7 +145,7 @@ export default {
     DATA_PRIVACY,
     FAQ,
     DONATE,
-    SUPPORT,
+  //  SUPPORT,
     IMPRINT,
   ],
 }
