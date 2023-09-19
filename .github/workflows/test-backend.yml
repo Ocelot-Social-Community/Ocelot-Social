@@ -11,7 +11,7 @@ jobs:
       backend: ${{ steps.changes.outputs.backend }}
       docker: ${{ steps.changes.outputs.docker }}
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4
 
       - name: Check for backend file changes
         uses: dorny/paths-filter@v2.11.1
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Neo4J | Build 'community' image
         run: |
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: backend | Build 'test' image
         run: |
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: backend | Lint
         run: cd backend && yarn && yarn run lint
@@ -84,7 +84,7 @@ jobs:
       checks: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Restore Neo4J cache
         uses: actions/cache/restore@v3.3.2
