@@ -101,7 +101,7 @@
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "apollo-server-testing": "~2.11.0",
-    "chai": "~4.2.0",
+    "chai": "~4.3.8",
     "cucumber": "~6.0.5",
     "eslint": "^8.37.0",
     "eslint-config-prettier": "^9.0.0",
