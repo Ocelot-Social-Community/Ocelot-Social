@@ -26,7 +26,7 @@
     "@babel/cli": "~7.8.4",
     "@babel/core": "~7.9.0",
     "@babel/node": "~7.8.7",
-    "@babel/plugin-proposal-throw-expressions": "^7.8.3",
+    "@babel/plugin-proposal-throw-expressions": "^7.22.5",
     "@babel/preset-env": "~7.22.9",
     "@babel/register": "^7.9.0",
     "@sentry/node": "^5.15.4",
