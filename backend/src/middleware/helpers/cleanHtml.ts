@@ -1,5 +1,5 @@
 import sanitizeHtml from 'sanitize-html'
-import linkifyHtml from 'linkify-html';
+import linkifyHtml from 'linkify-html'
 
 export const removeHtmlTags = (input) => {
   return sanitizeHtml(input, {
