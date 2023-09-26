@@ -53,6 +53,7 @@ export const searchPosts = gql`
         shoutedCount
         clickedCount
         viewedTeaserCount
+        postType
         author {
           ...user
         }
