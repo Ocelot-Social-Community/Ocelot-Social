@@ -54,6 +54,15 @@ export const searchPosts = gql`
         clickedCount
         viewedTeaserCount
         postType
+        eventStart
+        eventEnd
+        eventVenue
+        eventLocationName
+        eventLocation {
+          lng
+          lat
+        }
+        eventIsOnline
         author {
           ...user
         }
