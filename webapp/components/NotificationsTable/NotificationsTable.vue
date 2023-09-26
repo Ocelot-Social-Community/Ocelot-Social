@@ -65,7 +65,7 @@
                     class="notification-mention-post"
                     :class="{ 'notification-status': notification.read }"
                     :to="{
-                      name: isGroup(notification.from) ? 'group-id-slug' : 'post-id-slug',
+                      name: isGroup(notification.from) ? 'groups-id-slug' : 'post-id-slug',
                       params: params(notification.from),
                       hash: hashParam(notification.from),
                     }"

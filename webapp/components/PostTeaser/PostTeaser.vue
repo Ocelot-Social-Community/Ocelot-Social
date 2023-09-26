@@ -19,11 +19,31 @@
           <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" />
           <hc-ribbon
             :class="[isPinned ? '--pinned' : '', post.image ? 'post-ribbon-w-img' : 'post-ribbon']"
-            :text="isPinned ? $t('post.pinned') : $t('post.name')"
+            :text="ribbonText"
+            :typ="post.postType[0]"
           />
         </div>
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
+      <ds-space
+        v-if="post && post.postType[0] === 'Event'"
+        margin-bottom="small"
+        style="padding: 5px"
+      >
+        <location-teaser
+          class="event-info"
+          size="small"
+          :venue="post.eventVenue"
+          :locationName="post.eventLocationName"
+          :isOnline="post.eventIsOnline"
+        />
+        <date-time-range
+          class="event-info"
+          size="small"
+          :startDate="post.eventStart"
+          :endDate="post.eventEnd"
+        />
+      </ds-space>
       <!-- TODO: replace editor content with tiptap render view -->
       <!-- eslint-disable-next-line vue/no-v-html -->
       <div class="content hyphenate-text" v-html="excerpt" />
@@ -86,7 +106,9 @@
 import Category from '~/components/Category'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
+import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import HcRibbon from '~/components/Ribbon'
+import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
@@ -98,7 +120,9 @@ export default {
     Category,
     ContentMenu,
     CounterIcon,
+    DateTimeRange,
     HcRibbon,
+    LocationTeaser,
     UserTeaser,
   },
   props: {
@@ -152,6 +176,11 @@ export default {
     isPinned() {
       return this.post && this.post.pinned
     },
+    ribbonText() {
+      if (this.post.pinned) return this.$t('post.pinned')
+      if (this.post.postType[0] === 'Event') return this.$t('post.event')
+      return this.$t('post.name')
+    },
   },
   methods: {
     async deletePostCallback() {
@@ -186,6 +215,7 @@ export default {
   },
 }
 </script>
+
 <style lang="scss">
 .post-teaser,
 .post-teaser:hover,
@@ -234,6 +264,12 @@ export default {
   > .content {
     flex-grow: 1;
     margin-bottom: $space-small;
+  }
+
+  & .event-info {
+    display: flex;
+    align-items: center;
+    gap: 2px;
   }
 
   > .footer {

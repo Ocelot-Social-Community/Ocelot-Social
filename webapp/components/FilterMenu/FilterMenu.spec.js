@@ -15,11 +15,13 @@ describe('FilterMenu.vue', () => {
 
   const getters = {
     'posts/isActive': () => false,
+    'posts/filteredPostTypes': () => [],
     'posts/orderBy': () => 'createdAt_desc',
   }
 
   const stubs = {
     FollowingFilter: true,
+    PostTypeFilter: true,
     CategoriesFilter: true,
     EmotionsFilter: true,
     LanguagesFilter: true,

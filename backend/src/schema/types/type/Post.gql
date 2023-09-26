@@ -83,6 +83,9 @@ input _PostFilter {
   emotions_every: _PostEMOTEDFilter
   group: _GroupFilter
   postsInMyGroups: Boolean
+  postType_in: [PostType]
+  eventStart_gte: String
+  eventEnd_gte: String
 }
 
 enum _PostOrdering {
@@ -104,6 +107,8 @@ enum _PostOrdering {
   language_desc
   pinned_asc
   pinned_desc
+  eventStart_asc
+  eventStart_desc
 }
 
 
@@ -171,10 +176,28 @@ type Post {
     @cypher(statement: "MATCH (this)<-[emoted:EMOTED]-(:User) RETURN COUNT(DISTINCT emoted)")
 
   group: Group @relation(name: "IN", direction: "OUT")
+
+  postType: [PostType]
+    @cypher(statement: "RETURN [l IN labels(this) WHERE NOT l = 'Post']")
+
+  eventLocationName: String
+  eventLocation: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
+  eventVenue: String
+  eventStart: String
+  eventEnd: String
+  eventIsOnline: Boolean
 }
 
 input _PostInput {
   id: ID!
+}
+
+input _EventInput {
+  eventStart: String!
+  eventEnd: String
+  eventVenue: String
+  eventLocationName: String
+  eventIsOnline: Boolean
 }
 
 type Mutation {
@@ -189,6 +212,8 @@ type Mutation {
     categoryIds: [ID]
     contentExcerpt: String
     groupId: ID
+    postType: PostType = Article
+    eventInput: _EventInput
   ): Post
   UpdatePost(
     id: ID!
@@ -200,6 +225,8 @@ type Mutation {
     visibility: Visibility
     language: String
     categoryIds: [ID]
+    postType: PostType
+    eventInput: _EventInput
   ): Post
   DeletePost(id: ID!): Post
   AddPostEmotions(to: _PostInput!, data: _EMOTEDInput!): EMOTED
@@ -207,6 +234,11 @@ type Mutation {
   pinPost(id: ID!): Post
   unpinPost(id: ID!): Post
   markTeaserAsViewed(id: ID!): Post
+
+  # Shout the given Type and ID
+  shout(id: ID!, type: ShoutTypeEnum): Boolean!
+  # Unshout the given Type and ID
+  unshout(id: ID!, type: ShoutTypeEnum): Boolean!
 }
 
 type Query {

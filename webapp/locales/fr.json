@@ -75,6 +75,9 @@
       }
     }
   },
+  "chat": {
+    "search": "Filtrer les salons de chat"
+  },
   "code-of-conduct": {
     "subheader": "pour le réseau social de {ORGANIZATION_NAME}"
   },
@@ -401,6 +404,10 @@
       "all": "Tous",
       "read": "Lire",
       "unread": "Non lu"
+    },
+    "group": "Description",
+    "headerMenuButton": {
+      "tooltip": "Mes notifications"
     },
     "markAllAsRead": "Tout marquer comme lu",
     "pageLink": "Toutes les notifications",

@@ -25,6 +25,7 @@
             <base-button
               class="my-filter-button"
               v-if="
+                !postsFilter['postType_in'] &&
                 !postsFilter['categories_some'] &&
                 !postsFilter['author'] &&
                 !postsFilter['postsInMyGroups']
@@ -37,6 +38,22 @@
               &nbsp;
               <base-icon class="my-filter-button" :name="filterButtonIcon"></base-icon>
             </base-button>
+
+            <header-button
+              v-if="filteredPostTypes.includes('Article')"
+              :title="$t('contribution.filterMasonryGrid.onlyArticles')"
+              :clickButton="openFilterMenu"
+              :titleRemove="$t('filter-menu.deleteFilter')"
+              :clickRemove="resetPostType"
+            />
+
+            <header-button
+              v-if="filteredPostTypes.includes('Event')"
+              :title="$t('contribution.filterMasonryGrid.onlyEvents')"
+              :clickButton="openFilterMenu"
+              :titleRemove="$t('filter-menu.deleteFilter')"
+              :clickRemove="resetPostType"
+            />
 
             <header-button
               v-if="postsFilter['categories_some']"
@@ -62,7 +79,7 @@
               :clickRemove="resetByGroups"
             />
             <div id="my-filter" v-if="showFilter">
-              <div @mouseleave="showFilter = false">
+              <div @mouseleave="mouseLeaveFilterMenu">
                 <filter-menu-component @showFilterMenu="showFilterMenu" />
               </div>
             </div>
@@ -120,6 +137,7 @@
 
 <script>
 import postListActions from '~/mixins/postListActions'
+import mobile from '~/mixins/mobile'
 import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter.vue'
 import HcEmpty from '~/components/Empty/Empty'
@@ -134,7 +152,6 @@ import UpdateQuery from '~/components/utils/UpdateQuery'
 import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import { SHOW_CONTENT_FILTER_MASONRY_GRID } from '~/constants/filter.js'
 import { POST_ADD_BUTTON_POSITION_TOP } from '~/constants/posts.js'
-import mobile from '~/mixins/mobile'
 
 export default {
   components: {
@@ -154,12 +171,13 @@ export default {
       hideByScroll: false,
       revScrollpos: 0,
       showFilter: false,
+      developerNoAutoClosingFilterMenu: false, // stops automatic closing of filter menu for developer purposes: default is 'false'
       showDonations: false,
       goal: 15000,
       progress: 7000,
       posts: [],
       hasMore: true,
-      // Initialize your apollo data
+      // initialize your apollo data
       offset: 0,
       pageSize: 12,
       hashtag,
@@ -170,14 +188,12 @@ export default {
   },
   computed: {
     ...mapGetters({
+      filteredPostTypes: 'posts/filteredPostTypes',
       postsFilter: 'posts/filter',
       orderBy: 'posts/orderBy',
     }),
     filterButtonIcon() {
-      if (Object.keys(this.postsFilter).length === 0) {
-        return this.showFilter ? 'angle-up' : 'angle-down'
-      }
-      return 'close'
+      return this.showFilter ? 'angle-up' : 'angle-down'
     },
     finalFilters() {
       let filter = this.postsFilter
@@ -197,6 +213,11 @@ export default {
     },
   },
   watchQuery: ['hashtag'],
+  watch: {
+    postsFilter() {
+      this.resetPostList()
+    },
+  },
   mounted() {
     if (this.categoryId) {
       this.resetCategories()
@@ -207,6 +228,7 @@ export default {
   },
   methods: {
     ...mapMutations({
+      resetPostType: 'posts/RESET_POST_TYPE',
       resetByFollowed: 'posts/TOGGLE_FILTER_BY_FOLLOWED',
       resetByGroups: 'posts/TOGGLE_FILTER_BY_MY_GROUPS',
       resetCategories: 'posts/RESET_CATEGORIES',
@@ -214,6 +236,10 @@ export default {
     }),
     openFilterMenu() {
       this.showFilter = !this.showFilter
+    },
+    mouseLeaveFilterMenu() {
+      if (this.developerNoAutoClosingFilterMenu) return
+      this.showFilter = false
     },
     showFilterMenu(e) {
       if (!e || (!e.target.closest('#my-filter') && !e.target.closest('.my-filter-button'))) {

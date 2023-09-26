@@ -105,6 +105,7 @@ export default {
       styleguideStyles,
       '~assets/_new/styles/tokens.scss',
       '~assets/styles/imports/_branding.scss',
+      '~assets/_new/styles/export.scss',
     ],
   },
 
@@ -127,6 +128,7 @@ export default {
     { src: '~/plugins/vue-infinite-loading.js', ssr: false },
     { src: '~/plugins/vue-observe-visibility.js', ssr: false },
     { src: '~/plugins/v-mapbox.js', mode: 'client' },
+    { src: '~/plugins/vue-advanced-chat.js', mode: 'client' },
   ],
 
   router: {
@@ -248,6 +250,14 @@ export default {
      ** You can extend webpack config here
      */
     extend(config, ctx) {
+      // Add the compilerOptions
+      ctx.loaders.vue.compilerOptions = {
+        // Add your compilerOptions here
+        isCustomElement: (tagName) => {
+          return tagName === 'vue-advanced-chat' || tagName === 'emoji-picker'
+        },
+      }
+
       if (CONFIG.STYLEGUIDE_DEV) {
         config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/src/system`)
         config.module.rules.push({
