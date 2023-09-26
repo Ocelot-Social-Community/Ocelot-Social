@@ -1737,27 +1737,12 @@
   dependencies:
     json-buffer "~3.0.1"
 
-"@keyvhq/core@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@keyvhq/core/-/core-2.0.0.tgz#518311a59dbc4d6b6fd56852c15f483edb9fc7c9"
-  integrity sha512-fi3+F7GNImn1j4r6UFhsHRwN8a05uhUlrbNWZgnkX0h1NzcBEPNNqqMOE4KSASJwH2e9Eh/jm+bEfto58csNgg==
-  dependencies:
-    json-buffer "~3.0.1"
-
 "@keyvhq/memoize@~1.6.14":
   version "1.6.14"
   resolved "https://registry.yarnpkg.com/@keyvhq/memoize/-/memoize-1.6.14.tgz#6a347b81e9be7040c678f8fc4b9046186484b6fc"
   integrity sha512-bsFPrpOHEjAK1F7O0lzl5RR6KofA/zCaFzIBFMDRmcvDJk4Jkk5yqo66+DqQO5YBKWM74y/nAN63XCdHWmi91w==
   dependencies:
     "@keyvhq/core" "^1.6.14"
-    mimic-fn "~3.0.0"
-
-"@keyvhq/memoize@~2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@keyvhq/memoize/-/memoize-2.0.0.tgz#58b1118c2972b631aede81040eab6daefce8f5e8"
-  integrity sha512-0vibPmDh7nCWsbdS4A1IJX1G89PyT+nJEDGj1tUYsLPQ5BLnpLwneCudmXIvxD6cUUvMYqmhxKyjpvHd8DpPkA==
-  dependencies:
-    "@keyvhq/core" "^2.0.0"
     mimic-fn "~3.0.0"
 
 "@metascraper/helpers@^4.10.2":
@@ -6108,7 +6093,7 @@ got@^6.7.1:
     unzip-response "^2.0.1"
     url-parse-lax "^1.0.0"
 
-got@~11.8.0, got@~11.8.5, got@~11.8.6:
+got@~11.8.0, got@~11.8.5:
   version "11.8.6"
   resolved "https://registry.yarnpkg.com/got/-/got-11.8.6.tgz#276e827ead8772eddbcfc97170590b841823233a"
   integrity sha512-6tfZ91bOr7bOXnK7PRDCGBLa1H4U080YHNaAQ2KsMGlLEzRbk44nsZF2E1IeRc3vtJHPVbKCYgdFbaGO2ljd8g==
@@ -8349,16 +8334,6 @@ merge2@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/merge2/-/merge2-1.4.1.tgz#4368892f885e907455a6fd7dc55c0c9d404990ae"
   integrity sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==
-
-metascraper-audio@^5.34.4:
-  version "5.34.4"
-  resolved "https://registry.yarnpkg.com/metascraper-audio/-/metascraper-audio-5.34.4.tgz#84437c3962a9186cda69510229f6b68e6a25563a"
-  integrity sha512-Z/BzT0KLq8H6Zc0wm4PqKlSeI7O54ZsD2QhV9GgkJNz5jGj0Rs4P3OOvoa+FEtDyRKGfIzYuldAuhQMVmo1WMA==
-  dependencies:
-    "@keyvhq/memoize" "~2.0.0"
-    "@metascraper/helpers" "^5.34.4"
-    got "~11.8.6"
-    p-reflect "~2.1.0"
 
 metascraper-author@^5.33.5:
   version "5.33.5"
