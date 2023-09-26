@@ -1,7 +1,7 @@
-<template v-show="cappedCount > 0">
+<template>
   <span class="counter-icon">
     <base-icon :name="icon" />
-    <span :class="counterClass">{{ cappedCount }}</span>
+    <span v-if="count > 0" :class="counterClass">{{ cappedCount }}</span>
   </span>
 </template>
 
