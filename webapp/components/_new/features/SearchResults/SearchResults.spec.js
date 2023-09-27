@@ -50,8 +50,8 @@ describe('SearchResults', () => {
 
     describe('searchResults', () => {
       describe('contains no results', () => {
-        it('renders hc-empty component', () => {
-          expect(wrapper.find('.hc-empty').exists()).toBe(true)
+        it('renders empty component', () => {
+          expect(wrapper.find('.empty').exists()).toBe(true)
         })
       })
 
