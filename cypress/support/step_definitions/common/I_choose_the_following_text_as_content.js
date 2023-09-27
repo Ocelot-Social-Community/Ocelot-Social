@@ -1,6 +1,6 @@
 import { When } from "@badeball/cypress-cucumber-preprocessor";
 
-When("I choose the following text as content:", async text => {
+When("I choose the following text as content:", text => {
   cy.task('getValue', 'lastPost').then(lastPost => {
     lastPost.content = text.replace("\n", " ");
     cy.task('pushValue', { name: 'lastPost', value: lastPost })
