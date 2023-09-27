@@ -51,6 +51,18 @@ in `backend/.env`.
 
 Start Neo4J and confirm the database is running at [http://localhost:7474](http://localhost:7474).
 
+## Operations on Neo4j
+
+### Import Neo4j Dump Locally in Docker
+
+To import a dump into Neo4j running in a Docker container:
+
+- we need to set `command: ["tail", "-f", "/dev/null"]` in the Neo4j block of `docker-compose.yml` on top level so the Neo4j database is in maintenance mode
+- copy the dump into the running Docker container: `docker cp /path/to/dump <docker-image>:/existing-directory-in-docker/`
+- connect to the Docker containers Neo4j terminal: `docker exec -it neo4j bash`
+- to load the dump into the database we need the following command in this terminal: `neo4j-admin load --expand-commands --database=graph.db --from /backups/neo4j-dump --force`
+- leave the terminal by entering: `exit`
+
 ## Commands
 
 Here we describe some rarely used Cypher commands for Neo4j that are needed from time to time:
