@@ -1,7 +1,7 @@
 ##################################################################################
 # BASE (Is pushed to DockerHub for rebranding) ###################################
 ##################################################################################
-FROM node:20.7.0-alpine3.17 as base
+FROM node:20.2.0-alpine3.17 as base
 
 # ENVs
 ## DOCKER_WORKDIR would be a classical ARG, but that is not multi layer persistent - shame
@@ -22,11 +22,11 @@ ENV PORT="3000"
 
 # Labels
 LABEL org.label-schema.build-date="${BUILD_DATE}"
-LABEL org.label-schema.name="ocelot.social:backend"
+LABEL org.label-schema.name="ocelot.social:webapp"
 LABEL org.label-schema.description="Web Frontend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
 LABEL org.label-schema.url="https://ocelot.social"
-LABEL org.label-schema.vcs-url="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/backend"
+LABEL org.label-schema.vcs-url="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/webapp"
 LABEL org.label-schema.vcs-ref="${BUILD_COMMIT}"
 LABEL org.label-schema.vendor="ocelot.social Community"
 LABEL org.label-schema.version="${BUILD_VERSION}"
