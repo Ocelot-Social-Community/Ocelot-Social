@@ -328,9 +328,9 @@ export default {
     eventInput() {
       if (this.createEvent) {
         return {
-          eventStart: new Date(this.formData.eventStart).toISOString(),
+          eventStart: this.formData.eventStart,
           eventVenue: this.formData.eventVenue,
-          eventEnd: this.formData.eventEnd ? new Date(this.formData.eventEnd).toISOString() : null,
+          eventEnd: this.formData.eventEnd,
           eventIsOnline: this.formData.eventIsOnline,
           eventLocationName: !this.formData.eventIsOnline ? this.formData.eventLocationName : null,
         }
