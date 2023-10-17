@@ -29,7 +29,7 @@ export async function up(next) {
       await transaction.run(`
         MATCH (e:Event { id: '${id}' })
         SET e.eventStart = '${eventStart}'
-        SET (CASE WHEN e.eventEnd THEN e END).eventEnd = '${eventEnd}'
+        SET (CASE WHEN exists(e.eventEnd) THEN e END).eventEnd = '${eventEnd}'
         RETURN e
       `)
     }
