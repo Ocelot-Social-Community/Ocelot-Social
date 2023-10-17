@@ -787,9 +787,9 @@
     "viewEvent": {
       "eventEnd": "Ende",
       "eventIsOnline": "Online",
-      "eventLocationName": "Stadt — z.B. Musterstraße 1, 12345 Musterstadt",
+      "eventLocationName": "Adresse für Navi — z.B. Musterstraße 1, 12345 Musterstadt",
       "eventStart": "Beginn",
-      "eventVenue": "Veranstaltungsort — z.B. Hinterhof, 1. OG, …",
+      "eventVenue": "Ortsbeschreibung — z.B. Hinterhof, 1. OG, …",
       "title": "Veranstaltung"
     },
     "viewPost": {
