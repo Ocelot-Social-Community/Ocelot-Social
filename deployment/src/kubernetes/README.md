@@ -9,7 +9,7 @@ Please contact us if you are interested in options not listed below.
 
 Managed Kubernetes:
 
-- [DigitalOcean](/deployment/kubernetes/DigitalOcean.md)
+- [DigitalOcean](/deployment/src/kubernetes/DigitalOcean.md)
 
 ## Configuration
 

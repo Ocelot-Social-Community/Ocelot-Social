@@ -75,7 +75,7 @@ The IPs of the DigitalOcean machines are not necessarily stable, so the cluster'
 
 ## Deploy
 
-Yeah, you're done here. Back to [Deployment with Helm for Kubernetes](/deployment/kubernetes/README.md).
+Yeah, you're done here. Back to [Deployment with Helm for Kubernetes](/deployment/src/kubernetes/README.md).
 
 ## Backups On DigitalOcean
 
