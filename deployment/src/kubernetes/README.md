@@ -46,7 +46,7 @@ Please have a look here:
 
 - [Installing with Helm](https://cert-manager.io/docs/installation/helm/#installing-with-helm)
 
-Our Helm installation is optimized for cert-manager version `v1.9.1` and `kubectl` version `"v1.24.2`.
+Our Helm installation is optimized for cert-manager version `v1.13.1` and `kubectl` version `"v1.28.2`.
 
 Please search here for cert-manager versions that are compatible with your `kubectl` version on the cluster and on the client: [cert-manager Supported Releases](https://cert-manager.io/docs/installation/supported-releases/#supported-releases).
 
