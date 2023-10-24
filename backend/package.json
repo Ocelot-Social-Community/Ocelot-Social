@@ -10,7 +10,7 @@
   "scripts": {
     "__migrate": "migrate --compiler 'ts:./src/db/compiler.ts' --migrations-dir ./src/db/migrations",
     "prod:migrate": "migrate --compiler 'ts:./src/db/compiler.ts' --migrations-dir ./src/db/migrations --store ./src/db/migrate/store.ts",
-    "start": "node build/src/",
+    "start": "ts-node src/",
     "build": "tsc && ./scripts/build.copy.files.sh",
     "dev": "nodemon --exec ts-node src/ -e js,ts,gql",
     "dev:debug": "nodemon --exec babel-node --inspect=0.0.0.0:9229 src/ -e js,ts,gql",
