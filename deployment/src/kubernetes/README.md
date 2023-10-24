@@ -190,10 +190,22 @@ All commands for ocelot need to be executed in the kubernetes folder. Therefore 
 Only run once for the first time of installation:
 
 ```bash
+# in configuration/<deployment-name>
+
 # kubeconfig.yaml set globaly
-$ helm install ocelot ./
+helm install ocelot \
+  --values ./kubernetes/values.yaml \
+  --set appVersion="latest" \
+  ../../src/kubernetes/ \
+  --timeout 10m
+
 # or kubeconfig.yaml in your repo, then adjust
-$ helm --kubeconfig=/../kubeconfig.yaml install ocelot ./
+helm install ocelot \
+  --kubeconfig ./kubeconfig.yaml \
+  --values ./kubernetes/values.yaml \
+  --set appVersion="latest" \
+  ../../src/kubernetes/ \
+  --timeout 10m
 ```
 
 #### Upgrade & Update
@@ -201,10 +213,24 @@ $ helm --kubeconfig=/../kubeconfig.yaml install ocelot ./
 Run for all upgrades and updates:
 
 ```bash
+# !!! untested for now for new deployment structure !!!
+
+# in configuration/<deployment-name>
+
 # kubeconfig.yaml set globaly
-$ helm upgrade ocelot ./
+helm upgrade ocelot \
+  --values ./kubernetes/values.yaml \
+  --set appVersion="latest" \
+  ../../src/kubernetes/ \
+  --timeout 10m
+
 # or kubeconfig.yaml in your repo, then adjust
-$ helm --kubeconfig=/../kubeconfig.yaml upgrade ocelot ./
+helm upgrade ocelot \
+  --kubeconfig ./kubeconfig.yaml \
+  --values ./kubernetes/values.yaml \
+  --set appVersion="latest" \
+  ../../src/kubernetes/ \
+  --timeout 10m
 ```
 
 #### Rollback
@@ -212,10 +238,17 @@ $ helm --kubeconfig=/../kubeconfig.yaml upgrade ocelot ./
 Run for a rollback, in case something went wrong:
 
 ```bash
+# !!! untested for now for new deployment structure !!!
+
+# in configuration/<deployment-name>
+
 # kubeconfig.yaml set globaly
-$ helm rollback ocelot
+helm rollback ocelot --timeout 10m
+
 # or kubeconfig.yaml in your repo, then adjust
-$ helm --kubeconfig=/../kubeconfig.yaml rollback ocelot
+helm rollback ocelot \
+  --kubeconfig ./kubeconfig.yaml \
+  --timeout 10m
 ```
 
 #### Uninstall
@@ -223,10 +256,17 @@ $ helm --kubeconfig=/../kubeconfig.yaml rollback ocelot
 Be aware that if you uninstall ocelot the formerly bound volumes become unbound. Those volumes contain all data from uploads and database. You have to manually free their reference in order to bind them again when reinstalling. Once unbound from their former container references they should automatically be rebound (considering the sizes did not change)
 
 ```bash
+# !!! untested for now for new deployment structure !!!
+
+# in configuration/<deployment-name>
+
 # kubeconfig.yaml set globaly
-$ helm uninstall ocelot
+helm uninstall ocelot --timeout 10m
+
 # or kubeconfig.yaml in your repo, then adjust
-$ helm --kubeconfig=/../kubeconfig.yaml uninstall ocelot
+helm uninstall ocelot \
+  --kubeconfig ./kubeconfig.yaml \
+  --timeout 10m
 ```
 
 ## Backups
