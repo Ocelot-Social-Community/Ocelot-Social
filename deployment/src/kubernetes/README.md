@@ -52,23 +52,14 @@ Please search here for cert-manager versions that are compatible with your `kube
 
 ***ATTENTION:*** *When uninstalling cert-manager, be sure to use the same method as for installation! Otherwise, we could end up in a broken state, see [Uninstall](https://cert-manager.io/docs/installation/kubectl/#uninstalling).*
 
-<!-- #### 1. Create Namespace
-
-```bash
-# kubeconfig.yaml set globaly
-$ kubectl create namespace cert-manager
-# or kubeconfig.yaml in your repo, then adjust
-$ kubectl --kubeconfig=/../kubeconfig.yaml create namespace cert-manager
-```
-
-#### 2. Add Helm repository and update
+<!-- #### 1. Add Helm repository and update
 
 ```bash
 $ helm repo add jetstack https://charts.jetstack.io
 $ helm repo update
 ```
 
-#### 3. Install Cert-Manager Helm chart
+#### 2. Install Cert-Manager Helm chart
 
 ```bash
 # option 1
@@ -76,16 +67,24 @@ $ helm repo update
 # $ kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.crds.yaml
 
 # option 2
+# !!! untested for now for new deployment structure !!!
+
+# in configuration/<deployment-name>
+
 # kubeconfig.yaml set globaly
-$ helm install cert-manager jetstack/cert-manager \
+$ helm install \
+  cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-  --version v1.9.1 \
+  --create-namespace \
+  --version v1.13.1 \
   --set installCRDs=true
 # or kubeconfig.yaml in your repo, then adjust
-$ helm --kubeconfig=/../kubeconfig.yaml \
-  install cert-manager jetstack/cert-manager \
+$ helm install \
+  cert-manager jetstack/cert-manager \
+  --kubeconfig ./kubeconfig.yaml \
   --namespace cert-manager \
-  --version v1.9.1 \
+  --create-namespace \
+  --version v1.13.1 \
   --set installCRDs=true
 ``` -->
 
