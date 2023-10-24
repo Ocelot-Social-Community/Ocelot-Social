@@ -168,7 +168,7 @@ $ yarn run db:reset
 {% endtab %}
 {% endtabs %}
 
-#### Totally Reset and Setup Initial Production or Seeding in Database
+#### Full Reset, Including Migrations, and Setup of Initial Production or Demo Seeding Data
 
 There are cases where we need to completely reset the database, including migrations, and reinitialize it for production or set it up for development:
 
@@ -176,7 +176,6 @@ There are cases where we need to completely reset the database, including migrat
 # resetting the database, skipping migrations
 # in backend/ while database is running
 $ yarn run db:reset
-
 
 # run in Neo4j Cypher shell
 # drop all indexes and constraints
