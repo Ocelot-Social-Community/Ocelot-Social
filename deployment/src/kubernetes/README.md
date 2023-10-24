@@ -100,10 +100,15 @@ $ helm repo update
 #### 2. Install ingress-nginx
 
 ```bash
+# in configuration/<deployment-name>
+
 # kubeconfig.yaml set globaly
-$ helm install ingress-nginx ingress-nginx/ingress-nginx -f nginx.values.yaml
+helm install ingress-nginx ingress-nginx/ingress-nginx -f ../../src/kubernetes/nginx.values.yaml
+
 # or kubeconfig.yaml in your repo, then adjust
-$ helm --kubeconfig=/../kubeconfig.yaml install ingress-nginx ingress-nginx/ingress-nginx -f nginx.values.yaml
+helm install \
+  ingress-nginx ingress-nginx/ingress-nginx -f ../../src/kubernetes/nginx.values.yaml \
+  --kubeconfig ./kubeconfig.yaml
 ```
 
 ### DigitalOcean Firewall
@@ -157,6 +162,8 @@ $ doctl compute firewall get <ID> --context <context-name>
 ```
 
 ### DNS
+
+***ATTENTION:** This seems not to work at all so we leave it away at the moment*
 
 ***TODO:** I thought this is necessary if we use the DigitalOcean DNS management service? See [Manage DNS With DigitalOcean](/deployment/kubernetes/DigitalOcean.md#manage-dns-with-digitalocean)*
 
