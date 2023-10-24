@@ -131,6 +131,7 @@ In another terminal run:
 
 ```bash
 # in main folder while docker-compose is running
+$ docker exec backend yarn run db:reset
 $ docker exec backend yarn run db:seed
 ```
 
@@ -166,6 +167,32 @@ $ yarn run db:reset
 
 {% endtab %}
 {% endtabs %}
+
+#### Totally Reset and Setup Initial Production or Seeding in Database
+
+There are cases where we need to completely reset the database, including migrations, and reinitialize it for production or set it up for development:
+
+```bash
+# resetting the database, skipping migrations
+# in backend/ while database is running
+$ yarn run db:reset
+
+
+# run in Neo4j Cypher shell
+# drop all indexes and constraints
+cypher-shell > CALL apoc.schema.assert({},{},true) YIELD label, key RETURN * ;
+
+# delete all migrations
+cypher-shell > MATCH (n:Migration) DETACH DELETE n RETURN n;
+
+# run this command to setting up your database indexes and constraints plus creating initial admin account
+$ yarn prod:migrate init
+$ yarn run db:migrate up
+
+# if needed delete initial admin account and seeding demo data
+$ yarn run db:reset
+$ yarn run db:seed
+```
 
 ### Data migrations
 
