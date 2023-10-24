@@ -44,7 +44,7 @@
     "bcryptjs": "^2.4.3",
     "cross-env": "^7.0.3",
     "cucumber": "^6.0.5",
-    "cypress": "^13.2.0",
+    "cypress": "^13.3.1",
     "cypress-network-idle": "^1.14.2",
     "date-fns": "^2.25.0",
     "dotenv": "^16.3.1",
