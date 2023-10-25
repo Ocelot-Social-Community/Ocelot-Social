@@ -12,8 +12,7 @@ docker-compose*.yml
 ./*.log
 
 node_modules/
-scripts/
-dist/
+build/
 
 maintenance-worker/
 neo4j/

@@ -1,7 +1,7 @@
 <template>
   <nuxt-link
     class="group-teaser"
-    :to="{ name: 'group-id-slug', params: { id: group.id, slug: group.slug } }"
+    :to="{ name: 'groups-id-slug', params: { id: group.id, slug: group.slug } }"
   >
     <base-card
       :class="{

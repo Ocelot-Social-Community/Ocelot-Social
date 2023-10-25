@@ -1,22 +1,16 @@
-import Factory from '../../backend/src/db/factories'
-import { getNeode } from '../../backend/src/db/neo4j'
+import Factory from '../../backend/build/src/db/factories'
+import { getNeode } from '../../backend/build/src/db/neo4j'
 
+const neodeInstance = getNeode()
 
-const neo4jConfigs = {
-  uri: Cypress.env('NEO4J_URI'),
-  username: Cypress.env('NEO4J_USERNAME'),
-  password: Cypress.env('NEO4J_PASSWORD')
-}
-const neodeInstance = getNeode(neo4jConfigs)
-
-beforeEach(() => cy.then(() => neodeInstance.cypher('MATCH (everything) DETACH DELETE everything;')))
+beforeEach(() => cy.then(() => neodeInstance.writeCypher('MATCH (everything) DETACH DELETE everything;')))
 
 Cypress.Commands.add('neode', () => {
   return neodeInstance
 })
 
 Cypress.Commands.add(
-  'first',
+  'firstOf',
   { prevSubject: true },
   (neode, model, properties) => {
     return neode.first(model, properties)

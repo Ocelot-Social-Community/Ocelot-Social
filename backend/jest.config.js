@@ -1,14 +1,19 @@
 module.exports = {
   verbose: true,
+  preset: 'ts-jest',
   collectCoverage: true,
   collectCoverageFrom: [
-    '**/*.js',
+    '**/*.ts',
     '!**/node_modules/**',
     '!**/test/**',
-    '!**/dist/**',
-    '!**/src/**/?(*.)+(spec|test).js?(x)'
+    '!**/build/**',
+    '!**/src/**/?(*.)+(spec|test).ts?(x)'
   ],
-  coverageReporters: ['lcov', 'text'],
-  testMatch: ['**/src/**/?(*.)+(spec|test).js?(x)'],
-  setupFilesAfterEnv: ['<rootDir>/test/setup.js']
+  coverageThreshold: {
+    global: {
+      lines: 67,
+    },
+  },
+  testMatch: ['**/src/**/?(*.)+(spec|test).ts?(x)'],
+  setupFilesAfterEnv: ['<rootDir>/test/setup.ts']
 }

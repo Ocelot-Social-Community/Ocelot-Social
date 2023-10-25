@@ -90,6 +90,9 @@ $background-color-primary-inverse: rgb(241, 253, 244);
 $background-color-secondary: rgb(0, 142, 230);
 $background-color-secondary-active: rgb(10, 161, 255);
 $background-color-secondary-inverse: rgb(240, 249, 255);
+$background-color-third: rgb(126, 82, 204);
+$background-color-third-active: rgb(160, 103, 255);
+$background-color-third-inverse: rgb(239, 230, 255);
 $background-color-success: rgb(23, 181, 63);
 $background-color-success-active: rgb(26, 203, 71);
 $background-color-success-inverse: rgb(241, 253, 244);
@@ -336,10 +339,12 @@ $ease-in-sharp: cubic-bezier(0.895, 0.03, 0.685, 0.22);
  */
 
 $z-index-modal: 9999;
+$z-index-overlay: 9000;
 $z-index-dropdown: 8888;
 $z-index-page-submenu: 2500;
 $z-index-page-header: 2000;
 $z-index-page-sidebar: 1500;
+$z-index-sticky-float: 150;
 $z-index-sticky: 100;
 $z-index-post-teaser-link: 5;
 $z-index-surface: 1;
@@ -393,3 +398,27 @@ $color-toast-orange: $color-warning;
 $color-toast-yellow: $color-yellow;
 $color-toast-blue: $color-secondary;
 $color-toast-green: $color-success;
+
+/**
+ * @tokens Ribbon Color
+ */
+
+$color-ribbon-event: $background-color-third;
+$color-ribbon-event-active: $background-color-third-active;
+$color-ribbon-article: $background-color-secondary;
+$color-ribbon-article-active: $background-color-secondary-active;
+
+/**
+ * @tokens Chat Color
+ */
+
+$chat-message-bg-me: $color-primary-light;
+$chat-message-color: $text-color-base;
+$chat-message-bg-others: $color-neutral-80;
+$chat-sidemenu-bg: $color-secondary-active;
+$chat-new-message-color: $color-secondary-active;
+$chat-message-timestamp: $text-color-soft;
+$chat-message-checkmark-seen: $text-color-secondary;
+$chat-message-checkmark: $text-color-soft;
+$chat-room-color-counter-badge: $text-color-inverse;
+$chat-room-background-counter-badge: $color-secondary;

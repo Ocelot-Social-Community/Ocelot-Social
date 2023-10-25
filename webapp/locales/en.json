@@ -6,7 +6,8 @@
     "edit": "Edit",
     "loading": "loading",
     "loadMore": "load more",
-    "save": "Save"
+    "save": "Save",
+    "saveCategories": "Save topics"
   },
   "admin": {
     "categories": {
@@ -77,6 +78,28 @@
       }
     }
   },
+  "chat": {
+    "addRoomHeadline": "Search User for new Chat",
+    "cancelSelectMessage": "Cancel",
+    "conversationStarted": "Conversation started on:",
+    "isOnline": "is online",
+    "isTyping": "is writing...",
+    "lastSeen": "last seen ",
+    "messageDeleted": "This message was deleted",
+    "messagesEmpty": "No messages",
+    "newMessages": "New Messages",
+    "page": {
+      "headline": "Chat"
+    },
+    "roomEmpty": "No room selected",
+    "roomsEmpty": "No rooms",
+    "search": "Filter chat rooms",
+    "typeMessage": "Type message",
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chat with “{name}”"
+    }
+  },
   "client-only": {
     "loading": "Loading …"
   },
@@ -115,11 +138,20 @@
     "validations": {
       "categories": "at least one and at most three topics must be selected",
       "email": "must be a valid e-mail address",
+      "eventLocationNameLength": "minimum {min} or maximum {max} characters",
+      "eventLocationNameNotEmpty": "only empty characters are not allowed",
+      "eventVenueLength": "minimum {min} or maximum {max} characters",
+      "eventVenueNotEmpty": "only empty characters are not allowed",
       "url": "must be a valid URL"
     },
     "versus": "Versus"
   },
   "components": {
+    "dateTimeRange": {
+      "hourMinute": "HH:mm",
+      "monthDay": "MM/dd/",
+      "yearMonthDay": "MM/dd/yyyy"
+    },
     "password-reset": {
       "change-password": {
         "error": "Changing your password failed. Maybe the security code was not correct?",
@@ -267,17 +299,20 @@
       "happy": "Happy",
       "surprised": "Surprised"
     },
-    "filterFollow": "Filter contributions from users I follow",
+    "filterFollow": "Users I follow",
     "filterMasonryGrid": {
       "myFriends": "Users I follow",
       "myGroups": "By my groups",
       "myTopics": "My topics",
-      "noFilter": "Filter posts"
+      "noFilter": "Filter content",
+      "onlyArticles": "Articles",
+      "onlyEvents": "Events"
     },
-    "filterMyGroups": "Contributions in my groups",
+    "filterMyGroups": "My groups",
     "inappropriatePicture": "This image may be inappropriate for some people.",
     "languageSelectLabel": "Language of your contribution",
     "languageSelectText": "Select Language",
+    "newEvent": "Create a new Event",
     "newPost": "Create a new Post",
     "success": "Saved!",
     "teaserImage": {
@@ -377,17 +412,41 @@
   },
   "filter-menu": {
     "all": "All",
+    "article": "Article",
     "categories": "Topics",
+    "creationDate": "Creation date",
     "deleteFilter": "Delete filter",
     "emotions": "Emotions",
+    "ended": {
+      "all": {
+        "hint": "Show all, also ended",
+        "label": "All"
+      },
+      "onlyEnded": {
+        "hint": "Show only not ended",
+        "label": "Not ended"
+      }
+    },
+    "event": "Event",
+    "eventsBy": "Events – show ...",
+    "eventsEnded": "Ended",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
+    "following-title": "Sources",
     "languages": "Languages",
     "my-groups": "My groups",
     "order": {
+      "last": {
+        "hint": "Sort posts by the last first",
+        "label": "Last first"
+      },
       "newest": {
         "hint": "Sort posts by the newest first",
         "label": "Newest first"
+      },
+      "next": {
+        "hint": "Sort posts by the next first",
+        "label": "Next first"
       },
       "oldest": {
         "hint": "Sort posts by the oldest first",
@@ -395,10 +454,12 @@
       }
     },
     "order-by": "Order by ...",
+    "post-type": "Content type",
     "save": {
       "error": "Failed saving topic settings!",
       "success": "Topics saved!"
-    }
+    },
+    "startDate": "Start date"
   },
   "followButton": {
     "follow": "Follow",
@@ -417,7 +478,7 @@
     "addMemberToGroupSuccess": "“{name}” was added to the group with the role “{role}”!",
     "addUser": "Add User",
     "addUserNoOptions": "No users found!",
-    "addUserPlaceholder": " Username",
+    "addUserPlaceholder": "User name",
     "allGroups": "All Groups",
     "button": {
       "tooltip": "Show groups"
@@ -510,8 +571,14 @@
   },
   "header": {
     "avatarMenu": {
-      "Groups": "Groups",
+      "button": {
+        "tooltip": "My profile"
+      },
+      "groups": "Groups",
       "myProfile": "My profile"
+    },
+    "chat": {
+      "tooltip": "My chats"
     }
   },
   "index": {
@@ -520,12 +587,15 @@
   },
   "invite-codes": {
     "button": {
-      "tooltip": "Invite your friends"
+      "tooltip": "Invite friends"
     },
     "copy-code": "Copy Invite Link",
     "copy-success": "Invite code copied to clipboard",
     "not-available": "You have no valid invite code available!",
     "your-code": "Send this link per e-mail or in social media to invite your friends:"
+  },
+  "localeSwitch": {
+    "tooltip": "Choose language"
   },
   "login": {
     "email": "Your E-mail",
@@ -552,9 +622,16 @@
     "button": {
       "tooltip": "Show map"
     },
+    "legend": {
+      "event": "Event",
+      "group": "Group",
+      "theUser": "My position",
+      "user": "User"
+    },
     "markerTypes": {
+      "event": "event",
       "group": "group",
-      "theUser": "your position",
+      "theUser": "my position",
       "user": "user"
     },
     "pageTitle": "Map",
@@ -648,6 +725,9 @@
       "unread": "Unread"
     },
     "group": "Description",
+    "headerMenuButton": {
+      "tooltip": "My notifications"
+    },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
     "post": "Post or Group",
@@ -663,11 +743,6 @@
     "title": "Notifications",
     "user": "User"
   },
-  "position": {
-    "group": "Group",
-    "my": "My position",
-    "user": "User"
-  },
   "post": {
     "comment": {
       "reply": "Reply",
@@ -675,19 +750,27 @@
       "submitted": "Comment submitted!",
       "updated": "Changes saved!"
     },
+    "createNewEvent": {
+      "forGroup": {
+        "title": "For The Group “{name}”"
+      },
+      "title": "Create an Event"
+    },
     "createNewPost": {
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Create A New Post"
+      "title": "Create an Article"
     },
     "edited": "edited",
     "editPost": {
+      "event": "Edit Your Event",
       "forGroup": {
         "title": "For The Group “{name}”"
       },
       "title": "Edit Your Post"
     },
+    "event": "Event",
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
@@ -696,10 +779,18 @@
       "unpin": "Unpin post",
       "unpinnedSuccessfully": "Post unpinned successfully!"
     },
-    "name": "Post",
+    "name": "Article",
     "pinned": "Announcement",
     "takeAction": {
       "name": "Take action"
+    },
+    "viewEvent": {
+      "eventEnd": "End",
+      "eventIsOnline": "Online",
+      "eventLocationName": "City — e.g. Example Street 1, 12345 City",
+      "eventStart": "Start",
+      "eventVenue": "Venue — e.g. Backyard, 1st Floor, …",
+      "title": "Event"
     },
     "viewPost": {
       "forGroup": {
@@ -816,7 +907,7 @@
       "Tag": "Hashtag ::: Hashtags",
       "User": "User ::: Users"
     },
-    "hint": "What are you searching for? Use !… for posts, @… for users, &… for groups, #… for hashtags.",
+    "hint": "!... searches posts, @... searches users, &... searches groups, #… searches hashtags",
     "no-results": "No results found for \"{search}\". Try a different search term!",
     "page": "Page",
     "placeholder": "Search",

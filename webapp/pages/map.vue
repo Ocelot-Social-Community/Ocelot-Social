@@ -5,16 +5,15 @@
       <ds-heading tag="h1">{{ $t('map.pageTitle') }}</ds-heading>
       <small>
         <div>
-          <img
-            alt="my position"
-            src="/img/mapbox/marker-icons/mapbox-marker-icon-orange.svg"
-            width="15"
-          />
-          {{ $t('position.my') }}
-          <img alt="user" src="/img/mapbox/marker-icons/mapbox-marker-icon-green.svg" width="15" />
-          {{ $t('position.user') }}
-          <img alt="group" src="/img/mapbox/marker-icons/mapbox-marker-icon-blue.svg" width="15" />
-          {{ $t('position.group') }}
+          <span v-for="type in markers.types" :key="type.id">
+            <img
+              :alt="$t('map.legend.' + type.id)"
+              :src="'/img/mapbox/marker-icons/' + type.icon.legendName"
+              width="15"
+            />
+            {{ $t('map.legend.' + type.id) }}
+            &nbsp;&nbsp;
+          </span>
         </div>
       </small>
     </ds-space>
@@ -66,6 +65,7 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import { mapGetters } from 'vuex'
 import { profileUserQuery, mapUserQuery } from '~/graphql/User'
 import { groupQuery } from '~/graphql/groups'
+import { filterPosts } from '~/graphql/PostQuery.js'
 import mobile from '~/mixins/mobile'
 import Empty from '~/components/Empty/Empty'
 import MapStylesButtons from '~/components/Map/MapStylesButtons'
@@ -95,19 +95,40 @@ export default {
       currentUserCoordinates: null,
       users: null,
       groups: null,
+      posts: null,
       markers: {
-        icons: [
+        types: [
           {
-            id: 'marker-blue',
-            name: 'mapbox-marker-icon-20px-blue.png',
+            id: 'theUser',
+            icon: {
+              id: 'marker-orange',
+              legendName: 'mapbox-marker-icon-orange.svg',
+              mapName: 'mapbox-marker-icon-20px-orange.png',
+            },
           },
           {
-            id: 'marker-orange',
-            name: 'mapbox-marker-icon-20px-orange.png',
+            id: 'user',
+            icon: {
+              id: 'marker-green',
+              legendName: 'mapbox-marker-icon-green.svg',
+              mapName: 'mapbox-marker-icon-20px-green.png',
+            },
           },
           {
-            id: 'marker-green',
-            name: 'mapbox-marker-icon-20px-green.png',
+            id: 'group',
+            icon: {
+              id: 'marker-red',
+              legendName: 'mapbox-marker-icon-red.svg',
+              mapName: 'mapbox-marker-icon-20px-red.png',
+            },
+          },
+          {
+            id: 'event',
+            icon: {
+              id: 'marker-purple',
+              legendName: 'mapbox-marker-icon-purple.svg',
+              mapName: 'mapbox-marker-icon-20px-purple.png',
+            },
           },
         ],
         isImagesLoaded: false,
@@ -137,7 +158,8 @@ export default {
         this.markers.isImagesLoaded &&
         this.currentUser &&
         this.users &&
-        this.groups
+        this.groups &&
+        this.posts
       )
     },
     styles() {
@@ -236,17 +258,27 @@ export default {
 
         // Copy coordinates array.
         const coordinates = e.features[0].geometry.coordinates.slice()
-        const markerTypeLabel =
-          e.features[0].properties.type === 'group'
-            ? this.$t('map.markerTypes.group')
-            : e.features[0].properties.type === 'user'
-            ? this.$t('map.markerTypes.user')
-            : this.$t('map.markerTypes.theUser')
-        const markerProfileLinkTitle =
-          (e.features[0].properties.type === 'group' ? '&' : '@') + e.features[0].properties.slug
-        const markerProfileLink =
-          (e.features[0].properties.type === 'group' ? '/group' : '/profile') +
-          `/${e.features[0].properties.id}/${e.features[0].properties.slug}`
+        const markerTypeLabel = this.$t(`map.markerTypes.${e.features[0].properties.type}`)
+        const markerProfile = {
+          theUser: {
+            linkTitle: '@' + e.features[0].properties.slug,
+            link: `/profile/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
+          },
+          user: {
+            linkTitle: '@' + e.features[0].properties.slug,
+            link: `/profile/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
+          },
+          group: {
+            linkTitle: '&' + e.features[0].properties.slug,
+            link: `/groups/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
+          },
+          event: {
+            linkTitle: e.features[0].properties.slug,
+            link: `/post/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
+          },
+        }
+        const markerProfileLinkTitle = markerProfile[e.features[0].properties.type].linkTitle
+        const markerProfileLink = markerProfile[e.features[0].properties.type].link
         let description = `
           <div>
             <div>
@@ -258,11 +290,11 @@ export default {
           </div>
            `
         description +=
-          e.features[0].properties.about && e.features[0].properties.about.length > 0
+          e.features[0].properties.description && e.features[0].properties.description.length > 0
             ? `
             <hr>
             <div>
-              ${e.features[0].properties.about}
+              ${e.features[0].properties.description}
             </div>`
             : ''
 
@@ -305,15 +337,18 @@ export default {
     },
     loadMarkersIconsAndAddMarkers() {
       Promise.all(
-        this.markers.icons.map(
+        this.markers.types.map(
           (marker) =>
             new Promise((resolve, reject) => {
               // our images have to be in the 'static/img/*' folder otherwise they are not reachable via URL
-              this.map.loadImage('img/mapbox/marker-icons/' + marker.name, (error, image) => {
-                if (error) throw error
-                this.map.addImage(marker.id, image)
-                resolve()
-              })
+              this.map.loadImage(
+                'img/mapbox/marker-icons/' + marker.icon.mapName,
+                (error, image) => {
+                  if (error) throw error
+                  this.map.addImage(marker.icon.id, image)
+                  resolve()
+                },
+              )
             }),
         ),
       ).then(() => {
@@ -337,32 +372,11 @@ export default {
                 id: user.id,
                 slug: user.slug,
                 name: user.name,
-                about: user.about ? user.about : undefined,
+                description: user.about ? user.about : undefined,
               },
               geometry: {
                 type: 'Point',
                 coordinates: this.getCoordinates(user.location),
-              },
-            })
-          }
-        })
-        // add markers for "groups"
-        this.groups.forEach((group) => {
-          if (group.location) {
-            this.markers.geoJSON.push({
-              type: 'Feature',
-              properties: {
-                type: 'group',
-                iconName: 'marker-blue',
-                iconRotate: 0.0,
-                id: group.id,
-                slug: group.slug,
-                name: group.name,
-                about: group.about ? group.about : undefined,
-              },
-              geometry: {
-                type: 'Point',
-                coordinates: this.getCoordinates(group.location),
               },
             })
           }
@@ -378,7 +392,7 @@ export default {
               id: this.currentUser.id,
               slug: this.currentUser.slug,
               name: this.currentUser.name,
-              about: this.currentUser.about ? this.currentUser.about : undefined,
+              description: this.currentUser.about ? this.currentUser.about : undefined,
             },
             geometry: {
               type: 'Point',
@@ -386,6 +400,48 @@ export default {
             },
           })
         }
+        // add markers for "groups"
+        this.groups.forEach((group) => {
+          if (group.location) {
+            this.markers.geoJSON.push({
+              type: 'Feature',
+              properties: {
+                type: 'group',
+                iconName: 'marker-red',
+                iconRotate: 0.0,
+                id: group.id,
+                slug: group.slug,
+                name: group.name,
+                description: group.about ? group.about : undefined,
+              },
+              geometry: {
+                type: 'Point',
+                coordinates: this.getCoordinates(group.location),
+              },
+            })
+          }
+        })
+        // add markers for "posts", post type "Event" with location coordinates
+        this.posts.forEach((post) => {
+          if (post.postType.includes('Event') && post.eventLocation) {
+            this.markers.geoJSON.push({
+              type: 'Feature',
+              properties: {
+                type: 'event',
+                iconName: 'marker-purple',
+                iconRotate: 0.0,
+                id: post.id,
+                slug: post.slug,
+                name: post.title,
+                description: post.contentExcerpt,
+              },
+              geometry: {
+                type: 'Point',
+                coordinates: this.getCoordinates(post.eventLocation),
+              },
+            })
+          }
+        })
 
         this.markers.isGeoJSON = true
       }
@@ -480,6 +536,24 @@ export default {
       update({ Group }) {
         this.groups = Group
         this.addMarkersOnCheckPrepared()
+      },
+      fetchPolicy: 'cache-and-network',
+    },
+    Post: {
+      query() {
+        return filterPosts(this.$i18n)
+      },
+      variables() {
+        return {
+          filter: {
+            postType_in: ['Event'],
+            eventStart_gte: new Date(),
+            // would be good to just query for events with defined "eventLocation". couldn't get it working
+          },
+        }
+      },
+      update({ Post }) {
+        this.posts = Post
       },
       fetchPolicy: 'cache-and-network',
     },

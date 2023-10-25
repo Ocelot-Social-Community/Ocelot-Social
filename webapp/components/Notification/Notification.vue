@@ -9,7 +9,7 @@
     <p class="description">{{ $t(`notifications.reason.${notification.reason}`) }}</p>
     <nuxt-link
       class="link"
-      :to="{ name: isGroup ? 'group-id-slug' : 'post-id-slug', params, hashParam }"
+      :to="{ name: isGroup ? 'groups-id-slug' : 'post-id-slug', params, ...hashParam }"
       @click.native="$emit('read')"
     >
       <base-card wideContent>

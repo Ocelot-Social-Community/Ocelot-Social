@@ -1,0 +1,13 @@
+backend: &backend
+  - '.github/workflows/test-backend.yml'
+  - 'backend/**/*'
+  - 'neo4j/**/*'
+  - 'package.json'
+
+docker: &docker
+  - 'docker-compose.*'
+
+webapp: &webapp
+  - '.github/workflows/test-webapp.yml'
+  - 'webapp/**/*'
+  - 'package.json'

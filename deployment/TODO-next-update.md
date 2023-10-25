@@ -1,8 +1,21 @@
 # Todo For Next Update
 
-When you overtake this deploy and rebrand repo to your network you have to recognize the following changes and doings:
+When you introduce a new version and branding and deploy it on your network, you need to consider the following changes and actions:
 
-## Version >= 2.4.0 with 'ocelotDockerVersionTag' 2.4.0-XXX
+## Version >= 3.3.0 with 'ocelotDockerVersionTag' 3.3.0-XXX
+
+- We have the new option to configure DKIM for sent e-mails in environment variables (`.env` or `values.yaml`), see [deployment-values.md](deployment-values.md):
+  - `SMTP_DKIM_DOMAINNAME=`
+  - `SMTP_DKIM_KEYSELECTOR=`
+  - `SMTP_DKIM_PRIVATKEY=`
+
+## Version >= 2.7.0 with 'ocelotDockerVersionTag' 2.7.0-470
+
+- You have to rename all `.js` files  to `.ts` in `branding/constants`
+
+## Version >= 2.4.0 with 'ocelotDockerVersionTag' 2.4.0-298
+
+- You have to set `SHOW_CONTENT_FILTER_HEADER_MENU` and `SHOW_CONTENT_FILTER_MASONRY_GRID` in `branding/constants/filter.js` originally in main code file `webapp/constants/filter.js` to your preferred value.
 
 ### Main Code PR –  feat(webapp): map #5843
 

@@ -6,7 +6,8 @@
     "edit": "Bearbeiten",
     "loading": "wird geladen",
     "loadMore": "mehr laden",
-    "save": "Speichern"
+    "save": "Speichern",
+    "saveCategories": "Themen speichern"
   },
   "admin": {
     "categories": {
@@ -77,6 +78,28 @@
       }
     }
   },
+  "chat": {
+    "addRoomHeadline": "Suche Nutzer für neuen Chat",
+    "cancelSelectMessage": "Abbrechen",
+    "conversationStarted": "Unterhaltung startete am:",
+    "isOnline": "online",
+    "isTyping": "tippt...",
+    "lastSeen": "zuletzt gesehen ",
+    "messageDeleted": "Diese Nachricht wuerde gelöscht",
+    "messagesEmpty": "Keine Nachrichten",
+    "newMessages": "Neue Nachrichten",
+    "page": {
+      "headline": "Chat"
+    },
+    "roomEmpty": "Keinen Raum selektiert",
+    "roomsEmpty": "Keine Räume",
+    "search": "Chat-Räume filtern",
+    "typeMessage": "Nachricht schreiben",
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chatte mit „{name}“"
+    }
+  },
   "client-only": {
     "loading": "Lade …"
   },
@@ -115,11 +138,20 @@
     "validations": {
       "categories": "es müssen eine bis drei Themen ausgewählt werden",
       "email": "muss eine gültige E-Mail-Adresse sein",
+      "eventLocationNameLength": "Minimum {min}, Maximum {max} Zeichen",
+      "eventLocationNameNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
+      "eventVenueLength": "Minimum {min}, Maximum {max} Zeichen",
+      "eventVenueNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
       "url": "muss eine gültige URL sein"
     },
     "versus": "Versus"
   },
   "components": {
+    "dateTimeRange": {
+      "hourMinute": "HH:mm",
+      "monthDay": "dd.MM.",
+      "yearMonthDay": "dd.MM.yyyy"
+    },
     "password-reset": {
       "change-password": {
         "error": "Passwort Änderung fehlgeschlagen. Möglicherweise falscher Sicherheitscode?",
@@ -267,17 +299,20 @@
       "happy": "Glücklich",
       "surprised": "Erstaunt"
     },
-    "filterFollow": "Beiträge von Nutzern filtern, denen ich folge",
+    "filterFollow": "Nutzern, denen ich folge",
     "filterMasonryGrid": {
-      "myFriends": "Nutzer denen ich folge",
+      "myFriends": "Nutzer, denen ich folge",
       "myGroups": "Aus meinen Gruppen",
       "myTopics": "Meine Themen",
-      "noFilter": "Beiträge filtern"
+      "noFilter": "Inhalte filtern",
+      "onlyArticles": "Beiträge",
+      "onlyEvents": "Veranstaltungen"
     },
-    "filterMyGroups": "Beiträge in meinen Gruppen",
+    "filterMyGroups": "Meine Gruppen",
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache Deines Beitrags",
     "languageSelectText": "Sprache wählen",
+    "newEvent": "Erstelle einen neue Veranstaltung",
     "newPost": "Erstelle einen neuen Beitrag",
     "success": "Gespeichert!",
     "teaserImage": {
@@ -377,17 +412,41 @@
   },
   "filter-menu": {
     "all": "Alle",
+    "article": "Beitrag",
     "categories": "Themen",
+    "creationDate": "Erstellungszeitpunkt",
     "deleteFilter": "Filter löschen",
     "emotions": "Emotionen",
+    "ended": {
+      "all": {
+        "hint": "Zeige alle, auch zukünftige",
+        "label": "Alle"
+      },
+      "onlyEnded": {
+        "hint": "Zeige nur noch zukünftige",
+        "label": "Zukünftige"
+      }
+    },
+    "event": "Veranstaltung",
+    "eventsBy": "Veranstaltungen – zeige ...",
+    "eventsEnded": "Beendet",
     "filter-by": "Filtern nach ...",
-    "following": "Nutzer denen ich folge",
+    "following": "Nutzer, denen ich folge",
+    "following-title": "Quellen",
     "languages": "Sprachen",
-    "my-groups": "Meinen Gruppen",
+    "my-groups": "Meine Gruppen",
     "order": {
+      "last": {
+        "hint": "Sortiere die Letzten nach vorn",
+        "label": "Letzte zuerst"
+      },
       "newest": {
         "hint": "Sortiere die Neuesten nach vorn",
         "label": "Neueste zuerst"
+      },
+      "next": {
+        "hint": "Sortiere die Nächsten nach vorn",
+        "label": "Nächste zuerst"
       },
       "oldest": {
         "hint": "Sortiere die Ältesten nach vorn",
@@ -395,10 +454,12 @@
       }
     },
     "order-by": "Sortieren nach ...",
+    "post-type": "Inhaltstyp",
     "save": {
       "error": "Themen konnten nicht gespeichert werden!",
       "success": "Themen gespeichert!"
-    }
+    },
+    "startDate": "Anfangszeitpunkt"
   },
   "followButton": {
     "follow": "Folgen",
@@ -510,8 +571,14 @@
   },
   "header": {
     "avatarMenu": {
-      "Groups": "Gruppen",
+      "button": {
+        "tooltip": "Mein Profil"
+      },
+      "groups": "Gruppen",
       "myProfile": "Mein Profil"
+    },
+    "chat": {
+      "tooltip": "Meine Chats"
     }
   },
   "index": {
@@ -520,12 +587,15 @@
   },
   "invite-codes": {
     "button": {
-      "tooltip": "Lade deine Freunde ein"
+      "tooltip": "Freunde einladen"
     },
     "copy-code": "Einladungslink kopieren",
     "copy-success": "Einladungscode erfolgreich in die Zwischenablage kopiert",
     "not-available": "Du hast keinen Einladungscode zur Verfügung!",
     "your-code": "Sende diesen Link per E-Mail oder in sozialen Medien, um deine Freunde einzuladen:"
+  },
+  "localeSwitch": {
+    "tooltip": "Sprache wählen"
   },
   "login": {
     "email": "Deine E-Mail",
@@ -537,7 +607,7 @@
     "moreInfo": "Was ist {APPLICATION_NAME}?",
     "moreInfoHint": "zur Präsentationsseite",
     "no-account": "Du hast noch kein Nutzerkonto?",
-    "no-cookie": "Es kann kein Cookie angelegt werden. Du must Cookies akzeptieren.",
+    "no-cookie": "Es kann kein Cookie angelegt werden. Du musst Cookies akzeptieren.",
     "password": "Dein Passwort",
     "register": "Nutzerkonto erstellen",
     "success": "Du bist eingeloggt!"
@@ -552,9 +622,16 @@
     "button": {
       "tooltip": "Landkarte anzeigen"
     },
-    "markerTypes": {
+    "legend": {
+      "event": "Veranstaltung",
       "group": "Gruppe",
-      "theUser": "deine Position",
+      "theUser": "Meine Position",
+      "user": "Nutzer"
+    },
+    "markerTypes": {
+      "event": "Veranstaltung",
+      "group": "Gruppe",
+      "theUser": "meine Position",
       "user": "Nutzer"
     },
     "pageTitle": "Landkarte",
@@ -648,6 +725,9 @@
       "unread": "Ungelesen"
     },
     "group": "Beschreibung",
+    "headerMenuButton": {
+      "tooltip": "Meine Banachrichtigungen"
+    },
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",
@@ -663,11 +743,6 @@
     "title": "Benachrichtigungen",
     "user": "Nutzer"
   },
-  "position": {
-    "group": "Gruppe",
-    "my": "Meine Position",
-    "user": "Nutzer"
-  },
   "post": {
     "comment": {
       "reply": "Antworten",
@@ -675,19 +750,27 @@
       "submitted": "Kommentar gesendet",
       "updated": "Änderungen gespeichert"
     },
+    "createNewEvent": {
+      "forGroup": {
+        "title": "Für die Gruppe „{name}“"
+      },
+      "title": "Erstelle eine Veranstaltung"
+    },
     "createNewPost": {
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
-      "title": "Erstelle einen neuen Beitrag"
+      "title": "Erstelle einen Beitrag"
     },
     "edited": "bearbeitet",
     "editPost": {
+      "event": "Bearbeite deine Veranstaltung",
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
       "title": "Bearbeite deinen Beitrag"
     },
+    "event": "Veranstaltung",
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
@@ -700,6 +783,14 @@
     "pinned": "Meldung",
     "takeAction": {
       "name": "Aktiv werden"
+    },
+    "viewEvent": {
+      "eventEnd": "Ende",
+      "eventIsOnline": "Online",
+      "eventLocationName": "Stadt — z.B. Musterstraße 1, 12345 Musterstadt",
+      "eventStart": "Beginn",
+      "eventVenue": "Veranstaltungsort — z.B. Hinterhof, 1. OG, …",
+      "title": "Veranstaltung"
     },
     "viewPost": {
       "forGroup": {
@@ -816,7 +907,7 @@
       "Tag": "Hashtag ::: Hashtags",
       "User": "Nutzer ::: Nutzer"
     },
-    "hint": "Wonach suchst Du? Nutze !… für Beiträge, @… für Mitglieder, &… für Gruppen, #… für Hashtags",
+    "hint": "!... sucht Beiträge, @... sucht Nutzer, &... sucht Gruppen, #… sucht Hashtags",
     "no-results": "Keine Ergebnisse für \"{search}\" gefunden. Versuch' es mit einem anderen Begriff!",
     "page": "Seite",
     "placeholder": "Suchen",

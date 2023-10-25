@@ -8,7 +8,7 @@
       :src="profile.avatar | proxyApiUrl"
       class="image"
       :alt="profile.name"
-      :title="profile.name"
+      :title="showProfileNameTitle ? profile.name : ''"
       @error="$event.target.style.display = 'none'"
     />
   </div>
@@ -28,6 +28,10 @@ export default {
     profile: {
       type: Object,
       default: null,
+    },
+    showProfileNameTitle: {
+      type: Boolean,
+      default: true,
     },
   },
   computed: {

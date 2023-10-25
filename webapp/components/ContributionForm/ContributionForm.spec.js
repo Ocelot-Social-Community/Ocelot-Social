@@ -1,8 +1,8 @@
 import { mount } from '@vue/test-utils'
 import ContributionForm from './ContributionForm.vue'
+import PostMutations from '~/graphql/PostMutations.js'
 
 import Vuex from 'vuex'
-import PostMutations from '~/graphql/PostMutations.js'
 
 import ImageUploader from '~/components/Uploader/ImageUploader'
 import MutationObserver from 'mutation-observer'
@@ -15,6 +15,7 @@ const stubs = {
   'client-only': true,
   'nuxt-link': true,
   'v-popover': true,
+  'date-picker': true,
 }
 
 describe('ContributionForm.vue', () => {
@@ -45,6 +46,7 @@ describe('ContributionForm.vue', () => {
               slug: 'this-is-a-title-for-a-post',
               content: postContent,
               contentExcerpt: postContent,
+              postType: ['Article'],
             },
           },
         }),
@@ -106,6 +108,10 @@ describe('ContributionForm.vue', () => {
           await wrapper.vm.updateEditorContent(postContent)
         })
 
+        it('has no event data block', () => {
+          expect(wrapper.find('div.eventDatas').exists()).toBe(false)
+        })
+
         it('title cannot be empty', async () => {
           postTitleInput.setValue('')
           wrapper.find('form').trigger('submit')
@@ -142,6 +148,7 @@ describe('ContributionForm.vue', () => {
               id: null,
               image: null,
               groupId: null,
+              postType: 'Article',
             },
           }
           postTitleInput = wrapper.find('.ds-input')
@@ -268,6 +275,7 @@ describe('ContributionForm.vue', () => {
               image: {
                 sensitive: false,
               },
+              postType: 'Article',
             },
           }
         })
@@ -286,6 +294,89 @@ describe('ContributionForm.vue', () => {
           wrapper.find('[data-test="delete-button"]').trigger('click')
           await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
+        })
+      })
+    })
+
+    describe('Events', () => {
+      beforeEach(() => {
+        propsData.createEvent = true
+        wrapper = Wrapper()
+      })
+
+      it('has event data block', () => {
+        expect(wrapper.find('div.eventDatas').exists()).toBe(true)
+      })
+
+      describe('is online event', () => {
+        it('has false as default', () => {
+          expect(wrapper.vm.formData.eventIsOnline).toBe(false)
+        })
+
+        it('has input for event location', () => {
+          expect(wrapper.find('input[name="eventLocationName"]').exists()).toBe(true)
+        })
+
+        describe('click is online event', () => {
+          beforeEach(() => {
+            wrapper.find('input[name="eventIsOnline"]').setChecked(true)
+          })
+
+          it('has no input for event location', () => {
+            expect(wrapper.find('input[name="eventLocationName"]').exists()).toBe(false)
+          })
+        })
+
+        describe('invalid form', () => {
+          beforeEach(() => {
+            wrapper.find('input[name="title"]').setValue('Illegaler Kindergeburtstag')
+            wrapper.vm.updateEditorContent('Elli hat Geburtstag!')
+          })
+
+          it('has submit button disabled', () => {
+            expect(wrapper.find('button[type="submit"]').attributes('disabled')).toBe('disabled')
+          })
+        })
+
+        describe('valid form', () => {
+          const now = new Date()
+
+          beforeEach(() => {
+            wrapper.find('input[name="title"]').setValue('Illegaler Kindergeburtstag')
+            wrapper.vm.updateEditorContent('Elli hat Geburtstag!')
+            wrapper
+              .findComponent({ name: 'DatePicker' })
+              .vm.$emit('change', new Date(now.getFullYear(), now.getMonth() + 1).toISOString())
+            wrapper.find('input[name="eventVenue"]').setValue('Ellis Kinderzimmer')
+            wrapper.find('input[name="eventLocationName"]').setValue('Deutschland')
+          })
+
+          it('has submit button not disabled', () => {
+            expect(wrapper.find('button[type="submit"]').attributes('disabled')).toBe(undefined)
+          })
+
+          describe('submit', () => {
+            beforeEach(() => {
+              wrapper.find('form').trigger('submit')
+            })
+
+            it('calls create post', () => {
+              expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
+                mutation: PostMutations().CreatePost,
+                variables: expect.objectContaining({
+                  title: 'Illegaler Kindergeburtstag',
+                  content: 'Elli hat Geburtstag!',
+                  eventInput: {
+                    eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                    eventVenue: 'Ellis Kinderzimmer',
+                    eventLocationName: 'Deutschland',
+                    eventIsOnline: false,
+                    eventEnd: null,
+                  },
+                }),
+              })
+            })
+          })
         })
       })
     })

@@ -8,10 +8,10 @@ CUR_JOB=$(expr $1 - 1)
 MAX_JOBS=$2
 
 # Features
-FEATURE_LIST=( $(find cypress/integration/ -maxdepth 1 -name "*.feature") )
+FEATURE_LIST=( $(find cypress/e2e/ -maxdepth 1 -name "*.feature") )
 
 # Calculation
-MAX_FEATURES=$(find cypress/integration/ -maxdepth 1 -name "*.feature" -print | wc -l)
+MAX_FEATURES=$(find cypress/e2e/ -maxdepth 1 -name "*.feature" -print | wc -l)
 # adds overhead features to the first jobs
 if [[ $CUR_JOB -lt $(expr ${MAX_FEATURES} % ${MAX_JOBS}) ]]
 then

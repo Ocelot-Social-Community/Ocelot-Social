@@ -47,6 +47,16 @@ export const mutations = {
     delete filter.categories_some
     state.filter = filter
   },
+  RESET_FOLLOWERS_FILTER(state) {
+    const filter = clone(state.filter)
+    if (get(filter, 'postsInMyGroups')) {
+      delete filter.postsInMyGroups
+    }
+    if (get(filter, 'author.followedBy_some.id')) {
+      delete filter.author
+    }
+    state.filter = filter
+  },
   RESET_EMOTIONS(state) {
     const filter = clone(state.filter)
     delete filter.emotions_some
@@ -75,6 +85,42 @@ export const mutations = {
     if (isEmpty(get(filter, 'emotions_some.emotion_in'))) delete filter.emotions_some
     state.filter = filter
   },
+  RESET_POST_TYPE(state) {
+    const filter = clone(state.filter)
+    delete filter.eventStart_gte
+    delete filter.postType_in
+    state.order = 'createdAt_desc'
+    state.filter = filter
+  },
+  TOGGLE_POST_TYPE(state, postType) {
+    const filter = clone(state.filter)
+    if (postType && !(filter.postType_in && filter.postType_in.includes(postType))) {
+      filter.postType_in = [postType]
+      if (postType === 'Event') {
+        filter.eventStart_gte = new Date()
+        state.order = 'eventStart_asc'
+      } else {
+        delete filter.eventStart_gte
+        state.order = 'createdAt_desc'
+      }
+    } else {
+      delete filter.eventStart_gte
+      delete filter.postType_in
+      state.order = 'createdAt_desc'
+    }
+    state.filter = filter
+  },
+  TOGGLE_EVENTS_ENDED(state) {
+    const filter = clone(state.filter)
+    if (filter.eventStart_gte) {
+      delete filter.eventStart_gte
+    } else {
+      if (filter.postType_in && filter.postType_in.includes('Event')) {
+        filter.eventStart_gte = new Date()
+      }
+    }
+    state.filter = filter
+  },
   TOGGLE_ORDER(state, value) {
     state.order = value
   },
@@ -89,6 +135,9 @@ export const getters = {
   },
   filteredCategoryIds(state) {
     return get(state.filter, 'categories_some.id_in') || []
+  },
+  filteredPostTypes(state) {
+    return get(state.filter, 'postType_in') || []
   },
   filteredLanguageCodes(state) {
     return get(state.filter, 'language_in') || []
