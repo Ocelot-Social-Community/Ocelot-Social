@@ -180,6 +180,8 @@ $ helm repo update
 #### 2. Install DNS
 
 ```bash
+# !!! untested for now for new deployment structure !!!
+
 # kubeconfig.yaml set globaly
 $ helm install dns bitnami/external-dns -f dns.values.yaml
 # or kubeconfig.yaml in your repo, then adjust
