@@ -338,8 +338,11 @@ $ kubectl -n default rollout status deployment/ocelot-neo4j --timeout=240s
 # !!! be aware of the correct kube context !!!
 $ kubectl config get-contexts
 
-# reset and seed Neo4j database via backend for staging
+# for staging: reset and seed Neo4j database via backend
 $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "node --experimental-repl-await build/src/db/clean.js && node --experimental-repl-await build/src/db/seed.js"
 
+# or alternatively
 
+# for production: set Neo4j database indexes, constrains, and initial admin account plus run migrate up via backend
+$ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "yarn prod:migrate init && yarn prod:migrate up"
 ```
