@@ -18,9 +18,8 @@ BACKUP_FOLDER=${BACKUP_FOLDER:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/
 # create backup fodler
 mkdir -p ${BACKUP_FOLDER}
 
-# maintenance mode on
-# set Neo4j in offline mode (maintenance)
-${SCRIPT_DIR}/cluster.neo4j.sh off
+# cluster maintenance mode on && Neo4j maintenance mode on
+${SCRIPT_DIR}/cluster.neo4j.sh maintenance on
 
 # database backup
 kubectl --kubeconfig=${KUBECONFIG} -n default exec -it \
@@ -33,6 +32,5 @@ kubectl --kubeconfig=${KUBECONFIG} cp \
 kubectl --kubeconfig=${KUBECONFIG} cp \
     default/$(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-backend |awk '{ print $1 }'):/app/public/uploads $BACKUP_FOLDER/public-uploads
 
-# set Neo4j in online mode
-# maintenance mode off
-${SCRIPT_DIR}/cluster.neo4j.sh on
+# Neo4j maintenance mode off && cluster maintenance mode off
+${SCRIPT_DIR}/cluster.neo4j.sh maintenance off
