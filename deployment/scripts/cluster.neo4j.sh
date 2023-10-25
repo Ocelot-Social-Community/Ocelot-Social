@@ -14,7 +14,7 @@ fi
 KUBECONFIG=${KUBECONFIG:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubeconfig.yaml}
 
 case $1 in
-    offline-mode)
+    off)
         # maintenance mode on
         ${SCRIPT_DIR}/cluster.maintenance.sh on
 
@@ -26,7 +26,7 @@ case $1 in
         # wait for the container to restart
         sleep 60
     ;;
-    online-mode)
+    on)
         # set Neo4j in online mode
         kubectl --kubeconfig=${KUBECONFIG} get deployment ocelot-neo4j -o json \
             | jq 'del(.spec.template.spec.containers[].command)' \
@@ -39,7 +39,7 @@ case $1 in
         ${SCRIPT_DIR}/cluster.maintenance.sh off
     ;;
     *)
-        echo -e "Run this script with first argument either 'offline-mode' or 'online-mode'"
+        echo -e "Run this script with first argument either 'off' or 'on'"
         exit
     ;;
 esac

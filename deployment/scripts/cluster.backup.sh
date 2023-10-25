@@ -20,7 +20,7 @@ mkdir -p ${BACKUP_FOLDER}
 
 # maintenance mode on
 # set Neo4j in offline mode (maintenance)
-${SCRIPT_DIR}/cluster.neo4j.sh offline-mode
+${SCRIPT_DIR}/cluster.neo4j.sh off
 
 # database backup
 kubectl --kubeconfig=${KUBECONFIG} -n default exec -it \
@@ -35,4 +35,4 @@ kubectl --kubeconfig=${KUBECONFIG} cp \
 
 # set Neo4j in online mode
 # maintenance mode off
-${SCRIPT_DIR}/cluster.neo4j.sh online-mode
+${SCRIPT_DIR}/cluster.neo4j.sh on
