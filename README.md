@@ -6,7 +6,7 @@
 [![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discord.gg/AJSX9DCSUA)
 [![Open Source Helpers](https://www.codetriage.com/ocelot-social-community/ocelot-social/badges/users.svg)](https://www.codetriage.com/ocelot-social-community/ocelot-social)
 
-[ocelot.social](https://ocelot.social) is free and open source software program code to run social networks. Its development is supported by a community of programmers and interested network operators.
+[Ocelot.social](https://ocelot.social) is free and open source software program code to run social networks. Its development is supported by a community of programmers and interested network operators.
 
 <!-- markdownlint-disable MD033 -->
 <p align="center">
@@ -261,7 +261,7 @@ We give write permissions to every developer who asks for it. Just text us on
 
 ### Deployment
 
-Deployment methods can be found in our `deployment` folder described in the deployment [README](./deployment/README.md).
+Deployment methods can be found in our `deployment` folder described in the [README](./deployment/README.md).
 Our branding template is our [stage.ocelot.social](https://github.com/Ocelot-Social-Community/stage.ocelot.social) repository.
 Place your branding repository inside `deployment/configurations`.
 
