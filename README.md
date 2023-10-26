@@ -18,13 +18,17 @@ Our goal is to enable people to participate fairly and equally in online social 
 
 We therefore consider it desirable that operators offer such networks so that people can choose where they want to be on the move.
 
-At the same time, it should be possible in the future to link these networks with each other (ActivityPub, Fediverse), so that users can also connect with people from other networks - for example by making friends or following posts or other contributions.
+Our vision for the future is that at some point it should be possible to link these networks together (ActivityPub, Fediverse) so that users can also connect with people from other networks - for example, by friending them or following posts or other contributions.
+
+If you would like to help set up this capability with us, please contact us.
 
 In other words, we are interested in a network of networks and in keeping the data as close as possible to the user and the operator they trusts.
 
 ## Screenshots
 
+<!-- markdownlint-disable MD033 -->
 <img src="https://user-images.githubusercontent.com/17728384/218597429-554e4082-3906-4721-8f68-0c13146fc218.png" alt="Post feed" title="Post feed" />
+<!-- markdownlint-enable MD033 -->
 
 Check out more screenshots [here](/wiki/en:Screenshots).
 
@@ -42,6 +46,7 @@ Ocelot.social networks features:
 - **map**
 - **user accounts**
 - **user roles**
+- make your own **branded network**
 - and more …
 
 Check out the [full feature list](/wiki/en:FAQ#what-are-the-features).
@@ -82,7 +87,7 @@ Your donation is very welcome and helps to enhance and improve the network. This
 Are you interested in operating your own ocelot.social network or becoming a user? Please contact us here:
 
 - [hello@ocelot.social](mailto:hello@ocelot.social)
-- our developer chat on [Discord](https://discord.com/invite/DFSjPaX)
+- our developer chat on [Discord](https://discord.gg/AJSX9DCSUA)
 
 ## For Developers and Contributors
 
@@ -137,7 +142,7 @@ $ cd Ocelot-Social
 
 Visit our staging networks:
 
-* central staging network: [stage.ocelot.social](https://stage.ocelot.social)
+- central staging network: [stage.ocelot.social](https://stage.ocelot.social)
 <!-- - rebranded staging network: [rebrand.ocelot.social](https://stage.ocelot.social). -->
 
 #### Login
@@ -225,7 +230,9 @@ To have the necessary permission to push directly to this repository, please acc
 
 We are happy if you fork our repository, but we don't recommend it for development. You do not need a fork.
 
-Clone this repository locally as [described above](#clone-the-repository), create your branch named `<issue-number>-<description>`, add your code and push your branch to this repository. Then create a PR by comparing it to our `master`.
+Clone this repository locally as [described above](#clone-the-repository), create your branch named `<issue-number>-<description>`, add your code and push your branch direct to this repository. Then create a PR by comparing it to our `master`.
+
+**_!!! Be aware:_** Please don't compare from a fork, because the tests are breaking caused by credential problems.
 
 Please run the following commands before you push:
 
@@ -246,33 +253,48 @@ Check out our [contribution guideline](./CONTRIBUTING.md), too!
 
 #### Developer Chat
 
-Join our friendly open-source community on [Discord](https://discord.gg/AJSX9DCSUA) :heart_eyes_cat:
-Just introduce yourself at `#introduce-yourself` and mention a mentor or `@@Mentors` to get you onboard :neckbeard:
+Join our friendly open-source community on [Discord](https://discord.gg/AJSX9DCSUA) 😻
+Just introduce yourself at `#introduce-yourself` and mention a mentor or `@@Mentors` to get you onboard 🤓
 
 We give write permissions to every developer who asks for it. Just text us on
 [Discord](https://discord.gg/AJSX9DCSUA).
 
 ### Deployment
 
-Deployment methods can be found in the [Ocelot-Social-Deploy-Rebranding](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding) repository.
+Deployment methods can be found in our `deployment` folder described in the deployment [README](./deployment/README.md).
+Our branding template is our [stage.ocelot.social](https://github.com/Ocelot-Social-Community/stage.ocelot.social) repository.
+Place your branding repository inside `deployment/configurations`.
 
-The only deployment method in this repository for development purposes as described above is `docker-compose`.
+The only deployment method in this repository for production purposes is [Kubernetes](https://kubernetes.io) for now.
+But we just started to develop a deployment for [Docker Compose](https://docs.docker.com/compose/) as well.
+
+The only deployment method with branding in this repository for development purposes as described above is [Docker Compose](https://docs.docker.com/compose/):
+
+```bash
+# in folder deployment/
+# set your branding folder name in .env
+# then run
+$ docker compose up
+```
+
+The code is branded automatically.
+To setup the Neo4j database see above.
 
 ### Technology Stack
 
-* [VueJS](https://vuejs.org/)
-* [NuxtJS](https://nuxtjs.org/)
-* [GraphQL](https://graphql.org/)
-* [NodeJS](https://nodejs.org/en/)
-* [Neo4J](https://neo4j.com/)
+- [VueJS](https://vuejs.org/)
+- [NuxtJS](https://nuxtjs.org/)
+- [GraphQL](https://graphql.org/)
+- [NodeJS](https://nodejs.org/en/)
+- [Neo4J](https://neo4j.com/)
 
 #### For Testing
 
-* [Cypress](https://docs.cypress.io/)
-* [Storybook](https://storybook.js.org/)
-* [Jest](https://jestjs.io/)
-* [Vue Test Utils](https://vue-test-utils.vuejs.org/)
-* [ESLint](https://eslint.org/)
+- [Cypress](https://docs.cypress.io/)
+- [Storybook](https://storybook.js.org/)
+- [Jest](https://jestjs.io/)
+- [Vue Test Utils](https://vue-test-utils.vuejs.org/)
+- [ESLint](https://eslint.org/)
 
 ### Attributions
 
@@ -280,7 +302,9 @@ Locale Icons made by [Freepik](http://www.freepik.com/) from [www.flaticon.com](
 
 Browser compatibility testing with [BrowserStack](https://www.browserstack.com/).
 
+<!-- markdownlint-disable MD033 -->
 <img alt="BrowserStack Logo" src=".gitbook/assets/browserstack-logo.svg" width="256">
+<!-- markdownlint-enable MD033 -->
 
 ### License
 
