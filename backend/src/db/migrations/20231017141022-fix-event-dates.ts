@@ -19,11 +19,11 @@ export async function up(next) {
     for (const event of events.records) {
       let [id, eventStart, eventEnd] = event
       let date = new Date(eventStart)
-      date.setHours(date.getHours() - 2)
+      date.setHours(date.getHours() - 1)
       eventStart = date.toISOString()
       if (eventEnd) {
         date = new Date(eventEnd)
-        date.setHours(date.getHours() - 2)
+        date.setHours(date.getHours() - 1)
         eventEnd = date.toISOString()
       }
       await transaction.run(`
