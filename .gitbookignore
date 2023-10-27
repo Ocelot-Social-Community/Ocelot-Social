@@ -1,0 +1,5 @@
+# Ignore all files except .md files
+*
+
+# Include .md files
+!*.md
