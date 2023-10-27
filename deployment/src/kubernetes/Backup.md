@@ -137,7 +137,7 @@ $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-neo4j 
 # bash: enter bash of Neo4j
 $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-neo4j | awk '{ print $1 }') -- bash
 # generate Dump
-neo4j% neo4j-admin dump --to=/var/lib/neo4j/$(date +%F)-neo4j-dump
+neo4j% neo4j-admin dump --database=graph.db --to=/var/lib/neo4j/$(date +%F)-neo4j-dump
 # exit bash
 neo4j% exit
 

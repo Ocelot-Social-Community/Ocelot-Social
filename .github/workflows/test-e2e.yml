@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Copy env files
         run: |
@@ -36,7 +36,7 @@ jobs:
       
       - name: Cache docker images
         id: cache
-        uses: actions/cache/save@v3.3.1
+        uses: actions/cache/save@v3.3.2
         with:
           path: |
             /opt/cucumber-json-formatter
@@ -58,7 +58,7 @@ jobs:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - name: Restore cache
-        uses: actions/cache/restore@v3.3.1
+        uses: actions/cache/restore@v3.3.2
         id: cache
         with:
           path: |
@@ -101,6 +101,7 @@ jobs:
     name: Cleanup
     needs: [docker_preparation, fullstack_tests]
     runs-on: ubuntu-latest
+    permissions: write-all
     continue-on-error: true
     steps:
       - name: Delete cache
