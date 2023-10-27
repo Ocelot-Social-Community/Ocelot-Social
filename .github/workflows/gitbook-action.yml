@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout action
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Gitbook Action # https://github.com/ZanderZhao/gitbook-action/releases
       uses: ZanderZhao/gitbook-action@master  # -> or ZanderZhao/gitbook-action@v1.2.4, Just example, click above, use latest please
