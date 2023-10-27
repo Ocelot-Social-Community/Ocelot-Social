@@ -28,8 +28,8 @@ jobs:
         publish_repo: Ocelot-Social-Community/docs.ocelot.social
         publish_commit_message: ${{ github.event.head_commit.message }}
         # publish_branch: master
-        publish_branch: gh-pages
-        publish_dir: docs
+        publish_branch: gitbook-output
+        publish_dir: _book
         # Some not indicated are default values, eg: publish_repo
 
     # example2
