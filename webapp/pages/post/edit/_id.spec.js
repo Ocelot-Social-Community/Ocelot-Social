@@ -76,7 +76,7 @@ describe('post/_id.vue', () => {
       authorId = 'some-author'
       userId = 'some-user'
       wrapper = await Wrapper()
-      expect(error).toBeCalledWith({ message: 'error-pages.cannot-edit-post', statusCode: 403 })
+      expect(error).toHaveBeenCalledWith({ message: 'error-pages.cannot-edit-post', statusCode: 403 })
     })
 
     it('renders with asyncData of same user', async () => {

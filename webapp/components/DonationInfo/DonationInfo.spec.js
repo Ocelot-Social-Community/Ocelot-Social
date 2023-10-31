@@ -46,7 +46,7 @@ describe('DonationInfo.vue', () => {
 
         // it looks to me that toLocaleString for some reason is not working as expected
         it.skip('creates a label from the given amounts and a translation string', () => {
-          expect(mocks.$t).nthCalledWith(1, 'donations.amount-of-total', {
+          expect(mocks.$t).toHaveBeenNthCalledWith(1, 'donations.amount-of-total', {
             amount: '10.000',
             total: '50.000',
           })
@@ -55,7 +55,7 @@ describe('DonationInfo.vue', () => {
 
       describe('given english locale', () => {
         it('creates a label from the given amounts and a translation string', () => {
-          expect(mocks.$t).toBeCalledWith(
+          expect(mocks.$t).toHaveBeenCalledWith(
             'donations.amount-of-total',
             expect.objectContaining({
               amount: '10,000',

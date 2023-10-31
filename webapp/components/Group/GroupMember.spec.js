@@ -94,20 +94,20 @@ describe('GroupMember', () => {
 
       describe('with server error', () => {
         it('toasts an error message', () => {
-          expect(toastErrorMock).toBeCalledWith('Oh no!')
+          expect(toastErrorMock).toHaveBeenCalledWith('Oh no!')
         })
       })
 
       describe('with server success', () => {
         it('calls the API', () => {
-          expect(apolloMock).toBeCalledWith({
+          expect(apolloMock).toHaveBeenCalledWith({
             mutation: changeGroupMemberRoleMutation(),
             variables: { groupId: 'group-id', userId: 'user', roleInGroup: 'admin' },
           })
         })
 
         it('toasts a success message', () => {
-          expect(toastSuccessMock).toBeCalledWith('group.changeMemberRole')
+          expect(toastSuccessMock).toHaveBeenCalledWith('group.changeMemberRole')
         })
       })
     })
@@ -150,7 +150,7 @@ describe('GroupMember', () => {
         })
 
         it('toasts an error message', () => {
-          expect(toastErrorMock).toBeCalledWith('Oh no!!')
+          expect(toastErrorMock).toHaveBeenCalledWith('Oh no!!')
         })
 
         it('closes the modal', () => {
@@ -165,7 +165,7 @@ describe('GroupMember', () => {
         })
 
         it('calls the API', () => {
-          expect(apolloMock).toBeCalledWith({
+          expect(apolloMock).toHaveBeenCalledWith({
             mutation: removeUserFromGroupMutation(),
             variables: { groupId: 'group-id', userId: 'user' },
           })
@@ -176,7 +176,7 @@ describe('GroupMember', () => {
         })
 
         it('toasts a success message', () => {
-          expect(toastSuccessMock).toBeCalledWith('group.memberRemoved')
+          expect(toastSuccessMock).toHaveBeenCalledWith('group.memberRemoved')
         })
 
         it('closes the modal', () => {

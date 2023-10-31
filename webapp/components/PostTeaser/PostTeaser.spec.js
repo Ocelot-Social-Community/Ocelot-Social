@@ -73,7 +73,7 @@ describe('PostTeaser', () => {
     it('has no validation errors', () => {
       const spy = jest.spyOn(global.console, 'error')
       Wrapper()
-      expect(spy).not.toBeCalled()
+      expect(spy).not.toHaveBeenCalled()
       spy.mockReset()
     })
 
