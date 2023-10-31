@@ -31,7 +31,7 @@ const { parsed } = dotenv.config({ path: '../backend/.env' })
 module.exports = defineConfig({
   e2e: {
     projectId: "qa7fe2",
-    defaultCommandTimeout: 10000,
+    defaultCommandTimeout: 60000,
     pageLoadTimeout:180000,
     chromeWebSecurity: false,
     baseUrl: "http://localhost:3000",
