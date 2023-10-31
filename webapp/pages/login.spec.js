@@ -71,7 +71,7 @@ describe('Login.vue', () => {
       asyncData = true
       tosVersion = '0.0.4'
       wrapper = await Wrapper()
-      expect(redirect).toBeCalledWith('/')
+      expect(redirect).toHaveBeenCalledWith('/')
     })
   })
 })
