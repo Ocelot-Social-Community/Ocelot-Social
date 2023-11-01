@@ -89,15 +89,20 @@ CMD /bin/sh -c "yarn run dev"
 ##################################################################################
 FROM base as production
 
+# Copy package.json for script definitions
+COPY --from=build ${DOCKER_WORKDIR}/package.json ./package.json
+COPY --from=build ${DOCKER_WORKDIR}/package-lock.json ./package-lock.json
+
+# install production packages
+RUN yarn install --production=true --frozen-lockfile --non-interactive
+
 # Copy "binary"-files from build image
 COPY --from=build ${DOCKER_WORKDIR}/build ./build
-COPY --from=build ${DOCKER_WORKDIR}/node_modules ./node_modules
+
 # Copy static files
 # TODO - externalize the uploads so we can copy the whole folder
 COPY --from=build ${DOCKER_WORKDIR}/public/img/ ./public/img/
 COPY --from=build ${DOCKER_WORKDIR}/public/providers.json ./public/providers.json
-# Copy package.json for script definitions (lock file should not be needed)
-COPY --from=build ${DOCKER_WORKDIR}/package.json ./package.json
 
 # Run command
 CMD /bin/sh -c "yarn run start"
