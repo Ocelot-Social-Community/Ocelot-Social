@@ -30,7 +30,7 @@ In other words, we are interested in a network of networks and in keeping the da
 <img src="https://user-images.githubusercontent.com/17728384/218597429-554e4082-3906-4721-8f68-0c13146fc218.png" alt="Post feed" title="Post feed" />
 <!-- markdownlint-enable MD033 -->
 
-Check out more screenshots [here](/wiki/en:Screenshots).
+Check out more screenshots [here](https://github.com/Ocelot-Social-Community/Ocelot-Social/wiki/en:Screenshots).
 
 ## Features
 
@@ -49,14 +49,14 @@ Ocelot.social networks features:
 - make your own **branded network**
 - and more …
 
-Check out the [full feature list](/wiki/en:FAQ#what-are-the-features).
+Check out the [full feature list](https://github.com/Ocelot-Social-Community/Ocelot-Social/wiki/en:FAQ#what-are-the-features).
 
 ## User Guide and Frequently Asked Questions
 
-In the [wiki](/wiki) you can find more information.
+In the [wiki](https://github.com/Ocelot-Social-Community/Ocelot-Social/wiki) you can find more information.
 
-- [User Guide](/wiki/en:User-Guide)
-- [Frequently Asked Questions](/wiki/en:FAQ)
+- [User Guide](https://github.com/Ocelot-Social-Community/Ocelot-Social/wiki/en:User-Guide)
+- [Frequently Asked Questions](https://github.com/Ocelot-Social-Community/Ocelot-Social/wiki/en:FAQ)
 
 ## Demo
 

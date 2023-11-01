@@ -327,7 +327,7 @@ describe('Registration', () => {
       asyncData = true
       isLoggedIn = true
       wrapper = await Wrapper()
-      expect(redirect).toBeCalledWith('/')
+      expect(redirect).toHaveBeenCalledWith('/')
     })
 
     // copied from webapp/components/Registration/Signup.spec.js as testing template
