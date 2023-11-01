@@ -9,7 +9,7 @@ Please contact us if you are interested in options not listed below.
 
 Managed Kubernetes:
 
-- [DigitalOcean](/deployment/kubernetes/DigitalOcean.md)
+- [DigitalOcean](/deployment/src/kubernetes/DigitalOcean.md)
 
 ## Configuration
 
@@ -46,29 +46,20 @@ Please have a look here:
 
 - [Installing with Helm](https://cert-manager.io/docs/installation/helm/#installing-with-helm)
 
-Our Helm installation is optimized for cert-manager version `v1.9.1` and `kubectl` version `"v1.24.2`.
+Our Helm installation is optimized for cert-manager version `v1.13.1` and `kubectl` version `"v1.28.2`.
 
 Please search here for cert-manager versions that are compatible with your `kubectl` version on the cluster and on the client: [cert-manager Supported Releases](https://cert-manager.io/docs/installation/supported-releases/#supported-releases).
 
 ***ATTENTION:*** *When uninstalling cert-manager, be sure to use the same method as for installation! Otherwise, we could end up in a broken state, see [Uninstall](https://cert-manager.io/docs/installation/kubectl/#uninstalling).*
 
-<!-- #### 1. Create Namespace
-
-```bash
-# kubeconfig.yaml set globaly
-$ kubectl create namespace cert-manager
-# or kubeconfig.yaml in your repo, then adjust
-$ kubectl --kubeconfig=/../kubeconfig.yaml create namespace cert-manager
-```
-
-#### 2. Add Helm repository and update
+<!-- #### 1. Add Helm repository and update
 
 ```bash
 $ helm repo add jetstack https://charts.jetstack.io
 $ helm repo update
 ```
 
-#### 3. Install Cert-Manager Helm chart
+#### 2. Install Cert-Manager Helm chart
 
 ```bash
 # option 1
@@ -76,16 +67,24 @@ $ helm repo update
 # $ kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.crds.yaml
 
 # option 2
+# !!! untested for now for new deployment structure !!!
+
+# in configuration/<deployment-name>
+
 # kubeconfig.yaml set globaly
-$ helm install cert-manager jetstack/cert-manager \
+$ helm install \
+  cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-  --version v1.9.1 \
+  --create-namespace \
+  --version v1.13.1 \
   --set installCRDs=true
 # or kubeconfig.yaml in your repo, then adjust
-$ helm --kubeconfig=/../kubeconfig.yaml \
-  install cert-manager jetstack/cert-manager \
+$ helm install \
+  cert-manager jetstack/cert-manager \
+  --kubeconfig ./kubeconfig.yaml \
   --namespace cert-manager \
-  --version v1.9.1 \
+  --create-namespace \
+  --version v1.13.1 \
   --set installCRDs=true
 ``` -->
 
@@ -101,10 +100,15 @@ $ helm repo update
 #### 2. Install ingress-nginx
 
 ```bash
+# in configuration/<deployment-name>
+
 # kubeconfig.yaml set globaly
-$ helm install ingress-nginx ingress-nginx/ingress-nginx -f nginx.values.yaml
+helm install ingress-nginx ingress-nginx/ingress-nginx -f ../../src/kubernetes/nginx.values.yaml
+
 # or kubeconfig.yaml in your repo, then adjust
-$ helm --kubeconfig=/../kubeconfig.yaml install ingress-nginx ingress-nginx/ingress-nginx -f nginx.values.yaml
+helm install \
+  ingress-nginx ingress-nginx/ingress-nginx -f ../../src/kubernetes/nginx.values.yaml \
+  --kubeconfig ./kubeconfig.yaml
 ```
 
 ### DigitalOcean Firewall
@@ -159,6 +163,8 @@ $ doctl compute firewall get <ID> --context <context-name>
 
 ### DNS
 
+***ATTENTION:** This seems not to work at all so we leave it away at the moment*
+
 ***TODO:** I thought this is necessary if we use the DigitalOcean DNS management service? See [Manage DNS With DigitalOcean](/deployment/kubernetes/DigitalOcean.md#manage-dns-with-digitalocean)*
 
 This chart is only necessary (recommended is more precise) if you run DigitalOcean without load balancer.
@@ -174,6 +180,8 @@ $ helm repo update
 #### 2. Install DNS
 
 ```bash
+# !!! untested for now for new deployment structure !!!
+
 # kubeconfig.yaml set globaly
 $ helm install dns bitnami/external-dns -f dns.values.yaml
 # or kubeconfig.yaml in your repo, then adjust
@@ -191,10 +199,22 @@ All commands for ocelot need to be executed in the kubernetes folder. Therefore 
 Only run once for the first time of installation:
 
 ```bash
+# in configuration/<deployment-name>
+
 # kubeconfig.yaml set globaly
-$ helm install ocelot ./
+helm install ocelot \
+  --values ./kubernetes/values.yaml \
+  --set appVersion="latest" \
+  ../../src/kubernetes/ \
+  --timeout 10m
+
 # or kubeconfig.yaml in your repo, then adjust
-$ helm --kubeconfig=/../kubeconfig.yaml install ocelot ./
+helm install ocelot \
+  --kubeconfig ./kubeconfig.yaml \
+  --values ./kubernetes/values.yaml \
+  --set appVersion="latest" \
+  ../../src/kubernetes/ \
+  --timeout 10m
 ```
 
 #### Upgrade & Update
@@ -202,10 +222,24 @@ $ helm --kubeconfig=/../kubeconfig.yaml install ocelot ./
 Run for all upgrades and updates:
 
 ```bash
+# !!! untested for now for new deployment structure !!!
+
+# in configuration/<deployment-name>
+
 # kubeconfig.yaml set globaly
-$ helm upgrade ocelot ./
+helm upgrade ocelot \
+  --values ./kubernetes/values.yaml \
+  --set appVersion="latest" \
+  ../../src/kubernetes/ \
+  --timeout 10m
+
 # or kubeconfig.yaml in your repo, then adjust
-$ helm --kubeconfig=/../kubeconfig.yaml upgrade ocelot ./
+helm upgrade ocelot \
+  --kubeconfig ./kubeconfig.yaml \
+  --values ./kubernetes/values.yaml \
+  --set appVersion="latest" \
+  ../../src/kubernetes/ \
+  --timeout 10m
 ```
 
 #### Rollback
@@ -213,10 +247,17 @@ $ helm --kubeconfig=/../kubeconfig.yaml upgrade ocelot ./
 Run for a rollback, in case something went wrong:
 
 ```bash
+# !!! untested for now for new deployment structure !!!
+
+# in configuration/<deployment-name>
+
 # kubeconfig.yaml set globaly
-$ helm rollback ocelot
+helm rollback ocelot --timeout 10m
+
 # or kubeconfig.yaml in your repo, then adjust
-$ helm --kubeconfig=/../kubeconfig.yaml rollback ocelot
+helm rollback ocelot \
+  --kubeconfig ./kubeconfig.yaml \
+  --timeout 10m
 ```
 
 #### Uninstall
@@ -224,10 +265,17 @@ $ helm --kubeconfig=/../kubeconfig.yaml rollback ocelot
 Be aware that if you uninstall ocelot the formerly bound volumes become unbound. Those volumes contain all data from uploads and database. You have to manually free their reference in order to bind them again when reinstalling. Once unbound from their former container references they should automatically be rebound (considering the sizes did not change)
 
 ```bash
+# !!! untested for now for new deployment structure !!!
+
+# in configuration/<deployment-name>
+
 # kubeconfig.yaml set globaly
-$ helm uninstall ocelot
+helm uninstall ocelot --timeout 10m
+
 # or kubeconfig.yaml in your repo, then adjust
-$ helm --kubeconfig=/../kubeconfig.yaml uninstall ocelot
+helm uninstall ocelot \
+  --kubeconfig ./kubeconfig.yaml \
+  --timeout 10m
 ```
 
 ## Backups
@@ -292,8 +340,11 @@ $ kubectl -n default rollout status deployment/ocelot-neo4j --timeout=240s
 # !!! be aware of the correct kube context !!!
 $ kubectl config get-contexts
 
-# reset and seed Neo4j database via backend for staging
+# for staging: reset and seed Neo4j database via backend
 $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "node --experimental-repl-await build/src/db/clean.js && node --experimental-repl-await build/src/db/seed.js"
 
+# or alternatively
 
+# for production: set Neo4j database indexes, constrains, and initial admin account plus run migrate up via backend
+$ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "yarn prod:migrate init && yarn prod:migrate up"
 ```

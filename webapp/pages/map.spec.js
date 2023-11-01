@@ -114,19 +114,19 @@ describe('map', () => {
       })
 
       it('initializes on style load', () => {
-        expect(mapOnMock).toBeCalledWith('style.load', expect.any(Function))
+        expect(mapOnMock).toHaveBeenCalledWith('style.load', expect.any(Function))
       })
 
       it('initializes on mouseenter', () => {
-        expect(mapOnMock).toBeCalledWith('mouseenter', 'markers', expect.any(Function))
+        expect(mapOnMock).toHaveBeenCalledWith('mouseenter', 'markers', expect.any(Function))
       })
 
       it('initializes on mouseleave', () => {
-        expect(mapOnMock).toBeCalledWith('mouseleave', 'markers', expect.any(Function))
+        expect(mapOnMock).toHaveBeenCalledWith('mouseleave', 'markers', expect.any(Function))
       })
 
       it('calls add map control', () => {
-        expect(mapAddControlMock).toBeCalled()
+        expect(mapAddControlMock).toHaveBeenCalled()
       })
 
       describe('trigger style load event', () => {
@@ -137,7 +137,7 @@ describe('map', () => {
         })
 
         it('calls loadMarkersIconsAndAddMarkers', () => {
-          expect(spy).toBeCalled()
+          expect(spy).toHaveBeenCalled()
         })
       })
 
