@@ -114,11 +114,11 @@ describe('PostIndex', () => {
       })
 
       it('resets the category filter', () => {
-        expect(mutations['posts/RESET_CATEGORIES']).toBeCalled()
+        expect(mutations['posts/RESET_CATEGORIES']).toHaveBeenCalled()
       })
 
       it('sets the category', () => {
-        expect(mutations['posts/TOGGLE_CATEGORY']).toBeCalledWith({}, 'cat3')
+        expect(mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat3')
       })
     })
   })

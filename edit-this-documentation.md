@@ -2,13 +2,13 @@
 
 Find the [**table of contents** for this documentation on GitHub](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/SUMMARY.md) and navigate to the file you need to update.
 
-Click on the **edit pencil** on the right side directly above the text to edit this file on your fork of Human Connection \(HC\).
+Click on the **edit pencil** on the right side directly above the text to edit this file in our repository.
 
 You can see a preview of your changes by clicking the **Preview changes** tab aside the **Edit file** tab.
 
 If you are ready, fill in the **Propose file change** at the end of the webpage.
 
-After that you have to send your change to the HC basis with a pull request. Here make a comment which issue you have fixed. (If you are working on one of our [open issues](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues) please include the number.)
+After that you have to compare your change branch to our `master` branch with a pull request. Here make a comment which issue you have fixed. (If you are working on one of our [open issues](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues) please include the number.)
 
 ## Markdown your documentation
 
@@ -21,9 +21,9 @@ To design your documentation see the syntax description at GitBook:
 #### Headlines
 
 ```markdown
-# Main headline
-## Smaller headlines
-### Small headlines
+# Main Headline
+## Smaller Headlines
+### Small Headlines
 ```
 
 #### Tabs
@@ -60,15 +60,15 @@ XXX
 ![XXX](https://XXX)
 ```
 
-#### Hints For ToDos
+#### Hints for ToDos
 
 ```markdown
 {% hint style="info" %} TODO: XXX {% endhint %}
 ```
 
-## Host The Screenshots
+## Host the Screenshots
 
-### Host On Ocelot-Social \(GitHub\) repository
+### Host on Ocelot-Social \(GitHub\) Repository
 
 {% hint style="info" %}
 TODO: How to host on Ocelot-Social \(GitHub\) repository ...
@@ -88,12 +88,13 @@ Right click on it and choose kind of **Open link in new tab**.
 
 Copy the URL and paste it were you need it.
 
-## Screenshot modification
+## Screenshot Modification
 
-### Add an arrow or some other marking stuff
+### Add an Arrow or some other Marking Stuff
 
 {% tabs %}
 {% tab title="macOS" %}
+
 #### In the Preview App
 
 Got to: **Menu** + **Tools** \(GER: Werkzeuge\) + **Annotate** \(GER: Anmerkungen\) + etc.

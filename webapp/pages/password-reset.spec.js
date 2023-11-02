@@ -68,7 +68,7 @@ describe('password-reset.vue', () => {
       asyncData = true
       isLoggedIn = true
       wrapper = await Wrapper()
-      expect(redirect).toBeCalledWith('/')
+      expect(redirect).toHaveBeenCalledWith('/')
     })
   })
 })
