@@ -43,8 +43,8 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         source-files: ./docs/*
-        destination-username: 'mahula'
-        destination-repository: 'Ocelot-Social-Community/Ocelot-Social'
+        destination-username: 'Ocelot-Social-Community'
+        destination-repository: 'Ocelot-Social'
         destination-directory: 'docs/'
         commit-email: 'lenzmath@posteo.de'
         commit-username: 'mahula' 
