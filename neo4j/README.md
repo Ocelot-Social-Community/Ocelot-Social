@@ -53,15 +53,45 @@ Start Neo4J and confirm the database is running at [http://localhost:7474](http:
 
 ## Operations on Neo4j
 
-### Import Neo4j Dump Locally in Docker
+### Docker or Docker Compose
+
+- we need to set `command: ["tail", "-f", "/dev/null"]` in the Neo4j block of `docker-compose.yml` on top level so the Neo4j database is in maintenance mode
+
+### Create Neo4j Dump
+
+To create a dump in Neo4j running in a Docker container:
+
+- set the database to maintenance mode, see above
+- entering the following commands:
+
+```bash
+# connect to the Docker containers Neo4j terminal
+$ docker exec -it neo4j bash
+# generate Dump
+neo4j% neo4j-admin dump --database=graph.db --to=/var/lib/neo4j/$(date +%F)-neo4j-dump
+# exit bash
+neo4j% exit
+# copy the dump out of the running Docker container
+$ docker cp <docker-image-name('neo4j')>:/var/lib/neo4j/neo4j-dump <local-folder-path>/$(date +%F)-neo4j-dump
+```
+
+### Import Neo4j Dump
 
 To import a dump into Neo4j running in a Docker container:
 
-- we need to set `command: ["tail", "-f", "/dev/null"]` in the Neo4j block of `docker-compose.yml` on top level so the Neo4j database is in maintenance mode
-- copy the dump into the running Docker container: `docker cp /path/to/dump <docker-image>:/existing-directory-in-docker/`
-- connect to the Docker containers Neo4j terminal: `docker exec -it neo4j bash`
-- to load the dump into the database we need the following command in this terminal: `neo4j-admin load --expand-commands --database=graph.db --from /backups/neo4j-dump --force`
-- leave the terminal by entering: `exit`
+- set the database to maintenance mode, see above
+- entering the following commands:
+
+```bash
+# copy the dump into the running Docker container
+$ docker cp <local-folder-path>/neo4j-dump <docker-image-name('neo4j')>:/var/lib/neo4j/$(date +%F)-neo4j-dump
+# connect to the Docker containers Neo4j terminal
+$ docker exec -it neo4j bash
+# to load the dump into the database we need the following command in this terminal
+neo4j% neo4j-admin load --expand-commands --database=graph.db --from /var/lib/neo4j/$(date +%F)-neo4j-dump --force
+# leave the terminal by entering
+neo4j% exit
+```
 
 ## Commands
 

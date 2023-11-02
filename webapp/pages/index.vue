@@ -19,7 +19,7 @@
       </client-only>
     </div>
     <div>
-      <div v-if="categoriesActive && SHOW_CONTENT_FILTER_MASONRY_GRID" class="top-filter-menu">
+      <div v-if="SHOW_CONTENT_FILTER_MASONRY_GRID" class="top-filter-menu">
         <div class="filterButtonBox">
           <div class="filterButtonMenu" :class="{ 'hide-filter': hideByScroll }">
             <base-button
