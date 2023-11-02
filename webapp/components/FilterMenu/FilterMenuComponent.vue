@@ -3,7 +3,7 @@
     <div class="filter-menu-options">
       <div class="filter-header">
         <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
-        <div class="item-save-topics">
+        <div v-if="categoriesActive" class="item-save-topics">
           <labeled-button
             filled
             :label="$t('actions.saveCategories')"
@@ -62,18 +62,20 @@ export default {
   },
   methods: {
     saveCategories() {
-      this.$apollo
-        .mutate({
-          mutation: SaveCategories(),
-          variables: { activeCategories: this.filteredCategoryIds },
-        })
-        .then(() => {
-          this.$emit('showFilterMenu')
-          this.$toast.success(this.$t('filter-menu.save.success'))
-        })
-        .catch(() => {
-          this.$toast.error(this.$t('filter-menu.save.error'))
-        })
+      if (this.categoriesActive) {
+        this.$apollo
+          .mutate({
+            mutation: SaveCategories(),
+            variables: { activeCategories: this.filteredCategoryIds },
+          })
+          .then(() => {
+            this.$emit('showFilterMenu')
+            this.$toast.success(this.$t('filter-menu.save.success'))
+          })
+          .catch(() => {
+            this.$toast.error(this.$t('filter-menu.save.error'))
+          })
+      }
     },
   },
 }

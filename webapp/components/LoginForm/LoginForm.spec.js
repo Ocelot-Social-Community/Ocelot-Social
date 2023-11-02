@@ -75,8 +75,8 @@ describe('LoginForm', () => {
         describe('no categories saved', () => {
           it('resets the categories', async () => {
             await fillIn(Wrapper())
-            expect(storeMocks.mutations['posts/RESET_CATEGORIES']).toBeCalled()
-            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).not.toBeCalled()
+            expect(storeMocks.mutations['posts/RESET_CATEGORIES']).toHaveBeenCalled()
+            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).not.toHaveBeenCalled()
           })
         })
 
@@ -84,11 +84,11 @@ describe('LoginForm', () => {
           it('sets the categories', async () => {
             authUserMock.mockReturnValue({ activeCategories: ['cat1', 'cat9', 'cat12'] })
             await fillIn(Wrapper())
-            expect(storeMocks.mutations['posts/RESET_CATEGORIES']).toBeCalled()
-            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toBeCalledTimes(3)
-            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toBeCalledWith({}, 'cat1')
-            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toBeCalledWith({}, 'cat9')
-            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toBeCalledWith({}, 'cat12')
+            expect(storeMocks.mutations['posts/RESET_CATEGORIES']).toHaveBeenCalled()
+            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledTimes(3)
+            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat1')
+            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat9')
+            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat12')
           })
         })
       })
