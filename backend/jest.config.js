@@ -7,7 +7,8 @@ module.exports = {
     '!**/node_modules/**',
     '!**/test/**',
     '!**/build/**',
-    '!**/src/**/?(*.)+(spec|test).ts?(x)'
+    '!**/src/**/?(*.)+(spec|test).ts?(x)',
+    '!**/src/db/migrations/**'    
   ],
   coverageThreshold: {
     global: {
