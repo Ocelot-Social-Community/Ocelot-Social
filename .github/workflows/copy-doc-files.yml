@@ -1,4 +1,4 @@
-name: name: ocelot.social copy .md files to docs.ocelot.social CI
+name: ocelot.social copy .md files to docs.ocelot.social CI
 
 on:
   push:
