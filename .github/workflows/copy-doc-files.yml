@@ -32,17 +32,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@master
 
-    - name: Select .md files in origin structure
-      run: |
-        mkdir docs
-        rsync -av --include="*.md" --include="*/" --exclude="*" ./ ./docs/
-
     - name: Copy .md files
       uses: RomanosTrechlis/actions-copy-files@master
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
-        source-files: ./docs/*
+        source-files: ./**/*.md
         destination-username: 'Ocelot-Social-Community'
         destination-repository: 'Ocelot-Social'
         destination-directory: 'docs/'
