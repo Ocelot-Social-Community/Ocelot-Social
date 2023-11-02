@@ -108,6 +108,7 @@ services:
     volumes:
       - neo4j_data:/data
     environment:
+      # settings reference: https://neo4j.com/docs/operations-manual/4.4/docker/ref-settings/
       # TODO: This sounds scary for a production environment
       - NEO4J_AUTH=none
       - NEO4J_dbms_security_procedures_unrestricted=algo.*,apoc.*
