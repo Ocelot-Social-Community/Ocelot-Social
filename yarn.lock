@@ -1395,10 +1395,10 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.19.3.tgz#e5036be529f757e58d9a7771f2f1b14782986a74"
   integrity sha512-FbUN+0ZRXsypPyWE2IwIkVjDkDnJoMJARWOcFZn4KPPli+QnKqF0z1anvfaYe3ev5HFCpRDLLBDHyOALLppWHw==
 
-"@faker-js/faker@8.1.0":
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-8.1.0.tgz#e14896f1c57af2495e341dc4c7bf04125c8aeafd"
-  integrity sha512-38DT60rumHfBYynif3lmtxMqMqmsOQIxQgEuPZxCk2yUYN0eqWpTACgxi0VpidvsJB8CRxCpvP7B3anK85FjtQ==
+"@faker-js/faker@8.2.0":
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-8.2.0.tgz#d4656d2cb485fe6ec4e7b340da9f16fac2c36c4a"
+  integrity sha512-VacmzZqVxdWdf9y64lDOMZNDMM/FQdtM9IsaOPKOm2suYwEatb8VkdHqOzXcDnZbk7YDE2BmsJmy/2Hmkn563g==
 
 "@hapi/address@2.x.x":
   version "2.1.4"
