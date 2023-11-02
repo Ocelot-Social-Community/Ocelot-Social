@@ -42,7 +42,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
-        source-files: ./**/*.md
+        source-files: ./docs/*
         destination-username: 'mahula'
         destination-repository: 'Ocelot-Social-Community/Ocelot-Social'
         destination-directory: 'docs/'
