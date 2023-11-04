@@ -8,6 +8,8 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  assignees:
+    - "mahula"
 
 - package-ecosystem: npm
   directory: "/"
@@ -17,6 +19,8 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  assignees:
+    - "mahula"
 - package-ecosystem: npm
   directory: "/backend"
   rebase-strategy: "disabled"
@@ -25,6 +29,8 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  assignees:
+    - "mahula"
 - package-ecosystem: npm
   directory: "/webapp"
   rebase-strategy: "disabled"
@@ -33,6 +39,8 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  assignees:
+    - "mahula"
 
 - package-ecosystem: docker
   directory: "/backend"
@@ -42,6 +50,8 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  assignees:
+    - "mahula"
 - package-ecosystem: docker
   directory: "/webapp"
   rebase-strategy: "disabled"
@@ -50,6 +60,8 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  assignees:
+    - "mahula"
 - package-ecosystem: docker
   directory: "/neo4j"
   rebase-strategy: "disabled"
@@ -58,6 +70,8 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  assignees:
+    - "mahula"
 - package-ecosystem: docker
   directory: "/deployment/src/docker"
   rebase-strategy: "disabled"
@@ -66,3 +80,5 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  assignees:
+    - "mahula"
