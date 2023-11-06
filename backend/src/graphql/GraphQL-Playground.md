@@ -2,6 +2,8 @@
 
 ![GraphQL Playground](../../../.gitbook/assets/graphql-playground%20%281%29.png)
 
+[![Build Status Test](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test.yml/badge.svgTEST)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions)
+
 ***Attention:** For using the GraphQL Playground set `DEBUG=true` in your backend `.env`, see `.env.template`!*
 
 To use GraphQL Playground, we need to know some basics:

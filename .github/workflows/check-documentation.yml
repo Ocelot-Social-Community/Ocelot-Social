@@ -49,4 +49,4 @@ jobs:
         use-verbose-mode: 'yes'
         check-modified-files-only: 'no'
         base-branch: master # set to branch of current PR's branch
-        folder-path: '/home/runner/work/Ocelot-Social/Ocelot-Social/'
+        folder-path: '.'
