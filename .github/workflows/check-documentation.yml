@@ -42,3 +42,10 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@master
+    - name: Check Markdown Links
+      uses: gaurav-nelson/github-action-markdown-link-check@master
+      with:
+        use-quiet-mode: 'no'
+        use-quiet-mode: 'yes'
+        check-modified-files-only: 'no'
+        base-branch: master # set to branch of current PR's branch
