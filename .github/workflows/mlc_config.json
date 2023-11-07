@@ -1,7 +1,7 @@
 {
   "ignorePatterns": [
     {
-      "pattern": /^(https:\/\/github\.com\/Ocelot-Social-Community\/Ocelot-Social\/pull\/|http:\/\/localhost)/
+      "pattern": "/^(https:\/\/github.com\/Ocelot-Social-Community\/Ocelot-Social\/pull\/|http:\/\/localhost)/"
     }
   ],
   "timeout": "20s",
