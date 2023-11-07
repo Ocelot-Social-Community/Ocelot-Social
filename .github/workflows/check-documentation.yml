@@ -3,7 +3,7 @@ name: ocelot.social check documentation
 on:
   push:
     branches:
-      - trigger-docs.ocelot.social-deployment-by-markdown-file-changes-in-master-branch
+      - 6816-refactor-docsocelotsocial-ensure-vuepress-does-not-break
 
 jobs:
   files-changed:
