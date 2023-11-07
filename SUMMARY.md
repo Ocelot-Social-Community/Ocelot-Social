@@ -1,7 +1,7 @@
 # Table of contents
 
 
-* [Introduction](READMEtest.md)
+* [Introduction](README.md)
 * [Edit this Documentation](edit-this-documentation.md)
 * [Neo4J](neo4j/README.md)
 * [Backend](backend/README.md)
@@ -16,8 +16,8 @@
   * [End-to-end Tests](cypress/README.md)
   * [Webapp (Frontend) Tests](webapp/testing.md)
   * [Backend Tests](backend/testing.md)
-* [Deployment](deploymentTEST/README.md)
+* [Deployment](deployment/README.md)
 * [Contributing](CONTRIBUTING.md)
 * [Feature Specification](cypress/features.md)
-* [Code of Conduct](CODE_OF_CONTESTDUCT.md)
+* [Code of Conduct](CODE_OF_CONDUCT.md)
 * [License](LICENSE.md)
