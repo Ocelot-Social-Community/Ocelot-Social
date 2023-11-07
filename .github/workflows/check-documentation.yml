@@ -46,7 +46,7 @@ jobs:
       uses: gaurav-nelson/github-action-markdown-link-check@master
       with:
         use-quiet-mode: 'yes'
-        use-verbose-mode: 'yes'
+        use-verbose-mode: 'no'
         check-modified-files-only: 'no'
         config-file: '.github/workflows/mlc_config.json'
         base-branch: 'trigger-docs.ocelot.social-deployment-by-markdown-file-changes-in-master-branch' # set to branch of current PR's branch
