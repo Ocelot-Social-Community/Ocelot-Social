@@ -12,5 +12,5 @@ webapp: &webapp
   - 'webapp/**/*'
   - 'package.json'
 
-  markdown-files: &markdown-files
+markdown-files: &markdown-files
   - '**/*.md'
