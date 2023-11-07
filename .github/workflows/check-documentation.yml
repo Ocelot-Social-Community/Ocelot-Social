@@ -49,4 +49,5 @@ jobs:
         use-verbose-mode: 'yes'
         check-modified-files-only: 'no'
         base-branch: 'trigger-docs.ocelot.social-deployment-by-markdown-file-changes-in-master-branch' # set to branch of current PR's branch
-        folder-path: '.'
+        folder-path: './'
+        file-path: './README.md'
