@@ -35,7 +35,7 @@ jobs:
       - name: Check if .md files exist
         run: |
           if [ ! -f "SUMMARY.md" ]; then
-            echo "SUMMARY.md does not exist."
+            echo "The file SUMMARY.md does not exist."
             exit 1
           fi
 
@@ -49,9 +49,9 @@ jobs:
           done
 
           if [ ${#missing_files[@]} -eq 0 ]; then
-            echo "All listed .md files exist."
+            echo "All files listed in SUMMARY.dm exist."
           else
-            echo "The following .md files do not exist:"
+            echo "These files listed in SUMMARY.dm do not exist:"
             for missing_file in "${missing_files[@]}"; do
               echo "$missing_file"
             done
