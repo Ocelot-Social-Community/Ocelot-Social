@@ -1,7 +1,7 @@
 {
   "ignorePatterns": [
     {
-      "pattern": "^(https:\/\/github\.com\/Ocelot-Social-Community\/Ocelot-Social\/pull\/|http:\/\/localhost)"
+      "pattern": /^(https:\/\/github\.com\/Ocelot-Social-Community\/Ocelot-Social\/pull\/|http:\/\/localhost)/
     }
   ],
   "timeout": "20s",
@@ -10,6 +10,3 @@
   "fallbackRetryDelay": "30s",
   "aliveStatusCodes": [200, 206]
 }
-
-
-Please provide a regex for URLs, which start with ""^https://github.com/Ocelot-Social-Community/Ocelot-Social/pull/" or "http://localhost"
