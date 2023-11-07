@@ -45,10 +45,9 @@ jobs:
     - name: Check Markdown Links
       uses: gaurav-nelson/github-action-markdown-link-check@master
       with:
-        use-quiet-mode: 'no'
+        use-quiet-mode: 'yes'
         use-verbose-mode: 'yes'
         check-modified-files-only: 'no'
         config-file: '.github/workflows/mlc_config.json'
         base-branch: 'trigger-docs.ocelot.social-deployment-by-markdown-file-changes-in-master-branch' # set to branch of current PR's branch
         folder-path: '.'
-        file-path: './README.md'
