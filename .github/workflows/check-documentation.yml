@@ -32,7 +32,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@master
 
-      # TODO:
+      - name: Check if .md files exist
+        run: |
+          if [ ! -f "SUMMARY.md" ]; then
+            echo "SUMMARY.md does not exist."
+            exit 1
+          fi
+
+          md_files=$(grep -o -P '\[[^\]]+\]\(([^)]+\.md)\)' SUMMARY.md | sed -r 's/.*\(([^)]+)\)/\1/')
+          missing_files=()
+
+          for file in $md_files; do
+            if [ ! -f "$file" ]; then
+              missing_files+=("$file")
+            fi
+          done
+
+          if [ ${#missing_files[@]} -eq 0 ]; then
+            echo "All listed .md files exist."
+          else
+            echo "The following .md files do not exist:"
+            for missing_file in "${missing_files[@]}"; do
+              echo "$missing_file"
+            done
+            exit 1
+          fi
 
   check-markdown-links:
     name: Check Markdown links
