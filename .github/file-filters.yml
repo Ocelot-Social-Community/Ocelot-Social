@@ -11,3 +11,6 @@ webapp: &webapp
   - '.github/workflows/test-webapp.yml'
   - 'webapp/**/*'
   - 'package.json'
+
+  markdown-files: &markdown-files
+  - '**/*.md'
