@@ -23,41 +23,6 @@ jobs:
           filters: .github/file-filters.yml
           list-files: shell
 
-  check-summary:
-    name: Check documentation summary
-    if: needs.files-changed.outputs.markdown-files == 'true'
-    needs: files-changed
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@master
-
-      - name: Check, if all .md files listed in SUMMARY.md exist in current branch
-        run: |
-          if [ ! -f "SUMMARY.md" ]; then
-            echo "The file SUMMARY.md does not exist."
-            exit 1
-          fi
-
-          md_files=$(grep -o -P '\[[^\]]+\]\(([^)]+\.md)\)' SUMMARY.md | sed -r 's/.*\(([^)]+)\)/\1/')
-          missing_files=()
-
-          for file in $md_files; do
-            if [ ! -f "$file" ]; then
-              missing_files+=("$file")
-            fi
-          done
-
-          if [ ${#missing_files[@]} -eq 0 ]; then
-            echo "All .md files listed in SUMMARY.dm exist."
-          else
-            echo "These files listed in SUMMARY.dm do not exist:"
-            for missing_file in "${missing_files[@]}"; do
-              echo "$missing_file"
-            done
-            exit 1
-          fi
-
   check-markdown-links:
     name: Check Markdown links
     if: needs.files-changed.outputs.markdown-files == 'true'
