@@ -32,7 +32,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@master
 
-      - name: Check, if all .md files listed in SUMMARY.dm exist in current branch
+      - name: Check, if all .md files listed in SUMMARY.md exist in current branch
         run: |
           if [ ! -f "SUMMARY.md" ]; then
             echo "The file SUMMARY.md does not exist."
