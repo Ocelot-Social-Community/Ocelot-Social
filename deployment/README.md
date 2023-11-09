@@ -48,7 +48,7 @@ Since all deployment methods described here depend on [Docker](https://docker.co
 The next step is:
 
 - [Set Environment Variables and Configurations](./deployment-values.md)
-- [Configure And Branding](./deployment/configurations/stage.ocelot.social/branding/README.md)
+- [Configure And Branding](./configurations/stage.ocelot.social/branding/README.md)
 
 ### Optional: Locally Testing Configuration And Branding
 
