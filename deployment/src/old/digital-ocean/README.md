@@ -30,7 +30,7 @@ do this as a last step.
 
 We are storing our images in the s3-compatible [DigitalOcean Spaces](https://www.digitalocean.com/docs/spaces/). 
 
-We still want to take backups of our images in case something happens to the images in the cloud. See these [instructions](https://docs.digitalocean.com/products/spaces/reference/s3cmd/) about getting set up with `s3cmd` to take a copy of all images in a `Spaces` namespace, i.e. `ocelot-social-uploads`.
+We still want to take backups of our images in case something happens to the images in the cloud. See these [instructions](https://www.digitalocean.com/docs/spaces/resources/s3cmd-usage/) about getting set up with `s3cmd` to take a copy of all images in a `Spaces` namespace, i.e. `ocelot-social-uploads`.
 
 After configuring `s3cmd` with your credentials, etc. you should be able to make a backup with this command.
 

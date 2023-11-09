@@ -9,9 +9,9 @@ working reliably. It is very likely that DigitalOcean had some bugs when I
 tried out the steps below.
 {% endhint %}
 
-We use [velero](https://github.com/vmware-tanzu/velero) for on premise backups, we
+We use [velero](https://github.com/heptio/velero) for on premise backups, we
 tested on version `v0.11.0`, you can find their
-documentation [here](https://github.com/vmware-tanzu/velero/releases/tag/v0.11.0).
+documentation [here](https://heptio.github.io/velero/v0.11.0/).
 
 Our kubernets configurations adds some annotations to pods. The annotations
 define the important persistent volumes that need to be backed up. Velero will
@@ -22,8 +22,8 @@ pick them up and store the volumes in the same cluster but in another namespace
 
 You have to install the binary `velero` on your computer and get a tarball of
 the latest release. We use `v0.11.0` so visit the
-[release](https://github.com/vmware-tanzu/velero/releases/tag/v0.11.0) page and
-download and extract e.g. [velero-v0.11.0-linux-arm64.tar.gz](https://github.com/vmware-tanzu/velero/releases/download/v0.11.0/velero-v0.11.0-linux-arm64.tar.gz).
+[release](https://github.com/heptio/velero/releases/tag/v0.11.0) page and
+download and extract e.g. [velero-v0.11.0-linux-arm64.tar.gz](https://github.com/heptio/velero/releases/download/v0.11.0/velero-v0.11.0-linux-amd64.tar.gz).
 
 
 ## Setup Velero Namespace
