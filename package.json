@@ -1,0 +1,22 @@
+{
+  "name": "boilerplate-frontend",
+  "version": "1.0.0",
+  "description": "The IT4C Boilerplate for frontends",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IT4Change/boilerplate-frontend.git"
+  },
+  "keywords": [
+    "npm"
+  ],
+  "author": "Ulf Gebhardt",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/IT4Change/boilerplate-frontend/issues"
+  },
+  "homepage": "https://github.com/IT4Change/boilerplate-frontend#readme"
+}
