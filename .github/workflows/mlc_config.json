@@ -4,6 +4,7 @@
       "pattern": "^(https:\/\/github.com\/Ocelot-Social-Community\/Ocelot-Social\/pull\/|http:\/\/localhost)"
     }
   ],
+  "projectBaseUrl": "https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/",
   "timeout": "20s",
   "retryOn429": true,
   "retryCount": 2,
