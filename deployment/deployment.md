@@ -4,8 +4,8 @@ Before you start the deployment you have to do preparations.
 
 ## Deployment Preparations
 
-Since all deployment methods described here depend on [Docker](https://docker.com) and [DockerHub](https://hub.docker.com), you need to create your own organisation on DockerHub and put its name in the [package.json](/package.json) file as your `dockerOrganisation`.  
-Read more details in the [main README](/README.md) under [Usage](/README.md#usage).
+Since all deployment methods described here depend on [Docker](https://docker.com) and [DockerHub](https://hub.docker.com), you need to create your own organisation on DockerHub and put its name in the [package.json](./package.json) file as your `dockerOrganisation`.
+Read more details in the [main README](./README.md) under [Usage](./README.md#usage).
 
 ## Deployment Methods
 

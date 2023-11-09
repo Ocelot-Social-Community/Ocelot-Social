@@ -4,7 +4,7 @@ Thank you so much for thinking of contributing to the [ocelot.social](https://oc
 
 ## Getting Set Up
 
-Instructions for how to install all the necessary software and some code guidelines can be found in our main [Readme](/README.md) or in our [documentation](/SUMMARY.md).
+Instructions for how to install all the necessary software and some code guidelines can be found in our main [Readme](./README.md) or in our [documentation](./SUMMARY.md).
 
 To get you started we recommend that you join forces with a regular contributor. Please join [our Discord instance](https://discord.gg/AJSX9DCSUA) to chat with developers or just get in touch directly on an issue on either [Github](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues) or [Zenhub](https://app.zenhub.com/workspaces/ocelotsocial-5fb21ff922cb410015dd6535/board?filterLogic=any&repos=301151089):
 
@@ -36,7 +36,7 @@ Every pull request needs to:
 
 ## Contribution Flow For Open Source Contributors
 
-See [contributing in main README.md](/README.md#contributing)
+See [contributing in main README.md](./README.md#contributing)
 
 ## The Team
 
