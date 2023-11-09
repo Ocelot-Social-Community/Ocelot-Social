@@ -1,9 +1,6 @@
 name: ocelot.social check documentation
 
-on:
-  push:
-    branches:
-      - 6816-refactor-docsocelotsocial-ensure-vuepress-does-not-break
+on: push
 
 jobs:
   files-changed:
