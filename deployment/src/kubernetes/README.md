@@ -9,7 +9,7 @@ Please contact us if you are interested in options not listed below.
 
 Managed Kubernetes:
 
-- [DigitalOcean](/deployment/src/kubernetes/DigitalOcean.md)
+- [DigitalOcean](./DigitalOcean.md)
 
 ## Configuration
 
@@ -165,7 +165,7 @@ $ doctl compute firewall get <ID> --context <context-name>
 
 ***ATTENTION:** This seems not to work at all so we leave it away at the moment*
 
-***TODO:** I thought this is necessary if we use the DigitalOcean DNS management service? See [Manage DNS With DigitalOcean](/deployment/kubernetes/DigitalOcean.md#manage-dns-with-digitalocean)*
+***TODO:** I thought this is necessary if we use the DigitalOcean DNS management service? See [Manage DNS With DigitalOcean](./DigitalOcean.md#manage-dns-with-digitalocean)*
 
 This chart is only necessary (recommended is more precise) if you run DigitalOcean without load balancer.
 You need to generate an access token with read + write for the `dns.values.yaml` at <https://cloud.digitalocean.com/account/api/tokens> and fill it in.
@@ -280,7 +280,7 @@ helm uninstall ocelot \
 
 ## Backups
 
-You can and should do [backups](/deployment/kubernetes/Backup.md) with Kubernetes for sure.
+You can and should do [backups](./Backup.md) with Kubernetes for sure.
 
 ## Error Reporting
 
