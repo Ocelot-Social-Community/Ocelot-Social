@@ -14,21 +14,21 @@ To be able to build this project you need:
 
 The following commands are available:
 
-| Command                 | Description                              |
-|-------------------------|------------------------------------------|
-| `npm install`           | Project setup                            |
-| `npm run build`         | Compiles and minifies for production     |
-| **Develop**             |                                          |
-| `npm run dev`           | Compiles and hot-reloads for development |
-| `npm run preview`       | Run production preview                   |
-| **Test**                |                                          |
-| `npm run lint`          | Runs all linters                         |
-| `npm test`              | Run all tests & linters                  |
-| **Storybook**           |                                          |
-| `npm run storybook`     | Run Storybook                            |
-| npm run build:storybook | Build static storybook                   |
+| Command                   | Description                              |
+|---------------------------|------------------------------------------|
+| `npm install`             | Project setup                            |
+| `npm run build`           | Compiles and minifies for production     |
+| **Develop**               |                                          |
+| `npm run dev`             | Compiles and hot-reloads for development |
+| `npm run preview`         | Run production preview                   |
+| **Test**                  |                                          |
+| `npm run lint`            | Runs all linters                         |
+| `npm test`                | Run all tests & linters                  |
+| **Storybook**             |                                          |
+| `npm run storybook`       | Run Storybook                            |
+| `npm run build:storybook` | Build static storybook                   |
 
-## Technologie
+## Technology
 
 - [X] ~~nuxt3~~
 - [x] vuetify
