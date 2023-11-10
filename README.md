@@ -61,3 +61,9 @@ See [Configuration Reference](https://vitejs.dev/config/).
 
 [badge-npm-img]: https://img.shields.io/badge/npm-latest-blue
 [badge-npm-href]: https://www.npmjs.com/package/npm
+
+[badge-vuetify-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies.vuetify&label=vuetify&color=green
+[badge-vuetify-href]: https://vuetifyjs.com/
+
+[badge-storybook-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.storybook&label=storybook&color=green
+[badge-storybook-href]: https://storybook.js.org/
