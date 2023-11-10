@@ -10,6 +10,46 @@ To be able to build this project you need:
 - nodejs
 - npm
 
+## Commands
+
+The following commands are available:
+
+| Command                 | Description                              |
+|-------------------------|------------------------------------------|
+| `npm install`           | Project setup                            |
+| `npm run build`         | Compiles and minifies for production     |
+| **Develop**             |                                          |
+| `npm run dev`           | Compiles and hot-reloads for development |
+| `npm run preview`       | Run production preview                   |
+| **Test**                |                                          |
+| `npm run lint`          | Runs all linters                         |
+| `npm test`              | Run all tests & linters                  |
+| **Storybook**           |                                          |
+| `npm run storybook`     | Run Storybook                            |
+| npm run build:storybook | Build static storybook                   |
+
+## Technologie
+
+- [X] ~~nuxt3~~
+- [x] vuetify
+- [x] vue3
+- [x] pinia store
+- [x] storybook
+- [-] eslint
+- [ ] vite vue3 ssr
+- [ ] figma
+- [ ] chromatic
+- [ ] jest
+- [ ] localization?
+- [ ] documentation?
+
+## Known Problems
+
+Storybook delivers Introduction producing errors: https://github.com/storybookjs/storybook/issues/24792
+
+## Links
+
+See [Configuration Reference](https://vitejs.dev/config/).
 
 ## License
 
