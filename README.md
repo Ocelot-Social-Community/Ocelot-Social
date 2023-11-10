@@ -4,6 +4,13 @@
 
 The IT4C Boilerplate for frontends
 
+## Requirements
+
+To be able to build this project you need:
+- nodejs
+- npm
+
+
 ## License
 
 [Apache 2.0](./LICENSE)
