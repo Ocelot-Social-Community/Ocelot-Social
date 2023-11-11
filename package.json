@@ -37,7 +37,7 @@
     "@babel/core": "^7.23.2",
     "@babel/preset-env": "^7.23.2",
     "@babel/register": "^7.22.15",
-    "@badeball/cypress-cucumber-preprocessor": "^19.0.0",
+    "@badeball/cypress-cucumber-preprocessor": "^19.1.0",
     "@cypress/browserify-preprocessor": "^3.0.2",
     "@faker-js/faker": "8.2.0",
     "auto-changelog": "^2.3.0",
