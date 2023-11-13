@@ -27,6 +27,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@mdi/font": "^7.3.67",
     "@types/compression": "^1.7.2",
     "@types/express": "^4.17.17",
     "@types/node": "^20.4.10",
@@ -36,12 +37,15 @@
     "compression": "^1.7.4",
     "cross-env": "^7.0.3",
     "express": "^4.18.2",
+    "sass": "^1.69.5",
+    "sass-loader": "^13.3.2",
     "sirv": "^2.0.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6",
-    "vite": "^4.4.9",
     "vike": "^0.4.145",
-    "vue": "^3.3.4"
+    "vite": "^4.4.9",
+    "vue": "^3.3.4",
+    "vuetify": "^3.4.0"
   },
   "type": "module"
 }

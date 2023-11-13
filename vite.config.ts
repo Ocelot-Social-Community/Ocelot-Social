@@ -3,7 +3,8 @@ import vike from 'vike/plugin'
 import { UserConfig } from 'vite'
 
 const config: UserConfig = {
-  plugins: [vue(), vike()]
+  plugins: [vue(), vike()],
+  ssr: { noExternal: ['vuetify'] }
 }
 
 export default config

@@ -2,6 +2,7 @@
 [![nodejs][badge-nodejs-img]][badge-nodejs-href]
 [![npm][badge-npm-img]][badge-npm-href]
 [![vike][badge-vike-img]][badge-vike-href]
+[![vuetify][badge-vuetify-img]][badge-vuetify-href]
 
 The IT4C Boilerplate for frontends
 
@@ -43,12 +44,12 @@ The following commands are available:
 
 ## Technology
 
-- [ ] vuetify
 - [x] vue3
+- [x] vike
+- [x] vuetify
 - [ ] pinia store
 - [ ] storybook
 - [ ] eslint
-- [x] vite vue3 ssr
 - [ ] figma
 - [ ] chromatic
 - [ ] jest
@@ -61,7 +62,8 @@ Storybook delivers Introduction producing errors: https://github.com/storybookjs
 
 ## Links
 
-See [Configuration Reference](https://vitejs.dev/config/).
+See [Configuration Reference](https://vitejs.dev/config/).\
+See [vite-plugin-ssr-vuetify](https://github.com/brillout/vite-plugin-ssr-vuetify).
 
 ## License
 
@@ -76,7 +78,6 @@ See [Configuration Reference](https://vitejs.dev/config/).
 
 [badge-vike-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies.vike&label=vike&color=green
 [badge-vike-href]: https://vike.dev/
-
 
 [badge-vuetify-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies.vuetify&label=vuetify&color=green
 [badge-vuetify-href]: https://vuetifyjs.com/
