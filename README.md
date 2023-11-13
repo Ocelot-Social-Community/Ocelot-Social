@@ -62,7 +62,7 @@ The following commands are available:
 
 ## Known Problems
 
-Storybook delivers Introduction producing errors: https://github.com/storybookjs/storybook/issues/24792
+Currently none
 
 ## Links
 
