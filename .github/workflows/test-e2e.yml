@@ -25,16 +25,11 @@ jobs:
           docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/images/webapp.tar
 
-      - name: Install NodeJS requirements
+      - name: Install node requirements
         run: |
-          sudo apt install nvm
-          nvm install
-          nvm use
-          corepack enable
-
-      - name: Install cypress requirements
-        run: |
-          apt install nvm
+          sudo apt-get install curl gnupg2 -y
+          curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+          source ~/.bashrc
           nvm install
           nvm use
           corepack enable
