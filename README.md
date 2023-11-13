@@ -3,6 +3,7 @@
 [![npm][badge-npm-img]][badge-npm-href]
 [![vike][badge-vike-img]][badge-vike-href]
 [![vuetify][badge-vuetify-img]][badge-vuetify-href]
+[![storybook][badge-storybook-img]][badge-storybook-href]
 
 The IT4C Boilerplate for frontends
 
@@ -41,6 +42,9 @@ The following commands are available:
 | `npm run server:dev`      | Run development server                   |
 | **Test**                  |                                          |
 | `npm test`                | Run all tests & linters                  |
+| **Storybook**             |                                          |
+| `npm run storybook`       | Run Storybook                            |
+| `npm run build:storybook` | Build static storybook                   |
 
 ## Technology
 
