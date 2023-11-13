@@ -1,6 +1,7 @@
 # boilerplate-frontend
 [![nodejs][badge-nodejs-img]][badge-nodejs-href]
 [![npm][badge-npm-img]][badge-npm-href]
+[![vike][badge-vike-img]][badge-vike-href]
 
 The IT4C Boilerplate for frontends
 
@@ -14,6 +15,7 @@ To be able to build this project you need:
 
 The following commands are available:
 
+<!--
 | Command                   | Description                              |
 |---------------------------|------------------------------------------|
 | `npm install`             | Project setup                            |
@@ -27,16 +29,26 @@ The following commands are available:
 | **Storybook**             |                                          |
 | `npm run storybook`       | Run Storybook                            |
 | `npm run build:storybook` | Build static storybook                   |
+-->
+| Command                   | Description                              |
+|---------------------------|------------------------------------------|
+| `npm install`             | Project setup                            |
+| `npm run build`           | Compiles and minifies for production     |
+| `npm run server:prod`     | Runs productions server                  |
+| **Develop**               |                                          |
+| `npm run dev`             | Compiles and hot-reloads for development |
+| `npm run server:dev`      | Run development server                   |
+| **Test**                  |                                          |
+| `npm test`                | Run all tests & linters                  |
 
 ## Technology
 
-- [X] ~~nuxt3~~
-- [x] vuetify
+- [ ] vuetify
 - [x] vue3
-- [x] pinia store
-- [x] storybook
-- [-] eslint
-- [ ] vite vue3 ssr
+- [ ] pinia store
+- [ ] storybook
+- [ ] eslint
+- [x] vite vue3 ssr
 - [ ] figma
 - [ ] chromatic
 - [ ] jest
@@ -61,6 +73,10 @@ See [Configuration Reference](https://vitejs.dev/config/).
 
 [badge-npm-img]: https://img.shields.io/badge/npm-latest-blue
 [badge-npm-href]: https://www.npmjs.com/package/npm
+
+[badge-vike-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies.vike&label=vike&color=green
+[badge-vike-href]: https://vike.dev/
+
 
 [badge-vuetify-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies.vuetify&label=vuetify&color=green
 [badge-vuetify-href]: https://vuetifyjs.com/
