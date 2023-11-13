@@ -27,7 +27,7 @@ jobs:
 
       - name: Install NodeJS requirements
         run: |
-          apt install nvm
+          sudo apt install nvm
           nvm install
           nvm use
           corepack enable
