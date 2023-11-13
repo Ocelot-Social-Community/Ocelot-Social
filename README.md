@@ -51,8 +51,8 @@ The following commands are available:
 - [x] vue3
 - [x] vike
 - [x] vuetify
+- [x] storybook
 - [ ] pinia store
-- [ ] storybook
 - [ ] eslint
 - [ ] figma
 - [ ] chromatic
