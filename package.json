@@ -24,6 +24,8 @@
     "server": "node --loader ts-node/esm ./server/index.ts",
     "server:dev": "npm run server",
     "server:prod": "cross-env NODE_ENV=production npm run server",
+    "storybook": "cross-env STORYBOOK=true storybook dev -p 6006",
+    "build-storybook": "cross-env STORYBOOK=true && storybook build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -47,5 +49,17 @@
     "vue": "^3.3.4",
     "vuetify": "^3.4.0"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@storybook/addon-essentials": "^7.5.3",
+    "@storybook/addon-interactions": "^7.5.3",
+    "@storybook/addon-links": "^7.5.3",
+    "@storybook/blocks": "^7.5.3",
+    "@storybook/testing-library": "^0.2.2",
+    "@storybook/vue3": "^7.5.3",
+    "@storybook/vue3-vite": "^7.5.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^7.5.3"
+  }
 }
