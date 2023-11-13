@@ -13,11 +13,6 @@ jobs:
       - name: Setup specified node version
         uses: actions/setup-node@v4
         with:
-          node-version: $(nvm exec cat .nvmrc)
-
-      - name: Setup specified node version
-        uses: actions/setup-node@v4
-        with:
           node-version: 20.2.0 
 
       - name: Copy env files
