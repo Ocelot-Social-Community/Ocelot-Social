@@ -25,6 +25,13 @@ jobs:
           docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/images/webapp.tar
 
+      - name: Install NodeJS requirements
+        run: |
+          apt install nvm
+          nvm install
+          nvm use
+          corepack enable
+
       - name: Install cypress requirements
         run: |
           apt install nvm
