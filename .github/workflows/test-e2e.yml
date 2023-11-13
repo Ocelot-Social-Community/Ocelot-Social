@@ -27,6 +27,13 @@ jobs:
 
       - name: Install cypress requirements
         run: |
+          apt install nvm
+          nvm install
+          nvm use
+          corepack enable
+
+      - name: Install cypress requirements
+        run: |
           wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
           cd backend
           yarn install
