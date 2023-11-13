@@ -27,9 +27,6 @@ jobs:
 
       - name: Install node requirements
         run: |
-          sudo apt-get install curl gnupg2 -y
-          curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
-          source ~/.bashrc
           nvm install
           nvm use
           corepack enable
