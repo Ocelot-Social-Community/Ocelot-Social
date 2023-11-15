@@ -4,11 +4,11 @@
         "es2021": true
     },
     "extends": [
-        //"standard",
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
-        "plugin:vue/base",
-        "plugin:vue/vue3-essential",
+        "plugin:import/recommended",
+        "plugin:import/typescript",
+        "plugin:promise/recommended",
         "plugin:vue/vue3-recommended",
         "plugin:vuetify/base",
         "plugin:vuetify/recommended",
@@ -22,8 +22,16 @@
     "plugins": [
         "@typescript-eslint",
         "prettier",
+        "import",
+        "promise",
         "vue"
     ],
+    "settings": {
+        "import/resolver": {
+          "typescript": true,
+          "node": true
+        }
+      },
     "rules": {
         "indent": [
             "error",
@@ -40,6 +48,10 @@
         "semi": [
             "error",
             "never"
-        ]
+        ],
+        // This makes sure our vike router does not throw errors
+        "vue/multi-word-component-names": ["error", {
+            "ignores": ["default", "index.page"]
+          }]
     }
 }

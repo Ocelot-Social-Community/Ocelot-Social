@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 
-import Button from './Button.vue'
+import ExampleButton from './ExampleButton.vue'
 
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
 const meta = {
   title: 'Example/Button',
-  component: Button,
+  component: ExampleButton,
   // This component will have an automatically generated docsPage entry: https://storybook.js.org/docs/vue/writing-docs/autodocs
   tags: ['autodocs'],
   argTypes: {
@@ -14,7 +14,7 @@ const meta = {
     onClick: { action: 'clicked' },
   },
   args: { primary: false }, // default value
-} satisfies Meta<typeof Button>
+} satisfies Meta<typeof ExampleButton>
 
 export default meta
 type Story = StoryObj<typeof meta>

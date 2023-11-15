@@ -34,7 +34,7 @@
     "server:prod": "cross-env NODE_ENV=production npm run server",
     "storybook": "cross-env STORYBOOK=true storybook dev -p 6006",
     "build-storybook": "cross-env STORYBOOK=true && storybook build",
-    "lint": "eslint --ignore-path .gitignore .",
+    "lint": "eslint --ext .vue,.ts,.tsx,.js,.jsx --max-warnings 0 --ignore-path .gitignore .",
     "test": "npm run lint"
   },
   "dependencies": {
@@ -71,7 +71,10 @@
     "@typescript-eslint/parser": "^6.11.0",
     "eslint": "^8.53.0",
     "eslint-config-prettier": "^9.0.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-vue": "^9.18.1",
     "eslint-plugin-vuetify": "^2.1.0",
     "prettier": "^3.1.0",
