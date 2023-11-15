@@ -10,7 +10,13 @@
   },
   "keywords": [
     "npm",
-    "vike"
+    "nodejs",
+    "vite",
+    "vike",
+    "vue",
+    "vuetify",
+    "pinia",
+    "storybook"
   ],
   "author": "Ulf Gebhardt",
   "license": "Apache-2.0",
@@ -40,6 +46,7 @@
     "compression": "^1.7.4",
     "cross-env": "^7.0.3",
     "express": "^4.18.2",
+    "pinia": "^2.1.7",
     "sass": "^1.69.5",
     "sass-loader": "^13.3.2",
     "sirv": "^2.0.3",

@@ -5,6 +5,7 @@
 [![vike][badge-vike-img]][badge-vike-href]
 [![vuetify][badge-vuetify-img]][badge-vuetify-href]
 [![storybook][badge-storybook-img]][badge-storybook-href]
+[![pinia][badge-pinia-img]][badge-pinia-href]
 
 The IT4C Boilerplate for frontends
 
@@ -49,11 +50,12 @@ The following commands are available:
 
 ## Technology
 
-- [x] vue3
+- [x] vite
 - [x] vike
+- [x] vue3
 - [x] vuetify
 - [x] storybook
-- [ ] pinia store
+- [x] pinia store
 - [ ] eslint
 - [ ] figma
 - [ ] chromatic
@@ -91,5 +93,8 @@ See [vite-plugin-ssr-vuetify](https://github.com/brillout/vite-plugin-ssr-vuetif
 [badge-vuetify-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies.vuetify&label=vuetify&color=green
 [badge-vuetify-href]: https://vuetifyjs.com/
 
-[badge-storybook-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.storybook&label=storybook&color=green
+[badge-pinia-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies.pinia&label=pinia&color=green
+[badge-pinia-href]: https://pinia.vuejs.org/
+
+[badge-storybook-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.storybook&label=storybook&color=yellow
 [badge-storybook-href]: https://storybook.js.org/
