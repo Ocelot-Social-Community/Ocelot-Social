@@ -5,6 +5,7 @@
 [![vike][badge-vike-img]][badge-vike-href]
 [![vuetify][badge-vuetify-img]][badge-vuetify-href]
 [![pinia][badge-pinia-img]][badge-pinia-href]
+[![eslint][badge-eslint-img]][badge-eslint-href]
 [![storybook][badge-storybook-img]][badge-storybook-href]
 
 The IT4C Boilerplate for frontends
@@ -19,21 +20,6 @@ To be able to build this project you need:
 
 The following commands are available:
 
-<!--
-| Command                   | Description                              |
-|---------------------------|------------------------------------------|
-| `npm install`             | Project setup                            |
-| `npm run build`           | Compiles and minifies for production     |
-| **Develop**               |                                          |
-| `npm run dev`             | Compiles and hot-reloads for development |
-| `npm run preview`         | Run production preview                   |
-| **Test**                  |                                          |
-| `npm run lint`            | Runs all linters                         |
-| `npm test`                | Run all tests & linters                  |
-| **Storybook**             |                                          |
-| `npm run storybook`       | Run Storybook                            |
-| `npm run build:storybook` | Build static storybook                   |
--->
 | Command                   | Description                              |
 |---------------------------|------------------------------------------|
 | `npm install`             | Project setup                            |
@@ -43,6 +29,7 @@ The following commands are available:
 | `npm run dev`             | Compiles and hot-reloads for development |
 | `npm run server:dev`      | Run development server                   |
 | **Test**                  |                                          |
+| `npm run lint`            | Runs all linters                         |
 | `npm test`                | Run all tests & linters                  |
 | **Storybook**             |                                          |
 | `npm run storybook`       | Run Storybook                            |
@@ -56,13 +43,14 @@ The following commands are available:
 - [x] vuetify
 - [x] pinia store
 - [x] storybook
-- [ ] eslint
+- [x] eslint
 - [ ] figma
 - [ ] chromatic
 - [ ] jest
 - [ ] localization?
 - [ ] documentation?
 - [ ] docker
+- [ ] github actions
 
 ## Known Problems
 
@@ -95,6 +83,9 @@ See [vite-plugin-ssr-vuetify](https://github.com/brillout/vite-plugin-ssr-vuetif
 
 [badge-pinia-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies.pinia&label=pinia&color=green
 [badge-pinia-href]: https://pinia.vuejs.org/
+
+[badge-eslint-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.eslint&label=eslint&color=yellow
+[badge-eslint-href]: https://eslint.org/
 
 [badge-storybook-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.storybook&label=storybook&color=yellow
 [badge-storybook-href]: https://storybook.js.org/
