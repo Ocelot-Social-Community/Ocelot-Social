@@ -4,13 +4,15 @@
         "es2021": true
     },
     "extends": [
+        //"standard",
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:vue/base",
         "plugin:vue/vue3-essential",
         "plugin:vue/vue3-recommended",
         "plugin:vuetify/base",
-        "plugin:vuetify/recommended"
+        "plugin:vuetify/recommended",
+        "plugin:prettier/recommended"
     ],
     "parserOptions": {
         "ecmaVersion": "latest",
@@ -19,12 +21,13 @@
     },
     "plugins": [
         "@typescript-eslint",
+        "prettier",
         "vue"
     ],
     "rules": {
         "indent": [
             "error",
-            4
+            2
         ],
         "linebreak-style": [
             "error",

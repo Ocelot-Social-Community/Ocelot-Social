@@ -5,6 +5,6 @@ import * as components from 'vuetify/lib/components/index.mjs'
 import * as directives from 'vuetify/lib/directives/index.mjs'
 
 export default createVuetify({
-    components,
-    directives
+  components,
+  directives,
 })

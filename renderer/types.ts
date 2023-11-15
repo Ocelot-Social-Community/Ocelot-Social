@@ -1,14 +1,14 @@
 export type {
-    PageContextServer,
-    /*
+  PageContextServer,
+  /*
   // When using Client Routing https://vike.dev/clientRouting
   PageContextClient,
   PageContext,
   /*/
-    // When using Server Routing
-    PageContextClientWithServerRouting as PageContextClient,
-    PageContextWithServerRouting as PageContext
-    //*/
+  // When using Server Routing
+  PageContextClientWithServerRouting as PageContextClient,
+  PageContextWithServerRouting as PageContext,
+  //*/
 } from 'vike/types'
 export type { PageProps }
 export type { Component }
