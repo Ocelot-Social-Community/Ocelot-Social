@@ -8,7 +8,7 @@ import { PageContext } from './types'
 export { usePageContext }
 export { setPageContext }
 
-const key: InjectionKey<PageContext> = Symbol()
+const key: InjectionKey<PageContext> = Symbol(undefined)
 
 function usePageContext() {
   const pageContext = inject(key)

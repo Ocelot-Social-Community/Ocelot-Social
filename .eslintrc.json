@@ -4,14 +4,17 @@
         "es2021": true
     },
     "extends": [
+        "standard",
         "eslint:recommended",
         "plugin:@eslint-community/eslint-comments/recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:import/recommended",
         "plugin:import/typescript",
         "plugin:promise/recommended",
+        "plugin:security/recommended",
         "plugin:vue/vue3-recommended",
         "plugin:vuetify/recommended",
+        "plugin:storybook/recommended",
         "plugin:prettier/recommended"
     ],
     "parserOptions": {
@@ -24,7 +27,9 @@
         "prettier",
         "import",
         "promise",
-        "vue"
+        "security",
+        "vue",
+        "storybook"
     ],
     "settings": {
         "import/resolver": {
@@ -33,6 +38,10 @@
         }
       },
     "rules": {
+        "no-console": "error",
+        "no-debugger": "error",
+        "camelcase": "error",
+        "prettier/prettier": "error",
         "indent": [
             "error",
             2
@@ -54,6 +63,7 @@
             "ignores": ["default", "index.page"]
         }],
         // Optional eslint-comments rule
-        "@eslint-community/eslint-comments/no-unused-disable": "error"
+        "@eslint-community/eslint-comments/no-unused-disable": "error",
+        "@eslint-community/eslint-comments/disable-enable-pair": ["error", { "allowWholeFile": true }]
     }
 }

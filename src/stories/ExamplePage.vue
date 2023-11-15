@@ -1,6 +1,6 @@
 <template>
   <article>
-    <ExampleHeader
+    <example-header
       :user="user"
       @login="onLogin"
       @logout="onLogout"

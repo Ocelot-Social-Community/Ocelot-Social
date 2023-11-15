@@ -7,7 +7,7 @@ const meta = {
   component: ExamplePage,
   render: () => ({
     components: { ExamplePage },
-    template: '<my-page />',
+    template: '<example-page />',
   }),
   parameters: {
     // More on how to position stories at: https://storybook.js.org/docs/vue/configure/story-layout

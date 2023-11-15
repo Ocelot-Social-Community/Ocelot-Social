@@ -1,13 +1,13 @@
-export { render }
-// See https://vike.dev/data-fetching
-export const passToClient = ['pageProps', 'urlPathname']
-
 import { renderToString as renderToString_ } from '@vue/server-renderer'
 import type { App } from 'vue'
 import { escapeInject, dangerouslySkipEscape } from 'vike/server'
 import { createApp } from './app'
 import logoUrl from './logo.svg'
 import type { PageContextServer } from './types'
+
+export { render }
+// See https://vike.dev/data-fetching
+export const passToClient = ['pageProps', 'urlPathname']
 
 async function render(pageContext: PageContextServer) {
   const { Page, pageProps } = pageContext

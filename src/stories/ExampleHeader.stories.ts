@@ -15,7 +15,7 @@ const meta = {
     setup() {
       return { args }
     },
-    template: '<my-header :user="args.user" />',
+    template: '<example-header :user="args.user" />',
   }),
   parameters: {
     // More on how to position stories at: https://storybook.js.org/docs/react/configure/story-layout
