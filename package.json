@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "The IT4C Boilerplate for frontends",
   "main": "build/index.js",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/IT4Change/boilerplate-frontend.git"
@@ -49,7 +50,6 @@
     "vue": "^3.3.4",
     "vuetify": "^3.4.0"
   },
-  "type": "module",
   "devDependencies": {
     "@storybook/addon-essentials": "^7.5.3",
     "@storybook/addon-interactions": "^7.5.3",

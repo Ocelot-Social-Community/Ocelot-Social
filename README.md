@@ -1,6 +1,7 @@
 # boilerplate-frontend
 [![nodejs][badge-nodejs-img]][badge-nodejs-href]
 [![npm][badge-npm-img]][badge-npm-href]
+[![vue][badge-vue-img]][badge-vue-href]
 [![vike][badge-vike-img]][badge-vike-href]
 [![vuetify][badge-vuetify-img]][badge-vuetify-href]
 [![storybook][badge-storybook-img]][badge-storybook-href]
@@ -59,6 +60,7 @@ The following commands are available:
 - [ ] jest
 - [ ] localization?
 - [ ] documentation?
+- [ ] docker
 
 ## Known Problems
 
@@ -79,6 +81,9 @@ See [vite-plugin-ssr-vuetify](https://github.com/brillout/vite-plugin-ssr-vuetif
 
 [badge-npm-img]: https://img.shields.io/badge/npm-latest-blue
 [badge-npm-href]: https://www.npmjs.com/package/npm
+
+[badge-vue-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies.vue&label=vue&color=green
+[badge-vue-href]: https://vuejs.org/
 
 [badge-vike-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies.vike&label=vike&color=green
 [badge-vike-href]: https://vike.dev/
