@@ -1,11 +1,13 @@
 # boilerplate-frontend
 [![nodejs][badge-nodejs-img]][badge-nodejs-href]
 [![npm][badge-npm-img]][badge-npm-href]
+
 [![vue][badge-vue-img]][badge-vue-href]
 [![vike][badge-vike-img]][badge-vike-href]
 [![vuetify][badge-vuetify-img]][badge-vuetify-href]
-[![storybook][badge-storybook-img]][badge-storybook-href]
 [![pinia][badge-pinia-img]][badge-pinia-href]
+
+[![storybook][badge-storybook-img]][badge-storybook-href]
 
 The IT4C Boilerplate for frontends
 
@@ -54,8 +56,8 @@ The following commands are available:
 - [x] vike
 - [x] vue3
 - [x] vuetify
-- [x] storybook
 - [x] pinia store
+- [x] storybook
 - [ ] eslint
 - [ ] figma
 - [ ] chromatic
