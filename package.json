@@ -39,7 +39,8 @@
     "@badeball/cypress-cucumber-preprocessor": "^19.1.0",
     "@cypress/browserify-preprocessor": "^3.0.2",
     "@faker-js/faker": "8.2.0",
-    "@vuepress/plugin-search": "^2.0.0-beta.68",
+    "@vuepress/plugin-search": "^2.0.0-rc.0",
+    "@vuepress/plugin-toc": "^2.0.0-rc.0",
     "auto-changelog": "^2.3.0",
     "bcryptjs": "^2.4.3",
     "cross-env": "^7.0.3",
@@ -58,7 +59,7 @@
     "neode": "^0.4.8",
     "rosie": "^2.1.0",
     "slug": "^8.2.3",
-    "vuepress": "^2.0.0-beta.68",
+    "vuepress": "^2.0.0-rc.0",
     "wait-on": "^7.0.1"
   },
   "resolutions": {

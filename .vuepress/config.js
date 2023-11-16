@@ -3,23 +3,26 @@ import fs from 'fs'
 import { defineUserConfig } from 'vuepress'
 import { defaultTheme } from '@vuepress/theme-default'
 import { searchPlugin } from '@vuepress/plugin-search'
+import { tocPlugin } from '@vuepress/plugin-toc'
 
 export default defineUserConfig({
   base: '/',
   title: 'Ocelot-Social Documentation',
   description: 'Ocelot-Social Documentation',
   head: [
-    ['meta', {name: 'viewport', content: 'width=device-width,initial-scale=1'}]
+    ['meta', {name: 'viewport', content: 'width=device-width,initial-scale=1'}],
   ],
   theme: defaultTheme({
-    favicon: '/favicon.ico',
+    favicon: 'favicon.ico',
     logo: '/logo.svg',
     docsRepo: 'https://github.com/Ocelot-Social-Community/Ocelot-Social',
     docsBranch: 'master',
     docsDir: '.',
+    pagePatterns: ['**/*.md', '!.vuepress', '!node_modules', '!backend/node_modules', '!webapp/node_modules', '!deployment/src/old'],
     editLink: true,
     lastUpdated: false,
     contributors: false,
+    footerHtml: true,
     sidebar: generateSidebar('../SUMMARY.md'),
     navbar: [
       { text: 'Home', link: '/' },
@@ -31,13 +34,15 @@ export default defineUserConfig({
     plugins: {
       mdEnhance: {
         tabs: true,
-      },  
+      }
     },
   }),
   plugins: [
     searchPlugin({
-      placeholder: 'Search'
-    })
+    }),
+    tocPlugin({
+      // options
+    }),
   ],
 })
 
@@ -79,7 +84,6 @@ function getSummaryData(file) {
   })
 
   sidebarStructure.forEach(removeEmptyArrays)
-  console.log(JSON.stringify(sidebarStructure, null, 2))
   return sidebarStructure
 }
 
