@@ -8,14 +8,7 @@ export default mergeConfig(
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: ['tests/mock.$t.ts', 'tests/plugin.vuetify.ts']
-      /*
-      server: {
-        deps: {
-          inline: ['vuetify'],
-        },
-      },
-      */
+      setupFiles: ['tests/mock.$t.ts', 'tests/plugin.vuetify.ts'],
     },
   }),
 )
