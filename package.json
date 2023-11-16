@@ -4,7 +4,6 @@
   "description": "Free and open source software program code available to run social networks.",
   "author": "ocelot.social Community",
   "license": "MIT",
-  "private": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/Ocelot-Social-Community/Ocelot-Social.git"
@@ -40,6 +39,7 @@
     "@badeball/cypress-cucumber-preprocessor": "^19.1.0",
     "@cypress/browserify-preprocessor": "^3.0.2",
     "@faker-js/faker": "8.2.0",
+    "@vuepress/plugin-search": "^2.0.0-beta.68",
     "auto-changelog": "^2.3.0",
     "bcryptjs": "^2.4.3",
     "cross-env": "^7.0.3",
@@ -58,10 +58,12 @@
     "neode": "^0.4.8",
     "rosie": "^2.1.0",
     "slug": "^8.2.3",
+    "vuepress": "^2.0.0-beta.68",
     "wait-on": "^7.0.1"
   },
   "resolutions": {
     "set-value": "^2.0.1",
     "nan": "2.17.0"
-  }
+  },
+  "packageManager": "yarn@4.0.2"
 }
