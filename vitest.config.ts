@@ -7,7 +7,7 @@ export default mergeConfig(
   defineConfig({
     test: {
       globals: true,
-      environment: 'jsdom',
+      environment: 'happy-dom',
       setupFiles: ['tests/mock.$t.ts', 'tests/plugin.vuetify.ts'],
     },
   }),
