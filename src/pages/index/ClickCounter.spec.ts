@@ -7,6 +7,6 @@ describe('ClickCounter', () => {
 
   it('renders Button with a Counter of 0', () => {
     expect(wrapper.find('v-btn').exists()).toBe(true)
-    expect(wrapper.text()).toBe('Counter 0')
+    expect(wrapper.text()).toBe("$t('counter') 0")
   })
 })

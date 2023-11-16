@@ -5,6 +5,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    setupFiles: ['tests/unit.setup.ts'],
     /*
     server: {
       deps: {

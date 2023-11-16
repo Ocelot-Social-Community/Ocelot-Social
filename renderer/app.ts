@@ -2,7 +2,8 @@ import { createSSRApp, defineComponent, h } from 'vue'
 import PageShell from './PageShell.vue'
 import { setPageContext } from './usePageContext'
 import type { Component, PageContext, PageProps } from './types'
-import vuetify from './vuetify'
+import i18n from './i18n'
+import CreateVuetify from './vuetify'
 import { createPinia } from 'pinia'
 
 export { createApp }
@@ -25,7 +26,8 @@ function createApp(Page: Component, pageProps: PageProps | undefined, pageContex
   const pinia = createPinia()
   const app = createSSRApp(PageWithLayout)
   app.use(pinia)
-  app.use(vuetify)
+  app.use(i18n)
+  app.use(CreateVuetify(i18n))
 
   // Make pageContext available from any Vue component
   setPageContext(app, pageContext)

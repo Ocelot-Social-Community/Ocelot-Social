@@ -1,5 +1,5 @@
 <template>
-  <v-btn elevation="2" @click="state.count++">Counter {{ state.count }}</v-btn>
+  <v-btn elevation="2" @click="state.count++">{{ $t('counter') }} {{ state.count }}</v-btn>
 </template>
 
 <script lang="ts" setup>
