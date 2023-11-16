@@ -64,6 +64,5 @@
   "resolutions": {
     "set-value": "^2.0.1",
     "nan": "2.17.0"
-  },
-  "packageManager": "yarn@4.0.2"
+  }
 }
