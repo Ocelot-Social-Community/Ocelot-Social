@@ -119,5 +119,14 @@
         "promise/valid-params": "warn",
         "promise/prefer-await-to-callbacks": "error",
         "promise/no-multiple-resolved": "error"
-    }
+    },
+    "overrides": [
+		{
+			"files": ["**/*.test.[tj]s"], // or any other pattern
+			"plugins": ["vitest"],
+			"extends": [
+                "plugin:vitest/all"
+            ]
+		}
+	]
 }
