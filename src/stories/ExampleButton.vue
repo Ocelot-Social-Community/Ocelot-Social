@@ -3,6 +3,7 @@
 </template>
 
 <script lang="ts" setup>
+// eslint-disable-next-line import/no-unassigned-import
 import './button.css'
 import { computed } from 'vue'
 

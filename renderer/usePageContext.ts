@@ -2,8 +2,10 @@
 // See https://vike.dev/pageContext-anywhere
 
 import { inject } from 'vue'
-import type { App, InjectionKey } from 'vue'
+
 import { PageContext } from './types'
+
+import type { App, InjectionKey } from 'vue'
 
 export { usePageContext }
 export { setPageContext }

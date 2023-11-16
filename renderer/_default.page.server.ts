@@ -1,9 +1,11 @@
 import { renderToString as renderToString_ } from '@vue/server-renderer'
-import type { App } from 'vue'
 import { escapeInject, dangerouslySkipEscape } from 'vike/server'
+
 import { createApp } from './app'
 import logoUrl from './logo.svg'
+
 import type { PageContextServer } from './types'
+import type { App } from 'vue'
 
 export { render }
 // See https://vike.dev/data-fetching

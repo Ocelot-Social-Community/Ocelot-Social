@@ -1,10 +1,12 @@
+import { createPinia } from 'pinia'
 import { createSSRApp, defineComponent, h } from 'vue'
+
+import i18n from './i18n'
 import PageShell from './PageShell.vue'
 import { setPageContext } from './usePageContext'
-import type { Component, PageContext, PageProps } from './types'
-import i18n from './i18n'
 import CreateVuetify from './vuetify'
-import { createPinia } from 'pinia'
+
+import type { Component, PageContext, PageProps } from './types'
 
 export { createApp }
 

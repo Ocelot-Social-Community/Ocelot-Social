@@ -59,10 +59,11 @@
 </template>
 
 <script lang="ts" setup>
+// eslint-disable-next-line import/no-unassigned-import
 import './page.css'
-import ExampleHeader from './ExampleHeader.vue'
-
 import { ref } from 'vue'
+
+import ExampleHeader from './ExampleHeader.vue'
 
 const user = ref<{ name: string } | null>(null)
 
