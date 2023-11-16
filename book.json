@@ -9,6 +9,7 @@
     "-sharing",
     "hints",
     "tabs2",
+    "insert-logo",
     "theme-simple@git+https://github.com/plugins-zander/gitbook-plugin-theme-simple.git",
     "search-pro@git+https://github.com/plugins-zander/gitbook-plugin-search-pro.git",
     "splitter@git+https://github.com/plugins-zander/gitbook-plugin-splitter.git",
@@ -20,6 +21,10 @@
   "pluginsConfig": {
     "gtag": {
       "token": ""
+    },
+    "insert-logo": {
+      "url": "/webapp/static/img/custom/logo-squared.svg",
+      "style": "background: none; display: block; margin-left: auto; margin-right: auto; width: 25%;"
     },
     "edit-link": {
       "base": "https://github.com/Ocelot-Social-Community/Ocelot-Social/edit/master/",
