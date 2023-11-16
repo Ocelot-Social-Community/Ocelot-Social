@@ -1,18 +1,21 @@
-import vue from '@vitejs/plugin-vue' // Import the plugin here
-import { defineConfig } from 'vitest/config'
+import { defineConfig, mergeConfig } from 'vitest/config'
 
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['tests/unit.setup.ts'],
-    /*
-    server: {
-      deps: {
-        inline: ['vuetify'],
+import viteConfig from './vite.config'
+
+export default mergeConfig(
+  viteConfig,
+  defineConfig({
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: ['tests/unit.setup.ts'],
+      /*
+      server: {
+        deps: {
+          inline: ['vuetify'],
+        },
       },
+      */
     },
-    */
-  },
-  plugins: [vue()], // Include it in your array of plugins here
-})
+  }),
+)
