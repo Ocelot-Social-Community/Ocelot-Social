@@ -5,6 +5,7 @@
 [![vike][badge-vike-img]][badge-vike-href]
 [![vuetify][badge-vuetify-img]][badge-vuetify-href]
 [![pinia][badge-pinia-img]][badge-pinia-href]
+[![vue-i18n][badge-vue-i18n-img]][badge-vue-i18n-href]
 [![eslint][badge-eslint-img]][badge-eslint-href]
 [![vitest][badge-vitest-img]][badge-vitest-href]
 [![storybook][badge-storybook-img]][badge-storybook-href]
@@ -87,12 +88,14 @@ See [vite-plugin-ssr-vuetify](https://github.com/brillout/vite-plugin-ssr-vuetif
 [badge-pinia-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies.pinia&label=pinia&color=green
 [badge-pinia-href]: https://pinia.vuejs.org/
 
+[badge-vue-i18n-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies%5B%27vue-i18n%27%5D&label=vue-i18n&color=green
+[badge-vue-i18n-href]: https://vue-i18n.intlify.dev/
+
 [badge-eslint-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.eslint&label=eslint&color=yellow
 [badge-eslint-href]: https://eslint.org/
 
 [badge-vitest-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.vitest&label=vitest&color=yellow
 [badge-vitest-href]: https://vitest.dev/
-
 
 [badge-storybook-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.storybook&label=storybook&color=yellow
 [badge-storybook-href]: https://storybook.js.org/
