@@ -47,6 +47,7 @@ The following commands are available:
 | **Storybook**                |                                                 |
 | `npm run storybook`          | Run Storybook                                   |
 | `npm run storybook:build`    | Build static storybook                          |
+| `npm run storybook:test`     | Runs tests against all storybook stories        |
 | **Documentation**            |                                                 |
 | `npm run docs:dev`           | Run Documentation in development mode           |
 | `npm run docs:build`         | Build static documentation                      |
