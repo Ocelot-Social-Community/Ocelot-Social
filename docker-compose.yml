@@ -1,10 +1,8 @@
 # This file defines the production settings. It is overwritten by docker-compose.override.yml,
 # which defines the development settings. The override.yml is loaded by default. Therefore it
 # is required to explicitly define if you want an production build:
-# > docker-compose -f docker-compose.yml up 
-
-version: "3.4"
-
+# > docker-compose -f docker-compose.yml up
+version: '3.4'
 services:
   frontend:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
@@ -26,8 +24,8 @@ services:
       # - BUILD_COMMIT="0000000"
       - NODE_ENV="production"
     # env_file:
-      # - ./.env
-      # - ./frontend/.env
+    #   - ./.env
+    #   - ./frontend/.env
 
 networks:
   external-net:

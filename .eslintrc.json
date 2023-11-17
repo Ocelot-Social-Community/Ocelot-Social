@@ -6,7 +6,6 @@
     "extends": [
         "standard",
         "eslint:recommended",
-        "plugin:json/recommended-with-comments",
         "plugin:@eslint-community/eslint-comments/recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:import/recommended",
@@ -14,7 +13,6 @@
         "plugin:promise/recommended",
         "plugin:security/recommended",
         "plugin:vue/vue3-recommended",
-        "plugin:vuetify/recommended",
         "plugin:storybook/recommended",
         "plugin:prettier/recommended"
     ],
@@ -30,8 +28,7 @@
         "promise",
         "security",
         "vue",
-        "storybook",
-        "json"
+        "storybook"
     ],
     "settings": {
         "import/resolver": {
@@ -123,12 +120,26 @@
         "promise/no-multiple-resolved": "error"
     },
     "overrides": [
+        {
+            "files": ["*.json"],
+            "plugins": ["json"],
+            "extends": ["plugin:json/recommended-with-comments"]
+        },
+        {
+            "files": ["*.vue"],
+            "plugins": ["vuetify"],
+            "extends": ["plugin:vuetify/recommended"]
+        },
 		{
-			"files": ["**/*.test.[tj]s"], // or any other pattern
+			"files": ["**/*.test.[tj]s"],
 			"plugins": ["vitest"],
-			"extends": [
-                "plugin:vitest/all"
-            ]
-		}
+			"extends": ["plugin:vitest/all"]
+		},
+        {
+            "files": ["*.yaml", "*.yml"],
+            "parser": "yaml-eslint-parser",
+            "plugins": ["yml"],
+            "extends": ["plugin:yml/prettier"]
+        }
 	]
 }

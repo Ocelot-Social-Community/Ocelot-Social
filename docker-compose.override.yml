@@ -1,10 +1,8 @@
-version: "3.4"
-
+version: '3.4'
 services:
-
-  ########################################################
+  # ######################################################
   # FRONTEND #############################################
-  ########################################################
+  # ######################################################
   frontend:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: it4c/frontend:local-development
@@ -20,9 +18,9 @@ services:
       # bind the local folder to the docker to allow live reload
       - ./:/app
 
-  ########################################################
+  # ######################################################
   # STORYBOOK ############################################
-  ########################################################
+  # ######################################################
   storybook:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: it4c/frontend:local-storybook
@@ -40,9 +38,9 @@ services:
       # bind the local folder to the docker to allow live reload
       - ./:/app
 
-  ########################################################
-  # DOCUMENTATIOn ########################################
-  ########################################################
+  # ######################################################
+  # DOCUMENTATION ########################################
+  # ######################################################
   documentation:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: it4c/frontend:local-documentation
