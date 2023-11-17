@@ -11,6 +11,9 @@ const config: UserConfig = {
       ssr: true,
     }),
   ],
+  build: {
+    outDir: './build',
+  },
   ssr: { noExternal: ['vuetify'] },
 }
 
