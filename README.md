@@ -10,6 +10,7 @@
 [![eslint][badge-eslint-img]][badge-eslint-href]
 [![vitest][badge-vitest-img]][badge-vitest-href]
 [![storybook][badge-storybook-img]][badge-storybook-href]
+[![vuepress][badge-vuepress-img]][badge-vuepress-href]
 
 The IT4C Boilerplate for frontends
 
@@ -21,7 +22,7 @@ The project uses `vite` as builder, `vike` to do the SSR. The design framework i
 
 Testing is done with `eslint` and `vitest`.
 
-This projects utilizes `storybook` to develop frontend components.
+This projects utilizes `storybook` to develop frontend components and `vuepress` for static documentation generation.
 
 ## Commands
 
@@ -43,6 +44,9 @@ The following commands are available:
 | **Storybook**                |                                                 |
 | `npm run storybook`          | Run Storybook                                   |
 | `npm run storybook:build`    | Build static storybook                          |
+| **Documentation**            |                                                 |
+| `npm run docs:dev`           | Run Documentation in development mode           |
+| `npm run docs:build`         | Build static documentation                      |
 
 ### Docker
 
@@ -60,10 +64,11 @@ docker compose -f docker-compose.yml up
 
 The following endpoints are provided given the right command is executed:
 
-| Endpoint                                       | Description      |
-|------------------------------------------------|------------------|
-| [http://localhost:3000](http://localhost:3000) | The webfrontend  |
-| [http://localhost:6006](http://localhost:6006) | Storybook        |
+| Endpoint                                       | Description   |
+|------------------------------------------------|---------------|
+| [http://localhost:3000](http://localhost:3000) | Web           |
+| [http://localhost:6006](http://localhost:6006) | Storybook     |
+| [http://localhost:8080](http://localhost:8080) | Documentation |
 
 
 ## TODO
@@ -78,9 +83,9 @@ The following endpoints are provided given the right command is executed:
 - [x] vitest
 - [x] vue-i18n
 - [x] docker
+- [x] vuepress
 - [ ] figma
 - [ ] chromatic
-- [ ] documentation?
 - [ ] github actions
 
 ## Known Problems
@@ -122,5 +127,8 @@ Currently none
 [badge-vitest-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.vitest&label=vitest&color=yellow
 [badge-vitest-href]: https://vitest.dev/
 
-[badge-storybook-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.storybook&label=storybook&color=yellow
+[badge-storybook-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.storybook&label=storybook&color=orange
 [badge-storybook-href]: https://storybook.js.org/
+
+[badge-vuepress-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.vuepress&label=vuepress&color=orange
+[badge-vuepress-href]: https://vuepress.vuejs.org/

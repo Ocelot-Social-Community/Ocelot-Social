@@ -66,6 +66,19 @@ FROM base as storybook
 CMD /bin/sh -c "npm install && npm run storybook"
 
 ##################################################################################
+# DOCUMENTATION ##################################################################
+##################################################################################
+FROM base as documentation
+
+# We don't need to copy or build anything since we gonna bind to the
+# local filesystem which will need a rebuild anyway
+
+# Run command
+# (for development we need to execute npm install since the
+#  node_modules are on another volume and need updating)
+CMD /bin/sh -c "npm install && npm run docs:dev"
+
+##################################################################################
 # BUILD (Does contain all files and is therefore bloated) ########################
 ##################################################################################
 FROM base as build
