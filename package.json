@@ -59,10 +59,12 @@
     "neode": "^0.4.8",
     "rosie": "^2.1.0",
     "slug": "^8.2.3",
+    "wait-on": "^7.0.1"
+  },
+  "optionalDependencies": {
     "vuepress": "^2.0.0-rc.0",
     "vuepress-plugin-search-pro": "^2.0.0-rc.0",
-    "vuepress-theme-hope": "^2.0.0-rc.0",
-    "wait-on": "^7.0.1"
+    "vuepress-theme-hope": "^2.0.0-rc.0"
   },
   "resolutions": {
     "set-value": "^2.0.1",
