@@ -16,7 +16,7 @@ export default {
 </script>
 
 <style>
-.v-application__wrap {
+.v-application .v-application__wrap {
   min-height: unset;
 }
 </style>

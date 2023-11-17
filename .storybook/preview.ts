@@ -1,13 +1,20 @@
 import type { Preview } from "@storybook/vue3";
-import vuetify from '../renderer/vuetify'
+import { createPinia } from 'pinia'
+
 import { withVuetifyTheme } from './withVuetifyTheme.decorator';
+import i18n from '../renderer/i18n'
+import CreateVuetify from '../renderer/vuetify'
 // .storybook/preview.js
 
 import { setup } from '@storybook/vue3';
 
 setup((app) => {
   // Registers your app's plugins into Storybook
-  app.use(vuetify);
+  // app.use(vuetify);
+  const pinia = createPinia()
+  app.use(pinia)
+  app.use(i18n)
+  app.use(CreateVuetify(i18n))
 });
 
 export const decorators = [withVuetifyTheme];
