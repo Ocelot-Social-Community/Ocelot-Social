@@ -62,7 +62,7 @@ docker compose -f docker-compose.yml up
 
 ## Endpoints
 
-The following endpoints are provided given the right command is executed:
+The following endpoints are provided given the right command is executed or all three if `docker compose` is used:
 
 | Endpoint                                       | Description   |
 |------------------------------------------------|---------------|
