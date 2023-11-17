@@ -19,7 +19,9 @@
     "storybook",
     "eslint",
     "vitest",
-    "vue-i18n"
+    "vue-i18n",
+    "vuepress",
+    "docker"
   ],
   "author": "Ulf Gebhardt",
   "license": "Apache-2.0",
