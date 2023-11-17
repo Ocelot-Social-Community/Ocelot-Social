@@ -1,0 +1,35 @@
+# This file defines the production settings. It is overwritten by docker-compose.override.yml,
+# which defines the development settings. The override.yml is loaded by default. Therefore it
+# is required to explicitly define if you want an production build:
+# > docker-compose -f docker-compose.yml up 
+
+version: "3.4"
+
+services:
+  frontend:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: it4c/frontend:local-production
+    build:
+      context: .
+      target: production
+    networks:
+      - external-net
+      - internal-net
+    ports:
+      - 3000:3000
+    environment:
+      # Envs used in Dockerfile
+      # - DOCKER_WORKDIR="/app"
+      # - PORT=3000
+      # - BUILD_DATE="1970-01-01T00:00:00.00Z"
+      # - BUILD_VERSION="0.0.0.0"
+      # - BUILD_COMMIT="0000000"
+      - NODE_ENV="production"
+    # env_file:
+      # - ./.env
+      # - ./frontend/.env
+
+networks:
+  external-net:
+  internal-net:
+    internal: true

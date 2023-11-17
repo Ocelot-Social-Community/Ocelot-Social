@@ -1,6 +1,7 @@
 # boilerplate-frontend
 [![nodejs][badge-nodejs-img]][badge-nodejs-href]
 [![npm][badge-npm-img]][badge-npm-href]
+[![docker][badge-docker-img]][badge-docker-href]
 [![vue][badge-vue-img]][badge-vue-href]
 [![vike][badge-vike-img]][badge-vike-href]
 [![vuetify][badge-vuetify-img]][badge-vuetify-href]
@@ -12,11 +13,15 @@
 
 The IT4C Boilerplate for frontends
 
-## Requirements
+## Requirements & Technology
 
-To be able to build this project you need:
-- nodejs
-- npm
+To be able to build this project you need `nodejs`, `npm` and optional `docker`.
+
+The project uses `vite` as builder, `vike` to do the SSR. The design framework is `vuetify` which requires the frontend framework `vue3`. For localization `vue-i18n` is used; Session storage is handled with `pinia`.
+
+Testing is done with `eslint` and `vitest`.
+
+This projects utilizes `storybook` to develop frontend components.
 
 ## Commands
 
@@ -39,7 +44,29 @@ The following commands are available:
 | `npm run storybook`          | Run Storybook                                   |
 | `npm run storybook:build`    | Build static storybook                          |
 
-## Technology
+### Docker
+
+Docker can be run in development mode utilizing `docker-compose.overwrite.yml`:
+```bash
+docker compose up
+```
+
+Docker can be run in production mode:
+```bash
+docker compose -f docker-compose.yml up
+```
+
+## Endpoints
+
+The following endpoints are provided given the right command is executed:
+
+| Endpoint                                       | Description      |
+|------------------------------------------------|------------------|
+| [http://localhost:3000](http://localhost:3000) | The webfrontend  |
+| [http://localhost:6006](http://localhost:6006) | Storybook        |
+
+
+## TODO
 
 - [x] vite
 - [x] vike
@@ -60,11 +87,6 @@ The following commands are available:
 
 Currently none
 
-## Links
-
-See [Configuration Reference](https://vitejs.dev/config/).\
-See [vite-plugin-ssr-vuetify](https://github.com/brillout/vite-plugin-ssr-vuetify).
-
 ## License
 
 [Apache 2.0](./LICENSE)
@@ -75,6 +97,9 @@ See [vite-plugin-ssr-vuetify](https://github.com/brillout/vite-plugin-ssr-vuetif
 
 [badge-npm-img]: https://img.shields.io/badge/npm-latest-blue
 [badge-npm-href]: https://www.npmjs.com/package/npm
+
+[badge-docker-img]: https://img.shields.io/badge/docker-latest-blue
+[badge-docker-href]: https://www.docker.com/
 
 [badge-vue-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies.vue&label=vue&color=green
 [badge-vue-href]: https://vuejs.org/
