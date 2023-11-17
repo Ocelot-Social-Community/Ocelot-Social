@@ -6,6 +6,7 @@
     "extends": [
         "standard",
         "eslint:recommended",
+        "plugin:json/recommended-with-comments",
         "plugin:@eslint-community/eslint-comments/recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:import/recommended",
@@ -29,7 +30,8 @@
         "promise",
         "security",
         "vue",
-        "storybook"
+        "storybook",
+        "json"
     ],
     "settings": {
         "import/resolver": {
@@ -97,8 +99,8 @@
             "groups": ["builtin", "external", "internal", "parent", "sibling", "index", "object", "type"],
             "newlines-between": "always",
             "alphabetize": {
-            "order": "asc" /* sort in ascending order. Options: ["ignore", "asc", "desc"] */,
-            "caseInsensitive": true /* ignore case. Options: [true, false] */
+            "order": "asc", // sort in ascending order. Options: ["ignore", "asc", "desc"]
+            "caseInsensitive": true // ignore case. Options: [true, false]
             },
             "distinctGroup": true
         }
