@@ -8,11 +8,15 @@
 </template>
 
 <script>
+export const DEFAULT_THEME = 'light'
 export default {
   props: {
-    themeName: String,
+    themeName: {
+      default: DEFAULT_THEME,
+      type: String,
+    },
   },
-};
+}
 </script>
 
 <style>

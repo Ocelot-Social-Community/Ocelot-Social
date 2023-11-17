@@ -77,10 +77,10 @@ The following endpoints are provided given the right command is executed:
 - [x] eslint
 - [x] vitest
 - [x] vue-i18n
+- [x] docker
 - [ ] figma
 - [ ] chromatic
 - [ ] documentation?
-- [ ] docker
 - [ ] github actions
 
 ## Known Problems
