@@ -3,10 +3,13 @@ import vue from '@vitejs/plugin-vue'
 import vike from 'vike/plugin'
 import { UserConfig } from 'vite'
 
+const isStorybook = () =>
+  ['storybook', 'storybook:build'].includes(process.env.npm_lifecycle_event as string)
+
 const config: UserConfig = {
   plugins: [
     vue(),
-    process.env.STORYBOOK !== 'true' && vike(), // SSR only when storybook is not running
+    !isStorybook() && vike(), // SSR only when storybook is not running
     vueI18n({
       ssr: true,
     }),
