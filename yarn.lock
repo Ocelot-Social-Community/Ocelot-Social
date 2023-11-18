@@ -1418,10 +1418,10 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.19.5.tgz#faad84c41ba12e3a0acb52571df9bff37bee75f6"
   integrity sha512-czTrygUsB/jlM8qEW5MD8bgYU2Xg14lo6kBDXW6HdxKjh8M5PzETGiSHaz9MtbXBYDloHNUAUW2tMiKW4KM9Mw==
 
-"@faker-js/faker@8.2.0":
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-8.2.0.tgz#d4656d2cb485fe6ec4e7b340da9f16fac2c36c4a"
-  integrity sha512-VacmzZqVxdWdf9y64lDOMZNDMM/FQdtM9IsaOPKOm2suYwEatb8VkdHqOzXcDnZbk7YDE2BmsJmy/2Hmkn563g==
+"@faker-js/faker@8.3.1":
+  version "8.3.1"
+  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-8.3.1.tgz#7753df0cb88d7649becf984a96dd1bd0a26f43e3"
+  integrity sha512-FdgpFxY6V6rLZE9mmIBb9hM0xpfvQOSNOLnzolzKwsE1DH+gC7lEKV1p1IbR0lAYyvYd5a4u3qWJzowUkw1bIw==
 
 "@hapi/address@2.x.x":
   version "2.1.4"
