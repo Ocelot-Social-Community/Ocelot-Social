@@ -1056,7 +1056,7 @@
     minimatch "^3.0.4"
     node-hook "^1.0.0"
 
-"@badeball/cypress-cucumber-preprocessor@^19.1.0":
+"@badeball/cypress-cucumber-preprocessor@^19.1.1":
   version "19.1.1"
   resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-19.1.1.tgz#07ac616a2a072186d5ec65b8aefaff37ac85e4ad"
   integrity sha512-10Err2q+naGjV49xzpW+g5ovxJzC62WM+dG0+/3DmSREVDjgK+fo8szRymJzhRRcdPhGNplQ+Drl/LbtaQHIFQ==
