@@ -1,8 +1,8 @@
 name: "frontend:deploy:docs to github"
-on: [push]
-#  push:
-#    branches:
-#      - master
+on:
+  push:
+    branches:
+      - master
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
