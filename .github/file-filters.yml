@@ -5,3 +5,6 @@ frontend-test-lint-code: &frontend-test-lint-code
 
 frontend-test-unit-code: &frontend-test-unit-code
   - '**/*'
+
+frontend-test-build-code: &frontend-test-build-code
+  - '**/*'
