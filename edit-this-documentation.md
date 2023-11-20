@@ -29,16 +29,14 @@ To design your documentation see the syntax description at GitBook:
 #### Tabs
 
 ```markdown
-{% tabs %}
-{% tab title="XXX" %}
-XXX
-{% endtab %}
-{% tab title="XXX" %}
-XXX
-{% endtab %}
-…
-{% endtabs %}
+::: tabs
+@tab:active First tab's title <!-- this tab is setactive -->
+
+@tab Second tab's title
+
+:::
 ```
+
 
 #### Commands
 
@@ -92,23 +90,22 @@ Copy the URL and paste it were you need it.
 
 ### Add an Arrow or some other Marking Stuff
 
-{% tabs %}
-{% tab title="macOS" %}
+::: tabs
+@tab:active macOS
 
 #### In the Preview App
 
 Got to: **Menu** + **Tools** \(GER: Werkzeuge\) + **Annotate** \(GER: Anmerkungen\) + etc.
-{% endtab %}
 
-{% tab title="Windows" %}
+@tab Windows
+
 {% hint style="info" %}
 TODO: How to modify screenshots in Windows ...
 {% endhint %}
 {% endtab %}
 
-{% tab title="Linux" %}
+@tab Linux
 {% hint style="info" %}
 TODO: How to modify screenshots in Linux ...
 {% endhint %}
-{% endtab %}
-{% endtabs %}
+:::

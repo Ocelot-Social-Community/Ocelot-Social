@@ -83,8 +83,8 @@ More details about our GraphQL playground and how to use it with ocelot.social c
 
 Database indexes and constraints need to be created and upgraded when the database and the backend are running:
 
-{% tabs %}
-{% tab title="Docker" %}
+::: tabs
+@tab:active Docker
 
 ```bash
 # in main folder while docker-compose is running
@@ -102,8 +102,7 @@ $ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
 $ docker exec backend yarn run db:migrate up
 ```
 
-{% endtab %}
-{% tab title="Without Docker" %}
+@tab Without Docker
 
 ```bash
 # in folder backend/ while database is running
@@ -116,16 +115,15 @@ yarn run db:migrate init
 yarn run db:migrate up
 ```
 
-{% endtab %}
-{% endtabs %}
+:::
 
 #### Seed Database
 
 If you want your backend to return anything else than an empty response, you
 need to seed your database:
 
-{% tabs %}
-{% tab title="Docker" %}
+::: tabs
+@tab:active Docker
 
 In another terminal run:
 
@@ -147,8 +145,7 @@ $ docker exec backend yarn run db:migrate init
 $ docker exec backend yarn run db:migrate up
 ```
 
-{% endtab %}
-{% tab title="Without Docker" %}
+@tab Without Docker
 
 Run:
 
@@ -164,16 +161,15 @@ To reset the database run:
 $ yarn run db:reset
 ```
 
-{% endtab %}
-{% endtabs %}
+:::
 
 ### Data migrations
 
 Although Neo4J is schema-less,you might find yourself in a situation in which
 you have to migrate your data e.g. because your data modeling has changed.
 
-{% tabs %}
-{% tab title="Docker" %}
+::: tabs
+@tab:active Docker
 
 Generate a data migration file:
 
@@ -190,8 +186,7 @@ To run the migration:
 $ docker exec backend yarn run db:migrate up
 ```
 
-{% endtab %}
-{% tab title="Without Docker" %}
+@tab Without Docker
 
 Generate a data migration file:
 
@@ -208,16 +203,15 @@ To run the migration:
 $ yarn run db:migrate up
 ```
 
-{% endtab %}
-{% endtabs %}
+:::
 
 ## Testing
 
 **Beware**: We have no multiple database setup at the moment. We clean the
 database after each test, running the tests will wipe out all your data!
 
-{% tabs %}
-{% tab title="Docker" %}
+::: tabs
+@tab:active Docker
 
 Run the unit tests:
 
@@ -226,9 +220,7 @@ Run the unit tests:
 $ docker exec backend yarn run test
 ```
 
-{% endtab %}
-
-{% tab title="Without Docker" %}
+@tab Without Docker
 
 Run the unit tests:
 
@@ -237,5 +229,4 @@ Run the unit tests:
 $ yarn run test
 ```
 
-{% endtab %}
-{% endtabs %}
+:::
