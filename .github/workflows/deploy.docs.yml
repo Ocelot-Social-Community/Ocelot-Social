@@ -1,6 +1,8 @@
 name: "deploy:docs to github"
-on: [push]
-# TODO: master
+on:
+  push:
+    branches:
+      - master
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
