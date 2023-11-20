@@ -9,7 +9,7 @@ jobs:
     name: Detect File Changes - frontend-test-unit-code
     runs-on: ubuntu-latest
     outputs:
-      frontend: ${{ steps.changes.outputs.frontend-test-unit-code }}
+      frontend-test-unit-code: ${{ steps.changes.outputs.frontend-test-unit-code }}
     steps:
       - uses: actions/checkout@v3.3.0
 
