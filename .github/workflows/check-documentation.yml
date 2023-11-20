@@ -31,12 +31,13 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@master
+    - name: Remove old documentation files
+      run: rm -rf ./deployment/src/old/ # workaround until https://github.com/gaurav-nelson/github-action-markdown-link-check/pull/183 has been done
     - name: Check Markdown Links
       uses: gaurav-nelson/github-action-markdown-link-check@master
       with:
         use-quiet-mode: 'yes'
         use-verbose-mode: 'no'
-        # at any .md file change take the chance to check the links in all .md files
         check-modified-files-only: 'no'
         config-file: '.github/workflows/mlc_config.json'
         base-branch: 'master'
