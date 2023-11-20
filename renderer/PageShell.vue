@@ -24,9 +24,11 @@ body {
   margin: 0;
   font-family: sans-serif;
 }
+
 * {
   box-sizing: border-box;
 }
+
 a {
   text-decoration: none;
 }
@@ -38,20 +40,23 @@ a {
   max-width: 900px;
   margin: auto;
 }
+
 .content {
-  padding: 20px;
-  border-left: 2px solid #eee;
-  padding-bottom: 50px;
   min-height: 100vh;
-}
-.navigation {
   padding: 20px;
-  flex-shrink: 0;
+  padding-bottom: 50px;
+  border-left: 2px solid #eee;
+}
+
+.navigation {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   align-items: center;
+  padding: 20px;
   line-height: 1.8em;
 }
+
 .logo {
   margin-top: 20px;
   margin-bottom: 10px;

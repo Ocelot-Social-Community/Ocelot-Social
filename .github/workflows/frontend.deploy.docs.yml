@@ -1,4 +1,4 @@
-name: "deploy:docs to github"
+name: "frontend:deploy:docs to github"
 on:
   push:
     branches:

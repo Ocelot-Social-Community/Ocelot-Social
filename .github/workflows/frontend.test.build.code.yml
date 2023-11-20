@@ -1,15 +1,15 @@
-name: "test:unit test code with defined suites"
+name: "frontend:test:build test code"
 
 on: push
 
 jobs:
   # only (but most important) job from this workflow required for pull requests
-  # check results serve as run conditions for all other jobs here 
+  # check results serve as run conditions for all other jobs here
   files-changed:
-    name: Detect File Changes - frontend-test-unit-code
+    name: Detect File Changes - frontend-test-build-code
     runs-on: ubuntu-latest
     outputs:
-      changes: ${{ steps.changes.outputs.frontend-test-unit-code }}
+      changes: ${{ steps.changes.outputs.frontend-test-build-code }}
     steps:
       - uses: actions/checkout@v3.3.0
 
@@ -21,14 +21,14 @@ jobs:
           filters: .github/file-filters.yml
           list-files: shell
 
-  unit:
+  build:
     if: needs.files-changed.outputs.changes == 'true'
-    name: Unit - Frontend
+    name: Build - Frontend
     needs: files-changed
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Frontend | Unit
-        run: npm install && npm run test:unit
+      - name: Frontend | Build
+        run: npm install && npm run build

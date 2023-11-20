@@ -11,3 +11,7 @@ frontend-test-build-code: &frontend-test-build-code
 
 frontend-test-build-docs: &frontend-test-build-docs
   - '**/*.md'
+  - '.vuepress/'
+
+frontend-test-build-storybook: &frontend-test-build-storybook
+  - '**/*'

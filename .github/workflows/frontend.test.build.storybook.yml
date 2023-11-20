@@ -1,4 +1,4 @@
-name: "test:build test code"
+name: "frontend:test:build test storybook"
 
 on: push
 
@@ -6,10 +6,10 @@ jobs:
   # only (but most important) job from this workflow required for pull requests
   # check results serve as run conditions for all other jobs here
   files-changed:
-    name: Detect File Changes - frontend-test-build-code
+    name: Detect File Changes - frontend-test-build-storybook
     runs-on: ubuntu-latest
     outputs:
-      changes: ${{ steps.changes.outputs.frontend-test-build-code }}
+      changes: ${{ steps.changes.outputs.frontend-test-build-storybook }}
     steps:
       - uses: actions/checkout@v3.3.0
 
@@ -21,14 +21,14 @@ jobs:
           filters: .github/file-filters.yml
           list-files: shell
 
-  build:
+  storybook:
     if: needs.files-changed.outputs.changes == 'true'
-    name: Build - Frontend
+    name: Build Storybook - Frontend
     needs: files-changed
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Frontend | Build
-        run: npm install && npm run build
+      - name: Frontend | Build Storybook
+        run: npm install && npm run storybook:build
