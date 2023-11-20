@@ -29,6 +29,7 @@ jobs:
           # Configure which scopes are allowed (newline delimited).
           # Append a scope for each service here
           scopes: |
+            frontend
             docker
             release
             workflow
