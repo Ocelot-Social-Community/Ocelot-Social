@@ -6,10 +6,10 @@ jobs:
   # only (but most important) job from this workflow required for pull requests
   # check results serve as run conditions for all other jobs here 
   files-changed:
-    name: Detect File Changes - Frontend
+    name: Detect File Changes - frontend-test-unit-code
     runs-on: ubuntu-latest
     outputs:
-      frontend: ${{ steps.changes.outputs.frontend }}
+      frontend: ${{ steps.changes.outputs.frontend-test-unit-code }}
     steps:
       - uses: actions/checkout@v3.3.0
 
@@ -22,7 +22,7 @@ jobs:
           list-files: shell
 
   unit:
-    if: needs.files-changed.outputs.frontend == 'true'
+    if: needs.files-changed.outputs.frontend-test-unit-code == 'true'
     name: Unit - Frontend
     needs: files-changed
     runs-on: ubuntu-latest

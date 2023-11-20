@@ -1,4 +1,7 @@
 # These file filter patterns are used by the action https://github.com/dorny/paths-filter
 
-frontend: &frontend
+frontend-test-lint-code: &frontend-test-lint-code
+  - '**/*'
+
+frontend-test-unit-code: &frontend-test-unit-code
   - '**/*'
