@@ -80,7 +80,8 @@ The following endpoints are provided given the right command is executed or all 
 - [ ] chromatic
 - [ ] github actions
 - [ ] lint locales
-- [ ] zähler -> pinia
+- [ ] feature zähler -> pinia tore
+- [ ] lint style (inline vue) stylelint?
 
 ## Known Problems
 
