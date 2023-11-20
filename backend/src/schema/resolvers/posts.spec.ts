@@ -374,6 +374,31 @@ describe('CreatePost', () => {
         })
       })
 
+      describe('with event start in no ISO format', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+          const eventStart = new Date(now.getFullYear(), now.getMonth() - 1).toISOString()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: eventStart.split('T')[0],
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event start date must be in ISO format!',
+              },
+            ],
+          })
+        })
+      })
+
       describe('with event start date in the past', () => {
         it('throws an error', async () => {
           const now = new Date()
@@ -417,6 +442,32 @@ describe('CreatePost', () => {
             errors: [
               {
                 message: 'Event end date must be a valid date!',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('with valid start date and not ISO formated end date', () => {
+        it('throws an error', async () => {
+          const now = new Date()
+          const eventEnd = new Date(now.getFullYear(), now.getMonth() + 2).toISOString()
+          await expect(
+            mutate({
+              mutation: createPostMutation(),
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventEnd: eventEnd.split('T')[0],
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event end date must be in ISO format!',
               },
             ],
           })
