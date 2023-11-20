@@ -41,4 +41,4 @@ jobs:
         check-modified-files-only: 'no'
         config-file: '.github/workflows/mlc_config.json'
         base-branch: 'master'
-        folder-path: '., !./deployment/src/old/'
+        folder-path: '.'
