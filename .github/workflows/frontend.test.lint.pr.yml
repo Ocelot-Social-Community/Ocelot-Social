@@ -9,7 +9,7 @@ on:
 
 permissions:
   pull-requests: write
-  actions: write
+  statuses: write
 
 jobs:
   main:
