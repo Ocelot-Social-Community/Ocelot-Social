@@ -1,4 +1,4 @@
-name: "test:lint code with defined linters"
+name: "test:unit test code with defined suites"
 
 on: push
 
@@ -6,10 +6,10 @@ jobs:
   # only (but most important) job from this workflow required for pull requests
   # check results serve as run conditions for all other jobs here 
   files-changed:
-    name: Detect File Changes - frontend-test-lint-code
+    name: Detect File Changes - frontend-test-unit-code
     runs-on: ubuntu-latest
     outputs:
-      frontend-test-lint-code: ${{ steps.changes.outputs.frontend-test-lint-code }}
+      frontend-test-unit-code: ${{ steps.changes.outputs.frontend-test-unit-code }}
     steps:
       - uses: actions/checkout@v3.3.0
 
@@ -21,14 +21,14 @@ jobs:
           filters: .github/file-filters.yml
           list-files: shell
 
-  lint:
-    if: needs.files-changed.outputs.frontend-test-lint-code == 'true'
-    name: Lint - Frontend
+  unit:
+    if: needs.files-changed.outputs.frontend-test-unit-code == 'true'
+    name: Unit - Frontend
     needs: files-changed
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Frontend | Lint
-        run: npm install && npm run test:lint
+      - name: Frontend | Unit
+        run: npm install && npm run test:unit
