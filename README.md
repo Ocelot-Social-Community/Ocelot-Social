@@ -29,28 +29,28 @@ This projects utilizes `storybook` to develop frontend components and `vuepress`
 
 The following commands are available:
 
-| Command                      | Description                                     |
-|------------------------------|-------------------------------------------------|
-| `npm install`                | Project setup                                   |
-| `npm run build`              | Compiles and minifies for production            |
-| `npm run server:prod`        | Runs productions server                         |
-| **Develop**                  |                                                 |
-| `npm run dev`                | Compiles and hot-reloads for development        |
-| `npm run server:dev`         | Run development server                          |
-| **Test**                     |                                                 |
-| `npm run test:lint`          | Run all linters                                 |
-| `npm run test:lint:eslint`   | Run linter eslint                               |
-| `npm run test:lint:remark`   | Run linter remark                               |
-| `npm run test:unit`          | Run all unit tests and generate coverage report |
-| `npm run test:unit:dev`      | Run all unit tests in watch mode                |
-| `npm test`                   | Run all tests & linters                         |
-| **Storybook**                |                                                 |
-| `npm run storybook`          | Run Storybook                                   |
-| `npm run storybook:build`    | Build static storybook                          |
-| `npm run storybook:test`     | Run tests against all storybook stories         |
-| **Documentation**            |                                                 |
-| `npm run docs:dev`           | Run Documentation in development mode           |
-| `npm run docs:build`         | Build static documentation                      |
+| Command                    | Description                                     |
+|----------------------------|-------------------------------------------------|
+| `npm install`              | Project setup                                   |
+| `npm run build`            | Compiles and minifies for production            |
+| `npm run server:prod`      | Runs productions server                         |
+| **Develop**                |                                                 |
+| `npm run dev`              | Compiles and hot-reloads for development        |
+| `npm run server:dev`       | Run development server                          |
+| **Test**                   |                                                 |
+| `npm run test:lint`        | Run all linters                                 |
+| `npm run test:lint:eslint` | Run linter eslint                               |
+| `npm run test:lint:remark` | Run linter remark                               |
+| `npm run test:unit`        | Run all unit tests and generate coverage report |
+| `npm run test:unit:dev`    | Run all unit tests in watch mode                |
+| `npm test`                 | Run all tests & linters                         |
+| **Storybook**              |                                                 |
+| `npm run storybook`        | Run Storybook                                   |
+| `npm run storybook:build`  | Build static storybook                          |
+| `npm run storybook:test`   | Run tests against all storybook stories         |
+| **Documentation**          |                                                 |
+| `npm run docs:dev`         | Run Documentation in development mode           |
+| `npm run docs:build`       | Build static documentation                      |
 
 ### Docker
 
