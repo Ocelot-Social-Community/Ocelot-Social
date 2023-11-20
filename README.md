@@ -41,8 +41,8 @@ The following commands are available:
 | `npm run test:lint`          | Run all linters                                 |
 | `npm run test:lint:eslint`   | Run linter eslint                               |
 | `npm run test:lint:remark`   | Run linter remark                               |
-| `npm run test:unit`          | Run all unit tests in watch mode                |
-| `npm run test:unit:coverage` | Run all unit tests and generate coverage report |
+| `npm run test:unit`          | Run all unit tests and generate coverage report |
+| `npm run test:unit:dev`      | Run all unit tests in watch mode                |
 | `npm test`                   | Run all tests & linters                         |
 | **Storybook**                |                                                 |
 | `npm run storybook`          | Run Storybook                                   |
@@ -76,20 +76,11 @@ The following endpoints are provided given the right command is executed or all 
 
 ## TODO
 
-- [x] vite
-- [x] vike
-- [x] vue3
-- [x] vuetify
-- [x] pinia store
-- [x] storybook
-- [x] eslint
-- [x] vitest
-- [x] vue-i18n
-- [x] docker
-- [x] vuepress
 - [ ] figma
 - [ ] chromatic
 - [ ] github actions
+- [ ] lint locales
+- [ ] zähler -> pinia
 
 ## Known Problems
 

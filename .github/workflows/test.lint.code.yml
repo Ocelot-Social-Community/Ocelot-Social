@@ -9,7 +9,7 @@ jobs:
     name: Detect File Changes - frontend-test-lint-code
     runs-on: ubuntu-latest
     outputs:
-      frontend-test-lint-code: ${{ steps.changes.outputs.frontend-test-lint-code }}
+      changes: ${{ steps.changes.outputs.frontend-test-lint-code }}
     steps:
       - uses: actions/checkout@v3.3.0
 
@@ -22,7 +22,7 @@ jobs:
           list-files: shell
 
   lint:
-    if: needs.files-changed.outputs.frontend-test-lint-code == 'true'
+    if: needs.files-changed.outputs.changes == 'true'
     name: Lint - Frontend
     needs: files-changed
     runs-on: ubuntu-latest

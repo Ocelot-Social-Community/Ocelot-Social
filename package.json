@@ -43,9 +43,9 @@
     "test:lint": "npm run test:lint:eslint && npm run test:lint:remark",
     "test:lint:eslint": "eslint --ext .vue,.ts,.tsx,.js,.jsx,.json,.yml,.yaml --max-warnings 0 --ignore-path .gitignore .",
     "test:lint:remark": "remark . --quiet --frail",
-    "test:unit": "vitest",
-    "test:unit:coverage": "npm run test:unit -- run --coverage",
-    "test": "npm run test:lint && npm run test:unit:coverage",
+    "test:unit": "npm run test:unit -- run --coverage",
+    "test:unit:dev": "vitest",
+    "test": "npm run test:lint && npm run test:unit",
     "docs:dev": "vuepress dev .",
     "docs:build": "vuepress build ."
   },
