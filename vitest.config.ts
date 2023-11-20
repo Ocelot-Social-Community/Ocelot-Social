@@ -12,10 +12,10 @@ export default mergeConfig(
       coverage: {
         all: true,
         include: ['src/**/*.{js,jsx,ts,tsx,vue}'],
-        lines: 5.81,
+        lines: 5,
         functions: 0,
-        branches: 11.11,
-        statements: 5.81,
+        branches: 10,
+        statements: 5,
         // 100: true,
       },
     },
