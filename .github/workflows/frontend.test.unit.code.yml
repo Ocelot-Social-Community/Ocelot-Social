@@ -1,4 +1,4 @@
-name: "test:unit test code with defined suites"
+name: "frontend:test:unit test code with defined suites"
 
 on: push
 

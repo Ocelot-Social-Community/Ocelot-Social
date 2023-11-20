@@ -1,4 +1,4 @@
-name: "test:lint code with defined linters"
+name: "frontend:test:lint code with defined linters"
 
 on: push
 

@@ -1,4 +1,4 @@
-name: "test:build test storybook"
+name: "frontend:test:build test storybook"
 
 on: push
 

@@ -1,4 +1,4 @@
-name: "test:build test code"
+name: "frontend:test:build test code"
 
 on: push
 

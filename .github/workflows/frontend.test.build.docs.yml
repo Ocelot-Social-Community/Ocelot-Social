@@ -1,4 +1,4 @@
-name: "test:build test docs"
+name: "frontend:test:build test docs"
 
 on: push
 
