@@ -8,3 +8,6 @@ frontend-test-unit-code: &frontend-test-unit-code
 
 frontend-test-build-code: &frontend-test-build-code
   - '**/*'
+
+frontend-test-build-docs: &frontend-test-build-docs
+  - '**/*.md'
