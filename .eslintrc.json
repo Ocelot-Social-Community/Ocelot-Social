@@ -13,8 +13,7 @@
         "plugin:promise/recommended",
         "plugin:security/recommended",
         "plugin:vue/vue3-recommended",
-        "plugin:storybook/recommended",
-        "plugin:prettier/recommended"
+        "plugin:storybook/recommended"
     ],
     "parserOptions": {
         "ecmaVersion": "latest",
@@ -23,7 +22,6 @@
     },
     "plugins": [
         "@typescript-eslint",
-        "prettier",
         "import",
         "promise",
         "security",
@@ -40,7 +38,6 @@
         "no-console": "error",
         "no-debugger": "error",
         "camelcase": "error",
-        "prettier/prettier": "error",
         "indent": ["error", 2],
         "linebreak-style": ["error", "unix"],
         "semi": ["error", "never"],
@@ -121,6 +118,14 @@
     },
     "overrides": [
         {
+            "files": ["!*.json"],
+            "plugins": ["prettier"],
+            "extends": ["plugin:prettier/recommended"],
+            "rules": {
+                "prettier/prettier": "error"
+            }
+        },
+        {
             "files": ["*.json"],
             "plugins": ["json"],
             "extends": ["plugin:json/recommended-with-comments"]
@@ -131,7 +136,7 @@
             "extends": ["plugin:vuetify/recommended"]
         },
 		{
-			"files": ["**/*.test.[tj]s"],
+			"files": ["*.[test,spec].[tj]s"],
 			"plugins": ["vitest"],
 			"extends": ["plugin:vitest/all"]
 		},

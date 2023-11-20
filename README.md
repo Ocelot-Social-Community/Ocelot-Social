@@ -2,6 +2,7 @@
 [![nodejs][badge-nodejs-img]][badge-nodejs-href]
 [![npm][badge-npm-img]][badge-npm-href]
 [![docker][badge-docker-img]][badge-docker-href]
+[![jq][badge-jq-img]][badge-jq-href]
 [![vue][badge-vue-img]][badge-vue-href]
 [![vike][badge-vike-img]][badge-vike-href]
 [![vuetify][badge-vuetify-img]][badge-vuetify-href]
@@ -18,7 +19,7 @@ The IT4C Boilerplate for frontends
 
 ## Requirements & Technology
 
-To be able to build this project you need `nodejs`, `npm` and optional `docker`.
+To be able to build this project you need `nodejs`, `npm` and optional `docker` and `jq`.
 
 The project uses `vite` as builder, `vike` to do the SSR. The design framework is `vuetify` which requires the frontend framework `vue3`. For localization `vue-i18n` is used; Session storage is handled with `pinia`.
 
@@ -41,6 +42,7 @@ The following commands are available:
 | **Test**                   |                                                 |
 | `npm run test:lint`        | Run all linters                                 |
 | `npm run test:lint:eslint` | Run linter eslint                               |
+| `npm run test:lint:locales`| Run linter locales                              |
 | `npm run test:lint:remark` | Run linter remark                               |
 | `npm run test:lint:style`  | Run linter stylelint                            |
 | `npm run test:unit`        | Run all unit tests and generate coverage report |
@@ -81,9 +83,7 @@ The following endpoints are provided given the right command is executed or all 
 - [ ] figma
 - [ ] chromatic
 - [ ] github actions
-- [ ] lint locales
 - [ ] feature zähler -> pinia tore
-- [ ] lint style (inline vue) stylelint?
 
 ## Known Problems
 
@@ -102,6 +102,9 @@ Currently none
 
 [badge-docker-img]: https://img.shields.io/badge/docker-latest-blue
 [badge-docker-href]: https://www.docker.com/
+
+[badge-jq-img]: https://img.shields.io/badge/jq-latest-blue
+[badge-jq-href]: https://jqlang.github.io/jq/
 
 [badge-vue-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=dependencies.vue&label=vue&color=green
 [badge-vue-href]: https://vuejs.org/
