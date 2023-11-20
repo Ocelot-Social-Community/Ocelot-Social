@@ -1,6 +1,9 @@
 name: ocelot.social check documentation
 
-on: push
+on:
+  push:
+    branches:
+      - add-vuepress-action-with-root-directory-as-docs-directory
 
 jobs:
   files-changed:
@@ -37,4 +40,4 @@ jobs:
         check-modified-files-only: 'no'
         config-file: '.github/workflows/mlc_config.json'
         base-branch: 'master'
-        folder-path: '.'
+        folder-path: '.', '!./deployment/src/old/'

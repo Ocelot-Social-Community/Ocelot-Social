@@ -2,7 +2,7 @@
 
 [![Build Status Test](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test.yml/badge.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions)
 [![Build Status Publish](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/publish.yml/badge.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions)
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/LICENSE.md)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/LICENSE.md)
 [![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discord.gg/AJSX9DCSUA)
 [![Open Source Helpers](https://www.codetriage.com/ocelot-social-community/ocelot-social/badges/users.svg)](https://www.codetriage.com/ocelot-social-community/ocelot-social)
 
