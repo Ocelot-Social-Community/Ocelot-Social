@@ -8,27 +8,32 @@
   border-radius: 3em;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .storybook-button--primary {
   color: white;
   background-color: #1ea7fd;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .storybook-button--secondary {
   color: #333;
   background-color: transparent;
   box-shadow: rgb(0 0 0 / 15%) 0 0 0 1px inset;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .storybook-button--small {
   padding: 10px 16px;
   font-size: 12px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .storybook-button--medium {
   padding: 11px 20px;
   font-size: 14px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .storybook-button--large {
   padding: 12px 24px;
   font-size: 16px;
