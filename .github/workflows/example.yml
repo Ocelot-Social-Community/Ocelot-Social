@@ -1,0 +1,84 @@
+name: Gradido Frontend Test CI
+
+on: push
+
+jobs:
+  # only (but most important) job from this workflow required for pull requests
+  # check results serve as run conditions for all other jobs here 
+  files-changed:
+    name: Detect File Changes - Frontend
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.changes.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v3.3.0
+
+      - name: Check for frontend file changes
+        uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          token: ${{ github.token }}
+          filters: .github/file-filters.yml
+          list-files: shell
+
+  
+  build_test:
+    if: needs.files-changed.outputs.frontend == 'true'
+    name: Docker Build Test - Frontend
+    needs: files-changed
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Frontend | Build 'test' image
+        run: docker build --target test -t "gradido/frontend:test" frontend/ --build-arg NODE_ENV="test"
+
+  unit_test:
+    if: needs.files-changed.outputs.frontend == 'true'
+    name: Unit Tests - Frontend
+    needs: files-changed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Frontend | Unit tests
+        run: cd frontend && yarn global add node-gyp && yarn && yarn run test
+
+  lint:
+    if: needs.files-changed.outputs.frontend == 'true'
+    name: Lint - Frontend
+    needs: files-changed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Frontend | Lint
+        run: cd frontend && yarn global add node-gyp && yarn && yarn run lint
+
+  stylelint:
+    if: needs.files-changed.outputs.frontend == 'true'
+    name: Stylelint - Frontend
+    needs: files-changed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Frontend | Stylelint
+        run: cd frontend && yarn global add node-gyp && yarn && yarn run stylelint
+
+  locales:
+    if: needs.files-changed.outputs.frontend == 'true'
+    name: Locales - Frontend
+    needs: files-changed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Frontend | Locales
+        run: cd frontend && yarn global add node-gyp && yarn && yarn run locales
