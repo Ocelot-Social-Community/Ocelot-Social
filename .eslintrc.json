@@ -77,7 +77,13 @@
         "import/no-webpack-loader-syntax": "error",
         "import/consistent-type-specifier-style": "error",
         "import/exports-last": "off",
-        "import/extensions": "error",
+        "import/extensions": [
+            "error",
+            "never",
+            {
+              "json": "always"
+            }
+        ],
         "import/first": "error",
         "import/group-exports": "off",
         "import/newline-after-import": "error",
@@ -88,16 +94,16 @@
         "import/no-namespace": "error",
         "import/no-unassigned-import": "error",
         "import/order": [
-        "error",
-        {
-            "groups": ["builtin", "external", "internal", "parent", "sibling", "index", "object", "type"],
-            "newlines-between": "always",
-            "alphabetize": {
-            "order": "asc", // sort in ascending order. Options: ["ignore", "asc", "desc"]
-            "caseInsensitive": true // ignore case. Options: [true, false]
-            },
-            "distinctGroup": true
-        }
+            "error",
+            {
+                "groups": ["builtin", "external", "internal", "parent", "sibling", "index", "object", "type"],
+                "newlines-between": "always",
+                "alphabetize": {
+                "order": "asc", // sort in ascending order. Options: ["ignore", "asc", "desc"]
+                "caseInsensitive": true // ignore case. Options: [true, false]
+                },
+                "distinctGroup": true
+            }
         ],
         "import/prefer-default-export": "off",
         // promise
