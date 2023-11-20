@@ -9,6 +9,7 @@
 [![vue-i18n][badge-vue-i18n-img]][badge-vue-i18n-href]
 [![eslint][badge-eslint-img]][badge-eslint-href]
 [![remark-cli][badge-remark-cli-img]][badge-remark-cli-href]
+[![stylelint][badge-stylelint-img]][badge-stylelint-href]
 [![vitest][badge-vitest-img]][badge-vitest-href]
 [![storybook][badge-storybook-img]][badge-storybook-href]
 [![vuepress][badge-vuepress-img]][badge-vuepress-href]
@@ -21,7 +22,7 @@ To be able to build this project you need `nodejs`, `npm` and optional `docker`.
 
 The project uses `vite` as builder, `vike` to do the SSR. The design framework is `vuetify` which requires the frontend framework `vue3`. For localization `vue-i18n` is used; Session storage is handled with `pinia`.
 
-Testing is done with `vitest` and code style is enforced with `eslint` and `remark-cli`.
+Testing is done with `vitest` and code style is enforced with `eslint`, `remark-cli` and `stylelint`.
 
 This projects utilizes `storybook` to develop frontend components and `vuepress` for static documentation generation.
 
@@ -41,6 +42,7 @@ The following commands are available:
 | `npm run test:lint`        | Run all linters                                 |
 | `npm run test:lint:eslint` | Run linter eslint                               |
 | `npm run test:lint:remark` | Run linter remark                               |
+| `npm run test:lint:style`  | Run linter stylelint                            |
 | `npm run test:unit`        | Run all unit tests and generate coverage report |
 | `npm run test:unit:dev`    | Run all unit tests in watch mode                |
 | `npm test`                 | Run all tests & linters                         |
@@ -121,6 +123,9 @@ Currently none
 
 [badge-remark-cli-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies%5B%27remark-cli%27%5D&label=remark-cli&color=yellow
 [badge-remark-cli-href]: https://remark.js.org/
+
+[badge-stylelint-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.stylelint&label=stylelint&color=yellow
+[badge-stylelint-href]: https://stylelint.io/
 
 [badge-vitest-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.vitest&label=vitest&color=yellow
 [badge-vitest-href]: https://vitest.dev/
