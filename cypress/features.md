@@ -226,8 +226,6 @@ Shows automatically related actions for existing post.
 
 ### Moderation
 
-[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/moderation)
-
 * Report Button for users for doubtful Content
 * Moderator Panel
 * List of reported Content \(later replaced by User-Moderation\)
@@ -237,8 +235,6 @@ Shows automatically related actions for existing post.
 * Statistics about Decisions in Moderation
 
 ### Administration
-
-[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/administration)
 
 * Provide Admin-Interface to send Users Invite Code
 * Static Pages for Data Privacy Statement ...
@@ -252,8 +248,6 @@ Shows automatically related actions for existing post.
 * Double-opt-in by Email
 
 ### Internationalization
-
-[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/internationalization)
 
 * Frontend UI
 * Backend Error Messages
