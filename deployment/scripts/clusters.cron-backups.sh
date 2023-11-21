@@ -4,6 +4,11 @@
 SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
+# export all variables in "../.env"
+set -a            
+source ${SCRIPT_DIR}/../.env
+set +a
+
 # check BACKUP_CONFIGURATIONS
 if [ -z ${BACKUP_CONFIGURATIONS} ]; then
   echo "You must provide a `BACKUP_CONFIGURATIONS` via environment variable"
