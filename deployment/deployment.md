@@ -4,14 +4,14 @@ Before you start the deployment you have to do preparations.
 
 ## Deployment Preparations
 
-Since all deployment methods described here depend on [Docker](https://docker.com) and [DockerHub](https://hub.docker.com), you need to create your own organisation on DockerHub and put its name in the [package.json](/package.json) file as your `dockerOrganisation`.  
+Since all deployment methods described here depend on [Docker](https://docker.com) and [DockerHub](https://hub.docker.com), you need to create your own organisation on DockerHub and put its name in the [package.json](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/package.json) file as your `dockerOrganisation`.  
 Read more details in the [main README](/README.md) under [Usage](/README.md#usage).
 
 ## Deployment Methods
 
 You have the following options for a deployment:
 
-- [Kubernetes with Helm](./kubernetes/README.md)
+- [Kubernetes with Helm](./src/kubernetes/README.md)
 
 ## After Deployment
 

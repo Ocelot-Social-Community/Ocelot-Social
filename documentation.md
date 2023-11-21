@@ -115,3 +115,14 @@ TODO: How to modify screenshots in Linux ...
 ## Deploy this Documentation
 
 TODO
+
+```bash
+# set configured Node version
+nvm use
+
+# install Vuepress
+npm install
+
+# run vuepress
+npm run docs:dev
+```

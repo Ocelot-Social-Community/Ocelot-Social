@@ -9,8 +9,6 @@
 $ export DOCKER_DEFAULT_PLATFORM=linux/amd64
 ```
 
-For even more informations, see [Docker More Closely](#docker-more-closely)
-
 ### Docker Compose Override File For Apple M1 Platform
 
 For Docker compose `up` or `build` commands, you can use our Apple M1 override file that specifies the M1 platform:

@@ -249,7 +249,7 @@ $ yarn locales --fix
 $ yarn test
 ```
 
-Check out our [contribution guideline](./CONTRIBUTING.md), too!
+Check out our [contribution guideline](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/CONTRIBUTING.md), too!
 
 #### Developer Chat
 
