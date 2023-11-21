@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# !!! never tested !!!
-
 # base setup
 SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
@@ -35,7 +33,7 @@ helm install \
   --kubeconfig=${KUBECONFIG} \
   --namespace cert-manager \
   --create-namespace \
-  --version v1.13.1 \
+  --version v1.13.2 \
   --set installCRDs=true
 
 ## install Ocelot with helm
