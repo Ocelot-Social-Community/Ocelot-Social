@@ -3,7 +3,7 @@
   "retryOn429": true,
   "retryCount": 2,
   "fallbackRetryDelay": "30s",
-  "aliveStatusCodes": [200, 206, 403],
+  "aliveStatusCodes": [200, 206, 303, 403],
   "ignorePatterns": [
     {
       "pattern": "^(https:\/\/github.com\/Ocelot-Social-Community\/Ocelot-Social\/pull\/|http:\/\/localhost)"

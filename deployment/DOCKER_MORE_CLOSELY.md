@@ -27,7 +27,3 @@ $ docker compose -f docker-compose.ocelotsocial-branded.yml -f docker-compose.ap
 # only once: init admin user and create indexes and constraints in Neo4j database
 $ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
 ```
-
-## Docker More Closely In Main Code
-
-To get more informations about the Apple M1 platform and to analyze the Docker builds etc. you find our documentation in our main code, [here](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/DOCKER_MORE_CLOSELY.md).

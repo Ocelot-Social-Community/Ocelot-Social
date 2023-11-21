@@ -1,7 +1,6 @@
 # Table of contents
 
 * [Introduction](README.md)
-* [Edit this Documentation](edit-this-documentation.md)
 * [Neo4J](neo4j/README.md)
 * [Backend](backend/README.md)
   * [GraphQL](backend/graphql.md)
@@ -19,4 +18,5 @@
 * [Contributing](CONTRIBUTING.md)
 * [Feature Specification](cypress/features.md)
 * [Code of Conduct](CODE_OF_CONDUCT.md)
+* [Documentation](documentation.md)
 * [License](LICENSE.md)
