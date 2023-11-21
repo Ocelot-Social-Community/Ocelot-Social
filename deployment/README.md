@@ -48,7 +48,9 @@ Since all deployment methods described here depend on [Docker](https://docker.co
 The next step is:
 
 - [Set Environment Variables and Configurations](./deployment-values.md)
+<!-- markdown-link-check-disable -->
 - [Configure And Branding](./configurations/stage.ocelot.social/branding/README.md)
+<!-- markdown-link-check-enable -->
 
 ### Optional: Locally Testing Configuration And Branding
 
