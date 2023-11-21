@@ -195,9 +195,10 @@
         "yourEmail": "Your e-mail address:"
       },
       "email-nonce": {
-        "buttonTitle": "Confirm",
+        "buttonTitle": "Continue",
         "form": {
-          "description": "Open your inbox and enter the code that we've sent to you.",
+          "click-next": "Click on Continue.",
+          "description": "Open your e-mail inbox and enter the code that we've sent to you.",
           "next": "Continue",
           "nonce": "E-mail code: 32143",
           "validations": {
