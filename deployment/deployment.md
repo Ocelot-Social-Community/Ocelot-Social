@@ -5,7 +5,7 @@ Before you start the deployment you have to do preparations.
 ## Deployment Preparations
 
 Since all deployment methods described here depend on [Docker](https://docker.com) and [DockerHub](https://hub.docker.com), you need to create your own organisation on DockerHub and put its name in the [package.json](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/package.json) file as your `dockerOrganisation`.  
-Read more details in the [main README](/README.md) under [Usage](/README.md#usage).
+Read more details in the [main README](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md) under [Usage](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md#usage).
 
 ## Deployment Methods
 

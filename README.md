@@ -73,7 +73,7 @@ If you're wondering how you could help, there are plenty of ways, e.g.:
   - Promote it on your social networks.
   - Tell your friends about it by word-of-mouth.
   - Write a press article on ocelot.social or contact the editorial office of your local news page or radio station.
-- Take a [good first issue](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) or issues that need help. Make sure to read [CONTRIBUTING.md](/CONTRIBUTING.md) first though.
+- Take a [good first issue](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) or issues that need help. Make sure to read [CONTRIBUTING.md](./CONTRIBUTING.md) first though.
 - Testing and [reporting](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/new/choose) bugs.
 - Translating: Please [contact us](#contact).
 - Reviewing and testing pull requests.
