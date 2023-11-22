@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# time stamp
+printf "Backup started at:\n  "
+date
+
 # base setup
 SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
