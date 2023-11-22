@@ -786,9 +786,11 @@
     },
     "viewEvent": {
       "eventEnd": "Ende",
+      "eventEndTime": "Ende - Zeit",
       "eventIsOnline": "Online",
       "eventLocationName": "Stadt — z.B. Musterstraße 1, 12345 Musterstadt",
       "eventStart": "Beginn",
+      "eventStartTime": "Beginn - Zeit",
       "eventVenue": "Veranstaltungsort — z.B. Hinterhof, 1. OG, …",
       "title": "Veranstaltung"
     },

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <label>Beginn</label> -->
+    <label v-if="inputLabel">{{ inputLabel }}</label>
     <div class="date-input-container">
       <div class="event-grid-item-z-helper">
         <date-picker
@@ -9,24 +9,22 @@
           type="date"
           value-type="format"
           class="event-grid-item-z-helper"
-          :placeholder="$t('post.viewEvent.eventStart')"
-          :disabled-date="notBeforeToday"
-          :disabled-time="notBeforeNow"
-          @change="changeEventStart($event)"
-          :time-picker-options="{ start: '00:00', step: '00:30', end: '23:30', format: 'HH:mm' }"
+          :placeholder="placeholderDate"
+          :disabled-date="notBeforeDate"
+          :disabled-time="notBeforeDay"
+          @change="changeDate($event)"
         ></date-picker>
       </div>
-      <div class="event-grid-item-z-helper">
+      <div class="event-grid-item-z-helper time-picker">
         <date-picker
+          v-if="inputDate"
           name="inputTime"
           v-model="inputTime"
           type="datetime"
           :minute-step="15"
           format="HH:mm"
           class="event-grid-item-z-helper"
-          :placeholder="$t('post.viewEvent.eventStartTime')"
-          :disabled-date="notBeforeToday"
-          :disabled-time="notBeforeNow"
+          :placeholder="placeholderTime"
           :show-second="false"
           :show-time-panel="false"
           :confirm="true"
@@ -48,6 +46,7 @@
         </date-picker>
       </div>
     </div>
+    <!-- TODO decouple from eventstart? -->
     <div v-if="errors && errors.eventStart" class="chipbox event-grid-item-margin-helper">
       <ds-chip size="base" :color="errors && errors.eventStart && 'danger'">
         <base-icon name="warning" />
@@ -68,10 +67,14 @@ export default {
     DatePicker,
     TimePanel,
   },
-  emits: ['toggle-password'],
+  emits: ['change-event-start', 'change-event-end'],
   props: {
     errors: { type: Object, default: () => null },
     formDate: { type: String, default: () => null },
+    inputLabel: { type: String, default: '' },
+    compareDate: { type: String, default: () => null },
+    placeholderDate: { type: String },
+    placeholderTime: { type: String, default: '' },
     // formTime: { type: String, default: () => null },
   },
   data() {
@@ -82,17 +85,19 @@ export default {
     }
   },
   methods: {
-    notBeforeToday(date) {
-      return date < new Date().setHours(0, 0, 0, 0)
+    notBeforeDay(date) {
+      if (this.compareDate === null) {
+        return date < new Date().setHours(0, 0, 0, 0)
+      } else {
+        return date < new Date(this.compareDate).setHours(0, 0, 0, 0)
+      }
     },
-    notBeforeNow(date) {
-      return date < new Date()
-    },
-    notBeforeEventDay(date) {
-      return date < new Date(this.date).setHours(0, 0, 0, 0)
-    },
-    notBeforeEvent(date) {
-      return date <= new Date(this.date)
+    notBeforeDate(date) {
+      if (this.compareDate === null) {
+        return date < new Date()
+      } else {
+        return date <= new Date(this.compareDate)
+      }
     },
     getTimeFromDate(event) {
       if (this.inputTime) {
@@ -106,6 +111,9 @@ export default {
         // this.formDate = date_object.toUTCString()
       }
     },
+    changeDate(event) {
+      this.$emit('change-date', event)
+    },
     changeEventEnd(event) {
       this.$emit('change-event-end', event)
     },
@@ -117,6 +125,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.time-picker {
+  margin-left: $space-small;
+}
 .eventDatas {
   .chipbox {
     display: flex;
