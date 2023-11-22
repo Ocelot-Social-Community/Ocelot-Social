@@ -68,6 +68,20 @@ Docker can be run in production mode:
 docker compose -f docker-compose.yml up
 ```
 
+### Chromatic
+
+In order to use the chromatic workflow you need to provide a `CHROMATIC_PROJECT_TOKEN` in the repository secrets.
+
+If you want to run chromatic from the command line you either have to provide this variable as well
+```bash
+export CHROMATIC_PROJECT_TOKEN=...
+npm run chromatic
+```
+or you have to append it via parameter:
+```bash
+npm run chromatic -- --project-token=...
+```
+
 ## Endpoints
 
 The following endpoints are provided given the right command is executed or all three if `docker compose` is used:
