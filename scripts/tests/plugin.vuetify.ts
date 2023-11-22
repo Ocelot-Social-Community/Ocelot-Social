@@ -1,9 +1,7 @@
 import { config } from '@vue/test-utils'
 
-// eslint-disable-next-line import/no-relative-parent-imports
-import i18n from '../renderer/i18n'
-// eslint-disable-next-line import/no-relative-parent-imports
-import vuetify from '../renderer/vuetify'
+import i18n from '#plugins/i18n'
+import vuetify from '#plugins/vuetify'
 
 config.global.plugins.push(vuetify(i18n))
 

@@ -8,5 +8,5 @@
 </template>
 
 <script lang="ts" setup>
-import ClickCounter from './ClickCounter.vue'
+import ClickCounter from '#components/ClickCounter.vue'
 </script>

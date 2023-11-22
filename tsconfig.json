@@ -9,7 +9,16 @@
     "types": ["vite/client"],
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "#root/*": ["./*"],
+      "#src/*": ["./src/*"],
+      "#components/*": ["./src/components/*"],
+      "#pages/*": ["./src/pages/*"],
+      "#plugins/*": ["./renderer/plugins/*"],
+      "#context/*": ["./renderer/context/*"],
+      "#types/*": ["./types/*"]
+    }
   },
   "ts-node": {
     "transpileOnly": true,

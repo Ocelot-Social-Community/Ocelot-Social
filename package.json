@@ -24,7 +24,9 @@
     "docker",
     "remark-cli"
   ],
-  "author": "Ulf Gebhardt",
+  "author": {
+    "name": "Ulf Gebhardt"
+  },
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/IT4Change/boilerplate-frontend/issues"
@@ -122,5 +124,14 @@
     "stylelint-config-standard-scss": "^11.1.0",
     "vitest": "^0.34.6",
     "vuepress": "^2.0.0-rc.0"
+  },
+  "imports": {
+    "#root/*": "./*",
+    "#src/*": "./src/*",
+    "#components/*": "./src/components/*",
+    "#pages/*": "./src/pages/*",
+    "#plugins/*": "./renderer/plugins/*",
+    "#context/*": "./renderer/context/*",
+    "#types/*": "./types/*"
   }
 }

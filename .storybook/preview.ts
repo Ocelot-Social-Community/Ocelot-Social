@@ -1,10 +1,8 @@
 import { setup } from '@storybook/vue3'
 import { createPinia } from 'pinia'
 
-// eslint-disable-next-line  import/no-relative-parent-imports
-import i18n from '../renderer/i18n'
-// eslint-disable-next-line  import/no-relative-parent-imports
-import CreateVuetify from '../renderer/vuetify'
+import i18n from '#plugins/i18n'
+import CreateVuetify from '#plugins/vuetify'
 
 import { withVuetifyTheme } from './withVuetifyTheme.decorator'
 

@@ -1,16 +1,16 @@
-import { createPinia } from 'pinia'
 import { createSSRApp, defineComponent, h } from 'vue'
 
-import i18n from './i18n'
-import PageShell from './PageShell.vue'
-import { setPageContext } from './usePageContext'
-import CreateVuetify from './vuetify'
+import PageShell from '#components//PageShell.vue'
+import { setPageContext } from '#context/usePageContext'
+import i18n from '#plugins/i18n'
+import pinia from '#plugins/pinia'
+import CreateVuetify from '#plugins/vuetify'
+import { Page } from '#types/Page'
+import { PageProps } from '#types/PageProps'
 
-import type { Component, PageContext, PageProps } from './types'
+import type { PageContext } from '#types/PageContext'
 
-export { createApp }
-
-function createApp(Page: Component, pageProps: PageProps | undefined, pageContext: PageContext) {
+function createApp(Page: Page, pageProps: PageProps | undefined, pageContext: PageContext) {
   const PageWithLayout = defineComponent({
     render() {
       return h(
@@ -25,7 +25,6 @@ function createApp(Page: Component, pageProps: PageProps | undefined, pageContex
     },
   })
 
-  const pinia = createPinia()
   const app = createSSRApp(PageWithLayout)
   app.use(pinia)
   app.use(i18n)
@@ -36,3 +35,5 @@ function createApp(Page: Component, pageProps: PageProps | undefined, pageContex
 
   return app
 }
+
+export { createApp }
