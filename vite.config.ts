@@ -26,6 +26,7 @@ const config: UserConfig = {
       '#src': path.join(__dirname, '/src'),
       '#components': path.join(__dirname, '/src/components'),
       '#pages': path.join(__dirname, '/src/pages'),
+      '#assets': path.join(__dirname, '/src/assets'),
       '#plugins': path.join(__dirname, '/renderer/plugins'),
       '#context': path.join(__dirname, '/renderer/context'),
       '#types': path.join(__dirname, '/types'),

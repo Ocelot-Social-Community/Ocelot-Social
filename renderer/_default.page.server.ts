@@ -1,7 +1,7 @@
 import { renderToString as renderToString_ } from '@vue/server-renderer'
 import { escapeInject, dangerouslySkipEscape } from 'vike/server'
 
-import logoUrl from '#components/logo.svg'
+import logoUrl from '#assets/favicon.ico'
 
 import { createApp } from './app'
 

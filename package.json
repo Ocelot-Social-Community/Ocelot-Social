@@ -130,6 +130,7 @@
     "#src/*": "./src/*",
     "#components/*": "./src/components/*",
     "#pages/*": "./src/pages/*",
+    "#assets/*": "./src/assets/*",
     "#plugins/*": "./renderer/plugins/*",
     "#context/*": "./renderer/context/*",
     "#types/*": "./types/*"
