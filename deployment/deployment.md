@@ -22,9 +22,9 @@ After the first deployment of the new network on your server, the database is in
 
 ***ATTENTION:*** When you are logged in for the first time, please change your (the admin's) e-mail to an existing one and change your password to a secure one !!!
 
-## Use the Scripts
+## Using the Scripts
 
-To use all the scripts you have to set the variable `CONFIGURATION` in your terminal by entering:
+To use most of the scripts you have to set the variable `CONFIGURATION` in your terminal by entering:
 
 ```bash
 # in deployment folder
@@ -64,9 +64,13 @@ $ scripts/cluster.maintenance.sh on
 $ scripts/cluster.maintenance.sh off
 ```
 
-### Backup Script
+### Backup Scripts
 
-To save a locale backup of the database and uploaded images:
+Save backups.
+
+#### Single Backup
+
+To save a local backup of the database and uploaded images:
 
 ```bash
 # in deployment folder
@@ -76,3 +80,31 @@ $ scripts/cluster.backup.sh
 ```
 
 The backup will be saved into your network folders `backup` folder in a new folder with the date and time.
+
+#### Multiple Networks Backup
+
+In order to save several network backups locally, you must define the configuration names of all networks in `.env`. The template for this is `deployment/.env.dist`:
+
+```bash
+# in the deployment folders '.env' set as example
+BACKUP_CONFIGURATIONS="stage.ocelot.social stage.wir.social"
+BACKUP_SAVED_BACKUPS_NUMBER=7
+```
+
+If `BACKUP_SAVED_BACKUPS_NUMBER <= 0` then no backups will be deleted.
+
+To actually save all the backups run:
+
+```bash
+# in deployment folder
+
+# save all backups listed in 'BACKUP_CONFIGURATIONS'
+# delete all backups older then the 'BACKUP_SAVED_BACKUPS_NUMBER' newest ones
+$ scripts/clusters.cron-backups.sh
+```
+
+The backups will be saved into your networks folders `backup` folder in a new folder with the date and time.
+
+#### Automated Backups
+
+XXX
