@@ -13,8 +13,9 @@ ARG CONFIGURATION=example
 
 # copy public constants and email templates into the Docker image to brand it
 COPY configurations/${CONFIGURATION}/branding/constants/ src/config/
+COPY configurations/${CONFIGURATION}/branding/constants/ src/constants/
 # links.ts does only work in frontend, not backend
-RUN rm -Rf src/config/links.ts
+RUN rm -Rf src/config/links.ts src/constants/links.ts
 COPY configurations/${CONFIGURATION}/branding/email/ src/middleware/helpers/email/
 
 ##################################################################################
