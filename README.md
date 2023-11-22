@@ -14,6 +14,7 @@
 [![vitest][badge-vitest-img]][badge-vitest-href]
 [![storybook][badge-storybook-img]][badge-storybook-href]
 [![vuepress][badge-vuepress-img]][badge-vuepress-href]
+[![chromatic][badge-chromatic-img]][badge-chromatic-href]
 
 The IT4C Boilerplate for frontends
 
@@ -31,30 +32,32 @@ This projects utilizes `storybook` to develop frontend components and `vuepress`
 
 The following commands are available:
 
-| Command                     | Description                                     |
-|-----------------------------|-------------------------------------------------|
-| `npm install`               | Project setup                                   |
-| `npm run build`             | Compiles and minifies for production            |
-| `npm run server:prod`       | Runs productions server                         |
-| **Develop**                 |                                                 |
-| `npm run dev`               | Compiles and hot-reloads for development        |
-| `npm run server:dev`        | Run development server                          |
-| **Test**                    |                                                 |
-| `npm run test:lint`         | Run all linters                                 |
-| `npm run test:lint:eslint`  | Run linter eslint                               |
-| `npm run test:lint:locales` | Run linter locales                              |
-| `npm run test:lint:remark`  | Run linter remark                               |
-| `npm run test:lint:style`   | Run linter stylelint                            |
-| `npm run test:unit`         | Run all unit tests and generate coverage report |
-| `npm run test:unit:dev`     | Run all unit tests in watch mode                |
-| `npm test`                  | Run all tests & linters                         |
-| **Storybook**               |                                                 |
-| `npm run storybook`         | Run Storybook                                   |
-| `npm run storybook:build`   | Build static storybook                          |
-| `npm run storybook:test`    | Run tests against all storybook stories         |
-| **Documentation**           |                                                 |
-| `npm run docs:dev`          | Run Documentation in development mode           |
-| `npm run docs:build`        | Build static documentation                      |
+| Command                     | Description                                      |
+|-----------------------------|--------------------------------------------------|
+| `npm install`               | Project setup                                    |
+| `npm run build`             | Compiles and minifies for production             |
+| `npm run server:prod`       | Runs productions server                          |
+| **Develop**                 |                                                  |
+| `npm run dev`               | Compiles and hot-reloads for development         |
+| `npm run server:dev`        | Run development server                           |
+| **Test**                    |                                                  |
+| `npm run test:lint`         | Run all linters                                  |
+| `npm run test:lint:eslint`  | Run linter eslint                                |
+| `npm run test:lint:locales` | Run linter locales                               |
+| `npm run test:lint:remark`  | Run linter remark                                |
+| `npm run test:lint:style`   | Run linter stylelint                             |
+| `npm run test:unit`         | Run all unit tests and generate coverage report  |
+| `npm run test:unit:dev`     | Run all unit tests in watch mode                 |
+| `npm test`                  | Run all tests & linters                          |
+| **Storybook**               |                                                  |
+| `npm run storybook`         | Run Storybook                                    |
+| `npm run storybook:build`   | Build static storybook                           |
+| `npm run storybook:test`    | Run tests against all storybook stories          |
+| **Documentation**           |                                                  |
+| `npm run docs:dev`          | Run Documentation in development mode            |
+| `npm run docs:build`        | Build static documentation                       |
+| **Chromatic**               |                                                  |
+| `npm run chromatic`         | Run Chromatic. See Chromatic section for details |
 
 ### Docker
 
@@ -95,7 +98,6 @@ The following endpoints are provided given the right command is executed or all 
 ## TODO
 
 - [ ] figma
-- [ ] chromatic
 - [ ] feature zähler -> pinia tore
 
 ## Known Problems
@@ -151,3 +153,6 @@ Currently none
 
 [badge-vuepress-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.vuepress&label=vuepress&color=orange
 [badge-vuepress-href]: https://vuepress.vuejs.org/
+
+[badge-chromatic-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.chromatic&label=chromatic&color=orange
+[badge-chromatic-href]: https://www.chromatic.com/
