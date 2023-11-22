@@ -1,13 +1,13 @@
 import { renderToString as renderToString_ } from '@vue/server-renderer'
 import { escapeInject, dangerouslySkipEscape } from 'vike/server'
 
-import { createApp } from './app'
-import logoUrl from './logo.svg'
+import logoUrl from '#assets/favicon.ico'
 
-import type { PageContextServer } from './types'
+import { createApp } from './app'
+
+import type { PageContextServer } from '#types/PageContext'
 import type { App } from 'vue'
 
-export { render }
 // See https://vike.dev/data-fetching
 export const passToClient = ['pageProps', 'urlPathname']
 
@@ -56,3 +56,5 @@ async function renderToString(app: App) {
   if (err) throw err
   return appHtml
 }
+
+export { render }

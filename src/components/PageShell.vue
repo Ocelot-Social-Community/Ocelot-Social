@@ -4,7 +4,7 @@
       <div class="layout">
         <div class="navigation">
           <a href="/" class="logo">
-            <img src="./logo.svg" height="64" width="64" alt="logo" />
+            <img :src="Logo" height="64" width="64" alt="logo" />
           </a>
           <VikeLink href="/">Home</VikeLink>
           <VikeLink href="/about">About</VikeLink>
@@ -16,6 +16,8 @@
 </template>
 
 <script lang="ts" setup>
+import Logo from '#assets/it4c-logo2-clean-bg_alpha-128x128.png'
+
 import VikeLink from './VikeLink.vue'
 </script>
 

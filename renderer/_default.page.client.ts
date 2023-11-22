@@ -1,8 +1,6 @@
 import { createApp } from './app'
 
-import type { PageContextClient } from './types'
-
-export { render }
+import type { PageContextClient } from '#types/PageContext'
 
 // This render() hook only supports SSR, see https://vike.dev/render-modes for how to modify render() to support SPA
 async function render(pageContext: PageContextClient) {
@@ -15,3 +13,5 @@ async function render(pageContext: PageContextClient) {
 /* To enable Client-side Routing:
 export const clientRouting = true
 // !! WARNING !! Before doing so, read https://vike.dev/clientRouting */
+
+export { render }

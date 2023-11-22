@@ -3,12 +3,9 @@
 
 import { inject } from 'vue'
 
-import { PageContext } from './types'
+import { PageContext } from '#types/PageContext'
 
 import type { App, InjectionKey } from 'vue'
-
-export { usePageContext }
-export { setPageContext }
 
 const key: InjectionKey<PageContext> = Symbol(undefined)
 
@@ -21,3 +18,6 @@ function usePageContext() {
 function setPageContext(app: App, pageContext: PageContext) {
   app.provide(key, pageContext)
 }
+
+export { usePageContext }
+export { setPageContext }
