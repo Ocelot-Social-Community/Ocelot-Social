@@ -1,6 +1,6 @@
 import { createSSRApp, defineComponent, h } from 'vue'
 
-import PageShell from '#components//PageShell.vue'
+import PageShell from '#components/PageShell.vue'
 import { setPageContext } from '#context/usePageContext'
 import i18n from '#plugins/i18n'
 import pinia from '#plugins/pinia'
