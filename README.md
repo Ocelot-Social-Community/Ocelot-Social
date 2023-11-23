@@ -58,6 +58,8 @@ The following commands are available:
 | `npm run docs:build`        | Build static documentation                       |
 | **Chromatic**               |                                                  |
 | `npm run chromatic`         | Run Chromatic. See Chromatic section for details |
+| **Maintenance**             |                                                  |
+| `npm run update`            | Check for updates                                |
 
 ### Docker
 
@@ -85,6 +87,17 @@ or you have to append it via parameter:
 npm run chromatic -- --project-token=...
 ```
 
+### Update
+
+You can get a list of packes to update by running `npm run update`.
+
+Appending `-u ` will also update the packages in the `package.json`. You have to run `npm install` again after.
+
+```bash
+npm run update -- -u
+npm install
+```
+
 ## Endpoints
 
 The following endpoints are provided given the right command is executed or all three if `docker compose` is used:
@@ -97,12 +110,13 @@ The following endpoints are provided given the right command is executed or all 
 
 ## TODO
 
+- [ ] translations & language switch
 - [ ] tests
 - [ ] stories
 
 ## Known Problems
 
-Currently none
+- [ ] Image Rerender flicker
 
 ## License
 
