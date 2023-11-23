@@ -1,7 +1,7 @@
 import { mount, config } from '@vue/test-utils'
 import { describe, it, expect } from 'vitest'
 
-import ClickCounter from './ClickCounter.vue'
+import ClickCounter from './ClickCounter.delete.vue'
 
 describe('clickCounter', () => {
   const wrapper = mount(ClickCounter)
