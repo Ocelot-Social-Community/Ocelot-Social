@@ -10,8 +10,7 @@ async function render(pageContext: PageContextClient) {
   app.mount('#app')
 }
 
-/* To enable Client-side Routing:
+// To enable Client-side Routing:
 export const clientRouting = true
 // !! WARNING !! Before doing so, read https://vike.dev/clientRouting */
-
 export { render }

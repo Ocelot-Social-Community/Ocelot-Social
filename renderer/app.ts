@@ -11,6 +11,8 @@ import { PageProps } from '#types/PageProps'
 
 import type { PageContext } from '#types/PageContext'
 
+const vuetify = CreateVuetify(i18n)
+
 function createApp(
   Page: Page,
   pageProps: PageProps | undefined,
@@ -38,7 +40,7 @@ function createApp(
   const app = createSSRApp(PageWithLayout)
   app.use(pinia)
   app.use(i18n)
-  app.use(CreateVuetify(i18n))
+  app.use(vuetify)
 
   // Make pageContext available from any Vue component
   setPageContext(app, pageContext)
