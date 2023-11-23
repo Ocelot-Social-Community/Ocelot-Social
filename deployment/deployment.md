@@ -100,7 +100,7 @@ To actually save all the backups run:
 
 # save all backups listed in 'BACKUP_CONFIGURATIONS'
 # delete all backups older then the 'BACKUP_SAVED_BACKUPS_NUMBER' newest ones
-$ scripts/clusters.cron-backups.sh
+$ scripts/clusters.backup-multiple-servers.sh
 ```
 
 The backups will be saved into your networks folders `backup` folder in a new folder with the date and time.
