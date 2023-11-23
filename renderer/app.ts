@@ -31,7 +31,7 @@ function createApp(
     },
   })
 
-  if(isClient){
+  if (isClient) {
     pinia.use(piniaPluginPersistedstate)
   }
 
