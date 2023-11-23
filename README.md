@@ -100,7 +100,6 @@ The following endpoints are provided given the right command is executed or all 
 - [ ] tags
 - [ ] tests
 - [ ] stories
-- [ ] refactor subpages of app - lots of hacks
 
 ## Known Problems
 
