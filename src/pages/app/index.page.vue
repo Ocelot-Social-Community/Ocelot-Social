@@ -37,7 +37,12 @@ import { useCounterStore } from '#stores/counter'
 
 const counter = useCounterStore()
 
+/*
 const {
   routeParams: { id: page },
 } = usePageContext()
+*/
+const { routeParams } = usePageContext()
+const page = routeParams?.id
+// console.log(page)
 </script>

@@ -6,20 +6,14 @@ import { META } from '#src/env'
 
 import { createApp } from './app'
 
-import type { PageContextServer } from '#types/PageContext'
+import type { PageContextServer, PageContext } from '#types/PageContext'
 import type { App } from 'vue'
 
 // See https://vike.dev/data-fetching
-export const passToClient = ['pageProps', 'urlPathname', 'routeParams']
+export const passToClient = ['pageProps', /* 'urlPathname', */ 'routeParams']
 
-async function render(pageContext: PageContextServer) {
-  const { Page, pageProps } = pageContext
-  // This render() hook only supports SSR, see https://vike.dev/render-modes for how to modify render() to support SPA
-  if (!Page) {
-    throw new Error('My render() hook expects pageContext.Page to be defined')
-  }
-
-  const app = createApp(Page, pageProps, pageContext, false)
+async function render(pageContext: PageContextServer & PageContext) {
+  const app = createApp(pageContext, false)
 
   const appHtml = await renderToString(app)
 

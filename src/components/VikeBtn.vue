@@ -1,5 +1,5 @@
 <template>
-  <v-btn :variant="isRoutSelected($attrs.href as string) ? 'tonal' : 'flat'">
+  <v-btn :variant="isRouteSelected($attrs.href as string) ? 'tonal' : 'flat'">
     <slot />
   </v-btn>
 </template>
@@ -8,7 +8,7 @@ import { usePageContext } from '#context/usePageContext'
 
 const pageContext = usePageContext()
 
-const isRoutSelected = (href: string) => {
+const isRouteSelected = (href: string) => {
   if (href === '/app') {
     return pageContext.urlPathname.indexOf(href) === 0
   }
