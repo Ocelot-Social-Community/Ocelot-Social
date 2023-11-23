@@ -97,7 +97,6 @@ The following endpoints are provided given the right command is executed or all 
 
 ## TODO
 
-- [ ] tags
 - [ ] tests
 - [ ] stories
 

@@ -9,20 +9,22 @@
     "url": "git+https://github.com/IT4Change/boilerplate-frontend.git"
   },
   "keywords": [
-    "npm",
     "nodejs",
-    "vite",
-    "vike",
+    "npm",
+    "docker",
+    "jq",
     "vue",
+    "vike",
     "vuetify",
     "pinia",
-    "storybook",
-    "eslint",
-    "vitest",
     "vue-i18n",
+    "eslint",
+    "remark-cli",
+    "stylelint",
+    "vitest",
+    "storybook",
     "vuepress",
-    "docker",
-    "remark-cli"
+    "chromatic"
   ],
   "author": {
     "name": "Ulf Gebhardt"
