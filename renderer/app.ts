@@ -48,7 +48,7 @@ function createApp(pageContext: VikePageContext & PageContext, isClient = true) 
 
   objectAssign(app, {
     changePage: (pageContext: VikePageContext & PageContext) => {
-      Object.assign(pageContextReactive, reactive(pageContext))
+      Object.assign(pageContextReactive, pageContext)
       rootComponent.Page = markRaw(pageContext.Page)
       rootComponent.pageProps = markRaw(pageContext.pageProps || {})
     },

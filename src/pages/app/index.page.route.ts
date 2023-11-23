@@ -10,8 +10,8 @@ export default (pageContext: PageContext) => {
     }
   }
 
-  const result = resolveRoute('/app/@id', pageContext.urlPathname)
-  if (!['inc', 'reset'].includes(result.routeParams.id)) {
+  const result = resolveRoute('/app/@page', pageContext.urlPathname)
+  if (!['inc', 'reset'].includes(result.routeParams.page)) {
     return false
   }
   return result

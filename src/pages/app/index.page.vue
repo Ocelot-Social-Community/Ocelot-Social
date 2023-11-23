@@ -6,7 +6,6 @@
         <v-list-item link title="Increase" :active="page === 'inc'" href="/app/inc"></v-list-item>
 
         <v-divider class="my-2"></v-divider>
-
         <v-list-item link title="Reset" :active="page === 'reset'" href="/app/reset"></v-list-item>
       </v-list>
     </template>
@@ -31,18 +30,9 @@
 </template>
 
 <script lang="ts" setup>
-import { usePageContext } from '#context/usePageContext'
 import DefaultLayout from '#layouts/DefaultLayout.vue'
 import { useCounterStore } from '#stores/counter'
 
 const counter = useCounterStore()
-
-/*
-const {
-  routeParams: { id: page },
-} = usePageContext()
-*/
-const { routeParams } = usePageContext()
-const page = routeParams?.id
-// console.log(page)
+defineProps(['page'])
 </script>
