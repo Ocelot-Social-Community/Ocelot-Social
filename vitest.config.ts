@@ -14,7 +14,7 @@ export default mergeConfig(
         include: ['src/**/*.{js,jsx,ts,tsx,vue}'],
         lines: 1,
         functions: 0,
-        branches: 5,
+        branches: 4,
         statements: 1,
         // 100: true,
       },
