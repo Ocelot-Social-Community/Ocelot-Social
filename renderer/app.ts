@@ -1,3 +1,4 @@
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createSSRApp, defineComponent, h } from 'vue'
 
 import PageShell from '#components/PageShell.vue'
@@ -10,7 +11,12 @@ import { PageProps } from '#types/PageProps'
 
 import type { PageContext } from '#types/PageContext'
 
-function createApp(Page: Page, pageProps: PageProps | undefined, pageContext: PageContext) {
+function createApp(
+  Page: Page,
+  pageProps: PageProps | undefined,
+  pageContext: PageContext,
+  isClient = true,
+) {
   const PageWithLayout = defineComponent({
     render() {
       return h(
@@ -24,6 +30,10 @@ function createApp(Page: Page, pageProps: PageProps | undefined, pageContext: Pa
       )
     },
   })
+
+  if(isClient){
+    pinia.use(piniaPluginPersistedstate)
+  }
 
   const app = createSSRApp(PageWithLayout)
   app.use(pinia)

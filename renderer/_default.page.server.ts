@@ -19,7 +19,7 @@ async function render(pageContext: PageContextServer) {
     throw new Error('My render() hook expects pageContext.Page to be defined')
   }
 
-  const app = createApp(Page, pageProps, pageContext)
+  const app = createApp(Page, pageProps, pageContext, false)
 
   const appHtml = await renderToString(app)
 
