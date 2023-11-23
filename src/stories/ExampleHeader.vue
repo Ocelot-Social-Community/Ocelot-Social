@@ -1,3 +1,4 @@
+<!-- eslint-disable @intlify/vue-i18n/no-raw-text -->
 <template>
   <header>
     <div class="storybook-header">

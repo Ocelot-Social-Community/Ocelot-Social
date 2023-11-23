@@ -13,7 +13,9 @@ import type { App } from 'vue'
 export const passToClient = ['pageProps', /* 'urlPathname', */ 'routeParams']
 
 async function render(pageContext: PageContextServer & PageContext) {
-  const app = createApp(pageContext, false)
+  const { app, i18n } = createApp(pageContext, false)
+
+  const locale = i18n.global.locale.value
 
   const appHtml = await renderToString(app)
 
@@ -23,7 +25,7 @@ async function render(pageContext: PageContextServer & PageContext) {
   const desc = (documentProps && documentProps.description) || META.DEFAULT_DESCRIPTION
 
   const documentHtml = escapeInject`<!DOCTYPE html>
-    <html lang="en">
+    <html lang="${locale}">
       <head>
         <meta charset="UTF-8" />
         <link rel="icon" href="${logoUrl}" />

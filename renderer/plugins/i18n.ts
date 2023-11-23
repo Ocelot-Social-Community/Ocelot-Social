@@ -7,6 +7,7 @@ import en from '#src/locales/en.json'
 
 export default createI18n({
   legacy: false, // Vuetify does not support the legacy mode of vue-i18n
+  globalInjection: true,
   locale: 'de',
   fallbackLocale: 'en',
   messages: { de, en },

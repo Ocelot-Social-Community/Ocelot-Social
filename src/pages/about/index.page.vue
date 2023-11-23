@@ -1,17 +1,19 @@
 <template>
   <DefaultLayout>
-    <h1>About</h1>
-    <p>
-      To find out more about this boilerplate you can look at the sources:
-      <a href="https://github.com/IT4Change/boilerplate-frontend/" target="_blank"
-        >github.com/IT4Change/boilerplate-frontend</a
-      >.
-    </p>
+    <h1>{{ $t('about.h1') }}</h1>
+    <i18n-t scope="global" keypath="about.text1" tag="p">
+      <template #link>
+        <a href="https://github.com/IT4Change/boilerplate-frontend/" target="_blank">
+          {{ $t('about.link1') }}
+        </a>
+      </template>
+    </i18n-t>
     <br />
-    <p>
-      Want to get in touch? Find out how on our
-      <a href="https://it4c.dev" target="_blank">website</a>
-    </p>
+    <i18n-t scope="global" keypath="about.text2" tag="p">
+      <template #link>
+        <a href="https://it4c.dev" target="_blank">{{ $t('about.link2') }}</a>
+      </template>
+    </i18n-t>
   </DefaultLayout>
 </template>
 

@@ -61,7 +61,7 @@ function createApp(pageContext: VikePageContext & PageContext, isClient = true) 
   // Make pageContext available from any Vue component
   setPageContext(app, pageContextReactive)
 
-  return app
+  return { app, i18n }
 }
 
 // Same as `Object.assign()` but with type inference

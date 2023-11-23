@@ -1,16 +1,16 @@
 <template>
   <DefaultLayout>
-    <h1>IT4C Frontend Boilerplate</h1>
-    <p>Welcome to this minimal starter for frontends.</p>
+    <h1>{{ $t('home.h1') }}</h1>
+    <p>{{ $t('home.text1') }}</p>
     <br />
-    <p>This is just a basic example to demonstrate things - nothing fancy.</p>
+    <p>{{ $t('home.text2') }}</p>
     <br />
-    <p>In the App Section you will find a counter example utilizing the local storage.</p>
+    <p>{{ $t('home.text3') }}</p>
     <br />
-    <p>Happy Coding <v-icon icon="mdi-heart" color="red" /></p>
+    <p>{{ $t('home.text4') }} <v-icon icon="mdi-heart" color="red" /></p>
     <br />
-    <p>Sincerly</p>
-    <p>Your IT Team For Change</p>
+    <p>{{ $t('home.greet1') }}</p>
+    <p>{{ $t('home.greet2') }}</p>
   </DefaultLayout>
 </template>
 

@@ -1,11 +1,11 @@
 <template>
   <div v-if="is404">
-    <h1>404 Page Not Found</h1>
-    <p>This page could not be found.</p>
+    <h1>{{ $t('error.404.h1') }}</h1>
+    <p>{{ $t('error.404.text') }}</p>
   </div>
   <div v-else>
-    <h1>500 Internal Error</h1>
-    <p>Something went wrong.</p>
+    <h1>{{ $t('error.500.h1') }}</h1>
+    <p>{{ $t('error.500.text') }}</p>
   </div>
 </template>
 

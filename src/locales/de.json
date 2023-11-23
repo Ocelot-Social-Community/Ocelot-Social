@@ -1,3 +1,53 @@
 {
-  "counter": "Zähler"
+  "about": {
+    "h1": "Über",
+    "link1": "github.com",
+    "link2": "Webseite",
+    "text1": "Um mehr über diese Kochplatte zu erfahren kannst du dir den Quellcode auf {link} anschauen.",
+    "text2": "Du willst mehr erfahren? Besuche uns auf {link}."
+  },
+  "app": {
+    "inc": {
+      "h1": "Erhöhe den Zähler",
+      "menu": "Erhöhe",
+      "text": "Erhöhe: {count}"
+    },
+    "reset": {
+      "h1": "Den Zähler zurücksetzen",
+      "menu": "Zurücksetzen",
+      "text": "Zurücksetzent: {count}"
+    },
+    "value": {
+      "h1": "Der Zähler",
+      "menu": "Wert",
+      "text": "Der aktuelle Wert des Zählers lautet: {count}"
+    }
+  },
+  "error": {
+    "404": {
+      "h1": "404 Seite nicht gefunden",
+      "text": "Diese Seite konnte nicht gefunden werden."
+    },
+    "500": {
+      "h1": "500 Interner Fehler",
+      "text": "Irgendetwas ist schief gegangen."
+    }
+  },
+  "home": {
+    "greet1": "Hochachtungsvoll",
+    "greet2": "Dein IT Team For Change",
+    "h1": "IT4C Frontend Kochplatte",
+    "text1": "Willkommen zu diesem minimalen Frontendstarter.",
+    "text2": "Es handelt sich um ein einfaches Beispiel um zu zeigen was so geht - nichts besonderes.",
+    "text3": "In dem Anwendungsbereich wirst du ein Zählerbeispiel finden, welches den Browserspeicher verwendet.",
+    "text4": "Fröhliches Programmieren"
+  },
+  "language": {
+    "german": "Deutsch"
+  },
+  "menu": {
+    "about": "Über",
+    "app": "Anwendung",
+    "home": "Daheim"
+  }
 }

@@ -13,6 +13,7 @@
         "plugin:promise/recommended",
         "plugin:security/recommended",
         "plugin:vue/vue3-recommended",
+        "plugin:@intlify/vue-i18n/recommended",
         "plugin:storybook/recommended"
     ],
     "parserOptions": {
@@ -32,6 +33,9 @@
         "import/resolver": {
           "typescript": true,
           "node": true
+        },
+        "vue-i18n": {
+            "localeDir": "./src/locales/*.json"
         }
       },
     "rules": {

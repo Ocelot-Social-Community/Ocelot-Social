@@ -14,6 +14,7 @@ const config: UserConfig = {
     !isStorybook() && vike(), // SSR only when storybook is not running
     vueI18n({
       ssr: true,
+      include: path.resolve(__dirname, './src/locales/**'),
     }),
   ],
   build: {
