@@ -2,7 +2,7 @@
   <DefaultLayout>
     <template #sidemenu>
       <v-list rounded>
-        <v-list-item link title="Value" :active="page === undefined" href="/app"></v-list-item>
+        <v-list-item link title="Value" :active="page === null" href="/app"></v-list-item>
         <v-list-item link title="Increase" :active="page === 'inc'" href="/app/inc"></v-list-item>
 
         <v-divider class="my-2"></v-divider>
@@ -11,7 +11,7 @@
     </template>
 
     <template #default>
-      <div v-if="page === undefined">
+      <div v-if="page === null">
         <h1>The Counter</h1>
         <p>
           The current value of the counter is:
@@ -42,5 +42,5 @@ import DefaultLayout from '#layouts/DefaultLayout.vue'
 import { useCounterStore } from '#stores/counter'
 
 const counter = useCounterStore()
-defineProps(['page'])
+defineProps({ page: { type: String, default: null } })
 </script>
