@@ -8,14 +8,14 @@ describe('clickCounter', () => {
 
   it('renders Button with a Counter of 0', () => {
     expect(wrapper.find('.v-btn').exists()).toBeTruthy()
-    expect(wrapper.text()).toBe("$t('counter') 0")
+    expect(wrapper.text()).toBe("$t('app.inc.text')")
   })
 
   it('has default Translation German', () => {
     const $Backup = config.global.mocks.$t
     config.global.mocks.$t = config.global.mocks.i18n$t
     const wrapper = mount(ClickCounter)
-    expect(wrapper.text()).toBe('Zähler 0')
+    expect(wrapper.text()).toBe('Erhöhe: 0')
     config.global.mocks.$t = $Backup
   })
 })
