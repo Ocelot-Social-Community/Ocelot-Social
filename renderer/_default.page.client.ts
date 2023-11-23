@@ -1,17 +1,30 @@
 import { createApp } from './app'
 
-import type { PageContextClient } from '#types/PageContext'
+import type { PageContext, VikePageContext } from '#types/PageContext'
 
-// This render() hook only supports SSR, see https://vike.dev/render-modes for how to modify render() to support SPA
-async function render(pageContext: PageContextClient) {
-  const { Page, pageProps } = pageContext
-  if (!Page) throw new Error('Client-side render() hook expects pageContext.Page to be defined')
-  const app = createApp(Page, pageProps, pageContext)
-  app.mount('#app')
+let app: ReturnType<typeof createApp>
+async function render(pageContext: VikePageContext & PageContext) {
+  if (!app) {
+    app = createApp(pageContext)
+    app.mount('#app')
+  } else {
+    app.changePage(pageContext)
+  }
 }
 
-/* To enable Client-side Routing:
-export const clientRouting = true
-// !! WARNING !! Before doing so, read https://vike.dev/clientRouting */
+function onHydrationEnd() {
+  // console.log('Hydration finished; page is now interactive.')
+}
+function onPageTransitionStart() {
+  // console.log('Page transition start')
+}
+function onPageTransitionEnd() {
+  // console.log('Page transition end')
+}
 
+export const clientRouting = true
+export const prefetchStaticAssets = 'viewport'
 export { render }
+export { onHydrationEnd }
+export { onPageTransitionStart }
+export { onPageTransitionEnd }

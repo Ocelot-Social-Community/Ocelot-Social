@@ -6,3 +6,4 @@ coverage/
 .vuepress/.temp/
 .vuepress/.cache/
 build-storybook.log
+.env

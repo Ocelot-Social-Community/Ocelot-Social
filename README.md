@@ -26,7 +26,7 @@ The project uses `vite` as builder, `vike` to do the SSR. The design framework i
 
 Testing is done with `vitest` and code style is enforced with `eslint`, `remark-cli` and `stylelint`.
 
-This projects utilizes `storybook` to develop frontend components and `vuepress` for static documentation generation.
+This projects utilizes `storybook` and `chromatic` to develop, document & test frontend components and `vuepress` for static documentation generation.
 
 ## Commands
 
@@ -97,8 +97,8 @@ The following endpoints are provided given the right command is executed or all 
 
 ## TODO
 
-- [ ] figma
-- [ ] feature zähler -> pinia tore
+- [ ] tests
+- [ ] stories
 
 ## Known Problems
 

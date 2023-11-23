@@ -16,6 +16,8 @@
       "#components/*": ["./src/components/*"],
       "#pages/*": ["./src/pages/*"],
       "#assets/*": ["./src/assets/*"],
+      "#layouts/*": ["./src/layouts/*"],
+      "#stores/*": ["./src/stores/*"],
       "#plugins/*": ["./renderer/plugins/*"],
       "#context/*": ["./renderer/context/*"],
       "#types/*": ["./types/*"]
