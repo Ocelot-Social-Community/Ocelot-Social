@@ -2,6 +2,7 @@ import { renderToString as renderToString_ } from '@vue/server-renderer'
 import { escapeInject, dangerouslySkipEscape } from 'vike/server'
 
 import logoUrl from '#assets/favicon.ico'
+import { META } from '#src/env'
 
 import { createApp } from './app'
 
@@ -9,20 +10,23 @@ import type { PageContextServer } from '#types/PageContext'
 import type { App } from 'vue'
 
 // See https://vike.dev/data-fetching
-export const passToClient = ['pageProps', 'urlPathname']
+export const passToClient = ['pageProps', 'urlPathname', 'routeParams']
 
 async function render(pageContext: PageContextServer) {
   const { Page, pageProps } = pageContext
   // This render() hook only supports SSR, see https://vike.dev/render-modes for how to modify render() to support SPA
-  if (!Page) throw new Error('My render() hook expects pageContext.Page to be defined')
+  if (!Page) {
+    throw new Error('My render() hook expects pageContext.Page to be defined')
+  }
+
   const app = createApp(Page, pageProps, pageContext)
 
   const appHtml = await renderToString(app)
 
   // See https://vike.dev/head
   const { documentProps } = pageContext.exports
-  const title = (documentProps && documentProps.title) || 'Vite SSR app'
-  const desc = (documentProps && documentProps.description) || 'App using Vite + Vike'
+  const title = (documentProps && documentProps.title) || META.DEFAULT_TITLE
+  const desc = (documentProps && documentProps.description) || META.DEFAULT_DESCRIPTION
 
   const documentHtml = escapeInject`<!DOCTYPE html>
     <html lang="en">
