@@ -8,24 +8,18 @@ async function render(pageContext: VikePageContext & PageContext) {
     app = createApp(pageContext)
     app.mount('#app')
   } else {
-    // console.log(pageContext)
     app.changePage(pageContext)
   }
 }
 
 function onHydrationEnd() {
-  // eslint-disable-next-line no-console
-  console.log('Hydration finished; page is now interactive.')
+  // console.log('Hydration finished; page is now interactive.')
 }
 function onPageTransitionStart() {
-  // eslint-disable-next-line no-console
-  console.log('Page transition start')
-  // document.querySelector('.content')!.classList.add('page-transition')
+  // console.log('Page transition start')
 }
 function onPageTransitionEnd() {
-  // eslint-disable-next-line no-console
-  console.log('Page transition end')
-  // document.querySelector('.content')!.classList.remove('page-transition')
+  // console.log('Page transition end')
 }
 
 export const clientRouting = true
