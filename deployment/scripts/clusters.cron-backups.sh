@@ -18,8 +18,20 @@ set +a
 
 # check BACKUP_CONFIGURATIONS
 if [[ -z ${BACKUP_CONFIGURATIONS} ]]; then
-  echo "You must provide a `BACKUP_CONFIGURATIONS` via environment variable"
+  echo "You must provide a 'BACKUP_CONFIGURATIONS' via environment variable"
   exit 1
+fi
+# check BACKUP_SAVED_BACKUPS_NUMBER
+if [[ -z ${BACKUP_SAVED_BACKUPS_NUMBER} ]]; then
+  echo "You must provide a 'BACKUP_SAVED_BACKUPS_NUMBER' via environment variable"
+  exit 1
+fi
+
+# deleting backups?
+if (( BACKUP_SAVED_BACKUPS_NUMBER >= 1 )); then
+  printf "Keep the last %d backups for all networks.\n" $BACKUP_SAVED_BACKUPS_NUMBER
+else
+  echo "!!! ATTENTION: No backups are deleted !!!"
 fi
 
 # convert configurations to array
@@ -32,46 +44,46 @@ do
   echo "  $i"
 done
 echo "Cancel by ^C. You have 15 seconds"
-# wait for the admin to react
-sleep 15
+# # wait for the admin to react
+# sleep 15
 
-printf "\n"
+# printf "\n"
 
-for i in "${CONFIGURATIONS_ARRAY[@]}"
-do
-  CONFIGURATION=$i
-  # individual cluster backup
-  ${SCRIPT_DIR}/cluster.backup.sh
+# for i in "${CONFIGURATIONS_ARRAY[@]}"
+# do
+#   CONFIGURATION=$i
+#   # individual cluster backup
+#   ${SCRIPT_DIR}/cluster.backup.sh
 
-  # deleting backups?
-  if (( BACKUP_SAVED_BACKUPS_NUMBER >= 1 )); then
-    # delete all oldest backups, but leave the last BACKUP_SAVED_BACKUPS_NUMBER
+#   # deleting backups?
+#   if (( BACKUP_SAVED_BACKUPS_NUMBER >= 1 )); then
+#     # delete all oldest backups, but leave the last BACKUP_SAVED_BACKUPS_NUMBER
 
-    keep=$BACKUP_SAVED_BACKUPS_NUMBER
-    path="$SCRIPT_DIR/../configurations/$CONFIGURATION/backup/"
+#     keep=$BACKUP_SAVED_BACKUPS_NUMBER
+#     path="$SCRIPT_DIR/../configurations/$CONFIGURATION/backup/"
 
-    cd $path
+#     cd $path
 
-    printf "In\n  '$path'\n  remove:\n"
-    # TODO: replace 'ls' by 'find . -type d -maxdepth 1'? description: https://unix.stackexchange.com/questions/28939/how-to-delete-the-oldest-directory-in-a-given-directory
-    while [ `ls -1 | wc -l` -gt $keep ]; do
-      oldest=`ls -c1 | head -1`
-      echo "  $oldest"
-      rm -rf $oldest
-    done
+#     printf "In\n  '$path'\n  remove:\n"
+#     # TODO: replace 'ls' by 'find . -type d -maxdepth 1'? description: https://unix.stackexchange.com/questions/28939/how-to-delete-the-oldest-directory-in-a-given-directory
+#     while [ `ls -1 | wc -l` -gt $keep ]; do
+#       oldest=`ls -c1 | head -1`
+#       echo "  $oldest"
+#       rm -rf $oldest
+#     done
 
-    printf "Keep the last %d backups:\n  " $BACKUP_SAVED_BACKUPS_NUMBER
-    ls
+#     printf "Keep the last %d backups:\n  " $BACKUP_SAVED_BACKUPS_NUMBER
+#     ls
 
-    cd $SCRIPT_DIR
-  else
-    echo "!!! ATTENTION: No backups are deleted !!!"
-  fi
+#     cd $SCRIPT_DIR
+#   else
+#     echo "!!! ATTENTION: No backups are deleted !!!"
+#   fi
 
-  printf "\n"
-done
+#   printf "\n"
+# done
 
-# reset CONFIGURATION to old
-# TODO: clearily if this is the same as: $ export CONFIGURATION=${SAVE_CONFIGURATION}"
-CONFIGURATION=$SAVE_CONFIGURATION
-echo "Reset to CONFIGURATION=$CONFIGURATION"
+# # reset CONFIGURATION to old
+# # TODO: clearily if this is the same as: $ export CONFIGURATION=${SAVE_CONFIGURATION}"
+# CONFIGURATION=$SAVE_CONFIGURATION
+# echo "Reset to CONFIGURATION=$CONFIGURATION"
