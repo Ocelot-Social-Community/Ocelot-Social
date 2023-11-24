@@ -1,9 +1,6 @@
 name: ocelot.social check documentation
 
-on:
-  push:
-    branches:
-      - add-vuepress-action-with-root-directory-as-docs-directory
+on: push
 
 jobs:
   files-changed:
