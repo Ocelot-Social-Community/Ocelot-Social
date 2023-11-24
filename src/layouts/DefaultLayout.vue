@@ -1,5 +1,4 @@
 <template>
-  <TopMenu />
   <v-main class="bg-grey-lighten-3">
     <v-container>
       <v-row>
@@ -21,8 +20,6 @@
 
 <script lang="ts" setup>
 import { useSlots } from 'vue'
-
-import TopMenu from '#components/menu/TopMenu.vue'
 
 const slots = useSlots()
 </script>
