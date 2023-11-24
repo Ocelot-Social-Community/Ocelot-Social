@@ -53,6 +53,7 @@ XXX
 ```markdown
 [XXX](https://XXX)
 ```
+For the documentation to work in both frameworks - Github and Vuepress - please use absolute path for Github internal documentation links (e.g. /README.md over ../../README.mdetc.)
 
 ##### Screenshots or other Images
 
