@@ -50,6 +50,7 @@ You can talk to our core team on [Discord](https://discord.gg/AJSX9DCSUA). And o
 * Alex (@ogerly)
 * Hannes (@elweyn5803)
 * Mathias (@mahula)
+* Markus (@maeckes#1133)
 
 <!-- * Robert (@roschaefer)
 * Matt (@mattwr18)
