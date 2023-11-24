@@ -282,7 +282,7 @@ helm uninstall ocelot \
 
 You can and should do [backups](./Backup.md) with Kubernetes for sure.
 
-## Error Reporting
+<!-- ## Error Reporting
 
 We use [Sentry](https://github.com/getsentry/sentry) for error reporting in both
 our backend and web frontend. You can either use a hosted or a self-hosted
@@ -297,7 +297,7 @@ If you are lucky enough to have a kubernetes cluster with the required hardware
 support, try this [helm chart](https://github.com/helm/charts/tree/master/stable/sentry).
 
 On our kubernetes cluster we get "mult-attach" errors for persistent volumes.
-Apparently DigitalOcean's kubernetes clusters do not fulfill the requirements.
+Apparently DigitalOcean's kubernetes clusters do not fulfill the requirements. -->
 
 ## Kubernetes Commands (Without Helm) To Deploy New Docker Images To A Kubernetes Cluster
 
