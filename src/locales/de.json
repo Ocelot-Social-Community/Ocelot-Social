@@ -15,7 +15,7 @@
     "reset": {
       "h1": "Den Zähler zurücksetzen",
       "menu": "Zurücksetzen",
-      "text": "Zurücksetzent: {count}"
+      "text": "Zurücksetzen: {count}"
     },
     "value": {
       "h1": "Der Zähler",
