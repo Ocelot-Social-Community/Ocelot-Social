@@ -110,13 +110,14 @@ The following endpoints are provided given the right command is executed or all 
 
 ## TODO
 
-- [ ] translations & language switch
 - [ ] tests
 - [ ] stories
+- [ ] responsive design
 
 ## Known Problems
 
-- [ ] Image Rerender flicker
+- [ ] https://github.com/vuetifyjs/vuetify/issues/18772
+- [ ] https://github.com/vuetifyjs/vuetify/issues/18773
 
 ## License
 
