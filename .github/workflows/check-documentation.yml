@@ -7,7 +7,8 @@ jobs:
     name: Detect File Changes - Markdown files
     runs-on: ubuntu-latest
     outputs:
-      markdown-files: ${{ steps.changes.outputs.markdown-files }}
+      markdown: ${{ steps.changes.outputs.markdown }}
+      vuepress: ${{ steps.changes.outputs.vuepress }}
     steps:
       - name: Checkout code
         uses: actions/checkout@master
@@ -22,9 +23,9 @@ jobs:
 
   check-markdown-links:
     name: Check Markdown links
-    if: needs.files-changed.outputs.markdown-files == 'true'
     needs: files-changed
     runs-on: ubuntu-latest
+    if: needs.files-changed.outputs.markdown == 'true'
     steps:
     - name: Checkout code
       uses: actions/checkout@master
