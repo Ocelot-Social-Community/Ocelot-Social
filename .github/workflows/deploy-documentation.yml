@@ -29,14 +29,14 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.documentation == 'true'
     steps:
-    - name: Checkout code
-      uses: actions/checkout@master
+      - name: Checkout code
+        uses: actions/checkout@master
 
-    - name: Vuepress Build and Deploy
-      uses: jenkey2011/vuepress-deploy@master
-      env:
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        TARGET_REPO: Ocelot-Social-Community/Ocelot-Social
-        TARGET_BRANCH: gh-pages
-        BUILD_SCRIPT: npm install && npm run docs:build -- --config docs/.vuepress/config github.js
-        BUILD_DIR: .vuepress/dist
+      - name: Vuepress Build and Deploy
+        uses: jenkey2011/vuepress-deploy@master
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          TARGET_REPO: Ocelot-Social-Community/Ocelot-Social
+          TARGET_BRANCH: gh-pages
+          BUILD_SCRIPT: npm install && npm run docs:build -- --config docs/.vuepress/config github.js
+          BUILD_DIR: .vuepress/dist
