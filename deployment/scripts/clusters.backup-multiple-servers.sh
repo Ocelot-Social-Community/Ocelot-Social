@@ -18,12 +18,12 @@ set +a
 
 # check BACKUP_CONFIGURATIONS
 if [[ -z ${BACKUP_CONFIGURATIONS} ]]; then
-  echo "You must provide a 'BACKUP_CONFIGURATIONS' via environment variable"
+  echo "You must provide a BACKUP_CONFIGURATIONS via environment variable"
   exit 1
 fi
 # check BACKUP_SAVED_BACKUPS_NUMBER
 if [[ -z ${BACKUP_SAVED_BACKUPS_NUMBER} ]]; then
-  echo "You must provide a 'BACKUP_SAVED_BACKUPS_NUMBER' via environment variable"
+  echo "You must provide a BACKUP_SAVED_BACKUPS_NUMBER via environment variable"
   exit 1
 fi
 
