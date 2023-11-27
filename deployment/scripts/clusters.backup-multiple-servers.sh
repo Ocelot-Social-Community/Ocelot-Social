@@ -11,6 +11,7 @@ date
 SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
+# debugging
 echo "SCRIPT_PATH=$SCRIPT_PATH"
 echo "SCRIPT_DIR=$SCRIPT_DIR"
 
@@ -24,9 +25,13 @@ set +a
 
 # check BACKUP_CONFIGURATIONS
 if [[ -z ${BACKUP_CONFIGURATIONS} ]]; then
-  echo "You must provide a BACKUP_CONFIGURATIONS via environment variable"
+  #%! echo "You must provide a BACKUP_CONFIGURATIONS via environment variable"
+  printf "!!! You must provide a BACKUP_CONFIGURATIONS via environment variable !!!\n"
   exit 1
 else
+  # debugging
+  printf "BACKUP_CONFIGURATIONS=%s\n" $BACKUP_CONFIGURATIONS
+
   # convert configurations to array
   IFS=' ' read -a CONFIGURATIONS_ARRAY <<< "$BACKUP_CONFIGURATIONS"
 
@@ -40,7 +45,8 @@ fi
 
 # check BACKUP_SAVED_BACKUPS_NUMBER
 if [[ -z ${BACKUP_SAVED_BACKUPS_NUMBER} ]]; then
-  echo "You must provide a BACKUP_SAVED_BACKUPS_NUMBER via environment variable"
+  #%! echo "You must provide a BACKUP_SAVED_BACKUPS_NUMBER via environment variable"
+  printf "!!! You must provide a BACKUP_SAVED_BACKUPS_NUMBER via environment variable !!!\n"
   exit 1
 else
   # deleting backups?
