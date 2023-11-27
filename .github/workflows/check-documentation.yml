@@ -29,7 +29,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@master
-    - name: Check Markdown Links
+
+      - name: Check Markdown Links
       uses: gaurav-nelson/github-action-markdown-link-check@master
       with:
         use-quiet-mode: 'yes'
@@ -39,3 +40,23 @@ jobs:
         config-file: '.github/workflows/mlc_config.json'
         base-branch: 'master'
         folder-path: '.'
+
+  test-vuepress-build:
+    name: Test Vuepress build
+    needs: files-changed
+    runs-on: ubuntu-latest
+    if: needs.files-changed.outputs.vuepress == 'true'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@master
+
+    - name: Setup Node 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: yarn-install
+      run: yarn install
+
+    - name: yarn-docs:build
+      run: yarn run docs:build
