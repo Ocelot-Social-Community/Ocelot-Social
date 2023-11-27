@@ -4,6 +4,9 @@
 printf "\nMultiple backups started at:\n  "
 date
 
+# # log the shell used
+# echo "Shell used: $0"
+
 # base setup
 SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
@@ -20,29 +23,31 @@ set +a
 if [[ -z ${BACKUP_CONFIGURATIONS} ]]; then
   echo "You must provide a BACKUP_CONFIGURATIONS via environment variable"
   exit 1
+else
+  # convert configurations to array
+  IFS=' ' read -a CONFIGURATIONS_ARRAY <<< "$BACKUP_CONFIGURATIONS"
+
+  # display the clusters
+  printf "Backup the clusters:\n"
+  for i in "${CONFIGURATIONS_ARRAY[@]}"
+  do
+    echo "  $i"
+  done
 fi
+
 # check BACKUP_SAVED_BACKUPS_NUMBER
 if [[ -z ${BACKUP_SAVED_BACKUPS_NUMBER} ]]; then
   echo "You must provide a BACKUP_SAVED_BACKUPS_NUMBER via environment variable"
   exit 1
-fi
-
-# deleting backups?
-if (( BACKUP_SAVED_BACKUPS_NUMBER >= 1 )); then
-  printf "Keep the last %d backups for all networks.\n" $BACKUP_SAVED_BACKUPS_NUMBER
 else
-  echo "!!! ATTENTION: No backups are deleted !!!"
+  # deleting backups?
+  if (( BACKUP_SAVED_BACKUPS_NUMBER >= 1 )); then
+    printf "Keep the last %d backups for all networks.\n" $BACKUP_SAVED_BACKUPS_NUMBER
+  else
+    echo "!!! ATTENTION: No backups are deleted !!!"
+  fi
 fi
 
-# convert configurations to array
-IFS=' ' read -a CONFIGURATIONS_ARRAY <<< "$BACKUP_CONFIGURATIONS"
-
-# display the clusters
-printf "Backup the clusters:\n"
-for i in "${CONFIGURATIONS_ARRAY[@]}"
-do
-  echo "  $i"
-done
 echo "Cancel by ^C. You have 15 seconds"
 # wait for the admin to react
 sleep 15
