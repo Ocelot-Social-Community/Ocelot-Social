@@ -30,6 +30,7 @@ jobs:
           # Append a scope for each service here
           scopes: |
             frontend
+            docu
             docker
             release
             workflow
