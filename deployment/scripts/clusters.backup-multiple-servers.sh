@@ -11,6 +11,9 @@ date
 SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
+echo "SCRIPT_PATH=$SCRIPT_PATH"
+echo "SCRIPT_DIR=$SCRIPT_DIR"
+
 # save old CONFIGURATION for later reset
 SAVE_CONFIGURATION=$CONFIGURATION
 
