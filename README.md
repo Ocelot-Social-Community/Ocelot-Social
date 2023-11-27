@@ -126,6 +126,7 @@ To update the subtree you can use
 
 ```bash
 git subtree pull -P xxx/ xxx_boilerplate_frontend master
+git commit -m "Updated boilerplate_frontend in subtree under xxx/."
 ```
 
 Where `xxx` refers to the folder and product part you want to use the boilerplate in. This assumes that you might need several copies of the frontend boilerplate for you product.
