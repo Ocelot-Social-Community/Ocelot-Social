@@ -108,6 +108,30 @@ The following endpoints are provided given the right command is executed or all 
 | [http://localhost:6006](http://localhost:6006) | Storybook     |
 | [http://localhost:8080](http://localhost:8080) | Documentation |
 
+## How to use as part of a project
+
+If you want to use this as part of a larger project, e.g. in conjunction with a backend also utilizing a boilerplate you cannot use the template mechanic provided by github for this repository.
+
+You can use the following commands to include the whole git history of the boilerplate and be able to update according to changes to this repo using another remote.
+
+```bash
+git remote add xxx_boilerplate_frontend git@github.com:IT4Change/boilerplate-frontend.git
+git fetch xxx_boilerplate_frontend
+git merge -s ours --no-commit --allow-unrelated-histories xxx_boilerplate_frontend/master
+git read-tree --prefix=xxx/ -u xxx_boilerplate_frontend/master
+git commit -m "Imported boilerplate_frontend as a subtree under xxx/."
+```
+
+To update the subtree you can use
+
+```bash
+git pull -s subtree xxx_boilerplate_frontend master
+```
+
+Where `xxx` refers to the folder and product part you want to use the boilerplate in. This assumes that you might need several copies of the frontend boilerplate for you product.
+
+This mechanic was taken from this [source](https://stackoverflow.com/questions/1683531/how-to-import-existing-git-repository-into-another/8396318#8396318)
+
 ## TODO
 
 - [ ] tests
