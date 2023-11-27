@@ -55,8 +55,8 @@ jobs:
       with:
         node-version: '20'
 
-    - name: yarn-install
-      run: yarn install
+    - name: npm-install
+      run: npm install
 
-    - name: yarn-docs:build
-      run: yarn run docs:build
+    - name: npm-docs:build
+      run: npm run docs:build
