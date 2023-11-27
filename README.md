@@ -125,7 +125,7 @@ git commit -m "Imported boilerplate_frontend as a subtree under xxx/."
 To update the subtree you can use
 
 ```bash
-git pull -s subtree xxx_boilerplate_frontend master
+git subtree pull -P xxx/ xxx_boilerplate_frontend master
 ```
 
 Where `xxx` refers to the folder and product part you want to use the boilerplate in. This assumes that you might need several copies of the frontend boilerplate for you product.
