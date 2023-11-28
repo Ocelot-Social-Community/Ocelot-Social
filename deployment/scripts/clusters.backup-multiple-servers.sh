@@ -81,15 +81,16 @@ do
     cd $path
 
     printf "In\n  '$path'\n  remove:\n"
-    # TODO: replace 'ls' by 'find . -type d -maxdepth 1'? description: https://unix.stackexchange.com/questions/28939/how-to-delete-the-oldest-directory-in-a-given-directory
-    while [ `ls -1 | wc -l` -gt $keep ]; do
-      oldest=`ls -c1 | head -1`
-      echo "  $oldest"
+    while [ `ls -1  |  wc -l` -gt $keep ]; do
+      # TODO: because 'ls' is not always relyable maybe replace 'ls' by 'find . -type d -maxdepth 1'? description: https://unix.stackexchange.com/questions/28939/how-to-delete-the-oldest-directory-in-a-given-directory
+      #         I tested this, but 'find' this is crutial, because of shell compatibilities
+      oldest=`ls -c1  |  sort -n  |  head -1`
+      printf "  %s\n" $oldest
       rm -rf $oldest
     done
 
-    printf "Keep the last %d backups:\n  " $BACKUP_SAVED_BACKUPS_NUMBER
-    ls
+    printf "Keep the last %d backups:\n" $BACKUP_SAVED_BACKUPS_NUMBER
+    ls -c1  |  sort -n  |  awk '{print "  " $0}'
 
     cd $SCRIPT_DIR
   else

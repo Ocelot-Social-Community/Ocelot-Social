@@ -22,7 +22,8 @@ KUBECONFIG=${KUBECONFIG:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubeco
 BACKUP_DATE=$(date "+%F_%H-%M-%S")
 BACKUP_FOLDER=${BACKUP_FOLDER:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/backup/${BACKUP_DATE}}
 
-# create backup fodler
+printf "Backup folder name:  %s\n" $BACKUP_DATE
+# create backup folder
 mkdir -p ${BACKUP_FOLDER}
 
 # cluster maintenance mode on && Neo4j maintenance mode on
