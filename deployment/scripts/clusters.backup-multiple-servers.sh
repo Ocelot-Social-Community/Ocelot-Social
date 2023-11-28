@@ -12,11 +12,13 @@ SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
 # debugging
-echo "SCRIPT_PATH=$SCRIPT_PATH"
-echo "SCRIPT_DIR=$SCRIPT_DIR"
+echo "debugging SCRIPT_PATH=$SCRIPT_PATH"
+echo "debugging SCRIPT_DIR=$SCRIPT_DIR"
 
 # save old CONFIGURATION for later reset
 export SAVE_CONFIGURATION=$CONFIGURATION
+# debugging
+printf "debugging SAVE_CONFIGURATION=%s\n" $SAVE_CONFIGURATION
 
 # export all variables in "../.env"
 set -a            
@@ -30,7 +32,7 @@ if [[ -z ${BACKUP_CONFIGURATIONS} ]]; then
   exit 1
 else
   # debugging
-  printf "BACKUP_CONFIGURATIONS=%s\n" $BACKUP_CONFIGURATIONS
+  printf "debugging BACKUP_CONFIGURATIONS=%s\n" $BACKUP_CONFIGURATIONS
 
   # convert configurations to array
   IFS=' ' read -a CONFIGURATIONS_ARRAY <<< "$BACKUP_CONFIGURATIONS"
@@ -101,3 +103,5 @@ done
 # TODO: clearily if this is the same as: $ export CONFIGURATION=${SAVE_CONFIGURATION}"
 export CONFIGURATION=$SAVE_CONFIGURATION
 echo "Reset to CONFIGURATION=$CONFIGURATION"
+# debugging
+printf "debugging CONFIGURATION=%s\n" $CONFIGURATION
