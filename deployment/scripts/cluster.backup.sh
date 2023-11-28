@@ -8,9 +8,6 @@ date
 SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
-# debugging
-printf "CONFIGURATION=%s\n" $CONFIGURATION
-
 # check CONFIGURATION
 if [[ -z ${CONFIGURATION} ]]; then
   echo "!!! You must provide a CONFIGURATION via environment variable !!!"

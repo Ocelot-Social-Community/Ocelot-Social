@@ -4,21 +4,12 @@
 printf "\nMultiple backups started at:\n  "
 date
 
-# # log the shell used
-# echo "Shell used: $0"
-
 # base setup
 SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
-# debugging
-echo "debugging SCRIPT_PATH=$SCRIPT_PATH"
-echo "debugging SCRIPT_DIR=$SCRIPT_DIR"
-
 # save old CONFIGURATION for later reset
 export SAVE_CONFIGURATION=$CONFIGURATION
-# debugging
-printf "debugging SAVE_CONFIGURATION=%s\n" $SAVE_CONFIGURATION
 
 # export all variables in "../.env"
 set -a            
@@ -31,9 +22,6 @@ if [[ -z ${BACKUP_CONFIGURATIONS} ]]; then
   printf "!!! You must provide a BACKUP_CONFIGURATIONS via environment variable !!!\n"
   exit 1
 else
-  # debugging
-  printf "debugging BACKUP_CONFIGURATIONS=%s\n" $BACKUP_CONFIGURATIONS
-
   # convert configurations to array
   IFS=' ' read -a CONFIGURATIONS_ARRAY <<< "$BACKUP_CONFIGURATIONS"
 
@@ -82,8 +70,8 @@ do
 
     printf "In\n  '$path'\n  remove:\n"
     while [ `ls -1  |  wc -l` -gt $keep ]; do
-      # TODO: because 'ls' is not always relyable maybe replace 'ls' by 'find . -type d -maxdepth 1'? description: https://unix.stackexchange.com/questions/28939/how-to-delete-the-oldest-directory-in-a-given-directory
-      #         I tested this, but 'find' this is crutial, because of shell compatibilities
+      # TODO: because 'ls' is not always relyable the same on different shells maybe replace 'ls' by 'find . -type d -maxdepth 1'? description: https://unix.stackexchange.com/questions/28939/how-to-delete-the-oldest-directory-in-a-given-directory
+      #         I tested this, but 'find' is crutial to use, because of shell compatibilities
       oldest=`ls -c1  |  sort -n  |  head -1`
       printf "  %s\n" $oldest
       rm -rf $oldest
@@ -101,8 +89,5 @@ do
 done
 
 # reset CONFIGURATION to old
-# TODO: clearily if this is the same as: $ export CONFIGURATION=${SAVE_CONFIGURATION}"
 export CONFIGURATION=$SAVE_CONFIGURATION
 echo "Reset to CONFIGURATION=$CONFIGURATION"
-# debugging
-printf "debugging CONFIGURATION=%s\n" $CONFIGURATION
