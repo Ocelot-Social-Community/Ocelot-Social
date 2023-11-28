@@ -107,15 +107,27 @@ The backups will be saved into your networks folders `backup` folder in a new fo
 
 #### Automated Backups
 
-XXX
-
 ⚠️ *Attention: Please check carefully whether really the oldest backups have been deleted. As shells on different systems behave differently with regard to the commands used in this script.*
 
+Install automated backups by a cron job.
+Be aware of having the bash shell installed to run the script.
+The environment variables for the automated backups are described above.
+
+Installing a cron job by editing the cron table file:
+
 ```bash
-# in deployment folder
+# edit cron job table
+$ crontab -e
+```
+
+In the editor add the line:
+
+```bash
+# in cron job table file
 
 # set a cron job every night at 04am server time
-$ crontab -e
-
-0 15 * * * scripts/clusters.backup-multiple-servers.sh
+# min   hour    day     month   weekday command
+00      04      *       *       *       /root/Ocelot-Social/deployment/scripts/clusters.backup-multiple-servers.sh >> /root/Ocelot-Social/deployment/backup-cron-job.log
 ```
+
+This way the terminal output is written into a log file named `backup-cron-job.log` located in the deployment folder.
