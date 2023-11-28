@@ -12,13 +12,13 @@ SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
 # debugging
-echo "debugging SCRIPT_PATH=${SCRIPT_PATH}"
-echo "debugging SCRIPT_DIR=${SCRIPT_DIR}"
+echo "debugging SCRIPT_PATH=$SCRIPT_PATH"
+echo "debugging SCRIPT_DIR=$SCRIPT_DIR"
 
 # save old CONFIGURATION for later reset
-export SAVE_CONFIGURATION=${CONFIGURATION}
+export SAVE_CONFIGURATION=$CONFIGURATION
 # debugging
-printf "debugging SAVE_CONFIGURATION=%s\n" ${SAVE_CONFIGURATION}
+printf "debugging SAVE_CONFIGURATION=%s\n" $SAVE_CONFIGURATION
 
 # export all variables in "../.env"
 set -a            
@@ -32,16 +32,16 @@ if [[ -z ${BACKUP_CONFIGURATIONS} ]]; then
   exit 1
 else
   # debugging
-  printf "debugging BACKUP_CONFIGURATIONS=%s\n" ${BACKUP_CONFIGURATIONS}
+  printf "debugging BACKUP_CONFIGURATIONS=%s\n" $BACKUP_CONFIGURATIONS
 
   # convert configurations to array
-  IFS=' ' read -a CONFIGURATIONS_ARRAY <<< "${BACKUP_CONFIGURATIONS}"
+  IFS=' ' read -a CONFIGURATIONS_ARRAY <<< "$BACKUP_CONFIGURATIONS"
 
   # display the clusters
   printf "Backup the clusters:\n"
   for i in "${CONFIGURATIONS_ARRAY[@]}"
   do
-    echo "  ${i}"
+    echo "  $i"
   done
 fi
 
@@ -53,7 +53,7 @@ if [[ -z ${BACKUP_SAVED_BACKUPS_NUMBER} ]]; then
 else
   # deleting backups?
   if (( BACKUP_SAVED_BACKUPS_NUMBER >= 1 )); then
-    printf "Keep the last %d backups for all networks.\n" ${BACKUP_SAVED_BACKUPS_NUMBER}
+    printf "Keep the last %d backups for all networks.\n" $BACKUP_SAVED_BACKUPS_NUMBER
   else
     echo "!!! ATTENTION: No backups are deleted !!!"
   fi
@@ -67,7 +67,7 @@ printf "\n"
 
 for i in "${CONFIGURATIONS_ARRAY[@]}"
 do
-  export CONFIGURATION=${i}
+  export CONFIGURATION=$i
   # individual cluster backup
   ${SCRIPT_DIR}/cluster.backup.sh
 
@@ -75,8 +75,8 @@ do
   if (( BACKUP_SAVED_BACKUPS_NUMBER >= 1 )); then
     # delete all oldest backups, but leave the last BACKUP_SAVED_BACKUPS_NUMBER
 
-    keep=${BACKUP_SAVED_BACKUPS_NUMBER}
-    path="${SCRIPT_DIR}/../configurations/${CONFIGURATION}/backup/"
+    keep=$BACKUP_SAVED_BACKUPS_NUMBER
+    path="$SCRIPT_DIR/../configurations/$CONFIGURATION/backup/"
 
     cd $path
 
@@ -84,14 +84,14 @@ do
     # TODO: replace 'ls' by 'find . -type d -maxdepth 1'? description: https://unix.stackexchange.com/questions/28939/how-to-delete-the-oldest-directory-in-a-given-directory
     while [ `ls -1 | wc -l` -gt $keep ]; do
       oldest=`ls -c1 | head -1`
-      echo "  ${oldest}"
+      echo "  $oldest"
       rm -rf $oldest
     done
 
-    printf "Keep the last %d backups:\n  " ${BACKUP_SAVED_BACKUPS_NUMBER}
+    printf "Keep the last %d backups:\n  " $BACKUP_SAVED_BACKUPS_NUMBER
     ls
 
-    cd ${SCRIPT_DIR}
+    cd $SCRIPT_DIR
   else
     echo "!!! ATTENTION: No backups are deleted !!!"
   fi
@@ -101,7 +101,7 @@ done
 
 # reset CONFIGURATION to old
 # TODO: clearily if this is the same as: $ export CONFIGURATION=${SAVE_CONFIGURATION}"
-export CONFIGURATION=${SAVE_CONFIGURATION}
-echo "Reset to CONFIGURATION=${CONFIGURATION}"
+export CONFIGURATION=$SAVE_CONFIGURATION
+echo "Reset to CONFIGURATION=$CONFIGURATION"
 # debugging
-printf "debugging CONFIGURATION=%s\n" ${CONFIGURATION}
+printf "debugging CONFIGURATION=%s\n" $CONFIGURATION
