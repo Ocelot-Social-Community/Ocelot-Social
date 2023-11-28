@@ -16,7 +16,7 @@ echo "SCRIPT_PATH=$SCRIPT_PATH"
 echo "SCRIPT_DIR=$SCRIPT_DIR"
 
 # save old CONFIGURATION for later reset
-SAVE_CONFIGURATION=$CONFIGURATION
+export SAVE_CONFIGURATION=$CONFIGURATION
 
 # export all variables in "../.env"
 set -a            
@@ -65,7 +65,7 @@ printf "\n"
 
 for i in "${CONFIGURATIONS_ARRAY[@]}"
 do
-  CONFIGURATION=$i
+  export CONFIGURATION=$i
   # individual cluster backup
   ${SCRIPT_DIR}/cluster.backup.sh
 
@@ -99,5 +99,5 @@ done
 
 # reset CONFIGURATION to old
 # TODO: clearily if this is the same as: $ export CONFIGURATION=${SAVE_CONFIGURATION}"
-CONFIGURATION=$SAVE_CONFIGURATION
+export CONFIGURATION=$SAVE_CONFIGURATION
 echo "Reset to CONFIGURATION=$CONFIGURATION"
