@@ -30,7 +30,7 @@ To use most of the scripts you have to set the variable `CONFIGURATION` in your 
 # in deployment folder
 
 # set configuration name to folder name in 'configurations' folder (network name)
-$ export CONFIGURATION=`<your-configuration-name>`
+$ export CONFIGURATION=<your-configuration-name>
 # to check this
 $ echo $CONFIGURATION
 ```
@@ -108,3 +108,14 @@ The backups will be saved into your networks folders `backup` folder in a new fo
 #### Automated Backups
 
 XXX
+
+⚠️ *Attention: Please check carefully whether really the oldest backups have been deleted. As shells on different systems behave differently with regard to the commands used in this script.*
+
+```bash
+# in deployment folder
+
+# set a cron job every night at 04am server time
+$ crontab -e
+
+0 15 * * * scripts/clusters.backup-multiple-servers.sh
+```
