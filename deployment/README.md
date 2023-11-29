@@ -1,7 +1,7 @@
 # Ocelot.Social Deploy And Rebranding
 
 [![Build Status Publish](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/actions/workflows/publish.yml/badge.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/actions)
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/blob/LICENSE.md)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/blob/master/LICENSE.md)
 [![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discord.gg/AJSX9DCSUA)
 [![Open Source Helpers](https://www.codetriage.com/ocelot-social-community/ocelot-social-deploy-rebranding/badges/users.svg)](https://www.codetriage.com/ocelot-social-community/ocelot-social-deploy-rebranding)
 
@@ -41,16 +41,18 @@ Fork this repository to configure and rebrand it for your own [ocelot.social](ht
 
 Write your own data into the main configuration file:
 
-- [package.json](/package.json)
+- [package.json](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/package.json)
 
-Since all deployment methods described here depend on [Docker](https://docker.com) and [DockerHub](https://hub.docker.com), you need to create your own organisation on DockerHub and put its name in the [package.json](/package.json) file as your `dockerOrganisation`.
+Since all deployment methods described here depend on [Docker](https://docker.com) and [DockerHub](https://hub.docker.com), you need to create your own organisation on DockerHub and put its name in the [package.json](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/package.json) file as your `dockerOrganisation`.
 
 ### Configure And Branding
 
 The next step is:
 
 - [Set Environment Variables and Configurations](./deployment-values.md)
+<!-- markdown-link-check-disable -->
 - [Configure And Branding](./configurations/stage.ocelot.social/branding/README.md)
+<!-- markdown-link-check-enable -->
 
 ### Optional: Locally Testing Configuration And Branding
 
@@ -73,7 +75,7 @@ For the maintenance page have a look in your browser at `http://localhost:5000/`
 
 ### Push Changes To GitHub
 
-Before merging these changes into the "master" branch on your GitHub fork repository, you need to configure the GitHub repository secrets.  This is necessary to [publish](/.github/workflows/publish.yml) the Docker images by pushing them via GitHub actions to repositories belonging to your DockerHub organisation.
+Before merging these changes into the "master" branch on your GitHub fork repository, you need to configure the GitHub repository secrets.  This is necessary to [publish](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/.github/workflows/publish.yml) the Docker images by pushing them via GitHub actions to repositories belonging to your DockerHub organisation.
 
 First, go to your DockerHub profile under `Account Settings` and click on the `Security` tab. There you create an access token called `<your-organisation>-access-token` and copy the token to a safe place.
 
@@ -102,9 +104,9 @@ See the login details and browser addresses above.
 
 ### Deployment
 
-Afterwards you can [deploy](/deployment/deployment.md) it on your server:
+Afterwards you can [deploy](./deployment.md) it on your server:
 
-- [Kubernetes with Helm](/deployment/kubernetes/README.md)
+- [Kubernetes with Helm](./src/kubernetes/README.md)
 
 ## Developer Chat
 
@@ -133,7 +135,7 @@ Browser compatibility testing with [BrowserStack](https://www.browserstack.com/)
 
 ## License
 
-See the [LICENSE](/LICENSE.md) file for license rights and limitations (MIT).
+See the [LICENSE](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/LICENSE.md) file for license rights and limitations (MIT).
 
 
 We need `DOCKER_BUILDKIT=0` for this to work.

@@ -2,7 +2,7 @@
 
 [![Build Status Test](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test.yml/badge.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions)
 [![Build Status Publish](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/publish.yml/badge.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions)
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/LICENSE.md)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/LICENSE.md)
 [![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discord.gg/AJSX9DCSUA)
 [![Open Source Helpers](https://www.codetriage.com/ocelot-social-community/ocelot-social/badges/users.svg)](https://www.codetriage.com/ocelot-social-community/ocelot-social)
 
@@ -11,7 +11,7 @@
 <!-- markdownlint-disable MD033 -->
 <p align="center">
   <!-- <a href="https://ocelot.social" target="_blank"> -->
-    <img src="webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%">
+    <img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/master/webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%">
   <!-- </a> -->
 </p>
 <!-- markdownlint-enable MD033 -->
@@ -75,7 +75,7 @@ If you're wondering how you could help, there are plenty of ways, e.g.:
   - Promote it on your social networks.
   - Tell your friends about it by word-of-mouth.
   - Write a press article on ocelot.social or contact the editorial office of your local news page or radio station.
-- Take a [good first issue](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) or issues that need help. Make sure to read [CONTRIBUTING.md](/CONTRIBUTING.md) first though.
+- Take a [good first issue](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) or issues that need help. Make sure to read [CONTRIBUTING.md](./CONTRIBUTING.md) first though.
 - Testing and [reporting](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/new/choose) bugs.
 - Translating: Please [contact us](#contact).
 - Reviewing and testing pull requests.
@@ -251,7 +251,7 @@ $ yarn locales --fix
 $ yarn test
 ```
 
-Check out our [contribution guideline](./CONTRIBUTING.md), too!
+Check out our [contribution guideline](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/CONTRIBUTING.md), too!
 
 #### Developer Chat
 
@@ -305,7 +305,7 @@ Locale Icons made by [Freepik](http://www.freepik.com/) from [www.flaticon.com](
 Browser compatibility testing with [BrowserStack](https://www.browserstack.com/).
 
 <!-- markdownlint-disable MD033 -->
-<img alt="BrowserStack Logo" src=".gitbook/assets/browserstack-logo.svg" width="256">
+<img alt="BrowserStack Logo" src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/master/.gitbook/assets/browserstack-logo.svg" width="256">
 <!-- markdownlint-enable MD033 -->
 
 ### License
