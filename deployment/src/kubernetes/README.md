@@ -76,7 +76,7 @@ $ helm install \
   cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --create-namespace \
-  --version v1.13.1 \
+  --version v1.13.2 \
   --set installCRDs=true
 # or kubeconfig.yaml in your repo, then adjust
 $ helm install \
@@ -84,7 +84,7 @@ $ helm install \
   --kubeconfig ./kubeconfig.yaml \
   --namespace cert-manager \
   --create-namespace \
-  --version v1.13.1 \
+  --version v1.13.2 \
   --set installCRDs=true
 ``` -->
 
