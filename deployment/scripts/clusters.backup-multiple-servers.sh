@@ -21,16 +21,6 @@ if [[ -z ${BACKUP_CONFIGURATIONS} ]]; then
   #%! echo "You must provide a BACKUP_CONFIGURATIONS via environment variable"
   printf "!!! You must provide a BACKUP_CONFIGURATIONS via environment variable !!!\n"
   exit 1
-else
-  # convert configurations to array
-  IFS=' ' read -a CONFIGURATIONS_ARRAY <<< "$BACKUP_CONFIGURATIONS"
-
-  # display the clusters
-  printf "Backup the clusters:\n"
-  for i in "${CONFIGURATIONS_ARRAY[@]}"
-  do
-    echo "  $i"
-  done
 fi
 
 # check BACKUP_SAVED_BACKUPS_NUMBER
@@ -38,13 +28,23 @@ if [[ -z ${BACKUP_SAVED_BACKUPS_NUMBER} ]]; then
   #%! echo "You must provide a BACKUP_SAVED_BACKUPS_NUMBER via environment variable"
   printf "!!! You must provide a BACKUP_SAVED_BACKUPS_NUMBER via environment variable !!!\n"
   exit 1
+fi
+
+# convert configurations to array
+IFS=' ' read -a CONFIGURATIONS_ARRAY <<< "$BACKUP_CONFIGURATIONS"
+
+# display the clusters
+printf "Backup the clusters:\n"
+for i in "${CONFIGURATIONS_ARRAY[@]}"
+do
+  echo "  $i"
+done
+
+# deleting backups?
+if (( BACKUP_SAVED_BACKUPS_NUMBER >= 1 )); then
+  printf "Keep the last %d backups for all networks.\n" $BACKUP_SAVED_BACKUPS_NUMBER
 else
-  # deleting backups?
-  if (( BACKUP_SAVED_BACKUPS_NUMBER >= 1 )); then
-    printf "Keep the last %d backups for all networks.\n" $BACKUP_SAVED_BACKUPS_NUMBER
-  else
-    echo "!!! ATTENTION: No backups are deleted !!!"
-  fi
+  echo "!!! ATTENTION: No backups are deleted !!!"
 fi
 
 echo "Cancel by ^C. You have 15 seconds"
@@ -70,8 +70,6 @@ do
 
     printf "In\n  '$path'\n  remove:\n"
     while [ `ls -1  |  wc -l` -gt $keep ]; do
-      # TODO: because 'ls' is not always relyable the same on different shells maybe replace 'ls' by 'find . -type d -maxdepth 1'? description: https://unix.stackexchange.com/questions/28939/how-to-delete-the-oldest-directory-in-a-given-directory
-      #         I tested this, but 'find' is crutial to use, because of shell compatibilities
       oldest=`ls -c1  |  sort -n  |  head -1`
       printf "  %s\n" $oldest
       rm -rf $oldest
