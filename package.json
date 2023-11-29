@@ -4,7 +4,6 @@
   "description": "Free and open source software program code available to run social networks.",
   "author": "ocelot.social Community",
   "license": "MIT",
-  "private": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/Ocelot-Social-Community/Ocelot-Social.git"
@@ -27,6 +26,8 @@
   "scripts": {
     "db:seed": "cd backend && yarn run db:seed",
     "db:reset": "cd backend && yarn run db:reset",
+    "docs:build": "NODE_OPTIONS=--openssl-legacy-provider vuepress build .",
+    "docs:dev": "NODE_OPTIONS=--openssl-legacy-provider vuepress dev .",
     "cypress:run": "cypress run --e2e --browser electron --config-file ./cypress/cypress.config.js",
     "cypress:open": "cypress open --e2e --browser electron --config-file ./cypress/cypress.config.js",
     "release": "yarn version --no-git-tag-version --no-commit-hooks --no-commit && auto-changelog --latest-version $(node -p -e \"require('./package.json').version\") && cd backend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp/maintenance/source && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../../../package.json').version\")"
@@ -57,6 +58,11 @@
     "rosie": "^2.1.0",
     "slug": "^8.2.3",
     "wait-on": "^7.2.0"
+  },
+  "optionalDependencies": {
+    "vuepress": "^2.0.0-rc.0",
+    "vuepress-plugin-search-pro": "^2.0.0-rc.0",
+    "vuepress-theme-hope": "^2.0.0-rc.0"
   },
   "resolutions": {
     "set-value": "^2.0.1",

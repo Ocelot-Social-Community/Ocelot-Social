@@ -23,13 +23,12 @@ CAUTION: It seems that the behaviour of DigitalOcean has changed and the load ba
 And to create a load balancer costs money. Please refine the following documentation if required.
 {% endhint %}
 
-{% tabs %}
-{% tab title="Without Load Balancer" %}
+::: tabs
+@tab:active Without Load Balancer
 
 A solution without a load balance you can find [here](../no-loadbalancer/README.md).
 
-{% endtab %}
-{% tab title="With DigitalOcean Load Balancer" %}
+@tab With DigitalOcean Load Balancer
 
 {% hint style="info" %}
 CAUTION: It seems that the behaviour of DigitalOcean has changed and the load balancer is not created automatically anymore.
@@ -44,8 +43,7 @@ address. On DigitalOcean, this is how it should look like:
 If the load balancer isn't created automatically you have to create it your self on DigitalOcean under Networks.
 In case you don't need a DigitalOcean load balancer (which costs money by the way) have a look in the tab `Without Load Balancer`.
 
-{% endtab %}
-{% endtabs %}
+:::
 
 Check the ingress server is working correctly:
 

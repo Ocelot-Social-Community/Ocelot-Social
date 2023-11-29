@@ -1,4 +1,6 @@
-# Edit this Documentation
+# Documentation
+
+## Edit this Documentation
 
 Find the [**table of contents** for this documentation on GitHub](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/SUMMARY.md) and navigate to the file you need to update.
 
@@ -10,15 +12,15 @@ If you are ready, fill in the **Propose file change** at the end of the webpage.
 
 After that you have to compare your change branch to our `master` branch with a pull request. Here make a comment which issue you have fixed. (If you are working on one of our [open issues](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues) please include the number.)
 
-## Markdown your documentation
+### Markdown your documentation
 
 To design your documentation see the syntax description at GitBook:
 
 [https://toolchain.gitbook.com/syntax/markdown.html](https://toolchain.gitbook.com/syntax/markdown.html)
 
-### Some quick Examples
+#### Some quick Examples
 
-#### Headlines
+##### Headlines
 
 ```markdown
 # Main Headline
@@ -26,21 +28,19 @@ To design your documentation see the syntax description at GitBook:
 ### Small Headlines
 ```
 
-#### Tabs
+##### Tabs
 
 ```markdown
-{% tabs %}
-{% tab title="XXX" %}
-XXX
-{% endtab %}
-{% tab title="XXX" %}
-XXX
-{% endtab %}
-…
-{% endtabs %}
+::: tabs
+@tab:active First tab's title <!-- this tab is setactive -->
+
+@tab Second tab's title
+
+:::
 ```
 
-#### Commands
+
+##### Commands
 
 ~~~markdown
 ```<LANGUAGE> (for text highlighting)
@@ -48,33 +48,34 @@ XXX
 ```
 ~~~
 
-#### Links
+##### Links
 
 ```markdown
 [XXX](https://XXX)
 ```
+For the documentation to work in both frameworks - Github and Vuepress - please use absolute path for Github internal documentation links (e.g. /README.md over ../../README.mdetc.)
 
-#### Screenshots or other Images
+##### Screenshots or other Images
 
 ```markdown
 ![XXX](https://XXX)
 ```
 
-#### Hints for ToDos
+##### Hints for ToDos
 
 ```markdown
 {% hint style="info" %} TODO: XXX {% endhint %}
 ```
 
-## Host the Screenshots
+### Host the Screenshots
 
-### Host on Ocelot-Social \(GitHub\) Repository
+#### Host on Ocelot-Social \(GitHub\) Repository
 
 {% hint style="info" %}
 TODO: How to host on Ocelot-Social \(GitHub\) repository ...
 {% endhint %}
 
-### Quick Solution
+#### Quick Solution
 
 To quickly host the screenshots go to:
 
@@ -88,27 +89,41 @@ Right click on it and choose kind of **Open link in new tab**.
 
 Copy the URL and paste it were you need it.
 
-## Screenshot Modification
+### Screenshot Modification
 
-### Add an Arrow or some other Marking Stuff
+#### Add an Arrow or some other Marking Stuff
 
-{% tabs %}
-{% tab title="macOS" %}
+::: tabs
+@tab:active macOS
 
-#### In the Preview App
+##### In the Preview App
 
 Got to: **Menu** + **Tools** \(GER: Werkzeuge\) + **Annotate** \(GER: Anmerkungen\) + etc.
-{% endtab %}
 
-{% tab title="Windows" %}
+@tab Windows
+
 {% hint style="info" %}
 TODO: How to modify screenshots in Windows ...
 {% endhint %}
 {% endtab %}
 
-{% tab title="Linux" %}
+@tab Linux
 {% hint style="info" %}
 TODO: How to modify screenshots in Linux ...
 {% endhint %}
-{% endtab %}
-{% endtabs %}
+:::
+
+## Deploy this Documentation
+
+TODO
+
+```bash
+# set configured Node version
+nvm use
+
+# install Vuepress
+npm install
+
+# run vuepress
+npm run docs:dev
+```
