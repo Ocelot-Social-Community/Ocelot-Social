@@ -18,3 +18,4 @@ jobs:
         #TARGET_BRANCH: master
         BUILD_SCRIPT: npm install && npm run docs:build
         BUILD_DIR: build/docs/
+        VUEPRESS_BASE: "/boilerplate-frontend/"
