@@ -68,7 +68,7 @@ To create a dump in Neo4j running in a Docker container:
 # connect to the Docker containers Neo4j terminal
 $ docker exec -it neo4j bash
 # generate Dump
-neo4j% neo4j-admin dump --database=graph.db --to=/var/lib/neo4j/$(date +%F)-neo4j-dump
+neo4j% neo4j-admin dump --database=neo4j --to=/var/lib/neo4j/$(date +%F)-neo4j-dump
 # exit bash
 neo4j% exit
 # copy the dump out of the running Docker container
@@ -88,7 +88,7 @@ $ docker cp <local-folder-path>/neo4j-dump <docker-image-name('neo4j')>:/var/lib
 # connect to the Docker containers Neo4j terminal
 $ docker exec -it neo4j bash
 # to load the dump into the database we need the following command in this terminal
-neo4j% neo4j-admin load --expand-commands --database=graph.db --from /var/lib/neo4j/$(date +%F)-neo4j-dump --force
+neo4j% neo4j-admin load --expand-commands --database=neo4j --from /var/lib/neo4j/$(date +%F)-neo4j-dump --force
 # leave the terminal by entering
 neo4j% exit
 ```
