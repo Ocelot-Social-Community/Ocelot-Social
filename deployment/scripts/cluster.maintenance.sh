@@ -16,9 +16,11 @@ KUBECONFIG=${KUBECONFIG:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubeco
 
 case $1 in
     on)
+        echo "Network maintenance:  on"
         kubectl --kubeconfig=${KUBECONFIG} patch ingress ingress-ocelot-webapp --type merge --patch-file ${SCRIPT_DIR}/../src/kubernetes/patches/patch.ingress.maintenance.on.yaml
     ;;
     off)
+        echo "Network maintenance:  off"
         kubectl --kubeconfig=${KUBECONFIG} patch ingress ingress-ocelot-webapp --type merge --patch-file ${SCRIPT_DIR}/../src/kubernetes/patches/patch.ingress.maintenance.off.yaml
     ;;
     *)

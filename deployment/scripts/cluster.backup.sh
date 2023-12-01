@@ -27,13 +27,16 @@ mkdir -p ${BACKUP_FOLDER}
 ${SCRIPT_DIR}/cluster.neo4j.sh maintenance on
 
 # database backup
+echo "Dumping database ..."
 kubectl --kubeconfig=${KUBECONFIG} -n default exec -it \
     $(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-neo4j | awk '{ print $1 }') \
     -- neo4j-admin dump --database=neo4j --to=/var/lib/neo4j/$BACKUP_DATE-neo4j-dump
 # copy neo4j backup to local drive
+echo "Coping database ..."
 kubectl --kubeconfig=${KUBECONFIG} cp \
     default/$(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-neo4j |awk '{ print $1 }'):/var/lib/neo4j/$BACKUP_DATE-neo4j-dump $BACKUP_FOLDER/neo4j-dump
 # copy image data
+echo "Coping public uploads ..."
 kubectl --kubeconfig=${KUBECONFIG} cp \
     default/$(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-backend |awk '{ print $1 }'):/app/public/uploads $BACKUP_FOLDER/public-uploads
 
