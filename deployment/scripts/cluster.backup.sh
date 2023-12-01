@@ -9,7 +9,7 @@ SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
 # check CONFIGURATION
-if [[ -z ${CONFIGURATION} ]]; then
+if [[ -z "$CONFIGURATION" ]] || [[ $CONFIGURATION == "" ]]; then
   echo "!!! You must provide a CONFIGURATION via environment variable !!!"
   exit 1
 fi
