@@ -5,5 +5,5 @@ export default defineUserConfig({
   description: 'IT4C Frontend Boilerplate Documentation',
   dest: 'build/docs',
   base: process.env.VUEPRESS_BASE ? `/${process.env.VUEPRESS_BASE}/` : '/',
-  pagePatterns: ['**/*.md', '**/LICENSE', '!.vuepress', '!node_modules']
+  pagePatterns: ['**/*.md', '**/LICENSE', '!.vuepress', '!node_modules'],
 })
