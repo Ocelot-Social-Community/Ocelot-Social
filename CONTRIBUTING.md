@@ -1,6 +1,6 @@
 # CONTRIBUTING
 
-Thank you so much for thinking of contributing to the [ocelot.social](https://ocelot.social) project! It's awesome you're here, we really appreciate it. :-\)
+Thank you so much for thinking of contributing to the <!-- [ -->ocelot.social<!-- ](https://ocelot.social) --> project! It's awesome you're here, we really appreciate it. :-\)
 
 ## Getting Set Up
 
@@ -48,6 +48,9 @@ You can talk to our core team on [Discord](https://discord.gg/AJSX9DCSUA). And o
 * Moriz (@Mogge)
 * Wolle (@Tirokk)
 * Alex (@ogerly)
+* Hannes (@elweyn5803)
+* Mathias (@mahula)
+* Markus (@maeckes#1133)
 
 <!-- * Robert (@roschaefer)
 * Matt (@mattwr18)
