@@ -8229,10 +8229,10 @@ microsoft-capitalize@~1.0.5:
   resolved "https://registry.yarnpkg.com/microsoft-capitalize/-/microsoft-capitalize-1.0.5.tgz#bcaf915039f14224c8cfd74c31cea42fecacbb31"
   integrity sha512-iqDMU9J643BHg8Zp7EMZNLTp6Pgs2f1S2SMnCW2VlUqMs17xCZ5vwVjalBJEGVcUfG+/1ePqeEGcMW3VfzHK5A==
 
-migrate@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/migrate/-/migrate-2.0.0.tgz#eef68ac206f658d96ddfaf81c8c5999d71694956"
-  integrity sha512-Oklla7q1Ok3UZZOGL67wkFlKfZHAxdT7NusHwHgzPBfokbCvYDEEGM8Bx7G5jDuoRNiA7R261Y2CwZX0cyx9CQ==
+migrate@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/migrate/-/migrate-2.0.1.tgz#7a08e5496677dda4cb5f0cd44366cbce4d3d0294"
+  integrity sha512-t9yzYd4kPdx+soNL/Cc4YQoVYOgPK28LNEmkW7kn0x9duVBNsV+cDaETby8nZ9Dm+LsQTB4SPJ586i8WQgjM5g==
   dependencies:
     chalk "^4.1.2"
     commander "^2.20.3"
