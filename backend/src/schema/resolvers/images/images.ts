@@ -1,7 +1,7 @@
 import path from 'path'
 import { v4 as uuid } from 'uuid'
-import { Upload } from '@aws-sdk/lib-storage';
-import { ObjectCannedACL, S3 } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage'
+import { ObjectCannedACL, S3 } from '@aws-sdk/client-s3'
 import slug from 'slug'
 import { existsSync, unlinkSync, createWriteStream } from 'fs'
 import { UserInputError } from 'apollo-server'
