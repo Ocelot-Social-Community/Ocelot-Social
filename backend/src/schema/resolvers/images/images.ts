@@ -1,6 +1,7 @@
 import path from 'path'
 import { v4 as uuid } from 'uuid'
-import { S3 } from 'aws-sdk'
+import { Upload } from '@aws-sdk/lib-storage';
+import { ObjectCannedACL, S3 } from '@aws-sdk/client-s3';
 import slug from 'slug'
 import { existsSync, unlinkSync, createWriteStream } from 'fs'
 import { UserInputError } from 'apollo-server'
@@ -128,11 +129,14 @@ const s3Upload = async ({ createReadStream, uniqueFilename, mimetype }) => {
   const params = {
     Bucket,
     Key: s3Location,
-    ACL: 'public-read',
+    ACL: ObjectCannedACL.public_read,
     ContentType: mimetype,
     Body: createReadStream(),
   }
-  const data = await s3.upload(params).promise()
+  const data = await new Upload({
+    client: s3,
+    params,
+  }).done()
   const { Location } = data
   return Location
 }
@@ -143,12 +147,19 @@ const localFileDelete = async (url) => {
 }
 
 const s3Delete = async (url) => {
-  const s3 = new S3({ region, endpoint })
+  const s3 = new S3({
+    region,
+
+    // The transformation for endpoint is not implemented.
+    // Refer to UPGRADING.md on aws-sdk-js-v3 for changes needed.
+    // Please create/upvote feature request on aws-sdk-js-codemod for endpoint.
+    endpoint,
+  })
   let { pathname } = new URL(url, 'http://example.org') // dummy domain to avoid invalid URL error
   pathname = pathname.substring(1) // remove first character '/'
   const params = {
     Bucket,
     Key: pathname,
   }
-  await s3.deleteObject(params).promise()
+  await s3.deleteObject(params)
 }
