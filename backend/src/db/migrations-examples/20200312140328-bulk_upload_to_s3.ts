@@ -5,7 +5,7 @@ import { Upload } from '@aws-sdk/lib-storage'
 import { ObjectCannedACL, S3 } from '@aws-sdk/client-s3'
 import mime from 'mime-types'
 import s3Configs from '../../config'
-import https from 'https'
+import { Agent } from 'https'
 
 export const description = `
 Upload all image files to a S3 compatible object storage in order to reduce
@@ -16,7 +16,7 @@ export async function up(next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
-  const agent = new https.Agent({
+  const agent = new Agent({
     maxSockets: 5,
   })
 
