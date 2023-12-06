@@ -2,7 +2,7 @@ import { getDriver } from '../../db/neo4j'
 import { existsSync, createReadStream } from 'fs'
 import path from 'path'
 import { HttpHandlerOptions, streamCollector, Upload } from '@aws-sdk/lib-storage'
-import { ObjectCannedACL, S3 } from '@aws-sdk/client-s3'
+import { ObjectCannedACL, S3, S3ClientConfig } from '@aws-sdk/client-s3'
 import mime from 'mime-types'
 import s3Configs from '../../config'
 import { Agent } from 'https'
@@ -36,18 +36,20 @@ export async function up(next) {
   const s3 = new S3({
     region,
     endpoint,
-    middleware: (stack) => {
-      stack.add(
-        (next, context) => (args) => {
-          const httpOptions: HttpHandlerOptions = {
-              agent
-          };
-          args.request.handlerOptions = httpOptions;
-          return next(args);
-        },
-        { step: 'initialize', name: 'customHttpMiddleware' }
-      )
-    },
+    clientDefault: {
+      middleware: (stack) => {
+        stack.add(
+          (next, context) => (args) => {
+            const httpOptions: HttpHandlerOptions = {
+                agent
+            };
+            args.request.handlerOptions = httpOptions;
+            return next(args);
+          },
+          { step: 'initialize', name: 'customHttpMiddleware' }
+        )
+      }
+    }
   })
   try {
     // Implement your migration here.
