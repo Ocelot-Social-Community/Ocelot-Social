@@ -61,7 +61,7 @@
   },
   "optionalDependencies": {
     "vuepress": "^2.0.0-rc.0",
-    "vuepress-plugin-search-pro": "^2.0.0-rc.0",
+    "vuepress-plugin-search-pro": "^2.0.0-rc.4",
     "vuepress-theme-hope": "^2.0.0-rc.1"
   },
   "resolutions": {
