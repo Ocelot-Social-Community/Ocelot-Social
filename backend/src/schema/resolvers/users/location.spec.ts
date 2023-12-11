@@ -208,7 +208,7 @@ describe('userMiddleware', () => {
       }
       await mutate({ mutation: updateUserMutation, variables })
       const locations = await neode.cypher(
-        `MATCH (city:Location)-[:IS_IN]->(state:Location)-[:IS_IN]->(country:Location) return city {.*}, state {.*}, country {.*}`,
+        `MATCH (city:Location)-[:IS_IN]->(district:Location)-[:IS_IN]->(state:Location)-[:IS_IN]->(country:Location) return city {.*}, state {.*}, country {.*}`,
       )
       expect(
         locations.records.map((record) => {

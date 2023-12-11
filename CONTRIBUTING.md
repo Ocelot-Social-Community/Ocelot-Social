@@ -1,10 +1,10 @@
 # CONTRIBUTING
 
-Thank you so much for thinking of contributing to the [ocelot.social](https://ocelot.social) project! It's awesome you're here, we really appreciate it. :-\)
+Thank you so much for thinking of contributing to the <!-- [ -->ocelot.social<!-- ](https://ocelot.social) --> project! It's awesome you're here, we really appreciate it. :-\)
 
 ## Getting Set Up
 
-Instructions for how to install all the necessary software and some code guidelines can be found in our main [Readme](/README.md) or in our [documentation](/SUMMARY.md).
+Instructions for how to install all the necessary software and some code guidelines can be found in our main [Readme](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md) or in our [documentation](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/SUMMARY.md).
 
 To get you started we recommend that you join forces with a regular contributor. Please join [our Discord instance](https://discord.gg/AJSX9DCSUA) to chat with developers or just get in touch directly on an issue on either [Github](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues) or [Zenhub](https://app.zenhub.com/workspaces/ocelotsocial-5fb21ff922cb410015dd6535/board?filterLogic=any&repos=301151089):
 
@@ -36,7 +36,7 @@ Every pull request needs to:
 
 ## Contribution Flow For Open Source Contributors
 
-See [contributing in main README.md](/README.md#contributing)
+See [contributing in main README.md](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md#contributing)
 
 ## The Team
 
@@ -48,6 +48,9 @@ You can talk to our core team on [Discord](https://discord.gg/AJSX9DCSUA). And o
 * Moriz (@Mogge)
 * Wolle (@Tirokk)
 * Alex (@ogerly)
+* Hannes (@elweyn5803)
+* Mathias (@mahula)
+* Markus (@maeckes#1133)
 
 <!-- * Robert (@roschaefer)
 * Matt (@mattwr18)
