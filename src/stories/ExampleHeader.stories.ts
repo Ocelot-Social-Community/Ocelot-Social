@@ -13,6 +13,7 @@ const meta = {
   render: (args: any) => ({
     components: { ExampleHeader },
     setup() {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       return { args }
     },
     template: '<example-header :user="args.user" />',

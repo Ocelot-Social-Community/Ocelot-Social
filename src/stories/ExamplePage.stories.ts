@@ -26,8 +26,8 @@ type Story = StoryObj<typeof meta>
 export const LoggedIn: Story = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   play: async ({ canvasElement }: any) => {
-    const canvas = within(canvasElement)
-    const loginButton = await canvas.getByRole('button', {
+    const canvas = within(canvasElement as HTMLElement)
+    const loginButton = canvas.getByRole('button', {
       name: /Log in/i,
     })
     await userEvent.click(loginButton)
