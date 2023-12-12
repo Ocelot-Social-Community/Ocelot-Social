@@ -14,6 +14,8 @@ if [[ -z "$CONFIGURATION" ]] || [[ $CONFIGURATION == "" ]]; then
   exit 1
 fi
 
+printf "  Cluster:  %s\n" $CONFIGURATION
+
 # configuration
 KUBECONFIG=${KUBECONFIG:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubeconfig.yaml}
 BACKUP_DATE=$(date "+%F_%H-%M-%S")
