@@ -110,7 +110,13 @@ const searchResultPromise = async (session, setup, params) => {
 }
 
 const searchResultCallback = (result) => {
-  return result.records.map((r) => r.get('result'))
+  const response = result.records.map((r) => r.get('result'))
+  if (Array.isArray(response) && response.length && response[0].__typename === 'Post') {
+    response.forEach((post) => {
+      post.postType = [post.postType]
+    })
+  }
+  return response
 }
 
 const countResultCallback = (result) => {

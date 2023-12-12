@@ -57,6 +57,7 @@
   </div>
 </template>
 
+<!-- eslint-disable vue/no-reserved-component-names -->
 <script>
 import { isEmpty, toArray } from 'lodash'
 import mapboxgl from 'mapbox-gl'
@@ -270,7 +271,7 @@ export default {
           },
           group: {
             linkTitle: '&' + e.features[0].properties.slug,
-            link: `/group/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
+            link: `/groups/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
           },
           event: {
             linkTitle: e.features[0].properties.slug,
@@ -560,6 +561,7 @@ export default {
   },
 }
 </script>
+<!-- eslint-enable vue/no-reserved-component-names -->
 
 <style lang="scss">
 // description: https: //github.com/geospoc/v-mapbox/tree/v1.11.2/docs

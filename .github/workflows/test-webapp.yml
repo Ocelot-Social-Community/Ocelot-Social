@@ -11,7 +11,7 @@ jobs:
       docker: ${{ steps.changes.outputs.docker }}
       webapp: ${{ steps.changes.outputs.webapp }}
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4
 
       - name: Check for frontend file changes
         uses: dorny/paths-filter@v2.11.1
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Check translation files
         run: |
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Webapp | Build 'test' image
         run: |
@@ -50,7 +50,7 @@ jobs:
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
 
       - name: Cache docker image
-        uses: actions/cache/save@v3.3.1
+        uses: actions/cache/save@v3.3.2
         with:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-webapp-cache
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: webapp | Lint
         run: cd webapp && yarn && yarn run lint
@@ -76,10 +76,10 @@ jobs:
       checks: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Restore webapp cache
-        uses: actions/cache/restore@v3.3.1
+        uses: actions/cache/restore@v3.3.2
         with:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-webapp-cache
@@ -103,6 +103,7 @@ jobs:
     if: ${{ needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true' }}
     needs: [files-changed, unit_test_webapp]
     runs-on: ubuntu-latest
+    permissions: write-all
     continue-on-error: true
     steps:
       - name: Delete cache

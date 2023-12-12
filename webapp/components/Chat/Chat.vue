@@ -27,6 +27,7 @@
         @fetch-more-rooms="fetchRooms"
         @add-room="toggleUserSearch"
         @show-demo-options="showDemoOptions = $event"
+        @open-user-tag="redirectToUserProfile($event.detail[0])"
       >
         <div
           v-if="selectedRoom && selectedRoom.roomId"
@@ -329,6 +330,7 @@ export default {
           ;[...this.messages, ...Message].forEach((m) => {
             if (m.senderId !== this.currentUser.id) m.seen = true
             m.date = new Date(m.date).toDateString()
+            m.avatar = this.$filters.proxyApiUrl(m.avatar)
             msgs[m.indexId] = m
           })
           this.messages = msgs.filter(Boolean)
@@ -397,6 +399,7 @@ export default {
       const fixedRoom = {
         ...room,
         index: room.lastMessage ? room.lastMessage.date : room.createdAt,
+        avatar: this.$filters.proxyApiUrl(room.avatar),
         lastMessage: room.lastMessage
           ? {
               ...room.lastMessage,
@@ -404,7 +407,7 @@ export default {
             }
           : null,
         users: room.users.map((u) => {
-          return { ...u, username: u.name, avatar: u.avatar?.url }
+          return { ...u, username: u.name, avatar: this.$filters.proxyApiUrl(u.avatar?.url) }
         }),
       }
       if (!fixedRoom.avatar) {
@@ -439,13 +442,17 @@ export default {
           this.loadingRooms = false
         })
     },
+
+    redirectToUserProfile({ user }) {
+      const userID = user.id
+      const userName = user.name.toLowerCase().replaceAll(' ', '-')
+      const url = `/profile/${userID}/${userName}`
+      this.$router.push({ path: url })
+    },
   },
 }
 </script>
-<style lang="scss">
-body {
-  font-family: 'Quicksand', sans-serif;
-}
+<style lang="scss" scoped>
 .vac-avatar {
   background-size: cover;
   background-position: center center;
