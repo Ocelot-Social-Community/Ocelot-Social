@@ -95,6 +95,7 @@ neo4j% exit
 ```
 
 If you need a specific database name, add the option `--database=<name>` to the command `neo4j-admin load`.
+To find out the default database name, see below.
 
 ## Commands
 

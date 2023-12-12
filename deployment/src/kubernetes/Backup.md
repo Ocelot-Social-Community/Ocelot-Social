@@ -146,6 +146,7 @@ $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-neo4j 
 ```
 
 If you need a specific database name, add the option `--database=<name>` to the command `neo4j-admin dump`.
+To find out the default database name, see the [Neo4j readme](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/neo4j/README.md).
 
 Lets copy the dump backup
 
