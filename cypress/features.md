@@ -14,9 +14,9 @@ The following features will be implemented. This gets done in three steps:
 2. In a second step we will make our prototype publicly available with an advanced feature set including the technology and organizational structure to drive a bigger public social network.
 3. In a third step all the remaining features will be implemented to build the full product.
 
-### User Account
+The implemented features can be found [here](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/e2e)
 
-[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/user_account)
+### User Account
 
 * Sign-up
 * Agree to Data Privacy Statement
@@ -34,8 +34,6 @@ The following features will be implemented. This gets done in three steps:
 
 ### User Profile
 
-[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/user_profile)
-
 * Upload and Change Avatar
 * Upload and Change Profile Picture
 * Edit Social Media Accounts
@@ -45,8 +43,6 @@ The following features will be implemented. This gets done in three steps:
 * Show Comments of a specific User
 
 ### Dashboard
-
-[Clickdummy](https://preview.uxpin.com/24a2ab8adcd84f9a763d87ed27251351225e0ecd#/pages/99768919/simulate/sitemap?mode=i)
 
 * Show Link to own Profile
 * Show Friends Widget
@@ -58,8 +54,6 @@ The following features will be implemented. This gets done in three steps:
 * Show List of Let's Talk requests with online status of requesting people
 
 ### Posts
-
-[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/post)
 
 * Creating Posts
 * Persistent Links
@@ -85,8 +79,6 @@ The following features will be implemented. This gets done in three steps:
 
 ### Notifications
 
-[Cucumber features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/notifications)
-
 * User @-mentionings
 * Notify authors for comments
 * Administrative notifications to all users
@@ -108,16 +100,12 @@ The following features will be implemented. This gets done in three steps:
 
 ### Blacklist
 
-[Video](https://www.youtube.com/watch?v=-uDvvmN8hLQ)
-
 * Blacklist Users
 * Blacklist specific Terms
 * Blacklist Tags
 * Switch on/off Adult Content
 
 ### Search
-
-[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/search)
 
 * Search for Categories
 * Search for Tags
@@ -238,8 +226,6 @@ Shows automatically related actions for existing post.
 
 ### Moderation
 
-[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/moderation)
-
 * Report Button for users for doubtful Content
 * Moderator Panel
 * List of reported Content \(later replaced by User-Moderation\)
@@ -249,8 +235,6 @@ Shows automatically related actions for existing post.
 * Statistics about Decisions in Moderation
 
 ### Administration
-
-[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/administration)
 
 * Provide Admin-Interface to send Users Invite Code
 * Static Pages for Data Privacy Statement ...
@@ -264,8 +248,6 @@ Shows automatically related actions for existing post.
 * Double-opt-in by Email
 
 ### Internationalization
-
-[Cucumber Features](https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/cypress/integration/internationalization)
 
 * Frontend UI
 * Backend Error Messages
