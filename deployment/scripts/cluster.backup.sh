@@ -30,7 +30,7 @@ ${SCRIPT_DIR}/cluster.neo4j.sh maintenance on
 echo "Dumping database ..."
 kubectl --kubeconfig=${KUBECONFIG} -n default exec -it \
     $(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-neo4j | awk '{ print $1 }') \
-    -- neo4j-admin dump --database=neo4j --to=/var/lib/neo4j/$BACKUP_DATE-neo4j-dump
+    -- neo4j-admin dump --to=/var/lib/neo4j/$BACKUP_DATE-neo4j-dump
 # copy neo4j backup to local drive
 echo "Coping database ..."
 kubectl --kubeconfig=${KUBECONFIG} cp \
