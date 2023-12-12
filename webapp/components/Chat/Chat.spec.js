@@ -45,8 +45,8 @@ describe('Chat', () => {
         query: jest.fn().mockResolvedValue({}),
         mutate: jest.fn().mockResolvedValue({}),
         // TODO: https://stackoverflow.com/questions/58815471/in-jest-how-can-i-unit-test-a-method-that-subscribes-to-an-observable
-        subscribe: jest.fn(),// () => { observer },
-      }
+        subscribe: jest.fn(), // () => { observer },
+      },
     }
   })
 
@@ -55,12 +55,11 @@ describe('Chat', () => {
       store,
       stubs,
       mocks,
-      localVue, 
-      propsData: {}
+      localVue,
+      propsData: {},
     })
     expect(wrapper.exists()).toBe(true)
   })
 
   // Add more test cases for different scenarios or functionalities
-  
 })
