@@ -49,7 +49,9 @@ function createApp(pageContext: VikePageContext & PageContext, isClient = true) 
   objectAssign(app, {
     changePage: (pageContext: VikePageContext & PageContext) => {
       Object.assign(pageContextReactive, pageContext)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       rootComponent.Page = markRaw(pageContext.Page)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       rootComponent.pageProps = markRaw(pageContext.pageProps || {})
     },
   })

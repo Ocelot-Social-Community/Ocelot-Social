@@ -2,13 +2,13 @@ import { createApp } from './app'
 
 import type { PageContext, VikePageContext } from '#types/PageContext'
 
-let app: ReturnType<typeof createApp>
-async function render(pageContext: VikePageContext & PageContext) {
-  if (!app) {
-    app = createApp(pageContext).app
-    app.mount('#app')
+let instance: ReturnType<typeof createApp>
+/* async */ function render(pageContext: VikePageContext & PageContext) {
+  if (!instance) {
+    instance = createApp(pageContext)
+    instance.app.mount('#app')
   } else {
-    app.changePage(pageContext)
+    instance.app.changePage(pageContext)
   }
 }
 

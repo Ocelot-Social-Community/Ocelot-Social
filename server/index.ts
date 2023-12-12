@@ -19,7 +19,7 @@ import { root } from './root.js'
 
 const isProduction = process.env.NODE_ENV === 'production'
 
-startServer()
+void startServer()
 
 async function startServer() {
   const app = express()
@@ -52,6 +52,7 @@ async function startServer() {
 
   // Vike middleware. It should always be our last middleware (because it's a
   // catch-all middleware superseding any middleware placed after it).
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   app.get('*', async (req, res, next) => {
     const pageContextInit = {
       urlOriginal: req.originalUrl,
