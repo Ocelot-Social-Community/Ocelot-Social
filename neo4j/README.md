@@ -74,6 +74,8 @@ neo4j% exit
 $ docker cp <docker-image-name('neo4j')>:/var/lib/neo4j/neo4j-dump <local-folder-path>/$(date +%F)-neo4j-dump
 ```
 
+If you need a specific database name, add the option `--database=<name>` to the command `neo4j-admin dump`.
+
 ### Import Neo4j Dump
 
 To import a dump into Neo4j running in a Docker container:
@@ -91,6 +93,8 @@ neo4j% neo4j-admin load --expand-commands --database=neo4j --from /var/lib/neo4j
 # leave the terminal by entering
 neo4j% exit
 ```
+
+If you need a specific database name, add the option `--database=<name>` to the command `neo4j-admin load`.
 
 ## Commands
 
