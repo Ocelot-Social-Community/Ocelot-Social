@@ -14,13 +14,6 @@ if [[ -z "$CONFIGURATION" ]] || [[ $CONFIGURATION == "" ]]; then
   exit 1
 fi
 
-# check DATABASE_NAME or set default
-if [[ -z "$DATABASE_NAME" ]] || [[ $DATABASE_NAME == "" ]]; then
-  DATABASE_NAME="neo4j"
-  printf "Set satabase default name.\n"
-fi
-printf "Database name:  '%s'\n" $DATABASE_NAME
-
 # configuration
 KUBECONFIG=${KUBECONFIG:-${SCRIPT_DIR}/../configurations/${CONFIGURATION}/kubeconfig.yaml}
 BACKUP_DATE=$(date "+%F_%H-%M-%S")
@@ -37,7 +30,7 @@ ${SCRIPT_DIR}/cluster.neo4j.sh maintenance on
 echo "Dumping database ..."
 kubectl --kubeconfig=${KUBECONFIG} -n default exec -it \
     $(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-neo4j | awk '{ print $1 }') \
-    -- neo4j-admin dump --database=$DATABASE_NAME --to=/var/lib/neo4j/$BACKUP_DATE-neo4j-dump
+    -- neo4j-admin dump --database=neo4j --to=/var/lib/neo4j/$BACKUP_DATE-neo4j-dump
 # copy neo4j backup to local drive
 echo "Coping database ..."
 kubectl --kubeconfig=${KUBECONFIG} cp \
