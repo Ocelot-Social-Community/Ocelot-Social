@@ -5,7 +5,7 @@ SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
 # check CONFIGURATION
-if [ -z ${CONFIGURATION} ]; then
+if [[ -z "$CONFIGURATION" ]] || [[ $CONFIGURATION == "" ]]; then
   echo "You must provide a `CONFIGURATION` via environment variable"
   exit 1
 fi
@@ -21,20 +21,24 @@ case $1 in
                 ${SCRIPT_DIR}/cluster.maintenance.sh on
 
                 # set Neo4j in offline mode (maintenance)
+                echo "Neo4j maintenance:  on"
                 kubectl --kubeconfig=${KUBECONFIG} get deployment ocelot-neo4j -o json \
                     | jq '.spec.template.spec.containers[] += {"command": ["tail", "-f", "/dev/null"]}' \
                     | kubectl --kubeconfig=${KUBECONFIG} apply -f -
 
                 # wait for the container to restart
+                echo "Wait 60s ..."
                 sleep 60
             ;;
             off)
                 # set Neo4j in online mode
+                echo "Neo4j maintenance:  off"
                 kubectl --kubeconfig=${KUBECONFIG} get deployment ocelot-neo4j -o json \
                     | jq 'del(.spec.template.spec.containers[].command)' \
                     | kubectl --kubeconfig=${KUBECONFIG} apply -f -
 
                 # wait for the container to restart
+                echo "Wait 60s ..."
                 sleep 60
 
                 # maintenance mode off

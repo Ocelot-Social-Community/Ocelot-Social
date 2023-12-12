@@ -17,7 +17,7 @@ source ${SCRIPT_DIR}/../.env
 set +a
 
 # check BACKUP_CONFIGURATIONS
-if [[ -z ${BACKUP_CONFIGURATIONS} ]]; then
+if [[ -z "$BACKUP_CONFIGURATIONS" ]] || [[ $BACKUP_CONFIGURATIONS == "" ]]; then
   #%! echo "You must provide a BACKUP_CONFIGURATIONS via environment variable"
   printf "!!! You must provide a BACKUP_CONFIGURATIONS via environment variable !!!\n"
   exit 1

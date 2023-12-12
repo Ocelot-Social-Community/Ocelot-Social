@@ -109,7 +109,7 @@ The backups will be saved into your networks folders `backup` folder in a new fo
 
 ⚠️ *Attention: Please check carefully whether really the oldest backups have been deleted. As shells on different systems behave differently with regard to the commands used in this script.*
 
-Install automated backups by a cron job.
+Install automated backups by a [cron job](https://en.wikipedia.org/wiki/Cron).
 Be aware of having the bash shell installed to run the script.
 The environment variables for the automated backups are described above.
 
@@ -131,3 +131,7 @@ In the editor add the line:
 ```
 
 This way the terminal output is written into a log file named `backup-cron-job.log` located in the deployment folder.
+
+Be aware that the server datetime can differ from your local time.
+Especially by the change between summer and winter time, because servers usually have UTC.
+Find out the actual difference by running the command `date` on your server.
