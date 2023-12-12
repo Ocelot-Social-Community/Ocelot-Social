@@ -1,4 +1,4 @@
-# Neo4J
+# Neo4j 4.4
 
 Human Connection is a social network. Using a graph based database which can
 model nodes and edges natively - a network - feels like an obvious choice. We
@@ -16,8 +16,7 @@ docker-compose up
 ```
 
 You can access Neo4J through [http://localhost:7474/](http://localhost:7474/)
-for an interactive cypher shell and a visualization of the graph.
-
+for an interactive Cypher shell and a visualization of the graph.
 
 ## Installation Without Docker
 
@@ -51,7 +50,7 @@ in `backend/.env`.
 
 Start Neo4J and confirm the database is running at [http://localhost:7474](http://localhost:7474).
 
-## Operations on Neo4j
+## Operations on Neo4j 4.4
 
 ### Docker or Docker Compose
 
@@ -143,7 +142,7 @@ $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backen
 ***Cypher commands to show indexes and constraints***
 
 ```bash
-# in browser command line or cypher shell
+# in browser command line or Cypher shell
 
 # show all indexes and constraints
 $ :schema
@@ -158,7 +157,7 @@ $ CALL db.constraints();
 ***Cypher commands to create and drop indexes and constraints***
 
 ```bash
-# in browser command line or cypher shell
+# in browser command line or Cypher shell
 
 # create indexes
 $ CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"]);
@@ -171,3 +170,21 @@ $ DROP CONSTRAINT ON ( image:Image ) ASSERT image.url IS UNIQUE
 # drop all indexes and constraints
 $ CALL apoc.schema.assert({},{},true) YIELD label, key RETURN * ;
 ```
+
+### Database Management Commands
+
+***Cypher commands to manage databases***
+
+```bash
+# in browser command line or Cypher shell
+
+# show the default database
+$ SHOW DEFAULT DATABASE
+# show all databases
+$ SHOW DATABASES
+```
+
+To set the default database by configuration, use `NEO4J_dbms_default__database` as an environment variable when starting Neo4j 4.4, see [Docker specific configuration settings](<https://neo4j.com/docs/operations-manual/4.4/docker/ref-settings/>).
+
+If a database with this name does not exist, an empty database with this name is created and all other databases remain.
+You can switch back to an existing database without damaging it.
