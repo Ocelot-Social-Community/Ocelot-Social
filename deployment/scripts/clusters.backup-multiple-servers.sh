@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # time stamp
-printf "\nMultiple backups started at:\n  "
+printf "\n\nMultiple backups started at:\n  "
 date
 
 # base setup
