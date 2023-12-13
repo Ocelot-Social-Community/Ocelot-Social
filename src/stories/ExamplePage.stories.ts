@@ -6,8 +6,10 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 
 const meta = {
   title: 'Example/Page',
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   component: ExamplePage,
   render: () => ({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     components: { ExamplePage },
     template: '<example-page />',
   }),
