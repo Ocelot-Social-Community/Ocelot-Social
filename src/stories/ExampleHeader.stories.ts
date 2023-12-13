@@ -8,9 +8,11 @@ const meta = {
    * to learn how to generate automatic titles
    */
   title: 'Example/Header',
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   component: ExampleHeader,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   render: (args: any) => ({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     components: { ExampleHeader },
     setup() {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
