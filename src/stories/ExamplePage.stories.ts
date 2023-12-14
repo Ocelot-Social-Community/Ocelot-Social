@@ -1,13 +1,14 @@
 import { within, userEvent } from '@storybook/testing-library'
 
+import { SBComp } from '#types/SBComp'
+
 import ExamplePage from './ExamplePage.vue'
 
 import type { Meta, StoryObj } from '@storybook/vue3'
 
 const meta = {
   title: 'Example/Page',
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  component: ExamplePage,
+  component: ExamplePage as SBComp,
   render: () => ({
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     components: { ExamplePage },

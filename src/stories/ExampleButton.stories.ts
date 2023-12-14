@@ -1,3 +1,5 @@
+import { SBComp } from '#types/SBComp'
+
 import ExampleButton from './ExampleButton.vue'
 
 import type { Meta, StoryObj } from '@storybook/vue3'
@@ -5,8 +7,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
 const meta = {
   title: 'Example/Button',
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  component: ExampleButton,
+  component: ExampleButton as SBComp,
   // This component will have an automatically generated docsPage entry: https://storybook.js.org/docs/vue/writing-docs/autodocs
   tags: ['autodocs'],
   argTypes: {
