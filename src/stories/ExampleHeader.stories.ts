@@ -1,3 +1,5 @@
+import { SBComp } from '#types/SBComp'
+
 import ExampleHeader from './ExampleHeader.vue'
 
 import type { Meta, StoryObj } from '@storybook/vue3'
@@ -8,8 +10,7 @@ const meta = {
    * to learn how to generate automatic titles
    */
   title: 'Example/Header',
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  component: ExampleHeader,
+  component: ExampleHeader as SBComp,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   render: (args: any) => ({
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
