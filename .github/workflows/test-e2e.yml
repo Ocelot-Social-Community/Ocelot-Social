@@ -92,7 +92,7 @@ jobs:
       - name: Full stack tests | if tests failed, upload report
         id: e2e-report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
