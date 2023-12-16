@@ -34,7 +34,7 @@ jobs:
       - name: Neo4J | Save docker image 
         run: docker save "ocelotsocialnetwork/neo4j-community" > /tmp/neo4j.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-neo4j-community
           path: /tmp/neo4j.tar
@@ -83,7 +83,7 @@ jobs:
       - name: Backend | Save docker image
         run: docker save "ocelotsocialnetwork/backend" > /tmp/backend.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-backend-production
           path: /tmp/backend.tar
@@ -132,7 +132,7 @@ jobs:
       - name: Webapp | Save docker image
         run: docker save "ocelotsocialnetwork/webapp" > /tmp/webapp.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-webapp-production
           path: /tmp/webapp.tar
@@ -184,7 +184,7 @@ jobs:
       - name: Maintenance | Save docker image
         run: docker save "ocelotsocialnetwork/maintenance" > /tmp/maintenance.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-maintenance-production
           path: /tmp/maintenance.tar
