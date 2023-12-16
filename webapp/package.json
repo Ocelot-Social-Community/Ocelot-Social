@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@human-connection/styleguide": "0.5.22",
-    "@mapbox/mapbox-gl-geocoder": "^5.0.1",
+    "@mapbox/mapbox-gl-geocoder": "^5.0.2",
     "@nuxtjs/apollo": "^4.0.0-rc19",
     "@nuxtjs/axios": "~5.9.7",
     "@nuxtjs/dotenv": "~1.4.1",
