@@ -11,6 +11,8 @@ import Resolver, {
 import { mergeImage } from './images/images'
 import { createOrUpdateLocations } from './users/location'
 
+// Wolle console.log('DESCRIPTION_WITHOUT_HTML_LENGTH_MIN: ', DESCRIPTION_WITHOUT_HTML_LENGTH_MIN)
+
 export default {
   Query: {
     Group: async (_object, params, context, _resolveInfo) => {
