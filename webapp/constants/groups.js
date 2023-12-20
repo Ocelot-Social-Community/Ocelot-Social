@@ -9,4 +9,4 @@ export const {
   NAME_LENGTH_MAX,
   DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
   SHOW_GROUP_BUTTON_IN_HEADER,
-} = {...groupsDefault, ...groupsBranding}
+} = { ...groupsDefault, ...groupsBranding }
