@@ -9,7 +9,7 @@ SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname $SCRIPT_PATH)
 
 # check CONFIGURATION
-if [[ -z "$CONFIGURATION" ]] || [[ $CONFIGURATION == "" ]]; then
+if [[ -z "$CONFIGURATION" ]]; then
   echo "!!! You must provide a CONFIGURATION via environment variable !!!"
   exit 1
 fi
@@ -34,11 +34,11 @@ kubectl --kubeconfig=${KUBECONFIG} -n default exec -it \
     $(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-neo4j | awk '{ print $1 }') \
     -- neo4j-admin dump --to=/var/lib/neo4j/$BACKUP_DATE-neo4j-dump
 # copy neo4j backup to local drive
-echo "Coping database ..."
+echo "Copying database to local file system ..."
 kubectl --kubeconfig=${KUBECONFIG} cp \
     default/$(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-neo4j |awk '{ print $1 }'):/var/lib/neo4j/$BACKUP_DATE-neo4j-dump $BACKUP_FOLDER/neo4j-dump
 # copy image data
-echo "Coping public uploads ..."
+echo "Copying public uploads to local file system ..."
 kubectl --kubeconfig=${KUBECONFIG} cp \
     default/$(kubectl --kubeconfig=${KUBECONFIG} -n default get pods | grep ocelot-backend |awk '{ print $1 }'):/app/public/uploads $BACKUP_FOLDER/public-uploads
 
