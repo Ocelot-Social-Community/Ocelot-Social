@@ -1,3 +1,10 @@
-// this file is duplicated in `backend/src/constants/group` and `webapp/constants/group.js`
-export const DESCRIPTION_WITHOUT_HTML_LENGTH_MIN = 50 // with removed HTML tags
-export const DESCRIPTION_EXCERPT_HTML_LENGTH = 250 // with removed HTML tags
+// configurable values see: 'backend/src/constants/groupsDefault', 'webapp/constants/groupsDefault'
+// configurable values see: 'backend/src/constants/groups', 'webapp/constants/groups'
+
+import * as groupsDefault from './groupsDefault'
+import * as groupsBranding from '../branding/groupsBranding'
+
+export const { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN, DESCRIPTION_EXCERPT_HTML_LENGTH } = {
+  ...groupsDefault,
+  ...groupsBranding,
+}
