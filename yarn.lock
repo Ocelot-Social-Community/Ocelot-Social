@@ -1058,12 +1058,13 @@
     minimatch "^3.0.4"
     node-hook "^1.0.0"
 
-"@badeball/cypress-cucumber-preprocessor@^19.2.0":
-  version "19.2.0"
-  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-19.2.0.tgz#e19c949b7849740ddf35aa7e439d386ebbd9c098"
-  integrity sha512-uH4E38nO+hNxEvdYYawtXTcYOSjmS5uxan35HzjqeLeVub1Eo/zcMnKpk1aoKjZHjxHfWzlam8brwhSzrNVY/w==
+"@badeball/cypress-cucumber-preprocessor@^20.0.0":
+  version "20.0.0"
+  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-20.0.0.tgz#6417d22835b8ef8ff8e004e4e95df57419f36af7"
+  integrity sha512-wBpPMazRqmzs86wocMKi686rEzwygRDLpQZk4X8LgllfhAdEYqk8GfeVsSUVKYvqiYljbb7k2Blj1zS5vlxNJw==
   dependencies:
     "@badeball/cypress-configuration" "^6.1.0"
+    "@cucumber/ci-environment" "^10.0.0"
     "@cucumber/cucumber" "^10.0.0"
     "@cucumber/cucumber-expressions" "^17.0.0"
     "@cucumber/gherkin" "^27.0.0"
@@ -1093,7 +1094,7 @@
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
   integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
 
-"@cucumber/ci-environment@10.0.0":
+"@cucumber/ci-environment@10.0.0", "@cucumber/ci-environment@^10.0.0":
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/@cucumber/ci-environment/-/ci-environment-10.0.0.tgz#1ad66cc20cad9aefcfe92f4db3553680de2dd365"
   integrity sha512-lRkiehckosIOdc7p1L44nZsttO5dVHFjpwKKWZ07x8SeoAdV/sPuGe1PISe0AmAowFGza62nMOgG4KaroGzwFQ==
