@@ -12,7 +12,7 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:import/typescript',
     'plugin:promise/recommended',
-    'plugin:security/recommended',
+    'plugin:security/recommended-legacy',
     'plugin:vue/vue3-recommended',
     'plugin:@intlify/vue-i18n/recommended',
     'plugin:storybook/recommended',
