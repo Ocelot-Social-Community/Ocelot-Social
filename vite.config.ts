@@ -5,6 +5,8 @@ import vue from '@vitejs/plugin-vue'
 import vike from 'vike/plugin'
 import { UserConfig } from 'vite'
 import { checker } from 'vite-plugin-checker'
+import viteCompression from 'vite-plugin-compression'
+import vuetify from 'vite-plugin-vuetify'
 
 const isStorybook = () =>
   ['storybook', 'storybook:build'].includes(process.env.npm_lifecycle_event as string)
@@ -12,7 +14,7 @@ const isStorybook = () =>
 const config: UserConfig = {
   plugins: [
     vue(),
-    !isStorybook() && vike(), // SSR only when storybook is not running
+    !isStorybook() && vike({ prerender: true }), // SSR only when storybook is not running
     vueI18n({
       ssr: true,
       include: path.resolve(__dirname, './src/locales/**'),
@@ -21,6 +23,8 @@ const config: UserConfig = {
       typescript: true,
       vueTsc: true,
     }),
+    vuetify({ styles: { configFile: './src/assets/sass/style.scss' } }),
+    viteCompression({ filter: /\.*$/i }),
   ],
   build: {
     outDir: './build',
