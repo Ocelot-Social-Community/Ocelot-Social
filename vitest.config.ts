@@ -18,10 +18,12 @@ export default mergeConfig(
           '**/*{.,-}stories.?(c|m)[jt]s?(x)',
           'src/stories/**/*',
         ],
-        lines: 17,
-        // functions: 20, // has problems see https://github.com/vitest-dev/vitest/issues/3607
-        branches: 44,
-        statements: 17,
+        thresholds: {
+          lines: 17,
+          // functions: 20, // has problems see https://github.com/vitest-dev/vitest/issues/3607
+          branches: 44,
+          statements: 17,
+        },
       },
     },
   }),

@@ -9,9 +9,6 @@ import { createApp } from './app'
 import type { PageContextServer, PageContext } from '#types/PageContext'
 import type { App } from 'vue'
 
-// See https://vike.dev/data-fetching
-export const passToClient = ['pageProps', /* 'urlPathname', */ 'routeParams']
-
 async function render(pageContext: PageContextServer & PageContext) {
   const { app, i18n } = createApp(pageContext, false)
 
@@ -57,4 +54,4 @@ async function renderToString(app: App) {
   return appHtml
 }
 
-export { render }
+export default render

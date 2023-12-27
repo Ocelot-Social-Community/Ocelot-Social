@@ -12,7 +12,7 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:import/typescript',
     'plugin:promise/recommended',
-    'plugin:security/recommended',
+    'plugin:security/recommended-legacy',
     'plugin:vue/vue3-recommended',
     'plugin:@intlify/vue-i18n/recommended',
     'plugin:storybook/recommended',
@@ -43,7 +43,7 @@ module.exports = {
     'vue/multi-word-component-names': [
       'error',
       {
-        ignores: ['default', 'index.page'],
+        ignores: ['+Page'],
       },
     ],
     // Optional eslint-comments rule
