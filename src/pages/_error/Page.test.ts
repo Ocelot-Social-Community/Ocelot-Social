@@ -2,7 +2,7 @@ import { VueWrapper, mount } from '@vue/test-utils'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { ComponentPublicInstance } from 'vue'
 
-import ErrorPage from './_error.page.vue'
+import ErrorPage from './+Page.vue'
 
 describe('ErrorPage', () => {
   let wrapper: VueWrapper<unknown, ComponentPublicInstance<unknown, Omit<unknown, never>>>

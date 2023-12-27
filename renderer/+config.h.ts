@@ -2,5 +2,5 @@
 export default {
   clientRouting: true,
   prefetchStaticAssets: 'viewport',
-  passToClient: ['pageProps', /* 'urlPathname', */ 'routeParams']
+  passToClient: ['pageProps', /* 'urlPathname', */ 'routeParams'],
 }

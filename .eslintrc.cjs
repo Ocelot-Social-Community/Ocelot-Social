@@ -43,7 +43,7 @@ module.exports = {
     'vue/multi-word-component-names': [
       'error',
       {
-        ignores: ['default', 'index.page'],
+        ignores: ['+Page'],
       },
     ],
     // Optional eslint-comments rule
