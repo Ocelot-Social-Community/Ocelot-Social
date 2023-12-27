@@ -11,7 +11,7 @@ jobs:
     outputs:
       changes: ${{ steps.changes.outputs.frontend-test-lint-code }}
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4
 
       - name: Check for frontend file changes
         uses: dorny/paths-filter@v2.11.1
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Frontend | Lint
         run: npm install && npm run test:lint
