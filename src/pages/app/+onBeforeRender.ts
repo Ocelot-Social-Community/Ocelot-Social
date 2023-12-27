@@ -1,6 +1,6 @@
 import type { PageContextBuiltInServer } from 'vike/types'
 
-export { onBeforeRender }
+export default onBeforeRender
 
 /* async */ function onBeforeRender(pageContext: PageContextBuiltInServer) {
   return {
