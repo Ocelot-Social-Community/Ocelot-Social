@@ -24,14 +24,28 @@ void startServer()
 async function startServer() {
   const app = express()
 
-  app.use(compression())
-
   // Vite integration
   if (isProduction) {
     // In production, we need to serve our static assets ourselves.
     // (In dev, Vite's middleware serves our static assets.)
     const sirv = (await import('sirv')).default
-    app.use(sirv(`${root}/build/client`))
+    // assets 1y caching
+    app.use(
+      '/assets',
+      sirv(`${root}/build/client/assets`, {
+        maxAge: 31536000, // 1Y
+        immutable: true,
+        gzip: true,
+      }),
+    )
+    // cache things for 10min
+    app.use(
+      sirv(`${root}/build/client`, {
+        maxAge: 600,
+        immutable: true,
+        gzip: true,
+      }),
+    )
   } else {
     // We instantiate Vite's development server and integrate its middleware to our server.
     // ⚠️ We instantiate it only in development. (It isn't needed in production and it
@@ -44,6 +58,9 @@ async function startServer() {
       })
     ).middlewares
     app.use(viteDevMiddleware)
+
+    // on the fly compression
+    app.use(compression())
   }
 
   // ...
