@@ -58,14 +58,14 @@
     "update": "npx npm-check-updates"
   },
   "dependencies": {
-    "@intlify/unplugin-vue-i18n": "^1.5.0",
+    "@intlify/unplugin-vue-i18n": "^2.0.0",
     "@mdi/font": "^7.4.47",
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",
     "@types/node": "^20.10.5",
-    "@vitejs/plugin-vue": "^4.5.0",
-    "@vue/compiler-sfc": "^3.3.8",
-    "@vue/server-renderer": "^3.3.8",
+    "@vitejs/plugin-vue": "^5.0.0",
+    "@vue/compiler-sfc": "^3.3.13",
+    "@vue/server-renderer": "^3.3.13",
     "compression": "^1.7.4",
     "cross-env": "^7.0.3",
     "express": "^4.18.2",
@@ -78,8 +78,8 @@
     "typescript": "^5.3.3",
     "vike": "^0.4.152",
     "vite": "^5.0.10",
-    "vue": "^3.3.8",
-    "vue-i18n": "^9.7.1",
+    "vue": "^3.3.13",
+    "vue-i18n": "^9.8.0",
     "vuetify": "^3.4.8"
   },
   "devDependencies": {
@@ -96,7 +96,7 @@
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",
     "@vitest/coverage-v8": "^1.1.0",
-    "@vue/test-utils": "^2.4.2",
+    "@vue/test-utils": "^2.4.3",
     "@vuepress/bundler-vite": "^2.0.0-rc.0",
     "chromatic": "^10.2.0",
     "eslint": "^8.56.0",
@@ -131,9 +131,9 @@
     "stylelint-config-standard-scss": "^12.0.0",
     "vite-plugin-checker": "^0.6.2",
     "vite-plugin-compression": "^0.5.1",
-    "vite-plugin-vuetify": "^1.0.2",
+    "vite-plugin-vuetify": "^2.0.1",
     "vitest": "^1.1.0",
-    "vue-tsc": "^1.8.25",
+    "vue-tsc": "^1.8.27",
     "vuepress": "^2.0.0-rc.0"
   },
   "imports": {
