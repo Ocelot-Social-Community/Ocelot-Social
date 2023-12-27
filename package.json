@@ -147,10 +147,5 @@
     "#context/*": "./renderer/context/*",
     "#types/*": "./types/*",
     "#root/*": "./*"
-  },
-  "overrides": {
-    "vite-plugin-vuetify": {
-      "vite": "$vite"
-    }
   }
 }
