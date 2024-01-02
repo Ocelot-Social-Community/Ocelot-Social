@@ -13,9 +13,10 @@ ARG CONFIGURATION=example
 
 # copy public constants into the Docker image to brand it
 COPY configurations/${CONFIGURATION}/branding/static/ static/
-# COPY configurations/${CONFIGURATION}/branding/constants/ constants/
-# RUN /bin/sh -c 'cd constants && for f in *.ts; do mv -- "$f" "${f%.ts}.js"; done'
-COPY configurations/${CONFIGURATION}/branding/config/ branding/
+# Wolle: COPY configurations/${CONFIGURATION}/branding/constants/ constants/
+# Wolle: RUN /bin/sh -c 'cd constants && for f in *.ts; do mv -- "$f" "${f%.ts}.js"; done'
+COPY configurations/${CONFIGURATION}/branding/config-all/ branding/
+COPY configurations/${CONFIGURATION}/branding/config-webapp/ branding/
 RUN /bin/sh -c 'cd branding && for f in *.ts; do mv -- "$f" "${f%.ts}.js"; done'
 
 # locales

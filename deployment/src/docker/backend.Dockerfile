@@ -25,7 +25,8 @@ ARG CONFIGURATION=example
 # COPY configurations/${CONFIGURATION}/branding/email/ src/middleware/helpers/email/
 
 # copy public constants and email templates into the Docker image to brand it
-COPY configurations/${CONFIGURATION}/branding/config/ src/branding/
+COPY configurations/${CONFIGURATION}/branding/config-all/ src/branding/
+COPY configurations/${CONFIGURATION}/branding/config-backend/ src/branding/
 COPY configurations/${CONFIGURATION}/branding/email/ src/middleware/helpers/email/
 
 ##################################################################################
