@@ -1,0 +1,52 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LogoAvatar > renders 1`] = `
+<div
+  class="v-avatar v-theme--light v-avatar--density-default v-avatar--variant-flat ma-2 pa-1"
+  style="background-color: #333; color: #fff; caret-color: #fff; width: 48px; height: 48px;"
+>
+  <div
+    aria-label=""
+    class="v-responsive v-img v-img--booting"
+  >
+    <div
+      class="v-responsive__sizer"
+    />
+    
+    
+    <transition-stub
+      appear="true"
+      css="true"
+      name="fade-transition"
+      persisted="false"
+    >
+      <img
+        alt=""
+        class="v-img__img v-img__img--cover"
+        src="/src/assets/it4c-logo2-clean-bg_alpha-128x128.png"
+        style="display: none;"
+      />
+    </transition-stub>
+    <transition-stub
+      appear="false"
+      css="true"
+      name="fade-transition"
+      persisted="false"
+    >
+      <!---->
+    </transition-stub>
+    <!---->
+    <!---->
+    <!---->
+    
+    
+    <!---->
+  </div>
+  
+  <!---->
+  <span
+    class="v-avatar__underlay"
+  />
+  
+</div>
+`;

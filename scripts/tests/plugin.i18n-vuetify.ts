@@ -3,6 +3,7 @@ import { config } from '@vue/test-utils'
 import i18n from '#plugins/i18n'
 import vuetify from '#plugins/vuetify'
 
+config.global.plugins.push(i18n)
 config.global.plugins.push(vuetify(i18n))
 
 config.global.mocks = {

@@ -1,0 +1,68 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`DataPrivacyPage > renders 1`] = `
+<div
+  class="v-application v-theme--light v-layout v-layout--full-height v-locale--is-ltr"
+>
+  <div
+    class="v-application__wrap"
+  >
+    
+    <main
+      class="v-main bg-grey-lighten-3"
+      style="--v-layout-left: 0px; --v-layout-right: 0px; --v-layout-top: 0px; --v-layout-bottom: 0px;"
+    >
+      
+      <div
+        class="v-container v-locale--is-ltr"
+      >
+        <div
+          class="v-row"
+        >
+          <!--v-if-->
+          <div
+            class="v-col"
+          >
+            <div
+              class="v-sheet v-theme--light v-sheet--rounded pa-3"
+            >
+              
+              <h1>
+                $t('about.h1')
+              </h1>
+              <p>
+                Um mehr über diese Kochplatte zu erfahren kannst du dir den Quellcode auf 
+                
+                <a
+                  href="https://github.com/IT4Change/boilerplate-frontend/"
+                  target="_blank"
+                >
+                  $t('about.link1')
+                </a>
+                
+                 anschauen.
+              </p>
+              <br />
+              <p>
+                Du willst mehr erfahren? Besuche uns auf 
+                
+                <a
+                  href="https://it4c.dev"
+                  target="_blank"
+                >
+                  $t('about.link2')
+                </a>
+                
+                .
+              </p>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </main>
+    
+  </div>
+</div>
+`;

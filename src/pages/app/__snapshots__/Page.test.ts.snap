@@ -1,0 +1,161 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`DataPrivacyPage > renders 1`] = `
+<div
+  class="v-application v-theme--light v-layout v-layout--full-height v-locale--is-ltr"
+>
+  <div
+    class="v-application__wrap"
+  >
+    
+    <main
+      class="v-main bg-grey-lighten-3"
+      style="--v-layout-left: 0px; --v-layout-right: 0px; --v-layout-top: 0px; --v-layout-bottom: 0px;"
+    >
+      
+      <div
+        class="v-container v-locale--is-ltr"
+      >
+        <div
+          class="v-row"
+        >
+          <div
+            class="v-col v-col-2"
+          >
+            <div
+              class="v-sheet v-theme--light v-sheet--rounded"
+            >
+              
+              <div
+                class="v-list v-theme--light v-list--density-default v-list--one-line v-list--rounded"
+                role="listbox"
+                tabindex="0"
+              >
+                
+                <a
+                  class="v-list-item v-list-item--active v-list-item--link v-theme--light v-list-item--density-default v-list-item--one-line v-list-item--variant-text"
+                  href="/app"
+                  tabindex="-2"
+                >
+                  
+                  <span
+                    class="v-list-item__overlay"
+                  />
+                  <span
+                    class="v-list-item__underlay"
+                  />
+                  
+                  <!---->
+                  <div
+                    class="v-list-item__content"
+                    data-no-activator=""
+                  >
+                    <div
+                      class="v-list-item-title"
+                    >
+                      $t('app.value.menu')
+                    </div>
+                    <!---->
+                    <!---->
+                  </div>
+                  <!---->
+                </a>
+                <a
+                  class="v-list-item v-list-item--link v-theme--light v-list-item--density-default v-list-item--one-line v-list-item--variant-text"
+                  href="/app/inc"
+                  tabindex="-2"
+                >
+                  
+                  <span
+                    class="v-list-item__overlay"
+                  />
+                  <span
+                    class="v-list-item__underlay"
+                  />
+                  
+                  <!---->
+                  <div
+                    class="v-list-item__content"
+                    data-no-activator=""
+                  >
+                    <div
+                      class="v-list-item-title"
+                    >
+                      $t('app.inc.menu')
+                    </div>
+                    <!---->
+                    <!---->
+                  </div>
+                  <!---->
+                </a>
+                <hr
+                  aria-orientation="horizontal"
+                  class="v-divider v-theme--light my-2"
+                  role="separator"
+                />
+                <a
+                  class="v-list-item v-list-item--link v-theme--light v-list-item--density-default v-list-item--one-line v-list-item--variant-text"
+                  href="/app/reset"
+                  tabindex="-2"
+                >
+                  
+                  <span
+                    class="v-list-item__overlay"
+                  />
+                  <span
+                    class="v-list-item__underlay"
+                  />
+                  
+                  <!---->
+                  <div
+                    class="v-list-item__content"
+                    data-no-activator=""
+                  >
+                    <div
+                      class="v-list-item-title"
+                    >
+                      $t('app.reset.menu')
+                    </div>
+                    <!---->
+                    <!---->
+                  </div>
+                  <!---->
+                </a>
+                
+              </div>
+              
+            </div>
+          </div>
+          <div
+            class="v-col"
+          >
+            <div
+              class="v-sheet v-theme--light v-sheet--rounded pa-3"
+            >
+              
+              <div>
+                <h1>
+                  $t('app.value.h1')
+                </h1>
+                <p>
+                  Der aktuelle Wert des Zählers lautet: 
+                  
+                  
+                  <b>
+                    0
+                  </b>
+                  
+                  
+                </p>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </main>
+    
+  </div>
+</div>
+`;

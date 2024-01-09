@@ -8,7 +8,12 @@ export default mergeConfig(
     test: {
       globals: true,
       environment: 'happy-dom',
-      setupFiles: ['scripts/tests/mock.$t.ts', 'scripts/tests/plugin.vuetify.ts'],
+      setupFiles: [
+        'scripts/tests/mock.$t.ts',
+        'scripts/tests/mock.vikePageContext.ts',
+        'scripts/tests/plugin.pinia.ts',
+        'scripts/tests/plugin.i18n-vuetify.ts',
+      ],
       coverage: {
         all: true,
         include: ['src/**/*.{js,jsx,ts,tsx,vue}'],
@@ -19,10 +24,10 @@ export default mergeConfig(
           'src/stories/**/*',
         ],
         thresholds: {
-          lines: 25,
+          lines: 84,
           // functions: 20, // has problems see https://github.com/vitest-dev/vitest/issues/3607
-          branches: 60,
-          statements: 25,
+          branches: 92,
+          statements: 84,
         },
       },
     },

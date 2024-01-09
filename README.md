@@ -51,6 +51,7 @@ The following commands are available:
 | `npm run test:lint:remark`  | Run linter remark                                |
 | `npm run test:lint:style`   | Run linter stylelint                             |
 | `npm run test:unit`         | Run all unit tests and generate coverage report  |
+| `npm run test:unit:update`  | Run unit tests, coverage and update snapshots    |
 | `npm run test:unit:dev`     | Run all unit tests in watch mode                 |
 | `npm test`                  | Run all tests & linters                          |
 | **Storybook**               |                                                  |
