@@ -38,5 +38,5 @@ jobs:
         check-modified-files-only: 'no'
         config-file: '.github/workflows/mlc_config.json'
         base-branch: 'master'
-        file-path: '!./CHANGELOG.md'
+        file-path: './!CHANGELOG.md'
         folder-path: '.'
