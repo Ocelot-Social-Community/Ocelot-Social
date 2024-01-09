@@ -2,8 +2,6 @@ import { mount } from '@vue/test-utils'
 import { navigate } from 'vike/client/router'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import { vikePageContext } from '#context/usePageContext'
-
 import VikeBtn from './VikeBtn.vue'
 
 vi.mock('vike/client/router')
@@ -12,7 +10,6 @@ vi.mocked(navigate).mockResolvedValue()
 describe('VikeBtn', () => {
   const Wrapper = () => {
     return mount(VikeBtn, {
-      global: { provide: { [vikePageContext as symbol]: { urlPathname: '/some-url' } } },
       attrs: { href: '/some-path' },
     })
   }
