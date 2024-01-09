@@ -42,6 +42,8 @@ The following commands are available:
 | **Develop**                 |                                                  |
 | `npm run dev`               | Compiles and hot-reloads for development         |
 | `npm run server:dev`        | Run development server                           |
+| `npm run server:prod:ts`    | Run production server without build (ts-node)    |
+| `npm run server:build`      | Build Server into an executable cjs file         |
 | **Test**                    |                                                  |
 | `npm run test:lint`         | Run all linters                                  |
 | `npm run test:lint:eslint`  | Run linter eslint                                |
