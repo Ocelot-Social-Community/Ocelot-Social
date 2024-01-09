@@ -12,7 +12,7 @@ vi.mocked(navigate).mockResolvedValue()
 describe('VikeBtn', () => {
   const Wrapper = () => {
     return mount(VikeBtn, {
-      global: { provide: { [vikePageContext]: { urlPathname: '/some-url' } } },
+      global: { provide: { [vikePageContext as symbol]: { urlPathname: '/some-url' } } },
       attrs: { href: '/some-path' },
     })
   }
@@ -32,7 +32,7 @@ describe('VikeBtn', () => {
 
   describe('with href attribute app', () => {
     beforeEach(async () => {
-      await wrapper.setProps({ href: '/app' })
+      await wrapper.setProps({ href: '/app' } as Partial<object>)
     })
 
     it('has flat variant', () => {
@@ -42,7 +42,7 @@ describe('VikeBtn', () => {
 
   describe('with same href attribute', () => {
     beforeEach(async () => {
-      await wrapper.setProps({ href: '/some-url' })
+      await wrapper.setProps({ href: '/some-url' } as Partial<object>)
     })
 
     it('has tonal variant', () => {
