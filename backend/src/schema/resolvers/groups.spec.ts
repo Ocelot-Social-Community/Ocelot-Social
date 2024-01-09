@@ -328,15 +328,15 @@ describe('in mode', () => {
 
         describe('description', () => {
           describe('length without HTML', () => {
-            describe('less then 100 chars', () => {
+            describe('less then 3 chars', () => {
               it('throws error: "Description too short!"', async () => {
                 const { errors } = await mutate({
                   mutation: createGroupMutation(),
                   variables: {
                     ...variables,
                     description:
-                      '0123456789' +
-                      '<a href="https://domain.org/0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789">0123456789</a>',
+                      '0' +
+                      '<a href="https://domain.org/0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789">0</a>',
                   },
                 })
                 expect(errors![0]).toHaveProperty('message', 'Description too short!')
@@ -2850,15 +2850,15 @@ describe('in mode', () => {
 
             describe('description', () => {
               describe('length without HTML', () => {
-                describe('less then 100 chars', () => {
+                describe('less then 3 chars', () => {
                   it('throws error: "Description too short!"', async () => {
                     const { errors } = await mutate({
                       mutation: updateGroupMutation(),
                       variables: {
                         id: 'my-group',
                         description:
-                          '0123456789' +
-                          '<a href="https://domain.org/0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789">0123456789</a>',
+                          '0' +
+                          '<a href="https://domain.org/0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789">0</a>',
                       },
                     })
                     expect(errors![0]).toHaveProperty('message', 'Description too short!')
