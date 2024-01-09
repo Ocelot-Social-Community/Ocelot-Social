@@ -20,7 +20,7 @@ describe('VikeBtn', () => {
   })
 
   it('renders', () => {
-    expect(wrapper.find('.v-btn').exists()).toBeTruthy()
+    expect(wrapper.element).toMatchSnapshot()
   })
 
   it('icon is hidden', () => {
