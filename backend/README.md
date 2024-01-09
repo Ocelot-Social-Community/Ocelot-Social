@@ -186,7 +186,7 @@ To run the migration:
 $ docker exec backend yarn run db:migrate up
 ```
 
-@tab Without DockerTEST
+@tab Without DockerTESTING
 
 Generate a data migration file:
 
