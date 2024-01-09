@@ -29,7 +29,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@master
     - name: Remove old documentation files
-      run: rm -rf ./deployment/src/old/ ./!CHANGELOG.md # workaround until https://github.com/gaurav-nelson/github-action-markdown-link-check/pull/183 has been done
+      run: rm -rf ./deployment/src/old/ ./CHANGELOG.md # workaround until https://github.com/gaurav-nelson/github-action-markdown-link-check/pull/183 has been done
     - name: Check Markdown Links
       uses: gaurav-nelson/github-action-markdown-link-check@master
       with:
