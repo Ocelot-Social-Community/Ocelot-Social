@@ -54,11 +54,8 @@ function createApp(pageContext: VikePageContext & PageContext, isClient = true) 
     },
   })
 
-  // When doing Client Routing, we mutate pageContext (see usage of `app.changePage()` in `_default.page.client.js`).
-  // We therefore use a reactive pageContext.
   const pageContextReactive = reactive(pageContext)
 
-  // Make pageContext available from any Vue component
   setPageContext(app, pageContextReactive)
 
   return { app, i18n }
