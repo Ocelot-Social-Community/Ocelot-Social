@@ -33,8 +33,8 @@ jobs:
     - name: Check Markdown Links
       uses: gaurav-nelson/github-action-markdown-link-check@master
       with:
-        use-quiet-mode: 'yes'
-        use-verbose-mode: 'no'
+        use-quiet-mode: 'no'
+        use-verbose-mode: 'yes'
         check-modified-files-only: 'no'
         config-file: '.github/workflows/mlc_config.json'
         base-branch: 'master'
