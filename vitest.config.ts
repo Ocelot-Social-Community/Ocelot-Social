@@ -8,7 +8,12 @@ export default mergeConfig(
     test: {
       globals: true,
       environment: 'happy-dom',
-      setupFiles: ['scripts/tests/mock.$t.ts', 'scripts/tests/mock.vikePageContext.ts', 'scripts/tests/plugin.vuetify.ts'],
+      setupFiles: [
+        'scripts/tests/mock.$t.ts',
+        'scripts/tests/mock.vikePageContext.ts',
+        'scripts/tests/plugin.pinia.ts',
+        'scripts/tests/plugin.i18n-vuetify.ts',
+      ],
       coverage: {
         all: true,
         include: ['src/**/*.{js,jsx,ts,tsx,vue}'],
