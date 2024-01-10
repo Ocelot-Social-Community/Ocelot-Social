@@ -137,13 +137,16 @@ $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-neo4j 
 # bash: enter bash of Neo4j
 $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-neo4j | awk '{ print $1 }') -- bash
 # generate Dump
-neo4j% neo4j-admin dump --database=graph.db --to=/var/lib/neo4j/$(date +%F)-neo4j-dump
+neo4j% neo4j-admin dump --to=/var/lib/neo4j/$(date +%F)-neo4j-dump
 # exit bash
 neo4j% exit
 
 # ls: see if the new backup dump is there
 $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-neo4j | awk '{ print $1 }') -- ls
 ```
+
+If you need a specific database name, add the option `--database=<name>` to the command `neo4j-admin dump`.
+To find out the default database name, see the [Neo4j readme](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/neo4j/README.md).
 
 Lets copy the dump backup
 
