@@ -1,6 +1,7 @@
 import { setup } from '@storybook/vue3'
 import { createPinia } from 'pinia'
 
+import { setPageContext } from '#context/usePageContext'
 import i18n from '#plugins/i18n'
 import CreateVuetify from '#plugins/vuetify'
 
@@ -10,11 +11,12 @@ import type { Preview } from '@storybook/vue3'
 
 setup((app) => {
   // Registers your app's plugins into Storybook
-  // app.use(vuetify);
   const pinia = createPinia()
   app.use(pinia)
   app.use(i18n)
   app.use(CreateVuetify(i18n))
+
+  setPageContext(app, { urlPathname: '' })
 })
 
 export const decorators = [withVuetifyTheme]
