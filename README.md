@@ -141,7 +141,6 @@ This mechanic was taken from this [source](https://stackoverflow.com/questions/1
 ## TODO
 
 - [ ] tests
-- [ ] stories
 - [ ] responsive design
 
 ## Known Problems
