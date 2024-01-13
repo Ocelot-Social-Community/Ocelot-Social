@@ -79,8 +79,8 @@ $ kubectl -n ocelot-social get pods
 $ kubectl cp ./neo4j-backup human-connection/<POD-ID>:/root/
 $ kubectl -n ocelot-social exec -it <POD-ID> bash
 # Once you're in the pod restore the backup and overwrite the default database
-# called `graph.db` with `--force`.
-# This will delete all existing data in database `graph.db`!
+# called `neo4j` with `--force`.
+# This will delete all existing data in database `neo4j`!
 > neo4j-admin load --from=/root/neo4j-backup --force
 > exit
 ```
