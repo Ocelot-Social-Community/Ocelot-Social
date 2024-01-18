@@ -142,6 +142,7 @@
       },
       "email-nonce": {
         "form": {
+          "click-next": "Cliquez sur Continuer.",
           "description": "Ouvrez votre boîte de réception et entrez le code que nous vous avons envoyé.",
           "next": "Continuer",
           "nonce": "Entrez votre code",
