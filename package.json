@@ -33,17 +33,17 @@
     "release": "yarn version --no-git-tag-version --no-commit-hooks --no-commit && auto-changelog --latest-version $(node -p -e \"require('./package.json').version\") && cd backend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp/maintenance/source && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../../../package.json').version\")"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.5",
-    "@babel/preset-env": "^7.23.5",
+    "@babel/core": "^7.23.7",
+    "@babel/preset-env": "^7.23.6",
     "@babel/register": "^7.22.15",
-    "@badeball/cypress-cucumber-preprocessor": "^19.2.0",
+    "@badeball/cypress-cucumber-preprocessor": "^20.0.0",
     "@cypress/browserify-preprocessor": "^3.0.2",
-    "@cucumber/cucumber": "10.0.1",
+    "@cucumber/cucumber": "10.1.0",
     "@faker-js/faker": "8.3.1",
     "auto-changelog": "^2.3.0",
     "bcryptjs": "^2.4.3",
     "cross-env": "^7.0.3",
-    "cypress": "^13.6.1",
+    "cypress": "^13.6.2",
     "cypress-network-idle": "^1.14.2",
     "date-fns": "^2.25.0",
     "dotenv": "^16.3.1",
@@ -52,7 +52,7 @@
     "import": "^0.0.6",
     "jsonwebtoken": "^9.0.2",
     "mock-socket": "^9.0.3",
-    "multiple-cucumber-html-reporter": "^3.4.0",
+    "multiple-cucumber-html-reporter": "^3.6.0",
     "neo4j-driver": "^4.3.4",
     "neode": "^0.4.8",
     "rosie": "^2.1.0",
@@ -61,8 +61,8 @@
   },
   "optionalDependencies": {
     "vuepress": "^2.0.0-rc.0",
-    "vuepress-plugin-search-pro": "^2.0.0-rc.4",
-    "vuepress-theme-hope": "^2.0.0-rc.4"
+    "vuepress-plugin-search-pro": "^2.0.0-rc.6",
+    "vuepress-theme-hope": "^2.0.0-rc.11"
   },
   "resolutions": {
     "set-value": "^2.0.1",
