@@ -195,8 +195,9 @@
         "yourEmail": "Deine E-Mail-Adresse:"
       },
       "email-nonce": {
-        "buttonTitle": "Bestätigen",
+        "buttonTitle": "Weiter",
         "form": {
+          "click-next": "Click auf Weiter.",
           "description": "Öffne Dein E-Mail Postfach und gib den Code ein, den wir geschickt haben.",
           "next": "Weiter",
           "nonce": "E-Mail-Code: 32143",
