@@ -184,7 +184,10 @@ exports[`PageShell > renders 1`] = `
                     
                     <div
                       class="v-switch__track bg-success"
-                    />
+                    >
+                      <!---->
+                      <!---->
+                    </div>
                     
                     <div
                       class="v-selection-control__input"
