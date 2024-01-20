@@ -5,7 +5,7 @@ import { VApp } from 'vuetify/components'
 
 import TopMenu from './TopMenu.vue'
 
-describe('FooterMenu', () => {
+describe('TopMenu', () => {
   const wrapper = mount(VApp, {
     slots: {
       default: h(TopMenu),
