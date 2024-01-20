@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`FooterMenu > renders 1`] = `
+exports[`TopMenu > renders 1`] = `
 <div
   class="v-application v-theme--light v-layout v-layout--full-height v-locale--is-ltr"
 >
@@ -184,7 +184,10 @@ exports[`FooterMenu > renders 1`] = `
                     
                     <div
                       class="v-switch__track bg-success"
-                    />
+                    >
+                      <!---->
+                      <!---->
+                    </div>
                     
                     <div
                       class="v-selection-control__input"

@@ -5,7 +5,7 @@ import { VApp } from 'vuetify/components'
 
 import AppPage from './+Page.vue'
 
-describe('DataPrivacyPage', () => {
+describe('AppPage', () => {
   const wrapper = mount(VApp, {
     slots: {
       default: h(AppPage as Component),
