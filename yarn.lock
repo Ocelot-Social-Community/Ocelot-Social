@@ -23,20 +23,20 @@
   resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.23.5.tgz#ffb878728bb6bdcb6f4510aa51b1be9afb8cfd98"
   integrity sha512-uU27kfDRlhfKl+w1U6vp16IuvSLtjAxdArVXPa9BvLkrr7CYIsxH5adpHObeAGY/41+syctUWOZ140a2Rvkgjw==
 
-"@babel/core@^7.16.0", "@babel/core@^7.23.6":
-  version "7.23.6"
-  resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.23.6.tgz#8be77cd77c55baadcc1eae1c33df90ab6d2151d4"
-  integrity sha512-FxpRyGjrMJXh7X3wGLGhNDCRiwpWEF74sKjTLDJSG5Kyvow3QZaG0Adbqzi9ZrVjTWpsX+2cxWXD71NMg93kdw==
+"@babel/core@^7.16.0", "@babel/core@^7.23.7":
+  version "7.23.7"
+  resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.23.7.tgz#4d8016e06a14b5f92530a13ed0561730b5c6483f"
+  integrity sha512-+UpDgowcmqe36d4NwqvKsyPMlOLNGMsfMmQ5WGCu+siCe3t3dfe9njrzGfdN4qq+bcNUt0+Vw6haRxBOycs4dw==
   dependencies:
     "@ampproject/remapping" "^2.2.0"
     "@babel/code-frame" "^7.23.5"
     "@babel/generator" "^7.23.6"
     "@babel/helper-compilation-targets" "^7.23.6"
     "@babel/helper-module-transforms" "^7.23.3"
-    "@babel/helpers" "^7.23.6"
+    "@babel/helpers" "^7.23.7"
     "@babel/parser" "^7.23.6"
     "@babel/template" "^7.22.15"
-    "@babel/traverse" "^7.23.6"
+    "@babel/traverse" "^7.23.7"
     "@babel/types" "^7.23.6"
     convert-source-map "^2.0.0"
     debug "^4.1.0"
@@ -234,13 +234,13 @@
     "@babel/template" "^7.22.15"
     "@babel/types" "^7.22.19"
 
-"@babel/helpers@^7.23.6":
-  version "7.23.6"
-  resolved "https://registry.yarnpkg.com/@babel/helpers/-/helpers-7.23.6.tgz#d03af2ee5fb34691eec0cda90f5ecbb4d4da145a"
-  integrity sha512-wCfsbN4nBidDRhpDhvcKlzHWCTlgJYUUdSJfzXb2NuBssDSIjc3xcb+znA7l+zYsFljAcGM0aFkN40cR3lXiGA==
+"@babel/helpers@^7.23.7":
+  version "7.23.7"
+  resolved "https://registry.yarnpkg.com/@babel/helpers/-/helpers-7.23.7.tgz#eb543c36f81da2873e47b76ee032343ac83bba60"
+  integrity sha512-6AMnjCoC8wjqBzDHkuqpa7jAKwvMo4dC+lr/TFBz+ucfulO1XMpDnwWPGBNwClOKZ8h6xn5N81W/R5OrcKtCbQ==
   dependencies:
     "@babel/template" "^7.22.15"
-    "@babel/traverse" "^7.23.6"
+    "@babel/traverse" "^7.23.7"
     "@babel/types" "^7.23.6"
 
 "@babel/highlight@^7.23.4":
@@ -1012,10 +1012,10 @@
     "@babel/parser" "^7.22.15"
     "@babel/types" "^7.22.15"
 
-"@babel/traverse@^7.23.6":
-  version "7.23.6"
-  resolved "https://registry.yarnpkg.com/@babel/traverse/-/traverse-7.23.6.tgz#b53526a2367a0dd6edc423637f3d2d0f2521abc5"
-  integrity sha512-czastdK1e8YByZqezMPFiZ8ahwVMh/ESl9vPgvgdB9AmFMGP5jfpFax74AQgl5zj4XHzqeYAg2l8PuUeRS1MgQ==
+"@babel/traverse@^7.23.7":
+  version "7.23.7"
+  resolved "https://registry.yarnpkg.com/@babel/traverse/-/traverse-7.23.7.tgz#9a7bf285c928cb99b5ead19c3b1ce5b310c9c305"
+  integrity sha512-tY3mM8rH9jM0YHFGyfC0/xf+SB5eKUu7HPj7/k3fpi9dAlsMc5YbQvDi0Sh2QTPXqMhyaAtzAr807TIyfQrmyg==
   dependencies:
     "@babel/code-frame" "^7.23.5"
     "@babel/generator" "^7.23.6"
@@ -1049,10 +1049,10 @@
     minimatch "^3.0.4"
     node-hook "^1.0.0"
 
-"@badeball/cypress-cucumber-preprocessor@^20.0.0":
-  version "20.0.0"
-  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-20.0.0.tgz#6417d22835b8ef8ff8e004e4e95df57419f36af7"
-  integrity sha512-wBpPMazRqmzs86wocMKi686rEzwygRDLpQZk4X8LgllfhAdEYqk8GfeVsSUVKYvqiYljbb7k2Blj1zS5vlxNJw==
+"@badeball/cypress-cucumber-preprocessor@^20.0.1":
+  version "20.0.1"
+  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-20.0.1.tgz#270fd6f0f27b57128c05e79bf16eb33ffaf1eb7c"
+  integrity sha512-rokPo/4uEo0EGAFEpyl83SSEaL8CdC6k7ONC2HsD9hBDzTezIHW2gcgpbbc5yDoExqLicxJi/A0QACEq7JfcLg==
   dependencies:
     "@badeball/cypress-configuration" "^6.1.0"
     "@cucumber/ci-environment" "^10.0.0"
@@ -1097,10 +1097,10 @@
   dependencies:
     regexp-match-indices "1.0.2"
 
-"@cucumber/cucumber@10.1.0", "@cucumber/cucumber@^10.0.0":
-  version "10.1.0"
-  resolved "https://registry.yarnpkg.com/@cucumber/cucumber/-/cucumber-10.1.0.tgz#f57e5eddf6688e52d51414f808558b00595da252"
-  integrity sha512-9itQdAccTqJAe9VfdmovinOlUPLroC2KbB+CeQty8BKXpLB6hKO32k9S9FhnuXinFqh+E5znUrPtbUxS948bwQ==
+"@cucumber/cucumber@10.3.1", "@cucumber/cucumber@^10.0.0":
+  version "10.3.1"
+  resolved "https://registry.yarnpkg.com/@cucumber/cucumber/-/cucumber-10.3.1.tgz#5996b0e19886d075b199a255a9d390e569b6ffc8"
+  integrity sha512-0H0NkOXcYTCG1qCh3o0p1HPSMODGJmlHi1rm5yfoiMx5tJbBjxVNI2VVD2xtPWA+D6ehHQD9asewuzjMXrbPIw==
   dependencies:
     "@cucumber/ci-environment" "10.0.0"
     "@cucumber/cucumber-expressions" "17.0.1"
@@ -1110,7 +1110,7 @@
     "@cucumber/html-formatter" "21.2.0"
     "@cucumber/message-streams" "4.0.1"
     "@cucumber/messages" "24.0.1"
-    "@cucumber/tag-expressions" "6.0.0"
+    "@cucumber/tag-expressions" "6.1.0"
     assertion-error-formatter "^3.0.0"
     capital-case "^1.0.4"
     chalk "^4.1.2"
@@ -1222,10 +1222,10 @@
     figures "^3.2.0"
     ts-dedent "^2.0.0"
 
-"@cucumber/tag-expressions@6.0.0", "@cucumber/tag-expressions@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@cucumber/tag-expressions/-/tag-expressions-6.0.0.tgz#f17ece58c5a78c2aa65098f9905e63e2abd7895d"
-  integrity sha512-JbNb/254Wn6b8cfrIJoqR0NekHXvoB/eMvSY4RK11H8k+YZfm7mZesu/3yVX67nkW+Y+PGjZFcgTMcfjwFRsRw==
+"@cucumber/tag-expressions@6.1.0", "@cucumber/tag-expressions@^6.0.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@cucumber/tag-expressions/-/tag-expressions-6.1.0.tgz#cb7af908bdb43669b7574c606f71fa707196e962"
+  integrity sha512-+3DwRumrCJG27AtzCIL37A/X+A/gSfxOPLg8pZaruh5SLumsTmpvilwroVWBT2fPzmno/tGXypeK5a7NHU4RzA==
 
 "@cypress/browserify-preprocessor@^3.0.2":
   version "3.0.2"
