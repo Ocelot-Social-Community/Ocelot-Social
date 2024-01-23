@@ -23,7 +23,7 @@
   resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.23.5.tgz#ffb878728bb6bdcb6f4510aa51b1be9afb8cfd98"
   integrity sha512-uU27kfDRlhfKl+w1U6vp16IuvSLtjAxdArVXPa9BvLkrr7CYIsxH5adpHObeAGY/41+syctUWOZ140a2Rvkgjw==
 
-"@babel/core@^7.11.1", "@babel/core@^7.16.0", "@babel/core@^7.23.7":
+"@babel/core@^7.16.0", "@babel/core@^7.23.7":
   version "7.23.7"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.23.7.tgz#4d8016e06a14b5f92530a13ed0561730b5c6483f"
   integrity sha512-+UpDgowcmqe36d4NwqvKsyPMlOLNGMsfMmQ5WGCu+siCe3t3dfe9njrzGfdN4qq+bcNUt0+Vw6haRxBOycs4dw==
@@ -1049,10 +1049,10 @@
     minimatch "^3.0.4"
     node-hook "^1.0.0"
 
-"@badeball/cypress-cucumber-preprocessor@^20.0.0":
-  version "20.0.0"
-  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-20.0.0.tgz#6417d22835b8ef8ff8e004e4e95df57419f36af7"
-  integrity sha512-wBpPMazRqmzs86wocMKi686rEzwygRDLpQZk4X8LgllfhAdEYqk8GfeVsSUVKYvqiYljbb7k2Blj1zS5vlxNJw==
+"@badeball/cypress-cucumber-preprocessor@^20.0.1":
+  version "20.0.1"
+  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-20.0.1.tgz#270fd6f0f27b57128c05e79bf16eb33ffaf1eb7c"
+  integrity sha512-rokPo/4uEo0EGAFEpyl83SSEaL8CdC6k7ONC2HsD9hBDzTezIHW2gcgpbbc5yDoExqLicxJi/A0QACEq7JfcLg==
   dependencies:
     "@badeball/cypress-configuration" "^6.1.0"
     "@cucumber/ci-environment" "^10.0.0"
@@ -1097,10 +1097,10 @@
   dependencies:
     regexp-match-indices "1.0.2"
 
-"@cucumber/cucumber@10.1.0", "@cucumber/cucumber@^10.0.0":
-  version "10.1.0"
-  resolved "https://registry.yarnpkg.com/@cucumber/cucumber/-/cucumber-10.1.0.tgz#f57e5eddf6688e52d51414f808558b00595da252"
-  integrity sha512-9itQdAccTqJAe9VfdmovinOlUPLroC2KbB+CeQty8BKXpLB6hKO32k9S9FhnuXinFqh+E5znUrPtbUxS948bwQ==
+"@cucumber/cucumber@10.3.1", "@cucumber/cucumber@^10.0.0":
+  version "10.3.1"
+  resolved "https://registry.yarnpkg.com/@cucumber/cucumber/-/cucumber-10.3.1.tgz#5996b0e19886d075b199a255a9d390e569b6ffc8"
+  integrity sha512-0H0NkOXcYTCG1qCh3o0p1HPSMODGJmlHi1rm5yfoiMx5tJbBjxVNI2VVD2xtPWA+D6ehHQD9asewuzjMXrbPIw==
   dependencies:
     "@cucumber/ci-environment" "10.0.0"
     "@cucumber/cucumber-expressions" "17.0.1"
@@ -1110,7 +1110,7 @@
     "@cucumber/html-formatter" "21.2.0"
     "@cucumber/message-streams" "4.0.1"
     "@cucumber/messages" "24.0.1"
-    "@cucumber/tag-expressions" "6.0.0"
+    "@cucumber/tag-expressions" "6.1.0"
     assertion-error-formatter "^3.0.0"
     capital-case "^1.0.4"
     chalk "^4.1.2"
@@ -1222,10 +1222,10 @@
     figures "^3.2.0"
     ts-dedent "^2.0.0"
 
-"@cucumber/tag-expressions@6.0.0", "@cucumber/tag-expressions@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@cucumber/tag-expressions/-/tag-expressions-6.0.0.tgz#f17ece58c5a78c2aa65098f9905e63e2abd7895d"
-  integrity sha512-JbNb/254Wn6b8cfrIJoqR0NekHXvoB/eMvSY4RK11H8k+YZfm7mZesu/3yVX67nkW+Y+PGjZFcgTMcfjwFRsRw==
+"@cucumber/tag-expressions@6.1.0", "@cucumber/tag-expressions@^6.0.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@cucumber/tag-expressions/-/tag-expressions-6.1.0.tgz#cb7af908bdb43669b7574c606f71fa707196e962"
+  integrity sha512-+3DwRumrCJG27AtzCIL37A/X+A/gSfxOPLg8pZaruh5SLumsTmpvilwroVWBT2fPzmno/tGXypeK5a7NHU4RzA==
 
 "@cypress/browserify-preprocessor@^3.0.2":
   version "3.0.2"
