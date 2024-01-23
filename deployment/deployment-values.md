@@ -17,7 +17,7 @@ Sometimes it is enough to create an SPF record in your DNS.
 
 ### DKIM
 
-However, if you need DKIM authorization and verification, you must set the appropriate environment variables:
+However, if you need DKIM authorization and verification, you must set the appropriate environment variables in: `.env`, `docker-compose.yml` or Helm script `values.yaml`:
 
 ```bash
 SMTP_DKIM_DOMAINNAME=<your e-mail sender domain>
@@ -36,3 +36,23 @@ To create the private and public DKIM key, see here:
 Information about the required PEM format can be found here:
 
 <https://docs.progress.com/bundle/datadirect-hybrid-data-pipeline-installation-46/page/PEM-file-format.html>
+
+## Neo4j Database
+
+We have several configuration options for our Neo4j database.
+
+### DBMS_DEFAULT_DATABASE – Default Database Name to be Used
+
+If you need to set the default database name in Neo4j to be used for all operations and terminal commands like our backup scripts, you must set the appropriate environment variable in: `.env`, `docker-compose.yml` or Helm script `values.yaml`:
+
+```yaml
+DBMS_DEFAULT_DATABASE: "graph.db"
+```
+
+The default value is `neo4j` if it is not set.
+
+As example see files:
+
+- `neo4j/.env.template`
+- `deployment/docker-compose.yml`
+- `deployment/configurations/stage.ocelot.social/kubernetes/values.yaml.template`
