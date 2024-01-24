@@ -328,6 +328,9 @@
     "groups": {
       "tooltip": "Grupos"
     },
+    "map": {
+      "tooltip": "Mapa"
+    },
     "notifications": {
       "tooltip": "Notificaciones"
     }

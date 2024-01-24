@@ -583,6 +583,9 @@
     "groups": {
       "tooltip": "Groups"
     },
+    "map": {
+      "tooltip": "Map"
+    },
     "notifications": {
       "tooltip": "Notifications"
     }
@@ -625,9 +628,6 @@
   },
   "map": {
     "alertMessage": "The map cannot be accessed: The Mapbox token is not set on the server!",
-    "button": {
-      "tooltip": "Show map"
-    },
     "legend": {
       "event": "Event",
       "group": "Group",
