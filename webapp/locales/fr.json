@@ -306,6 +306,11 @@
     "hashtag-search": "Recherche de #{hashtag}",
     "title": "Votre bulle de filtre"
   },
+  "header": {
+    "avatarMenu": {
+      "chats": "Chats"
+    }
+  },
   "index": {
     "change-filter-settings": "Modifiez les paramètres de filtrage pour obtenir plus de résultats.",
     "no-results": "Pas de contribution trouvée."

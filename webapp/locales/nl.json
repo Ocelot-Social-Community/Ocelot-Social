@@ -93,6 +93,11 @@
     "membersCount": null,
     "membersListTitle": null
   },
+  "header": {
+    "avatarMenu": {
+      "chats": "Chats"
+    }
+  },
   "login": {
     "email": "Uw E-mail",
     "hello": "Hallo",

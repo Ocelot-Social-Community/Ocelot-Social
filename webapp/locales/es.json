@@ -316,6 +316,11 @@
     "hashtag-search": "Buscando a #{hashtag}",
     "title": "Su burbuja de filtro"
   },
+  "header": {
+    "avatarMenu": {
+      "chats": "Chats"
+    }
+  },
   "index": {
     "change-filter-settings": "Cambie la configuración de sus filtros para obtener más resultados.",
     "no-results": "No se han encontrado contribuciones."

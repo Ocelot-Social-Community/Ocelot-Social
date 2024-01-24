@@ -180,6 +180,11 @@
   "hashtags-filter": {
     "title": "Twoja bańka filtrująca"
   },
+  "header": {
+    "avatarMenu": {
+      "chats": "Czaty"
+    }
+  },
   "login": {
     "email": "Twój adres e-mail",
     "forgotPassword": "Zapomniałeś hasła?",

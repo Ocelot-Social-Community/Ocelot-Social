@@ -310,6 +310,11 @@
     "hashtag-search": null,
     "title": null
   },
+  "header": {
+    "avatarMenu": {
+      "chats": "Chat"
+    }
+  },
   "index": {
     "change-filter-settings": null,
     "no-results": null

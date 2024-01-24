@@ -575,6 +575,7 @@
       "button": {
         "tooltip": "My profile"
       },
+      "chats": "Chats",
       "groups": "Groups",
       "myProfile": "My profile"
     },
