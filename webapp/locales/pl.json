@@ -203,7 +203,8 @@
     "markAllAsRead": "Oznacz wszystkie jako przeczytane",
     "menu": {
       "mentioned": "wspomiał o Tobie we wpisie"
-    }
+    },
+    "pageLink": "Powiadomienia"
   },
   "post": {
     "comment": {

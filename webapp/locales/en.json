@@ -730,7 +730,7 @@
       "tooltip": "My notifications"
     },
     "markAllAsRead": "Mark all as read",
-    "pageLink": "All notifications",
+    "pageLink": "Notifications",
     "post": "Post or Group",
     "reason": {
       "changed_group_member_role": "Changed your role in group …",
