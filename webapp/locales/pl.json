@@ -187,6 +187,9 @@
     },
     "chats": {
       "tooltip": "Czaty"
+    },
+    "notifications": {
+      "tooltip": "Powiadomienia"
     }
   },
   "login": {

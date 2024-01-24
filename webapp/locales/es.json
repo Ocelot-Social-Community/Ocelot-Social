@@ -323,6 +323,9 @@
     },
     "chats": {
       "tooltip": "Chats"
+    },
+    "notifications": {
+      "tooltip": "Notificaciones"
     }
   },
   "index": {

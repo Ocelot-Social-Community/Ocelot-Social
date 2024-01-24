@@ -317,6 +317,9 @@
     },
     "chats": {
       "tooltip": "Chat"
+    },
+    "notifications": {
+      "tooltip": "Notifiche"
     }
   },
   "index": {

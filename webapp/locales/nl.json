@@ -100,6 +100,9 @@
     },
     "chats": {
       "tooltip": "Chats"
+    },
+    "notifications": {
+      "tooltip": "Notificaties"
     }
   },
   "login": {

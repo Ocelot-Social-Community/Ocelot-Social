@@ -582,6 +582,9 @@
     },
     "chats": {
       "tooltip": "Chats"
+    },
+    "notifications": {
+      "tooltip": "Banachrichtigungen"
     }
   },
   "index": {
@@ -728,9 +731,6 @@
       "unread": "Ungelesen"
     },
     "group": "Beschreibung",
-    "headerMenuButton": {
-      "tooltip": "Meine Banachrichtigungen"
-    },
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",

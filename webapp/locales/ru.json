@@ -334,6 +334,9 @@
     },
     "chats": {
       "tooltip": "Чаты"
+    },
+    "notifications": {
+      "tooltip": "Уведомления"
     }
   },
   "index": {

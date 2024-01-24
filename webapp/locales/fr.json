@@ -313,6 +313,9 @@
     },
     "chats": {
       "tooltip": "Chats"
+    },
+    "notifications": {
+      "tooltip": "Notifications"
     }
   },
   "index": {
@@ -416,9 +419,6 @@
       "unread": "Non lu"
     },
     "group": "Description",
-    "headerMenuButton": {
-      "tooltip": "Mes notifications"
-    },
     "markAllAsRead": "Tout marquer comme lu",
     "pageLink": "Toutes les notifications",
     "post": "Post",
