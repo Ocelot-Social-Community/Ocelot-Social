@@ -96,10 +96,14 @@
   "header": {
     "avatarMenu": {
       "chats": "Chats",
+      "groups": "Groepen",
       "notifications": "Notificaties"
     },
     "chats": {
       "tooltip": "Chats"
+    },
+    "groups": {
+      "tooltip": "Groepen"
     },
     "notifications": {
       "tooltip": "Notificaties"

@@ -183,10 +183,14 @@
   "header": {
     "avatarMenu": {
       "chats": "Czaty",
+      "groups": "Grupy",
       "notifications": "Powiadomienia"
     },
     "chats": {
       "tooltip": "Czaty"
+    },
+    "groups": {
+      "tooltip": "Grupy"
     },
     "notifications": {
       "tooltip": "Powiadomienia"

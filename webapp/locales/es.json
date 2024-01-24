@@ -319,10 +319,14 @@
   "header": {
     "avatarMenu": {
       "chats": "Chats",
+      "groups": "Grupos",
       "notifications": "Notificaciones"
     },
     "chats": {
       "tooltip": "Chats"
+    },
+    "groups": {
+      "tooltip": "Grupos"
     },
     "notifications": {
       "tooltip": "Notificaciones"

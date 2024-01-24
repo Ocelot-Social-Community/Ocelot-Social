@@ -351,10 +351,14 @@
   "header": {
     "avatarMenu": {
       "chats": "Chats",
+      "groups": "Grupos",
       "notifications": "Notificações"
     },
     "chats": {
       "tooltip": "Chats"
+    },
+    "groups": {
+      "tooltip": "Grupos"
     },
     "notifications": {
       "tooltip": "Notificações"

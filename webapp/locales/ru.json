@@ -330,10 +330,14 @@
   "header": {
     "avatarMenu": {
       "chats": "Чаты",
+      "groups": "Группы",
       "notifications": "Уведомления"
     },
     "chats": {
       "tooltip": "Чаты"
+    },
+    "groups": {
+      "tooltip": "Группы"
     },
     "notifications": {
       "tooltip": "Уведомления"

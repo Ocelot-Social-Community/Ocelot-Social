@@ -481,9 +481,6 @@
     "addUserNoOptions": "No users found!",
     "addUserPlaceholder": "User name",
     "allGroups": "All Groups",
-    "button": {
-      "tooltip": "Show groups"
-    },
     "categories": "Topic ::: Topics",
     "categoriesTitle": "Topics of the group",
     "changeMemberRole": "The role has been changed to “{role}”!",
@@ -582,6 +579,9 @@
     },
     "chats": {
       "tooltip": "Chats"
+    },
+    "groups": {
+      "tooltip": "Groups"
     },
     "notifications": {
       "tooltip": "Notifications"
