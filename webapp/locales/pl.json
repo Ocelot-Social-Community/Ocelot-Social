@@ -184,6 +184,9 @@
     "avatarMenu": {
       "chats": "Czaty",
       "notifications": "Powiadomienia"
+    },
+    "chats": {
+      "tooltip": "Czaty"
     }
   },
   "login": {

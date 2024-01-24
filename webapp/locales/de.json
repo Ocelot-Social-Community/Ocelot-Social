@@ -580,8 +580,8 @@
       "myProfile": "Mein Profil",
       "notifications": "Benachrichtigungen"
     },
-    "chat": {
-      "tooltip": "Meine Chats"
+    "chats": {
+      "tooltip": "Chats"
     }
   },
   "index": {

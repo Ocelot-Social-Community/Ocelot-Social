@@ -352,6 +352,9 @@
     "avatarMenu": {
       "chats": "Chats",
       "notifications": "Notificações"
+    },
+    "chats": {
+      "tooltip": "Chats"
     }
   },
   "index": {

@@ -314,6 +314,9 @@
     "avatarMenu": {
       "chats": "Chat",
       "notifications": "Notifiche"
+    },
+    "chats": {
+      "tooltip": "Chat"
     }
   },
   "index": {

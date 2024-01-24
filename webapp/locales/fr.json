@@ -310,6 +310,9 @@
     "avatarMenu": {
       "chats": "Chats",
       "notifications": "Notifications"
+    },
+    "chats": {
+      "tooltip": "Chats"
     }
   },
   "index": {

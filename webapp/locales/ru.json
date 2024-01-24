@@ -331,6 +331,9 @@
     "avatarMenu": {
       "chats": "Чаты",
       "notifications": "Уведомления"
+    },
+    "chats": {
+      "tooltip": "Чаты"
     }
   },
   "index": {
