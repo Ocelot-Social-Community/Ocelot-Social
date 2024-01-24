@@ -35,6 +35,7 @@ jobs:
       with:
         use-quiet-mode: 'yes'
         use-verbose-mode: 'no'
+        # at any .md file change take the chance to check the links in all .md files
         check-modified-files-only: 'no'
         config-file: '.github/workflows/mlc_config.json'
         base-branch: 'master'
