@@ -577,7 +577,8 @@
       },
       "chats": "Chats",
       "groups": "Gruppen",
-      "myProfile": "Mein Profil"
+      "myProfile": "Mein Profil",
+      "notifications": "Benachrichtigungen"
     },
     "chat": {
       "tooltip": "Meine Chats"

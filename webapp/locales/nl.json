@@ -95,7 +95,8 @@
   },
   "header": {
     "avatarMenu": {
-      "chats": "Chats"
+      "chats": "Chats",
+      "notifications": "Notificaties"
     }
   },
   "login": {

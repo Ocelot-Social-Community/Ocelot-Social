@@ -98,7 +98,7 @@ export default {
           icon: 'chat-bubble',
         },
         {
-          name: this.$t('notifications.pageLink'),
+          name: this.$t('header.avatarMenu.notifications'),
           path: '/notifications',
           icon: 'bell',
         },

@@ -312,7 +312,8 @@
   },
   "header": {
     "avatarMenu": {
-      "chats": "Chat"
+      "chats": "Chat",
+      "notifications": "Notifiche"
     }
   },
   "index": {

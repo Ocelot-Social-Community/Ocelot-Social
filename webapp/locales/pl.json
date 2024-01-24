@@ -182,7 +182,8 @@
   },
   "header": {
     "avatarMenu": {
-      "chats": "Czaty"
+      "chats": "Czaty",
+      "notifications": "Powiadomienia"
     }
   },
   "login": {
