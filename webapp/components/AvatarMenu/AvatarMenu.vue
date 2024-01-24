@@ -93,6 +93,11 @@ export default {
           icon: 'users',
         },
         {
+          name: this.$t('header.avatarMenu.map'),
+          path: `/map`,
+          icon: 'globe',
+        },
+        {
           name: this.$t('header.avatarMenu.chats'),
           path: `/chat`,
           icon: 'chat-bubble',

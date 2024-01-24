@@ -310,6 +310,7 @@
     "avatarMenu": {
       "chats": "Chats",
       "groups": "Groupes",
+      "map": "Carte",
       "notifications": "Notifications"
     },
     "chats": {
