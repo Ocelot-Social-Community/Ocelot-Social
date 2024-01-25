@@ -1,0 +1,48 @@
+name: ocelot.social deploy documentation
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  files-changed:
+    name: Detect File Changes - Markdown and Vuepress files
+    runs-on: ubuntu-latest
+    outputs:
+      documentation: ${{ steps.changes.outputs.documentation }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+
+      - name: Check for file changes
+        uses: dorny/paths-filter@master
+        id: changes
+        with:
+          token: ${{ github.token }}
+          filters: .github/file-filters.yml
+          list-files: shell
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build Vuepress Pages
+        run: npm install && npm run build
+
+      - name: Deploy Vuepress to Github Pages
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: gh-pages
+          build_dir: .vuepress/dist
+          author: Wolfgang Huß <vorstand@busfaktor.org>
+          fqdn: docs.ocelot.social
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
