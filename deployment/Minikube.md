@@ -11,7 +11,7 @@ $ minikube dashboard
 
 This will give you an overview. Some of the steps below need some timing to make resources available to other dependent deployments. Keeping an eye on the dashboard is a great way to check that.
 
-Follow the installation instruction for [Kubernetes with Helm](./kubernetes/README.md).
+Follow the installation instruction for [Kubernetes with Helm](./src/kubernetes/README.md).
 
 If all the pods and services have settled and everything looks green in your
 minikube dashboard, expose the services you want on your host system.

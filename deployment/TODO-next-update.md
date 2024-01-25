@@ -2,9 +2,20 @@
 
 When you introduce a new version and branding and deploy it on your network, you need to consider the following changes and actions:
 
-## Version >= 3.3.0 with 'ocelotDockerVersionTag' 3.3.0-XXX
+## Version >= 3.1.3 with 'ocelotDockerVersionTag' 3.1.3-XXX
 
-- We have the new option to configure DKIM for sent e-mails in environment variables (`.env` or `values.yaml`), see [deployment-values.md](deployment-values.md):
+- We have the new option to configure the default name of the Neo4j database to be used for operations and commands in environment variables (`.env`, `docker-compose.yml` or `values.yaml`).
+For more details see  [deployment-values.md](deployment-values.md):
+
+```yaml
+DBMS_DEFAULT_DATABASE: "graph.db"
+```
+
+The default value is `neo4j` if it is not set.
+
+## Version >= 3.1.0 with 'ocelotDockerVersionTag' 3.1.0-555
+
+- We have the new option to configure DKIM for sent e-mails in environment variables (`.env`, `docker-compose.yml` or `values.yaml`), see [deployment-values.md](deployment-values.md):
   - `SMTP_DKIM_DOMAINNAME=`
   - `SMTP_DKIM_KEYSELECTOR=`
   - `SMTP_DKIM_PRIVATKEY=`

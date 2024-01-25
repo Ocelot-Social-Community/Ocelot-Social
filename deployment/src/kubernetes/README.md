@@ -9,7 +9,7 @@ Please contact us if you are interested in options not listed below.
 
 Managed Kubernetes:
 
-- [DigitalOcean](/deployment/src/kubernetes/DigitalOcean.md)
+- [DigitalOcean](./DigitalOcean.md)
 
 ## Configuration
 
@@ -76,7 +76,7 @@ $ helm install \
   cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --create-namespace \
-  --version v1.13.1 \
+  --version v1.13.2 \
   --set installCRDs=true
 # or kubeconfig.yaml in your repo, then adjust
 $ helm install \
@@ -84,7 +84,7 @@ $ helm install \
   --kubeconfig ./kubeconfig.yaml \
   --namespace cert-manager \
   --create-namespace \
-  --version v1.13.1 \
+  --version v1.13.2 \
   --set installCRDs=true
 ``` -->
 
@@ -165,7 +165,7 @@ $ doctl compute firewall get <ID> --context <context-name>
 
 ***ATTENTION:** This seems not to work at all so we leave it away at the moment*
 
-***TODO:** I thought this is necessary if we use the DigitalOcean DNS management service? See [Manage DNS With DigitalOcean](/deployment/kubernetes/DigitalOcean.md#manage-dns-with-digitalocean)*
+***TODO:** I thought this is necessary if we use the DigitalOcean DNS management service? See [Manage DNS With DigitalOcean](./DigitalOcean.md#manage-dns-with-digitalocean)*
 
 This chart is only necessary (recommended is more precise) if you run DigitalOcean without load balancer.
 You need to generate an access token with read + write for the `dns.values.yaml` at <https://cloud.digitalocean.com/account/api/tokens> and fill it in.
@@ -280,9 +280,9 @@ helm uninstall ocelot \
 
 ## Backups
 
-You can and should do [backups](/deployment/kubernetes/Backup.md) with Kubernetes for sure.
+You can and should do [backups](./Backup.md) with Kubernetes for sure.
 
-## Error Reporting
+<!-- ## Error Reporting
 
 We use [Sentry](https://github.com/getsentry/sentry) for error reporting in both
 our backend and web frontend. You can either use a hosted or a self-hosted
@@ -297,7 +297,7 @@ If you are lucky enough to have a kubernetes cluster with the required hardware
 support, try this [helm chart](https://github.com/helm/charts/tree/master/stable/sentry).
 
 On our kubernetes cluster we get "mult-attach" errors for persistent volumes.
-Apparently DigitalOcean's kubernetes clusters do not fulfill the requirements.
+Apparently DigitalOcean's kubernetes clusters do not fulfill the requirements. -->
 
 ## Kubernetes Commands (Without Helm) To Deploy New Docker Images To A Kubernetes Cluster
 
