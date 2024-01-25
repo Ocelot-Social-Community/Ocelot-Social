@@ -35,7 +35,7 @@ jobs:
           node-version: 20
 
       - name: Build Vuepress Pages
-        run: npm install && npm run build
+        run: npm install && npm run docs:build
 
       - name: Deploy Vuepress to Github Pages
         uses: crazy-max/ghaction-github-pages@v4
