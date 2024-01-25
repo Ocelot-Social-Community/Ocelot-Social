@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       markdown: ${{ steps.changes.outputs.markdown }}
-      vuepress: ${{ steps.changes.outputs.vuepress }}
+      documentation: ${{ steps.changes.outputs.documentation }}
     steps:
       - name: Checkout code
         uses: actions/checkout@master
@@ -45,7 +45,7 @@ jobs:
     name: Test Vuepress build
     needs: files-changed
     runs-on: ubuntu-latest
-    if: needs.files-changed.outputs.vuepress == 'true'
+    if: needs.files-changed.outputs.documentation == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@master
