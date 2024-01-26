@@ -84,7 +84,7 @@ $ kubectl -n kubernetes-dashboard port-forward $POD_NAME 8443:8443
 
 ### Log-In to Kubernetes Dashboard
 
-Access the URL in your local web browser at <https://127.0.0.1:8443/>, and log in using your Kubernetes cluster credentials – downloaded config file. You may encounter a certificate warning, so make sure to override it.
+Access the URL in your local web browser at `https://127.0.0.1:8443/`, and log in using your Kubernetes cluster credentials – downloaded config file. You may encounter a certificate warning, so make sure to override it.
 
 ## DNS Configuration
 
