@@ -481,9 +481,6 @@
     "addUserNoOptions": "Keine Nutzer gefunden!",
     "addUserPlaceholder": "Nutzername",
     "allGroups": "Alle Gruppen",
-    "button": {
-      "tooltip": "Gruppen anzeigen"
-    },
     "categories": "Thema ::: Themen",
     "categoriesTitle": "Themen der Gruppe",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
@@ -575,11 +572,23 @@
       "button": {
         "tooltip": "Mein Profil"
       },
+      "chats": "Chats",
       "groups": "Gruppen",
-      "myProfile": "Mein Profil"
+      "map": "Landkarte",
+      "myProfile": "Mein Profil",
+      "notifications": "Benachrichtigungen"
     },
-    "chat": {
-      "tooltip": "Meine Chats"
+    "chats": {
+      "tooltip": "Chats"
+    },
+    "groups": {
+      "tooltip": "Gruppen"
+    },
+    "map": {
+      "tooltip": "Landkarte"
+    },
+    "notifications": {
+      "tooltip": "Banachrichtigungen"
     }
   },
   "index": {
@@ -620,9 +629,6 @@
   },
   "map": {
     "alertMessage": "Es kann nicht auf die Karte zugegriffen werden: Der Mapbox-Token ist auf dem Server nicht gesetzt!",
-    "button": {
-      "tooltip": "Landkarte anzeigen"
-    },
     "legend": {
       "event": "Veranstaltung",
       "group": "Gruppe",
@@ -726,9 +732,6 @@
       "unread": "Ungelesen"
     },
     "group": "Beschreibung",
-    "headerMenuButton": {
-      "tooltip": "Meine Banachrichtigungen"
-    },
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",

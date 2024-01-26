@@ -310,6 +310,22 @@
     "hashtag-search": null,
     "title": null
   },
+  "header": {
+    "avatarMenu": {
+      "chats": "Chat",
+      "groups": "Gruppi",
+      "notifications": "Notifiche"
+    },
+    "chats": {
+      "tooltip": "Chat"
+    },
+    "groups": {
+      "tooltip": "Gruppi"
+    },
+    "notifications": {
+      "tooltip": "Notifiche"
+    }
+  },
   "index": {
     "change-filter-settings": null,
     "no-results": null
@@ -356,7 +372,7 @@
       "unread": null
     },
     "markAllAsRead": "Segna tutti come letti",
-    "pageLink": null,
+    "pageLink": "Tutte le notifiche",
     "post": null,
     "reason": {
       "commented_on_post": null,

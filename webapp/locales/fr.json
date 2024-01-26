@@ -306,6 +306,26 @@
     "hashtag-search": "Recherche de #{hashtag}",
     "title": "Votre bulle de filtre"
   },
+  "header": {
+    "avatarMenu": {
+      "chats": "Chats",
+      "groups": "Groupes",
+      "map": "Carte",
+      "notifications": "Notifications"
+    },
+    "chats": {
+      "tooltip": "Chats"
+    },
+    "groups": {
+      "tooltip": "Groupes"
+    },
+    "map": {
+      "tooltip": "Carte"
+    },
+    "notifications": {
+      "tooltip": "Notifications"
+    }
+  },
   "index": {
     "change-filter-settings": "Modifiez les paramètres de filtrage pour obtenir plus de résultats.",
     "no-results": "Pas de contribution trouvée."
@@ -407,9 +427,6 @@
       "unread": "Non lu"
     },
     "group": "Description",
-    "headerMenuButton": {
-      "tooltip": "Mes notifications"
-    },
     "markAllAsRead": "Tout marquer comme lu",
     "pageLink": "Toutes les notifications",
     "post": "Post",
