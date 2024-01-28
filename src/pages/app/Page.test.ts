@@ -4,12 +4,17 @@ import { Component, h } from 'vue'
 import { VApp } from 'vuetify/components'
 
 import AppPage from './+Page.vue'
+import { title } from './+title'
 
 describe('AppPage', () => {
   const wrapper = mount(VApp, {
     slots: {
       default: h(AppPage as Component),
     },
+  })
+
+  it('title returns correct title', () => {
+    expect(title).toBe('DreamMall')
   })
 
   it('renders', () => {

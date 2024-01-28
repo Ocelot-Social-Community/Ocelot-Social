@@ -4,12 +4,17 @@ import { Component, h } from 'vue'
 import { VApp } from 'vuetify/components'
 
 import IndexPage from './+Page.vue'
+import { title } from './+title'
 
-describe('DataPrivacyPage', () => {
+describe('IndexPage', () => {
   const wrapper = mount(VApp, {
     slots: {
       default: h(IndexPage as Component),
     },
+  })
+
+  it('title returns default title', () => {
+    expect(title).toBe('DreamMall')
   })
 
   it('renders', () => {

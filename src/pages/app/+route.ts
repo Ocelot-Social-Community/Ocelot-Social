@@ -1,6 +1,5 @@
 import { resolveRoute } from 'vike/routing'
-
-import { PageContext } from '#types/PageContext'
+import { PageContext } from 'vike/types'
 
 export default (pageContext: PageContext) => {
   {
