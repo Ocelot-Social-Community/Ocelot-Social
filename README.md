@@ -138,11 +138,6 @@ Where `xxx` refers to the folder and product part you want to use the boilerplat
 
 This mechanic was taken from this [source](https://stackoverflow.com/questions/1683531/how-to-import-existing-git-repository-into-another/8396318#8396318)
 
-## TODO
-
-- [ ] tests
-- [ ] responsive design
-
 ## Known Problems
 
 - [ ] [Image flicker](https://github.com/vuetifyjs/vuetify/issues/18772)
