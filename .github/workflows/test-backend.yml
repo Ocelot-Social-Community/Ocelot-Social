@@ -108,6 +108,7 @@ jobs:
       - name: backend | copy env files
         run: |
           cp webapp/.env.template webapp/.env
+          cp frontend/.env.dist frontend/.env
           cp backend/.env.template backend/.env
 
       - name: backend | docker-compose
