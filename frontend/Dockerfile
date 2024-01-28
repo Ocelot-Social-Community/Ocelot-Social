@@ -12,7 +12,7 @@ ENV BUILD_COMMIT="0000000"
 ## SET NODE_ENV
 ENV NODE_ENV="production"
 ## App relevant Envs
-ENV PORT="3000"
+ENV PORT="3002"
 
 # Labels
 LABEL org.label-schema.build-date="${BUILD_DATE}"
@@ -34,6 +34,7 @@ LABEL maintainer="info@it4c.dev"
 # Settings
 ## Expose Container Port
 EXPOSE ${PORT}
+EXPOSE 24678
 
 ## Workdir
 RUN mkdir -p ${DOCKER_WORKDIR}
