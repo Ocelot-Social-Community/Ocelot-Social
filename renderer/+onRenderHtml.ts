@@ -6,7 +6,6 @@ import logoUrl from '#assets/favicon.ico'
 import image from '#assets/it4c-logo2-clean-bg_alpha-128x128.png'
 import { META } from '#src/env'
 
-
 import { createApp } from './app'
 import { getDescription, getTitle } from './utils'
 

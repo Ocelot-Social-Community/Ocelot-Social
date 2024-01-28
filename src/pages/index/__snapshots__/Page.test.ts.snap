@@ -67,3 +67,71 @@ exports[`DataPrivacyPage > renders 1`] = `
   </div>
 </div>
 `;
+
+exports[`IndexPage > renders 1`] = `
+<div
+  class="v-application v-theme--light v-layout v-layout--full-height v-locale--is-ltr"
+>
+  <div
+    class="v-application__wrap"
+  >
+    
+    <main
+      class="v-main bg-grey-lighten-3"
+      style="--v-layout-left: 0px; --v-layout-right: 0px; --v-layout-top: 0px; --v-layout-bottom: 0px;"
+    >
+      
+      <div
+        class="v-container v-locale--is-ltr"
+      >
+        <div
+          class="v-row"
+        >
+          <!--v-if-->
+          <div
+            class="v-col"
+          >
+            <div
+              class="v-sheet v-theme--light v-sheet--rounded pa-3"
+            >
+              
+              <h1>
+                $t('home.h1')
+              </h1>
+              <p>
+                $t('home.text1')
+              </p>
+              <br />
+              <p>
+                $t('home.text2')
+              </p>
+              <br />
+              <p>
+                $t('home.text3')
+              </p>
+              <br />
+              <p>
+                $t('home.text4') 
+                <i
+                  aria-hidden="true"
+                  class="mdi-heart mdi v-icon notranslate v-theme--light v-icon--size-default text-red"
+                />
+              </p>
+              <br />
+              <p>
+                $t('home.greet1')
+              </p>
+              <p>
+                $t('home.greet2')
+              </p>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </main>
+    
+  </div>
+</div>
+`;

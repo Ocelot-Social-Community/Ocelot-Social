@@ -1,4 +1,5 @@
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import { PageContext } from 'vike/types'
 import { createSSRApp, defineComponent, h, markRaw, reactive, Component } from 'vue'
 
 import PageShell from '#components/PageShell.vue'
@@ -6,8 +7,6 @@ import { setPageContext } from '#context/usePageContext'
 import i18n from '#plugins/i18n'
 import pinia from '#plugins/pinia'
 import CreateVuetify from '#plugins/vuetify'
-
-import { PageContext } from 'vike/types'
 
 const vuetify = CreateVuetify(i18n)
 
