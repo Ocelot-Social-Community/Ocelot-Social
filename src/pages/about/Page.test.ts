@@ -14,7 +14,7 @@ describe('AboutPage', () => {
   })
 
   it('title returns correct title', () => {
-    expect(title).toBe('DreamMall')
+    expect(title).toBe('IT4C | About')
   })
 
   it('renders', () => {

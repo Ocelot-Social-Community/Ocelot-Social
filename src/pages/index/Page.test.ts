@@ -14,7 +14,7 @@ describe('IndexPage', () => {
   })
 
   it('title returns default title', () => {
-    expect(title).toBe('DreamMall')
+    expect(title).toBe('IT4C')
   })
 
   it('renders', () => {
