@@ -137,5 +137,4 @@ Browser compatibility testing with [BrowserStack](https://www.browserstack.com/)
 
 See the [LICENSE](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/LICENSE.md) file for license rights and limitations (MIT).
 
-
 We need `DOCKER_BUILDKIT=0` for this to work.

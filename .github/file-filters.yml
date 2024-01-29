@@ -12,5 +12,20 @@ webapp: &webapp
   - 'webapp/**/*'
   - 'package.json'
 
-markdown-files: &markdown-files
+docs-check: &docs-check
+  - '.github/workflows/check-documentation.yml'
+
+markdown: &markdown
+  - *docs-check
   - '**/*.md'
+  - '.github/workflows/mlc_config.json'
+
+vuepress: &vuepress
+  - *docs-check
+  - '.github/workflows/deploy-documentation.yml'
+  - '.vuepress/**/*'
+  - 'package.json'
+
+documentation: &documentation
+  - *vuepress
+  - *markdown
