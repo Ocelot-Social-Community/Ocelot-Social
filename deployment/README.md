@@ -10,19 +10,17 @@ The forked original repository is [stage.ocelot.social](https://github.com/Ocelo
 
 <!-- markdownlint-disable MD033 -->
 <p align="center">
-  <!-- <a href="https://ocelot.social" target="_blank"> -->
-    <img src="../webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%">
-  <!-- </a> -->
+  <a href="https://ocelot.social" target="_blank"><img src="../webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%"></a>
 </p>
 <!-- markdownlint-enable MD033 -->
 
 ## Live demo
 
-__Try out our deployed <!-- [ -->development environment<!-- ](https://stage.ocelot.social)-->.__
+__Try out our deployed [development environment](https://stage.ocelot.social).__
 
 Visit our staging networks:
 
-- central staging network: <!-- [ -->stage.ocelot.social<!-- ](https://stage.ocelot.social)-->
+- central staging network: [stage.ocelot.social](https://stage.ocelot.social)
 <!-- - rebranded staging network: [rebrand.ocelot.social](https://stage.ocelot.social). -->
 
 Logins:
