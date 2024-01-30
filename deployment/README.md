@@ -9,7 +9,7 @@ This repository is an in use template to rebrand, configure, and deploy [ocelot.
 The forked original repository is [stage.ocelot.social](https://github.com/Ocelot-Social-Community/stage.ocelot.social).
 
 <!-- markdownlint-disable MD033 -->
-<p align="center">
+<p style="text-align: center;">
   <a href="https://ocelot.social" target="_blank"><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/master/webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%"></a>
 </p>
 <!-- markdownlint-enable MD033 -->
