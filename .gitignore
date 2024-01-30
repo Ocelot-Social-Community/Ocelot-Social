@@ -15,6 +15,11 @@ cypress/videos
 cypress/screenshots/
 cypress.env.json
 
+.vuepress/.cache/
+.vuepress/.temp/
+.vuepress/dist/
+
+
 !.gitkeep
 **/coverage
 
