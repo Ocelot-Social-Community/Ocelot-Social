@@ -1,6 +1,6 @@
 # CONTRIBUTING
 
-Thank you so much for thinking of contributing to the <!-- [ -->ocelot.social<!-- ](https://ocelot.social) --> project! It's awesome you're here, we really appreciate it. :-\)
+Thank you so much for thinking of contributing to the [ocelot.social](https://ocelot.social) project! It's awesome you're here, we really appreciate it. :-\)
 
 ## Getting Set Up
 
