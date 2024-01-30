@@ -60,50 +60,24 @@
             <ds-space margin-top="x-small" />
             <ds-grid>
               <ds-grid-item class="event-grid-item">
-                <!-- <label>Beginn</label> -->
-                <div class="event-grid-item-z-helper">
-                  <date-picker
-                    name="eventStart"
-                    v-model="formData.eventStart"
-                    type="datetime"
-                    value-type="format"
-                    :minute-step="15"
-                    Xformat="DD-MM-YYYY HH:mm"
-                    class="event-grid-item-z-helper"
-                    :placeholder="$t('post.viewEvent.eventStart')"
-                    :disabled-date="notBeforeToday"
-                    :disabled-time="notBeforeNow"
-                    :show-second="false"
-                    @change="changeEventStart($event)"
-                  ></date-picker>
-                </div>
-                <div
-                  v-if="errors && errors.eventStart"
-                  class="chipbox event-grid-item-margin-helper"
-                >
-                  <ds-chip size="base" :color="errors && errors.eventStart && 'danger'">
-                    <base-icon name="warning" />
-                  </ds-chip>
-                </div>
+                <date-time-picker
+                  :form-date="formData.eventStart"
+                  :errors="errors"
+                  :placeholder-date="$t('post.viewEvent.eventStart')"
+                  :placeholder-time="$t('post.viewEvent.eventStartTime')"
+                  @change-date="changeEventStart"
+                ></date-time-picker>
               </ds-grid-item>
               <ds-grid-item class="event-grid-item">
-                <!-- <label>Ende (optional)</label> -->
-
-                <date-picker
-                  v-model="formData.eventEnd"
-                  name="eventEnd"
-                  type="datetime"
-                  value-type="format"
-                  :minute-step="15"
-                  :seconds-step="0"
-                  Xformat="DD-MM-YYYY HH:mm"
-                  :placeholder="$t('post.viewEvent.eventEnd')"
-                  class="event-grid-item-font-helper"
-                  :disabled-date="notBeforeEventDay"
-                  :disabled-time="notBeforeEvent"
-                  :show-second="false"
-                  @change="changeEventEnd($event)"
-                ></date-picker>
+                <date-time-picker
+                  v-if="formData.eventStart"
+                  :form-date="formData.eventEnd"
+                  :compare-date="formData.eventStart"
+                  :errors="errors"
+                  :placeholder-date="$t('post.viewEvent.eventEnd')"
+                  :placeholder-time="$t('post.viewEvent.eventEndTime')"
+                  @change-date="changeEventEnd"
+                ></date-time-picker>
               </ds-grid-item>
             </ds-grid>
             <ds-grid class="event-location-grid">
@@ -195,8 +169,7 @@ import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import ImageUploader from '~/components/Uploader/ImageUploader'
 import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
-import DatePicker from 'vue2-datepicker'
-import 'vue2-datepicker/scss/index.scss'
+import DateTimePicker from '~/components/_new/features/DateTimePicker/DateTimePicker.vue'
 
 export default {
   components: {
@@ -204,7 +177,7 @@ export default {
     ImageUploader,
     PageParamsLink,
     CategoriesSelect,
-    DatePicker,
+    DateTimePicker,
   },
   props: {
     contribution: {
@@ -363,18 +336,6 @@ export default {
     },
   },
   methods: {
-    notBeforeToday(date) {
-      return date < new Date().setHours(0, 0, 0, 0)
-    },
-    notBeforeNow(date) {
-      return date < new Date()
-    },
-    notBeforeEventDay(date) {
-      return date < new Date(this.formData.eventStart).setHours(0, 0, 0, 0)
-    },
-    notBeforeEvent(date) {
-      return date <= new Date(this.formData.eventStart)
-    },
     submit() {
       let image = null
 

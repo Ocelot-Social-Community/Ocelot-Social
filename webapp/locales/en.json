@@ -790,9 +790,11 @@
     },
     "viewEvent": {
       "eventEnd": "End",
+      "eventEndTime": "End - Time",
       "eventIsOnline": "Online",
       "eventLocationName": "City — e.g. Example Street 1, 12345 City",
       "eventStart": "Start",
+      "eventStartTime": "Start - Time",
       "eventVenue": "Venue — e.g. Backyard, 1st Floor, …",
       "title": "Event"
     },
