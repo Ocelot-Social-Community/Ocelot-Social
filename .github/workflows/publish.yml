@@ -34,7 +34,7 @@ jobs:
       - name: Neo4J | Save docker image 
         run: docker save "ocelotsocialnetwork/neo4j-community" > /tmp/neo4j.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-neo4j-community
           path: /tmp/neo4j.tar
@@ -83,7 +83,7 @@ jobs:
       - name: Backend | Save docker image
         run: docker save "ocelotsocialnetwork/backend" > /tmp/backend.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-backend-production
           path: /tmp/backend.tar
@@ -132,7 +132,7 @@ jobs:
       - name: Webapp | Save docker image
         run: docker save "ocelotsocialnetwork/webapp" > /tmp/webapp.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-webapp-production
           path: /tmp/webapp.tar
@@ -184,7 +184,7 @@ jobs:
       - name: Maintenance | Save docker image
         run: docker save "ocelotsocialnetwork/maintenance" > /tmp/maintenance.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-maintenance-production
           path: /tmp/maintenance.tar
@@ -201,25 +201,25 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
       - name: Download Docker Image (Neo4J)
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-neo4j-community
           path: /tmp
       - run: docker load < /tmp/neo4j.tar
       - name: Download Docker Image (Backend)
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-backend-production
           path: /tmp
       - run: docker load < /tmp/backend.tar
       - name: Download Docker Image (WebApp)
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-webapp-production
           path: /tmp
       - run: docker load < /tmp/webapp.tar
       - name: Download Docker Image (Maintenance)
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-maintenance-production
           path: /tmp
@@ -253,7 +253,7 @@ jobs:
           echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
       - run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       - name: package-version-to-git-tag + build number
-        uses: pkgdeps/git-tag-action@v2
+        uses: pkgdeps/git-tag-action@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           github_repo: ${{ github.repository }}

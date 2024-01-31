@@ -4,7 +4,7 @@
       ghost
       circle
       v-tooltip="{
-        content: $t('header.chat.tooltip'),
+        content: $t('header.chats.tooltip'),
         placement: 'bottom-start',
       }"
     >

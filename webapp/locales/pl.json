@@ -180,6 +180,22 @@
   "hashtags-filter": {
     "title": "Twoja bańka filtrująca"
   },
+  "header": {
+    "avatarMenu": {
+      "chats": "Czaty",
+      "groups": "Grupy",
+      "notifications": "Powiadomienia"
+    },
+    "chats": {
+      "tooltip": "Czaty"
+    },
+    "groups": {
+      "tooltip": "Grupy"
+    },
+    "notifications": {
+      "tooltip": "Powiadomienia"
+    }
+  },
   "login": {
     "email": "Twój adres e-mail",
     "forgotPassword": "Zapomniałeś hasła?",
@@ -203,7 +219,8 @@
     "markAllAsRead": "Oznacz wszystkie jako przeczytane",
     "menu": {
       "mentioned": "wspomiał o Tobie we wpisie"
-    }
+    },
+    "pageLink": "Wszystkie powiadomienia"
   },
   "post": {
     "comment": {
