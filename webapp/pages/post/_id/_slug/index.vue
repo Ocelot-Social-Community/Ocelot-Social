@@ -405,12 +405,6 @@ export default {
     filter: blur($blur-radius);
   }
 
-  & .event-info {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-  }
-
   .blur-toggle {
     position: absolute;
     bottom: 0;
