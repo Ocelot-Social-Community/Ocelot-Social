@@ -16,7 +16,6 @@
       </template>
       <client-only>
         <div class="post-user-row">
-          <!-- <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" /> -->
           <user-teaser :user="post.author" :group="post.group" />
           <hc-ribbon
             :class="[isPinned ? '--pinned' : '', post.image ? 'post-ribbon-w-img' : 'post-ribbon']"
@@ -26,25 +25,27 @@
         </div>
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
-      <ds-space
-        v-if="post && post.postType[0] === 'Event'"
-        margin-bottom="small"
-        style="padding: 5px"
-      >
-        <location-teaser
-          class="event-info"
-          size="base"
-          :venue="post.eventVenue"
-          :locationName="post.eventLocationName"
-          :isOnline="post.eventIsOnline"
-        />
-        <date-time-range
-          class="event-info"
-          size="base"
-          :startDate="post.eventStart"
-          :endDate="post.eventEnd"
-        />
-      </ds-space>
+      <client-only>
+        <ds-space
+          v-if="post && post.postType[0] === 'Event'"
+          margin-bottom="small"
+          style="padding: 5px"
+        >
+          <location-teaser
+            class="event-info"
+            size="base"
+            :venue="post.eventVenue"
+            :locationName="post.eventLocationName"
+            :isOnline="post.eventIsOnline"
+          />
+          <date-time-range
+            class="event-info"
+            size="base"
+            :startDate="post.eventStart"
+            :endDate="post.eventEnd"
+          />
+        </ds-space>
+      </client-only>
       <!-- TODO: replace editor content with tiptap render view -->
       <!-- eslint-disable-next-line vue/no-v-html -->
       <div class="content hyphenate-text" v-html="excerpt" />
@@ -99,12 +100,14 @@
           />
         </client-only>
       </footer>
-      <div class="date-row">
-        <span class="text">
-          <relative-date-time :date-time="post.createdAt" />
-          <slot name="dateTime"></slot>
-        </span>
-      </div>
+      <client-only>
+        <div class="date-row" v-if="post.createdAt">
+          <span class="text">
+            <relative-date-time :date-time="post.createdAt" />
+            <slot name="dateTime"></slot>
+          </span>
+        </div>
+      </client-only>
     </base-card>
   </nuxt-link>
 </template>
