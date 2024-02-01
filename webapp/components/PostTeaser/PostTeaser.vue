@@ -16,7 +16,8 @@
       </template>
       <client-only>
         <div class="post-user-row">
-          <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" />
+          <!-- <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" /> -->
+          <user-teaser :user="post.author" :group="post.group" />
           <hc-ribbon
             :class="[isPinned ? '--pinned' : '', post.image ? 'post-ribbon-w-img' : 'post-ribbon']"
             :text="ribbonText"
@@ -32,14 +33,14 @@
       >
         <location-teaser
           class="event-info"
-          size="small"
+          size="base"
           :venue="post.eventVenue"
           :locationName="post.eventLocationName"
           :isOnline="post.eventIsOnline"
         />
         <date-time-range
           class="event-info"
-          size="small"
+          size="base"
           :startDate="post.eventStart"
           :endDate="post.eventEnd"
         />
@@ -98,6 +99,12 @@
           />
         </client-only>
       </footer>
+      <div class="date-row">
+        <span class="text">
+          <relative-date-time :date-time="post.createdAt" />
+          <slot name="dateTime"></slot>
+        </span>
+      </div>
     </base-card>
   </nuxt-link>
 </template>
@@ -109,6 +116,7 @@ import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import HcRibbon from '~/components/Ribbon'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
+import RelativeDateTime from '~/components/RelativeDateTime'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
@@ -123,6 +131,7 @@ export default {
     DateTimeRange,
     HcRibbon,
     LocationTeaser,
+    RelativeDateTime,
     UserTeaser,
   },
   props: {
@@ -251,6 +260,7 @@ export default {
   flex-direction: column;
   overflow: visible;
   height: 100%;
+  padding-bottom: $space-x-small;
 
   > .hero-image {
     border-top-left-radius: 5px;
@@ -264,12 +274,6 @@ export default {
   > .content {
     flex-grow: 1;
     margin-bottom: $space-small;
-  }
-
-  & .event-info {
-    display: flex;
-    align-items: center;
-    gap: 2px;
   }
 
   > .footer {
@@ -300,6 +304,22 @@ export default {
 
   .user-teaser {
     margin-bottom: $space-small;
+  }
+  > .date-row {
+    display: flex;
+    justify-content: end;
+    margin-top: $space-small;
+    > .text {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: $text-color-soft;
+      font-size: $font-size-small;
+
+      > .ds-text {
+        display: inline;
+      }
+    }
   }
 }
 </style>
