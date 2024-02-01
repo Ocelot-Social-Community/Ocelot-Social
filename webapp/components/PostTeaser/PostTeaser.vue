@@ -307,7 +307,7 @@ export default {
   }
   > .date-row {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     margin-top: $space-small;
     > .text {
       overflow: hidden;
