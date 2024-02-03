@@ -63,7 +63,7 @@
     "@vuepress/bundler-vite": "^2.0.0-rc.2",
     "vuepress": "^2.0.0-rc.2",
     "vuepress-plugin-search-pro": "^2.0.0-rc.15",
-    "vuepress-theme-hope": "^2.0.0-rc.15"
+    "vuepress-theme-hope": "^2.0.0-rc.19"
   },
   "resolutions": {
     "set-value": "^2.0.1",
