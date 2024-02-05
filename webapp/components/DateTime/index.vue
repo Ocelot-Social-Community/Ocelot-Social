@@ -19,9 +19,13 @@ export default {
   computed: {
     dateTimeString() {
       if (dateTimeConstants.RELATIVE_DATETIME) {
-        return formatRelative(new Date(this.dateTime), new Date(), { locale: getDateFnsLocale(this) })
+        return formatRelative(new Date(this.dateTime), new Date(), {
+          locale: getDateFnsLocale(this),
+        })
       } else {
-        return format(new Date(this.dateTime), dateTimeConstants.ABSOLUT_DATETIME_FORMAT, { locale: getDateFnsLocale(this) })
+        return format(new Date(this.dateTime), dateTimeConstants.ABSOLUT_DATETIME_FORMAT, {
+          locale: getDateFnsLocale(this),
+        })
       }
     },
   },
