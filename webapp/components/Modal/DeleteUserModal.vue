@@ -15,7 +15,7 @@
             <ds-text size="small">
               <span class="bold">{{ $t('modals.deleteUser.created') }}</span>
               <br />
-              <relative-date-time :date-time="userdata.createdAt" />
+              <date-time :date-time="userdata.createdAt" />
             </ds-text>
           </ds-flex-item>
           <ds-flex-item width="15%">
@@ -49,7 +49,7 @@
 import gql from 'graphql-tag'
 import { mapMutations } from 'vuex'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
-import RelativeDateTime from '~/components/RelativeDateTime'
+import DateTime from '~/components/DateTime'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 
 export default {
@@ -57,7 +57,7 @@ export default {
   components: {
     UserTeaser,
     SweetalertIcon,
-    RelativeDateTime,
+    DateTime,
   },
   props: {
     userdata: { type: Object, required: true },
