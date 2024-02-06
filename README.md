@@ -122,19 +122,19 @@ Clone the repository, this will create a new folder called `Ocelot-Social`:
 Using HTTPS:
 
 ```bash
-git clone https://github.com/Ocelot-Social-Community/Ocelot-Social.git
+$ git clone https://github.com/Ocelot-Social-Community/Ocelot-Social.git
 ```
 
 Using SSH:
 
 ```bash
-git clone git@github.com:Ocelot-Social-Community/Ocelot-Social.git
+$ git clone git@github.com:Ocelot-Social-Community/Ocelot-Social.git
 ```
 
 Change into the new folder.
 
 ```bash
-cd Ocelot-Social
+$ cd Ocelot-Social
 ```
 
 ### Live Demo and Developer Logins
