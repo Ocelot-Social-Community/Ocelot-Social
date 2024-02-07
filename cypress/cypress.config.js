@@ -39,6 +39,8 @@ module.exports = defineConfig({
     supportFile: "cypress/support/e2e.js",
     retries:  0,
     video: false,
+    viewportHeight: 720,
+    viewportWidth: 1290,
     setupNodeEvents,
   },
   env: parsed
