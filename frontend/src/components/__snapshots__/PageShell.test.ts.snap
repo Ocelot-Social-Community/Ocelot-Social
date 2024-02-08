@@ -1,0 +1,275 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PageShell > renders 1`] = `
+<div
+  class="v-application v-theme--light v-layout v-layout--full-height v-locale--is-ltr"
+>
+  <div
+    class="v-application__wrap"
+  >
+    
+    <header
+      class="v-toolbar v-toolbar--flat v-toolbar--density-default v-theme--light v-locale--is-ltr v-app-bar"
+      style="top: 0px; z-index: 1004; transform: translateY(0%); position: fixed; left: 0px; width: calc(100% - 0px - 0px);"
+    >
+      <!---->
+      
+      <div
+        class="v-toolbar__content"
+        style="height: 64px;"
+      >
+        <!---->
+        <!---->
+        
+        <div
+          class="v-row"
+        >
+          <div
+            class="v-col"
+          >
+            <div
+              class="v-avatar v-theme--light v-avatar--density-default v-avatar--variant-flat ma-2 pa-1"
+              style="background-color: #333; color: #fff; caret-color: #fff; width: 48px; height: 48px;"
+            >
+              <div
+                aria-label=""
+                class="v-responsive v-img v-img--booting"
+              >
+                <div
+                  class="v-responsive__sizer"
+                />
+                
+                
+                <transition-stub
+                  appear="true"
+                  css="true"
+                  name="fade-transition"
+                  persisted="false"
+                >
+                  <img
+                    alt=""
+                    class="v-img__img v-img__img--cover"
+                    src="/src/assets/it4c-logo2-clean-bg_alpha-128x128.png"
+                    style="display: none;"
+                  />
+                </transition-stub>
+                <transition-stub
+                  appear="false"
+                  css="true"
+                  name="fade-transition"
+                  persisted="false"
+                >
+                  <!---->
+                </transition-stub>
+                <!---->
+                <!---->
+                <!---->
+                
+                
+                <!---->
+              </div>
+              
+              <!---->
+              <span
+                class="v-avatar__underlay"
+              />
+              
+            </div>
+          </div>
+          <div
+            class="v-col d-flex align-center justify-center grow"
+          >
+            <a
+              class="v-btn v-theme--light v-btn--density-default v-btn--size-default v-btn--variant-flat"
+              href="/"
+            >
+              
+              <span
+                class="v-btn__overlay"
+              />
+              <span
+                class="v-btn__underlay"
+              />
+              
+              <!---->
+              <span
+                class="v-btn__content"
+                data-no-activator=""
+              >
+                
+                
+                
+                $t('menu.home')
+                
+                
+                
+              </span>
+              <!---->
+              <!---->
+            </a>
+            <a
+              class="v-btn v-theme--light v-btn--density-default v-btn--size-default v-btn--variant-flat"
+              href="/app"
+            >
+              
+              <span
+                class="v-btn__overlay"
+              />
+              <span
+                class="v-btn__underlay"
+              />
+              
+              <!---->
+              <span
+                class="v-btn__content"
+                data-no-activator=""
+              >
+                
+                
+                
+                $t('menu.app')
+                
+                
+                
+              </span>
+              <!---->
+              <!---->
+            </a>
+            <a
+              class="v-btn v-theme--light v-btn--density-default v-btn--size-default v-btn--variant-flat"
+              href="/about"
+            >
+              
+              <span
+                class="v-btn__overlay"
+              />
+              <span
+                class="v-btn__underlay"
+              />
+              
+              <!---->
+              <span
+                class="v-btn__content"
+                data-no-activator=""
+              >
+                
+                
+                
+                $t('menu.about')
+                
+                
+                
+              </span>
+              <!---->
+              <!---->
+            </a>
+          </div>
+          <div
+            class="v-col"
+          >
+            <div
+              class="v-input v-input--horizontal v-input--center-affix v-input--density-default v-locale--is-ltr v-input--dirty v-switch d-flex justify-end mr-5"
+            >
+              <!---->
+              <div
+                class="v-input__control"
+              >
+                
+                <div
+                  class="v-selection-control v-selection-control--dirty v-selection-control--density-default"
+                >
+                  <div
+                    class="v-selection-control__wrapper text-success"
+                  >
+                    
+                    <div
+                      class="v-switch__track bg-success"
+                    >
+                      <!---->
+                      <!---->
+                    </div>
+                    
+                    <div
+                      class="v-selection-control__input"
+                    >
+                      
+                      
+                      <input
+                        aria-describedby="switch-4-messages"
+                        aria-disabled="false"
+                        id="switch-4"
+                        type="checkbox"
+                        value="true"
+                      />
+                      <div
+                        class="v-switch__thumb bg-success"
+                      >
+                        <transition-stub
+                          appear="false"
+                          css="true"
+                          name="scale-transition"
+                          persisted="false"
+                        >
+                          <!---->
+                        </transition-stub>
+                      </div>
+                      
+                      
+                    </div>
+                  </div>
+                  <label
+                    class="v-label v-label--clickable"
+                    for="switch-4"
+                  >
+                    <!---->
+                    
+                    $t('language.german')
+                    
+                  </label>
+                </div>
+                
+              </div>
+              <!---->
+              <div
+                class="v-input__details"
+              >
+                <transition-group-stub
+                  appear="false"
+                  aria-live="polite"
+                  class="v-messages"
+                  css="true"
+                  id="switch-4-messages"
+                  name="slide-y-transition"
+                  persisted="false"
+                  role="alert"
+                  tag="div"
+                >
+                  <!---->
+                </transition-group-stub>
+                <!---->
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!---->
+      </div>
+      
+      
+      <transition-stub
+        appear="false"
+        css="true"
+        name="expand-transition"
+        persisted="false"
+      >
+        <!---->
+      </transition-stub>
+      
+    </header>
+    
+    Page Content
+    
+    
+  </div>
+</div>
+`;

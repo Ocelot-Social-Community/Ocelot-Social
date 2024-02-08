@@ -1,0 +1,16 @@
+{
+    "plugins": [
+        "remark-gfm",
+        "remark-preset-lint-consistent",
+        "remark-preset-lint-markdown-style-guide",
+        "remark-preset-lint-recommended",
+        [
+            "remark-lint-maximum-line-length",
+            false
+        ],
+        [
+            "remark-lint-list-item-indent",
+            "space"
+        ]
+    ]
+}
