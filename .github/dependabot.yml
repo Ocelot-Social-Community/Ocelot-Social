@@ -66,3 +66,29 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+
+# frontend
+- package-ecosystem: "github-actions"
+  directory: "/frontend"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+- package-ecosystem: npm
+  directory: "/frontend"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+- package-ecosystem: docker
+  directory: "/frontend"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"

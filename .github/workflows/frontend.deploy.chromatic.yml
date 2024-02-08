@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+      WORKING_DIRECTORY: ./frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,3 +18,4 @@ jobs:
 
       - name: Frontend | Build
         run: npm install && npm run chromatic -- --exit-zero-on-changes
+        working-directory: ${{env.WORKING_DIRECTORY}}
