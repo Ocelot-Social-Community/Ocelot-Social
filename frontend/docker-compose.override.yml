@@ -1,0 +1,64 @@
+version: '3.4'
+services:
+  # ######################################################
+  # FRONTEND #############################################
+  # ######################################################
+  frontend:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: it4c/frontend:local-development
+    build:
+      target: development
+    environment:
+      - NODE_ENV="development"
+      # - DEBUG=true
+    volumes:
+      # This makes sure the docker container has its own node modules.
+      # Therefore it is possible to have a different node version on the host machine
+      - frontend_node_modules:/app/node_modules
+      # bind the local folder to the docker to allow live reload
+      - ./:/app
+
+  # ######################################################
+  # STORYBOOK ############################################
+  # ######################################################
+  storybook:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: it4c/frontend:local-storybook
+    build:
+      target: storybook
+    environment:
+      - NODE_ENV="development"
+      # - DEBUG=true
+    ports:
+      - 6006:6006
+    volumes:
+      # This makes sure the docker container has its own node modules.
+      # Therefore it is possible to have a different node version on the host machine
+      - storybook_node_modules:/app/node_modules
+      # bind the local folder to the docker to allow live reload
+      - ./:/app
+
+  # ######################################################
+  # DOCUMENTATION ########################################
+  # ######################################################
+  documentation:
+    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
+    image: it4c/frontend:local-documentation
+    build:
+      target: documentation
+    environment:
+      - NODE_ENV="development"
+      # - DEBUG=true
+    ports:
+      - 8080:8080
+    volumes:
+      # This makes sure the docker container has its own node modules.
+      # Therefore it is possible to have a different node version on the host machine
+      - documentation_node_modules:/app/node_modules
+      # bind the local folder to the docker to allow live reload
+      - ./:/app
+
+volumes:
+  frontend_node_modules:
+  storybook_node_modules:
+  documentation_node_modules:
