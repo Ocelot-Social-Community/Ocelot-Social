@@ -1,15 +1,15 @@
-name: "frontend:test:lint code with defined linters"
+name: "frontend:test:build test code"
 
 on: push
 
 jobs:
   # only (but most important) job from this workflow required for pull requests
-  # check results serve as run conditions for all other jobs here 
+  # check results serve as run conditions for all other jobs here
   files-changed:
-    name: Detect File Changes - frontend-test-lint-code
+    name: Detect File Changes - frontend-test-build-code
     runs-on: ubuntu-latest
     outputs:
-      changes: ${{ steps.changes.outputs.frontend-test-lint-code }}
+      changes: ${{ steps.changes.outputs.frontend-test-build-code }}
     steps:
       - uses: actions/checkout@v4
 
@@ -21,14 +21,17 @@ jobs:
           filters: .github/file-filters.yml
           list-files: shell
 
-  lint:
+  build:
     if: needs.files-changed.outputs.changes == 'true'
-    name: Lint - Frontend
+    name: Build - Frontend
     needs: files-changed
     runs-on: ubuntu-latest
+    env:
+      WORKING_DIRECTORY: ./frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Frontend | Lint
-        run: npm install && npm run test:lint
+      - name: Frontend | Build
+        run: npm install && npm run build
+        working-directory: ${{env.WORKING_DIRECTORY}}
