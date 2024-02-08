@@ -34,3 +34,4 @@ jobs:
 
       - name: Frontend | Build
         run: npm install && npm run build
+        working-directory: ${{env.WORKING_DIRECTORY}}

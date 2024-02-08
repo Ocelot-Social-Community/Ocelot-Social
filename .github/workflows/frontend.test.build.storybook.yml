@@ -34,3 +34,4 @@ jobs:
 
       - name: Frontend | Build Storybook
         run: npm install && npm run storybook:build
+        working-directory: ${{env.WORKING_DIRECTORY}}
