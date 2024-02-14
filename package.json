@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social",
-  "version": "3.1.2",
+  "version": "3.2.0",
   "description": "Free and open source software program code available to run social networks.",
   "author": "ocelot.social Community",
   "license": "MIT",
@@ -30,15 +30,15 @@
     "docs:dev": "NODE_OPTIONS=--openssl-legacy-provider vuepress dev .",
     "cypress:run": "cypress run --e2e --browser electron --config-file ./cypress/cypress.config.js",
     "cypress:open": "cypress open --e2e --browser electron --config-file ./cypress/cypress.config.js",
-    "release": "yarn version --no-git-tag-version --no-commit-hooks --no-commit && auto-changelog --latest-version $(node -p -e \"require('./package.json').version\") && cd backend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp/maintenance/source && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../../../package.json').version\")"
+    "release": "yarn version --no-git-tag-version --no-commit-hooks --no-commit && auto-changelog --latest-version $(node -p -e \"require('./package.json').version\") && cd backend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../frontend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp/maintenance/source && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../../../package.json').version\")"
   },
   "devDependencies": {
     "@babel/core": "^7.23.7",
     "@babel/preset-env": "^7.23.9",
     "@babel/register": "^7.22.15",
     "@badeball/cypress-cucumber-preprocessor": "^20.0.1",
-    "@cypress/browserify-preprocessor": "^3.0.2",
     "@cucumber/cucumber": "10.3.1",
+    "@cypress/browserify-preprocessor": "^3.0.2",
     "@faker-js/faker": "8.4.0",
     "auto-changelog": "^2.3.0",
     "bcryptjs": "^2.4.3",
