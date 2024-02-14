@@ -171,11 +171,11 @@ Please copy and paste the following quotes for the languages:
 
 ## Docker – More Closely
 
-### Apple M1 Platform
+### Apple Silicon Platform
 
-***Attention:** For using Docker commands in Apple M1 environments!*
+***ATTENTION:** For using Docker commands in Apple Silicon environments!*
 
-#### Environment Variable For Apple M1 Platform
+#### Environment Variable For Apple Silicon Platform (M1, M2 Chips)
 
 If you encounter trouble building the docker containers on an Apple M1 chip you can try to explicitly define the target platform docker builds and pulls images for:
 

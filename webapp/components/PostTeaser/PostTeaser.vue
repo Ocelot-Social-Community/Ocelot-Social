@@ -103,7 +103,7 @@
       <client-only>
         <div class="date-row" v-if="post.createdAt">
           <span class="text">
-            <relative-date-time :date-time="post.createdAt" />
+            <date-time :date-time="post.createdAt" />
             <slot name="dateTime"></slot>
           </span>
         </div>
@@ -119,7 +119,7 @@ import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import HcRibbon from '~/components/Ribbon'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
-import RelativeDateTime from '~/components/RelativeDateTime'
+import DateTime from '~/components/DateTime'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
@@ -134,7 +134,7 @@ export default {
     DateTimeRange,
     HcRibbon,
     LocationTeaser,
-    RelativeDateTime,
+    DateTime,
     UserTeaser,
   },
   props: {

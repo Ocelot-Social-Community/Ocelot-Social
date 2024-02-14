@@ -2,7 +2,9 @@
 
 When you introduce a new version and branding and deploy it on your network, you need to consider the following changes and actions:
 
-## Version >= 3.1.3 with 'ocelotDockerVersionTag' 3.1.3-XXX
+## Version >= 3.2.0 with 'ocelotDockerVersionTag' 3.2.0-XXX
+
+### Backend and Kubernetes Config `DBMS_DEFAULT_DATABASE`
 
 - We have the new option to configure the default name of the Neo4j database to be used for operations and commands in environment variables (`.env`, `docker-compose.yml` or `values.yaml`).
 For more details see  [deployment-values.md](deployment-values.md):
@@ -12,6 +14,10 @@ DBMS_DEFAULT_DATABASE: "graph.db"
 ```
 
 The default value is `neo4j` if it is not set.
+
+### Webapp Config `dateTime`
+
+- You can set `RELATIVE_DATETIME` and `ABSOLUT_DATETIME_FORMAT` in `branding/constants/dateTime.js` originally in main code file `webapp/constants/dateTime.js` to your preferred values.
 
 ## Version >= 3.1.0 with 'ocelotDockerVersionTag' 3.1.0-555
 
@@ -26,7 +32,7 @@ The default value is `neo4j` if it is not set.
 
 ## Version >= 2.4.0 with 'ocelotDockerVersionTag' 2.4.0-298
 
-- You have to set `SHOW_CONTENT_FILTER_HEADER_MENU` and `SHOW_CONTENT_FILTER_MASONRY_GRID` in `branding/constants/filter.js` originally in main code file `webapp/constants/filter.js` to your preferred value.
+- You have to set `SHOW_CONTENT_FILTER_HEADER_MENU` and `SHOW_CONTENT_FILTER_MASONRY_GRID` in `branding/constants/filter.js` originally in main code file `webapp/constants/filter.js` to your preferred values.
 
 ### Main Code PR –  feat(webapp): map #5843
 

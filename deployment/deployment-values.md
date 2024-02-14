@@ -3,6 +3,21 @@
 For each deployment, you need to set the environment variables and configurations.
 Here is some specific information on how to set the values.
 
+## Webapp
+
+We have several configuration possibilities just in the frontend.
+
+### Date Time
+
+In file `branding/constants/dateTime.js`.
+
+- `RELATIVE_DATETIME`
+  - `true` (default) or `false`
+- `ABSOLUT_DATETIME_FORMAT`
+  - definition see [date-fns, format](https://date-fns.org/v3.3.1/docs/format):
+    - `P`: just localized date
+    - `Pp`: just localized date and time
+
 ## E-Mails
 
 You need to set environment variables to send registration and invitation information or notifications to users, for example.

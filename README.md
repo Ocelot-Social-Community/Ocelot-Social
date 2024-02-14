@@ -172,7 +172,9 @@ Check the correct Docker installation by checking the version before proceeding.
 $ docker --version
 ```
 
-##### Start Ocelot-Social via Docker-Compose
+##### Start Ocelot-Social via Docker Compose
+
+***ATTENTION:** For using Docker commands in Apple Silicon environments see [here](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/CONTRIBUTING.md#apple-silicon-platform).*
 
 Prepare ENVs once beforehand:
 
@@ -233,7 +235,7 @@ We are happy if you fork our repository, but we don't recommend it for developme
 
 Clone this repository locally as [described above](#clone-the-repository), create your branch named `<issue-number>-<description>`, add your code and push your branch direct to this repository. Then create a PR by comparing it to our `master`.
 
-**_!!! Be aware:_** Please don't compare from a fork, because the tests are breaking caused by credential problems.
+***!!! Be aware:*** Please don't compare from a fork, because the tests are breaking caused by credential problems.
 
 Please run the following commands before you push:
 
