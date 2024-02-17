@@ -4,45 +4,63 @@ import { hopeTheme } from 'vuepress-theme-hope'
 
 export default hopeTheme({
   favicon: 'favicon.ico',
-    logo: '/logo.svg',
-    docsRepo: 'https://github.com/Ocelot-Social-Community/Ocelot-Social',
-    docsBranch: 'master',
-    docsDir: '.',
-    editLink: true,
-    lastUpdated: false,
-    contributors: false,
-    print: false,
-    pure: true,
-    displayFooter: true,
-    footer: 'CC BY busFaktor() e.V. & Authors',
-    sidebar: generateSidebar('../../SUMMARY.md'),
-    navbar: [
-      { text: 'Home', link: '/' },
-      {
-        text: 'Github',
-        link: 'https://github.com/Ocelot-Social-Community/Ocelot-Social'
-      },
-    ],
-    plugins: {
-      mdEnhance: {
-        tabs: true,
-        imgSize: true
-      },
-      searchPro: {
-        indexContent: true,
-        autoSuggestions: true,
-        customFields: [
-          {
-            getter: (page) => page.frontmatter.category,
-            formatter: "Category: $content",
-          },
-          {
-            getter: (page) => page.frontmatter.tag,
-            formatter: "Tag: $content",
-          },
-        ],
-      }
+  logo: '/logo.svg',
+  docsRepo: 'https://github.com/Ocelot-Social-Community/Ocelot-Social',
+  docsBranch: 'master',
+  docsDir: '.',
+  editLink: true,
+  lastUpdated: false,
+  contributors: false,
+  print: false,
+  pure: true,
+  navbarLayout: {
+    start: ['Brand'],
+    center: ['Links'],
+    end: ['Repo', 'Outlook', 'Search'],
+  },
+  repo: 'Ocelot-Social-Community/Ocelot-Social',
+  repoLabel: 'GitHub',
+  repoDisplay: true,
+
+
+  displayFooter: true,
+  copyright: '&copy; by <a href="https://busfaktor.org" target="_blank">busFaktor() e.V.</a> & Authors | <a href="https://ocelot.social/en/impressum/">Imprint</a>',
+  footer: 'Released under the <a class="vt-link link link" href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer"><!--[-->MIT License<!--]--><!----></a>.',
+  sidebar: generateSidebar('../../SUMMARY.md'),
+  navbar: [
+    {
+      text: 'Demo',
+      link: 'https://stage.ocelot.social/',
+      target: '_self',
+    },
+  ],
+  plugins: {
+    mdEnhance: {
+      align: true,
+      demo: true,
+      imgLazyload: true,
+      imgMark: true,
+      imgSize: true,
+      sub: true,
+      sup: true,
+      tabs: true,
+      vPre: true,
+    },
+    searchPro: {
+      indexContent: true,
+      autoSuggestions: true,
+      customFields: [
+        {
+          getter: (page) => page.frontmatter.category,
+          formatter: "Category: $content",
+        },
+        {
+          getter: (page) => page.frontmatter.tag,
+          formatter: "Tag: $content",
+        },
+      ],
     }
+  }
 })
 
 function generateSidebar(summaryFileName) {
