@@ -60,10 +60,10 @@
     "wait-on": "^7.2.0"
   },
   "optionalDependencies": {
-    "@vuepress/bundler-vite": "^2.0.0-rc.2",
-    "vuepress": "^2.0.0-rc.2",
-    "vuepress-plugin-search-pro": "^2.0.0-rc.15",
-    "vuepress-theme-hope": "^2.0.0-rc.15"
+    "@vuepress/bundler-vite": "^2.0.0-rc.7",
+    "vuepress": "^2.0.0-rc.7",
+    "vuepress-plugin-search-pro": "^2.0.0-rc.23",
+    "vuepress-theme-hope": "^2.0.0-rc.23"
   },
   "resolutions": {
     "set-value": "^2.0.1",
