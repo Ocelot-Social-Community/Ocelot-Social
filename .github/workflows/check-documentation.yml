@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Check for markdown file changes
-        uses: dorny/paths-filter@v3.0.0
+        uses: dorny/paths-filter@v3.0.1
         id: changes
         with:
           token: ${{ github.token }}
