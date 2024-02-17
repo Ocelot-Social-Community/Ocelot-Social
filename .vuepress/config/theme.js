@@ -14,7 +14,8 @@ export default hopeTheme({
     print: false,
     pure: true,
     displayFooter: true,
-    footer: 'CC BY busFaktor() e.V. & Authors',
+    copyright: '&copy; by <a href="https://busfaktor.org" target="_blank">busFaktor() e.V.</a> & Authors | <a href="/en/impressum/">Impressum</a>',
+    footer: 'Released under the <a class="vt-link link link" href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer"><!--[-->MIT License<!--]--><!----></a>.',
     sidebar: generateSidebar('../../SUMMARY.md'),
     navbar: [
       { text: 'Home', link: '/' },
