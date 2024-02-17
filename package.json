@@ -46,7 +46,7 @@
     "cypress": "^13.6.4",
     "cypress-network-idle": "^1.14.2",
     "date-fns": "^2.25.0",
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.4.4",
     "expect": "^29.6.4",
     "graphql-request": "^2.0.0",
     "import": "^0.0.6",
