@@ -42,6 +42,9 @@ frontend-test-unit-code: &frontend-test-unit-code
 frontend-test-build-code: &frontend-test-build-code
   - 'frontend/**/*'
 
+frontend-test-build-docker: &frontend-test-build-docker
+  - 'frontend/**/*'
+
 frontend-test-build-docs: &frontend-test-build-docs
   - 'frontend/**/*.md'
   - 'frontend/.vuepress/*'
