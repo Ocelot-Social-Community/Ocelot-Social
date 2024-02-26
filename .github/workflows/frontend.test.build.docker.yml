@@ -26,21 +26,27 @@ jobs:
     name: Build Docker Production - Frontend
     needs: files-changed
     runs-on: ubuntu-latest
+    env:
+      WORKING_DIRECTORY: ./frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Frontend | Build Docker Production
         run: docker compose -f docker-compose.yml build
+        working-directory: ${{env.WORKING_DIRECTORY}}
 
   build-development:
     if: needs.files-changed.outputs.changes == 'true'
     name: Build Docker Development - Frontend
     needs: files-changed
     runs-on: ubuntu-latest
+    env:
+      WORKING_DIRECTORY: ./frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Frontend | Build Docker Development
         run: docker compose build
+        working-directory: ${{env.WORKING_DIRECTORY}}
