@@ -9,7 +9,7 @@
       ghost
       circle
       v-tooltip="{
-        content: $t('notifications.headerMenuButton.tooltip'),
+        content: $t('header.notifications.tooltip'),
         placement: 'bottom-start',
       }"
     />
@@ -20,7 +20,7 @@
         ghost
         circle
         v-tooltip="{
-          content: $t('notifications.headerMenuButton.tooltip'),
+          content: $t('header.notifications.tooltip'),
           placement: 'bottom-start',
         }"
         @click="toggleMenu"

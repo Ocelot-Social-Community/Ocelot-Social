@@ -327,6 +327,22 @@
     "hashtag-search": "Поиск по #{hashtag}",
     "title": "Ваш фильтр пузыря"
   },
+  "header": {
+    "avatarMenu": {
+      "chats": "Чаты",
+      "groups": "Группы",
+      "notifications": "Уведомления"
+    },
+    "chats": {
+      "tooltip": "Чаты"
+    },
+    "groups": {
+      "tooltip": "Группы"
+    },
+    "notifications": {
+      "tooltip": "Уведомления"
+    }
+  },
   "index": {
     "change-filter-settings": "Измените настройки фильтра, чтобы получить больше результатов.",
     "no-results": "Посты не найдены."

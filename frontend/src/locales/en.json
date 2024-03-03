@@ -1,0 +1,53 @@
+{
+  "about": {
+    "h1": "About",
+    "link1": "github.com",
+    "link2": "website",
+    "text1": "To find out more about this boilerplate you can look at the sources on {link}.",
+    "text2": "Want to get in touch? Find out how on our {link}."
+  },
+  "app": {
+    "inc": {
+      "h1": "Increase the Counter",
+      "menu": "Increase",
+      "text": "Increase: {count}"
+    },
+    "reset": {
+      "h1": "Reset the Counter",
+      "menu": "Reset",
+      "text": "Reset: {count}"
+    },
+    "value": {
+      "h1": "The Counter",
+      "menu": "Value",
+      "text": "The current value of the counter is: {count}"
+    }
+  },
+  "error": {
+    "404": {
+      "h1": "404 Page Not Found",
+      "text": "This page could not be found."
+    },
+    "500": {
+      "h1": "500 Internal Error",
+      "text": "Something went wrong."
+    }
+  },
+  "home": {
+    "greet1": "Sincerly",
+    "greet2": "Your IT Team For Change",
+    "h1": "IT4C Frontend Boilerplate",
+    "text1": "Welcome to this minimal starter for frontends.",
+    "text2": "This is just a basic example to demonstrate things - nothing fancy.",
+    "text3": "In the App Section you will find a counter example utilizing the local storage.",
+    "text4": "Happy Coding"
+  },
+  "language": {
+    "german": "German"
+  },
+  "menu": {
+    "about": "About",
+    "app": "App",
+    "home": "Home"
+  }
+}

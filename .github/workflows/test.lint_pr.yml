@@ -1,4 +1,4 @@
-name: "ocelot.social lint pull request CI"
+name: "test:lint pull request CI"
 
 on:
   pull_request_target:
@@ -6,6 +6,10 @@ on:
       - opened
       - edited
       - synchronize
+
+permissions:
+  pull-requests: write
+  statuses: write
 
 jobs:
   main:
@@ -26,8 +30,12 @@ jobs:
           scopes: |
             backend
             webapp
+            frontend
             database
+            docu
+            docker
             release
+            workflow
             other
           # Configure that a scope must always be provided.
           requireScope: true

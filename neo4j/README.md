@@ -1,4 +1,4 @@
-# Neo4J
+# Neo4j 4.4
 
 Human Connection is a social network. Using a graph based database which can
 model nodes and edges natively - a network - feels like an obvious choice. We
@@ -16,8 +16,7 @@ docker-compose up
 ```
 
 You can access Neo4J through [http://localhost:7474/](http://localhost:7474/)
-for an interactive cypher shell and a visualization of the graph.
-
+for an interactive Cypher shell and a visualization of the graph.
 
 ## Installation Without Docker
 
@@ -51,7 +50,7 @@ in `backend/.env`.
 
 Start Neo4J and confirm the database is running at [http://localhost:7474](http://localhost:7474).
 
-## Operations on Neo4j
+## Operations on Neo4j 4.4
 
 ### Docker or Docker Compose
 
@@ -68,12 +67,14 @@ To create a dump in Neo4j running in a Docker container:
 # connect to the Docker containers Neo4j terminal
 $ docker exec -it neo4j bash
 # generate Dump
-neo4j% neo4j-admin dump --database=graph.db --to=/var/lib/neo4j/$(date +%F)-neo4j-dump
+neo4j% neo4j-admin dump --to=/var/lib/neo4j/$(date +%F)-neo4j-dump
 # exit bash
 neo4j% exit
 # copy the dump out of the running Docker container
 $ docker cp <docker-image-name('neo4j')>:/var/lib/neo4j/neo4j-dump <local-folder-path>/$(date +%F)-neo4j-dump
 ```
+
+If you need a specific database name, add the option `--database=<name>` to the command `neo4j-admin dump`.
 
 ### Import Neo4j Dump
 
@@ -88,10 +89,13 @@ $ docker cp <local-folder-path>/neo4j-dump <docker-image-name('neo4j')>:/var/lib
 # connect to the Docker containers Neo4j terminal
 $ docker exec -it neo4j bash
 # to load the dump into the database we need the following command in this terminal
-neo4j% neo4j-admin load --database=neo4j --from /var/lib/neo4j/$(date +%F)-neo4j-dump --force
+neo4j% neo4j-admin load --from /var/lib/neo4j/$(date +%F)-neo4j-dump --force
 # leave the terminal by entering
 neo4j% exit
 ```
+
+If you need a specific database name, add the option `--database=<name>` to the command `neo4j-admin load`.
+To find out the default database name, see below.
 
 ## Commands
 
@@ -143,7 +147,7 @@ $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backen
 ***Cypher commands to show indexes and constraints***
 
 ```bash
-# in browser command line or cypher shell
+# in browser command line or Cypher shell
 
 # show all indexes and constraints
 $ :schema
@@ -158,7 +162,7 @@ $ CALL db.constraints();
 ***Cypher commands to create and drop indexes and constraints***
 
 ```bash
-# in browser command line or cypher shell
+# in browser command line or Cypher shell
 
 # create indexes
 $ CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"]);
@@ -171,3 +175,21 @@ $ DROP CONSTRAINT ON ( image:Image ) ASSERT image.url IS UNIQUE
 # drop all indexes and constraints
 $ CALL apoc.schema.assert({},{},true) YIELD label, key RETURN * ;
 ```
+
+### Database Management Commands
+
+***Cypher commands to manage databases***
+
+```bash
+# in browser command line or Cypher shell
+
+# show the default database
+$ SHOW DEFAULT DATABASE
+# show all databases
+$ SHOW DATABASES
+```
+
+To set the default database by configuration, use `NEO4J_dbms_default__database` as an environment variable when starting Neo4j 4.4, see [Docker specific configuration settings](<https://neo4j.com/docs/operations-manual/4.4/docker/ref-settings/>).
+
+If a database with this name does not exist, an empty database with this name is created and all other databases remain.
+You can switch back to an existing database without damaging it.

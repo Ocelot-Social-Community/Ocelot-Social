@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social",
-  "version": "3.1.2",
+  "version": "3.2.0",
   "description": "Free and open source software program code available to run social networks.",
   "author": "ocelot.social Community",
   "license": "MIT",
@@ -30,29 +30,29 @@
     "docs:dev": "NODE_OPTIONS=--openssl-legacy-provider vuepress dev .",
     "cypress:run": "cypress run --e2e --browser electron --config-file ./cypress/cypress.config.js",
     "cypress:open": "cypress open --e2e --browser electron --config-file ./cypress/cypress.config.js",
-    "release": "yarn version --no-git-tag-version --no-commit-hooks --no-commit && auto-changelog --latest-version $(node -p -e \"require('./package.json').version\") && cd backend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp/maintenance/source && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../../../package.json').version\")"
+    "release": "yarn version --no-git-tag-version --no-commit-hooks --no-commit && auto-changelog --latest-version $(node -p -e \"require('./package.json').version\") && cd backend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../frontend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp/maintenance/source && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../../../package.json').version\")"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.3",
-    "@babel/preset-env": "^7.23.3",
-    "@babel/register": "^7.22.15",
-    "@badeball/cypress-cucumber-preprocessor": "^19.2.0",
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.23.9",
+    "@babel/register": "^7.23.7",
+    "@badeball/cypress-cucumber-preprocessor": "^20.0.1",
+    "@cucumber/cucumber": "10.3.1",
     "@cypress/browserify-preprocessor": "^3.0.2",
-    "@cucumber/cucumber": "10.0.1",
-    "@faker-js/faker": "8.3.1",
+    "@faker-js/faker": "8.4.1",
     "auto-changelog": "^2.3.0",
     "bcryptjs": "^2.4.3",
     "cross-env": "^7.0.3",
-    "cypress": "^13.6.0",
+    "cypress": "^13.6.4",
     "cypress-network-idle": "^1.14.2",
-    "date-fns": "^2.25.0",
-    "dotenv": "^16.3.1",
+    "date-fns": "^3.3.1",
+    "dotenv": "^16.4.4",
     "expect": "^29.6.4",
     "graphql-request": "^2.0.0",
     "import": "^0.0.6",
     "jsonwebtoken": "^9.0.2",
     "mock-socket": "^9.0.3",
-    "multiple-cucumber-html-reporter": "^3.4.0",
+    "multiple-cucumber-html-reporter": "^3.6.1",
     "neo4j-driver": "^4.3.4",
     "neode": "^0.4.8",
     "rosie": "^2.1.0",
@@ -60,9 +60,10 @@
     "wait-on": "^7.2.0"
   },
   "optionalDependencies": {
-    "vuepress": "^2.0.0-rc.0",
-    "vuepress-plugin-search-pro": "^2.0.0-rc.0",
-    "vuepress-theme-hope": "^2.0.0-rc.1"
+    "@vuepress/bundler-vite": "^2.0.0-rc.7",
+    "vuepress": "^2.0.0-rc.7",
+    "vuepress-plugin-search-pro": "^2.0.0-rc.23",
+    "vuepress-theme-hope": "^2.0.0-rc.23"
   },
   "resolutions": {
     "set-value": "^2.0.1",

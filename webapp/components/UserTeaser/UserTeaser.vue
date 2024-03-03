@@ -14,12 +14,12 @@
           <nuxt-link v-if="linkToProfile" :to="userLink">
             <span class="text">
               <span class="slug">{{ userSlug }}</span>
-              <span v-if="!userOnly" class="name">{{ userName }}</span>
+              <span class="name">{{ userName }}</span>
             </span>
           </nuxt-link>
           <span v-else class="text">
             <span class="slug">{{ userSlug }}</span>
-            <span v-if="!userOnly" class="name">{{ userName }}</span>
+            <span class="name">{{ userName }}</span>
           </span>
           <span v-if="wide">&nbsp;</span>
           <span v-if="group">
@@ -34,12 +34,11 @@
             </nuxt-link>
           </span>
         </div>
-        <span v-if="!userOnly" class="text">
+        <span v-if="!userOnly && dateTime" class="text">
           <base-icon name="clock" />
-          <relative-date-time :date-time="dateTime" />
+          <date-time :date-time="dateTime" />
           <slot name="dateTime"></slot>
         </span>
-        <span v-else class="text">{{ userName }}</span>
       </div>
     </div>
   </div>
@@ -48,13 +47,13 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import RelativeDateTime from '~/components/RelativeDateTime'
+import DateTime from '~/components/DateTime'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 
 export default {
   name: 'UserTeaser',
   components: {
-    RelativeDateTime,
+    DateTime,
     ProfileAvatar,
   },
   props: {

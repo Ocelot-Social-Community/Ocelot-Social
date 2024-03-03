@@ -1,9 +1,9 @@
 import { shallowMount } from '@vue/test-utils'
-import RelativeDateTime from './'
+import DateTime from '.'
 
 const localVue = global.localVue
 
-describe('RelativeDateTime', () => {
+describe('DateTime', () => {
   let mocks
   let locale
   let dateTime
@@ -17,7 +17,7 @@ describe('RelativeDateTime', () => {
   })
 
   const Wrapper = () => {
-    return shallowMount(RelativeDateTime, {
+    return shallowMount(DateTime, {
       mocks,
       localVue,
       propsData: {

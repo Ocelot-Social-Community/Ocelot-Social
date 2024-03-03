@@ -9,20 +9,18 @@ This repository is an in use template to rebrand, configure, and deploy [ocelot.
 The forked original repository is [stage.ocelot.social](https://github.com/Ocelot-Social-Community/stage.ocelot.social).
 
 <!-- markdownlint-disable MD033 -->
-<p align="center">
-  <!-- <a href="https://ocelot.social" target="_blank"> -->
-    <img src="../webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%">
-  <!-- </a> -->
+<p style="text-align: center;">
+  <a href="https://ocelot.social" target="_blank"><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/master/webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%"></a>
 </p>
 <!-- markdownlint-enable MD033 -->
 
 ## Live demo
 
-__Try out our deployed <!-- [ -->development environment<!-- ](https://stage.ocelot.social)-->.__
+__Try out our deployed [development environment](https://stage.ocelot.social).__
 
 Visit our staging networks:
 
-- central staging network: <!-- [ -->stage.ocelot.social<!-- ](https://stage.ocelot.social)-->
+- central staging network: [stage.ocelot.social](https://stage.ocelot.social)
 <!-- - rebranded staging network: [rebrand.ocelot.social](https://stage.ocelot.social). -->
 
 Logins:
@@ -136,6 +134,5 @@ Browser compatibility testing with [BrowserStack](https://www.browserstack.com/)
 ## License
 
 See the [LICENSE](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/LICENSE.md) file for license rights and limitations (MIT).
-
 
 We need `DOCKER_BUILDKIT=0` for this to work.

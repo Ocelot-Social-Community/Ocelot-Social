@@ -18,6 +18,9 @@
     <ds-text>
       {{ $t('components.registration.email-nonce.form.description') }}
     </ds-text>
+    <ds-text>
+      {{ $t('components.registration.email-nonce.form.click-next') }}
+    </ds-text>
     <slot></slot>
     <ds-space margin="xxx-small" />
   </ds-form>
