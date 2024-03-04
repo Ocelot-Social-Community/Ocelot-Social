@@ -93,6 +93,22 @@
     "membersCount": null,
     "membersListTitle": null
   },
+  "header": {
+    "avatarMenu": {
+      "chats": "Chats",
+      "groups": "Groepen",
+      "notifications": "Notificaties"
+    },
+    "chats": {
+      "tooltip": "Chats"
+    },
+    "groups": {
+      "tooltip": "Groepen"
+    },
+    "notifications": {
+      "tooltip": "Notificaties"
+    }
+  },
   "login": {
     "email": "Uw E-mail",
     "hello": "Hallo",
@@ -111,7 +127,7 @@
       "unread": null
     },
     "markAllAsRead": "Markeer alles als gelezen",
-    "pageLink": null,
+    "pageLink": "Alle notificaties",
     "post": null,
     "reason": {
       "commented_on_post": null,

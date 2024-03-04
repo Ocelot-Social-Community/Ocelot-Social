@@ -19,7 +19,7 @@
           <client-only>
             <group-content-menu
               v-if="isGroupOwner"
-              class="group-content-menu"
+              class="group-profile-content-menu"
               :usage="'groupProfile'"
               :group="group || {}"
               placement="bottom-end"
@@ -639,8 +639,8 @@ export default {
   margin: auto;
   margin-top: -60px;
 }
-.page-name-group-id-slug {
-  .ds-flex-item:first-child .group-content-menu {
+.group-profile {
+  .ds-flex-item:first-child .group-profile-content-menu {
     position: absolute;
     top: $space-x-small;
     right: $space-x-small;

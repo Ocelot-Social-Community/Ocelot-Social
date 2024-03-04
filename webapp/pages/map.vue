@@ -57,6 +57,7 @@
   </div>
 </template>
 
+<!-- eslint-disable vue/no-reserved-component-names -->
 <script>
 import { isEmpty, toArray } from 'lodash'
 import mapboxgl from 'mapbox-gl'
@@ -560,6 +561,7 @@ export default {
   },
 }
 </script>
+<!-- eslint-enable vue/no-reserved-component-names -->
 
 <style lang="scss">
 // description: https: //github.com/geospoc/v-mapbox/tree/v1.11.2/docs

@@ -25,6 +25,10 @@ module.exports = {
     'no-console': ['error'],
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'vue/component-name-in-template-casing': ['error', 'kebab-case'],
+    // deactivate Vue3 rules for now, project will be migrated to Vue3
+    'vue/multi-word-component-names': 0,
+    'vue/no-mutating-props': 0,
+    'vue/no-v-text-v-html-on-component': 0,
     'prettier/prettier': ['error', {
       htmlWhitespaceSensitivity: 'ignore'
     }],

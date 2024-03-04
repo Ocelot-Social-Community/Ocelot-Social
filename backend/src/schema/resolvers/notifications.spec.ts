@@ -56,98 +56,97 @@ describe('given some notifications', () => {
       Factory.build('user', { id: 'neighbor' }),
       Factory.build('category', { id: 'cat1' }),
     ])
-    const [post1, post2, post3] = await Promise.all([
-      Factory.build('post', { id: 'p1', content: 'Not for you' }, { author, categoryIds }),
-      Factory.build(
-        'post',
-        {
-          id: 'p2',
-          content: 'Already seen post mention',
-        },
-        {
-          author,
-          categoryIds,
-        },
-      ),
-      Factory.build(
-        'post',
-        {
-          id: 'p3',
-          content: 'You have been mentioned in a post',
-        },
-        {
-          author,
-          categoryIds,
-        },
-      ),
-    ])
-    const [comment1, comment2, comment3] = await Promise.all([
-      Factory.build(
-        'comment',
-        {
-          id: 'c1',
-          content: 'You have seen this comment mentioning already',
-        },
-        {
-          author,
-          postId: 'p3',
-        },
-      ),
-      Factory.build(
-        'comment',
-        {
-          id: 'c2',
-          content: 'You have been mentioned in a comment',
-        },
-        {
-          author,
-          postId: 'p3',
-        },
-      ),
-      Factory.build(
-        'comment',
-        {
-          id: 'c3',
-          content: 'Somebody else was mentioned in a comment',
-        },
-        {
-          author,
-          postId: 'p3',
-        },
-      ),
-    ])
-    await Promise.all([
-      post1.relateTo(neighbor, 'notified', {
-        createdAt: '2019-08-29T17:33:48.651Z',
-        read: false,
-        reason: 'mentioned_in_post',
-      }),
-      post2.relateTo(user, 'notified', {
-        createdAt: '2019-08-30T17:33:48.651Z',
-        read: true,
-        reason: 'mentioned_in_post',
-      }),
-      post3.relateTo(user, 'notified', {
-        createdAt: '2019-08-31T17:33:48.651Z',
-        read: false,
-        reason: 'mentioned_in_post',
-      }),
-      comment1.relateTo(user, 'notified', {
-        createdAt: '2019-08-30T15:33:48.651Z',
-        read: true,
-        reason: 'mentioned_in_comment',
-      }),
-      comment2.relateTo(user, 'notified', {
-        createdAt: '2019-08-30T19:33:48.651Z',
-        read: false,
-        reason: 'mentioned_in_comment',
-      }),
-      comment3.relateTo(neighbor, 'notified', {
-        createdAt: '2019-09-01T17:33:48.651Z',
-        read: false,
-        reason: 'mentioned_in_comment',
-      }),
-    ])
+    const post1 = await Factory.build(
+      'post',
+      { id: 'p1', content: 'Not for you' },
+      { author, categoryIds },
+    )
+    const post2 = await Factory.build(
+      'post',
+      {
+        id: 'p2',
+        content: 'Already seen post mention',
+      },
+      {
+        author,
+        categoryIds,
+      },
+    )
+    const post3 = await Factory.build(
+      'post',
+      {
+        id: 'p3',
+        content: 'You have been mentioned in a post',
+      },
+      {
+        author,
+        categoryIds,
+      },
+    )
+    const comment1 = await Factory.build(
+      'comment',
+      {
+        id: 'c1',
+        content: 'You have seen this comment mentioning already',
+      },
+      {
+        author,
+        postId: 'p3',
+      },
+    )
+    const comment2 = await Factory.build(
+      'comment',
+      {
+        id: 'c2',
+        content: 'You have been mentioned in a comment',
+      },
+      {
+        author,
+        postId: 'p3',
+      },
+    )
+    const comment3 = await Factory.build(
+      'comment',
+      {
+        id: 'c3',
+        content: 'Somebody else was mentioned in a comment',
+      },
+      {
+        author,
+        postId: 'p3',
+      },
+    )
+
+    await post1.relateTo(neighbor, 'notified', {
+      createdAt: '2019-08-29T17:33:48.651Z',
+      read: false,
+      reason: 'mentioned_in_post',
+    })
+    await post2.relateTo(user, 'notified', {
+      createdAt: '2019-08-30T17:33:48.651Z',
+      read: true,
+      reason: 'mentioned_in_post',
+    })
+    await post3.relateTo(user, 'notified', {
+      createdAt: '2019-08-31T17:33:48.651Z',
+      read: false,
+      reason: 'mentioned_in_post',
+    })
+    await comment1.relateTo(user, 'notified', {
+      createdAt: '2019-08-30T15:33:48.651Z',
+      read: true,
+      reason: 'mentioned_in_comment',
+    })
+    await comment2.relateTo(user, 'notified', {
+      createdAt: '2019-08-30T19:33:48.651Z',
+      read: false,
+      reason: 'mentioned_in_comment',
+    })
+    await comment3.relateTo(neighbor, 'notified', {
+      createdAt: '2019-09-01T17:33:48.651Z',
+      read: false,
+      reason: 'mentioned_in_comment',
+    })
   })
 
   describe('notifications', () => {

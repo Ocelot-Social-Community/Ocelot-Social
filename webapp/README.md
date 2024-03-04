@@ -59,8 +59,8 @@ We ensure the quality of our frontend code by using
 
 For more information see our [frontend testing guide](testing.md). Use these commands to run the tests:
 
-{% tabs %}
-{% tab title="With Docker" %}
+::: tabs
+@tab:active With Docker
 
 After starting the application following the above guidelines, open new terminal windows for each of these commands:
 
@@ -81,9 +81,7 @@ $ docker-compose exec webapp yarn storybook
 
 You can then visit the Storybook playground on `http://localhost:3002`
 
-{% endtab %}
-
-{% tab title="Without Docker" %}
+@tab title Without Docker
 
 After starting the application following the above guidelines, open new terminal windows and navigate to the `/webapp` directory for each of these commands:
 
@@ -109,8 +107,7 @@ $ yarn storybook
 
 You can then visit the Storybook playground on `http://localhost:3002`
 
-{% endtab %}
-{% endtabs %}
+:::
 
 ## Maintenance Mode
 

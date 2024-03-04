@@ -348,6 +348,22 @@
     "hashtag-search": "Procurando por #{hashtag}",
     "title": "Sua bolha de filtro"
   },
+  "header": {
+    "avatarMenu": {
+      "chats": "Chats",
+      "groups": "Grupos",
+      "notifications": "Notificações"
+    },
+    "chats": {
+      "tooltip": "Chats"
+    },
+    "groups": {
+      "tooltip": "Grupos"
+    },
+    "notifications": {
+      "tooltip": "Notificações"
+    }
+  },
   "index": {
     "change-filter-settings": "Altere suas configurações de filtro para obter mais resultados.",
     "no-results": "Nenhuma contribuição encontrada."

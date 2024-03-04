@@ -1,3 +1,5 @@
+# These file filter patterns are used by the action https://github.com/dorny/paths-filter
+
 backend: &backend
   - '.github/workflows/test-backend.yml'
   - 'backend/**/*'
@@ -11,3 +13,41 @@ webapp: &webapp
   - '.github/workflows/test-webapp.yml'
   - 'webapp/**/*'
   - 'package.json'
+
+docs-check: &docs-check
+  - '.github/workflows/check-documentation.yml'
+
+markdown: &markdown
+  - *docs-check
+  - '**/*.md'
+  - '.github/workflows/mlc_config.json'
+
+vuepress: &vuepress
+  - *docs-check
+  - '.github/workflows/deploy-documentation.yml'
+  - '.vuepress/**/*'
+  - 'package.json'
+
+documentation: &documentation
+  - *vuepress
+  - *markdown
+
+# frontend
+frontend-test-lint-code: &frontend-test-lint-code
+  - 'frontend/**/*'
+
+frontend-test-unit-code: &frontend-test-unit-code
+  - 'frontend/**/*'
+
+frontend-test-build-code: &frontend-test-build-code
+  - 'frontend/**/*'
+
+frontend-test-build-docker: &frontend-test-build-docker
+  - 'frontend/**/*'
+
+frontend-test-build-docs: &frontend-test-build-docs
+  - 'frontend/**/*.md'
+  - 'frontend/.vuepress/*'
+
+frontend-test-build-storybook: &frontend-test-build-storybook
+  - 'frontend/**/*'
