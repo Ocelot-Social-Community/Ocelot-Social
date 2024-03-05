@@ -15,6 +15,7 @@
     "generate": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt generate",
     "lint": "eslint --ext .js,.vue .",
     "locales": "../scripts/translations/missing-keys.sh && ../scripts/translations/sort.sh",
+    "locales:normalize": "../scripts/translations/normalize.sh",
     "precommit": "yarn lint",
     "test": "cross-env NODE_ENV=test jest --coverage --forceExit --detectOpenHandles",
     "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand"
