@@ -1,7 +1,7 @@
 # normalize-locales.jq
 #
 # creates a copy of the structure of source and replaces the values
-# by the corresponding value of target. If the key does not exist in target,
+# by the corresponding values of target. If a key does not exist in target,
 # the value is set to null.
 #
 # jq -n --argfile source en.json --argfile target es.json -f normalize-locales.jq 
