@@ -16,7 +16,7 @@
     </template>
     <template #reportedOn="scope">
       <ds-text size="small">
-        <hc-relative-date-time :date-time="scope.row.createdAt" data-test="filed-date" />
+        <date-time :date-time="scope.row.createdAt" data-test="filed-date" />
       </ds-text>
     </template>
     <template #reasonCategory="scope">
@@ -29,12 +29,12 @@
 </template>
 <script>
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
-import HcRelativeDateTime from '~/components/RelativeDateTime'
+import DateTime from '~/components/DateTime'
 
 export default {
   components: {
     UserTeaser,
-    HcRelativeDateTime,
+    DateTime,
   },
   props: {
     filed: { type: Array, default: () => [] },

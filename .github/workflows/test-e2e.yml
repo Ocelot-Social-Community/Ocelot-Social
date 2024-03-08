@@ -13,6 +13,7 @@ jobs:
       - name: Copy env files
         run: |
           cp webapp/.env.template webapp/.env
+          cp frontend/.env.dist frontend/.env
           cp backend/.env.template backend/.env
 
       - name: Build docker images
@@ -36,7 +37,7 @@ jobs:
       
       - name: Cache docker images
         id: cache
-        uses: actions/cache/save@v3.3.2
+        uses: actions/cache/save@v4.0.1
         with:
           path: |
             /opt/cucumber-json-formatter
@@ -58,7 +59,7 @@ jobs:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - name: Restore cache
-        uses: actions/cache/restore@v3.3.2
+        uses: actions/cache/restore@v4.0.1
         id: cache
         with:
           path: |
@@ -92,7 +93,7 @@ jobs:
       - name: Full stack tests | if tests failed, upload report
         id: e2e-report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report

@@ -20,4 +20,5 @@ data:
   NEO4J_dbms_security_procedures_unrestricted: "{{ .Values.NEO4J.DBMS_SECURITY_PROCEDURES_UNRESTRICTED }}"
   NEO4J_dbms_allow__format__migration: "true"
   NEO4J_dbms_allow__upgrade: "true"
-  NEO4J_apoc_import_file_enabled: "{{ .Values.NEO4J.APOC_IMPORT_FILE_ENABLED }}" 
+  NEO4J_dbms_default__database: "{{ .Values.NEO4J.DBMS_DEFAULT_DATABASE }}"
+  NEO4J_apoc_import_file_enabled: "{{ .Values.NEO4J.APOC_IMPORT_FILE_ENABLED }}"

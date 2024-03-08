@@ -6,7 +6,8 @@
     "edit": "Редактировать",
     "loading": "загрузка",
     "loadMore": "Загрузить ещё",
-    "save": "Сохранить"
+    "save": "Сохранить",
+    "saveCategories": null
   },
   "admin": {
     "categories": {
@@ -30,6 +31,7 @@
       "goal": "Необходимы ежемесячные пожертвования",
       "name": "Информация о пожертвованиях",
       "progress": "Пожертвования собраны",
+      "showDonationsCheckboxLabel": null,
       "successfulUpdate": "Информация о пожертвованиях успешно обновлена!"
     },
     "hashtags": {
@@ -63,6 +65,7 @@
         "placeholder": "Электронная почта, имя или описание"
       },
       "name": "Пользователи",
+      "roleChanged": null,
       "table": {
         "columns": {
           "createdAt": "Дата создания",
@@ -74,6 +77,31 @@
         }
       }
     }
+  },
+  "chat": {
+    "addRoomHeadline": null,
+    "cancelSelectMessage": null,
+    "conversationStarted": null,
+    "isOnline": null,
+    "isTyping": null,
+    "lastSeen": null,
+    "messageDeleted": null,
+    "messagesEmpty": null,
+    "newMessages": null,
+    "page": {
+      "headline": null
+    },
+    "roomEmpty": null,
+    "roomsEmpty": null,
+    "search": null,
+    "typeMessage": null,
+    "userProfileButton": {
+      "label": null,
+      "tooltip": null
+    }
+  },
+  "client-only": {
+    "loading": null
   },
   "code-of-conduct": {
     "subheader": "социальной сети {ORGANIZATION_NAME}"
@@ -110,11 +138,20 @@
     "validations": {
       "categories": "Выберите от одной то трех категорий",
       "email": "должен быть корректный адрес электронной почты",
+      "eventLocationNameLength": null,
+      "eventLocationNameNotEmpty": null,
+      "eventVenueLength": null,
+      "eventVenueNotEmpty": null,
       "url": "должен быть корректный URL"
     },
     "versus": "Против"
   },
   "components": {
+    "dateTimeRange": {
+      "hourMinute": null,
+      "monthDay": null,
+      "yearMonthDay": null
+    },
     "password-reset": {
       "change-password": {
         "error": "Смена пароля не удалась. Может быть, код безопасности был неправильным?",
@@ -132,20 +169,61 @@
     },
     "registration": {
       "create-user-account": {
+        "buttonTitle": null,
         "error": "Не удалось создать учетную запись!",
         "help": "Может быть, подтверждение было недействительным? В случае возникновения проблем, не стесняйтесь обращаться за помощью, отправив нам письмо по электронной почте:",
+        "recieveCommunicationAsEmailsEtcConfirmed": null,
         "success": "Учетная запись успешно создана!",
+        "termsAndCondsEtcConfirmed": null,
         "title": "Создать учетную запись"
       },
-      "email-nonce": {
+      "email": {
+        "buttonTitle": {
+          "resend": null,
+          "send": null,
+          "skipResend": null
+        },
         "form": {
+          "sendEmailAgain": null,
+          "success": null
+        },
+        "title": null
+      },
+      "email-display": {
+        "warningFormat": null,
+        "warningUndef": null,
+        "yourEmail": null
+      },
+      "email-nonce": {
+        "buttonTitle": null,
+        "form": {
+          "click-next": null,
           "description": "Откройте папку \\\"Входящие\\\" и введите код из сообщения.",
           "next": "Продолжить",
           "nonce": "Введите код",
           "validations": {
-            "length": "длина должна быть {nonceLength} символов"
+            "error": null,
+            "length": "длина должна быть {nonceLength} символов",
+            "success": null
+          }
+        },
+        "title": null
+      },
+      "invite-code": {
+        "buttonTitle": null,
+        "form": {
+          "description": null,
+          "invite-code": null,
+          "next": null,
+          "validations": {
+            "error": null,
+            "length": null,
+            "success": null
           }
         }
+      },
+      "no-public-registrstion": {
+        "title": null
       },
       "signup": {
         "form": {
@@ -164,27 +242,55 @@
     }
   },
   "contribution": {
+    "amount-clicks": null,
+    "amount-comments": null,
+    "amount-shouts": null,
+    "amount-views": null,
     "categories": {
       "infoSelectedNoOfMaxCategories": "Выбрано {chosen} из {max} категорий"
     },
     "category": {
+      "description": {
+        "body-and-excercise": null,
+        "children": null,
+        "culture": null,
+        "economy": null,
+        "energy": null,
+        "finance": null,
+        "health": null,
+        "home": null,
+        "it-and-media": null,
+        "law": null,
+        "miscellaneous": null,
+        "mobility": null,
+        "nature": null,
+        "networking": null,
+        "peace": null,
+        "politics": null,
+        "psyche": null,
+        "science": null,
+        "spirituality": null
+      },
       "name": {
-        "animal-protection": "Защита животных",
-        "art-culture-sport": "Искусство, культура и спорт",
-        "consumption-sustainability": "Потребление и стабильность",
-        "cooperation-development": "Сотрудничество и развитие",
-        "democracy-politics": "Демократия и политика",
-        "economy-finances": "Экономика и финансы",
-        "education-sciences": "Образование и наука",
-        "energy-technology": "Энергия и технологии",
-        "environment-nature": "Окружающая среда и природа",
-        "freedom-of-speech": "Свобода слова",
-        "global-peace-nonviolence": "Глобальный мир и борьба с насилием",
-        "happiness-values": "Счастье и ценности",
-        "health-wellbeing": "Здоровье и благополучие",
-        "human-rights-justice": "Права человека и справедливость",
-        "it-internet-data-privacy": "ИТ, интернет и конфиденциальность",
-        "just-for-fun": "Просто для удовольствия"
+        "body-and-excercise": null,
+        "children": null,
+        "culture": null,
+        "economy": null,
+        "energy": null,
+        "finance": null,
+        "health": null,
+        "home": null,
+        "it-and-media": null,
+        "law": null,
+        "miscellaneous": null,
+        "mobility": null,
+        "nature": null,
+        "networking": null,
+        "peace": null,
+        "politics": null,
+        "psyche": null,
+        "science": null,
+        "spirituality": null
       }
     },
     "emotions-label": {
@@ -194,18 +300,33 @@
       "happy": "Счастлив",
       "surprised": "Удивлен"
     },
-    "filterALL": "Просмотреть все посты",
     "filterFollow": "Показать сообщения пользователей, на которых я подписан",
+    "filterMasonryGrid": {
+      "myFriends": null,
+      "myGroups": null,
+      "myTopics": null,
+      "noFilter": null,
+      "onlyArticles": null,
+      "onlyEvents": null
+    },
+    "filterMyGroups": null,
     "inappropriatePicture": "Эта картинка может быть неуместным для некоторых людей.",
     "languageSelectLabel": "Язык",
     "languageSelectText": "Выберите язык",
+    "newEvent": null,
     "newPost": "Создать пост",
     "success": "Сохранено!",
     "teaserImage": {
+      "cropImage": null,
       "cropperConfirm": "Подтвердить",
+      "errors": {
+        "aspect-ratio-too-small": null,
+        "unSupported-file-format": null
+      },
       "supportedFormats": "Вставьте изображение файла формата JPG, PNG или GIF!"
     },
-    "title": "Заголовок"
+    "title": "Заголовок",
+    "visibleOnlyForMembersOfGroup": null
   },
   "delete": {
     "cancel": "Отменить",
@@ -286,50 +407,205 @@
     "back-to-index": "Обратно в индекс страницы",
     "cannot-edit-post": "Этот пост нельзя редактировать",
     "default": "Произошла ошибка.",
+    "group-not-found": null,
     "post-not-found": "Этот пост не удалось найти",
     "profile-not-found": "Этот профиль не удалось найти"
   },
   "filter-menu": {
     "all": "Все",
+    "article": null,
     "categories": "Категории",
+    "creationDate": null,
+    "deleteFilter": null,
     "emotions": "",
+    "ended": {
+      "all": {
+        "hint": null,
+        "label": null
+      },
+      "onlyEnded": {
+        "hint": null,
+        "label": null
+      }
+    },
+    "event": null,
+    "eventsBy": null,
+    "eventsEnded": null,
     "filter-by": "Другие фильтры ...",
     "following": "Мои подписки",
+    "following-title": null,
     "languages": "Языки",
+    "my-groups": null,
     "order": {
+      "last": {
+        "hint": null,
+        "label": null
+      },
       "newest": {
         "hint": null,
         "label": "Сначала новые"
+      },
+      "next": {
+        "hint": null,
+        "label": null
       },
       "oldest": {
         "hint": null,
         "label": "Сначала старые"
       }
-    }
+    },
+    "order-by": null,
+    "post-type": null,
+    "save": {
+      "error": null,
+      "success": null
+    },
+    "startDate": null
   },
   "followButton": {
     "follow": "Подписаться",
     "following": "Вы подписаны"
   },
   "group": {
+    "actionRadii": {
+      "continental": null,
+      "global": null,
+      "interplanetary": null,
+      "national": null,
+      "regional": null
+    },
+    "actionRadius": null,
+    "addMemberToGroup": null,
+    "addMemberToGroupSuccess": null,
+    "addUser": null,
+    "addUserNoOptions": null,
+    "addUserPlaceholder": null,
+    "allGroups": null,
+    "categories": null,
+    "categoriesTitle": null,
+    "changeMemberRole": null,
+    "contentMenu": {
+      "visitGroupPage": null
+    },
+    "createNewGroup": {
+      "title": null,
+      "tooltip": null
+    },
+    "description": null,
+    "editGroupSettings": {
+      "groupName": null,
+      "title": null
+    },
+    "errors": {
+      "userAlreadyMember": null
+    },
+    "follow": null,
     "foundation": null,
+    "general": null,
     "goal": null,
+    "groupCreated": null,
+    "in": null,
     "joinLeaveButton": {
       "iAmMember": null,
       "join": null,
-      "pendingMember": null
+      "leave": null,
+      "pendingMember": null,
+      "tooltip": null
+    },
+    "labelSlug": null,
+    "leaveModal": {
+      "confirmButton": null,
+      "message": null,
+      "title": null
+    },
+    "memberRemoved": null,
+    "members": null,
+    "membersAdministrationList": {
+      "avatar": null,
+      "name": null,
+      "roleInGroup": null,
+      "slug": null
     },
     "membersCount": null,
-    "membersListTitle": null
+    "membersListTitle": null,
+    "membersListTitleNotAllowedSeeingGroupMembers": null,
+    "modal": {
+      "cancel": null,
+      "confirm": null,
+      "confirmAddGroupMemberText": null,
+      "confirmAddGroupMemberTitle": null
+    },
+    "myGroups": null,
+    "name": null,
+    "radius": null,
+    "removeMember": null,
+    "removeMemberButton": null,
+    "role": null,
+    "roles": {
+      "admin": null,
+      "owner": null,
+      "pending": null,
+      "usual": null
+    },
+    "save": null,
+    "type": null,
+    "types": {
+      "closed": null,
+      "hidden": null,
+      "public": null
+    },
+    "typesOptions": {
+      "closed": null,
+      "hidden": null,
+      "public": null
+    },
+    "update": null,
+    "updatedGroup": null
   },
   "hashtags-filter": {
     "clearSearch": "Очистить поиск",
     "hashtag-search": "Поиск по #{hashtag}",
     "title": "Ваш фильтр пузыря"
   },
+  "header": {
+    "avatarMenu": {
+      "button": {
+        "tooltip": null
+      },
+      "chats": "Чаты",
+      "groups": "Группы",
+      "map": null,
+      "myProfile": null,
+      "notifications": "Уведомления"
+    },
+    "chats": {
+      "tooltip": "Чаты"
+    },
+    "groups": {
+      "tooltip": "Группы"
+    },
+    "map": {
+      "tooltip": null
+    },
+    "notifications": {
+      "tooltip": "Уведомления"
+    }
+  },
   "index": {
     "change-filter-settings": "Измените настройки фильтра, чтобы получить больше результатов.",
     "no-results": "Посты не найдены."
+  },
+  "invite-codes": {
+    "button": {
+      "tooltip": null
+    },
+    "copy-code": null,
+    "copy-success": null,
+    "not-available": null,
+    "your-code": null
+  },
+  "localeSwitch": {
+    "tooltip": null
   },
   "login": {
     "email": "Электронная почта",
@@ -341,6 +617,7 @@
     "moreInfo": "Что такое {APPLICATION_NAME}?",
     "moreInfoHint": "на страницу проекта",
     "no-account": "У вас нет аккаунта?",
+    "no-cookie": null,
     "password": "Пароль",
     "register": "Зарегистрируйтесь",
     "success": "Вы вошли в систему!"
@@ -349,6 +626,33 @@
     "explanation": "В данный момент мы проводим плановое техническое обслуживание, пожалуйста, повторите попытку позже.",
     "questions": "Любые вопросы или сообщения о проблемах отправляйте на электронную почту",
     "title": "{APPLICATION_NAME} на техническом обслуживании"
+  },
+  "map": {
+    "alertMessage": null,
+    "legend": {
+      "event": null,
+      "group": null,
+      "theUser": null,
+      "user": null
+    },
+    "markerTypes": {
+      "event": null,
+      "group": null,
+      "theUser": null,
+      "user": null
+    },
+    "pageTitle": null,
+    "styles": {
+      "dark": null,
+      "outdoors": null,
+      "satellite": null,
+      "streets": null
+    }
+  },
+  "modals": {
+    "deleteUser": {
+      "created": null
+    }
   },
   "moderation": {
     "name": "Модерация",
@@ -427,13 +731,18 @@
       "read": "Прочитанные",
       "unread": "Непрочитанные"
     },
+    "group": null,
     "markAllAsRead": "Отметить все как прочитанное",
     "pageLink": "Все уведомления",
     "post": "Пост",
     "reason": {
+      "changed_group_member_role": null,
       "commented_on_post": "Комментарий к посту...",
       "mentioned_in_comment": "Упоминание в комментарии....",
-      "mentioned_in_post": "Упоминание в посте...."
+      "mentioned_in_post": "Упоминание в посте....",
+      "removed_user_from_group": null,
+      "user_joined_group": null,
+      "user_left_group": null
     },
     "title": "Уведомления",
     "user": "Пользователь"
@@ -445,7 +754,27 @@
       "submitted": "Комментарий отправлен",
       "updated": "Изменения сохраненные"
     },
+    "createNewEvent": {
+      "forGroup": {
+        "title": null
+      },
+      "title": null
+    },
+    "createNewPost": {
+      "forGroup": {
+        "title": null
+      },
+      "title": null
+    },
     "edited": "Изменен",
+    "editPost": {
+      "event": null,
+      "forGroup": {
+        "title": null
+      },
+      "title": null
+    },
+    "event": null,
     "menu": {
       "delete": "Удалить пост",
       "edit": "Редактировать пост",
@@ -458,6 +787,20 @@
     "pinned": "Объявление",
     "takeAction": {
       "name": "Действовать"
+    },
+    "viewEvent": {
+      "eventEnd": null,
+      "eventIsOnline": null,
+      "eventLocationName": null,
+      "eventStart": null,
+      "eventVenue": null,
+      "title": null
+    },
+    "viewPost": {
+      "forGroup": {
+        "title": null
+      },
+      "title": null
     }
   },
   "profile": {
@@ -474,7 +817,6 @@
       "title": "Пригласите кого-нибудь в {APPLICATION_NAME}!"
     },
     "memberSince": "Участник с",
-    "name": "Мой профиль",
     "network": {
       "andMore": "и ещё {number} человек... ::: и ещё {number} человека... ::: и ещё {number} человек...",
       "followedBy": "ваши подписчики:",
@@ -562,12 +904,19 @@
   },
   "search": {
     "failed": "Ничего не найдено",
+    "for": null,
     "heading": {
+      "Group": null,
       "Post": "Посты",
+      "Tag": null,
       "User": "Пользователи"
     },
     "hint": "Что вы хотите найти? Используйте !... для постов, @... для пользователей, #... для хэштегов.",
-    "placeholder": "Поиск"
+    "no-results": null,
+    "page": null,
+    "placeholder": "Поиск",
+    "results": null,
+    "title": null
   },
   "settings": {
     "blocked-users": {
@@ -595,6 +944,7 @@
     "data": {
       "labelBio": "О себе",
       "labelCity": "Город или регион",
+      "labelCityHint": null,
       "labelName": "Имя",
       "labelSlug": "Уникальное имя пользователя",
       "name": "Персональные данные",
@@ -604,13 +954,19 @@
     "deleteUserAccount": {
       "accountDescription": "Обратите внимание, что ваши посты и комментарии важны для сообщества. Если вы все равно хотите их удалить, то вы должны отметить соответствующие опции ниже.",
       "accountWarning": "Вы <b>НЕ СМОЖЕТЕ</b> восстановить свой аккаунт, посты или комментарии после удаления.",
+      "accountWarningAdmin": null,
+      "accountWarningIsAdmin": null,
       "commentedCount": "Удалить мои комментарии: {count}",
+      "confirmDeleting": null,
       "contributionsCount": "Удалить мои посты: {count}",
+      "infoAdmin": null,
       "name": "Удалить данные",
       "pleaseConfirm": "<b class='is-danger'>Разрушительное действие!</b> Введите <b>{confirm}</b> для подтверждения.",
       "success": "Аккаунт успешно удален!"
     },
     "download": {
+      "description": null,
+      "json": null,
       "name": "Скачать данные"
     },
     "email": {
@@ -675,6 +1031,11 @@
       "unmuted": "{name} будет снова включен"
     },
     "name": "Настройки",
+    "notifications": {
+      "name": null,
+      "send-email-notifications": null,
+      "success-update": null
+    },
     "organizations": {
       "name": "Мои организации"
     },
@@ -704,6 +1065,13 @@
       "name": "Безопасность"
     },
     "social-media": {
+      "add-new-link": null,
+      "delete-modal": {
+        "confirm-button": null,
+        "message": null,
+        "title": null
+      },
+      "edit-link": null,
       "name": "Социальные Медиа",
       "placeholder": "Ссылка на профиль социальной сети",
       "requireUnique": "Ссылка уже существует",
@@ -728,6 +1096,7 @@
     "contact": "Контакт",
     "data-privacy": "Конфиденциальность",
     "director": "Управляющий директор",
+    "donate": null,
     "error-occurred": "Произошла ошибка.",
     "faq": "ЧаВо (FAQ)",
     "germany": "Германия",
@@ -735,6 +1104,7 @@
     "made": "Сделано с ❤️",
     "register": "Регистрационный номер",
     "responsible": "ответственный за содержание этой страницы (§ 55 Abs. 2 RStV)",
+    "support": null,
     "taxident": "UST-ID. в соответствии с §27a Закона о налоге с продаж Германии:",
     "termsAndConditions": "Условия и положения",
     "thanks": "Спасибо!",

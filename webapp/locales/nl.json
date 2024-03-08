@@ -1,6 +1,13 @@
 {
   "actions": {
-    "cancel": "Annuleren"
+    "cancel": "Annuleren",
+    "create": null,
+    "delete": null,
+    "edit": null,
+    "loading": null,
+    "loadMore": null,
+    "save": null,
+    "saveCategories": null
   },
   "admin": {
     "categories": {
@@ -20,6 +27,25 @@
       "shouts": "Shouts",
       "users": "Gebruikers"
     },
+    "donations": {
+      "goal": null,
+      "name": null,
+      "progress": null,
+      "showDonationsCheckboxLabel": null,
+      "successfulUpdate": null
+    },
+    "hashtags": {
+      "name": null,
+      "nameOfHashtag": null,
+      "number": null,
+      "tagCount": null,
+      "tagCountUnique": null
+    },
+    "invites": {
+      "description": null,
+      "name": null,
+      "title": null
+    },
     "name": "Admin",
     "notifications": {
       "name": "Meldingen"
@@ -33,18 +59,66 @@
     "settings": {
       "name": "Instellingen"
     },
-    "tags": {
-      "name": "Tags",
-      "tagCount": "Berichten",
-      "tagCountUnique": "Gebruikers"
-    },
     "users": {
-      "name": "Gebruikers"
+      "empty": null,
+      "form": {
+        "placeholder": null
+      },
+      "name": "Gebruikers",
+      "roleChanged": null,
+      "table": {
+        "columns": {
+          "createdAt": null,
+          "email": null,
+          "name": null,
+          "number": null,
+          "role": null,
+          "slug": null
+        }
+      }
     }
   },
+  "chat": {
+    "addRoomHeadline": null,
+    "cancelSelectMessage": null,
+    "conversationStarted": null,
+    "isOnline": null,
+    "isTyping": null,
+    "lastSeen": null,
+    "messageDeleted": null,
+    "messagesEmpty": null,
+    "newMessages": null,
+    "page": {
+      "headline": null
+    },
+    "roomEmpty": null,
+    "roomsEmpty": null,
+    "search": null,
+    "typeMessage": null,
+    "userProfileButton": {
+      "label": null,
+      "tooltip": null
+    }
+  },
+  "client-only": {
+    "loading": null
+  },
+  "code-of-conduct": {
+    "subheader": null
+  },
   "comment": {
-    "delete": "Commentaar verwijderen",
-    "edit": "Commentaar bewerken"
+    "content": {
+      "unavailable-placeholder": null
+    },
+    "edited": null,
+    "menu": {
+      "delete": null,
+      "edit": null
+    },
+    "show": {
+      "less": null,
+      "more": null
+    }
   },
   "common": {
     "category": "Categorie ::: Categorieën",
@@ -61,45 +135,592 @@
     "tag": "Tag ::: Tags",
     "takeAction": "Onderneem actie",
     "user": "Gebruiker ::: Gebruikers",
+    "validations": {
+      "categories": null,
+      "email": null,
+      "eventLocationNameLength": null,
+      "eventLocationNameNotEmpty": null,
+      "eventVenueLength": null,
+      "eventVenueNotEmpty": null,
+      "url": null
+    },
     "versus": "Versus"
   },
-  "contribution": {
-    "delete": "Bijdrage verwijderen",
-    "edit": "Bijdrage bewerken",
-    "teaserImage": {
-      "cropperConfirm": "Bevestigen",
-      "supportedFormats": "Voeg een afbeelding in met het bestandsformaat JPG, PNG of GIF!"
+  "components": {
+    "dateTimeRange": {
+      "hourMinute": null,
+      "monthDay": null,
+      "yearMonthDay": null
+    },
+    "password-reset": {
+      "change-password": {
+        "error": null,
+        "help": null,
+        "success": null
+      },
+      "request": {
+        "form": {
+          "description": null,
+          "submit": null,
+          "submitted": null
+        },
+        "title": null
+      }
+    },
+    "registration": {
+      "create-user-account": {
+        "buttonTitle": null,
+        "error": null,
+        "help": null,
+        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "success": null,
+        "termsAndCondsEtcConfirmed": null,
+        "title": null
+      },
+      "email": {
+        "buttonTitle": {
+          "resend": null,
+          "send": null,
+          "skipResend": null
+        },
+        "form": {
+          "sendEmailAgain": null,
+          "success": null
+        },
+        "title": null
+      },
+      "email-display": {
+        "warningFormat": null,
+        "warningUndef": null,
+        "yourEmail": null
+      },
+      "email-nonce": {
+        "buttonTitle": null,
+        "form": {
+          "click-next": null,
+          "description": null,
+          "next": null,
+          "nonce": null,
+          "validations": {
+            "error": null,
+            "length": null,
+            "success": null
+          }
+        },
+        "title": null
+      },
+      "invite-code": {
+        "buttonTitle": null,
+        "form": {
+          "description": null,
+          "invite-code": null,
+          "next": null,
+          "validations": {
+            "error": null,
+            "length": null,
+            "success": null
+          }
+        }
+      },
+      "no-public-registrstion": {
+        "title": null
+      },
+      "signup": {
+        "form": {
+          "data-privacy": null,
+          "description": null,
+          "errors": {
+            "email-exists": null
+          },
+          "submit": null,
+          "success": null,
+          "terms-and-condition": null
+        },
+        "title": null,
+        "unavailable": null
+      }
     }
   },
+  "contribution": {
+    "amount-clicks": null,
+    "amount-comments": null,
+    "amount-shouts": null,
+    "amount-views": null,
+    "categories": {
+      "infoSelectedNoOfMaxCategories": null
+    },
+    "category": {
+      "description": {
+        "body-and-excercise": null,
+        "children": null,
+        "culture": null,
+        "economy": null,
+        "energy": null,
+        "finance": null,
+        "health": null,
+        "home": null,
+        "it-and-media": null,
+        "law": null,
+        "miscellaneous": null,
+        "mobility": null,
+        "nature": null,
+        "networking": null,
+        "peace": null,
+        "politics": null,
+        "psyche": null,
+        "science": null,
+        "spirituality": null
+      },
+      "name": {
+        "body-and-excercise": null,
+        "children": null,
+        "culture": null,
+        "economy": null,
+        "energy": null,
+        "finance": null,
+        "health": null,
+        "home": null,
+        "it-and-media": null,
+        "law": null,
+        "miscellaneous": null,
+        "mobility": null,
+        "nature": null,
+        "networking": null,
+        "peace": null,
+        "politics": null,
+        "psyche": null,
+        "science": null,
+        "spirituality": null
+      }
+    },
+    "emotions-label": {
+      "angry": null,
+      "cry": null,
+      "funny": null,
+      "happy": null,
+      "surprised": null
+    },
+    "filterFollow": null,
+    "filterMasonryGrid": {
+      "myFriends": null,
+      "myGroups": null,
+      "myTopics": null,
+      "noFilter": null,
+      "onlyArticles": null,
+      "onlyEvents": null
+    },
+    "filterMyGroups": null,
+    "inappropriatePicture": null,
+    "languageSelectLabel": null,
+    "languageSelectText": null,
+    "newEvent": null,
+    "newPost": null,
+    "success": null,
+    "teaserImage": {
+      "cropImage": null,
+      "cropperConfirm": "Bevestigen",
+      "errors": {
+        "aspect-ratio-too-small": null,
+        "unSupported-file-format": null
+      },
+      "supportedFormats": "Voeg een afbeelding in met het bestandsformaat JPG, PNG of GIF!"
+    },
+    "title": null,
+    "visibleOnlyForMembersOfGroup": null
+  },
+  "delete": {
+    "cancel": null,
+    "comment": {
+      "message": null,
+      "success": null,
+      "title": null,
+      "type": null
+    },
+    "contribution": {
+      "message": null,
+      "success": null,
+      "title": null,
+      "type": null
+    },
+    "submit": null
+  },
   "disable": {
+    "cancel": null,
     "comment": {
       "message": "Wilt u de reactie van \" <b> {name} </b> \" echt uitschakelen ?",
       "title": "Commentaar uitschakelen",
       "type": "Melding"
+    },
+    "contribution": {
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "submit": null,
+    "success": null,
+    "user": {
+      "message": null,
+      "title": null,
+      "type": null
     }
+  },
+  "donations": {
+    "amount-of-total": null,
+    "donate-now": null
+  },
+  "editor": {
+    "embed": {
+      "always_allow": null,
+      "data_privacy_info": null,
+      "data_privacy_warning": null,
+      "play_now": null
+    },
+    "hashtag": {
+      "addHashtag": null,
+      "addLetter": null,
+      "noHashtagsFound": null
+    },
+    "legend": {
+      "bold": null,
+      "heading3": null,
+      "heading4": null,
+      "italic": null,
+      "legendTitle": null,
+      "link": null,
+      "orderedList": null,
+      "paragraph": null,
+      "quote": null,
+      "ruler": null,
+      "underline": null,
+      "unorderedList": null
+    },
+    "mention": {
+      "noUsersFound": null
+    },
+    "placeholder": null
+  },
+  "error-pages": {
+    "403-default": null,
+    "404-default": null,
+    "500-default": null,
+    "503-default": null,
+    "back-to-index": null,
+    "cannot-edit-post": null,
+    "default": null,
+    "group-not-found": null,
+    "post-not-found": null,
+    "profile-not-found": null
+  },
+  "filter-menu": {
+    "all": null,
+    "article": null,
+    "categories": null,
+    "creationDate": null,
+    "deleteFilter": null,
+    "emotions": null,
+    "ended": {
+      "all": {
+        "hint": null,
+        "label": null
+      },
+      "onlyEnded": {
+        "hint": null,
+        "label": null
+      }
+    },
+    "event": null,
+    "eventsBy": null,
+    "eventsEnded": null,
+    "filter-by": null,
+    "following": null,
+    "following-title": null,
+    "languages": null,
+    "my-groups": null,
+    "order": {
+      "last": {
+        "hint": null,
+        "label": null
+      },
+      "newest": {
+        "hint": null,
+        "label": null
+      },
+      "next": {
+        "hint": null,
+        "label": null
+      },
+      "oldest": {
+        "hint": null,
+        "label": null
+      }
+    },
+    "order-by": null,
+    "post-type": null,
+    "save": {
+      "error": null,
+      "success": null
+    },
+    "startDate": null
   },
   "followButton": {
     "follow": "Volgen",
     "following": "Volgt"
   },
   "group": {
+    "actionRadii": {
+      "continental": null,
+      "global": null,
+      "interplanetary": null,
+      "national": null,
+      "regional": null
+    },
+    "actionRadius": null,
+    "addMemberToGroup": null,
+    "addMemberToGroupSuccess": null,
+    "addUser": null,
+    "addUserNoOptions": null,
+    "addUserPlaceholder": null,
+    "allGroups": null,
+    "categories": null,
+    "categoriesTitle": null,
+    "changeMemberRole": null,
+    "contentMenu": {
+      "visitGroupPage": null
+    },
+    "createNewGroup": {
+      "title": null,
+      "tooltip": null
+    },
+    "description": null,
+    "editGroupSettings": {
+      "groupName": null,
+      "title": null
+    },
+    "errors": {
+      "userAlreadyMember": null
+    },
+    "follow": null,
     "foundation": null,
+    "general": null,
     "goal": null,
+    "groupCreated": null,
+    "in": null,
     "joinLeaveButton": {
       "iAmMember": null,
       "join": null,
-      "pendingMember": null
+      "leave": null,
+      "pendingMember": null,
+      "tooltip": null
+    },
+    "labelSlug": null,
+    "leaveModal": {
+      "confirmButton": null,
+      "message": null,
+      "title": null
+    },
+    "memberRemoved": null,
+    "members": null,
+    "membersAdministrationList": {
+      "avatar": null,
+      "name": null,
+      "roleInGroup": null,
+      "slug": null
     },
     "membersCount": null,
-    "membersListTitle": null
+    "membersListTitle": null,
+    "membersListTitleNotAllowedSeeingGroupMembers": null,
+    "modal": {
+      "cancel": null,
+      "confirm": null,
+      "confirmAddGroupMemberText": null,
+      "confirmAddGroupMemberTitle": null
+    },
+    "myGroups": null,
+    "name": null,
+    "radius": null,
+    "removeMember": null,
+    "removeMemberButton": null,
+    "role": null,
+    "roles": {
+      "admin": null,
+      "owner": null,
+      "pending": null,
+      "usual": null
+    },
+    "save": null,
+    "type": null,
+    "types": {
+      "closed": null,
+      "hidden": null,
+      "public": null
+    },
+    "typesOptions": {
+      "closed": null,
+      "hidden": null,
+      "public": null
+    },
+    "update": null,
+    "updatedGroup": null
+  },
+  "hashtags-filter": {
+    "clearSearch": null,
+    "hashtag-search": null,
+    "title": null
+  },
+  "header": {
+    "avatarMenu": {
+      "button": {
+        "tooltip": null
+      },
+      "chats": "Chats",
+      "groups": "Groepen",
+      "map": null,
+      "myProfile": null,
+      "notifications": "Notificaties"
+    },
+    "chats": {
+      "tooltip": "Chats"
+    },
+    "groups": {
+      "tooltip": "Groepen"
+    },
+    "map": {
+      "tooltip": null
+    },
+    "notifications": {
+      "tooltip": "Notificaties"
+    }
+  },
+  "index": {
+    "change-filter-settings": null,
+    "no-results": null
+  },
+  "invite-codes": {
+    "button": {
+      "tooltip": null
+    },
+    "copy-code": null,
+    "copy-success": null,
+    "not-available": null,
+    "your-code": null
+  },
+  "localeSwitch": {
+    "tooltip": null
   },
   "login": {
     "email": "Uw E-mail",
+    "failure": null,
+    "forgotPassword": null,
     "hello": "Hallo",
     "login": "Inloggen",
     "logout": "Uitloggen",
     "moreInfo": "Wat is {APPLICATION_NAME}?",
-    "password": "Uw Wachtwoord"
+    "moreInfoHint": null,
+    "no-account": null,
+    "no-cookie": null,
+    "password": "Uw Wachtwoord",
+    "register": null,
+    "success": null
+  },
+  "maintenance": {
+    "explanation": null,
+    "questions": null,
+    "title": null
+  },
+  "map": {
+    "alertMessage": null,
+    "legend": {
+      "event": null,
+      "group": null,
+      "theUser": null,
+      "user": null
+    },
+    "markerTypes": {
+      "event": null,
+      "group": null,
+      "theUser": null,
+      "user": null
+    },
+    "pageTitle": null,
+    "styles": {
+      "dark": null,
+      "outdoors": null,
+      "satellite": null,
+      "streets": null
+    }
+  },
+  "modals": {
+    "deleteUser": {
+      "created": null
+    }
+  },
+  "moderation": {
+    "name": null,
+    "reports": {
+      "author": null,
+      "content": null,
+      "decideButton": null,
+      "decided": null,
+      "decideModal": {
+        "cancel": null,
+        "Comment": {
+          "disable": {
+            "message": null,
+            "title": null
+          },
+          "enable": {
+            "message": null,
+            "title": null
+          }
+        },
+        "Post": {
+          "disable": {
+            "message": null,
+            "title": null
+          },
+          "enable": {
+            "message": null,
+            "title": null
+          }
+        },
+        "submit": null,
+        "User": {
+          "disable": {
+            "message": null,
+            "title": null
+          },
+          "enable": {
+            "message": null,
+            "title": null
+          }
+        }
+      },
+      "decision": null,
+      "DecisionSuccess": null,
+      "disabled": null,
+      "disabledAt": null,
+      "disabledBy": null,
+      "empty": null,
+      "enabled": null,
+      "enabledAt": null,
+      "enabledBy": null,
+      "filterLabel": {
+        "all": null,
+        "closed": null,
+        "reviewed": null,
+        "unreviewed": null
+      },
+      "moreDetails": null,
+      "name": null,
+      "noDecision": null,
+      "numberOfUsers": null,
+      "previousDecision": null,
+      "reasonCategory": null,
+      "reasonDescription": null,
+      "reportedOn": null,
+      "status": null,
+      "submitter": null
+    }
   },
   "notifications": {
     "comment": null,
@@ -110,35 +731,103 @@
       "read": null,
       "unread": null
     },
+    "group": null,
     "markAllAsRead": "Markeer alles als gelezen",
-    "pageLink": null,
+    "pageLink": "Alle notificaties",
     "post": null,
     "reason": {
+      "changed_group_member_role": null,
       "commented_on_post": null,
       "mentioned_in_comment": null,
-      "mentioned_in_post": null
+      "mentioned_in_post": null,
+      "removed_user_from_group": null,
+      "user_joined_group": null,
+      "user_left_group": null
     },
     "title": null,
     "user": null
   },
   "post": {
-    "moreInfo": {
-      "name": "Meer info"
+    "comment": {
+      "reply": null,
+      "submit": null,
+      "submitted": null,
+      "updated": null
+    },
+    "createNewEvent": {
+      "forGroup": {
+        "title": null
+      },
+      "title": null
+    },
+    "createNewPost": {
+      "forGroup": {
+        "title": null
+      },
+      "title": null
+    },
+    "edited": null,
+    "editPost": {
+      "event": null,
+      "forGroup": {
+        "title": null
+      },
+      "title": null
+    },
+    "event": null,
+    "menu": {
+      "delete": null,
+      "edit": null,
+      "pin": null,
+      "pinnedSuccessfully": null,
+      "unpin": null,
+      "unpinnedSuccessfully": null
     },
     "name": "Post",
+    "pinned": null,
     "takeAction": {
       "name": "Onderneem actie"
+    },
+    "viewEvent": {
+      "eventEnd": null,
+      "eventIsOnline": null,
+      "eventLocationName": null,
+      "eventStart": null,
+      "eventVenue": null,
+      "title": null
+    },
+    "viewPost": {
+      "forGroup": {
+        "title": null
+      },
+      "title": null
     }
   },
   "profile": {
     "avatar": {
       "submitted": null
     },
+    "commented": null,
     "follow": "Volgen",
     "followers": "Volgelingen",
     "following": "Volgt",
+    "invites": {
+      "description": null,
+      "emailPlaceholder": null,
+      "title": null
+    },
     "memberSince": "Lid sinds",
-    "name": "Mijn profiel"
+    "network": {
+      "andMore": null,
+      "followedBy": null,
+      "followedByNobody": null,
+      "following": null,
+      "followingNobody": null,
+      "title": null
+    },
+    "shouted": null,
+    "socialMedia": null,
+    "userAnonym": null
   },
   "quotes": {
     "african": {
@@ -146,20 +835,68 @@
       "quote": "Veel kleine mensen op veel kleine plaatsen doen veel kleine dingen, die het gezicht van de wereld kunnen veranderen."
     }
   },
+  "release": {
+    "cancel": null,
+    "comment": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "contribution": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "submit": null,
+    "success": null,
+    "user": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    }
+  },
   "report": {
     "cancel": "Annuleren",
     "comment": {
+      "error": null,
       "message": "Wilt u echt het commentaar van \"<b>{name}</b>\" melden?",
       "title": "Reactie melden",
       "type": "Melding"
     },
     "contribution": {
+      "error": null,
       "message": "Wilt u echt het commentaar van \"<b>{name}</b>\" melden?",
       "title": "Bijdrage melden",
       "type": "Bijdrage"
     },
+    "reason": {
+      "category": {
+        "invalid": null,
+        "label": null,
+        "options": {
+          "advert_products_services_commercial": null,
+          "criminal_behavior_violation_german_law": null,
+          "discrimination_etc": null,
+          "doxing": null,
+          "glorific_trivia_of_cruel_inhuman_acts": null,
+          "intentional_intimidation_stalking_persecution": null,
+          "other": null,
+          "pornographic_content_links": null
+        },
+        "placeholder": null
+      },
+      "description": {
+        "label": null,
+        "placeholder": null
+      }
+    },
     "submit": "Verzenden",
+    "success": null,
     "user": {
+      "error": null,
       "message": "Wilt u echt het commentaar van \"<b>{name}</b>\" melden?",
       "title": "Gebruiker melden",
       "type": "Gebruiker"
@@ -167,18 +904,107 @@
   },
   "search": {
     "failed": "Niets gevonden",
+    "for": null,
+    "heading": {
+      "Group": null,
+      "Post": null,
+      "Tag": null,
+      "User": null
+    },
     "hint": "Waar zoekt u naar? Gebruik !... voor berichten, @... voor gebruikers, #... voor hashtags.",
-    "placeholder": "Zoeken"
+    "no-results": null,
+    "page": null,
+    "placeholder": "Zoeken",
+    "results": null,
+    "title": null
   },
   "settings": {
-    "data": {
-      "name": "Uw gegevens"
+    "blocked-users": {
+      "block": null,
+      "columns": {
+        "name": null,
+        "slug": null,
+        "unblock": null
+      },
+      "empty": null,
+      "explanation": {
+        "closing": null,
+        "commenting-disabled": null,
+        "commenting-explanation": null,
+        "intro": null,
+        "notifications": null,
+        "their-perspective": null,
+        "your-perspective": null
+      },
+      "how-to": null,
+      "name": null,
+      "unblock": null,
+      "unblocked": null
     },
-    "delete": {
-      "name": "Account verwijderen"
+    "data": {
+      "labelBio": null,
+      "labelCity": null,
+      "labelCityHint": null,
+      "labelName": null,
+      "labelSlug": null,
+      "name": "Uw gegevens",
+      "namePlaceholder": null,
+      "success": null
+    },
+    "deleteUserAccount": {
+      "accountDescription": null,
+      "accountWarning": null,
+      "accountWarningAdmin": null,
+      "accountWarningIsAdmin": null,
+      "commentedCount": null,
+      "confirmDeleting": null,
+      "contributionsCount": null,
+      "infoAdmin": null,
+      "name": null,
+      "pleaseConfirm": null,
+      "success": null
     },
     "download": {
+      "description": null,
+      "json": null,
       "name": "Gegevens downloaden"
+    },
+    "email": {
+      "change-successful": null,
+      "labelEmail": null,
+      "labelNewEmail": null,
+      "labelNonce": null,
+      "name": null,
+      "submitted": null,
+      "success": null,
+      "validation": {
+        "same-email": null
+      },
+      "verification-error": {
+        "explanation": null,
+        "message": null,
+        "reason": {
+          "invalid-nonce": null,
+          "no-email-request": null
+        },
+        "support": null
+      }
+    },
+    "embeds": {
+      "info-description": null,
+      "name": null,
+      "status": {
+        "change": {
+          "allow": null,
+          "deny": null,
+          "question": null
+        },
+        "description": null,
+        "disabled": {
+          "off": null,
+          "on": null
+        }
+      }
     },
     "invites": {
       "name": "Uitnodigingen"
@@ -186,29 +1012,107 @@
     "languages": {
       "name": "Talen"
     },
+    "muted-users": {
+      "columns": {
+        "name": null,
+        "slug": null,
+        "unmute": null
+      },
+      "empty": null,
+      "explanation": {
+        "intro": null,
+        "search": null,
+        "your-perspective": null
+      },
+      "how-to": null,
+      "mute": null,
+      "name": null,
+      "unmute": null,
+      "unmuted": null
+    },
     "name": "Instellingen",
+    "notifications": {
+      "name": null,
+      "send-email-notifications": null,
+      "success-update": null
+    },
     "organizations": {
       "name": "Mijn Organisaties"
     },
+    "privacy": {
+      "make-shouts-public": null,
+      "name": null,
+      "success-update": null
+    },
     "security": {
+      "change-password": {
+        "button": null,
+        "label-new-password": null,
+        "label-new-password-confirm": null,
+        "label-old-password": null,
+        "message-new-password-confirm-required": null,
+        "message-new-password-missmatch": null,
+        "message-new-password-required": null,
+        "message-old-password-required": null,
+        "passwordSecurity": null,
+        "passwordStrength0": null,
+        "passwordStrength1": null,
+        "passwordStrength2": null,
+        "passwordStrength3": null,
+        "passwordStrength4": null,
+        "success": null
+      },
       "name": "Veiligheid"
+    },
+    "social-media": {
+      "add-new-link": null,
+      "delete-modal": {
+        "confirm-button": null,
+        "message": null,
+        "title": null
+      },
+      "edit-link": null,
+      "name": null,
+      "placeholder": null,
+      "requireUnique": null,
+      "submit": null,
+      "successAdd": null,
+      "successDelete": null
+    },
+    "validation": {
+      "slug": {
+        "alreadyTaken": null,
+        "regex": null
+      }
     }
   },
   "shoutButton": {
     "shouted": "uitgeroepen"
   },
   "site": {
+    "back-to-login": null,
     "bank": "bankrekening",
+    "code-of-conduct": null,
     "contact": "contact",
     "data-privacy": "gegevensbescherming",
     "director": "Directeur",
+    "donate": null,
+    "error-occurred": null,
+    "faq": null,
     "germany": "Duitsland",
     "imprint": "Afdruk",
     "made": "Met ❤️ gemaakt",
     "register": "inschrijfnummer",
     "responsible": "Verantwoordelijk volgens § 55 Abs. 2 RStV (Duitsland).",
+    "support": null,
     "taxident": "Identificatienummer voor de belasting over de toegevoegde waarde overeenkomstig § 27 a Wet op de belasting over de toegevoegde waarde (Duitsland).",
-    "termsAc": "Gebruiksvoorwaarden",
+    "termsAndConditions": null,
+    "thanks": null,
     "tribunal": "registerrechtbank"
+  },
+  "termsAndConditions": {
+    "newTermsAndConditions": null,
+    "termsAndConditionsNewConfirm": null,
+    "termsAndConditionsNewConfirmText": null
   }
 }

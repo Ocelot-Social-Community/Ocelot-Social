@@ -195,9 +195,10 @@
         "yourEmail": "Your e-mail address:"
       },
       "email-nonce": {
-        "buttonTitle": "Confirm",
+        "buttonTitle": "Continue",
         "form": {
-          "description": "Open your inbox and enter the code that we've sent to you.",
+          "click-next": "Click on Continue.",
+          "description": "Open your e-mail inbox and enter the code that we've sent to you.",
           "next": "Continue",
           "nonce": "E-mail code: 32143",
           "validations": {
@@ -480,9 +481,6 @@
     "addUserNoOptions": "No users found!",
     "addUserPlaceholder": "User name",
     "allGroups": "All Groups",
-    "button": {
-      "tooltip": "Show groups"
-    },
     "categories": "Topic ::: Topics",
     "categoriesTitle": "Topics of the group",
     "changeMemberRole": "The role has been changed to “{role}”!",
@@ -574,11 +572,23 @@
       "button": {
         "tooltip": "My profile"
       },
+      "chats": "Chats",
       "groups": "Groups",
-      "myProfile": "My profile"
+      "map": "Map",
+      "myProfile": "My profile",
+      "notifications": "Notifications"
     },
-    "chat": {
-      "tooltip": "My chats"
+    "chats": {
+      "tooltip": "Chats"
+    },
+    "groups": {
+      "tooltip": "Groups"
+    },
+    "map": {
+      "tooltip": "Map"
+    },
+    "notifications": {
+      "tooltip": "Notifications"
     }
   },
   "index": {
@@ -619,9 +629,6 @@
   },
   "map": {
     "alertMessage": "The map cannot be accessed: The Mapbox token is not set on the server!",
-    "button": {
-      "tooltip": "Show map"
-    },
     "legend": {
       "event": "Event",
       "group": "Group",
@@ -725,9 +732,6 @@
       "unread": "Unread"
     },
     "group": "Description",
-    "headerMenuButton": {
-      "tooltip": "My notifications"
-    },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
     "post": "Post or Group",
@@ -787,9 +791,9 @@
     "viewEvent": {
       "eventEnd": "End",
       "eventIsOnline": "Online",
-      "eventLocationName": "City — e.g. Example Street 1, 12345 City",
+      "eventLocationName": "Adress for navi — e.g. Example Street 1, 12345 City",
       "eventStart": "Start",
-      "eventVenue": "Venue — e.g. Backyard, 1st Floor, …",
+      "eventVenue": "Location description — e.g. backyard, 1st floor, …",
       "title": "Event"
     },
     "viewPost": {

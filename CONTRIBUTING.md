@@ -1,10 +1,10 @@
 # CONTRIBUTING
 
-Thank you so much for thinking of contributing to the <!-- [ -->ocelot.social<!-- ](https://ocelot.social) --> project! It's awesome you're here, we really appreciate it. :-\)
+Thank you so much for thinking of contributing to the [ocelot.social](https://ocelot.social) project! It's awesome you're here, we really appreciate it. :-\)
 
 ## Getting Set Up
 
-Instructions for how to install all the necessary software and some code guidelines can be found in our main [Readme](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md) or in our [documentation](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/SUMMARY.md).
+Instructions for how to install all the necessary software and some code guidelines can be found in our main [Readme](./README.md) or in our [documentation](./SUMMARY.md).
 
 To get you started we recommend that you join forces with a regular contributor. Please join [our Discord instance](https://discord.gg/AJSX9DCSUA) to chat with developers or just get in touch directly on an issue on either [Github](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues) or [Zenhub](https://app.zenhub.com/workspaces/ocelotsocial-5fb21ff922cb410015dd6535/board?filterLogic=any&repos=301151089):
 
@@ -36,7 +36,7 @@ Every pull request needs to:
 
 ## Contribution Flow For Open Source Contributors
 
-See [contributing in main README.md](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md#contributing)
+See [contributing in main README.md](./README.md#contributing)
 
 ## The Team
 
@@ -171,11 +171,11 @@ Please copy and paste the following quotes for the languages:
 
 ## Docker – More Closely
 
-### Apple M1 Platform
+### Apple Silicon Platform
 
-***Attention:** For using Docker commands in Apple M1 environments!*
+***ATTENTION:** For using Docker commands in Apple Silicon environments!*
 
-#### Environment Variable For Apple M1 Platform
+#### Environment Variable For Apple Silicon Platform (M1, M2 Chips)
 
 If you encounter trouble building the docker containers on an Apple M1 chip you can try to explicitly define the target platform docker builds and pulls images for:
 

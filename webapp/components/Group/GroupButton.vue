@@ -6,7 +6,7 @@
         circle
         ghost
         v-tooltip="{
-          content: $t('group.button.tooltip'),
+          content: $t('header.groups.tooltip'),
           placement: 'bottom-start',
         }"
       />

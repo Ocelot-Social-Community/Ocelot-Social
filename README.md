@@ -1,18 +1,19 @@
 # Ocelot.Social
 
-[![Build Status Test](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test.yml/badge.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions)
+[![Backend Test CI](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-backend.yml/badge.svg?branch=master)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-backend.yml)
+[![Webapp Test CI](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-webapp.yml/badge.svg?branch=master)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-webapp.yml)
+[![E2E Test CI](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-e2e.yml/badge.svg?branch=master)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/test-e2e.yml)
 [![Build Status Publish](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions/workflows/publish.yml/badge.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/actions)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/LICENSE.md)
 [![Discord Channel](https://img.shields.io/discord/489522408076738561.svg)](https://discord.gg/AJSX9DCSUA)
 [![Open Source Helpers](https://www.codetriage.com/ocelot-social-community/ocelot-social/badges/users.svg)](https://www.codetriage.com/ocelot-social-community/ocelot-social)
 
-<!-- [ -->Ocelot.social<!-- ](<https://ocelot.social>) --> is free and open source software program code to run social networks. Its development is supported by a community of programmers and interested network operators.
+[Ocelot.social](https://ocelot.social) is free and open source software program code to run social networks. Its development is supported by a community of programmers and interested network operators.
 
 <!-- markdownlint-disable MD033 -->
-<p align="center">
-  <!-- <a href="https://ocelot.social" target="_blank"> -->
-    <img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/master/webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%">
-  <!-- </a> -->
+<!-- <p align="center"> -->
+<p style="text-align: center;">
+  <a href="https://ocelot.social" target="_blank"><img src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/master/webapp/static/img/custom/logo-squared.svg" alt="ocelot.social" width="40%" height="40%"></a>
 </p>
 <!-- markdownlint-enable MD033 -->
 
@@ -69,7 +70,7 @@ Try out our live demo network, see [here](#live-demo-and-developer-logins).
 If you're wondering how you could help, there are plenty of ways, e.g.:
 
 - Spread the good word about ocelot.social to make it more popular:
-  - Add the link <!-- [ -->ocelot.social<!-- ](https://ocelot.social)--> to your website.
+  - Add the link [ocelot.social](https://ocelot.social) to your website.
   - Give ocelot.social a Like at <https://alternativeto.net/software/ocelot-social/>.
   - Star our project on GitHub at <https://github.com/Ocelot-Social-Community/Ocelot-Social/>.
   - Promote it on your social networks.
@@ -140,11 +141,11 @@ $ cd Ocelot-Social
 
 ### Live Demo and Developer Logins
 
-**Try out our deployed <!-- [ -->development environment<!--](https://stage.ocelot.social)-->.**
+**Try out our deployed [development environment](https://stage.ocelot.social).**
 
 Visit our staging networks:
 
-- central staging network: <!-- [ -->stage.ocelot.social<!-- ](https://stage.ocelot.social)-->
+- central staging network: [stage.ocelot.social](https://stage.ocelot.social)
 <!-- - rebranded staging network: [rebrand.ocelot.social](https://stage.ocelot.social). -->
 
 #### Login
@@ -173,7 +174,9 @@ Check the correct Docker installation by checking the version before proceeding.
 $ docker --version
 ```
 
-##### Start Ocelot-Social via Docker-Compose
+##### Start Ocelot-Social via Docker Compose
+
+***ATTENTION:** For using Docker commands in Apple Silicon environments see [here](https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/CONTRIBUTING.md#apple-silicon-platform).*
 
 Prepare ENVs once beforehand:
 
@@ -234,7 +237,7 @@ We are happy if you fork our repository, but we don't recommend it for developme
 
 Clone this repository locally as [described above](#clone-the-repository), create your branch named `<issue-number>-<description>`, add your code and push your branch direct to this repository. Then create a PR by comparing it to our `master`.
 
-**_!!! Be aware:_** Please don't compare from a fork, because the tests are breaking caused by credential problems.
+***!!! Be aware:*** Please don't compare from a fork, because the tests are breaking caused by credential problems.
 
 Please run the following commands before you push:
 
