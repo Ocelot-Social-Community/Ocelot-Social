@@ -33,9 +33,9 @@
     "release": "yarn version --no-git-tag-version --no-commit-hooks --no-commit && auto-changelog --latest-version $(node -p -e \"require('./package.json').version\") && cd backend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../frontend && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../package.json').version\") && cd ../webapp/maintenance/source && yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $(node -p -e \"require('./../../../package.json').version\")"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.7",
-    "@babel/preset-env": "^7.23.9",
-    "@babel/register": "^7.22.15",
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "@babel/register": "^7.23.7",
     "@badeball/cypress-cucumber-preprocessor": "^20.0.1",
     "@cucumber/cucumber": "10.3.1",
     "@cypress/browserify-preprocessor": "^3.0.2",
@@ -43,9 +43,9 @@
     "auto-changelog": "^2.3.0",
     "bcryptjs": "^2.4.3",
     "cross-env": "^7.0.3",
-    "cypress": "^13.6.4",
+    "cypress": "^13.6.6",
     "cypress-network-idle": "^1.14.2",
-    "date-fns": "^2.25.0",
+    "date-fns": "^3.3.1",
     "dotenv": "^16.4.4",
     "expect": "^29.6.4",
     "graphql-request": "^2.0.0",
@@ -63,7 +63,7 @@
     "@vuepress/bundler-vite": "^2.0.0-rc.7",
     "vuepress": "^2.0.0-rc.7",
     "vuepress-plugin-search-pro": "^2.0.0-rc.23",
-    "vuepress-theme-hope": "^2.0.0-rc.23"
+    "vuepress-theme-hope": "^2.0.0-rc.29"
   },
   "resolutions": {
     "set-value": "^2.0.1",
