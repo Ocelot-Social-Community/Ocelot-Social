@@ -1,10 +1,11 @@
 import { getDriver } from '../../db/neo4j'
 import { existsSync, createReadStream } from 'fs'
 import path from 'path'
-import { S3 } from 'aws-sdk'
+import { HttpHandlerOptions, streamCollector, Upload } from '@aws-sdk/lib-storage'
+import { ObjectCannedACL, S3, S3ClientConfig } from '@aws-sdk/client-s3'
 import mime from 'mime-types'
 import s3Configs from '../../config'
-import https from 'https'
+import { Agent } from 'https'
 
 export const description = `
 Upload all image files to a S3 compatible object storage in order to reduce
@@ -15,7 +16,7 @@ export async function up(next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
-  const agent = new https.Agent({
+  const agent = new Agent({
     maxSockets: 5,
   })
 
@@ -32,7 +33,24 @@ export async function up(next) {
     return
   }
 
-  const s3 = new S3({ region, endpoint, httpOptions: { agent } })
+  const s3 = new S3({
+    region,
+    endpoint,
+    clientDefault: {
+      middleware: (stack) => {
+        stack.add(
+          (next, context) => (args) => {
+            const httpOptions: HttpHandlerOptions = {
+                agent
+            };
+            args.request.handlerOptions = httpOptions;
+            return next(args);
+          },
+          { step: 'initialize', name: 'customHttpMiddleware' }
+        )
+      }
+    }
+  })
   try {
     // Implement your migration here.
     const { records } = await transaction.run('MATCH (image:Image) RETURN image.url as url')
@@ -50,12 +68,15 @@ export async function up(next) {
               const params = {
                 Bucket,
                 Key: s3Location,
-                ACL: 'public-read',
+                ACL: ObjectCannedACL.public_read,
                 ContentType: mimeType || 'image/jpeg',
                 Body: createReadStream(fileLocation),
               }
 
-              const data = await s3.upload(params).promise()
+              const data = await new Upload({
+                client: s3,
+                params,
+              }).done()
               const { Location: spacesUrl } = data
 
               const updatedRecord = await transaction.run(
