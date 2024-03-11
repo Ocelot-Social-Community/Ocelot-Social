@@ -18,6 +18,7 @@ const config: UserConfig = {
     vueI18n({
       ssr: true,
       include: path.resolve(__dirname, './src/locales/**'),
+      jitCompilation: false,
     }),
     checker({
       typescript: true,
