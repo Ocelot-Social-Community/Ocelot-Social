@@ -1095,7 +1095,6 @@
     "code-of-conduct": null,
     "contact": "Contatto",
     "data-privacy": "protezione dei dati",
-    "director": "Direttore Generale",
     "donate": null,
     "error-occurred": null,
     "faq": null,
@@ -1103,12 +1102,9 @@
     "imprint": "Impressum",
     "made": "Con ❤️ fatto",
     "register": "numero di registro",
-    "responsible": "Responsabile ai sensi del § 55 Abs. 2 RStV (Germania)",
     "support": null,
-    "taxident": "Numero di identificazione dell'imposta sul valore aggiunto ai sensi del § 27 a Legge sull'imposta sul valore aggiunto (Germania)",
     "termsAndConditions": null,
-    "thanks": null,
-    "tribunal": "registro tribunale"
+    "thanks": null
   },
   "termsAndConditions": {
     "newTermsAndConditions": "Nuovi Termini e Condizioni",

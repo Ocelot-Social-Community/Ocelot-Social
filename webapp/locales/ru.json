@@ -1095,7 +1095,6 @@
     "code-of-conduct": "Кодекс поведения",
     "contact": "Контакт",
     "data-privacy": "Конфиденциальность",
-    "director": "Управляющий директор",
     "donate": null,
     "error-occurred": "Произошла ошибка.",
     "faq": "ЧаВо (FAQ)",
@@ -1103,12 +1102,9 @@
     "imprint": "Импрессум",
     "made": "Сделано с ❤️",
     "register": "Регистрационный номер",
-    "responsible": "ответственный за содержание этой страницы (§ 55 Abs. 2 RStV)",
     "support": null,
-    "taxident": "UST-ID. в соответствии с §27a Закона о налоге с продаж Германии:",
     "termsAndConditions": "Условия и положения",
-    "thanks": "Спасибо!",
-    "tribunal": "Суд регистрации"
+    "thanks": "Спасибо!"
   },
   "termsAndConditions": {
     "newTermsAndConditions": "Новые условия и положения",
