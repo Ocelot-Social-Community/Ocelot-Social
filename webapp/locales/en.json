@@ -1095,7 +1095,6 @@
     "code-of-conduct": "Code of Conduct",
     "contact": "Contact",
     "data-privacy": "Data privacy",
-    "director": "Managing Director",
     "donate": "Donate",
     "error-occurred": "An error occurred.",
     "faq": "FAQ",
@@ -1103,12 +1102,9 @@
     "imprint": "Imprint",
     "made": "Made with ❤️",
     "register": "Registry number",
-    "responsible": "responsible for contents of this page (§ 55 Abs. 2 RStV)",
     "support": "Support",
-    "taxident": "USt-ID. according to §27a of the German Sales Tax Law:",
     "termsAndConditions": "Terms and conditions",
-    "thanks": "Thanks!",
-    "tribunal": "Registry court"
+    "thanks": "Thanks!"
   },
   "termsAndConditions": {
     "newTermsAndConditions": "New Terms and Conditions",

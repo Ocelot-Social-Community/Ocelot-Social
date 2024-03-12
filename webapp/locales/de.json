@@ -1095,7 +1095,6 @@
     "code-of-conduct": "Verhaltenscodex",
     "contact": "Kontakt",
     "data-privacy": "Datenschutzerklärung",
-    "director": "Geschäftsführer",
     "donate": "Spenden",
     "error-occurred": "Ein Fehler ist aufgetreten.",
     "faq": "FAQ",
@@ -1103,12 +1102,9 @@
     "imprint": "Impressum",
     "made": "Mit ❤️ gemacht",
     "register": "Registernummer",
-    "responsible": "Verantwortlich für Inhalte dieser Seite (§ 55 Abs. 2 RStV)",
     "support": "Support",
-    "taxident": "Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz (Deutschland)",
     "termsAndConditions": "Nutzungsbedingungen",
-    "thanks": "Danke!",
-    "tribunal": "Registergericht"
+    "thanks": "Danke!"
   },
   "termsAndConditions": {
     "newTermsAndConditions": "Neue Nutzungsbedingungen",

@@ -1095,7 +1095,6 @@
     "code-of-conduct": "Código de conducta",
     "contact": "Contacto",
     "data-privacy": "Protección de datos",
-    "director": "Director General",
     "donate": null,
     "error-occurred": "Se ha ocurrido un error.",
     "faq": "Preguntas más frecuentes",
@@ -1103,12 +1102,9 @@
     "imprint": "Pie de imprenta",
     "made": "Hecho con ❤️",
     "register": "Número de registro",
-    "responsible": "Responsable según § 55 Abs. 2 RStV (Alemania)",
     "support": null,
-    "taxident": "Número de identificación del impuesto sobre el valor añadido según el § 27 a de la Ley del Impuesto sobre el Valor Añadido (Alemania)",
     "termsAndConditions": "Términos y condiciones",
-    "thanks": "¡Gracias!",
-    "tribunal": "Tribunal de registro"
+    "thanks": "¡Gracias!"
   },
   "termsAndConditions": {
     "newTermsAndConditions": "Nuevos términos de uso",
