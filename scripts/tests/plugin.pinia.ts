@@ -1,5 +1,4 @@
+import { createTestingPinia } from '@pinia/testing'
 import { config } from '@vue/test-utils'
 
-import pinia from '#plugins/pinia'
-
-config.global.plugins.push(pinia)
+config.global.plugins.push(createTestingPinia())
