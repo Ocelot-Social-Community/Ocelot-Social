@@ -1095,7 +1095,6 @@
     "code-of-conduct": null,
     "contact": "Kontakt",
     "data-privacy": "ochrona danych",
-    "director": "Dyrektor zarządzający",
     "donate": null,
     "error-occurred": null,
     "faq": null,
@@ -1103,12 +1102,9 @@
     "imprint": "Nadruk",
     "made": "Z ❤️ zrobiony",
     "register": "numer rejestracyjny",
-    "responsible": "Odpowiedzialny zgodnie z § 55 Abs. 2 RStV (Niemcy)",
     "support": null,
-    "taxident": "Numer identyfikacyjny podatku od wartości dodanej zgodnie z § 27 a Ustawa o podatku od wartości dodanej (Niemcy)",
     "termsAndConditions": null,
-    "thanks": null,
-    "tribunal": "sąd rejestrowy"
+    "thanks": null
   },
   "termsAndConditions": {
     "newTermsAndConditions": null,

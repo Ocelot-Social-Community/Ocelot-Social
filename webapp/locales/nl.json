@@ -1095,7 +1095,6 @@
     "code-of-conduct": null,
     "contact": "contact",
     "data-privacy": "gegevensbescherming",
-    "director": "Directeur",
     "donate": null,
     "error-occurred": null,
     "faq": null,
@@ -1103,12 +1102,9 @@
     "imprint": "Afdruk",
     "made": "Met ❤️ gemaakt",
     "register": "inschrijfnummer",
-    "responsible": "Verantwoordelijk volgens § 55 Abs. 2 RStV (Duitsland).",
     "support": null,
-    "taxident": "Identificatienummer voor de belasting over de toegevoegde waarde overeenkomstig § 27 a Wet op de belasting over de toegevoegde waarde (Duitsland).",
     "termsAndConditions": null,
-    "thanks": null,
-    "tribunal": "registerrechtbank"
+    "thanks": null
   },
   "termsAndConditions": {
     "newTermsAndConditions": null,
