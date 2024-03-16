@@ -80,7 +80,7 @@ async function startServer() {
         next()
       } else {
         const { body, statusCode, headers, earlyHints } = httpResponse
-        if (res.writeEarlyHints)
+        if (process.env.EARLY_HINTS && res.writeEarlyHints)
           res.writeEarlyHints({ link: earlyHints.map((e) => e.earlyHintLink) })
         headers.forEach(([name, value]) => res.setHeader(name, value))
         res.status(statusCode)
