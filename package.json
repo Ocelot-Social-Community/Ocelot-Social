@@ -56,7 +56,7 @@
     "neo4j-driver": "^4.3.4",
     "neode": "^0.4.8",
     "rosie": "^2.1.0",
-    "slug": "^8.2.3",
+    "slug": "^9.0.0",
     "wait-on": "^7.2.0"
   },
   "optionalDependencies": {
