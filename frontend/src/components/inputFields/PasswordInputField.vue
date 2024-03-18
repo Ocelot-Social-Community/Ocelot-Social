@@ -57,11 +57,11 @@ function toggleReveal() {
 
 .reveal-button {
   height: 56px !important; // TODO Get value from Vuetify (--v-input-control-height)
+  border: 1px solid rgb(0 0 0 / 30%) !important; // --v-border-opacity 0.12?!
+  border-left: none !important;
   border-top-left-radius: 0 !important;
   border-bottom-left-radius: 0 !important;
   box-shadow: none !important;
-  border: 1px solid rgba(0, 0, 0, 0.3) !important; // --v-border-opacity 0.12?!
-  border-left: none !important;
 }
 
 /*
@@ -82,7 +82,7 @@ function toggleReveal() {
   margin-right: 2px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-}*/
+} */
 
 /*
 .password-wrapper {
