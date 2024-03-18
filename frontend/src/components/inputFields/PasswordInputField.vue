@@ -50,14 +50,16 @@ function toggleReveal() {
 </template>
 
 <style lang="scss">
+@use '../../assets/sass/style';
+
 .v-field {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
 }
 
 .reveal-button {
-  height: 56px !important; // TODO Get value from Vuetify (--v-input-control-height)
-  border: 1px solid rgb(0 0 0 / 30%) !important; // --v-border-opacity 0.12?!
+  height: style.$input-control-height !important;
+  border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity)) !important; // --v-border-opacity 0.12, but should be more like 30%
   border-left: none !important;
   border-top-left-radius: 0 !important;
   border-bottom-left-radius: 0 !important;
