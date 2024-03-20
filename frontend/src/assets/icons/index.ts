@@ -3,8 +3,6 @@ const iconsModule = import.meta.glob('./svgComponents/' + '*.vue', {
   eager: true,
 })
 
-// Wolle console.log('iconsModule: ', iconsModule)
-
 type Module = {
   default: object
 }
@@ -15,7 +13,5 @@ Object.entries(iconsModule).forEach(([key, module]) => {
   // eslint-disable-next-line security/detect-object-injection
   icons[iconName] = module as Module
 })
-
-// Wolle console.log('icons: ', icons)
 
 export default icons
