@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-// import icons, { iconNames } from '#assets/icons'
+// Wolle import icons, { iconNames } from '#assets/icons'
 // import icons from '#assets/icons/svgs/angle-down.svg'
 
 // const iconsX = { icons }
