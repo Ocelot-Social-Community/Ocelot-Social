@@ -36,14 +36,14 @@
     "@babel/core": "^7.24.0",
     "@babel/preset-env": "^7.24.0",
     "@babel/register": "^7.23.7",
-    "@badeball/cypress-cucumber-preprocessor": "^20.0.1",
+    "@badeball/cypress-cucumber-preprocessor": "^20.0.2",
     "@cucumber/cucumber": "10.3.1",
     "@cypress/browserify-preprocessor": "^3.0.2",
     "@faker-js/faker": "8.4.1",
     "auto-changelog": "^2.3.0",
     "bcryptjs": "^2.4.3",
     "cross-env": "^7.0.3",
-    "cypress": "^13.6.6",
+    "cypress": "^13.7.0",
     "cypress-network-idle": "^1.14.2",
     "date-fns": "^3.3.1",
     "dotenv": "^16.4.4",
@@ -56,14 +56,14 @@
     "neo4j-driver": "^4.3.4",
     "neode": "^0.4.8",
     "rosie": "^2.1.0",
-    "slug": "^8.2.3",
+    "slug": "^9.0.0",
     "wait-on": "^7.2.0"
   },
   "optionalDependencies": {
     "@vuepress/bundler-vite": "^2.0.0-rc.7",
     "vuepress": "^2.0.0-rc.7",
     "vuepress-plugin-search-pro": "^2.0.0-rc.23",
-    "vuepress-theme-hope": "^2.0.0-rc.29"
+    "vuepress-theme-hope": "^2.0.0-rc.31"
   },
   "resolutions": {
     "set-value": "^2.0.1",
