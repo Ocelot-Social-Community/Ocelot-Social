@@ -1,11 +1,44 @@
 <script lang="ts" setup>
-// Wolle import icons, { iconNames } from '#assets/icons'
-// import icons from '#assets/icons/svgs/angle-down.svg'
-
-// const iconsX = { icons }
+const props = withDefaults(
+  defineProps<{
+    name: string
+    size?: 'small' | 'medium' | 'large'
+    ariaHidden?: boolean
+  }>(),
+  { size: 'medium', ariaHidden: false },
+)
 </script>
 
 <template>
-  <!-- <v-icon aria-label="My Account" role="img" aria-hidden="false"> $icons['angle-down'] </v-icon> -->
-  <v-icon aria-label="My Account" role="img" aria-hidden="false" icon="$vuetify"></v-icon>
+  <v-icon
+    class="base-icon"
+    :class="['svg', `--${size}`]"
+    :aria-hidden="props.ariaHidden"
+    :icon="props.name"
+  ></v-icon>
 </template>
+
+<style lang="scss">
+.base-icon {
+  display: inline-flex;
+  vertical-align: bottom;
+
+  > .svg {
+    height: 1.2em;
+    fill: currentColor;
+
+    &.--small {
+      height: 0.8em;
+    }
+
+    &.--medium {
+      height: 1.2em;
+    }
+
+    &.--large {
+      margin-left: 4px;
+      height: 2.2em;
+    }
+  }
+}
+</style>
