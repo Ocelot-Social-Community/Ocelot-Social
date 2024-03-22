@@ -1,44 +1,22 @@
 <script lang="ts" setup>
 const props = withDefaults(
   defineProps<{
-    name: string
-    size?: 'small' | 'medium' | 'large'
-    ariaHidden?: boolean
+    icon: string
+    color?: string
+    size: string | number | undefined
   }>(),
-  { size: 'medium', ariaHidden: false },
+  { color: '' },
 )
 </script>
 
 <template>
-  <v-icon
-    class="base-icon"
-    :class="['svg', `--${size}`]"
-    :aria-hidden="props.ariaHidden"
-    :icon="props.name"
-  ></v-icon>
+  <v-icon class="svg-color" :icon="props.icon" :size="props.size" />
 </template>
 
 <style lang="scss">
-.base-icon {
-  display: inline-flex;
-  vertical-align: bottom;
-
-  > .svg {
-    height: 1.2em;
-    fill: currentColor;
-
-    &.--small {
-      height: 0.8em;
-    }
-
-    &.--medium {
-      height: 1.2em;
-    }
-
-    &.--large {
-      margin-left: 4px;
-      height: 2.2em;
-    }
-  }
+.svg-color {
+  color: v-bind('props.color');
+  fill: currentColor;
+  stroke: currentColor;
 }
 </style>
