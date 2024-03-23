@@ -16,7 +16,7 @@ readdirSync(inputDir).forEach((file) => {
   const fileName = parse(file).name
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const content = readFileSync(filePath, 'utf8')
-  const vueComponent = `<!-- eslint-disable vue/multi-word-component-names -->\n<!-- eslint-disable @intlify/vue-i18n/no-raw-text -->\n<template>\n${content}\n</template>\n\n<script lang="ts">\nimport { defineComponent } from 'vue';\n\nexport default defineComponent({});\n</script>\n`
+  const vueComponent = `<!-- eslint-disable vue/multi-word-component-names -->\n<!-- eslint-disable @intlify/vue-i18n/no-raw-text -->\n<template>\n${content}\n</template>\n`
 
   const outputFilePath = join(outputDir, `${fileName}.vue`)
   // eslint-disable-next-line security/detect-non-literal-fs-filename
