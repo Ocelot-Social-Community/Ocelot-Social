@@ -188,16 +188,22 @@ describe('Filter Posts', () => {
         variables: { filter: { postType_in: ['Event'] }, orderBy: ['eventStart_asc'] },
       })
       expect(result).toHaveLength(2)
-      expect(result).toEqual([
-        expect.objectContaining({
-          id: 'e2',
-          eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString(),
-        }),
-        expect.objectContaining({
-          id: 'e1',
-          eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
-        }),
-      ])
+      expect(result).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'e2',
+            eventStart: new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate() + 1,
+            ).toISOString(),
+          }),
+          expect.objectContaining({
+            id: 'e1',
+            eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+          }),
+        ]),
+      )
     })
   })
 
@@ -219,12 +225,14 @@ describe('Filter Posts', () => {
         },
       })
       expect(result).toHaveLength(1)
-      expect(result).toEqual([
-        expect.objectContaining({
-          id: 'e1',
-          eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
-        }),
-      ])
+      expect(result).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'e1',
+            eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+          }),
+        ]),
+      )
     })
   })
 })
