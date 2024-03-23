@@ -62,7 +62,7 @@
     "merge-graphql-schemas": "^1.7.8",
     "metascraper": "^5.33.5",
     "metascraper-author": "^5.33.5",
-    "metascraper-date": "^5.33.5",
+    "metascraper-date": "^5.45.0",
     "metascraper-description": "^5.33.5",
     "metascraper-image": "^5.33.5",
     "metascraper-lang": "^5.33.5",
