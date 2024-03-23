@@ -16,7 +16,7 @@ const props = withDefaults(
 <style lang="scss">
 .svg-color {
   color: v-bind('props.color');
-  fill: currentColor;
-  stroke: currentColor;
+  fill: currentcolor;
+  stroke: currentcolor;
 }
 </style>
