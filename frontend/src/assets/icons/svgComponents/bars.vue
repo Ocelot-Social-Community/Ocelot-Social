@@ -7,9 +7,3 @@
     <path d="M4 7h24v2h-24v-2zM4 15h24v2h-24v-2zM4 23h24v2h-24v-2z"></path>
   </svg>
 </template>
-
-<script lang="ts">
-import { defineComponent } from 'vue'
-
-export default defineComponent({})
-</script>

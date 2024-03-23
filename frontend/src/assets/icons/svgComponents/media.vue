@@ -19,9 +19,3 @@
     <rect x="13.5" y="27.8" width="5.6" height="1.5" />
   </svg>
 </template>
-
-<script lang="ts">
-import { defineComponent } from 'vue'
-
-export default defineComponent({})
-</script>
