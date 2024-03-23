@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
-    "@babel/preset-env": "^7.24.0",
+    "@babel/preset-env": "^7.24.3",
     "@babel/register": "^7.23.7",
     "@badeball/cypress-cucumber-preprocessor": "^20.0.2",
     "@cucumber/cucumber": "10.3.1",
