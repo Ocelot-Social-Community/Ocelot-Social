@@ -15,6 +15,7 @@ const props = withDefaults(
 
 <style lang="scss">
 .svg-color {
+  // eslint-disable scss/function-no-unknown
   color: v-bind('props.color');
   fill: currentcolor;
   stroke: currentcolor;
