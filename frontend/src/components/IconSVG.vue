@@ -15,7 +15,8 @@ const props = withDefaults(
 
 <style lang="scss">
 .svg-color {
-  // eslint-disable-next-line scss/function-no-unknown
+  // there should be a '@use' directive to silent stylelint, but I couldn't find this out
+  // stylelint-disable function-no-unknown
   color: v-bind('props.color');
   fill: currentcolor;
   stroke: currentcolor;
