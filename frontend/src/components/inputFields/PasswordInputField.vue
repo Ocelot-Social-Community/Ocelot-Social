@@ -41,6 +41,7 @@ function toggleReveal() {
       :placeholder="$props.placeholder"
       :prepend-inner-icon="PasswordIcon"
       :class="['password-field']"
+      :validation="$props.validation"
     >
     </v-text-field>
     <v-btn class="reveal-button" type="button" @click="toggleReveal">

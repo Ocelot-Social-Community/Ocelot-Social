@@ -1,21 +1,13 @@
 <script lang="ts" setup>
+import { InputHTMLAttributes } from 'vue'
+
 import MailIcon from '#components/icons/MailIcon.vue'
 
-withDefaults(
-  defineProps<{
-    modelValue: string
-    label?: string
-    placeholder?: string
-    required?: boolean
-    autofocus?: boolean
-  }>(),
-  {
-    label: '',
-    placeholder: '',
-    required: undefined,
-    autofocus: undefined,
-  },
-)
+interface Props extends /* @vue-ignore */ InputHTMLAttributes {
+  modelValue: string
+}
+
+withDefaults(defineProps<Props>(), {})
 
 const email = defineModel<string>()
 </script>
@@ -25,10 +17,6 @@ const email = defineModel<string>()
     v-model="email"
     variant="outlined"
     type="email"
-    :label="$props.label"
-    :placeholder="$props.placeholder"
-    :required="$props.required"
     :prepend-inner-icon="MailIcon"
-    :autofocus="autofocus"
   ></v-text-field>
 </template>
