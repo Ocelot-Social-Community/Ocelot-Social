@@ -406,11 +406,11 @@ export default {
       if (type === 'following') this.followingCount = count
       if (type === 'followedBy') this.followedByCount = count
     },
-    async showOrChangeChat(roomID) {
+    async showOrChangeChat(userID) {
       if (this.getShowChat.showChat) {
         await this.showChat({ showChat: false, roomID: null })
       }
-      await this.showChat({ showChat: true, roomID })
+      await this.showChat({ showChat: true, roomID: userID })
     },
   },
   apollo: {
