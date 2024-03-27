@@ -1,14 +1,14 @@
+import { VIcon } from 'vuetify/components'
+
 import { iconNames } from '#assets/icons'
 import { SBComp } from '#types/SBComp'
-
-import IconSVG from './IconSVG.vue'
 
 import type { Meta, StoryObj } from '@storybook/vue3'
 
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
 const meta = {
-  title: 'Icons/IconSVG',
-  component: IconSVG as SBComp,
+  title: 'Icons/Ocelot Icon Set',
+  component: VIcon as SBComp,
   // This component will have an automatically generated docsPage entry: https://storybook.js.org/docs/vue/writing-docs/autodocs
   tags: ['autodocs'],
   argTypes: {
@@ -22,7 +22,7 @@ const meta = {
     },
   },
   args: { size: 'default', icon: '$heart', color: '' }, // default value
-} satisfies Meta<typeof IconSVG>
+} satisfies Meta<typeof VIcon>
 
 export default meta
 type Story = StoryObj<typeof meta>
