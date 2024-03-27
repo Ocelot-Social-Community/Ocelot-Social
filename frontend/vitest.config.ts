@@ -22,6 +22,8 @@ export default mergeConfig(
           // storybook
           '**/*{.,-}stories.?(c|m)[jt]s?(x)',
           'src/stories/**/*',
+          // scripts
+          'src/assets/icons/helpers/convertSvgToVue.js',
         ],
         thresholds: {
           lines: 84,
