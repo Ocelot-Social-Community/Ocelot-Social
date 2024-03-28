@@ -48,6 +48,10 @@
   "menu": {
     "about": "Über",
     "app": "Anwendung",
-    "home": "Daheim"
+    "home": "Daheim",
+    "theme": {
+      "switchToDark": "Dunkel",
+      "switchToLight": "Hell"
+    }
   }
 }
