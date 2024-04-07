@@ -43,7 +43,7 @@
     "linkify-it": "~5.0.0",
     "mapbox-gl": "1.13.2",
     "node-fetch": "^2.6.1",
-    "nuxt": "~2.12.1",
+    "nuxt": "~3.11.2",
     "nuxt-dropzone": "^1.0.4",
     "nuxt-env": "~0.1.0",
     "sass": "^1.30.0",
