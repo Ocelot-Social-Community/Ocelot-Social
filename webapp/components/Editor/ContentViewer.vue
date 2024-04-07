@@ -5,7 +5,7 @@
 <script>
 import defaultExtensions from './defaultExtensions.js'
 import Hashtag from './nodes/Hashtag.js'
-import { Editor, EditorContent } from 'tiptap'
+import { Editor, EditorContent } from '@tiptap/vue-2'
 
 export default {
   name: 'ContentViewer',

@@ -1,4 +1,4 @@
-import { Bold as TipTapBold } from 'tiptap-extensions'
+import { Bold as TipTapBold } from '@tiptap/extension-bold'
 
 export default class Bold extends TipTapBold {
   pasteRules() {

@@ -1,4 +1,4 @@
-import { Link as TipTapLink } from 'tiptap-extensions'
+import { Link as TipTapLink } from '@tiptap/extension-link'
 
 export default class Link extends TipTapLink {
   pasteRules({ type }) {

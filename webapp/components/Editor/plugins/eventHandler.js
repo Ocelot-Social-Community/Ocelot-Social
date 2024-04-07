@@ -1,4 +1,5 @@
-import { Extension, Plugin } from 'tiptap'
+import { Extension } from '@tiptap/core'
+import { Plugin } from '@tiptap/pm/state'
 // import { Slice, Fragment } from 'prosemirror-model'
 
 export default class EventHandler extends Extension {

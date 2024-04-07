@@ -1,4 +1,4 @@
-import { Node } from 'tiptap'
+import { Node } from '@tiptap/vue-2'
 import pasteRule from '../commands/pasteRule'
 import { compileToFunctions } from 'vue-template-compiler'
 import Vue from 'vue'

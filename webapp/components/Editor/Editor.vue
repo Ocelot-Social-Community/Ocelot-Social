@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import { Editor, EditorContent } from 'tiptap'
-import { History } from 'tiptap-extensions'
+import { Editor, EditorContent } from '@tiptap/vue-2'
+import { History } from '@tiptap/extension-history'
 import linkify from 'linkify-it'
 import { replace, build } from 'xregexp/xregexp-all.js'
 
