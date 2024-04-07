@@ -1,7 +1,7 @@
 version: 2
-open-pull-requests-limit: 0
 updates:
 - package-ecosystem: "github-actions"
+  open-pull-requests-limit: 999
   directory: "/"
   rebase-strategy: "disabled"
   schedule:
@@ -10,6 +10,7 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 - package-ecosystem: npm
+  open-pull-requests-limit: 999
   directory: "/"
   rebase-strategy: "disabled"
   schedule:
@@ -18,6 +19,7 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 - package-ecosystem: docker
+  open-pull-requests-limit: 999
   directory: "/"
   rebase-strategy: "disabled"
   schedule:
