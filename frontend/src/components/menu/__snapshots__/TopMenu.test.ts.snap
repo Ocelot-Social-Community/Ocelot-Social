@@ -197,6 +197,7 @@ exports[`TopMenu > renders 1`] = `
                       <input
                         aria-describedby="switch-4-messages"
                         aria-disabled="false"
+                        aria-label="$t('language.german')"
                         id="switch-4"
                         type="checkbox"
                         value="true"
