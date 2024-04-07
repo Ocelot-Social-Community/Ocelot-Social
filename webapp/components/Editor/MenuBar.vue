@@ -1,5 +1,5 @@
 <template>
-  <editor-menu-bar :editor="editor" v-slot="{ commands, isActive, getMarkAttrs }">
+  <!--editor-menu-bar :editor="editor" v-slot="{ commands, isActive, getMarkAttrs }">
     <div>
       <menu-bar-button :isActive="isActive.bold()" :onClick="commands.bold" icon="bold" />
 
@@ -62,19 +62,34 @@
 
       <menu-legend class="legend-button" />
     </div>
-  </editor-menu-bar>
+  </editor-menu-bar-->
+  <div class="editor-menu-bar">
+    <button
+      @click="toggleBold"
+      :class="{ 'is-active': editor.isActive('bold') }"
+    >
+      <b>B</b>
+    </button>
+    <button
+      @click="toggleItalic"
+      :class="{ 'is-active': editor.isActive('italic') }"
+    >
+      <i>I</i>
+    </button>
+    <!-- Add more buttons for other formatting options -->
+  </div>
 </template>
 
 <script>
-import { EditorMenuBar } from 'tiptap'
-import MenuBarButton from './MenuBarButton'
-import MenuLegend from './MenuLegend.vue'
+// import { EditorMenuBar } from '@tiptap/vue-2'
+// import MenuBarButton from './MenuBarButton'
+// import MenuLegend from './MenuLegend.vue'
 
 export default {
   components: {
-    EditorMenuBar,
-    MenuBarButton,
-    MenuLegend,
+    // EditorMenuBar,
+    // MenuBarButton,
+    // MenuLegend,
   },
   props: {
     editor: Object,
