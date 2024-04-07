@@ -61,7 +61,7 @@
     "update": "npx npm-check-updates"
   },
   "dependencies": {
-    "@intlify/unplugin-vue-i18n": "^4.0.0",
+    "@intlify/unplugin-vue-i18n": "^2.0.0",
     "@mdi/font": "^7.4.47",
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",
