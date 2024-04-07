@@ -5,17 +5,15 @@ import Strike from '~/components/Editor/marks/Strike'
 import Italic from '~/components/Editor/marks/Italic'
 import Bold from '~/components/Editor/marks/Bold'
 import EmbedQuery from '~/graphql/EmbedQuery.js'
-import {
-  Heading,
-  HardBreak,
-  Blockquote,
-  ListItem,
-  BulletList,
-  OrderedList,
-  HorizontalRule,
-  Placeholder,
-  Underline,
-} from 'tiptap-extensions'
+import { Heading } from '@tiptap/extension-heading'
+import { HardBreak } from '@tiptap/extension-hard-break'
+import { Blockquote } from '@tiptap/extension-blockquote'
+import { ListItem } from '@tiptap/extension-list-item'
+import { BulletList } from '@tiptap/extension-bullet-list'
+import { OrderedList } from '@tiptap/extension-ordered-list'
+import { HorizontalRule } from '@tiptap/extension-horizontal-rule'
+import { Placeholder } from '@tiptap/extension-placeholder'
+import { Underline } from '@tiptap/extension-underline'
 
 export default function defaultExtensions(component) {
   const { placeholder, $t, $apollo } = component

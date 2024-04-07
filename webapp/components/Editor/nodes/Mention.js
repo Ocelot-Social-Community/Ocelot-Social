@@ -1,4 +1,4 @@
-import { Mention as TipTapMention } from 'tiptap-extensions'
+import { Mention as TipTapMention } from '@tiptap/extension-mention'
 
 export default class Mention extends TipTapMention {
   get name() {

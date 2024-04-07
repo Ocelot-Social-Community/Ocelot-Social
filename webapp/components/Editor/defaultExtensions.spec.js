@@ -1,5 +1,5 @@
 import defaultExtensions from './defaultExtensions.js'
-import { Editor } from 'tiptap'
+import { Editor } from '@tiptap/vue-2'
 
 let content
 let createEditor
