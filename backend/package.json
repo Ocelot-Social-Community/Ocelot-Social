@@ -82,7 +82,7 @@
     "neo4j-graphql-js": "^2.11.5",
     "neode": "^0.4.9",
     "node-fetch": "^2.7.0",
-    "nodemailer": "^6.4.4",
+    "nodemailer": "^6.9.13",
     "nodemailer-html-to-text": "^3.2.0",
     "request": "~2.88.2",
     "sanitize-html": "~2.11.0",
