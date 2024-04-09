@@ -15,7 +15,6 @@ const metascraper = Metascraper([
   require('metascraper-description')(),
   require('metascraper-image')(),
   require('metascraper-lang')(),
-  require('metascraper-lang-detector')(),
   require('metascraper-logo')(),
   require('metascraper-publisher')(),
   require('metascraper-title')(),
@@ -23,8 +22,6 @@ const metascraper = Metascraper([
   require('metascraper-soundcloud')(),
   require('metascraper-video')(),
   require('metascraper-youtube')(),
-
-  // require('./rules/metascraper-embed')()
 ])
 
 const fetchEmbed = async (url) => {
