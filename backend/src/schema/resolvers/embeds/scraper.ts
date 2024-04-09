@@ -1,11 +1,17 @@
 import Metascraper from 'metascraper'
-import fetch from 'node-fetch'
-
 import { ApolloError } from 'apollo-server'
 import isEmpty from 'lodash/isEmpty'
 import isArray from 'lodash/isArray'
 import mergeWith from 'lodash/mergeWith'
 import findProvider from './findProvider'
+
+// eslint-disable-next-line no-new-func
+const _importDynamic = new Function('modulePath', 'return import(modulePath)')
+
+async function fetch(...args) {
+  const { default: fetch } = await _importDynamic('node-fetch')
+  return fetch(...args)
+}
 
 const error = require('debug')('embed:error')
 
@@ -23,8 +29,6 @@ const metascraper = Metascraper([
   require('metascraper-soundcloud')(),
   require('metascraper-video')(),
   require('metascraper-youtube')(),
-
-  // require('./rules/metascraper-embed')()
 ])
 
 const fetchEmbed = async (url) => {
