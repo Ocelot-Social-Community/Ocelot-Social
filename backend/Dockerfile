@@ -1,7 +1,7 @@
 ##################################################################################
 # BASE (Is pushed to DockerHub for rebranding) ###################################
 ##################################################################################
-FROM node:21.0.0-alpine3.17 as base
+FROM node:20.12.1-alpine3.19 as base
 
 # ENVs
 ## DOCKER_WORKDIR would be a classical ARG, but that is not multi layer persistent - shame
