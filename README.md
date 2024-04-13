@@ -35,7 +35,7 @@ This projects utilizes `storybook` and `chromatic` to develop, document & test f
 The following commands are available:
 
 | Command                     | Description                                      |
-|-----------------------------|--------------------------------------------------|
+| --------------------------- | ------------------------------------------------ |
 | `npm install`               | Project setup                                    |
 | `npm run build`             | Compiles and minifies for production             |
 | `npm run server:prod`       | Runs productions server                          |
@@ -108,7 +108,7 @@ npm install
 The following endpoints are provided given the right command is executed or all three if `docker compose` is used:
 
 | Endpoint                                       | Description   |
-|------------------------------------------------|---------------|
+| ---------------------------------------------- | ------------- |
 | [http://localhost:3000](http://localhost:3000) | Web           |
 | [http://localhost:6006](http://localhost:6006) | Storybook     |
 | [http://localhost:8080](http://localhost:8080) | Documentation |
