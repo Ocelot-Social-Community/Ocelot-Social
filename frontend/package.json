@@ -87,7 +87,7 @@
     "vuetify": "^3.5.14"
   },
   "devDependencies": {
-    "@eslint-community/eslint-plugin-eslint-comments": "^4.2.0",
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.3.0",
     "@intlify/eslint-plugin-vue-i18n": "^2.0.0",
     "@storybook/addon-essentials": "^8.0.6",
     "@storybook/addon-interactions": "^8.0.6",
