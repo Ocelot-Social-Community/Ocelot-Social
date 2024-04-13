@@ -42,7 +42,7 @@
     "jsonwebtoken": "~9.0.0",
     "linkify-it": "~5.0.0",
     "mapbox-gl": "1.13.2",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.3.2",
     "nuxt": "~2.12.1",
     "nuxt-dropzone": "^1.0.4",
     "nuxt-env": "~0.1.0",
