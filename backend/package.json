@@ -36,7 +36,7 @@
     "apollo-link-http": "~1.5.17",
     "apollo-server": "~2.14.2",
     "apollo-server-express": "^2.14.2",
-    "aws-sdk": "^2.1595.0",
+    "aws-sdk": "^2.1599.0",
     "babel-core": "~7.0.0-0",
     "babel-eslint": "~10.1.0",
     "babel-jest": "~29.7.0",
@@ -96,7 +96,7 @@
   "devDependencies": {
     "@faker-js/faker": "7.6.0",
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.12.5",
+    "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.57.1",
     "apollo-server-testing": "~2.11.0",
