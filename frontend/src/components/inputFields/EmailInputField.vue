@@ -1,9 +1,7 @@
 <script lang="ts" setup>
-import { InputHTMLAttributes } from 'vue'
-
 import MailIcon from '#components/icons/MailIcon.vue'
 
-interface Props extends /* @vue-ignore */ InputHTMLAttributes {
+interface Props {
   modelValue: string
 }
 
