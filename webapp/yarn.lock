@@ -18931,10 +18931,10 @@ vt-pbf@^3.1.1:
     "@mapbox/vector-tile" "^1.3.1"
     pbf "^3.2.1"
 
-vue-advanced-chat@^2.0.10:
-  version "2.0.10"
-  resolved "https://registry.yarnpkg.com/vue-advanced-chat/-/vue-advanced-chat-2.0.10.tgz#ee47eb78306367f195a9233aea250467303fdedd"
-  integrity sha512-s7NXN0nl4pIl8uaOlpB/kcjV8jnE7w8FvdAFhM22J0KH0rhdxiJr3fIeYRR1bpzZj05tZaIEWqJl3ECi8xNptQ==
+vue-advanced-chat@^2.0.11:
+  version "2.0.11"
+  resolved "https://registry.yarnpkg.com/vue-advanced-chat/-/vue-advanced-chat-2.0.11.tgz#5b40a92b33f2cb3338d930ffd60053dd6608681c"
+  integrity sha512-ctJXNnghEOig+ox2q7Pi/FXp1fXZL0bdBkMQ2QSmvrRI5cvZ0Lv9rpDDNsc8LGJdvitm/ykGFJlnAx2pThhGkg==
   dependencies:
     emoji-picker-element "1.12.1"
     micromark "^3.1.0"
