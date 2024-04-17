@@ -6,13 +6,15 @@ import { I18n, useI18n } from 'vue-i18n'
 import { createVuetify, ThemeDefinition } from 'vuetify'
 import { createVueI18nAdapter } from 'vuetify/locale/adapters/vue-i18n'
 
+import tokens from '#assets/sass/tokens.module.scss'
+
 const ocelotStandardLightTheme: ThemeDefinition = {
   dark: false,
   colors: {
     background: 'rgb(255, 255, 255)',
     surface: 'rgb(255, 255, 255)',
     // primary: rgbToHex(23, 181, 63, '#'),
-    primary: 'rgb(23, 181, 63)',
+    primary: tokens.primaryColor,
     // 'primary-darken-1': rgbToHex(25, 122, 49, '#'),
     'primary-darken-1': 'rgb(25, 122, 49)',
     secondary: 'rgb(0, 142, 230)',
