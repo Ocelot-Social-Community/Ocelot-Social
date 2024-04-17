@@ -10,7 +10,7 @@
         ],
         [
             "remark-lint-list-item-indent",
-            "space"
+            "one"
         ]
     ]
 }

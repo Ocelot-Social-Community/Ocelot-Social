@@ -1,6 +1,7 @@
 version: 2
 updates:
 - package-ecosystem: "github-actions"
+  open-pull-requests-limit: 99999
   directory: "/"
   rebase-strategy: "disabled"
   schedule:
@@ -10,6 +11,7 @@ updates:
     time: "03:00"
 
 - package-ecosystem: npm
+  open-pull-requests-limit: 99999
   directory: "/"
   rebase-strategy: "disabled"
   schedule:
@@ -18,6 +20,7 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 - package-ecosystem: npm
+  open-pull-requests-limit: 99999
   directory: "/backend"
   rebase-strategy: "disabled"
   schedule:
@@ -26,6 +29,7 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 - package-ecosystem: npm
+  open-pull-requests-limit: 99999
   directory: "/webapp"
   rebase-strategy: "disabled"
   schedule:
@@ -35,6 +39,7 @@ updates:
     time: "03:00"
 
 - package-ecosystem: docker
+  open-pull-requests-limit: 99999
   directory: "/backend"
   rebase-strategy: "disabled"
   schedule:
@@ -43,6 +48,7 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 - package-ecosystem: docker
+  open-pull-requests-limit: 99999
   directory: "/webapp"
   rebase-strategy: "disabled"
   schedule:
@@ -51,6 +57,7 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 - package-ecosystem: docker
+  open-pull-requests-limit: 99999
   directory: "/neo4j"
   rebase-strategy: "disabled"
   schedule:
@@ -59,6 +66,7 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 - package-ecosystem: docker
+  open-pull-requests-limit: 99999
   directory: "/deployment/src/docker"
   rebase-strategy: "disabled"
   schedule:
@@ -69,6 +77,7 @@ updates:
 
 # frontend
 - package-ecosystem: "github-actions"
+  open-pull-requests-limit: 99999
   directory: "/frontend"
   rebase-strategy: "disabled"
   schedule:
@@ -77,6 +86,7 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 - package-ecosystem: npm
+  open-pull-requests-limit: 99999
   directory: "/frontend"
   rebase-strategy: "disabled"
   schedule:
@@ -85,6 +95,7 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 - package-ecosystem: docker
+  open-pull-requests-limit: 99999
   directory: "/frontend"
   rebase-strategy: "disabled"
   schedule:
