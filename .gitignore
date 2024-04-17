@@ -9,6 +9,7 @@ yarn-error.log*
 .eslintcache
 kubeconfig.yaml
 backup-cron-job.log
+.vscode
 
 node_modules/
 cypress/videos
