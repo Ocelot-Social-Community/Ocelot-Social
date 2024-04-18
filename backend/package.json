@@ -94,7 +94,7 @@
     "xregexp": "^4.3.0"
   },
   "devDependencies": {
-    "@faker-js/faker": "7.6.0",
+    "@faker-js/faker": "8.4.1",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
