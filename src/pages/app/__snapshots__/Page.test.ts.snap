@@ -33,7 +33,7 @@ exports[`AppPage > renders 1`] = `
               >
                 
                 <a
-                  class="v-list-item v-list-item--active v-list-item--link v-theme--light v-list-item--density-default v-list-item--one-line v-list-item--variant-text"
+                  class="v-list-item v-list-item--active v-list-item--link v-theme--light v-list-item--density-default v-list-item--one-line rounded-0 v-list-item--variant-text"
                   href="/app"
                   tabindex="-2"
                 >
@@ -61,7 +61,7 @@ exports[`AppPage > renders 1`] = `
                   <!---->
                 </a>
                 <a
-                  class="v-list-item v-list-item--link v-theme--light v-list-item--density-default v-list-item--one-line v-list-item--variant-text"
+                  class="v-list-item v-list-item--link v-theme--light v-list-item--density-default v-list-item--one-line rounded-0 v-list-item--variant-text"
                   href="/app/inc"
                   tabindex="-2"
                 >
@@ -94,7 +94,7 @@ exports[`AppPage > renders 1`] = `
                   role="separator"
                 />
                 <a
-                  class="v-list-item v-list-item--link v-theme--light v-list-item--density-default v-list-item--one-line v-list-item--variant-text"
+                  class="v-list-item v-list-item--link v-theme--light v-list-item--density-default v-list-item--one-line rounded-0 v-list-item--variant-text"
                   href="/app/reset"
                   tabindex="-2"
                 >
