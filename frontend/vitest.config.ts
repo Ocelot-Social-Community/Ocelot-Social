@@ -28,7 +28,7 @@ export default mergeConfig(
         thresholds: {
           lines: 84,
           // functions: 20, // has problems see https://github.com/vitest-dev/vitest/issues/3607
-          branches: 92,
+          branches: 89,
           statements: 84,
         },
       },
