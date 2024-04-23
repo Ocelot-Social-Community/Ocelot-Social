@@ -7,7 +7,7 @@
     <br />
     <p>{{ $t('home.text3') }}</p>
     <br />
-    <p>{{ $t('home.text4') }} <v-icon icon="mdi-heart" color="error" /></p>
+    <p>{{ $t('home.text4') }} <v-icon icon="$heart" color="error" /></p>
     <br />
     <p>{{ $t('home.greet1') }}</p>
     <p>{{ $t('home.greet2') }}</p>
