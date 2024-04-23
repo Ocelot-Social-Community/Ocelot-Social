@@ -1,3 +1,4 @@
+<!-- eslint-disable prettier/prettier -->
 <template>
   <v-app-bar flat>
     <v-row>
@@ -39,9 +40,7 @@ import LogoAvatar from './LogoAvatar.vue'
 
 const theme = useTheme()
 function toggleTheme() {
-  theme.global.name.value = theme.global.current.value.dark
-    ? 'ocelotStandardLightTheme'
-    : 'ocelotStandardDarkTheme'
+  theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
 }
 
 const { current: locale } = useLocale()

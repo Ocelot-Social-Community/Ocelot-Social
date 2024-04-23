@@ -8,7 +8,7 @@ import { createVueI18nAdapter } from 'vuetify/locale/adapters/vue-i18n'
 
 import tokens from '#assets/sass/tokens.module.scss'
 
-const ocelotStandardLightTheme: ThemeDefinition = {
+const lightTheme: ThemeDefinition = {
   dark: false,
   colors: {
     background: tokens.backgroundColorBase,
@@ -25,10 +25,10 @@ const ocelotStandardLightTheme: ThemeDefinition = {
   },
 }
 
-const ocelotStandardDarkTheme: ThemeDefinition = {
+const darkTheme: ThemeDefinition = {
   dark: true,
   colors: {
-    ...ocelotStandardLightTheme.colors,
+    ...lightTheme.colors,
     background: tokens.backgroundColorInverse,
     surface: tokens.backgroundColorInverseSoft,
   },
@@ -45,11 +45,10 @@ export default (i18n: I18n<any, NonNullable<unknown>, NonNullable<unknown>, stri
     },
     ssr: true,
     theme: {
-      defaultTheme: 'ocelotStandardLightTheme',
-      // defaultTheme: 'ocelotStandardDarkTheme',
+      defaultTheme: 'light',
       themes: {
-        ocelotStandardLightTheme,
-        ocelotStandardDarkTheme,
+        light: lightTheme,
+        dark: darkTheme,
       },
     },
   })
