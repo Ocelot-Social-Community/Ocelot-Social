@@ -1,10 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 
-import EyeClosedIcon from '#components/icons/EyeClosedIcon.vue'
-import EyeIcon from '#components/icons/EyeIcon.vue'
-import PasswordIcon from '#components/icons/PasswordIcon.vue'
-
 withDefaults(
   defineProps<{
     modelValue: string
@@ -39,12 +35,12 @@ function toggleReveal() {
       :label="$props.label"
       :required="required"
       :placeholder="$props.placeholder"
-      :prepend-inner-icon="PasswordIcon"
+      prepend-inner-icon="$lock"
       :class="['password-field']"
     >
     </v-text-field>
     <v-btn class="reveal-button" type="button" @click="toggleReveal">
-      <component :is="reveal ? EyeClosedIcon : EyeIcon"></component>
+      <v-icon :icon="reveal ? '$eye-slash' : '$eye'"></v-icon>
     </v-btn>
   </div>
 </template>

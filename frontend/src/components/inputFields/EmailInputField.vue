@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import MailIcon from '#components/icons/MailIcon.vue'
-
 interface Props {
   modelValue: string
 }
@@ -15,6 +13,6 @@ const email = defineModel<string>()
     v-model="email"
     variant="outlined"
     type="email"
-    :prepend-inner-icon="MailIcon"
+    prepend-inner-icon="$envelope"
   ></v-text-field>
 </template>
