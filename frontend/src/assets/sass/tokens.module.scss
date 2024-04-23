@@ -1,5 +1,6 @@
-$primary-color: rgba(20,20,20,10%);
+/* stylelint-disable color-function-notation */
+$color-primary: rgb(23, 181, 63);
 
 :export {
-    primaryColor: $primary-color
+    primaryColor: $color-primary
 }
