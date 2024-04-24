@@ -436,7 +436,7 @@ $chat-room-color-counter-badge: $text-color-inverse;
 $chat-room-background-counter-badge: $color-secondary;
 
 :export {
-  primaryColor: $color-primary;
+  colorPrimary: $color-primary;
   colorSecondary: $color-secondary;
   colorPrimaryActive: $color-primary-active;
   colorPrimaryLight: $color-primary-light;

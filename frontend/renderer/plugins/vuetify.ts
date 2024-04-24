@@ -13,7 +13,7 @@ const lightTheme: ThemeDefinition = {
   colors: {
     background: tokens.backgroundColorBase,
     surface: tokens.backgroundColorSoft,
-    primary: tokens.primaryColor,
+    primary: tokens.colorPrimary,
     secondary: tokens.colorSecondary,
     success: tokens.colorSuccess,
     info: tokens.colorInfo,
