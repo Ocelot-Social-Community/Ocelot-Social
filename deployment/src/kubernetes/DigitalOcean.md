@@ -96,6 +96,10 @@ DigitalOcean has a website about Kubernetes Dashboard and alternatives:
 
 There are the following two ways to set up the DNS.
 
+### Set a Static IP
+
+In the menu on the left side under `Networking` on tab `Reserved IP` you can reserve a static IP for your cluster.
+
 ### Manage DNS With A Different Domain Provider
 
 If you have registered your domain or subdomain with another domain provider, add an `A` record there with one of the IP addresses from one of the cluster droplets in the DNS.
