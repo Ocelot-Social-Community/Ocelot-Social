@@ -107,7 +107,7 @@ Factory.define('user')
   .option('email', faker.internet.exampleEmail)
   .option('avatar', () =>
     Factory.build('image', {
-      url: faker.internet.avatar(),
+      url: faker.image.avatar(),
     }),
   )
   .after(async (buildObject, options) => {
