@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import slugify from 'slug'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
-import { faker } from '@faker-js/faker'
+import { faker }  from '@faker-js/faker'
 import { getDriver, getNeode } from './neo4j'
 import CONFIG from '../config/index'
 import generateInviteCode from '../schema/resolvers/helpers/generateInviteCode'
@@ -49,7 +49,7 @@ Factory.define('badge')
   })
 
 Factory.define('image')
-  .attr('url', faker.image.unsplash.imageUrl)
+  .attr('url', faker.image.url)
   .attr('aspectRatio', 1.3333333333333333)
   .attr('alt', faker.lorem.sentence)
   .attr('type', 'image/jpeg')
