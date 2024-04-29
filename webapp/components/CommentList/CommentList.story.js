@@ -1,4 +1,4 @@
-import faker from '@faker-js/faker'
+import { faker } from '@faker-js/faker'
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
 import HcCommentList from './CommentList.vue'
