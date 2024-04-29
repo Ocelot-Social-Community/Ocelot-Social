@@ -63,7 +63,7 @@ Factory.define('basicUser')
   .option('password', '1234')
   .attrs({
     id: uuid,
-    name: faker.name.fullName,
+    name: faker.person.fullName,
     password: '1234',
     role: 'user',
     termsAndConditionsAgreedVersion: '0.0.1',

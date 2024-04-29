@@ -61,7 +61,7 @@ const helpers = {
   },
   fakeUser(n) {
     return new Array(n || 1).fill(0).map(() => {
-      const name = faker.person.person.fullName()
+      const name = faker.person.fullName()
       return {
         id: faker.string.uuid(),
         name,
