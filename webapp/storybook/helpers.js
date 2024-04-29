@@ -77,7 +77,7 @@ const helpers = {
         id: faker.string.uuid(),
         title,
         content,
-        slug: faker.lorem.slug(title),
+        slug: faker.lorem.slug({ min: 1, max: 3 }, title),
         shoutedCount: faker.number.int(),
         commentsCount: faker.number.int(),
         clickedCount: faker.number.int(),
