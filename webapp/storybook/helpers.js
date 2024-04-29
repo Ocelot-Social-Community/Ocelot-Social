@@ -61,9 +61,9 @@ const helpers = {
   },
   fakeUser(n) {
     return new Array(n || 1).fill(0).map(() => {
-      const name = faker.name.findName()
+      const name = faker.person.person.fullName()
       return {
-        id: faker.random.uuid(),
+        id: faker.string.uuid(),
         name,
         slug: faker.helpers.slugify(name),
       }
@@ -74,14 +74,14 @@ const helpers = {
       const title = faker.lorem.words()
       const content = faker.lorem.paragraph()
       return {
-        id: faker.random.uuid(),
+        id: faker.string.uuid(),
         title,
         content,
         slug: faker.lorem.slug(title),
-        shoutedCount: faker.random.number(),
-        commentsCount: faker.random.number(),
-        clickedCount: faker.random.number(),
-        viewedTeaserCount: faker.random.number(),
+        shoutedCount: faker.number.int(),
+        commentsCount: faker.number.int(),
+        clickedCount: faker.number.int(),
+        viewedTeaserCount: faker.number.int(),
         postType: ['Article'],
       }
     })

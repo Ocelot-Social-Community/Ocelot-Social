@@ -17,7 +17,7 @@ helpers.init()
 const postMock = (fields) => {
   return {
     ...post,
-    id: faker.random.uuid(),
+    id: faker.string.uuid(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
     deleted: false,
@@ -30,7 +30,7 @@ const postMock = (fields) => {
 const userMock = (fields) => {
   return {
     ...user,
-    id: faker.random.uuid(),
+    id: faker.string.uuid(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
     deleted: false,

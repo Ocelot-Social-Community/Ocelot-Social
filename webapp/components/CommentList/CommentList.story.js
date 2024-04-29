@@ -8,7 +8,7 @@ helpers.init()
 
 const commentMock = (fields) => {
   return {
-    id: faker.random.uuid(),
+    id: faker.string.uuid(),
     title: faker.lorem.sentence(),
     content: faker.lorem.paragraph(),
     createdAt: faker.date.past(),
