@@ -121,7 +121,7 @@
     "prettier": "^3.2.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "remark-cli": "^12.0.0",
+    "remark-cli": "^12.0.1",
     "remark-gfm": "^4.0.0",
     "remark-preset-lint-consistent": "^6.0.0",
     "remark-preset-lint-markdown-style-guide": "^6.0.0",
