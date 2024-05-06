@@ -1,4 +1,4 @@
-import faker from '@faker-js/faker'
+import { faker } from '@faker-js/faker'
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
 import HcCommentList from './CommentList.vue'
@@ -8,7 +8,7 @@ helpers.init()
 
 const commentMock = (fields) => {
   return {
-    id: faker.random.uuid(),
+    id: faker.string.uuid(),
     title: faker.lorem.sentence(),
     content: faker.lorem.paragraph(),
     createdAt: faker.date.past(),
