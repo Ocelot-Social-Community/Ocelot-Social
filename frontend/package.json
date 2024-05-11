@@ -100,7 +100,7 @@
     "@typescript-eslint/eslint-plugin": "^7.6.0",
     "@typescript-eslint/parser": "^7.6.0",
     "@vitest/coverage-v8": "^1.5.0",
-    "@vue/test-utils": "^2.4.5",
+    "@vue/test-utils": "^2.4.6",
     "@vuepress/bundler-vite": "^2.0.0-rc.9",
     "chromatic": "^11.3.0",
     "eslint": "^8.57.0",
