@@ -3454,12 +3454,12 @@
   dependencies:
     "@sinonjs/commons" "^2.0.0"
 
-"@storybook/addon-a11y@^8.0.8":
-  version "8.0.8"
-  resolved "https://registry.yarnpkg.com/@storybook/addon-a11y/-/addon-a11y-8.0.8.tgz#efd71fef036ced41482f4bf4139bc13bc756e57e"
-  integrity sha512-QiNzKej1C3QjPBHm8nwk0lqv9N9cLInlyJ62Cp+/+ethcH2elNnBf1H3ad/DC6XIQRyMtvvhCOnzygAMnjCq1w==
+"@storybook/addon-a11y@^8.0.10":
+  version "8.0.10"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-a11y/-/addon-a11y-8.0.10.tgz#d342591b51bbce1ddf4ce0f87bddd2ff701edb51"
+  integrity sha512-ymeTRE1uWplifWUMc3tO5lLGn4buS/hUVWKRM11SqugmxRym55B4thCJU089HAEMY+V/imiCeOE63TT+DGsk8g==
   dependencies:
-    "@storybook/addon-highlight" "8.0.8"
+    "@storybook/addon-highlight" "8.0.10"
     axe-core "^4.2.0"
 
 "@storybook/addon-actions@^5.3.21":
@@ -3482,10 +3482,10 @@
     react-inspector "^4.0.0"
     uuid "^3.3.2"
 
-"@storybook/addon-highlight@8.0.8":
-  version "8.0.8"
-  resolved "https://registry.yarnpkg.com/@storybook/addon-highlight/-/addon-highlight-8.0.8.tgz#e4c1d2df7d4b4e325a007e4a7de5042cc5101625"
-  integrity sha512-KKD7xiNhxZQM4fdDidtcla6jSzgN1f9qe1AwFSHLXwIW22+4c97Vgf+AookN7cJvB77HxRUnvQH//zV1CJEDug==
+"@storybook/addon-highlight@8.0.10":
+  version "8.0.10"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-highlight/-/addon-highlight-8.0.10.tgz#bb7b4db944ca6e2a406c3ff2a6e77a339544aeb7"
+  integrity sha512-40GB82t1e2LCCjqXcC6Z5lq1yIpA1+Yl5E2tKeggOVwg5HHAX02ESNDdBaIOlCqMkU3WKzjGPurDNOLUAbsV2g==
   dependencies:
     "@storybook/global" "^5.0.0"
 
