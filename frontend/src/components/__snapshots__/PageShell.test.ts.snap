@@ -165,6 +165,36 @@ exports[`PageShell > renders 1`] = `
             </a>
           </div>
           <div
+            class="v-col d-flex align-center justify-center grow"
+          >
+            <button
+              class="v-btn v-theme--light v-btn--density-default v-btn--size-default v-btn--variant-text"
+              type="button"
+            >
+              
+              <span
+                class="v-btn__overlay"
+              />
+              <span
+                class="v-btn__underlay"
+              />
+              
+              <!---->
+              <span
+                class="v-btn__content"
+                data-no-activator=""
+              >
+                
+                
+                $t('menu.theme.switchToDark')
+                
+                
+              </span>
+              <!---->
+              <!---->
+            </button>
+          </div>
+          <div
             class="v-col"
           >
             <div
@@ -195,10 +225,10 @@ exports[`PageShell > renders 1`] = `
                       
                       
                       <input
-                        aria-describedby="switch-4-messages"
+                        aria-describedby="switch-5-messages"
                         aria-disabled="false"
                         aria-label="$t('language.german')"
-                        id="switch-4"
+                        id="switch-5"
                         type="checkbox"
                         value="true"
                       />
@@ -220,7 +250,7 @@ exports[`PageShell > renders 1`] = `
                   </div>
                   <label
                     class="v-label v-label--clickable"
-                    for="switch-4"
+                    for="switch-5"
                   >
                     <!---->
                     
@@ -239,7 +269,7 @@ exports[`PageShell > renders 1`] = `
                   aria-live="polite"
                   class="v-messages"
                   css="true"
-                  id="switch-4-messages"
+                  id="switch-5-messages"
                   name="slide-y-transition"
                   persisted="false"
                   role="alert"
