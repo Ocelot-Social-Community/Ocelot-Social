@@ -101,7 +101,7 @@
     "@typescript-eslint/parser": "^7.8.0",
     "@vitest/coverage-v8": "^1.6.0",
     "@vue/test-utils": "^2.4.6",
-    "@vuepress/bundler-vite": "^2.0.0-rc.9",
+    "@vuepress/bundler-vite": "^2.0.0-rc.11",
     "chromatic": "^11.3.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
