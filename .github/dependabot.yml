@@ -79,6 +79,7 @@ updates:
         - "ts*"
         - "*types?"
 
+# webapp
 - package-ecosystem: docker
   open-pull-requests-limit: 99
   directory: "/webapp"
@@ -97,6 +98,44 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  groups:
+    apollo:
+      - applies-to: version-updates
+      patterns:
+        - "apollo*"
+    babel:
+      - applies-to: version-updates
+      patterns:
+        - "*babel*"
+    eslint:
+      - applies-to: version-updates
+      patterns:
+        - "eslint*"
+    jest:
+      - applies-to: version-updates
+      patterns:
+        - "jest*"
+    mapbox:
+      - applies-to: version-updates
+      patterns:
+        - "*mapbox*"
+    nuxt:
+      - applies-to: version-updates
+      patterns:
+        - "*nuxt*"
+    sass:
+      - applies-to: version-updates
+      patterns:
+        - "sass*"
+    storybook:
+      - applies-to: version-updates
+      patterns:
+        - "*storybook*"
+    vue:
+      - applies-to: version-updates
+      patterns:
+        - "vue*"
+        - "@vue*"
 
 - package-ecosystem: docker
   open-pull-requests-limit: 99
@@ -107,6 +146,7 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+
 - package-ecosystem: docker
   open-pull-requests-limit: 99
   directory: "/deployment/src/docker"
