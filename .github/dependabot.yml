@@ -167,6 +167,67 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  groups:
+    eslint:
+      applies-to: version-updates
+      patterns:
+        - "eslint*"
+        - "@eslint*"
+    pinia:
+      applies-to: version-updates
+      patterns:
+        - "pinia*"
+    react:
+      applies-to: version-updates
+      patterns:
+        - "react*"
+    remark:
+      applies-to: version-updates
+      patterns:
+        - "remark*"
+    sass:
+      applies-to: version-updates
+      patterns:
+        - "sass*"
+    storybook:
+      applies-to: version-updates
+      patterns:
+        - "storybook"
+        - "@storybook*"
+    stylelint:
+      applies-to: version-updates
+      patterns:
+        - "stylelint*"
+    typescript:
+      applies-to: version-updates
+      patterns:
+        - "ts*"
+        - "@types*"
+        - "typescript"
+    vite:
+      applies-to: version-updates
+      patterns:
+        - "vite"
+        - "vite-plugin*"
+        - "@vitejs/plugin-vue"
+    vitest:
+      applies-to: version-updates
+      patterns:
+        - "vitest"
+        - "@vitest*"
+    vue:
+      applies-to: version-updates
+      patterns:
+        - "*vue?(/)*"
+      exclude-patterns:
+        - "vuetify"
+        - "*vuepress*"
+        - "vue-tsc"
+    vuepress:
+      applies-to: version-updates
+      patterns:
+        - "vuepress"
+        - "@vuepress*"
 - package-ecosystem: docker
   open-pull-requests-limit: 99
   directory: "/frontend"
