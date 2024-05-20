@@ -9,7 +9,6 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
-
 - package-ecosystem: npm
   open-pull-requests-limit: 99
   directory: "/"
@@ -19,6 +18,21 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  groups:
+    babel:
+      - applies-to: version-updates
+      patterns:
+        - "*babel*"
+    cypress:
+      - applies-to: version-updates
+      patterns:
+        - "*cypress*"
+        - "*cucumber*"
+    vuepress:
+      applies-to: version-updates
+      patterns:
+        - "*vuepress*"
+
 - package-ecosystem: npm
   open-pull-requests-limit: 99
   directory: "/backend"
