@@ -33,9 +33,55 @@ updates:
       patterns:
         - "*vuepress*"
 
+# backend
+- package-ecosystem: docker
+  open-pull-requests-limit: 99
+  directory: "/backend"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
 - package-ecosystem: npm
   open-pull-requests-limit: 99
   directory: "/backend"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+  groups:
+    apollo:
+      - applies-to: version-updates
+      patterns:
+        - "*apollo*"
+    babel:
+      - applies-to: version-updates
+      patterns:
+        - "*babel*"
+    graphql:
+      - applies-to: version-updates
+      patterns:
+        - "graphql*"
+    metascraper:
+      - applies-to: version-updates
+      patterns:
+        - "metascraper*"
+    neo4j:
+      - applies-to: version-updates
+      patterns:
+        - "neo*"
+    typescript:
+      - applies-to: version-updates
+      patterns:
+        - "ts*"
+        - "*types?"
+
+- package-ecosystem: docker
+  open-pull-requests-limit: 99
+  directory: "/webapp"
   rebase-strategy: "disabled"
   schedule:
     interval: weekly
@@ -52,24 +98,6 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 
-- package-ecosystem: docker
-  open-pull-requests-limit: 99
-  directory: "/backend"
-  rebase-strategy: "disabled"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    timezone: "Europe/Berlin"
-    time: "03:00"
-- package-ecosystem: docker
-  open-pull-requests-limit: 99
-  directory: "/webapp"
-  rebase-strategy: "disabled"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    timezone: "Europe/Berlin"
-    time: "03:00"
 - package-ecosystem: docker
   open-pull-requests-limit: 99
   directory: "/neo4j"
