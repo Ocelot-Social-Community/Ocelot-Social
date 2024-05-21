@@ -20,7 +20,7 @@ updates:
     time: "03:00"
   groups:
     babel:
-      - applies-to: version-updates
+      applies-to: version-updates
       patterns:
         - "*babel*"
     cypress:
