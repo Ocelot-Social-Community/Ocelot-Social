@@ -1,17 +1,7 @@
 version: 2
 updates:
 - package-ecosystem: "github-actions"
-  open-pull-requests-limit: 99999
-  directory: "/"
-  rebase-strategy: "disabled"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    timezone: "Europe/Berlin"
-    time: "03:00"
-
-- package-ecosystem: npm
-  open-pull-requests-limit: 99999
+  open-pull-requests-limit: 99
   directory: "/"
   rebase-strategy: "disabled"
   schedule:
@@ -20,7 +10,32 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 - package-ecosystem: npm
-  open-pull-requests-limit: 99999
+  open-pull-requests-limit: 99
+  directory: "/"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+  groups:
+    babel:
+      applies-to: version-updates
+      patterns:
+        - "*babel*"
+    cypress:
+      applies-to: version-updates
+      patterns:
+        - "*cypress*"
+        - "*cucumber*"
+    vuepress:
+      applies-to: version-updates
+      patterns:
+        - "*vuepress*"
+
+# backend
+- package-ecosystem: docker
+  open-pull-requests-limit: 99
   directory: "/backend"
   rebase-strategy: "disabled"
   schedule:
@@ -29,17 +44,7 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 - package-ecosystem: npm
-  open-pull-requests-limit: 99999
-  directory: "/webapp"
-  rebase-strategy: "disabled"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    timezone: "Europe/Berlin"
-    time: "03:00"
-
-- package-ecosystem: docker
-  open-pull-requests-limit: 99999
+  open-pull-requests-limit: 99
   directory: "/backend"
   rebase-strategy: "disabled"
   schedule:
@@ -47,8 +52,36 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  groups:
+    apollo:
+      applies-to: version-updates
+      patterns:
+        - "*apollo*"
+    babel:
+      applies-to: version-updates
+      patterns:
+        - "*babel*"
+    graphql:
+      applies-to: version-updates
+      patterns:
+        - "graphql*"
+    metascraper:
+      applies-to: version-updates
+      patterns:
+        - "metascraper*"
+    neo4j:
+      applies-to: version-updates
+      patterns:
+        - "neo*"
+    typescript:
+      applies-to: version-updates
+      patterns:
+        - "ts*"
+        - "*types?"
+
+# webapp
 - package-ecosystem: docker
-  open-pull-requests-limit: 99999
+  open-pull-requests-limit: 99
   directory: "/webapp"
   rebase-strategy: "disabled"
   schedule:
@@ -56,8 +89,56 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+- package-ecosystem: npm
+  open-pull-requests-limit: 99
+  directory: "/webapp"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+  groups:
+    apollo:
+      applies-to: version-updates
+      patterns:
+        - "apollo*"
+    babel:
+      applies-to: version-updates
+      patterns:
+        - "*babel*"
+    eslint:
+      applies-to: version-updates
+      patterns:
+        - "eslint*"
+    jest:
+      applies-to: version-updates
+      patterns:
+        - "jest*"
+    mapbox:
+      applies-to: version-updates
+      patterns:
+        - "*mapbox*"
+    nuxt:
+      applies-to: version-updates
+      patterns:
+        - "*nuxt*"
+    sass:
+      applies-to: version-updates
+      patterns:
+        - "sass*"
+    storybook:
+      applies-to: version-updates
+      patterns:
+        - "*storybook*"
+    vue:
+      applies-to: version-updates
+      patterns:
+        - "vue*"
+        - "@vue*"
+
 - package-ecosystem: docker
-  open-pull-requests-limit: 99999
+  open-pull-requests-limit: 99
   directory: "/neo4j"
   rebase-strategy: "disabled"
   schedule:
@@ -65,8 +146,9 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+
 - package-ecosystem: docker
-  open-pull-requests-limit: 99999
+  open-pull-requests-limit: 99
   directory: "/deployment/src/docker"
   rebase-strategy: "disabled"
   schedule:
@@ -76,17 +158,8 @@ updates:
     time: "03:00"
 
 # frontend
-- package-ecosystem: "github-actions"
-  open-pull-requests-limit: 99999
-  directory: "/frontend"
-  rebase-strategy: "disabled"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    timezone: "Europe/Berlin"
-    time: "03:00"
 - package-ecosystem: npm
-  open-pull-requests-limit: 99999
+  open-pull-requests-limit: 99
   directory: "/frontend"
   rebase-strategy: "disabled"
   schedule:
@@ -94,8 +167,69 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  groups:
+    eslint:
+      applies-to: version-updates
+      patterns:
+        - "eslint*"
+        - "@eslint*"
+    pinia:
+      applies-to: version-updates
+      patterns:
+        - "pinia*"
+    react:
+      applies-to: version-updates
+      patterns:
+        - "react*"
+    remark:
+      applies-to: version-updates
+      patterns:
+        - "remark*"
+    sass:
+      applies-to: version-updates
+      patterns:
+        - "sass*"
+    storybook:
+      applies-to: version-updates
+      patterns:
+        - "storybook"
+        - "@storybook*"
+    stylelint:
+      applies-to: version-updates
+      patterns:
+        - "stylelint*"
+    typescript:
+      applies-to: version-updates
+      patterns:
+        - "ts*"
+        - "@types*"
+        - "typescript"
+    vite:
+      applies-to: version-updates
+      patterns:
+        - "vite"
+        - "vite-plugin*"
+        - "@vitejs/plugin-vue"
+    vitest:
+      applies-to: version-updates
+      patterns:
+        - "vitest"
+        - "@vitest*"
+    vue:
+      applies-to: version-updates
+      patterns:
+        - "*vue?(/)*"
+      exclude-patterns:
+        - "vuetify"
+        - "*vuepress*"
+        - "vue-tsc"
+    vuepress:
+      applies-to: version-updates
+      patterns:
+        - "vuepress"
+        - "@vuepress*"
 - package-ecosystem: docker
-  open-pull-requests-limit: 99999
+  open-pull-requests-limit: 99
   directory: "/frontend"
   rebase-strategy: "disabled"
   schedule:
