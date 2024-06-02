@@ -66,7 +66,7 @@
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",
     "@types/node": "^20.12.11",
-    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue": "^5.0.5",
     "@vue/compiler-sfc": "^3.4.27",
     "@vue/server-renderer": "3.4.27",
     "@vuepress/theme-default": "^2.0.0-rc.33",
@@ -81,7 +81,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
     "vike": "^0.4.171",
-    "vite": "^5.2.11",
+    "vite": "^5.2.12",
     "vue": "3.4.27",
     "vue-i18n": "^9.13.1",
     "vuetify": "^3.5.15"
