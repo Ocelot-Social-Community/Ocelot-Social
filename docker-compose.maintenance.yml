@@ -1,8 +1,6 @@
 # Todo: !!! This file seems related to our old maintenance worker for MongoDB and has to be refactored in case of using it !!!
 
-version: "3.4"
-
-services:
+ervices:
   maintenance-worker:
     image: ocelotsocialnetwork/develop-maintenance-worker:latest
     build:
