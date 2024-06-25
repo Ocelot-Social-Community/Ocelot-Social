@@ -3,8 +3,6 @@
 # is required to explicitly define if you want an production build:
 # > docker-compose -f docker-compose.yml up 
 
-version: "3.4"
-
 services:
 
   ########################################################
