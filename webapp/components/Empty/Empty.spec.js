@@ -38,7 +38,7 @@ describe('Empty.vue', () => {
       it('renders that message', () => {
         propsData.message = 'this is a custom message for Empty component'
         wrapper = Wrapper()
-        expect(wrapper.find('.hc-empty-message').text()).toEqual(propsData.message)
+        expect(wrapper.find('.empty-message').text()).toEqual(propsData.message)
       })
     })
 
@@ -46,7 +46,7 @@ describe('Empty.vue', () => {
       it('sets margin to that margin', () => {
         propsData.margin = 'xxx-small'
         wrapper = Wrapper()
-        expect(wrapper.find('.hc-empty').attributes().margin).toEqual(propsData.margin)
+        expect(wrapper.find('.empty').attributes().margin).toEqual(propsData.margin)
       })
     })
   })

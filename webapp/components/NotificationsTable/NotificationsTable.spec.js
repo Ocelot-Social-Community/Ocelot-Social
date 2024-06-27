@@ -48,8 +48,8 @@ describe('NotificationsTable.vue', () => {
     })
 
     describe('no notifications', () => {
-      it('renders HcEmpty component', () => {
-        expect(wrapper.find('.hc-empty').exists()).toBe(true)
+      it('renders Empty component', () => {
+        expect(wrapper.find('.empty').exists()).toBe(true)
       })
     })
 

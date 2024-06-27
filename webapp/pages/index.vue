@@ -121,7 +121,7 @@
       </template>
       <template v-else>
         <ds-grid-item :row-span="2" column-span="fullWidth">
-          <hc-empty icon="docs" />
+          <empty icon="docs" />
           <ds-text align="center">{{ $t('index.no-results') }}</ds-text>
           <ds-text align="center">{{ $t('index.change-filter-settings') }}</ds-text>
         </ds-grid-item>
@@ -140,7 +140,7 @@ import postListActions from '~/mixins/postListActions'
 import mobile from '~/mixins/mobile'
 import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter.vue'
-import HcEmpty from '~/components/Empty/Empty'
+import Empty from '~/components/Empty/Empty'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
@@ -158,7 +158,7 @@ export default {
     DonationInfo,
     HashtagsFilter,
     PostTeaser,
-    HcEmpty,
+    Empty,
     MasonryGrid,
     MasonryGridItem,
     FilterMenuComponent,
