@@ -1,9 +1,16 @@
-import fetch from 'node-fetch'
 import fs from 'fs'
 import path from 'path'
 import { createTestClient } from 'apollo-server-testing'
 import createServer from '../../server'
 import gql from 'graphql-tag'
+
+// eslint-disable-next-line no-new-func
+const _importDynamic = new Function('modulePath', 'return import(modulePath)')
+
+async function fetch(...args) {
+  const { default: fetch } = await _importDynamic('node-fetch')
+  return fetch(...args)
+}
 
 jest.mock('node-fetch')
 const mockedFetch = jest.mocked(fetch)
