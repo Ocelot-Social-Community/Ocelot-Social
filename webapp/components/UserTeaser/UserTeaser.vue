@@ -11,7 +11,7 @@
       <profile-avatar v-else-if="showAvatar" :profile="user" size="small" />
       <div class="info flex-direction-column">
         <div :class="wide ? 'flex-direction-row' : 'flex-direction-column'">
-          <nuxt-link v-if="linkToProfile" :to="userLink">
+          <nuxt-link v-if="linkToProfile" :to="userLink" class="flex-direction-column_link">
             <span class="text">
               <span class="slug">{{ userSlug }}</span>
               <span class="name">{{ userName }}</span>
@@ -26,7 +26,7 @@
             <span class="text">
               {{ $t('group.in') }}
             </span>
-            <nuxt-link :to="groupLink">
+            <nuxt-link :to="groupLink" class="flex-direction-column_link">
               <span class="text">
                 <span class="slug">{{ groupSlug }}</span>
                 <span v-if="!userOnly" class="name">{{ groupName }}</span>
@@ -164,6 +164,13 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: center;
+  }
+
+  .flex-direction-column_link {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #70677e;
   }
 
   .text {
