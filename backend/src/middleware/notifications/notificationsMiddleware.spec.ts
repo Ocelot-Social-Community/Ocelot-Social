@@ -549,6 +549,7 @@ describe('notifications', () => {
             postContent = 'Content of post where I get mentioned in a comment.'
             postAuthor = notifiedUser
           })
+
           it('sends only one notification with reason commented_on_post, no notification with reason mentioned_in_comment', async () => {
             await createCommentOnPostAction()
             const expected = {

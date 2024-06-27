@@ -1,5 +1,6 @@
 import { pubsub, NOTIFICATION_ADDED } from '../../server'
-import extractMentionedUsers from './mentions/extractMentionedUsers'
+import { AuthenticationError } from 'apollo-server'
+import { queryAllUserIds, extractMentionedUsers } from './mentions/extractMentionedUsers'
 import { validateNotifyUsers } from '../validation/validationMiddleware'
 import { sendMail } from '../helpers/email/sendMail'
 import { notificationTemplate } from '../helpers/email/templateBuilder'
@@ -99,23 +100,57 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
-    await publishNotifications(context, [
-      notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
-    ])
+    if (idsOfUsers.find((id) => id === 'all')) {
+      if (context.user.role !== 'admin') {
+        throw new AuthenticationError('You are not allowed to use the "@all" mention!')
+      }
+      let userToNotify = await queryAllUserIds(context)
+      userToNotify = userToNotify.filter((id) => id !== context.user.id)
+      await publishNotifications(context, [
+        notifyUsersOfMention('Post', post.id, userToNotify, 'mentioned_in_post', context),
+      ])
+    } else {
+      await publishNotifications(context, [
+        notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
+      ])
+    }
   }
   return post
 }
 
 const handleContentDataOfComment = async (resolve, root, args, context, resolveInfo) => {
   const { content } = args
-  let idsOfUsers = extractMentionedUsers(content)
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
-  idsOfUsers = idsOfUsers.filter((id) => id !== postAuthor.id)
-  await publishNotifications(context, [
-    notifyUsersOfMention('Comment', comment.id, idsOfUsers, 'mentioned_in_comment', context),
-    notifyUsersOfComment('Comment', comment.id, postAuthor.id, 'commented_on_post', context),
-  ])
+  const mentionedUserIds = extractMentionedUsers(content).filter((id) => id !== postAuthor.id)
+
+  let notifications
+  if (mentionedUserIds.includes('all')) {
+    if (context.user.role !== 'admin') {
+      throw new AuthenticationError('You are not allowed to use the "@all" mention!')
+    }
+    const userToNotify = (await queryAllUserIds(context)).filter((id) => id !== postAuthor.id)
+    const notification = notifyUsersOfMention(
+      'Comment',
+      comment.id,
+      userToNotify,
+      'mentioned_in_comment',
+      context,
+    )
+    notifications = [notification]
+  } else {
+    notifications = [
+      notifyUsersOfMention(
+        'Comment',
+        comment.id,
+        mentionedUserIds,
+        'mentioned_in_comment',
+        context,
+      ),
+      notifyUsersOfComment('Comment', comment.id, postAuthor.id, 'commented_on_post', context),
+    ]
+  }
+  await publishNotifications(context, notifications)
   return comment
 }
 
