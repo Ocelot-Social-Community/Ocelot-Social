@@ -90,7 +90,7 @@
     "slug": "~9.0.0",
     "subscriptions-transport-ws": "^0.9.19",
     "trunc-html": "~1.1.2",
-    "uuid": "~9.0.1",
+    "uuid": "~10.0.0",
     "validator": "^13.11.0",
     "xregexp": "^4.3.0"
   },
