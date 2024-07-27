@@ -73,7 +73,7 @@
     "compression": "^1.7.4",
     "cross-env": "^7.0.3",
     "express": "^4.19.2",
-    "pinia": "^2.1.7",
+    "pinia": "^2.2.0",
     "pinia-plugin-persistedstate": "^3.2.1",
     "sass": "^1.77.6",
     "sass-loader": "^14.2.1",
