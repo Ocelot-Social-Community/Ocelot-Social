@@ -11,10 +11,10 @@ jobs:
       docker: ${{ steps.changes.outputs.docker }}
       webapp: ${{ steps.changes.outputs.webapp }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # v4.1.7
 
       - name: Check for frontend file changes
-        uses: dorny/paths-filter@v3.0.2
+        uses: dorny/paths-filter@dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: changes
         with:
           token: ${{ github.token }}
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # v4.1.7
 
       - name: Check translation files
         run: |
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # v4.1.7
 
       - name: Webapp | Build 'test' image
         run: |
@@ -50,7 +50,7 @@ jobs:
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
 
       - name: Cache docker image
-        uses: actions/cache/save@v4.0.2
+        uses: actions/cache/sav@40c3b67b2955d93d83b27ed164edd0756bc24049 # v4.0.2
         with:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-webapp-cache
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # v4.1.7
 
       - name: webapp | Lint
         run: cd webapp && yarn && yarn run lint
@@ -76,10 +76,10 @@ jobs:
       checks: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # v4.1.7
 
       - name: Restore webapp cache
-        uses: actions/cache/restore@v4.0.2
+        uses: actions/cache/restore@40c3b67b2955d93d83b27ed164edd0756bc24049 # v4.0.2
         with:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-webapp-cache
