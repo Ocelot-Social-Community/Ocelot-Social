@@ -93,11 +93,11 @@ jobs:
           cp frontend/.env.dist frontend/.env
           cp backend/.env.template backend/.env
 
-      - name: backend | docker-compose
-        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
+      - name: backend | docker compose
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
 
       - name: webapp | Unit tests incl. coverage check
-        run: docker-compose exec -T webapp yarn test
+        run: docker compose exec -T webapp yarn test
 
   cleanup:
     name: Cleanup
