@@ -50,7 +50,7 @@ CMD ["yarn", "run", "start"]
 ##################################################################################
 # CODE (Does contain all code files and is pushed to DockerHub for rebranding) ###
 ##################################################################################
-FROM base as code
+FROM base AS code
 
 COPY package.json yarn.lock ./
 # yarn install
@@ -78,7 +78,7 @@ COPY maintenance/source ./
 ##################################################################################
 # BUILD ### TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO ##
 ##################################################################################
-FROM code as build
+FROM code AS build
 
 # yarn generate
 RUN yarn run generate
@@ -86,7 +86,7 @@ RUN yarn run generate
 ##################################################################################
 # PRODUCTION ### TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO ####
 ##################################################################################
-FROM nginx:alpine as production
+FROM nginx:alpine AS production
 
 COPY --from=build ./app/dist/ /usr/share/nginx/html/
 RUN rm /etc/nginx/conf.d/default.conf

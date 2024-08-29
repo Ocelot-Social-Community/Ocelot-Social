@@ -7,7 +7,7 @@ ARG APP_IMAGE_CODE=${APP_IMAGE}:${APP_IMAGE_TAG_CODE}
 ##################################################################################
 # CODE (branded) #################################################################
 ##################################################################################
-FROM $APP_IMAGE_CODE as code
+FROM $APP_IMAGE_CODE AS code
 
 ARG CONFIGURATION=example
 
@@ -25,7 +25,7 @@ RUN tools/merge-locales.sh
 ##################################################################################
 # BUILD ##########################################################################
 ##################################################################################
-FROM code as build
+FROM code AS build
 
 # yarn install
 ## unnicely done in $APP_IMAGE_CODE at the moment, see main repo
@@ -36,8 +36,8 @@ RUN yarn run generate
 ##################################################################################
 # BRANDED ### TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO # TODO ####
 ##################################################################################
-# FROM $APP_IMAGE_BASE as branded
-FROM nginx:alpine as branded
+# FROM $APP_IMAGE_BASE AS branded
+FROM nginx:alpine AS branded
 
 COPY --from=build ./app/dist/ /usr/share/nginx/html/
 RUN rm /etc/nginx/conf.d/default.conf
