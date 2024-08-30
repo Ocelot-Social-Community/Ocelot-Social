@@ -632,8 +632,8 @@ describe('CreatePost', () => {
                 eventLocationName: 'Leipzig',
                 eventVenue: 'Connewitzer Kreuz',
                 eventLocation: {
-                  lng: 12.374733,
-                  lat: 51.340632,
+                  lng: 12.375101,
+                  lat: 51.34083,
                 },
               },
             },
@@ -947,8 +947,8 @@ describe('UpdatePost', () => {
                 eventLocationName: 'Leipzig',
                 eventVenue: 'Connewitzer Kreuz',
                 eventLocation: {
-                  lng: 12.374733,
-                  lat: 51.340632,
+                  lng: 12.375101,
+                  lat: 51.34083,
                 },
               },
             },
