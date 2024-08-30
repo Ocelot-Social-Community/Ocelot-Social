@@ -7,7 +7,7 @@ ARG APP_IMAGE_CODE=${APP_IMAGE}:${APP_IMAGE_TAG_CODE}
 ##################################################################################
 # CODE (branded) #################################################################
 ##################################################################################
-FROM $APP_IMAGE_CODE as code
+FROM $APP_IMAGE_CODE AS code
 
 ARG CONFIGURATION=example
 
@@ -20,7 +20,7 @@ COPY configurations/${CONFIGURATION}/branding/email/ src/middleware/helpers/emai
 ##################################################################################
 # BUILD ##########################################################################
 ##################################################################################
-FROM code as build
+FROM code AS build
 
 # yarn install
 RUN yarn install --production=false --frozen-lockfile --non-interactive
@@ -30,7 +30,7 @@ RUN yarn run build
 ##################################################################################
 # BRANDED (Does contain only "binary"- and static-files to reduce image size) ####
 ##################################################################################
-FROM $APP_IMAGE_BASE as branded
+FROM $APP_IMAGE_BASE AS branded
 
 # TODO - do all copying with one COPY command to have one layer
 # Copy "binary"-files from build image

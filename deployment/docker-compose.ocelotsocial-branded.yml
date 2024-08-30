@@ -1,6 +1,4 @@
 # This docker-compose file is just here for testing
-version: "3.4"
-
 services:
 
   ########################################################
