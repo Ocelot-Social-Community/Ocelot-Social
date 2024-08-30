@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # v4.1.7
 
       - name: Copy env files
         run: |
@@ -37,7 +37,7 @@ jobs:
       
       - name: Cache docker images
         id: cache
-        uses: actions/cache/save@v4.0.2
+        uses: actions/cache@40c3b67b2955d93d83b27ed164edd0756bc24049 # v4.0.2
         with:
           path: |
             /opt/cucumber-json-formatter
@@ -59,7 +59,7 @@ jobs:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - name: Restore cache
-        uses: actions/cache/restore@v4.0.2
+        uses: actions/cache@40c3b67b2955d93d83b27ed164edd0756bc24049 # v4.0.2
         id: cache
         with:
           path: |
@@ -70,14 +70,14 @@ jobs:
           key: ${{ github.run_id }}-e2e-preparation-cache
           fail-on-cache-miss: true
 
-      - name: Boot up test system | docker-compose
+      - name: Boot up test system | docker compose
         run: |
           chmod +x /opt/cucumber-json-formatter
           sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
           docker load < /tmp/images/neo4j.tar
           docker load < /tmp/images/backend.tar
           docker load < /tmp/images/webapp.tar
-          docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp neo4j backend
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp neo4j backend
           sleep 90s
 
       - name: Full stack tests | run tests
@@ -93,7 +93,7 @@ jobs:
       - name: Full stack tests | if tests failed, upload report
         id: e2e-report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@89ef406dd8d7e03cfd12d9e0a4a378f454709029 # v4.3.5
         with:
           name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
