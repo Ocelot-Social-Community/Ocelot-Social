@@ -1,7 +1,7 @@
 import path from 'path'
 import { v4 as uuid } from 'uuid'
 import { Upload } from '@aws-sdk/lib-storage'
-import { ObjectCannedACL, S3 } from '@aws-sdk/client-s3'
+import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import slug from 'slug'
 import { existsSync, unlinkSync, createWriteStream } from 'fs'
 import { UserInputError } from 'apollo-server'
@@ -123,18 +123,21 @@ const localFileUpload = ({ createReadStream, uniqueFilename }) => {
 }
 
 const s3Upload = async ({ createReadStream, uniqueFilename, mimetype }) => {
-  const s3 = new S3({ region, endpoint })
+  const s3Client = new S3Client({
+    region,
+    endpoint,
+  })
   const s3Location = `original/${uniqueFilename}`
 
   const params = {
     Bucket,
     Key: s3Location,
-    ACL: ObjectCannedACL.public_read,
+    ACL: 'public-read',
     ContentType: mimetype,
     Body: createReadStream(),
   }
   const data = await new Upload({
-    client: s3,
+    client: s3Client,
     params,
   }).done()
   const { Location } = data
@@ -147,19 +150,23 @@ const localFileDelete = async (url) => {
 }
 
 const s3Delete = async (url) => {
-  const s3 = new S3({
-    region,
-
-    // The transformation for endpoint is not implemented.
-    // Refer to UPGRADING.md on aws-sdk-js-v3 for changes needed.
-    // Please create/upvote feature request on aws-sdk-js-codemod for endpoint.
-    endpoint,
-  })
   let { pathname } = new URL(url, 'http://example.org') // dummy domain to avoid invalid URL error
   pathname = pathname.substring(1) // remove first character '/'
-  const params = {
+
+  const s3Client = new S3Client({
+    region,
+    endpoint,
+  })
+
+  const command = new DeleteObjectCommand({
     Bucket,
     Key: pathname,
+  })
+
+  try {
+    await s3Client.send(command)
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(err)
   }
-  await s3.deleteObject(params)
 }
