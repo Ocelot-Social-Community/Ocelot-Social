@@ -23,6 +23,9 @@
     "db:migrate:create": "yarn run __migrate --template-file ./src/db/migrate/template.ts --date-format 'yyyymmddHHmmss' create"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.645.0",
+    "@aws-sdk/lib-storage": "^3.645.0",
+    "@aws-sdk/types": "^3.609.0",
     "@babel/cli": "~7.25.6",
     "@babel/core": "^7.25.2",
     "@babel/node": "~7.25.0",
@@ -36,7 +39,6 @@
     "apollo-link-http": "~1.5.17",
     "apollo-server": "~2.14.2",
     "apollo-server-express": "^2.14.2",
-    "aws-sdk": "^2.1599.0",
     "babel-core": "~7.0.0-0",
     "babel-eslint": "~10.1.0",
     "babel-jest": "~29.7.0",
