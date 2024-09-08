@@ -1,4 +1,4 @@
-import cheerio from 'cheerio'
+import * as cheerio from 'cheerio'
 import { exec, build } from 'xregexp/xregexp-all.js'
 // formats of a Hashtag:
 //   https://en.wikipedia.org/w/index.php?title=Hashtag&oldid=905141980#Style
