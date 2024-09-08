@@ -1,7 +1,7 @@
 ##################################################################################
 # BASE (Is pushed to DockerHub for rebranding) ###################################
 ##################################################################################
-FROM node:20.2.0-alpine3.17 as base
+FROM node:20.12.1-alpine3.19 AS base
 
 # ENVs
 ## DOCKER_WORKDIR would be a classical ARG, but that is not multi layer persistent - shame
@@ -48,7 +48,7 @@ WORKDIR ${DOCKER_WORKDIR}
 ##################################################################################
 # DEVELOPMENT (Connected to the local environment, to reload on demand) ##########
 ##################################################################################
-FROM base as development
+FROM base AS development
 
 # We don't need to copy or build anything since we gonna bind to the
 # local filesystem which will need a rebuild anyway
@@ -61,7 +61,7 @@ CMD /bin/sh -c "yarn install && yarn run dev"
 ##################################################################################
 # CODE (Does contain all code files and is pushed to DockerHub for rebranding) ###
 ##################################################################################
-FROM base as code
+FROM base AS code
 
 # copy everything, but do not build.
 COPY . .
@@ -69,7 +69,7 @@ COPY . .
 ##################################################################################
 # BUILD (Does contain all files and the compilate and is therefore bloated) ######
 ##################################################################################
-FROM code as build
+FROM code AS build
 
 # yarn install
 RUN yarn install --production=false --frozen-lockfile --non-interactive
@@ -79,7 +79,7 @@ RUN yarn run build
 ##################################################################################
 # TEST ###########################################################################
 ##################################################################################
-FROM build as test
+FROM build AS test
 
 # Run command
 CMD /bin/sh -c "yarn run dev"
@@ -87,7 +87,7 @@ CMD /bin/sh -c "yarn run dev"
 ##################################################################################
 # PRODUCTION (Does contain only "binary"- and static-files to reduce image size) #
 ##################################################################################
-FROM base as production
+FROM base AS production
 
 # TODO - do all copying with one COPY command to have one layer
 # Copy "binary"-files from build image

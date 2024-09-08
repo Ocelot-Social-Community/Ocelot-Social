@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # v4.1.7
       - name: Setup env
         run: |
           echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
@@ -34,7 +34,7 @@ jobs:
       - name: Neo4J | Save docker image 
         run: docker save "ocelotsocialnetwork/neo4j-community" > /tmp/neo4j.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: docker-neo4j-community
           path: /tmp/neo4j.tar
@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # v4.1.7
       - name: Setup env
         run: |
           echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
@@ -83,7 +83,7 @@ jobs:
       - name: Backend | Save docker image
         run: docker save "ocelotsocialnetwork/backend" > /tmp/backend.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: docker-backend-production
           path: /tmp/backend.tar
@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # v4.1.7
       - name: Setup env
         run: |
           echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
@@ -132,7 +132,7 @@ jobs:
       - name: Webapp | Save docker image
         run: docker save "ocelotsocialnetwork/webapp" > /tmp/webapp.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: docker-webapp-production
           path: /tmp/webapp.tar
@@ -145,7 +145,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # v4.1.7
       - name: Setup env
         run: |
           echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
@@ -184,7 +184,7 @@ jobs:
       - name: Maintenance | Save docker image
         run: docker save "ocelotsocialnetwork/maintenance" > /tmp/maintenance.tar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: docker-maintenance-production
           path: /tmp/maintenance.tar
@@ -201,25 +201,25 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
       - name: Download Docker Image (Neo4J)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: docker-neo4j-community
           path: /tmp
       - run: docker load < /tmp/neo4j.tar
       - name: Download Docker Image (Backend)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: docker-backend-production
           path: /tmp
       - run: docker load < /tmp/backend.tar
       - name: Download Docker Image (WebApp)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: docker-webapp-production
           path: /tmp
       - run: docker load < /tmp/webapp.tar
       - name: Download Docker Image (Maintenance)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: docker-maintenance-production
           path: /tmp
@@ -243,7 +243,7 @@ jobs:
     needs: [upload_to_dockerhub]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # v4.1.7
         with:
           fetch-depth: 0 # Fetch full History for changelog
       - name: Setup env
@@ -253,7 +253,7 @@ jobs:
           echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
       - run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       - name: package-version-to-git-tag + build number
-        uses: pkgdeps/git-tag-action@v3
+        uses: pkgdeps/git-tag-action@v3.0.0 # v3.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           github_repo: ${{ github.repository }}
@@ -267,7 +267,7 @@ jobs:
       - name: package-version-to-git-release
         continue-on-error: true # Will fail if tag exists
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@4c11c9fe1dcd9636620a16455165783b20fc7ea0 # v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
@@ -283,7 +283,7 @@ jobs:
     needs: [github_tag]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # v4.1.7
         with:
           fetch-depth: 0 # Fetch full History for changelog
       - name: Setup env
@@ -293,7 +293,7 @@ jobs:
           echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
       - run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       #- name: Repository Dispatch
-      #  uses: peter-evans/repository-dispatch@v3
+      #  uses: peter-evans/repository-dispatch@733a1daa12a9e7f9b219279836ac0190f48cf46d # v3.0.0
       #  with:
       #    token: ${{ github.token }}
       #    event-type: trigger-ocelot-build-success
@@ -301,7 +301,7 @@ jobs:
       #    client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "VERSION": "${VERSION}", "BUILD_DATE": "${BUILD_DATE}", "BUILD_COMMIT": "${BUILD_COMMIT}", "BUILD_VERSION": "${BUILD_VERSION}"}'
 
       - name: Repository Dispatch stage.ocelot.social
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@733a1daa12a9e7f9b219279836ac0190f48cf46d # v3.0.0
         with:
           token: ${{ secrets.OCELOT_PUBLISH_EVENT_PAT }} # this token is required to access the other repository
           event-type: trigger-ocelot-build-success
@@ -309,7 +309,7 @@ jobs:
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "GITHUB_RUN_NUMBER": "${{ env.GITHUB_RUN_NUMBER }}", "VERSION": "${VERSION}", "BUILD_DATE": "${BUILD_DATE}", "BUILD_COMMIT": "${BUILD_COMMIT}", "BUILD_VERSION": "${BUILD_VERSION}"}'
       
       - name: Repository Dispatch stage.yunite.me
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@733a1daa12a9e7f9b219279836ac0190f48cf46d # v3.0.0
         with:
           token: ${{ secrets.OCELOT_PUBLISH_EVENT_PAT }} # this token is required to access the other repository
           event-type: trigger-ocelot-build-success

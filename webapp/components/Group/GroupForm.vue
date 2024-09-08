@@ -272,8 +272,8 @@ export default {
       return isNestedValue
         ? this.formData.locationName.value
         : isDirectString
-        ? this.formData.locationName
-        : ''
+          ? this.formData.locationName
+          : ''
     },
     locationNameLabelAddOnOldName() {
       return this.formLocationName !== '' ? ' — ' + this.formLocationName : ''

@@ -49,7 +49,7 @@ Factory.define('badge')
   })
 
 Factory.define('image')
-  .attr('url', faker.image.unsplash.imageUrl)
+  .attr('url', faker.image.url)
   .attr('aspectRatio', 1.3333333333333333)
   .attr('alt', faker.lorem.sentence)
   .attr('type', 'image/jpeg')
@@ -63,7 +63,7 @@ Factory.define('basicUser')
   .option('password', '1234')
   .attrs({
     id: uuid,
-    name: faker.name.fullName,
+    name: faker.person.fullName,
     password: '1234',
     role: 'user',
     termsAndConditionsAgreedVersion: '0.0.1',
@@ -107,7 +107,7 @@ Factory.define('user')
   .option('email', faker.internet.exampleEmail)
   .option('avatar', () =>
     Factory.build('image', {
-      url: faker.internet.avatar(),
+      url: faker.image.avatar(),
     }),
   )
   .after(async (buildObject, options) => {

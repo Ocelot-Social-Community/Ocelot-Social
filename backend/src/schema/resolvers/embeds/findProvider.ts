@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import minimatch from 'minimatch'
+import { minimatch } from 'minimatch'
 
 let oEmbedProvidersFile = fs.readFileSync(
   path.join(__dirname, '../../../../public/providers.json'),

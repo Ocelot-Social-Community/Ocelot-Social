@@ -1,4 +1,4 @@
-FROM node:21-alpine3.17 as base
+FROM node:21-alpine3.17 AS base
 
 # ENVs (available in production aswell, can be overwritten by commandline or env file)
 ## DOCKER_WORKDIR would be a classical ARG, but that is not multi layer persistent - shame
@@ -43,7 +43,7 @@ WORKDIR ${DOCKER_WORKDIR}
 ##################################################################################
 # DEVELOPMENT (Connected to the local environment, to reload on demand) ##########
 ##################################################################################
-FROM base as development
+FROM base AS development
 
 # We don't need to copy or build anything since we gonna bind to the
 # local filesystem which will need a rebuild anyway
@@ -56,7 +56,7 @@ CMD /bin/sh -c "npm install && npm run dev"
 ##################################################################################
 # STORYBOOK ######################################################################
 ##################################################################################
-FROM base as storybook
+FROM base AS storybook
 
 # We don't need to copy or build anything since we gonna bind to the
 # local filesystem which will need a rebuild anyway
@@ -69,7 +69,7 @@ CMD /bin/sh -c "npm install && npm run storybook"
 ##################################################################################
 # DOCUMENTATION ##################################################################
 ##################################################################################
-FROM base as documentation
+FROM base AS documentation
 
 # We don't need to copy or build anything since we gonna bind to the
 # local filesystem which will need a rebuild anyway
@@ -82,7 +82,7 @@ CMD /bin/sh -c "npm install && npm run docs:dev"
 ##################################################################################
 # BUILD (Does contain all files and is therefore bloated) ########################
 ##################################################################################
-FROM base as build
+FROM base AS build
 
 # Copy everything
 COPY . .
@@ -94,7 +94,7 @@ RUN npm run build
 ##################################################################################
 # TEST ###########################################################################
 ##################################################################################
-#FROM build as test
+#FROM build AS test
 
 # Install Additional Software
 # RUN apk add --no-cache bash jq
@@ -105,7 +105,7 @@ RUN npm run build
 ##################################################################################
 # PRODUCTION (Does contain only "binary"- and static-files to reduce image size) #
 ##################################################################################
-FROM base as production
+FROM base AS production
 
 # Copy "binary"-files from build image
 COPY --from=build ${DOCKER_WORKDIR}/build ./build

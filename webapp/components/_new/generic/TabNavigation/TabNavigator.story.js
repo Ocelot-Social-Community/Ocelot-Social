@@ -1,4 +1,4 @@
-import faker from '@faker-js/faker'
+import { faker } from '@faker-js/faker'
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
 import HcEmpty from '~/components/Empty/Empty'
@@ -17,7 +17,7 @@ helpers.init()
 const postMock = (fields) => {
   return {
     ...post,
-    id: faker.random.uuid(),
+    id: faker.string.uuid(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
     deleted: false,
@@ -30,7 +30,7 @@ const postMock = (fields) => {
 const userMock = (fields) => {
   return {
     ...user,
-    id: faker.random.uuid(),
+    id: faker.string.uuid(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
     deleted: false,
