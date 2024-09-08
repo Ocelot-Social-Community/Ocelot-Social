@@ -14,7 +14,6 @@
 [![vitest][badge-vitest-img]][badge-vitest-href]
 [![storybook][badge-storybook-img]][badge-storybook-href]
 [![vuepress][badge-vuepress-img]][badge-vuepress-href]
-[![chromatic][badge-chromatic-img]][badge-chromatic-href]
 
 The IT4C Boilerplate for frontends
 
@@ -28,7 +27,7 @@ The project uses `vite` as builder, `vike` to do the SSR. The design framework i
 
 Testing is done with `vitest` and code style is enforced with `eslint`, `remark-cli` and `stylelint`.
 
-This projects utilizes `storybook` and `chromatic` to develop, document & test frontend components and `vuepress` for static documentation generation.
+This projects utilizes `storybook` to develop, document & test frontend components and `vuepress` for static documentation generation.
 
 ## Commands
 
@@ -61,8 +60,6 @@ The following commands are available:
 | **Documentation**           |                                                  |
 | `npm run docs:dev`          | Run Documentation in development mode            |
 | `npm run docs:build`        | Build static documentation                       |
-| **Chromatic**               |                                                  |
-| `npm run chromatic`         | Run Chromatic. See Chromatic section for details |
 | **Maintenance**             |                                                  |
 | `npm run update`            | Check for updates                                |
 
@@ -76,20 +73,6 @@ docker compose up
 Docker can be run in production mode:
 ```bash
 docker compose -f docker-compose.yml up
-```
-
-### Chromatic
-
-In order to use the chromatic workflow you need to provide a `CHROMATIC_PROJECT_TOKEN` in the repository secrets.
-
-If you want to run chromatic from the command line you either have to provide this variable as well
-```bash
-export CHROMATIC_PROJECT_TOKEN=...
-npm run chromatic
-```
-or you have to append it via parameter:
-```bash
-npm run chromatic -- --project-token=...
 ```
 
 ### Update
@@ -192,6 +175,3 @@ This mechanic was taken from this [source](https://stackoverflow.com/questions/1
 
 [badge-vuepress-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.vuepress&label=vuepress&color=orange
 [badge-vuepress-href]: https://vuepress.vuejs.org/
-
-[badge-chromatic-img]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIT4Change%2Fboilerplate-frontend%2Fmaster%2Fpackage.json&query=devDependencies.chromatic&label=chromatic&color=orange
-[badge-chromatic-href]: https://www.chromatic.com/
