@@ -23,8 +23,7 @@
     "stylelint",
     "vitest",
     "storybook",
-    "vuepress",
-    "chromatic"
+    "vuepress"
   ],
   "author": {
     "name": "Ulf Gebhardt"
@@ -57,7 +56,6 @@
     "test": "npm run test:lint && npm run test:unit",
     "docs:dev": "vuepress dev .",
     "docs:build": "vuepress build .",
-    "chromatic": "npx chromatic --build-script-name storybook:build",
     "update": "npx npm-check-updates"
   },
   "dependencies": {
@@ -102,7 +100,6 @@
     "@vitest/coverage-v8": "^2.0.5",
     "@vue/test-utils": "^2.4.6",
     "@vuepress/bundler-vite": "^2.0.0-rc.14",
-    "chromatic": "^11.5.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard": "^17.1.0",
