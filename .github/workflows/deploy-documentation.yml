@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@6d193bf28034eafb982f37bd894289fe649468fc # v4.1.7
 
       - name: Setup Node 20
-        uses: actions/setup-node@1c7b2db92075f828bee89d7e19d33a911d15e7b3 # v4.0.3
+        uses: actions/setup-node@97ca147735c170fb35096b39ef17a0fc5d9270ac # v4.0.3
         with:
           node-version: 20
 
@@ -38,7 +38,7 @@ jobs:
         run: npm install && npm run docs:build
 
       - name: Deploy Vuepress to Github Pages
-        uses: crazy-max/ghaction-github-pages@cda5497acf90563d34489ed832a67c2c50353a16 # v4.0.0
+        uses: crazy-max/ghaction-github-pages@08f571653184e9ff3d598bdda53ffd4ed00ed562 # v4.0.0
         with:
           target_branch: gh-pages
           build_dir: .vuepress/dist
