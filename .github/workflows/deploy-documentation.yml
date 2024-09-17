@@ -38,7 +38,7 @@ jobs:
         run: npm install && npm run docs:build
 
       - name: Deploy Vuepress to Github Pages
-        uses: crazy-max/ghaction-github-pages@cda5497acf90563d34489ed832a67c2c50353a16 # v4.0.0
+        uses: crazy-max/ghaction-github-pages@08f571653184e9ff3d598bdda53ffd4ed00ed562 # v4.0.0
         with:
           target_branch: gh-pages
           build_dir: .vuepress/dist
