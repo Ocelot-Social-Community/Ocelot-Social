@@ -81,6 +81,17 @@ $ scripts/cluster.backup.sh
 
 The backup will be saved into your network folders `backup` folder in a new folder with the date and time.
 
+##### Default Database Name
+
+To execute this script, it may be necessary to set the default database name in Neo4j.
+
+In our deployments there are cases where the database is called `neo4j` (used by default) and in other cases `graph.db` (accidentally happened when we loaded the database into a new cluster).
+
+In the new deployment with Helm, we set the default database name by the environment variable `NEO4J_dbms_default__database` in the Helm `values.yaml`.
+See [Docker-specific configuration settings](https://neo4j.com/docs/operations-manual/4.4/docker/ref-settings/)
+
+For more information see [Database Management Commands](../neo4j/README.md#database-management-commands).
+
 #### Multiple Networks Backup
 
 In order to save several network backups locally, you must define the configuration names of all networks in `.env`. The template for this is `deployment/.env.dist`:

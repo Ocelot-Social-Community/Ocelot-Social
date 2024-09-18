@@ -70,8 +70,13 @@ For authentication, download the current cluster configuration file from Digital
 Set the context of the cluster by command:
 
 ```bash
-$ kubectl config use-context <context-name>
+kubectl config use-context <context-name>
 ```
+
+We seem to have two instances in our DigitalOcean cluster how we need to log into the Kubernetes Dashboard.
+It looks like it depends on the Kubernetes Dashboard version, but we are not absolutely sure.
+
+#### Login with `kubeconfig` File
 
 Port-forward the Kubernetes Dashboard to your local machine:
 
@@ -82,9 +87,22 @@ $ export POD_NAME=$(kubectl get pods -n kubernetes-dashboard -l "app.kubernetes.
 $ kubectl -n kubernetes-dashboard port-forward $POD_NAME 8443:8443
 ```
 
-### Log-In to Kubernetes Dashboard
+Access the URL in your local web browser at `https://127.0.0.1:8443/`, and log in using your Kubernetes cluster credentials – downloaded config file.
+You may encounter a certificate warning, so make sure to override it.
 
-Access the URL in your local web browser at `https://127.0.0.1:8443/`, and log in using your Kubernetes cluster credentials – downloaded config file. You may encounter a certificate warning, so make sure to override it.
+#### Login with Admin Token
+
+Port-forward the Kubernetes Dashboard to your local machine:
+
+```bash
+# create your access token
+kubectl -n kubernetes-dashboard create token admin-user
+# forward port
+kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+```
+
+Access the URL in your local web browser at `https://127.0.0.1:8443/`, and log in using your access token.
+You may encounter a certificate warning, so make sure to override it.
 
 ## Alternatives to Kubernetes Dashboard
 
