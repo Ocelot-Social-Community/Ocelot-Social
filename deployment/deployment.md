@@ -90,7 +90,7 @@ In our deployments there are cases where the database is called `neo4j` (used by
 In the new deployment with Helm, we set the default database name by the environment variable `NEO4J_dbms_default__database` in the Helm `values.yaml`.
 See [Docker-specific configuration settings](https://neo4j.com/docs/operations-manual/4.4/docker/ref-settings/)
 
-For more information see [Database Management Commands](/neo4j/README.md#database-management-commands).
+For more information see [Database Management Commands](../neo4j/README.md#database-management-commands).
 
 #### Multiple Networks Backup
 

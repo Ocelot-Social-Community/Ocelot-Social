@@ -216,4 +216,4 @@ You can switch back to an existing database without damaging it.
 It seems to be impossible to change the name of an existing database on the fly.
 To change the name of an existing database, we need to load a dump or restore a backup under a new name in Neo4j.
 
-For more information on deployment, see [Default Database Name](/deployment/deployment.md#default-database-name).
+For more information on deployment, see [Default Database Name](../deployment/deployment.md#default-database-name).
