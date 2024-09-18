@@ -32,7 +32,7 @@ and drop the `.jar` file into the `plugins` folder of the just extracted Neo4j-S
 
 Then make sure to allow Apoc procedures by adding the following line to your Neo4j configuration \(`conf/neo4j.conf`\):
 
-```
+```text
 dbms.security.procedures.unrestricted=apoc.*
 ```
 
@@ -75,6 +75,8 @@ $ docker cp <docker-image-name('neo4j')>:/var/lib/neo4j/neo4j-dump <local-folder
 ```
 
 If you need a specific database name, add the option `--database=<name>` to the command `neo4j-admin dump`.
+
+In our deployments there are cases where the database is called `neo4j` (used by default) and in other cases `graph.db` (accidentally happened when we loaded the database into a new cluster).
 
 ### Import Neo4j Dump
 
@@ -144,6 +146,23 @@ On a server with Kubernetes cluster:
 $ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "yarn prod:migrate init"
 ```
 
+***Enter and Exit Cypher Shell***
+
+```bash
+# enter the bash of Neo4j database
+$ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-neo4j | awk '{ print $1 }') -- bash
+# enter Cypher-Shell to send Cypher commands
+neo4j# cypher-shell
+
+# send Cypher commands
+cypher-shell# < Cypher commands >
+# exit Cypher-Shell
+cypher-shell# :exit
+
+# exit bash
+neo4j# exit
+```
+
 ***Cypher commands to show indexes and constraints***
 
 ```bash
@@ -189,7 +208,12 @@ $ SHOW DEFAULT DATABASE
 $ SHOW DATABASES
 ```
 
-To set the default database by configuration, use `NEO4J_dbms_default__database` as an environment variable when starting Neo4j 4.4, see [Docker specific configuration settings](<https://neo4j.com/docs/operations-manual/4.4/docker/ref-settings/>).
+To set the default database by configuration, use `NEO4J_dbms_default__database` as an environment variable when starting Neo4j 4.4, see [Docker specific configuration settings](https://neo4j.com/docs/operations-manual/4.4/docker/ref-settings/).
 
 If a database with this name does not exist, an empty database with this name is created and all other databases remain.
 You can switch back to an existing database without damaging it.
+
+It seems to be impossible to change the name of an existing database on the fly.
+To change the name of an existing database, we need to load a dump or restore a backup under a new name in Neo4j.
+
+For more information on deployment, see [Default Database Name](/deployment/deployment.md#default-database-name).
