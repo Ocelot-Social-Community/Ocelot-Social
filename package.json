@@ -45,7 +45,7 @@
     "cross-env": "^7.0.3",
     "cypress": "^13.8.1",
     "cypress-network-idle": "^1.14.2",
-    "date-fns": "^3.6.0",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "expect": "^29.6.4",
     "graphql-request": "^2.0.0",
