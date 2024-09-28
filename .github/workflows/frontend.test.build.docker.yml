@@ -11,7 +11,7 @@ jobs:
     outputs:
       changes: ${{ steps.changes.outputs.frontend-test-build-docker }}
     steps:
-      - uses: actions/checkout@6d193bf28034eafb982f37bd894289fe649468fc # v4.1.7
+      - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.1.7
 
       - name: Check for frontend file changes
         uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
@@ -30,7 +30,7 @@ jobs:
       WORKING_DIRECTORY: ./frontend
     steps:
       - name: Checkout code
-        uses: actions/checkout@6d193bf28034eafb982f37bd894289fe649468fc # v4.1.7
+        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.1.7
 
       - name: Frontend | Build Docker Production
         run: docker compose -f docker-compose.yml build
@@ -45,7 +45,7 @@ jobs:
       WORKING_DIRECTORY: ./frontend
     steps:
       - name: Checkout code
-        uses: actions/checkout@6d193bf28034eafb982f37bd894289fe649468fc # v4.1.7
+        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.1.7
 
       - name: Frontend | Build Docker Development
         run: docker compose build
