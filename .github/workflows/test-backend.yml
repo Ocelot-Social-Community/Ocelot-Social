@@ -37,7 +37,7 @@ jobs:
       
       - name: Cache docker images
         id: cache-neo4j
-        uses: actions/cache@81382a721fc89d96eca335d0c3ba33144b2baa9d # v4.0.2
+        uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.0.2
         with:
           path: /tmp/neo4j.tar
           key: ${{ github.run_id }}-backend-neo4j-cache
@@ -58,7 +58,7 @@ jobs:
       
       - name: Cache docker images
         id: cache-backend
-        uses: actions/cache@81382a721fc89d96eca335d0c3ba33144b2baa9d # v4.0.2
+        uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.0.2
         with:
           path: /tmp/backend.tar
           key: ${{ github.run_id }}-backend-cache
@@ -87,14 +87,14 @@ jobs:
         uses: actions/checkout@6d193bf28034eafb982f37bd894289fe649468fc # v4.1.7
 
       - name: Restore Neo4J cache
-        uses: actions/cache@81382a721fc89d96eca335d0c3ba33144b2baa9d # v4.0.2
+        uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.0.2
         with:
           path: /tmp/neo4j.tar
           key: ${{ github.run_id }}-backend-neo4j-cache
           fail-on-cache-miss: true
 
       - name: Restore Backend cache
-        uses: actions/cache@81382a721fc89d96eca335d0c3ba33144b2baa9d # v4.0.2
+        uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.0.2
         with:
           path: /tmp/backend.tar
           key: ${{ github.run_id }}-backend-cache

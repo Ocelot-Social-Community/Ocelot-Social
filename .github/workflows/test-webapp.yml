@@ -50,7 +50,7 @@ jobs:
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
 
       - name: Cache docker image
-        uses: actions/cache@81382a721fc89d96eca335d0c3ba33144b2baa9d # v4.0.2
+        uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.0.2
         with:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-webapp-cache
@@ -79,7 +79,7 @@ jobs:
         uses: actions/checkout@6d193bf28034eafb982f37bd894289fe649468fc # v4.1.7
 
       - name: Restore webapp cache
-        uses: actions/cache@81382a721fc89d96eca335d0c3ba33144b2baa9d # v4.0.2
+        uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.0.2
         with:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-webapp-cache
