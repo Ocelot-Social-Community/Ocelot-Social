@@ -13,7 +13,7 @@ jobs:
       documentation: ${{ steps.changes.outputs.documentation }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@6d193bf28034eafb982f37bd894289fe649468fc # v4.1.7
+        uses: actions/checkout@6b42224f41ee5dfe5395e27c8b2746f1f9955030 # v4.1.7
 
       - name: Check for file changes
         uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@6d193bf28034eafb982f37bd894289fe649468fc # v4.1.7
+        uses: actions/checkout@6b42224f41ee5dfe5395e27c8b2746f1f9955030 # v4.1.7
 
       - name: Setup Node 20
         uses: actions/setup-node@97ca147735c170fb35096b39ef17a0fc5d9270ac # v4.0.3
