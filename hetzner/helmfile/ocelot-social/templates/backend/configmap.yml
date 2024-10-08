@@ -1,0 +1,10 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-backend-env
+data:
+  GRAPHQL_URI: "http://{{ .Release.Name }}-backend:4000"
+  NEO4J_URI: "bolt://{{ .Release.Name }}-neo4j:7687"
+{{- range $key, $value := .Values.backend.env }}
+  {{ $key }}: {{ $value | quote }}
+{{- end }}
