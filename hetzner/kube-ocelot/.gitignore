@@ -1,0 +1,9 @@
+**/.terraform/*
+*.tfstate
+*.tfstate.*terraform
+*.tfstate.lock.info
+*.tfstate.backup
+
+kube_override.tf
+
+!terraform.tfstate
