@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-backend
+spec:
+  ports:
+    - name: {{ .Release.Name }}-graphql
+      port: 4000
+      targetPort: 4000
+  selector:
+    app: {{ .Release.Name }}-backend
