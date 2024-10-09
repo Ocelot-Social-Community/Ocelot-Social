@@ -19,6 +19,12 @@ spec:
           pathType: ImplementationSpecific
           backend:
             service:
+            {{- if .Values.underMaintenance }}
+              name: {{ .Release.Name }}-maintenance
+              port:
+                number: 80
+            {{- else }}
               name: {{ .Release.Name }}-webapp
               port:
                 number: 3000
+            {{- end }}

@@ -20,6 +20,9 @@ spec:
       - name: container-{{ .Release.Name }}-neo4j
         image: "{{ .Values.neo4j.image.repository }}:{{ default .Values.global.image.tag .Values.neo4j.image.tag .Chart.AppVersion "latest" }}"
         imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
+        {{- if .Values.underMaintenance }}
+        command: ["tail", "-f", "/dev/null"]
+        {{- end }}
         ports:
         - containerPort: 7687
         - containerPort: 7474

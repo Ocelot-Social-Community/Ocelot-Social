@@ -1,6 +1,9 @@
 domain: stage.ocelot.social
+
 cert_manager:
   issuer: # override default
+
+underMaintenance: false
 
 global:
   image:
