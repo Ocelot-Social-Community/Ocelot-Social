@@ -21,7 +21,10 @@ spec:
         image: "{{ .Values.neo4j.image.repository }}:{{ default .Values.global.image.tag .Values.neo4j.image.tag .Chart.AppVersion "latest" }}"
         imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
         {{- if .Values.underMaintenance }}
-        command: ["tail", "-f", "/dev/null"]
+        command:
+          - "bash"
+          - "-c"
+          - "while true; do echo 'Neo4j is not running. Pod is in offline maintenance mode.'; sleep 60; done"
         {{- end }}
         ports:
         - containerPort: 7687
