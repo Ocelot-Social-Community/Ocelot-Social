@@ -1120,6 +1120,16 @@ output "kubeconfig" {
   sensitive = true
 }
 
+output "ingress_public_ipv4" {
+  value     = module.kube-hetzner.ingress_public_ipv4
+  sensitive = false
+}
+
+output "ingress_public_ipv6" {
+  value     = module.kube-hetzner.ingress_public_ipv6
+  sensitive = false
+}
+
 variable "hcloud_token" {
   sensitive = true
   default   = ""
