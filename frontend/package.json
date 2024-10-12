@@ -70,7 +70,7 @@
     "@vuepress/theme-default": "^2.0.0-rc.37",
     "compression": "^1.7.4",
     "cross-env": "^7.0.3",
-    "express": "^4.19.2",
+    "express": "^4.21.1",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
     "sass": "^1.77.6",
