@@ -13,7 +13,7 @@ terraform {
   encryption {
     key_provider "pbkdf2" "hcloud_token" {
       # Specify a long / complex passphrase (min. 16 characters)
-      passphrase= var.hcloud_token != "" ? var.hcloud_token : local.hcloud_token
+      passphrase= var.hcloud_token
     }
 
     method "aes_gcm" "new_method" {

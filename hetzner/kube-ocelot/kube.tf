@@ -1,17 +1,8 @@
-locals {
-  # You have the choice of setting your Hetzner API token here or define the TF_VAR_hcloud_token env
-  # within your shell, such as: export TF_VAR_hcloud_token=xxxxxxxxxxx
-  # If you choose to define it in the shell, this can be left as is.
-
-  # Your Hetzner token can be found in your Project > Security > API Token (Read & Write is required).
-  hcloud_token = "xxxxxxxxxxx"
-}
-
 module "kube-hetzner" {
   providers = {
     hcloud = hcloud
   }
-  hcloud_token = var.hcloud_token != "" ? var.hcloud_token : local.hcloud_token
+  hcloud_token = var.hcloud_token
 
   # Then fill or edit the below values. Only the first values starting with a * are obligatory; the rest can remain with their default values, or you
   # could adapt them to your needs.
@@ -1081,7 +1072,7 @@ bootstrapPassword: "supermario"
 }
 
 provider "hcloud" {
-  token = var.hcloud_token != "" ? var.hcloud_token : local.hcloud_token
+  token = var.hcloud_token
 }
 
 output "kubeconfig" {
