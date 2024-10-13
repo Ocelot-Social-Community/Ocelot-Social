@@ -17,7 +17,7 @@
       <ds-text>
         {{ $t('settings.embeds.status.change.question') }}
       </ds-text>
-      <base-button @click="submit" :filled="!disabled" :disabled="!disabled">
+      <base-button @click="submit" :filled="!disabled" :disabled="!disabled" style="margin-right: 5px;">
         {{ $t('settings.embeds.status.change.deny') }}
       </base-button>
       <base-button @click="submit" :filled="disabled" :disabled="disabled">
@@ -54,6 +54,7 @@ export default {
   data() {
     return {
       disabled: null,
+      print: true,
       providers: [],
     }
   },
