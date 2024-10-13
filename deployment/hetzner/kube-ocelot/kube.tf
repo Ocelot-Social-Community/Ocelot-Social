@@ -1092,5 +1092,5 @@ output "ingress_public_ipv6" {
 
 variable "hcloud_token" {
   sensitive = true
-  default   = ""
+  nullable = false
 }
