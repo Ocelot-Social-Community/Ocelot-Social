@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-neo4j
+spec:
+  ports:
+  - name: {{ .Release.Name }}-bolt
+    port: 7687
+    targetPort: 7687
+  - name: {{ .Release.Name }}-http # for debugging only
+    port: 7474
+    targetPort: 7474
+  selector:
+    app: {{ .Release.Name }}-neo4j

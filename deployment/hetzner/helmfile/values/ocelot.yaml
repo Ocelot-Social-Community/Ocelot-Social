@@ -1,0 +1,3 @@
+domain: ocelot-social.roschaefer.de
+cert_manager:
+  issuer: ocelot-social-letsencrypt-prod
