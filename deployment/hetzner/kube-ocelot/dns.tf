@@ -8,10 +8,8 @@ provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
 
-locals {
-  cloudflare_zone = {
-    id = "075910ecd8f8366d1f1bc7cfd3c8835c"
-  }
+data "cloudflare_zone" "roschaeferde" {
+  name = "roschaefer.de"
 }
 
 resource "cloudflare_record" "terraform_managed_resource_f74d9e9ce7f4efa02204fac4f5296647" {
@@ -19,7 +17,7 @@ resource "cloudflare_record" "terraform_managed_resource_f74d9e9ce7f4efa02204fac
   name    = "ocelot-social"
   proxied = false
   type    = "A"
-  zone_id = local.cloudflare_zone.id
+  zone_id = data.cloudflare_zone.roschaeferde.id
 }
 
 resource "cloudflare_record" "terraform_managed_resource_aad453c5a627017d66250b3513322148" {
@@ -27,5 +25,5 @@ resource "cloudflare_record" "terraform_managed_resource_aad453c5a627017d66250b3
   name    = "ocelot-social"
   proxied = false
   type    = "AAAA"
-  zone_id = local.cloudflare_zone.id
+  zone_id = data.cloudflare_zone.roschaeferde.id
 }
