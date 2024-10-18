@@ -1,0 +1,36 @@
+{{- if .Values.underMaintenance }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name:  {{ .Release.Name }}-neo4j-backup
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: container-{{ .Release.Name }}-neo4j-backup
+        image: "{{ .Values.neo4j.image.repository }}:{{ default .Values.global.image.tag .Values.neo4j.image.tag .Chart.AppVersion "latest" }}"
+        imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
+        command:
+          - neo4j-admin
+          - dump
+          - --to
+          - "/backups/neo4j-dump-{{ now | date "20060102150405" }}"
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-neo4j-env
+        - secretRef:
+            name: {{ .Release.Name }}-neo4j-secret-env
+        volumeMounts:
+          - mountPath: /data/
+            name: neo4j-data
+          - mountPath: /backups/
+            name: neo4j-backups
+      volumes:
+        - name: neo4j-data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-neo4j-data
+        - name: neo4j-backups
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-neo4j-backups
+{{- end }}

@@ -1,0 +1,6 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-neo4j-env
+data:
+{{ .Values.neo4j.env | toYaml | indent 2 }}

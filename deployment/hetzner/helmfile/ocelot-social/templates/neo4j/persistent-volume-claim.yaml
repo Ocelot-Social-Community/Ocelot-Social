@@ -1,0 +1,22 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-neo4j-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage:  {{ .Values.neo4j.storage }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-neo4j-backups
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage:  {{ .Values.neo4j.storageBackups }}

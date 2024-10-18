@@ -4,32 +4,19 @@
 FROM node:20.12.1-alpine3.19 AS base
 
 # ENVs
-## DOCKER_WORKDIR would be a classical ARG, but that is not multi layer persistent - shame
 ENV DOCKER_WORKDIR="/app"
-## We Cannot do `$(date -u +'%Y-%m-%dT%H:%M:%SZ')` here so we use unix timestamp=0
-ARG BBUILD_DATE="1970-01-01T00:00:00.00Z"
-ENV BUILD_DATE=$BBUILD_DATE
-## We cannot do $(yarn run version)-${BUILD_NUMBER} here so we default to 0.0.0-0
-ARG BBUILD_VERSION="0.0.0-0"
-ENV BUILD_VERSION=$BBUILD_VERSION
-## We cannot do `$(git rev-parse --short HEAD)` here so we default to 0000000
-ARG BBUILD_COMMIT="0000000"
-ENV BUILD_COMMIT=$BBUILD_COMMIT
 ## SET NODE_ENV
 ENV NODE_ENV="production"
 ## App relevant Envs
 ENV PORT="4000"
 
 # Labels
-LABEL org.label-schema.build-date="${BUILD_DATE}"
 LABEL org.label-schema.name="ocelot.social:backend"
 LABEL org.label-schema.description="Backend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
 LABEL org.label-schema.url="https://ocelot.social"
 LABEL org.label-schema.vcs-url="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/backend"
-LABEL org.label-schema.vcs-ref="${BUILD_COMMIT}"
 LABEL org.label-schema.vendor="ocelot.social Community"
-LABEL org.label-schema.version="${BUILD_VERSION}"
 LABEL org.label-schema.schema-version="1.0"
 LABEL maintainer="devops@ocelot.social"
 

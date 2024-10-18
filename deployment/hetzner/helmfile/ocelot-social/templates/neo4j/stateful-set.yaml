@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name:  {{ .Release.Name }}-neo4j
+spec:
+  replicas: {{ .Values.underMaintenance | ternary 0 1 }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-neo4j
+  template:
+    metadata:
+      name: neo4j
+      annotations:
+        backup.velero.io/backup-volumes: neo4j-data
+      labels:
+        app: {{ .Release.Name }}-neo4j
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: container-{{ .Release.Name }}-neo4j
+        image: "{{ .Values.neo4j.image.repository }}:{{ default .Values.global.image.tag .Values.neo4j.image.tag .Chart.AppVersion "latest" }}"
+        imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
+        ports:
+        - containerPort: 7687
+        - containerPort: 7474
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-neo4j-env
+        - secretRef:
+            name: {{ .Release.Name }}-neo4j-secret-env
+        volumeMounts:
+          - mountPath: /data/
+            name: neo4j-data
+      volumes:
+        - name: neo4j-data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-neo4j-data
