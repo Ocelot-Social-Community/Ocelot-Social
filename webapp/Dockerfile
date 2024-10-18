@@ -3,33 +3,17 @@
 ##################################################################################
 FROM node:20.12.1-alpine3.19 AS base
 
-# ENVs
-## DOCKER_WORKDIR would be a classical ARG, but that is not multi layer persistent - shame
 ENV DOCKER_WORKDIR="/app"
-## We Cannot do `$(date -u +'%Y-%m-%dT%H:%M:%SZ')` here so we use unix timestamp=0
-ARG BBUILD_DATE="1970-01-01T00:00:00.00Z"
-ENV BUILD_DATE=$BBUILD_DATE
-## We cannot do $(yarn run version)-${BUILD_NUMBER} here so we default to 0.0.0-0
-ARG BBUILD_VERSION="0.0.0-0"
-ENV BUILD_VERSION=$BBUILD_VERSION
-## We cannot do `$(git rev-parse --short HEAD)` here so we default to 0000000
-ARG BBUILD_COMMIT="0000000"
-ENV BUILD_COMMIT=$BBUILD_COMMIT
-## SET NODE_ENV
 ENV NODE_ENV="production"
-## App relevant Envs
 ENV PORT="3000"
 
 # Labels
-LABEL org.label-schema.build-date="${BUILD_DATE}"
 LABEL org.label-schema.name="ocelot.social:webapp"
 LABEL org.label-schema.description="Web Frontend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
 LABEL org.label-schema.url="https://ocelot.social"
 LABEL org.label-schema.vcs-url="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/webapp"
-LABEL org.label-schema.vcs-ref="${BUILD_COMMIT}"
 LABEL org.label-schema.vendor="ocelot.social Community"
-LABEL org.label-schema.version="${BUILD_VERSION}"
 LABEL org.label-schema.schema-version="1.0"
 LABEL maintainer="devops@ocelot.social"
 
@@ -106,3 +90,52 @@ COPY --from=build ${DOCKER_WORKDIR}/package.json ./package.json
 
 # Run command
 CMD /bin/sh -c "yarn run start"
+
+##################################################################################
+# maintenance-build
+##################################################################################
+FROM base AS maintenance-build
+
+COPY package.json yarn.lock ./
+# yarn install
+RUN yarn install --production=false --frozen-lockfile --non-interactive
+
+COPY assets assets
+# COPY components/_new/generic/ components/_new/generic
+COPY components/LocaleSwitch/ components/LocaleSwitch
+COPY components/Dropdown.vue components/Dropdown.vue
+# COPY components/Logo/ components/Logo
+COPY layouts/blank.vue layouts/blank.vue
+COPY locales locales
+COPY mixins mixins
+COPY plugins/i18n.js plugins/v-tooltip.js plugins/styleguide.js plugins/
+COPY static static
+COPY constants constants
+COPY nuxt.config.js nuxt.config.js
+COPY config/ config/
+
+# this is needed in rebranding
+COPY maintenance/nginx maintenance/nginx
+# this will also ovewrite the existing package.json
+COPY maintenance/source ./
+
+RUN yarn run generate
+
+##################################################################################
+# maintenance-production
+##################################################################################
+FROM nginx:alpine AS maintenance
+
+LABEL org.label-schema.name="ocelot.social:maintenance"
+LABEL org.label-schema.description="Maintenance page of the Social Network Software ocelot.social"
+LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
+LABEL org.label-schema.url="https://ocelot.social"
+LABEL org.label-schema.vcs-url="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/webapp"
+LABEL org.label-schema.vendor="ocelot.social Community"
+LABEL org.label-schema.schema-version="1.0"
+LABEL maintainer="devops@ocelot.social"
+
+
+COPY --from=maintenance-build ./app/dist/ /usr/share/nginx/html/
+RUN rm /etc/nginx/conf.d/default.conf
+COPY maintenance/nginx/custom.conf /etc/nginx/conf.d/
