@@ -11,7 +11,7 @@ jobs:
       documentation: ${{ steps.changes.outputs.documentation }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@6d193bf28034eafb982f37bd894289fe649468fc # v4.1.7
+        uses: actions/checkout@163217dfcd28294438ea1c1c149cfaf66eec283e # v4.1.7
 
       - name: Check for markdown file changes
         uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
@@ -28,7 +28,7 @@ jobs:
     if: needs.files-changed.outputs.markdown == 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@6d193bf28034eafb982f37bd894289fe649468fc # v4.1.7
+        uses: actions/checkout@163217dfcd28294438ea1c1c149cfaf66eec283e # v4.1.7
       
       - name: Remove old documentation files
         run: rm -rf ./deployment/src/old/ ./CHANGELOG.md # workaround until https://github.com/gaurav-nelson/github-action-markdown-link-check/pull/183 has been done
@@ -51,7 +51,7 @@ jobs:
     if: needs.files-changed.outputs.documentation == 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@6d193bf28034eafb982f37bd894289fe649468fc # v4.1.7
+        uses: actions/checkout@163217dfcd28294438ea1c1c149cfaf66eec283e # v4.1.7
 
       - name: Setup Node 20
         uses: actions/setup-node@aca7b64a59c0063db8564e0ffdadd3887f1cbae5 # v4.0.3

@@ -22,7 +22,7 @@ jobs:
     continue-on-error: true
     steps:
       - name: Checkout code
-        uses: actions/checkout@6d193bf28034eafb982f37bd894289fe649468fc # v4.1.7
+        uses: actions/checkout@163217dfcd28294438ea1c1c149cfaf66eec283e # v4.1.7
 
       - name: Cleanup
         run: |
