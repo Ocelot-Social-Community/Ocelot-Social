@@ -168,7 +168,7 @@
           </template>
           <template v-else>
             <ds-grid-item column-span="fullWidth">
-              <hc-empty margin="xx-large" icon="file" />
+              <empty margin="xx-large" icon="file" />
             </ds-grid-item>
           </template>
         </masonry-grid>
@@ -189,7 +189,7 @@ import HcFollowButton from '~/components/Button/FollowButton'
 import HcCountTo from '~/components/CountTo.vue'
 import HcBadges from '~/components/Badges.vue'
 import FollowList, { followListVisibleCount } from '~/components/features/ProfileList/FollowList'
-import HcEmpty from '~/components/Empty/Empty'
+import Empty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
@@ -218,7 +218,7 @@ export default {
     HcFollowButton,
     HcCountTo,
     HcBadges,
-    HcEmpty,
+    Empty,
     ProfileAvatar,
     ContentMenu,
     AvatarUploader,
