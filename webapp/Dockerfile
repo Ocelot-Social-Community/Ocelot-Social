@@ -97,6 +97,7 @@ COPY --from=build ${DOCKER_WORKDIR}/nuxt.config.js ./nuxt.config.js
 # Copy static files
 # TODO - this seems not be needed anymore for the new rebranding
 # TODO - this should be one Folder containign all stuff needed to be copied
+# Wolle: what shall happen here?
 COPY --from=build ${DOCKER_WORKDIR}/config/ ./config/
 COPY --from=build ${DOCKER_WORKDIR}/constants ./constants
 COPY --from=build ${DOCKER_WORKDIR}/static ./static
