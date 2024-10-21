@@ -87,7 +87,7 @@
     "nodemailer-html-to-text": "^3.2.0",
     "request": "~2.88.2",
     "sanitize-html": "~2.13.1",
-    "slug": "~9.1.0",
+    "slug": "~10.0.0",
     "subscriptions-transport-ws": "^0.9.19",
     "trunc-html": "~1.1.2",
     "uuid": "~9.0.1",
