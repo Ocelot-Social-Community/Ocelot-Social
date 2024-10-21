@@ -75,7 +75,7 @@
     "pinia-plugin-persistedstate": "^4.1.1",
     "sass": "^1.77.6",
     "sass-loader": "^14.2.1",
-    "sirv": "^2.0.4",
+    "sirv": "^3.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
     "vike": "^0.4.195",
