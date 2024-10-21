@@ -22,7 +22,7 @@ updates:
     babel:
       applies-to: version-updates
       patterns:
-        - "*babel*"
+        - "@babel/*"
     cypress:
       applies-to: version-updates
       patterns:
