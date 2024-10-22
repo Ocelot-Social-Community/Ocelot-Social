@@ -14,7 +14,10 @@ jobs:
           - name: backend
             context: backend
             file: backend/Dockerfile
-            target: production
+          - name: backend-unbranded
+            context: backend
+            file: backend/Dockerfile
+            target: code
           - name: webapp
             context: webapp
             file: webapp/Dockerfile
