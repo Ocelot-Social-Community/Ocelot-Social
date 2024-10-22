@@ -10,7 +10,7 @@
 // }
 
 $color-primary: rgb(56, 57, 55);
-$color-primary-light: rgb(161, 179, 177);
+$color-primary-light: rgb(112, 115, 110);
 $color-primary-dark: rgb(81, 99, 97);
 $color-primary-active: rgb(123, 160, 149);
 $color-primary-inverse: rgb(241, 248, 243);
@@ -37,8 +37,8 @@ $color-toast-green: $color-tertiary;
 $chat-message-bg-me: $color-primary-light;
 $chat-message-checkmark-seen: $color-tertiary;
 $chat-message-checkmark: $text-color-inverse;
-$chat-room-color-counter-badge: $color-tertiary;
-$chat-room-background-counter-badge: $color-secondary;
+$chat-room-color-counter-badge: $color-primary;
+$chat-room-background-counter-badge: $text-color-inverse;
 
 .main-navigation a {
   color: #fff;
