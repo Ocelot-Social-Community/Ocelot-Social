@@ -5,7 +5,7 @@ services:
   ########################################################
   webapp:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/webapp:local-development
+    image: ghcr.io/ocelot-social-community/ocelot-social/webapp:local-development
     build:
       target: development
     environment:
@@ -24,7 +24,7 @@ services:
   ########################################################
   frontend:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/frontend:local-development
+    image: ghcr.io/ocelot-social-community/ocelot-social/frontend:local-development
     build:
       target: development
     environment:
@@ -44,7 +44,7 @@ services:
   ########################################################
   backend:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/backend:local-development
+    image: ghcr.io/ocelot-social-community/ocelot-social/backend:local-development
     build:
       target: development
     environment:
@@ -62,20 +62,17 @@ services:
   ########################################################
   maintenance:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/maintenance:local-development
+    image: ghcr.io/ocelot-social-community/ocelot-social/maintenance:local-development
 
   ########################################################
   # NEO4J ################################################
   ########################################################
   neo4j:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/neo4j-community:local-development
+    image: ghcr.io/ocelot-social-community/ocelot-social/neo4j-community:local-development
     ports:
       # Also expose the neo4j query browser
       - 7474:7474
-    networks:
-      # So we can access the neo4j query browser from our host machine
-      - external-net
 
   ########################################################
   # MAILSERVER TO FAKE SMTP ##############################
@@ -85,13 +82,6 @@ services:
     container_name: mailserver
     ports:
       - 1080:80
-    networks:
-      - external-net
-      
-# the following network from the main YAML gives the warning `WARNING: Some networks were defined but are not used by any service: internal-net` and should be removed
-#   but removing is not possible yet, it seems: https://github.com/docker/compose/issues/3729#issuecomment-623154878
-# networks:
-#   internal-net:
 
 volumes:
   webapp_node_modules:
