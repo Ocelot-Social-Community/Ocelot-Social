@@ -16,12 +16,12 @@ jobs:
             context: backend
             file: backend/Dockerfile
             target: base
-            suffix: base
+            suffix: -base
           - name: backend
             context: backend
             file: backend/Dockerfile
             target: code
-            suffix: code
+            suffix: -code
           - name: backend
             context: backend
             file: backend/Dockerfile
@@ -31,12 +31,12 @@ jobs:
             context: webapp
             file: webapp/Dockerfile
             target: base
-            suffix: base
+            suffix: -base
           - name: webapp
             context: webapp
             file: webapp/Dockerfile
             target: code
-            suffix: code
+            suffix: -code
           - name: webapp
             context: webapp
             file: webapp/Dockerfile
@@ -46,12 +46,12 @@ jobs:
             context: webapp
             file: webapp/Dockerfile.maintenance
             target: base
-            suffix: base
+            suffix: -base
           - name: maintenance
             context: webapp
             file: webapp/Dockerfile.maintenance
             target: code
-            suffix: code
+            suffix: -code
           - name: maintenance
             context: webapp
             file: webapp/Dockerfile.maintenance
