@@ -73,7 +73,7 @@
     "express": "^4.21.1",
     "pinia": "^2.2.4",
     "pinia-plugin-persistedstate": "^4.1.1",
-    "sass": "^1.77.6",
+    "sass": "^1.80.3",
     "sass-loader": "^14.2.1",
     "sirv": "^3.0.0",
     "ts-node": "^10.9.2",
