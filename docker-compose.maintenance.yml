@@ -1,7 +1,6 @@
 # Todo: !!! This file seems related to our old maintenance worker for MongoDB and has to be refactored in case of using it !!!
 
 services:
-
   maintenance-worker:
     image: ghcr.io/ocelot-social-community/ocelot-social/develop-maintenance-worker:latest
     build:
@@ -32,7 +31,5 @@ services:
       - 7474:7474
 
 volumes:
-  webapp_node_modules:
-  backend_node_modules:
   neo4j-data:
   uploads:

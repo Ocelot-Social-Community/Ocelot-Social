@@ -1,10 +1,6 @@
 services:
 
-  ########################################################
-  # WEBAPP ###############################################
-  ########################################################
   webapp:
-    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ghcr.io/ocelot-social-community/ocelot-social/webapp:local-development
     build:
       target: development
@@ -13,17 +9,9 @@ services:
       # - DEBUG=true
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
     volumes:
-      # This makes sure the docker container has its own node modules.
-      # Therefore it is possible to have a different node version on the host machine
-      - webapp_node_modules:/app/node_modules
-      # bind the local folder to the docker to allow live reload
       - ./webapp:/app
 
-  ########################################################
-  # FRONTEND #############################################
-  ########################################################
   frontend:
-    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ghcr.io/ocelot-social-community/ocelot-social/frontend:local-development
     build:
       target: development
@@ -33,17 +21,9 @@ services:
       # port required for npm run dev
       - 24678:24678
     volumes:
-      # This makes sure the docker container has its own node modules.
-      # Therefore it is possible to have a different node version on the host machine
-      - frontend_node_modules:/app/node_modules
-      # bind the local folder to the docker to allow live reload
       - ./frontend:/app
 
-  ########################################################
-  # BACKEND ##############################################
-  ########################################################
   backend:
-    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:local-development
     build:
       target: development
@@ -51,39 +31,15 @@ services:
       - NODE_ENV="development"
       - DEBUG=true
     volumes:
-      # This makes sure the docker container has its own node modules.
-      # Therefore it is possible to have a different node version on the host machine
-      - backend_node_modules:/app/node_modules
-      # bind the local folder to the docker to allow live reload
       - ./backend:/app
 
-  ########################################################
-  # MAINTENANCE ##########################################
-  ########################################################
-  maintenance:
-    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ghcr.io/ocelot-social-community/ocelot-social/maintenance:local-development
-
-  ########################################################
-  # NEO4J ################################################
-  ########################################################
   neo4j:
-    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ghcr.io/ocelot-social-community/ocelot-social/neo4j-community:local-development
     ports:
       # Also expose the neo4j query browser
       - 7474:7474
 
-  ########################################################
-  # MAILSERVER TO FAKE SMTP ##############################
-  ########################################################
   mailserver:
     image: djfarrelly/maildev
     container_name: mailserver
     ports:
       - 1080:80
-
-volumes:
-  webapp_node_modules:
-  frontend_node_modules:
-  backend_node_modules:

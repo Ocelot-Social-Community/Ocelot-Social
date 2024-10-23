@@ -19,9 +19,6 @@ services:
       # Envs used in Dockerfile
       # - DOCKER_WORKDIR="/app"
       # - PORT="3000"
-      - BUILD_DATE
-      - BUILD_VERSION
-      - BUILD_COMMIT
       - NODE_ENV="production"
       # Application only envs
       - HOST=0.0.0.0 # This is nuxt specific, alternative value is HOST=webapp
@@ -42,9 +39,6 @@ services:
       # Envs used in Dockerfile
       # - DOCKER_WORKDIR="/app"
       # - PORT="3002"
-      - BUILD_DATE
-      - BUILD_VERSION
-      - BUILD_COMMIT
       - NODE_ENV="production"
       # Application only envs
       #- HOST=0.0.0.0 # This is nuxt specific, alternative value is HOST=webapp
@@ -67,9 +61,6 @@ services:
       # Envs used in Dockerfile
       # - DOCKER_WORKDIR="/app"
       # - PORT="4000"
-      - BUILD_DATE
-      - BUILD_VERSION
-      - BUILD_COMMIT
       - NODE_ENV="production"
       # Application only envs
       - DEBUG=false
