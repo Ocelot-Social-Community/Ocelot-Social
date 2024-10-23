@@ -134,7 +134,6 @@ updates:
     vue:
       applies-to: version-updates
       patterns:
-        - "vue*"
         - "@vue*"
 
 - package-ecosystem: docker
