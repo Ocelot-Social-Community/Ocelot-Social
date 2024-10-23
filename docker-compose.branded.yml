@@ -1,0 +1,34 @@
+services:
+
+  webapp:
+    image: ghcr.io/ocelot-social-community/stage.ocelot.social/webapp
+    build:
+      target: branded
+      context: ./deployment
+      dockerfile: ./src/docker/webapp.Dockerfile
+      args:
+        CONFIGURATION: stage.ocelot.social
+        APP_IMAGE_TAG_CODE: ${OCELOT_VERSION:-latest}-code
+        APP_IMAGE_TAG_BASE: ${OCELOT_VERSION:-latest}-base
+
+  backend:
+    image: ghcr.io/ocelot-social-community/stage.ocelot.social/backend
+    build:
+      target: branded
+      context: ./deployment
+      dockerfile: ./src/docker/backend.Dockerfile
+      args:
+        CONFIGURATION: stage.ocelot.social
+        APP_IMAGE_TAG_CODE: ${OCELOT_VERSION:-latest}-code
+        APP_IMAGE_TAG_BASE: ${OCELOT_VERSION:-latest}-base
+
+  maintenance:
+    image: ghcr.io/ocelot-social-community/stage.ocelot.social/maintenance
+    build:
+      target: branded
+      context: ./deployment
+      dockerfile: ./src/docker/maintenance.Dockerfile
+      args:
+        CONFIGURATION: stage.ocelot.social
+        APP_IMAGE_TAG_CODE: ${OCELOT_VERSION:-latest}-code
+        APP_IMAGE_TAG_BASE: ${OCELOT_VERSION:-latest}-base
