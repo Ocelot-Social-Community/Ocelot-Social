@@ -1,4 +1,4 @@
-ARG APP_IMAGE=ocelotsocialnetwork/backend
+ARG APP_IMAGE=ghcr.io/ocelot-social-community/ocelot-social/backend
 ARG APP_IMAGE_TAG_BASE=latest-base
 ARG APP_IMAGE_TAG_CODE=latest-code
 ARG APP_IMAGE_BASE=${APP_IMAGE}:${APP_IMAGE_TAG_BASE}
