@@ -4,6 +4,6 @@ export default {
   name: APPLICATION_NAME,
   short_name: APPLICATION_SHORT_NAME,
   description: APPLICATION_DESCRIPTION,
-  theme_color: '#17b53f',
+  theme_color: '$theme-color',
   lang: 'en',
 }
