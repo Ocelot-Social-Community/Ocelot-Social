@@ -186,6 +186,9 @@ $ cp .env.template .env
 
 # in folder backend/
 $ cp .env.template .env
+
+# in folder frontend/
+$ cp .env.template .env
 ```
 
 For Development:

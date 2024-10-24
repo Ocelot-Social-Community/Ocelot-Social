@@ -1,4 +1,4 @@
-ARG APP_IMAGE=ocelotsocialnetwork/maintenance
+ARG APP_IMAGE=ghcr.io/ocelot-social-community/ocelot-social/maintenance
 ARG APP_IMAGE_TAG_BASE=latest-base
 ARG APP_IMAGE_TAG_CODE=latest-code
 ARG APP_IMAGE_BASE=${APP_IMAGE}:${APP_IMAGE_TAG_BASE}
@@ -9,17 +9,13 @@ ARG APP_IMAGE_CODE=${APP_IMAGE}:${APP_IMAGE_TAG_CODE}
 ##################################################################################
 FROM $APP_IMAGE_CODE AS code
 
-ARG CONFIGURATION=example
-
 # copy public constants into the Docker image to brand it
-COPY configurations/${CONFIGURATION}/branding/static/ static/
-COPY configurations/${CONFIGURATION}/branding/constants/ constants/
+COPY ./branding/static/ static/
+COPY ./branding/constants/ constants/
 RUN /bin/sh -c 'cd constants && for f in *.ts; do mv -- "$f" "${f%.ts}.js"; done'
 
 # locales
-COPY configurations/${CONFIGURATION}/branding/locales/*.json locales/tmp/
-COPY src/tools/ tools/
-RUN apk add --no-cache bash jq
+COPY ./branding/locales/*.json locales/tmp/
 RUN tools/merge-locales.sh
 
 ##################################################################################

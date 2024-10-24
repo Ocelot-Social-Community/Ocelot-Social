@@ -35,7 +35,7 @@ LABEL maintainer="devops@ocelot.social"
 
 # Install Additional Software
 ## install: git
-RUN apk --no-cache add git python3 make g++
+RUN apk --no-cache add git python3 make g++ bash jq
 
 # Settings
 ## Expose Container Port
