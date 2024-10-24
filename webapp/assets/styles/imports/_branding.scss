@@ -50,7 +50,6 @@ a:hover {
 }
 
 /* ds-menu-item link colors */
-// .ds-menu-item-link .router-link-exact-active .router-link-active {
 a:hover.ds-menu-item-link {
   color: $color-secondary;
 }
@@ -58,9 +57,10 @@ a:hover.ds-menu-item-link {
   color: $color-secondary;
   border-left-color: $color-secondary;
 }
-// a:hover {
-//   color: $color-primary-light;
-// }
+
+.v-popover.open .trigger a {
+  color: $color-secondary;
+}
 
 .main-navigation a {
   color: #fff;
@@ -85,14 +85,17 @@ a:hover.ds-menu-item-link {
   color: #fff;
 }
 
-#nav-search-box .hc-hashtag a {
-  color: #17b53f;
+// #nav-search-box .hc-hashtag a {
+.hc-hashtag a {
+  color: $color-secondary;
+}
+.hc-hashtag a:hover {
+  color: $color-secondary-active;
 }
 
 #footer {
   background-color: $color-tertiary;
 }
-
 #footer a {
   color: $color-primary;
 }
