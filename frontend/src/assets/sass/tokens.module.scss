@@ -29,14 +29,6 @@ $color-yellow-active: rgb(255, 206, 10);
 $color-yellow-inverse: rgb(255, 252, 240);
 
 /**
- * @tokens Theme
- * @presenter Color
- */
-
-// main color in general. e.g. the color in the background of the app that is visible behind the transparent iPhone status bar to name one use case, or the current color of SVGs to name another use case
-$theme-color: $color-primary;
-
-/**
  * @tokens Color Neutral
  * @presenter Color
  */
