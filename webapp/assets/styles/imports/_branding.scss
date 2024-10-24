@@ -27,7 +27,7 @@ $color-tertiary: rgb(244, 142, 0);
 $color-header-background: $color-primary;
 $color-footer-background: $color-secondary;
 
-$color-locale-menu: $color-secondary;
+$color-locale-menu: $color-primary;
 
 $color-donation-bar: $color-tertiary;
 
@@ -41,11 +41,32 @@ $chat-message-checkmark: $text-color-inverse;
 $chat-room-color-counter-badge: $color-primary;
 $chat-room-background-counter-badge: $color-tertiary;
 
+/* "a" link colors */
+a {
+  color: $color-primary;
+}
+a:hover {
+  color: $color-primary-light;
+}
+
+/* ds-menu-item link colors */
+// .ds-menu-item-link .router-link-exact-active .router-link-active {
+a:hover.ds-menu-item-link {
+  color: $color-tertiary;
+}
+.ds-menu-item-link.router-link-exact-active {
+  color: $color-tertiary;
+  border-left-color: $color-tertiary;
+}
+// a:hover {
+//   color: $color-primary-light;
+// }
+
 .main-navigation a {
   color: #fff;
-  text-transform: uppercase;
-  font-size: 16px;
-  font-weight: 500;
+  // text-transform: uppercase;
+  // font-size: 16px;
+  // font-weight: 500;
 }
 
 .main-navigation a:hover {
@@ -104,12 +125,17 @@ $chat-room-background-counter-badge: $color-tertiary;
 // }
 
 /* chips on group teaser */
-a.group-teaser footer .ds-chip-primary {
-  background-color: $color-tertiary;
-}
+// a.group-teaser footer .ds-chip-primary {
+//   background-color: $color-tertiary;
+// }
 
 /* chips on group profile */
-.group-profile .ds-chip-primary {
+// .group-profile .ds-chip-primary {
+//   background-color: $color-tertiary;
+// }
+
+/* chips with primary color */
+.ds-chip-primary {
   background-color: $color-tertiary;
 }
 
@@ -124,7 +150,9 @@ div.tab-navigation li.Tabs__tab {
 }
 
 /* submit button color group form */
-form.group-form button.ds-button-primary {
+// form.group-form button.ds-button-primary {
+/* ds-button with primary color */
+.ds-button-primary {
   background-color: $color-primary;
 }
 
