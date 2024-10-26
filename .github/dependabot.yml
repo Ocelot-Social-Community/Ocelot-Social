@@ -103,10 +103,10 @@ updates:
       applies-to: version-updates
       patterns:
         - "apollo*"
-    babel:
+    @babel:
       applies-to: version-updates
       patterns:
-        - "*babel*"
+        - "@babel*"
     eslint:
       applies-to: version-updates
       patterns:
@@ -119,10 +119,6 @@ updates:
       applies-to: version-updates
       patterns:
         - "*mapbox*"
-    nuxt:
-      applies-to: version-updates
-      patterns:
-        - "*nuxt*"
     sass:
       applies-to: version-updates
       patterns:
