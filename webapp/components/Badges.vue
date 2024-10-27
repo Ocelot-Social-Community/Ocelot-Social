@@ -17,9 +17,8 @@ export default {
 }
 </script>
 
-@use 'sass:math';
-
 <style lang="scss">
+@use 'sass:math';
 .hc-badges {
   text-align: center;
   position: relative;

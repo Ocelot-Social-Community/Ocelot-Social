@@ -107,6 +107,7 @@ export default {
       '~assets/styles/imports/_branding.scss',
       '~assets/_new/styles/export.scss',
     ],
+    hoistUseStatements: true,
   },
 
   /*
