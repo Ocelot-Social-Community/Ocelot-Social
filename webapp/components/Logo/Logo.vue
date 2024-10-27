@@ -113,6 +113,7 @@ export default {
 .ds-logo-svg {
   height: auto;
   fill: #000000;
+  max-width: 100%;
 }
 </style>
 
