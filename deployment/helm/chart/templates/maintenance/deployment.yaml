@@ -1,0 +1,23 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name:  {{ .Release.Name }}-maintenance
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-maintenance
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-maintenance
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: {{ .Release.Name }}-maintenance
+        image: "{{ .Values.maintenance.image.repository }}:{{ default .Values.global.image.tag .Values.maintenance.image.tag "latest" }}"
+        imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
+        env:
+          - name: HOST
+            value: 0.0.0.0
+        ports:
+          - containerPort: 80

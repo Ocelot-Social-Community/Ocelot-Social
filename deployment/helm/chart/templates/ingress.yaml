@@ -1,0 +1,30 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}
+  annotations:
+    cert-manager.io/issuer: {{ .Values.cert_manager.issuer | default (printf "%s-letsencrypt-staging"  .Release.Name) }}
+spec:
+  tls:
+  - hosts:
+      - {{ quote .Values.domain }}
+    secretName: {{ .Release.Name }}-letsencrypt-tls
+
+  rules:
+  - host: {{ quote .Values.domain }}
+    http:
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          backend:
+            service:
+            {{- if .Values.underMaintenance }}
+              name: {{ .Release.Name }}-maintenance
+              port:
+                number: 80
+            {{- else }}
+              name: {{ .Release.Name }}-webapp
+              port:
+                number: 3000
+            {{- end }}
