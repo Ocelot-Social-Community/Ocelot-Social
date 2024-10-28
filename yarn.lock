@@ -7285,10 +7285,10 @@ slimsearch@^2.1.1:
   resolved "https://registry.yarnpkg.com/slimsearch/-/slimsearch-2.1.1.tgz#3ca8d88a09373519729fea0cc3ba1ea8af285e64"
   integrity sha512-l1utJWal8F/RIheYk88DE2+enI12nIrn5SHt4ih/CNAH81PzkTv2GVBODlLynDJb7xan5hjd8XTL5f0L4cxLQA==
 
-slug@^9.1.0:
-  version "9.1.0"
-  resolved "https://registry.yarnpkg.com/slug/-/slug-9.1.0.tgz#246baf1e9d8e821f7f5863a7c8bdd86a7ec3f12c"
-  integrity sha512-ioOsCfzQSu+D6NZ8XMCR8IW9FgvF8W7Xzz56hBkB/ALvNaWeBs2MUvvPugq3GCrxfHPFeK6hAxGkY/WLnfX2Lg==
+slug@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/slug/-/slug-10.0.0.tgz#1af6259e37201497c7bb31b4b8187520c9f3ebb6"
+  integrity sha512-M8s2PWOUeSCdD4S1NH5lCzXg2zFV1fozrtfr0FSKl65x+EF1rUowj+/vyFlnHgxPxWzT+DL0VXKfYc1DHJoymg==
 
 source-map-js@^1.2.0, source-map-js@^1.2.1:
   version "1.2.1"
