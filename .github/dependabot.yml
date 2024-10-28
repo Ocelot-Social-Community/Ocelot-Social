@@ -61,18 +61,10 @@ updates:
       applies-to: version-updates
       patterns:
         - "*babel*"
-    graphql:
-      applies-to: version-updates
-      patterns:
-        - "graphql*"
     metascraper:
       applies-to: version-updates
       patterns:
         - "metascraper*"
-    neo4j:
-      applies-to: version-updates
-      patterns:
-        - "neo*"
     typescript:
       applies-to: version-updates
       patterns:
