@@ -95,7 +95,7 @@ updates:
       applies-to: version-updates
       patterns:
         - "apollo*"
-    @babel:
+    babel:
       applies-to: version-updates
       patterns:
         - "@babel*"
