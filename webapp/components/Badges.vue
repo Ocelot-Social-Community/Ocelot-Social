@@ -18,6 +18,7 @@ export default {
 </script>
 
 <style lang="scss">
+@use 'sass:math';
 .hc-badges {
   text-align: center;
   position: relative;
@@ -38,7 +39,7 @@ export default {
   $offset: $size * -0.2;
 
   &.hc-badges-dual {
-    padding-top: $size / 2 - 2;
+    padding-top: math.div($size, 2) - 2;
   }
 
   .hc-badge-container {
@@ -58,10 +59,10 @@ export default {
       margin-left: -6px;
     }
     &:first-child {
-      margin-left: -$size / 3;
+      margin-left: math.div(-$size, 3);
     }
     &:last-child {
-      margin-right: -$size / 3;
+      margin-right: math.div(-$size, 3);
     }
   }
 }
