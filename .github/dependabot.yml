@@ -122,7 +122,6 @@ updates:
     vue:
       applies-to: version-updates
       patterns:
-        - "vue*"
         - "@vue*"
 
 - package-ecosystem: docker
@@ -173,10 +172,6 @@ updates:
       applies-to: version-updates
       patterns:
         - "remark*"
-    sass:
-      applies-to: version-updates
-      patterns:
-        - "sass*"
     storybook:
       applies-to: version-updates
       patterns:

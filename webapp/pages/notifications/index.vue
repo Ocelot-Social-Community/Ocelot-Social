@@ -26,14 +26,14 @@
         />
       </ds-flex-item>
       <ds-flex-item class="notifications-footer-button" :width="{ base: 'auto' }" centered>
-        <ds-button
+        <base-button
           primary
           :disabled="unreadNotificationsCount === 0"
           @click="markAllAsRead"
           data-test="markAllAsRead-button"
         >
           {{ $t('notifications.markAllAsRead') }}
-        </ds-button>
+        </base-button>
       </ds-flex-item>
     </ds-flex>
   </base-card>
