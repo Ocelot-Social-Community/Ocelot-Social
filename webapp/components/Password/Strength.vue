@@ -97,9 +97,7 @@ export default {
   position: absolute;
   width: 0;
   border-radius: inherit;
-  transition:
-    width 0.5s ease-in-out,
-    background 0.25s;
+  transition: width 0.5s ease-in-out, background 0.25s;
 }
 
 .password-strength-meter-inner {
