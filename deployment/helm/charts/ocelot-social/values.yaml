@@ -1,0 +1,26 @@
+domain: stage.ocelot.social
+
+cert_manager:
+  issuer:
+
+underMaintenance: false
+
+global:
+  image:
+    pullPolicy: IfNotPresent
+    tag:
+
+backend:
+  image:
+    repository: ghcr.io/ocelot-social-community/ocelot-social/backend
+  storage: "10Gi"
+  env:
+    NEO4J_URI: "bolt://ocelot-social-neo4j:7687"
+
+webapp:
+  image:
+    repository: ghcr.io/ocelot-social-community/ocelot-social/webapp
+
+maintenance:
+  image:
+    repository: ghcr.io/ocelot-social-community/ocelot-social/maintenance

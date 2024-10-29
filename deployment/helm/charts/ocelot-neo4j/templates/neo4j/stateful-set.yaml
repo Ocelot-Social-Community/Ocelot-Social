@@ -18,7 +18,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: container-{{ .Release.Name }}-neo4j
-        image: "{{ .Values.neo4j.image.repository }}:{{ default .Values.global.image.tag .Values.neo4j.image.tag .Chart.AppVersion "latest" }}"
+        image: "{{ .Values.neo4j.image.repository }}:{{ .Values.neo4j.image.tag | default (include "defaultTag" .)  }}"
         imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
         ports:
         - containerPort: 7687

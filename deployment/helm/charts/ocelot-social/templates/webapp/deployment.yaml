@@ -15,7 +15,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: {{ .Release.Name }}-webapp
-        image: "{{ .Values.webapp.image.repository }}:{{ default .Values.global.image.tag .Values.webapp.image.tag .Chart.AppVersion "latest" }}"
+        image: "{{ .Values.webapp.image.repository }}:{{ .Values.webapp.image.tag | default (include "defaultTag" .)  }}"
         imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
         ports:
         - containerPort: 3000

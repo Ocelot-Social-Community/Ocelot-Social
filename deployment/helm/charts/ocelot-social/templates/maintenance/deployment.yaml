@@ -14,7 +14,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: {{ .Release.Name }}-maintenance
-        image: "{{ .Values.maintenance.image.repository }}:{{ default .Values.global.image.tag .Values.maintenance.image.tag "latest" }}"
+        image: "{{ .Values.maintenance.image.repository }}:{{ .Values.maintenance.image.tag | default (include "defaultTag" .)  }}"
         imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
         env:
           - name: HOST

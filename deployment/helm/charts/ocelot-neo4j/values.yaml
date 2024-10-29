@@ -1,36 +1,13 @@
-domain: stage.ocelot.social
-
-cert_manager:
-  issuer: # override default
-
 underMaintenance: false
 
 global:
   image:
-    pullPolicy: Always
-    tag: latest
-
-backend:
-  image:
-    repository: ghcr.io/ocelot-social-community/ocelot-social/backend
-  storage: "10Gi"
-  env:
-    PRODUCTION_DB_CLEAN_ALLOW: "true"
-    PUBLIC_REGISTRATION: "true"
-    INVITE_REGISTRATION: "true"
-    CATEGORIES_ACTIVE:
-
-webapp:
-  image:
-    repository: ghcr.io/ocelot-social-community/ocelot-social/webapp
-
-maintenance:
-  image:
-    repository: ghcr.io/ocelot-social-community/ocelot-social/maintenance
+    tag:
 
 neo4j:
   image:
     repository: ghcr.io/ocelot-social-community/ocelot-social/neo4j
+    tag:
 
   storage: "5Gi"
   storageBackups: "10Gi"

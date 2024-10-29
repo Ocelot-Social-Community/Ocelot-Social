@@ -16,12 +16,9 @@ spec:
       restartPolicy: Always
       initContainers:
         - name: {{ .Release.Name }}-backend-migrations
-          image: "{{ .Values.backend.image.repository }}:{{ default .Values.global.image.tag .Values.backend.image.tag "latest" }}"
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"
           imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
           command: ["/bin/sh", "-c", "yarn prod:migrate up"]
-          env:
-          - name: NEO4J_URI
-            value: "bolt://{{ .Release.Name }}-neo4j:7687"
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-backend-env
@@ -29,13 +26,11 @@ spec:
               name: {{ .Release.Name }}-backend-secret-env
       containers:
         - name: {{ .Release.Name }}-backend
-          image: "{{ .Values.backend.image.repository }}:{{ default .Values.global.image.tag .Values.backend.image.tag .Chart.AppVersion "latest" }}"
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"
           imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
           env:
           - name: GRAPHQL_URI
             value: "http://{{ .Release.Name }}-backend:4000"
-          - name: NEO4J_URI
-            value: "bolt://{{ .Release.Name }}-neo4j:7687"
           - name: CLIENT_URI
             value: "https://{{ .Values.domain }}"
           envFrom:
