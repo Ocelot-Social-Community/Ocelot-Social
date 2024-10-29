@@ -16,6 +16,7 @@ spec:
       - name: {{ .Release.Name }}-maintenance
         image: "{{ .Values.maintenance.image.repository }}:{{ .Values.maintenance.image.tag | default (include "defaultTag" .)  }}"
         imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
+        {{- include "resources" .Values.maintenance.resources | indent 8 }}
         env:
           - name: HOST
             value: 0.0.0.0

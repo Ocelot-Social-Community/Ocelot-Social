@@ -17,6 +17,7 @@ spec:
       - name: {{ .Release.Name }}-webapp
         image: "{{ .Values.webapp.image.repository }}:{{ .Values.webapp.image.tag | default (include "defaultTag" .)  }}"
         imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
+        {{- include "resources" .Values.webapp.resources | indent 8 }}
         ports:
         - containerPort: 3000
         env:

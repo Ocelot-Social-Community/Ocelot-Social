@@ -19,6 +19,7 @@ spec:
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"
           imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
           command: ["/bin/sh", "-c", "yarn prod:migrate up"]
+          {{- include "resources" .Values.backend.resources | indent 10 }}
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-backend-env
@@ -28,6 +29,7 @@ spec:
         - name: {{ .Release.Name }}-backend
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"
           imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
+          {{- include "resources" .Values.backend.resources | indent 10 }}
           env:
           - name: GRAPHQL_URI
             value: "http://{{ .Release.Name }}-backend:4000"
