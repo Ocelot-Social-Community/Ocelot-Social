@@ -22,7 +22,7 @@ updates:
     babel:
       applies-to: version-updates
       patterns:
-        - "@babel/*"
+        - "@babel*"
     cypress:
       applies-to: version-updates
       patterns:
@@ -53,14 +53,14 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
   groups:
-    apollo:
+    apollo-server:
       applies-to: version-updates
       patterns:
-        - "*apollo*"
+        - "*apollo-server*"
     babel:
       applies-to: version-updates
       patterns:
-        - "*babel*"
+        - "@babel*"
     metascraper:
       applies-to: version-updates
       patterns:
@@ -99,10 +99,6 @@ updates:
       applies-to: version-updates
       patterns:
         - "@babel*"
-    eslint:
-      applies-to: version-updates
-      patterns:
-        - "eslint*"
     jest:
       applies-to: version-updates
       patterns:
@@ -111,10 +107,6 @@ updates:
       applies-to: version-updates
       patterns:
         - "*mapbox*"
-    sass:
-      applies-to: version-updates
-      patterns:
-        - "sass*"
     storybook:
       applies-to: version-updates
       patterns:
