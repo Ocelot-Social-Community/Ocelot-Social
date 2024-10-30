@@ -141,7 +141,12 @@
               </div>
             </client-only>
             <!-- hamburger menu -->
-            <base-button icon="bars" @click="toggleMobileMenuView" circle class="hamburger-button" />
+            <base-button
+              icon="bars"
+              @click="toggleMobileMenuView"
+              circle
+              class="hamburger-button"
+            />
           </ds-flex-item>
         </ds-flex>
         <!-- search, filter -->
