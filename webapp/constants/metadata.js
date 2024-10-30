@@ -6,4 +6,5 @@ export default {
   COOKIE_NAME: 'ocelot-social-token',
   ORGANIZATION_NAME: 'ocelot.social Community',
   ORGANIZATION_JURISDICTION: 'City of Angels',
+  THEME_COLOR: 'rgb(23, 181, 63)', // $color-primary – as the main color in general. e.g. the color in the background of the app that is visible behind the transparent iPhone status bar to name one use case, or the current color of SVGs to name another use case
 }
