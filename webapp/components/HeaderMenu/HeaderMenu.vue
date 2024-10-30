@@ -109,7 +109,7 @@
       <div v-else class="mobil-header-box">
         <!-- logo, hamburger-->
         <ds-flex style="align-items: center">
-          <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
+          <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" class="logo-container">
             <div @click="toggleMobileMenu ? toggleMobileMenuView() : ''">
               <a
                 v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
@@ -136,12 +136,17 @@
                 <chat-notification-menu />
               </div>
               <!-- notification menu -->
-              <div style="display: inline-flex; padding-right: 20px">
+              <div style="display: inline-flex; padding-right: clamp(10px, 2.5vw, 20px)">
                 <notification-menu />
               </div>
             </client-only>
             <!-- hamburger menu -->
-            <base-button icon="bars" @click="toggleMobileMenuView" circle />
+            <base-button
+              icon="bars"
+              @click="toggleMobileMenuView"
+              circle
+              class="hamburger-button"
+            />
           </ds-flex-item>
         </ds-flex>
         <!-- search, filter -->
@@ -368,6 +373,7 @@ export default {
 }
 .main-navigation-flex {
   align-items: center;
+  flex-wrap: nowrap !important;
 }
 .main-navigation-right {
   display: flex;
@@ -379,6 +385,10 @@ export default {
 .ds-flex-item.mobile-hamburger-menu {
   margin-left: auto;
   text-align: right;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-end;
 }
 .mobile-menu {
   margin: 0 20px;
@@ -396,5 +406,11 @@ export default {
 }
 .hide-mobile-menu {
   display: none;
+}
+.logo-container {
+  max-width: calc(100vw - 140px) !important;
+}
+.hamburger-button {
+  flex-shrink: 0;
 }
 </style>
