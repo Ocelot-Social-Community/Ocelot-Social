@@ -97,7 +97,7 @@ a:hover.ds-menu-item-link {
   background-color: $color-tertiary;
 }
 #footer a {
-  color: $color-primary;
+  color: $color-primary-inverse;
 }
 
 .avatar-menu .profile-avatar {
@@ -120,12 +120,12 @@ a:hover.ds-menu-item-link {
 //   text-transform: none;
 // }
 
-// .ds-footer {
-//   font-family: 'Overpass', Helvetica, Arial, Lucida, sans-serif;
-//   text-transform: uppercase;
-//   font-size: 16px;
-//   font-weight: 300;
-// }
+.ds-footer {
+  // font-family: 'Overpass', Helvetica, Arial, Lucida, sans-serif;
+  // text-transform: uppercase;
+  // font-size: 16px;
+  font-weight: 600;
+}
 
 /* chips on group teaser */
 // a.group-teaser footer .ds-chip-primary {
