@@ -28,5 +28,7 @@ spec:
         - name: GRAPHQL_URI
           value: "http://{{ .Release.Name }}-backend:4000"
         envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-webapp-env
         - secretRef:
             name: {{ .Release.Name }}-webapp-secret-env
