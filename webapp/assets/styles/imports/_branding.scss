@@ -3,3 +3,163 @@
     * Here, all SCSS variables and classes can be adapted to your custom design. 
     *
 */
+
+// @font-face {
+//   font-family: Overpass;
+//   src: url('~@/assets/fonts/Overpass-VariableFont_wght.ttf');
+// }
+
+$color-primary: rgb(56, 57, 55);
+$color-primary-light: rgb(149, 153, 147);
+$color-primary-dark: rgb(25, 26, 24);
+$color-primary-active: rgb(95, 97, 92);
+$color-primary-inverse: rgb(226, 230, 218);
+
+$color-secondary: rgb(244, 142, 0);
+$color-secondary-active: rgb(255, 172, 23);
+$color-secondary-inverse: rgb(255, 238, 212);
+
+$color-tertiary: rgb(0, 168, 181);
+
+// $font-family-heading: 'Overpass', Helvetica, Arial, Lucida, sans-serif;
+// $font-family-text: 'Overpass', Helvetica, Arial, Lucida, sans-serif;
+
+$color-header-background: $color-primary;
+$color-footer-background: $color-tertiary;
+
+$color-locale-menu: $color-primary;
+
+$color-donation-bar: $color-secondary;
+
+$color-toast-blue: rgb(0, 142, 230);
+$color-toast-green: $color-secondary;
+
+$chat-message-bg-me: $color-primary-light;
+$chat-message-bg-others: $color-primary-inverse;
+$chat-message-checkmark-seen: $color-secondary;
+$chat-message-checkmark: $text-color-inverse;
+$chat-room-color-counter-badge: $color-primary;
+$chat-room-background-counter-badge: $color-secondary;
+
+/* "a" link colors */
+a {
+  color: $color-primary;
+}
+a:hover {
+  color: $color-primary-light;
+}
+
+/* ds-menu-item link colors */
+a:hover.ds-menu-item-link {
+  color: $color-secondary;
+}
+.ds-menu-item-link.router-link-exact-active {
+  color: $color-secondary;
+  border-left-color: $color-secondary;
+}
+
+.v-popover.open .trigger a {
+  color: $color-secondary;
+}
+
+.main-navigation a {
+  color: #fff;
+  // text-transform: uppercase;
+  // font-size: 16px;
+  // font-weight: 500;
+}
+
+.main-navigation a:hover {
+  color: hsla(0, 0%, 100%, .8);
+}
+
+.main-navigation .router-link-exact-active {
+  color: $color-secondary !important;
+}
+
+.main-navigation .locale-menu {
+  color: #fff;
+}
+
+.main-navigation .base-button {
+  color: #fff;
+}
+
+// #nav-search-box .hc-hashtag a {
+.hc-hashtag a {
+  color: $color-secondary;
+}
+.hc-hashtag a:hover {
+  color: $color-secondary-active;
+}
+
+#footer {
+  background-color: $color-tertiary;
+}
+#footer a {
+  color: $color-primary-inverse;
+}
+
+.avatar-menu .profile-avatar {
+  color: $color-primary;
+}
+
+.profile-avatar .initials {
+  color: $color-primary;
+}
+
+// .branding-menu .ds-text {
+//   font-family: 'Overpass', Helvetica, Arial, Lucida, sans-serif;
+//   font-weight: 500;
+//   text-transform: uppercase;
+//   font-size: 16px;
+// }
+
+/* avoid uppercase for user slug */
+// span.slug {
+//   text-transform: none;
+// }
+
+.ds-footer {
+  // font-family: 'Overpass', Helvetica, Arial, Lucida, sans-serif;
+  // text-transform: uppercase;
+  // font-size: 16px;
+  font-weight: 600;
+}
+
+/* chips on group teaser */
+// a.group-teaser footer .ds-chip-primary {
+//   background-color: $color-secondary;
+// }
+
+/* chips on group profile */
+// .group-profile .ds-chip-primary {
+//   background-color: $color-secondary;
+// }
+
+/* chips with primary color */
+.ds-chip-primary {
+  background-color: $color-secondary;
+}
+
+/* number count color */
+div.ds-number>p.ds-number-count {
+  color: $color-primary;
+}
+
+/* active tab border bottom color */
+div.tab-navigation li.Tabs__tab {
+  border-bottom-color: $color-primary;
+}
+
+/* submit button color group form */
+// form.group-form button.ds-button-primary {
+/* ds-button with primary color */
+.ds-button-primary {
+  background-color: $color-primary;
+}
+
+/* color of active filter tags in post teaser */
+span.category-tag.filterActive {
+  background-color: $color-primary;
+}
