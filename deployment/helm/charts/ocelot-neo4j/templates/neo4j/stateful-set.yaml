@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name:  {{ .Release.Name }}-neo4j
 spec:
-  replicas: {{ .Values.underMaintenance | ternary 0 1 }}
+  replicas: 1
   selector:
     matchLabels:
       app: {{ .Release.Name }}-neo4j

@@ -1,4 +1,3 @@
-{{- if .Values.underMaintenance }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -33,4 +32,3 @@ spec:
         - name: neo4j-backups
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-neo4j-backups
-{{- end }}
