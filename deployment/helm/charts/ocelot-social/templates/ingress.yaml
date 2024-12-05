@@ -1,14 +1,23 @@
 ---
+{{- define "joinRedirectMiddlewares" -}}
+{{- $local := dict "first" true -}}
+{{- range $k, $v := .Values.redirect_domains -}}{{- if not $local.first -}},{{- end -}}{{$.Release.Namespace}}-redirect-{{- $v | replace "." "-" -}}@kubernetescrd{{- $_ := set $local "first" false -}}{{- end -}}
+{{- end -}}
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}
   annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: {{ include "joinRedirectMiddlewares" $ }}
     cert-manager.io/issuer: {{ .Values.cert_manager.issuer | default (printf "%s-letsencrypt-staging"  .Release.Name) }}
 spec:
   tls:
   - hosts:
       - {{ quote .Values.domain }}
+      {{- range .Values.redirect_domains }}
+      - {{ quote . }}
+      {{- end }}
     secretName: {{ .Release.Name }}-letsencrypt-tls
 
   rules:
@@ -28,3 +37,29 @@ spec:
               port:
                 number: 3000
             {{- end }}
+  {{- range .Values.redirect_domains }}
+  - host:  {{ quote . }} # the service must be defined, else the redirect is not working
+    http:
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: {{ $.Release.Name }}-maintenance
+              port:
+                number: 80
+  {{- end }}
+
+{{- range .Values.redirect_domains }}
+---
+# Redirect with domain replacement
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-{{ . | replace "." "-" }}
+spec:
+  redirectRegex:
+    regex: ^https://{{ . }}(.*)
+    replacement: https://{{ $.Values.domain }}${1}
+    permanent: true
+{{- end }}
