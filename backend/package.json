@@ -45,7 +45,7 @@
     "cheerio": "~1.0.0",
     "cors": "~2.8.5",
     "cross-env": "~7.0.3",
-    "dotenv": "~16.4.5",
+    "dotenv": "~16.4.7",
     "express": "^4.21.1",
     "graphql": "^14.6.0",
     "graphql-middleware": "~4.0.2",
