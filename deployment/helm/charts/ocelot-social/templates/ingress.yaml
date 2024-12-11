@@ -10,7 +10,7 @@ metadata:
   name: {{ .Release.Name }}-ocelot
   annotations:
     cert-manager.io/issuer: {{ .Values.cert_manager.issuer | default (printf "%s-letsencrypt-staging"  .Release.Name) }}
-    traefik.ingress.kubernetes.io/router.middlewares: {{ include "joinRedirectMiddlewares" $ | default ""}}
+    traefik.ingress.kubernetes.io/router.middlewares: {{ quote (include "joinRedirectMiddlewares" $)}}
 spec:
   tls:
   - hosts:
