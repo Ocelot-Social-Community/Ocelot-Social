@@ -9,8 +9,8 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-ocelot
   annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: {{ include "joinRedirectMiddlewares" $ }}
     cert-manager.io/issuer: {{ .Values.cert_manager.issuer | default (printf "%s-letsencrypt-staging"  .Release.Name) }}
+    traefik.ingress.kubernetes.io/router.middlewares: {{ include "joinRedirectMiddlewares" $ }}
 spec:
   tls:
   - hosts:
