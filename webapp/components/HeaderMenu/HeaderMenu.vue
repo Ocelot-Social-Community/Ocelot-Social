@@ -185,9 +185,11 @@
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="text-align: center"
           >
-            <client-only>
-              <invite-button placement="top" />
-            </client-only>
+            <div v-if="inviteRegistration">
+              <client-only>
+                <invite-button placement="top" />
+              </client-only>
+            </div>
           </ds-flex-item>
           <!-- group button -->
           <ds-flex-item
