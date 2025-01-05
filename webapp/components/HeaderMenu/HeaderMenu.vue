@@ -182,14 +182,13 @@
           </ds-flex-item>
           <!-- invite button mobile -->
           <ds-flex-item
+            v-if="inviteRegistration"
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="text-align: center"
           >
-            <div v-if="inviteRegistration">
-              <client-only>
-                <invite-button placement="top" />
-              </client-only>
-            </div>
+            <client-only>
+              <invite-button placement="top" />
+            </client-only>
           </ds-flex-item>
           <!-- group button -->
           <ds-flex-item
