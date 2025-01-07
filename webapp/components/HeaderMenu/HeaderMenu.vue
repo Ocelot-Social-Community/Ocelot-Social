@@ -182,6 +182,7 @@
           </ds-flex-item>
           <!-- invite button mobile -->
           <ds-flex-item
+            v-if="inviteRegistration"
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="text-align: center"
           >
