@@ -59,10 +59,10 @@
     "slug": "^10.0.0"
   },
   "optionalDependencies": {
-    "@vuepress/bundler-vite": "^2.0.0-rc.18",
-    "vuepress": "^2.0.0-rc.18",
+    "@vuepress/bundler-vite": "^2.0.0-rc.19",
+    "vuepress": "^2.0.0-rc.19",
     "vuepress-plugin-search-pro": "^2.0.0-rc.59",
-    "vuepress-theme-hope": "^2.0.0-rc.59"
+    "vuepress-theme-hope": "^2.0.0-rc.70"
   },
   "resolutions": {
     "set-value": "^2.0.1",
