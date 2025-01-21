@@ -43,6 +43,8 @@ if (!hasEmailConfig) {
       ignoreTLS: CONFIG.SMTP_IGNORE_TLS,
       secure: CONFIG.SMTP_SECURE, // true for 465, false for other ports
       pool: true,
+      maxConnections: CONFIG.SMTP_MAX_CONNECTIONS,
+      maxMessages: CONFIG.SMTP_MAX_MESSAGES,
       auth: hasAuthData && {
         user: CONFIG.SMTP_USERNAME,
         pass: CONFIG.SMTP_PASSWORD,
