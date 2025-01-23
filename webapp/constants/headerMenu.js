@@ -1,13 +1,13 @@
 export default {
   MENU: [
-    // {
-    //   nameIdent: 'nameIdent',
-    //   path: '/',
-    // },
-    // {
-    //   nameIdent: 'nameIdent',
-    //   url: 'https://ocelot.social',
-    //   target: '_blank',
-    // },
+    {
+      nameIdent: 'changemediaRebranding.header.newsFeed',
+      path: '/',
+    },
+    {
+      nameIdent: 'changemediaRebranding.header.about',
+      url: 'https://changemedia.club',
+      // target: '_blank',
+    },
   ],
 }

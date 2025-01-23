@@ -78,6 +78,12 @@
       }
     }
   },
+  "changemediaRebranding": {
+    "header": {
+      "about": "Club",
+      "newsFeed": "Beiträge"
+    }
+  },
   "chat": {
     "addRoomHeadline": "Suche Nutzer für neuen Chat",
     "cancelSelectMessage": "Abbrechen",

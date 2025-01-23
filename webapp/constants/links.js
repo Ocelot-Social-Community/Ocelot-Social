@@ -3,26 +3,26 @@
 import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
-  // if defined it's dominating
+  // externalLink: null, // if string is defined and not empty it's dominating
   externalLink: {
-    url: 'https://ocelot.social',
-    target: '_blank',
+    url: 'https://changemedia.club',
+    target: '',
   },
 
   internalPage: {
     // footerIdent: 'site.made', // localized string identifier, if undefined default is used
     // headTitleIdent: 'site.made', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.made', // localized string identifier, on null it's hidden, if undefined default is used
+    headlineIdent: null, // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
-  // if defined it's dominating
+  // externalLink: null, // if string is defined and not empty it's dominating
   externalLink: {
-    url: 'https://busfaktor.org/en/spenden',
+    url: 'https://ko-fi.com/changemedia',
     target: '_blank',
   },
 
@@ -33,13 +33,14 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
+  // externalLink: null, // if string is defined and not empty it's dominating
   externalLink: {
-    url: 'http://ocelot.social/en/impressum',
-    target: '_blank',
+    url: 'https://changemedia.club/impressum',
+    target: '',
   },
 
   internalPage: {
@@ -49,11 +50,11 @@ const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwrite({
-  // externalLink: null, // if defined it's dominating
+  // externalLink: null, // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.termsAndConditions', // localized string identifier, if undefined default is used
@@ -62,11 +63,11 @@ const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwri
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
-  // externalLink: null, // if defined it's dominating
+  // externalLink: null, // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
@@ -75,11 +76,11 @@ const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
-  // externalLink: null, // if defined it's dominating
+  // externalLink: null, // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
@@ -88,11 +89,11 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
-  // externalLink: null, // if defined it's dominating
+  // externalLink: null, // if string is defined and not empty it's dominating
 
   internalPage: {
     // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
@@ -101,14 +102,14 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
-  // if defined it's dominating
+  // externalLink: null, // if string is defined and not empty it's dominating
   externalLink: {
-    url: 'https://ocelot.social',
-    target: '_blank',
+    url: 'https://changemedia.club/impressum',
+    target: '',
   },
 
   internalPage: {
@@ -118,7 +119,7 @@ const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 
@@ -138,12 +139,12 @@ export default {
 
   FOOTER_LINK_LIST: [
     ORGANIZATION,
-    TERMS_AND_CONDITIONS,
-    CODE_OF_CONDUCT,
-    DATA_PRIVACY,
+    // TERMS_AND_CONDITIONS,
+    // CODE_OF_CONDUCT,
+    // DATA_PRIVACY,
     FAQ,
     DONATE,
-    SUPPORT,
     IMPRINT,
+    SUPPORT,
   ],
 }
