@@ -24,10 +24,10 @@
   },
   "dependencies": {
     "@babel/cli": "~7.26.4",
-    "@babel/core": "^7.26.0",
+    "@babel/core": "^7.26.7",
     "@babel/node": "~7.26.0",
     "@babel/plugin-proposal-throw-expressions": "^7.25.9",
-    "@babel/preset-env": "~7.26.0",
+    "@babel/preset-env": "~7.26.7",
     "@babel/register": "^7.23.7",
     "@sentry/node": "^5.15.4",
     "apollo-cache-inmemory": "~1.6.6",
