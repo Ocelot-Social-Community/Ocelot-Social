@@ -4061,10 +4061,10 @@ cypress-network-idle@^1.15.0:
   resolved "https://registry.yarnpkg.com/cypress-network-idle/-/cypress-network-idle-1.15.0.tgz#e249f08695a46f1ddce18a95d5293937f277cbb3"
   integrity sha512-8zU16zhc7S3nMl1NTEEcNsZYlJy/ZzP2zPTTrngGxyXH32Ipake/xfHLZsgrzeWCieiS2AVhQsakhWqFzO3hpw==
 
-cypress@^14.0.0:
-  version "14.0.0"
-  resolved "https://registry.yarnpkg.com/cypress/-/cypress-14.0.0.tgz#a71cb0a243a0bfeb97b6973ab9c5291ca5288e93"
-  integrity sha512-kEGqQr23so5IpKeg/dp6GVi7RlHx1NmW66o2a2Q4wk9gRaAblLZQSiZJuDI8UMC4LlG5OJ7Q6joAiqTrfRNbTw==
+cypress@^14.0.1:
+  version "14.0.1"
+  resolved "https://registry.yarnpkg.com/cypress/-/cypress-14.0.1.tgz#8ecf8aab261213fe7ed6043cb7f8a5f662144733"
+  integrity sha512-gBAvKZE3f6eBaW1v8OtrwAFP90rjNZjjOO40M2KvOvmwVXk96Ps5Yjyck1EzGkXmNCaC/8kXFOY/1KD/wsaWpQ==
   dependencies:
     "@cypress/request" "^3.0.6"
     "@cypress/xvfb" "^1.2.4"
