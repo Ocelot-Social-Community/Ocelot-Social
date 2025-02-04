@@ -45,6 +45,9 @@
   "language": {
     "german": "German"
   },
+  "login": {
+    "login": "Login"
+  },
   "menu": {
     "about": "About",
     "app": "App",
