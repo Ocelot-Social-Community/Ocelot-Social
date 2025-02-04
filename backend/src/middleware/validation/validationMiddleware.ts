@@ -3,6 +3,8 @@ import { UserInputError } from 'apollo-server'
 const COMMENT_MIN_LENGTH = 1
 const NO_POST_ERR_MESSAGE = 'Comment cannot be created without a post!'
 const USERNAME_MIN_LENGTH = 3
+const SLUG_BLACKLIST = ['all']
+
 const validateCreateComment = async (resolve, root, args, context, info) => {
   const content = args.content.replace(/<(?:.|\n)*?>/gm, '').trim()
   const { postId } = args
@@ -111,10 +113,12 @@ export const validateNotifyUsers = async (label, reason) => {
   }
 }
 
-const validateUpdateUser = async (resolve, root, params, context, info) => {
-  const { name } = params
+const validateUser = async (resolve, root, params, context, info) => {
+  const { name, slug } = params
   if (typeof name === 'string' && name.trim().length < USERNAME_MIN_LENGTH)
-    throw new UserInputError(`Username must be at least ${USERNAME_MIN_LENGTH} character long!`)
+    throw new UserInputError(`User name must be at least ${USERNAME_MIN_LENGTH} character long!`)
+  if (typeof slug === 'string' && SLUG_BLACKLIST.find((blacklisted) => blacklisted === slug))
+    throw new UserInputError(`User slug “${slug}” must not be in blacklist!`)
   return resolve(root, params, context, info)
 }
 
@@ -122,7 +126,8 @@ export default {
   Mutation: {
     CreateComment: validateCreateComment,
     UpdateComment: validateUpdateComment,
-    UpdateUser: validateUpdateUser,
+    SignupVerification: validateUser,
+    UpdateUser: validateUser,
     fileReport: validateReport,
     review: validateReview,
   },

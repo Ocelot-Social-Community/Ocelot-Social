@@ -20,6 +20,7 @@ export const signupVerificationMutation = gql`
       termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
     ) {
       id
+      name
       slug
     }
   }
