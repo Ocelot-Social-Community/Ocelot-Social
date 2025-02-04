@@ -11,20 +11,7 @@
           :placeholder="$t('settings.data.namePlaceholder')"
         />
         <ds-input id="slug" model="slug" icon="at" :label="$t('settings.data.labelSlug')" />
-        <!-- eslint-disable vue/use-v-on-exact -->
-        <ds-select
-          id="city"
-          model="locationName"
-          icon="map-marker"
-          :options="cities"
-          :label="$t('settings.data.labelCity')"
-          :placeholder="$t('settings.data.labelCity')"
-          :loading="loadingGeo"
-          @input.native="handleCityInput"
-        />
-        <ds-text class="location-hint" color="softer">
-          {{ $t('settings.data.labelCityHint') }}
-        </ds-text>
+        <location-select v-model="locationName"/>
         <!-- eslint-enable vue/use-v-on-exact -->
         <ds-input
           id="about"
@@ -45,13 +32,16 @@
 <script>
 import { mapGetters, mapMutations } from 'vuex'
 import UniqueSlugForm from '~/components/utils/UniqueSlugForm'
+import LocationSelect from '~/components/Select/LocationSelect'
 import { updateUserMutation } from '~/graphql/User'
-import { queryLocations } from '~/graphql/location'
 
 let timeout
 
 export default {
   name: 'NewsFeed',
+  components: {
+    LocationSelect
+  },
   data() {
     return {
       cities: [],
@@ -76,7 +66,7 @@ export default {
     },
     form: {
       get: function () {
-        const { name, slug, locationName, about } = this.currentUser
+        const { name, slug, locationName = '', about } = this.currentUser
         return { name, slug, locationName, about }
       },
       set: function (formData) {
@@ -121,52 +111,12 @@ export default {
         this.loadingData = false
       }
     },
-    handleCityInput(value) {
-      clearTimeout(timeout)
-      timeout = setTimeout(() => this.requestGeoData(value), 500)
-    },
-    processLocationsResult(places) {
-      if (!places.length) {
-        return []
-      }
-      const result = []
-      places.forEach((place) => {
-        result.push({
-          label: place.place_name,
-          value: place.place_name,
-          id: place.id,
-        })
-      })
-
-      return result
-    },
-    async requestGeoData(e) {
-      const value = e.target ? e.target.value.trim() : ''
-      if (value === '') {
-        this.cities = []
-        return
-      }
-      this.loadingGeo = true
-
-      const place = encodeURIComponent(value)
-      const lang = this.$i18n.locale()
-
-      const {
-        data: { queryLocations: res },
-      } = await this.$apollo.query({ query: queryLocations(), variables: { place, lang } })
-
-      this.cities = this.processLocationsResult(res)
-      this.loadingGeo = false
-    },
   },
 }
 </script>
 
 <style lang="scss">
-// .settings-form {
-// >
 .location-hint {
   margin-top: -$space-x-small - $space-xxx-small - $space-xxx-small;
 }
-// }
 </style>

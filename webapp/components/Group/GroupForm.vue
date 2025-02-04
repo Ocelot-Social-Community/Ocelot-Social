@@ -110,29 +110,7 @@
         </ds-chip>
 
         <!-- location -->
-        <!-- TODO: move 'ds-select' from styleguide to main code and implement missing translation etc. functionality -->
-        <ds-select
-          id="city"
-          :label="$t('settings.data.labelCity') + locationNameLabelAddOnOldName"
-          v-model="formData.locationName"
-          :options="cities"
-          icon="map-marker"
-          :icon-right="null"
-          :placeholder="$t('settings.data.labelCity') + ' …'"
-          :loading="loadingGeo"
-          @input.native="handleCityInput"
-        />
-        <base-button
-          v-if="formLocationName !== ''"
-          icon="close"
-          ghost
-          size="small"
-          style="position: relative; display: inline-block; right: -96%; top: -33px; width: 26px"
-          @click="formData.locationName = ''"
-        ></base-button>
-        <ds-text class="location-hint" color="softer">
-          {{ $t('settings.data.labelCityHint') }}
-        </ds-text>
+        <location-select v-model="formData.locationName" />
 
         <ds-space margin-top="small" />
 
@@ -176,9 +154,8 @@ import {
 } from '~/constants/groups.js'
 import Editor from '~/components/Editor/Editor'
 import ActionRadiusSelect from '~/components/Select/ActionRadiusSelect'
+import LocationSelect from '~/components/Select/LocationSelect'
 import { queryLocations } from '~/graphql/location'
-
-let timeout
 
 export default {
   name: 'GroupForm',
@@ -186,6 +163,7 @@ export default {
     CategoriesSelect,
     Editor,
     ActionRadiusSelect,
+    LocationSelect,
   },
   props: {
     update: {
@@ -214,12 +192,6 @@ export default {
         groupType: groupType || '',
         about: about || '',
         description: description || '',
-        // from database 'locationName' comes as "string | null"
-        // 'formData.locationName':
-        //   see 'created': tries to set it to a "requestGeoData" object and fills the menu if possible
-        //   if user selects one from menu we get a "requestGeoData" object here
-        //   "requestGeoData" object: "{ id: String, label: String, value: String }"
-        //   otherwise it's a string: empty or none empty
         locationName: locationName || '',
         actionRadius: actionRadius || '',
         categoryIds: categories ? categories.map((category) => category.id) : [],
@@ -258,11 +230,6 @@ export default {
       },
     }
   },
-  async created() {
-    // set to "requestGeoData" object and fill select menu if possible
-    this.formData.locationName =
-      (await this.requestGeoData(this.formLocationName)) || this.formLocationName
-  },
   computed: {
     formLocationName() {
       const isNestedValue =
@@ -274,9 +241,6 @@ export default {
         : isDirectString
           ? this.formData.locationName
           : ''
-    },
-    locationNameLabelAddOnOldName() {
-      return this.formLocationName !== '' ? ' — ' + this.formLocationName : ''
     },
     descriptionLength() {
       return this.$filters.removeHtml(this.formData.description).length
@@ -321,6 +285,9 @@ export default {
     changeActionRadius(event) {
       this.$refs.groupForm.update('actionRadius', event.target.value)
     },
+    changeLocation(event) {
+      this.formData.locationName = event.target.value
+    },
     updateEditorDescription(value) {
       this.$refs.groupForm.update('description', value)
     },
@@ -342,47 +309,6 @@ export default {
             id: this.group.id,
           })
         : this.$emit('createGroup', variables)
-    },
-    handleCityInput(event) {
-      clearTimeout(timeout)
-      timeout = setTimeout(
-        () => this.requestGeoData(event.target ? event.target.value.trim() : ''),
-        500,
-      )
-    },
-    processLocationsResult(places) {
-      if (!places.length) {
-        return []
-      }
-      const result = []
-      places.forEach((place) => {
-        result.push({
-          label: place.place_name,
-          value: place.place_name,
-          id: place.id,
-        })
-      })
-
-      return result
-    },
-    async requestGeoData(value) {
-      if (value === '') {
-        this.cities = []
-        return
-      }
-      this.loadingGeo = true
-
-      const place = encodeURIComponent(value)
-      const lang = this.$i18n.locale()
-
-      const {
-        data: { queryLocations: result },
-      } = await this.$apollo.query({ query: queryLocations(), variables: { place, lang } })
-
-      this.cities = this.processLocationsResult(result)
-      this.loadingGeo = false
-
-      return this.cities.find((city) => city.value === value)
     },
   },
 }
