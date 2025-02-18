@@ -1,9 +1,9 @@
-// this file is duplicated in `backend/src/config/metadata` and `webapp/constants/metadata.js` and replaced on rebranding
+// this file is duplicated in `backend/src/config/metadata.js` and `webapp/constants/metadata.js` and replaced on rebranding
 export default {
-  APPLICATION_NAME: 'ocelot.social',
-  APPLICATION_SHORT_NAME: 'ocelot',
-  APPLICATION_DESCRIPTION: 'ocelot.social Community Network',
-  COOKIE_NAME: 'ocelot-social-token',
-  ORGANIZATION_NAME: 'ocelot.social Community',
-  ORGANIZATION_JURISDICTION: 'City of Angels',
+  APPLICATION_NAME: 'Reformer.network',
+  APPLICATION_SHORT_NAME: 'Reformer.network',
+  APPLICATION_DESCRIPTION: 'Reformer.network, social network',
+  COOKIE_NAME: 'reformer-network-token',
+  ORGANIZATION_NAME: 'Stichting Rudulin',
+  ORGANIZATION_JURISDICTION: 'Amsterdam',
 }
