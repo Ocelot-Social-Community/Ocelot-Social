@@ -112,13 +112,13 @@ jobs:
           cp backend/.env.template backend/.env
 
       - name: backend | docker compose
-        run: docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps neo4j backend
+        run: docker compose -f docker-compose.yml -f docker-compose.override.yml up --detach --no-deps neo4j backend
 
       - name: backend | Initialize Database
-        run: docker compose exec -T backend yarn prod:migrate init
+        run: docker compose exec -T backend yarn db:migrate init
 
       - name: backend | Migrate Database Up
-        run: docker compose exec -T backend yarn prod:migrate up
+        run: docker compose exec -T backend yarn db:migrate up
 
       - name: backend | Unit test incl. coverage check
         run: docker compose exec -T backend yarn test
