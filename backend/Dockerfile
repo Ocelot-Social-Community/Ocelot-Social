@@ -33,7 +33,7 @@ ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-
 
 FROM build AS test
 # required for the migrations
-ONBUILD RUN cp -r ./src /src
+# ONBUILD RUN cp -r ./src /src
 CMD ["/bin/bash", "-c", "yarn run dev"]
 
 FROM build AS production_build
