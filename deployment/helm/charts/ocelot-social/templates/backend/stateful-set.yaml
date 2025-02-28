@@ -1,0 +1,52 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name:  {{ .Release.Name }}-backend
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-backend
+  template:
+    metadata:
+      annotations:
+        backup.velero.io/backup-volumes: uploads
+      labels:
+        app: {{ .Release.Name }}-backend
+    spec:
+      restartPolicy: Always
+      initContainers:
+        - name: {{ .Release.Name }}-backend-migrations
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"
+          imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
+          command: ["/bin/sh", "-c", "yarn prod:migrate up"]
+          {{- include "resources" .Values.backend.resources | indent 10 }}
+          envFrom:
+          - configMapRef:
+              name: {{ .Release.Name }}-backend-env
+          - secretRef:
+              name: {{ .Release.Name }}-backend-secret-env
+      containers:
+        - name: {{ .Release.Name }}-backend
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"
+          imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
+          {{- include "resources" .Values.backend.resources | indent 10 }}
+          env:
+          - name: GRAPHQL_URI
+            value: "http://{{ .Release.Name }}-backend:4000"
+          - name: CLIENT_URI
+            value: "https://{{ .Values.domain }}"
+          envFrom:
+          - configMapRef:
+              name: {{ .Release.Name }}-backend-env
+          - secretRef:
+              name: {{ .Release.Name }}-backend-secret-env
+          ports:
+          - containerPort: 4000
+            protocol: TCP
+          volumeMounts:
+            - mountPath: /app/public/uploads
+              name: uploads
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-uploads

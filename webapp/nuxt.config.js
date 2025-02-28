@@ -302,7 +302,7 @@ export default {
         modules: [
           {
             preTransformNode(abstractSyntaxTreeElement) {
-              if (!ctx.isDev) {
+              if (!ctx.isDev && CONFIG.NODE_ENV !== 'test') {
                 const { attrsMap, attrsList } = abstractSyntaxTreeElement
                 tagAttributesForTesting.forEach((attribute) => {
                   if (attrsMap[attribute]) {

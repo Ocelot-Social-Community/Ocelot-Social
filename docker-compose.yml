@@ -1,22 +1,14 @@
 # This file defines the production settings. It is overwritten by docker-compose.override.yml,
 # which defines the development settings. The override.yml is loaded by default. Therefore it
 # is required to explicitly define if you want an production build:
-# > docker-compose -f docker-compose.yml up 
+# > docker-compose -f docker-compose.yml up
 
 services:
-
-  ########################################################
-  # WEBAPP ###############################################
-  ########################################################
   webapp:
-    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/webapp:local-production
-    container_name: webapp
+    image: ghcr.io/ocelot-social-community/ocelot-social/webapp:${OCELOT_VERSION:-latest}
     build:
       context: ./webapp
       target: production
-    networks:
-      - external-net
     depends_on:
       - backend
     ports:
@@ -27,9 +19,6 @@ services:
       # Envs used in Dockerfile
       # - DOCKER_WORKDIR="/app"
       # - PORT="3000"
-      - BUILD_DATE
-      - BUILD_VERSION
-      - BUILD_COMMIT
       - NODE_ENV="production"
       # Application only envs
       - HOST=0.0.0.0 # This is nuxt specific, alternative value is HOST=webapp
@@ -37,18 +26,11 @@ services:
     env_file:
       - ./webapp/.env
 
-  ########################################################
-  # FRONTEND #############################################
-  ########################################################
   frontend:
-    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/frontend:local-production
-    container_name: frontend
+    image: ghcr.io/ocelot-social-community/ocelot-social/frontend:${OCELOT_VERSION:-latest}
     build:
       context: ./frontend
       target: production
-    networks:
-      - external-net
     depends_on:
       - backend
     ports:
@@ -57,9 +39,6 @@ services:
       # Envs used in Dockerfile
       # - DOCKER_WORKDIR="/app"
       # - PORT="3002"
-      - BUILD_DATE
-      - BUILD_VERSION
-      - BUILD_COMMIT
       - NODE_ENV="production"
       # Application only envs
       #- HOST=0.0.0.0 # This is nuxt specific, alternative value is HOST=webapp
@@ -67,19 +46,11 @@ services:
     env_file:
       - ./frontend/.env
 
-  ########################################################
-  # BACKEND ##############################################
-  ########################################################
   backend:
-    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/backend:local-production
-    container_name: backend
+    image: ghcr.io/ocelot-social-community/ocelot-social/backend:${OCELOT_VERSION:-latest}
     build:
       context: ./backend
       target: production
-    networks:
-      - external-net
-      - internal-net
     depends_on:
       - neo4j
     ports:
@@ -90,9 +61,6 @@ services:
       # Envs used in Dockerfile
       # - DOCKER_WORKDIR="/app"
       # - PORT="4000"
-      - BUILD_DATE
-      - BUILD_VERSION
-      - BUILD_COMMIT
       - NODE_ENV="production"
       # Application only envs
       - DEBUG=false
@@ -102,35 +70,20 @@ services:
     env_file:
       - ./backend/.env
 
-  ########################################################
-  # MAINTENANCE ##########################################
-  ########################################################
   maintenance:
-    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/maintenance:local-production
-    container_name: maintenance
+    image: ghcr.io/ocelot-social-community/ocelot-social/maintenance:${OCELOT_VERSION:-latest}
     build:
-      # TODO: Separate from webapp, this must be independent
       context: ./webapp
       dockerfile: Dockerfile.maintenance
-    networks:
-      - external-net
     ports:
       - 3001:80
 
-  ########################################################
-  # NEO4J ################################################
-  ########################################################
   neo4j:
-    # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ocelotsocialnetwork/neo4j-community:local-production
-    container_name: neo4j
+    image: ghcr.io/ocelot-social-community/ocelot-social/neo4j
     build:
       context: ./neo4j
       # community edition 👆🏼, because we have no enterprise licence 👇🏼 at the moment
       target: community
-    networks:
-      - internal-net
     ports:
       - 7687:7687
     volumes:
@@ -151,11 +104,6 @@ services:
       # TODO: Remove the playground from production
     # bring the database in offline mode to export or load dumps
     # command: ["tail", "-f", "/dev/null"]
-
-networks:
-  external-net:
-  internal-net:
-    internal: true
 
 volumes:
   backend_uploads:
