@@ -178,6 +178,10 @@ import Editor from '~/components/Editor/Editor'
 import ActionRadiusSelect from '~/components/Select/ActionRadiusSelect'
 import { queryLocations } from '~/graphql/location'
 
+// Wolle console.log('NAME_LENGTH_MIN: ', NAME_LENGTH_MIN)
+// console.log('NAME_LENGTH_MAX: ', NAME_LENGTH_MAX)
+// console.log('DESCRIPTION_WITHOUT_HTML_LENGTH_MIN: ', DESCRIPTION_WITHOUT_HTML_LENGTH_MIN)
+
 let timeout
 
 export default {

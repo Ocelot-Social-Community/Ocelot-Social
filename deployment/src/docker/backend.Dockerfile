@@ -11,10 +11,22 @@ FROM $APP_IMAGE_CODE AS code
 
 ARG CONFIGURATION=example
 
+# alt Wolle # copy public constants and email templates into the Docker image to brand it
+# COPY configurations/${CONFIGURATION}/branding/constants/emails.ts src/config/
+# COPY configurations/${CONFIGURATION}/branding/constants/logos.ts src/config/
+# COPY configurations/${CONFIGURATION}/branding/constants/metadata.ts src/config/
+# COPY configurations/${CONFIGURATION}/branding/email/ src/middleware/helpers/email/
+
+# Wolle # copy public constants and email templates into the Docker image to brand it
+# COPY configurations/${CONFIGURATION}/branding/constants/ src/config/
+# COPY configurations/${CONFIGURATION}/branding/constants/ src/constants/
+# # links.ts does only work in frontend, not backend
+# RUN rm -Rf src/config/links.ts src/constants/links.ts
+# COPY configurations/${CONFIGURATION}/branding/email/ src/middleware/helpers/email/
+
 # copy public constants and email templates into the Docker image to brand it
-COPY configurations/${CONFIGURATION}/branding/constants/emails.ts src/config/
-COPY configurations/${CONFIGURATION}/branding/constants/logos.ts src/config/
-COPY configurations/${CONFIGURATION}/branding/constants/metadata.ts src/config/
+COPY configurations/${CONFIGURATION}/branding/config-all/ src/branding/
+COPY configurations/${CONFIGURATION}/branding/config-backend/ src/branding/
 COPY configurations/${CONFIGURATION}/branding/email/ src/middleware/helpers/email/
 
 ##################################################################################
