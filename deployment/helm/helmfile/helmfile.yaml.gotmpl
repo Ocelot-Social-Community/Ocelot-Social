@@ -1,0 +1,16 @@
+releases:
+  - name: ocelot-social
+    namespace: ocelot-social
+    chart: ../charts/ocelot-social
+    values:
+    - ./values/ocelot.yaml
+    secrets:
+      - ./secrets/ocelot.yaml
+
+  - name: ocelot-neo4j
+    namespace: ocelot-social
+    chart: ../charts/ocelot-neo4j
+    values:
+    - ./values/ocelot.yaml
+    secrets:
+      - ./secrets/ocelot.yaml
