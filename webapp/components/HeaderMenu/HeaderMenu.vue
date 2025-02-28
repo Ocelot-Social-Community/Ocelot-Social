@@ -290,7 +290,7 @@ import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotifica
 import CustomButton from '~/components/CustomButton/CustomButton'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import GroupButton from '~/components/Group/GroupButton'
-import headerMenu from '~/constants/headerMenu.js'
+import headerMenuBranded from '~/constants/headerMenuBranded.js'
 import InviteButton from '~/components/InviteButton/InviteButton'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
@@ -327,9 +327,9 @@ export default {
       LOGOS,
       SHOW_GROUP_BUTTON_IN_HEADER,
       SHOW_CONTENT_FILTER_HEADER_MENU,
-      isHeaderMenu: headerMenu.MENU.length > 0,
-      customButton: headerMenu.CUSTOM_BUTTON,
-      menu: headerMenu.MENU,
+      isHeaderMenu: headerMenuBranded.MENU.length > 0,
+      customButton: headerMenuBranded.CUSTOM_BUTTON,
+      menu: headerMenuBranded.MENU,
       mobileSearchVisible: false,
       toggleMobileMenu: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
