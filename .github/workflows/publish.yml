@@ -201,25 +201,25 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
       - name: Download Docker Image (Neo4J)
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
         with:
           name: docker-neo4j-community
           path: /tmp
       - run: docker load < /tmp/neo4j.tar
       - name: Download Docker Image (Backend)
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
         with:
           name: docker-backend-production
           path: /tmp
       - run: docker load < /tmp/backend.tar
       - name: Download Docker Image (WebApp)
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
         with:
           name: docker-webapp-production
           path: /tmp
       - run: docker load < /tmp/webapp.tar
       - name: Download Docker Image (Maintenance)
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
         with:
           name: docker-maintenance-production
           path: /tmp
