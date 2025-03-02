@@ -4,10 +4,10 @@ import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
   // if defined it's dominating
-  externalLink: {
-    url: 'https://ocelot.social',
-    target: '_blank',
-  },
+  // externalLink: {
+  //   url: 'https://ocelot.social',
+  //   target: '_blank',
+  // },
 
   internalPage: {
     // footerIdent: 'site.made', // localized string identifier, if undefined default is used
@@ -16,15 +16,15 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
   // if defined it's dominating
-  externalLink: {
-    url: 'https://busfaktor.org/en/spenden',
-    target: '_blank',
-  },
+  // externalLink: {
+  //   url: 'https://ocelot.social/en/donate/',
+  //   target: '_blank',
+  // },
 
   internalPage: {
     // footerIdent: 'site.donate', // localized string identifier, if undefined default is used
@@ -33,14 +33,15 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
-  externalLink: {
-    url: 'http://ocelot.social/en/impressum',
-    target: '_blank',
-  },
+  // if defined it's dominating
+  // externalLink: {
+  //   url: 'http://ocelot.social/en/imprint/',
+  //   target: '_blank',
+  // },
 
   internalPage: {
     // footerIdent: 'site.imprint', // localized string identifier, if undefined default is used
@@ -49,7 +50,7 @@ const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwrite({
@@ -62,7 +63,7 @@ const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwri
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
@@ -75,7 +76,7 @@ const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
@@ -88,7 +89,7 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
@@ -101,15 +102,15 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
   // if defined it's dominating
-  externalLink: {
-    url: 'https://ocelot.social',
-    target: '_blank',
-  },
+  // externalLink: {
+  //   url: 'https://ocelot.social/en/contact/',
+  //   target: '_blank',
+  // },
 
   internalPage: {
     // footerIdent: 'site.support', // localized string identifier, if undefined default is used
@@ -118,12 +119,12 @@ const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 
 export default {
-  LANDING_PAGE: '/login', // examples: '/login', '/registration', '/organization', or external 'https://ocelot.social'
+  LANDING_PAGE: '/organization', // examples: '/login', '/registration', '/organization', or external 'https://ocelot.social'
 
   // you can find and store templates for 👇🏼 at https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/tree/master/branding/templates/
 
@@ -141,8 +142,8 @@ export default {
     TERMS_AND_CONDITIONS,
     CODE_OF_CONDUCT,
     DATA_PRIVACY,
-    FAQ,
     DONATE,
+    FAQ,
     SUPPORT,
     IMPRINT,
   ],
