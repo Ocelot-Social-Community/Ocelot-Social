@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social-backend",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "GraphQL Backend for ocelot.social",
   "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
   "author": "ocelot.social Community",
@@ -57,8 +57,8 @@
     "ioredis": "^4.16.1",
     "jsonwebtoken": "~8.5.1",
     "languagedetect": "^2.0.0",
-    "linkifyjs": "^4.2.0",
     "linkify-html": "^4.2.0",
+    "linkifyjs": "^4.2.0",
     "lodash": "~4.17.21",
     "merge-graphql-schemas": "^1.7.8",
     "metascraper": "^5.46.7",
