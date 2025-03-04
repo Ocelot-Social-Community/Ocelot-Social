@@ -15,6 +15,7 @@ node_modules/
 cypress/videos
 cypress/screenshots/
 cypress.env.json
+deployment/configurations/
 
 .vuepress/.cache/
 .vuepress/.temp/
