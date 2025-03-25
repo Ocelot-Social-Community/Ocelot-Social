@@ -129,7 +129,7 @@ describe('observing posts', () => {
 
       await expect(
         query({
-          query: 'query Post($id: ID) { Post(id: $id) { observedByMe } }',
+          query: postQuery,
           variables: { id: 'p2' },
         }),
       ).resolves.toMatchObject({
