@@ -26,6 +26,14 @@ const createCommentMutation = gql`
   }
 `
 
+const postQuery = gql`
+  query Post($id: ID) {
+    Post(id: $id) {
+      observedByMe
+    }
+  }
+`
+
 beforeAll(async () => {
   await cleanDatabase()
 
@@ -46,7 +54,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  // await cleanDatabase()
+  await cleanDatabase()
   driver.close()
 })
 
@@ -95,7 +103,7 @@ describe('observing posts', () => {
     it('has another user NOT observing the post BEFORE commenting it', async () => {
       await expect(
         query({
-          query: 'query Post($id: ID) { Post(id: $id) { observedByMe } }',
+          query: postQuery,
           variables: { id: 'p2' },
         }),
       ).resolves.toMatchObject({
@@ -133,6 +141,91 @@ describe('observing posts', () => {
           ],
         },
         errors: undefined,
+      })
+    })
+  })
+
+  describe('toggle observe post', () => {
+    beforeAll(async () => {
+      authenticatedUser = await otherUser.toJson()
+    })
+
+    const toggleObservePostMutation = gql`
+      mutation ($id: ID!, $value: Boolean!) {
+        toggleObservePost(id: $id, value: $value) {
+          observedByMe
+        }
+      }
+    `
+
+    describe('switch off observation', () => {
+      it('does not observe the post anymore', async () => {
+        await expect(
+          mutate({
+            mutation: toggleObservePostMutation,
+            variables: {
+              id: 'p2',
+              value: false,
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            toggleObservePost: {
+              observedByMe: false,
+            },
+          },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('comment the post again', () => {
+      it('does NOT alter the observation state', async () => {
+        await mutate({
+          mutation: createCommentMutation,
+          variables: {
+            postId: 'p2',
+            content:
+              'After commenting the post I do not observe again, I should NOT observe the post',
+          },
+        })
+
+        await expect(
+          query({
+            query: postQuery,
+            variables: { id: 'p2' },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            Post: [
+              {
+                observedByMe: false,
+              },
+            ],
+          },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('switch on observation', () => {
+      it('does observe the post again', async () => {
+        await expect(
+          mutate({
+            mutation: toggleObservePostMutation,
+            variables: {
+              id: 'p2',
+              value: true,
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            toggleObservePost: {
+              observedByMe: true,
+            },
+          },
+          errors: undefined,
+        })
       })
     })
   })

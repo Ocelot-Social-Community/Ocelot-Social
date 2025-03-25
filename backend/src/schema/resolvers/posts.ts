@@ -420,6 +420,35 @@ export default {
         session.close()
       }
     },
+    toggleObservePost: async (_parent, params, context, _resolveInfo) => {
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const transactionResponse = await transaction.run(
+          `
+          MATCH (post:Post { id: $params.id })
+          MATCH (user:User { id: $userId })
+          MERGE (user)-[obs:OBSERVES]->(post)
+          ON CREATE SET 
+            obs.createdAt = toString(datetime()),
+            obs.updatedAt = toString(datetime()),
+            obs.active = $params.value
+          ON MATCH SET
+            obs.updatedAt = toString(datetime()),
+            obs.active = $params.value
+          RETURN post
+        `,
+          { userId: context.user.id, params },
+        )
+        return transactionResponse.records.map((record) => record.get('post').properties)
+      })
+      try {
+        const [post] = await writeTxResultPromise
+        post.viewedTeaserCount = post.viewedTeaserCount.low
+        return post
+      } finally {
+        session.close()
+      }
+    },
   },
   Post: {
     ...Resolver('Post', {

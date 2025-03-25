@@ -175,5 +175,12 @@ export default () => {
         }
       }
     `,
+    toggleObservePost: gql`
+      mutation ($id: ID!, $value: Boolean!) {
+        toggleObservePost(id: $id, value: $value) {
+          observedByMe
+        }
+      }
+    `,
   }
 }
