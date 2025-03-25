@@ -1,5 +1,6 @@
 import { createTestClient } from 'apollo-server-testing'
 import Factory, { cleanDatabase } from '../../db/factories'
+import gql from 'graphql-tag'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
 
@@ -11,10 +12,19 @@ CONFIG.CATEGORIES_ACTIVE = false
 const driver = getDriver()
 const neode = getNeode()
 
-// let query
+let query
 let mutate
 let authenticatedUser
 let user
+let otherUser
+
+const createCommentMutation = gql`
+  mutation ($id: ID, $postId: ID!, $content: String!) {
+    CreateComment(id: $id, postId: $postId, content: $content) {
+      id
+    }
+  }
+`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -31,12 +41,12 @@ beforeAll(async () => {
       }
     },
   })
-  // query = createTestClient(server).query
+  query = createTestClient(server).query
   mutate = createTestClient(server).mutate
 })
 
 afterAll(async () => {
-  await cleanDatabase()
+  // await cleanDatabase()
   driver.close()
 })
 
@@ -47,10 +57,15 @@ describe('observing posts', () => {
       name: 'User',
       about: 'I am a user',
     })
+    otherUser = await Factory.build('user', {
+      id: 'other-user',
+      name: 'Other User',
+      about: 'I am another user',
+    })
     authenticatedUser = await user.toJson()
   })
 
-  describe('after creating the post', () => {
+  describe('creating posts', () => {
     it('has the author of the post observing the post', async () => {
       await expect(
         mutate({
@@ -66,6 +81,56 @@ describe('observing posts', () => {
           CreatePost: {
             observedByMe: true,
           },
+        },
+        errors: undefined,
+      })
+    })
+  })
+
+  describe('commenting posts', () => {
+    beforeAll(async () => {
+      authenticatedUser = await otherUser.toJson()
+    })
+
+    it('has another user NOT observing the post BEFORE commenting it', async () => {
+      await expect(
+        query({
+          query: 'query Post($id: ID) { Post(id: $id) { observedByMe } }',
+          variables: { id: 'p2' },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          Post: [
+            {
+              observedByMe: false,
+            },
+          ],
+        },
+        errors: undefined,
+      })
+    })
+
+    it('has another user observing the post AFTER commenting it', async () => {
+      await mutate({
+        mutation: createCommentMutation,
+        variables: {
+          postId: 'p2',
+          content: 'After commenting the post, I should observe the post automatically',
+        },
+      })
+
+      await expect(
+        query({
+          query: 'query Post($id: ID) { Post(id: $id) { observedByMe } }',
+          variables: { id: 'p2' },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          Post: [
+            {
+              observedByMe: true,
+            },
+          ],
         },
         errors: undefined,
       })
