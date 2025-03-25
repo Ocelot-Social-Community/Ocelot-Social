@@ -144,6 +144,10 @@ export default {
             WITH post
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
+            MERGE (post)<-[obs:OBSERVES]-(author)
+            SET obs.active = true
+            SET obs.createdAt = toString(datetime())
+            SET obs.updatedAt = toString(datetime())
             ${categoriesCypher}
             ${groupCypher}
             RETURN post {.*, postType: [l IN labels(post) WHERE NOT l = 'Post'] }
@@ -458,6 +462,8 @@ export default {
           'MATCH(this)<-[:SHOUTED]-(related:User {id: $cypherParams.currentUserId}) RETURN COUNT(related) >= 1',
         viewedTeaserByCurrentUser:
           'MATCH (this)<-[:VIEWED_TEASER]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1',
+        observedByMe:
+          'MATCH (this)<-[obs:OBSERVES]-(related:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(related) >= 1',
       },
     }),
     relatedContributions: async (parent, params, context, resolveInfo) => {
