@@ -30,6 +30,7 @@ const postQuery = gql`
   query Post($id: ID) {
     Post(id: $id) {
       observedByMe
+      observingUsersCount
     }
   }
 `
@@ -88,6 +89,7 @@ describe('observing posts', () => {
         data: {
           CreatePost: {
             observedByMe: true,
+            observingUsersCount: 1,
           },
         },
         errors: undefined,
@@ -111,6 +113,7 @@ describe('observing posts', () => {
           Post: [
             {
               observedByMe: false,
+              observingUsersCount: 1,
             },
           ],
         },
@@ -137,6 +140,7 @@ describe('observing posts', () => {
           Post: [
             {
               observedByMe: true,
+              observingUsersCount: 2,
             },
           ],
         },
@@ -154,6 +158,7 @@ describe('observing posts', () => {
       mutation ($id: ID!, $value: Boolean!) {
         toggleObservePost(id: $id, value: $value) {
           observedByMe
+          observingUsersCount
         }
       }
     `
@@ -172,6 +177,7 @@ describe('observing posts', () => {
           data: {
             toggleObservePost: {
               observedByMe: false,
+              observingUsersCount: 1,
             },
           },
           errors: undefined,
@@ -200,6 +206,7 @@ describe('observing posts', () => {
             Post: [
               {
                 observedByMe: false,
+                observingUsersCount: 1,
               },
             ],
           },
@@ -222,6 +229,7 @@ describe('observing posts', () => {
           data: {
             toggleObservePost: {
               observedByMe: true,
+              observingUsersCount: 2,
             },
           },
           errors: undefined,

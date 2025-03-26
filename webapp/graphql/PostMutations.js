@@ -179,6 +179,7 @@ export default () => {
       mutation ($id: ID!, $value: Boolean!) {
         toggleObservePost(id: $id, value: $value) {
           observedByMe
+          observingUsersCount
         }
       }
     `,

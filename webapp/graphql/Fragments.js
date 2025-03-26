@@ -68,6 +68,7 @@ export const postFragment = gql`
     pinnedAt
     pinned
     observedByMe
+    observingUsersCount
   }
 `
 
