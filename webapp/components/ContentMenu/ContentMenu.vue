@@ -118,15 +118,17 @@ export default {
         })
       }
 
-      if (!this.isOwner) {
+      if (this.resourceType === 'contribution') {
         routes.push({
-          label: this.$t(`report.${this.resourceType}.title`),
+          label: this.$t(`post.menu.follow`),
           callback: () => {
-            this.openModal('report')
+            this.$emit('follow', this.resource)
           },
-          icon: 'flag',
+          icon: 'bell',
         })
       }
+
+      routes.push()
 
       if (!this.isOwner && this.isModerator) {
         if (!this.resource.disabled) {

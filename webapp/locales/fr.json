@@ -781,7 +781,9 @@
       "pin": "Épingler le Post",
       "pinnedSuccessfully": "Poste épinglé avec succès!",
       "unpin": "Retirer l'épingle du poste",
-      "unpinnedSuccessfully": "Épingle retirer du Post avec succès!"
+      "unpinnedSuccessfully": "Épingle retirer du Post avec succès!",
+      "follow": "Suivre le Post",
+      "unfollow": "Ne plus suivre le Post"
     },
     "name": "Post",
     "pinned": "Annonce",

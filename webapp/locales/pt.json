@@ -781,7 +781,9 @@
       "pin": "Fixar publicação",
       "pinnedSuccessfully": "Publicação fixada com sucesso!",
       "unpin": "Desafixar publicação",
-      "unpinnedSuccessfully": "Publicação desafixada com sucesso!"
+      "unpinnedSuccessfully": "Publicação desafixada com sucesso!",
+      "follow": "Seguir publicação",
+      "unfollow": "Deixar de seguir publicação"
     },
     "name": "Postar",
     "pinned": "Anúncio",

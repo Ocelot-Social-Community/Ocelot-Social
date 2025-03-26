@@ -781,7 +781,9 @@
       "pin": null,
       "pinnedSuccessfully": null,
       "unpin": null,
-      "unpinnedSuccessfully": null
+      "unpinnedSuccessfully": null,
+      "follow": null,
+      "unfollow": null
     },
     "name": "Poczta",
     "pinned": null,
