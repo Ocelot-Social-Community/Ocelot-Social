@@ -778,12 +778,12 @@
     "menu": {
       "delete": "Usuń wpis",
       "edit": "Edytuj wpis",
+      "observe": null,
       "pin": null,
       "pinnedSuccessfully": null,
+      "unobserve": null,
       "unpin": null,
-      "unpinnedSuccessfully": null,
-      "observe": null,
-      "unobserve": null
+      "unpinnedSuccessfully": null
     },
     "name": "Poczta",
     "pinned": null,

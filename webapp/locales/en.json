@@ -747,6 +747,9 @@
     "title": "Notifications",
     "user": "User"
   },
+  "observeButton": {
+    "observed": "observed"
+  },
   "post": {
     "comment": {
       "reply": "Reply",
@@ -778,12 +781,12 @@
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
+      "observe": "Observe post",
       "pin": "Pin post",
       "pinnedSuccessfully": "Post pinned successfully!",
+      "unobserve": "Stop to observe post",
       "unpin": "Unpin post",
-      "unpinnedSuccessfully": "Post unpinned successfully!",
-      "observe": "Observe post",
-      "unobserve": "Stop to observe post"
+      "unpinnedSuccessfully": "Post unpinned successfully!"
     },
     "name": "Article",
     "pinned": "Announcement",
@@ -1090,9 +1093,6 @@
   },
   "shoutButton": {
     "shouted": "shouted"
-  },
-  "observeButton": {
-    "observed": "observed"
   },
   "site": {
     "back-to-login": "Back to login page",

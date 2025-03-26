@@ -747,6 +747,9 @@
     "title": "Benachrichtigungen",
     "user": "Nutzer"
   },
+  "observeButton": {
+    "observed": "beobachtet"
+  },
   "post": {
     "comment": {
       "reply": "Antworten",
@@ -778,12 +781,12 @@
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
+      "observe": "Beitrag beobachten",
       "pin": "Beitrag anheften",
       "pinnedSuccessfully": "Beitrag erfolgreich angeheftet!",
+      "unobserve": "Beitrag nicht mehr beobachten",
       "unpin": "Beitrag loslösen",
-      "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!",
-      "observe": "Beitrag beobachten",
-      "unobserve": "Beitrag nicht mehr beobachten"
+      "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!"
     },
     "name": "Beitrag",
     "pinned": "Meldung",
@@ -1090,9 +1093,6 @@
   },
   "shoutButton": {
     "shouted": "empfohlen"
-  },
-  "observeButton": {
-    "observed": "beobachtet"
   },
   "site": {
     "back-to-login": "Zurück zur Anmeldung",

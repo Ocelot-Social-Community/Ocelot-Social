@@ -778,12 +778,12 @@
     "menu": {
       "delete": "Supprimer le Post",
       "edit": "Modifier le Post",
+      "observe": "Observer le Post",
       "pin": "Épingler le Post",
       "pinnedSuccessfully": "Poste épinglé avec succès!",
+      "unobserve": "Ne plus observer le Post",
       "unpin": "Retirer l'épingle du poste",
-      "unpinnedSuccessfully": "Épingle retirer du Post avec succès!",
-      "observe": "Observer le Post",
-      "unobserve": "Ne plus observer le Post"
+      "unpinnedSuccessfully": "Épingle retirer du Post avec succès!"
     },
     "name": "Post",
     "pinned": "Annonce",

@@ -778,12 +778,12 @@
     "menu": {
       "delete": "Borrar contribución",
       "edit": "Editar contribución",
+      "observe": "Observar contribución",
       "pin": "Anclar contribución",
       "pinnedSuccessfully": "¡Contribución anclado con éxito!",
+      "unobserve": "Dejar de observar contribución",
       "unpin": "Desanclar contribución",
-      "unpinnedSuccessfully": "¡Contribución desanclado con éxito!",
-      "observe": "Observar contribución",
-      "unobserve": "Dejar de observar contribución"
+      "unpinnedSuccessfully": "¡Contribución desanclado con éxito!"
     },
     "name": "Contribución",
     "pinned": "Anuncio",

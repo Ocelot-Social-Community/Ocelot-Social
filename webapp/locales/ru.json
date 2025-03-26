@@ -778,12 +778,12 @@
     "menu": {
       "delete": "Удалить пост",
       "edit": "Редактировать пост",
+      "observe": null,
       "pin": "Закрепить пост",
       "pinnedSuccessfully": "Пост больше не закреплен!",
+      "unobserve": null,
       "unpin": "Открепить пост",
-      "unpinnedSuccessfully": "Пост успешно не закреплено!",
-      "observe": null,
-      "unobserve": null
+      "unpinnedSuccessfully": "Пост успешно не закреплено!"
     },
     "name": "Пост",
     "pinned": "Объявление",

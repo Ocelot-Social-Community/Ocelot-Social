@@ -778,12 +778,12 @@
     "menu": {
       "delete": null,
       "edit": null,
+      "observe": null,
       "pin": null,
       "pinnedSuccessfully": null,
+      "unobserve": null,
       "unpin": null,
-      "unpinnedSuccessfully": null,
-      "observe": null,
-      "unobserve": null
+      "unpinnedSuccessfully": null
     },
     "name": "Post",
     "pinned": null,

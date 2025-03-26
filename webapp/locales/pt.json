@@ -778,12 +778,12 @@
     "menu": {
       "delete": "Excluir publicação",
       "edit": "Editar publicação",
+      "observe": "Observar publicação",
       "pin": "Fixar publicação",
       "pinnedSuccessfully": "Publicação fixada com sucesso!",
+      "unobserve": "Deixar de observar publicação",
       "unpin": "Desafixar publicação",
-      "unpinnedSuccessfully": "Publicação desafixada com sucesso!",
-      "observe": "Observar publicação",
-      "unobserve": "Deixar de observar publicação"
+      "unpinnedSuccessfully": "Publicação desafixada com sucesso!"
     },
     "name": "Postar",
     "pinned": "Anúncio",
