@@ -118,7 +118,7 @@
                   class="shout-button"
                 >
                   <observe-button
-                    :is-observed="post.observedByMe"
+                    :is-observed="post.isObservedByMe"
                     :count="post.shoutedCount"
                     :is-shouted="post.shoutedByCurrentUser"
                     :post-id="post.id"

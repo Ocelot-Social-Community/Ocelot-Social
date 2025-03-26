@@ -118,7 +118,7 @@ export default {
         })
       }
 
-      if (this.resourceType === 'contribution' && !this.resource.observedByMe) {
+      if (this.resourceType === 'contribution' && !this.resource.isObservedByMe) {
         routes.push({
           label: this.$t(`post.menu.observe`),
           callback: () => {
@@ -128,7 +128,7 @@ export default {
         })
       }
 
-      if (this.resourceType === 'contribution' && this.resource.observedByMe) {
+      if (this.resourceType === 'contribution' && this.resource.isObservedByMe) {
         routes.push({
           label: this.$t(`post.menu.unobserve`),
           callback: () => {
