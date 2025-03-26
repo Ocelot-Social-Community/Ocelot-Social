@@ -118,21 +118,21 @@ export default {
         })
       }
 
-      if (this.resourceType === 'contribution' && !this.observedByMe) {
+      if (this.resourceType === 'contribution' && !this.resource.observedByMe) {
         routes.push({
           label: this.$t(`post.menu.observe`),
           callback: () => {
-            this.$emit('follow', this.resource)
+            this.$emit('toggleObservePost', this.resource, true)
           },
           icon: 'bell',
         })
       }
 
-      if (this.resourceType === 'contribution' && this.observedByMe) {
+      if (this.resourceType === 'contribution' && this.resource.observedByMe) {
         routes.push({
           label: this.$t(`post.menu.unobserve`),
           callback: () => {
-            this.$emit('follow', this.resource)
+            this.$emit('toggleObservePost', this.resource, false)
           },
           icon: 'bell-slashed',
         })

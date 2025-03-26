@@ -1,13 +1,6 @@
 <template>
   <ds-space margin="xx-small" class="text-align-center">
-    <base-button
-      :loading="loading"
-      :disabled="disabled"
-      :filled="shouted"
-      icon="bell"
-      circle
-      @click="toggle"
-    />
+    <base-button :loading="loading" :filled="shouted" icon="bell" circle @click="toggle" />
     <ds-space margin-bottom="xx-small" />
     <ds-text color="soft" class="shout-button-text">
       <ds-heading style="display: inline" tag="h3">{{ shoutedCount }}x</ds-heading>

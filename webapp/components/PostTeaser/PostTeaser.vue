@@ -59,7 +59,7 @@
             :key="category.id"
             v-tooltip="{
               content: `
-                ${$t(`contribution.category.name.${category.slug}`)}: 
+                ${$t(`contribution.category.name.${category.slug}`)}:
                 ${$t(`contribution.category.description.${category.slug}`)}
               `,
               placement: 'bottom-start',
@@ -97,6 +97,7 @@
             :is-owner="isAuthor"
             @pinPost="pinPost"
             @unpinPost="unpinPost"
+            @toggleObservePost="toggleObservePost"
           />
         </client-only>
       </footer>
@@ -211,6 +212,9 @@ export default {
     },
     unpinPost(post) {
       this.$emit('unpinPost', post)
+    },
+    toggleObservePost(post, value) {
+      this.$emit('toggleObservePost', post, value)
     },
     visibilityChanged(isVisible, entry, id) {
       if (!this.post.viewedTeaserByCurrentUser && isVisible) {

@@ -49,6 +49,7 @@
                   :is-owner="isAuthor"
                   @pinPost="pinPost"
                   @unpinPost="unpinPost"
+                  @toggleObservePost="toggleObservePost"
                 />
               </client-only>
             </section>
@@ -336,6 +337,24 @@ export default {
         })
         .then(() => {
           this.$toast.success(this.$t('post.menu.unpinnedSuccessfully'))
+        })
+        .catch((error) => this.$toast.error(error.message))
+    },
+    toggleObservePost(post, value) {
+      this.$apollo
+        .mutate({
+          mutation: PostMutations().toggleObservePost,
+          variables: {
+            value,
+            id: post.id,
+          },
+        })
+        .then(() => {
+          const message = this.$t(
+            `post.menu.${value ? 'observedSuccessfully' : 'unobservedSuccessfully'}`,
+          )
+          this.$toast.success(message)
+          this.$apollo.queries.Post.refetch()
         })
         .catch((error) => this.$toast.error(error.message))
     },
