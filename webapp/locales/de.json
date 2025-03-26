@@ -1091,6 +1091,9 @@
   "shoutButton": {
     "shouted": "empfohlen"
   },
+  "observeButton": {
+    "observed": "beobachtet"
+  },
   "site": {
     "back-to-login": "Zurück zur Anmeldung",
     "bank": "Bankverbindung",

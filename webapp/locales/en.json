@@ -1091,6 +1091,9 @@
   "shoutButton": {
     "shouted": "shouted"
   },
+  "observeButton": {
+    "observed": "observed"
+  },
   "site": {
     "back-to-login": "Back to login page",
     "bank": "bank account",

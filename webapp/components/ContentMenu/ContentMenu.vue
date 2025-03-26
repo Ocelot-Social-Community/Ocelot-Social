@@ -122,7 +122,7 @@ export default {
         routes.push({
           label: this.$t(`post.menu.observe`),
           callback: () => {
-            this.$emit('toggleObservePost', this.resource, true)
+            this.$emit('toggleObservePost', this.resource.id, true)
           },
           icon: 'bell',
         })
@@ -132,7 +132,7 @@ export default {
         routes.push({
           label: this.$t(`post.menu.unobserve`),
           callback: () => {
-            this.$emit('toggleObservePost', this.resource, false)
+            this.$emit('toggleObservePost', this.resource.id, false)
           },
           icon: 'bell-slashed',
         })

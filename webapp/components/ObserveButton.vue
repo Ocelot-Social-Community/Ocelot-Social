@@ -1,82 +1,46 @@
 <template>
   <ds-space margin="xx-small" class="text-align-center">
-    <base-button :loading="loading" :filled="shouted" icon="bell" circle @click="toggle" />
+    <base-button :loading="loading" :filled="observed" icon="bell" circle @click="toggle" />
     <ds-space margin-bottom="xx-small" />
-    <ds-text color="soft" class="shout-button-text">
-      <ds-heading style="display: inline" tag="h3">{{ shoutedCount }}x</ds-heading>
-      {{ $t('shoutButton.shouted') }}
+    <ds-text color="soft" class="observe-button-text">
+      <ds-heading style="display: inline" tag="h3">{{ observedCount }}x</ds-heading>
+      {{ $t('observeButton.observed') }}
     </ds-text>
   </ds-space>
 </template>
 
 <script>
-import gql from 'graphql-tag'
-
 export default {
   props: {
     count: { type: Number, default: 0 },
     postId: { type: String, default: null },
-    isFollowed: { type: Boolean, default: false },
+    isObserved: { type: Boolean, default: false },
   },
   data() {
     return {
       loading: false,
-      shoutedCount: this.count,
-      shouted: false,
+      observedCount: this.count,
+      observed: false,
     }
   },
   watch: {
-    isShouted: {
+    isObserved: {
       immediate: true,
-      handler: function (shouted) {
-        this.shouted = shouted
+      handler: function (observed) {
+        this.observed = observed
       },
     },
   },
   methods: {
     toggle() {
-      const shout = !this.shouted
-      const mutation = shout ? 'shout' : 'unshout'
-      const count = shout ? this.shoutedCount + 1 : this.shoutedCount - 1
-
-      const backup = {
-        shoutedCount: this.shoutedCount,
-        shouted: this.shouted,
-      }
-
-      this.shoutedCount = count
-      this.shouted = shout
-
-      this.$apollo
-        .mutate({
-          mutation: gql`
-            mutation($id: ID!) {
-              ${mutation}(id: $id, type: Post)
-            }
-          `,
-          variables: {
-            id: this.postId,
-          },
-        })
-        .then((res) => {
-          if (res && res.data) {
-            this.$emit('update', shout)
-          }
-        })
-        .catch(() => {
-          this.shoutedCount = backup.shoutedCount
-          this.shouted = backup.shouted
-        })
-        .finally(() => {
-          this.loading = false
-        })
+      this.$emit('toggleObservePost', this.postId, !this.observed)
     },
   },
 }
 </script>
 
 <style lang="scss">
-.shout-button-text {
+.observe-button-text {
   user-select: none;
 }
 .text-align-center {

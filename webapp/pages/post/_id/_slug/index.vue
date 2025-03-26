@@ -118,10 +118,11 @@
                   class="shout-button"
                 >
                   <observe-button
-                    :is-observed="post.isObservedByMe"
+                    :is-observed="post.observedByMe"
                     :count="post.shoutedCount"
                     :is-shouted="post.shoutedByCurrentUser"
                     :post-id="post.id"
+                    @toggleObservePost="toggleObservePost"
                   />
                 </ds-flex-item>
               </ds-flex>
@@ -340,13 +341,13 @@ export default {
         })
         .catch((error) => this.$toast.error(error.message))
     },
-    toggleObservePost(post, value) {
+    toggleObservePost(postId, value) {
       this.$apollo
         .mutate({
           mutation: PostMutations().toggleObservePost,
           variables: {
             value,
-            id: post.id,
+            id: postId,
           },
         })
         .then(() => {
