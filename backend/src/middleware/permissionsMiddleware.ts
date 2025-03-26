@@ -465,6 +465,7 @@ export default shield(
       CreateRoom: isAuthenticated,
       CreateMessage: isAuthenticated,
       MarkMessagesAsSeen: isAuthenticated,
+      toggleObservePost: isAuthenticated,
     },
     User: {
       email: or(isMyOwn, isAdmin),

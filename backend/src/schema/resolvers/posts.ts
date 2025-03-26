@@ -144,6 +144,10 @@ export default {
             WITH post
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
+            MERGE (post)<-[obs:OBSERVES]-(author)
+            SET obs.active = true
+            SET obs.createdAt = toString(datetime())
+            SET obs.updatedAt = toString(datetime())
             ${categoriesCypher}
             ${groupCypher}
             RETURN post {.*, postType: [l IN labels(post) WHERE NOT l = 'Post'] }
@@ -416,6 +420,35 @@ export default {
         session.close()
       }
     },
+    toggleObservePost: async (_parent, params, context, _resolveInfo) => {
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const transactionResponse = await transaction.run(
+          `
+          MATCH (post:Post { id: $params.id })
+          MATCH (user:User { id: $userId })
+          MERGE (user)-[obs:OBSERVES]->(post)
+          ON CREATE SET 
+            obs.createdAt = toString(datetime()),
+            obs.updatedAt = toString(datetime()),
+            obs.active = $params.value
+          ON MATCH SET
+            obs.updatedAt = toString(datetime()),
+            obs.active = $params.value
+          RETURN post
+        `,
+          { userId: context.user.id, params },
+        )
+        return transactionResponse.records.map((record) => record.get('post').properties)
+      })
+      try {
+        const [post] = await writeTxResultPromise
+        post.viewedTeaserCount = post.viewedTeaserCount.low
+        return post
+      } finally {
+        session.close()
+      }
+    },
   },
   Post: {
     ...Resolver('Post', {
@@ -452,12 +485,15 @@ export default {
         shoutedCount:
           '<-[:SHOUTED]-(related:User) WHERE NOT related.deleted = true AND NOT related.disabled = true',
         emotionsCount: '<-[related:EMOTED]-(:User)',
+        observingUsersCount: '<-[related:OBSERVES]-(:User) WHERE related.active = true',
       },
       boolean: {
         shoutedByCurrentUser:
           'MATCH(this)<-[:SHOUTED]-(related:User {id: $cypherParams.currentUserId}) RETURN COUNT(related) >= 1',
         viewedTeaserByCurrentUser:
           'MATCH (this)<-[:VIEWED_TEASER]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1',
+        isObservedByMe:
+          'MATCH (this)<-[obs:OBSERVES]-(related:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(related) >= 1',
       },
     }),
     relatedContributions: async (parent, params, context, resolveInfo) => {
