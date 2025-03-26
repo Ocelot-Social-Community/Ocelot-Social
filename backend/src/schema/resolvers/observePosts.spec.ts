@@ -29,7 +29,7 @@ const createCommentMutation = gql`
 const postQuery = gql`
   query Post($id: ID) {
     Post(id: $id) {
-      observedByMe
+      isObservedByMe
       observingUsersCount
     }
   }
@@ -88,7 +88,7 @@ describe('observing posts', () => {
       ).resolves.toMatchObject({
         data: {
           CreatePost: {
-            observedByMe: true,
+            isObservedByMe: true,
             observingUsersCount: 1,
           },
         },
@@ -112,7 +112,7 @@ describe('observing posts', () => {
         data: {
           Post: [
             {
-              observedByMe: false,
+              isObservedByMe: false,
               observingUsersCount: 1,
             },
           ],
@@ -139,7 +139,7 @@ describe('observing posts', () => {
         data: {
           Post: [
             {
-              observedByMe: true,
+              isObservedByMe: true,
               observingUsersCount: 2,
             },
           ],
@@ -157,7 +157,7 @@ describe('observing posts', () => {
     const toggleObservePostMutation = gql`
       mutation ($id: ID!, $value: Boolean!) {
         toggleObservePost(id: $id, value: $value) {
-          observedByMe
+          isObservedByMe
           observingUsersCount
         }
       }
@@ -176,7 +176,7 @@ describe('observing posts', () => {
         ).resolves.toMatchObject({
           data: {
             toggleObservePost: {
-              observedByMe: false,
+              isObservedByMe: false,
               observingUsersCount: 1,
             },
           },
@@ -205,7 +205,7 @@ describe('observing posts', () => {
           data: {
             Post: [
               {
-                observedByMe: false,
+                isObservedByMe: false,
                 observingUsersCount: 1,
               },
             ],
@@ -228,7 +228,7 @@ describe('observing posts', () => {
         ).resolves.toMatchObject({
           data: {
             toggleObservePost: {
-              observedByMe: true,
+              isObservedByMe: true,
               observingUsersCount: 2,
             },
           },

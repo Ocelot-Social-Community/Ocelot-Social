@@ -187,7 +187,7 @@ type Post {
   eventEnd: String
   eventIsOnline: Boolean
 
-  observedByMe: Boolean!
+  isObservedByMe: Boolean!
     @cypher(
       statement: "MATCH (this)<-[obs:OBSERVES]-(u:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(u) >= 1"
   )

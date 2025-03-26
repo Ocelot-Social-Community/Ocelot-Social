@@ -46,7 +46,7 @@ export const createPostMutation = () => {
           lng
           lat
         }
-        observedByMe
+        isObservedByMe
         observingUsersCount
       }
     }
