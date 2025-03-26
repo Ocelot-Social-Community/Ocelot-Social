@@ -1,9 +1,9 @@
 <template>
   <ds-space margin="xx-small" class="text-align-center">
-    <base-button :loading="loading" :filled="observed" icon="bell" circle @click="toggle" />
+    <base-button :loading="loading" :filled="isObserved" icon="bell" circle @click="toggle" />
     <ds-space margin-bottom="xx-small" />
     <ds-text color="soft" class="observe-button-text">
-      <ds-heading style="display: inline" tag="h3">{{ observedCount }}x</ds-heading>
+      <ds-heading style="display: inline" tag="h3">{{ count }}x</ds-heading>
       {{ $t('observeButton.observed') }}
     </ds-text>
   </ds-space>
@@ -19,21 +19,11 @@ export default {
   data() {
     return {
       loading: false,
-      observedCount: this.count,
-      observed: false,
     }
-  },
-  watch: {
-    isObserved: {
-      immediate: true,
-      handler: function (observed) {
-        this.observed = observed
-      },
-    },
   },
   methods: {
     toggle() {
-      this.$emit('toggleObservePost', this.postId, !this.observed)
+      this.$emit('toggleObservePost', this.postId, !this.isObserved)
     },
   },
 }
