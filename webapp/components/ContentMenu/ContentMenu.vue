@@ -134,7 +134,7 @@ export default {
           callback: () => {
             this.$emit('follow', this.resource)
           },
-          icon: 'bell-crossed',
+          icon: 'bell-slashed',
         })
       }
 
