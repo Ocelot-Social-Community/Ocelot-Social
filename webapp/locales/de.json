@@ -782,8 +782,8 @@
       "pinnedSuccessfully": "Beitrag erfolgreich angeheftet!",
       "unpin": "Beitrag loslösen",
       "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!",
-      "follow": "Beitrag folgen",
-      "unfollow": "Beitrag nicht mehr folgen"
+      "observe": "Beitrag beobachten",
+      "unobserve": "Beitrag nicht mehr beobachten"
     },
     "name": "Beitrag",
     "pinned": "Meldung",

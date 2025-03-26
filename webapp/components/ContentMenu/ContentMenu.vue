@@ -120,7 +120,7 @@ export default {
 
       if (this.resourceType === 'contribution' && !this.observedByMe) {
         routes.push({
-          label: this.$t(`post.menu.follow`),
+          label: this.$t(`post.menu.observe`),
           callback: () => {
             this.$emit('follow', this.resource)
           },
@@ -130,7 +130,7 @@ export default {
 
       if (this.resourceType === 'contribution' && this.observedByMe) {
         routes.push({
-          label: this.$t(`post.menu.unfollow`),
+          label: this.$t(`post.menu.unobserve`),
           callback: () => {
             this.$emit('follow', this.resource)
           },

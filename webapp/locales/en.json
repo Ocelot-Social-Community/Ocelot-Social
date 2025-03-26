@@ -782,8 +782,8 @@
       "pinnedSuccessfully": "Post pinned successfully!",
       "unpin": "Unpin post",
       "unpinnedSuccessfully": "Post unpinned successfully!",
-      "follow": "Follow post",
-      "unfollow": "Unfollow post"
+      "observe": "Observe post",
+      "unobserve": "Stop to observe post"
     },
     "name": "Article",
     "pinned": "Announcement",

@@ -782,8 +782,8 @@
       "pinnedSuccessfully": "¡Contribución anclado con éxito!",
       "unpin": "Desanclar contribución",
       "unpinnedSuccessfully": "¡Contribución desanclado con éxito!",
-      "follow": "Seguir contribución",
-      "unfollow": "Dejar de seguir contribución"
+      "observe": "Observar contribución",
+      "unobserve": "Dejar de observar contribución"
     },
     "name": "Contribución",
     "pinned": "Anuncio",

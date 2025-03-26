@@ -116,9 +116,8 @@
                   :width="{ lg: '15%', md: '22%', sm: '22%', base: '100%' }"
                   class="shout-button"
                 >
-                  <follow-button
-                    v-if="post.author"
-                    :disabled="isAuthor"
+                  <observe-button
+                    :is-observed="post.isObservedByMe"
                     :count="post.shoutedCount"
                     :is-shouted="post.shoutedByCurrentUser"
                     :post-id="post.id"
@@ -169,7 +168,7 @@ import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcShoutButton from '~/components/ShoutButton.vue'
-import FollowButton from '~/components/FollowButton.vue'
+import ObserveButton from '~/components/ObserveButton.vue'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import {
@@ -198,7 +197,7 @@ export default {
     HcCategory,
     HcHashtag,
     HcShoutButton,
-    FollowButton,
+    ObserveButton,
     LocationTeaser,
     PageParamsLink,
     UserTeaser,

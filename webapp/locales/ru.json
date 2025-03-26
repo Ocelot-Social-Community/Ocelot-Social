@@ -782,8 +782,8 @@
       "pinnedSuccessfully": "Пост больше не закреплен!",
       "unpin": "Открепить пост",
       "unpinnedSuccessfully": "Пост успешно не закреплено!",
-      "follow": null,
-      "unfollow": null
+      "observe": null,
+      "unobserve": null
     },
     "name": "Пост",
     "pinned": "Объявление",

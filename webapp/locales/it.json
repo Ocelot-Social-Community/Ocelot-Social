@@ -782,8 +782,8 @@
       "pinnedSuccessfully": null,
       "unpin": null,
       "unpinnedSuccessfully": null,
-      "follow": null,
-      "unfollow": null
+      "observe": null,
+      "unobserve": null
     },
     "name": "Messaggio",
     "pinned": null,
