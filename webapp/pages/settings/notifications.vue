@@ -1,10 +1,16 @@
 <template>
   <base-card>
     <h2 class="title">{{ $t('settings.notifications.name') }}</h2>
-    <ds-space margin-bottom="small">
-      <input id="send-email" type="checkbox" v-model="notifyByEmail" />
-      <label for="send-email">{{ $t('settings.notifications.send-email-notifications') }}</label>
+    <ds-space margin-bottom="small" v-for="topic in topics" :key="topic.id">
+      <input :id="topic.id" type="checkbox" v-model="notifyByEmail[topic.id]" />
+      <label :for="topic.id">{{ topic.name }}</label>
     </ds-space>
+    <base-button @click="activateAll">
+      {{ $t('settings.notifications.activateAll') }}
+    </base-button>
+    <base-button @click="deactivateAll">
+      {{ $t('settings.notifications.deactivateAll') }}
+    </base-button>
     <base-button class="save-button" filled @click="submit" :disabled="disabled">
       {{ $t('actions.save') }}
     </base-button>
@@ -18,7 +24,14 @@ import { updateUserMutation } from '~/graphql/User'
 export default {
   data() {
     return {
-      notifyByEmail: false,
+      notifyByEmail: {
+        posts: false,
+        comments: false,
+      },
+      topics: [
+        { id: 'posts', name: this.$t('settings.notifications.posts') },
+        { id: 'comments', name: this.$t('settings.notifications.comments') },
+      ],
     }
   },
   computed: {
@@ -30,12 +43,26 @@ export default {
     },
   },
   created() {
-    this.notifyByEmail = this.currentUser.sendNotificationEmails || false
+    this.notifyByEmail = {
+      posts: this.currentUser.sendNotificationEmails || false,
+      comments: this.currentUser.sendNotificationEmails || false,
+    }
   },
   methods: {
     ...mapMutations({
       setCurrentUser: 'auth/SET_USER',
     }),
+    setAll(value) {
+      for (const key of Object.keys(this.notifyByEmail)) {
+        this.notifyByEmail[key] = value
+      }
+    },
+    activateAll() {
+      this.setAll(true)
+    },
+    deactivateAll() {
+      this.setAll(false)
+    },
     async submit() {
       try {
         await this.$apollo.mutate({
