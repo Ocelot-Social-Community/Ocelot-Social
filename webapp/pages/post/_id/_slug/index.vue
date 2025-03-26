@@ -111,6 +111,19 @@
                     :post-id="post.id"
                   />
                 </ds-flex-item>
+                <!-- Follow Button -->
+                <ds-flex-item
+                  :width="{ lg: '15%', md: '22%', sm: '22%', base: '100%' }"
+                  class="shout-button"
+                >
+                  <follow-button
+                    v-if="post.author"
+                    :disabled="isAuthor"
+                    :count="post.shoutedCount"
+                    :is-shouted="post.shoutedByCurrentUser"
+                    :post-id="post.id"
+                  />
+                </ds-flex-item>
               </ds-flex>
             </ds-space>
             <!-- Comments -->
@@ -156,6 +169,7 @@ import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcShoutButton from '~/components/ShoutButton.vue'
+import FollowButton from '~/components/FollowButton.vue'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import {
@@ -184,6 +198,7 @@ export default {
     HcCategory,
     HcHashtag,
     HcShoutButton,
+    FollowButton,
     LocationTeaser,
     PageParamsLink,
     UserTeaser,
@@ -379,7 +394,7 @@ export default {
     position: relative;
     /*  The padding top makes sure the correct height is set (according to the
         hero image aspect ratio) before the hero image loads so
-        the autoscroll works correctly when following a comment link. 
+        the autoscroll works correctly when following a comment link.
       */
 
     padding-top: calc(var(--hero-image-aspect-ratio) * (100% + 48px));

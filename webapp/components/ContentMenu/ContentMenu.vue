@@ -118,13 +118,23 @@ export default {
         })
       }
 
-      if (this.resourceType === 'contribution') {
+      if (this.resourceType === 'contribution' && !this.observedByMe) {
         routes.push({
           label: this.$t(`post.menu.follow`),
           callback: () => {
             this.$emit('follow', this.resource)
           },
           icon: 'bell',
+        })
+      }
+
+      if (this.resourceType === 'contribution' && this.observedByMe) {
+        routes.push({
+          label: this.$t(`post.menu.unfollow`),
+          callback: () => {
+            this.$emit('follow', this.resource)
+          },
+          icon: 'bell-crossed',
         })
       }
 
