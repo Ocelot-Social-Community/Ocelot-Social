@@ -1,12 +1,16 @@
 import { mount } from '@vue/test-utils'
-import { beforeEach, expect, describe, it } from 'jest'
 import ObserveButton from './ObserveButton.vue'
-// import Vue from 'vue'
+
+const localVue = global.localVue
 
 describe('ObserveButton', () => {
+  let mocks
+
   const Wrapper = (count = 1, postId = '123', isObserved = true) => {
     return mount(ObserveButton, {
-      props: {
+      mocks,
+      localVue,
+      propsData: {
         count,
         postId,
         isObserved,
@@ -17,6 +21,9 @@ describe('ObserveButton', () => {
   let wrapper
 
   beforeEach(() => {
+    mocks = {
+      $t: jest.fn(),
+    }
     wrapper = Wrapper()
   })
 
@@ -24,25 +31,13 @@ describe('ObserveButton', () => {
     expect(wrapper.element).toMatchSnapshot()
   })
 
-  /*
-  it('toggle the button', async () => {
-    mocks.$apollo.mutate = jest.fn().mockResolvedValue({ data: { shout: 'WeDoShout' } })
-    wrapper.find('.base-button').trigger('click')
-    expect(wrapper.vm.shouted).toBe(true)
-    expect(wrapper.vm.shoutedCount).toBe(1)
-    await Vue.nextTick()
-    expect(wrapper.vm.shouted).toBe(true)
-    expect(wrapper.vm.shoutedCount).toBe(1)
+  it('renders unobserved', () => {
+    wrapper = Wrapper(1, '123', false)
+    expect(wrapper.element).toMatchSnapshot()
   })
 
-  it('toggle the button, but backend fails', async () => {
-    mocks.$apollo.mutate = jest.fn().mockRejectedValue({ message: 'Ouch!' })
-    await wrapper.find('.base-button').trigger('click')
-    expect(wrapper.vm.shouted).toBe(true)
-    expect(wrapper.vm.shoutedCount).toBe(1)
-    await Vue.nextTick()
-    expect(wrapper.vm.shouted).toBe(false)
-    expect(wrapper.vm.shoutedCount).toBe(0)
+  it('emits toggleObservePost when clicked', () => {
+    wrapper.find('.base-button').trigger('click')
+    expect(wrapper.emitted().toggleObservePost).toBeTruthy()
   })
-    */
 })
