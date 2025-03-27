@@ -147,8 +147,6 @@ export default {
         })
       }
 
-      routes.push()
-
       if (!this.isOwner && this.isModerator) {
         if (!this.resource.disabled) {
           routes.push({
