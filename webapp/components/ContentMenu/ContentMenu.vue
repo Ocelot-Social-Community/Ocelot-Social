@@ -78,24 +78,6 @@ export default {
             },
             icon: 'trash',
           })
-
-          if (this.resource.isObservedByMe) {
-            routes.push({
-              label: this.$t(`post.menu.unobserve`),
-              callback: () => {
-                this.$emit('toggleObservePost', this.resource.id, false)
-              },
-              icon: 'bell-slashed',
-            })
-          } else {
-            routes.push({
-              label: this.$t(`post.menu.observe`),
-              callback: () => {
-                this.$emit('toggleObservePost', this.resource.id, true)
-              },
-              icon: 'bell',
-            })
-          }
         }
 
         if (this.isAdmin && !this.resource.group) {
@@ -116,6 +98,24 @@ export default {
               icon: 'unlink',
             })
           }
+        }
+
+        if (this.resource.isObservedByMe) {
+          routes.push({
+            label: this.$t(`post.menu.unobserve`),
+            callback: () => {
+              this.$emit('toggleObservePost', this.resource.id, false)
+            },
+            icon: 'bell-slashed',
+          })
+        } else {
+          routes.push({
+            label: this.$t(`post.menu.observe`),
+            callback: () => {
+              this.$emit('toggleObservePost', this.resource.id, true)
+            },
+            icon: 'bell',
+          })
         }
       }
 
@@ -141,7 +141,6 @@ export default {
           label: this.$t(`report.${this.resourceType}.title`),
           callback: () => {
             this.openModal('report')
-            this.$emit('toggleObservePost', this.resource.id, true)
           },
           icon: 'flag',
         })

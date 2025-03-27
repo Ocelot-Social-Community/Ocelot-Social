@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ObserveButton renders 1`] = `
+exports[`ObserveButton observed renders 1`] = `
 <div
   class="ds-space text-align-center"
   style="margin-top: 4px; margin-bottom: 4px;"
@@ -40,7 +40,7 @@ exports[`ObserveButton renders 1`] = `
 </div>
 `;
 
-exports[`ObserveButton renders unobserved 1`] = `
+exports[`ObserveButton unobserved renders 1`] = `
 <div
   class="ds-space text-align-center"
   style="margin-top: 4px; margin-bottom: 4px;"

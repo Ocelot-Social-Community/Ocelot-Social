@@ -27,17 +27,31 @@ describe('ObserveButton', () => {
     wrapper = Wrapper()
   })
 
-  it('renders', () => {
-    expect(wrapper.element).toMatchSnapshot()
+  describe('observed', () => {
+    it('renders', () => {
+      expect(wrapper.element).toMatchSnapshot()
+    })
+
+    it('emits toggleObservePost with false when clicked', () => {
+      const button = wrapper.find('.base-button')
+      button.trigger('click')
+      expect(wrapper.emitted('toggleObservePost')).toEqual([['123', false]])
+    })
   })
 
-  it('renders unobserved', () => {
-    wrapper = Wrapper(1, '123', false)
-    expect(wrapper.element).toMatchSnapshot()
-  })
+  describe('unobserved', () => {
+    beforeEach(() => {
+      wrapper = Wrapper(1, '123', false)
+    })
 
-  it('emits toggleObservePost when clicked', () => {
-    wrapper.find('.base-button').trigger('click')
-    expect(wrapper.emitted().toggleObservePost).toBeTruthy()
+    it('renders', () => {
+      expect(wrapper.element).toMatchSnapshot()
+    })
+
+    it('emits toggleObservePost with true when clicked', () => {
+      const button = wrapper.find('.base-button')
+      button.trigger('click')
+      expect(wrapper.emitted('toggleObservePost')).toEqual([['123', true]])
+    })
   })
 })
