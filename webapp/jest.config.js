@@ -38,4 +38,5 @@ module.exports = {
   },
   moduleFileExtensions: ['js', 'json', 'vue'],
   testEnvironment: 'jest-environment-jsdom',
+  snapshotSerializers: ['jest-serializer-vue'],
 }

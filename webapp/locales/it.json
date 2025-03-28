@@ -778,8 +778,10 @@
     "menu": {
       "delete": null,
       "edit": null,
+      "observe": null,
       "pin": null,
       "pinnedSuccessfully": null,
+      "unobserve": null,
       "unpin": null,
       "unpinnedSuccessfully": null
     },
