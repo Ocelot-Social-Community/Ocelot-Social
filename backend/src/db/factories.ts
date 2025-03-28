@@ -1,11 +1,13 @@
-import { v4 as uuid } from 'uuid'
-import slugify from 'slug'
+import { faker } from '@faker-js/faker'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
-import { faker } from '@faker-js/faker'
+import slugify from 'slug'
+import { v4 as uuid } from 'uuid'
+
+import CONFIG from '@config/index'
+import generateInviteCode from '@schema/resolvers/helpers/generateInviteCode'
+
 import { getDriver, getNeode } from './neo4j'
-import CONFIG from '../config/index'
-import generateInviteCode from '../schema/resolvers/helpers/generateInviteCode'
 
 const neode = getNeode()
 
@@ -15,18 +17,19 @@ const uniqueImageUrl = (imageUrl) => {
   return newUrl.toString()
 }
 
-export const cleanDatabase = async (options: any = {}) => {
-  const { driver = getDriver() } = options
+export const cleanDatabase = async ({ withMigrations } = { withMigrations: false }) => {
+  const driver = getDriver()
   const session = driver.session()
+
+  const clean = `
+    MATCH (everything)
+    ${withMigrations ? '' : "WHERE NOT 'Migration' IN labels(everything)"}
+    DETACH DELETE everything
+  `
+
   try {
     await session.writeTransaction((transaction) => {
-      return transaction.run(
-        `
-          MATCH (everything)
-          WHERE NOT 'Migration' IN labels(everything)
-          DETACH DELETE everything
-        `,
-      )
+      return transaction.run(clean)
     })
   } finally {
     session.close()
@@ -70,7 +73,6 @@ Factory.define('basicUser')
     termsAndConditionsAgreedAt: '2019-08-01T10:47:19.212Z',
     allowEmbedIframes: false,
     showShoutsPublicly: false,
-    sendNotificationEmails: true,
     locale: 'en',
   })
   .attr('slug', ['slug', 'name'], (slug, name) => {
@@ -173,6 +175,7 @@ Factory.define('post')
     ])
     await Promise.all([
       post.relateTo(author, 'author'),
+      post.relateTo(author, 'observes'),
       // Promise.all(categories.map((c) => c.relateTo(post, 'post'))),
       Promise.all(tags.map((t) => t.relateTo(post, 'post'))),
     ])
@@ -208,7 +211,11 @@ Factory.define('comment')
       options.author,
       options.post,
     ])
-    await Promise.all([comment.relateTo(author, 'author'), comment.relateTo(post, 'post')])
+    await Promise.all([
+      comment.relateTo(author, 'author'),
+      comment.relateTo(post, 'post'),
+      post.relateTo(author, 'observes'),
+    ])
     return comment
   })
 

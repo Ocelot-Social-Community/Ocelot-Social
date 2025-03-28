@@ -1,8 +1,10 @@
 import { UserInputError } from 'apollo-server'
-import { getNeode } from '../../db/neo4j'
-import encryptPassword from '../../helpers/encryptPassword'
-import generateNonce from './helpers/generateNonce'
+
+import { getNeode } from '@db/neo4j'
+import encryptPassword from '@helpers/encryptPassword'
+
 import existingEmailAddress from './helpers/existingEmailAddress'
+import generateNonce from './helpers/generateNonce'
 import normalizeEmail from './helpers/normalizeEmail'
 
 const neode = getNeode()
@@ -98,7 +100,6 @@ const signupCypher = (inviteCode) => {
       SET user.updatedAt = toString(datetime())
       SET user.allowEmbedIframes = false
       SET user.showShoutsPublicly = false
-      SET user.sendNotificationEmails = true
       SET email.verifiedAt = toString(datetime())
       WITH user
       OPTIONAL MATCH (post:Post)-[:IN]->(group:Group)

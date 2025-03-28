@@ -1,5 +1,6 @@
-import { getNeode } from '../../db/neo4j'
 import { UserInputError } from 'apollo-server'
+
+import { getNeode } from '@db/neo4j'
 
 const neode = getNeode()
 

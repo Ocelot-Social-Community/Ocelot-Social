@@ -1,4 +1,4 @@
-import { getDriver } from '../../db/neo4j'
+import { getDriver } from '@db/neo4j'
 
 export const description = `
   This migration creates a MUTED relationship between two edges(:User) that have a pre-existing BLOCKED relationship.
@@ -21,6 +21,7 @@ export async function up(next) {
       `,
     )
     await transaction.commit()
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -38,6 +39,7 @@ export function down(next) {
   try {
     // Rollback your migration here.
     next()
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     next(err)
   } finally {

@@ -1,9 +1,11 @@
-import { neo4jgraphql } from 'neo4j-graphql-js'
-import { getNeode } from '../../db/neo4j'
 import { UserInputError, ForbiddenError } from 'apollo-server'
-import { mergeImage, deleteImage } from './images/images'
-import Resolver from './helpers/Resolver'
+import { neo4jgraphql } from 'neo4j-graphql-js'
+
+import { getNeode } from '@db/neo4j'
+
 import log from './helpers/databaseLogger'
+import Resolver from './helpers/Resolver'
+import { mergeImage, deleteImage } from './images/images'
 import { createOrUpdateLocations } from './users/location'
 
 const neode = getNeode()
@@ -64,12 +66,12 @@ export default {
             const result = txc.run(
               `
             MATCH (user:User)-[:PRIMARY_EMAIL]->(e:EmailAddress {email: $args.email})
-            RETURN user`,
+            RETURN user {.*, email: e.email}`,
               { args },
             )
             return result
           })
-          return readTxResult.records.map((r) => r.get('user').properties)
+          return readTxResult.records.map((r) => r.get('user'))
         } finally {
           session.close()
         }
@@ -111,32 +113,53 @@ export default {
     blockUser: async (object, args, context, resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
-      await neode.cypher(
-        `
-      MATCH(u:User {id: $currentUser.id})-[r:FOLLOWS]->(b:User {id: $args.id})
-      DELETE r
-      `,
-        { currentUser, args },
-      )
-      const [user, blockedUser] = await Promise.all([
-        neode.find('User', currentUser.id),
-        neode.find('User', args.id),
-      ])
-      await user.relateTo(blockedUser, 'blocked')
-      return blockedUser.toJson()
+
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const unBlockUserTransactionResponse = await transaction.run(
+          `
+            MATCH (blockedUser:User {id: $args.id})
+            MATCH (currentUser:User {id: $currentUser.id})
+            OPTIONAL MATCH (currentUser)-[r:FOLLOWS]->(blockedUser)
+            DELETE r
+            CREATE (currentUser)-[:BLOCKED]->(blockedUser)
+            RETURN blockedUser {.*}
+          `,
+          { currentUser, args },
+        )
+        return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new UserInputError(error.message)
+      } finally {
+        session.close()
+      }
     },
     unblockUser: async (object, args, context, resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
-      await neode.cypher(
-        `
-      MATCH(u:User {id: $currentUser.id})-[r:BLOCKED]->(b:User {id: $args.id})
-      DELETE r
-      `,
-        { currentUser, args },
-      )
-      const blockedUser = await neode.find('User', args.id)
-      return blockedUser.toJson()
+
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const unBlockUserTransactionResponse = await transaction.run(
+          `
+            MATCH(u:User {id: $currentUser.id})-[r:BLOCKED]->(blockedUser:User {id: $args.id})
+            DELETE r
+            RETURN blockedUser {.*}
+          `,
+          { currentUser, args },
+        )
+        return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new UserInputError(error.message)
+      } finally {
+        session.close()
+      }
     },
     UpdateUser: async (_parent, params, context, _resolveInfo) => {
       const { avatar: avatarInput } = params
@@ -150,6 +173,19 @@ export default {
         }
         params.termsAndConditionsAgreedAt = new Date().toISOString()
       }
+
+      const {
+        emailNotificationSettings,
+      }: { emailNotificationSettings: { name: string; value: boolean }[] | undefined } = params
+      delete params.emailNotificationSettings
+      if (emailNotificationSettings) {
+        emailNotificationSettings.forEach((setting) => {
+          params[
+            'emailNotifications' + setting.name.charAt(0).toUpperCase() + setting.name.slice(1)
+          ] = setting.value
+        })
+      }
+
       const session = context.driver.session()
 
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -255,14 +291,14 @@ export default {
         const switchUserRoleResponse = await transaction.run(
           `
             MATCH (user:User {id: $id})
+            OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(e:EmailAddress)
             SET user.role = $role
             SET user.updatedAt = toString(datetime())
-            RETURN user {.*}
+            RETURN user {.*, email: e.email}
           `,
           { id, role },
         )
-        const [user] = switchUserRoleResponse.records.map((record) => record.get('user'))
-        return user
+        return switchUserRoleResponse.records.map((record) => record.get('user'))[0]
       })
       try {
         const user = await writeTxResultPromise
@@ -314,15 +350,93 @@ export default {
         session.close()
       }
     },
+    updateOnlineStatus: async (object, args, context, resolveInfo) => {
+      const { status } = args
+      const {
+        user: { id },
+      } = context
+
+      const CYPHER_AWAY = `
+          MATCH (user:User {id: $id})
+          WITH user,
+          CASE user.lastOnlineStatus
+            WHEN 'away' THEN user.awaySince
+            ELSE toString(datetime())
+          END AS awaySince
+          SET user.awaySince = awaySince
+          SET user.lastOnlineStatus = $status
+        `
+      const CYPHER_ONLINE = `
+          MATCH (user:User {id: $id})
+            SET user.awaySince = null
+            SET user.lastOnlineStatus = $status
+        `
+
+      // Last Online Time is saved as `lastActiveAt`
+      const session = context.driver.session()
+      await session.writeTransaction((transaction) => {
+        // return transaction.run(status === 'away' ? CYPHER_AWAY : CYPHER_ONLINE, { id, status })
+        return transaction.run(status === 'away' ? CYPHER_AWAY : CYPHER_ONLINE, { id, status })
+      })
+
+      return true
+    },
   },
   User: {
-    email: async (parent, params, context, resolveInfo) => {
-      if (typeof parent.email !== 'undefined') return parent.email
-      const { id } = parent
-      const statement = `MATCH(u:User {id: $id})-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e`
-      const result = await neode.cypher(statement, { id })
-      const [{ email }] = result.records.map((r) => r.get('e').properties)
-      return email
+    emailNotificationSettings: async (parent, params, context, resolveInfo) => {
+      return [
+        {
+          type: 'post',
+          settings: [
+            {
+              name: 'commentOnObservedPost',
+              value: parent.emailNotificationsCommentOnObservedPost ?? true,
+            },
+            {
+              name: 'mention',
+              value: parent.emailNotificationsMention ?? true,
+            },
+            {
+              name: 'followingUsers',
+              value: parent.emailNotificationsFollowingUsers ?? true,
+            },
+            {
+              name: 'postInGroup',
+              value: parent.emailNotificationsPostInGroup ?? true,
+            },
+          ],
+        },
+        {
+          type: 'chat',
+          settings: [
+            {
+              name: 'chatMessage',
+              value: parent.emailNotificationsChatMessage ?? true,
+            },
+          ],
+        },
+        {
+          type: 'group',
+          settings: [
+            {
+              name: 'groupMemberJoined',
+              value: parent.emailNotificationsGroupMemberJoined ?? true,
+            },
+            {
+              name: 'groupMemberLeft',
+              value: parent.emailNotificationsGroupMemberLeft ?? true,
+            },
+            {
+              name: 'groupMemberRemoved',
+              value: parent.emailNotificationsGroupMemberRemoved ?? true,
+            },
+            {
+              name: 'groupMemberRoleChanged',
+              value: parent.emailNotificationsGroupMemberRoleChanged ?? true,
+            },
+          ],
+        },
+      ]
     },
     ...Resolver('User', {
       undefinedToNull: [
@@ -335,7 +449,6 @@ export default {
         'termsAndConditionsAgreedAt',
         'allowEmbedIframes',
         'showShoutsPublicly',
-        'sendNotificationEmails',
         'locale',
       ],
       boolean: {

@@ -1,4 +1,4 @@
-import extractHashtags from '../hashtags/extractHashtags'
+import extractHashtags from './extractHashtags'
 
 const updateHashtagsOfPost = async (postId, hashtags, context) => {
   if (!hashtags.length) return

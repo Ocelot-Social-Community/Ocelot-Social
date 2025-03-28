@@ -485,6 +485,8 @@
     "categoriesTitle": null,
     "changeMemberRole": null,
     "contentMenu": {
+      "muteGroup": null,
+      "unmuteGroup": null,
       "visitGroupPage": null
     },
     "createNewGroup": {
@@ -535,6 +537,7 @@
       "confirmAddGroupMemberText": null,
       "confirmAddGroupMemberTitle": null
     },
+    "muted": null,
     "myGroups": null,
     "name": null,
     "radius": null,
@@ -559,6 +562,8 @@
       "hidden": null,
       "public": null
     },
+    "unmute": null,
+    "unmuted": null,
     "update": null,
     "updatedGroup": null
   },
@@ -738,14 +743,19 @@
     "reason": {
       "changed_group_member_role": null,
       "commented_on_post": "Комментарий к посту...",
+      "followed_user_posted": null,
       "mentioned_in_comment": "Упоминание в комментарии....",
       "mentioned_in_post": "Упоминание в посте....",
+      "post_in_group": null,
       "removed_user_from_group": null,
       "user_joined_group": null,
       "user_left_group": null
     },
     "title": "Уведомления",
     "user": "Пользователь"
+  },
+  "observeButton": {
+    "observed": null
   },
   "post": {
     "comment": {
@@ -778,8 +788,12 @@
     "menu": {
       "delete": "Удалить пост",
       "edit": "Редактировать пост",
+      "observe": null,
+      "observedSuccessfully": null,
       "pin": "Закрепить пост",
       "pinnedSuccessfully": "Пост больше не закреплен!",
+      "unobserve": null,
+      "unobservedSuccessfully": null,
       "unpin": "Открепить пост",
       "unpinnedSuccessfully": "Пост успешно не закреплено!"
     },
@@ -1032,9 +1046,24 @@
     },
     "name": "Настройки",
     "notifications": {
-      "name": null,
-      "send-email-notifications": null,
-      "success-update": null
+      "chat": "Чат",
+      "chatMessage": "Сообщение, полученное во время отсутствия",
+      "checkAll": "Отметить все",
+      "commentOnObservedPost": "Комментарии по поводу замеченных сообщений",
+      "followingUsers": null,
+      "group": "Группы",
+      "groupMemberJoined": "Участник присоединился к группе, которой я владею",
+      "groupMemberLeft": "Участник вышел из группы, которой владею",
+      "groupMemberRemoved": "Был удален из группы",
+      "groupMemberRoleChanged": "Моя роль в группе была изменена",
+      "mention": "Упоминание в вкладе",
+      "name": "Уведомления",
+      "post": "Сообщения и комментарии",
+      "postByFollowedUser": "Сообщения пользователей, за которыми я слежу",
+      "postInGroup": "Сообщение в группе, членом которой я являюсь",
+      "send-email-notifications": "Отправлять уведомления по электронной почте",
+      "success-update": "Настройки уведомлений сохранены! ",
+      "uncheckAll": "Снимите все флажки"
     },
     "organizations": {
       "name": "Мои организации"

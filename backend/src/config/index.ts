@@ -1,11 +1,15 @@
-import dotenv from 'dotenv'
+/* eslint-disable n/no-process-env */
+/* eslint-disable n/no-unpublished-require */
+/* eslint-disable n/no-missing-require */
+import { config } from 'dotenv'
+
 import emails from './emails'
 import metadata from './metadata'
 
 // Load env file
 if (require.resolve) {
   try {
-    dotenv.config({ path: require.resolve('../../.env') })
+    config({ path: require.resolve('../../.env') })
   } catch (error) {
     // This error is thrown when the .env is not found
     if (error.code !== 'MODULE_NOT_FOUND') {

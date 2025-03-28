@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid'
+
 import Resolver from './helpers/Resolver'
 
 export default {
@@ -25,6 +26,12 @@ export default {
             SET comment.createdAt = toString(datetime())
             SET comment.updatedAt = toString(datetime())
             MERGE (post)<-[:COMMENTS]-(comment)<-[:WROTE]-(author)
+            WITH post, author, comment
+            MERGE (post)<-[obs:OBSERVES]-(author)
+            ON CREATE SET
+              obs.active = true,
+              obs.createdAt = toString(datetime()),
+              obs.updatedAt = toString(datetime())      
             RETURN comment
           `,
           { userId: user.id, postId, params },
@@ -93,6 +100,14 @@ export default {
       hasOne: {
         author: '<-[:WROTE]-(related:User)',
         post: '-[:COMMENTS]->(related:Post)',
+      },
+      count: {
+        postObservingUsersCount:
+          '-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(related:User) WHERE obs.active = true AND NOT related.deleted AND NOT related.disabled',
+      },
+      boolean: {
+        isPostObservedByMe:
+          'MATCH (this)-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(related:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(related) >= 1',
       },
     }),
   },

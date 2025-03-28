@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
-import CONFIG from './../config'
+
+import CONFIG from '@config/index'
 
 export default async (driver, authorizationHeader) => {
   if (!authorizationHeader) return null
@@ -8,6 +9,7 @@ export default async (driver, authorizationHeader) => {
   try {
     const decoded = await jwt.verify(token, CONFIG.JWT_SECRET)
     id = decoded.sub
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     return null
   }

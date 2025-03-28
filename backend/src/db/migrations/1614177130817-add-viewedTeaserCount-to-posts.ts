@@ -1,10 +1,10 @@
-import { getDriver } from '../../db/neo4j'
+import { getDriver } from '@db/neo4j'
 
 export const description = `
 This migration adds the viewedTeaserCount property to all posts, setting it to 0.
 `
 
-module.exports.up = async function (next) {
+export async function up(next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -28,7 +28,7 @@ module.exports.up = async function (next) {
   }
 }
 
-module.exports.down = async function (next) {
+export async function down(next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()

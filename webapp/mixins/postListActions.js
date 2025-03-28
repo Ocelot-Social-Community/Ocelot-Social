@@ -35,5 +35,23 @@ export default {
         })
         .catch((error) => this.$toast.error(error.message))
     },
+    toggleObservePost(postId, value, refetchPostList = () => {}) {
+      this.$apollo
+        .mutate({
+          mutation: PostMutations().toggleObservePost,
+          variables: {
+            value,
+            id: postId,
+          },
+        })
+        .then(() => {
+          const message = this.$t(
+            `post.menu.${value ? 'observedSuccessfully' : 'unobservedSuccessfully'}`,
+          )
+          this.$toast.success(message)
+          refetchPostList()
+        })
+        .catch((error) => this.$toast.error(error.message))
+    },
   },
 }

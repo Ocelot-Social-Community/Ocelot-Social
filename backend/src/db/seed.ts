@@ -1,20 +1,23 @@
-import sample from 'lodash/sample'
-import { createTestClient } from 'apollo-server-testing'
-import CONFIG from '../config'
-import createServer from '../server'
+/* eslint-disable n/no-process-exit */
 import { faker } from '@faker-js/faker'
-import Factory from '../db/factories'
-import { getNeode, getDriver } from '../db/neo4j'
+import { createTestClient } from 'apollo-server-testing'
+import sample from 'lodash/sample'
+
+import CONFIG from '@config/index'
+import { categories } from '@constants/categories'
+import { createCommentMutation } from '@graphql/comments'
 import {
   createGroupMutation,
   joinGroupMutation,
   changeGroupMemberRoleMutation,
-} from '../graphql/groups'
-import { createPostMutation } from '../graphql/posts'
-import { createRoomMutation } from '../graphql/rooms'
-import { createMessageMutation } from '../graphql/messages'
-import { createCommentMutation } from '../graphql/comments'
-import { categories } from '../constants/categories'
+} from '@graphql/groups'
+import { createMessageMutation } from '@graphql/messages'
+import { createPostMutation } from '@graphql/posts'
+import { createRoomMutation } from '@graphql/rooms'
+import createServer from '@src/server'
+
+import Factory from './factories'
+import { getNeode, getDriver } from './neo4j'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
@@ -1565,6 +1568,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await driver.close()
     await neode.close()
     process.exit(0)
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     /* eslint-disable-next-line no-console */
     console.error(err)

@@ -1,5 +1,7 @@
-import { getDriver } from '../../db/neo4j'
-import { existsSync } from 'fs'
+/* eslint-disable security/detect-non-literal-fs-filename */
+import { existsSync } from 'node:fs'
+
+import { getDriver } from '@db/neo4j'
 
 export const description = `
   In this review:
