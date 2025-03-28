@@ -25,6 +25,12 @@ export default {
             SET comment.createdAt = toString(datetime())
             SET comment.updatedAt = toString(datetime())
             MERGE (post)<-[:COMMENTS]-(comment)<-[:WROTE]-(author)
+            WITH post, author, comment
+            MERGE (post)<-[obs:OBSERVES]-(author)
+            ON CREATE SET
+              obs.active = true,
+              obs.createdAt = toString(datetime()),
+              obs.updatedAt = toString(datetime())      
             RETURN comment
           `,
           { userId: user.id, postId, params },

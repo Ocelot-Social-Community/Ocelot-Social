@@ -186,6 +186,13 @@ type Post {
   eventStart: String
   eventEnd: String
   eventIsOnline: Boolean
+
+  isObservedByMe: Boolean!
+    @cypher(
+      statement: "MATCH (this)<-[obs:OBSERVES]-(u:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(u) >= 1"
+  )
+  observingUsersCount: Int!
+    @cypher(statement: "MATCH (this)<-[obs:OBSERVES]-(u:User) WHERE obs.active = true RETURN COUNT(DISTINCT u)")  
 }
 
 input _PostInput {
@@ -239,6 +246,8 @@ type Mutation {
   shout(id: ID!, type: ShoutTypeEnum): Boolean!
   # Unshout the given Type and ID
   unshout(id: ID!, type: ShoutTypeEnum): Boolean!
+
+  toggleObservePost(id: ID!, value: Boolean!): Post!
 }
 
 type Query {

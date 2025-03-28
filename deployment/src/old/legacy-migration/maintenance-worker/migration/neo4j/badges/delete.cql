@@ -1,1 +1,0 @@
-MATCH (n:Badge) DETACH DELETE n;
