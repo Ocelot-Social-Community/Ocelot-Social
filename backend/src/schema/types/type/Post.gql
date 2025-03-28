@@ -192,7 +192,7 @@ type Post {
       statement: "MATCH (this)<-[obs:OBSERVES]-(u:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(u) >= 1"
   )
   observingUsersCount: Int!
-    @cypher(statement: "MATCH (this)<-[obs:OBSERVES]-(u:User) WHERE obs.active = true RETURN COUNT(DISTINCT u)")  
+    @cypher(statement: "MATCH (this)<-[obs:OBSERVES]-(u:User) WHERE obs.active = true AND NOT u.deleted = true AND NOT u.disabled = true RETURN COUNT(DISTINCT u)")  
 }
 
 input _PostInput {
