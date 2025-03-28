@@ -81,8 +81,6 @@ export const filterPosts = (i18n) => {
           lng
           lat
         }
-        isObservedByMe
-        observingUsersCount
         eventIsOnline
         ...post
         ...postCounts
