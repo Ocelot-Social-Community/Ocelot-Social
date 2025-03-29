@@ -37,7 +37,7 @@ jobs:
       
       - name: Cache docker images
         id: cache
-        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.0.2
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
           path: |
             /opt/cucumber-json-formatter
@@ -59,7 +59,7 @@ jobs:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - name: Restore cache
-        uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.0.2
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         id: cache
         with:
           path: |
