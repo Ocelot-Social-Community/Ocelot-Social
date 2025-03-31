@@ -315,10 +315,10 @@ export default {
         this.$toast.error(err.message)
       }
     },
-    async createComment(comment, isPostObservedByMe, postObservingUsersCount) {
+    async createComment(comment) {
       this.post.comments.push(comment)
-      this.post.isObservedByMe = isPostObservedByMe
-      this.post.observingUsersCount = postObservingUsersCount
+      this.post.isObservedByMe = comment.isPostObservedByMe
+      this.post.observingUsersCount = comment.postObservingUsersCount
     },
     pinPost(post) {
       this.$apollo
