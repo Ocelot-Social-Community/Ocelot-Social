@@ -120,7 +120,6 @@
                   <observe-button
                     :is-observed="post.isObservedByMe"
                     :count="post.observingUsersCount"
-                    :is-shouted="post.shoutedByCurrentUser"
                     :post-id="post.id"
                     @toggleObservePost="toggleObservePost"
                   />
