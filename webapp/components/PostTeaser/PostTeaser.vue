@@ -213,8 +213,8 @@ export default {
     unpinPost(post) {
       this.$emit('unpinPost', post)
     },
-    toggleObservePost(post, value) {
-      this.$emit('toggleObservePost', post, value)
+    toggleObservePost(postId, value) {
+      this.$emit('toggleObservePost', postId, value)
     },
     visibilityChanged(isVisible, entry, id) {
       if (!this.post.viewedTeaserByCurrentUser && isVisible) {

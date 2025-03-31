@@ -35,13 +35,13 @@ export default {
         })
         .catch((error) => this.$toast.error(error.message))
     },
-    toggleObservePost(post, value, refetchPostList = () => {}) {
+    toggleObservePost(postId, value, refetchPostList = () => {}) {
       this.$apollo
         .mutate({
           mutation: PostMutations().toggleObservePost,
           variables: {
             value,
-            id: post.id,
+            id: postId,
           },
         })
         .then(() => {
