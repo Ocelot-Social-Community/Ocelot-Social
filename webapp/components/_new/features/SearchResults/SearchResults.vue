@@ -48,7 +48,9 @@
                 @removePostFromList="posts = removePostFromList(post, posts)"
                 @pinPost="pinPost(post, refetchPostList)"
                 @unpinPost="unpinPost(post, refetchPostList)"
-                @toggleObservePost="toggleObservePost(postId, value, refetchPostList)"
+                @toggleObservePost="
+                  (postId, value) => toggleObservePost(postId, value, refetchPostList)
+                "
               />
             </masonry-grid-item>
           </template>
