@@ -747,6 +747,9 @@
     "title": null,
     "user": null
   },
+  "observeButton": {
+    "observed": null
+  },
   "post": {
     "comment": {
       "reply": null,
@@ -779,9 +782,11 @@
       "delete": null,
       "edit": null,
       "observe": null,
+      "observedSuccessfully": null,
       "pin": null,
       "pinnedSuccessfully": null,
       "unobserve": null,
+      "unobservedSuccessfully": null,
       "unpin": null,
       "unpinnedSuccessfully": null
     },

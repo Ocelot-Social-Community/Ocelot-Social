@@ -747,6 +747,9 @@
     "title": "Notifications",
     "user": "Utilisateur"
   },
+  "observeButton": {
+    "observed": null
+  },
   "post": {
     "comment": {
       "reply": null,
@@ -779,9 +782,11 @@
       "delete": "Supprimer le Post",
       "edit": "Modifier le Post",
       "observe": "Observer le Post",
+      "observedSuccessfully": null,
       "pin": "Épingler le Post",
       "pinnedSuccessfully": "Poste épinglé avec succès!",
       "unobserve": "Ne plus observer le Post",
+      "unobservedSuccessfully": null,
       "unpin": "Retirer l'épingle du poste",
       "unpinnedSuccessfully": "Épingle retirer du Post avec succès!"
     },
