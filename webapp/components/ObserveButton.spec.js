@@ -24,10 +24,13 @@ describe('ObserveButton', () => {
     mocks = {
       $t: jest.fn(),
     }
-    wrapper = Wrapper()
   })
 
   describe('observed', () => {
+    beforeEach(() => {
+      wrapper = Wrapper(1, '123', true)
+    })
+
     it('renders', () => {
       expect(wrapper.element).toMatchSnapshot()
     })
