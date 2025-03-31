@@ -100,6 +100,14 @@ export default {
         author: '<-[:WROTE]-(related:User)',
         post: '-[:COMMENTS]->(related:Post)',
       },
+      count: {
+        postObservingUsersCount:
+          '-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(related:User) WHERE obs.active = true AND NOT related.deleted AND NOT related.disabled',
+      },
+      boolean: {
+        isPostObservedByMe:
+          'MATCH (this)-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(related:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(related) >= 1',
+      },
     }),
   },
 }
