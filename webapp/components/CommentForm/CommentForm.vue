@@ -109,10 +109,12 @@ export default {
             const {
               data: { CreateComment },
             } = res
-            this.$emit('createComment', CreateComment)
+            this.$emit('createComment', CreateComment, data.isPostObservedByMe, data.postObservingUsersCount)
             this.clear()
             this.$toast.success(this.$t('post.comment.submitted'))
             this.disabled = false
+            // Refetch the post to update the observed state
+            this.
           } else {
             const {
               data: { UpdateComment },
