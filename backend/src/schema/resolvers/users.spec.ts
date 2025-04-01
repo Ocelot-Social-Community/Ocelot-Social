@@ -63,6 +63,12 @@ const saveCategorySettings = gql`
   }
 `
 
+const updateOnlineStatus = gql`
+  mutation ($status: OnlineStatus!) {
+    updateOnlineStatus(status: $status)
+  }
+`
+
 beforeAll(async () => {
   await cleanDatabase()
 
@@ -717,6 +723,82 @@ describe('save category settings', () => {
               },
             }),
           )
+        })
+      })
+    })
+  })
+})
+
+describe('updateOnlineStatus', () => {
+  beforeEach(async () => {
+    user = await Factory.build('user', {
+      id: 'user',
+      role: 'user',
+    })
+    variables = {
+      status: 'online',
+    }
+  })
+
+  describe('not authenticated', () => {
+    beforeEach(async () => {
+      authenticatedUser = undefined
+    })
+
+    it('throws an error', async () => {
+      await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'Not Authorized!',
+            }),
+          ],
+        }),
+      )
+    })
+  })
+
+  describe('authenticated', () => {
+    beforeEach(async () => {
+      authenticatedUser = await user.toJson()
+    })
+
+    describe('set online', () => {
+      it('returns true and saves the user in the database as online', async () => {
+        await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toEqual(
+          expect.objectContaining({
+            data: { updateOnlineStatus: true },
+          }),
+        )
+
+        const cypher = 'MATCH (u:User {id: $id}) RETURN u'
+        const result = await neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser = neode.hydrateFirst(result, 'u', neode.model('User'))
+        await expect(dbUser.toJson()).resolves.toMatchObject({
+          lastOnlineStatus: 'online',
+        })
+      })
+    })
+
+    describe('set away', () => {
+      beforeEach(() => {
+        variables = {
+          status: 'away',
+        }
+      })
+
+      it('returns true and saves the user in the database as away', async () => {
+        await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toEqual(
+          expect.objectContaining({
+            data: { updateOnlineStatus: true },
+          }),
+        )
+
+        const cypher = 'MATCH (u:User {id: $id}) RETURN u'
+        const result = await neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser = neode.hydrateFirst(result, 'u', neode.model('User'))
+        await expect(dbUser.toJson()).resolves.toMatchObject({
+          lastOnlineStatus: 'away',
         })
       })
     })
