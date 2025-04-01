@@ -238,7 +238,6 @@ describe('notifications', () => {
           })
 
           it('sends me no notification', async () => {
-            await notifiedUser.relateTo(commentAuthor, 'blocked')
             await createCommentOnPostAction()
             const expected = expect.objectContaining({
               data: { notifications: [] },
