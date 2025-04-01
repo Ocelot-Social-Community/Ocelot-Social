@@ -314,6 +314,26 @@ export default {
         session.close()
       }
     },
+    updateOnlineStatus: async (object, args, context, resolveInfo) => {
+      const { status } = args
+      const {
+        user: { id },
+      } = context
+
+      // Last Online Time is saved as `lastActiveAt`
+      const session = context.driver.session()
+      await session.writeTransaction((transaction) => {
+        return transaction.run(
+          `
+          MATCH (user:User {id: $id})
+            SET user.lastOnlineStatus = $status
+        `,
+          { id, status },
+        )
+      })
+
+      return true
+    },
   },
   User: {
     email: async (parent, params, context, resolveInfo) => {
