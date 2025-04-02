@@ -322,6 +322,7 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
       MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
         WHERE NOT recipientUser.id = $currentUserId
         AND NOT (recipientUser)-[:BLOCKED]-(currentUser)
+        AND recipientUser.sendNotificationEmails = true
       RETURN recipientUser, emailAddress {.email}
     `
     const txResponse = await transaction.run(messageRecipientCypher, {
