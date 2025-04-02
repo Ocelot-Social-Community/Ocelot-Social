@@ -26,6 +26,7 @@ enum NotificationReason {
   user_left_group
   changed_group_member_role
   removed_user_from_group
+  followed_user_posted
 }
 
 type Query {
