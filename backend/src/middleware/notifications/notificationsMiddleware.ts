@@ -2,7 +2,7 @@ import { pubsub, NOTIFICATION_ADDED } from '../../server'
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 import { validateNotifyUsers } from '../validation/validationMiddleware'
 import { sendMail } from '../helpers/email/sendMail'
-import { notificationTemplate } from '../helpers/email/templateBuilder'
+import { chatMessageTemplate, notificationTemplate } from '../helpers/email/templateBuilder'
 
 const queryNotificationEmails = async (context, notificationUserIds) => {
   if (!(notificationUserIds && notificationUserIds.length)) return []
@@ -311,44 +311,49 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
 
   // Find Recipient
   const session = context.driver.session()
-  const messageRecipient = await session.readTransaction(async (transaction) => {
+  const messageRecipient = session.readTransaction(async (transaction) => {
     const messageRecipientCypher = `
       MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
-      MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
+      MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
         WHERE NOT recipientUser.id = $currentUserId
-      RETURN recipientUser
+      RETURN recipientUser, emailAddress {.email}
     `
-    const messageRecipientTxResponse = await transaction.run(messageRecipientCypher, {
+    const txResponse = await transaction.run(messageRecipientCypher, {
       currentUserId,
       roomId,
     })
 
-    const [recipientUser] = await messageRecipientTxResponse.records.map((record) =>
-      record.get('recipientUser'),
-    )
-    return recipientUser
+    return {
+      user: await txResponse.records.map((record) => record.get('recipientUser'))[0],
+      email: await txResponse.records.map((record) => record.get('emailAddress'))[0].email,
+    }
   })
 
-  session.close()
+  try {
+    const { user, email } = await messageRecipient
 
-  // Is Recipient online
-  const lastActive = new Date(messageRecipient.properties.lastActiveAt).getTime()
-  const awaySince = new Date(messageRecipient.properties.awaySince).getTime()
-  const now = new Date().getTime()
-  const status = messageRecipient.properties.lastOnlineStatus
-  // online & last active less than 1.5min -> no action
-  if (status === 'online' && now - lastActive < 90000) {
+    // Is Recipient online
+    const lastActive = new Date(user.properties.lastActiveAt).getTime()
+    const awaySince = new Date(user.properties.awaySince).getTime()
+    const now = new Date().getTime()
+    const status = user.properties.lastOnlineStatus
+    // online & last active less than 1.5min -> no action
+    if (status === 'online' && now - lastActive < 90000) {
+      return resolve(root, args, context, resolveInfo)
+    }
+    // away for less then 3min -> no action
+    if (status === 'away' && now - awaySince < 180000) {
+      return resolve(root, args, context, resolveInfo)
+    }
+
+    sendMail(chatMessageTemplate({ email, variables: { name: user.properties.name } }))
+
     return resolve(root, args, context, resolveInfo)
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
   }
-  // away for less then 3min -> no action
-  if (status === 'away' && now - awaySince < 180000) {
-    return resolve(root, args, context, resolveInfo)
-  }
-
-  // TODO
-  console.log('do notify via email', messageRecipient)
-
-  return resolve(root, args, context, resolveInfo)
 }
 
 export default {
