@@ -3,6 +3,7 @@ import extractMentionedUsers from './mentions/extractMentionedUsers'
 import { validateNotifyUsers } from '../validation/validationMiddleware'
 import { sendMail } from '../helpers/email/sendMail'
 import { chatMessageTemplate, notificationTemplate } from '../helpers/email/templateBuilder'
+import { isUserOnline } from '../helpers/isUserOnline'
 
 const queryNotificationEmails = async (context, notificationUserIds) => {
   if (!(notificationUserIds && notificationUserIds.length)) return []
@@ -304,6 +305,10 @@ const notifyUsersOfComment = async (label, commentId, postAuthorId, reason, cont
 }
 
 const handleCreateMessage = async (resolve, root, args, context, resolveInfo) => {
+  // Execute resolver
+  const result = await resolve(root, args, context, resolveInfo)
+
+  // Query Parameters
   const { roomId } = args
   const {
     user: { id: currentUserId },
@@ -330,25 +335,16 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
   })
 
   try {
+    // Execute Query
     const { user, email } = await messageRecipient
 
-    // Is Recipient online
-    const lastActive = new Date(user.properties.lastActiveAt).getTime()
-    const awaySince = new Date(user.properties.awaySince).getTime()
-    const now = new Date().getTime()
-    const status = user.properties.lastOnlineStatus
-    // online & last active less than 1.5min -> no action
-    if (status === 'online' && now - lastActive < 90000) {
-      return resolve(root, args, context, resolveInfo)
-    }
-    // away for less then 3min -> no action
-    if (status === 'away' && now - awaySince < 180000) {
-      return resolve(root, args, context, resolveInfo)
+    // Send EMail if not considered online
+    if (!isUserOnline(user)) {
+      void sendMail(chatMessageTemplate({ email, variables: { name: user.properties.name } }))
     }
 
-    sendMail(chatMessageTemplate({ email, variables: { name: user.properties.name } }))
-
-    return resolve(root, args, context, resolveInfo)
+    // Return resolver result to client
+    return result
   } catch (error) {
     throw new Error(error)
   } finally {
