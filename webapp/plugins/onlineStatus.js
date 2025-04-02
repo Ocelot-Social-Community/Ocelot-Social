@@ -15,9 +15,6 @@ const updateOnlineStatus = async () => {
     mutation: updateOnlineStatusMutation,
     variables: { status },
   })
-
-  // TODO
-  console.log(`call home as ${status} at ${new Date().toUTCString()}`)
 }
 
 export default ({ app }) => {
