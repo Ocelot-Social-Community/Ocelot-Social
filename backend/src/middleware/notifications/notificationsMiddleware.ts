@@ -332,7 +332,7 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
 
     return {
       user: await txResponse.records.map((record) => record.get('recipientUser'))[0],
-      email: await txResponse.records.map((record) => record.get('emailAddress'))[0].email,
+      email: await txResponse.records.map((record) => record.get('emailAddress'))[0]?.email,
     }
   })
 
