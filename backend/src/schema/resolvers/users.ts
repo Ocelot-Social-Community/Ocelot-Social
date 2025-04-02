@@ -320,16 +320,27 @@ export default {
         user: { id },
       } = context
 
+      const CYPHER_AWAY = `
+          MATCH (user:User {id: $id})
+          WITH user,
+          CASE user.lastOnlineStatus
+            WHEN 'away' THEN user.awaySince
+            ELSE toString(datetime())
+          END AS awaySince
+          SET user.awaySince = awaySince
+          SET user.lastOnlineStatus = $status
+        `
+      const CYPHER_ONLINE = `
+          MATCH (user:User {id: $id})
+            SET user.awaySince = null
+            SET user.lastOnlineStatus = $status
+        `
+
       // Last Online Time is saved as `lastActiveAt`
       const session = context.driver.session()
       await session.writeTransaction((transaction) => {
-        return transaction.run(
-          `
-          MATCH (user:User {id: $id})
-            SET user.lastOnlineStatus = $status
-        `,
-          { id, status },
-        )
+        // return transaction.run(status === 'away' ? CYPHER_AWAY : CYPHER_ONLINE, { id, status })
+        return transaction.run(status === 'away' ? CYPHER_AWAY : CYPHER_ONLINE, { id, status })
       })
 
       return true

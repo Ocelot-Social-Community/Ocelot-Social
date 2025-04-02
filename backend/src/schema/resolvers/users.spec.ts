@@ -777,6 +777,9 @@ describe('updateOnlineStatus', () => {
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'online',
         })
+        await expect(dbUser.toJson()).resolves.not.toMatchObject({
+          awaySince: expect.any(String),
+        })
       })
     })
 
@@ -799,6 +802,38 @@ describe('updateOnlineStatus', () => {
         const dbUser = neode.hydrateFirst(result, 'u', neode.model('User'))
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
+          awaySince: expect.any(String),
+        })
+      })
+
+      it('stores the timestamp of the first away call', async () => {
+        await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toEqual(
+          expect.objectContaining({
+            data: { updateOnlineStatus: true },
+          }),
+        )
+
+        const cypher = 'MATCH (u:User {id: $id}) RETURN u'
+        const result = await neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser = neode.hydrateFirst(result, 'u', neode.model('User'))
+        await expect(dbUser.toJson()).resolves.toMatchObject({
+          lastOnlineStatus: 'away',
+          awaySince: expect.any(String),
+        })
+
+        const awaySince = (await dbUser.toJson()).awaySince
+
+        await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toEqual(
+          expect.objectContaining({
+            data: { updateOnlineStatus: true },
+          }),
+        )
+
+        const result2 = await neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser2 = neode.hydrateFirst(result2, 'u', neode.model('User'))
+        await expect(dbUser2.toJson()).resolves.toMatchObject({
+          lastOnlineStatus: 'away',
+          awaySince,
         })
       })
     })
