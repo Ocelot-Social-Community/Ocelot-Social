@@ -303,6 +303,54 @@ const notifyUsersOfComment = async (label, commentId, postAuthorId, reason, cont
   }
 }
 
+const handleCreateMessage = async (resolve, root, args, context, resolveInfo) => {
+  const { roomId } = args
+  const {
+    user: { id: currentUserId },
+  } = context
+
+  // Find Recipient
+  const session = context.driver.session()
+  const messageRecipient = await session.readTransaction(async (transaction) => {
+    const messageRecipientCypher = `
+      MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+      MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
+        WHERE NOT recipientUser.id = $currentUserId
+      RETURN recipientUser
+    `
+    const messageRecipientTxResponse = await transaction.run(messageRecipientCypher, {
+      currentUserId,
+      roomId,
+    })
+
+    const [recipientUser] = await messageRecipientTxResponse.records.map((record) =>
+      record.get('recipientUser'),
+    )
+    return recipientUser
+  })
+
+  session.close()
+
+  // Is Recipient online
+  const lastActive = new Date(messageRecipient.properties.lastActiveAt).getTime()
+  const awaySince = new Date(messageRecipient.properties.awaySince).getTime()
+  const now = new Date().getTime()
+  const status = messageRecipient.properties.lastOnlineStatus
+  // online & last active less than 1.5min -> no action
+  if (status === 'online' && now - lastActive < 90000) {
+    return resolve(root, args, context, resolveInfo)
+  }
+  // away for less then 3min -> no action
+  if (status === 'away' && now - awaySince < 180000) {
+    return resolve(root, args, context, resolveInfo)
+  }
+
+  // TODO
+  console.log('do notify via email', messageRecipient)
+
+  return resolve(root, args, context, resolveInfo)
+}
+
 export default {
   Mutation: {
     CreatePost: handleContentDataOfPost,
@@ -313,5 +361,6 @@ export default {
     LeaveGroup: handleLeaveGroup,
     ChangeGroupMemberRole: handleChangeGroupMemberRole,
     RemoveUserFromGroup: handleRemoveUserFromGroup,
+    CreateMessage: handleCreateMessage,
   },
 }
