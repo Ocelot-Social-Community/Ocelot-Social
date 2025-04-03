@@ -91,7 +91,7 @@ docker exec backend yarn db:migrate init
 # for docker production:
 docker exec backend yarn prod:migrate init
 ```
-> Note: the `init` command will break some indices & constrains when executed after `up`
+
 
 ```sh
 # in backend/ with database running (In docker or local)
