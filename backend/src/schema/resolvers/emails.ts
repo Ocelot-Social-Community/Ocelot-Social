@@ -85,6 +85,8 @@ export default {
           `
             MATCH (user:User {id: $userId})-[:PRIMARY_EMAIL]->(previous:EmailAddress)
             MATCH (user)<-[:BELONGS_TO]-(email:UnverifiedEmailAddress {email: $email, nonce: $nonce})
+            OPTIONAL MATCH (abandonedEmail:EmailAddress{email: $email}) WHERE NOT EXISTS ((abandonedEmail)<-[]-())
+            DELETE abandonedEmail
             MERGE (user)-[:PRIMARY_EMAIL]->(email)
             SET email:EmailAddress
             SET email.verifiedAt = toString(datetime())
