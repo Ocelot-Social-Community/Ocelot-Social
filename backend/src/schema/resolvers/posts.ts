@@ -485,7 +485,8 @@ export default {
         shoutedCount:
           '<-[:SHOUTED]-(related:User) WHERE NOT related.deleted = true AND NOT related.disabled = true',
         emotionsCount: '<-[related:EMOTED]-(:User)',
-        observingUsersCount: '<-[related:OBSERVES]-(:User) WHERE related.active = true',
+        observingUsersCount:
+          '<-[obs:OBSERVES]-(related:User) WHERE obs.active = true AND NOT related.deleted = true AND NOT related.disabled = true',
       },
       boolean: {
         shoutedByCurrentUser:
