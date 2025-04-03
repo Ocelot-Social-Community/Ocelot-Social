@@ -130,6 +130,7 @@ export default {
     { src: '~/plugins/vue-observe-visibility.js', ssr: false },
     { src: '~/plugins/v-mapbox.js', mode: 'client' },
     { src: '~/plugins/vue-advanced-chat.js', mode: 'client' },
+    { src: '~/plugins/onlineStatus.js', mode: 'client' },
   ],
 
   router: {
