@@ -4,12 +4,31 @@ class Store {
   async init(errFn) {
     const neode = getNeode()
     const session = neode.driver.session()
-    const writeTxResultPromise = session.writeTransaction(async (txc) => {
+    const txFreshIndicesConstrains = session.writeTransaction(async (txc) => {
       await txc.run('CALL apoc.schema.assert({},{},true)') // drop all indices and constraints
+      /* 
+      #############################################
+      # ADD YOUR CUSTOM INDICES & CONSTRAINS HERE #
+      #############################################
+      */
+      // Search indexes (also part of migration 20230320130345-fulltext-search-indexes)
+      await txc.run(
+        `CALL db.index.fulltext.createNodeIndex("user_fulltext_search",["User"],["name", "slug"])`,
+      )
+      await txc.run(
+        `CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"])`,
+      )
+      await txc.run(`CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"])`) // also part of migration 20200207080200-fulltext_index_for_tags
+      // Search indexes (also part of migration 20220803060819-create_fulltext_indices_and_unique_keys_for_groups)
+      await txc.run(`
+        CALL db.index.fulltext.createNodeIndex("group_fulltext_search",["Group"],["name", "slug", "about", "description"])
+      `)
     })
     try {
-      // TODO: this breaks custom constraints, but neode.schema.drop() does not work
-      await writeTxResultPromise
+      // Due to limitations of neode in combination with the limitations of the community version of neo4j
+      // we need to have all constraints and indexes defined here. They can not be properly migrated
+      await txFreshIndicesConstrains
+
       await getNeode().schema.install()
       // eslint-disable-next-line no-console
       console.log('Successfully installed neode schema!')
