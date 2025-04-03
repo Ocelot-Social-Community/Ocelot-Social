@@ -135,5 +135,7 @@ export const commentFragment = gql`
     deleted
     content
     contentExcerpt
+    isPostObservedByMe
+    postObservingUsersCount
   }
 `

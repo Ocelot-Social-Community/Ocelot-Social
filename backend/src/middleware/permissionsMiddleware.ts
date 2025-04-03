@@ -462,6 +462,7 @@ export default shield(
       switchUserRole: isAdmin,
       markTeaserAsViewed: allow,
       saveCategorySettings: isAuthenticated,
+      updateOnlineStatus: isAuthenticated,
       CreateRoom: isAuthenticated,
       CreateMessage: isAuthenticated,
       MarkMessagesAsSeen: isAuthenticated,

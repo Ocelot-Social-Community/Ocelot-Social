@@ -22,6 +22,8 @@ const createCommentMutation = gql`
   mutation ($id: ID, $postId: ID!, $content: String!) {
     CreateComment(id: $id, postId: $postId, content: $content) {
       id
+      isPostObservedByMe
+      postObservingUsersCount
     }
   }
 `
@@ -122,11 +124,20 @@ describe('observing posts', () => {
     })
 
     it('has another user observing the post AFTER commenting it', async () => {
-      await mutate({
-        mutation: createCommentMutation,
-        variables: {
-          postId: 'p2',
-          content: 'After commenting the post, I should observe the post automatically',
+      await expect(
+        mutate({
+          mutation: createCommentMutation,
+          variables: {
+            postId: 'p2',
+            content: 'After commenting the post, I should observe the post automatically',
+          },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          CreateComment: {
+            isPostObservedByMe: true,
+            postObservingUsersCount: 2,
+          },
         },
       })
 
@@ -187,12 +198,21 @@ describe('observing posts', () => {
 
     describe('comment the post again', () => {
       it('does NOT alter the observation state', async () => {
-        await mutate({
-          mutation: createCommentMutation,
-          variables: {
-            postId: 'p2',
-            content:
-              'After commenting the post I do not observe again, I should NOT observe the post',
+        await expect(
+          mutate({
+            mutation: createCommentMutation,
+            variables: {
+              postId: 'p2',
+              content:
+                'After commenting the post I do not observe again, I should NOT observe the post',
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            CreateComment: {
+              isPostObservedByMe: false,
+              postObservingUsersCount: 1,
+            },
           },
         })
 
