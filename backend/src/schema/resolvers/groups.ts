@@ -200,7 +200,7 @@ export default {
 
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds) {
         if (categoryIds.length < CATEGORIES_MIN) {
-          throw new UserInputError('Too view categories!')
+          throw new UserInputError('Too few categories!')
         }
         if (categoryIds.length > CATEGORIES_MAX) {
           throw new UserInputError('Too many categories!')
