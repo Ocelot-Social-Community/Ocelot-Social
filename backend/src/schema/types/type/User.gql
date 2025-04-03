@@ -224,6 +224,8 @@ type Mutation {
   switchUserRole(role: UserRole!, id: ID!): User
 
   saveCategorySettings(activeCategories: [String]): Boolean
+  
+  updateOnlineStatus(status: OnlineStatus!): Boolean!
 
   requestPasswordReset(email: String!): Boolean!
   resetPassword(email: String!, nonce: String!, newPassword: String!): Boolean!
