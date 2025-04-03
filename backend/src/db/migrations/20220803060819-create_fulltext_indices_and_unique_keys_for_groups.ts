@@ -18,9 +18,13 @@ export async function up(next) {
     // await transaction.run(`
     //   CREATE CONSTRAINT ON ( group:Group ) ASSERT group.slug IS UNIQUE
     // `)
+
+    // We do do this in /src/db/migrate/store.ts
+    /*
     await transaction.run(`
       CALL db.index.fulltext.createNodeIndex("group_fulltext_search",["Group"],["name", "slug", "about", "description"])
     `)
+    */
     await transaction.commit()
     next()
   } catch (error) {
@@ -42,6 +46,8 @@ export async function down(next) {
 
   try {
     // Implement your migration here.
+    // We do do this in /src/db/migrate/store.ts
+    /*
     await transaction.run(`
       DROP CONSTRAINT ON ( group:Group ) ASSERT group.id IS UNIQUE
     `)
@@ -52,6 +58,7 @@ export async function down(next) {
       CALL db.index.fulltext.drop("group_fulltext_search")
     `)
     await transaction.commit()
+    */
     next()
   } catch (error) {
     // eslint-disable-next-line no-console
