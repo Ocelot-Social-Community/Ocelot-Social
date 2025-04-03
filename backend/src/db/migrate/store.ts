@@ -1,104 +1,24 @@
 import { getDriver, getNeode } from '../../db/neo4j'
-import { hashSync } from 'bcryptjs'
-import { v4 as uuid } from 'uuid'
-import { categories } from '../../constants/categories'
-import CONFIG from '../../config'
-
-const defaultAdmin = {
-  email: 'admin@example.org',
-  password: hashSync('1234', 10),
-  name: 'admin',
-  id: uuid(),
-  slug: 'admin',
-}
-
-const createCategories = async (session) => {
-  const createCategoriesTxResultPromise = session.writeTransaction(async (txc) => {
-    categories.forEach(({ icon, name }, index) => {
-      const id = `cat${index + 1}`
-      txc.run(
-        `MERGE (c:Category {
-          icon: "${icon}",
-          slug: "${name}",
-          name: "${name}",
-          id: "${id}",
-          createdAt: toString(datetime())
-        })`,
-      )
-    })
-  })
-  try {
-    await createCategoriesTxResultPromise
-    console.log('Successfully created categories!') // eslint-disable-line no-console
-  } catch (error) {
-    console.log(`Error creating categories: ${error}`) // eslint-disable-line no-console
-  }
-}
-
-const createDefaultAdminUser = async (session) => {
-  const readTxResultPromise = session.readTransaction(async (txc) => {
-    const result = await txc.run('MATCH (user:User) RETURN count(user) AS userCount')
-    return result.records.map((r) => r.get('userCount'))
-  })
-  let createAdmin = false
-  try {
-    const userCount = parseInt(String(await readTxResultPromise))
-    if (userCount === 0) createAdmin = true
-  } catch (error) {
-    console.log(error) // eslint-disable-line no-console
-  }
-  if (createAdmin) {
-    const createAdminTxResultPromise = session.writeTransaction(async (txc) => {
-      txc.run(
-        `MERGE (e:EmailAddress {
-           email: "${defaultAdmin.email}",
-           createdAt: toString(datetime())
-         })-[:BELONGS_TO]->(u:User {
-           name: "${defaultAdmin.name}",
-           encryptedPassword: "${defaultAdmin.password}",
-           role: "admin",
-           id: "${defaultAdmin.id}",
-           slug: "${defaultAdmin.slug}",
-           createdAt: toString(datetime()),
-           allowEmbedIframes: false,
-           showShoutsPublicly: false,
-           sendNotificationEmails: true,
-           deleted: false,
-           disabled: false
-         })-[:PRIMARY_EMAIL]->(e)`,
-      )
-    })
-    try {
-      await createAdminTxResultPromise
-      console.log('Successfully created default admin user!') // eslint-disable-line no-console
-    } catch (error) {
-      console.log(error) // eslint-disable-line no-console
-    }
-  }
-}
 
 class Store {
-  async init(next) {
+  async init(errFn) {
     const neode = getNeode()
-    const { driver } = neode
-    const session = driver.session()
-    await createDefaultAdminUser(session)
-    if (CONFIG.CATEGORIES_ACTIVE) await createCategories(session)
+    const session = neode.driver.session()
     const writeTxResultPromise = session.writeTransaction(async (txc) => {
       await txc.run('CALL apoc.schema.assert({},{},true)') // drop all indices and constraints
     })
     try {
+      // TODO: this breaks custom constraints, but neode.schema.drop() does not work
       await writeTxResultPromise
       await getNeode().schema.install()
       // eslint-disable-next-line no-console
-      console.log('Successfully created database indices and constraints!')
-      next()
+      console.log('Successfully installed neode schema!')
     } catch (error) {
       console.log(error) // eslint-disable-line no-console
-      next(error, null)
+      errFn(error)
     } finally {
       session.close()
-      driver.close()
+      neode.driver.close()
     }
   }
 

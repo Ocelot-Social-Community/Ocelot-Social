@@ -8,19 +8,19 @@
   "private": false,
   "main": "src/index.ts",
   "scripts": {
-    "__migrate": "migrate --compiler 'ts:./src/db/compiler.ts' --migrations-dir ./src/db/migrations",
-    "prod:migrate": "migrate --migrations-dir ./build/src/db/migrations --store ./build/src/db/migrate/store.js",
     "start": "node build/src/",
     "build": "tsc && ./scripts/build.copy.files.sh",
     "dev": "nodemon --exec ts-node src/ -e js,ts,gql",
     "dev:debug": "nodemon --exec babel-node --inspect=0.0.0.0:9229 src/ -e js,ts,gql",
     "lint": "eslint --max-warnings=0 --ext .js,.ts ./src",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--max-old-space-size=8192 jest --runInBand --coverage --forceExit --detectOpenHandles",
-    "db:clean": "ts-node src/db/clean.ts",
-    "db:reset": "yarn run db:clean",
+    "db:reset": "ts-node src/db/clean.ts",
     "db:seed": "ts-node src/db/seed.ts",
-    "db:migrate": "yarn run __migrate --store ./src/db/migrate/store.ts",
-    "db:migrate:create": "yarn run __migrate --template-file ./src/db/migrate/template.ts --date-format 'yyyymmddHHmmss' create"
+    "db:data:admin": "ts-node src/db/admin.ts",
+    "db:data:categories": "ts-node src/db/categories.ts",
+    "db:migrate": "migrate --compiler 'ts:./src/db/compiler.ts' --migrations-dir ./src/db/migrations --store ./src/db/migrate/store.ts",
+    "db:migrate:create": "migrate --compiler 'ts:./src/db/compiler.ts' --migrations-dir ./src/db/migrations --template-file ./src/db/migrate/template.ts --date-format 'yyyymmddHHmmss' create",
+    "prod:migrate": "migrate --migrations-dir ./build/src/db/migrations --store ./build/src/db/migrate/store.js"
   },
   "dependencies": {
     "@babel/cli": "~7.27.0",

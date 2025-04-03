@@ -79,89 +79,65 @@ More details about our GraphQL playground and how to use it with ocelot.social c
 
 ![GraphQL Playground](../.gitbook/assets/graphql-playground.png)
 
-### Database Indexes and Constraints
+## Database
 
-Database indexes and constraints need to be created and upgraded when the database and the backend are running:
+A fresh database needs to be initialized and migrated.
 
-::: tabs
-@tab:active Docker
-
-```bash
-# in main folder while docker-compose is running
-$ docker exec backend yarn run db:migrate init
-
-# only once: init admin user and create indexes and constraints in Neo4j database
-# for development
-$ docker compose exec backend yarn prod:migrate init
-# in production mode use command
-$ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
-```
-
-```bash
-# in main folder with docker compose running
-$ docker exec backend yarn run db:migrate up
-```
-
-@tab Without Docker
-
-```bash
+```sh
 # in folder backend/ while database is running
-# make sure your database is running on http://localhost:7474/browser/
-yarn run db:migrate init
+yarn db:migrate init
+# for docker environments:
+docker exec backend yarn db:migrate init
+# for docker production:
+docker exec backend yarn prod:migrate init
 ```
+> Note: the `init` command will break some indices & constrains when executed after `up`
 
-```bash
+```sh
 # in backend/ with database running (In docker or local)
-yarn run db:migrate up
+yarn db:migrate up
+# for docker development:
+docker exec backend yarn db:migrate up
+# for docker production
+docker exec backend yarn prod:migrate up
 ```
 
-:::
+### Optional Data
 
-#### Seed Database
+You can seed some optional data into the database.
 
-If you want your backend to return anything else than an empty response, you
-need to seed your database:
-
-::: tabs
-@tab:active Docker
-
-In another terminal run:
-
-```bash
-# in main folder while docker-compose is running
-$ docker exec backend yarn run db:seed
+To create the default admin 'admin@example.org' with password `1234` use
+```sh
+yarn db:data:admin
 ```
 
-To reset the database run:
+When using `CATEGORIES_ACTIVE=true` you also want to seed the categories with
+```sh
+yarn db:data:categories
+```
 
-```bash
-# in main folder while docker-compose is running
-$ docker exec backend yarn run db:reset
+### Seed Data
+
+For a predefined set of testdata you can seed the database with:
+```sh
+yarn db:seed
+# for docker
+docker exec backend yarn db:seed
+```
+
+### Reset Data
+
+In order to reset the database you can run 
+
+```sh
+yarn db:reset
+# for docker
+docker exec backend yarn db:reset
 # you could also wipe out your neo4j database and delete all volumes with:
-$ docker-compose down -v
-# if container is not running, run this command to set up your database indexes and constraints
-$ docker exec backend yarn run db:migrate init
-# And then upgrade the indexes and const
-$ docker exec backend yarn run db:migrate up
+docker-compose down -v
 ```
 
-@tab Without Docker
-
-Run:
-
-```bash
-# in backend/ while database is running
-$ yarn run db:seed
-```
-
-To reset the database run:
-
-```bash
-# in backend/ while database is running
-$ yarn run db:reset
-```
-
-:::
+> Note: This just deletes the data and not the constraints, hence you do not need to rerun `yarn db:migrate init` or `yarn db:migrate up`.
 
 ### Data migrations
 
