@@ -5,7 +5,8 @@ class Store {
     const neode = getNeode()
     const session = neode.driver.session()
     const txFreshIndicesConstrains = session.writeTransaction(async (txc) => {
-      await txc.run('CALL apoc.schema.assert({},{},true)') // drop all indices and constraints
+      // drop all indices and constraints
+      await txc.run('CALL apoc.schema.assert({},{},true)')
       /* 
       #############################################
       # ADD YOUR CUSTOM INDICES & CONSTRAINS HERE #
