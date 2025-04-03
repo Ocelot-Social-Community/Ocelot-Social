@@ -14,7 +14,7 @@
     "dev:debug": "nodemon --exec babel-node --inspect=0.0.0.0:9229 src/ -e js,ts,gql",
     "lint": "eslint --max-warnings=0 --ext .js,.ts ./src",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--max-old-space-size=8192 jest --runInBand --coverage --forceExit --detectOpenHandles",
-    "db:reset": "ts-node src/db/clean.ts",
+    "db:reset": "ts-node src/db/reset.ts",
     "db:seed": "ts-node src/db/seed.ts",
     "db:data:admin": "ts-node src/db/admin.ts",
     "db:data:categories": "ts-node src/db/categories.ts",
