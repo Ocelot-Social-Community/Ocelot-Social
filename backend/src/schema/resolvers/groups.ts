@@ -130,7 +130,7 @@ export default {
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
       if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
-        throw new UserInputError('Too view categories!')
+        throw new UserInputError('Too few categories!')
       }
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
         throw new UserInputError('Too many categories!')
