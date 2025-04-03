@@ -6,6 +6,7 @@ import {
   resetPasswordTemplate,
   wrongAccountTemplate,
   notificationTemplate,
+  chatMessageTemplate,
 } from './templateBuilder'
 
 const englishHint = 'English version below!'
@@ -34,6 +35,12 @@ const resetPasswordTemplateData = () => ({
     name: 'Mr Example',
   },
 })
+const chatMessageTemplateData = {
+  email: 'test@example.org',
+  variables: {
+    name: 'Mr Example',
+  },
+}
 const wrongAccountTemplateData = () => ({
   email: 'test@example.org',
   variables: {},
@@ -155,6 +162,31 @@ describe('templateBuilder', () => {
           actionUrl,
           theResetPasswordTemplateData.variables.nonce,
           theResetPasswordTemplateData.variables.name,
+          enContent,
+          deContent,
+          supportUrl,
+        ])
+      })
+    })
+  })
+
+  describe('chatMessageTemplate', () => {
+    describe('multi language', () => {
+      it('e-mail is build with all data', () => {
+        const subject = 'Neue Chatnachricht | New chat message'
+        const actionUrl = new URL('/chat', CONFIG.CLIENT_URI).toString()
+        const enContent = 'You have received a new chat message. Click here to read:'
+        const deContent = 'Du hast eine neue Chatnachricht erhalten. Klicke hier, um sie zu lesen:'
+        testEmailData(null, chatMessageTemplate, chatMessageTemplateData, [
+          ...textsStandard,
+          {
+            templPropName: 'subject',
+            isContaining: false,
+            text: subject,
+          },
+          englishHint,
+          actionUrl,
+          chatMessageTemplateData.variables.name,
           enContent,
           deContent,
           supportUrl,
