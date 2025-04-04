@@ -101,7 +101,12 @@ const validateReview = async (resolve, root, args, context, info) => {
 }
 
 export const validateNotifyUsers = async (label, reason) => {
-  const reasonsAllowed = ['mentioned_in_post', 'mentioned_in_comment', 'commented_on_post']
+  const reasonsAllowed = [
+    'mentioned_in_post',
+    'mentioned_in_comment',
+    'commented_on_post',
+    'followed_user_posted',
+  ]
   if (!reasonsAllowed.includes(reason)) throw new Error('Notification reason is not allowed!')
   if (
     (label === 'Post' && reason !== 'mentioned_in_post') ||
