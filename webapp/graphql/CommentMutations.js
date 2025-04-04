@@ -13,6 +13,8 @@ export default (i18n) => {
           updatedAt
           disabled
           deleted
+          isPostObservedByMe
+          postObservingUsersCount
           author {
             id
             slug
