@@ -747,6 +747,9 @@
     "title": "Notifications",
     "user": "User"
   },
+  "observeButton": {
+    "observed": "observed"
+  },
   "post": {
     "comment": {
       "reply": "Reply",
@@ -778,8 +781,12 @@
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
+      "observe": "Observe post",
+      "observedSuccessfully": "You are now observing this post!",
       "pin": "Pin post",
       "pinnedSuccessfully": "Post pinned successfully!",
+      "unobserve": "Stop to observe post",
+      "unobservedSuccessfully": "You are no longer observing this post!",
       "unpin": "Unpin post",
       "unpinnedSuccessfully": "Post unpinned successfully!"
     },

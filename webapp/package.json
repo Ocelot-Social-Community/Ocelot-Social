@@ -40,6 +40,7 @@
     "express": "~4.21.2",
     "graphql": "~14.7.0",
     "intersection-observer": "^0.12.0",
+    "jest-serializer-vue": "^3.1.0",
     "jsonwebtoken": "~9.0.2",
     "linkify-it": "~5.0.0",
     "mapbox-gl": "1.13.2",
