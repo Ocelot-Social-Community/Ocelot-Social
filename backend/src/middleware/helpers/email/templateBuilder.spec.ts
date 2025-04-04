@@ -175,8 +175,8 @@ describe('templateBuilder', () => {
       it('e-mail is build with all data', () => {
         const subject = 'Neue Chatnachricht | New chat message'
         const actionUrl = new URL('/chat', CONFIG.CLIENT_URI).toString()
-        const enContent = 'You have received a new chat message. Click here to read:'
-        const deContent = 'Du hast eine neue Chatnachricht erhalten. Klicke hier, um sie zu lesen:'
+        const enContent = 'You have received a new chat message.'
+        const deContent = 'Du hast eine neue Chatnachricht erhalten.'
         testEmailData(null, chatMessageTemplate, chatMessageTemplateData, [
           ...textsStandard,
           {
