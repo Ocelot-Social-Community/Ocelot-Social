@@ -9,8 +9,8 @@ for locale_file in "${locale_list[@]}"
 do
     jq -n \
        -f $(dirname "$0")/normalize-locales.jq \
-       --argfile source $ROOT_DIR/webapp/locales/en.json \
-       --argfile target $ROOT_DIR/webapp/locales/$locale_file \
+       --slurpfile source $ROOT_DIR/webapp/locales/en.json \
+       --slurpfile target $ROOT_DIR/webapp/locales/$locale_file \
        > "$tmp"
     mv "$tmp" $ROOT_DIR/webapp/locales/$locale_file
 done
