@@ -24,7 +24,15 @@ import { updateUserMutation } from '~/graphql/User'
 export default {
   data() {
     return {
-      emailNotificationSettings: [...this.currentUser.emailNotificationSettings],
+      emailNotificationSettings: {
+        commentOnObservedPost: true,
+        postByFollowedUser: true,
+        postInGroup: true,
+        groupMemberJoined: true,
+        groupMemberLeft: true,
+        groupMemberRemoved: true,
+        groupMemberRoleChanged: true,
+      },
       topics: [
         {
           id: 'commentOnObservedPost',
@@ -32,13 +40,13 @@ export default {
         },
         { id: 'postByFollowedUser', name: this.$t('settings.notifications.postByFollowedUser') },
         { id: 'postInGroup', name: this.$t('settings.notifications.postInGroup') },
-        { id: 'groupMemberJoined', name: this.$t('settings.notifications.groupMemberJoined') },
-        { id: 'groupMemberLeft', name: this.$t('settings.notifications.groupMemberLeft') },
         { id: 'groupMemberRemoved', name: this.$t('settings.notifications.groupMemberRemoved') },
         {
           id: 'groupMemberRoleChanged',
           name: this.$t('settings.notifications.groupMemberRoleChanged'),
         },
+        { id: 'groupMemberJoined', name: this.$t('settings.notifications.groupMemberJoined') },
+        { id: 'groupMemberLeft', name: this.$t('settings.notifications.groupMemberLeft') },
       ],
     }
   },
@@ -51,6 +59,9 @@ export default {
         (value, index) => value === this.currentUser.emailNotificationSettings[index],
       )
     },
+  },
+  created() {
+    this.emailNotificationSettings = { ...this.currentUser.emailNotificationSettings }
   },
   methods: {
     ...mapMutations({
