@@ -12,6 +12,7 @@ import { PubSub } from 'graphql-subscriptions'
 import Redis from 'ioredis'
 import bodyParser from 'body-parser'
 import { graphqlUploadExpress } from 'graphql-upload'
+import { randomInt } from 'crypto'
 
 export const NOTIFICATION_ADDED = 'NOTIFICATION_ADDED'
 export const CHAT_MESSAGE_ADDED = 'CHAT_MESSAGE_ADDED'
@@ -59,13 +60,26 @@ export const context = async (options) => {
   }
 }
 
+const webSocketList: Record<string,WebSocket> = {}
+
 const createServer = (options?) => {
   const defaults = {
     context,
     schema: middleware(schema),
     subscriptions: {
       onConnect: (connectionParams, webSocket) => {
+        const random = randomInt(9999)
+        webSocket.identifier = `${connectionParams.authorization} ${random}`
+        console.log('onConnect', webSocket.identifier)
+        webSocketList[webSocket.identifier] = webSocket
+        console.log('connected sockets: ', Object.keys(webSocketList).length)
         return getContext(connectionParams)
+      },
+      onDisconnect: (webSocket) => {
+        console.log( 'onDisconnect', webSocket.identifier)
+        delete webSocketList[webSocket.identifier]
+        console.log('connected sockets: ', Object.keys(webSocketList).length)
+        // console.log('onDisconnect', webSocket, webSocket.rawHeaders)
       },
     },
     debug: !!CONFIG.DEBUG,
