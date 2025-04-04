@@ -1041,7 +1041,14 @@
     "notifications": {
       "name": "Notifications",
       "send-email-notifications": "Send e-mail notifications",
-      "success-update": "Notifications settings saved!"
+      "success-update": "Notifications settings saved!",
+      "commentOnObservedPost": "Comments on observed posts",
+      "postByFollowedUser": "Posts by users I follow",
+      "postInGroup": "Post in a group I am a member of",
+      "groupMemberJoined": "Member joined a group I own",
+      "groupMemberLeft": "Member left a group I own",
+      "groupMemberRoleChanged": "My role in a group was changed",
+      "groupMemberRemoved": "I was removed from a group"
     },
     "organizations": {
       "name": "My Organizations"
