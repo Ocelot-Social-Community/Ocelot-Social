@@ -26,7 +26,15 @@ describe('notifications.vue', () => {
           return {
             id: 'u343',
             name: 'MyAccount',
-            sendNotificationEmails: true,
+            emailNotificationSettings: {
+              commentOnObservedPost: true,
+              postByFollowedUser: true,
+              postInGroup: true,
+              groupMemberJoined: true,
+              groupMemberLeft: true,
+              groupMemberRemoved: true,
+              groupMemberRoleChanged: true,
+            },
           }
         },
       },

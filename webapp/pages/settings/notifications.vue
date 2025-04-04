@@ -2,7 +2,7 @@
   <base-card>
     <h2 class="title">{{ $t('settings.notifications.name') }}</h2>
     <ds-space margin-bottom="small" v-for="topic in topics" :key="topic.id">
-      <input :id="topic.id" type="checkbox" v-model="notifyByEmail[topic.id]" />
+      <input :id="topic.id" type="checkbox" v-model="emailNotificationSettings[topic.id]" />
       <label :for="topic.id">{{ topic.name }}</label>
     </ds-space>
     <base-button @click="activateAll">
@@ -24,13 +24,21 @@ import { updateUserMutation } from '~/graphql/User'
 export default {
   data() {
     return {
-      notifyByEmail: {
-        posts: false,
-        comments: false,
-      },
+      emailNotificationSettings: [...this.currentUser.emailNotificationSettings],
       topics: [
-        { id: 'posts', name: this.$t('settings.notifications.posts') },
-        { id: 'comments', name: this.$t('settings.notifications.comments') },
+        {
+          id: 'commentOnObservedPost',
+          name: this.$t('settings.notifications.commentOnObservedPost'),
+        },
+        { id: 'postByFollowedUser', name: this.$t('settings.notifications.postByFollowedUser') },
+        { id: 'postInGroup', name: this.$t('settings.notifications.postInGroup') },
+        { id: 'groupMemberJoined', name: this.$t('settings.notifications.groupMemberJoined') },
+        { id: 'groupMemberLeft', name: this.$t('settings.notifications.groupMemberLeft') },
+        { id: 'groupMemberRemoved', name: this.$t('settings.notifications.groupMemberRemoved') },
+        {
+          id: 'groupMemberRoleChanged',
+          name: this.$t('settings.notifications.groupMemberRoleChanged'),
+        },
       ],
     }
   },
@@ -39,22 +47,18 @@ export default {
       currentUser: 'auth/user',
     }),
     disabled() {
-      return this.notifyByEmail === this.currentUser.sendNotificationEmails
+      return this.emailNotificationSettings.every(
+        (value, index) => value === this.currentUser.emailNotificationSettings[index],
+      )
     },
-  },
-  created() {
-    this.notifyByEmail = {
-      posts: this.currentUser.sendNotificationEmails || false,
-      comments: this.currentUser.sendNotificationEmails || false,
-    }
   },
   methods: {
     ...mapMutations({
       setCurrentUser: 'auth/SET_USER',
     }),
     setAll(value) {
-      for (const key of Object.keys(this.notifyByEmail)) {
-        this.notifyByEmail[key] = value
+      for (const key of Object.keys(this.emailNotificationSettings)) {
+        this.emailNotificationSettings[key] = value
       }
     },
     activateAll() {
@@ -69,19 +73,19 @@ export default {
           mutation: updateUserMutation(),
           variables: {
             id: this.currentUser.id,
-            sendNotificationEmails: this.notifyByEmail,
+            emailNotificationSettings: this.emailNotificationSettings,
           },
           update: (_, { data: { UpdateUser } }) => {
-            const { sendNotificationEmails } = UpdateUser
+            const { emailNotificationSettings } = UpdateUser
             this.setCurrentUser({
               ...this.currentUser,
-              sendNotificationEmails,
+              emailNotificationSettings,
             })
             this.$toast.success(this.$t('settings.notifications.success-update'))
           },
         })
       } catch (error) {
-        this.notifyByEmail = !this.notifyByEmail
+        this.emailNotificationSettings = !this.emailNotificationSettings
         this.$toast.error(error.message)
       }
     },
