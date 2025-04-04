@@ -747,6 +747,9 @@
     "title": "Notificações",
     "user": "Usuário"
   },
+  "observeButton": {
+    "observed": null
+  },
   "post": {
     "comment": {
       "reply": null,
@@ -778,8 +781,12 @@
     "menu": {
       "delete": "Excluir publicação",
       "edit": "Editar publicação",
+      "observe": "Observar publicação",
+      "observedSuccessfully": null,
       "pin": "Fixar publicação",
       "pinnedSuccessfully": "Publicação fixada com sucesso!",
+      "unobserve": "Deixar de observar publicação",
+      "unobservedSuccessfully": null,
       "unpin": "Desafixar publicação",
       "unpinnedSuccessfully": "Publicação desafixada com sucesso!"
     },

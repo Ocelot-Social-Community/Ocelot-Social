@@ -500,6 +500,44 @@ describe('ContentMenu.vue', () => {
           ],
         ])
       })
+
+      it('can observe posts', async () => {
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'contribution',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            isObservedByMe: false,
+          },
+        })
+        wrapper
+          .findAll('.ds-menu-item')
+          .filter((item) => item.text() === 'post.menu.observe')
+          .at(0)
+          .trigger('click')
+        expect(wrapper.emitted('toggleObservePost')).toEqual([
+          ['d23a4265-f5f7-4e17-9f86-85f714b4b9f8', true],
+        ])
+      })
+
+      it('can unobserve posts', async () => {
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'contribution',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            isObservedByMe: true,
+          },
+        })
+        wrapper
+          .findAll('.ds-menu-item')
+          .filter((item) => item.text() === 'post.menu.unobserve')
+          .at(0)
+          .trigger('click')
+        expect(wrapper.emitted('toggleObservePost')).toEqual([
+          ['d23a4265-f5f7-4e17-9f86-85f714b4b9f8', false],
+        ])
+      })
     })
   })
 })
