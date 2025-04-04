@@ -28,16 +28,16 @@
       <report-row :key="report.id" :report="report" @confirm-report="$emit('confirm', report)" />
     </template>
   </table>
-  <hc-empty v-else icon="alert" :message="$t('moderation.reports.empty')" />
+  <empty v-else icon="alert" :message="$t('moderation.reports.empty')" />
 </template>
 
 <script>
-import HcEmpty from '~/components/Empty/Empty'
+import Empty from '~/components/Empty/Empty'
 import ReportRow from '~/components/features/ReportRow/ReportRow'
 
 export default {
   components: {
-    HcEmpty,
+    Empty,
     ReportRow,
   },
   props: {

@@ -97,11 +97,11 @@
       </ds-grid-item>
     </ds-grid>
   </div>
-  <hc-empty v-else icon="alert" :message="$t('notifications.empty')" />
+  <empty v-else icon="alert" :message="$t('notifications.empty')" />
 </template>
 <script>
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
-import HcEmpty from '~/components/Empty/Empty'
+import Empty from '~/components/Empty/Empty'
 import BaseCard from '../_new/generic/BaseCard/BaseCard.vue'
 import mobile from '~/mixins/mobile'
 
@@ -110,7 +110,7 @@ const maxMobileWidth = 768 // at this point the table breaks down
 export default {
   components: {
     UserTeaser,
-    HcEmpty,
+    Empty,
     BaseCard,
   },
   mixins: [mobile(maxMobileWidth)],

@@ -101,7 +101,7 @@
         <!-- no results -->
         <ds-grid-item v-else :row-span="7" column-span="fullWidth">
           <ds-space centered>
-            <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
+            <empty icon="tasks" :message="$t('search.no-results', { search })" />
           </ds-space>
         </ds-grid-item>
       </masonry-grid>
@@ -112,7 +112,7 @@
 <script>
 import postListActions from '~/mixins/postListActions'
 import { searchPosts, searchUsers, searchGroups, searchHashtags } from '~/graphql/Search.js'
-import HcEmpty from '~/components/Empty/Empty'
+import Empty from '~/components/Empty/Empty'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem'
 import PostTeaser from '~/components/PostTeaser/PostTeaser'
@@ -126,7 +126,7 @@ export default {
   name: 'SearchResults',
   components: {
     TabNavigation,
-    HcEmpty,
+    Empty,
     MasonryGrid,
     MasonryGridItem,
     PostTeaser,
