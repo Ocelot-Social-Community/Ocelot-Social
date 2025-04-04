@@ -12,7 +12,7 @@ import { PubSub } from 'graphql-subscriptions'
 import Redis from 'ioredis'
 import bodyParser from 'body-parser'
 import { graphqlUploadExpress } from 'graphql-upload'
-import { randomInt } from 'crypto'
+import { integer } from 'aws-sdk/clients/cloudfront'
 
 export const NOTIFICATION_ADDED = 'NOTIFICATION_ADDED'
 export const CHAT_MESSAGE_ADDED = 'CHAT_MESSAGE_ADDED'
@@ -60,7 +60,7 @@ export const context = async (options) => {
   }
 }
 
-const webSocketList: Record<string,WebSocket> = {}
+const webSocketList: Record<string,integer> = {}
 
 const createServer = (options?) => {
   const defaults = {
@@ -68,17 +68,25 @@ const createServer = (options?) => {
     schema: middleware(schema),
     subscriptions: {
       onConnect: (connectionParams, webSocket) => {
-        const random = randomInt(9999)
-        webSocket.identifier = `${connectionParams.authorization} ${random}`
+        webSocket.identifier = connectionParams.authorization
         console.log('onConnect', webSocket.identifier)
-        webSocketList[webSocket.identifier] = webSocket
-        console.log('connected sockets: ', Object.keys(webSocketList).length)
+        if(!webSocketList[webSocket.identifier]){
+          webSocketList[webSocket.identifier] = 1
+        } else {
+          webSocketList[webSocket.identifier] += 1
+        }
+        console.log('connections: ', webSocketList[webSocket.identifier])
+        console.log('connected users: ', Object.keys(webSocketList).length)
         return getContext(connectionParams)
       },
       onDisconnect: (webSocket) => {
         console.log( 'onDisconnect', webSocket.identifier)
-        delete webSocketList[webSocket.identifier]
-        console.log('connected sockets: ', Object.keys(webSocketList).length)
+        webSocketList[webSocket.identifier] -= 1
+        if(webSocketList[webSocket.identifier] === 0){
+          delete webSocketList[webSocket.identifier]
+        }
+        console.log('connections: ', webSocketList[webSocket.identifier])
+        console.log('connected users: ', Object.keys(webSocketList).length)
       },
     },
     debug: !!CONFIG.DEBUG,
