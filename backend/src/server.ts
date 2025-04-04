@@ -79,7 +79,6 @@ const createServer = (options?) => {
         console.log( 'onDisconnect', webSocket.identifier)
         delete webSocketList[webSocket.identifier]
         console.log('connected sockets: ', Object.keys(webSocketList).length)
-        // console.log('onDisconnect', webSocket, webSocket.rawHeaders)
       },
     },
     debug: !!CONFIG.DEBUG,
