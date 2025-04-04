@@ -12,7 +12,7 @@ export async function up(next) {
   try {
     // Implement your migration here.
     await transaction.run(`
-      MATCH (commenter:User)-[:WROTE]->(:COMMENT)->[:COMMENTS]->(post:Post)
+      MATCH (commenter:User)-[:WROTE]->(:COMMENT)-[:COMMENTS]->(post:Post)
       MERGE (commenter)-[obs:OBSERVES]->(post)
       ON CREATE SET
         obs.active = true,
