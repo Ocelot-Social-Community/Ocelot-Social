@@ -1,6 +1,6 @@
 import { getDriver } from '../../db/neo4j'
 
-export const description = 'Transforms the `sendNotificationEmails` property on User to a multi value system'
+export const description = ''
 
 export async function up(next) {
   const driver = getDriver()
