@@ -70,6 +70,24 @@ export default {
         })
       }
 
+      if (this.group.isMuted) {
+        routes.push({
+          label: this.$t('group.contentMenu.unmuteGroup'),
+          icon: 'volume-up',
+          callback: () => {
+            this.$emit('unmute', this.group.id)
+          },
+        })
+      } else {
+        routes.push({
+          label: this.$t('group.contentMenu.muteGroup'),
+          icon: 'volume-off',
+          callback: () => {
+            this.$emit('mute', this.group.id)
+          },
+        })
+      }
+
       return routes
     },
   },
