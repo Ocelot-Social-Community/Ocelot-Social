@@ -389,33 +389,41 @@ export default {
       }
 
       return [
-        {
-          name: 'commentOnObservedPost',
-          type: 'post',
-          value: parent.emailNotificationsCommentOnObservedPost ?? true,
-        },
-        {
-          name: 'mention',
-          type: 'post',
-          value: parent.emailNotificationsMention ?? true,
-        },
-        {
-          name: 'groupMemberJoined',
-          type: 'group',
-          value: parent.emailNotificationsGroupMemberJoined ?? true,
-        },
-        { name: 'groupMemberLeft', type: 'group', value: parent.emailNotificationsGroupMemberLeft ?? true},
-        {
-          name: 'groupMemberRemoved',
-          type: 'group',
-          value: parent.emailNotificationsGroupMemberRemoved ?? true,
-        },
-        {
-          name: 'groupMemberRoleChanged',
-          type: 'group',
-          value: parent.emailNotificationsGroupMemberRoleChanged ?? true,
-        },
-      ]
+  {
+    type: 'post',
+    settings: [
+      {
+        name: 'commentOnObservedPost',
+        value: parent.emailNotificationsPostByFollowedUser ?? true,
+      },
+      {
+        name: 'mention',
+        value: parent.emailNotificationsPostInGroup ?? true,
+      },
+    ],
+  },
+  {
+    type: 'group',
+    settings: [
+      {
+        name: 'groupMemberJoined',
+        value: parent.emailNotificationsGroupMemberJoined ?? true,
+      },
+      {
+        name: 'groupMemberLeft',
+        value: parent.emailNotificationsGroupMemberLeft ?? true,
+      },
+      {
+        name: 'groupMemberRemoved',
+        value: parent.emailNotificationsGroupMemberRemoved ?? true,
+      },
+      {
+        name: 'groupMemberRoleChanged',
+        value: parent.emailNotificationsGroupMemberRoleChanged ?? true,
+      },
+    ],
+  },
+]
     },
     ...Resolver('User', {
       undefinedToNull: [
