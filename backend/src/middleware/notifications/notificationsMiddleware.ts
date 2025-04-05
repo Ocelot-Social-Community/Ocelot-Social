@@ -31,7 +31,7 @@ const queryNotificationEmails = async (context, notificationUserIds) => {
   }
 }
 
-const publishNotifications = async (context, promises) => {
+const publishNotifications = async (context, promises, emailNotificationSetting: string) => {
   let notifications = await Promise.all(promises)
   notifications = notifications.flat()
   const notificationsEmailAddresses = await queryNotificationEmails(
@@ -40,7 +40,7 @@ const publishNotifications = async (context, promises) => {
   )
   notifications.forEach((notificationAdded, index) => {
     pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
-    if (notificationAdded.to.sendNotificationEmails) {
+    if (notificationAdded.to[emailNotificationSetting] ?? true) { // Default to true
       sendMail(
         notificationTemplate({
           email: notificationsEmailAddresses[index].email,
@@ -57,7 +57,7 @@ const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
   if (user) {
     await publishNotifications(context, [
       notifyOwnersOfGroup(groupId, userId, 'user_joined_group', context),
-    ])
+    ], 'emailNotificationsGroupMemberJoined')
   }
   return user
 }
@@ -68,7 +68,7 @@ const handleLeaveGroup = async (resolve, root, args, context, resolveInfo) => {
   if (user) {
     await publishNotifications(context, [
       notifyOwnersOfGroup(groupId, userId, 'user_left_group', context),
-    ])
+    ], 'emailNotificationsGroupMemberLeft')
   }
   return user
 }
@@ -79,7 +79,7 @@ const handleChangeGroupMemberRole = async (resolve, root, args, context, resolve
   if (user) {
     await publishNotifications(context, [
       notifyMemberOfGroup(groupId, userId, 'changed_group_member_role', context),
-    ])
+    ], 'emailNotificationsGroupMemberRoleChanged')
   }
   return user
 }
@@ -90,7 +90,7 @@ const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveIn
   if (user) {
     await publishNotifications(context, [
       notifyMemberOfGroup(groupId, userId, 'removed_user_from_group', context),
-    ])
+    ], 'emailNotificationsGroupMemberRemoved')
   }
   return user
 }
@@ -101,7 +101,7 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
   if (post) {
     await publishNotifications(context, [
       notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
-    ])
+    ], 'TODO')
   }
   return post
 }
@@ -120,10 +120,19 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
       'mentioned_in_comment',
       context,
     ),
+  ], 'TODO')
+
+  await publishNotifications(context, [
     notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context),
-  ])
+  ], 'emailNotificationsCommentOnObservedPost')
+  
   return comment
 }
+
+/* TODO unused
+emailNotificationsPostByFollowedUser: true
+emailNotificationsPostInGroup: true
+*/
 
 const postAuthorOfComment = async (commentId, { context }) => {
   const session = context.driver.session()

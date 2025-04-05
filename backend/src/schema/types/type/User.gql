@@ -19,6 +19,17 @@ enum _UserOrdering {
   locale_desc
 }
 
+input EmailNotificationSettingsInput {
+  name: String
+  value: Boolean
+}
+
+type EmailNotificationSettings {
+  name: String
+  type: String
+  value: Boolean
+}
+
 type User {
   id: ID!
   actorId: String
@@ -46,7 +57,7 @@ type User {
 
   allowEmbedIframes: Boolean
   showShoutsPublicly: Boolean
-  sendNotificationEmails: Boolean
+  emailNotificationSettings: [EmailNotificationSettings]!
   locale: String
   friends: [User]! @relation(name: "FRIENDS", direction: "BOTH")
   friendsCount: Int! @cypher(statement: "MATCH (this)<-[:FRIENDS]->(r:User) RETURN COUNT(DISTINCT r)")
@@ -206,7 +217,7 @@ type Mutation {
     termsAndConditionsAgreedAt: String
     allowEmbedIframes: Boolean
     showShoutsPublicly: Boolean
-    sendNotificationEmails: Boolean
+    emailNotificationSettings: [EmailNotificationSettingsInput]
     locale: String
   ): User
 

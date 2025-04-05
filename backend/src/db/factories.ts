@@ -70,7 +70,13 @@ Factory.define('basicUser')
     termsAndConditionsAgreedAt: '2019-08-01T10:47:19.212Z',
     allowEmbedIframes: false,
     showShoutsPublicly: false,
-    sendNotificationEmails: true,
+    emailNotificationsCommentOnObservedPost: true,
+    emailNotificationsPostByFollowedUser: true,
+    emailNotificationsPostInGroup: true,
+    emailNotificationsGroupMemberJoined: true,
+    emailNotificationsGroupMemberLeft: true,
+    emailNotificationsGroupMemberRemoved: true,
+    emailNotificationsGroupMemberRoleChanged: true,
     locale: 'en',
   })
   .attr('slug', ['slug', 'name'], (slug, name) => {

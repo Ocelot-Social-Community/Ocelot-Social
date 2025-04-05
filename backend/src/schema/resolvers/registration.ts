@@ -98,7 +98,13 @@ const signupCypher = (inviteCode) => {
       SET user.updatedAt = toString(datetime())
       SET user.allowEmbedIframes = false
       SET user.showShoutsPublicly = false
-      SET user.sendNotificationEmails = true
+      SET user.emailNotificationsCommentOnObservedPost = true
+      SET user.emailNotificationsPostByFollowedUser = true
+      SET user.emailNotificationsPostInGroup = true
+      SET user.emailNotificationsGroupMemberJoined = true
+      SET user.emailNotificationsGroupMemberLeft = true
+      SET user.emailNotificationsGroupMemberRemoved = true
+      SET user.emailNotificationsGroupMemberRoleChanged = true
       SET email.verifiedAt = toString(datetime())
       WITH user
       OPTIONAL MATCH (post:Post)-[:IN]->(group:Group)

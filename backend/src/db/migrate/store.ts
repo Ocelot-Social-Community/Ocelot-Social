@@ -53,19 +53,25 @@ const createDefaultAdminUser = async (session) => {
         `MERGE (e:EmailAddress {
            email: "${defaultAdmin.email}",
            createdAt: toString(datetime())
-         })-[:BELONGS_TO]->(u:User {
-           name: "${defaultAdmin.name}",
-           encryptedPassword: "${defaultAdmin.password}",
-           role: "admin",
-           id: "${defaultAdmin.id}",
-           slug: "${defaultAdmin.slug}",
-           createdAt: toString(datetime()),
-           allowEmbedIframes: false,
-           showShoutsPublicly: false,
-           sendNotificationEmails: true,
-           deleted: false,
-           disabled: false
-         })-[:PRIMARY_EMAIL]->(e)`,
+        })-[:BELONGS_TO]->(u:User {
+          name: "${defaultAdmin.name}",
+          encryptedPassword: "${defaultAdmin.password}",
+          role: "admin",
+          id: "${defaultAdmin.id}",
+          slug: "${defaultAdmin.slug}",
+          createdAt: toString(datetime()),
+          allowEmbedIframes: false,
+          showShoutsPublicly: false,
+          emailNotificationsCommentOnObservedPost: true
+          emailNotificationsPostByFollowedUser: true
+          emailNotificationsPostInGroup: true
+          emailNotificationsGroupMemberJoined: true
+          emailNotificationsGroupMemberLeft: true
+          emailNotificationsGroupMemberRemoved: true
+          emailNotificationsGroupMemberRoleChanged: true
+          deleted: false,
+          disabled: false
+        })-[:PRIMARY_EMAIL]->(e)`,
       )
     })
     try {

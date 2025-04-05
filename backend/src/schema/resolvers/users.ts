@@ -150,6 +150,30 @@ export default {
         }
         params.termsAndConditionsAgreedAt = new Date().toISOString()
       }
+
+      const {
+        emailNotificationSettings,
+      }: { emailNotificationSettings: { name: string; value: boolean }[] | undefined } = params
+      if (emailNotificationSettings) {
+        emailNotificationSettings.forEach((setting) => {
+          const allowedSettingNames = [
+            'commentOnObservedPost',
+            'postByFollowedUser',
+            'postInGroup',
+            'groupMemberJoined',
+            'groupMemberLeft',
+            'groupMemberRemoved',
+            'groupMemberRoleChanged',
+          ]
+          if (!allowedSettingNames.includes(setting.name)) {
+            return
+          }
+          params[
+            'emailNotifications' + setting.name.charAt(0).toUpperCase() + setting.name.slice(1)
+          ] = setting.value
+        })
+      }
+
       const session = context.driver.session()
 
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -355,6 +379,44 @@ export default {
       const [{ email }] = result.records.map((r) => r.get('e').properties)
       return email
     },
+    emailNotificationSettings: async (parent, params, context, resolveInfo) => {
+      const { user } = context
+      const { id } = parent
+      // Its not the own user
+      if (user.id !== id) {
+        return []
+      }
+
+      return [
+        {
+          name: 'commentOnObservedPost',
+          type: 'post',
+          value: user.emailNotificationsCommentOnObservedPost ?? true,
+        },
+        {
+          name: 'postByFollowedUser',
+          type: 'post',
+          value: user.emailNotificationsPostByFollowedUser ?? true,
+        },
+        { name: 'postInGroup', type: 'post', value: user.emailNotificationsPostInGroup ?? true},
+        {
+          name: 'groupMemberJoined',
+          type: 'group',
+          value: user.emailNotificationsGroupMemberJoined ?? true,
+        },
+        { name: 'groupMemberLeft', type: 'group', value: user.emailNotificationsGroupMemberLeft ?? true},
+        {
+          name: 'groupMemberRemoved',
+          type: 'group',
+          value: user.emailNotificationsGroupMemberRemoved ?? true,
+        },
+        {
+          name: 'groupMemberRoleChanged',
+          type: 'group',
+          value: user.emailNotificationsGroupMemberRoleChanged ?? true,
+        },
+      ]
+    },
     ...Resolver('User', {
       undefinedToNull: [
         'actorId',
@@ -366,7 +428,6 @@ export default {
         'termsAndConditionsAgreedAt',
         'allowEmbedIframes',
         'showShoutsPublicly',
-        'sendNotificationEmails',
         'locale',
       ],
       boolean: {
