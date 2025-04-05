@@ -30,10 +30,10 @@ describe('notifications.vue', () => {
               commentOnObservedPost: true,
               postByFollowedUser: true,
               postInGroup: true,
-              groupMemberJoined: true,
-              groupMemberLeft: true,
-              groupMemberRemoved: true,
-              groupMemberRoleChanged: true,
+              groupMemberJoined: false,
+              groupMemberLeft: false,
+              groupMemberRemoved: false,
+              groupMemberRoleChanged: false,
             },
           }
         },
@@ -56,15 +56,37 @@ describe('notifications.vue', () => {
 
     it('renders', () => {
       expect(wrapper.classes('base-card')).toBe(true)
+      // TODO snapshot match
     })
 
-    it('clicking on submit changes notifyByEmail to false', async () => {
-      await wrapper.find('#send-email').setChecked(false)
-      await wrapper.find('.base-button').trigger('click')
-      expect(wrapper.vm.notifyByEmail).toBe(false)
+    it('activate all button works', async () => {
+      await wrapper.find('#activate-all').trigger('click')
+      expect(wrapper.vm.emailNotificationSettings).toEqual({
+        commentOnObservedPost: true,
+        postByFollowedUser: true,
+        postInGroup: true,
+        groupMemberJoined: true,
+        groupMemberLeft: true,
+        groupMemberRemoved: true,
+        groupMemberRoleChanged: true,
+      })
     })
 
-    it('clicking on submit with a server error shows a toast and notifyByEmail is still true', async () => {
+    it('deactivate all button works', async () => {
+      await wrapper.find('#deactivate-all').trigger('click')
+      expect(wrapper.vm.emailNotificationSettings).toEqual({
+        commentOnObservedPost: false,
+        postByFollowedUser: false,
+        postInGroup: false,
+        groupMemberJoined: false,
+        groupMemberLeft: false,
+        groupMemberRemoved: false,
+        groupMemberRoleChanged: false,
+      })
+    })
+
+    it('clicking on submit with a server error shows a toast and emailSettings stay the same', async () => {
+      // TODO
       mocks.$apollo.mutate = jest.fn().mockRejectedValue({ message: 'Ouch!' })
       await wrapper.find('#send-email').setChecked(false)
       await wrapper.find('.base-button').trigger('click')
