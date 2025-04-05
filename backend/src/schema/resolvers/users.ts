@@ -154,6 +154,7 @@ export default {
       const {
         emailNotificationSettings,
       }: { emailNotificationSettings: { name: string; value: boolean }[] | undefined } = params
+      delete params.emailNotificationSettings
       if (emailNotificationSettings) {
         emailNotificationSettings.forEach((setting) => {
           const allowedSettingNames = [
@@ -171,6 +172,7 @@ export default {
           params[
             'emailNotifications' + setting.name.charAt(0).toUpperCase() + setting.name.slice(1)
           ] = setting.value
+          console.log(params)
         })
       }
 
@@ -381,9 +383,8 @@ export default {
     },
     emailNotificationSettings: async (parent, params, context, resolveInfo) => {
       const { user } = context
-      const { id } = parent
-      // Its not the own user
-      if (user.id !== id) {
+      if (user.id !== parent.id) {
+        // Its not the own user
         return []
       }
 
@@ -391,29 +392,29 @@ export default {
         {
           name: 'commentOnObservedPost',
           type: 'post',
-          value: user.emailNotificationsCommentOnObservedPost ?? true,
+          value: parent.emailNotificationsCommentOnObservedPost ?? true,
         },
         {
           name: 'postByFollowedUser',
           type: 'post',
-          value: user.emailNotificationsPostByFollowedUser ?? true,
+          value: parent.emailNotificationsPostByFollowedUser ?? true,
         },
-        { name: 'postInGroup', type: 'post', value: user.emailNotificationsPostInGroup ?? true},
+        { name: 'postInGroup', type: 'post', value: parent.emailNotificationsPostInGroup ?? true},
         {
           name: 'groupMemberJoined',
           type: 'group',
-          value: user.emailNotificationsGroupMemberJoined ?? true,
+          value: parent.emailNotificationsGroupMemberJoined ?? true,
         },
-        { name: 'groupMemberLeft', type: 'group', value: user.emailNotificationsGroupMemberLeft ?? true},
+        { name: 'groupMemberLeft', type: 'group', value: parent.emailNotificationsGroupMemberLeft ?? true},
         {
           name: 'groupMemberRemoved',
           type: 'group',
-          value: user.emailNotificationsGroupMemberRemoved ?? true,
+          value: parent.emailNotificationsGroupMemberRemoved ?? true,
         },
         {
           name: 'groupMemberRoleChanged',
           type: 'group',
-          value: user.emailNotificationsGroupMemberRoleChanged ?? true,
+          value: parent.emailNotificationsGroupMemberRoleChanged ?? true,
         },
       ]
     },
