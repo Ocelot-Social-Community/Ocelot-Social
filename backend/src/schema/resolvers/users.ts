@@ -173,7 +173,6 @@ export default {
           params[
             'emailNotifications' + setting.name.charAt(0).toUpperCase() + setting.name.slice(1)
           ] = setting.value
-          console.log(params)
         })
       }
 
