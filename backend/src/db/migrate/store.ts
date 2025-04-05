@@ -62,13 +62,6 @@ const createDefaultAdminUser = async (session) => {
           createdAt: toString(datetime()),
           allowEmbedIframes: false,
           showShoutsPublicly: false,
-          emailNotificationsCommentOnObservedPost: true
-          emailNotificationsPostByFollowedUser: true
-          emailNotificationsPostInGroup: true
-          emailNotificationsGroupMemberJoined: true
-          emailNotificationsGroupMemberLeft: true
-          emailNotificationsGroupMemberRemoved: true
-          emailNotificationsGroupMemberRoleChanged: true
           deleted: false,
           disabled: false
         })-[:PRIMARY_EMAIL]->(e)`,
