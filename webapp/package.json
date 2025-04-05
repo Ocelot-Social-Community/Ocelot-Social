@@ -37,7 +37,7 @@
     "cropperjs": "^1.6.2",
     "cross-env": "~7.0.3",
     "date-fns": "2.22.1",
-    "express": "~4.21.2",
+    "express": "~5.1.0",
     "graphql": "~14.7.0",
     "intersection-observer": "^0.12.0",
     "jest-serializer-vue": "^3.1.0",
