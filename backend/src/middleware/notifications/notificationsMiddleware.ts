@@ -40,7 +40,8 @@ const publishNotifications = async (context, promises, emailNotificationSetting:
   )
   notifications.forEach((notificationAdded, index) => {
     pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
-    if (notificationAdded.to[emailNotificationSetting] ?? true) { // Default to true
+    if (notificationAdded.to[emailNotificationSetting] ?? true) {
+      // Default to true
       sendMail(
         notificationTemplate({
           email: notificationsEmailAddresses[index].email,
@@ -55,9 +56,11 @@ const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
-    await publishNotifications(context, [
-      notifyOwnersOfGroup(groupId, userId, 'user_joined_group', context),
-    ], 'emailNotificationsGroupMemberJoined')
+    await publishNotifications(
+      context,
+      [notifyOwnersOfGroup(groupId, userId, 'user_joined_group', context)],
+      'emailNotificationsGroupMemberJoined',
+    )
   }
   return user
 }
@@ -66,9 +69,11 @@ const handleLeaveGroup = async (resolve, root, args, context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
-    await publishNotifications(context, [
-      notifyOwnersOfGroup(groupId, userId, 'user_left_group', context),
-    ], 'emailNotificationsGroupMemberLeft')
+    await publishNotifications(
+      context,
+      [notifyOwnersOfGroup(groupId, userId, 'user_left_group', context)],
+      'emailNotificationsGroupMemberLeft',
+    )
   }
   return user
 }
@@ -77,9 +82,11 @@ const handleChangeGroupMemberRole = async (resolve, root, args, context, resolve
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
-    await publishNotifications(context, [
-      notifyMemberOfGroup(groupId, userId, 'changed_group_member_role', context),
-    ], 'emailNotificationsGroupMemberRoleChanged')
+    await publishNotifications(
+      context,
+      [notifyMemberOfGroup(groupId, userId, 'changed_group_member_role', context)],
+      'emailNotificationsGroupMemberRoleChanged',
+    )
   }
   return user
 }
@@ -88,9 +95,11 @@ const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveIn
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
-    await publishNotifications(context, [
-      notifyMemberOfGroup(groupId, userId, 'removed_user_from_group', context),
-    ], 'emailNotificationsGroupMemberRemoved')
+    await publishNotifications(
+      context,
+      [notifyMemberOfGroup(groupId, userId, 'removed_user_from_group', context)],
+      'emailNotificationsGroupMemberRemoved',
+    )
   }
   return user
 }
@@ -99,9 +108,11 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
-    await publishNotifications(context, [
-      notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
-    ], 'emailNotificationsMention')
+    await publishNotifications(
+      context,
+      [notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context)],
+      'emailNotificationsMention',
+    )
   }
   return post
 }
@@ -112,20 +123,26 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
   idsOfMentionedUsers = idsOfMentionedUsers.filter((id) => id !== postAuthor.id)
-  await publishNotifications(context, [
-    notifyUsersOfMention(
-      'Comment',
-      comment.id,
-      idsOfMentionedUsers,
-      'mentioned_in_comment',
-      context,
-    ),
-  ], 'emailNotificationsMention')
+  await publishNotifications(
+    context,
+    [
+      notifyUsersOfMention(
+        'Comment',
+        comment.id,
+        idsOfMentionedUsers,
+        'mentioned_in_comment',
+        context,
+      ),
+    ],
+    'emailNotificationsMention',
+  )
 
-  await publishNotifications(context, [
-    notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context),
-  ], 'emailNotificationsCommentOnObservedPost')
-  
+  await publishNotifications(
+    context,
+    [notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context)],
+    'emailNotificationsCommentOnObservedPost',
+  )
+
   return comment
 }
 
