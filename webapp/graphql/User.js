@@ -394,9 +394,11 @@ export const currentUserQuery = gql`
       allowEmbedIframes
       showShoutsPublicly
       emailNotificationSettings {
-        name
         type
-        value
+        settings {
+          name
+          value
+        }
       }
       termsAndConditionsAgreedVersion
       socialMedia {
