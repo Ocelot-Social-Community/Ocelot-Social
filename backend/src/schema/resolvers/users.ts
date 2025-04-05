@@ -159,6 +159,7 @@ export default {
         emailNotificationSettings.forEach((setting) => {
           const allowedSettingNames = [
             'commentOnObservedPost',
+            'mention',
             'postByFollowedUser',
             'postInGroup',
             'groupMemberJoined',
@@ -395,11 +396,10 @@ export default {
           value: parent.emailNotificationsCommentOnObservedPost ?? true,
         },
         {
-          name: 'postByFollowedUser',
+          name: 'mention',
           type: 'post',
-          value: parent.emailNotificationsPostByFollowedUser ?? true,
+          value: parent.emailNotificationsMention ?? true,
         },
-        { name: 'postInGroup', type: 'post', value: parent.emailNotificationsPostInGroup ?? true},
         {
           name: 'groupMemberJoined',
           type: 'group',

@@ -161,11 +161,7 @@ export default {
     type: 'boolean',
     default: true,
   },
-  emailNotificationsPostByFollowedUser: {
-    type: 'boolean',
-    default: true,
-  },
-  emailNotificationsPostInGroup: {
+  emailNotificationsMention: {
     type: 'boolean',
     default: true,
   },

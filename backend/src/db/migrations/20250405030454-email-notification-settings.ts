@@ -12,8 +12,7 @@ export async function up(next) {
     await transaction.run(`
       MATCH (user:User)
       SET user.emailNotificationsCommentOnObservedPost = user.sendNotificationEmails
-      SET user.emailNotificationsPostByFollowedUser = user.sendNotificationEmails
-      SET user.emailNotificationsPostInGroup = user.sendNotificationEmails
+      SET user.emailNotificationsMention = user.sendNotificationEmails
       SET user.emailNotificationsGroupMemberJoined = user.sendNotificationEmails
       SET user.emailNotificationsGroupMemberLeft = user.sendNotificationEmails
       SET user.emailNotificationsGroupMemberRemoved = user.sendNotificationEmails
@@ -45,8 +44,7 @@ export async function down(next) {
       MATCH (user:User)
       SET user.sendNotificationEmails = true
       REMOVE user.emailNotificationsCommentOnObservedPost
-      REMOVE user.emailNotificationsPostByFollowedUser
-      REMOVE user.emailNotificationsPostInGroup
+      REMOVE user.emailNotificationsMention
       REMOVE user.emailNotificationsGroupMemberJoined
       REMOVE user.emailNotificationsGroupMemberLeft
       REMOVE user.emailNotificationsGroupMemberRemoved

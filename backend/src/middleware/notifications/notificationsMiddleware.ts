@@ -101,7 +101,7 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
   if (post) {
     await publishNotifications(context, [
       notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
-    ], 'TODO')
+    ], 'emailNotificationsMention')
   }
   return post
 }
@@ -120,7 +120,7 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
       'mentioned_in_comment',
       context,
     ),
-  ], 'TODO')
+  ], 'emailNotificationsMention')
 
   await publishNotifications(context, [
     notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context),
@@ -128,11 +128,6 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
   
   return comment
 }
-
-/* TODO unused
-emailNotificationsPostByFollowedUser: true
-emailNotificationsPostInGroup: true
-*/
 
 const postAuthorOfComment = async (commentId, { context }) => {
   const session = context.driver.session()
