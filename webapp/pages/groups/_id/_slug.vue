@@ -18,7 +18,7 @@
           <!-- Menu -->
           <client-only>
             <group-content-menu
-              v-if="isGroupOwner"
+              v-if="isGroupMember"
               class="group-profile-content-menu"
               :usage="'groupProfile'"
               :group="group || {}"
