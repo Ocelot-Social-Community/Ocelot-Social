@@ -46,11 +46,6 @@ export const profileUserQuery = (i18n) => {
           url
         }
         showShoutsPublicly
-        emailNotificationSettings {
-          name
-          type
-          value
-        }
       }
     }
   `
