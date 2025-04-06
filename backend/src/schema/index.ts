@@ -10,6 +10,8 @@ export default makeAugmentedSchema({
       exclude: [
         'Badge',
         'Embed',
+        'EmailNotificationSettings',
+        'EmailNotificationSettingsOption',
         'EmailAddress',
         'Notification',
         'Statistics',
