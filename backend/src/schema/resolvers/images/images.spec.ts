@@ -1,3 +1,4 @@
+/* eslint-disable promise/prefer-await-to-callbacks */
 import { deleteImage, mergeImage } from './images'
 import { getNeode, getDriver } from '../../../db/neo4j'
 import Factory, { cleanDatabase } from '../../../db/factories'

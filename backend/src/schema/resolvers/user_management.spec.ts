@@ -1,3 +1,4 @@
+/* eslint-disable promise/prefer-await-to-callbacks */
 import jwt from 'jsonwebtoken'
 import CONFIG from '../../config'
 import Factory, { cleanDatabase } from '../../db/factories'
