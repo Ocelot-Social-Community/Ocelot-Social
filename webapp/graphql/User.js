@@ -359,9 +359,11 @@ export const updateUserMutation = () => {
         allowEmbedIframes
         showShoutsPublicly
         emailNotificationSettings {
-          name
           type
-          value
+          settings {
+            name
+            value
+          }
         }
         locale
         termsAndConditionsAgreedVersion
