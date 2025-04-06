@@ -1039,16 +1039,16 @@
     },
     "name": "Einstellungen",
     "notifications": {
-      "name": "Benachrichtigungen",
-      "send-email-notifications": "Sende E-Mail-Benachrichtigungen",
-      "success-update": "Benachrichtigungs-Einstellungen gespeichert!",
       "commentOnObservedPost": "Kommentare zu beobachteten Beiträgen",
-      "postByFollowedUser": "Beitrag von einem Nutzer, dem ich folge",
-      "postInGroup": "Beitrag in einer Gruppe, die ich beobachte",
       "groupMemberJoined": "Ein Mitglied ist deiner Gruppe beigetreten",
       "groupMemberLeft": "Ein Mitglied hat deine Gruppe verlassen",
-      "groupMemberRoleChanged": "Deine Rolle in einer Gruppe wurde geändert",
       "groupMemberRemoved": "Du wurdest aus einer Gruppe entfernt",
+      "groupMemberRoleChanged": "Deine Rolle in einer Gruppe wurde geändert",
+      "name": "Benachrichtigungen",
+      "postByFollowedUser": "Beitrag von einem Nutzer, dem ich folge",
+      "postInGroup": "Beitrag in einer Gruppe, die ich beobachte",
+      "send-email-notifications": "Sende E-Mail-Benachrichtigungen",
+      "success-update": "Benachrichtigungs-Einstellungen gespeichert!"
     },
     "organizations": {
       "name": "Meine Organisationen"
