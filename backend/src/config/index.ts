@@ -1,5 +1,6 @@
 /* eslint-disable n/no-process-env */
 /* eslint-disable n/no-unpublished-require */
+/* eslint-disable n/no-missing-require */
 import { config } from 'dotenv'
 import emails from './emails'
 import metadata from './metadata'
