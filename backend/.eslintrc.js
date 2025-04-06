@@ -201,7 +201,7 @@ module.exports = {
         'jest/prefer-to-have-length': 'error',
         'jest/valid-expect': 'error',
         '@typescript-eslint/unbound-method': 'off',
-        // 'jest/unbound-method': 'error',
+        'jest/unbound-method': 'error',
       },
     },
   ],
