@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-as-default */
 import request from 'request'
 import { UserInputError } from 'apollo-server'
 import Debug from 'debug'

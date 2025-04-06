@@ -8,12 +8,12 @@ module.exports = {
     parser: 'babel-eslint'
   },*/
   parser: '@typescript-eslint/parser',
-  plugins: ['prettier', '@typescript-eslint' /*, 'import', 'n', 'promise'*/],
+  plugins: ['prettier', '@typescript-eslint', 'import', 'n', 'promise'],
   extends: [
     'standard',
-    // 'eslint:recommended',
+    'eslint:recommended',
     'plugin:prettier/recommended',
-    // 'plugin:import/recommended',
+    'plugin:import/recommended',
     // 'plugin:import/typescript',
     // 'plugin:security/recommended',
     // 'plugin:@eslint-community/eslint-comments/recommended',

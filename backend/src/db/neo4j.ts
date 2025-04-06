@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-as-default-member */
 import neo4j from 'neo4j-driver'
 import CONFIG from './../config'
 import Neode from 'neode'
