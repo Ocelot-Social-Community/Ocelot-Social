@@ -198,6 +198,7 @@ export default {
         const user = await writeTxResultPromise
         // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
         await createOrUpdateLocations('User', params.id, params.locationName, session)
+        console.log(user)
         return user
       } catch (error) {
         throw new UserInputError(error.message)
@@ -388,11 +389,11 @@ export default {
           settings: [
             {
               name: 'commentOnObservedPost',
-              value: parent.emailNotificationsPostByFollowedUser ?? true,
+              value: parent.emailNotificationsCommentOnObservedPost ?? true,
             },
             {
               name: 'mention',
-              value: parent.emailNotificationsPostInGroup ?? true,
+              value: parent.emailNotificationsMention ?? true,
             },
           ],
         },
