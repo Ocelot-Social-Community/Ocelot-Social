@@ -608,7 +608,7 @@ const emailNotificationSettingsQuery = gql`
 `
 
 const emailNotificationSettingsMutation = gql`
-  mutation ($id: ID!, $emailNotificationSettings: [emailNotificationSettings]!) {
+  mutation ($id: ID!, $emailNotificationSettings: [EmailNotificationSettingsInput]!) {
     UpdateUser(id: $id, emailNotificationSettings: $emailNotificationSettings) {
       emailNotificationSettings {
         type
@@ -735,7 +735,7 @@ describe('emailNotificationSettings', () => {
     })
 
     describe('as self', () => {
-      it('returns the emailNotificationSettings', async () => {
+      it('updates the emailNotificationSettings', async () => {
         authenticatedUser = await user.toJson()
         await expect(
           mutate({
@@ -745,46 +745,44 @@ describe('emailNotificationSettings', () => {
         ).resolves.toEqual(
           expect.objectContaining({
             data: {
-              User: [
-                {
-                  emailNotificationSettings: [
-                    {
-                      type: 'post',
-                      settings: [
-                        {
-                          name: 'commentOnObservedPost',
-                          value: true,
-                        },
-                        {
-                          name: 'mention',
-                          value: false,
-                        },
-                      ],
-                    },
-                    {
-                      type: 'group',
-                      settings: [
-                        {
-                          name: 'groupMemberJoined',
-                          value: true,
-                        },
-                        {
-                          name: 'groupMemberLeft',
-                          value: true,
-                        },
-                        {
-                          name: 'groupMemberRemoved',
-                          value: true,
-                        },
-                        {
-                          name: 'groupMemberRoleChanged',
-                          value: true,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
+              UpdateUser: {
+                emailNotificationSettings: [
+                  {
+                    type: 'post',
+                    settings: [
+                      {
+                        name: 'commentOnObservedPost',
+                        value: true,
+                      },
+                      {
+                        name: 'mention',
+                        value: false,
+                      },
+                    ],
+                  },
+                  {
+                    type: 'group',
+                    settings: [
+                      {
+                        name: 'groupMemberJoined',
+                        value: true,
+                      },
+                      {
+                        name: 'groupMemberLeft',
+                        value: true,
+                      },
+                      {
+                        name: 'groupMemberRemoved',
+                        value: true,
+                      },
+                      {
+                        name: 'groupMemberRoleChanged',
+                        value: true,
+                      },
+                    ],
+                  },
+                ],
+              },
             },
           }),
         )
