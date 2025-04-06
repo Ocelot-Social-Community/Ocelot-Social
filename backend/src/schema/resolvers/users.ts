@@ -382,12 +382,6 @@ export default {
       return email
     },
     emailNotificationSettings: async (parent, params, context, resolveInfo) => {
-      const { user } = context
-      if (user.id !== parent.id) {
-        // Its not the own user
-        return []
-      }
-
       return [
         {
           type: 'post',

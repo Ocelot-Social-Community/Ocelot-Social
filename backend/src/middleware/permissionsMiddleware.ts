@@ -470,6 +470,7 @@ export default shield(
     },
     User: {
       email: or(isMyOwn, isAdmin),
+      emailNotificationSettings: isMyOwn,
     },
     Report: isModerator,
   },
