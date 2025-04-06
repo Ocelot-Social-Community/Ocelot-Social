@@ -26,7 +26,7 @@ input EmailNotificationSettingsInput {
 
 type EmailNotificationSettings {
   type: String
-  settings: [EmailNotificationSettingsOption]
+  settings: [EmailNotificationSettingsOption] @neo4j_ignore
 }
 
 type EmailNotificationSettingsOption {
@@ -61,7 +61,7 @@ type User {
 
   allowEmbedIframes: Boolean
   showShoutsPublicly: Boolean
-  emailNotificationSettings: [EmailNotificationSettings]!
+  emailNotificationSettings: [EmailNotificationSettings]! @neo4j_ignore
   locale: String
   friends: [User]! @relation(name: "FRIENDS", direction: "BOTH")
   friendsCount: Int! @cypher(statement: "MATCH (this)<-[:FRIENDS]->(r:User) RETURN COUNT(DISTINCT r)")
