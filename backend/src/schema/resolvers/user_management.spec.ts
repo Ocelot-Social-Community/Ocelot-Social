@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import CONFIG from './../../config'
+import CONFIG from '../../config'
 import Factory, { cleanDatabase } from '../../db/factories'
 import gql from 'graphql-tag'
 import { loginMutation } from '../../graphql/userManagement'

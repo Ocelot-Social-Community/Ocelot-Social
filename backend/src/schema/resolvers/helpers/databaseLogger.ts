@@ -1,5 +1,6 @@
 /* eslint-disable import/no-named-as-default */
 import Debug from 'debug'
+
 const debugCypher = Debug('human-connection:neo4j:cypher')
 const debugStats = Debug('human-connection:neo4j:stats')
 

@@ -4,6 +4,7 @@ import http from 'http'
 import helmet from 'helmet'
 import { ApolloServer } from 'apollo-server-express'
 import CONFIG from './config'
+// eslint-disable-next-line import/no-cycle
 import middleware from './middleware'
 import { getNeode, getDriver } from './db/neo4j'
 import decode from './jwt/decode'

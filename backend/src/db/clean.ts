@@ -1,5 +1,5 @@
 import CONFIG from '../config'
-import { cleanDatabase } from '../db/factories'
+import { cleanDatabase } from './factories'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot clean the database in a non-staging and real production environment!`)

@@ -1,6 +1,6 @@
 /* eslint-disable security/detect-object-injection */
 import { applyMiddleware } from 'graphql-middleware'
-import CONFIG from './../config'
+import CONFIG from '../config'
 import softDelete from './softDelete/softDeleteMiddleware'
 import sluggify from './sluggifyMiddleware'
 import excerpt from './excerptMiddleware'
@@ -9,6 +9,7 @@ import permissions from './permissionsMiddleware'
 import includedFields from './includedFieldsMiddleware'
 import orderBy from './orderByMiddleware'
 import validation from './validation/validationMiddleware'
+// eslint-disable-next-line import/no-cycle
 import notifications from './notifications/notificationsMiddleware'
 import hashtags from './hashtags/hashtagsMiddleware'
 import login from './login/loginMiddleware'

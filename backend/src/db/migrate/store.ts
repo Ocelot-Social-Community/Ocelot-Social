@@ -1,4 +1,4 @@
-import { getDriver, getNeode } from '../../db/neo4j'
+import { getDriver, getNeode } from '../neo4j'
 import { hashSync } from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 import { categories } from '../../constants/categories'
@@ -166,4 +166,4 @@ class Store {
   }
 }
 
-module.exports = Store
+export default Store

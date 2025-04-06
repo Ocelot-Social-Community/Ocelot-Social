@@ -3,8 +3,8 @@ import { createTestClient } from 'apollo-server-testing'
 import CONFIG from '../config'
 import createServer from '../server'
 import { faker } from '@faker-js/faker'
-import Factory from '../db/factories'
-import { getNeode, getDriver } from '../db/neo4j'
+import Factory from './factories'
+import { getNeode, getDriver } from './neo4j'
 import {
   createGroupMutation,
   joinGroupMutation,
