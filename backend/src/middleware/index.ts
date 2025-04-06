@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 import { applyMiddleware } from 'graphql-middleware'
 import CONFIG from './../config'
 import softDelete from './softDelete/softDeleteMiddleware'

@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
 import path from 'path'
 import { v4 as uuid } from 'uuid'
 import { S3 } from 'aws-sdk'

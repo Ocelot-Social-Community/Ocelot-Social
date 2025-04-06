@@ -8,14 +8,14 @@ module.exports = {
     parser: 'babel-eslint'
   },*/
   parser: '@typescript-eslint/parser',
-  plugins: ['prettier', '@typescript-eslint', 'import', 'n', 'promise'],
+  plugins: ['prettier', '@typescript-eslint', 'import', 'n', 'promise', 'security'],
   extends: [
     'standard',
     'eslint:recommended',
     'plugin:prettier/recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
-    // 'plugin:security/recommended',
+    'plugin:security/recommended-legacy',
     'plugin:@eslint-community/eslint-comments/recommended',
   ],
   settings: {

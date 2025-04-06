@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
 import { getDriver } from '../../db/neo4j'
 import { existsSync } from 'fs'
 

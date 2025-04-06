@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-regexp */
 import Factory, { cleanDatabase } from '../../db/factories'
 import { getDriver } from '../../db/neo4j'
 import gql from 'graphql-tag'

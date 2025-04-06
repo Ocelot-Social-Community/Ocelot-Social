@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * iterate through all fields and replace it with the callback result
  * @property data Array

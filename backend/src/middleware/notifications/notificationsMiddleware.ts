@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 import { pubsub, NOTIFICATION_ADDED } from '../../server'
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 import { validateNotifyUsers } from '../validation/validationMiddleware'
