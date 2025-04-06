@@ -14,9 +14,9 @@ module.exports = {
     'eslint:recommended',
     'plugin:prettier/recommended',
     'plugin:import/recommended',
-    // 'plugin:import/typescript',
+    'plugin:import/typescript',
     // 'plugin:security/recommended',
-    // 'plugin:@eslint-community/eslint-comments/recommended',
+    'plugin:@eslint-community/eslint-comments/recommended',
   ],
   settings: {
     'import/parsers': {
@@ -166,10 +166,10 @@ module.exports = {
     // 'promise/prefer-await-to-callbacks': 'error',
     // 'promise/no-multiple-resolved': 'error',
     // eslint comments
-    // '@eslint-community/eslint-comments/disable-enable-pair': ['error', { allowWholeFile: true }],
-    // '@eslint-community/eslint-comments/no-restricted-disable': 'error',
-    // '@eslint-community/eslint-comments/no-use': 'off',
-    // '@eslint-community/eslint-comments/require-description': 'off',
+    '@eslint-community/eslint-comments/disable-enable-pair': ['error', { allowWholeFile: true }],
+    '@eslint-community/eslint-comments/no-restricted-disable': 'error',
+    '@eslint-community/eslint-comments/no-use': 'off',
+    '@eslint-community/eslint-comments/require-description': 'off',
   },
   overrides: [
     // only for ts files
