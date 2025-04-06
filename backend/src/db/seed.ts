@@ -1,3 +1,4 @@
+/* eslint-disable n/no-process-exit */
 import sample from 'lodash/sample'
 import { createTestClient } from 'apollo-server-testing'
 import CONFIG from '../config'

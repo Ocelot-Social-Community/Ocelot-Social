@@ -1,3 +1,4 @@
+/* eslint-disable n/no-process-exit */
 import CONFIG from '../config'
 import { cleanDatabase } from './factories'
 

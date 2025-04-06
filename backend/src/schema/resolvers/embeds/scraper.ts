@@ -1,3 +1,5 @@
+/* eslint-disable n/no-extraneous-require */
+/* eslint-disable n/global-require */
 /* eslint-disable import/no-commonjs */
 /* eslint-disable import/no-named-as-default */
 import Metascraper from 'metascraper'
