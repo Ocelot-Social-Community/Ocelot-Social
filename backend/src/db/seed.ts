@@ -1566,6 +1566,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await driver.close()
     await neode.close()
     process.exit(0)
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     /* eslint-disable-next-line no-console */
     console.error(err)

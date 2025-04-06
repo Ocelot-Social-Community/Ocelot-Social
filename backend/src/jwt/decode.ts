@@ -8,6 +8,7 @@ export default async (driver, authorizationHeader) => {
   try {
     const decoded = await jwt.verify(token, CONFIG.JWT_SECRET)
     id = decoded.sub
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     return null
   }

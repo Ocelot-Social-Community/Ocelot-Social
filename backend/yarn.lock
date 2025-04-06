@@ -4614,6 +4614,11 @@ eslint-plugin-n@^16.6.2:
     resolve "^1.22.2"
     semver "^7.5.3"
 
+eslint-plugin-no-catch-all@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-no-catch-all/-/eslint-plugin-no-catch-all-1.1.0.tgz#f2e8950cc2b0bdde5faa4ab339d0986c6ae32fb0"
+  integrity sha512-VkP62jLTmccPrFGN/W6V7a3SEwdtTZm+Su2k4T3uyJirtkm0OMMm97h7qd8pRFAHus/jQg9FpUpLRc7sAylBEQ==
+
 eslint-plugin-prettier@^5.2.6:
   version "5.2.6"
   resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-5.2.6.tgz#be39e3bb23bb3eeb7e7df0927cdb46e4d7945096"

@@ -41,6 +41,7 @@ const fetchEmbed = async (url) => {
   try {
     const response = await fetch(endpointUrl)
     json = await response.json()
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     error(`Error fetching embed data: ${err.message}`)
     return {}

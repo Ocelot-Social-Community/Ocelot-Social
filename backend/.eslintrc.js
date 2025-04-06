@@ -4,7 +4,7 @@ module.exports = {
     node: true,
   },
   parser: '@typescript-eslint/parser',
-  plugins: ['prettier', '@typescript-eslint', 'import', 'n', 'promise', 'security'],
+  plugins: ['prettier', '@typescript-eslint', 'import', 'n', 'promise', 'security', 'no-catch-all',],
   extends: [
     'standard',
     'eslint:recommended',
@@ -26,6 +26,7 @@ module.exports = {
     },
   },
   rules: {
+    'no-catch-all/no-catch-all': 'error',
     'no-console': 'error',
     camelcase: 'error',
     'no-debugger': 'error',

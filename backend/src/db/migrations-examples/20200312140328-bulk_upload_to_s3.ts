@@ -96,6 +96,7 @@ export async function down(next) {
     await transaction.run(``)
     await transaction.commit()
     next()
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)

@@ -91,6 +91,7 @@ describe('deleteImage', () => {
             })
             throw new Error('Ouch!')
           })
+          // eslint-disable-next-line no-catch-all/no-catch-all
         } catch (err) {
           // nothing has been deleted
           await expect(neode.all('Image')).resolves.toHaveLength(1)
@@ -252,6 +253,7 @@ describe('mergeImage', () => {
               })
               return transaction.run('Ooops invalid cypher!', { image })
             })
+            // eslint-disable-next-line no-catch-all/no-catch-all
           } catch (err) {
             // nothing has been created
             await expect(neode.all('Image')).resolves.toHaveLength(0)
