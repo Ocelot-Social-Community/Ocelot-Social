@@ -1,5 +1,6 @@
 import Vuex from 'vuex'
 import { mount } from '@vue/test-utils'
+import {render, fireEvent, screen} from '@testing-library/vue'
 import Notifications from './notifications.vue'
 
 const localVue = global.localVue
@@ -11,7 +12,7 @@ describe('notifications.vue', () => {
 
   beforeEach(() => {
     mocks = {
-      $t: jest.fn(),
+      $t: jest.fn(v => v),
       $apollo: {
         mutate: jest.fn(),
       },
@@ -26,15 +27,42 @@ describe('notifications.vue', () => {
           return {
             id: 'u343',
             name: 'MyAccount',
-            emailNotificationSettings: {
-              commentOnObservedPost: true,
-              postByFollowedUser: true,
-              postInGroup: true,
-              groupMemberJoined: false,
-              groupMemberLeft: false,
-              groupMemberRemoved: false,
-              groupMemberRoleChanged: false,
-            },
+            emailNotificationSettings: [
+              {
+                type: "post",
+                settings: [
+                  {
+                    name: "commentOnObservedPost",
+                    value: true,
+                  },
+                  {
+                    name: "mention",
+                    value: false,
+                  }
+                ],
+              },
+              {
+                type: "group",
+                settings: [
+                  {
+                    name: "groupMemberJoined",
+                    value: true,
+                  },
+                  {
+                    name: "groupMemberLeft",
+                    value: true,
+                  },
+                  {
+                    name: "groupMemberRemoved",
+                    value: false,
+                  },
+                  {
+                    name: "groupMemberRoleChanged",
+                    value: true,
+                  }
+                ],
+              },
+            ],
           }
         },
       },
@@ -55,43 +83,57 @@ describe('notifications.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.classes('base-card')).toBe(true)
-      // TODO snapshot match
+      expect(wrapper.element).toMatchSnapshot()
     })
+  })
 
-    it('activate all button works', async () => {
-      await wrapper.find('#activate-all').trigger('click')
-      expect(wrapper.vm.emailNotificationSettings).toEqual({
-        commentOnObservedPost: true,
-        postByFollowedUser: true,
-        postInGroup: true,
-        groupMemberJoined: true,
-        groupMemberLeft: true,
-        groupMemberRemoved: true,
-        groupMemberRoleChanged: true,
+  describe('Notifications', () => {
+    beforeEach(() => {
+      render(Notifications, {
+        store,
+        mocks,
+        localVue,
       })
     })
 
-    it('deactivate all button works', async () => {
-      await wrapper.find('#deactivate-all').trigger('click')
-      expect(wrapper.vm.emailNotificationSettings).toEqual({
-        commentOnObservedPost: false,
-        postByFollowedUser: false,
-        postInGroup: false,
-        groupMemberJoined: false,
-        groupMemberLeft: false,
-        groupMemberRemoved: false,
-        groupMemberRoleChanged: false,
-      })
+    it('check all button works', async () => {
+      const button = screen.getByText('settings.notifications.checkAll')
+      await fireEvent.click(button)
+
+      const checkboxes = screen.getAllByRole('checkbox')
+      for (const checkbox of checkboxes) {
+        expect(checkbox.checked).toEqual(true)
+      }
+
+      // Check that the button is disabled
+      expect(button.disabled).toBe(true)
     })
 
-    it('clicking on submit with a server error shows a toast and emailSettings stay the same', async () => {
-      // TODO
+    it('uncheck all button works', async () => {
+      const button = screen.getByText('settings.notifications.uncheckAll')
+      await fireEvent.click(button)
+
+      const checkboxes = screen.getAllByRole('checkbox')
+      for (const checkbox of checkboxes) {
+        expect(checkbox.checked).toEqual(false)
+      }
+
+      // Check that the button is disabled
+      expect(button.disabled).toBe(true)
+    })
+
+    it('clicking on submit with a server error shows a toast', async () => {
       mocks.$apollo.mutate = jest.fn().mockRejectedValue({ message: 'Ouch!' })
-      await wrapper.find('#send-email').setChecked(false)
-      await wrapper.find('.base-button').trigger('click')
+
+      // Change some value to enable save button
+      const checkbox = screen.getAllByRole('checkbox')[0]
+      await fireEvent.click(checkbox)
+
+      // Click save button
+      const button = screen.getByText('actions.save')
+      await fireEvent.click(button)
+
       expect(mocks.$toast.error).toHaveBeenCalledWith('Ouch!')
-      expect(wrapper.vm.notifyByEmail).toBe(true)
     })
   })
 })
