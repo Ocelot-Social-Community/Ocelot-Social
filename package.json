@@ -33,13 +33,13 @@
     "release": "./scripts/release.sh"
   },
   "devDependencies": {
-    "@babel/core": "^7.26.9",
+    "@babel/core": "^7.26.10",
     "@babel/preset-env": "^7.26.9",
     "@babel/register": "^7.25.9",
     "@badeball/cypress-cucumber-preprocessor": "^22.0.1",
     "@cucumber/cucumber": "11.2.0",
     "@cypress/browserify-preprocessor": "^3.0.2",
-    "@faker-js/faker": "9.5.0",
+    "@faker-js/faker": "9.6.0",
     "auto-changelog": "^2.5.0",
     "bcryptjs": "^2.4.3",
     "cross-env": "^7.0.3",

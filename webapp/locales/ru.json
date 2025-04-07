@@ -747,6 +747,9 @@
     "title": "Уведомления",
     "user": "Пользователь"
   },
+  "observeButton": {
+    "observed": null
+  },
   "post": {
     "comment": {
       "reply": "Ответ",
@@ -778,8 +781,12 @@
     "menu": {
       "delete": "Удалить пост",
       "edit": "Редактировать пост",
+      "observe": null,
+      "observedSuccessfully": null,
       "pin": "Закрепить пост",
       "pinnedSuccessfully": "Пост больше не закреплен!",
+      "unobserve": null,
+      "unobservedSuccessfully": null,
       "unpin": "Открепить пост",
       "unpinnedSuccessfully": "Пост успешно не закреплено!"
     },

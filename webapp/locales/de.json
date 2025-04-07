@@ -747,6 +747,9 @@
     "title": "Benachrichtigungen",
     "user": "Nutzer"
   },
+  "observeButton": {
+    "observed": "beobachtet"
+  },
   "post": {
     "comment": {
       "reply": "Antworten",
@@ -778,8 +781,12 @@
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
+      "observe": "Beitrag beobachten",
+      "observedSuccessfully": "Du beobachtest diesen Beitrag!",
       "pin": "Beitrag anheften",
       "pinnedSuccessfully": "Beitrag erfolgreich angeheftet!",
+      "unobserve": "Beitrag nicht mehr beobachten",
+      "unobservedSuccessfully": "Du beobachtest diesen Beitrag nicht mehr!",
       "unpin": "Beitrag loslösen",
       "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!"
     },

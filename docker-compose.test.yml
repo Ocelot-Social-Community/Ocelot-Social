@@ -40,3 +40,4 @@ services:
     image: djfarrelly/maildev
     ports:
       - 1080:80
+      - 25:25
