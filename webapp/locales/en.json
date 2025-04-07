@@ -561,6 +561,7 @@
       "hidden": "Secret — Group (including the name) is completely invisible",
       "public": "Public — Group and all posts are visible for all registered users"
     },
+    "unmute": "Unmute group",
     "update": "Save change",
     "updatedGroup": "The group data has been changed."
   },
