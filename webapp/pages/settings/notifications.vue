@@ -1,10 +1,13 @@
 <template>
   <base-card>
     <h2 class="title">{{ $t('settings.notifications.name') }}</h2>
-    <ds-space margin-bottom="small" v-for="topic in topics" :key="topic.id">
-      <input :id="topic.id" type="checkbox" v-model="emailNotificationSettings[topic.id]" />
-      <label :for="topic.id">{{ topic.name }}</label>
-    </ds-space>
+    <div v-for="topic in emailNotificationSettings" :key="topic.type">
+      <h3>{{ $t(`settings.notifications.${topic.type}`) }}</h3>
+      <ds-space margin-bottom="small" v-for="setting in topic.settings" :key="setting.name" >
+        <input :id="setting.name" type="checkbox" v-model="setting.value" />
+        <label :for="setting.name">{{ $t(`settings.notifications.${setting.name}`) }}</label>
+      </ds-space>
+    </div>
     <base-button @click="activateAll">
       {{ $t('settings.notifications.activateAll') }}
     </base-button>
@@ -24,30 +27,7 @@ import { updateUserMutation } from '~/graphql/User'
 export default {
   data() {
     return {
-      emailNotificationSettings: {
-        commentOnObservedPost: true,
-        postByFollowedUser: true,
-        postInGroup: true,
-        groupMemberJoined: true,
-        groupMemberLeft: true,
-        groupMemberRemoved: true,
-        groupMemberRoleChanged: true,
-      },
-      topics: [
-        {
-          id: 'commentOnObservedPost',
-          name: this.$t('settings.notifications.commentOnObservedPost'),
-        },
-        { id: 'postByFollowedUser', name: this.$t('settings.notifications.postByFollowedUser') },
-        { id: 'postInGroup', name: this.$t('settings.notifications.postInGroup') },
-        { id: 'groupMemberRemoved', name: this.$t('settings.notifications.groupMemberRemoved') },
-        {
-          id: 'groupMemberRoleChanged',
-          name: this.$t('settings.notifications.groupMemberRoleChanged'),
-        },
-        { id: 'groupMemberJoined', name: this.$t('settings.notifications.groupMemberJoined') },
-        { id: 'groupMemberLeft', name: this.$t('settings.notifications.groupMemberLeft') },
-      ],
+      emailNotificationSettings: {},
     }
   },
   computed: {
@@ -55,13 +35,20 @@ export default {
       currentUser: 'auth/user',
     }),
     disabled() {
-      return this.emailNotificationSettings.every(
+      return Object.entries(this.emailNotificationSettings).every(
+        // TODO deep equals
         (value, index) => value === this.currentUser.emailNotificationSettings[index],
       )
     },
   },
   created() {
-    this.emailNotificationSettings = { ...this.currentUser.emailNotificationSettings }
+    this.emailNotificationSettings = [ ...this.currentUser.emailNotificationSettings.map(topic => ({
+      type: topic.type,
+      settings: topic.settings.map(setting => ({
+        name: setting.name,
+        value: setting.value,
+      })),
+    }))]
   },
   methods: {
     ...mapMutations({
@@ -78,13 +65,25 @@ export default {
     deactivateAll() {
       this.setAll(false)
     },
+    transformToEmailSettingsInput(emailSettings) {
+      const emailSettingsInput = []
+      for (const topic of emailSettings) {
+        for (const setting of topic.settings) {
+          emailSettingsInput.push({
+            name: setting.name,
+            value: setting.value,
+          })
+        }
+      }
+      return emailSettingsInput
+    },
     async submit() {
       try {
         await this.$apollo.mutate({
           mutation: updateUserMutation(),
           variables: {
             id: this.currentUser.id,
-            emailNotificationSettings: this.emailNotificationSettings,
+            emailNotificationSettings: this.transformToEmailSettingsInput(this.emailNotificationSettings),
           },
           update: (_, { data: { UpdateUser } }) => {
             const { emailNotificationSettings } = UpdateUser
@@ -96,7 +95,6 @@ export default {
           },
         })
       } catch (error) {
-        this.emailNotificationSettings = !this.emailNotificationSettings
         this.$toast.error(error.message)
       }
     },
