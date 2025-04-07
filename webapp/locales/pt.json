@@ -1039,9 +1039,21 @@
     },
     "name": "Configurações",
     "notifications": {
+      "checkAll": null,
+      "commentOnObservedPost": null,
+      "group": null,
+      "groupMemberJoined": null,
+      "groupMemberLeft": null,
+      "groupMemberRemoved": null,
+      "groupMemberRoleChanged": null,
+      "mention": null,
       "name": null,
+      "post": null,
+      "postByFollowedUser": null,
+      "postInGroup": null,
       "send-email-notifications": null,
-      "success-update": null
+      "success-update": null,
+      "uncheckAll": null
     },
     "organizations": {
       "name": "Minhas Organizações"

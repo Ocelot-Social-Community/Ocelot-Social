@@ -1,18 +1,18 @@
 <template>
   <base-card>
     <h2 class="title">{{ $t('settings.notifications.name') }}</h2>
-    <div v-for="topic in emailNotificationSettings" :key="topic.type">
+    <ds-space margin-bottom="small" v-for="topic in emailNotificationSettings" :key="topic.type">
       <h3>{{ $t(`settings.notifications.${topic.type}`) }}</h3>
-      <ds-space margin-bottom="small" v-for="setting in topic.settings" :key="setting.name" >
+      <div v-for="setting in topic.settings" :key="setting.name" >
         <input :id="setting.name" type="checkbox" v-model="setting.value" />
         <label :for="setting.name">{{ $t(`settings.notifications.${setting.name}`) }}</label>
-      </ds-space>
-    </div>
+      </div>
+    </ds-space>
     <base-button @click="activateAll">
-      {{ $t('settings.notifications.activateAll') }}
+      {{ $t('settings.notifications.checkAll') }}
     </base-button>
     <base-button @click="deactivateAll">
-      {{ $t('settings.notifications.deactivateAll') }}
+      {{ $t('settings.notifications.uncheckAll') }}
     </base-button>
     <base-button class="save-button" filled @click="submit" :disabled="disabled">
       {{ $t('actions.save') }}
