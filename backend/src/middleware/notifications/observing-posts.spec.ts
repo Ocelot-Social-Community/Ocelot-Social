@@ -1,10 +1,10 @@
-import gql from 'graphql-tag'
-import { cleanDatabase } from '../../db/factories'
-import { getNeode, getDriver } from '../../db/neo4j'
-import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
+import gql from 'graphql-tag'
 
-import CONFIG from '../../config'
+import CONFIG from '@config/index'
+import { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 

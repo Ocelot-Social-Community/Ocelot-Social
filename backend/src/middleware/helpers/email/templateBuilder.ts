@@ -1,11 +1,13 @@
+/* eslint-disable import/no-namespace */
 import mustache from 'mustache'
-import CONFIG from '../../../config'
-import metadata from '../../../config/metadata'
-import logosWebapp from '../../../config/logos'
+
+import logosWebapp from '@config//logos'
+import metadata from '@config//metadata'
+import CONFIG from '@config/index'
 
 import * as templates from './templates'
-import * as templatesEN from './templates/en'
 import * as templatesDE from './templates/de'
+import * as templatesEN from './templates/en'
 
 const from = CONFIG.EMAIL_DEFAULT_SENDER
 const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
@@ -68,6 +70,19 @@ export const resetPasswordTemplate = ({ email, variables: { nonce, name } }) => 
     to: email,
     subject,
     html: mustache.render(templates.layout, renderParams, { content: templates.passwordReset }),
+  }
+}
+
+export const chatMessageTemplate = ({ email, variables: { name } }) => {
+  const subject = 'Neue Chatnachricht | New chat message'
+  const actionUrl = new URL('/chat', CONFIG.CLIENT_URI)
+  const renderParams = { ...defaultParams, englishHint, actionUrl, name, subject }
+
+  return {
+    from,
+    to: email,
+    subject,
+    html: mustache.render(templates.layout, renderParams, { content: templates.chatMessage }),
   }
 }
 

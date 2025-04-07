@@ -1,4 +1,4 @@
-import { getDriver, getNeode } from '../../db/neo4j'
+import { getDriver, getNeode } from '@db/neo4j'
 
 class Store {
   async init(errFn) {
@@ -32,7 +32,8 @@ class Store {
 
       await getNeode().schema.install()
       // eslint-disable-next-line no-console
-      console.log('Successfully installed neode schema!')
+      console.log('Successfully created database indices and constraints!')
+      // eslint-disable-next-line no-catch-all/no-catch-all
     } catch (error) {
       console.log(error) // eslint-disable-line no-console
       errFn(error)
@@ -62,6 +63,7 @@ class Store {
       }
       const [{ title: lastRun }] = migrations
       next(null, { lastRun, migrations })
+      // eslint-disable-next-line no-catch-all/no-catch-all
     } catch (error) {
       console.log(error) // eslint-disable-line no-console
       next(error)
@@ -97,6 +99,7 @@ class Store {
     try {
       await writeTxResultPromise
       next()
+      // eslint-disable-next-line no-catch-all/no-catch-all
     } catch (error) {
       console.log(error) // eslint-disable-line no-console
       next(error)
@@ -106,4 +109,4 @@ class Store {
   }
 }
 
-module.exports = Store
+export default Store
