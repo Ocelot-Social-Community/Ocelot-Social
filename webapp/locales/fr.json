@@ -485,6 +485,8 @@
     "categoriesTitle": null,
     "changeMemberRole": null,
     "contentMenu": {
+      "muteGroup": null,
+      "unmuteGroup": null,
       "visitGroupPage": null
     },
     "createNewGroup": {

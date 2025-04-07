@@ -485,6 +485,8 @@
     "categoriesTitle": "Topics of the group",
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
+      "muteGroup": "Mute group",
+      "unmuteGroup": "Unmute group",
       "visitGroupPage": "Show group"
     },
     "createNewGroup": {
