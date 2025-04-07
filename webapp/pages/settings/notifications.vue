@@ -8,13 +8,13 @@
         <label :for="setting.name">{{ $t(`settings.notifications.${setting.name}`) }}</label>
       </div>
     </ds-space>
-    <base-button @click="activateAll">
+    <base-button @click="checkAll" :disabled="isCheckAllDisabled">
       {{ $t('settings.notifications.checkAll') }}
     </base-button>
-    <base-button @click="deactivateAll">
+    <base-button @click="uncheckAll" :disabled="isUncheckAllDisabled">
       {{ $t('settings.notifications.uncheckAll') }}
     </base-button>
-    <base-button class="save-button" filled @click="submit" :disabled="disabled">
+    <base-button class="save-button" filled @click="submit" :disabled="isSubmitDisabled">
       {{ $t('actions.save') }}
     </base-button>
   </base-card>
@@ -34,10 +34,20 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
-    disabled() {
+    isSubmitDisabled() {
       return Object.entries(this.emailNotificationSettings).every(
         // TODO deep equals
         (value, index) => value === this.currentUser.emailNotificationSettings[index],
+      )
+    },
+    isCheckAllDisabled() {
+      return Object.entries(this.emailNotificationSettings).every(
+        (topic) => topic[1].settings.every(setting => setting.value),
+      )
+    },
+    isUncheckAllDisabled() {
+      return Object.entries(this.emailNotificationSettings).every(
+        (topic) => topic[1].settings.every(setting => !setting.value),
       )
     },
   },
@@ -55,14 +65,16 @@ export default {
       setCurrentUser: 'auth/SET_USER',
     }),
     setAll(value) {
-      for (const key of Object.keys(this.emailNotificationSettings)) {
-        this.emailNotificationSettings[key] = value
+      for (const topic of this.emailNotificationSettings) {
+        for (const setting of topic.settings) {
+          setting.value = value
+        }
       }
     },
-    activateAll() {
+    checkAll() {
       this.setAll(true)
     },
-    deactivateAll() {
+    uncheckAll() {
       this.setAll(false)
     },
     transformToEmailSettingsInput(emailSettings) {
