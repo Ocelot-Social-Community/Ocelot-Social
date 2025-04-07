@@ -1,8 +1,10 @@
-import path from 'path'
+/* eslint-disable promise/avoid-new */
+/* eslint-disable security/detect-non-literal-fs-filename */
+import path from 'node:path'
 import { v4 as uuid } from 'uuid'
 import { S3 } from 'aws-sdk'
 import slug from 'slug'
-import { existsSync, unlinkSync, createWriteStream } from 'fs'
+import { existsSync, unlinkSync, createWriteStream } from 'node:fs'
 import { UserInputError } from 'apollo-server'
 import { getDriver } from '../../../db/neo4j'
 import CONFIG from '../../../config'

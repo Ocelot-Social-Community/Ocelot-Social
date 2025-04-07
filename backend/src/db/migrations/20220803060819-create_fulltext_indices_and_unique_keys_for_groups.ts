@@ -1,4 +1,4 @@
-import { getDriver } from '../../db/neo4j'
+import { getDriver } from '../neo4j'
 
 export const description = `
   We introduced a new node label 'Group' and we need two primary keys 'id' and 'slug' for it.

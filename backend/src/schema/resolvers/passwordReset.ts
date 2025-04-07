@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid'
 import bcrypt from 'bcryptjs'
-import CONSTANTS_REGISTRATION from './../../constants/registration'
+import CONSTANTS_REGISTRATION from '../../constants/registration'
 import createPasswordReset from './helpers/createPasswordReset'
 
 export default {
