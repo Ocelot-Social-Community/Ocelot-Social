@@ -41,7 +41,7 @@ module.exports = {
     'import/export': 'error',
     // 'import/no-deprecated': 'error',
     'import/no-empty-named-blocks': 'error',
-    // 'import/no-extraneous-dependencies': 'error',
+    'import/no-extraneous-dependencies': 'error',
     'import/no-mutable-exports': 'error',
     'import/no-unused-modules': 'error',
     'import/no-named-as-default': 'error',
