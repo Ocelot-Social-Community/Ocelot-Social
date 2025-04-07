@@ -44,7 +44,6 @@ const publishNotifications = async (context, promises, emailNotificationSetting:
   notifications.forEach((notificationAdded, index) => {
     pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
     if (notificationAdded.to[emailNotificationSetting] ?? true) {
-      // Default to true
       sendMail(
         notificationTemplate({
           email: notificationsEmailAddresses[index].email,
@@ -356,7 +355,7 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
       MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
         WHERE NOT recipientUser.id = $currentUserId
         AND NOT (recipientUser)-[:BLOCKED]-(currentUser)
-        AND recipientUser.sendNotificationEmails = true
+        AND NOT recipientUser.emailNotificationsChatMessage = false
       RETURN recipientUser, emailAddress {.email}
     `
     const txResponse = await transaction.run(messageRecipientCypher, {
