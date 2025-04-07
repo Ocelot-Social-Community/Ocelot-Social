@@ -3,7 +3,7 @@
     <h2 class="title">{{ $t('settings.notifications.name') }}</h2>
     <ds-space margin-bottom="small" v-for="topic in emailNotificationSettings" :key="topic.type">
       <h3>{{ $t(`settings.notifications.${topic.type}`) }}</h3>
-      <div v-for="setting in topic.settings" :key="setting.name" >
+      <div v-for="setting in topic.settings" :key="setting.name">
         <input :id="setting.name" type="checkbox" v-model="setting.value" />
         <label :for="setting.name">{{ $t(`settings.notifications.${setting.name}`) }}</label>
       </div>
@@ -35,29 +35,37 @@ export default {
       currentUser: 'auth/user',
     }),
     isSubmitDisabled() {
-      return this.emailNotificationSettings.every(
-        (topic) => topic.settings.every(setting => setting.value === this.currentUser.emailNotificationSettings.find(t => t.type === topic.type).settings.find(s => s.name === setting.name).value),
+      return this.emailNotificationSettings.every((topic) =>
+        topic.settings.every(
+          (setting) =>
+            setting.value ===
+            this.currentUser.emailNotificationSettings
+              .find((t) => t.type === topic.type)
+              .settings.find((s) => s.name === setting.name).value,
+        ),
       )
     },
     isCheckAllDisabled() {
-      return this.emailNotificationSettings.every(
-        (topic) => topic.settings.every(setting => setting.value),
+      return this.emailNotificationSettings.every((topic) =>
+        topic.settings.every((setting) => setting.value),
       )
     },
     isUncheckAllDisabled() {
-      return this.emailNotificationSettings.every(
-        (topic) => topic.settings.every(setting => !setting.value),
+      return this.emailNotificationSettings.every((topic) =>
+        topic.settings.every((setting) => !setting.value),
       )
     },
   },
   created() {
-    this.emailNotificationSettings = [ ...this.currentUser.emailNotificationSettings.map(topic => ({
-      type: topic.type,
-      settings: topic.settings.map(setting => ({
-        name: setting.name,
-        value: setting.value,
+    this.emailNotificationSettings = [
+      ...this.currentUser.emailNotificationSettings.map((topic) => ({
+        type: topic.type,
+        settings: topic.settings.map((setting) => ({
+          name: setting.name,
+          value: setting.value,
+        })),
       })),
-    }))]
+    ]
   },
   methods: {
     ...mapMutations({
@@ -94,7 +102,9 @@ export default {
           mutation: updateUserMutation(),
           variables: {
             id: this.currentUser.id,
-            emailNotificationSettings: this.transformToEmailSettingsInput(this.emailNotificationSettings),
+            emailNotificationSettings: this.transformToEmailSettingsInput(
+              this.emailNotificationSettings,
+            ),
           },
           update: (_, { data: { UpdateUser } }) => {
             const { emailNotificationSettings } = UpdateUser

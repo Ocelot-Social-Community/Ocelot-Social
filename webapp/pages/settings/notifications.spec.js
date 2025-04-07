@@ -1,6 +1,6 @@
 import Vuex from 'vuex'
 import { mount } from '@vue/test-utils'
-import {render, fireEvent, screen} from '@testing-library/vue'
+import { render, fireEvent, screen } from '@testing-library/vue'
 import Notifications from './notifications.vue'
 
 const localVue = global.localVue
@@ -12,7 +12,7 @@ describe('notifications.vue', () => {
 
   beforeEach(() => {
     mocks = {
-      $t: jest.fn(v => v),
+      $t: jest.fn((v) => v),
       $apollo: {
         mutate: jest.fn(),
       },
@@ -29,37 +29,37 @@ describe('notifications.vue', () => {
             name: 'MyAccount',
             emailNotificationSettings: [
               {
-                type: "post",
+                type: 'post',
                 settings: [
                   {
-                    name: "commentOnObservedPost",
+                    name: 'commentOnObservedPost',
                     value: true,
                   },
                   {
-                    name: "mention",
+                    name: 'mention',
                     value: false,
-                  }
+                  },
                 ],
               },
               {
-                type: "group",
+                type: 'group',
                 settings: [
                   {
-                    name: "groupMemberJoined",
+                    name: 'groupMemberJoined',
                     value: true,
                   },
                   {
-                    name: "groupMemberLeft",
+                    name: 'groupMemberLeft',
                     value: true,
                   },
                   {
-                    name: "groupMemberRemoved",
+                    name: 'groupMemberRemoved',
                     value: false,
                   },
                   {
-                    name: "groupMemberRoleChanged",
+                    name: 'groupMemberRoleChanged',
                     value: true,
-                  }
+                  },
                 ],
               },
             ],
