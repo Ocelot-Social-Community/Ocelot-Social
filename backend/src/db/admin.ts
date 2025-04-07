@@ -36,6 +36,7 @@ const createDefaultAdminUser = async () => {
   try {
     await createAdminTxResultPromise
     console.log('Successfully created default admin user!') // eslint-disable-line no-console
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (error) {
     console.log(error) // eslint-disable-line no-console
   } finally {
