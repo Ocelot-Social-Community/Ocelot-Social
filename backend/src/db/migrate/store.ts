@@ -1,4 +1,4 @@
-import { getDriver, getNeode } from '../../db/neo4j'
+import { getDriver, getNeode } from '../neo4j'
 import { hashSync } from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 import { categories } from '../../constants/categories'
@@ -30,6 +30,7 @@ const createCategories = async (session) => {
   try {
     await createCategoriesTxResultPromise
     console.log('Successfully created categories!') // eslint-disable-line no-console
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (error) {
     console.log(`Error creating categories: ${error}`) // eslint-disable-line no-console
   }
@@ -44,6 +45,7 @@ const createDefaultAdminUser = async (session) => {
   try {
     const userCount = parseInt(String(await readTxResultPromise))
     if (userCount === 0) createAdmin = true
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (error) {
     console.log(error) // eslint-disable-line no-console
   }
@@ -70,6 +72,7 @@ const createDefaultAdminUser = async (session) => {
     try {
       await createAdminTxResultPromise
       console.log('Successfully created default admin user!') // eslint-disable-line no-console
+      // eslint-disable-next-line no-catch-all/no-catch-all
     } catch (error) {
       console.log(error) // eslint-disable-line no-console
     }
@@ -92,6 +95,7 @@ class Store {
       // eslint-disable-next-line no-console
       console.log('Successfully created database indices and constraints!')
       next()
+      // eslint-disable-next-line no-catch-all/no-catch-all
     } catch (error) {
       console.log(error) // eslint-disable-line no-console
       next(error, null)
@@ -121,6 +125,7 @@ class Store {
       }
       const [{ title: lastRun }] = migrations
       next(null, { lastRun, migrations })
+      // eslint-disable-next-line no-catch-all/no-catch-all
     } catch (error) {
       console.log(error) // eslint-disable-line no-console
       next(error)
@@ -156,6 +161,7 @@ class Store {
     try {
       await writeTxResultPromise
       next()
+      // eslint-disable-next-line no-catch-all/no-catch-all
     } catch (error) {
       console.log(error) // eslint-disable-line no-console
       next(error)
@@ -165,4 +171,4 @@ class Store {
   }
 }
 
-module.exports = Store
+export default Store

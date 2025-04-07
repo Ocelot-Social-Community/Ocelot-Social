@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { cleanDatabase } from '../../db/factories'
+import Factory, { cleanDatabase } from '../../db/factories'
 import { createTestClient } from 'apollo-server-testing'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer, { pubsub } from '../../server'
@@ -10,6 +10,23 @@ import {
   changeGroupMemberRoleMutation,
   removeUserFromGroupMutation,
 } from '../../graphql/groups'
+import { createMessageMutation } from '../../graphql/messages'
+import { createRoomMutation } from '../../graphql/rooms'
+
+const sendMailMock = jest.fn()
+jest.mock('../helpers/email/sendMail', () => ({
+  sendMail: () => sendMailMock(),
+}))
+
+const chatMessageTemplateMock = jest.fn()
+jest.mock('../helpers/email/templateBuilder', () => ({
+  chatMessageTemplate: () => chatMessageTemplateMock(),
+}))
+
+let isUserOnlineMock = jest.fn()
+jest.mock('../helpers/isUserOnline', () => ({
+  isUserOnline: () => isUserOnlineMock(),
+}))
 
 let server, query, mutate, notifiedUser, authenticatedUser
 let publishSpy
@@ -629,6 +646,115 @@ describe('notifications', () => {
             expect(publishSpy).toHaveBeenCalledTimes(1)
           })
         })
+      })
+    })
+  })
+
+  describe('chat email notifications', () => {
+    let chatSender
+    let chatReceiver
+    let roomId
+
+    beforeEach(async () => {
+      jest.clearAllMocks()
+
+      chatSender = await neode.create(
+        'User',
+        {
+          id: 'chatSender',
+          name: 'chatSender',
+          slug: 'chatSender',
+        },
+        {
+          email: 'chatSender@example.org',
+          password: '1234',
+        },
+      )
+
+      chatReceiver = await Factory.build(
+        'user',
+        { id: 'chatReceiver', name: 'chatReceiver', slug: 'chatReceiver' },
+        { email: 'user@example.org' },
+      )
+
+      authenticatedUser = await chatSender.toJson()
+
+      const room = await mutate({
+        mutation: createRoomMutation(),
+        variables: {
+          userId: 'chatReceiver',
+        },
+      })
+      roomId = room.data.CreateRoom.id
+    })
+
+    describe('chatReceiver is online', () => {
+      it('sends no email', async () => {
+        isUserOnlineMock = jest.fn().mockReturnValue(true)
+
+        await mutate({
+          mutation: createMessageMutation(),
+          variables: {
+            roomId,
+            content: 'Some nice message to chatReceiver',
+          },
+        })
+
+        expect(sendMailMock).not.toHaveBeenCalled()
+        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('chatReceiver is offline', () => {
+      it('sends an email', async () => {
+        isUserOnlineMock = jest.fn().mockReturnValue(false)
+
+        await mutate({
+          mutation: createMessageMutation(),
+          variables: {
+            roomId,
+            content: 'Some nice message to chatReceiver',
+          },
+        })
+
+        expect(sendMailMock).toHaveBeenCalledTimes(1)
+        expect(chatMessageTemplateMock).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('chatReceiver has blocked chatSender', () => {
+      it('sends no email', async () => {
+        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        await chatReceiver.relateTo(chatSender, 'blocked')
+
+        await mutate({
+          mutation: createMessageMutation(),
+          variables: {
+            roomId,
+            content: 'Some nice message to chatReceiver',
+          },
+        })
+
+        expect(sendMailMock).not.toHaveBeenCalled()
+        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('chatReceiver has disabled email notifications', () => {
+      it('sends no email', async () => {
+        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        await chatReceiver.update({ sendNotificationEmails: false })
+
+        await mutate({
+          mutation: createMessageMutation(),
+          variables: {
+            roomId,
+            content: 'Some nice message to chatReceiver',
+          },
+        })
+
+        expect(sendMailMock).not.toHaveBeenCalled()
+        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
       })
     })
   })
