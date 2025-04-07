@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-commonjs
 module.exports = {
   root: true,
   env: {
@@ -49,7 +50,7 @@ module.exports = {
     'import/no-commonjs': 'error',
     'import/no-import-module-exports': 'error',
     'import/no-nodejs-modules': 'off',
-    'import/unambiguous': 'error',
+    'import/unambiguous': 'off', // not compatible with scriptless vue files
     'import/default': 'error',
     // 'import/named': 'error',
     'import/namespace': 'error',
