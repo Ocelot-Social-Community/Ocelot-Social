@@ -1,3 +1,6 @@
+/* eslint-disable promise/avoid-new */
+/* eslint-disable promise/prefer-await-to-callbacks */
+/* eslint-disable import/no-named-as-default */
 import request from 'request'
 import { UserInputError } from 'apollo-server'
 import Debug from 'debug'

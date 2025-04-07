@@ -1,4 +1,4 @@
-import { getDriver } from '../../db/neo4j'
+import { getDriver } from '../neo4j'
 
 export const description = `
 Transform event start and end date of format 'YYYY-MM-DD HH:MM:SS' in CEST

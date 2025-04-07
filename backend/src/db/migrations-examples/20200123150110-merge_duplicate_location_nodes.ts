@@ -1,3 +1,4 @@
+/* eslint-disable promise/prefer-await-to-callbacks */
 import { throwError, concat } from 'rxjs'
 import { flatMap, mergeMap, map, catchError } from 'rxjs/operators'
 import { getDriver } from '../neo4j'

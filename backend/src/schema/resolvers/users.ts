@@ -160,8 +160,7 @@ export default {
           const allowedSettingNames = [
             'commentOnObservedPost',
             'mention',
-            'postByFollowedUser',
-            'postInGroup',
+            'chatMessage',
             'groupMemberJoined',
             'groupMemberLeft',
             'groupMemberRemoved',
@@ -393,6 +392,15 @@ export default {
             {
               name: 'mention',
               value: parent.emailNotificationsMention ?? true,
+            },
+          ],
+        },
+        {
+          type: 'chat',
+          settings: [
+            {
+              name: 'chatMessage',
+              value: parent.emailNotificationsChatMessage ?? true,
             },
           ],
         },

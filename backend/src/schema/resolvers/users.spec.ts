@@ -677,6 +677,15 @@ describe('emailNotificationSettings', () => {
                       ],
                     },
                     {
+                      type: 'chat',
+                      settings: [
+                        {
+                          name: 'chatMessage',
+                          value: true,
+                        },
+                      ],
+                    },
+                    {
                       type: 'group',
                       settings: [
                         {
@@ -757,6 +766,15 @@ describe('emailNotificationSettings', () => {
                       {
                         name: 'mention',
                         value: false,
+                      },
+                    ],
+                  },
+                  {
+                    type: 'chat',
+                    settings: [
+                      {
+                        name: 'chatMessage',
+                        value: true,
                       },
                     ],
                   },

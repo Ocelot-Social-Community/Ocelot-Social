@@ -2,7 +2,7 @@ import Factory, { cleanDatabase } from '../../db/factories'
 import gql from 'graphql-tag'
 import { getDriver } from '../../db/neo4j'
 import { createTestClient } from 'apollo-server-testing'
-import createServer from '../.././server'
+import createServer from '../../server'
 import {
   markAsReadMutation,
   markAllAsReadMutation,

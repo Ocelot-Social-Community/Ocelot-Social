@@ -1,4 +1,4 @@
-import { getDriver } from '../../db/neo4j'
+import { getDriver } from '../neo4j'
 
 export const description =
   'Transforms the `sendNotificationEmails` property on User to a multi value system'
@@ -14,6 +14,7 @@ export async function up(next) {
       MATCH (user:User)
       SET user.emailNotificationsCommentOnObservedPost = user.sendNotificationEmails
       SET user.emailNotificationsMention = user.sendNotificationEmails
+      SET user.emailNotificationsChatMessage = user.sendNotificationEmails
       SET user.emailNotificationsGroupMemberJoined = user.sendNotificationEmails
       SET user.emailNotificationsGroupMemberLeft = user.sendNotificationEmails
       SET user.emailNotificationsGroupMemberRemoved = user.sendNotificationEmails
@@ -46,6 +47,7 @@ export async function down(next) {
       SET user.sendNotificationEmails = true
       REMOVE user.emailNotificationsCommentOnObservedPost
       REMOVE user.emailNotificationsMention
+      REMOVE user.emailNotificationsChatMessage
       REMOVE user.emailNotificationsGroupMemberJoined
       REMOVE user.emailNotificationsGroupMemberLeft
       REMOVE user.emailNotificationsGroupMemberRemoved
