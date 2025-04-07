@@ -1,3 +1,7 @@
+/* eslint-disable n/no-extraneous-require */
+/* eslint-disable n/global-require */
+/* eslint-disable import/no-commonjs */
+/* eslint-disable import/no-named-as-default */
 import Metascraper from 'metascraper'
 import fetch from 'node-fetch'
 
@@ -37,6 +41,7 @@ const fetchEmbed = async (url) => {
   try {
     const response = await fetch(endpointUrl)
     json = await response.json()
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     error(`Error fetching embed data: ${err.message}`)
     return {}

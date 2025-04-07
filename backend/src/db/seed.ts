@@ -1,10 +1,11 @@
+/* eslint-disable n/no-process-exit */
 import sample from 'lodash/sample'
 import { createTestClient } from 'apollo-server-testing'
 import CONFIG from '../config'
 import createServer from '../server'
 import { faker } from '@faker-js/faker'
-import Factory from '../db/factories'
-import { getNeode, getDriver } from '../db/neo4j'
+import Factory from './factories'
+import { getNeode, getDriver } from './neo4j'
 import {
   createGroupMutation,
   joinGroupMutation,
@@ -1565,6 +1566,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await driver.close()
     await neode.close()
     process.exit(0)
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     /* eslint-disable-next-line no-console */
     console.error(err)

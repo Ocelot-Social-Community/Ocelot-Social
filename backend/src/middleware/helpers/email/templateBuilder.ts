@@ -1,3 +1,4 @@
+/* eslint-disable import/no-namespace */
 import mustache from 'mustache'
 import CONFIG from '../../../config'
 import metadata from '../../../config/metadata'

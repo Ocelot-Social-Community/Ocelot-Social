@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-object-injection */
+// eslint-disable-next-line import/no-cycle
 import { pubsub, NOTIFICATION_ADDED } from '../../server'
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 import { validateNotifyUsers } from '../validation/validationMiddleware'
