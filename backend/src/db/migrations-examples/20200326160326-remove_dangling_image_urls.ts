@@ -1,6 +1,6 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
 import { getDriver } from '../neo4j'
-import { existsSync } from 'fs'
+import { existsSync } from 'node:fs'
 
 export const description = `
   In this review:

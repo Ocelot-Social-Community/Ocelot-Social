@@ -1,7 +1,7 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
 import { getDriver } from '../neo4j'
-import { existsSync, createReadStream } from 'fs'
-import path from 'path'
+import { existsSync, createReadStream } from 'node:fs'
+import path from 'node:path'
 import { S3 } from 'aws-sdk'
 import mime from 'mime-types'
 import s3Configs from '../../config'
