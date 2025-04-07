@@ -561,6 +561,7 @@
       "hidden": "Geheim — Gruppe (auch der Name) komplett unsichtbar",
       "public": "Öffentlich — Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
     },
+    "unmute": "Gruppe nicht mehr stummschalten",
     "update": "Änderung speichern",
     "updatedGroup": "Die Gruppendaten wurden geändert!"
   },

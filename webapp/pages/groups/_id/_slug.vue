@@ -80,19 +80,9 @@
                  </ds-flex-item> -->
           </ds-flex>
           <div class="action-buttons">
-            <!-- <base-button v-if="user.isBlocked" @click="unblockUser(user)">
-                 {{ $t('settings.blocked-users.unblock') }}
-                 </base-button>
-                 <base-button v-if="user.isMuted" @click="unmuteUser(user)">
-                 {{ $t('settings.muted-users.unmute') }}
-                 </base-button>
-                 <follow-button
-                 v-if="!user.isMuted && !user.isBlocked"
-                 :follow-id="user.id"
-                 :is-followed="user.followedByCurrentUser"
-                 @optimistic="optimisticFollow"
-                 @update="updateFollow"
-                 /> -->
+            <base-button danger v-if="group.isMuted" @click="unmuteGroup" icon="volume-up">
+              {{ $t('group.unmute') }}
+            </base-button>
             <!-- Group join / leave -->
             <join-leave-button
               :group="group || {}"
@@ -104,8 +94,6 @@
               @prepare="prepareJoinLeave"
               @update="updateJoinLeave"
             />
-            <!-- implement:
-                 v-if="!user.isMuted && !user.isBlocked" -->
           </div>
           <hr />
           <ds-space margin-top="small" margin-bottom="small">
@@ -310,9 +298,7 @@
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
-import { muteGroup } from '~/graphql/settings/MutedGroups'
-// import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
-// import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
+import { muteGroup, unmuteGroup } from '~/graphql/settings/MutedGroups'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import postListActions from '~/mixins/postListActions'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
@@ -473,7 +459,6 @@ export default {
           mutation: muteGroup(),
           variables: {
             id: this.group.id,
-            isMuted: true,
           },
         })
         // this.$apollo.queries.Group.refetch()
@@ -482,19 +467,19 @@ export default {
         this.$toast.error(error.message)
       }
     },
-    unmuteGroup() {
-      this.$apollo.mutate({
-        mutation: muteGroup(),
-        variables: {
-          id: this.group.id,
-          isMuted: false,
-        },
-      }).then(() => {
-        this.$apollo.queries.Group.refetch()
-        this.$toast.success(this.$t('group.unmuteGroup'))
-      }).catch((error) => {
+    async unmuteGroup() {
+      try {
+        await this.$apollo.mutate({
+          mutation: unmuteGroup(),
+          variables: {
+            id: this.group.id,
+          },
+        })
+        // this.$apollo.queries.Group.refetch()
+        this.$toast.success(this.$t('group.muteGroup'))
+      } catch (error) {
         this.$toast.error(error.message)
-      })
+      }
     },
     uniq(items, field = 'id') {
       return uniqBy(items, field)
