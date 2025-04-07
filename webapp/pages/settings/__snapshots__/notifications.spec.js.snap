@@ -1,0 +1,143 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`notifications.vue mount renders 1`] = `
+<article
+  class="base-card"
+>
+  <h2
+    class="title"
+  >
+    settings.notifications.name
+  </h2>
+   
+  <div
+    class="ds-space"
+    style="margin-bottom: 16px;"
+  >
+    <h3>
+      settings.notifications.post
+    </h3>
+     
+    <div>
+      <input
+        id="commentOnObservedPost"
+        type="checkbox"
+      />
+       
+      <label
+        for="commentOnObservedPost"
+      >
+        settings.notifications.commentOnObservedPost
+      </label>
+    </div>
+    <div>
+      <input
+        id="mention"
+        type="checkbox"
+      />
+       
+      <label
+        for="mention"
+      >
+        settings.notifications.mention
+      </label>
+    </div>
+  </div>
+  <div
+    class="ds-space"
+    style="margin-bottom: 16px;"
+  >
+    <h3>
+      settings.notifications.group
+    </h3>
+     
+    <div>
+      <input
+        id="groupMemberJoined"
+        type="checkbox"
+      />
+       
+      <label
+        for="groupMemberJoined"
+      >
+        settings.notifications.groupMemberJoined
+      </label>
+    </div>
+    <div>
+      <input
+        id="groupMemberLeft"
+        type="checkbox"
+      />
+       
+      <label
+        for="groupMemberLeft"
+      >
+        settings.notifications.groupMemberLeft
+      </label>
+    </div>
+    <div>
+      <input
+        id="groupMemberRemoved"
+        type="checkbox"
+      />
+       
+      <label
+        for="groupMemberRemoved"
+      >
+        settings.notifications.groupMemberRemoved
+      </label>
+    </div>
+    <div>
+      <input
+        id="groupMemberRoleChanged"
+        type="checkbox"
+      />
+       
+      <label
+        for="groupMemberRoleChanged"
+      >
+        settings.notifications.groupMemberRoleChanged
+      </label>
+    </div>
+  </div>
+   
+  <button
+    class="base-button"
+    type="button"
+  >
+    <!---->
+     
+    <!---->
+     
+    settings.notifications.checkAll
+  
+  </button>
+   
+  <button
+    class="base-button"
+    type="button"
+  >
+    <!---->
+     
+    <!---->
+     
+    settings.notifications.uncheckAll
+  
+  </button>
+   
+  <button
+    class="save-button base-button --filled"
+    disabled="disabled"
+    type="button"
+  >
+    <!---->
+     
+    <!---->
+     
+    actions.save
+  
+  </button>
+   
+  <!---->
+</article>
+`;
