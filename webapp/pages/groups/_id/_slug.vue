@@ -23,13 +23,9 @@
               :usage="'groupProfile'"
               :group="group || {}"
               placement="bottom-end"
+              @mute="muteGroup"
+              @unmute="unmuteGroup"
             />
-            <!-- TODO: implement later on -->
-            <!-- @mute="muteUser"
-                 @unmute="unmuteUser"
-                 @block="blockUser"
-                 @unblock="unblockUser"
-                 @delete="deleteUser" -->
           </client-only>
           <ds-space margin="small">
             <!-- group name -->
@@ -314,6 +310,7 @@
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
+import { muteGroup } from '~/graphql/settings/MutedGroups'
 // import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 // import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 import UpdateQuery from '~/components/utils/UpdateQuery'
@@ -470,6 +467,35 @@ export default {
     //     this.resetPostList()
     //   }
     // },
+    async muteGroup() {
+      try {
+        await this.$apollo.mutate({
+          mutation: muteGroup(),
+          variables: {
+            id: this.group.id,
+            isMuted: true,
+          },
+        })
+        // this.$apollo.queries.Group.refetch()
+        this.$toast.success(this.$t('group.muteGroup'))
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
+    unmuteGroup() {
+      this.$apollo.mutate({
+        mutation: muteGroup(),
+        variables: {
+          id: this.group.id,
+          isMuted: false,
+        },
+      }).then(() => {
+        this.$apollo.queries.Group.refetch()
+        this.$toast.success(this.$t('group.unmuteGroup'))
+      }).catch((error) => {
+        this.$toast.error(error.message)
+      })
+    },
     uniq(items, field = 'id') {
       return uniqBy(items, field)
     },
