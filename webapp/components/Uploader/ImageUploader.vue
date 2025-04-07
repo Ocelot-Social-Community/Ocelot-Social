@@ -52,7 +52,6 @@
 import VueDropzone from 'nuxt-dropzone'
 import Cropper from 'cropperjs'
 import LoadingSpinner from '~/components/_new/generic/LoadingSpinner/LoadingSpinner'
-import 'cropperjs/dist/cropper.css'
 
 const minAspectRatio = 0.3
 
