@@ -72,6 +72,19 @@ export const resetPasswordTemplate = ({ email, variables: { nonce, name } }) => 
   }
 }
 
+export const chatMessageTemplate = ({ email, variables: { name } }) => {
+  const subject = 'Neue Chatnachricht | New chat message'
+  const actionUrl = new URL('/chat', CONFIG.CLIENT_URI)
+  const renderParams = { ...defaultParams, englishHint, actionUrl, name, subject }
+
+  return {
+    from,
+    to: email,
+    subject,
+    html: mustache.render(templates.layout, renderParams, { content: templates.chatMessage }),
+  }
+}
+
 export const wrongAccountTemplate = ({ email, _variables = {} }) => {
   const subject = 'Falsche Mailadresse? | Wrong E-mail?'
   const actionUrl = new URL('/password-reset/request', CONFIG.CLIENT_URI)
