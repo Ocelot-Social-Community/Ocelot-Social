@@ -165,6 +165,10 @@ export default {
     type: 'boolean',
     default: true,
   },
+  emailNotificationsChatMessage: {
+    type: 'boolean',
+    default: true,
+  },
   emailNotificationsGroupMemberJoined: {
     type: 'boolean',
     default: true,
