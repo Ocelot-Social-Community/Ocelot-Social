@@ -27,7 +27,7 @@ import { updateUserMutation } from '~/graphql/User'
 export default {
   data() {
     return {
-      emailNotificationSettings: {},
+      emailNotificationSettings: [],
     }
   },
   computed: {
@@ -35,19 +35,18 @@ export default {
       currentUser: 'auth/user',
     }),
     isSubmitDisabled() {
-      return Object.entries(this.emailNotificationSettings).every(
-        // TODO deep equals
-        (value, index) => value === this.currentUser.emailNotificationSettings[index],
+      return this.emailNotificationSettings.every(
+        (topic) => topic.settings.every(setting => setting.value === this.currentUser.emailNotificationSettings.find(t => t.type === topic.type).settings.find(s => s.name === setting.name).value),
       )
     },
     isCheckAllDisabled() {
-      return Object.entries(this.emailNotificationSettings).every(
-        (topic) => topic[1].settings.every(setting => setting.value),
+      return this.emailNotificationSettings.every(
+        (topic) => topic.settings.every(setting => setting.value),
       )
     },
     isUncheckAllDisabled() {
-      return Object.entries(this.emailNotificationSettings).every(
-        (topic) => topic[1].settings.every(setting => !setting.value),
+      return this.emailNotificationSettings.every(
+        (topic) => topic.settings.every(setting => !setting.value),
       )
     },
   },
