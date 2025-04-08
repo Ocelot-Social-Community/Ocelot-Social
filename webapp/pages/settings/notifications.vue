@@ -1,12 +1,16 @@
 <template>
   <base-card>
     <h2 class="title">{{ $t('settings.notifications.name') }}</h2>
-    <ds-space margin-bottom="small" v-for="topic in emailNotificationSettings" :key="topic.type">
-      <h3>{{ $t(`settings.notifications.${topic.type}`) }}</h3>
-      <div v-for="setting in topic.settings" :key="setting.name">
-        <input :id="setting.name" type="checkbox" v-model="setting.value" />
-        <label :for="setting.name">{{ $t(`settings.notifications.${setting.name}`) }}</label>
-      </div>
+    <ds-space margin-top="base" v-for="topic in emailNotificationSettings" :key="topic.type">
+      <ds-space margin-bottom="small">
+      <h4>{{ $t(`settings.notifications.${topic.type}`) }}</h4>
+    </ds-space>
+    <div class="notifcation-settings-section">
+    <ds-space margin-bottom="small" v-for="setting in topic.settings" :key="setting.name">
+      <input :id="setting.name" type="checkbox" v-model="setting.value" />
+      <label :for="setting.name" class="label">{{ $t(`settings.notifications.${setting.name}`) }}</label>
+    </ds-space>
+    </div>
     </ds-space>
     <base-button @click="checkAll" :disabled="isCheckAllDisabled">
       {{ $t('settings.notifications.checkAll') }}
@@ -122,3 +126,12 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.notifcation-settings-section {
+  margin-left: $space-x-small;
+}
+.label {
+  margin-left: $space-xx-small;
+}
+</style>
