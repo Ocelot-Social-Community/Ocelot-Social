@@ -1,9 +1,11 @@
-import encode from '@jwt/encode'
-import bcrypt from 'bcryptjs'
 import { AuthenticationError } from 'apollo-server'
+import bcrypt from 'bcryptjs'
+
 import { getNeode } from '@db/neo4j'
-import normalizeEmail from './helpers/normalizeEmail'
+import encode from '@jwt/encode'
+
 import log from './helpers/databaseLogger'
+import normalizeEmail from './helpers/normalizeEmail'
 
 const neode = getNeode()
 

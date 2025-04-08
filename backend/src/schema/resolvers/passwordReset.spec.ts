@@ -1,10 +1,12 @@
-import Factory, { cleanDatabase } from '@db/factories'
-import gql from 'graphql-tag'
-import { getNeode, getDriver } from '@db/neo4j'
-import CONSTANTS_REGISTRATION from '@constants/registration'
-import createPasswordReset from './helpers/createPasswordReset'
-import createServer from '@src/server'
 import { createTestClient } from 'apollo-server-testing'
+import gql from 'graphql-tag'
+
+import CONSTANTS_REGISTRATION from '@constants/registration'
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import createServer from '@src/server'
+
+import createPasswordReset from './helpers/createPasswordReset'
 
 const neode = getNeode()
 const driver = getDriver()

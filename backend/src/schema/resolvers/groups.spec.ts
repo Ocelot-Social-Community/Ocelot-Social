@@ -1,5 +1,8 @@
 import { createTestClient } from 'apollo-server-testing'
+
+import CONFIG from '@config/index'
 import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
 import {
   createGroupMutation,
   updateGroupMutation,
@@ -10,9 +13,7 @@ import {
   groupMembersQuery,
   groupQuery,
 } from '@graphql/groups'
-import { getNeode, getDriver } from '@db/neo4j'
 import createServer from '@src/server'
-import CONFIG from '@config/index'
 
 const driver = getDriver()
 const neode = getNeode()

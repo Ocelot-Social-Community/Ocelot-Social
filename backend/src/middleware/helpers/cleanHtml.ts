@@ -1,6 +1,6 @@
 /* eslint-disable security/detect-unsafe-regex */
-import sanitizeHtml from 'sanitize-html'
 import linkifyHtml from 'linkify-html'
+import sanitizeHtml from 'sanitize-html'
 
 export const removeHtmlTags = (input) => {
   return sanitizeHtml(input, {

@@ -1,7 +1,10 @@
 import { createTestClient } from 'apollo-server-testing'
+
+import CONFIG from '@config/index'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import createServer from '@src/server'
+import { signupVerificationMutation } from '@graphql/authentications'
+import { createCommentMutation } from '@graphql/comments'
 import {
   createGroupMutation,
   changeGroupMemberRoleMutation,
@@ -14,11 +17,7 @@ import {
   profilePagePosts,
   searchPosts,
 } from '@graphql/posts'
-import { createCommentMutation } from '@graphql/comments'
-// eslint-disable-next-line no-unused-vars
-import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
-import CONFIG from '@config/index'
-import { signupVerificationMutation } from '@graphql/authentications'
+import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 

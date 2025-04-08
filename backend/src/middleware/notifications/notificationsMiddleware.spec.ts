@@ -1,8 +1,8 @@
-import gql from 'graphql-tag'
-import Factory, { cleanDatabase } from '@db/factories'
 import { createTestClient } from 'apollo-server-testing'
+import gql from 'graphql-tag'
+
+import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import createServer, { pubsub } from '@src/server'
 import {
   createGroupMutation,
   joinGroupMutation,
@@ -12,6 +12,7 @@ import {
 } from '@graphql/groups'
 import { createMessageMutation } from '@graphql/messages'
 import { createRoomMutation } from '@graphql/rooms'
+import createServer, { pubsub } from '@src/server'
 
 const sendMailMock = jest.fn()
 jest.mock('../helpers/email/sendMail', () => ({
