@@ -32,6 +32,11 @@ export default {
   created() {
     this.notifyByEmail = this.currentUser.sendNotificationEmails || false
   },
+  mounted() {
+    document.getElementById('settings-content').scrollIntoView({
+      behavior: 'smooth',
+    })
+  },
   methods: {
     ...mapMutations({
       setCurrentUser: 'auth/SET_USER',
