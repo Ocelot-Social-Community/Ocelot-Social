@@ -717,10 +717,7 @@ describe('emailNotificationSettings', () => {
   })
 
   describe('mutate the field', () => {
-    const emailNotificationSettings = [
-      { name: 'mention', value: false },
-      { name: 'non-existent', value: true },
-    ]
+    const emailNotificationSettings = [{ name: 'mention', value: false }]
 
     describe('as another user', () => {
       it('throws an error', async () => {

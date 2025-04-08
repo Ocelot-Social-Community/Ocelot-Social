@@ -157,18 +157,6 @@ export default {
       delete params.emailNotificationSettings
       if (emailNotificationSettings) {
         emailNotificationSettings.forEach((setting) => {
-          const allowedSettingNames = [
-            'commentOnObservedPost',
-            'mention',
-            'chatMessage',
-            'groupMemberJoined',
-            'groupMemberLeft',
-            'groupMemberRemoved',
-            'groupMemberRoleChanged',
-          ]
-          if (!allowedSettingNames.includes(setting.name)) {
-            return
-          }
           params[
             'emailNotifications' + setting.name.charAt(0).toUpperCase() + setting.name.slice(1)
           ] = setting.value

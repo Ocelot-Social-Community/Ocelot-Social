@@ -1,0 +1,5 @@
+enum EmailNotificationSettingsType {
+  post
+  chat
+  group
+}

@@ -20,17 +20,17 @@ enum _UserOrdering {
 }
 
 input EmailNotificationSettingsInput {
-  name: String
+  name: EmailNotificationSettingsName
   value: Boolean
 }
 
 type EmailNotificationSettings {
-  type: String
+  type: EmailNotificationSettingsType
   settings: [EmailNotificationSettingsOption] @neo4j_ignore
 }
 
 type EmailNotificationSettingsOption {
-  name: String
+  name: EmailNotificationSettingsName
   value: Boolean
 }
 

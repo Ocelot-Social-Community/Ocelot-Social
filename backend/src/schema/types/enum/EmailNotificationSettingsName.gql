@@ -1,0 +1,9 @@
+enum EmailNotificationSettingsName {
+  commentOnObservedPost
+  mention
+  chatMessage
+  groupMemberJoined
+  groupMemberLeft
+  groupMemberRemoved
+  groupMemberRoleChanged
+}
