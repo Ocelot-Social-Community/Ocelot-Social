@@ -1,6 +1,6 @@
 /* eslint-disable import/no-named-as-default-member */
 import express from 'express'
-import http from 'http'
+import http from 'node:http'
 import helmet from 'helmet'
 import { ApolloServer } from 'apollo-server-express'
 import CONFIG from './config'
