@@ -57,6 +57,35 @@ const notificationQuery = gql`
   }
 `
 
+const muteGroupMutation = gql`
+  mutation ($id: ID!) {
+    muteGroup(id: $id) {
+      id
+      isMutedByMe
+    }
+  }
+`
+
+const unmuteGroupMutation = gql`
+  mutation ($id: ID!) {
+    unmuteGroup(id: $id) {
+      id
+      isMutedByMe
+    }
+  }
+`
+
+const markAllAsRead = async () =>
+  mutate({
+    mutation: gql`
+      mutation {
+        markAllAsRead {
+          id
+        }
+      }
+    `,
+  })
+
 beforeAll(async () => {
   await cleanDatabase()
 
@@ -161,16 +190,6 @@ describe('notify group members of new posts in group', () => {
 
   describe('group owner posts in group', () => {
     beforeAll(async () => {
-      const markAllAsRead = async () =>
-        mutate({
-          mutation: gql`
-            mutation {
-              markAllAsRead {
-                id
-              }
-            }
-          `,
-        })
       authenticatedUser = await groupMember.toJson()
       await markAllAsRead()
       authenticatedUser = await postAuthor.toJson()
@@ -242,6 +261,115 @@ describe('notify group members of new posts in group', () => {
           ],
         },
         errors: undefined,
+      })
+    })
+
+    describe('group member mutes group', () => {
+      it('sets the muted status correctly', async () => {
+        authenticatedUser = await groupMember.toJson()
+        await expect(
+          mutate({
+            mutation: muteGroupMutation,
+            variables: {
+              id: 'g-1',
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            muteGroup: {
+              isMutedByMe: true,
+            },
+          },
+          errors: undefined,
+        })
+      })
+
+      it('sends no notification when another post is posted', async () => {
+        authenticatedUser = await groupMember.toJson()
+        await markAllAsRead()
+        authenticatedUser = await postAuthor.toJson()
+        await mutate({
+          mutation: createPostMutation,
+          variables: {
+            id: 'post-1',
+            title: 'This is another  post in the group',
+            content: 'This is the content of another post in the group',
+            groupId: 'g-1',
+          },
+        })
+        authenticatedUser = await groupMember.toJson()
+        await expect(
+          query({
+            query: notificationQuery,
+            variables: {
+              read: false,
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            notifications: [],
+          },
+          errors: undefined,
+        })
+      })
+
+      describe('group member unmutes group again', () => {
+        it('sets the muted status correctly', async () => {
+          authenticatedUser = await groupMember.toJson()
+          await expect(
+            mutate({
+              mutation: unmuteGroupMutation,
+              variables: {
+                id: 'g-1',
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              unmuteGroup: {
+                isMutedByMe: false,
+              },
+            },
+            errors: undefined,
+          })
+        })
+
+        it('sends notification when another post is posted', async () => {
+          authenticatedUser = await groupMember.toJson()
+          await markAllAsRead()
+          authenticatedUser = await postAuthor.toJson()
+          await mutate({
+            mutation: createPostMutation,
+            variables: {
+              id: 'post-2',
+              title: 'This is yet another  post in the group',
+              content: 'This is the content of yet another post in the group',
+              groupId: 'g-1',
+            },
+          })
+          authenticatedUser = await groupMember.toJson()
+          await expect(
+            query({
+              query: notificationQuery,
+              variables: {
+                read: false,
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              notifications: [
+                {
+                  from: {
+                    __typename: 'Post',
+                    id: 'post-2',
+                  },
+                  read: false,
+                  reason: 'post_in_group',
+                },
+              ],
+            },
+            errors: undefined,
+          })
+        })
       })
     })
   })

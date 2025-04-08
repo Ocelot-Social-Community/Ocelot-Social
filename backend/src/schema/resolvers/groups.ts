@@ -366,6 +366,64 @@ export default {
         session.close()
       }
     },
+    muteGroup: async (_parent, params, context, _resolveInfo) => {
+      const { id: groupId } = params
+      const userId = context.user.id
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const transactionResponse = await transaction.run(
+          `
+          MATCH (group:Group { id: $groupId })
+          MATCH (user:User { id: $userId })
+          MERGE (user)-[m:MUTED]->(group)
+          SET m.createdAt = toString(datetime())
+          RETURN group { .* }
+        `,
+          {
+            groupId,
+            userId,
+          },
+        )
+        const [group] = await transactionResponse.records.map((record) => record.get('group'))
+        return group
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    unmuteGroup: async (_parent, params, context, _resolveInfo) => {
+      const { id: groupId } = params
+      const userId = context.user.id
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const transactionResponse = await transaction.run(
+          `
+          MATCH (group:Group { id: $groupId })
+          MATCH (user:User { id: $userId })
+          OPTIONAL MATCH  (user)-[m:MUTED]->(group)
+          DELETE m
+          RETURN group { .* }
+        `,
+          {
+            groupId,
+            userId,
+          },
+        )
+        const [group] = await transactionResponse.records.map((record) => record.get('group'))
+        return group
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
   },
   Group: {
     ...Resolver('Group', {
@@ -377,6 +435,10 @@ export default {
       hasOne: {
         avatar: '-[:AVATAR_IMAGE]->(related:Image)',
         location: '-[:IS_IN]->(related:Location)',
+      },
+      boolean: {
+        isMutedByMe:
+          'MATCH (this)<-[:MUTED]-(related:User {id: $cypherParams.currentUserId}) RETURN COUNT(related) >= 1',
       },
     }),
   },
