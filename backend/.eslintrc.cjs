@@ -130,7 +130,7 @@ module.exports = {
     // 'n/no-unpublished-bin': 'error', // part of n/recommended
     'n/no-unpublished-import': [
       'error',
-      { allowModules: ['apollo-server-testing', 'rosie', '@faker-js/faker'] },
+      { allowModules: ['apollo-server-testing', 'rosie', '@faker-js/faker', 'ts-jest'] },
     ], // part of n/recommended
     // 'n/no-unpublished-require': 'error', // part of n/recommended
     // 'n/no-unsupported-features/es-builtins': 'error', // part of n/recommended
