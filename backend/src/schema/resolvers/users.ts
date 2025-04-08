@@ -1,5 +1,5 @@
 import { neo4jgraphql } from 'neo4j-graphql-js'
-import { getNeode } from '../../db/neo4j'
+import { getNeode } from '@db/neo4j'
 import { UserInputError, ForbiddenError } from 'apollo-server'
 import { mergeImage, deleteImage } from './images/images'
 import Resolver from './helpers/Resolver'

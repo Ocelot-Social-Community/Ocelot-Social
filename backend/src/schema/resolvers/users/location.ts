@@ -5,8 +5,8 @@ import request from 'request'
 import { UserInputError } from 'apollo-server'
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Debug from 'debug'
-import asyncForEach from '../../../helpers/asyncForEach'
-import CONFIG from '../../../config'
+import asyncForEach from '@helpers/asyncForEach'
+import CONFIG from '@config/index'
 
 const debug = Debug('human-connection:location')
 

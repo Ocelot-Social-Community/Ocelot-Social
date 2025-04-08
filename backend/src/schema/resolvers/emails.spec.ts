@@ -1,7 +1,7 @@
-import Factory, { cleanDatabase } from '../../db/factories'
+import Factory, { cleanDatabase } from '@db/factories'
 import gql from 'graphql-tag'
-import { getDriver, getNeode } from '../../db/neo4j'
-import createServer from '../../server'
+import { getDriver, getNeode } from '@db/neo4j'
+import createServer from '@src/server'
 import { createTestClient } from 'apollo-server-testing'
 
 const neode = getNeode()

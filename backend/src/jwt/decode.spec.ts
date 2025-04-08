@@ -1,5 +1,5 @@
-import Factory, { cleanDatabase } from '../db/factories'
-import { getDriver, getNeode } from '../db/neo4j'
+import Factory, { cleanDatabase } from '@db/factories'
+import { getDriver, getNeode } from '@db/neo4j'
 import decode from './decode'
 import encode from './encode'
 

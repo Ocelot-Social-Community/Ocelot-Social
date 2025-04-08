@@ -1,8 +1,8 @@
 /* eslint-disable import/no-namespace */
 import mustache from 'mustache'
-import CONFIG from '../../../config'
-import metadata from '../../../config/metadata'
-import logosWebapp from '../../../config/logos'
+import CONFIG from '@config/index'
+import metadata from '@config//metadata'
+import logosWebapp from '@config//logos'
 
 import * as templates from './templates'
 import * as templatesEN from './templates/en'

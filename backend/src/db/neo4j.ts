@@ -1,8 +1,8 @@
 /* eslint-disable import/no-named-as-default-member */
 import neo4j from 'neo4j-driver'
-import CONFIG from '../config'
+import CONFIG from '@config/index'
 import Neode from 'neode'
-import models from '../models'
+import models from '@models/index'
 
 let driver
 const defaultOptions = {

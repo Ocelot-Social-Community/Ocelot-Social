@@ -1,10 +1,10 @@
-import { sendMail } from '../helpers/email/sendMail'
+import { sendMail } from '@middleware/helpers/email/sendMail'
 import {
   signupTemplate,
   resetPasswordTemplate,
   wrongAccountTemplate,
   emailVerificationTemplate,
-} from '../helpers/email/templateBuilder'
+} from '@middleware/helpers/email/templateBuilder'
 
 const sendSignupMail = async (resolve, root, args, context, resolveInfo) => {
   const { inviteCode } = args
