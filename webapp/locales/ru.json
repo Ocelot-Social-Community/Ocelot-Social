@@ -738,6 +738,7 @@
     "reason": {
       "changed_group_member_role": null,
       "commented_on_post": "Комментарий к посту...",
+      "followed_user_posted": null,
       "mentioned_in_comment": "Упоминание в комментарии....",
       "mentioned_in_post": "Упоминание в посте....",
       "removed_user_from_group": null,
