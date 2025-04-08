@@ -3,14 +3,16 @@
     <h2 class="title">{{ $t('settings.notifications.name') }}</h2>
     <ds-space margin-top="base" v-for="topic in emailNotificationSettings" :key="topic.type">
       <ds-space margin-bottom="small">
-      <h4>{{ $t(`settings.notifications.${topic.type}`) }}</h4>
-    </ds-space>
-    <div class="notifcation-settings-section">
-    <ds-space margin-bottom="small" v-for="setting in topic.settings" :key="setting.name">
-      <input :id="setting.name" type="checkbox" v-model="setting.value" />
-      <label :for="setting.name" class="label">{{ $t(`settings.notifications.${setting.name}`) }}</label>
-    </ds-space>
-    </div>
+        <h4>{{ $t(`settings.notifications.${topic.type}`) }}</h4>
+      </ds-space>
+      <div class="notifcation-settings-section">
+        <ds-space margin-bottom="x-small" v-for="setting in topic.settings" :key="setting.name">
+          <input :id="setting.name" type="checkbox" v-model="setting.value" />
+          <label :for="setting.name" class="label">
+            {{ $t(`settings.notifications.${setting.name}`) }}
+          </label>
+        </ds-space>
+      </div>
     </ds-space>
     <base-button @click="checkAll" :disabled="isCheckAllDisabled">
       {{ $t('settings.notifications.checkAll') }}
@@ -116,9 +118,9 @@ export default {
               ...this.currentUser,
               emailNotificationSettings,
             })
-            this.$toast.success(this.$t('settings.notifications.success-update'))
           },
         })
+        this.$toast.success(this.$t('settings.notifications.success-update'))
       } catch (error) {
         this.$toast.error(error.message)
       }

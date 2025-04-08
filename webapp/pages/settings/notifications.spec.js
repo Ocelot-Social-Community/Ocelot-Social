@@ -122,6 +122,65 @@ describe('notifications.vue', () => {
       expect(button.disabled).toBe(true)
     })
 
+    it('clicking on submit keeps set values and shows success message', async () => {
+      mocks.$apollo.mutate = jest.fn().mockResolvedValue({
+        data: {
+          UpdateUser: {
+            emailNotificationSettings: [
+              {
+                type: 'post',
+                settings: [
+                  {
+                    name: 'commentOnObservedPost',
+                    value: false,
+                  },
+                  {
+                    name: 'mention',
+                    value: false,
+                  },
+                ],
+              },
+              {
+                type: 'group',
+                settings: [
+                  {
+                    name: 'groupMemberJoined',
+                    value: true,
+                  },
+                  {
+                    name: 'groupMemberLeft',
+                    value: true,
+                  },
+                  {
+                    name: 'groupMemberRemoved',
+                    value: false,
+                  },
+                  {
+                    name: 'groupMemberRoleChanged',
+                    value: true,
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      })
+
+      // Change some value to enable save button
+      const checkbox = screen.getAllByRole('checkbox')[0]
+      await fireEvent.click(checkbox)
+
+      const newValue = checkbox.checked
+
+      // Click save button
+      const button = screen.getByText('actions.save')
+      await fireEvent.click(button)
+
+      expect(checkbox.checked).toEqual(newValue)
+
+      expect(mocks.$toast.success).toHaveBeenCalledWith('settings.notifications.success-update')
+    })
+
     it('clicking on submit with a server error shows a toast', async () => {
       mocks.$apollo.mutate = jest.fn().mockRejectedValue({ message: 'Ouch!' })
 

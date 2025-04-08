@@ -12,92 +12,146 @@ exports[`notifications.vue mount renders 1`] = `
    
   <div
     class="ds-space"
-    style="margin-bottom: 16px;"
+    style="margin-top: 24px; margin-bottom: 32px;"
   >
-    <h3>
-      settings.notifications.post
-    </h3>
-     
-    <div>
-      <input
-        id="commentOnObservedPost"
-        type="checkbox"
-      />
-       
-      <label
-        for="commentOnObservedPost"
-      >
-        settings.notifications.commentOnObservedPost
-      </label>
+    <div
+      class="ds-space"
+      style="margin-bottom: 16px;"
+    >
+      <h4>
+        settings.notifications.post
+      </h4>
     </div>
-    <div>
-      <input
-        id="mention"
-        type="checkbox"
-      />
-       
-      <label
-        for="mention"
+     
+    <div
+      class="notifcation-settings-section"
+    >
+      <div
+        class="ds-space"
+        style="margin-bottom: 8px;"
       >
-        settings.notifications.mention
-      </label>
+        <input
+          id="commentOnObservedPost"
+          type="checkbox"
+        />
+         
+        <label
+          class="label"
+          for="commentOnObservedPost"
+        >
+          
+          settings.notifications.commentOnObservedPost
+        
+        </label>
+      </div>
+      <div
+        class="ds-space"
+        style="margin-bottom: 8px;"
+      >
+        <input
+          id="mention"
+          type="checkbox"
+        />
+         
+        <label
+          class="label"
+          for="mention"
+        >
+          
+          settings.notifications.mention
+        
+        </label>
+      </div>
     </div>
   </div>
   <div
     class="ds-space"
-    style="margin-bottom: 16px;"
+    style="margin-top: 24px; margin-bottom: 32px;"
   >
-    <h3>
-      settings.notifications.group
-    </h3>
+    <div
+      class="ds-space"
+      style="margin-bottom: 16px;"
+    >
+      <h4>
+        settings.notifications.group
+      </h4>
+    </div>
      
-    <div>
-      <input
-        id="groupMemberJoined"
-        type="checkbox"
-      />
-       
-      <label
-        for="groupMemberJoined"
+    <div
+      class="notifcation-settings-section"
+    >
+      <div
+        class="ds-space"
+        style="margin-bottom: 8px;"
       >
-        settings.notifications.groupMemberJoined
-      </label>
-    </div>
-    <div>
-      <input
-        id="groupMemberLeft"
-        type="checkbox"
-      />
-       
-      <label
-        for="groupMemberLeft"
+        <input
+          id="groupMemberJoined"
+          type="checkbox"
+        />
+         
+        <label
+          class="label"
+          for="groupMemberJoined"
+        >
+          
+          settings.notifications.groupMemberJoined
+        
+        </label>
+      </div>
+      <div
+        class="ds-space"
+        style="margin-bottom: 8px;"
       >
-        settings.notifications.groupMemberLeft
-      </label>
-    </div>
-    <div>
-      <input
-        id="groupMemberRemoved"
-        type="checkbox"
-      />
-       
-      <label
-        for="groupMemberRemoved"
+        <input
+          id="groupMemberLeft"
+          type="checkbox"
+        />
+         
+        <label
+          class="label"
+          for="groupMemberLeft"
+        >
+          
+          settings.notifications.groupMemberLeft
+        
+        </label>
+      </div>
+      <div
+        class="ds-space"
+        style="margin-bottom: 8px;"
       >
-        settings.notifications.groupMemberRemoved
-      </label>
-    </div>
-    <div>
-      <input
-        id="groupMemberRoleChanged"
-        type="checkbox"
-      />
-       
-      <label
-        for="groupMemberRoleChanged"
+        <input
+          id="groupMemberRemoved"
+          type="checkbox"
+        />
+         
+        <label
+          class="label"
+          for="groupMemberRemoved"
+        >
+          
+          settings.notifications.groupMemberRemoved
+        
+        </label>
+      </div>
+      <div
+        class="ds-space"
+        style="margin-bottom: 8px;"
       >
-        settings.notifications.groupMemberRoleChanged
-      </label>
+        <input
+          id="groupMemberRoleChanged"
+          type="checkbox"
+        />
+         
+        <label
+          class="label"
+          for="groupMemberRoleChanged"
+        >
+          
+          settings.notifications.groupMemberRoleChanged
+        
+        </label>
+      </div>
     </div>
   </div>
    
