@@ -42,7 +42,8 @@ export async function down(next) {
   try {
     // Implement your migration here.
     await transaction.run(`
-      MATCH (u:User)-[obs:OBSERVES]->(p:Post)<-[:COMMENTS]-(:COMMENT)<-[:WROTE]-(u)
+      MATCH (u:User)-[obs:OBSERVES]->(p:Post)<-[:COMMENTS]-(:Comment)<-[:WROTE]-(u)
+      WHERE NOT (u)-[:WROTE]->(post)
       DELETE obs
       RETURN p
     `)
