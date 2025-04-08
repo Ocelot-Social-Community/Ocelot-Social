@@ -99,12 +99,13 @@ const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveIn
 }
 
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
+  const { groupId } = args
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
     await publishNotifications(context, [
       notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
-      notifyFollowingUsers(post.id, context),
+      notifyFollowingUsers(post.id, groupId, context),
     ])
   }
   return post
@@ -148,7 +149,8 @@ const postAuthorOfComment = async (commentId, { context }) => {
   }
 }
 
-const notifyFollowingUsers = async (postId, context) => {
+const notifyFollowingUsers = async (postId, groupId, context) => {
+  if (groupId) return []
   const reason = 'followed_user_posted'
   const cypher = `
     MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })<-[:FOLLOWS]-(user:User)

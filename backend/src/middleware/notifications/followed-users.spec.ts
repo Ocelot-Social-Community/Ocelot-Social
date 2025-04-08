@@ -3,6 +3,7 @@ import { cleanDatabase } from '../../db/factories'
 import { getNeode, getDriver } from '../../db/neo4j'
 import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
+import { createGroupMutation, joinGroupMutation } from '../../graphql/groups'
 
 import CONFIG from '../../config'
 
@@ -16,8 +17,8 @@ const driver = getDriver()
 const neode = getNeode()
 
 const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $content: String!) {
-    CreatePost(id: $id, title: $title, content: $content) {
+  mutation ($id: ID, $title: String!, $content: String!, $groupId: ID) {
+    CreatePost(id: $id, title: $title, content: $content, groupId: $groupId) {
       id
       title
       content
@@ -82,7 +83,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  // await cleanDatabase()
+  await cleanDatabase()
   driver.close()
 })
 
@@ -187,6 +188,88 @@ describe('following users notifications', () => {
 
     it('sends notification to the second follower', async () => {
       authenticatedUser = await secondFollower.toJson()
+      await expect(
+        query({
+          query: notificationQuery,
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: [
+            {
+              from: {
+                __typename: 'Post',
+                id: 'post',
+              },
+              read: false,
+              reason: 'followed_user_posted',
+            },
+          ],
+        },
+        errors: undefined,
+      })
+    })
+  })
+
+  describe('followed user posts in group', () => {
+    beforeAll(async () => {
+      authenticatedUser = await postAuthor.toJson()
+      await mutate({
+        mutation: createGroupMutation(),
+        variables: {
+          id: 'g-1',
+          name: 'A group',
+          description: 'A group to test the follow user notification',
+          groupType: 'public',
+          actionRadius: 'national',
+        },
+      })
+      authenticatedUser = await firstFollower.toJson()
+      await mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g-1',
+          userId: 'first-follower',
+        },
+      })
+      authenticatedUser = await postAuthor.toJson()
+      await mutate({
+        mutation: createPostMutation,
+        variables: {
+          id: 'group-post',
+          title: 'This is the post in the group',
+          content: 'This is the content of the post in the group',
+          groupId: 'g-1',
+        },
+      })
+    })
+
+    it('sends the join group notification to the post author', async () => {
+      await expect(
+        query({
+          query: notificationQuery,
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: [
+            {
+              from: {
+                __typename: 'Group',
+                id: 'g-1',
+              },
+              read: false,
+              reason: 'user_joined_group',
+              relatedUser: {
+                id: 'first-follower',
+              },
+            },
+          ],
+        },
+        errors: undefined,
+      })
+    })
+
+    it('sends NO new notification to the first follower although he is a member of the group', async () => {
+      authenticatedUser = await firstFollower.toJson()
       await expect(
         query({
           query: notificationQuery,
