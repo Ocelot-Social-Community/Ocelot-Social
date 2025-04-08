@@ -5,10 +5,11 @@ module.exports = {
     node: true,
   },
   parser: '@typescript-eslint/parser',
-  plugins: ['prettier', '@typescript-eslint', 'import', 'n', 'promise', 'security', 'no-catch-all',],
+  plugins: ['prettier', '@typescript-eslint', 'import', 'n', 'promise', 'security', 'no-catch-all'],
   extends: [
     'standard',
     'eslint:recommended',
+    'plugin:n/recommended',
     'plugin:prettier/recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
@@ -42,7 +43,7 @@ module.exports = {
     'import/export': 'error',
     // 'import/no-deprecated': 'error',
     'import/no-empty-named-blocks': 'error',
-    // 'import/no-extraneous-dependencies': 'error',
+    'import/no-extraneous-dependencies': 'error',
     'import/no-mutable-exports': 'error',
     'import/no-unused-modules': 'error',
     'import/no-named-as-default': 'error',
@@ -102,36 +103,36 @@ module.exports = {
     //   },
     // ],
     'import/prefer-default-export': 'off',
+
     // n
+    // 'n/callback-return': 'error',
+    'n/exports-style': 'error',
+    'n/file-extension-in-import': ['error', 'never'],
+    'n/global-require': 'error',
     'n/handle-callback-err': 'error',
+    // 'n/hashbang': 'error', // part of n/recommended
     'n/no-callback-literal': 'error',
-    'n/no-exports-assign': 'error',
-    // 'n/no-extraneous-import': 'error',
-    'n/no-extraneous-require': 'error',
+    // 'n/no-deprecated-api': 'error', // part of n/recommended
+    // 'n/no-exports-assign': 'error', // part of n/recommended
+    'n/no-extraneous-import': 'off', // TODO // part of n/recommended
+    // 'n/no-extraneous-require': 'error', // part of n/recommended
     'n/no-hide-core-modules': 'error',
-    'n/no-missing-import': 'off', // not compatible with typescript
-    'n/no-missing-require': 'error',
+    'n/no-missing-import': 'off', // not compatible with typescript // part of n/recommended
+    // 'n/no-missing-require': 'error', // part of n/recommended
+    'n/no-mixed-requires': 'error',
     'n/no-new-require': 'error',
     'n/no-path-concat': 'error',
-    'n/no-process-exit': 'error',
-    'n/no-unpublished-bin': 'error',
-    'n/no-unpublished-import': 'off', // TODO need to exclude seeds
-    'n/no-unpublished-require': 'error',
-    'n/no-unsupported-features': ['error', { ignores: ['modules'] }],
-    'n/no-unsupported-features/es-builtins': 'error',
-    'n/no-unsupported-features/es-syntax': 'error',
-    'n/no-unsupported-features/node-builtins': 'error',
-    'n/process-exit-as-throw': 'error',
-    'n/shebang': 'error',
-    //'n/callback-return': 'error',
-    'n/exports-style': 'error',
-    'n/file-extension-in-import': 'off',
-    'n/global-require': 'error',
-    'n/no-mixed-requires': 'error',
     'n/no-process-env': 'error',
+    // 'n/no-process-exit': 'error', // part of n/recommended
     'n/no-restricted-import': 'error',
     'n/no-restricted-require': 'error',
     // 'n/no-sync': 'error',
+    // 'n/no-unpublished-bin': 'error', // part of n/recommended
+    'n/no-unpublished-import': ['error', { 'allowModules': ['apollo-server-testing', 'rosie', '@faker-js/faker'] }], // part of n/recommended
+    // 'n/no-unpublished-require': 'error', // part of n/recommended
+    // 'n/no-unsupported-features/es-builtins': 'error', // part of n/recommended
+    // 'n/no-unsupported-features/es-syntax': 'error', // part of n/recommended
+    // 'n/no-unsupported-features/node-builtins': 'error', // part of n/recommended
     'n/prefer-global/buffer': 'error',
     'n/prefer-global/console': 'error',
     'n/prefer-global/process': 'error',
@@ -139,8 +140,12 @@ module.exports = {
     'n/prefer-global/text-encoder': 'error',
     'n/prefer-global/url': 'error',
     'n/prefer-global/url-search-params': 'error',
+    'n/prefer-node-protocol': 'error',
     'n/prefer-promises/dns': 'error',
     'n/prefer-promises/fs': 'error',
+    // 'n/process-exit-as-throw': 'error', // part of n/recommended
+    'n/shebang': 'error',
+
     // promise
     // 'promise/always-return': 'error', // part of promise/recommended
     'promise/avoid-new': 'error', 
@@ -210,4 +215,4 @@ module.exports = {
       },
     },
   ],
-};
+}
