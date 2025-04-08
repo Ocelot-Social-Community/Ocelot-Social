@@ -2,7 +2,7 @@ import fetch from 'node-fetch'
 import fs from 'node:fs'
 import path from 'node:path'
 import { createTestClient } from 'apollo-server-testing'
-import createServer from '../../server'
+import createServer from '@src/server'
 import gql from 'graphql-tag'
 
 jest.mock('node-fetch')

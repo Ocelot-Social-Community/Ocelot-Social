@@ -9,7 +9,7 @@ import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
 import { validateEventParams } from './helpers/events'
 import { createOrUpdateLocations } from './users/location'
-import CONFIG from '../../config'
+import CONFIG from '@config/index'
 
 const maintainPinnedPosts = (params) => {
   const pinnedPostFilter = { pinned: true }

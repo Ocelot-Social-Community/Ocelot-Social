@@ -1,9 +1,9 @@
 import { createTestClient } from 'apollo-server-testing'
-import Factory, { cleanDatabase } from '../../db/factories'
-import { getNeode, getDriver } from '../../db/neo4j'
-import createServer from '../../server'
-import CONFIG from '../../config'
-import { filterPosts, createPostMutation } from '../../graphql/posts'
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import createServer from '@src/server'
+import CONFIG from '@config/index'
+import { filterPosts, createPostMutation } from '@graphql/posts'
 
 CONFIG.CATEGORIES_ACTIVE = false
 

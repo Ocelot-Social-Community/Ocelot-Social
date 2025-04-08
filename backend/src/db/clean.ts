@@ -1,5 +1,5 @@
 /* eslint-disable n/no-process-exit */
-import CONFIG from '../config'
+import CONFIG from '@config/index'
 import { cleanDatabase } from './factories'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
