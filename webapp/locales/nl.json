@@ -1039,6 +1039,8 @@
     },
     "name": "Instellingen",
     "notifications": {
+      "chat": "Chat",
+      "chatMessage": "Bericht ontvangen tijdens afwezigheid",
       "checkAll": "Vink alles aan",
       "commentOnObservedPost": "Geef commentaar op een bijdrage die ik volg",
       "group": "Groepen",
