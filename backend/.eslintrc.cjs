@@ -23,7 +23,7 @@ module.exports = {
     },
     'import/resolver': {
       typescript: {
-        project: ['./tsconfig.json'],
+        project: ['./tsconfig.json', './backend/tsconfig.json'],
       },
       node: true,
     },
@@ -52,16 +52,16 @@ module.exports = {
     'import/no-commonjs': 'error',
     'import/no-import-module-exports': 'error',
     'import/no-nodejs-modules': 'off',
-    'import/unambiguous': 'off', // not compatible with scriptless vue files
+    'import/unambiguous': 'off', // not compatible with .eslintrc.cjs
     'import/default': 'error',
-    // 'import/named': 'error',
+    'import/named': 'off', // has false positives
     'import/namespace': 'error',
     'import/no-absolute-path': 'error',
     'import/no-cycle': 'error',
     'import/no-dynamic-require': 'error',
     'import/no-internal-modules': 'off',
     'import/no-relative-packages': 'error',
-    // 'import/no-relative-parent-imports': ['error', { ignore: ['@/*'] }],
+    'import/no-relative-parent-imports': ['error', { ignore: ['@/*'] }],
     'import/no-self-import': 'error',
     'import/no-unresolved': 'error',
     'import/no-useless-path-segments': 'error',
@@ -72,8 +72,8 @@ module.exports = {
     'import/first': 'error',
     'import/group-exports': 'off',
     'import/newline-after-import': 'error',
-    // 'import/no-anonymous-default-export': 'error',
-    // 'import/no-default-export': 'error',
+    'import/no-anonymous-default-export': 'off', // not compatible with neode
+    'import/no-default-export': 'off', // not compatible with neode
     'import/no-duplicates': 'error',
     'import/no-named-default': 'error',
     'import/no-namespace': 'error',
@@ -128,7 +128,10 @@ module.exports = {
     'n/no-restricted-require': 'error',
     // 'n/no-sync': 'error',
     // 'n/no-unpublished-bin': 'error', // part of n/recommended
-    'n/no-unpublished-import': ['error', { 'allowModules': ['apollo-server-testing', 'rosie', '@faker-js/faker'] }], // part of n/recommended
+    'n/no-unpublished-import': [
+      'error',
+      { allowModules: ['apollo-server-testing', 'rosie', '@faker-js/faker', 'ts-jest'] },
+    ], // part of n/recommended
     // 'n/no-unpublished-require': 'error', // part of n/recommended
     // 'n/no-unsupported-features/es-builtins': 'error', // part of n/recommended
     // 'n/no-unsupported-features/es-syntax': 'error', // part of n/recommended
@@ -148,7 +151,7 @@ module.exports = {
 
     // promise
     // 'promise/always-return': 'error', // part of promise/recommended
-    'promise/avoid-new': 'error', 
+    'promise/avoid-new': 'error',
     // 'promise/catch-or-return': 'error', // part of promise/recommended
     // 'promise/no-callback-in-promise': 'warn', // part of promise/recommended
     'promise/no-multiple-resolved': 'error',
@@ -163,7 +166,7 @@ module.exports = {
     'promise/prefer-catch': 'error',
     'promise/spec-only': 'error',
     // 'promise/valid-params': 'error', // part of promise/recommended
-    
+
     // eslint comments
     '@eslint-community/eslint-comments/disable-enable-pair': ['error', { allowWholeFile: true }],
     '@eslint-community/eslint-comments/no-restricted-disable': 'error',

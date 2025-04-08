@@ -1,6 +1,6 @@
 import { UserInputError } from 'apollo-server'
-import { getNeode } from '../../db/neo4j'
-import encryptPassword from '../../helpers/encryptPassword'
+import { getNeode } from '@db/neo4j'
+import encryptPassword from '@helpers/encryptPassword'
 import generateNonce from './helpers/generateNonce'
 import existingEmailAddress from './helpers/existingEmailAddress'
 import normalizeEmail from './helpers/normalizeEmail'

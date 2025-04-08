@@ -1,4 +1,4 @@
-import { getDriver } from '../neo4j'
+import { getDriver } from '@db/neo4j'
 import { v4 as uuid } from 'uuid'
 
 export const description =
