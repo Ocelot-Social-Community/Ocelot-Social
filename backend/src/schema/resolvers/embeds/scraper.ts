@@ -11,6 +11,7 @@ import isArray from 'lodash/isArray'
 import mergeWith from 'lodash/mergeWith'
 import findProvider from './findProvider'
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 const error = require('debug')('embed:error')
 
 const metascraper = Metascraper([
