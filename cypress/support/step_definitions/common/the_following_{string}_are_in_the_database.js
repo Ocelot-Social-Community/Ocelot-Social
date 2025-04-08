@@ -1,4 +1,4 @@
-import { Given } from '@badeball/cypress-cucumber-preprocessor';
+import { Given } from '@badeball/cypress-cucumber-preprocessor'
 import './../../factories'
 
 Given('the following {string} are in the database:', (table,data) => {
