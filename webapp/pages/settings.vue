@@ -8,7 +8,7 @@
       <ds-flex-item :width="{ base: '100%', md: '200px' }">
         <ds-menu :routes="routes" :is-exact="() => true" />
       </ds-flex-item>
-      <ds-flex-item :width="{ base: '100%', md: 1 }">
+      <ds-flex-item :width="{ base: '100%', md: 1 }" id="settings-content">
         <transition name="slide-up" appear>
           <nuxt-child />
         </transition>
