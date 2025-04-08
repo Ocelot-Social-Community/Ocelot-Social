@@ -1047,12 +1047,12 @@
       "groupMemberRemoved": "Zostałem usunięty z grupy",
       "groupMemberRoleChanged": "Moja rola w grupie uległa zmianie",
       "mention": "Mentioned in a contribution",
-      "name": "Notifications",
-      "post": "Posts and comments",
-      "postByFollowedUser": "Posts by users I follow",
-      "postInGroup": "Post in a group I am a member of",
-      "send-email-notifications": "Send email notifications",
-      "success-update": "Notification settings saved! ",
+      "name": "Powiadomienia e-mail",
+      "post": "Posty",
+      "postByFollowedUser": "Posty użytkowników, których obserwuję",
+      "postInGroup": "Posty w grupie, której jestem członkiem",
+      "send-email-notifications": "Wyślij powiadomienia e-mail",
+      "success-update": "Ustawienia powiadomień zapisane! ",
       "uncheckAll": "Odznacz wszystko"
     },
     "organizations": {

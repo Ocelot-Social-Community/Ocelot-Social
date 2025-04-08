@@ -1047,7 +1047,7 @@
       "groupMemberRemoved": "I was removed from a group",
       "groupMemberRoleChanged": "My role in a group was changed",
       "mention": "I was mentioned",
-      "name": "Notifications",
+      "name": "Email Notifications",
       "post": "Posts and comments",
       "postByFollowedUser": "Posts by users I follow",
       "postInGroup": "Post in a group I am a member of",
