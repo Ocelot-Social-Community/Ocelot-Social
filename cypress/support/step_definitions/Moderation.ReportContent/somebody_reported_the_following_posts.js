@@ -1,4 +1,6 @@
 import { Given } from "@badeball/cypress-cucumber-preprocessor";
+import './../../commands'
+import './../../factories'
 import 'cypress-network-idle';
 
 Given('somebody reported the following posts:', table => {
