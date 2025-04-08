@@ -26,8 +26,10 @@ import { mapGetters } from 'vuex'
 import { userDataQuery } from '~/graphql/User'
 import BaseButton from '~/components/_new/generic/BaseButton/BaseButton.vue'
 import isEmpty from 'lodash/isEmpty'
+import scrollToContent from './scroll-to-content.js'
 
 export default {
+  mixins: [scrollToContent],
   components: {
     BaseButton,
   },
