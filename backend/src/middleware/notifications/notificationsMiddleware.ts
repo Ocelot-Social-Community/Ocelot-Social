@@ -1,8 +1,11 @@
+/* eslint-disable security/detect-object-injection */
+// eslint-disable-next-line import/no-cycle
 import { pubsub, NOTIFICATION_ADDED } from '../../server'
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 import { validateNotifyUsers } from '../validation/validationMiddleware'
 import { sendMail } from '../helpers/email/sendMail'
-import { notificationTemplate } from '../helpers/email/templateBuilder'
+import { chatMessageTemplate, notificationTemplate } from '../helpers/email/templateBuilder'
+import { isUserOnline } from '../helpers/isUserOnline'
 
 const queryNotificationEmails = async (context, notificationUserIds) => {
   if (!(notificationUserIds && notificationUserIds.length)) return []
@@ -109,13 +112,19 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
 
 const handleContentDataOfComment = async (resolve, root, args, context, resolveInfo) => {
   const { content } = args
-  let idsOfUsers = extractMentionedUsers(content)
+  let idsOfMentionedUsers = extractMentionedUsers(content)
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
-  idsOfUsers = idsOfUsers.filter((id) => id !== postAuthor.id)
+  idsOfMentionedUsers = idsOfMentionedUsers.filter((id) => id !== postAuthor.id)
   await publishNotifications(context, [
-    notifyUsersOfMention('Comment', comment.id, idsOfUsers, 'mentioned_in_comment', context),
-    notifyUsersOfComment('Comment', comment.id, postAuthor.id, 'commented_on_post', context),
+    notifyUsersOfMention(
+      'Comment',
+      comment.id,
+      idsOfMentionedUsers,
+      'mentioned_in_comment',
+      context,
+    ),
+    notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context),
   ])
   return comment
 }
@@ -306,35 +315,90 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
   }
 }
 
-const notifyUsersOfComment = async (label, commentId, postAuthorId, reason, context) => {
-  if (context.user.id === postAuthorId) return []
+const notifyUsersOfComment = async (label, commentId, reason, context) => {
   await validateNotifyUsers(label, reason)
   const session = context.driver.session()
   const writeTxResultPromise = await session.writeTransaction(async (transaction) => {
     const notificationTransactionResponse = await transaction.run(
       `
-      MATCH (postAuthor:User {id: $postAuthorId})-[:WROTE]->(post:Post)<-[:COMMENTS]-(comment:Comment { id: $commentId })<-[:WROTE]-(commenter:User)
-      WHERE NOT (postAuthor)-[:BLOCKED]-(commenter)
-      MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(postAuthor)
+      MATCH (observingUser:User)-[:OBSERVES { active: true }]->(post:Post)<-[:COMMENTS]-(comment:Comment { id: $commentId })<-[:WROTE]-(commenter:User)
+      WHERE NOT (observingUser)-[:BLOCKED]-(commenter) AND NOT observingUser.id = $userId
+      WITH observingUser, post, comment, commenter
+      MATCH (postAuthor:User)-[:WROTE]->(post)
+      MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(observingUser)
       SET notification.read = FALSE
       SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
       SET notification.updatedAt = toString(datetime())
-      WITH notification, postAuthor, post, commenter,
+      WITH notification, observingUser, post, commenter, postAuthor,
       comment {.*, __typename: labels(comment)[0], author: properties(commenter), post:  post {.*, author: properties(postAuthor) } } AS finalResource
       RETURN notification {
         .*,
         from: finalResource,
-        to: properties(postAuthor),
+        to: properties(observingUser),
         relatedUser: properties(commenter)
       }
     `,
-      { commentId, postAuthorId, reason },
+      {
+        commentId,
+        reason,
+        userId: context.user.id,
+      },
     )
     return notificationTransactionResponse.records.map((record) => record.get('notification'))
   })
   try {
     const notifications = await writeTxResultPromise
     return notifications
+  } finally {
+    session.close()
+  }
+}
+
+const handleCreateMessage = async (resolve, root, args, context, resolveInfo) => {
+  // Execute resolver
+  const result = await resolve(root, args, context, resolveInfo)
+
+  // Query Parameters
+  const { roomId } = args
+  const {
+    user: { id: currentUserId },
+  } = context
+
+  // Find Recipient
+  const session = context.driver.session()
+  const messageRecipient = session.readTransaction(async (transaction) => {
+    const messageRecipientCypher = `
+      MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+      MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
+        WHERE NOT recipientUser.id = $currentUserId
+        AND NOT (recipientUser)-[:BLOCKED]-(currentUser)
+        AND recipientUser.sendNotificationEmails = true
+      RETURN recipientUser, emailAddress {.email}
+    `
+    const txResponse = await transaction.run(messageRecipientCypher, {
+      currentUserId,
+      roomId,
+    })
+
+    return {
+      user: await txResponse.records.map((record) => record.get('recipientUser'))[0],
+      email: await txResponse.records.map((record) => record.get('emailAddress'))[0]?.email,
+    }
+  })
+
+  try {
+    // Execute Query
+    const { user, email } = await messageRecipient
+
+    // Send EMail if we found a user(not blocked) and he is not considered online
+    if (user && !isUserOnline(user)) {
+      void sendMail(chatMessageTemplate({ email, variables: { name: user.properties.name } }))
+    }
+
+    // Return resolver result to client
+    return result
+  } catch (error) {
+    throw new Error(error)
   } finally {
     session.close()
   }
@@ -350,5 +414,6 @@ export default {
     LeaveGroup: handleLeaveGroup,
     ChangeGroupMemberRole: handleChangeGroupMemberRole,
     RemoveUserFromGroup: handleRemoveUserFromGroup,
+    CreateMessage: handleCreateMessage,
   },
 }

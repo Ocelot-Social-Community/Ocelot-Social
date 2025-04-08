@@ -1,4 +1,5 @@
 import Resolver from './helpers/Resolver'
+
 export default {
   Image: {
     ...Resolver('Image', {

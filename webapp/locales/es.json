@@ -747,6 +747,9 @@
     "title": "Notificaciones",
     "user": "Usuario"
   },
+  "observeButton": {
+    "observed": null
+  },
   "post": {
     "comment": {
       "reply": "Contestar",
@@ -778,8 +781,12 @@
     "menu": {
       "delete": "Borrar contribución",
       "edit": "Editar contribución",
+      "observe": "Observar contribución",
+      "observedSuccessfully": null,
       "pin": "Anclar contribución",
       "pinnedSuccessfully": "¡Contribución anclado con éxito!",
+      "unobserve": "Dejar de observar contribución",
+      "unobservedSuccessfully": null,
       "unpin": "Desanclar contribución",
       "unpinnedSuccessfully": "¡Contribución desanclado con éxito!"
     },

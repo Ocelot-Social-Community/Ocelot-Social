@@ -54,6 +54,8 @@ export default {
   },
   invitedBy: { type: 'relationship', relationship: 'INVITED', target: 'User', direction: 'in' },
   lastActiveAt: { type: 'string', isoDate: true },
+  lastOnlineStatus: { type: 'string' },
+  awaySince: { type: 'string', isoDate: true },
   createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
   updatedAt: {
     type: 'string',
