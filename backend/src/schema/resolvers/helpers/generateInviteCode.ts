@@ -1,4 +1,4 @@
-import CONSTANTS_REGISTRATION from './../../../constants/registration'
+import CONSTANTS_REGISTRATION from '../../../constants/registration'
 
 export default function generateInviteCode() {
   // 6 random numbers in [ 0, 35 ] are 36 possible numbers (10 [0-9] + 26 [A-Z])

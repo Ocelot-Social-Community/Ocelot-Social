@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-unsafe-regex */
 import sanitizeHtml from 'sanitize-html'
 import linkifyHtml from 'linkify-html'
 

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-namespace */
 import mustache from 'mustache'
 import CONFIG from '../../../config'
 import metadata from '../../../config/metadata'
@@ -68,6 +69,19 @@ export const resetPasswordTemplate = ({ email, variables: { nonce, name } }) => 
     to: email,
     subject,
     html: mustache.render(templates.layout, renderParams, { content: templates.passwordReset }),
+  }
+}
+
+export const chatMessageTemplate = ({ email, variables: { name } }) => {
+  const subject = 'Neue Chatnachricht | New chat message'
+  const actionUrl = new URL('/chat', CONFIG.CLIENT_URI)
+  const renderParams = { ...defaultParams, englishHint, actionUrl, name, subject }
+
+  return {
+    from,
+    to: email,
+    subject,
+    html: mustache.render(templates.layout, renderParams, { content: templates.chatMessage }),
   }
 }
 

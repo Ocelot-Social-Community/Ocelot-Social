@@ -1,6 +1,6 @@
 import encode from './encode'
 import jwt from 'jsonwebtoken'
-import CONFIG from './../config'
+import CONFIG from '../config'
 
 describe('encode', () => {
   let payload

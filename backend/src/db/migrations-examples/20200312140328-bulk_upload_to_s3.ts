@@ -1,4 +1,5 @@
-import { getDriver } from '../../db/neo4j'
+/* eslint-disable security/detect-non-literal-fs-filename */
+import { getDriver } from '../neo4j'
 import { existsSync, createReadStream } from 'fs'
 import path from 'path'
 import { S3 } from 'aws-sdk'
@@ -95,6 +96,7 @@ export async function down(next) {
     await transaction.run(``)
     await transaction.commit()
     next()
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)

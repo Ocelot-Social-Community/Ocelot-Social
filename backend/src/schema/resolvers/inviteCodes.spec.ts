@@ -1,9 +1,10 @@
+/* eslint-disable security/detect-non-literal-regexp */
 import Factory, { cleanDatabase } from '../../db/factories'
 import { getDriver } from '../../db/neo4j'
 import gql from 'graphql-tag'
 import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
-import CONSTANTS_REGISTRATION from './../../constants/registration'
+import CONSTANTS_REGISTRATION from '../../constants/registration'
 
 let user
 let query

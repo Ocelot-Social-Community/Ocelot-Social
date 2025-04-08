@@ -2,6 +2,7 @@ import generateNonce from './helpers/generateNonce'
 import Resolver from './helpers/Resolver'
 import existingEmailAddress from './helpers/existingEmailAddress'
 import { UserInputError } from 'apollo-server'
+// eslint-disable-next-line import/extensions
 import Validator from 'neode/build/Services/Validator.js'
 import normalizeEmail from './helpers/normalizeEmail'
 
