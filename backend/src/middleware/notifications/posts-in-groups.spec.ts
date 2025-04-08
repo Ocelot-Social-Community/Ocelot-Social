@@ -108,7 +108,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  // await cleanDatabase()
+  await cleanDatabase()
   driver.close()
 })
 
