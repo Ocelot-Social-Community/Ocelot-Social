@@ -73,6 +73,11 @@ export default {
       })),
     ]
   },
+  mounted() {
+    document.getElementById('settings-content').scrollIntoView({
+      behavior: 'smooth',
+    })
+  },
   methods: {
     ...mapMutations({
       setCurrentUser: 'auth/SET_USER',
