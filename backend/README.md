@@ -84,7 +84,7 @@ More details about our GraphQL playground and how to use it with ocelot.social c
 A fresh database needs to be initialized and migrated.
 
 ```sh
-# in folder backend/ while database is running
+# in folder backend while database is running
 yarn db:migrate init
 # for docker environments:
 docker exec backend yarn db:migrate init
@@ -93,8 +93,9 @@ docker exec backend yarn prod:migrate init
 ```
 
 ```sh
-# in backend/ with database running (In docker or local)
+# in backend with database running (In docker or local)
 yarn db:migrate up
+
 # for docker development:
 docker exec backend yarn db:migrate up
 # for docker production
@@ -108,12 +109,14 @@ You can seed some optional data into the database.
 To create the default admin <admin@example.org> with password `1234` use:
 
 ```sh
+# in backend with database running (In docker or local)
 yarn db:data:admin
 ```
 
 When using `CATEGORIES_ACTIVE=true` you also want to seed the categories with:
 
 ```sh
+# in backend with database running (In docker or local)
 yarn db:data:categories
 ```
 
@@ -122,7 +125,9 @@ yarn db:data:categories
 For a predefined set of test data you can seed the database with:
 
 ```sh
+# in backend with database running (In docker or local)
 yarn db:seed
+
 # for docker
 docker exec backend yarn db:seed
 ```
@@ -132,9 +137,15 @@ docker exec backend yarn db:seed
 In order to reset the database you can run:
 
 ```sh
+# in backend with database running (In docker or local)
 yarn db:reset
+# or deleting the migrations as well
+yarn db:reset:withmigrations
+
 # for docker
 docker exec backend yarn db:reset
+# or deleting the migrations as well
+docker exec backend yarn db:reset:withmigrations
 # you could also wipe out your neo4j database and delete all volumes with:
 docker compose down -v
 ```
@@ -149,7 +160,7 @@ you have to migrate your data e.g. because your data modeling has changed.
 Generate a data migration file:
 
 ```sh
-# in backend/
+# in backend
 $ yarn run db:migrate:create your_data_migration
 # Edit the file in ./src/db/migrations/
 
