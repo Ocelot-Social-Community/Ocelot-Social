@@ -5,14 +5,14 @@
     </ds-space>
     <ds-space margin="large" />
     <ds-flex gutter="small">
-      <ds-flex-item :width="{ base: '100%', md: '200px' }">
+      <div class="menu-container">
         <ds-menu :routes="routes" :is-exact="() => true" />
-      </ds-flex-item>
-      <ds-flex-item :width="{ base: '100%', md: 1 }" id="settings-content">
+      </div>
+      <div class="settings-content" id="settings-content">
         <transition name="slide-up" appear>
           <nuxt-child />
         </transition>
-      </ds-flex-item>
+      </div>
     </ds-flex>
   </div>
 </template>
@@ -87,3 +87,24 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.menu-container {
+  width: 100%
+}
+.settings-content {
+  flex: 1;
+  padding: 0 24px;
+  margin-top: 32px;
+}
+
+@media screen and (min-width: 600px) {
+  .settings-content {
+    margin-top: 0;
+  }
+
+  .menu-container {
+    width: 200px;
+  }
+}
+</style>

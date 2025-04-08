@@ -1,7 +1,9 @@
 export default {
   mounted() {
-    document.getElementById('settings-content').scrollIntoView({
-      behavior: 'smooth',
-    })
-  }
+    if (document.documentElement.clientWidth < 600) {
+      document.getElementById('settings-content').scrollIntoView({
+        behavior: 'smooth',
+      })
+    }
+  },
 }
