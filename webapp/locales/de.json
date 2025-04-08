@@ -1039,6 +1039,8 @@
     },
     "name": "Einstellungen",
     "notifications": {
+      "chat": "Chat",
+      "chatMessage": "Nachricht erhalten während Abwesenheit",
       "checkAll": "Alle auswählen",
       "commentOnObservedPost": "Kommentare zu beobachteten Beiträgen",
       "group": "Gruppen",

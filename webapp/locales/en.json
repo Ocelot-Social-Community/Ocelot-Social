@@ -1039,6 +1039,8 @@
     },
     "name": "Settings",
     "notifications": {
+      "chat": "Chat",
+      "chatMessage": "Message received while absent",
       "checkAll": "Check all",
       "commentOnObservedPost": "Comments on observed posts",
       "group": "Groups",

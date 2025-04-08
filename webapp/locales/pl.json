@@ -1039,6 +1039,8 @@
     },
     "name": "Ustawienia",
     "notifications": {
+      "chat": "Chat",
+      "chatMessage": "Wiadomość otrzymana podczas nieobecności",
       "checkAll": "Wybierz wszystko",
       "commentOnObservedPost": "Skomentuj wpis, który obserwuję",
       "group": "Grupy",

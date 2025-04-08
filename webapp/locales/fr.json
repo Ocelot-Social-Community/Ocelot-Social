@@ -1039,6 +1039,8 @@
     },
     "name": "Paramètres",
     "notifications": {
+      "chat" : "Chat",
+      "chatMessage" : "Message reçu pendant l'absence",
       "checkAll": "Tout cocher",
       "commentOnObservedPost" : "Commentez une contribution que je suis",
       "group" : "Groups",
