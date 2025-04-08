@@ -109,4 +109,4 @@ You will receive the answer:
 ```
 
 If you look into the Neo4j database with your browser and search the groups, you will now also find your new group.
-For more details about our Neo4j database read [here](../../@db/neo4j/README.md).
+For more details about our Neo4j database read [here](../../../neo4j/README.md).
