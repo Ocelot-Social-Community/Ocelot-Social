@@ -1,8 +1,9 @@
-import { Given } from "@badeball/cypress-cucumber-preprocessor";
+import { Given } from '@badeball/cypress-cucumber-preprocessor'
+import './../../factories'
 
 Given('{string} wrote a post {string}', (author, title) => {
   cy.factory()
-    .build("post", {
+    .build('post', {
       title,
     }, {
       authorId: author,
