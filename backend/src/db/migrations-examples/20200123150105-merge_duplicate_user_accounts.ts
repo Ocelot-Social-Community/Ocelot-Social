@@ -1,3 +1,4 @@
+/* eslint-disable import/no-deprecated */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable promise/prefer-await-to-callbacks */
 import { throwError, concat } from 'rxjs'

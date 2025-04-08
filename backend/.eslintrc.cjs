@@ -41,7 +41,7 @@ module.exports = {
     ],
     // import
     'import/export': 'error',
-    // 'import/no-deprecated': 'error',
+    'import/no-deprecated': 'error',
     'import/no-empty-named-blocks': 'error',
     'import/no-extraneous-dependencies': 'error',
     'import/no-mutable-exports': 'error',
@@ -114,7 +114,7 @@ module.exports = {
     'n/no-callback-literal': 'error',
     // 'n/no-deprecated-api': 'error', // part of n/recommended
     // 'n/no-exports-assign': 'error', // part of n/recommended
-    'n/no-extraneous-import': 'off', // TODO // part of n/recommended
+    'n/no-extraneous-import': 'off', // same as import/no-extraneous-dependencies // part of n/recommended
     // 'n/no-extraneous-require': 'error', // part of n/recommended
     'n/no-hide-core-modules': 'error',
     'n/no-missing-import': 'off', // not compatible with typescript // part of n/recommended
@@ -128,7 +128,10 @@ module.exports = {
     'n/no-restricted-require': 'error',
     // 'n/no-sync': 'error',
     // 'n/no-unpublished-bin': 'error', // part of n/recommended
-    'n/no-unpublished-import': ['error', { 'allowModules': ['apollo-server-testing', 'rosie', '@faker-js/faker'] }], // part of n/recommended
+    'n/no-unpublished-import': [
+      'error',
+      { allowModules: ['apollo-server-testing', 'rosie', '@faker-js/faker'] },
+    ], // part of n/recommended
     // 'n/no-unpublished-require': 'error', // part of n/recommended
     // 'n/no-unsupported-features/es-builtins': 'error', // part of n/recommended
     // 'n/no-unsupported-features/es-syntax': 'error', // part of n/recommended
@@ -148,7 +151,7 @@ module.exports = {
 
     // promise
     // 'promise/always-return': 'error', // part of promise/recommended
-    'promise/avoid-new': 'error', 
+    'promise/avoid-new': 'error',
     // 'promise/catch-or-return': 'error', // part of promise/recommended
     // 'promise/no-callback-in-promise': 'warn', // part of promise/recommended
     'promise/no-multiple-resolved': 'error',
@@ -163,7 +166,7 @@ module.exports = {
     'promise/prefer-catch': 'error',
     'promise/spec-only': 'error',
     // 'promise/valid-params': 'error', // part of promise/recommended
-    
+
     // eslint comments
     '@eslint-community/eslint-comments/disable-enable-pair': ['error', { allowWholeFile: true }],
     '@eslint-community/eslint-comments/no-restricted-disable': 'error',
