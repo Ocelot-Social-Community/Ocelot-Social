@@ -12,6 +12,7 @@ module.exports = {
     'plugin:prettier/recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
+    'plugin:promise/recommended',
     'plugin:security/recommended-legacy',
     'plugin:@eslint-community/eslint-comments/recommended',
   ],
@@ -141,20 +142,23 @@ module.exports = {
     'n/prefer-promises/dns': 'error',
     'n/prefer-promises/fs': 'error',
     // promise
-    'promise/catch-or-return': 'error',
-    'promise/no-return-wrap': 'error',
-    'promise/param-names': 'error',
-    'promise/always-return': 'error',
-    'promise/no-native': 'off',
-    'promise/no-nesting': 'warn',
-    'promise/no-promise-in-callback': 'warn',
-    'promise/no-callback-in-promise': 'warn',
-    'promise/avoid-new': 'warn',
-    'promise/no-new-statics': 'error',
-    'promise/no-return-in-finally': 'warn',
-    'promise/valid-params': 'warn',
-    'promise/prefer-await-to-callbacks': 'error',
+    // 'promise/always-return': 'error', // part of promise/recommended
+    'promise/avoid-new': 'error', 
+    // 'promise/catch-or-return': 'error', // part of promise/recommended
+    // 'promise/no-callback-in-promise': 'warn', // part of promise/recommended
     'promise/no-multiple-resolved': 'error',
+    'promise/no-native': 'off', // ES5 only
+    // 'promise/no-nesting': 'warn', // part of promise/recommended
+    // 'promise/no-new-statics': 'error', // part of promise/recommended
+    // 'promise/no-promise-in-callback': 'warn', // part of promise/recommended
+    // 'promise/no-return-in-finally': 'warn', // part of promise/recommended
+    // 'promise/no-return-wrap': 'error', // part of promise/recommended
+    // 'promise/param-names': 'error', // part of promise/recommended
+    'promise/prefer-await-to-callbacks': 'error',
+    'promise/prefer-catch': 'error',
+    'promise/spec-only': 'error',
+    // 'promise/valid-params': 'error', // part of promise/recommended
+    
     // eslint comments
     '@eslint-community/eslint-comments/disable-enable-pair': ['error', { allowWholeFile: true }],
     '@eslint-community/eslint-comments/no-restricted-disable': 'error',
