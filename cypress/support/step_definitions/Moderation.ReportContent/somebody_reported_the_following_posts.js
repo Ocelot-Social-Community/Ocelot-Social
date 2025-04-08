@@ -1,7 +1,7 @@
-import { Given } from "@badeball/cypress-cucumber-preprocessor";
+import { Given } from '@badeball/cypress-cucumber-preprocessor'
 import './../../commands'
 import './../../factories'
-import 'cypress-network-idle';
+import 'cypress-network-idle'
 
 Given('somebody reported the following posts:', table => {
   const reportIdRegex = /^[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}$/

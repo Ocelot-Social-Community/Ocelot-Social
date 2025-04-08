@@ -1,9 +1,9 @@
-import { Given } from "@badeball/cypress-cucumber-preprocessor";
+import { Given } from '@badeball/cypress-cucumber-preprocessor'
 import encode from '../../../../backend/build/src/jwt/encode'
 
-Given("I am logged in as {string}", slug => {
+Given('I am logged in as {string}', slug => {
   cy.neode()
-    .firstOf("User", { slug })
+    .firstOf('User', { slug })
     .then(user => {
       return new Cypress.Promise((resolve, reject) => {
         if(!user) {
