@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 
 import { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { createGroupMutation, joinGroupMutation } from '@graphql/groups'
+import { createGroupMutation } from '@graphql/groups'
 import CONFIG from '@src/config'
 import createServer from '@src/server'
 
@@ -125,6 +125,7 @@ describe('following users notifications', () => {
         password: '1234',
       },
     )
+    await secondFollower.update({ emailNotificationsFollowingUsers: false })
     authenticatedUser = await firstFollower.toJson()
     await mutate({
       mutation: followUserMutation,
@@ -210,7 +211,7 @@ describe('following users notifications', () => {
     })
   })
 
-  describe('followed user posts in group', () => {
+  describe('followed user posts in public group', () => {
     beforeAll(async () => {
       authenticatedUser = await postAuthor.toJson()
       await mutate({
@@ -223,15 +224,6 @@ describe('following users notifications', () => {
           actionRadius: 'national',
         },
       })
-      authenticatedUser = await firstFollower.toJson()
-      await mutate({
-        mutation: joinGroupMutation(),
-        variables: {
-          groupId: 'g-1',
-          userId: 'first-follower',
-        },
-      })
-      authenticatedUser = await postAuthor.toJson()
       await mutate({
         mutation: createPostMutation,
         variables: {
@@ -243,7 +235,21 @@ describe('following users notifications', () => {
       })
     })
 
-    it('sends the join group notification to the post author', async () => {
+    it('sends NO notification to the post author', async () => {
+      await expect(
+        query({
+          query: notificationQuery,
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: [],
+        },
+        errors: undefined,
+      })
+    })
+
+    it('sends notification to the first follower although he is no member of the group', async () => {
+      authenticatedUser = await firstFollower.toJson()
       await expect(
         query({
           query: notificationQuery,
@@ -253,22 +259,65 @@ describe('following users notifications', () => {
           notifications: [
             {
               from: {
-                __typename: 'Group',
-                id: 'g-1',
+                __typename: 'Post',
+                id: 'group-post',
               },
               read: false,
-              reason: 'user_joined_group',
-              relatedUser: {
-                id: 'first-follower',
+              reason: 'followed_user_posted',
+            },
+            {
+              from: {
+                __typename: 'Post',
+                id: 'post',
               },
+              read: false,
+              reason: 'followed_user_posted',
             },
           ],
         },
         errors: undefined,
       })
     })
+  })
 
-    it('sends NO new notification to the first follower although he is a member of the group', async () => {
+  describe('followed user posts in closed group', () => {
+    beforeAll(async () => {
+      authenticatedUser = await postAuthor.toJson()
+      await mutate({
+        mutation: createGroupMutation(),
+        variables: {
+          id: 'g-2',
+          name: 'A closed group',
+          description: 'A group to test the follow user notification',
+          groupType: 'closed',
+          actionRadius: 'national',
+        },
+      })
+      await mutate({
+        mutation: createPostMutation,
+        variables: {
+          id: 'closed-group-post',
+          title: 'This is the post in the closed group',
+          content: 'This is the content of the post in the closed group',
+          groupId: 'g-2',
+        },
+      })
+    })
+
+    it('sends NO notification to the post author', async () => {
+      await expect(
+        query({
+          query: notificationQuery,
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: [],
+        },
+        errors: undefined,
+      })
+    })
+
+    it('sends NO notification to the first follower', async () => {
       authenticatedUser = await firstFollower.toJson()
       await expect(
         query({
@@ -277,6 +326,14 @@ describe('following users notifications', () => {
       ).resolves.toMatchObject({
         data: {
           notifications: [
+            {
+              from: {
+                __typename: 'Post',
+                id: 'group-post',
+              },
+              read: false,
+              reason: 'followed_user_posted',
+            },
             {
               from: {
                 __typename: 'Post',
