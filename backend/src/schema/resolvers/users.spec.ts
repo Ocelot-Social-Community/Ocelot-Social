@@ -675,6 +675,10 @@ describe('emailNotificationSettings', () => {
                           name: 'mention',
                           value: true,
                         },
+                        {
+                          name: 'followingUsers',
+                          value: true,
+                        },
                       ],
                     },
                     {
@@ -764,6 +768,10 @@ describe('emailNotificationSettings', () => {
                       {
                         name: 'mention',
                         value: false,
+                      },
+                      {
+                        name: 'followingUsers',
+                        value: true,
                       },
                     ],
                   },
