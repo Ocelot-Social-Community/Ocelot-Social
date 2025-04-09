@@ -1044,6 +1044,7 @@
       "chatMessage": "Messaggio ricevuto durante l'assenza",
       "checkAll": "Seleziona tutto",
       "commentOnObservedPost": "Commenta un contributo che sto guardando",
+      "followingUsers": null,
       "group": "Gruppi",
       "groupMemberJoined": "Un nuovo membro si è unito a un mio gruppo",
       "groupMemberLeft": "Un membro ha lasciato un mio gruppo",

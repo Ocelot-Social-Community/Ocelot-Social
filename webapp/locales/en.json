@@ -1044,6 +1044,7 @@
       "chatMessage": "Message received while absent",
       "checkAll": "Check all",
       "commentOnObservedPost": "Comments on observed posts",
+      "followingUsers": "User I follow published a new post",
       "group": "Groups",
       "groupMemberJoined": "Member joined a group I own",
       "groupMemberLeft": "Member left a group I own",
