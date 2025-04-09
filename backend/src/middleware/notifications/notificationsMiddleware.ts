@@ -115,15 +115,16 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
-    await publishNotifications(context, [
-      notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
-      notifyFollowingUsers(post.id, groupId, context),
-    ])
-    // await publishNotifications(
-    //   context,
-    //   [notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context)],
-    //   'emailNotificationsMention',
-    // )
+    await publishNotifications(
+      context,
+      [notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context)],
+      'emailNotificationsMention',
+    )
+    await publishNotifications(
+      context,
+      [notifyFollowingUsers(post.id, groupId, context)],
+      'emailNotificationsFollowingUsers',
+    )
   }
   return post
 }
