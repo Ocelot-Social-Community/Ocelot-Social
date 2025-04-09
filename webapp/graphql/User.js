@@ -46,7 +46,6 @@ export const profileUserQuery = (i18n) => {
           url
         }
         showShoutsPublicly
-        sendNotificationEmails
       }
     }
   `
@@ -335,7 +334,7 @@ export const updateUserMutation = () => {
       $about: String
       $allowEmbedIframes: Boolean
       $showShoutsPublicly: Boolean
-      $sendNotificationEmails: Boolean
+      $emailNotificationSettings: [EmailNotificationSettingsInput]
       $termsAndConditionsAgreedVersion: String
       $avatar: ImageInput
       $locationName: String # empty string '' sets it to null
@@ -347,7 +346,7 @@ export const updateUserMutation = () => {
         about: $about
         allowEmbedIframes: $allowEmbedIframes
         showShoutsPublicly: $showShoutsPublicly
-        sendNotificationEmails: $sendNotificationEmails
+        emailNotificationSettings: $emailNotificationSettings
         termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
         avatar: $avatar
         locationName: $locationName
@@ -359,7 +358,13 @@ export const updateUserMutation = () => {
         about
         allowEmbedIframes
         showShoutsPublicly
-        sendNotificationEmails
+        emailNotificationSettings {
+          type
+          settings {
+            name
+            value
+          }
+        }
         locale
         termsAndConditionsAgreedVersion
         avatar {
@@ -390,7 +395,13 @@ export const currentUserQuery = gql`
       locale
       allowEmbedIframes
       showShoutsPublicly
-      sendNotificationEmails
+      emailNotificationSettings {
+        type
+        settings {
+          name
+          value
+        }
+      }
       termsAndConditionsAgreedVersion
       socialMedia {
         id
