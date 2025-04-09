@@ -1,22 +1,24 @@
 /* eslint-disable security/detect-object-injection */
 import { applyMiddleware } from 'graphql-middleware'
+
 import CONFIG from '@config/index'
-import softDelete from './softDelete/softDeleteMiddleware'
-import sluggify from './sluggifyMiddleware'
+
+import chatMiddleware from './chatMiddleware'
 import excerpt from './excerptMiddleware'
-import xss from './xssMiddleware'
-import permissions from './permissionsMiddleware'
+import hashtags from './hashtags/hashtagsMiddleware'
 import includedFields from './includedFieldsMiddleware'
-import orderBy from './orderByMiddleware'
-import validation from './validation/validationMiddleware'
+import languages from './languages/languages'
+import login from './login/loginMiddleware'
 // eslint-disable-next-line import/no-cycle
 import notifications from './notifications/notificationsMiddleware'
-import hashtags from './hashtags/hashtagsMiddleware'
-import login from './login/loginMiddleware'
+import orderBy from './orderByMiddleware'
+import permissions from './permissionsMiddleware'
 import sentry from './sentryMiddleware'
-import languages from './languages/languages'
+import sluggify from './sluggifyMiddleware'
+import softDelete from './softDelete/softDeleteMiddleware'
 import userInteractions from './userInteractions'
-import chatMiddleware from './chatMiddleware'
+import validation from './validation/validationMiddleware'
+import xss from './xssMiddleware'
 
 export default (schema) => {
   const middlewares = {

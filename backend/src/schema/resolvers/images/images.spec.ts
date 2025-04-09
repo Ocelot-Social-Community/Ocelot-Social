@@ -1,8 +1,10 @@
 /* eslint-disable promise/prefer-await-to-callbacks */
-import { deleteImage, mergeImage } from './images'
-import { getNeode, getDriver } from '@db/neo4j'
-import Factory, { cleanDatabase } from '@db/factories'
 import { UserInputError } from 'apollo-server'
+
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+
+import { deleteImage, mergeImage } from './images'
 
 const driver = getDriver()
 const neode = getNeode()

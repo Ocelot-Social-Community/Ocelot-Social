@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+
 import CONFIG from '@config/index'
 
 export default async (driver, authorizationHeader) => {

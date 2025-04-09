@@ -1,14 +1,15 @@
 /* eslint-disable security/detect-object-injection */
-// eslint-disable-next-line import/no-cycle
-import { pubsub, NOTIFICATION_ADDED } from '@src/server'
-import extractMentionedUsers from './mentions/extractMentionedUsers'
-import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 import { sendMail } from '@middleware/helpers/email/sendMail'
 import {
   chatMessageTemplate,
   notificationTemplate,
 } from '@middleware/helpers/email/templateBuilder'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
+import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
+// eslint-disable-next-line import/no-cycle
+import { pubsub, NOTIFICATION_ADDED } from '@src/server'
+
+import extractMentionedUsers from './mentions/extractMentionedUsers'
 
 const queryNotificationEmails = async (context, notificationUserIds) => {
   if (!(notificationUserIds && notificationUserIds.length)) return []

@@ -1,6 +1,7 @@
 import { makeAugmentedSchema } from 'neo4j-graphql-js'
-import typeDefs from './types'
+
 import resolvers from './resolvers'
+import typeDefs from './types'
 
 export default makeAugmentedSchema({
   typeDefs,

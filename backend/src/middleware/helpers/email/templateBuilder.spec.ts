@@ -1,5 +1,6 @@
 import CONFIG from '@config/index'
 import logosWebapp from '@config/logos'
+
 import {
   signupTemplate,
   emailVerificationTemplate,
