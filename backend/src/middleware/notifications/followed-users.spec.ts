@@ -268,7 +268,7 @@ describe('following users notifications', () => {
       })
     })
 
-    it('sends NO new notification to the first follower although he is a member of the group', async () => {
+    it('sends a notification to the first follower but with the reason post-in-group', async () => {
       authenticatedUser = await firstFollower.toJson()
       await expect(
         query({
@@ -277,6 +277,14 @@ describe('following users notifications', () => {
       ).resolves.toMatchObject({
         data: {
           notifications: [
+            {
+              from: {
+                __typename: 'Post',
+                id: 'group-post',
+              },
+              read: false,
+              reason: 'post_in_group',
+            },
             {
               from: {
                 __typename: 'Post',
