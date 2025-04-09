@@ -1,8 +1,9 @@
-import { getDriver, getNeode } from '../neo4j'
 import { hashSync } from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
-import { categories } from '../../constants/categories'
-import CONFIG from '../../config'
+
+import CONFIG from '@config/index'
+import { categories } from '@constants/categories'
+import { getDriver, getNeode } from '@db/neo4j'
 
 const defaultAdmin = {
   email: 'admin@example.org',

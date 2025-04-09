@@ -1,4 +1,5 @@
-import walkRecursive from '../helpers/walkRecursive'
+import walkRecursive from '@helpers/walkRecursive'
+
 import { cleanHtml } from './helpers/cleanHtml'
 
 // exclamation mark separetes field names, that should not be sanitized

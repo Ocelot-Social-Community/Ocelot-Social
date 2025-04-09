@@ -1,7 +1,8 @@
 import { rule, shield, deny, allow, or, and } from 'graphql-shield'
-import { getNeode } from '../db/neo4j'
-import CONFIG from '../config'
-import { validateInviteCode } from '../schema/resolvers/transactions/inviteCodes'
+
+import CONFIG from '@config/index'
+import { getNeode } from '@db/neo4j'
+import { validateInviteCode } from '@schema/resolvers/transactions/inviteCodes'
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true

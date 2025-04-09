@@ -1,7 +1,9 @@
-import { neo4jgraphql } from 'neo4j-graphql-js'
-import Resolver from './helpers/Resolver'
-import { pubsub, ROOM_COUNT_UPDATED } from '../../server'
 import { withFilter } from 'graphql-subscriptions'
+import { neo4jgraphql } from 'neo4j-graphql-js'
+
+import { pubsub, ROOM_COUNT_UPDATED } from '@src/server'
+
+import Resolver from './helpers/Resolver'
 
 export const getUnreadRoomsCount = async (userId, session) => {
   return session.readTransaction(async (transaction) => {

@@ -1,11 +1,13 @@
-import { v4 as uuid } from 'uuid'
-import slugify from 'slug'
+import { faker } from '@faker-js/faker'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
-import { faker } from '@faker-js/faker'
+import slugify from 'slug'
+import { v4 as uuid } from 'uuid'
+
+import CONFIG from '@config/index'
+import generateInviteCode from '@schema/resolvers/helpers/generateInviteCode'
+
 import { getDriver, getNeode } from './neo4j'
-import CONFIG from '../config/index'
-import generateInviteCode from '../schema/resolvers/helpers/generateInviteCode'
 
 const neode = getNeode()
 

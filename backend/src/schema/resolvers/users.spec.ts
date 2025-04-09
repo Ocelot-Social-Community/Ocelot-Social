@@ -1,9 +1,10 @@
-import Factory, { cleanDatabase } from '../../db/factories'
-import gql from 'graphql-tag'
-import { getNeode, getDriver } from '../../db/neo4j'
-import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
-import { categories } from '../../constants/categories'
+import gql from 'graphql-tag'
+
+import { categories } from '@constants/categories'
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import createServer from '@src/server'
 
 const categoryIds = ['cat9']
 let user

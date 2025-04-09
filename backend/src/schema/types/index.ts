@@ -1,4 +1,5 @@
-import path from 'path'
+import path from 'node:path'
+
 import { mergeTypes, fileLoader } from 'merge-graphql-schemas'
 
 const typeDefs = fileLoader(path.join(__dirname, './**/*.gql'))

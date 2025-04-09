@@ -1,15 +1,17 @@
-import { v4 as uuid } from 'uuid'
-import { neo4jgraphql } from 'neo4j-graphql-js'
-import { isEmpty } from 'lodash'
 import { UserInputError } from 'apollo-server'
-import { mergeImage, deleteImage } from './images/images'
-import Resolver from './helpers/Resolver'
+import { isEmpty } from 'lodash'
+import { neo4jgraphql } from 'neo4j-graphql-js'
+import { v4 as uuid } from 'uuid'
+
+import CONFIG from '@config/index'
+
+import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
-import { validateEventParams } from './helpers/events'
+import Resolver from './helpers/Resolver'
+import { mergeImage, deleteImage } from './images/images'
 import { createOrUpdateLocations } from './users/location'
-import CONFIG from '../../config'
 
 const maintainPinnedPosts = (params) => {
   const pinnedPostFilter = { pinned: true }
