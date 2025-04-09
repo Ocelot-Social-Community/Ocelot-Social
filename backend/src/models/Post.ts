@@ -58,4 +58,15 @@ export default {
   },
   pinned: { type: 'boolean', default: null, valid: [null, true] },
   postType: { type: 'string', default: 'Article', valid: ['Article', 'Event'] },
+  observes: {
+    type: 'relationship',
+    relationship: 'OBSERVES',
+    target: 'User',
+    direction: 'in',
+    properties: {
+      createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
+      updatedAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
+      active: { type: 'boolean', default: true },
+    },
+  },
 }

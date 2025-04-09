@@ -1040,9 +1040,23 @@
     },
     "name": "Instellingen",
     "notifications": {
-      "name": null,
-      "send-email-notifications": null,
-      "success-update": null
+      "chat": "Chat",
+      "chatMessage": "Bericht ontvangen tijdens afwezigheid",
+      "checkAll": "Vink alles aan",
+      "commentOnObservedPost": "Geef commentaar op een bijdrage die ik volg",
+      "group": "Groepen",
+      "groupMemberJoined": "Een nieuw lid is lid geworden van een groep van mij",
+      "groupMemberLeft": "Een lid heeft een groep van mij verlaten",
+      "groupMemberRemoved": "Ik ben verwijderd uit een groep",
+      "groupMemberRoleChanged": "Mijn rol in een groep is veranderd",
+      "mention": "Genoemd in een bijdrage",
+      "name": "Email Meldingen",
+      "post": "Berichten en reacties",
+      "postByFollowedUser": "Berichten van gebruikers die ik volg",
+      "postInGroup": "Bericht in een groep waar ik lid van ben",
+      "send-email-notifications": "E-mailmeldingen verzenden",
+      "success-update": "Meldingsinstellingen opgeslagen! ",
+      "uncheckAll": "Vink alles uit"
     },
     "organizations": {
       "name": "Mijn Organisaties"

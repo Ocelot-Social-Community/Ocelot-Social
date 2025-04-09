@@ -1,7 +1,8 @@
-import CONFIG from '../../../config'
-import { cleanHtml } from '../cleanHtml'
 import nodemailer from 'nodemailer'
 import { htmlToText } from 'nodemailer-html-to-text'
+
+import CONFIG from '@config/index'
+import { cleanHtml } from '@middleware/helpers/cleanHtml'
 
 const hasEmailConfig = CONFIG.SMTP_HOST && CONFIG.SMTP_PORT
 const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD

@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
-import CONFIG from '../config'
+
+import CONFIG from '@config/index'
 
 // Generate an Access Token for the given User ID
 export default function encode(user) {

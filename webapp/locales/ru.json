@@ -1040,9 +1040,23 @@
     },
     "name": "Настройки",
     "notifications": {
-      "name": null,
-      "send-email-notifications": null,
-      "success-update": null
+      "chat": "Чат",
+      "chatMessage": "Сообщение, полученное во время отсутствия",
+      "checkAll": "Отметить все",
+      "commentOnObservedPost": "Комментарии по поводу замеченных сообщений",
+      "group": "Группы",
+      "groupMemberJoined": "Участник присоединился к группе, которой я владею",
+      "groupMemberLeft": "Участник вышел из группы, которой владею",
+      "groupMemberRemoved": "Был удален из группы",
+      "groupMemberRoleChanged": "Моя роль в группе была изменена",
+      "mention": "Упоминание в вкладе",
+      "name": "Уведомления",
+      "post": "Сообщения и комментарии",
+      "postByFollowedUser": "Сообщения пользователей, за которыми я слежу",
+      "postInGroup": "Сообщение в группе, членом которой я являюсь",
+      "send-email-notifications": "Отправлять уведомления по электронной почте",
+      "success-update": "Настройки уведомлений сохранены! ",
+      "uncheckAll": "Снимите все флажки"
     },
     "organizations": {
       "name": "Мои организации"
