@@ -2,6 +2,7 @@
 /* eslint-disable promise/prefer-await-to-callbacks */
 import { throwError, concat } from 'rxjs'
 import { flatMap, mergeMap, map, catchError, filter } from 'rxjs/operators'
+
 import { getDriver } from '@db/neo4j'
 import normalizeEmail from '@schema/resolvers/helpers/normalizeEmail'
 

@@ -1,4 +1,5 @@
 import { getNeode } from '@db/neo4j'
+
 import Resolver from './helpers/Resolver'
 
 const neode = getNeode()

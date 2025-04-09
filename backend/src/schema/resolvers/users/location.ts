@@ -1,12 +1,13 @@
 /* eslint-disable promise/avoid-new */
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable import/no-named-as-default */
-import request from 'request'
 import { UserInputError } from 'apollo-server'
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Debug from 'debug'
-import asyncForEach from '@helpers/asyncForEach'
+import request from 'request'
+
 import CONFIG from '@config/index'
+import asyncForEach from '@helpers/asyncForEach'
 
 const debug = Debug('human-connection:location')
 

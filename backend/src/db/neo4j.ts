@@ -1,7 +1,8 @@
 /* eslint-disable import/no-named-as-default-member */
 import neo4j from 'neo4j-driver'
-import CONFIG from '@config/index'
 import Neode from 'neode'
+
+import CONFIG from '@config/index'
 import models from '@models/index'
 
 let driver

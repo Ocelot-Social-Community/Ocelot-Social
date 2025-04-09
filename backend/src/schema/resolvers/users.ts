@@ -1,9 +1,11 @@
-import { neo4jgraphql } from 'neo4j-graphql-js'
-import { getNeode } from '@db/neo4j'
 import { UserInputError, ForbiddenError } from 'apollo-server'
-import { mergeImage, deleteImage } from './images/images'
-import Resolver from './helpers/Resolver'
+import { neo4jgraphql } from 'neo4j-graphql-js'
+
+import { getNeode } from '@db/neo4j'
+
 import log from './helpers/databaseLogger'
+import Resolver from './helpers/Resolver'
+import { mergeImage, deleteImage } from './images/images'
 import { createOrUpdateLocations } from './users/location'
 
 const neode = getNeode()
