@@ -174,6 +174,7 @@ Factory.define('post')
     ])
     await Promise.all([
       post.relateTo(author, 'author'),
+      post.relateTo(author, 'observes'),
       // Promise.all(categories.map((c) => c.relateTo(post, 'post'))),
       Promise.all(tags.map((t) => t.relateTo(post, 'post'))),
     ])
@@ -209,7 +210,11 @@ Factory.define('comment')
       options.author,
       options.post,
     ])
-    await Promise.all([comment.relateTo(author, 'author'), comment.relateTo(post, 'post')])
+    await Promise.all([
+      comment.relateTo(author, 'author'),
+      comment.relateTo(post, 'post'),
+      post.relateTo(author, 'observes'),
+    ])
     return comment
   })
 

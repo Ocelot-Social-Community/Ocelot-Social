@@ -190,4 +190,15 @@ export default {
     type: 'string',
     allow: [null],
   },
+  observes: {
+    type: 'relationship',
+    relationship: 'OBSERVES',
+    target: 'Post',
+    direction: 'out',
+    properties: {
+      createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
+      updatedAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
+      active: { type: 'boolean', default: true },
+    },
+  },
 }
