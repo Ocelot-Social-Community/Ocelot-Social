@@ -74,7 +74,7 @@ export const resetPasswordTemplate = ({ email, variables: { nonce, name } }) => 
 }
 
 export const chatMessageTemplate = ({ email, variables: { senderUser, recipientUser } }) => {
-  const subject = `Neue Chatnachricht | New chat message - ${senderUser.name}`
+  const subject = `Neue Chat-Nachricht | New chat message - ${senderUser.name}`
   const actionUrl = new URL('/chat', CONFIG.CLIENT_URI)
   const renderParams = {
     ...defaultParams,

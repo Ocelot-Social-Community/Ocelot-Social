@@ -39,7 +39,12 @@ const resetPasswordTemplateData = () => ({
 const chatMessageTemplateData = {
   email: 'test@example.org',
   variables: {
-    name: 'Mr Example',
+    senderUser: {
+      name: 'Sender',
+    },
+    recipientUser: {
+      name: 'Recipient',
+    },
   },
 }
 const wrongAccountTemplateData = () => ({
@@ -174,10 +179,10 @@ describe('templateBuilder', () => {
   describe('chatMessageTemplate', () => {
     describe('multi language', () => {
       it('e-mail is build with all data', () => {
-        const subject = 'Neue Chatnachricht | New chat message'
+        const subject = `Neue Chat-Nachricht | New chat message - ${chatMessageTemplateData.variables.senderUser.name}`
         const actionUrl = new URL('/chat', CONFIG.CLIENT_URI).toString()
-        const enContent = 'You have received a new chat message.'
-        const deContent = 'Du hast eine neue Chatnachricht erhalten.'
+        const enContent = `You have received a new chat message from <b>${chatMessageTemplateData.variables.senderUser.name}</b>.`
+        const deContent = `Du hast eine neue Chat-Nachricht von <b>${chatMessageTemplateData.variables.senderUser.name}</b> erhalten.`
         testEmailData(null, chatMessageTemplate, chatMessageTemplateData, [
           ...textsStandard,
           {
@@ -187,7 +192,8 @@ describe('templateBuilder', () => {
           },
           englishHint,
           actionUrl,
-          chatMessageTemplateData.variables.name,
+          chatMessageTemplateData.variables.senderUser,
+          chatMessageTemplateData.variables.recipientUser,
           enContent,
           deContent,
           supportUrl,
