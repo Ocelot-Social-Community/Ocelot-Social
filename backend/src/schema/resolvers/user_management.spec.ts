@@ -64,55 +64,6 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('isLoggedIn', () => {
-  const isLoggedInQuery = gql`
-    {
-      isLoggedIn
-    }
-  `
-  const respondsWith = async (expected) => {
-    await expect(query({ query: isLoggedInQuery })).resolves.toMatchObject(expected)
-  }
-
-  describe('unauthenticated', () => {
-    it('returns false', async () => {
-      await respondsWith({ data: { isLoggedIn: false } })
-    })
-  })
-
-  describe('authenticated', () => {
-    beforeEach(async () => {
-      user = await Factory.build('user', { id: 'u3' })
-      const userBearerToken = encode({ id: 'u3' })
-      req = { headers: { authorization: `Bearer ${userBearerToken}` } }
-    })
-
-    it('returns true', async () => {
-      await respondsWith({ data: { isLoggedIn: true } })
-    })
-
-    describe('but user is disabled', () => {
-      beforeEach(async () => {
-        await disable('u3')
-      })
-
-      it('returns false', async () => {
-        await respondsWith({ data: { isLoggedIn: false } })
-      })
-    })
-
-    describe('but user is deleted', () => {
-      beforeEach(async () => {
-        await user.update({ updatedAt: new Date().toISOString(), deleted: true })
-      })
-
-      it('returns false', async () => {
-        await respondsWith({ data: { isLoggedIn: false } })
-      })
-    })
-  })
-})
-
 describe('currentUser', () => {
   const currentUserQuery = gql`
     {

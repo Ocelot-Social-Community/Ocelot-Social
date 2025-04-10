@@ -66,12 +66,12 @@ export default {
             const result = txc.run(
               `
             MATCH (user:User)-[:PRIMARY_EMAIL]->(e:EmailAddress {email: $args.email})
-            RETURN user`,
+            RETURN user {.*, email: e.email}`,
               { args },
             )
             return result
           })
-          return readTxResult.records.map((r) => r.get('user').properties)
+          return readTxResult.records.map((r) => r.get('user'))
         } finally {
           session.close()
         }
@@ -362,14 +362,16 @@ export default {
     },
   },
   User: {
-    email: async (parent, params, context, resolveInfo) => {
+    /* email: async (parent, params, context, resolveInfo) => {
+      console.log('email queried')
       if (typeof parent.email !== 'undefined') return parent.email
+      console.log('email queried - manual response')
       const { id } = parent
       const statement = `MATCH(u:User {id: $id})-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e`
       const result = await neode.cypher(statement, { id })
       const [{ email }] = result.records.map((r) => r.get('e').properties)
       return email
-    },
+    }, */
     emailNotificationSettings: async (parent, params, context, resolveInfo) => {
       return [
         {
