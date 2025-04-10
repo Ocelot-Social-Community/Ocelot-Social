@@ -86,8 +86,8 @@ describe('currentUser', () => {
   }
 
   describe('unauthenticated', () => {
-    it('returns null', async () => {
-      await respondsWith({ data: { currentUser: null } })
+    it('throws "Not Authorized!"', async () => {
+      await respondsWith({ errors: [{ message: 'Not Authorized!' }] })
     })
   })
 
