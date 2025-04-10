@@ -7,36 +7,36 @@ const stubs = {
   'router-link': {
     template: '<span><slot /></span>',
   },
-}
-
-const propsData = {
-  usage: 'groupTeaser',
-  resource: {},
-  group: {},
-  resourceType: 'group',
+  'v-popover': true,
 }
 
 describe('GroupContentMenu', () => {
-  let wrapper
   let mocks
 
   beforeEach(() => {
     mocks = {
-      $t: jest.fn(),
+      $t: jest.fn((s) => s),
     }
   })
 
   describe('mount', () => {
-    const Wrapper = () => {
+    const Wrapper = (propsData) => {
       return mount(GroupContentMenu, { propsData, mocks, localVue, stubs })
     }
 
-    beforeEach(() => {
-      wrapper = Wrapper()
+    it('renders as groupTeaser', () => {
+      const wrapper = Wrapper({ usage: 'groupTeaser', group: { id: 'groupid' } })
+      expect(wrapper.element).toMatchSnapshot()
     })
 
-    it('renders', () => {
-      expect(wrapper.findAll('.group-content-menu')).toHaveLength(1)
+    it('renders as groupProfile, not muted', () => {
+      const wrapper = Wrapper({ usage: 'groupProfile', group: { isMuted: false, id: 'groupid' } })
+      expect(wrapper.element).toMatchSnapshot()
+    })
+
+    it('renders as groupProfile, muted', () => {
+      const wrapper = Wrapper({ usage: 'groupProfile', group: { isMuted: true, id: 'groupid' } })
+      expect(wrapper.element).toMatchSnapshot()
     })
   })
 })
