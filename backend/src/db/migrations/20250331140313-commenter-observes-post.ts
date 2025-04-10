@@ -1,4 +1,4 @@
-import { getDriver } from '../neo4j'
+import { getDriver } from '@db/neo4j'
 
 export const description = `
 All users commenting a post observe the post.
