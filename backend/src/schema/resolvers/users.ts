@@ -270,14 +270,14 @@ export default {
         const switchUserRoleResponse = await transaction.run(
           `
             MATCH (user:User {id: $id})
+            OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(e:EmailAddress)
             SET user.role = $role
             SET user.updatedAt = toString(datetime())
-            RETURN user {.*}
+            RETURN user {.*, email: e.email}
           `,
           { id, role },
         )
-        const [user] = switchUserRoleResponse.records.map((record) => record.get('user'))
-        return user
+        return switchUserRoleResponse.records.map((record) => record.get('user'))[0]
       })
       try {
         const user = await writeTxResultPromise
