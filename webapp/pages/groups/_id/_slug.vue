@@ -80,7 +80,7 @@
                  </ds-flex-item> -->
           </ds-flex>
           <div class="action-buttons">
-            <base-button danger v-if="group.isMuted" @click="unmuteGroup" icon="volume-up">
+            <base-button danger v-if="group.isMutedByMe" @click="unmuteGroup" icon="volume-up">
               {{ $t('group.unmute') }}
             </base-button>
             <!-- Group join / leave -->
@@ -462,7 +462,7 @@ export default {
           },
         })
         // this.$apollo.queries.Group.refetch()
-        this.$toast.success(this.$t('group.muteGroup'))
+        this.$toast.success(this.$t('group.muted'))
       } catch (error) {
         this.$toast.error(error.message)
       }
@@ -476,7 +476,7 @@ export default {
           },
         })
         // this.$apollo.queries.Group.refetch()
-        this.$toast.success(this.$t('group.muteGroup'))
+        this.$toast.success(this.$t('group.unmuted'))
       } catch (error) {
         this.$toast.error(error.message)
       }

@@ -25,7 +25,7 @@ export const muteGroup = () => {
       muteGroup(id: $id) {
         id
         name
-        isMuted
+        isMutedByMe
       }
     }
   `
@@ -37,7 +37,7 @@ export const unmuteGroup = () => {
       unmuteGroup(id: $id) {
         id
         name
-        isMuted
+        isMutedByMe
       }
     }
   `
