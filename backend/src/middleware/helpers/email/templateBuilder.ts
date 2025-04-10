@@ -1,9 +1,9 @@
 /* eslint-disable import/no-namespace */
 import mustache from 'mustache'
 
-import logosWebapp from '@config//logos'
-import metadata from '@config//metadata'
 import CONFIG from '@config/index'
+import logosWebapp from '@config/logos'
+import metadata from '@config/metadata'
 
 import * as templates from './templates'
 import * as templatesDE from './templates/de'
@@ -73,10 +73,17 @@ export const resetPasswordTemplate = ({ email, variables: { nonce, name } }) => 
   }
 }
 
-export const chatMessageTemplate = ({ email, variables: { name } }) => {
-  const subject = 'Neue Chatnachricht | New chat message'
+export const chatMessageTemplate = ({ email, variables: { senderUser, recipientUser } }) => {
+  const subject = `Neue Chatnachricht | New chat message - ${senderUser.name}`
   const actionUrl = new URL('/chat', CONFIG.CLIENT_URI)
-  const renderParams = { ...defaultParams, englishHint, actionUrl, name, subject }
+  const renderParams = {
+    ...defaultParams,
+    subject,
+    englishHint,
+    actionUrl,
+    senderUser,
+    recipientUser,
+  }
 
   return {
     from,

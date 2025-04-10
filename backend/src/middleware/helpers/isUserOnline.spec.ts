@@ -5,11 +5,9 @@ let user
 describe('isUserOnline', () => {
   beforeEach(() => {
     user = {
-      properties: {
-        lastActiveAt: null,
-        awaySince: null,
-        lastOnlineStatus: null,
-      },
+      lastActiveAt: null,
+      awaySince: null,
+      lastOnlineStatus: null,
     }
   })
   describe('user has lastOnlineStatus `online`', () => {
