@@ -148,7 +148,6 @@ input _UserFilter {
   name_contains: String
   about_contains: String
   slug_contains: String
-  email_contains: String
   id: ID
   id_not: ID
   id_in: [ID!]
