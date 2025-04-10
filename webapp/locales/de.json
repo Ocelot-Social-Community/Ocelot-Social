@@ -537,6 +537,7 @@
       "confirmAddGroupMemberText": "Nutzer „{name}“ zur Gruppe hinzufügen?",
       "confirmAddGroupMemberTitle": "Bestätigen"
     },
+    "muted": "Gruppe stummgeschaltet",
     "myGroups": "Meine Gruppen",
     "name": "Gruppenname",
     "radius": "Radius",
@@ -562,6 +563,7 @@
       "public": "Öffentlich — Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
     },
     "unmute": "Gruppe nicht mehr stummschalten",
+    "unmuted": "Gruppe nicht mehr stummgeschaltet",
     "update": "Änderung speichern",
     "updatedGroup": "Die Gruppendaten wurden geändert!"
   },

@@ -537,6 +537,7 @@
       "confirmAddGroupMemberText": "Add user “{name}” to group?",
       "confirmAddGroupMemberTitle": "Confirm"
     },
+    "muted": "Group muted",
     "myGroups": "My Groups",
     "name": "Group name",
     "radius": "Radius",
@@ -562,6 +563,7 @@
       "public": "Public — Group and all posts are visible for all registered users"
     },
     "unmute": "Unmute group",
+    "unmuted": "Group unmuted",
     "update": "Save change",
     "updatedGroup": "The group data has been changed."
   },
