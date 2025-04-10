@@ -747,6 +747,9 @@
     "title": "Benachrichtigungen",
     "user": "Nutzer"
   },
+  "observeButton": {
+    "observed": "beobachtet"
+  },
   "post": {
     "comment": {
       "reply": "Antworten",
@@ -778,8 +781,12 @@
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
+      "observe": "Beitrag beobachten",
+      "observedSuccessfully": "Du beobachtest diesen Beitrag!",
       "pin": "Beitrag anheften",
       "pinnedSuccessfully": "Beitrag erfolgreich angeheftet!",
+      "unobserve": "Beitrag nicht mehr beobachten",
+      "unobservedSuccessfully": "Du beobachtest diesen Beitrag nicht mehr!",
       "unpin": "Beitrag loslösen",
       "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!"
     },
@@ -1032,9 +1039,23 @@
     },
     "name": "Einstellungen",
     "notifications": {
-      "name": "Benachrichtigungen",
+      "chat": "Chat",
+      "chatMessage": "Nachricht erhalten während Abwesenheit",
+      "checkAll": "Alle auswählen",
+      "commentOnObservedPost": "Kommentare zu beobachteten Beiträgen",
+      "group": "Gruppen",
+      "groupMemberJoined": "Ein Mitglied ist deiner Gruppe beigetreten",
+      "groupMemberLeft": "Ein Mitglied hat deine Gruppe verlassen",
+      "groupMemberRemoved": "Du wurdest aus einer Gruppe entfernt",
+      "groupMemberRoleChanged": "Deine Rolle in einer Gruppe wurde geändert",
+      "mention": "Ich wurde erwähnt",
+      "name": "Benachrichtigungen per Email",
+      "post": "Beiträge und Kommentare",
+      "postByFollowedUser": "Beitrag von einem Nutzer, dem ich folge",
+      "postInGroup": "Beitrag in einer Gruppe, die ich beobachte",
       "send-email-notifications": "Sende E-Mail-Benachrichtigungen",
-      "success-update": "Benachrichtigungs-Einstellungen gespeichert!"
+      "success-update": "Benachrichtigungs-Einstellungen gespeichert!",
+      "uncheckAll": "Alle abwählen"
     },
     "organizations": {
       "name": "Meine Organisationen"

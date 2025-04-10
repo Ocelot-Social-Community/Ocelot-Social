@@ -1,4 +1,4 @@
-import { getDriver } from '../../db/neo4j'
+import { getDriver } from '@db/neo4j'
 
 export const description = `
   We introduced a new node label 'Image' and we need a primary key for it. Best
@@ -48,6 +48,7 @@ export async function down(next) {
     `)
     await transaction.commit()
     next()
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)

@@ -1,12 +1,18 @@
+/* eslint-disable n/no-extraneous-require */
+/* eslint-disable n/global-require */
+/* eslint-disable import/no-commonjs */
+/* eslint-disable import/no-named-as-default */
+
+import { ApolloError } from 'apollo-server'
+import isArray from 'lodash/isArray'
+import isEmpty from 'lodash/isEmpty'
+import mergeWith from 'lodash/mergeWith'
 import Metascraper from 'metascraper'
 import fetch from 'node-fetch'
 
-import { ApolloError } from 'apollo-server'
-import isEmpty from 'lodash/isEmpty'
-import isArray from 'lodash/isArray'
-import mergeWith from 'lodash/mergeWith'
 import findProvider from './findProvider'
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 const error = require('debug')('embed:error')
 
 const metascraper = Metascraper([
@@ -37,6 +43,7 @@ const fetchEmbed = async (url) => {
   try {
     const response = await fetch(endpointUrl)
     json = await response.json()
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     error(`Error fetching embed data: ${err.message}`)
     return {}

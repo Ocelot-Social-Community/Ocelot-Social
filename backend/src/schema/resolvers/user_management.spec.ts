@@ -1,13 +1,15 @@
-import jwt from 'jsonwebtoken'
-import CONFIG from './../../config'
-import Factory, { cleanDatabase } from '../../db/factories'
-import gql from 'graphql-tag'
-import { loginMutation } from '../../graphql/userManagement'
+/* eslint-disable promise/prefer-await-to-callbacks */
 import { createTestClient } from 'apollo-server-testing'
-import createServer, { context } from '../../server'
-import encode from '../../jwt/encode'
-import { getNeode, getDriver } from '../../db/neo4j'
-import { categories } from '../../constants/categories'
+import gql from 'graphql-tag'
+import jwt from 'jsonwebtoken'
+
+import CONFIG from '@config/index'
+import { categories } from '@constants/categories'
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import { loginMutation } from '@graphql/userManagement'
+import encode from '@jwt/encode'
+import createServer, { context } from '@src/server'
 
 const neode = getNeode()
 const driver = getDriver()

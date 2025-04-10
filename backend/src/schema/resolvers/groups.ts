@@ -1,9 +1,11 @@
-import { v4 as uuid } from 'uuid'
 import { UserInputError } from 'apollo-server'
-import CONFIG from '../../config'
-import { CATEGORIES_MIN, CATEGORIES_MAX } from '../../constants/categories'
-import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
-import { removeHtmlTags } from '../../middleware/helpers/cleanHtml'
+import { v4 as uuid } from 'uuid'
+
+import CONFIG from '@config/index'
+import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
+import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
+import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
+
 import Resolver, {
   removeUndefinedNullValuesFromObject,
   convertObjectToCypherMapLiteral,
@@ -130,7 +132,7 @@ export default {
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
       if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
-        throw new UserInputError('Too view categories!')
+        throw new UserInputError('Too few categories!')
       }
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
         throw new UserInputError('Too many categories!')
@@ -200,7 +202,7 @@ export default {
 
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds) {
         if (categoryIds.length < CATEGORIES_MIN) {
-          throw new UserInputError('Too view categories!')
+          throw new UserInputError('Too few categories!')
         }
         if (categoryIds.length > CATEGORIES_MAX) {
           throw new UserInputError('Too many categories!')

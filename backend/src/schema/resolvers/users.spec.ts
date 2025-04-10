@@ -1,9 +1,10 @@
-import Factory, { cleanDatabase } from '../../db/factories'
-import gql from 'graphql-tag'
-import { getNeode, getDriver } from '../../db/neo4j'
-import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
-import { categories } from '../../constants/categories'
+import gql from 'graphql-tag'
+
+import { categories } from '@constants/categories'
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import createServer from '@src/server'
 
 const categoryIds = ['cat9']
 let user
@@ -588,6 +589,220 @@ describe('switch user role', () => {
           ],
         }),
       )
+    })
+  })
+})
+
+let anotherUser
+const emailNotificationSettingsQuery = gql`
+  query ($id: ID!) {
+    User(id: $id) {
+      emailNotificationSettings {
+        type
+        settings {
+          name
+          value
+        }
+      }
+    }
+  }
+`
+
+const emailNotificationSettingsMutation = gql`
+  mutation ($id: ID!, $emailNotificationSettings: [EmailNotificationSettingsInput]!) {
+    UpdateUser(id: $id, emailNotificationSettings: $emailNotificationSettings) {
+      emailNotificationSettings {
+        type
+        settings {
+          name
+          value
+        }
+      }
+    }
+  }
+`
+
+describe('emailNotificationSettings', () => {
+  beforeEach(async () => {
+    user = await Factory.build('user', {
+      id: 'user',
+      role: 'user',
+    })
+    anotherUser = await Factory.build('user', {
+      id: 'anotherUser',
+      role: 'anotherUser',
+    })
+  })
+
+  describe('query the field', () => {
+    describe('as another user', () => {
+      it('throws an error', async () => {
+        authenticatedUser = await anotherUser.toJson()
+        const targetUser = await user.toJson()
+        await expect(
+          query({ query: emailNotificationSettingsQuery, variables: { id: targetUser.id } }),
+        ).resolves.toEqual(
+          expect.objectContaining({
+            errors: [
+              expect.objectContaining({
+                message: 'Not Authorized!',
+              }),
+            ],
+          }),
+        )
+      })
+    })
+
+    describe('as self', () => {
+      it('returns the emailNotificationSettings', async () => {
+        authenticatedUser = await user.toJson()
+        await expect(
+          query({ query: emailNotificationSettingsQuery, variables: { id: authenticatedUser.id } }),
+        ).resolves.toEqual(
+          expect.objectContaining({
+            data: {
+              User: [
+                {
+                  emailNotificationSettings: [
+                    {
+                      type: 'post',
+                      settings: [
+                        {
+                          name: 'commentOnObservedPost',
+                          value: true,
+                        },
+                        {
+                          name: 'mention',
+                          value: true,
+                        },
+                      ],
+                    },
+                    {
+                      type: 'chat',
+                      settings: [
+                        {
+                          name: 'chatMessage',
+                          value: true,
+                        },
+                      ],
+                    },
+                    {
+                      type: 'group',
+                      settings: [
+                        {
+                          name: 'groupMemberJoined',
+                          value: true,
+                        },
+                        {
+                          name: 'groupMemberLeft',
+                          value: true,
+                        },
+                        {
+                          name: 'groupMemberRemoved',
+                          value: true,
+                        },
+                        {
+                          name: 'groupMemberRoleChanged',
+                          value: true,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          }),
+        )
+      })
+    })
+  })
+
+  describe('mutate the field', () => {
+    const emailNotificationSettings = [{ name: 'mention', value: false }]
+
+    describe('as another user', () => {
+      it('throws an error', async () => {
+        authenticatedUser = await anotherUser.toJson()
+        const targetUser = await user.toJson()
+        await expect(
+          mutate({
+            mutation: emailNotificationSettingsMutation,
+            variables: { id: targetUser.id, emailNotificationSettings },
+          }),
+        ).resolves.toEqual(
+          expect.objectContaining({
+            errors: [
+              expect.objectContaining({
+                message: 'Not Authorized!',
+              }),
+            ],
+          }),
+        )
+      })
+    })
+
+    describe('as self', () => {
+      it('updates the emailNotificationSettings', async () => {
+        authenticatedUser = await user.toJson()
+        await expect(
+          mutate({
+            mutation: emailNotificationSettingsMutation,
+            variables: { id: authenticatedUser.id, emailNotificationSettings },
+          }),
+        ).resolves.toEqual(
+          expect.objectContaining({
+            data: {
+              UpdateUser: {
+                emailNotificationSettings: [
+                  {
+                    type: 'post',
+                    settings: [
+                      {
+                        name: 'commentOnObservedPost',
+                        value: true,
+                      },
+                      {
+                        name: 'mention',
+                        value: false,
+                      },
+                    ],
+                  },
+                  {
+                    type: 'chat',
+                    settings: [
+                      {
+                        name: 'chatMessage',
+                        value: true,
+                      },
+                    ],
+                  },
+                  {
+                    type: 'group',
+                    settings: [
+                      {
+                        name: 'groupMemberJoined',
+                        value: true,
+                      },
+                      {
+                        name: 'groupMemberLeft',
+                        value: true,
+                      },
+                      {
+                        name: 'groupMemberRemoved',
+                        value: true,
+                      },
+                      {
+                        name: 'groupMemberRoleChanged',
+                        value: true,
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          }),
+        )
+      })
     })
   })
 })

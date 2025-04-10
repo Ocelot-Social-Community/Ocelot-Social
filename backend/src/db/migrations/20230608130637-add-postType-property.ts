@@ -1,4 +1,4 @@
-import { getDriver } from '../../db/neo4j'
+import { getDriver } from '@db/neo4j'
 
 export const description = 'Add postType property Article to all posts'
 

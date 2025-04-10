@@ -1,5 +1,6 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
+
 import { minimatch } from 'minimatch'
 
 let oEmbedProvidersFile = fs.readFileSync(

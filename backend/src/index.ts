@@ -1,5 +1,5 @@
-import createServer from './server'
 import CONFIG from './config'
+import createServer from './server'
 
 const { server, httpServer } = createServer()
 const url = new URL(CONFIG.GRAPHQL_URI)
