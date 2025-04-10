@@ -68,9 +68,6 @@ export const mutations = {
     state.filter = filter
   },
   TOGGLE_CATEGORY(state, categoryId) {
-    if (!this.$env.CATEGORIES_ACTIVE) {
-      return
-    }
     const filter = clone(state.filter)
     update(filter, 'categories_some.id_in', (categoryIds) => xor(categoryIds, [categoryId]))
     if (isEmpty(get(filter, 'categories_some.id_in'))) delete filter.categories_some
