@@ -155,12 +155,50 @@ export default {
     type: 'boolean',
     default: false,
   },
-  sendNotificationEmails: {
+
+  // emailNotifications
+  emailNotificationsCommentOnObservedPost: {
     type: 'boolean',
     default: true,
   },
+  emailNotificationsMention: {
+    type: 'boolean',
+    default: true,
+  },
+  emailNotificationsChatMessage: {
+    type: 'boolean',
+    default: true,
+  },
+  emailNotificationsGroupMemberJoined: {
+    type: 'boolean',
+    default: true,
+  },
+  emailNotificationsGroupMemberLeft: {
+    type: 'boolean',
+    default: true,
+  },
+  emailNotificationsGroupMemberRemoved: {
+    type: 'boolean',
+    default: true,
+  },
+  emailNotificationsGroupMemberRoleChanged: {
+    type: 'boolean',
+    default: true,
+  },
+
   locale: {
     type: 'string',
     allow: [null],
+  },
+  observes: {
+    type: 'relationship',
+    relationship: 'OBSERVES',
+    target: 'Post',
+    direction: 'out',
+    properties: {
+      createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
+      updatedAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
+      active: { type: 'boolean', default: true },
+    },
   },
 }

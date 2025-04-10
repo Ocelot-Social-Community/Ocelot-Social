@@ -1,5 +1,6 @@
-import { getDriver } from '../neo4j'
 import { v4 as uuid } from 'uuid'
+
+import { getDriver } from '@db/neo4j'
 
 export const description =
   'This migration adds a Donations node with default settings to the database.'

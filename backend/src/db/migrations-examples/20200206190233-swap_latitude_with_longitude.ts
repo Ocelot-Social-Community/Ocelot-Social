@@ -1,4 +1,4 @@
-import { getDriver } from '../neo4j'
+import { getDriver } from '@db/neo4j'
 
 export const description = `
 This migration swaps the value stored in Location.lat with the value

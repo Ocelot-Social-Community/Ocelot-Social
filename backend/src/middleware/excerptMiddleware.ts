@@ -1,5 +1,6 @@
 import trunc from 'trunc-html'
-import { DESCRIPTION_EXCERPT_HTML_LENGTH } from '../constants/groups'
+
+import { DESCRIPTION_EXCERPT_HTML_LENGTH } from '@constants/groups'
 
 export default {
   Mutation: {
