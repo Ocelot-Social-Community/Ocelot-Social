@@ -30,12 +30,18 @@ describe('GroupContentMenu', () => {
     })
 
     it('renders as groupProfile, not muted', () => {
-      const wrapper = Wrapper({ usage: 'groupProfile', group: { isMuted: false, id: 'groupid' } })
+      const wrapper = Wrapper({
+        usage: 'groupProfile',
+        group: { isMutedByMe: false, id: 'groupid' },
+      })
       expect(wrapper.element).toMatchSnapshot()
     })
 
     it('renders as groupProfile, muted', () => {
-      const wrapper = Wrapper({ usage: 'groupProfile', group: { isMuted: true, id: 'groupid' } })
+      const wrapper = Wrapper({
+        usage: 'groupProfile',
+        group: { isMutedByMe: true, id: 'groupid' },
+      })
       expect(wrapper.element).toMatchSnapshot()
     })
   })
