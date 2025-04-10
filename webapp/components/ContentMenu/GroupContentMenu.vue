@@ -64,7 +64,6 @@ export default {
       }
 
       if (this.usage === 'groupProfile') {
-        console.log(this.group)
         if (this.group.isMutedByMe) {
           routes.push({
             label: this.$t('group.contentMenu.unmuteGroup'),
