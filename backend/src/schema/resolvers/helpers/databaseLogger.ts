@@ -1,4 +1,5 @@
 /* eslint-disable import/no-named-as-default */
+// eslint-disable-next-line import/no-extraneous-dependencies
 import Debug from 'debug'
 
 const debugCypher = Debug('human-connection:neo4j:cypher')

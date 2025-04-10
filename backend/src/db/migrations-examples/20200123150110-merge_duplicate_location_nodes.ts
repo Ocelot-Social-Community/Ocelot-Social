@@ -1,7 +1,9 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable promise/prefer-await-to-callbacks */
 import { throwError, concat } from 'rxjs'
 import { flatMap, mergeMap, map, catchError } from 'rxjs/operators'
-import { getDriver } from '../neo4j'
+
+import { getDriver } from '@db/neo4j'
 
 export const description = `
   This migration merges duplicate :Location nodes. It became

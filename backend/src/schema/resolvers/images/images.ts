@@ -1,13 +1,15 @@
 /* eslint-disable promise/avoid-new */
 /* eslint-disable security/detect-non-literal-fs-filename */
-import path from 'path'
-import { v4 as uuid } from 'uuid'
+import { existsSync, unlinkSync, createWriteStream } from 'node:fs'
+import path from 'node:path'
+
+import { UserInputError } from 'apollo-server'
 import { S3 } from 'aws-sdk'
 import slug from 'slug'
-import { existsSync, unlinkSync, createWriteStream } from 'fs'
-import { UserInputError } from 'apollo-server'
-import { getDriver } from '../../../db/neo4j'
-import CONFIG from '../../../config'
+import { v4 as uuid } from 'uuid'
+
+import CONFIG from '@config/index'
+import { getDriver } from '@db/neo4j'
 
 // const widths = [34, 160, 320, 640, 1024]
 const { AWS_ENDPOINT: endpoint, AWS_REGION: region, AWS_BUCKET: Bucket, S3_CONFIGURED } = CONFIG
