@@ -1,4 +1,5 @@
-import { categories } from '../constants/categories'
+import { categories } from '@constants/categories'
+
 import { getDriver } from './neo4j'
 
 const createCategories = async () => {
