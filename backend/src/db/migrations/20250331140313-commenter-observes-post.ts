@@ -1,7 +1,8 @@
 import { getDriver } from '@db/neo4j'
 
-export const description =
-  'This migration adds a fulltext index for the tags in order to search for Hasthags.'
+export const description = `
+All users commenting a post observe the post.
+`
 
 export async function up(next) {
   const driver = getDriver()
@@ -9,27 +10,25 @@ export async function up(next) {
   const transaction = session.beginTransaction()
 
   try {
-    // We do do this in /src/db/migrate/store.ts
-    /*
+    // Implement your migration here.
     await transaction.run(`
-      CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"])
+      MATCH (commenter:User)-[:WROTE]->(:Comment)-[:COMMENTS]->(post:Post)
+      MERGE (commenter)-[obs:OBSERVES]->(post)
+      ON CREATE SET
+        obs.active = true,
+        obs.createdAt = toString(datetime()),
+        obs.updatedAt = toString(datetime())
+      RETURN post
     `)
     await transaction.commit()
-    */
     next()
   } catch (error) {
-    const { message } = error
-    if (message.includes('There already exists an index')) {
-      // all fine
-      // eslint-disable-next-line no-console
-      console.log(message)
-      next()
-    } else {
-      await transaction.rollback()
-      // eslint-disable-next-line no-console
-      console.log('rolled back')
-      throw new Error(error)
-    }
+    // eslint-disable-next-line no-console
+    console.log(error)
+    await transaction.rollback()
+    // eslint-disable-next-line no-console
+    console.log('rolled back')
+    throw new Error(error)
   } finally {
     session.close()
   }
@@ -42,13 +41,13 @@ export async function down(next) {
 
   try {
     // Implement your migration here.
-    // We do do this in /src/db/migrate/store.ts
-    /*
     await transaction.run(`
-      CALL db.index.fulltext.drop("tag_fulltext_search")
+      MATCH (u:User)-[obs:OBSERVES]->(p:Post)<-[:COMMENTS]-(:Comment)<-[:WROTE]-(u)
+      WHERE NOT (u)-[:WROTE]->(post)
+      DELETE obs
+      RETURN p
     `)
     await transaction.commit()
-    */
     next()
   } catch (error) {
     // eslint-disable-next-line no-console
