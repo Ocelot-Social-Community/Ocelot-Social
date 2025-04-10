@@ -485,8 +485,8 @@
     "categoriesTitle": null,
     "changeMemberRole": null,
     "contentMenu": {
-      "muteGroup": null,
-      "unmuteGroup": null,
+      "muteGroup": "Silenciar grupo",
+      "unmuteGroup": "Desactivar silencio del grupo",
       "visitGroupPage": null
     },
     "createNewGroup": {
@@ -537,6 +537,7 @@
       "confirmAddGroupMemberText": null,
       "confirmAddGroupMemberTitle": null
     },
+    "muted": "Grupo silenciado",
     "myGroups": null,
     "name": null,
     "radius": null,
@@ -561,6 +562,8 @@
       "hidden": null,
       "public": null
     },
+    "unmute": "Desactivar silencio",
+    "unmuted": "Silencio del grupo desactivado",
     "update": null,
     "updatedGroup": null
   },
