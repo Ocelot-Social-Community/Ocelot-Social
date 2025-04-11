@@ -295,6 +295,7 @@ describe('notify group members of new posts in group', () => {
       })
 
       it('sends NO notification when another post is posted', async () => {
+        jest.clearAllMocks()
         authenticatedUser = await groupMember.toJson()
         await markAllAsRead()
         authenticatedUser = await postAuthor.toJson()
@@ -321,6 +322,10 @@ describe('notify group members of new posts in group', () => {
           },
           errors: undefined,
         })
+      })
+
+      it('sends NO email', () => {
+        expect(sendMailMock).not.toHaveBeenCalled()
       })
 
       describe('group member unmutes group again but disables email', () => {
