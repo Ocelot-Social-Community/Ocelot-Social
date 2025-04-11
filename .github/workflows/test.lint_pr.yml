@@ -33,6 +33,8 @@ jobs:
             frontend
             maintenance
             database
+            deps
+            deps-dev
             docu
             docker
             release
