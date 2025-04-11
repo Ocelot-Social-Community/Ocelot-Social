@@ -738,6 +738,7 @@
     "reason": {
       "changed_group_member_role": null,
       "commented_on_post": "Comentou no seu post …",
+      "followed_user_posted": null,
       "mentioned_in_comment": "Mentionou você em um comentário …",
       "mentioned_in_post": "Mencinou você em um post …",
       "removed_user_from_group": null,
@@ -1043,6 +1044,7 @@
       "chatMessage": "Mensagem recebida durante a ausência",
       "checkAll": "Marcar tudo",
       "commentOnObservedPost": "Comentários sobre as mensagens observadas",
+      "followingUsers": null,
       "group": "Grupos",
       "groupMemberJoined": "Member joined a group I own",
       "groupMemberLeft": "Membro saiu de um grupo de que sou proprietário",

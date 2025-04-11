@@ -1,6 +1,7 @@
 enum EmailNotificationSettingsName {
   commentOnObservedPost
   mention
+  followingUsers
   chatMessage
   groupMemberJoined
   groupMemberLeft

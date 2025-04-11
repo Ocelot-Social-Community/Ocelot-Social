@@ -737,7 +737,8 @@
     "post": "Beitrag oder Gruppe",
     "reason": {
       "changed_group_member_role": "Hat Deine Rolle in der Gruppe geändert …",
-      "commented_on_post": "Hat Deinen Beitrag kommentiert …",
+      "commented_on_post": "Hat einen Beitrag den du beobachtest kommentiert …",
+      "followed_user_posted": "Hat einen neuen Betrag geschrieben …",
       "mentioned_in_comment": "Hat Dich in einem Kommentar erwähnt …",
       "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …",
       "removed_user_from_group": "Hat Dich aus der Gruppe entfernt …",
@@ -1043,6 +1044,7 @@
       "chatMessage": "Nachricht erhalten während Abwesenheit",
       "checkAll": "Alle auswählen",
       "commentOnObservedPost": "Kommentare zu beobachteten Beiträgen",
+      "followingUsers": "Ein Nutzer dem ich folge veröffentlichte einen neuen Beitrag",
       "group": "Gruppen",
       "groupMemberJoined": "Ein Mitglied ist deiner Gruppe beigetreten",
       "groupMemberLeft": "Ein Mitglied hat deine Gruppe verlassen",

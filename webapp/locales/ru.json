@@ -738,6 +738,7 @@
     "reason": {
       "changed_group_member_role": null,
       "commented_on_post": "Комментарий к посту...",
+      "followed_user_posted": null,
       "mentioned_in_comment": "Упоминание в комментарии....",
       "mentioned_in_post": "Упоминание в посте....",
       "removed_user_from_group": null,
@@ -1043,6 +1044,7 @@
       "chatMessage": "Сообщение, полученное во время отсутствия",
       "checkAll": "Отметить все",
       "commentOnObservedPost": "Комментарии по поводу замеченных сообщений",
+      "followingUsers": null,
       "group": "Группы",
       "groupMemberJoined": "Участник присоединился к группе, которой я владею",
       "groupMemberLeft": "Участник вышел из группы, которой владею",

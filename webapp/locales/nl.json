@@ -738,6 +738,7 @@
     "reason": {
       "changed_group_member_role": null,
       "commented_on_post": null,
+      "followed_user_posted": null,
       "mentioned_in_comment": null,
       "mentioned_in_post": null,
       "removed_user_from_group": null,
@@ -1043,6 +1044,7 @@
       "chatMessage": "Bericht ontvangen tijdens afwezigheid",
       "checkAll": "Vink alles aan",
       "commentOnObservedPost": "Geef commentaar op een bijdrage die ik volg",
+      "followingUsers": null,
       "group": "Groepen",
       "groupMemberJoined": "Een nieuw lid is lid geworden van een groep van mij",
       "groupMemberLeft": "Een lid heeft een groep van mij verlaten",

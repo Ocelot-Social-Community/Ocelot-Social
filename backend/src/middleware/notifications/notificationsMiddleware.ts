@@ -111,6 +111,7 @@ const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveIn
 }
 
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
+  const { groupId } = args
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
@@ -118,6 +119,11 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
       context,
       [notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context)],
       'emailNotificationsMention',
+    )
+    await publishNotifications(
+      context,
+      [notifyFollowingUsers(post.id, groupId, context)],
+      'emailNotificationsFollowingUsers',
     )
   }
   return post
@@ -166,6 +172,45 @@ const postAuthorOfComment = async (commentId, { context }) => {
       )
     })
     return postAuthorId.records.map((record) => record.get('authorId'))
+  } finally {
+    session.close()
+  }
+}
+
+const notifyFollowingUsers = async (postId, groupId, context) => {
+  const reason = 'followed_user_posted'
+  const cypher = `
+    MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })<-[:FOLLOWS]-(user:User)
+    OPTIONAL MATCH (post)-[:IN]->(group:Group { id: $groupId })
+    WITH post, author, user, group WHERE group IS NULL OR group.groupType = 'public'
+    MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
+      SET notification.read = FALSE
+      SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
+      SET notification.updatedAt = toString(datetime())
+    WITH notification, author, user,
+      post {.*, author: properties(author) } AS finalResource
+    RETURN notification {
+      .*,
+      from: finalResource,
+      to: properties(user),
+      relatedUser: properties(author)
+    }
+  `
+  const session = context.driver.session()
+  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+    const notificationTransactionResponse = await transaction.run(cypher, {
+      postId,
+      reason,
+      groupId: groupId || null,
+      userId: context.user.id,
+    })
+    return notificationTransactionResponse.records.map((record) => record.get('notification'))
+  })
+  try {
+    const notifications = await writeTxResultPromise
+    return notifications
+  } catch (error) {
+    throw new Error(error)
   } finally {
     session.close()
   }

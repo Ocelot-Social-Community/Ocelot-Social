@@ -185,6 +185,10 @@ export default {
     type: 'boolean',
     default: true,
   },
+  emailNotificationsFollowingUsers: {
+    type: 'boolean',
+    default: true,
+  },
 
   locale: {
     type: 'string',

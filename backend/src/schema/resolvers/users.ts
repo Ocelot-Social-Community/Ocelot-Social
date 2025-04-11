@@ -383,6 +383,10 @@ export default {
               name: 'mention',
               value: parent.emailNotificationsMention ?? true,
             },
+            {
+              name: 'followingUsers',
+              value: parent.emailNotificationsFollowingUsers ?? true,
+            },
           ],
         },
         {
