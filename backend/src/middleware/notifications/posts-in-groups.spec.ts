@@ -1,15 +1,15 @@
-import gql from 'graphql-tag'
-import { cleanDatabase } from '../../db/factories'
-import { getNeode, getDriver } from '../../db/neo4j'
-import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
+import gql from 'graphql-tag'
+
+import { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
 import {
   createGroupMutation,
   joinGroupMutation,
   changeGroupMemberRoleMutation,
-} from '../../graphql/groups'
-
-import CONFIG from '../../config'
+} from '@graphql/groups'
+import CONFIG from '@src/config'
+import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
