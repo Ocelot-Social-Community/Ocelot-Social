@@ -143,11 +143,11 @@ describe('Message', () => {
                 },
               },
             })
-            expect(pubsubSpy).toBeCalledWith('ROOM_COUNT_UPDATED', {
+            expect(pubsubSpy).toHaveBeenCalledWith('ROOM_COUNT_UPDATED', {
               roomCountUpdated: '1',
               userId: 'other-chatting-user',
             })
-            expect(pubsubSpy).toBeCalledWith('CHAT_MESSAGE_ADDED', {
+            expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
               chatMessageAdded: expect.objectContaining({
                 id: expect.any(String),
                 content: 'Some nice message to other chatting user',

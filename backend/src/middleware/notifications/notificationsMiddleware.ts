@@ -7,7 +7,9 @@ import {
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 // eslint-disable-next-line import/no-cycle
-import { pubsub, NOTIFICATION_ADDED } from '@src/server'
+import { getUnreadRoomsCount } from '@schema/resolvers/rooms'
+// eslint-disable-next-line import/no-cycle
+import { pubsub, NOTIFICATION_ADDED, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '@src/server'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 
@@ -436,7 +438,7 @@ const notifyUsersOfComment = async (label, commentId, reason, context) => {
 
 const handleCreateMessage = async (resolve, root, args, context, resolveInfo) => {
   // Execute resolver
-  const result = await resolve(root, args, context, resolveInfo)
+  const message = await resolve(root, args, context, resolveInfo)
 
   // Query Parameters
   const { roomId } = args
@@ -452,7 +454,6 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
       MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
         WHERE NOT recipientUser.id = $currentUserId
         AND NOT (recipientUser)-[:BLOCKED]-(senderUser)
-        AND NOT recipientUser.emailNotificationsChatMessage = false
       RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email}
     `
     const txResponse = await transaction.run(messageRecipientCypher, {
@@ -471,13 +472,27 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
     // Execute Query
     const { senderUser, recipientUser, email } = await messageRecipient
 
-    // Send EMail if we found a user(not blocked) and he is not considered online
-    if (recipientUser && !isUserOnline(recipientUser)) {
-      void sendMail(chatMessageTemplate({ email, variables: { senderUser, recipientUser } }))
+    if (recipientUser) {
+      // send subscriptions
+      const roomCountUpdated = await getUnreadRoomsCount(recipientUser.id, session)
+
+      void pubsub.publish(ROOM_COUNT_UPDATED, {
+        roomCountUpdated,
+        userId: recipientUser.id,
+      })
+      void pubsub.publish(CHAT_MESSAGE_ADDED, {
+        chatMessageAdded: message,
+        userId: recipientUser.id,
+      })
+
+      // Send EMail if we found a user(not blocked) and he is not considered online
+      if (recipientUser.emailNotificationsChatMessage !== false && !isUserOnline(recipientUser)) {
+        void sendMail(chatMessageTemplate({ email, variables: { senderUser, recipientUser } }))
+      }
     }
 
     // Return resolver result to client
-    return result
+    return message
   } catch (error) {
     throw new Error(error)
   } finally {
