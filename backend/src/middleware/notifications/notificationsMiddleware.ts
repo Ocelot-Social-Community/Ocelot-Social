@@ -127,7 +127,7 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
     )
     await publishNotifications(
       context,
-      [notifyGorupMembersOfNewPost(post.id, groupId, context)],
+      [notifyGroupMembersOfNewPost(post.id, groupId, context)],
       'emailNotificationsPostInGroup',
     )
   }
