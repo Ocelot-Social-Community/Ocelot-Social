@@ -1421,76 +1421,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           </div>
            
           <client-only-stub>
-            <v-popover-stub
-              autohide="true"
-              class="group-content-menu group-profile-content-menu"
-              container="body"
-              delay="0"
-              handleresize="true"
-              offset="5"
-              openclass="open"
-              opengroup="0"
-              placement="bottom-end"
-              popoverarrowclass="tooltip-arrow popover-arrow"
-              popoverbaseclass="tooltip popover"
-              popoverclass="vue-popover-theme"
-              popoverinnerclass="tooltip-inner popover-inner"
-              popoverwrapperclass="wrapper"
-              popperoptions="[object Object]"
-              trigger="manual"
-            >
-              <button
-                class="base-button --icon-only --circle --small"
-                data-test="group-menu-button"
-                type="button"
-              >
-                <span
-                  class="base-icon"
-                >
-                  <!---->
-                </span>
-                 
-                <!---->
-                 
-              </button>
-               
-              <div>
-                <div
-                  class="group-menu-popover"
-                >
-                  <nav
-                    class="ds-menu"
-                  >
-                    <ul
-                      class="ds-menu-list"
-                    >
-                      
-          
-          
-                      <li
-                        class="ds-menu-item ds-menu-item-level-0"
-                      >
-                        <router-link-stub
-                          class="ds-menu-item-link"
-                          exact="true"
-                          to="/"
-                        >
-                          <span
-                            class="base-icon"
-                          >
-                            <!---->
-                          </span>
-                          
-            group.contentMenu.unmuteGroup
-          
-                        </router-link-stub>
-                        <!---->
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-              </div>
-            </v-popover-stub>
+            <!---->
           </client-only-stub>
            
           <div
@@ -4479,76 +4410,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           </div>
            
           <client-only-stub>
-            <v-popover-stub
-              autohide="true"
-              class="group-content-menu group-profile-content-menu"
-              container="body"
-              delay="0"
-              handleresize="true"
-              offset="5"
-              openclass="open"
-              opengroup="0"
-              placement="bottom-end"
-              popoverarrowclass="tooltip-arrow popover-arrow"
-              popoverbaseclass="tooltip popover"
-              popoverclass="vue-popover-theme"
-              popoverinnerclass="tooltip-inner popover-inner"
-              popoverwrapperclass="wrapper"
-              popperoptions="[object Object]"
-              trigger="manual"
-            >
-              <button
-                class="base-button --icon-only --circle --small"
-                data-test="group-menu-button"
-                type="button"
-              >
-                <span
-                  class="base-icon"
-                >
-                  <!---->
-                </span>
-                 
-                <!---->
-                 
-              </button>
-               
-              <div>
-                <div
-                  class="group-menu-popover"
-                >
-                  <nav
-                    class="ds-menu"
-                  >
-                    <ul
-                      class="ds-menu-list"
-                    >
-                      
-          
-          
-                      <li
-                        class="ds-menu-item ds-menu-item-level-0"
-                      >
-                        <router-link-stub
-                          class="ds-menu-item-link"
-                          exact="true"
-                          to="/"
-                        >
-                          <span
-                            class="base-icon"
-                          >
-                            <!---->
-                          </span>
-                          
-            group.contentMenu.muteGroup
-          
-                        </router-link-stub>
-                        <!---->
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-              </div>
-            </v-popover-stub>
+            <!---->
           </client-only-stub>
            
           <div
