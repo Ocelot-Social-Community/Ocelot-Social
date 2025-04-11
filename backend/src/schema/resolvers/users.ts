@@ -113,32 +113,53 @@ export default {
     blockUser: async (object, args, context, resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
-      await neode.cypher(
-        `
-      MATCH(u:User {id: $currentUser.id})-[r:FOLLOWS]->(b:User {id: $args.id})
-      DELETE r
-      `,
-        { currentUser, args },
-      )
-      const [user, blockedUser] = await Promise.all([
-        neode.find('User', currentUser.id),
-        neode.find('User', args.id),
-      ])
-      await user.relateTo(blockedUser, 'blocked')
-      return blockedUser.toJson()
+
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const unBlockUserTransactionResponse = await transaction.run(
+          `
+            MATCH (blockedUser:User {id: $args.id})
+            MATCH (currentUser:User {id: $currentUser.id})
+            OPTIONAL MATCH (currentUser)-[r:FOLLOWS]->(blockedUser)
+            DELETE r
+            CREATE (currentUser)-[:BLOCKED]->(blockedUser)
+            RETURN blockedUser {.*}
+          `,
+          { currentUser, args },
+        )
+        return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new UserInputError(error.message)
+      } finally {
+        session.close()
+      }
     },
     unblockUser: async (object, args, context, resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
-      await neode.cypher(
-        `
-      MATCH(u:User {id: $currentUser.id})-[r:BLOCKED]->(b:User {id: $args.id})
-      DELETE r
-      `,
-        { currentUser, args },
-      )
-      const blockedUser = await neode.find('User', args.id)
-      return blockedUser.toJson()
+
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const unBlockUserTransactionResponse = await transaction.run(
+          `
+            MATCH(u:User {id: $currentUser.id})-[r:BLOCKED]->(blockedUser:User {id: $args.id})
+            DELETE r
+            RETURN blockedUser {.*}
+          `,
+          { currentUser, args },
+        )
+        return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new UserInputError(error.message)
+      } finally {
+        session.close()
+      }
     },
     UpdateUser: async (_parent, params, context, _resolveInfo) => {
       const { avatar: avatarInput } = params
