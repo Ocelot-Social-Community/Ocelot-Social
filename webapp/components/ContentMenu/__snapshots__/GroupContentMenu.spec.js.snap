@@ -1,219 +1,231 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`GroupContentMenu mount renders as groupProfile, muted 1`] = `
-<v-popover-stub
-  autohide="true"
-  class="group-content-menu"
-  container="body"
-  delay="0"
-  handleresize="true"
-  offset="5"
-  openclass="open"
-  opengroup="0.08745536838540247"
-  placement="bottom-end"
-  popoverarrowclass="tooltip-arrow popover-arrow"
-  popoverbaseclass="tooltip popover"
-  popoverclass="vue-popover-theme"
-  popoverinnerclass="tooltip-inner popover-inner"
-  popoverwrapperclass="wrapper"
-  popperoptions="[object Object]"
-  trigger="manual"
->
-  <button
-    class="base-button --icon-only --circle --small"
-    data-test="group-menu-button"
-    type="button"
-  >
-    <span
-      class="base-icon"
-    >
-      <!---->
-    </span>
-     
-    <!---->
-     
-  </button>
-   
+exports[`GroupContentMenu renders as groupProfile, muted 1`] = `
+<body>
   <div>
-    <div
-      class="group-menu-popover"
+    <v-popover-stub
+      autohide="true"
+      class="group-content-menu"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="5"
+      openclass="open"
+      opengroup="0.3629396543129324"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
     >
-      <nav
-        class="ds-menu"
+      <button
+        class="base-button --icon-only --circle --small"
+        data-test="group-menu-button"
+        type="button"
       >
-        <ul
-          class="ds-menu-list"
+        <span
+          class="base-icon"
         >
-          
-          
-          
-          <li
-            class="ds-menu-item ds-menu-item-level-0"
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+       
+      <div>
+        <div
+          class="group-menu-popover"
+        >
+          <nav
+            class="ds-menu"
           >
-            <a
-              class="ds-menu-item-link"
-              exact="true"
-              href="/"
+            <ul
+              class="ds-menu-list"
             >
-              <span
-                class="base-icon"
-              >
-                <!---->
-              </span>
               
+          
+          
+              <li
+                class="ds-menu-item ds-menu-item-level-0"
+              >
+                <a
+                  class="ds-menu-item-link"
+                  exact="true"
+                  href="/"
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                  
             group.contentMenu.unmuteGroup
           
-            </a>
-            <!---->
-          </li>
-        </ul>
-      </nav>
-    </div>
+                </a>
+                <!---->
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </v-popover-stub>
   </div>
-</v-popover-stub>
+</body>
 `;
 
-exports[`GroupContentMenu mount renders as groupProfile, not muted 1`] = `
-<v-popover-stub
-  autohide="true"
-  class="group-content-menu"
-  container="body"
-  delay="0"
-  handleresize="true"
-  offset="5"
-  openclass="open"
-  opengroup="0.31732123510201005"
-  placement="bottom-end"
-  popoverarrowclass="tooltip-arrow popover-arrow"
-  popoverbaseclass="tooltip popover"
-  popoverclass="vue-popover-theme"
-  popoverinnerclass="tooltip-inner popover-inner"
-  popoverwrapperclass="wrapper"
-  popperoptions="[object Object]"
-  trigger="manual"
->
-  <button
-    class="base-button --icon-only --circle --small"
-    data-test="group-menu-button"
-    type="button"
-  >
-    <span
-      class="base-icon"
-    >
-      <!---->
-    </span>
-     
-    <!---->
-     
-  </button>
-   
+exports[`GroupContentMenu renders as groupProfile, not muted 1`] = `
+<body>
   <div>
-    <div
-      class="group-menu-popover"
+    <v-popover-stub
+      autohide="true"
+      class="group-content-menu"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="5"
+      openclass="open"
+      opengroup="0.5838043770172634"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
     >
-      <nav
-        class="ds-menu"
+      <button
+        class="base-button --icon-only --circle --small"
+        data-test="group-menu-button"
+        type="button"
       >
-        <ul
-          class="ds-menu-list"
+        <span
+          class="base-icon"
         >
-          
-          
-          
-          <li
-            class="ds-menu-item ds-menu-item-level-0"
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+       
+      <div>
+        <div
+          class="group-menu-popover"
+        >
+          <nav
+            class="ds-menu"
           >
-            <a
-              class="ds-menu-item-link"
-              exact="true"
-              href="/"
+            <ul
+              class="ds-menu-list"
             >
-              <span
-                class="base-icon"
-              >
-                <!---->
-              </span>
               
+          
+          
+              <li
+                class="ds-menu-item ds-menu-item-level-0"
+              >
+                <a
+                  class="ds-menu-item-link"
+                  exact="true"
+                  href="/"
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                  
             group.contentMenu.muteGroup
           
-            </a>
-            <!---->
-          </li>
-        </ul>
-      </nav>
-    </div>
+                </a>
+                <!---->
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </v-popover-stub>
   </div>
-</v-popover-stub>
+</body>
 `;
 
-exports[`GroupContentMenu mount renders as groupTeaser 1`] = `
-<v-popover-stub
-  autohide="true"
-  class="group-content-menu"
-  container="body"
-  delay="0"
-  handleresize="true"
-  offset="5"
-  openclass="open"
-  opengroup="0.5422585676467131"
-  placement="bottom-end"
-  popoverarrowclass="tooltip-arrow popover-arrow"
-  popoverbaseclass="tooltip popover"
-  popoverclass="vue-popover-theme"
-  popoverinnerclass="tooltip-inner popover-inner"
-  popoverwrapperclass="wrapper"
-  popperoptions="[object Object]"
-  trigger="manual"
->
-  <button
-    class="base-button --icon-only --circle --small"
-    data-test="group-menu-button"
-    type="button"
-  >
-    <span
-      class="base-icon"
-    >
-      <!---->
-    </span>
-     
-    <!---->
-     
-  </button>
-   
+exports[`GroupContentMenu renders as groupTeaser 1`] = `
+<body>
   <div>
-    <div
-      class="group-menu-popover"
+    <v-popover-stub
+      autohide="true"
+      class="group-content-menu"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="5"
+      openclass="open"
+      opengroup="0.7080794569628173"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
     >
-      <nav
-        class="ds-menu"
+      <button
+        class="base-button --icon-only --circle --small"
+        data-test="group-menu-button"
+        type="button"
       >
-        <ul
-          class="ds-menu-list"
+        <span
+          class="base-icon"
         >
-          
-          
-          
-          <li
-            class="ds-menu-item ds-menu-item-level-0"
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+       
+      <div>
+        <div
+          class="group-menu-popover"
+        >
+          <nav
+            class="ds-menu"
           >
-            <a
-              class="ds-menu-item-link"
-              href="/groups/groupid"
+            <ul
+              class="ds-menu-list"
             >
-              <span
-                class="base-icon"
-              >
-                <!---->
-              </span>
               
+          
+          
+              <li
+                class="ds-menu-item ds-menu-item-level-0"
+              >
+                <a
+                  class="ds-menu-item-link"
+                  href="/groups/groupid"
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                  
             group.contentMenu.visitGroupPage
           
-            </a>
-            <!---->
-          </li>
-        </ul>
-      </nav>
-    </div>
+                </a>
+                <!---->
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </v-popover-stub>
   </div>
-</v-popover-stub>
+</body>
 `;
