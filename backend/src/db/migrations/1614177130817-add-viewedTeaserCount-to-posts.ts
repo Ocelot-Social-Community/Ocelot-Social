@@ -1,4 +1,4 @@
-import { getDriver } from '../neo4j'
+import { getDriver } from '@db/neo4j'
 
 export const description = `
 This migration adds the viewedTeaserCount property to all posts, setting it to 0.

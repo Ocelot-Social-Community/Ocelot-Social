@@ -1041,9 +1041,24 @@
     },
     "name": "Configuración",
     "notifications": {
-      "name": null,
-      "send-email-notifications": null,
-      "success-update": null
+      "chat": "Chat",
+      "chatMessage": "Mensaje recibido mientras estaba ausente",
+      "checkAll": "Seleccionar todo",
+      "commentOnObservedPost": "Comentario en una contribución que estoy observando",
+      "followingUsers": null,
+      "group": "Grupos",
+      "groupMemberJoined": "Un nuevo miembro se unió a un grupo mio",
+      "groupMemberLeft": "Un miembro dejó un grupo mio",
+      "groupMemberRemoved": "Fui eliminado de un grupo",
+      "groupMemberRoleChanged": "Mi rol en un grupo ha cambiado",
+      "mention": "Mencionado en una contribución",
+      "name": "Notificaciones por correo electrónico",
+      "post": "Entradas y comentarios",
+      "postByFollowedUser": "Posts by users I follow",
+      "postInGroup": "Post en un grupo del que soy miembro",
+      "send-email-notifications": "Enviar notificaciones por correo electrónico",
+      "success-update": "¡Configuración de notificaciones guardada!",
+      "uncheckAll": "Deseleccionar todo"
     },
     "organizations": {
       "name": "Mis organizaciones"

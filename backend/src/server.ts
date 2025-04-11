@@ -1,19 +1,21 @@
 /* eslint-disable import/no-named-as-default-member */
-import express from 'express'
 import http from 'node:http'
-import helmet from 'helmet'
+
 import { ApolloServer } from 'apollo-server-express'
-import CONFIG from './config'
-// eslint-disable-next-line import/no-cycle
-import middleware from './middleware'
-import { getNeode, getDriver } from './db/neo4j'
-import decode from './jwt/decode'
-import schema from './schema'
+import bodyParser from 'body-parser'
+import express from 'express'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { PubSub } from 'graphql-subscriptions'
-import Redis from 'ioredis'
-import bodyParser from 'body-parser'
 import { graphqlUploadExpress } from 'graphql-upload'
+import helmet from 'helmet'
+import Redis from 'ioredis'
+
+import CONFIG from './config'
+import { getNeode, getDriver } from './db/neo4j'
+import decode from './jwt/decode'
+// eslint-disable-next-line import/no-cycle
+import middleware from './middleware'
+import schema from './schema'
 
 export const NOTIFICATION_ADDED = 'NOTIFICATION_ADDED'
 export const CHAT_MESSAGE_ADDED = 'CHAT_MESSAGE_ADDED'

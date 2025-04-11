@@ -1,4 +1,4 @@
-import { getDriver } from '../neo4j'
+import { getDriver } from '@db/neo4j'
 
 export const description =
   'This migration adds a fulltext index for the tags in order to search for Hasthags.'
@@ -9,10 +9,13 @@ export async function up(next) {
   const transaction = session.beginTransaction()
 
   try {
+    // We do do this in /src/db/migrate/store.ts
+    /*
     await transaction.run(`
       CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"])
     `)
     await transaction.commit()
+    */
     next()
   } catch (error) {
     const { message } = error
@@ -39,10 +42,13 @@ export async function down(next) {
 
   try {
     // Implement your migration here.
+    // We do do this in /src/db/migrate/store.ts
+    /*
     await transaction.run(`
       CALL db.index.fulltext.drop("tag_fulltext_search")
     `)
     await transaction.commit()
+    */
     next()
   } catch (error) {
     // eslint-disable-next-line no-console

@@ -1,9 +1,11 @@
-import { v4 as uuid } from 'uuid'
 import { UserInputError } from 'apollo-server'
-import CONFIG from '../../config'
-import { CATEGORIES_MIN, CATEGORIES_MAX } from '../../constants/categories'
-import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
-import { removeHtmlTags } from '../../middleware/helpers/cleanHtml'
+import { v4 as uuid } from 'uuid'
+
+import CONFIG from '@config/index'
+import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
+import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
+import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
+
 import Resolver, {
   removeUndefinedNullValuesFromObject,
   convertObjectToCypherMapLiteral,

@@ -1,5 +1,6 @@
 import LanguageDetect from 'languagedetect'
-import { removeHtmlTags } from '../helpers/cleanHtml'
+
+import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 
 const setPostLanguage = (text, defaultLanguage) => {
   const lngDetector = new LanguageDetect()

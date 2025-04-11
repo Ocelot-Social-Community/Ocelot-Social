@@ -1,11 +1,13 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
-import { getDriver } from '../neo4j'
+import https from 'https'
 import { existsSync, createReadStream } from 'node:fs'
 import path from 'node:path'
+
 import { S3 } from 'aws-sdk'
 import mime from 'mime-types'
-import s3Configs from '../../config'
-import https from 'https'
+
+import s3Configs from '@config/index'
+import { getDriver } from '@db/neo4j'
 
 export const description = `
 Upload all image files to a S3 compatible object storage in order to reduce

@@ -1,10 +1,11 @@
-import generateNonce from './helpers/generateNonce'
-import Resolver from './helpers/Resolver'
-import existingEmailAddress from './helpers/existingEmailAddress'
 import { UserInputError } from 'apollo-server'
 // eslint-disable-next-line import/extensions
 import Validator from 'neode/build/Services/Validator.js'
+
+import existingEmailAddress from './helpers/existingEmailAddress'
+import generateNonce from './helpers/generateNonce'
 import normalizeEmail from './helpers/normalizeEmail'
+import Resolver from './helpers/Resolver'
 
 export default {
   Query: {
@@ -86,6 +87,8 @@ export default {
           `
             MATCH (user:User {id: $userId})-[:PRIMARY_EMAIL]->(previous:EmailAddress)
             MATCH (user)<-[:BELONGS_TO]-(email:UnverifiedEmailAddress {email: $email, nonce: $nonce})
+            OPTIONAL MATCH (abandonedEmail:EmailAddress{email: $email}) WHERE NOT EXISTS ((abandonedEmail)<-[]-())
+            DELETE abandonedEmail
             MERGE (user)-[:PRIMARY_EMAIL]->(email)
             SET email:EmailAddress
             SET email.verifiedAt = toString(datetime())

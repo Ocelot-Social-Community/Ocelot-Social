@@ -2,13 +2,14 @@
 /* eslint-disable n/global-require */
 /* eslint-disable import/no-commonjs */
 /* eslint-disable import/no-named-as-default */
+
+import { ApolloError } from 'apollo-server'
+import isArray from 'lodash/isArray'
+import isEmpty from 'lodash/isEmpty'
+import mergeWith from 'lodash/mergeWith'
 import Metascraper from 'metascraper'
 import fetch from 'node-fetch'
 
-import { ApolloError } from 'apollo-server'
-import isEmpty from 'lodash/isEmpty'
-import isArray from 'lodash/isArray'
-import mergeWith from 'lodash/mergeWith'
 import findProvider from './findProvider'
 
 // eslint-disable-next-line import/no-extraneous-dependencies
