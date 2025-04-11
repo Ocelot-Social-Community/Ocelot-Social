@@ -51,5 +51,8 @@ module.exports = defineConfig({
     viewportWidth: 1290,
     setupNodeEvents,
   },
-  env: parsed
+  env: {
+    ...parsed,
+    mailserverURL: 'http://localhost:1080',
+  }
 });
