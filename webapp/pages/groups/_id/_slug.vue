@@ -458,7 +458,7 @@ export default {
         await this.$apollo.mutate({
           mutation: muteGroup(),
           variables: {
-            id: this.group.id,
+            groupId: this.group.id,
           },
         })
         this.$toast.success(this.$t('group.muted'))
@@ -471,7 +471,7 @@ export default {
         await this.$apollo.mutate({
           mutation: unmuteGroup(),
           variables: {
-            id: this.group.id,
+            groupId: this.group.id,
           },
         })
         this.$toast.success(this.$t('group.unmuted'))

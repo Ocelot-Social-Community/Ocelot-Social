@@ -1,28 +1,9 @@
 import gql from 'graphql-tag'
 
-// Not sure if we need this
-export const mutedGroups = () => {
-  return gql`
-    {
-      mutedGroups {
-        id
-        name
-        slug
-        avatar {
-          url
-        }
-        about
-        disabled
-        deleted
-      }
-    }
-  `
-}
-
 export const muteGroup = () => {
   return gql`
-    mutation ($id: ID!) {
-      muteGroup(id: $id) {
+    mutation ($groupId: ID!) {
+      muteGroup(groupId: $groupId) {
         id
         name
         isMutedByMe
@@ -33,8 +14,8 @@ export const muteGroup = () => {
 
 export const unmuteGroup = () => {
   return gql`
-    mutation ($id: ID!) {
-      unmuteGroup(id: $id) {
+    mutation ($groupId: ID!) {
+      unmuteGroup(groupId: $groupId) {
         id
         name
         isMutedByMe
