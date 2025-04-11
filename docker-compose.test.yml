@@ -37,7 +37,7 @@ services:
     #  - NEO4J_dbms_connector_https_listen__address=0.0.0.0:7473
 
   mailserver:
-    image: djfarrelly/maildev
+    image: maildev/maildev
     ports:
-      - 1080:80
-      - 25:25
+      - 1080:1080
+      - 1025:1025
