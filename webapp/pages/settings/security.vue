@@ -7,8 +7,10 @@
 
 <script>
 import ChangePassword from '~/components/Password/Change'
+import scrollToContent from './scroll-to-content.js'
 
 export default {
+  mixins: [scrollToContent],
   components: {
     ChangePassword,
   },

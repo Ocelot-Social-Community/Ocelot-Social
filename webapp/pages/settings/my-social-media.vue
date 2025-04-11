@@ -35,8 +35,10 @@ import {
 } from '~/graphql/SocialMedia.js'
 import MySomethingList from '~/components/_new/features/MySomethingList/MySomethingList.vue'
 import SocialMediaListItem from '~/components/_new/features/SocialMedia/SocialMediaListItem.vue'
+import scrollToContent from './scroll-to-content.js'
 
 export default {
+  mixins: [scrollToContent],
   components: {
     MySomethingList,
     SocialMediaListItem,

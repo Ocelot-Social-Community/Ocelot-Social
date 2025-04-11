@@ -72,8 +72,10 @@
 <script>
 import { mutedUsers, unmuteUser } from '~/graphql/settings/MutedUsers'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import scrollToContent from './scroll-to-content.js'
 
 export default {
+  mixins: [scrollToContent],
   components: {
     ProfileAvatar,
   },

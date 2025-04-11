@@ -29,8 +29,10 @@
 <script>
 import { mapGetters, mapMutations } from 'vuex'
 import { updateUserMutation } from '~/graphql/User'
+import scrollToContent from './scroll-to-content.js'
 
 export default {
+  mixins: [scrollToContent],
   data() {
     return {
       emailNotificationSettings: [],
