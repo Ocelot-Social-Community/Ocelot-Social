@@ -741,6 +741,7 @@
       "followed_user_posted": null,
       "mentioned_in_comment": "Le mencionó en un comentario …",
       "mentioned_in_post": "Le mencionó en una contribución …",
+      "post_in_group": null,
       "removed_user_from_group": null,
       "user_joined_group": null,
       "user_left_group": null

@@ -106,6 +106,7 @@ export const validateNotifyUsers = async (label, reason) => {
     'mentioned_in_comment',
     'commented_on_post',
     'followed_user_posted',
+    'post_in_group',
   ]
   if (!reasonsAllowed.includes(reason)) throw new Error('Notification reason is not allowed!')
   if (

@@ -125,6 +125,11 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
       [notifyFollowingUsers(post.id, groupId, context)],
       'emailNotificationsFollowingUsers',
     )
+    await publishNotifications(
+      context,
+      [notifyGroupMembersOfNewPost(post.id, groupId, context)],
+      'emailNotificationsPostInGroup',
+    )
   }
   return post
 }
@@ -202,6 +207,49 @@ const notifyFollowingUsers = async (postId, groupId, context) => {
       postId,
       reason,
       groupId: groupId || null,
+      userId: context.user.id,
+    })
+    return notificationTransactionResponse.records.map((record) => record.get('notification'))
+  })
+  try {
+    const notifications = await writeTxResultPromise
+    return notifications
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+}
+
+const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
+  if (!groupId) return []
+  const reason = 'post_in_group'
+  const cypher = `
+    MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })
+    MATCH (post)-[:IN]->(group:Group { id: $groupId })<-[membership:MEMBER_OF]-(user:User)
+      WHERE NOT membership.role = 'pending'
+      AND NOT (user)-[:MUTED]->(group)
+      AND NOT user.id = $userId
+    WITH post, author, user
+    MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
+      SET notification.read = FALSE
+      SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
+      SET notification.updatedAt = toString(datetime())
+    WITH notification, author, user,
+      post {.*, author: properties(author) } AS finalResource
+    RETURN notification {
+      .*,
+      from: finalResource,
+      to: properties(user),
+      relatedUser: properties(author)
+    }
+  `
+  const session = context.driver.session()
+  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+    const notificationTransactionResponse = await transaction.run(cypher, {
+      postId,
+      reason,
+      groupId,
       userId: context.user.id,
     })
     return notificationTransactionResponse.records.map((record) => record.get('notification'))
