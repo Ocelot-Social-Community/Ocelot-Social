@@ -44,7 +44,7 @@ export async function down(next) {
     // Implement your migration here.
     await transaction.run(`
       MATCH (user:User)
-      SET user.sendNotificationEmails = true
+      SET user.sendNotificationEmails = user.emailNotificationsMention
       REMOVE user.emailNotificationsCommentOnObservedPost
       REMOVE user.emailNotificationsMention
       REMOVE user.emailNotificationsChatMessage
