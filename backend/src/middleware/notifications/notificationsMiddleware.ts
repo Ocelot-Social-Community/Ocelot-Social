@@ -400,12 +400,12 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
   const session = context.driver.session()
   const messageRecipient = session.readTransaction(async (transaction) => {
     const messageRecipientCypher = `
-      MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+      MATCH (senderUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
       MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
         WHERE NOT recipientUser.id = $currentUserId
-        AND NOT (recipientUser)-[:BLOCKED]-(currentUser)
+        AND NOT (recipientUser)-[:BLOCKED]-(senderUser)
         AND NOT recipientUser.emailNotificationsChatMessage = false
-      RETURN recipientUser, emailAddress {.email}
+      RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email}
     `
     const txResponse = await transaction.run(messageRecipientCypher, {
       currentUserId,
@@ -413,18 +413,19 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
     })
 
     return {
-      user: await txResponse.records.map((record) => record.get('recipientUser'))[0],
+      senderUser: await txResponse.records.map((record) => record.get('senderUser'))[0],
+      recipientUser: await txResponse.records.map((record) => record.get('recipientUser'))[0],
       email: await txResponse.records.map((record) => record.get('emailAddress'))[0]?.email,
     }
   })
 
   try {
     // Execute Query
-    const { user, email } = await messageRecipient
+    const { senderUser, recipientUser, email } = await messageRecipient
 
     // Send EMail if we found a user(not blocked) and he is not considered online
-    if (user && !isUserOnline(user)) {
-      void sendMail(chatMessageTemplate({ email, variables: { name: user.properties.name } }))
+    if (recipientUser && !isUserOnline(recipientUser)) {
+      void sendMail(chatMessageTemplate({ email, variables: { senderUser, recipientUser } }))
     }
 
     // Return resolver result to client
