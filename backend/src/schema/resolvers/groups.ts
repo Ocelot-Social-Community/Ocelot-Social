@@ -369,7 +369,7 @@ export default {
       }
     },
     muteGroup: async (_parent, params, context, _resolveInfo) => {
-      const { id: groupId } = params
+      const { groupId } = params
       const userId = context.user.id
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -398,7 +398,7 @@ export default {
       }
     },
     unmuteGroup: async (_parent, params, context, _resolveInfo) => {
-      const { id: groupId } = params
+      const { groupId } = params
       const userId = context.user.id
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
