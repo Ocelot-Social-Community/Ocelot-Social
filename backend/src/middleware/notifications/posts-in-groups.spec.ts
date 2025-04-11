@@ -294,7 +294,7 @@ describe('notify group members of new posts in group', () => {
         })
       })
 
-      it('sends no notification when another post is posted', async () => {
+      it('sends NO notification when another post is posted', async () => {
         authenticatedUser = await groupMember.toJson()
         await markAllAsRead()
         authenticatedUser = await postAuthor.toJson()
