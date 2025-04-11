@@ -142,6 +142,6 @@ type Mutation {
     userId: ID!
   ): User
 
-  muteGroup(id: ID!): Group
-  unmuteGroup(id: ID!): Group  
+  muteGroup(groupId: ID!): Group
+  unmuteGroup(groupId: ID!): Group  
 }
