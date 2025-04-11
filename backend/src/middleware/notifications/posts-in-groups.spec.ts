@@ -386,7 +386,7 @@ describe('notify group members of new posts in group', () => {
           })
         })
 
-        it('sends no email', () => {
+        it('sends NO email', () => {
           expect(sendMailMock).not.toHaveBeenCalled()
         })
       })
