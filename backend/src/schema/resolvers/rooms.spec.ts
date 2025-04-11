@@ -2,8 +2,10 @@ import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { createMessageMutation } from '@graphql/messages'
-import { createRoomMutation, roomQuery, unreadRoomsQuery } from '@graphql/rooms'
+import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import { roomQuery } from '@graphql/queries/roomQuery'
+import { unreadRoomsQuery } from '@graphql/queries/unreadRoomsQuery'
 import createServer from '@src/server'
 
 const driver = getDriver()

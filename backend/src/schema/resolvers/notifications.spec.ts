@@ -3,11 +3,9 @@ import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
-import {
-  markAsReadMutation,
-  markAllAsReadMutation,
-  notificationQuery,
-} from '@graphql/notifications'
+import { markAllAsReadMutation } from '@graphql/queries/markAllAsReadMutation'
+import { markAsReadMutation } from '@graphql/queries/markAsReadMutation'
+import { notificationQuery } from '@graphql/queries/notificationQuery'
 import createServer from '@src/server'
 
 const driver = getDriver()
