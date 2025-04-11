@@ -348,4 +348,73 @@ describe('following users notifications', () => {
       })
     })
   })
+
+  describe('followed user posts in hidden group', () => {
+    beforeAll(async () => {
+      authenticatedUser = await postAuthor.toJson()
+      await mutate({
+        mutation: createGroupMutation(),
+        variables: {
+          id: 'g-3',
+          name: 'A hidden group',
+          description: 'A hidden group to test the follow user notification',
+          groupType: 'hidden',
+          actionRadius: 'national',
+        },
+      })
+      await mutate({
+        mutation: createPostMutation,
+        variables: {
+          id: 'hidden-group-post',
+          title: 'This is the post in the hidden group',
+          content: 'This is the content of the post in the hidden group',
+          groupId: 'g-3',
+        },
+      })
+    })
+
+    it('sends NO notification to the post author', async () => {
+      await expect(
+        query({
+          query: notificationQuery,
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: [],
+        },
+        errors: undefined,
+      })
+    })
+
+    it('sends NO notification to the first follower', async () => {
+      authenticatedUser = await firstFollower.toJson()
+      await expect(
+        query({
+          query: notificationQuery,
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: [
+            {
+              from: {
+                __typename: 'Post',
+                id: 'group-post',
+              },
+              read: false,
+              reason: 'followed_user_posted',
+            },
+            {
+              from: {
+                __typename: 'Post',
+                id: 'post',
+              },
+              read: false,
+              reason: 'followed_user_posted',
+            },
+          ],
+        },
+        errors: undefined,
+      })
+    })
+  })
 })

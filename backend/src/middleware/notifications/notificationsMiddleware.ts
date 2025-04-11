@@ -178,30 +178,11 @@ const postAuthorOfComment = async (commentId, { context }) => {
 }
 
 const notifyFollowingUsers = async (postId, groupId, context) => {
-  if (groupId) {
-    const session = context.driver.session()
-    const readTxPromise = session.readTransaction(async (transaction) => {
-      const transactionResponse = await transaction.run(
-        `
-          MATCH (post:Post { id: $postId })-[:IN]->(group:Group { id: $groupId })
-          RETURN group.groupType AS groupType
-        `,
-        { postId, groupId },
-      )
-      return transactionResponse.records.map((record) => record.get('groupType'))[0]
-    })
-    try {
-      const groupType = await readTxPromise
-      if (groupType !== 'public') return []
-    } catch (error) {
-      throw new Error(error)
-    } finally {
-      session.close()
-    }
-  }
   const reason = 'followed_user_posted'
   const cypher = `
     MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })<-[:FOLLOWS]-(user:User)
+    OPTIONAL MATCH (post)-[:IN]->(group:Group { id: $groupId })
+    WITH post, author, user, group WHERE group IS NULL OR group.groupType = 'public'
     MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
       SET notification.read = FALSE
       SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
@@ -220,6 +201,7 @@ const notifyFollowingUsers = async (postId, groupId, context) => {
     const notificationTransactionResponse = await transaction.run(cypher, {
       postId,
       reason,
+      groupId: groupId || null,
       userId: context.user.id,
     })
     return notificationTransactionResponse.records.map((record) => record.get('notification'))
