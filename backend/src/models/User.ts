@@ -189,6 +189,10 @@ export default {
     type: 'boolean',
     default: true,
   },
+  emailNotificationsPostInGroup: {
+    type: 'boolean',
+    default: true,
+  },
 
   locale: {
     type: 'string',

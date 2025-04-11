@@ -679,6 +679,10 @@ describe('emailNotificationSettings', () => {
                           name: 'followingUsers',
                           value: true,
                         },
+                        {
+                          name: 'postInGroup',
+                          value: true,
+                        },
                       ],
                     },
                     {
@@ -771,6 +775,10 @@ describe('emailNotificationSettings', () => {
                       },
                       {
                         name: 'followingUsers',
+                        value: true,
+                      },
+                      {
+                        name: 'postInGroup',
                         value: true,
                       },
                     ],

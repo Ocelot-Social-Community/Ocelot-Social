@@ -468,6 +468,8 @@ export default shield(
       CreateMessage: isAuthenticated,
       MarkMessagesAsSeen: isAuthenticated,
       toggleObservePost: isAuthenticated,
+      muteGroup: and(isAuthenticated, isMemberOfGroup),
+      unmuteGroup: and(isAuthenticated, isMemberOfGroup),
     },
     User: {
       email: or(isMyOwn, isAdmin),

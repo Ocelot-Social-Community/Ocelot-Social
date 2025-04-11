@@ -387,6 +387,10 @@ export default {
               name: 'followingUsers',
               value: parent.emailNotificationsFollowingUsers ?? true,
             },
+            {
+              name: 'postInGroup',
+              value: parent.emailNotificationsPostInGroup ?? true,
+            },
           ],
         },
         {
