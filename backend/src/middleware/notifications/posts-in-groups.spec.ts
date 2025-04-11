@@ -1,7 +1,7 @@
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import { cleanDatabase } from '@db/factories'
+import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import {
   createGroupMutation,
@@ -12,6 +12,11 @@ import CONFIG from '@src/config'
 import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
+
+const sendMailMock = jest.fn()
+jest.mock('../helpers/email/sendMail', () => ({
+  sendMail: () => sendMailMock(),
+}))
 
 let server, query, mutate, authenticatedUser
 
@@ -114,8 +119,8 @@ afterAll(async () => {
 
 describe('notify group members of new posts in group', () => {
   beforeAll(async () => {
-    postAuthor = await neode.create(
-      'User',
+    postAuthor = await Factory.build(
+      'user',
       {
         id: 'post-author',
         name: 'Post Author',
@@ -126,8 +131,8 @@ describe('notify group members of new posts in group', () => {
         password: '1234',
       },
     )
-    groupMember = await neode.create(
-      'User',
+    groupMember = await Factory.build(
+      'user',
       {
         id: 'group-member',
         name: 'Group Member',
@@ -138,8 +143,8 @@ describe('notify group members of new posts in group', () => {
         password: '1234',
       },
     )
-    pendingMember = await neode.create(
-      'User',
+    pendingMember = await Factory.build(
+      'user',
       {
         id: 'pending-member',
         name: 'Pending Member',
@@ -190,6 +195,7 @@ describe('notify group members of new posts in group', () => {
 
   describe('group owner posts in group', () => {
     beforeAll(async () => {
+      jest.clearAllMocks()
       authenticatedUser = await groupMember.toJson()
       await markAllAsRead()
       authenticatedUser = await postAuthor.toJson()
@@ -264,6 +270,10 @@ describe('notify group members of new posts in group', () => {
       })
     })
 
+    it('sends one email', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(1)
+    })
+
     describe('group member mutes group', () => {
       it('sets the muted status correctly', async () => {
         authenticatedUser = await groupMember.toJson()
@@ -284,7 +294,7 @@ describe('notify group members of new posts in group', () => {
         })
       })
 
-      it('sends no notification when another post is posted', async () => {
+      it('sends NO notification when another post is posted', async () => {
         authenticatedUser = await groupMember.toJson()
         await markAllAsRead()
         authenticatedUser = await postAuthor.toJson()
@@ -313,7 +323,12 @@ describe('notify group members of new posts in group', () => {
         })
       })
 
-      describe('group member unmutes group again', () => {
+      describe('group member unmutes group again but disables email', () => {
+        beforeAll(async () => {
+          jest.clearAllMocks()
+          await groupMember.update({ emailNotificationsPostInGroup: false })
+        })
+
         it('sets the muted status correctly', async () => {
           authenticatedUser = await groupMember.toJson()
           await expect(
@@ -369,6 +384,10 @@ describe('notify group members of new posts in group', () => {
             },
             errors: undefined,
           })
+        })
+
+        it('sends NO email', () => {
+          expect(sendMailMock).not.toHaveBeenCalled()
         })
       })
     })
