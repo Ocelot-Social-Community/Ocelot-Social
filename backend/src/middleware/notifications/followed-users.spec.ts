@@ -1,13 +1,18 @@
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import { cleanDatabase } from '@db/factories'
+import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import { createGroupMutation } from '@graphql/groups'
 import CONFIG from '@src/config'
 import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
+
+const sendMailMock = jest.fn()
+jest.mock('../helpers/email/sendMail', () => ({
+  sendMail: () => sendMailMock(),
+}))
 
 let server, query, mutate, authenticatedUser
 
@@ -89,8 +94,8 @@ afterAll(async () => {
 
 describe('following users notifications', () => {
   beforeAll(async () => {
-    postAuthor = await neode.create(
-      'User',
+    postAuthor = await Factory.build(
+      'user',
       {
         id: 'post-author',
         name: 'Post Author',
@@ -101,8 +106,8 @@ describe('following users notifications', () => {
         password: '1234',
       },
     )
-    firstFollower = await neode.create(
-      'User',
+    firstFollower = await Factory.build(
+      'user',
       {
         id: 'first-follower',
         name: 'First Follower',
@@ -113,8 +118,8 @@ describe('following users notifications', () => {
         password: '1234',
       },
     )
-    secondFollower = await neode.create(
-      'User',
+    secondFollower = await Factory.build(
+      'user',
       {
         id: 'second-follower',
         name: 'Second Follower',
@@ -136,6 +141,7 @@ describe('following users notifications', () => {
       mutation: followUserMutation,
       variables: { id: 'post-author' },
     })
+    jest.clearAllMocks()
   })
 
   describe('the followed user writes a post', () => {
@@ -208,6 +214,10 @@ describe('following users notifications', () => {
         },
         errors: undefined,
       })
+    })
+
+    it('sends only one email, as second follower has emails disabled', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(1)
     })
   })
 

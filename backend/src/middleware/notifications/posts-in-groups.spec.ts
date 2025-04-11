@@ -18,18 +18,6 @@ jest.mock('../helpers/email/sendMail', () => ({
   sendMail: () => sendMailMock(),
 }))
 
-const chatMessageTemplateMock = jest.fn()
-const notificationTemplateMock = jest.fn()
-jest.mock('../helpers/email/templateBuilder', () => ({
-  chatMessageTemplate: () => chatMessageTemplateMock(),
-  notificationTemplate: () => notificationTemplateMock(),
-}))
-
-const isUserOnlineMock = jest.fn()
-jest.mock('../helpers/isUserOnline', () => ({
-  isUserOnline: () => isUserOnlineMock(),
-}))
-
 let server, query, mutate, authenticatedUser
 
 let postAuthor, groupMember, pendingMember
