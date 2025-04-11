@@ -1,5 +1,5 @@
-import { mount } from '@vue/test-utils'
 import GroupProfileSlug from './_slug.vue'
+import { render, screen, fireEvent } from '@testing-library/vue'
 
 const localVue = global.localVue
 
@@ -10,13 +10,19 @@ const stubs = {
   'v-popover': true,
   'nuxt-link': true,
   'router-link': true,
-  'infinite-loading': true,
+  // 'infinite-loading': true,
   'follow-list': true,
 }
 
+// Mock Math.random, used in Dropdown
+Object.assign(Math, {
+  random: () => 0,
+})
+
+jest.mock('vue-infinite-loading', () => ({}))
+
 describe('GroupProfileSlug', () => {
   let wrapper
-  let Wrapper
   let mocks
   let yogaPractice
   let schoolForCitizens
@@ -201,17 +207,142 @@ describe('GroupProfileSlug', () => {
     }
   })
 
-  describe('mount', () => {
-    Wrapper = (data = () => {}) => {
-      return mount(GroupProfileSlug, {
-        mocks,
-        localVue,
-        data,
-        stubs,
-      })
-    }
+  const Wrapper = (data = () => {}) => {
+    return render(GroupProfileSlug, {
+      mocks,
+      localVue,
+      data,
+      stubs,
+    })
+  }
 
-    describe('given a puplic group – "yoga-practice"', () => {
+  describe('given a puplic group – "yoga-practice"', () => {
+    describe('given a current user', () => {
+      describe('as group owner – "peter-lustig"', () => {
+        beforeEach(() => {
+          mocks.$store = {
+            getters: {
+              'auth/user': peterLustig,
+              'auth/isModerator': () => false,
+            },
+          }
+          wrapper = Wrapper(() => {
+            return {
+              Group: [
+                {
+                  ...yogaPractice,
+                  myRole: 'owner',
+                },
+              ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            }
+          })
+        })
+
+        it('renders', () => {
+          expect(wrapper.container).toMatchSnapshot()
+        })
+
+        describe('after "show more" click displays full description', () => {
+          beforeEach(async () => {
+            const button = screen.getByText('comment.show.more')
+            await fireEvent.click(button)
+            // await wrapper.container.vm.$nextTick()
+          })
+
+          it('has full description', () => {
+            // test if end of full description is visible
+            expect(
+              screen.queryByText('Use the exercises (consciously) for your personal development.'),
+            ).not.toBeNull()
+          })
+
+          it('has "show less" button', () => {
+            expect(screen.queryByText('comment.show.less')).not.toBeNull()
+          })
+        })
+      })
+
+      describe('as usual member – "jenny-rostock"', () => {
+        beforeEach(() => {
+          mocks.$store = {
+            getters: {
+              'auth/user': jennyRostock,
+              'auth/isModerator': () => false,
+            },
+          }
+          wrapper = Wrapper(() => {
+            return {
+              Group: [
+                {
+                  ...yogaPractice,
+                  myRole: 'usual',
+                },
+              ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            }
+          })
+        })
+
+        it('renders', () => {
+          expect(wrapper.container).toMatchSnapshot()
+        })
+      })
+
+      describe('as pending member – "bob-der-baumeister"', () => {
+        beforeEach(() => {
+          mocks.$store = {
+            getters: {
+              'auth/user': bobDerBaumeister,
+              'auth/isModerator': () => false,
+            },
+          }
+          wrapper = Wrapper(() => {
+            return {
+              Group: [
+                {
+                  ...yogaPractice,
+                  myRole: 'pending',
+                },
+              ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            }
+          })
+        })
+
+        it('renders', () => {
+          expect(wrapper.container).toMatchSnapshot()
+        })
+      })
+
+      describe('as none(!) member – "huey"', () => {
+        beforeEach(() => {
+          mocks.$store = {
+            getters: {
+              'auth/user': huey,
+              'auth/isModerator': () => false,
+            },
+          }
+          wrapper = Wrapper(() => {
+            return {
+              Group: [
+                {
+                  ...yogaPractice,
+                  myRole: null,
+                },
+              ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            }
+          })
+        })
+
+        it('renders', () => {
+          expect(wrapper.container).toMatchSnapshot()
+        })
+      })
+    })
+
+    describe('given a closed group – "school-for-citizens"', () => {
       describe('given a current user', () => {
         describe('as group owner – "peter-lustig"', () => {
           beforeEach(() => {
@@ -225,7 +356,7 @@ describe('GroupProfileSlug', () => {
               return {
                 Group: [
                   {
-                    ...yogaPractice,
+                    ...schoolForCitizens,
                     myRole: 'owner',
                   },
                 ],
@@ -235,29 +366,7 @@ describe('GroupProfileSlug', () => {
           })
 
           it('renders', () => {
-            expect(wrapper.element).toMatchSnapshot()
-          })
-
-          describe('after "show more" click displays full description', () => {
-            let groupDescriptionBaseCard
-            beforeEach(async () => {
-              // TODO Use vue testing library
-              groupDescriptionBaseCard = wrapper.find('.collaps-button')
-              await groupDescriptionBaseCard.find('.collaps-button').trigger('click')
-              await wrapper.vm.$nextTick()
-            })
-
-            it('has full description', () => {
-              // test if end of full description is visible
-              expect(groupDescriptionBaseCard.text()).toContain(
-                `Use the exercises (consciously) for your personal development.`,
-              )
-            })
-
-            it('has "show less" button', () => {
-              expect(wrapper.vm.isDescriptionCollapsed).toBe(false)
-              expect(groupDescriptionBaseCard.text()).toContain('comment.show.less')
-            })
+            expect(wrapper.container).toMatchSnapshot()
           })
         })
 
@@ -273,7 +382,7 @@ describe('GroupProfileSlug', () => {
               return {
                 Group: [
                   {
-                    ...yogaPractice,
+                    ...schoolForCitizens,
                     myRole: 'usual',
                   },
                 ],
@@ -283,7 +392,30 @@ describe('GroupProfileSlug', () => {
           })
 
           it('renders', () => {
-            expect(wrapper.element).toMatchSnapshot()
+            expect(wrapper.container).toMatchSnapshot()
+          })
+
+          describe('clicking unmute button with valid server answer', () => {
+            beforeEach(async () => {
+              const button = screen.getByText('group.unmute')
+              await fireEvent.click(button)
+            })
+
+            it('shows a success message', () => {
+              expect(mocks.$toast.success).toHaveBeenCalledWith('group.unmuted')
+            })
+          })
+
+          describe('clicking unmute button with server error', () => {
+            beforeEach(async () => {
+              mocks.$apollo.mutate = jest.fn().mockRejectedValue({ message: 'Ouch!' })
+              const button = screen.getByText('group.unmute')
+              await fireEvent.click(button)
+            })
+
+            it('shows error message', async () => {
+              expect(mocks.$toast.error).toHaveBeenCalledWith('Ouch!')
+            })
           })
         })
 
@@ -299,7 +431,7 @@ describe('GroupProfileSlug', () => {
               return {
                 Group: [
                   {
-                    ...yogaPractice,
+                    ...schoolForCitizens,
                     myRole: 'pending',
                   },
                 ],
@@ -309,7 +441,7 @@ describe('GroupProfileSlug', () => {
           })
 
           it('renders', () => {
-            expect(wrapper.element).toMatchSnapshot()
+            expect(wrapper.container).toMatchSnapshot()
           })
         })
 
@@ -325,7 +457,7 @@ describe('GroupProfileSlug', () => {
               return {
                 Group: [
                   {
-                    ...yogaPractice,
+                    ...schoolForCitizens,
                     myRole: null,
                   },
                 ],
@@ -335,223 +467,115 @@ describe('GroupProfileSlug', () => {
           })
 
           it('renders', () => {
-            expect(wrapper.element).toMatchSnapshot()
+            expect(wrapper.container).toMatchSnapshot()
           })
         })
       })
+    })
 
-      describe('given a closed group – "school-for-citizens"', () => {
-        describe('given a current user', () => {
-          describe('as group owner – "peter-lustig"', () => {
-            beforeEach(() => {
-              mocks.$store = {
-                getters: {
-                  'auth/user': peterLustig,
-                  'auth/isModerator': () => false,
-                },
+    describe('given a hidden group – "investigative-journalism"', () => {
+      describe('given a current user', () => {
+        describe('as group owner – "peter-lustig"', () => {
+          beforeEach(() => {
+            mocks.$store = {
+              getters: {
+                'auth/user': peterLustig,
+                'auth/isModerator': () => false,
+              },
+            }
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...investigativeJournalism,
+                    myRole: 'owner',
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
               }
-              wrapper = Wrapper(() => {
-                return {
-                  Group: [
-                    {
-                      ...schoolForCitizens,
-                      myRole: 'owner',
-                    },
-                  ],
-                  GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
-                }
-              })
-            })
-
-            it('renders', () => {
-              expect(wrapper.element).toMatchSnapshot()
             })
           })
 
-          describe('as usual member – "jenny-rostock"', () => {
-            beforeEach(() => {
-              mocks.$store = {
-                getters: {
-                  'auth/user': jennyRostock,
-                  'auth/isModerator': () => false,
-                },
-              }
-              wrapper = Wrapper(() => {
-                return {
-                  Group: [
-                    {
-                      ...schoolForCitizens,
-                      myRole: 'usual',
-                    },
-                  ],
-                  GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
-                }
-              })
-            })
-
-            it('renders', () => {
-              expect(wrapper.element).toMatchSnapshot()
-            })
-          })
-
-          describe('as pending member – "bob-der-baumeister"', () => {
-            beforeEach(() => {
-              mocks.$store = {
-                getters: {
-                  'auth/user': bobDerBaumeister,
-                  'auth/isModerator': () => false,
-                },
-              }
-              wrapper = Wrapper(() => {
-                return {
-                  Group: [
-                    {
-                      ...schoolForCitizens,
-                      myRole: 'pending',
-                    },
-                  ],
-                  GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
-                }
-              })
-            })
-
-            it('renders', () => {
-              expect(wrapper.element).toMatchSnapshot()
-            })
-          })
-
-          describe('as none(!) member – "huey"', () => {
-            beforeEach(() => {
-              mocks.$store = {
-                getters: {
-                  'auth/user': huey,
-                  'auth/isModerator': () => false,
-                },
-              }
-              wrapper = Wrapper(() => {
-                return {
-                  Group: [
-                    {
-                      ...schoolForCitizens,
-                      myRole: null,
-                    },
-                  ],
-                  GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
-                }
-              })
-            })
-
-            it('renders', () => {
-              expect(wrapper.element).toMatchSnapshot()
-            })
+          it('renders', () => {
+            expect(wrapper.container).toMatchSnapshot()
           })
         })
-      })
 
-      describe('given a hidden group – "investigative-journalism"', () => {
-        describe('given a current user', () => {
-          describe('as group owner – "peter-lustig"', () => {
-            beforeEach(() => {
-              mocks.$store = {
-                getters: {
-                  'auth/user': peterLustig,
-                  'auth/isModerator': () => false,
-                },
+        describe('as usual member – "jenny-rostock"', () => {
+          beforeEach(() => {
+            mocks.$store = {
+              getters: {
+                'auth/user': jennyRostock,
+                'auth/isModerator': () => false,
+              },
+            }
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...investigativeJournalism,
+                    myRole: 'usual',
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
               }
-              wrapper = Wrapper(() => {
-                return {
-                  Group: [
-                    {
-                      ...investigativeJournalism,
-                      myRole: 'owner',
-                    },
-                  ],
-                  GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
-                }
-              })
-            })
-
-            it('renders', () => {
-              expect(wrapper.element).toMatchSnapshot()
             })
           })
 
-          describe('as usual member – "jenny-rostock"', () => {
-            beforeEach(() => {
-              mocks.$store = {
-                getters: {
-                  'auth/user': jennyRostock,
-                  'auth/isModerator': () => false,
-                },
-              }
-              wrapper = Wrapper(() => {
-                return {
-                  Group: [
-                    {
-                      ...investigativeJournalism,
-                      myRole: 'usual',
-                    },
-                  ],
-                  GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
-                }
-              })
-            })
+          it('renders', () => {
+            expect(wrapper.container).toMatchSnapshot()
+          })
+        })
 
-            it('renders', () => {
-              expect(wrapper.element).toMatchSnapshot()
+        describe('as pending member – "bob-der-baumeister"', () => {
+          beforeEach(() => {
+            mocks.$store = {
+              getters: {
+                'auth/user': bobDerBaumeister,
+                'auth/isModerator': () => false,
+              },
+            }
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...investigativeJournalism,
+                    myRole: 'pending',
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
-          describe('as pending member – "bob-der-baumeister"', () => {
-            beforeEach(() => {
-              mocks.$store = {
-                getters: {
-                  'auth/user': bobDerBaumeister,
-                  'auth/isModerator': () => false,
-                },
-              }
-              wrapper = Wrapper(() => {
-                return {
-                  Group: [
-                    {
-                      ...investigativeJournalism,
-                      myRole: 'pending',
-                    },
-                  ],
-                  GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
-                }
-              })
-            })
+          it('renders', () => {
+            expect(wrapper.container).toMatchSnapshot()
+          })
+        })
 
-            it('renders', () => {
-              expect(wrapper.element).toMatchSnapshot()
+        describe('as none(!) member – "huey"', () => {
+          beforeEach(() => {
+            mocks.$store = {
+              getters: {
+                'auth/user': huey,
+                'auth/isModerator': () => false,
+              },
+            }
+            wrapper = Wrapper(() => {
+              return {
+                Group: [
+                  {
+                    ...investigativeJournalism,
+                    myRole: null,
+                  },
+                ],
+                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+              }
             })
           })
 
-          describe('as none(!) member – "huey"', () => {
-            beforeEach(() => {
-              mocks.$store = {
-                getters: {
-                  'auth/user': huey,
-                  'auth/isModerator': () => false,
-                },
-              }
-              wrapper = Wrapper(() => {
-                return {
-                  Group: [
-                    {
-                      ...investigativeJournalism,
-                      myRole: null,
-                    },
-                  ],
-                  GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
-                }
-              })
-            })
-
-            it('renders', () => {
-              expect(wrapper.element).toMatchSnapshot()
-            })
+          it('renders', () => {
+            expect(wrapper.container).toMatchSnapshot()
           })
         })
       })

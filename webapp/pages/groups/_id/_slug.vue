@@ -461,7 +461,6 @@ export default {
             id: this.group.id,
           },
         })
-        // this.$apollo.queries.Group.refetch()
         this.$toast.success(this.$t('group.muted'))
       } catch (error) {
         this.$toast.error(error.message)
@@ -475,7 +474,6 @@ export default {
             id: this.group.id,
           },
         })
-        // this.$apollo.queries.Group.refetch()
         this.$toast.success(this.$t('group.unmuted'))
       } catch (error) {
         this.$toast.error(error.message)
