@@ -63,8 +63,8 @@ const notificationQuery = gql`
 `
 
 const muteGroupMutation = gql`
-  mutation ($id: ID!) {
-    muteGroup(id: $id) {
+  mutation ($groupId: ID!) {
+    muteGroup(groupId: $groupId) {
       id
       isMutedByMe
     }
@@ -72,8 +72,8 @@ const muteGroupMutation = gql`
 `
 
 const unmuteGroupMutation = gql`
-  mutation ($id: ID!) {
-    unmuteGroup(id: $id) {
+  mutation ($groupId: ID!) {
+    unmuteGroup(groupId: $groupId) {
       id
       isMutedByMe
     }
@@ -281,7 +281,7 @@ describe('notify group members of new posts in group', () => {
           mutate({
             mutation: muteGroupMutation,
             variables: {
-              id: 'g-1',
+              groupId: 'g-1',
             },
           }),
         ).resolves.toMatchObject({
@@ -340,7 +340,7 @@ describe('notify group members of new posts in group', () => {
             mutate({
               mutation: unmuteGroupMutation,
               variables: {
-                id: 'g-1',
+                groupId: 'g-1',
               },
             }),
           ).resolves.toMatchObject({
