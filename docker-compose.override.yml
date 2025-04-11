@@ -39,8 +39,8 @@ services:
       - 7474:7474
 
   mailserver:
-    image: djfarrelly/maildev
+    image: maildev/maildev
     container_name: mailserver
     ports:
-      - 1080:80
-      - 25:25
+      - 1080:1080
+      - 1025:1025
