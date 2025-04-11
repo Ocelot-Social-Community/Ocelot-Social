@@ -1,5 +1,6 @@
 import { AuthenticationError } from 'apollo-server'
 import bcrypt from 'bcryptjs'
+import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { getNeode } from '@db/neo4j'
 import encode from '@jwt/encode'
@@ -11,38 +12,8 @@ const neode = getNeode()
 
 export default {
   Query: {
-    isLoggedIn: (_, args, { driver, user }) => {
-      return Boolean(user && user.id)
-    },
-    currentUser: async (object, params, context, resolveInfo) => {
-      const { user, driver } = context
-      if (!user) return null
-      const session = driver.session()
-      const currentUserTransactionPromise = session.readTransaction(async (transaction) => {
-        const result = await transaction.run(
-          `
-            MATCH (user:User {id: $id})
-            OPTIONAL MATCH (category:Category) WHERE NOT ((user)-[:NOT_INTERESTED_IN]->(category))
-            OPTIONAL MATCH (cats:Category)
-            WITH user, [(user)<-[:OWNED_BY]-(medium:SocialMedia) | properties(medium) ] AS media, category, toString(COUNT(cats)) AS categoryCount
-            RETURN user {.*, socialMedia: media, activeCategories: collect(category.id) } AS user, categoryCount
-          `,
-          { id: user.id },
-        )
-        const [categoryCount] = result.records.map((record) => record.get('categoryCount'))
-        const [currentUser] = result.records.map((record) => record.get('user'))
-        // frontend expects empty array when all categories are selected
-        if (currentUser.activeCategories.length === parseInt(categoryCount))
-          currentUser.activeCategories = []
-        return currentUser
-      })
-      try {
-        const currentUser = await currentUserTransactionPromise
-        return currentUser
-      } finally {
-        session.close()
-      }
-    },
+    currentUser: async (object, params, context, resolveInfo) =>
+      neo4jgraphql(object, { id: context.user.id }, context, resolveInfo),
   },
   Mutation: {
     login: async (_, { email, password }, { driver, req, user }) => {
