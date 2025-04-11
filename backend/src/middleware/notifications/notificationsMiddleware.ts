@@ -221,7 +221,7 @@ const notifyFollowingUsers = async (postId, groupId, context) => {
   }
 }
 
-const notifyGorupMembersOfNewPost = async (postId, groupId, context) => {
+const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
   if (!groupId) return []
   const reason = 'post_in_group'
   const cypher = `
