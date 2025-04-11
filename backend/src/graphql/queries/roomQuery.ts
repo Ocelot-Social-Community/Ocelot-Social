@@ -1,28 +1,5 @@
 import gql from 'graphql-tag'
 
-export const createRoomMutation = () => {
-  return gql`
-    mutation ($userId: ID!) {
-      CreateRoom(userId: $userId) {
-        id
-        roomId
-        roomName
-        lastMessageAt
-        unreadCount
-        #avatar
-        users {
-          _id
-          id
-          name
-          avatar {
-            url
-          }
-        }
-      }
-    }
-  `
-}
-
 export const roomQuery = () => {
   return gql`
     query Room($first: Int, $offset: Int, $id: ID) {
@@ -54,14 +31,6 @@ export const roomQuery = () => {
           }
         }
       }
-    }
-  `
-}
-
-export const unreadRoomsQuery = () => {
-  return gql`
-    query {
-      UnreadRooms
     }
   `
 }

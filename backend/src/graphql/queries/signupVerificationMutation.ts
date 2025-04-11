@@ -1,7 +1,5 @@
 import gql from 'graphql-tag'
 
-// ------ mutations
-
 export const signupVerificationMutation = gql`
   mutation (
     $password: String!
@@ -24,7 +22,3 @@ export const signupVerificationMutation = gql`
     }
   }
 `
-
-// ------ queries
-
-// fill queries in here
