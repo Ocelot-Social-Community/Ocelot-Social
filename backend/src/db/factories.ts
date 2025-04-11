@@ -17,18 +17,19 @@ const uniqueImageUrl = (imageUrl) => {
   return newUrl.toString()
 }
 
-export const cleanDatabase = async (options: any = {}) => {
-  const { driver = getDriver() } = options
+export const cleanDatabase = async ({ withMigrations } = { withMigrations: false }) => {
+  const driver = getDriver()
   const session = driver.session()
+
+  const clean = `
+    MATCH (everything)
+    ${withMigrations ? '' : "WHERE NOT 'Migration' IN labels(everything)"}
+    DETACH DELETE everything
+  `
+
   try {
     await session.writeTransaction((transaction) => {
-      return transaction.run(
-        `
-          MATCH (everything)
-          WHERE NOT 'Migration' IN labels(everything)
-          DETACH DELETE everything
-        `,
-      )
+      return transaction.run(clean)
     })
   } finally {
     session.close()
@@ -72,7 +73,6 @@ Factory.define('basicUser')
     termsAndConditionsAgreedAt: '2019-08-01T10:47:19.212Z',
     allowEmbedIframes: false,
     showShoutsPublicly: false,
-    sendNotificationEmails: true,
     locale: 'en',
   })
   .attr('slug', ['slug', 'name'], (slug, name) => {

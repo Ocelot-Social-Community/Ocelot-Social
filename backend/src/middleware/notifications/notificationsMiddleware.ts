@@ -38,7 +38,7 @@ const queryNotificationEmails = async (context, notificationUserIds) => {
   }
 }
 
-const publishNotifications = async (context, promises) => {
+const publishNotifications = async (context, promises, emailNotificationSetting: string) => {
   let notifications = await Promise.all(promises)
   notifications = notifications.flat()
   const notificationsEmailAddresses = await queryNotificationEmails(
@@ -47,7 +47,7 @@ const publishNotifications = async (context, promises) => {
   )
   notifications.forEach((notificationAdded, index) => {
     pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
-    if (notificationAdded.to.sendNotificationEmails) {
+    if (notificationAdded.to[emailNotificationSetting] ?? true) {
       sendMail(
         notificationTemplate({
           email: notificationsEmailAddresses[index].email,
@@ -62,9 +62,11 @@ const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
-    await publishNotifications(context, [
-      notifyOwnersOfGroup(groupId, userId, 'user_joined_group', context),
-    ])
+    await publishNotifications(
+      context,
+      [notifyOwnersOfGroup(groupId, userId, 'user_joined_group', context)],
+      'emailNotificationsGroupMemberJoined',
+    )
   }
   return user
 }
@@ -73,9 +75,11 @@ const handleLeaveGroup = async (resolve, root, args, context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
-    await publishNotifications(context, [
-      notifyOwnersOfGroup(groupId, userId, 'user_left_group', context),
-    ])
+    await publishNotifications(
+      context,
+      [notifyOwnersOfGroup(groupId, userId, 'user_left_group', context)],
+      'emailNotificationsGroupMemberLeft',
+    )
   }
   return user
 }
@@ -84,9 +88,11 @@ const handleChangeGroupMemberRole = async (resolve, root, args, context, resolve
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
-    await publishNotifications(context, [
-      notifyMemberOfGroup(groupId, userId, 'changed_group_member_role', context),
-    ])
+    await publishNotifications(
+      context,
+      [notifyMemberOfGroup(groupId, userId, 'changed_group_member_role', context)],
+      'emailNotificationsGroupMemberRoleChanged',
+    )
   }
   return user
 }
@@ -95,20 +101,30 @@ const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveIn
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
-    await publishNotifications(context, [
-      notifyMemberOfGroup(groupId, userId, 'removed_user_from_group', context),
-    ])
+    await publishNotifications(
+      context,
+      [notifyMemberOfGroup(groupId, userId, 'removed_user_from_group', context)],
+      'emailNotificationsGroupMemberRemoved',
+    )
   }
   return user
 }
 
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
+  const { groupId } = args
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
-    await publishNotifications(context, [
-      notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
-    ])
+    await publishNotifications(
+      context,
+      [notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context)],
+      'emailNotificationsMention',
+    )
+    await publishNotifications(
+      context,
+      [notifyFollowingUsers(post.id, groupId, context)],
+      'emailNotificationsFollowingUsers',
+    )
   }
   return post
 }
@@ -119,16 +135,26 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
   idsOfMentionedUsers = idsOfMentionedUsers.filter((id) => id !== postAuthor.id)
-  await publishNotifications(context, [
-    notifyUsersOfMention(
-      'Comment',
-      comment.id,
-      idsOfMentionedUsers,
-      'mentioned_in_comment',
-      context,
-    ),
-    notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context),
-  ])
+  await publishNotifications(
+    context,
+    [
+      notifyUsersOfMention(
+        'Comment',
+        comment.id,
+        idsOfMentionedUsers,
+        'mentioned_in_comment',
+        context,
+      ),
+    ],
+    'emailNotificationsMention',
+  )
+
+  await publishNotifications(
+    context,
+    [notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context)],
+    'emailNotificationsCommentOnObservedPost',
+  )
+
   return comment
 }
 
@@ -146,6 +172,45 @@ const postAuthorOfComment = async (commentId, { context }) => {
       )
     })
     return postAuthorId.records.map((record) => record.get('authorId'))
+  } finally {
+    session.close()
+  }
+}
+
+const notifyFollowingUsers = async (postId, groupId, context) => {
+  const reason = 'followed_user_posted'
+  const cypher = `
+    MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })<-[:FOLLOWS]-(user:User)
+    OPTIONAL MATCH (post)-[:IN]->(group:Group { id: $groupId })
+    WITH post, author, user, group WHERE group IS NULL OR group.groupType = 'public'
+    MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
+      SET notification.read = FALSE
+      SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
+      SET notification.updatedAt = toString(datetime())
+    WITH notification, author, user,
+      post {.*, author: properties(author) } AS finalResource
+    RETURN notification {
+      .*,
+      from: finalResource,
+      to: properties(user),
+      relatedUser: properties(author)
+    }
+  `
+  const session = context.driver.session()
+  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+    const notificationTransactionResponse = await transaction.run(cypher, {
+      postId,
+      reason,
+      groupId: groupId || null,
+      userId: context.user.id,
+    })
+    return notificationTransactionResponse.records.map((record) => record.get('notification'))
+  })
+  try {
+    const notifications = await writeTxResultPromise
+    return notifications
+  } catch (error) {
+    throw new Error(error)
   } finally {
     session.close()
   }
@@ -335,12 +400,12 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
   const session = context.driver.session()
   const messageRecipient = session.readTransaction(async (transaction) => {
     const messageRecipientCypher = `
-      MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+      MATCH (senderUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
       MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
         WHERE NOT recipientUser.id = $currentUserId
-        AND NOT (recipientUser)-[:BLOCKED]-(currentUser)
-        AND recipientUser.sendNotificationEmails = true
-      RETURN recipientUser, emailAddress {.email}
+        AND NOT (recipientUser)-[:BLOCKED]-(senderUser)
+        AND NOT recipientUser.emailNotificationsChatMessage = false
+      RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email}
     `
     const txResponse = await transaction.run(messageRecipientCypher, {
       currentUserId,
@@ -348,18 +413,19 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
     })
 
     return {
-      user: await txResponse.records.map((record) => record.get('recipientUser'))[0],
+      senderUser: await txResponse.records.map((record) => record.get('senderUser'))[0],
+      recipientUser: await txResponse.records.map((record) => record.get('recipientUser'))[0],
       email: await txResponse.records.map((record) => record.get('emailAddress'))[0]?.email,
     }
   })
 
   try {
     // Execute Query
-    const { user, email } = await messageRecipient
+    const { senderUser, recipientUser, email } = await messageRecipient
 
     // Send EMail if we found a user(not blocked) and he is not considered online
-    if (user && !isUserOnline(user)) {
-      void sendMail(chatMessageTemplate({ email, variables: { name: user.properties.name } }))
+    if (recipientUser && !isUserOnline(recipientUser)) {
+      void sendMail(chatMessageTemplate({ email, variables: { senderUser, recipientUser } }))
     }
 
     // Return resolver result to client

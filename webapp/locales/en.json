@@ -737,7 +737,8 @@
     "post": "Post or Group",
     "reason": {
       "changed_group_member_role": "Changed your role in group …",
-      "commented_on_post": "Commented on your post …",
+      "commented_on_post": "Commented on a post you observe …",
+      "followed_user_posted": "Wrote a new post …",
       "mentioned_in_comment": "Mentioned you in a comment …",
       "mentioned_in_post": "Mentioned you in a post …",
       "removed_user_from_group": "Removed you from group …",
@@ -1039,9 +1040,24 @@
     },
     "name": "Settings",
     "notifications": {
-      "name": "Notifications",
+      "chat": "Chat",
+      "chatMessage": "Message received while absent",
+      "checkAll": "Check all",
+      "commentOnObservedPost": "Comments on observed posts",
+      "followingUsers": "User I follow published a new post",
+      "group": "Groups",
+      "groupMemberJoined": "Member joined a group I own",
+      "groupMemberLeft": "Member left a group I own",
+      "groupMemberRemoved": "I was removed from a group",
+      "groupMemberRoleChanged": "My role in a group was changed",
+      "mention": "I was mentioned",
+      "name": "Email Notifications",
+      "post": "Posts and comments",
+      "postByFollowedUser": "Posts by users I follow",
+      "postInGroup": "Post in a group I am a member of",
       "send-email-notifications": "Send e-mail notifications",
-      "success-update": "Notifications settings saved!"
+      "success-update": "Notifications settings saved!",
+      "uncheckAll": "Uncheck all"
     },
     "organizations": {
       "name": "My Organizations"

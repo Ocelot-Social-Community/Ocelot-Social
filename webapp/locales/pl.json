@@ -738,6 +738,7 @@
     "reason": {
       "changed_group_member_role": null,
       "commented_on_post": null,
+      "followed_user_posted": null,
       "mentioned_in_comment": null,
       "mentioned_in_post": null,
       "removed_user_from_group": null,
@@ -1039,9 +1040,24 @@
     },
     "name": "Ustawienia",
     "notifications": {
-      "name": null,
-      "send-email-notifications": null,
-      "success-update": null
+      "chat": "Chat",
+      "chatMessage": "Wiadomość otrzymana podczas nieobecności",
+      "checkAll": "Wybierz wszystko",
+      "commentOnObservedPost": "Skomentuj wpis, który obserwuję",
+      "followingUsers": null,
+      "group": "Grupy",
+      "groupMemberJoined": "Nowy członek dołączył do mojej grupy",
+      "groupMemberLeft": "Członek opuścił moją grupę",
+      "groupMemberRemoved": "Zostałem usunięty z grupy",
+      "groupMemberRoleChanged": "Moja rola w grupie uległa zmianie",
+      "mention": "Mentioned in a contribution",
+      "name": "Powiadomienia e-mail",
+      "post": "Posty",
+      "postByFollowedUser": "Posty użytkowników, których obserwuję",
+      "postInGroup": "Posty w grupie, której jestem członkiem",
+      "send-email-notifications": "Wyślij powiadomienia e-mail",
+      "success-update": "Ustawienia powiadomień zapisane! ",
+      "uncheckAll": "Odznacz wszystko"
     },
     "organizations": {
       "name": "My Organizations"
