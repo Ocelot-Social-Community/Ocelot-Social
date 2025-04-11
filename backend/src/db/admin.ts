@@ -28,7 +28,6 @@ const createDefaultAdminUser = async () => {
         createdAt: toString(datetime()),
         allowEmbedIframes: false,
         showShoutsPublicly: false,
-        sendNotificationEmails: true,
         deleted: false,
         disabled: false
         })-[:PRIMARY_EMAIL]->(e)`,
