@@ -1,5 +1,103 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
+<body>
+  <div>
+    <v-popover-stub
+      autohide="true"
+      class="group-content-menu"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="5"
+      openclass="open"
+      opengroup="0"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
+    >
+      <button
+        class="base-button --icon-only --circle --small"
+        data-test="group-menu-button"
+        type="button"
+      >
+        <span
+          class="base-icon"
+        >
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+       
+      <div>
+        <div
+          class="group-menu-popover"
+        >
+          <nav
+            class="ds-menu"
+          >
+            <ul
+              class="ds-menu-list"
+            >
+              
+          
+          
+              <li
+                class="ds-menu-item ds-menu-item-level-0"
+              >
+                <a
+                  class="ds-menu-item-link"
+                  exact="true"
+                  href="/"
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                  
+            group.contentMenu.muteGroup
+          
+                </a>
+                <!---->
+              </li>
+              
+          
+          
+              <li
+                class="ds-menu-item ds-menu-item-level-0"
+              >
+                <a
+                  class="ds-menu-item-link"
+                  href="/groups/edit/groupid"
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                  
+            admin.settings.name
+          
+                </a>
+                <!---->
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </v-popover-stub>
+  </div>
+</body>
+`;
+
 exports[`GroupContentMenu renders as groupProfile, muted 1`] = `
 <body>
   <div>
@@ -11,7 +109,7 @@ exports[`GroupContentMenu renders as groupProfile, muted 1`] = `
       handleresize="true"
       offset="5"
       openclass="open"
-      opengroup="0.3629396543129324"
+      opengroup="0"
       placement="bottom-end"
       popoverarrowclass="tooltip-arrow popover-arrow"
       popoverbaseclass="tooltip popover"
@@ -88,7 +186,7 @@ exports[`GroupContentMenu renders as groupProfile, not muted 1`] = `
       handleresize="true"
       offset="5"
       openclass="open"
-      opengroup="0.5838043770172634"
+      opengroup="0"
       placement="bottom-end"
       popoverarrowclass="tooltip-arrow popover-arrow"
       popoverbaseclass="tooltip popover"
@@ -165,7 +263,7 @@ exports[`GroupContentMenu renders as groupTeaser 1`] = `
       handleresize="true"
       offset="5"
       openclass="open"
-      opengroup="0.7080794569628173"
+      opengroup="0"
       placement="bottom-end"
       popoverarrowclass="tooltip-arrow popover-arrow"
       popoverbaseclass="tooltip popover"

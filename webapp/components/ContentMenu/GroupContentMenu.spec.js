@@ -1,5 +1,5 @@
 import GroupContentMenu from './GroupContentMenu.vue'
-import { render } from '@testing-library/vue'
+import { render, screen, fireEvent } from '@testing-library/vue'
 
 const localVue = global.localVue
 
@@ -9,6 +9,11 @@ const stubs = {
   },
   'v-popover': true,
 }
+
+// Mock Math.random, used in Dropdown
+Object.assign(Math, {
+  random: () => 0,
+})
 
 describe('GroupContentMenu', () => {
   let mocks
@@ -42,5 +47,37 @@ describe('GroupContentMenu', () => {
       group: { isMutedByMe: true, id: 'groupid' },
     })
     expect(wrapper.baseElement).toMatchSnapshot()
+  })
+
+  it('renders as groupProfile when I am the owner', () => {
+    const wrapper = Wrapper({
+      usage: 'groupProfile',
+      group: { myRole: 'owner', id: 'groupid' },
+    })
+    expect(wrapper.baseElement).toMatchSnapshot()
+  })
+
+  describe('mute button', () => {
+    it('emits mute', async () => {
+      const wrapper = Wrapper({
+        usage: 'groupProfile',
+        group: { isMutedByMe: false, id: 'groupid' },
+      })
+      const muteButton = screen.getByText('group.contentMenu.muteGroup')
+      await fireEvent.click(muteButton)
+      expect(wrapper.emitted().mute).toBeTruthy()
+    })
+  })
+
+  describe('unmute button', () => {
+    it('emits unmute', async () => {
+      const wrapper = Wrapper({
+        usage: 'groupProfile',
+        group: { isMutedByMe: true, id: 'groupid' },
+      })
+      const muteButton = screen.getByText('group.contentMenu.unmuteGroup')
+      await fireEvent.click(muteButton)
+      expect(wrapper.emitted().unmute).toBeTruthy()
+    })
   })
 })
