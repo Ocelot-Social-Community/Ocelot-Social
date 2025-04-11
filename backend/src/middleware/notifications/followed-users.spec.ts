@@ -151,7 +151,7 @@ describe('following users notifications', () => {
       })
     })
 
-    it('sends no notification to the post author', async () => {
+    it('sends NO notification to the post author', async () => {
       await expect(
         query({
           query: notificationQuery,
