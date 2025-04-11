@@ -30,7 +30,7 @@ describe('GroupContentMenu', () => {
 
   it('renders as groupTeaser', () => {
     const wrapper = Wrapper({ usage: 'groupTeaser', group: { id: 'groupid' } })
-    expect(wrapper.baseElement).toMatchSnapshot()
+    expect(wrapper.container).toMatchSnapshot()
   })
 
   it('renders as groupProfile, not muted', () => {
@@ -38,7 +38,7 @@ describe('GroupContentMenu', () => {
       usage: 'groupProfile',
       group: { isMutedByMe: false, id: 'groupid' },
     })
-    expect(wrapper.baseElement).toMatchSnapshot()
+    expect(wrapper.container).toMatchSnapshot()
   })
 
   it('renders as groupProfile, muted', () => {
@@ -46,7 +46,7 @@ describe('GroupContentMenu', () => {
       usage: 'groupProfile',
       group: { isMutedByMe: true, id: 'groupid' },
     })
-    expect(wrapper.baseElement).toMatchSnapshot()
+    expect(wrapper.container).toMatchSnapshot()
   })
 
   it('renders as groupProfile when I am the owner', () => {
@@ -54,7 +54,7 @@ describe('GroupContentMenu', () => {
       usage: 'groupProfile',
       group: { myRole: 'owner', id: 'groupid' },
     })
-    expect(wrapper.baseElement).toMatchSnapshot()
+    expect(wrapper.container).toMatchSnapshot()
   })
 
   describe('mute button', () => {
