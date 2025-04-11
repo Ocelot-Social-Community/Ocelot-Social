@@ -248,7 +248,7 @@ describe('following users notifications', () => {
       })
     })
 
-    it('sends a notification to the first follower but with the reason post-in-group', async () => {
+    it('sends a notification to the first follower', async () => {
       authenticatedUser = await firstFollower.toJson()
       await expect(
         query({
