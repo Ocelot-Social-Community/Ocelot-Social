@@ -9,6 +9,25 @@ const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD
 const hasDKIMData =
   CONFIG.SMTP_DKIM_DOMAINNAME && CONFIG.SMTP_DKIM_KEYSELECTOR && CONFIG.SMTP_DKIM_PRIVATKEY
 
+const transporter = nodemailer.createTransport({
+  host: CONFIG.SMTP_HOST,
+  port: CONFIG.SMTP_PORT,
+  ignoreTLS: CONFIG.SMTP_IGNORE_TLS,
+  secure: CONFIG.SMTP_SECURE, // true for 465, false for other ports
+  pool: true,
+  maxConnections: CONFIG.SMTP_MAX_CONNECTIONS,
+  maxMessages: CONFIG.SMTP_MAX_MESSAGES,
+  auth: hasAuthData && {
+    user: CONFIG.SMTP_USERNAME,
+    pass: CONFIG.SMTP_PASSWORD,
+  },
+  dkim: hasDKIMData && {
+    domainName: CONFIG.SMTP_DKIM_DOMAINNAME,
+    keySelector: CONFIG.SMTP_DKIM_KEYSELECTOR,
+    privateKey: CONFIG.SMTP_DKIM_PRIVATKEY,
+  },
+})
+
 let sendMailCallback: any = async () => {}
 if (!hasEmailConfig) {
   if (!CONFIG.TEST) {
@@ -38,22 +57,6 @@ if (!hasEmailConfig) {
   }
 } else {
   sendMailCallback = async (templateArgs) => {
-    const transporter = nodemailer.createTransport({
-      host: CONFIG.SMTP_HOST,
-      port: CONFIG.SMTP_PORT,
-      ignoreTLS: CONFIG.SMTP_IGNORE_TLS,
-      secure: CONFIG.SMTP_SECURE, // true for 465, false for other ports
-      auth: hasAuthData && {
-        user: CONFIG.SMTP_USERNAME,
-        pass: CONFIG.SMTP_PASSWORD,
-      },
-      dkim: hasDKIMData && {
-        domainName: CONFIG.SMTP_DKIM_DOMAINNAME,
-        keySelector: CONFIG.SMTP_DKIM_KEYSELECTOR,
-        privateKey: CONFIG.SMTP_DKIM_PRIVATKEY,
-      },
-    })
-
     transporter.use(
       'compile',
       htmlToText({

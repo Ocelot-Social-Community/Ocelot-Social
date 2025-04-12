@@ -26,4 +26,4 @@ sed -i -e 's/appVersion: ".*"/appVersion: "'"$VERSION_NEW"'"/g' $ROOT_DIR/deploy
 
 # generate changelog
 cd $ROOT_DIR
-yarn run auto-changelog --latest-version $VERSION_NEW
+yarn run auto-changelog --commit-limit 0 --latest-version $VERSION_NEW
