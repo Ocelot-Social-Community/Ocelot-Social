@@ -64,55 +64,6 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('isLoggedIn', () => {
-  const isLoggedInQuery = gql`
-    {
-      isLoggedIn
-    }
-  `
-  const respondsWith = async (expected) => {
-    await expect(query({ query: isLoggedInQuery })).resolves.toMatchObject(expected)
-  }
-
-  describe('unauthenticated', () => {
-    it('returns false', async () => {
-      await respondsWith({ data: { isLoggedIn: false } })
-    })
-  })
-
-  describe('authenticated', () => {
-    beforeEach(async () => {
-      user = await Factory.build('user', { id: 'u3' })
-      const userBearerToken = encode({ id: 'u3' })
-      req = { headers: { authorization: `Bearer ${userBearerToken}` } }
-    })
-
-    it('returns true', async () => {
-      await respondsWith({ data: { isLoggedIn: true } })
-    })
-
-    describe('but user is disabled', () => {
-      beforeEach(async () => {
-        await disable('u3')
-      })
-
-      it('returns false', async () => {
-        await respondsWith({ data: { isLoggedIn: false } })
-      })
-    })
-
-    describe('but user is deleted', () => {
-      beforeEach(async () => {
-        await user.update({ updatedAt: new Date().toISOString(), deleted: true })
-      })
-
-      it('returns false', async () => {
-        await respondsWith({ data: { isLoggedIn: false } })
-      })
-    })
-  })
-})
-
 describe('currentUser', () => {
   const currentUserQuery = gql`
     {
@@ -135,8 +86,8 @@ describe('currentUser', () => {
   }
 
   describe('unauthenticated', () => {
-    it('returns null', async () => {
-      await respondsWith({ data: { currentUser: null } })
+    it('throws "Not Authorized!"', async () => {
+      await respondsWith({ errors: [{ message: 'Not Authorized!' }] })
     })
   })
 
@@ -200,10 +151,32 @@ describe('currentUser', () => {
           )
         })
 
-        it('returns empty array for all categories', async () => {
+        it('returns all categories by default', async () => {
           await respondsWith({
             data: {
-              currentUser: expect.objectContaining({ activeCategories: [] }),
+              currentUser: expect.objectContaining({
+                activeCategories: [
+                  'cat1',
+                  'cat10',
+                  'cat11',
+                  'cat12',
+                  'cat13',
+                  'cat14',
+                  'cat15',
+                  'cat16',
+                  'cat17',
+                  'cat18',
+                  'cat19',
+                  'cat2',
+                  'cat3',
+                  'cat4',
+                  'cat5',
+                  'cat6',
+                  'cat7',
+                  'cat8',
+                  'cat9',
+                ],
+              }),
             },
           })
         })
