@@ -485,6 +485,8 @@
     "categoriesTitle": null,
     "changeMemberRole": null,
     "contentMenu": {
+      "muteGroup": null,
+      "unmuteGroup": null,
       "visitGroupPage": null
     },
     "createNewGroup": {
@@ -535,6 +537,7 @@
       "confirmAddGroupMemberText": null,
       "confirmAddGroupMemberTitle": null
     },
+    "muted": null,
     "myGroups": null,
     "name": null,
     "radius": null,
@@ -559,6 +562,8 @@
       "hidden": null,
       "public": null
     },
+    "unmute": null,
+    "unmuted": null,
     "update": null,
     "updatedGroup": null
   },
@@ -738,8 +743,10 @@
     "reason": {
       "changed_group_member_role": null,
       "commented_on_post": null,
+      "followed_user_posted": null,
       "mentioned_in_comment": null,
       "mentioned_in_post": null,
+      "post_in_group": null,
       "removed_user_from_group": null,
       "user_joined_group": null,
       "user_left_group": null
@@ -1043,6 +1050,7 @@
       "chatMessage": "Bericht ontvangen tijdens afwezigheid",
       "checkAll": "Vink alles aan",
       "commentOnObservedPost": "Geef commentaar op een bijdrage die ik volg",
+      "followingUsers": null,
       "group": "Groepen",
       "groupMemberJoined": "Een nieuw lid is lid geworden van een groep van mij",
       "groupMemberLeft": "Een lid heeft een groep van mij verlaten",

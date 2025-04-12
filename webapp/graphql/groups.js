@@ -177,6 +177,7 @@ export const groupQuery = (i18n) => {
         descriptionExcerpt
         groupType
         actionRadius
+        isMutedByMe
         categories {
           id
           slug

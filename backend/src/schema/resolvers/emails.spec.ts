@@ -294,15 +294,33 @@ describe('VerifyEmailAddress', () => {
             await expect(email).toBe(false)
           })
 
-          describe('Edge case: In the meantime someone created an `EmailAddress` node with the given email', () => {
+          describe('Edge case: In the meantime someone created an `EmailAddress` node with the given email belonging to a user', () => {
             beforeEach(async () => {
-              await Factory.build('emailAddress', { email: 'to-be-verified@example.org' })
+              await Factory.build('user', { id: '568' }, { email: 'to-be-verified@example.org' })
             })
 
             it('throws UserInputError because of unique constraints', async () => {
               await expect(mutate({ mutation, variables })).resolves.toMatchObject({
                 data: { VerifyEmailAddress: null },
                 errors: [{ message: 'A user account with this email already exists.' }],
+              })
+            })
+          })
+
+          describe('Edge case: We have an abandoned `EmailAddress` node with the given email', () => {
+            beforeEach(async () => {
+              await Factory.build('emailAddress', { email: 'to-be-verified@example.org' })
+            })
+
+            it('connects the new `EmailAddress` as PRIMARY', async () => {
+              await mutate({ mutation, variables })
+              const result = await neode.cypher(`
+                MATCH(u:User {id: "567"})-[:PRIMARY_EMAIL]->(e:EmailAddress {email: "to-be-verified@example.org"})
+                RETURN e
+              `)
+              const email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
+              await expect(email.toJson()).resolves.toMatchObject({
+                email: 'to-be-verified@example.org',
               })
             })
           })
