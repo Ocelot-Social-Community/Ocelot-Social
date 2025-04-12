@@ -563,7 +563,7 @@
       "public": "Öffentlich — Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
     },
     "unmute": "Nicht stummschalten",
-    "unmuted": "Gruppe nicht stummgeschaltet",
+    "unmuted": "Gruppe nicht mehr stummgeschaltet",
     "update": "Änderung speichern",
     "updatedGroup": "Die Gruppendaten wurden geändert!"
   },
