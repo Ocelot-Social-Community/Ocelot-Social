@@ -66,12 +66,12 @@ export default {
             const result = txc.run(
               `
             MATCH (user:User)-[:PRIMARY_EMAIL]->(e:EmailAddress {email: $args.email})
-            RETURN user`,
+            RETURN user {.*, email: e.email}`,
               { args },
             )
             return result
           })
-          return readTxResult.records.map((r) => r.get('user').properties)
+          return readTxResult.records.map((r) => r.get('user'))
         } finally {
           session.close()
         }
@@ -291,14 +291,14 @@ export default {
         const switchUserRoleResponse = await transaction.run(
           `
             MATCH (user:User {id: $id})
+            OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(e:EmailAddress)
             SET user.role = $role
             SET user.updatedAt = toString(datetime())
-            RETURN user {.*}
+            RETURN user {.*, email: e.email}
           `,
           { id, role },
         )
-        const [user] = switchUserRoleResponse.records.map((record) => record.get('user'))
-        return user
+        return switchUserRoleResponse.records.map((record) => record.get('user'))[0]
       })
       try {
         const user = await writeTxResultPromise
@@ -383,14 +383,6 @@ export default {
     },
   },
   User: {
-    email: async (parent, params, context, resolveInfo) => {
-      if (typeof parent.email !== 'undefined') return parent.email
-      const { id } = parent
-      const statement = `MATCH(u:User {id: $id})-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e`
-      const result = await neode.cypher(statement, { id })
-      const [{ email }] = result.records.map((r) => r.get('e').properties)
-      return email
-    },
     emailNotificationSettings: async (parent, params, context, resolveInfo) => {
       return [
         {
