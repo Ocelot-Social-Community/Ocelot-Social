@@ -99,6 +99,24 @@ export default {
             })
           }
         }
+
+        if (this.resource.isObservedByMe) {
+          routes.push({
+            label: this.$t(`post.menu.unobserve`),
+            callback: () => {
+              this.$emit('toggleObservePost', this.resource.id, false)
+            },
+            icon: 'bell-slashed',
+          })
+        } else {
+          routes.push({
+            label: this.$t(`post.menu.observe`),
+            callback: () => {
+              this.$emit('toggleObservePost', this.resource.id, true)
+            },
+            icon: 'bell',
+          })
+        }
       }
 
       if (this.isOwner && this.resourceType === 'comment') {

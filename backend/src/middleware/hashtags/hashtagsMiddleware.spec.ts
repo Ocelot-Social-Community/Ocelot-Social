@@ -1,8 +1,9 @@
-import gql from 'graphql-tag'
-import { cleanDatabase } from '../../db/factories'
 import { createTestClient } from 'apollo-server-testing'
-import { getNeode, getDriver } from '../../db/neo4j'
-import createServer from '../../server'
+import gql from 'graphql-tag'
+
+import { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import createServer from '@src/server'
 
 let server
 let query

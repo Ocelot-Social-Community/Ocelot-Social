@@ -1,5 +1,8 @@
 import { createTestClient } from 'apollo-server-testing'
-import Factory, { cleanDatabase } from '../../db/factories'
+
+import CONFIG from '@config/index'
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
 import {
   createGroupMutation,
   updateGroupMutation,
@@ -9,10 +12,8 @@ import {
   removeUserFromGroupMutation,
   groupMembersQuery,
   groupQuery,
-} from '../../graphql/groups'
-import { getNeode, getDriver } from '../../db/neo4j'
-import createServer from '../../server'
-import CONFIG from '../../config'
+} from '@graphql/groups'
+import createServer from '@src/server'
 
 const driver = getDriver()
 const neode = getNeode()
@@ -377,22 +378,22 @@ describe('in mode', () => {
 
           describe('not even one', () => {
             describe('by "categoryIds: null"', () => {
-              it('throws error: "Too view categories!"', async () => {
+              it('throws error: "Too few categories!"', async () => {
                 const { errors } = await mutate({
                   mutation: createGroupMutation(),
                   variables: { ...variables, categoryIds: null },
                 })
-                expect(errors![0]).toHaveProperty('message', 'Too view categories!')
+                expect(errors![0]).toHaveProperty('message', 'Too few categories!')
               })
             })
 
             describe('by "categoryIds: []"', () => {
-              it('throws error: "Too view categories!"', async () => {
+              it('throws error: "Too few categories!"', async () => {
                 const { errors } = await mutate({
                   mutation: createGroupMutation(),
                   variables: { ...variables, categoryIds: [] },
                 })
-                expect(errors![0]).toHaveProperty('message', 'Too view categories!')
+                expect(errors![0]).toHaveProperty('message', 'Too few categories!')
               })
             })
           })
@@ -2900,7 +2901,7 @@ describe('in mode', () => {
 
               describe('not even one', () => {
                 describe('by "categoryIds: []"', () => {
-                  it('throws error: "Too view categories!"', async () => {
+                  it('throws error: "Too few categories!"', async () => {
                     const { errors } = await mutate({
                       mutation: updateGroupMutation(),
                       variables: {
@@ -2908,7 +2909,7 @@ describe('in mode', () => {
                         categoryIds: [],
                       },
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Too view categories!')
+                    expect(errors![0]).toHaveProperty('message', 'Too few categories!')
                   })
                 })
               })

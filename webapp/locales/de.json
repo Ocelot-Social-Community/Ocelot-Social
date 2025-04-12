@@ -485,6 +485,8 @@
     "categoriesTitle": "Themen der Gruppe",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
     "contentMenu": {
+      "muteGroup": "Gruppe stummschalten",
+      "unmuteGroup": "Gruppe nicht mehr stummschalten",
       "visitGroupPage": "Gruppe anzeigen"
     },
     "createNewGroup": {
@@ -535,6 +537,7 @@
       "confirmAddGroupMemberText": "Nutzer „{name}“ zur Gruppe hinzufügen?",
       "confirmAddGroupMemberTitle": "Bestätigen"
     },
+    "muted": "Gruppe stummgeschaltet",
     "myGroups": "Meine Gruppen",
     "name": "Gruppenname",
     "radius": "Radius",
@@ -559,6 +562,8 @@
       "hidden": "Geheim — Gruppe (auch der Name) komplett unsichtbar",
       "public": "Öffentlich — Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
     },
+    "unmute": "Gruppe nicht mehr stummschalten",
+    "unmuted": "Gruppe nicht mehr stummgeschaltet",
     "update": "Änderung speichern",
     "updatedGroup": "Die Gruppendaten wurden geändert!"
   },
@@ -737,15 +742,20 @@
     "post": "Beitrag oder Gruppe",
     "reason": {
       "changed_group_member_role": "Hat Deine Rolle in der Gruppe geändert …",
-      "commented_on_post": "Hat Deinen Beitrag kommentiert …",
+      "commented_on_post": "Hat einen Beitrag den du beobachtest kommentiert …",
+      "followed_user_posted": "Hat einen neuen Betrag geschrieben …",
       "mentioned_in_comment": "Hat Dich in einem Kommentar erwähnt …",
       "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …",
+      "post_in_group": "Hat einen Beitrag in der Gruppe geschrieben …",
       "removed_user_from_group": "Hat Dich aus der Gruppe entfernt …",
       "user_joined_group": "Ist Deiner Gruppe beigetreten …",
       "user_left_group": "Hat deine Gruppe verlassen …"
     },
     "title": "Benachrichtigungen",
     "user": "Nutzer"
+  },
+  "observeButton": {
+    "observed": "beobachtet"
   },
   "post": {
     "comment": {
@@ -778,8 +788,12 @@
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
+      "observe": "Beitrag beobachten",
+      "observedSuccessfully": "Du beobachtest diesen Beitrag!",
       "pin": "Beitrag anheften",
       "pinnedSuccessfully": "Beitrag erfolgreich angeheftet!",
+      "unobserve": "Beitrag nicht mehr beobachten",
+      "unobservedSuccessfully": "Du beobachtest diesen Beitrag nicht mehr!",
       "unpin": "Beitrag loslösen",
       "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!"
     },
@@ -1032,9 +1046,24 @@
     },
     "name": "Einstellungen",
     "notifications": {
-      "name": "Benachrichtigungen",
+      "chat": "Chat",
+      "chatMessage": "Nachricht erhalten während Abwesenheit",
+      "checkAll": "Alle auswählen",
+      "commentOnObservedPost": "Kommentare zu beobachteten Beiträgen",
+      "followingUsers": "Ein Nutzer dem ich folge veröffentlichte einen neuen Beitrag",
+      "group": "Gruppen",
+      "groupMemberJoined": "Ein Mitglied ist deiner Gruppe beigetreten",
+      "groupMemberLeft": "Ein Mitglied hat deine Gruppe verlassen",
+      "groupMemberRemoved": "Du wurdest aus einer Gruppe entfernt",
+      "groupMemberRoleChanged": "Deine Rolle in einer Gruppe wurde geändert",
+      "mention": "Ich wurde erwähnt",
+      "name": "Benachrichtigungen per Email",
+      "post": "Beiträge und Kommentare",
+      "postByFollowedUser": "Beitrag von einem Nutzer, dem ich folge",
+      "postInGroup": "Beitrag in einer Gruppe, die ich beobachte",
       "send-email-notifications": "Sende E-Mail-Benachrichtigungen",
-      "success-update": "Benachrichtigungs-Einstellungen gespeichert!"
+      "success-update": "Benachrichtigungs-Einstellungen gespeichert!",
+      "uncheckAll": "Alle abwählen"
     },
     "organizations": {
       "name": "Meine Organisationen"

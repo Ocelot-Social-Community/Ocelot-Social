@@ -1,6 +1,8 @@
-import log from './helpers/databaseLogger'
 import { withFilter } from 'graphql-subscriptions'
-import { pubsub, NOTIFICATION_ADDED } from '../../server'
+
+import { pubsub, NOTIFICATION_ADDED } from '@src/server'
+
+import log from './helpers/databaseLogger'
 
 export default {
   Subscription: {

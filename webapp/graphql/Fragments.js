@@ -67,6 +67,8 @@ export const postFragment = gql`
     }
     pinnedAt
     pinned
+    isObservedByMe
+    observingUsersCount
   }
 `
 
@@ -133,5 +135,7 @@ export const commentFragment = gql`
     deleted
     content
     contentExcerpt
+    isPostObservedByMe
+    postObservingUsersCount
   }
 `

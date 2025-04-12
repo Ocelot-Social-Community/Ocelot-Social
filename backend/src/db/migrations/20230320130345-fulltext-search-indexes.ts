@@ -1,4 +1,4 @@
-import { getDriver } from '../../db/neo4j'
+import { getDriver } from '@db/neo4j'
 
 export const description = ''
 
@@ -8,6 +8,8 @@ export async function up(next) {
   const transaction = session.beginTransaction()
 
   try {
+    // We do do this in /src/db/migrate/store.ts
+    /*
     // Drop indexes if they exist because due to legacy code they might be set already
     const indexesResponse = await transaction.run(`CALL db.indexes()`)
     const indexes = indexesResponse.records.map((record) => record.get('name'))
@@ -31,6 +33,7 @@ export async function up(next) {
       `CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"])`,
     )
     await transaction.commit()
+    */
     next()
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -50,10 +53,13 @@ export async function down(next) {
   const transaction = session.beginTransaction()
 
   try {
+    // We do do this in /src/db/migrate/store.ts
+    /*
     await transaction.run(`CALL db.index.fulltext.drop("user_fulltext_search")`)
     await transaction.run(`CALL db.index.fulltext.drop("post_fulltext_search")`)
     await transaction.run(`CALL db.index.fulltext.drop("tag_fulltext_search")`)
     await transaction.commit()
+    */
     next()
   } catch (error) {
     // eslint-disable-next-line no-console

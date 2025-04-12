@@ -1,13 +1,14 @@
-import Factory, { cleanDatabase } from '../../db/factories'
-import gql from 'graphql-tag'
-import { getDriver } from '../../db/neo4j'
 import { createTestClient } from 'apollo-server-testing'
-import createServer from '../.././server'
+import gql from 'graphql-tag'
+
+import Factory, { cleanDatabase } from '@db/factories'
+import { getDriver } from '@db/neo4j'
 import {
   markAsReadMutation,
   markAllAsReadMutation,
   notificationQuery,
-} from '../../graphql/notifications'
+} from '@graphql/notifications'
+import createServer from '@src/server'
 
 const driver = getDriver()
 let authenticatedUser

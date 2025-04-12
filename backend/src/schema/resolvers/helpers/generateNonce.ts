@@ -1,4 +1,4 @@
-import CONSTANTS_REGISTRATION from './../../../constants/registration'
+import CONSTANTS_REGISTRATION from '@constants/registration'
 
 // TODO: why this is not used in resolver 'requestPasswordReset'?
 export default function generateNonce() {

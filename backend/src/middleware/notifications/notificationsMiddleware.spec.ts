@@ -1,15 +1,35 @@
-import gql from 'graphql-tag'
-import { cleanDatabase } from '../../db/factories'
 import { createTestClient } from 'apollo-server-testing'
-import { getNeode, getDriver } from '../../db/neo4j'
-import createServer, { pubsub } from '../../server'
+import gql from 'graphql-tag'
+
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
 import {
   createGroupMutation,
   joinGroupMutation,
   leaveGroupMutation,
   changeGroupMemberRoleMutation,
   removeUserFromGroupMutation,
-} from '../../graphql/groups'
+} from '@graphql/groups'
+import { createMessageMutation } from '@graphql/messages'
+import { createRoomMutation } from '@graphql/rooms'
+import createServer, { pubsub } from '@src/server'
+
+const sendMailMock = jest.fn()
+jest.mock('../helpers/email/sendMail', () => ({
+  sendMail: () => sendMailMock(),
+}))
+
+const chatMessageTemplateMock = jest.fn()
+const notificationTemplateMock = jest.fn()
+jest.mock('../helpers/email/templateBuilder', () => ({
+  chatMessageTemplate: () => chatMessageTemplateMock(),
+  notificationTemplate: () => notificationTemplateMock(),
+}))
+
+let isUserOnlineMock = jest.fn()
+jest.mock('../helpers/isUserOnline', () => ({
+  isUserOnline: () => isUserOnlineMock(),
+}))
 
 let server, query, mutate, notifiedUser, authenticatedUser
 let publishSpy
@@ -68,8 +88,8 @@ afterAll(async () => {
 
 beforeEach(async () => {
   publishSpy.mockClear()
-  notifiedUser = await neode.create(
-    'User',
+  notifiedUser = await Factory.build(
+    'user',
     {
       id: 'you',
       name: 'Al Capone',
@@ -169,6 +189,7 @@ describe('notifications', () => {
 
         describe('commenter is not me', () => {
           beforeEach(async () => {
+            jest.clearAllMocks()
             commentContent = 'Commenters comment.'
             commentAuthor = await neode.create(
               'User',
@@ -184,25 +205,8 @@ describe('notifications', () => {
             )
           })
 
-          it('sends me a notification', async () => {
+          it('sends me a notification and email', async () => {
             await createCommentOnPostAction()
-            const expected = expect.objectContaining({
-              data: {
-                notifications: [
-                  {
-                    read: false,
-                    createdAt: expect.any(String),
-                    reason: 'commented_on_post',
-                    from: {
-                      __typename: 'Comment',
-                      id: 'c47',
-                      content: commentContent,
-                    },
-                    relatedUser: null,
-                  },
-                ],
-              },
-            })
             await expect(
               query({
                 query: notificationQuery,
@@ -210,24 +214,85 @@ describe('notifications', () => {
                   read: false,
                 },
               }),
-            ).resolves.toEqual(expected)
+            ).resolves.toMatchObject(
+              expect.objectContaining({
+                data: {
+                  notifications: [
+                    {
+                      read: false,
+                      createdAt: expect.any(String),
+                      reason: 'commented_on_post',
+                      from: {
+                        __typename: 'Comment',
+                        id: 'c47',
+                        content: commentContent,
+                      },
+                      relatedUser: null,
+                    },
+                  ],
+                },
+              }),
+            )
+
+            // Mail
+            expect(sendMailMock).toHaveBeenCalledTimes(1)
+            expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
           })
 
-          it('sends me no notification if I have blocked the comment author', async () => {
-            await notifiedUser.relateTo(commentAuthor, 'blocked')
-            await createCommentOnPostAction()
-            const expected = expect.objectContaining({
-              data: { notifications: [] },
-            })
+          describe('if I have disabled `emailNotificationsCommentOnObservedPost`', () => {
+            it('sends me a notification but no email', async () => {
+              await notifiedUser.update({ emailNotificationsCommentOnObservedPost: false })
+              await createCommentOnPostAction()
+              await expect(
+                query({
+                  query: notificationQuery,
+                  variables: {
+                    read: false,
+                  },
+                }),
+              ).resolves.toMatchObject(
+                expect.objectContaining({
+                  data: {
+                    notifications: [
+                      {
+                        read: false,
+                        createdAt: expect.any(String),
+                        reason: 'commented_on_post',
+                        from: {
+                          __typename: 'Comment',
+                          id: 'c47',
+                          content: commentContent,
+                        },
+                        relatedUser: null,
+                      },
+                    ],
+                  },
+                }),
+              )
 
-            await expect(
-              query({
-                query: notificationQuery,
-                variables: {
-                  read: false,
-                },
-              }),
-            ).resolves.toEqual(expected)
+              // No Mail
+              expect(sendMailMock).not.toHaveBeenCalled()
+              expect(notificationTemplateMock).not.toHaveBeenCalled()
+            })
+          })
+
+          describe('if I have blocked the comment author', () => {
+            it('sends me no notification', async () => {
+              await notifiedUser.relateTo(commentAuthor, 'blocked')
+              await createCommentOnPostAction()
+              const expected = expect.objectContaining({
+                data: { notifications: [] },
+              })
+
+              await expect(
+                query({
+                  query: notificationQuery,
+                  variables: {
+                    read: false,
+                  },
+                }),
+              ).resolves.toEqual(expected)
+            })
           })
         })
 
@@ -238,7 +303,6 @@ describe('notifications', () => {
           })
 
           it('sends me no notification', async () => {
-            await notifiedUser.relateTo(commentAuthor, 'blocked')
             await createCommentOnPostAction()
             const expected = expect.objectContaining({
               data: { notifications: [] },
@@ -257,6 +321,7 @@ describe('notifications', () => {
       })
 
       beforeEach(async () => {
+        jest.clearAllMocks()
         postAuthor = await neode.create(
           'User',
           {
@@ -279,7 +344,7 @@ describe('notifications', () => {
             'Hey <a class="mention" data-mention-id="you" href="/profile/you/al-capone">@al-capone</a> how do you do?'
         })
 
-        it('sends me a notification', async () => {
+        it('sends me a notification and email', async () => {
           await createPostAction()
           const expectedContent =
             'Hey <a class="mention" data-mention-id="you" href="/profile/you/al-capone" target="_blank">@al-capone</a> how do you do?'
@@ -306,6 +371,47 @@ describe('notifications', () => {
                 },
               ],
             },
+          })
+
+          // Mail
+          expect(sendMailMock).toHaveBeenCalledTimes(1)
+          expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+        })
+
+        describe('if I have disabled `emailNotificationsMention`', () => {
+          it('sends me a notification but no email', async () => {
+            await notifiedUser.update({ emailNotificationsMention: false })
+            await createPostAction()
+            const expectedContent =
+              'Hey <a class="mention" data-mention-id="you" href="/profile/you/al-capone" target="_blank">@al-capone</a> how do you do?'
+            await expect(
+              query({
+                query: notificationQuery,
+                variables: {
+                  read: false,
+                },
+              }),
+            ).resolves.toMatchObject({
+              errors: undefined,
+              data: {
+                notifications: [
+                  {
+                    read: false,
+                    createdAt: expect.any(String),
+                    reason: 'mentioned_in_post',
+                    from: {
+                      __typename: 'Post',
+                      id: 'p47',
+                      content: expectedContent,
+                    },
+                  },
+                ],
+              },
+            })
+
+            // Mail
+            expect(sendMailMock).not.toHaveBeenCalled()
+            expect(notificationTemplateMock).not.toHaveBeenCalled()
           })
         })
 
@@ -634,12 +740,121 @@ describe('notifications', () => {
     })
   })
 
+  describe('chat email notifications', () => {
+    let chatSender
+    let chatReceiver
+    let roomId
+
+    beforeEach(async () => {
+      jest.clearAllMocks()
+
+      chatSender = await neode.create(
+        'User',
+        {
+          id: 'chatSender',
+          name: 'chatSender',
+          slug: 'chatSender',
+        },
+        {
+          email: 'chatSender@example.org',
+          password: '1234',
+        },
+      )
+
+      chatReceiver = await Factory.build(
+        'user',
+        { id: 'chatReceiver', name: 'chatReceiver', slug: 'chatReceiver' },
+        { email: 'user@example.org' },
+      )
+
+      authenticatedUser = await chatSender.toJson()
+
+      const room = await mutate({
+        mutation: createRoomMutation(),
+        variables: {
+          userId: 'chatReceiver',
+        },
+      })
+      roomId = room.data.CreateRoom.id
+    })
+
+    describe('if the chatReceiver is online', () => {
+      it('sends no email', async () => {
+        isUserOnlineMock = jest.fn().mockReturnValue(true)
+
+        await mutate({
+          mutation: createMessageMutation(),
+          variables: {
+            roomId,
+            content: 'Some nice message to chatReceiver',
+          },
+        })
+
+        expect(sendMailMock).not.toHaveBeenCalled()
+        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('if the chatReceiver is offline', () => {
+      it('sends an email', async () => {
+        isUserOnlineMock = jest.fn().mockReturnValue(false)
+
+        await mutate({
+          mutation: createMessageMutation(),
+          variables: {
+            roomId,
+            content: 'Some nice message to chatReceiver',
+          },
+        })
+
+        expect(sendMailMock).toHaveBeenCalledTimes(1)
+        expect(chatMessageTemplateMock).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('if the chatReceiver has blocked chatSender', () => {
+      it('sends no email', async () => {
+        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        await chatReceiver.relateTo(chatSender, 'blocked')
+
+        await mutate({
+          mutation: createMessageMutation(),
+          variables: {
+            roomId,
+            content: 'Some nice message to chatReceiver',
+          },
+        })
+
+        expect(sendMailMock).not.toHaveBeenCalled()
+        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('if the chatReceiver has disabled `emailNotificationsChatMessage`', () => {
+      it('sends no email', async () => {
+        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        await chatReceiver.update({ emailNotificationsChatMessage: false })
+
+        await mutate({
+          mutation: createMessageMutation(),
+          variables: {
+            roomId,
+            content: 'Some nice message to chatReceiver',
+          },
+        })
+
+        expect(sendMailMock).not.toHaveBeenCalled()
+        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+      })
+    })
+  })
+
   describe('group notifications', () => {
     let groupOwner
 
     beforeEach(async () => {
-      groupOwner = await neode.create(
-        'User',
+      groupOwner = await Factory.build(
+        'user',
         {
           id: 'group-owner',
           name: 'Group Owner',
@@ -666,7 +881,7 @@ describe('notifications', () => {
     })
 
     describe('user joins group', () => {
-      beforeEach(async () => {
+      const joinGroupAction = async () => {
         authenticatedUser = await notifiedUser.toJson()
         await mutate({
           mutation: joinGroupMutation(),
@@ -676,9 +891,14 @@ describe('notifications', () => {
           },
         })
         authenticatedUser = await groupOwner.toJson()
+      }
+
+      beforeEach(async () => {
+        jest.clearAllMocks()
       })
 
-      it('has the notification in database', async () => {
+      it('sends the group owner a notification and email', async () => {
+        await joinGroupAction()
         await expect(
           query({
             query: notificationQuery,
@@ -702,19 +922,50 @@ describe('notifications', () => {
           },
           errors: undefined,
         })
+
+        // Mail
+        expect(sendMailMock).toHaveBeenCalledTimes(1)
+        expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+      })
+
+      describe('if the group owner has disabled `emailNotificationsGroupMemberJoined`', () => {
+        it('sends the group owner a notification but no email', async () => {
+          await groupOwner.update({ emailNotificationsGroupMemberJoined: false })
+          await joinGroupAction()
+          await expect(
+            query({
+              query: notificationQuery,
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              notifications: [
+                {
+                  read: false,
+                  reason: 'user_joined_group',
+                  createdAt: expect.any(String),
+                  from: {
+                    __typename: 'Group',
+                    id: 'closed-group',
+                  },
+                  relatedUser: {
+                    id: 'you',
+                  },
+                },
+              ],
+            },
+            errors: undefined,
+          })
+
+          // Mail
+          expect(sendMailMock).not.toHaveBeenCalled()
+          expect(notificationTemplateMock).not.toHaveBeenCalled()
+        })
       })
     })
 
-    describe('user leaves group', () => {
-      beforeEach(async () => {
+    describe('user joins and leaves group', () => {
+      const leaveGroupAction = async () => {
         authenticatedUser = await notifiedUser.toJson()
-        await mutate({
-          mutation: joinGroupMutation(),
-          variables: {
-            groupId: 'closed-group',
-            userId: authenticatedUser.id,
-          },
-        })
         await mutate({
           mutation: leaveGroupMutation(),
           variables: {
@@ -723,9 +974,22 @@ describe('notifications', () => {
           },
         })
         authenticatedUser = await groupOwner.toJson()
+      }
+
+      beforeEach(async () => {
+        jest.clearAllMocks()
+        authenticatedUser = await notifiedUser.toJson()
+        await mutate({
+          mutation: joinGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: authenticatedUser.id,
+          },
+        })
       })
 
-      it('has two the notification in database', async () => {
+      it('sends the group owner two notifications and emails', async () => {
+        await leaveGroupAction()
         await expect(
           query({
             query: notificationQuery,
@@ -761,19 +1025,61 @@ describe('notifications', () => {
           },
           errors: undefined,
         })
+
+        // Mail
+        expect(sendMailMock).toHaveBeenCalledTimes(2)
+        expect(notificationTemplateMock).toHaveBeenCalledTimes(2)
+      })
+
+      describe('if the group owner has disabled `emailNotificationsGroupMemberLeft`', () => {
+        it('sends the group owner two notification but only only one email', async () => {
+          await groupOwner.update({ emailNotificationsGroupMemberLeft: false })
+          await leaveGroupAction()
+          await expect(
+            query({
+              query: notificationQuery,
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              notifications: [
+                {
+                  read: false,
+                  reason: 'user_left_group',
+                  createdAt: expect.any(String),
+                  from: {
+                    __typename: 'Group',
+                    id: 'closed-group',
+                  },
+                  relatedUser: {
+                    id: 'you',
+                  },
+                },
+                {
+                  read: false,
+                  reason: 'user_joined_group',
+                  createdAt: expect.any(String),
+                  from: {
+                    __typename: 'Group',
+                    id: 'closed-group',
+                  },
+                  relatedUser: {
+                    id: 'you',
+                  },
+                },
+              ],
+            },
+            errors: undefined,
+          })
+
+          // Mail
+          expect(sendMailMock).toHaveBeenCalledTimes(1)
+          expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+        })
       })
     })
 
     describe('user role in group changes', () => {
-      beforeEach(async () => {
-        authenticatedUser = await notifiedUser.toJson()
-        await mutate({
-          mutation: joinGroupMutation(),
-          variables: {
-            groupId: 'closed-group',
-            userId: authenticatedUser.id,
-          },
-        })
+      const changeGroupMemberRoleAction = async () => {
         authenticatedUser = await groupOwner.toJson()
         await mutate({
           mutation: changeGroupMemberRoleMutation(),
@@ -784,9 +1090,23 @@ describe('notifications', () => {
           },
         })
         authenticatedUser = await notifiedUser.toJson()
+      }
+
+      beforeEach(async () => {
+        authenticatedUser = await notifiedUser.toJson()
+        await mutate({
+          mutation: joinGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: authenticatedUser.id,
+          },
+        })
+        // Clear after because the above generates a notification not related
+        jest.clearAllMocks()
       })
 
-      it('has notification in database', async () => {
+      it('sends the group member a notification and email', async () => {
+        await changeGroupMemberRoleAction()
         await expect(
           query({
             query: notificationQuery,
@@ -810,19 +1130,49 @@ describe('notifications', () => {
           },
           errors: undefined,
         })
+
+        // Mail
+        expect(sendMailMock).toHaveBeenCalledTimes(1)
+        expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+      })
+
+      describe('if the group member has disabled `emailNotificationsGroupMemberRoleChanged`', () => {
+        it('sends the group member a notification but no email', async () => {
+          notifiedUser.update({ emailNotificationsGroupMemberRoleChanged: false })
+          await changeGroupMemberRoleAction()
+          await expect(
+            query({
+              query: notificationQuery,
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              notifications: [
+                {
+                  read: false,
+                  reason: 'changed_group_member_role',
+                  createdAt: expect.any(String),
+                  from: {
+                    __typename: 'Group',
+                    id: 'closed-group',
+                  },
+                  relatedUser: {
+                    id: 'group-owner',
+                  },
+                },
+              ],
+            },
+            errors: undefined,
+          })
+
+          // Mail
+          expect(sendMailMock).not.toHaveBeenCalled()
+          expect(notificationTemplateMock).not.toHaveBeenCalled()
+        })
       })
     })
 
     describe('user is removed from group', () => {
-      beforeEach(async () => {
-        authenticatedUser = await notifiedUser.toJson()
-        await mutate({
-          mutation: joinGroupMutation(),
-          variables: {
-            groupId: 'closed-group',
-            userId: authenticatedUser.id,
-          },
-        })
+      const removeUserFromGroupAction = async () => {
         authenticatedUser = await groupOwner.toJson()
         await mutate({
           mutation: removeUserFromGroupMutation(),
@@ -832,9 +1182,23 @@ describe('notifications', () => {
           },
         })
         authenticatedUser = await notifiedUser.toJson()
+      }
+
+      beforeEach(async () => {
+        authenticatedUser = await notifiedUser.toJson()
+        await mutate({
+          mutation: joinGroupMutation(),
+          variables: {
+            groupId: 'closed-group',
+            userId: authenticatedUser.id,
+          },
+        })
+        // Clear after because the above generates a notification not related
+        jest.clearAllMocks()
       })
 
-      it('has notification in database', async () => {
+      it('sends the previous group member a notification and email', async () => {
+        await removeUserFromGroupAction()
         await expect(
           query({
             query: notificationQuery,
@@ -857,6 +1221,44 @@ describe('notifications', () => {
             ],
           },
           errors: undefined,
+        })
+
+        // Mail
+        expect(sendMailMock).toHaveBeenCalledTimes(1)
+        expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+      })
+
+      describe('if the previous group member has disabled `emailNotificationsGroupMemberRemoved`', () => {
+        it('sends the previous group member a notification but no email', async () => {
+          notifiedUser.update({ emailNotificationsGroupMemberRemoved: false })
+          await removeUserFromGroupAction()
+          await expect(
+            query({
+              query: notificationQuery,
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              notifications: [
+                {
+                  read: false,
+                  reason: 'removed_user_from_group',
+                  createdAt: expect.any(String),
+                  from: {
+                    __typename: 'Group',
+                    id: 'closed-group',
+                  },
+                  relatedUser: {
+                    id: 'group-owner',
+                  },
+                },
+              ],
+            },
+            errors: undefined,
+          })
+
+          // Mail
+          expect(sendMailMock).not.toHaveBeenCalled()
+          expect(notificationTemplateMock).not.toHaveBeenCalled()
         })
       })
     })

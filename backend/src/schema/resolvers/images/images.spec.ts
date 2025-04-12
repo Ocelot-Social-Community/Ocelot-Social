@@ -1,7 +1,10 @@
-import { deleteImage, mergeImage } from './images'
-import { getNeode, getDriver } from '../../../db/neo4j'
-import Factory, { cleanDatabase } from '../../../db/factories'
+/* eslint-disable promise/prefer-await-to-callbacks */
 import { UserInputError } from 'apollo-server'
+
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+
+import { deleteImage, mergeImage } from './images'
 
 const driver = getDriver()
 const neode = getNeode()
@@ -90,6 +93,7 @@ describe('deleteImage', () => {
             })
             throw new Error('Ouch!')
           })
+          // eslint-disable-next-line no-catch-all/no-catch-all
         } catch (err) {
           // nothing has been deleted
           await expect(neode.all('Image')).resolves.toHaveLength(1)
@@ -251,6 +255,7 @@ describe('mergeImage', () => {
               })
               return transaction.run('Ooops invalid cypher!', { image })
             })
+            // eslint-disable-next-line no-catch-all/no-catch-all
           } catch (err) {
             // nothing has been created
             await expect(neode.all('Image')).resolves.toHaveLength(0)

@@ -130,6 +130,7 @@ export default {
     { src: '~/plugins/vue-observe-visibility.js', ssr: false },
     { src: '~/plugins/v-mapbox.js', mode: 'client' },
     { src: '~/plugins/vue-advanced-chat.js', mode: 'client' },
+    { src: '~/plugins/onlineStatus.js', mode: 'client' },
   ],
 
   router: {
@@ -302,7 +303,7 @@ export default {
         modules: [
           {
             preTransformNode(abstractSyntaxTreeElement) {
-              if (!ctx.isDev) {
+              if (!ctx.isDev && CONFIG.NODE_ENV !== 'test') {
                 const { attrsMap, attrsList } = abstractSyntaxTreeElement
                 tagAttributesForTesting.forEach((attribute) => {
                   if (attrsMap[attribute]) {

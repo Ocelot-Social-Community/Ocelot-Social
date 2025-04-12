@@ -19,6 +19,21 @@ enum _UserOrdering {
   locale_desc
 }
 
+input EmailNotificationSettingsInput {
+  name: EmailNotificationSettingsName
+  value: Boolean
+}
+
+type EmailNotificationSettings {
+  type: EmailNotificationSettingsType
+  settings: [EmailNotificationSettingsOption] @neo4j_ignore
+}
+
+type EmailNotificationSettingsOption {
+  name: EmailNotificationSettingsName
+  value: Boolean
+}
+
 type User {
   id: ID!
   actorId: String
@@ -46,7 +61,7 @@ type User {
 
   allowEmbedIframes: Boolean
   showShoutsPublicly: Boolean
-  sendNotificationEmails: Boolean
+  emailNotificationSettings: [EmailNotificationSettings]! @neo4j_ignore
   locale: String
   friends: [User]! @relation(name: "FRIENDS", direction: "BOTH")
   friendsCount: Int! @cypher(statement: "MATCH (this)<-[:FRIENDS]->(r:User) RETURN COUNT(DISTINCT r)")
@@ -184,8 +199,7 @@ type Query {
   availableRoles: [UserRole]! 
   mutedUsers: [User]
   blockedUsers: [User]
-  isLoggedIn: Boolean!
-  currentUser: User
+  currentUser: User!
 }
 
 enum Deletable {
@@ -206,7 +220,7 @@ type Mutation {
     termsAndConditionsAgreedAt: String
     allowEmbedIframes: Boolean
     showShoutsPublicly: Boolean
-    sendNotificationEmails: Boolean
+    emailNotificationSettings: [EmailNotificationSettingsInput]
     locale: String
   ): User
 
@@ -224,6 +238,8 @@ type Mutation {
   switchUserRole(role: UserRole!, id: ID!): User
 
   saveCategorySettings(activeCategories: [String]): Boolean
+  
+  updateOnlineStatus(status: OnlineStatus!): Boolean!
 
   requestPasswordReset(email: String!): Boolean!
   resetPassword(email: String!, nonce: String!, newPassword: String!): Boolean!

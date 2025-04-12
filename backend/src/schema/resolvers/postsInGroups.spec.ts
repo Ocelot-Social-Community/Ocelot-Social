@@ -1,28 +1,27 @@
 import { createTestClient } from 'apollo-server-testing'
-import Factory, { cleanDatabase } from '../../db/factories'
-import { getNeode, getDriver } from '../../db/neo4j'
-import createServer from '../../server'
+
+import CONFIG from '@config/index'
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import { signupVerificationMutation } from '@graphql/authentications'
+import { createCommentMutation } from '@graphql/comments'
 import {
   createGroupMutation,
   changeGroupMemberRoleMutation,
   leaveGroupMutation,
-} from '../../graphql/groups'
+} from '@graphql/groups'
 import {
   createPostMutation,
   postQuery,
   filterPosts,
   profilePagePosts,
   searchPosts,
-} from '../../graphql/posts'
-import { createCommentMutation } from '../../graphql/comments'
-// eslint-disable-next-line no-unused-vars
-import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
-import CONFIG from '../../config'
-import { signupVerificationMutation } from '../../graphql/authentications'
+} from '@graphql/posts'
+import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-jest.mock('../../constants/groups', () => {
+jest.mock('@constants/groups', () => {
   return {
     __esModule: true,
     DESCRIPTION_WITHOUT_HTML_LENGTH_MIN: 5,
@@ -52,6 +51,9 @@ beforeAll(async () => {
         driver,
         neode,
         user: authenticatedUser,
+        cypherParams: {
+          currentUserId: authenticatedUser ? authenticatedUser.id : null,
+        },
       }
     },
   })
