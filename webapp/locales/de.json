@@ -1142,6 +1142,7 @@
   },
   "reformer-network": {
     "footer": {
+      "code-of-conduct": "Verhaltensrichtlinien",
       "legal-information": "Rechtliches"
     }
   }

@@ -70,9 +70,9 @@ const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
   // externalLink: null, // if defined it's dominating
 
   internalPage: {
-    // footerIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.code-of-conduct', // localized string identifier, on null it's hidden, if undefined default is used
+    footerIdent: 'reformer-network.footer.code-of-conduct', // localized string identifier, if undefined default is used
+    headTitleIdent: 'reformer-network.footer.code-of-conduct', // localized string identifier, if undefined default is used
+    headlineIdent: 'reformer-network.footer.code-of-conduct', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
