@@ -1143,7 +1143,8 @@
   "reformer-network": {
     "footer": {
       "code-of-conduct": "Verhaltensrichtlinien",
-      "legal-information": "Rechtliches"
+      "terms-and-conditions": "Allgemeine Geschäftsbedingungen (AGB)",
+      "terms-and-conditions-short": "AGBs"
     }
   }
 }

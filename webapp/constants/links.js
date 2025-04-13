@@ -57,9 +57,9 @@ const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwri
   // externalLink: null, // if defined it's dominating
 
   internalPage: {
-    // footerIdent: 'site.termsAndConditions', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.termsAndConditions', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.termsAndConditions', // localized string identifier, on null it's hidden, if undefined default is used
+    footerIdent: 'reformer-network.footer.terms-and-conditions-short', // localized string identifier, if undefined default is used
+    headTitleIdent: 'reformer-network.footer.terms-and-conditions', // localized string identifier, if undefined default is used
+    headlineIdent: 'reformer-network.footer.terms-and-conditions', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
@@ -83,9 +83,9 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
   // externalLink: null, // if defined it's dominating
 
   internalPage: {
-    footerIdent: 'reformer-network.footer.legal-information', // localized string identifier, if undefined default is used
-    headTitleIdent: 'reformer-network.footer.legal-information', // localized string identifier, if undefined default is used
-    headlineIdent: 'reformer-network.footer.legal-information', // localized string identifier, on null it's hidden, if undefined default is used
+    // footerIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
+    // headTitleIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
+    // headlineIdent: 'site.data-privacy', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
@@ -140,8 +140,8 @@ export default {
   FOOTER_LINK_LIST: [
     ORGANIZATION,
     CODE_OF_CONDUCT,
-    TERMS_AND_CONDITIONS,
     DATA_PRIVACY,
+    TERMS_AND_CONDITIONS,
     DONATE,
     FAQ,
     SUPPORT,
