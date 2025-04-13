@@ -83,9 +83,9 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
   // externalLink: null, // if defined it's dominating
 
   internalPage: {
-    // footerIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.data-privacy', // localized string identifier, on null it's hidden, if undefined default is used
+    footerIdent: 'reformer-network.footer.legal-information', // localized string identifier, if undefined default is used
+    headTitleIdent: 'reformer-network.footer.legal-information', // localized string identifier, if undefined default is used
+    headlineIdent: 'reformer-network.footer.legal-information', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
