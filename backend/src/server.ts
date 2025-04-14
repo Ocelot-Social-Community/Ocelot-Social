@@ -6,6 +6,7 @@ import bodyParser from 'body-parser'
 import express from 'express'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { PubSub } from 'graphql-subscriptions'
+
 import { graphqlUploadExpress } from 'graphql-upload'
 import helmet from 'helmet'
 import Redis from 'ioredis'
@@ -95,8 +96,8 @@ const createServer = (options?) => {
     ) as any,
   )
   app.use(express.static('public'))
-  app.use(bodyParser.json({ limit: '10mb' }) as any)
-  app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }) as any)
+  app.use(express.json({ limit: '10mb' }) as any)
+  app.use(express.urlencoded({ limit: '10mb', extended: true }) as any)
   app.use(graphqlUploadExpress())
   server.applyMiddleware({ app, path: '/' })
   const httpServer = http.createServer(app)
