@@ -90,7 +90,7 @@ export default {
 
 <style scoped>
 .menu-container {
-  width: 100%
+  width: 100%;
 }
 .settings-content {
   flex: 1;
