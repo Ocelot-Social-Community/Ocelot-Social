@@ -485,6 +485,8 @@
     "categoriesTitle": "Themen der Gruppe",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
     "contentMenu": {
+      "muteGroup": "Stummschalten",
+      "unmuteGroup": "Nicht stummschalten",
       "visitGroupPage": "Gruppe anzeigen"
     },
     "createNewGroup": {
@@ -535,6 +537,7 @@
       "confirmAddGroupMemberText": "Nutzer „{name}“ zur Gruppe hinzufügen?",
       "confirmAddGroupMemberTitle": "Bestätigen"
     },
+    "muted": "Gruppe stummgeschaltet",
     "myGroups": "Meine Gruppen",
     "name": "Gruppenname",
     "radius": "Radius",
@@ -559,6 +562,8 @@
       "hidden": "Geheim — Gruppe (auch der Name) komplett unsichtbar",
       "public": "Öffentlich — Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
     },
+    "unmute": "Nicht stummschalten",
+    "unmuted": "Gruppe nicht mehr stummgeschaltet",
     "update": "Änderung speichern",
     "updatedGroup": "Die Gruppendaten wurden geändert!"
   },
@@ -737,9 +742,11 @@
     "post": "Beitrag oder Gruppe",
     "reason": {
       "changed_group_member_role": "Hat Deine Rolle in der Gruppe geändert …",
-      "commented_on_post": "Hat Deinen Beitrag kommentiert …",
+      "commented_on_post": "Hat einen Beitrag den du beobachtest kommentiert …",
+      "followed_user_posted": "Hat einen neuen Betrag geschrieben …",
       "mentioned_in_comment": "Hat Dich in einem Kommentar erwähnt …",
       "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …",
+      "post_in_group": "Hat einen Beitrag in der Gruppe geschrieben …",
       "removed_user_from_group": "Hat Dich aus der Gruppe entfernt …",
       "user_joined_group": "Ist Deiner Gruppe beigetreten …",
       "user_left_group": "Hat deine Gruppe verlassen …"
@@ -1043,6 +1050,7 @@
       "chatMessage": "Nachricht erhalten während Abwesenheit",
       "checkAll": "Alle auswählen",
       "commentOnObservedPost": "Kommentare zu beobachteten Beiträgen",
+      "followingUsers": "Ein Nutzer dem ich folge veröffentlichte einen neuen Beitrag",
       "group": "Gruppen",
       "groupMemberJoined": "Ein Mitglied ist deiner Gruppe beigetreten",
       "groupMemberLeft": "Ein Mitglied hat deine Gruppe verlassen",

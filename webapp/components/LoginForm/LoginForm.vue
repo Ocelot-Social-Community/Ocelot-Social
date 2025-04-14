@@ -100,7 +100,7 @@ export default {
         await this.$store.dispatch('auth/login', { email, password })
         if (this.currentUser && this.currentUser.activeCategories) {
           this.resetCategories()
-          if (this.currentUser.activeCategories.length > 0) {
+          if (this.currentUser.activeCategories.length < 19) {
             this.currentUser.activeCategories.forEach((categoryId) => {
               this.toggleCategory(categoryId)
             })

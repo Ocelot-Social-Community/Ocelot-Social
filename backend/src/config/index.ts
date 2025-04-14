@@ -57,6 +57,8 @@ const smtp = {
   SMTP_DKIM_KEYSELECTOR: hasDKIMData && env.SMTP_DKIM_KEYSELECTOR,
   // PEM format: https://docs.progress.com/bundle/datadirect-hybrid-data-pipeline-installation-46/page/PEM-file-format.html
   SMTP_DKIM_PRIVATKEY: hasDKIMData && env.SMTP_DKIM_PRIVATKEY.replace(/\\n/g, '\n'), // replace all "\n" in .env string by real line break
+  SMTP_MAX_CONNECTIONS: env.SMTP_MAX_CONNECTIONS || 5,
+  SMTP_MAX_MESSAGES: env.SMTP_MAX_MESSAGES || 100,
 }
 
 const neo4j = {

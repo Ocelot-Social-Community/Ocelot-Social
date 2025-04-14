@@ -18,18 +18,14 @@
           <!-- Menu -->
           <client-only>
             <group-content-menu
-              v-if="isGroupOwner"
+              v-if="isGroupMemberNonePending"
               class="group-profile-content-menu"
               :usage="'groupProfile'"
               :group="group || {}"
               placement="bottom-end"
+              @mute="muteGroup"
+              @unmute="unmuteGroup"
             />
-            <!-- TODO: implement later on -->
-            <!-- @mute="muteUser"
-                 @unmute="unmuteUser"
-                 @block="blockUser"
-                 @unblock="unblockUser"
-                 @delete="deleteUser" -->
           </client-only>
           <ds-space margin="small">
             <!-- group name -->
@@ -84,19 +80,9 @@
                  </ds-flex-item> -->
           </ds-flex>
           <div class="action-buttons">
-            <!-- <base-button v-if="user.isBlocked" @click="unblockUser(user)">
-                 {{ $t('settings.blocked-users.unblock') }}
-                 </base-button>
-                 <base-button v-if="user.isMuted" @click="unmuteUser(user)">
-                 {{ $t('settings.muted-users.unmute') }}
-                 </base-button>
-                 <follow-button
-                 v-if="!user.isMuted && !user.isBlocked"
-                 :follow-id="user.id"
-                 :is-followed="user.followedByCurrentUser"
-                 @optimistic="optimisticFollow"
-                 @update="updateFollow"
-                 /> -->
+            <base-button danger v-if="group.isMutedByMe" @click="unmuteGroup" icon="volume-up">
+              {{ $t('group.unmute') }}
+            </base-button>
             <!-- Group join / leave -->
             <join-leave-button
               :group="group || {}"
@@ -108,8 +94,6 @@
               @prepare="prepareJoinLeave"
               @update="updateJoinLeave"
             />
-            <!-- implement:
-                 v-if="!user.isMuted && !user.isBlocked" -->
           </div>
           <hr />
           <ds-space margin-top="small" margin-bottom="small">
@@ -314,8 +298,7 @@
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
-// import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
-// import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
+import { muteGroup, unmuteGroup } from '~/graphql/settings/MutedGroups'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import postListActions from '~/mixins/postListActions'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
@@ -470,6 +453,32 @@ export default {
     //     this.resetPostList()
     //   }
     // },
+    async muteGroup() {
+      try {
+        await this.$apollo.mutate({
+          mutation: muteGroup(),
+          variables: {
+            groupId: this.group.id,
+          },
+        })
+        this.$toast.success(this.$t('group.muted'))
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
+    async unmuteGroup() {
+      try {
+        await this.$apollo.mutate({
+          mutation: unmuteGroup(),
+          variables: {
+            groupId: this.group.id,
+          },
+        })
+        this.$toast.success(this.$t('group.unmuted'))
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
     uniq(items, field = 'id') {
       return uniqBy(items, field)
     },
