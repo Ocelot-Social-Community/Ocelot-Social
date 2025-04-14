@@ -4,7 +4,7 @@ import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import { createMessageMutation, messageQuery, markMessagesAsSeen } from '@graphql/messages'
 import { createRoomMutation, roomQuery } from '@graphql/rooms'
-import createServer from '@src/server'
+import createServer, { pubsub } from '@src/server'
 
 const driver = getDriver()
 const neode = getNeode()
@@ -13,6 +13,8 @@ let query
 let mutate
 let authenticatedUser
 let chattingUser, otherChattingUser, notChattingUser
+
+const pubsubSpy = jest.spyOn(pubsub, 'publish')
 
 beforeAll(async () => {
   await cleanDatabase()
