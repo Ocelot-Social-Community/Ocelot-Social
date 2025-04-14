@@ -478,6 +478,7 @@ export default {
         invitedBy: '<-[:INVITED]-(related:User)',
         location: '-[:IS_IN]->(related:Location)',
         redeemedInviteCode: '-[:REDEEMED]->(related:InviteCode)',
+        verified: '<-[:VERIFIED]-(related:Badge)',
       },
       hasMany: {
         followedBy: '<-[:FOLLOWS]-(related:User)',

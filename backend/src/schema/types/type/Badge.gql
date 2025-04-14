@@ -1,17 +1,11 @@
 type Badge {
   id: ID!
   type: BadgeType!
-  status: BadgeStatus!
   icon: String!
   createdAt: String
-  updatedAt: String
 
   rewarded: [User]! @relation(name: "REWARDED", direction: "OUT")
-}
-
-enum BadgeStatus {
-  permanent
-  temporary
+  verified: [User]! @relation(name: "VERIFIED", direction: "OUT")
 }
 
 enum BadgeType {
@@ -24,6 +18,7 @@ type Query {
 }
 
 type Mutation {
-  rewardBadge(badgeId: ID!, userId: ID!): User
-  unrewardBadge(badgeId: ID!, userId: ID!): User
+  verify(badgeId: ID!, userId: ID!): User
+  reward(badgeId: ID!, userId: ID!): User
+  unreward(badgeId: ID!, userId: ID!): User
 }

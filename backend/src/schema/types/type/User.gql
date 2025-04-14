@@ -125,6 +125,7 @@ type User {
 
   categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
+  verified: Badge @relation(name: "VERIFIED", direction: "IN")
   badges: [Badge]! @relation(name: "REWARDED", direction: "IN")
   badgesCount: Int! @cypher(statement: "MATCH (this)<-[:REWARDED]-(r:Badge) RETURN COUNT(r)")
 
