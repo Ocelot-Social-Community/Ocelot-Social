@@ -15,8 +15,8 @@ enum BadgeStatus {
 }
 
 enum BadgeType {
-  role
-  crowdfunding
+  verification
+  badge
 }
 
 type Query {
@@ -24,6 +24,6 @@ type Query {
 }
 
 type Mutation {
-  reward(badgeKey: ID!, userId: ID!): User
-  unreward(badgeKey: ID!, userId: ID!): User
+  rewardBadge(badgeId: ID!, userId: ID!): User
+  unrewardBadge(badgeId: ID!, userId: ID!): User
 }

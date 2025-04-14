@@ -10,7 +10,7 @@ const instance = getNeode()
 
 let authenticatedUser, regularUser, administrator, moderator, badge, query, mutate
 
-describe('rewards', () => {
+describe('Badges', () => {
   const variables = {
     from: 'indiegogo_en_rhino',
     to: 'regular-user-id',
@@ -71,8 +71,8 @@ describe('rewards', () => {
     )
     badge = await Factory.build('badge', {
       id: 'indiegogo_en_rhino',
-      type: 'crowdfunding',
-      status: 'permanent',
+      type: 'badge',
+      description: 'You earned a rhino',
       icon: '/img/badges/indiegogo_en_rhino.svg',
     })
   })
@@ -85,7 +85,7 @@ describe('rewards', () => {
   describe('reward', () => {
     const rewardMutation = gql`
       mutation ($from: ID!, $to: ID!) {
-        reward(badgeKey: $from, userId: $to) {
+        rewardBadge(badgeId: $from, userId: $to) {
           id
           badges {
             id
@@ -98,13 +98,28 @@ describe('rewards', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
         await expect(mutate({ mutation: rewardMutation, variables })).resolves.toMatchObject({
-          data: { reward: null },
+          data: { rewardBadge: null },
           errors: [{ message: 'Not Authorized!' }],
         })
       })
     })
 
-    describe('authenticated admin', () => {
+    describe('authenticated as moderator', () => {
+      beforeEach(async () => {
+        authenticatedUser = moderator.toJson()
+      })
+
+      describe('rewards badge to user', () => {
+        it('throws authorization error', async () => {
+          await expect(mutate({ mutation: rewardMutation, variables })).resolves.toMatchObject({
+            data: { rewardBadge: null },
+            errors: [{ message: 'Not Authorized!' }],
+          })
+        })
+      })
+    })
+
+    describe('authenticated as admin', () => {
       beforeEach(async () => {
         authenticatedUser = await administrator.toJson()
       })
@@ -117,8 +132,8 @@ describe('rewards', () => {
               variables: { to: 'regular-user-id', from: 'non-existent-badge-id' },
             }),
           ).resolves.toMatchObject({
-            data: { reward: null },
-            errors: [{ message: "Couldn't find a badge with that id" }],
+            data: { rewardBadge: null },
+            errors: [{ message: "Error: Could not reward badge! Ensure the user and the badge exist." }],
           })
         })
       })
@@ -131,8 +146,8 @@ describe('rewards', () => {
               variables: { to: 'non-existent-user-id', from: 'indiegogo_en_rhino' },
             }),
           ).resolves.toMatchObject({
-            data: { reward: null },
-            errors: [{ message: "Couldn't find a user with that id" }],
+            data: { rewardBadge: null },
+            errors: [{ message: "Error: Could not reward badge! Ensure the user and the badge exist." }],
           })
         })
       })
@@ -140,7 +155,7 @@ describe('rewards', () => {
       it('rewards a badge to user', async () => {
         const expected = {
           data: {
-            reward: {
+            rewardBadge: {
               id: 'regular-user-id',
               badges: [{ id: 'indiegogo_en_rhino' }],
             },
@@ -155,12 +170,14 @@ describe('rewards', () => {
       it('rewards a second different badge to same user', async () => {
         await Factory.build('badge', {
           id: 'indiegogo_en_racoon',
+          type: 'badge',
+          description: 'You earned a racoon',
           icon: '/img/badges/indiegogo_en_racoon.svg',
         })
         const badges = [{ id: 'indiegogo_en_racoon' }, { id: 'indiegogo_en_rhino' }]
         const expected = {
           data: {
-            reward: {
+            rewardBadge: {
               id: 'regular-user-id',
               badges: expect.arrayContaining(badges),
             },
@@ -188,7 +205,7 @@ describe('rewards', () => {
       it('rewards the same badge as well to another user', async () => {
         const expected = {
           data: {
-            reward: {
+            rewardBadge: {
               id: 'regular-user-2-id',
               badges: [{ id: 'indiegogo_en_rhino' }],
             },
@@ -247,21 +264,6 @@ describe('rewards', () => {
         await expect(query({ query: userQuery })).resolves.toMatchObject(expected)
       })
     })
-
-    describe('authenticated moderator', () => {
-      beforeEach(async () => {
-        authenticatedUser = moderator.toJson()
-      })
-
-      describe('rewards badge to user', () => {
-        it('throws authorization error', async () => {
-          await expect(mutate({ mutation: rewardMutation, variables })).resolves.toMatchObject({
-            data: { reward: null },
-            errors: [{ message: 'Not Authorized!' }],
-          })
-        })
-      })
-    })
   })
 
   describe('unreward', () => {
@@ -269,13 +271,13 @@ describe('rewards', () => {
       await regularUser.relateTo(badge, 'rewarded')
     })
     const expected = {
-      data: { unreward: { id: 'regular-user-id', badges: [] } },
+      data: { unrewardBadge: { id: 'regular-user-id', badges: [] } },
       errors: undefined,
     }
 
     const unrewardMutation = gql`
       mutation ($from: ID!, $to: ID!) {
-        unreward(badgeKey: $from, userId: $to) {
+        unrewardBadge(badgeId: $from, userId: $to) {
           id
           badges {
             id
@@ -309,7 +311,7 @@ describe('rewards', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
         await expect(mutate({ mutation: unrewardMutation, variables })).resolves.toMatchObject({
-          data: { unreward: null },
+          data: { unrewardBadge: null },
           errors: [{ message: 'Not Authorized!' }],
         })
       })
@@ -342,7 +344,7 @@ describe('rewards', () => {
       describe('removes bage from user', () => {
         it('throws authorization error', async () => {
           await expect(mutate({ mutation: unrewardMutation, variables })).resolves.toMatchObject({
-            data: { unreward: null },
+            data: { unrewardBadge: null },
             errors: [{ message: 'Not Authorized!' }],
           })
         })
