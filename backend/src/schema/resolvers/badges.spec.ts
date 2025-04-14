@@ -65,14 +65,14 @@ describe('Badges', () => {
       },
     )
     badge = await Factory.build('badge', {
-      id: 'indiegogo_en_rhino',
+      id: 'badge_rhino',
       type: 'badge',
       description: 'You earned a rhino',
       icon: '/img/badges/indiegogo_en_rhino.svg',
     })
 
     verification = await Factory.build('badge', {
-      id: 'indiegogo_en_turtle',
+      id: 'verification_turtle',
       type: 'verification',
       description: 'You are a verified turtle',
       icon: '/img/badges/indiegogo_en_turtle.svg',
@@ -86,7 +86,7 @@ describe('Badges', () => {
 
   describe('verify', () => {
     const variables = {
-      badgeId: 'indiegogo_en_turtle',
+      badgeId: 'verification_turtle',
       userId: 'regular-user-id',
     }
 
@@ -153,7 +153,7 @@ describe('Badges', () => {
           await expect(
             mutate({
               mutation: verifyMutation,
-              variables: { userId: 'non-existent-user-id', badgeId: 'indiegogo_en_turtle' },
+              variables: { userId: 'non-existent-user-id', badgeId: 'verification_turtle' },
             }),
           ).resolves.toMatchObject({
             data: { verify: null },
@@ -167,7 +167,7 @@ describe('Badges', () => {
           await expect(
             mutate({
               mutation: verifyMutation,
-              variables: { userId: 'regular-user-id', badgeId: 'indiegogo_en_rhino' },
+              variables: { userId: 'regular-user-id', badgeId: 'badge_rhino' },
             }),
           ).resolves.toMatchObject({
             data: { verify: null },
@@ -181,7 +181,7 @@ describe('Badges', () => {
           data: {
             verify: {
               id: 'regular-user-id',
-              verified: { id: 'indiegogo_en_turtle' },
+              verified: { id: 'verification_turtle' },
               badges: [],
             },
           },
@@ -194,7 +194,7 @@ describe('Badges', () => {
 
       it('overrides the existing verification if a second verification badge is rewarded to the same user', async () => {
         await Factory.build('badge', {
-          id: 'indiegogo_en_racoon',
+          id: 'verification_racoon',
           type: 'verification',
           description: 'You are a verified racoon',
           icon: '/img/badges/indiegogo_en_racoon.svg',
@@ -203,7 +203,7 @@ describe('Badges', () => {
           data: {
             verify: {
               id: 'regular-user-id',
-              verified: { id: 'indiegogo_en_racoon' },
+              verified: { id: 'verification_racoon' },
               badges: [],
             },
           },
@@ -213,7 +213,7 @@ describe('Badges', () => {
           mutation: verifyMutation,
           variables: {
             userId: 'regular-user-id',
-            badgeId: 'indiegogo_en_rhino',
+            badgeId: 'verification_turtle',
           },
         })
         await expect(
@@ -221,7 +221,7 @@ describe('Badges', () => {
             mutation: verifyMutation,
             variables: {
               userId: 'regular-user-id',
-              badgeId: 'indiegogo_en_racoon',
+              badgeId: 'verification_racoon',
             },
           }),
         ).resolves.toMatchObject(expected)
@@ -232,7 +232,7 @@ describe('Badges', () => {
           data: {
             verify: {
               id: 'regular-user-2-id',
-              verified: { id: 'indiegogo_en_turtle' },
+              verified: { id: 'verification_turtle' },
               badges: [],
             },
           },
@@ -256,7 +256,7 @@ describe('Badges', () => {
             mutation: verifyMutation,
             variables: {
               userId: 'regular-user-2-id',
-              badgeId: 'indiegogo_en_turtle',
+              badgeId: 'verification_turtle',
             },
           }),
         ).resolves.toMatchObject(expected)
@@ -266,7 +266,7 @@ describe('Badges', () => {
 
   describe('reward', () => {
     const variables = {
-      badgeId: 'indiegogo_en_rhino',
+      badgeId: 'badge_rhino',
       userId: 'regular-user-id',
     }
 
@@ -333,7 +333,7 @@ describe('Badges', () => {
           await expect(
             mutate({
               mutation: rewardMutation,
-              variables: { userId: 'non-existent-user-id', badgeId: 'indiegogo_en_rhino' },
+              variables: { userId: 'non-existent-user-id', badgeId: 'badge_rhino' },
             }),
           ).resolves.toMatchObject({
             data: { reward: null },
@@ -347,7 +347,7 @@ describe('Badges', () => {
           await expect(
             mutate({
               mutation: rewardMutation,
-              variables: { userId: 'regular-user-id', badgeId: 'indiegogo_en_turtle' },
+              variables: { userId: 'regular-user-id', badgeId: 'verification_turtle' },
             }),
           ).resolves.toMatchObject({
             data: { reward: null },
@@ -362,7 +362,7 @@ describe('Badges', () => {
             reward: {
               id: 'regular-user-id',
               verified: null,
-              badges: [{ id: 'indiegogo_en_rhino' }],
+              badges: [{ id: 'badge_rhino' }],
             },
           },
           errors: undefined,
@@ -374,12 +374,12 @@ describe('Badges', () => {
 
       it('rewards a second different badge to the same user', async () => {
         await Factory.build('badge', {
-          id: 'indiegogo_en_racoon',
+          id: 'badge_racoon',
           type: 'badge',
           description: 'You earned a racoon',
           icon: '/img/badges/indiegogo_en_racoon.svg',
         })
-        const badges = [{ id: 'indiegogo_en_racoon' }, { id: 'indiegogo_en_rhino' }]
+        const badges = [{ id: 'badge_racoon' }, { id: 'badge_rhino' }]
         const expected = {
           data: {
             reward: {
@@ -393,7 +393,7 @@ describe('Badges', () => {
           mutation: rewardMutation,
           variables: {
             userId: 'regular-user-id',
-            badgeId: 'indiegogo_en_rhino',
+            badgeId: 'badge_rhino',
           },
         })
         await expect(
@@ -401,7 +401,7 @@ describe('Badges', () => {
             mutation: rewardMutation,
             variables: {
               userId: 'regular-user-id',
-              badgeId: 'indiegogo_en_racoon',
+              badgeId: 'badge_racoon',
             },
           }),
         ).resolves.toMatchObject(expected)
@@ -412,7 +412,7 @@ describe('Badges', () => {
           data: {
             reward: {
               id: 'regular-user-2-id',
-              badges: [{ id: 'indiegogo_en_rhino' }],
+              badges: [{ id: 'badge_rhino' }],
             },
           },
           errors: undefined,
@@ -435,7 +435,7 @@ describe('Badges', () => {
             mutation: rewardMutation,
             variables: {
               userId: 'regular-user-2-id',
-              badgeId: 'indiegogo_en_rhino',
+              badgeId: 'badge_rhino',
             },
           }),
         ).resolves.toMatchObject(expected)
@@ -462,7 +462,7 @@ describe('Badges', () => {
           }
         `
         const expected = {
-          data: { User: [{ badgesCount: 1, badges: [{ id: 'indiegogo_en_rhino' }] }] },
+          data: { User: [{ badgesCount: 1, badges: [{ id: 'badge_rhino' }] }] },
           errors: undefined,
         }
 
@@ -473,7 +473,7 @@ describe('Badges', () => {
 
   describe('unreward', () => {
     const variables = {
-      badgeId: 'indiegogo_en_rhino',
+      badgeId: 'badge_rhino',
       userId: 'regular-user-id',
     }
 
@@ -510,7 +510,7 @@ describe('Badges', () => {
           }
         `
         const expected = {
-          data: { User: [{ badgesCount: 1, badges: [{ id: 'indiegogo_en_rhino' }] }] },
+          data: { User: [{ badgesCount: 1, badges: [{ id: 'badge_rhino' }] }] },
           errors: undefined,
         }
         await expect(query({ query: userQuery })).resolves.toMatchObject(expected)

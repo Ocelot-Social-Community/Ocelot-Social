@@ -126,27 +126,39 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // badges
     const racoon = await Factory.build('badge', {
-      id: 'indiegogo_en_racoon',
+      id: 'badge_racoon',
+      type: 'badge',
+      description: 'You earned a Racoon',
       icon: '/img/badges/indiegogo_en_racoon.svg',
     })
     const rabbit = await Factory.build('badge', {
-      id: 'indiegogo_en_rabbit',
+      id: 'badge_rabbit',
+      type: 'badge',
+      description: 'You earned a Rabbit',
       icon: '/img/badges/indiegogo_en_rabbit.svg',
     })
     const wolf = await Factory.build('badge', {
-      id: 'indiegogo_en_wolf',
+      id: 'badge_wolf',
+      type: 'badge',
+      description: 'You earned a Wolf',
       icon: '/img/badges/indiegogo_en_wolf.svg',
     })
     const bear = await Factory.build('badge', {
-      id: 'indiegogo_en_bear',
+      id: 'badge_bear',
+      type: 'badge',
+      description: 'You earned a Bear',
       icon: '/img/badges/indiegogo_en_bear.svg',
     })
     const turtle = await Factory.build('badge', {
-      id: 'indiegogo_en_turtle',
+      id: 'badge_turtle',
+      type: 'badge',
+      description: 'You earned a Turtle',
       icon: '/img/badges/indiegogo_en_turtle.svg',
     })
     const rhino = await Factory.build('badge', {
-      id: 'indiegogo_en_rhino',
+      id: 'badge_rhino',
+      type: 'badge',
+      description: 'You earned a Rhino',
       icon: '/img/badges/indiegogo_en_rhino.svg',
     })
 

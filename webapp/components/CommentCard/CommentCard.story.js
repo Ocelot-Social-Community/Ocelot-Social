@@ -32,7 +32,7 @@ const comment = {
     location: null,
     badges: [
       {
-        id: 'indiegogo_en_bear',
+        id: 'badge_bear',
         icon: '/img/badges/indiegogo_en_bear.svg',
         __typename: 'Badge',
       },
