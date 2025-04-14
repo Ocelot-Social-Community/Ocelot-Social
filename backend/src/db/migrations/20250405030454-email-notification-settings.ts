@@ -22,7 +22,6 @@ export async function up(next) {
       REMOVE user.sendNotificationEmails
     `)
     await transaction.commit()
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)

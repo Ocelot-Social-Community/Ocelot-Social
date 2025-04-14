@@ -15,7 +15,6 @@ export async function up(next) {
         SET p.clickedCount = 0
     `)
     await transaction.commit()
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -39,7 +38,6 @@ export async function down(next) {
         REMOVE p.clickedCount
     `)
     await transaction.commit()
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)

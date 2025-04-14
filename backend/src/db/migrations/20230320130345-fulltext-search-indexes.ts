@@ -34,7 +34,6 @@ export async function up(next) {
     )
     await transaction.commit()
     */
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -60,7 +59,6 @@ export async function down(next) {
     await transaction.run(`CALL db.index.fulltext.drop("tag_fulltext_search")`)
     await transaction.commit()
     */
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
