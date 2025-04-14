@@ -12,6 +12,7 @@ export const getUnreadRoomsCount = async (userId, session) => {
       MATCH (user:User { id: $userId })-[:CHATS_IN]->(room:Room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
       WHERE NOT sender.id = $userId AND NOT message.seen
       AND NOT (user)-[:BLOCKED]->(sender)
+      AND NOT (user)-[:MUTED]->(sender)
       RETURN toString(COUNT(DISTINCT room)) AS count
     `
     const unreadRoomsTxResponse = await transaction.run(unreadRoomsCypher, { userId })
