@@ -54,5 +54,6 @@ module.exports = defineConfig({
   env: {
     ...parsed,
     mailserverURL: 'http://localhost:1080',
+    backendURL: 'http://localhost:4000',
   }
 });
