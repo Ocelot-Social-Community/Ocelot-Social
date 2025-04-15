@@ -485,8 +485,8 @@
     "categoriesTitle": "Themen der Gruppe",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
     "contentMenu": {
-      "muteGroup": "Gruppe stummschalten",
-      "unmuteGroup": "Gruppe nicht mehr stummschalten",
+      "muteGroup": "Stummschalten",
+      "unmuteGroup": "Nicht stummschalten",
       "visitGroupPage": "Gruppe anzeigen"
     },
     "createNewGroup": {
@@ -562,7 +562,7 @@
       "hidden": "Geheim — Gruppe (auch der Name) komplett unsichtbar",
       "public": "Öffentlich — Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
     },
-    "unmute": "Gruppe nicht mehr stummschalten",
+    "unmute": "Nicht stummschalten",
     "unmuted": "Gruppe nicht mehr stummgeschaltet",
     "update": "Änderung speichern",
     "updatedGroup": "Die Gruppendaten wurden geändert!"

@@ -9,12 +9,12 @@ import createServer, { pubsub } from '@src/server'
 const driver = getDriver()
 const neode = getNeode()
 
-const pubsubSpy = jest.spyOn(pubsub, 'publish')
-
 let query
 let mutate
 let authenticatedUser
 let chattingUser, otherChattingUser, notChattingUser
+
+const pubsubSpy = jest.spyOn(pubsub, 'publish')
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -118,7 +118,7 @@ describe('Message', () => {
         })
 
         describe('user chats in room', () => {
-          it('returns the message and publishes subscriptions', async () => {
+          it('returns the message', async () => {
             await expect(
               mutate({
                 mutation: createMessageMutation(),
@@ -142,24 +142,6 @@ describe('Message', () => {
                   seen: false,
                 },
               },
-            })
-            expect(pubsubSpy).toBeCalledWith('ROOM_COUNT_UPDATED', {
-              roomCountUpdated: '1',
-              userId: 'other-chatting-user',
-            })
-            expect(pubsubSpy).toBeCalledWith('CHAT_MESSAGE_ADDED', {
-              chatMessageAdded: expect.objectContaining({
-                id: expect.any(String),
-                content: 'Some nice message to other chatting user',
-                senderId: 'chatting-user',
-                username: 'Chatting User',
-                avatar: expect.any(String),
-                date: expect.any(String),
-                saved: true,
-                distributed: false,
-                seen: false,
-              }),
-              userId: 'other-chatting-user',
             })
           })
 

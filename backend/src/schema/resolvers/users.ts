@@ -66,12 +66,12 @@ export default {
             const result = txc.run(
               `
             MATCH (user:User)-[:PRIMARY_EMAIL]->(e:EmailAddress {email: $args.email})
-            RETURN user`,
+            RETURN user {.*, email: e.email}`,
               { args },
             )
             return result
           })
-          return readTxResult.records.map((r) => r.get('user').properties)
+          return readTxResult.records.map((r) => r.get('user'))
         } finally {
           session.close()
         }
@@ -113,32 +113,53 @@ export default {
     blockUser: async (object, args, context, resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
-      await neode.cypher(
-        `
-      MATCH(u:User {id: $currentUser.id})-[r:FOLLOWS]->(b:User {id: $args.id})
-      DELETE r
-      `,
-        { currentUser, args },
-      )
-      const [user, blockedUser] = await Promise.all([
-        neode.find('User', currentUser.id),
-        neode.find('User', args.id),
-      ])
-      await user.relateTo(blockedUser, 'blocked')
-      return blockedUser.toJson()
+
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const unBlockUserTransactionResponse = await transaction.run(
+          `
+            MATCH (blockedUser:User {id: $args.id})
+            MATCH (currentUser:User {id: $currentUser.id})
+            OPTIONAL MATCH (currentUser)-[r:FOLLOWS]->(blockedUser)
+            DELETE r
+            CREATE (currentUser)-[:BLOCKED]->(blockedUser)
+            RETURN blockedUser {.*}
+          `,
+          { currentUser, args },
+        )
+        return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new UserInputError(error.message)
+      } finally {
+        session.close()
+      }
     },
     unblockUser: async (object, args, context, resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
-      await neode.cypher(
-        `
-      MATCH(u:User {id: $currentUser.id})-[r:BLOCKED]->(b:User {id: $args.id})
-      DELETE r
-      `,
-        { currentUser, args },
-      )
-      const blockedUser = await neode.find('User', args.id)
-      return blockedUser.toJson()
+
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const unBlockUserTransactionResponse = await transaction.run(
+          `
+            MATCH(u:User {id: $currentUser.id})-[r:BLOCKED]->(blockedUser:User {id: $args.id})
+            DELETE r
+            RETURN blockedUser {.*}
+          `,
+          { currentUser, args },
+        )
+        return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new UserInputError(error.message)
+      } finally {
+        session.close()
+      }
     },
     UpdateUser: async (_parent, params, context, _resolveInfo) => {
       const { avatar: avatarInput } = params
@@ -270,14 +291,14 @@ export default {
         const switchUserRoleResponse = await transaction.run(
           `
             MATCH (user:User {id: $id})
+            OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(e:EmailAddress)
             SET user.role = $role
             SET user.updatedAt = toString(datetime())
-            RETURN user {.*}
+            RETURN user {.*, email: e.email}
           `,
           { id, role },
         )
-        const [user] = switchUserRoleResponse.records.map((record) => record.get('user'))
-        return user
+        return switchUserRoleResponse.records.map((record) => record.get('user'))[0]
       })
       try {
         const user = await writeTxResultPromise
@@ -362,14 +383,6 @@ export default {
     },
   },
   User: {
-    email: async (parent, params, context, resolveInfo) => {
-      if (typeof parent.email !== 'undefined') return parent.email
-      const { id } = parent
-      const statement = `MATCH(u:User {id: $id})-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e`
-      const result = await neode.cypher(statement, { id })
-      const [{ email }] = result.records.map((r) => r.get('e').properties)
-      return email
-    },
     emailNotificationSettings: async (parent, params, context, resolveInfo) => {
       return [
         {
