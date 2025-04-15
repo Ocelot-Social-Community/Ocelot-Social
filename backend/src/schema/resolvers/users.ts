@@ -558,6 +558,32 @@ export default {
         session.close()
       }
     },
+    badgesUnusedCount: async (_parent, _params, context, _resolveInfo) => {
+      const {
+        user: { id: userId },
+      } = context
+
+      const session = context.driver.session()
+
+      const query = session.writeTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge)
+            WHERE NOT (user)-[:PROFILEBADGE]-(badge)
+            RETURN toString(COUNT(badge)) as count
+          `,
+          { userId },
+        )
+        return result.records.map((record) => record.get('count'))[0]
+      })
+      try {
+        return await query
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
     ...Resolver('User', {
       undefinedToNull: [
         'actorId',

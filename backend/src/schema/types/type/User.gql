@@ -130,7 +130,7 @@ type User {
   badgesCount: Int! @cypher(statement: "MATCH (this)<-[:REWARDED]-(r:Badge) RETURN COUNT(r)")
   profileBadges: [Badge]! @neo4j_ignore
   badgesUnused: [Badge]! @neo4j_ignore
-  profileBadgesCount: Int! @neo4j_ignore
+  badgesUnusedCount: Int! @neo4j_ignore
 
   emotions: [EMOTED]
 
