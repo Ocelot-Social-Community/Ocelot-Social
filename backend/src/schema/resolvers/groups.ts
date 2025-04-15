@@ -440,7 +440,7 @@ export default {
       },
       boolean: {
         isMutedByMe:
-          'MATCH (this)<-[:MUTED]-(related:User {id: $cypherParams.currentUserId}) RETURN COUNT(related) >= 1',
+          'MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )',
       },
     }),
   },
