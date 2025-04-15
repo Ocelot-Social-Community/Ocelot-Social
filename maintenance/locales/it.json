@@ -1,0 +1,1143 @@
+{
+  "actions": {
+    "cancel": null,
+    "create": "Crea",
+    "delete": "Cancella",
+    "edit": "Modifica",
+    "loading": "Caricamento in corso",
+    "loadMore": "Carica di più",
+    "save": "Salva",
+    "saveCategories": null
+  },
+  "admin": {
+    "categories": {
+      "categoryName": "Nome",
+      "name": "Categorie",
+      "postCount": "Messaggi"
+    },
+    "dashboard": {
+      "comments": "Commenti",
+      "follows": "Segue",
+      "invites": "Inviti",
+      "name": "Cruscotto",
+      "notifications": "Notifiche",
+      "organizations": "Organizzazioni",
+      "posts": "Messaggi",
+      "projects": "Progetti",
+      "shouts": "Gridi",
+      "users": "Utenti"
+    },
+    "donations": {
+      "goal": "Donazioni mensili necessarie",
+      "name": "Info donazioni",
+      "progress": "Donazioni raccolte finora",
+      "showDonationsCheckboxLabel": null,
+      "successfulUpdate": "Informazioni sulle donazioni aggiornate con successo!"
+    },
+    "hashtags": {
+      "name": null,
+      "nameOfHashtag": null,
+      "number": null,
+      "tagCount": null,
+      "tagCountUnique": null
+    },
+    "invites": {
+      "description": null,
+      "name": null,
+      "title": null
+    },
+    "name": "Admin",
+    "notifications": {
+      "name": "Notifiche"
+    },
+    "organizations": {
+      "name": "Organizzazioni"
+    },
+    "pages": {
+      "name": "Pagine"
+    },
+    "settings": {
+      "name": "Impostazioni"
+    },
+    "users": {
+      "empty": null,
+      "form": {
+        "placeholder": null
+      },
+      "name": "Utenti",
+      "roleChanged": null,
+      "table": {
+        "columns": {
+          "createdAt": null,
+          "email": null,
+          "name": null,
+          "number": null,
+          "role": null,
+          "slug": null
+        }
+      }
+    }
+  },
+  "chat": {
+    "addRoomHeadline": null,
+    "cancelSelectMessage": null,
+    "conversationStarted": null,
+    "isOnline": null,
+    "isTyping": null,
+    "lastSeen": null,
+    "messageDeleted": null,
+    "messagesEmpty": null,
+    "newMessages": null,
+    "page": {
+      "headline": null
+    },
+    "roomEmpty": null,
+    "roomsEmpty": null,
+    "search": null,
+    "typeMessage": null,
+    "userProfileButton": {
+      "label": null,
+      "tooltip": null
+    }
+  },
+  "client-only": {
+    "loading": null
+  },
+  "code-of-conduct": {
+    "subheader": null
+  },
+  "comment": {
+    "content": {
+      "unavailable-placeholder": null
+    },
+    "edited": null,
+    "menu": {
+      "delete": null,
+      "edit": null
+    },
+    "show": {
+      "less": null,
+      "more": null
+    }
+  },
+  "common": {
+    "category": "Categoria ::: Categorie",
+    "comment": "Commento ::: Commenti",
+    "letsTalk": "Discutiamo",
+    "loading": "Caricamento in corso",
+    "loadMore": "Caricare di più",
+    "name": "Nome",
+    "organization": "Organizzazione ::: Organizzazioni",
+    "post": "Messaggio ::: Messaggi",
+    "project": "Progetto ::: Progetti",
+    "reportContent": null,
+    "shout": "Grido ::: Gridi",
+    "tag": "Tag ::: Tag",
+    "takeAction": "Agire",
+    "user": "Utente ::: Utenti",
+    "validations": {
+      "categories": null,
+      "email": null,
+      "eventLocationNameLength": null,
+      "eventLocationNameNotEmpty": null,
+      "eventVenueLength": null,
+      "eventVenueNotEmpty": null,
+      "url": null
+    },
+    "versus": "Verso"
+  },
+  "components": {
+    "dateTimeRange": {
+      "hourMinute": null,
+      "monthDay": null,
+      "yearMonthDay": null
+    },
+    "password-reset": {
+      "change-password": {
+        "error": "Modifica della password non riuscita. Forse il codice di sicurezza non era corretto?",
+        "help": null,
+        "success": null
+      },
+      "request": {
+        "form": {
+          "description": null,
+          "submit": null,
+          "submitted": null
+        },
+        "title": null
+      }
+    },
+    "registration": {
+      "create-user-account": {
+        "buttonTitle": null,
+        "error": null,
+        "help": null,
+        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "success": null,
+        "termsAndCondsEtcConfirmed": null,
+        "title": null
+      },
+      "email": {
+        "buttonTitle": {
+          "resend": null,
+          "send": null,
+          "skipResend": null
+        },
+        "form": {
+          "sendEmailAgain": null,
+          "success": null
+        },
+        "title": null
+      },
+      "email-display": {
+        "warningFormat": null,
+        "warningUndef": null,
+        "yourEmail": null
+      },
+      "email-nonce": {
+        "buttonTitle": null,
+        "form": {
+          "click-next": null,
+          "description": null,
+          "next": null,
+          "nonce": null,
+          "validations": {
+            "error": null,
+            "length": null,
+            "success": null
+          }
+        },
+        "title": null
+      },
+      "invite-code": {
+        "buttonTitle": null,
+        "form": {
+          "description": null,
+          "invite-code": null,
+          "next": null,
+          "validations": {
+            "error": null,
+            "length": null,
+            "success": null
+          }
+        }
+      },
+      "no-public-registrstion": {
+        "title": null
+      },
+      "signup": {
+        "form": {
+          "data-privacy": null,
+          "description": null,
+          "errors": {
+            "email-exists": null
+          },
+          "submit": null,
+          "success": null,
+          "terms-and-condition": null
+        },
+        "title": null,
+        "unavailable": null
+      }
+    }
+  },
+  "contribution": {
+    "amount-clicks": null,
+    "amount-comments": null,
+    "amount-shouts": null,
+    "amount-views": null,
+    "categories": {
+      "infoSelectedNoOfMaxCategories": null
+    },
+    "category": {
+      "description": {
+        "body-and-excercise": null,
+        "children": null,
+        "culture": null,
+        "economy": null,
+        "energy": null,
+        "finance": null,
+        "health": null,
+        "home": null,
+        "it-and-media": null,
+        "law": null,
+        "miscellaneous": null,
+        "mobility": null,
+        "nature": null,
+        "networking": null,
+        "peace": null,
+        "politics": null,
+        "psyche": null,
+        "science": null,
+        "spirituality": null
+      },
+      "name": {
+        "body-and-excercise": null,
+        "children": null,
+        "culture": null,
+        "economy": null,
+        "energy": null,
+        "finance": null,
+        "health": null,
+        "home": null,
+        "it-and-media": null,
+        "law": null,
+        "miscellaneous": null,
+        "mobility": null,
+        "nature": null,
+        "networking": null,
+        "peace": null,
+        "politics": null,
+        "psyche": null,
+        "science": null,
+        "spirituality": null
+      }
+    },
+    "emotions-label": {
+      "angry": null,
+      "cry": null,
+      "funny": null,
+      "happy": null,
+      "surprised": null
+    },
+    "filterFollow": null,
+    "filterMasonryGrid": {
+      "myFriends": null,
+      "myGroups": null,
+      "myTopics": null,
+      "noFilter": null,
+      "onlyArticles": null,
+      "onlyEvents": null
+    },
+    "filterMyGroups": null,
+    "inappropriatePicture": null,
+    "languageSelectLabel": null,
+    "languageSelectText": null,
+    "newEvent": null,
+    "newPost": null,
+    "success": null,
+    "teaserImage": {
+      "cropImage": null,
+      "cropperConfirm": "Confermare",
+      "errors": {
+        "aspect-ratio-too-small": null,
+        "unSupported-file-format": null
+      },
+      "supportedFormats": "Inserisci un'immagine in formato file JPG, PNG o GIF!"
+    },
+    "title": null,
+    "visibleOnlyForMembersOfGroup": null
+  },
+  "delete": {
+    "cancel": null,
+    "comment": {
+      "message": null,
+      "success": null,
+      "title": null,
+      "type": null
+    },
+    "contribution": {
+      "message": null,
+      "success": null,
+      "title": null,
+      "type": null
+    },
+    "submit": null
+  },
+  "disable": {
+    "cancel": null,
+    "comment": {
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "contribution": {
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "submit": null,
+    "success": null,
+    "user": {
+      "message": null,
+      "title": null,
+      "type": null
+    }
+  },
+  "donations": {
+    "amount-of-total": "{amount} of {total} € collezionato",
+    "donate-now": "Dona ora"
+  },
+  "editor": {
+    "embed": {
+      "always_allow": null,
+      "data_privacy_info": "I tuoi dati non sono ancora stati condivisi con fornitori terzi. Se continui a guardare questo video, il seguente fornitore probabilmente raccoglierà i dati dell'utente:",
+      "data_privacy_warning": null,
+      "play_now": null
+    },
+    "hashtag": {
+      "addHashtag": null,
+      "addLetter": null,
+      "noHashtagsFound": null
+    },
+    "legend": {
+      "bold": null,
+      "heading3": null,
+      "heading4": null,
+      "italic": null,
+      "legendTitle": null,
+      "link": null,
+      "orderedList": null,
+      "paragraph": null,
+      "quote": null,
+      "ruler": null,
+      "underline": null,
+      "unorderedList": null
+    },
+    "mention": {
+      "noUsersFound": null
+    },
+    "placeholder": null
+  },
+  "error-pages": {
+    "403-default": null,
+    "404-default": null,
+    "500-default": null,
+    "503-default": null,
+    "back-to-index": null,
+    "cannot-edit-post": null,
+    "default": null,
+    "group-not-found": null,
+    "post-not-found": null,
+    "profile-not-found": null
+  },
+  "filter-menu": {
+    "all": null,
+    "article": null,
+    "categories": null,
+    "creationDate": null,
+    "deleteFilter": null,
+    "emotions": null,
+    "ended": {
+      "all": {
+        "hint": null,
+        "label": null
+      },
+      "onlyEnded": {
+        "hint": null,
+        "label": null
+      }
+    },
+    "event": null,
+    "eventsBy": null,
+    "eventsEnded": null,
+    "filter-by": null,
+    "following": null,
+    "following-title": null,
+    "languages": null,
+    "my-groups": null,
+    "order": {
+      "last": {
+        "hint": null,
+        "label": null
+      },
+      "newest": {
+        "hint": null,
+        "label": null
+      },
+      "next": {
+        "hint": null,
+        "label": null
+      },
+      "oldest": {
+        "hint": null,
+        "label": null
+      }
+    },
+    "order-by": null,
+    "post-type": null,
+    "save": {
+      "error": null,
+      "success": null
+    },
+    "startDate": null
+  },
+  "followButton": {
+    "follow": null,
+    "following": null
+  },
+  "group": {
+    "actionRadii": {
+      "continental": null,
+      "global": null,
+      "interplanetary": null,
+      "national": null,
+      "regional": null
+    },
+    "actionRadius": null,
+    "addMemberToGroup": null,
+    "addMemberToGroupSuccess": null,
+    "addUser": null,
+    "addUserNoOptions": null,
+    "addUserPlaceholder": null,
+    "allGroups": null,
+    "categories": null,
+    "categoriesTitle": null,
+    "changeMemberRole": null,
+    "contentMenu": {
+      "muteGroup": null,
+      "unmuteGroup": null,
+      "visitGroupPage": null
+    },
+    "createNewGroup": {
+      "title": null,
+      "tooltip": null
+    },
+    "description": null,
+    "editGroupSettings": {
+      "groupName": null,
+      "title": null
+    },
+    "errors": {
+      "userAlreadyMember": null
+    },
+    "follow": null,
+    "foundation": null,
+    "general": null,
+    "goal": null,
+    "groupCreated": null,
+    "in": null,
+    "joinLeaveButton": {
+      "iAmMember": null,
+      "join": null,
+      "leave": null,
+      "pendingMember": null,
+      "tooltip": null
+    },
+    "labelSlug": null,
+    "leaveModal": {
+      "confirmButton": null,
+      "message": null,
+      "title": null
+    },
+    "memberRemoved": null,
+    "members": null,
+    "membersAdministrationList": {
+      "avatar": null,
+      "name": null,
+      "roleInGroup": null,
+      "slug": null
+    },
+    "membersCount": null,
+    "membersListTitle": null,
+    "membersListTitleNotAllowedSeeingGroupMembers": null,
+    "modal": {
+      "cancel": null,
+      "confirm": null,
+      "confirmAddGroupMemberText": null,
+      "confirmAddGroupMemberTitle": null
+    },
+    "muted": null,
+    "myGroups": null,
+    "name": null,
+    "radius": null,
+    "removeMember": null,
+    "removeMemberButton": null,
+    "role": null,
+    "roles": {
+      "admin": null,
+      "owner": null,
+      "pending": null,
+      "usual": null
+    },
+    "save": null,
+    "type": null,
+    "types": {
+      "closed": null,
+      "hidden": null,
+      "public": null
+    },
+    "typesOptions": {
+      "closed": null,
+      "hidden": null,
+      "public": null
+    },
+    "unmute": null,
+    "unmuted": null,
+    "update": null,
+    "updatedGroup": null
+  },
+  "hashtags-filter": {
+    "clearSearch": null,
+    "hashtag-search": null,
+    "title": null
+  },
+  "header": {
+    "avatarMenu": {
+      "button": {
+        "tooltip": null
+      },
+      "chats": "Chat",
+      "groups": "Gruppi",
+      "map": null,
+      "myProfile": null,
+      "notifications": "Notifiche"
+    },
+    "chats": {
+      "tooltip": "Chat"
+    },
+    "groups": {
+      "tooltip": "Gruppi"
+    },
+    "map": {
+      "tooltip": null
+    },
+    "notifications": {
+      "tooltip": "Notifiche"
+    }
+  },
+  "index": {
+    "change-filter-settings": null,
+    "no-results": null
+  },
+  "invite-codes": {
+    "button": {
+      "tooltip": null
+    },
+    "copy-code": null,
+    "copy-success": null,
+    "not-available": null,
+    "your-code": null
+  },
+  "localeSwitch": {
+    "tooltip": null
+  },
+  "login": {
+    "email": "La tua email",
+    "failure": null,
+    "forgotPassword": null,
+    "hello": "Ciao",
+    "login": "Accesso",
+    "logout": "Logout",
+    "moreInfo": "Che cosa è {APPLICATION_NAME}?",
+    "moreInfoHint": null,
+    "no-account": null,
+    "no-cookie": null,
+    "password": "La tua password",
+    "register": null,
+    "success": null
+  },
+  "maintenance": {
+    "explanation": null,
+    "questions": null,
+    "title": null
+  },
+  "map": {
+    "alertMessage": null,
+    "legend": {
+      "event": null,
+      "group": null,
+      "theUser": null,
+      "user": null
+    },
+    "markerTypes": {
+      "event": null,
+      "group": null,
+      "theUser": null,
+      "user": null
+    },
+    "pageTitle": null,
+    "styles": {
+      "dark": null,
+      "outdoors": null,
+      "satellite": null,
+      "streets": null
+    }
+  },
+  "modals": {
+    "deleteUser": {
+      "created": null
+    }
+  },
+  "moderation": {
+    "name": null,
+    "reports": {
+      "author": null,
+      "content": null,
+      "decideButton": null,
+      "decided": null,
+      "decideModal": {
+        "cancel": null,
+        "Comment": {
+          "disable": {
+            "message": null,
+            "title": null
+          },
+          "enable": {
+            "message": null,
+            "title": null
+          }
+        },
+        "Post": {
+          "disable": {
+            "message": null,
+            "title": null
+          },
+          "enable": {
+            "message": null,
+            "title": null
+          }
+        },
+        "submit": null,
+        "User": {
+          "disable": {
+            "message": null,
+            "title": null
+          },
+          "enable": {
+            "message": null,
+            "title": null
+          }
+        }
+      },
+      "decision": null,
+      "DecisionSuccess": null,
+      "disabled": null,
+      "disabledAt": null,
+      "disabledBy": null,
+      "empty": null,
+      "enabled": null,
+      "enabledAt": null,
+      "enabledBy": null,
+      "filterLabel": {
+        "all": null,
+        "closed": null,
+        "reviewed": null,
+        "unreviewed": null
+      },
+      "moreDetails": null,
+      "name": null,
+      "noDecision": null,
+      "numberOfUsers": null,
+      "previousDecision": null,
+      "reasonCategory": null,
+      "reasonDescription": null,
+      "reportedOn": null,
+      "status": null,
+      "submitter": null
+    }
+  },
+  "notifications": {
+    "comment": null,
+    "content": null,
+    "empty": null,
+    "filterLabel": {
+      "all": null,
+      "read": null,
+      "unread": null
+    },
+    "group": null,
+    "markAllAsRead": "Segna tutti come letti",
+    "pageLink": "Tutte le notifiche",
+    "post": null,
+    "reason": {
+      "changed_group_member_role": null,
+      "commented_on_post": null,
+      "followed_user_posted": null,
+      "mentioned_in_comment": null,
+      "mentioned_in_post": null,
+      "post_in_group": null,
+      "removed_user_from_group": null,
+      "user_joined_group": null,
+      "user_left_group": null
+    },
+    "title": null,
+    "user": null
+  },
+  "observeButton": {
+    "observed": null
+  },
+  "post": {
+    "comment": {
+      "reply": null,
+      "submit": null,
+      "submitted": null,
+      "updated": null
+    },
+    "createNewEvent": {
+      "forGroup": {
+        "title": null
+      },
+      "title": null
+    },
+    "createNewPost": {
+      "forGroup": {
+        "title": null
+      },
+      "title": null
+    },
+    "edited": null,
+    "editPost": {
+      "event": null,
+      "forGroup": {
+        "title": null
+      },
+      "title": null
+    },
+    "event": null,
+    "menu": {
+      "delete": null,
+      "edit": null,
+      "observe": null,
+      "observedSuccessfully": null,
+      "pin": null,
+      "pinnedSuccessfully": null,
+      "unobserve": null,
+      "unobservedSuccessfully": null,
+      "unpin": null,
+      "unpinnedSuccessfully": null
+    },
+    "name": "Messaggio",
+    "pinned": null,
+    "takeAction": {
+      "name": "Agire"
+    },
+    "viewEvent": {
+      "eventEnd": null,
+      "eventIsOnline": null,
+      "eventLocationName": null,
+      "eventStart": null,
+      "eventVenue": null,
+      "title": null
+    },
+    "viewPost": {
+      "forGroup": {
+        "title": null
+      },
+      "title": null
+    }
+  },
+  "profile": {
+    "avatar": {
+      "submitted": null
+    },
+    "commented": "Commentato",
+    "follow": "Seguire",
+    "followers": "Seguenti",
+    "following": "Seguendo",
+    "invites": {
+      "description": null,
+      "emailPlaceholder": null,
+      "title": null
+    },
+    "memberSince": "Membro dal",
+    "network": {
+      "andMore": null,
+      "followedBy": null,
+      "followedByNobody": null,
+      "following": null,
+      "followingNobody": null,
+      "title": null
+    },
+    "shouted": "Gridato",
+    "socialMedia": null,
+    "userAnonym": "Anonymous"
+  },
+  "quotes": {
+    "african": {
+      "author": "Proverbio africano",
+      "quote": "Molte piccole persone in molti piccoli luoghi fanno molte piccole cose, che possono cambiare la faccia del mondo."
+    }
+  },
+  "release": {
+    "cancel": null,
+    "comment": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "contribution": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "submit": null,
+    "success": null,
+    "user": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    }
+  },
+  "report": {
+    "cancel": null,
+    "comment": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "contribution": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    },
+    "reason": {
+      "category": {
+        "invalid": null,
+        "label": null,
+        "options": {
+          "advert_products_services_commercial": null,
+          "criminal_behavior_violation_german_law": null,
+          "discrimination_etc": null,
+          "doxing": null,
+          "glorific_trivia_of_cruel_inhuman_acts": null,
+          "intentional_intimidation_stalking_persecution": null,
+          "other": null,
+          "pornographic_content_links": null
+        },
+        "placeholder": null
+      },
+      "description": {
+        "label": null,
+        "placeholder": null
+      }
+    },
+    "submit": null,
+    "success": null,
+    "user": {
+      "error": null,
+      "message": null,
+      "title": null,
+      "type": null
+    }
+  },
+  "search": {
+    "failed": "Non è stato trovato nulla",
+    "for": null,
+    "heading": {
+      "Group": null,
+      "Post": null,
+      "Tag": null,
+      "User": null
+    },
+    "hint": "Cosa state cercando? Usate !... per i post, @... per gli utenti, #... per gli hashtag.",
+    "no-results": null,
+    "page": null,
+    "placeholder": "Ricerca",
+    "results": null,
+    "title": null
+  },
+  "settings": {
+    "blocked-users": {
+      "block": null,
+      "columns": {
+        "name": null,
+        "slug": null,
+        "unblock": null
+      },
+      "empty": null,
+      "explanation": {
+        "closing": null,
+        "commenting-disabled": null,
+        "commenting-explanation": null,
+        "intro": null,
+        "notifications": null,
+        "their-perspective": null,
+        "your-perspective": null
+      },
+      "how-to": null,
+      "name": null,
+      "unblock": null,
+      "unblocked": null
+    },
+    "data": {
+      "labelBio": "Su di te",
+      "labelCity": "La tua città o regione",
+      "labelCityHint": null,
+      "labelName": "Nome",
+      "labelSlug": null,
+      "name": "I tuoi dati",
+      "namePlaceholder": "Anonymous",
+      "success": null
+    },
+    "deleteUserAccount": {
+      "accountDescription": "Essere consapevoli che i tuoi post e commenti sono importanti per la nostra comunità. Se cancelli il tuo account utente, tutto scomparirà per sempre - e sarebbe un vero peccato!",
+      "accountWarning": "Attenzione! Tu NON PUOI GESTIRE e NON PUOI RECUPERARE il tuo account, i tuoi messaggi o commenti dopo aver cancellato il tuo account!",
+      "accountWarningAdmin": null,
+      "accountWarningIsAdmin": null,
+      "commentedCount": "Cancella i miei {count} commenti",
+      "confirmDeleting": null,
+      "contributionsCount": "Cancellare i miei {count} messaggi",
+      "infoAdmin": null,
+      "name": "Cancellare l'account utente",
+      "pleaseConfirm": "Azione distruttiva! Digita “{confirm}” per confermare.",
+      "success": "Account eliminato con successo!"
+    },
+    "download": {
+      "description": null,
+      "json": null,
+      "name": "Scaricamento dati"
+    },
+    "email": {
+      "change-successful": null,
+      "labelEmail": null,
+      "labelNewEmail": null,
+      "labelNonce": null,
+      "name": null,
+      "submitted": null,
+      "success": null,
+      "validation": {
+        "same-email": null
+      },
+      "verification-error": {
+        "explanation": null,
+        "message": null,
+        "reason": {
+          "invalid-nonce": null,
+          "no-email-request": null
+        },
+        "support": null
+      }
+    },
+    "embeds": {
+      "info-description": "Ecco l'elenco dei fornitori di terze parti i cui contenuti possono essere visualizzati come codice di terze parti, ad esempio sotto forma di video incorporati.",
+      "name": null,
+      "status": {
+        "change": {
+          "allow": null,
+          "deny": null,
+          "question": null
+        },
+        "description": null,
+        "disabled": {
+          "off": null,
+          "on": null
+        }
+      }
+    },
+    "invites": {
+      "name": "Inviti"
+    },
+    "languages": {
+      "name": "Lingue"
+    },
+    "muted-users": {
+      "columns": {
+        "name": null,
+        "slug": null,
+        "unmute": null
+      },
+      "empty": null,
+      "explanation": {
+        "intro": null,
+        "search": null,
+        "your-perspective": null
+      },
+      "how-to": null,
+      "mute": null,
+      "name": null,
+      "unmute": null,
+      "unmuted": null
+    },
+    "name": "Impostazioni",
+    "notifications": {
+      "chat": "Chat",
+      "chatMessage": "Messaggio ricevuto durante l'assenza",
+      "checkAll": "Seleziona tutto",
+      "commentOnObservedPost": "Commenta un contributo che sto guardando",
+      "followingUsers": null,
+      "group": "Gruppi",
+      "groupMemberJoined": "Un nuovo membro si è unito a un mio gruppo",
+      "groupMemberLeft": "Un membro ha lasciato un mio gruppo",
+      "groupMemberRemoved": "Sono stato rimosso da un gruppo",
+      "groupMemberRoleChanged": "Il mio ruolo in un gruppo è cambiato",
+      "mention": "Menzionato in un contributo",
+      "name": "Notifiche via e-mail",
+      "post": "Messaggi e commenti",
+      "postByFollowedUser": "Messaggi di utenti che seguo",
+      "postInGroup": "Post in un gruppo di cui sono membro",
+      "send-email-notifications": "Invia notifiche via e-mail",
+      "success-update": "Impostazioni di notifica salvate! ",
+      "uncheckAll": "Deseleziona tutto"
+    },
+    "organizations": {
+      "name": "Mie organizzazioni"
+    },
+    "privacy": {
+      "make-shouts-public": null,
+      "name": null,
+      "success-update": null
+    },
+    "security": {
+      "change-password": {
+        "button": null,
+        "label-new-password": null,
+        "label-new-password-confirm": null,
+        "label-old-password": null,
+        "message-new-password-confirm-required": null,
+        "message-new-password-missmatch": null,
+        "message-new-password-required": null,
+        "message-old-password-required": null,
+        "passwordSecurity": null,
+        "passwordStrength0": null,
+        "passwordStrength1": null,
+        "passwordStrength2": null,
+        "passwordStrength3": null,
+        "passwordStrength4": null,
+        "success": null
+      },
+      "name": "Sicurezza"
+    },
+    "social-media": {
+      "add-new-link": null,
+      "delete-modal": {
+        "confirm-button": null,
+        "message": null,
+        "title": null
+      },
+      "edit-link": null,
+      "name": null,
+      "placeholder": null,
+      "requireUnique": null,
+      "submit": null,
+      "successAdd": "Social media aggiunti. \nProfilo utente aggiornato ",
+      "successDelete": "Social media cancellati. Profilo utente aggiornato!"
+    },
+    "validation": {
+      "slug": {
+        "alreadyTaken": null,
+        "regex": null
+      }
+    }
+  },
+  "shoutButton": {
+    "shouted": null
+  },
+  "site": {
+    "back-to-login": null,
+    "bank": "conto bancario",
+    "code-of-conduct": null,
+    "contact": "Contatto",
+    "data-privacy": "protezione dei dati",
+    "donate": null,
+    "error-occurred": null,
+    "faq": null,
+    "germany": "Germania",
+    "imprint": "Impressum",
+    "made": "Con ❤️ fatto",
+    "register": "numero di registro",
+    "support": null,
+    "termsAndConditions": null,
+    "thanks": null
+  },
+  "termsAndConditions": {
+    "newTermsAndConditions": "Nuovi Termini e Condizioni",
+    "termsAndConditionsNewConfirm": "Ho letto e accetto le nuove condizioni generali di contratto.",
+    "termsAndConditionsNewConfirmText": "Si prega di leggere le nuove condizioni d'uso ora!"
+  }
+}
