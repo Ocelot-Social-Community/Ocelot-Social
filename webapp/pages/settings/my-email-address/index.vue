@@ -31,8 +31,10 @@ import { mapGetters } from 'vuex'
 import { AddEmailAddressMutation } from '~/graphql/EmailAddress.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import normalizeEmail from '~/components/utils/NormalizeEmail'
+import scrollToContent from '../scroll-to-content.js'
 
 export default {
+  mixins: [scrollToContent],
   components: {
     SweetalertIcon,
   },
