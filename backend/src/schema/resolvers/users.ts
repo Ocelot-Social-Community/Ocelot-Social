@@ -381,6 +381,71 @@ export default {
 
       return true
     },
+    setProfileBadge: async (_object, args, context, _resolveInfo) => {
+      const { slot, badgeId } = args
+      const {
+        user: { id: userId },
+      } = context
+
+      if (slot >= 9 || slot < 0) {
+        throw new Error('There is only 9 badge slots to fill')
+      }
+
+      const session = context.driver.session()
+
+      const query = session.writeTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge {id: $badgeId})
+            OPTIONAL MATCH (user)-[badgeRelation:PROFILEBADGE]->(badge)
+            OPTIONAL MATCH (user)-[slotRelation:PROFILEBADGE{slot: $slot}]->(:Badge)
+            DELETE badgeRelation, slotRelation
+            MERGE (user)-[:PROFILEBADGE{slot: toInteger($slot)}]->(badge)
+            RETURN user {.*}
+          `,
+          { userId, badgeId, slot },
+        )
+        return result.records.map((record) => record.get('user'))[0]
+      })
+      try {
+        const user = await query
+        if (!user) {
+          throw new Error('You cat set badges must be rewarded to you.')
+        }
+        return user
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    resetProfileBadges: async (_object, _args, context, _resolveInfo) => {
+      const {
+        user: { id: userId },
+      } = context
+
+      const session = context.driver.session()
+
+      const query = session.writeTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $userId})
+            OPTIONAL MATCH (user)-[relation:PROFILEBADGE]->(:Badge)
+            DELETE relation
+            RETURN user {.*}
+          `,
+          { userId },
+        )
+        return result.records.map((record) => record.get('user'))[0]
+      })
+      try {
+        return await query
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
   },
   User: {
     emailNotificationSettings: async (parent, params, context, resolveInfo) => {
@@ -437,6 +502,61 @@ export default {
           ],
         },
       ]
+    },
+    profileBadges: async (parent, _params, context, _resolveInfo) => {
+      const session = context.driver.session()
+
+      const query = session.readTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $parent.id})-[relation:PROFILEBADGE]->(badge:Badge)
+            WITH relation, badge
+            ORDER BY relation.slot ASC
+            RETURN relation.slot as slot, badge {.*}
+          `,
+          { parent },
+        )
+        return result.records
+      })
+      try {
+        const profileBadges = await query
+        const result = Array(9).fill(null)
+        profileBadges.map((record) => {
+          result[record.get('slot')] = record.get('badge')
+          return true
+        })
+        return result
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    badgesUnused: async (_parent, _params, context, _resolveInfo) => {
+      const {
+        user: { id: userId },
+      } = context
+
+      const session = context.driver.session()
+
+      const query = session.writeTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge)
+            WHERE NOT (user)-[:PROFILEBADGE]-(badge)
+            RETURN badge {.*}
+          `,
+          { userId },
+        )
+        return result.records.map((record) => record.get('badge'))
+      })
+      try {
+        return await query
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
     },
     ...Resolver('User', {
       undefinedToNull: [

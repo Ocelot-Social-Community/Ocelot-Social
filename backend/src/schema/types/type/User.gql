@@ -128,6 +128,9 @@ type User {
   verified: Badge @relation(name: "VERIFIED", direction: "IN")
   badges: [Badge]! @relation(name: "REWARDED", direction: "IN")
   badgesCount: Int! @cypher(statement: "MATCH (this)<-[:REWARDED]-(r:Badge) RETURN COUNT(r)")
+  profileBadges: [Badge]! @neo4j_ignore
+  badgesUnused: [Badge]! @neo4j_ignore
+  profileBadgesCount: Int! @neo4j_ignore
 
   emotions: [EMOTED]
 
@@ -248,4 +251,7 @@ type Mutation {
 
   # Get a JWT Token for the given Email and password
   login(email: String!, password: String!): String!
+
+  setProfileBadge(slot: Int!, badgeId: ID!): User
+  resetProfileBadges: User
 }

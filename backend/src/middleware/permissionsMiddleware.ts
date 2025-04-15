@@ -468,6 +468,8 @@ export default shield(
       toggleObservePost: isAuthenticated,
       muteGroup: and(isAuthenticated, isMemberOfGroup),
       unmuteGroup: and(isAuthenticated, isMemberOfGroup),
+      setProfileBadge: isAuthenticated,
+      resetProfileBadges: isAuthenticated,
     },
     User: {
       email: or(isMyOwn, isAdmin),
