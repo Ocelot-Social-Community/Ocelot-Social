@@ -18,6 +18,7 @@ import createServer from '@src/server'
 
 import Factory from './factories'
 import { getNeode, getDriver } from './neo4j'
+import { badges, verification } from './seed/badges'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
@@ -124,44 +125,28 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await Hamburg.relateTo(Germany, 'isIn')
     await Paris.relateTo(France, 'isIn')
 
-    // badges
-    const racoon = await Factory.build('badge', {
-      id: 'badge_racoon',
-      type: 'badge',
-      description: 'You earned a Racoon',
-      icon: '/img/badges/indiegogo_en_racoon.svg',
-    })
-    const rabbit = await Factory.build('badge', {
-      id: 'badge_rabbit',
-      type: 'badge',
-      description: 'You earned a Rabbit',
-      icon: '/img/badges/indiegogo_en_rabbit.svg',
-    })
-    const wolf = await Factory.build('badge', {
-      id: 'badge_wolf',
-      type: 'badge',
-      description: 'You earned a Wolf',
-      icon: '/img/badges/indiegogo_en_wolf.svg',
-    })
-    const bear = await Factory.build('badge', {
-      id: 'badge_bear',
-      type: 'badge',
-      description: 'You earned a Bear',
-      icon: '/img/badges/indiegogo_en_bear.svg',
-    })
-    const turtle = await Factory.build('badge', {
-      id: 'badge_turtle',
-      type: 'badge',
-      description: 'You earned a Turtle',
-      icon: '/img/badges/indiegogo_en_turtle.svg',
-    })
-    const rhino = await Factory.build('badge', {
-      id: 'badge_rhino',
-      type: 'badge',
-      description: 'You earned a Rhino',
-      icon: '/img/badges/indiegogo_en_rhino.svg',
-    })
+    const {
+      badgeAirship,
+      badgeBee,
+      badgeStarter,
+      badgeFlower,
+      badgePanda,
+      badgeTiger,
+      badgeAlienship,
+      badgeBalloon,
+      badgeMagicrainbow,
+      badgeSuperfounder,
+      badgeBigballoon,
+      badgeLifetree,
+      badgeRacoon,
+      badgeRhino,
+      badgeWolf,
+      badgeTurtle,
+      badgeBear,
+      badgeRabbit,
+    } = await badges()
 
+    const { verificationAdmin, verificationModerator, verificationDeveloper } = await verification()
     // users
     const peterLustig = await Factory.build(
       'user',
@@ -255,14 +240,36 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await jennyRostock.relateTo(Paris, 'isIn')
     await huey.relateTo(Paris, 'isIn')
 
-    await peterLustig.relateTo(racoon, 'rewarded')
-    await peterLustig.relateTo(rhino, 'rewarded')
-    await peterLustig.relateTo(wolf, 'rewarded')
-    await bobDerBaumeister.relateTo(racoon, 'rewarded')
-    await bobDerBaumeister.relateTo(turtle, 'rewarded')
-    await jennyRostock.relateTo(bear, 'rewarded')
-    await dagobert.relateTo(rabbit, 'rewarded')
+    // badges
+    await peterLustig.relateTo(badgeRacoon, 'rewarded')
+    await peterLustig.relateTo(badgeRhino, 'rewarded')
+    await peterLustig.relateTo(badgeWolf, 'rewarded')
+    await peterLustig.relateTo(badgeAirship, 'rewarded')
+    await peterLustig.relateTo(verificationAdmin, 'verified')
 
+    await bobDerBaumeister.relateTo(badgeRacoon, 'rewarded')
+    await bobDerBaumeister.relateTo(badgeTurtle, 'rewarded')
+    await bobDerBaumeister.relateTo(badgeBee, 'rewarded')
+    await peterLustig.relateTo(verificationModerator, 'verified')
+
+    await jennyRostock.relateTo(badgeBear, 'rewarded')
+    await jennyRostock.relateTo(badgeStarter, 'rewarded')
+    await jennyRostock.relateTo(badgeFlower, 'rewarded')
+
+    await huey.relateTo(badgePanda, 'rewarded')
+    await huey.relateTo(badgeTiger, 'rewarded')
+    await huey.relateTo(badgeAlienship, 'rewarded')
+    await huey.relateTo(badgeBalloon, 'rewarded')
+    await huey.relateTo(badgeMagicrainbow, 'rewarded')
+    await huey.relateTo(badgeSuperfounder, 'rewarded')
+    await huey.relateTo(verificationDeveloper, 'verified')
+
+    await dewey.relateTo(badgeBigballoon, 'rewarded')
+    await dewey.relateTo(badgeLifetree, 'rewarded')
+
+    await louie.relateTo(badgeRabbit, 'rewarded')
+
+    // Friends
     await peterLustig.relateTo(bobDerBaumeister, 'friends')
     await peterLustig.relateTo(jennyRostock, 'friends')
     await bobDerBaumeister.relateTo(jennyRostock, 'friends')

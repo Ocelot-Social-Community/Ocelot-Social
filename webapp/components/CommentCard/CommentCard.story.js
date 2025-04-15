@@ -33,7 +33,7 @@ const comment = {
     badges: [
       {
         id: 'badge_bear',
-        icon: '/img/badges/indiegogo_en_bear.svg',
+        icon: '/img/badges/badge_blue_bear.svg',
         __typename: 'Badge',
       },
     ],

@@ -68,14 +68,14 @@ describe('Badges', () => {
       id: 'badge_rhino',
       type: 'badge',
       description: 'You earned a rhino',
-      icon: '/img/badges/indiegogo_en_rhino.svg',
+      icon: '/img/badges/badge_blue_rhino.svg',
     })
 
     verification = await Factory.build('badge', {
-      id: 'verification_turtle',
+      id: 'verification_moderator',
       type: 'verification',
-      description: 'You are a verified turtle',
-      icon: '/img/badges/indiegogo_en_turtle.svg',
+      description: 'You are a moderator',
+      icon: '/img/badges/verification_red_moderator.svg',
     })
   })
 
@@ -86,7 +86,7 @@ describe('Badges', () => {
 
   describe('verify', () => {
     const variables = {
-      badgeId: 'verification_turtle',
+      badgeId: 'verification_moderator',
       userId: 'regular-user-id',
     }
 
@@ -158,7 +158,7 @@ describe('Badges', () => {
           await expect(
             mutate({
               mutation: verifyMutation,
-              variables: { userId: 'non-existent-user-id', badgeId: 'verification_turtle' },
+              variables: { userId: 'non-existent-user-id', badgeId: 'verification_moderator' },
             }),
           ).resolves.toMatchObject({
             data: { verify: null },
@@ -196,7 +196,7 @@ describe('Badges', () => {
           data: {
             verify: {
               id: 'regular-user-id',
-              verified: { id: 'verification_turtle' },
+              verified: { id: 'verification_moderator' },
               badges: [],
             },
           },
@@ -209,16 +209,16 @@ describe('Badges', () => {
 
       it('overrides the existing verification if a second verification badge is rewarded to the same user', async () => {
         await Factory.build('badge', {
-          id: 'verification_racoon',
+          id: 'verification_admin',
           type: 'verification',
-          description: 'You are a verified racoon',
-          icon: '/img/badges/indiegogo_en_racoon.svg',
+          description: 'You are an admin',
+          icon: '/img/badges/verification_red_admin.svg',
         })
         const expected = {
           data: {
             verify: {
               id: 'regular-user-id',
-              verified: { id: 'verification_racoon' },
+              verified: { id: 'verification_admin' },
               badges: [],
             },
           },
@@ -228,7 +228,7 @@ describe('Badges', () => {
           mutation: verifyMutation,
           variables: {
             userId: 'regular-user-id',
-            badgeId: 'verification_turtle',
+            badgeId: 'verification_moderator',
           },
         })
         await expect(
@@ -236,7 +236,7 @@ describe('Badges', () => {
             mutation: verifyMutation,
             variables: {
               userId: 'regular-user-id',
-              badgeId: 'verification_racoon',
+              badgeId: 'verification_admin',
             },
           }),
         ).resolves.toMatchObject(expected)
@@ -247,7 +247,7 @@ describe('Badges', () => {
           data: {
             verify: {
               id: 'regular-user-2-id',
-              verified: { id: 'verification_turtle' },
+              verified: { id: 'verification_moderator' },
               badges: [],
             },
           },
@@ -271,7 +271,7 @@ describe('Badges', () => {
             mutation: verifyMutation,
             variables: {
               userId: 'regular-user-2-id',
-              badgeId: 'verification_turtle',
+              badgeId: 'verification_moderator',
             },
           }),
         ).resolves.toMatchObject(expected)
@@ -372,7 +372,7 @@ describe('Badges', () => {
           await expect(
             mutate({
               mutation: rewardMutation,
-              variables: { userId: 'regular-user-id', badgeId: 'verification_turtle' },
+              variables: { userId: 'regular-user-id', badgeId: 'verification_moderator' },
             }),
           ).resolves.toMatchObject({
             data: { reward: null },
@@ -407,7 +407,7 @@ describe('Badges', () => {
           id: 'badge_racoon',
           type: 'badge',
           description: 'You earned a racoon',
-          icon: '/img/badges/indiegogo_en_racoon.svg',
+          icon: '/img/badges/badge_blue_racoon.svg',
         })
         const badges = [{ id: 'badge_racoon' }, { id: 'badge_rhino' }]
         const expected = {
@@ -582,7 +582,7 @@ describe('Badges', () => {
           data: {
             unreward: {
               id: 'regular-user-id',
-              verified: { id: 'verification_turtle' },
+              verified: { id: 'verification_moderator' },
               badges: [],
             },
           },
@@ -596,7 +596,7 @@ describe('Badges', () => {
           data: {
             unreward: {
               id: 'regular-user-id',
-              verified: { id: 'verification_turtle' },
+              verified: { id: 'verification_moderator' },
               badges: [],
             },
           },
@@ -609,7 +609,7 @@ describe('Badges', () => {
           mutate({
             mutation: unrewardMutation,
             variables: {
-              badgeId: 'verification_turtle',
+              badgeId: 'verification_moderator',
               userId: 'regular-user-id',
             },
           }),
@@ -625,7 +625,7 @@ describe('Badges', () => {
         await mutate({
           mutation: unrewardMutation,
           variables: {
-            badgeId: 'verification_turtle',
+            badgeId: 'verification_moderator',
             userId: 'regular-user-id',
           },
         })
@@ -633,7 +633,7 @@ describe('Badges', () => {
           mutate({
             mutation: unrewardMutation,
             variables: {
-              badgeId: 'verification_turtle',
+              badgeId: 'verification_moderator',
               userId: 'regular-user-id',
             },
           }),
