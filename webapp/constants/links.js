@@ -10,9 +10,9 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
   // },
 
   internalPage: {
-    // footerIdent: 'site.made', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.made', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.made', // localized string identifier, on null it's hidden, if undefined default is used
+    footerIdent: 'reformer-network.footer.about-us', // localized string identifier, if undefined default is used
+    headTitleIdent: 'reformer-network.footer.about-us', // localized string identifier, if undefined default is used
+    headlineIdent: 'reformer-network.footer.about-us', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
@@ -142,7 +142,6 @@ export default {
     CODE_OF_CONDUCT,
     DATA_PRIVACY,
     TERMS_AND_CONDITIONS,
-    DONATE,
     FAQ,
     SUPPORT,
     IMPRINT,

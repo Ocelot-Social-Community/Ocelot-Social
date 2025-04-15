@@ -1142,6 +1142,7 @@
   },
   "reformer-network": {
     "footer": {
+      "about-us": "About us",
       "code-of-conduct": "Code of Conduct",
       "terms-and-conditions": "Terms and Conditions",
       "terms-and-conditions-short": "Terms and Conditions"
