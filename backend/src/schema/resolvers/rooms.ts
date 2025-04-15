@@ -1,13 +1,18 @@
-import { neo4jgraphql } from 'neo4j-graphql-js'
-import Resolver from './helpers/Resolver'
-import { pubsub, ROOM_COUNT_UPDATED } from '../../server'
 import { withFilter } from 'graphql-subscriptions'
+import { neo4jgraphql } from 'neo4j-graphql-js'
+
+// eslint-disable-next-line import/no-cycle
+import { pubsub, ROOM_COUNT_UPDATED } from '@src/server'
+
+import Resolver from './helpers/Resolver'
 
 export const getUnreadRoomsCount = async (userId, session) => {
   return session.readTransaction(async (transaction) => {
     const unreadRoomsCypher = `
-      MATCH (:User { id: $userId })-[:CHATS_IN]->(room:Room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
+      MATCH (user:User { id: $userId })-[:CHATS_IN]->(room:Room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
       WHERE NOT sender.id = $userId AND NOT message.seen
+      AND NOT (user)-[:BLOCKED]->(sender)
+      AND NOT (user)-[:MUTED]->(sender)
       RETURN toString(COUNT(DISTINCT room)) AS count
     `
     const unreadRoomsTxResponse = await transaction.run(unreadRoomsCypher, { userId })

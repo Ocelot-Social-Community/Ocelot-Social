@@ -1,1 +1,0 @@
-MATCH (u:User)-[e:EMOTED]->(c:Post) DETACH DELETE e;

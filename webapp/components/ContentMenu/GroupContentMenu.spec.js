@@ -1,5 +1,5 @@
-import { mount } from '@vue/test-utils'
 import GroupContentMenu from './GroupContentMenu.vue'
+import { render, screen, fireEvent } from '@testing-library/vue'
 
 const localVue = global.localVue
 
@@ -7,36 +7,77 @@ const stubs = {
   'router-link': {
     template: '<span><slot /></span>',
   },
+  'v-popover': true,
 }
 
-const propsData = {
-  usage: 'groupTeaser',
-  resource: {},
-  group: {},
-  resourceType: 'group',
-}
+// Mock Math.random, used in Dropdown
+Object.assign(Math, {
+  random: () => 0,
+})
 
 describe('GroupContentMenu', () => {
-  let wrapper
   let mocks
 
   beforeEach(() => {
     mocks = {
-      $t: jest.fn(),
+      $t: jest.fn((s) => s),
     }
   })
 
-  describe('mount', () => {
-    const Wrapper = () => {
-      return mount(GroupContentMenu, { propsData, mocks, localVue, stubs })
-    }
+  const Wrapper = (propsData) => {
+    return render(GroupContentMenu, { propsData, mocks, localVue, stubs })
+  }
 
-    beforeEach(() => {
-      wrapper = Wrapper()
+  it('renders as groupTeaser', () => {
+    const wrapper = Wrapper({ usage: 'groupTeaser', group: { id: 'groupid' } })
+    expect(wrapper.container).toMatchSnapshot()
+  })
+
+  it('renders as groupProfile, not muted', () => {
+    const wrapper = Wrapper({
+      usage: 'groupProfile',
+      group: { isMutedByMe: false, id: 'groupid' },
     })
+    expect(wrapper.container).toMatchSnapshot()
+  })
 
-    it('renders', () => {
-      expect(wrapper.findAll('.group-content-menu')).toHaveLength(1)
+  it('renders as groupProfile, muted', () => {
+    const wrapper = Wrapper({
+      usage: 'groupProfile',
+      group: { isMutedByMe: true, id: 'groupid' },
+    })
+    expect(wrapper.container).toMatchSnapshot()
+  })
+
+  it('renders as groupProfile when I am the owner', () => {
+    const wrapper = Wrapper({
+      usage: 'groupProfile',
+      group: { myRole: 'owner', id: 'groupid' },
+    })
+    expect(wrapper.container).toMatchSnapshot()
+  })
+
+  describe('mute button', () => {
+    it('emits mute', async () => {
+      const wrapper = Wrapper({
+        usage: 'groupProfile',
+        group: { isMutedByMe: false, id: 'groupid' },
+      })
+      const muteButton = screen.getByText('group.contentMenu.muteGroup')
+      await fireEvent.click(muteButton)
+      expect(wrapper.emitted().mute).toBeTruthy()
+    })
+  })
+
+  describe('unmute button', () => {
+    it('emits unmute', async () => {
+      const wrapper = Wrapper({
+        usage: 'groupProfile',
+        group: { isMutedByMe: true, id: 'groupid' },
+      })
+      const muteButton = screen.getByText('group.contentMenu.unmuteGroup')
+      await fireEvent.click(muteButton)
+      expect(wrapper.emitted().unmute).toBeTruthy()
     })
   })
 })

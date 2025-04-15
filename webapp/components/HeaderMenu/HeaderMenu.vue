@@ -96,6 +96,10 @@
               <client-only v-if="!isEmpty(this.$env.MAPBOX_TOKEN)">
                 <map-button />
               </client-only>
+              <!-- custom button -->
+              <client-only v-if="!isEmpty(customButton)">
+                <custom-button :settings="customButton" />
+              </client-only>
               <!-- avatar menu -->
               <client-only>
                 <avatar-menu placement="top" />
@@ -109,7 +113,7 @@
       <div v-else class="mobil-header-box">
         <!-- logo, hamburger-->
         <ds-flex style="align-items: center">
-          <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
+          <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" class="logo-container">
             <div @click="toggleMobileMenu ? toggleMobileMenuView() : ''">
               <a
                 v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
@@ -136,12 +140,17 @@
                 <chat-notification-menu />
               </div>
               <!-- notification menu -->
-              <div style="display: inline-flex; padding-right: 20px">
+              <div style="display: inline-flex; padding-right: clamp(10px, 2.5vw, 20px)">
                 <notification-menu />
               </div>
             </client-only>
             <!-- hamburger menu -->
-            <base-button icon="bars" @click="toggleMobileMenuView" circle />
+            <base-button
+              icon="bars"
+              @click="toggleMobileMenuView"
+              circle
+              class="hamburger-button"
+            />
           </ds-flex-item>
         </ds-flex>
         <!-- search, filter -->
@@ -177,6 +186,7 @@
           </ds-flex-item>
           <!-- invite button mobile -->
           <ds-flex-item
+            v-if="inviteRegistration"
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="text-align: center"
           >
@@ -205,6 +215,18 @@
             <client-only>
               <div @click="toggleMobileMenuView">
                 <map-button />
+              </div>
+            </client-only>
+          </ds-flex-item>
+          <!-- custom button -->
+          <ds-flex-item
+            v-if="!isEmpty(customButton)"
+            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+            style="text-align: center"
+          >
+            <client-only>
+              <div @click="toggleMobileMenuView">
+                <custom-button :settings="customButton" />
               </div>
             </client-only>
           </ds-flex-item>
@@ -265,9 +287,10 @@ import { SHOW_CONTENT_FILTER_HEADER_MENU } from '~/constants/filter.js'
 import LOGOS from '~/constants/logos.js'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotificationMenu'
+import CustomButton from '~/components/CustomButton/CustomButton'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import GroupButton from '~/components/Group/GroupButton'
-import headerMenu from '~/constants/headerMenu.js'
+import headerMenuBranded from '~/constants/headerMenuBranded.js'
 import InviteButton from '~/components/InviteButton/InviteButton'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
@@ -280,6 +303,8 @@ import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParams
 export default {
   components: {
     AvatarMenu,
+    ChatNotificationMenu,
+    CustomButton,
     FilterMenu,
     GroupButton,
     InviteButton,
@@ -289,7 +314,6 @@ export default {
     NotificationMenu,
     PageParamsLink,
     SearchField,
-    ChatNotificationMenu,
   },
   props: {
     showMobileMenu: { type: Boolean, default: false },
@@ -303,8 +327,9 @@ export default {
       LOGOS,
       SHOW_GROUP_BUTTON_IN_HEADER,
       SHOW_CONTENT_FILTER_HEADER_MENU,
-      isHeaderMenu: headerMenu.MENU.length > 0,
-      menu: headerMenu.MENU,
+      isHeaderMenu: headerMenuBranded.MENU.length > 0,
+      customButton: headerMenuBranded.CUSTOM_BUTTON,
+      menu: headerMenuBranded.MENU,
       mobileSearchVisible: false,
       toggleMobileMenu: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
@@ -368,6 +393,7 @@ export default {
 }
 .main-navigation-flex {
   align-items: center;
+  flex-wrap: nowrap !important;
 }
 .main-navigation-right {
   display: flex;
@@ -379,6 +405,10 @@ export default {
 .ds-flex-item.mobile-hamburger-menu {
   margin-left: auto;
   text-align: right;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-end;
 }
 .mobile-menu {
   margin: 0 20px;
@@ -396,5 +426,11 @@ export default {
 }
 .hide-mobile-menu {
   display: none;
+}
+.logo-container {
+  max-width: calc(100vw - 140px) !important;
+}
+.hamburger-button {
+  flex-shrink: 0;
 }
 </style>

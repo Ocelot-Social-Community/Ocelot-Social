@@ -1,9 +1,10 @@
-import Factory, { cleanDatabase } from '../../db/factories'
-import gql from 'graphql-tag'
-import { getNeode, getDriver } from '../../db/neo4j'
-import createServer from '../../server'
 import { createTestClient } from 'apollo-server-testing'
-import { categories } from '../../constants/categories'
+import gql from 'graphql-tag'
+
+import { categories } from '@constants/categories'
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import createServer from '@src/server'
 
 const categoryIds = ['cat9']
 let user
@@ -60,6 +61,12 @@ const switchUserRoleMutation = gql`
 const saveCategorySettings = gql`
   mutation ($activeCategories: [String]) {
     saveCategorySettings(activeCategories: $activeCategories)
+  }
+`
+
+const updateOnlineStatus = gql`
+  mutation ($status: OnlineStatus!) {
+    updateOnlineStatus(status: $status)
   }
 `
 
@@ -586,6 +593,236 @@ describe('switch user role', () => {
   })
 })
 
+let anotherUser
+const emailNotificationSettingsQuery = gql`
+  query ($id: ID!) {
+    User(id: $id) {
+      emailNotificationSettings {
+        type
+        settings {
+          name
+          value
+        }
+      }
+    }
+  }
+`
+
+const emailNotificationSettingsMutation = gql`
+  mutation ($id: ID!, $emailNotificationSettings: [EmailNotificationSettingsInput]!) {
+    UpdateUser(id: $id, emailNotificationSettings: $emailNotificationSettings) {
+      emailNotificationSettings {
+        type
+        settings {
+          name
+          value
+        }
+      }
+    }
+  }
+`
+
+describe('emailNotificationSettings', () => {
+  beforeEach(async () => {
+    user = await Factory.build('user', {
+      id: 'user',
+      role: 'user',
+    })
+    anotherUser = await Factory.build('user', {
+      id: 'anotherUser',
+      role: 'anotherUser',
+    })
+  })
+
+  describe('query the field', () => {
+    describe('as another user', () => {
+      it('throws an error', async () => {
+        authenticatedUser = await anotherUser.toJson()
+        const targetUser = await user.toJson()
+        await expect(
+          query({ query: emailNotificationSettingsQuery, variables: { id: targetUser.id } }),
+        ).resolves.toEqual(
+          expect.objectContaining({
+            errors: [
+              expect.objectContaining({
+                message: 'Not Authorized!',
+              }),
+            ],
+          }),
+        )
+      })
+    })
+
+    describe('as self', () => {
+      it('returns the emailNotificationSettings', async () => {
+        authenticatedUser = await user.toJson()
+        await expect(
+          query({ query: emailNotificationSettingsQuery, variables: { id: authenticatedUser.id } }),
+        ).resolves.toEqual(
+          expect.objectContaining({
+            data: {
+              User: [
+                {
+                  emailNotificationSettings: [
+                    {
+                      type: 'post',
+                      settings: [
+                        {
+                          name: 'commentOnObservedPost',
+                          value: true,
+                        },
+                        {
+                          name: 'mention',
+                          value: true,
+                        },
+                        {
+                          name: 'followingUsers',
+                          value: true,
+                        },
+                        {
+                          name: 'postInGroup',
+                          value: true,
+                        },
+                      ],
+                    },
+                    {
+                      type: 'chat',
+                      settings: [
+                        {
+                          name: 'chatMessage',
+                          value: true,
+                        },
+                      ],
+                    },
+                    {
+                      type: 'group',
+                      settings: [
+                        {
+                          name: 'groupMemberJoined',
+                          value: true,
+                        },
+                        {
+                          name: 'groupMemberLeft',
+                          value: true,
+                        },
+                        {
+                          name: 'groupMemberRemoved',
+                          value: true,
+                        },
+                        {
+                          name: 'groupMemberRoleChanged',
+                          value: true,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          }),
+        )
+      })
+    })
+  })
+
+  describe('mutate the field', () => {
+    const emailNotificationSettings = [{ name: 'mention', value: false }]
+
+    describe('as another user', () => {
+      it('throws an error', async () => {
+        authenticatedUser = await anotherUser.toJson()
+        const targetUser = await user.toJson()
+        await expect(
+          mutate({
+            mutation: emailNotificationSettingsMutation,
+            variables: { id: targetUser.id, emailNotificationSettings },
+          }),
+        ).resolves.toEqual(
+          expect.objectContaining({
+            errors: [
+              expect.objectContaining({
+                message: 'Not Authorized!',
+              }),
+            ],
+          }),
+        )
+      })
+    })
+
+    describe('as self', () => {
+      it('updates the emailNotificationSettings', async () => {
+        authenticatedUser = await user.toJson()
+        await expect(
+          mutate({
+            mutation: emailNotificationSettingsMutation,
+            variables: { id: authenticatedUser.id, emailNotificationSettings },
+          }),
+        ).resolves.toEqual(
+          expect.objectContaining({
+            data: {
+              UpdateUser: {
+                emailNotificationSettings: [
+                  {
+                    type: 'post',
+                    settings: [
+                      {
+                        name: 'commentOnObservedPost',
+                        value: true,
+                      },
+                      {
+                        name: 'mention',
+                        value: false,
+                      },
+                      {
+                        name: 'followingUsers',
+                        value: true,
+                      },
+                      {
+                        name: 'postInGroup',
+                        value: true,
+                      },
+                    ],
+                  },
+                  {
+                    type: 'chat',
+                    settings: [
+                      {
+                        name: 'chatMessage',
+                        value: true,
+                      },
+                    ],
+                  },
+                  {
+                    type: 'group',
+                    settings: [
+                      {
+                        name: 'groupMemberJoined',
+                        value: true,
+                      },
+                      {
+                        name: 'groupMemberLeft',
+                        value: true,
+                      },
+                      {
+                        name: 'groupMemberRemoved',
+                        value: true,
+                      },
+                      {
+                        name: 'groupMemberRoleChanged',
+                        value: true,
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          }),
+        )
+      })
+    })
+  })
+})
+
 describe('save category settings', () => {
   beforeEach(async () => {
     await Promise.all(
@@ -717,6 +954,117 @@ describe('save category settings', () => {
               },
             }),
           )
+        })
+      })
+    })
+  })
+})
+
+describe('updateOnlineStatus', () => {
+  beforeEach(async () => {
+    user = await Factory.build('user', {
+      id: 'user',
+      role: 'user',
+    })
+    variables = {
+      status: 'online',
+    }
+  })
+
+  describe('not authenticated', () => {
+    beforeEach(async () => {
+      authenticatedUser = undefined
+    })
+
+    it('throws an error', async () => {
+      await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'Not Authorized!',
+            }),
+          ],
+        }),
+      )
+    })
+  })
+
+  describe('authenticated', () => {
+    beforeEach(async () => {
+      authenticatedUser = await user.toJson()
+    })
+
+    describe('set online', () => {
+      it('returns true and saves the user in the database as online', async () => {
+        await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toEqual(
+          expect.objectContaining({
+            data: { updateOnlineStatus: true },
+          }),
+        )
+
+        const cypher = 'MATCH (u:User {id: $id}) RETURN u'
+        const result = await neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser = neode.hydrateFirst(result, 'u', neode.model('User'))
+        await expect(dbUser.toJson()).resolves.toMatchObject({
+          lastOnlineStatus: 'online',
+        })
+        await expect(dbUser.toJson()).resolves.not.toMatchObject({
+          awaySince: expect.any(String),
+        })
+      })
+    })
+
+    describe('set away', () => {
+      beforeEach(() => {
+        variables = {
+          status: 'away',
+        }
+      })
+
+      it('returns true and saves the user in the database as away', async () => {
+        await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toEqual(
+          expect.objectContaining({
+            data: { updateOnlineStatus: true },
+          }),
+        )
+
+        const cypher = 'MATCH (u:User {id: $id}) RETURN u'
+        const result = await neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser = neode.hydrateFirst(result, 'u', neode.model('User'))
+        await expect(dbUser.toJson()).resolves.toMatchObject({
+          lastOnlineStatus: 'away',
+          awaySince: expect.any(String),
+        })
+      })
+
+      it('stores the timestamp of the first away call', async () => {
+        await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toEqual(
+          expect.objectContaining({
+            data: { updateOnlineStatus: true },
+          }),
+        )
+
+        const cypher = 'MATCH (u:User {id: $id}) RETURN u'
+        const result = await neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser = neode.hydrateFirst(result, 'u', neode.model('User'))
+        await expect(dbUser.toJson()).resolves.toMatchObject({
+          lastOnlineStatus: 'away',
+          awaySince: expect.any(String),
+        })
+
+        const awaySince = (await dbUser.toJson()).awaySince
+
+        await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toEqual(
+          expect.objectContaining({
+            data: { updateOnlineStatus: true },
+          }),
+        )
+
+        const result2 = await neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser2 = neode.hydrateFirst(result2, 'u', neode.model('User'))
+        await expect(dbUser2.toJson()).resolves.toMatchObject({
+          lastOnlineStatus: 'away',
+          awaySince,
         })
       })
     })

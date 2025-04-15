@@ -1,4 +1,5 @@
 import { UserInputError } from 'apollo-server'
+
 import Resolver from './helpers/Resolver'
 import { queryLocations } from './users/location'
 

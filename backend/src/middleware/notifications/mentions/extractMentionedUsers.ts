@@ -1,8 +1,8 @@
-import cheerio from 'cheerio'
+import { load } from 'cheerio'
 
 export default (content?) => {
   if (!content) return []
-  const $ = cheerio.load(content)
+  const $ = load(content)
   const userIds = $('a.mention[data-mention-id]')
     .map((_, el) => {
       return $(el).attr('data-mention-id')

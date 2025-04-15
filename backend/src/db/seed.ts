@@ -1,20 +1,23 @@
-import sample from 'lodash/sample'
-import { createTestClient } from 'apollo-server-testing'
-import CONFIG from '../config'
-import createServer from '../server'
+/* eslint-disable n/no-process-exit */
 import { faker } from '@faker-js/faker'
-import Factory from '../db/factories'
-import { getNeode, getDriver } from '../db/neo4j'
+import { createTestClient } from 'apollo-server-testing'
+import sample from 'lodash/sample'
+
+import CONFIG from '@config/index'
+import { categories } from '@constants/categories'
+import { createCommentMutation } from '@graphql/comments'
 import {
   createGroupMutation,
   joinGroupMutation,
   changeGroupMemberRoleMutation,
-} from '../graphql/groups'
-import { createPostMutation } from '../graphql/posts'
-import { createRoomMutation } from '../graphql/rooms'
-import { createMessageMutation } from '../graphql/messages'
-import { createCommentMutation } from '../graphql/comments'
-import { categories } from '../constants/categories'
+} from '@graphql/groups'
+import { createMessageMutation } from '@graphql/messages'
+import { createPostMutation } from '@graphql/posts'
+import { createRoomMutation } from '@graphql/rooms'
+import createServer from '@src/server'
+
+import Factory from './factories'
+import { getNeode, getDriver } from './neo4j'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
@@ -632,7 +635,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         categoryIds: ['cat16'],
         author: peterLustig,
         image: Factory.build('image', {
-          url: faker.image.unsplash.food(300, 169),
+          url: faker.image.urlLoremFlickr({ category: 'food', width: 300, height: 169 }),
           sensitive: true,
           aspectRatio: 300 / 169,
         }),
@@ -648,7 +651,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         categoryIds: ['cat1'],
         author: bobDerBaumeister,
         image: Factory.build('image', {
-          url: faker.image.unsplash.technology(300, 1500),
+          url: faker.image.urlLoremFlickr({ category: 'technics', width: 300, height: 1500 }),
           aspectRatio: 300 / 1500,
         }),
       },
@@ -696,7 +699,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         categoryIds: ['cat6'],
         author: peterLustig,
         image: Factory.build('image', {
-          url: faker.image.unsplash.buildings(300, 857),
+          url: faker.image.urlLoremFlickr({ category: 'city', width: 300, height: 857 }),
           aspectRatio: 300 / 857,
         }),
       },
@@ -735,7 +738,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         categoryIds: ['cat11'],
         author: louie,
         image: Factory.build('image', {
-          url: faker.image.unsplash.people(300, 901),
+          url: faker.image.urlLoremFlickr({ category: 'people', width: 300, height: 901 }),
           aspectRatio: 300 / 901,
         }),
       },
@@ -761,7 +764,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         categoryIds: ['cat14'],
         author: jennyRostock,
         image: Factory.build('image', {
-          url: faker.image.unsplash.objects(300, 200),
+          url: faker.image.urlLoremFlickr({ category: 'abstract', width: 300, height: 200 }),
           aspectRatio: 300 / 450,
         }),
       },
@@ -821,7 +824,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       mutation: createPostMutation(),
       variables: {
         id: 'p8',
-        image: faker.image.unsplash.nature(),
+        image: faker.image.urlLoremFlickr({ category: 'nature' }),
         title: `Quantum Flow Theory explains Quantum Gravity`,
         content: hashtagAndMention1,
         categoryIds: ['cat8'],
@@ -1178,7 +1181,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           categoryIds: ['cat1'],
           author: jennyRostock,
           image: Factory.build('image', {
-            url: faker.image.unsplash.objects(),
+            url: faker.image.urlLoremFlickr({ category: 'abstract' }),
           }),
         },
       )
@@ -1229,7 +1232,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           categoryIds: ['cat1'],
           author: peterLustig,
           image: Factory.build('image', {
-            url: faker.image.unsplash.buildings(),
+            url: faker.image.urlLoremFlickr({ category: 'city' }),
           }),
         },
       )
@@ -1280,7 +1283,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           categoryIds: ['cat1'],
           author: dewey,
           image: Factory.build('image', {
-            url: faker.image.unsplash.food(),
+            url: faker.image.urlLoremFlickr({ category: 'food' }),
           }),
         },
       )
@@ -1331,7 +1334,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           categoryIds: ['cat1'],
           author: louie,
           image: Factory.build('image', {
-            url: faker.image.unsplash.technology(),
+            url: faker.image.urlLoremFlickr({ category: 'technics' }),
           }),
         },
       )
@@ -1382,7 +1385,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           categoryIds: ['cat1'],
           author: bobDerBaumeister,
           image: Factory.build('image', {
-            url: faker.image.unsplash.people(),
+            url: faker.image.urlLoremFlickr({ category: 'people' }),
           }),
         },
       )
@@ -1433,7 +1436,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           categoryIds: ['cat1'],
           author: huey,
           image: Factory.build('image', {
-            url: faker.image.unsplash.nature(),
+            url: faker.image.urlLoremFlickr({ category: 'nature' }),
           }),
         },
       )
@@ -1565,6 +1568,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await driver.close()
     await neode.close()
     process.exit(0)
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     /* eslint-disable-next-line no-console */
     console.error(err)

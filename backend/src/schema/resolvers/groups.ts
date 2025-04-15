@@ -1,9 +1,11 @@
-import { v4 as uuid } from 'uuid'
 import { UserInputError } from 'apollo-server'
-import CONFIG from '../../config'
-import { CATEGORIES_MIN, CATEGORIES_MAX } from '../../constants/categories'
-import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '../../constants/groups'
-import { removeHtmlTags } from '../../middleware/helpers/cleanHtml'
+import { v4 as uuid } from 'uuid'
+
+import CONFIG from '@config/index'
+import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
+import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
+import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
+
 import Resolver, {
   removeUndefinedNullValuesFromObject,
   convertObjectToCypherMapLiteral,
@@ -130,7 +132,7 @@ export default {
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
       if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
-        throw new UserInputError('Too view categories!')
+        throw new UserInputError('Too few categories!')
       }
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
         throw new UserInputError('Too many categories!')
@@ -200,7 +202,7 @@ export default {
 
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds) {
         if (categoryIds.length < CATEGORIES_MIN) {
-          throw new UserInputError('Too view categories!')
+          throw new UserInputError('Too few categories!')
         }
         if (categoryIds.length > CATEGORIES_MAX) {
           throw new UserInputError('Too many categories!')
@@ -366,6 +368,64 @@ export default {
         session.close()
       }
     },
+    muteGroup: async (_parent, params, context, _resolveInfo) => {
+      const { groupId } = params
+      const userId = context.user.id
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const transactionResponse = await transaction.run(
+          `
+          MATCH (group:Group { id: $groupId })
+          MATCH (user:User { id: $userId })
+          MERGE (user)-[m:MUTED]->(group)
+          SET m.createdAt = toString(datetime())
+          RETURN group { .* }
+        `,
+          {
+            groupId,
+            userId,
+          },
+        )
+        const [group] = await transactionResponse.records.map((record) => record.get('group'))
+        return group
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    unmuteGroup: async (_parent, params, context, _resolveInfo) => {
+      const { groupId } = params
+      const userId = context.user.id
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const transactionResponse = await transaction.run(
+          `
+          MATCH (group:Group { id: $groupId })
+          MATCH (user:User { id: $userId })
+          OPTIONAL MATCH  (user)-[m:MUTED]->(group)
+          DELETE m
+          RETURN group { .* }
+        `,
+          {
+            groupId,
+            userId,
+          },
+        )
+        const [group] = await transactionResponse.records.map((record) => record.get('group'))
+        return group
+      })
+      try {
+        return await writeTxResultPromise
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
   },
   Group: {
     ...Resolver('Group', {
@@ -377,6 +437,10 @@ export default {
       hasOne: {
         avatar: '-[:AVATAR_IMAGE]->(related:Image)',
         location: '-[:IS_IN]->(related:Location)',
+      },
+      boolean: {
+        isMutedByMe:
+          'MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )',
       },
     }),
   },

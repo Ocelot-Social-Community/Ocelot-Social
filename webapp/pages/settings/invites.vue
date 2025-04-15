@@ -7,8 +7,10 @@
 
 <script>
 import HcEmpty from '~/components/Empty/Empty'
+import scrollToContent from './scroll-to-content.js'
 
 export default {
+  mixins: [scrollToContent],
   components: {
     HcEmpty,
   },

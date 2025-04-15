@@ -1,9 +1,9 @@
-import { neo4jgraphql } from 'neo4j-graphql-js'
-import Resolver from './helpers/Resolver'
-
-import { getUnreadRoomsCount } from './rooms'
-import { pubsub, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '../../server'
 import { withFilter } from 'graphql-subscriptions'
+import { neo4jgraphql } from 'neo4j-graphql-js'
+
+import { pubsub, CHAT_MESSAGE_ADDED } from '@src/server'
+
+import Resolver from './helpers/Resolver'
 
 const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
   return session.writeTransaction(async (transaction) => {
@@ -110,22 +110,7 @@ export default {
         return message
       })
       try {
-        const message = await writeTxResultPromise
-        if (message) {
-          const roomCountUpdated = await getUnreadRoomsCount(message.recipientId, session)
-
-          // send subscriptions
-          void pubsub.publish(ROOM_COUNT_UPDATED, {
-            roomCountUpdated,
-            userId: message.recipientId,
-          })
-          void pubsub.publish(CHAT_MESSAGE_ADDED, {
-            chatMessageAdded: message,
-            userId: message.recipientId,
-          })
-        }
-
-        return message
+        return await writeTxResultPromise
       } catch (error) {
         throw new Error(error)
       } finally {

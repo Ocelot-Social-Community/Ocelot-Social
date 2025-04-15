@@ -1,7 +1,8 @@
 import { rule, shield, deny, allow, or, and } from 'graphql-shield'
-import { getNeode } from '../db/neo4j'
-import CONFIG from '../config'
-import { validateInviteCode } from '../schema/resolvers/transactions/inviteCodes'
+
+import CONFIG from '@config/index'
+import { getNeode } from '@db/neo4j'
+import { validateInviteCode } from '@schema/resolvers/transactions/inviteCodes'
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true
@@ -383,7 +384,7 @@ export default shield(
       Tag: allow,
       reports: isModerator,
       statistics: allow,
-      currentUser: allow,
+      currentUser: isAuthenticated,
       Group: isAuthenticated,
       GroupMembers: isAllowedSeeingGroupMembers,
       GroupCount: isAuthenticated,
@@ -391,7 +392,6 @@ export default shield(
       profilePagePosts: allow,
       Comment: allow,
       User: or(noEmailFilter, isAdmin),
-      isLoggedIn: allow,
       Badge: allow,
       PostsEmotionsCountByEmotion: allow,
       PostsEmotionsByCurrentUser: isAuthenticated,
@@ -462,12 +462,17 @@ export default shield(
       switchUserRole: isAdmin,
       markTeaserAsViewed: allow,
       saveCategorySettings: isAuthenticated,
+      updateOnlineStatus: isAuthenticated,
       CreateRoom: isAuthenticated,
       CreateMessage: isAuthenticated,
       MarkMessagesAsSeen: isAuthenticated,
+      toggleObservePost: isAuthenticated,
+      muteGroup: and(isAuthenticated, isMemberOfGroup),
+      unmuteGroup: and(isAuthenticated, isMemberOfGroup),
     },
     User: {
       email: or(isMyOwn, isAdmin),
+      emailNotificationSettings: isMyOwn,
     },
     Report: isModerator,
   },

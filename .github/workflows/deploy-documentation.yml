@@ -13,10 +13,10 @@ jobs:
       documentation: ${{ steps.changes.outputs.documentation }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
       - name: Check for file changes
-        uses: dorny/paths-filter@master
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: changes
         with:
           token: ${{ github.token }}
@@ -27,10 +27,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
       - name: Setup Node 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.0.3
         with:
           node-version: 20
 
@@ -38,7 +38,7 @@ jobs:
         run: npm install && npm run docs:build
 
       - name: Deploy Vuepress to Github Pages
-        uses: crazy-max/ghaction-github-pages@v4
+        uses: crazy-max/ghaction-github-pages@df5cc2bfa78282ded844b354faee141f06b41865 # v4.0.0
         with:
           target_branch: gh-pages
           build_dir: .vuepress/dist

@@ -1,3 +1,4 @@
+<!-- eslint-disable prettier/prettier -->
 <template>
   <v-app-bar flat>
     <v-row>
@@ -8,6 +9,13 @@
         <VikeBtn href="/">{{ $t('menu.home') }}</VikeBtn>
         <VikeBtn href="/app">{{ $t('menu.app') }}</VikeBtn>
         <VikeBtn href="/about">{{ $t('menu.about') }}</VikeBtn>
+      </v-col>
+      <v-col class="d-flex align-center justify-center grow">
+        <v-btn @click="toggleTheme">{{
+          theme.global.current.value.dark
+            ? $t('menu.theme.switchToLight')
+            : $t('menu.theme.switchToDark')
+        }}</v-btn>
       </v-col>
       <v-col>
         <v-switch
@@ -24,11 +32,16 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useLocale } from 'vuetify'
+import { useLocale, useTheme } from 'vuetify'
 
 import VikeBtn from '#components/VikeBtn.vue'
 
 import LogoAvatar from './LogoAvatar.vue'
+
+const theme = useTheme()
+function toggleTheme() {
+  theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+}
 
 const { current: locale } = useLocale()
 const isEnabled = ref(locale.value === 'de')

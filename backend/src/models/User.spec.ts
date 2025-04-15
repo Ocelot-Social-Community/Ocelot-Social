@@ -1,5 +1,5 @@
-import { cleanDatabase } from '../db/factories'
-import { getNeode, getDriver } from '../db/neo4j'
+import { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
 
 const driver = getDriver()
 const neode = getNeode()

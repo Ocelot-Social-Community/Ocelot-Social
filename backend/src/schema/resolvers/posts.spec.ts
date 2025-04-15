@@ -1,10 +1,11 @@
 import { createTestClient } from 'apollo-server-testing'
-import Factory, { cleanDatabase } from '../../db/factories'
 import gql from 'graphql-tag'
-import { getNeode, getDriver } from '../../db/neo4j'
-import createServer from '../../server'
-import { createPostMutation } from '../../graphql/posts'
-import CONFIG from '../../config'
+
+import CONFIG from '@config/index'
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import { createPostMutation } from '@graphql/posts'
+import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = true
 
@@ -28,6 +29,9 @@ beforeAll(async () => {
         driver,
         neode,
         user: authenticatedUser,
+        cypherParams: {
+          currentUserId: authenticatedUser ? authenticatedUser.id : null,
+        },
       }
     },
   })
@@ -632,8 +636,8 @@ describe('CreatePost', () => {
                 eventLocationName: 'Leipzig',
                 eventVenue: 'Connewitzer Kreuz',
                 eventLocation: {
-                  lng: 12.374733,
-                  lat: 51.340632,
+                  lng: 12.375101,
+                  lat: 51.34083,
                 },
               },
             },
@@ -947,8 +951,8 @@ describe('UpdatePost', () => {
                 eventLocationName: 'Leipzig',
                 eventVenue: 'Connewitzer Kreuz',
                 eventLocation: {
-                  lng: 12.374733,
-                  lat: 51.340632,
+                  lng: 12.375101,
+                  lat: 51.34083,
                 },
               },
             },

@@ -11,10 +11,10 @@ jobs:
       documentation: ${{ steps.changes.outputs.documentation }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
       - name: Check for markdown file changes
-        uses: dorny/paths-filter@v3.0.2
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: changes
         with:
           token: ${{ github.token }}
@@ -28,13 +28,13 @@ jobs:
     if: needs.files-changed.outputs.markdown == 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
       
-      - name: Remove old documentation files
-        run: rm -rf ./deployment/src/old/ ./CHANGELOG.md # workaround until https://github.com/gaurav-nelson/github-action-markdown-link-check/pull/183 has been done
+      - name: Remove uncheckable documentation files
+        run: rm -rf ./CHANGELOG.md # workaround until https://github.com/gaurav-nelson/github-action-markdown-link-check/pull/183 has been done
 
       - name: Check Markdown Links
-        uses: gaurav-nelson/github-action-markdown-link-check@master
+        uses: gaurav-nelson/github-action-markdown-link-check@1b916f2cf6c36510a6059943104e3c42ce6c16bc # 1.0.15
         with:
           use-quiet-mode: 'yes'
           use-verbose-mode: 'no'
@@ -51,10 +51,10 @@ jobs:
     if: needs.files-changed.outputs.documentation == 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
       - name: Setup Node 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.0.3
         with:
           node-version: '20'
 

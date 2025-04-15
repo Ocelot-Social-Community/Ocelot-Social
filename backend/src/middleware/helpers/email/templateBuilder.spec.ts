@@ -1,11 +1,13 @@
-import CONFIG from '../../../config'
-import logosWebapp from '../../../config/logos'
+import CONFIG from '@config/index'
+import logosWebapp from '@config/logos'
+
 import {
   signupTemplate,
   emailVerificationTemplate,
   resetPasswordTemplate,
   wrongAccountTemplate,
   notificationTemplate,
+  chatMessageTemplate,
 } from './templateBuilder'
 
 const englishHint = 'English version below!'
@@ -34,6 +36,17 @@ const resetPasswordTemplateData = () => ({
     name: 'Mr Example',
   },
 })
+const chatMessageTemplateData = {
+  email: 'test@example.org',
+  variables: {
+    senderUser: {
+      name: 'Sender',
+    },
+    recipientUser: {
+      name: 'Recipient',
+    },
+  },
+}
 const wrongAccountTemplateData = () => ({
   email: 'test@example.org',
   variables: {},
@@ -155,6 +168,32 @@ describe('templateBuilder', () => {
           actionUrl,
           theResetPasswordTemplateData.variables.nonce,
           theResetPasswordTemplateData.variables.name,
+          enContent,
+          deContent,
+          supportUrl,
+        ])
+      })
+    })
+  })
+
+  describe('chatMessageTemplate', () => {
+    describe('multi language', () => {
+      it('e-mail is build with all data', () => {
+        const subject = `Neue Chat-Nachricht | New chat message - ${chatMessageTemplateData.variables.senderUser.name}`
+        const actionUrl = new URL('/chat', CONFIG.CLIENT_URI).toString()
+        const enContent = `You have received a new chat message from <b>${chatMessageTemplateData.variables.senderUser.name}</b>.`
+        const deContent = `Du hast eine neue Chat-Nachricht von <b>${chatMessageTemplateData.variables.senderUser.name}</b> erhalten.`
+        testEmailData(null, chatMessageTemplate, chatMessageTemplateData, [
+          ...textsStandard,
+          {
+            templPropName: 'subject',
+            isContaining: false,
+            text: subject,
+          },
+          englishHint,
+          actionUrl,
+          chatMessageTemplateData.variables.senderUser,
+          chatMessageTemplateData.variables.recipientUser,
           enContent,
           deContent,
           supportUrl,

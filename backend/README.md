@@ -6,12 +6,12 @@ Run the following command to install everything through docker.
 
 The installation takes a bit longer on the first pass or on rebuild ...
 
-```bash
+```sh
 # in main folder
-$ docker-compose up
+$ docker compose up
 # or
 # rebuild the containers for a cleanup
-$ docker-compose up --build
+$ docker compose up --build
 ```
 
 Wait a little until your backend is up and running at [http://localhost:4000/](http://localhost:4000/).
@@ -20,22 +20,22 @@ Wait a little until your backend is up and running at [http://localhost:4000/](h
 
 For the local installation you need a recent version of
 [Node](https://nodejs.org/en/) (&gt;= `v16.19.0`). We are using
-`v19.4.0` and therefore we recommend to use the same version
+`v20.12.1` and therefore we recommend to use the same version
 ([see](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4082)
 some known problems with more recent node versions). You can use the
 [node version manager](https://github.com/nvm-sh/nvm) `nvm` to switch
 between different local Node versions:
 
-```bash
+```sh
 # install Node
 $ cd backend
-$ nvm install v19.4.0
-$ nvm use v19.4.0
+$ nvm install v20.12.1
+$ nvm use v20.12.1
 ```
 
 Install node dependencies with [yarn](https://yarnpkg.com/en/):
 
-```bash
+```sh
 # in main folder
 $ cd backend
 $ yarn install
@@ -47,7 +47,7 @@ $ nvm use && yarn
 
 Copy Environment Variables:
 
-```bash
+```sh
 # in backend/
 $ cp .env.template .env
 ```
@@ -57,14 +57,14 @@ a [local Neo4J](http://localhost:7474) instance is up and running.
 
 Start the backend for development with:
 
-```bash
+```sh
 # in backend/
 $ yarn run dev
 ```
 
 or start the backend in production environment with:
 
-```bash
+```sh
 # in backend/
 $ yarn run start
 ```
@@ -79,154 +79,120 @@ More details about our GraphQL playground and how to use it with ocelot.social c
 
 ![GraphQL Playground](../.gitbook/assets/graphql-playground.png)
 
-### Database Indexes and Constraints
+## Database
 
-Database indexes and constraints need to be created and upgraded when the database and the backend are running:
+A fresh database needs to be initialized and migrated.
 
-::: tabs
-@tab:active Docker
-
-```bash
-# in main folder while docker-compose is running
-$ docker exec backend yarn run db:migrate init
-
-# only once: init admin user and create indexes and constraints in Neo4j database
-# for development
-$ docker compose exec backend yarn prod:migrate init
-# in production mode use command
-$ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
+```sh
+# in folder backend while database is running
+yarn db:migrate init
+# for docker environments:
+docker exec backend yarn db:migrate init
+# for docker production:
+docker exec backend yarn prod:migrate init
 ```
 
-```bash
-# in main folder with docker compose running
-$ docker exec backend yarn run db:migrate up
+```sh
+# in backend with database running (In docker or local)
+yarn db:migrate up
+
+# for docker development:
+docker exec backend yarn db:migrate up
+# for docker production
+docker exec backend yarn prod:migrate up
 ```
 
-@tab Without Docker
+### Optional Data
 
-```bash
-# in folder backend/ while database is running
-# make sure your database is running on http://localhost:7474/browser/
-yarn run db:migrate init
+You can seed some optional data into the database.
+
+To create the default admin <admin@example.org> with password `1234` use:
+
+```sh
+# in backend with database running (In docker or local)
+yarn db:data:admin
 ```
 
-```bash
-# in backend/ with database running (In docker or local)
-yarn run db:migrate up
+When using `CATEGORIES_ACTIVE=true` you also want to seed the categories with:
+
+```sh
+# in backend with database running (In docker or local)
+yarn db:data:categories
 ```
 
-:::
+### Seed Data
 
-#### Seed Database
+For a predefined set of test data you can seed the database with:
 
-If you want your backend to return anything else than an empty response, you
-need to seed your database:
+```sh
+# in backend with database running (In docker or local)
+yarn db:seed
 
-::: tabs
-@tab:active Docker
-
-In another terminal run:
-
-```bash
-# in main folder while docker-compose is running
-$ docker exec backend yarn run db:seed
+# for docker
+docker exec backend yarn db:seed
 ```
 
-To reset the database run:
+### Reset Data
 
-```bash
-# in main folder while docker-compose is running
-$ docker exec backend yarn run db:reset
+In order to reset the database you can run:
+
+```sh
+# in backend with database running (In docker or local)
+yarn db:reset
+# or deleting the migrations as well
+yarn db:reset:withmigrations
+
+# for docker
+docker exec backend yarn db:reset
+# or deleting the migrations as well
+docker exec backend yarn db:reset:withmigrations
 # you could also wipe out your neo4j database and delete all volumes with:
-$ docker-compose down -v
-# if container is not running, run this command to set up your database indexes and constraints
-$ docker exec backend yarn run db:migrate init
-# And then upgrade the indexes and const
-$ docker exec backend yarn run db:migrate up
+docker compose down -v
 ```
 
-@tab Without Docker
-
-Run:
-
-```bash
-# in backend/ while database is running
-$ yarn run db:seed
-```
-
-To reset the database run:
-
-```bash
-# in backend/ while database is running
-$ yarn run db:reset
-```
-
-:::
+> Note: This just deletes the data and not the constraints, hence you do not need to rerun `yarn db:migrate init` or `yarn db:migrate up`.
 
 ### Data migrations
 
 Although Neo4J is schema-less,you might find yourself in a situation in which
 you have to migrate your data e.g. because your data modeling has changed.
 
-::: tabs
-@tab:active Docker
-
 Generate a data migration file:
 
-```bash
-# in main folder while docker-compose is running
-$ docker-compose exec backend yarn run db:migrate:create your_data_migration
-# Edit the file in ./src/db/migrations/
-```
-
-To run the migration:
-
-```bash
-# in main folder while docker-compose is running
-$ docker exec backend yarn run db:migrate up
-```
-
-@tab Without Docker
-
-Generate a data migration file:
-
-```bash
-# in backend/
+```sh
+# in backend
 $ yarn run db:migrate:create your_data_migration
 # Edit the file in ./src/db/migrations/
+
+# for docker
+# in main folder while docker compose is running
+$ docker compose exec backend yarn run db:migrate:create your_data_migration
+# Edit the file in ./src/db/migrations/
 ```
 
 To run the migration:
 
-```bash
+```sh
 # in backend/ while database is running
 $ yarn run db:migrate up
-```
 
-:::
+# for docker
+# in main folder while docker compose is running
+$ docker exec backend yarn run db:migrate up
+```
 
 ## Testing
 
 **Beware**: We have no multiple database setup at the moment. We clean the
 database after each test, running the tests will wipe out all your data!
 
-::: tabs
-@tab:active Docker
-
 Run the unit tests:
 
-```bash
-# in main folder while docker-compose is running
-$ docker exec backend yarn run test
-```
-
-@tab Without Docker
-
-Run the unit tests:
-
-```bash
+```sh
 # in backend/ while database is running
 $ yarn run test
-```
 
-:::
+# for docker
+# in main folder while docker compose is running
+$ docker exec backend yarn run test
+```

@@ -1,9 +1,9 @@
 'use strict'
 
-module.exports.up = function (next) {
+export async function up(next) {
   next()
 }
 
-module.exports.down = function (next) {
+export async function down(next) {
   next()
 }

@@ -1,11 +1,15 @@
-import dotenv from 'dotenv'
+/* eslint-disable n/no-process-env */
+/* eslint-disable n/no-unpublished-require */
+/* eslint-disable n/no-missing-require */
+import { config } from 'dotenv'
+
 import emails from './emails'
 import metadata from './metadata'
 
 // Load env file
 if (require.resolve) {
   try {
-    dotenv.config({ path: require.resolve('../../.env') })
+    config({ path: require.resolve('../../.env') })
   } catch (error) {
     // This error is thrown when the .env is not found
     if (error.code !== 'MODULE_NOT_FOUND') {
@@ -53,6 +57,8 @@ const smtp = {
   SMTP_DKIM_KEYSELECTOR: hasDKIMData && env.SMTP_DKIM_KEYSELECTOR,
   // PEM format: https://docs.progress.com/bundle/datadirect-hybrid-data-pipeline-installation-46/page/PEM-file-format.html
   SMTP_DKIM_PRIVATKEY: hasDKIMData && env.SMTP_DKIM_PRIVATKEY.replace(/\\n/g, '\n'), // replace all "\n" in .env string by real line break
+  SMTP_MAX_CONNECTIONS: env.SMTP_MAX_CONNECTIONS || 5,
+  SMTP_MAX_MESSAGES: env.SMTP_MAX_MESSAGES || 100,
 }
 
 const neo4j = {

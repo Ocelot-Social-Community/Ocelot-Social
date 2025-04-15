@@ -485,6 +485,8 @@
     "categoriesTitle": null,
     "changeMemberRole": null,
     "contentMenu": {
+      "muteGroup": null,
+      "unmuteGroup": null,
       "visitGroupPage": null
     },
     "createNewGroup": {
@@ -535,6 +537,7 @@
       "confirmAddGroupMemberText": null,
       "confirmAddGroupMemberTitle": null
     },
+    "muted": null,
     "myGroups": null,
     "name": null,
     "radius": null,
@@ -559,6 +562,8 @@
       "hidden": null,
       "public": null
     },
+    "unmute": null,
+    "unmuted": null,
     "update": null,
     "updatedGroup": null
   },
@@ -738,14 +743,19 @@
     "reason": {
       "changed_group_member_role": null,
       "commented_on_post": "Commenté sur votre post…",
+      "followed_user_posted": null,
       "mentioned_in_comment": "Vous a mentionné dans un commentaire…",
       "mentioned_in_post": "Vous a mentionné dans un post…",
+      "post_in_group": null,
       "removed_user_from_group": null,
       "user_joined_group": null,
       "user_left_group": null
     },
     "title": "Notifications",
     "user": "Utilisateur"
+  },
+  "observeButton": {
+    "observed": null
   },
   "post": {
     "comment": {
@@ -778,8 +788,12 @@
     "menu": {
       "delete": "Supprimer le Post",
       "edit": "Modifier le Post",
+      "observe": "Observer le Post",
+      "observedSuccessfully": null,
       "pin": "Épingler le Post",
       "pinnedSuccessfully": "Poste épinglé avec succès!",
+      "unobserve": "Ne plus observer le Post",
+      "unobservedSuccessfully": null,
       "unpin": "Retirer l'épingle du poste",
       "unpinnedSuccessfully": "Épingle retirer du Post avec succès!"
     },
@@ -1032,9 +1046,24 @@
     },
     "name": "Paramètres",
     "notifications": {
-      "name": null,
-      "send-email-notifications": null,
-      "success-update": null
+      "chat": "Chat",
+      "chatMessage": "Message reçu pendant l'absence",
+      "checkAll": "Tout cocher",
+      "commentOnObservedPost": "Commentez une contribution que je suis",
+      "followingUsers": null,
+      "group": "Groups",
+      "groupMemberJoined": "Un nouveau membre a rejoint un de mes groupes",
+      "groupMemberLeft": "Un membre a quitté un de mes groupes",
+      "groupMemberRemoved": "J'ai été retiré d'un groupe",
+      "groupMemberRoleChanged": "Mon rôle au sein d'un groupe a changé",
+      "mention": "Mentionné dans une contribution",
+      "name": "Notifications par mail",
+      "post": "Messages et commentaires",
+      "postByFollowedUser": "Messages des utilisateurs que je suis",
+      "postInGroup": "Message dans un groupe dont je suis membre",
+      "send-email-notifications": "Envoyer des notifications par courrier électronique",
+      "success-update": "Paramètres de notification sauvegardés ! ",
+      "uncheckAll": "Tout décocher"
     },
     "organizations": {
       "name": "Mes organisations"

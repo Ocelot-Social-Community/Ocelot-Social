@@ -48,6 +48,10 @@
   "menu": {
     "about": "About",
     "app": "App",
-    "home": "Home"
+    "home": "Home",
+    "theme": {
+      "switchToDark": "Dark",
+      "switchToLight": "Light"
+    }
   }
 }

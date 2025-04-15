@@ -1,8 +1,9 @@
-import gql from 'graphql-tag'
-import Factory, { cleanDatabase } from '../../../db/factories'
-import { getNeode, getDriver } from '../../../db/neo4j'
 import { createTestClient } from 'apollo-server-testing'
-import createServer from '../../../server'
+import gql from 'graphql-tag'
+
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import createServer from '@src/server'
 
 const neode = getNeode()
 const driver = getDriver()
@@ -38,8 +39,8 @@ const newlyCreatedNodesWithLocales = [
       nameRU: 'Вельцхайм',
       nameNL: 'Welzheim',
       namePL: 'Welzheim',
-      lng: 9.634741,
-      lat: 48.874924,
+      lng: 9.634301,
+      lat: 48.874393,
     },
     state: {
       id: expect.stringContaining('region'),

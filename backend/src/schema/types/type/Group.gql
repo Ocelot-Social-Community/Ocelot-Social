@@ -41,6 +41,8 @@ type Group {
   myRole: GroupMemberRole # if 'null' then the current user is no member
 
   posts: [Post] @relation(name: "IN", direction: "IN")
+
+  isMutedByMe: Boolean! @cypher(statement: "MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )")
 }
 
 
@@ -137,4 +139,7 @@ type Mutation {
     groupId: ID!
     userId: ID!
   ): User
+
+  muteGroup(groupId: ID!): Group
+  unmuteGroup(groupId: ID!): Group  
 }

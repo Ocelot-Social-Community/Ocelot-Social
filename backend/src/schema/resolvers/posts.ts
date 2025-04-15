@@ -1,15 +1,17 @@
-import { v4 as uuid } from 'uuid'
-import { neo4jgraphql } from 'neo4j-graphql-js'
-import { isEmpty } from 'lodash'
 import { UserInputError } from 'apollo-server'
-import { mergeImage, deleteImage } from './images/images'
-import Resolver from './helpers/Resolver'
+import { isEmpty } from 'lodash'
+import { neo4jgraphql } from 'neo4j-graphql-js'
+import { v4 as uuid } from 'uuid'
+
+import CONFIG from '@config/index'
+
+import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
-import { validateEventParams } from './helpers/events'
+import Resolver from './helpers/Resolver'
+import { mergeImage, deleteImage } from './images/images'
 import { createOrUpdateLocations } from './users/location'
-import CONFIG from '../../config'
 
 const maintainPinnedPosts = (params) => {
   const pinnedPostFilter = { pinned: true }
@@ -144,6 +146,10 @@ export default {
             WITH post
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
+            MERGE (post)<-[obs:OBSERVES]-(author)
+            SET obs.active = true
+            SET obs.createdAt = toString(datetime())
+            SET obs.updatedAt = toString(datetime())
             ${categoriesCypher}
             ${groupCypher}
             RETURN post {.*, postType: [l IN labels(post) WHERE NOT l = 'Post'] }
@@ -416,6 +422,35 @@ export default {
         session.close()
       }
     },
+    toggleObservePost: async (_parent, params, context, _resolveInfo) => {
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const transactionResponse = await transaction.run(
+          `
+          MATCH (post:Post { id: $params.id })
+          MATCH (user:User { id: $userId })
+          MERGE (user)-[obs:OBSERVES]->(post)
+          ON CREATE SET 
+            obs.createdAt = toString(datetime()),
+            obs.updatedAt = toString(datetime()),
+            obs.active = $params.value
+          ON MATCH SET
+            obs.updatedAt = toString(datetime()),
+            obs.active = $params.value
+          RETURN post
+        `,
+          { userId: context.user.id, params },
+        )
+        return transactionResponse.records.map((record) => record.get('post').properties)
+      })
+      try {
+        const [post] = await writeTxResultPromise
+        post.viewedTeaserCount = post.viewedTeaserCount.low
+        return post
+      } finally {
+        session.close()
+      }
+    },
   },
   Post: {
     ...Resolver('Post', {
@@ -452,12 +487,16 @@ export default {
         shoutedCount:
           '<-[:SHOUTED]-(related:User) WHERE NOT related.deleted = true AND NOT related.disabled = true',
         emotionsCount: '<-[related:EMOTED]-(:User)',
+        observingUsersCount:
+          '<-[obs:OBSERVES]-(related:User) WHERE obs.active = true AND NOT related.deleted = true AND NOT related.disabled = true',
       },
       boolean: {
         shoutedByCurrentUser:
           'MATCH(this)<-[:SHOUTED]-(related:User {id: $cypherParams.currentUserId}) RETURN COUNT(related) >= 1',
         viewedTeaserByCurrentUser:
           'MATCH (this)<-[:VIEWED_TEASER]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1',
+        isObservedByMe:
+          'MATCH (this)<-[obs:OBSERVES]-(related:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(related) >= 1',
       },
     }),
     relatedContributions: async (parent, params, context, resolveInfo) => {

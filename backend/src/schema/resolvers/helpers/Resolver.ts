@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 import log from './databaseLogger'
 
 export const undefinedToNullResolver = (list) => {
