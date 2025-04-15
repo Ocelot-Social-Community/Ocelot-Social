@@ -143,7 +143,12 @@ describe('Badges', () => {
             }),
           ).resolves.toMatchObject({
             data: { verify: null },
-            errors: [{ message: "Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type." }],
+            errors: [
+              {
+                message:
+                  'Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
+              },
+            ],
           })
         })
       })
@@ -157,7 +162,12 @@ describe('Badges', () => {
             }),
           ).resolves.toMatchObject({
             data: { verify: null },
-            errors: [{ message: "Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type." }],
+            errors: [
+              {
+                message:
+                  'Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
+              },
+            ],
           })
         })
       })
@@ -171,7 +181,12 @@ describe('Badges', () => {
             }),
           ).resolves.toMatchObject({
             data: { verify: null },
-            errors: [{ message: "Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type." }],
+            errors: [
+              {
+                message:
+                  'Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
+              },
+            ],
           })
         })
       })
@@ -323,7 +338,12 @@ describe('Badges', () => {
             }),
           ).resolves.toMatchObject({
             data: { reward: null },
-            errors: [{ message: "Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type." }],
+            errors: [
+              {
+                message:
+                  'Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
+              },
+            ],
           })
         })
       })
@@ -337,7 +357,12 @@ describe('Badges', () => {
             }),
           ).resolves.toMatchObject({
             data: { reward: null },
-            errors: [{ message: "Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type." }],
+            errors: [
+              {
+                message:
+                  'Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
+              },
+            ],
           })
         })
       })
@@ -351,7 +376,12 @@ describe('Badges', () => {
             }),
           ).resolves.toMatchObject({
             data: { reward: null },
-            errors: [{ message: "Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type." }],
+            errors: [
+              {
+                message:
+                  'Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
+              },
+            ],
           })
         })
       })
@@ -479,16 +509,16 @@ describe('Badges', () => {
 
     beforeEach(async () => {
       await regularUser.relateTo(badge, 'rewarded')
+      await regularUser.relateTo(verification, 'verified')
     })
-    const expected = {
-      data: { unreward: { id: 'regular-user-id', badges: [] } },
-      errors: undefined,
-    }
 
     const unrewardMutation = gql`
       mutation ($badgeId: ID!, $userId: ID!) {
         unreward(badgeId: $badgeId, userId: $userId) {
           id
+          verified {
+            id
+          }
           badges {
             id
           }
@@ -548,16 +578,71 @@ describe('Badges', () => {
       })
 
       it('removes a badge from user', async () => {
-        await expect(mutate({ mutation: unrewardMutation, variables })).resolves.toMatchObject(
-          expected,
-        )
+        await expect(mutate({ mutation: unrewardMutation, variables })).resolves.toMatchObject({
+          data: {
+            unreward: {
+              id: 'regular-user-id',
+              verified: { id: 'verification_turtle' },
+              badges: [],
+            },
+          },
+          errors: undefined,
+        })
       })
 
       it('does not crash when unrewarding multiple times', async () => {
         await mutate({ mutation: unrewardMutation, variables })
-        await expect(mutate({ mutation: unrewardMutation, variables })).resolves.toMatchObject(
-          expected,
-        )
+        await expect(mutate({ mutation: unrewardMutation, variables })).resolves.toMatchObject({
+          data: {
+            unreward: {
+              id: 'regular-user-id',
+              verified: { id: 'verification_turtle' },
+              badges: [],
+            },
+          },
+          errors: undefined,
+        })
+      })
+
+      it('removes a verification from user', async () => {
+        await expect(
+          mutate({
+            mutation: unrewardMutation,
+            variables: {
+              badgeId: 'verification_turtle',
+              userId: 'regular-user-id',
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            unreward: { id: 'regular-user-id', verified: null, badges: [{ id: 'badge_rhino' }] },
+          },
+          errors: undefined,
+        })
+      })
+
+      it('does not crash when removing verification multiple times', async () => {
+        await mutate({
+          mutation: unrewardMutation,
+          variables: {
+            badgeId: 'verification_turtle',
+            userId: 'regular-user-id',
+          },
+        })
+        await expect(
+          mutate({
+            mutation: unrewardMutation,
+            variables: {
+              badgeId: 'verification_turtle',
+              userId: 'regular-user-id',
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            unreward: { id: 'regular-user-id', verified: null, badges: [{ id: 'badge_rhino' }] },
+          },
+          errors: undefined,
+        })
       })
     })
   })

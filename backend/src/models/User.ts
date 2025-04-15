@@ -52,6 +52,12 @@ export default {
     target: 'Badge',
     direction: 'in',
   },
+  verified: {
+    type: 'relationship',
+    relationship: 'VERIFIED',
+    target: 'Badge',
+    direction: 'in',
+  },
   invitedBy: { type: 'relationship', relationship: 'INVITED', target: 'User', direction: 'in' },
   lastActiveAt: { type: 'string', isoDate: true },
   lastOnlineStatus: { type: 'string' },
