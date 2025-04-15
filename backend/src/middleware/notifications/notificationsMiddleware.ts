@@ -346,9 +346,10 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
     case 'mentioned_in_post': {
       mentionedCypher = `
         MATCH (post: Post { id: $id })<-[:WROTE]-(author: User)
-        MATCH (user: User)
-        WHERE user.id in $idsOfUsers
-        AND NOT (user)-[:BLOCKED]-(author)
+        MATCH (user: User) WHERE user.id in $idsOfUsers AND NOT (user)-[:BLOCKED]-(author)
+        OPTIONAL MATCH (post)-[:IN]->(group:Group)
+        OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(user)
+        WITH post, author, user, group WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
         MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
         WITH post AS resource, notification, user
       `
@@ -358,9 +359,12 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
       mentionedCypher = `
       MATCH (postAuthor: User)-[:WROTE]->(post: Post)<-[:COMMENTS]-(comment: Comment { id: $id })<-[:WROTE]-(commenter: User)
       MATCH (user: User)
-      WHERE user.id in $idsOfUsers
-      AND NOT (user)-[:BLOCKED]-(commenter)
-      AND NOT (user)-[:BLOCKED]-(postAuthor)
+        WHERE user.id in $idsOfUsers
+        AND NOT (user)-[:BLOCKED]-(commenter)
+        AND NOT (user)-[:BLOCKED]-(postAuthor)
+      OPTIONAL MATCH (post)-[:IN]->(group:Group)
+      OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(user)
+      WITH comment, user, group WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
       MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(user)
       WITH comment AS resource, notification, user
       `
