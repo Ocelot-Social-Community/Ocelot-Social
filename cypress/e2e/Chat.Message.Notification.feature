@@ -3,7 +3,9 @@ Feature: Notifications for Chat Messages via E-Mail
   Get notified about chat messages via e-mail
   To be informed promptly about recent activities in their chats
 
-  Online users just get the chat room list and chat notification list.
+  For chat messages from muted or blocked users no emails are send.
+  # Online users just get the chat room list and chat notification list.
+  Online users do not receive any chat related emails.
   For chat messages from muted users no emails are send.
 
   Background:
@@ -16,10 +18,14 @@ Feature: Notifications for Chat Messages via E-Mail
     And "Bob der Baumeister" mutes "Nathan Narrator"
     And "Bob der Baumeister" blocks "Billy Block"
 
-  Scenario: No Chat Notification Email when Online
-    Given I am logged in as "bob-der-baumeister"
-    # When "Jenny Rostock" sends a chat message to "Bob der Baumeister"
-    # And "Nathan Narrator" sends a chat message to "Bob der Baumeister"
+  Scenario: Receive Chat Notification Email only when Online
+    When "Jenny Rostock" sends a chat message to "Bob der Baumeister"
+    And "Nathan Narrator" sends a chat message to "Bob der Baumeister"
+    And "Billy Block" sends a chat message to "Bob der Baumeister"
+    Then "moderator@example.org" should receive "0" chat notification email referencing "Jenny Rostock"
+    When I am logged in as "bob-der-baumeister"
+    And "Jenny Rostock" sends a chat message to "Bob der Baumeister"
+    And "Nathan Narrator" sends a chat message to "Bob der Baumeister"
+    And "Billy Block" sends a chat message to "Bob der Baumeister"
     Then "moderator@example.org" should receive no chat notification email
-    # And "Bob der Baumeister" should receive "0" chat notification email referencing "Nathan Narrator"
   
