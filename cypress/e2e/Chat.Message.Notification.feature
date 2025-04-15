@@ -12,7 +12,9 @@ Feature: Notifications for Chat Messages via E-Mail
       | Bob der Baumeister | bob-der-baumeister | moderator@example.org | 1234     | u2   |  0.0.4                           |
       | Jenny Rostock      | jenny-rostock      | user@example.org      | 1234     | u3   |  0.0.4                           |
       | Nathan Narrator    | nathan-narrator    | narrator@example.org  | abcd     | u_nn |  0.0.4                           |
+      | Billy Block        | billy-block        | billy@example.org     | 4321     | u_bb |  0.0.4                           |
     And "Bob der Baumeister" mutes "Nathan Narrator"
+    And "Bob der Baumeister" blocks "Billy Block"
 
   Scenario: No Chat Notification Email when Online
     Given I am logged in as "bob-der-baumeister"
