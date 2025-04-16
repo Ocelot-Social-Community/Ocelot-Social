@@ -49,7 +49,8 @@ const publishNotifications = async (context, promises, emailNotificationSetting:
   )
   notifications.forEach((notificationAdded, index) => {
     pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
-    if (notificationAdded.to[emailNotificationSetting] ?? true) {
+    if ((notificationAdded.to[emailNotificationSetting] ?? true)
+        && !isUserOnline(notificationAdded.to)) {
       sendMail(
         notificationTemplate({
           email: notificationsEmailAddresses[index].email,
