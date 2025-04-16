@@ -234,6 +234,8 @@ const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
     MATCH (post)-[:IN]->(group:Group { id: $groupId })<-[membership:MEMBER_OF]-(user:User)
       WHERE NOT membership.role = 'pending'
       AND NOT (user)-[:MUTED]->(group)
+      AND NOT (user)-[:MUTED]->(author)
+      AND NOT (user)-[:BLOCKED]->(author)
       AND NOT user.id = $userId
     WITH post, author, user
     MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
