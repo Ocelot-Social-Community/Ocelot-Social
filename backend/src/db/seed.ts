@@ -246,15 +246,23 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await peterLustig.relateTo(badgeWolf, 'rewarded')
     await peterLustig.relateTo(badgeAirship, 'rewarded')
     await peterLustig.relateTo(verificationAdmin, 'verified')
+    await peterLustig.relateTo(badgeRacoon, 'profilebadge', { slot: 0 })
+    await peterLustig.relateTo(badgeRhino, 'profilebadge', { slot: 1 })
+    await peterLustig.relateTo(badgeAirship, 'profilebadge', { slot: 5 })
 
     await bobDerBaumeister.relateTo(badgeRacoon, 'rewarded')
     await bobDerBaumeister.relateTo(badgeTurtle, 'rewarded')
     await bobDerBaumeister.relateTo(badgeBee, 'rewarded')
-    await peterLustig.relateTo(verificationModerator, 'verified')
+    await bobDerBaumeister.relateTo(verificationModerator, 'verified')
+    await bobDerBaumeister.relateTo(badgeRacoon, 'profilebadge', { slot: 1 })
+    await bobDerBaumeister.relateTo(badgeTurtle, 'profilebadge', { slot: 2 })
 
     await jennyRostock.relateTo(badgeBear, 'rewarded')
     await jennyRostock.relateTo(badgeStarter, 'rewarded')
     await jennyRostock.relateTo(badgeFlower, 'rewarded')
+    await jennyRostock.relateTo(badgeBear, 'profilebadge', { slot: 0 })
+    await jennyRostock.relateTo(badgeStarter, 'profilebadge', { slot: 1 })
+    await jennyRostock.relateTo(badgeFlower, 'profilebadge', { slot: 2 })
 
     await huey.relateTo(badgePanda, 'rewarded')
     await huey.relateTo(badgeTiger, 'rewarded')
@@ -263,11 +271,17 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await huey.relateTo(badgeMagicrainbow, 'rewarded')
     await huey.relateTo(badgeSuperfounder, 'rewarded')
     await huey.relateTo(verificationDeveloper, 'verified')
+    await huey.relateTo(badgePanda, 'profilebadge', { slot: 0 })
+    await huey.relateTo(badgeTiger, 'profilebadge', { slot: 1 })
+    await huey.relateTo(badgeAlienship, 'profilebadge', { slot: 2 })
 
     await dewey.relateTo(badgeBigballoon, 'rewarded')
     await dewey.relateTo(badgeLifetree, 'rewarded')
+    await dewey.relateTo(badgeBigballoon, 'profilebadge', { slot: 7 })
+    await dewey.relateTo(badgeLifetree, 'profilebadge', { slot: 8 })
 
     await louie.relateTo(badgeRabbit, 'rewarded')
+    await louie.relateTo(badgeRabbit, 'profilebadge', { slot: 4 })
 
     // Friends
     await peterLustig.relateTo(bobDerBaumeister, 'friends')

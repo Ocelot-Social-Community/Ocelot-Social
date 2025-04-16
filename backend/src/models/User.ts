@@ -52,6 +52,18 @@ export default {
     target: 'Badge',
     direction: 'in',
   },
+  profilebadge: {
+    type: 'relationship',
+    relationship: 'PROFILEBADGE',
+    target: 'Badge',
+    direction: 'out',
+    properties: {
+      slot: {
+        type: 'int',
+        required: true,
+      },
+    },
+  },
   verified: {
     type: 'relationship',
     relationship: 'VERIFIED',
