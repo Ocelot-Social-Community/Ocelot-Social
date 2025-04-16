@@ -7,7 +7,9 @@ import {
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 // eslint-disable-next-line import/no-cycle
-import { pubsub, NOTIFICATION_ADDED } from '@src/server'
+import { getUnreadRoomsCount } from '@schema/resolvers/rooms'
+// eslint-disable-next-line import/no-cycle
+import { pubsub, NOTIFICATION_ADDED, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '@src/server'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 
@@ -111,6 +113,7 @@ const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveIn
 }
 
 const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
+  const { groupId } = args
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
@@ -118,6 +121,16 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
       context,
       [notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context)],
       'emailNotificationsMention',
+    )
+    await publishNotifications(
+      context,
+      [notifyFollowingUsers(post.id, groupId, context)],
+      'emailNotificationsFollowingUsers',
+    )
+    await publishNotifications(
+      context,
+      [notifyGroupMembersOfNewPost(post.id, groupId, context)],
+      'emailNotificationsPostInGroup',
     )
   }
   return post
@@ -166,6 +179,88 @@ const postAuthorOfComment = async (commentId, { context }) => {
       )
     })
     return postAuthorId.records.map((record) => record.get('authorId'))
+  } finally {
+    session.close()
+  }
+}
+
+const notifyFollowingUsers = async (postId, groupId, context) => {
+  const reason = 'followed_user_posted'
+  const cypher = `
+    MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })<-[:FOLLOWS]-(user:User)
+    OPTIONAL MATCH (post)-[:IN]->(group:Group { id: $groupId })
+    WITH post, author, user, group WHERE group IS NULL OR group.groupType = 'public'
+    MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
+      SET notification.read = FALSE
+      SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
+      SET notification.updatedAt = toString(datetime())
+    WITH notification, author, user,
+      post {.*, author: properties(author) } AS finalResource
+    RETURN notification {
+      .*,
+      from: finalResource,
+      to: properties(user),
+      relatedUser: properties(author)
+    }
+  `
+  const session = context.driver.session()
+  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+    const notificationTransactionResponse = await transaction.run(cypher, {
+      postId,
+      reason,
+      groupId: groupId || null,
+      userId: context.user.id,
+    })
+    return notificationTransactionResponse.records.map((record) => record.get('notification'))
+  })
+  try {
+    const notifications = await writeTxResultPromise
+    return notifications
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    session.close()
+  }
+}
+
+const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
+  if (!groupId) return []
+  const reason = 'post_in_group'
+  const cypher = `
+    MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })
+    MATCH (post)-[:IN]->(group:Group { id: $groupId })<-[membership:MEMBER_OF]-(user:User)
+      WHERE NOT membership.role = 'pending'
+      AND NOT (user)-[:MUTED]->(group)
+      AND NOT user.id = $userId
+    WITH post, author, user
+    MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
+      SET notification.read = FALSE
+      SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
+      SET notification.updatedAt = toString(datetime())
+    WITH notification, author, user,
+      post {.*, author: properties(author) } AS finalResource
+    RETURN notification {
+      .*,
+      from: finalResource,
+      to: properties(user),
+      relatedUser: properties(author)
+    }
+  `
+  const session = context.driver.session()
+  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+    const notificationTransactionResponse = await transaction.run(cypher, {
+      postId,
+      reason,
+      groupId,
+      userId: context.user.id,
+    })
+    return notificationTransactionResponse.records.map((record) => record.get('notification'))
+  })
+  try {
+    const notifications = await writeTxResultPromise
+    return notifications
+  } catch (error) {
+    throw new Error(error)
   } finally {
     session.close()
   }
@@ -343,7 +438,7 @@ const notifyUsersOfComment = async (label, commentId, reason, context) => {
 
 const handleCreateMessage = async (resolve, root, args, context, resolveInfo) => {
   // Execute resolver
-  const result = await resolve(root, args, context, resolveInfo)
+  const message = await resolve(root, args, context, resolveInfo)
 
   // Query Parameters
   const { roomId } = args
@@ -359,7 +454,7 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
       MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
         WHERE NOT recipientUser.id = $currentUserId
         AND NOT (recipientUser)-[:BLOCKED]-(senderUser)
-        AND NOT recipientUser.emailNotificationsChatMessage = false
+        AND NOT (recipientUser)-[:MUTED]->(senderUser)
       RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email}
     `
     const txResponse = await transaction.run(messageRecipientCypher, {
@@ -378,13 +473,27 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
     // Execute Query
     const { senderUser, recipientUser, email } = await messageRecipient
 
-    // Send EMail if we found a user(not blocked) and he is not considered online
-    if (recipientUser && !isUserOnline(recipientUser)) {
-      void sendMail(chatMessageTemplate({ email, variables: { senderUser, recipientUser } }))
+    if (recipientUser) {
+      // send subscriptions
+      const roomCountUpdated = await getUnreadRoomsCount(recipientUser.id, session)
+
+      void pubsub.publish(ROOM_COUNT_UPDATED, {
+        roomCountUpdated,
+        userId: recipientUser.id,
+      })
+      void pubsub.publish(CHAT_MESSAGE_ADDED, {
+        chatMessageAdded: message,
+        userId: recipientUser.id,
+      })
+
+      // Send EMail if we found a user(not blocked) and he is not considered online
+      if (recipientUser.emailNotificationsChatMessage !== false && !isUserOnline(recipientUser)) {
+        void sendMail(chatMessageTemplate({ email, variables: { senderUser, recipientUser } }))
+      }
     }
 
     // Return resolver result to client
-    return result
+    return message
   } catch (error) {
     throw new Error(error)
   } finally {

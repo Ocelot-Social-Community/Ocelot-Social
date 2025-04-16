@@ -62,6 +62,27 @@ export default {
           params: { id: this.group.id, slug: this.group.slug },
         })
       }
+
+      if (this.usage === 'groupProfile') {
+        if (this.group.isMutedByMe) {
+          routes.push({
+            label: this.$t('group.contentMenu.unmuteGroup'),
+            icon: 'volume-up',
+            callback: () => {
+              this.$emit('unmute', this.group.id)
+            },
+          })
+        } else {
+          routes.push({
+            label: this.$t('group.contentMenu.muteGroup'),
+            icon: 'volume-off',
+            callback: () => {
+              this.$emit('mute', this.group.id)
+            },
+          })
+        }
+      }
+
       if (this.group.myRole === 'owner') {
         routes.push({
           label: this.$t('admin.settings.name'),

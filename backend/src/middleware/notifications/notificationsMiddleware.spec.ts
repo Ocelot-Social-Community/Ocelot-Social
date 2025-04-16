@@ -29,8 +29,10 @@ jest.mock('../helpers/isUserOnline', () => ({
   isUserOnline: () => isUserOnlineMock(),
 }))
 
+const pubsubSpy = jest.spyOn(pubsub, 'publish')
+
 let server, query, mutate, notifiedUser, authenticatedUser
-let publishSpy
+
 const driver = getDriver()
 const neode = getNeode()
 const categoryIds = ['cat9']
@@ -63,7 +65,6 @@ const createCommentMutation = gql`
 beforeAll(async () => {
   await cleanDatabase()
 
-  publishSpy = jest.spyOn(pubsub, 'publish')
   const createServerResult = createServer({
     context: () => {
       return {
@@ -85,7 +86,6 @@ afterAll(async () => {
 })
 
 beforeEach(async () => {
-  publishSpy.mockClear()
   notifiedUser = await Factory.build(
     'user',
     {
@@ -415,7 +415,7 @@ describe('notifications', () => {
 
         it('publishes `NOTIFICATION_ADDED` to me', async () => {
           await createPostAction()
-          expect(publishSpy).toHaveBeenCalledWith(
+          expect(pubsubSpy).toHaveBeenCalledWith(
             'NOTIFICATION_ADDED',
             expect.objectContaining({
               notificationAdded: expect.objectContaining({
@@ -426,7 +426,7 @@ describe('notifications', () => {
               }),
             }),
           )
-          expect(publishSpy).toHaveBeenCalledTimes(1)
+          expect(pubsubSpy).toHaveBeenCalledTimes(1)
         })
 
         describe('updates the post and mentions me again', () => {
@@ -576,7 +576,7 @@ describe('notifications', () => {
 
           it('does not publish `NOTIFICATION_ADDED`', async () => {
             await createPostAction()
-            expect(publishSpy).not.toHaveBeenCalled()
+            expect(pubsubSpy).not.toHaveBeenCalled()
           })
         })
       })
@@ -720,7 +720,7 @@ describe('notifications', () => {
 
           it('does not publish `NOTIFICATION_ADDED` to authenticated user', async () => {
             await createCommentOnPostAction()
-            expect(publishSpy).toHaveBeenCalledWith(
+            expect(pubsubSpy).toHaveBeenCalledWith(
               'NOTIFICATION_ADDED',
               expect.objectContaining({
                 notificationAdded: expect.objectContaining({
@@ -731,14 +731,14 @@ describe('notifications', () => {
                 }),
               }),
             )
-            expect(publishSpy).toHaveBeenCalledTimes(1)
+            expect(pubsubSpy).toHaveBeenCalledTimes(1)
           })
         })
       })
     })
   })
 
-  describe('chat email notifications', () => {
+  describe('chat notifications', () => {
     let chatSender
     let chatReceiver
     let roomId
@@ -777,7 +777,7 @@ describe('notifications', () => {
     })
 
     describe('if the chatReceiver is online', () => {
-      it('sends no email', async () => {
+      it('publishes subscriptions but sends no email', async () => {
         isUserOnlineMock = jest.fn().mockReturnValue(true)
 
         await mutate({
@@ -788,13 +788,32 @@ describe('notifications', () => {
           },
         })
 
+        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_COUNT_UPDATED', {
+          roomCountUpdated: '1',
+          userId: 'chatReceiver',
+        })
+        expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
+          chatMessageAdded: expect.objectContaining({
+            id: expect.any(String),
+            content: 'Some nice message to chatReceiver',
+            senderId: 'chatSender',
+            username: 'chatSender',
+            avatar: null,
+            date: expect.any(String),
+            saved: true,
+            distributed: false,
+            seen: false,
+          }),
+          userId: 'chatReceiver',
+        })
+
         expect(sendMailMock).not.toHaveBeenCalled()
         expect(chatMessageTemplateMock).not.toHaveBeenCalled()
       })
     })
 
     describe('if the chatReceiver is offline', () => {
-      it('sends an email', async () => {
+      it('publishes subscriptions and sends an email', async () => {
         isUserOnlineMock = jest.fn().mockReturnValue(false)
 
         await mutate({
@@ -805,13 +824,32 @@ describe('notifications', () => {
           },
         })
 
+        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_COUNT_UPDATED', {
+          roomCountUpdated: '1',
+          userId: 'chatReceiver',
+        })
+        expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
+          chatMessageAdded: expect.objectContaining({
+            id: expect.any(String),
+            content: 'Some nice message to chatReceiver',
+            senderId: 'chatSender',
+            username: 'chatSender',
+            avatar: null,
+            date: expect.any(String),
+            saved: true,
+            distributed: false,
+            seen: false,
+          }),
+          userId: 'chatReceiver',
+        })
+
         expect(sendMailMock).toHaveBeenCalledTimes(1)
         expect(chatMessageTemplateMock).toHaveBeenCalledTimes(1)
       })
     })
 
     describe('if the chatReceiver has blocked chatSender', () => {
-      it('sends no email', async () => {
+      it('publishes no subscriptions and sends no email', async () => {
         isUserOnlineMock = jest.fn().mockReturnValue(false)
         await chatReceiver.relateTo(chatSender, 'blocked')
 
@@ -823,13 +861,37 @@ describe('notifications', () => {
           },
         })
 
+        expect(pubsubSpy).not.toHaveBeenCalled()
+        expect(pubsubSpy).not.toHaveBeenCalled()
+
+        expect(sendMailMock).not.toHaveBeenCalled()
+        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('if the chatReceiver has muted chatSender', () => {
+      it('publishes no subscriptions and sends no email', async () => {
+        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        await chatReceiver.relateTo(chatSender, 'muted')
+
+        await mutate({
+          mutation: createMessageMutation(),
+          variables: {
+            roomId,
+            content: 'Some nice message to chatReceiver',
+          },
+        })
+
+        expect(pubsubSpy).not.toHaveBeenCalled()
+        expect(pubsubSpy).not.toHaveBeenCalled()
+
         expect(sendMailMock).not.toHaveBeenCalled()
         expect(chatMessageTemplateMock).not.toHaveBeenCalled()
       })
     })
 
     describe('if the chatReceiver has disabled `emailNotificationsChatMessage`', () => {
-      it('sends no email', async () => {
+      it('publishes subscriptions but sends no email', async () => {
         isUserOnlineMock = jest.fn().mockReturnValue(false)
         await chatReceiver.update({ emailNotificationsChatMessage: false })
 
@@ -839,6 +901,25 @@ describe('notifications', () => {
             roomId,
             content: 'Some nice message to chatReceiver',
           },
+        })
+
+        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_COUNT_UPDATED', {
+          roomCountUpdated: '1',
+          userId: 'chatReceiver',
+        })
+        expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
+          chatMessageAdded: expect.objectContaining({
+            id: expect.any(String),
+            content: 'Some nice message to chatReceiver',
+            senderId: 'chatSender',
+            username: 'chatSender',
+            avatar: null,
+            date: expect.any(String),
+            saved: true,
+            distributed: false,
+            seen: false,
+          }),
+          userId: 'chatReceiver',
         })
 
         expect(sendMailMock).not.toHaveBeenCalled()
