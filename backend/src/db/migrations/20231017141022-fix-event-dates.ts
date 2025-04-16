@@ -34,7 +34,6 @@ export async function up(next) {
       `)
     }
     await transaction.commit()
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -54,7 +53,6 @@ export async function down(next) {
 
   try {
     // No sense in running this down
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
