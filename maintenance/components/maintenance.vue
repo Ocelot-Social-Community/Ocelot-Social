@@ -44,9 +44,9 @@
   </template>
 
   <script>
-  import emails from '~/constants/emails.js'
+  import emails from '~/constants/emails'
   // import links from '~/constants/links.js'
-  import metadata from '~/constants/metadata.js'
+  import metadata from '~/constants/metadata'
 //  import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
   // import Logo from '~/components/Logo/Logo'
 
