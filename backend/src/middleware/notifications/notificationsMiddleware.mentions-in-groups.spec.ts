@@ -515,7 +515,7 @@ describe('mentions in groups', () => {
       })
     })
 
-    it('sends only 1 emails', () => {
+    it('sends only 1 email', () => {
       expect(sendMailMock).toHaveBeenCalledTimes(1)
     })
   })
