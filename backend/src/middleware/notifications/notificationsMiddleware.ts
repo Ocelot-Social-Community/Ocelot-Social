@@ -40,7 +40,12 @@ const queryNotificationEmails = async (context, notificationUserIds) => {
   }
 }
 
-const publishNotifications = async (context, promises, emailNotificationSetting: string) => {
+const publishNotifications = async (
+  context,
+  promises,
+  emailNotificationSetting: string,
+  emailsSent: string[] = [],
+): Promise<string[]> => {
   let notifications = await Promise.all(promises)
   notifications = notifications.flat()
   const notificationsEmailAddresses = await queryNotificationEmails(
@@ -53,14 +58,18 @@ const publishNotifications = async (context, promises, emailNotificationSetting:
       (notificationAdded.to[emailNotificationSetting] ?? true) &&
       !isUserOnline(notificationAdded.to)
     ) {
-      sendMail(
-        notificationTemplate({
-          email: notificationsEmailAddresses[index].email,
-          variables: { notification: notificationAdded },
-        }),
-      )
+      if (!emailsSent.includes(notificationsEmailAddresses[index].email)) {
+        sendMail(
+          notificationTemplate({
+            email: notificationsEmailAddresses[index].email,
+            variables: { notification: notificationAdded },
+          }),
+        )
+        emailsSent.push(notificationsEmailAddresses[index].email)
+      }
     }
   })
+  return emailsSent
 }
 
 const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
@@ -120,20 +129,26 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
-    await publishNotifications(
+    const sentEmails: string[] = await publishNotifications(
       context,
       [notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context)],
       'emailNotificationsMention',
     )
-    await publishNotifications(
-      context,
-      [notifyFollowingUsers(post.id, groupId, context)],
-      'emailNotificationsFollowingUsers',
+    sentEmails.concat(
+      await publishNotifications(
+        context,
+        [notifyFollowingUsers(post.id, groupId, context)],
+        'emailNotificationsFollowingUsers',
+        sentEmails,
+      ),
     )
-    await publishNotifications(
-      context,
-      [notifyGroupMembersOfNewPost(post.id, groupId, context)],
-      'emailNotificationsPostInGroup',
+    sentEmails.concat(
+      await publishNotifications(
+        context,
+        [notifyGroupMembersOfNewPost(post.id, groupId, context)],
+        'emailNotificationsPostInGroup',
+        sentEmails,
+      ),
     )
   }
   return post
@@ -145,7 +160,7 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
   idsOfMentionedUsers = idsOfMentionedUsers.filter((id) => id !== postAuthor.id)
-  await publishNotifications(
+  const sentEmails: string[] = await publishNotifications(
     context,
     [
       notifyUsersOfMention(
@@ -158,13 +173,14 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
     ],
     'emailNotificationsMention',
   )
-
-  await publishNotifications(
-    context,
-    [notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context)],
-    'emailNotificationsCommentOnObservedPost',
+  sentEmails.concat(
+    await publishNotifications(
+      context,
+      [notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context)],
+      'emailNotificationsCommentOnObservedPost',
+      sentEmails,
+    ),
   )
-
   return comment
 }
 
