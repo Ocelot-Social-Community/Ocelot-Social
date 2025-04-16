@@ -339,8 +339,8 @@ describe('mentions in groups', () => {
       })
     })
 
-    it('sends 3 emails, 2 mentions and 1 post in group', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(5)
+    it('sends 3 emails, one for each user', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(3)
     })
   })
 
@@ -427,8 +427,8 @@ describe('mentions in groups', () => {
       })
     })
 
-    it('sends 2 emails, one mention and one post in group', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(2)
+    it('sends only 1 email', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -515,8 +515,8 @@ describe('mentions in groups', () => {
       })
     })
 
-    it('sends 2 emails, one mention and one post in group', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(2)
+    it('sends only 1 emails', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(1)
     })
   })
 
