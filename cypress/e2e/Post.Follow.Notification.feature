@@ -24,9 +24,11 @@ Feature: Notifications Posts
   Scenario: Receive notifications regarding observed Post
     Given "Bob der Baumeister" observes the post "nicePost"
     When "Nathan Narrator" comments on the post "nicePost"
-    Then "moderator@example.org" receives an email regarding "The nice Post"
+    Then "moderator@example.org" receives "0" email regarding "The nice Post"
     When I am logged in as "Bob der Baumeister"
     Then a notification about the new post is displayed in the nav menu
+    When "Jenny Rostock" comments on the post "nicePost"
+    Then "moderator@example.org" receives "1" email regarding "The nice Post"
 
   # omit these scenarios as the different ways into observing /unobserving a post should be covered in unit testing
 

@@ -22,12 +22,15 @@ Feature: Notifications for Groups
     And "Bob der Baumeister" joins the group "Jenny's Group"
     And "Billy Block" joins the group "Jenny's Group"
 
-  Scenario: In-app notification
+  Scenario: Get notified about new post in group
     Given "Bob der Baumeister" posts to group "Jenny's Group"
-    Then "Jenny Rostock" receives an email about a new post in group "Jenny's Group"
+    Then "Jenny Rostock" receives "1" email about a new post in group "Jenny's Group"
     And the email contains a deep link to the post
     When I am logged in as "Jenny Rostock"
     Then I see a notification about the new post in the dashboard
+    When "Bob der Baumeister" posts to group "Jenny's Group"
+    Then "Jenny Rostock" receives "0" email about a new post in group "Jenny's Group"
+
 
   # omit these scenarios as the different ways to deactivate notifications for groups are covered in unit testing
 
