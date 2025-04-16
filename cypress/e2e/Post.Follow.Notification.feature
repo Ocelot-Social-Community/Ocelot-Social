@@ -4,7 +4,8 @@ Feature: Notifications Posts
   In order to get notified about new comments on a post
 
   When absent or offline I get notified via e-mail
-  # For users I have blocked or muted no notifications or emails are send
+  # No notifications or emails are send regarding comments from users I have blocked or muted
+
 
   Background:
     Given the following "users" are in the database:
@@ -27,7 +28,7 @@ Feature: Notifications Posts
     When I am logged in as "Bob der Baumeister"
     Then a notification about the new post is displayed in the nav menu
 
-  # TODO: omit hese scenario as the different ways into observin /unobserving apost shouldbecovered in unit testing
+  # omit these scenarios as the different ways into observing /unobserving a post should be covered in unit testing
 
   # Scenario: Unfollow a post and receive no more notifications about it
   #   Given I follow a post 
