@@ -11,7 +11,6 @@ export async function up(next) {
     // Implement your migration here.
     await transaction.run(``)
     await transaction.commit()
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -33,7 +32,6 @@ export async function down(next) {
     // Implement your migration here.
     await transaction.run(``)
     await transaction.commit()
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
