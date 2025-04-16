@@ -10,6 +10,7 @@ yarn-error.log*
 kubeconfig.yaml
 backup-cron-job.log
 .vscode
+.nuxt
 
 node_modules/
 cypress/videos

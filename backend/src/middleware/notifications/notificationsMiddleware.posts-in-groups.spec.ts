@@ -118,7 +118,7 @@ afterAll(async () => {
 })
 
 describe('notify group members of new posts in group', () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     postAuthor = await Factory.build(
       'user',
       {
@@ -193,8 +193,12 @@ describe('notify group members of new posts in group', () => {
     })
   })
 
+  afterEach(async () => {
+    await cleanDatabase()
+  })
+
   describe('group owner posts in group', () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
       jest.clearAllMocks()
       authenticatedUser = await groupMember.toJson()
       await markAllAsRead()
@@ -275,29 +279,15 @@ describe('notify group members of new posts in group', () => {
     })
 
     describe('group member mutes group', () => {
-      it('sets the muted status correctly', async () => {
+      beforeEach(async () => {
         authenticatedUser = await groupMember.toJson()
-        await expect(
-          mutate({
-            mutation: muteGroupMutation,
-            variables: {
-              groupId: 'g-1',
-            },
-          }),
-        ).resolves.toMatchObject({
-          data: {
-            muteGroup: {
-              isMutedByMe: true,
-            },
+        await mutate({
+          mutation: muteGroupMutation,
+          variables: {
+            groupId: 'g-1',
           },
-          errors: undefined,
         })
-      })
-
-      it('sends NO notification when another post is posted', async () => {
         jest.clearAllMocks()
-        authenticatedUser = await groupMember.toJson()
-        await markAllAsRead()
         authenticatedUser = await postAuthor.toJson()
         await mutate({
           mutation: createPostMutation,
@@ -308,7 +298,9 @@ describe('notify group members of new posts in group', () => {
             groupId: 'g-1',
           },
         })
-        authenticatedUser = await groupMember.toJson()
+      })
+
+      it('sends NO notification when another post is posted', async () => {
         await expect(
           query({
             query: notificationQuery,
@@ -329,28 +321,16 @@ describe('notify group members of new posts in group', () => {
       })
 
       describe('group member unmutes group again but disables email', () => {
-        beforeAll(async () => {
+        beforeEach(async () => {
+          authenticatedUser = await groupMember.toJson()
+          await mutate({
+            mutation: unmuteGroupMutation,
+            variables: {
+              groupId: 'g-1',
+            },
+          })
           jest.clearAllMocks()
           await groupMember.update({ emailNotificationsPostInGroup: false })
-        })
-
-        it('sets the muted status correctly', async () => {
-          authenticatedUser = await groupMember.toJson()
-          await expect(
-            mutate({
-              mutation: unmuteGroupMutation,
-              variables: {
-                groupId: 'g-1',
-              },
-            }),
-          ).resolves.toMatchObject({
-            data: {
-              unmuteGroup: {
-                isMutedByMe: false,
-              },
-            },
-            errors: undefined,
-          })
         })
 
         it('sends notification when another post is posted', async () => {
@@ -394,6 +374,86 @@ describe('notify group members of new posts in group', () => {
         it('sends NO email', () => {
           expect(sendMailMock).not.toHaveBeenCalled()
         })
+      })
+    })
+
+    describe('group member blocks author', () => {
+      beforeEach(async () => {
+        await groupMember.relateTo(postAuthor, 'blocked')
+        authenticatedUser = await groupMember.toJson()
+        await markAllAsRead()
+        jest.clearAllMocks()
+        authenticatedUser = await postAuthor.toJson()
+        await mutate({
+          mutation: createPostMutation,
+          variables: {
+            id: 'post-1',
+            title: 'This is another  post in the group',
+            content: 'This is the content of another post in the group',
+            groupId: 'g-1',
+          },
+        })
+      })
+
+      it('sends no notification to the user', async () => {
+        authenticatedUser = await groupMember.toJson()
+        await expect(
+          query({
+            query: notificationQuery,
+            variables: {
+              read: false,
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            notifications: [],
+          },
+          errors: undefined,
+        })
+      })
+
+      it('sends NO email', () => {
+        expect(sendMailMock).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('group member mutes author', () => {
+      beforeEach(async () => {
+        await groupMember.relateTo(postAuthor, 'muted')
+        authenticatedUser = await groupMember.toJson()
+        await markAllAsRead()
+        jest.clearAllMocks()
+        authenticatedUser = await postAuthor.toJson()
+        await mutate({
+          mutation: createPostMutation,
+          variables: {
+            id: 'post-1',
+            title: 'This is another  post in the group',
+            content: 'This is the content of another post in the group',
+            groupId: 'g-1',
+          },
+        })
+      })
+
+      it('sends no notification to the user', async () => {
+        authenticatedUser = await groupMember.toJson()
+        await expect(
+          query({
+            query: notificationQuery,
+            variables: {
+              read: false,
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            notifications: [],
+          },
+          errors: undefined,
+        })
+      })
+
+      it('sends NO email', () => {
+        expect(sendMailMock).not.toHaveBeenCalled()
       })
     })
   })

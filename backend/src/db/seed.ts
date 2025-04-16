@@ -16,6 +16,7 @@ import createServer from '@src/server'
 
 import Factory from './factories'
 import { getNeode, getDriver } from './neo4j'
+import { trophies, verification } from './seed/badges'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
@@ -122,32 +123,28 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await Hamburg.relateTo(Germany, 'isIn')
     await Paris.relateTo(France, 'isIn')
 
-    // badges
-    const racoon = await Factory.build('badge', {
-      id: 'indiegogo_en_racoon',
-      icon: '/img/badges/indiegogo_en_racoon.svg',
-    })
-    const rabbit = await Factory.build('badge', {
-      id: 'indiegogo_en_rabbit',
-      icon: '/img/badges/indiegogo_en_rabbit.svg',
-    })
-    const wolf = await Factory.build('badge', {
-      id: 'indiegogo_en_wolf',
-      icon: '/img/badges/indiegogo_en_wolf.svg',
-    })
-    const bear = await Factory.build('badge', {
-      id: 'indiegogo_en_bear',
-      icon: '/img/badges/indiegogo_en_bear.svg',
-    })
-    const turtle = await Factory.build('badge', {
-      id: 'indiegogo_en_turtle',
-      icon: '/img/badges/indiegogo_en_turtle.svg',
-    })
-    const rhino = await Factory.build('badge', {
-      id: 'indiegogo_en_rhino',
-      icon: '/img/badges/indiegogo_en_rhino.svg',
-    })
+    const {
+      trophyAirship,
+      trophyBee,
+      trophyStarter,
+      trophyFlower,
+      trophyPanda,
+      trophyTiger,
+      trophyAlienship,
+      trophyBalloon,
+      trophyMagicrainbow,
+      trophySuperfounder,
+      trophyBigballoon,
+      trophyLifetree,
+      trophyRacoon,
+      trophyRhino,
+      trophyWolf,
+      trophyTurtle,
+      trophyBear,
+      trophyRabbit,
+    } = await trophies()
 
+    const { verificationAdmin, verificationModerator, verificationDeveloper } = await verification()
     // users
     const peterLustig = await Factory.build(
       'user',
@@ -241,14 +238,50 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await jennyRostock.relateTo(Paris, 'isIn')
     await huey.relateTo(Paris, 'isIn')
 
-    await peterLustig.relateTo(racoon, 'rewarded')
-    await peterLustig.relateTo(rhino, 'rewarded')
-    await peterLustig.relateTo(wolf, 'rewarded')
-    await bobDerBaumeister.relateTo(racoon, 'rewarded')
-    await bobDerBaumeister.relateTo(turtle, 'rewarded')
-    await jennyRostock.relateTo(bear, 'rewarded')
-    await dagobert.relateTo(rabbit, 'rewarded')
+    // badges
+    await peterLustig.relateTo(trophyRacoon, 'rewarded')
+    await peterLustig.relateTo(trophyRhino, 'rewarded')
+    await peterLustig.relateTo(trophyWolf, 'rewarded')
+    await peterLustig.relateTo(trophyAirship, 'rewarded')
+    await peterLustig.relateTo(verificationAdmin, 'verifies')
+    await peterLustig.relateTo(trophyRacoon, 'selected', { slot: 0 })
+    await peterLustig.relateTo(trophyRhino, 'selected', { slot: 1 })
+    await peterLustig.relateTo(trophyAirship, 'selected', { slot: 5 })
 
+    await bobDerBaumeister.relateTo(trophyRacoon, 'rewarded')
+    await bobDerBaumeister.relateTo(trophyTurtle, 'rewarded')
+    await bobDerBaumeister.relateTo(trophyBee, 'rewarded')
+    await bobDerBaumeister.relateTo(verificationModerator, 'verifies')
+    await bobDerBaumeister.relateTo(trophyRacoon, 'selected', { slot: 1 })
+    await bobDerBaumeister.relateTo(trophyTurtle, 'selected', { slot: 2 })
+
+    await jennyRostock.relateTo(trophyBear, 'rewarded')
+    await jennyRostock.relateTo(trophyStarter, 'rewarded')
+    await jennyRostock.relateTo(trophyFlower, 'rewarded')
+    await jennyRostock.relateTo(trophyBear, 'selected', { slot: 0 })
+    await jennyRostock.relateTo(trophyStarter, 'selected', { slot: 1 })
+    await jennyRostock.relateTo(trophyFlower, 'selected', { slot: 2 })
+
+    await huey.relateTo(trophyPanda, 'rewarded')
+    await huey.relateTo(trophyTiger, 'rewarded')
+    await huey.relateTo(trophyAlienship, 'rewarded')
+    await huey.relateTo(trophyBalloon, 'rewarded')
+    await huey.relateTo(trophyMagicrainbow, 'rewarded')
+    await huey.relateTo(trophySuperfounder, 'rewarded')
+    await huey.relateTo(verificationDeveloper, 'verifies')
+    await huey.relateTo(trophyPanda, 'selected', { slot: 0 })
+    await huey.relateTo(trophyTiger, 'selected', { slot: 1 })
+    await huey.relateTo(trophyAlienship, 'selected', { slot: 2 })
+
+    await dewey.relateTo(trophyBigballoon, 'rewarded')
+    await dewey.relateTo(trophyLifetree, 'rewarded')
+    await dewey.relateTo(trophyBigballoon, 'selected', { slot: 7 })
+    await dewey.relateTo(trophyLifetree, 'selected', { slot: 8 })
+
+    await louie.relateTo(trophyRabbit, 'rewarded')
+    await louie.relateTo(trophyRabbit, 'selected', { slot: 4 })
+
+    // Friends
     await peterLustig.relateTo(bobDerBaumeister, 'friends')
     await peterLustig.relateTo(jennyRostock, 'friends')
     await bobDerBaumeister.relateTo(jennyRostock, 'friends')

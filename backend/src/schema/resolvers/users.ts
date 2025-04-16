@@ -1,6 +1,7 @@
 import { UserInputError, ForbiddenError } from 'apollo-server'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
+import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import { getNeode } from '@db/neo4j'
 
 import log from './helpers/databaseLogger'
@@ -381,6 +382,73 @@ export default {
 
       return true
     },
+    setTrophyBadgeSelected: async (_object, args, context, _resolveInfo) => {
+      const { slot, badgeId } = args
+      const {
+        user: { id: userId },
+      } = context
+
+      if (slot >= TROPHY_BADGES_SELECTED_MAX || slot < 0) {
+        throw new Error(
+          `Invalid slot! There is only ${TROPHY_BADGES_SELECTED_MAX} badge-slots to fill`,
+        )
+      }
+
+      const session = context.driver.session()
+
+      const query = session.writeTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge {id: $badgeId})
+            OPTIONAL MATCH (user)-[badgeRelation:SELECTED]->(badge)
+            OPTIONAL MATCH (user)-[slotRelation:SELECTED{slot: $slot}]->(:Badge)
+            DELETE badgeRelation, slotRelation
+            MERGE (user)-[:SELECTED{slot: toInteger($slot)}]->(badge)
+            RETURN user {.*}
+          `,
+          { userId, badgeId, slot },
+        )
+        return result.records.map((record) => record.get('user'))[0]
+      })
+      try {
+        const user = await query
+        if (!user) {
+          throw new Error('You cannot set badges not rewarded to you.')
+        }
+        return user
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    resetTrophyBadgesSelected: async (_object, _args, context, _resolveInfo) => {
+      const {
+        user: { id: userId },
+      } = context
+
+      const session = context.driver.session()
+
+      const query = session.writeTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $userId})
+            OPTIONAL MATCH (user)-[relation:SELECTED]->(:Badge)
+            DELETE relation
+            RETURN user {.*}
+          `,
+          { userId },
+        )
+        return result.records.map((record) => record.get('user'))[0]
+      })
+      try {
+        return await query
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
   },
   User: {
     emailNotificationSettings: async (parent, params, context, resolveInfo) => {
@@ -438,6 +506,87 @@ export default {
         },
       ]
     },
+    badgeTrophiesSelected: async (parent, _params, context, _resolveInfo) => {
+      const session = context.driver.session()
+
+      const query = session.readTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $parent.id})-[relation:SELECTED]->(badge:Badge)
+            WITH relation, badge
+            ORDER BY relation.slot ASC
+            RETURN relation.slot as slot, badge {.*}
+          `,
+          { parent },
+        )
+        return result.records
+      })
+      try {
+        const badgesSelected = await query
+        const result = Array(TROPHY_BADGES_SELECTED_MAX).fill(null)
+        badgesSelected.map((record) => {
+          result[record.get('slot')] = record.get('badge')
+          return true
+        })
+        return result
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    badgeTrophiesUnused: async (_parent, _params, context, _resolveInfo) => {
+      const {
+        user: { id: userId },
+      } = context
+
+      const session = context.driver.session()
+
+      const query = session.writeTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge)
+            WHERE NOT (user)-[:SELECTED]-(badge)
+            RETURN badge {.*}
+          `,
+          { userId },
+        )
+        return result.records.map((record) => record.get('badge'))
+      })
+      try {
+        return await query
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    badgeTrophiesUnusedCount: async (_parent, _params, context, _resolveInfo) => {
+      const {
+        user: { id: userId },
+      } = context
+
+      const session = context.driver.session()
+
+      const query = session.writeTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge)
+            WHERE NOT (user)-[:SELECTED]-(badge)
+            RETURN toString(COUNT(badge)) as count
+          `,
+          { userId },
+        )
+        return result.records.map((record) => record.get('count'))[0]
+      })
+      try {
+        return await query
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
     ...Resolver('User', {
       undefinedToNull: [
         'actorId',
@@ -471,13 +620,14 @@ export default {
           '-[:WROTE]->(c:Comment)-[:COMMENTS]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true',
         shoutedCount:
           '-[:SHOUTED]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true',
-        badgesCount: '<-[:REWARDED]-(related:Badge)',
+        badgeTrophiesCount: '<-[:REWARDED]-(related:Badge)',
       },
       hasOne: {
         avatar: '-[:AVATAR_IMAGE]->(related:Image)',
         invitedBy: '<-[:INVITED]-(related:User)',
         location: '-[:IS_IN]->(related:Location)',
         redeemedInviteCode: '-[:REDEEMED]->(related:InviteCode)',
+        badgeVerification: '<-[:VERIFIES]-(related:Badge)',
       },
       hasMany: {
         followedBy: '<-[:FOLLOWS]-(related:User)',
@@ -488,7 +638,7 @@ export default {
         comments: '-[:WROTE]->(related:Comment)',
         shouted: '-[:SHOUTED]->(related:Post)',
         categories: '-[:CATEGORIZED]->(related:Category)',
-        badges: '<-[:REWARDED]-(related:Badge)',
+        badgeTrophies: '<-[:REWARDED]-(related:Badge)',
         inviteCodes: '-[:GENERATED]->(related:InviteCode)',
       },
     }),

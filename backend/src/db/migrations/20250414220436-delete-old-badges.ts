@@ -1,6 +1,6 @@
 import { getDriver } from '@db/neo4j'
 
-export const description = 'Add postType property Article to all posts'
+export const description = ''
 
 export async function up(next) {
   const driver = getDriver()
@@ -8,10 +8,10 @@ export async function up(next) {
   const transaction = session.beginTransaction()
 
   try {
+    // Implement your migration here.
     await transaction.run(`
-      MATCH (post:Post)
-      SET post.postType = 'Article'
-      RETURN post
+      MATCH (badge:Badge)
+      DETACH DELETE badge
     `)
     await transaction.commit()
   } catch (error) {
@@ -32,12 +32,10 @@ export async function down(next) {
   const transaction = session.beginTransaction()
 
   try {
-    await transaction.run(`
-      MATCH (post:Post)
-      REMOVE post.postType
-      RETURN post
-    `)
-    await transaction.commit()
+    // cannot be rolled back
+    // Implement your migration here.
+    // await transaction.run(``)
+    // await transaction.commit()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
