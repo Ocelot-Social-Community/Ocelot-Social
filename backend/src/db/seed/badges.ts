@@ -177,7 +177,7 @@ export const verification = async () => {
     }),
     verificationDeveloper: await Factory.build('badge', {
       id: 'verification_developer',
-      type: 'badge',
+      type: 'verification',
       description: 'You are a Developer',
       icon: '/img/badges/verification_red_developer.svg',
     }),
