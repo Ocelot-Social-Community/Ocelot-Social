@@ -171,7 +171,7 @@ export const verification = async () => {
     }),
     verificationAdmin: await Factory.build('badge', {
       id: 'verification_admin',
-      type: 'badge',
+      type: 'verification',
       description: 'You are an Administrator',
       icon: '/img/badges/verification_red_admin.svg',
     }),
