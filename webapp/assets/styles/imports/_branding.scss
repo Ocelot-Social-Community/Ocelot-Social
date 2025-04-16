@@ -23,6 +23,7 @@ $color-secondary-active: rgb(255, 172, 23);
 $color-secondary-inverse: rgb(255, 238, 212);
 
 $color-tertiary: rgb(0, 168, 181);
+$color-tertiary-light: rgb(182, 228, 234);
 
 $color-header-background: $color-primary;
 $color-footer-background: $color-tertiary;
@@ -33,6 +34,13 @@ $color-donation-bar: $color-secondary;
 
 $color-toast-blue: rgb(0, 142, 230);
 $color-toast-green: $color-secondary;
+
+$color-ribbon-announcement: $color-secondary;
+$color-ribbon-announcement-shadow: color.adjust($color-ribbon-announcement, $lightness: -20%,);
+$color-ribbon-article: $color-tertiary;
+$color-ribbon-article-shadow: color.adjust($color-ribbon-article, $lightness: -20%);
+$color-ribbon-event: $background-color-third-active;
+$color-ribbon-event-shadow: color.adjust($color-ribbon-event, $lightness: -20%);
 
 $chat-message-bg-me: $color-primary-light;
 $chat-message-bg-others: $color-primary-inverse;
