@@ -1,5 +1,5 @@
 import { getNeode } from './neo4j'
-import { badges, verification } from './seed/badges'
+import { badges, verification } from './seed/badges-default'
 
 // eslint-disable-next-line import/newline-after-import
 ;(async function () {
