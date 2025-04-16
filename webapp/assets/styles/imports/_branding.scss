@@ -25,29 +25,54 @@ $color-secondary-inverse: rgb(255, 238, 212);
 $color-tertiary: rgb(0, 168, 181);
 $color-tertiary-light: rgb(182, 228, 234);
 
-$color-header-background: $color-primary;
-$color-footer-background: $color-tertiary;
+$color-primary: rgb(239, 124, 0);
+$color-primary-light: $color-tertiary;
+$color-primary-dark: color.adjust($color-tertiary, $lightness: -20%);
+$color-primary-active: rgb(255, 172, 23);
+$color-primary-inverse: rgb(255, 238, 212);
+
+$color-secondary: rgb(56, 57, 55);
+$color-secondary-light: rgb(230, 231, 231);
+$color-secondary-dark: rgb(25, 26, 24);
+$color-secondary-active: rgb(135, 135, 135);
+$color-secondary-inverse: rgb(226, 230, 218);
+
+$text-color-link: $color-primary;
+$text-color-link-active: $color-primary-light;
+
+$background-color-primary: $color-primary;
+$background-color-primary-active: $color-primary-active;
+$background-color-primary-inverse: $color-tertiary-light;
+
+
+$color-header-background: $color-secondary;
+$color-footer-background: $color-secondary-active;
 
 $color-locale-menu: $color-primary;
 
 $color-donation-bar: $color-secondary;
 
 $color-toast-blue: rgb(0, 142, 230);
-$color-toast-green: $color-secondary;
+$color-toast-green: $color-primary-light;
 
-$color-ribbon-announcement: $color-secondary;
-$color-ribbon-announcement-shadow: color.adjust($color-ribbon-announcement, $lightness: -20%,);
+$color-ribbon-announcement: $color-primary;
+$color-ribbon-announcement-shadow: color.adjust($color-ribbon-announcement, $lightness: -20%);
 $color-ribbon-article: $color-tertiary;
 $color-ribbon-article-shadow: color.adjust($color-ribbon-article, $lightness: -20%);
 $color-ribbon-event: $background-color-third-active;
 $color-ribbon-event-shadow: color.adjust($color-ribbon-event, $lightness: -20%);
 
-$chat-message-bg-me: $color-primary-light;
-$chat-message-bg-others: $color-primary-inverse;
-$chat-message-checkmark-seen: $color-secondary;
+$chat-sidemenu-background-over: color.adjust($color-tertiary-light, $lightness: -10%);
+$chat-sidemenu-background-active: $color-tertiary-light;
+$chat-message-bg-me: $color-tertiary-light;
+$chat-message-bg-others: $color-secondary-light;
+$chat-message-checkmark-seen: $color-primary;
 $chat-message-checkmark: $text-color-inverse;
-$chat-room-color-counter-badge: $color-primary;
-$chat-room-background-counter-badge: $color-secondary;
+$chat-room-color-counter-badge: $color-primary-inverse;
+$chat-room-background-counter-badge: $color-primary;
+$chat-icon-add: $color-primary-light;
+$chat-icon-send: $color-primary-light;
+$chat-icon-emoji: $color-primary-light;
 
 /* "a" link colors */
 a {
@@ -57,55 +82,65 @@ a:hover {
   color: $color-primary-light;
 }
 
+.base-button.--circle.post-add-button-top {
+  background-color: $color-secondary-active;
+  border-color: $color-secondary-active;
+}
+
 /* ds-menu-item link colors */
+a.ds-menu-item-link {
+  color: $color-primary;
+}
 a:hover.ds-menu-item-link {
-  color: $color-secondary;
+  color: $color-primary-light;
 }
 .ds-menu-item-link.router-link-exact-active {
-  color: $color-secondary;
-  border-left-color: $color-secondary;
+  color: $color-primary;
+  border-left-color: $color-primary;
 }
 
 .v-popover.open .trigger a {
-  color: $color-secondary;
+  color: $color-primary;
 }
 
 .main-navigation a {
-  color: #fff;
+  color: white;
   // text-transform: uppercase;
   // font-size: 16px;
   // font-weight: 500;
 }
-
-.main-navigation a:hover {
-  color: hsla(0, 0%, 100%, .8);
-}
+// .main-navigation a:hover {
+//   color: rgba(255, 255, 255, .8);
+// }
 
 .main-navigation .router-link-exact-active {
   color: $color-secondary !important;
 }
 
 .main-navigation .locale-menu {
-  color: #fff;
+  color: white;
 }
 
 .main-navigation .base-button {
-  color: #fff;
+  color: white;
 }
 
 // #nav-search-box .hc-hashtag a {
 .hc-hashtag a {
-  color: $color-secondary;
+  color: $color-primary;
 }
 .hc-hashtag a:hover {
-  color: $color-secondary-active;
+  color: $color-primary-active;
 }
 
 #footer {
-  background-color: $color-tertiary;
+  background-color: $color-secondary-active;
 }
 #footer a {
-  color: $color-primary-inverse;
+  color: $color-secondary-inverse;
+}
+#footer a:hover {
+  color: $color-primary-active;
 }
 
 .avatar-menu .profile-avatar {
@@ -135,24 +170,14 @@ a:hover.ds-menu-item-link {
   font-weight: 600;
 }
 
-/* chips on group teaser */
-// a.group-teaser footer .ds-chip-primary {
-//   background-color: $color-secondary;
-// }
-
-/* chips on group profile */
-// .group-profile .ds-chip-primary {
-//   background-color: $color-secondary;
-// }
-
 /* chips with primary color */
 .ds-chip-primary {
-  background-color: $color-secondary;
+  background-color: $color-tertiary;
 }
 
 /* number count color */
 div.ds-number>p.ds-number-count {
-  color: $color-primary;
+  color: $text-color-base;
 }
 
 /* active tab border bottom color */
