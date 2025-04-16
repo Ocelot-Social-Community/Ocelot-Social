@@ -22,7 +22,7 @@ Feature: Notifications for Chat Messages via E-Mail
     When "Jenny Rostock" sends a chat message to "Bob der Baumeister"
     And "Nathan Narrator" sends a chat message to "Bob der Baumeister"
     And "Billy Block" sends a chat message to "Bob der Baumeister"
-    Then "moderator@example.org" should receive "0" chat notification email referencing "Jenny Rostock"
+    Then "moderator@example.org" should receive "1" chat notification email referencing "Jenny Rostock"
     When I am logged in as "bob-der-baumeister"
     And "Jenny Rostock" sends a chat message to "Bob der Baumeister"
     And "Nathan Narrator" sends a chat message to "Bob der Baumeister"
