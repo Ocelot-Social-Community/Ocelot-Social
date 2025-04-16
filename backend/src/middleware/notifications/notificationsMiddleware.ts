@@ -235,7 +235,7 @@ const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
       WHERE NOT membership.role = 'pending'
       AND NOT (user)-[:MUTED]->(group)
       AND NOT (user)-[:MUTED]->(author)
-      AND NOT (user)-[:BLOCKED]->(author)
+      AND NOT (user)-[:BLOCKED]-(author)
       AND NOT user.id = $userId
     WITH post, author, user
     MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
@@ -351,7 +351,10 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
     case 'mentioned_in_post': {
       mentionedCypher = `
         MATCH (post: Post { id: $id })<-[:WROTE]-(author: User)
-        MATCH (user: User) WHERE user.id in $idsOfUsers AND NOT (user)-[:BLOCKED]-(author)
+        MATCH (user: User)
+          WHERE user.id in $idsOfUsers
+          AND NOT (user)-[:BLOCKED]-(author)
+          AND NOT (user)-[:MUTED]->(author)
         OPTIONAL MATCH (post)-[:IN]->(group:Group)
         OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(user)
         WITH post, author, user, group WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
@@ -367,6 +370,8 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
         WHERE user.id in $idsOfUsers
         AND NOT (user)-[:BLOCKED]-(commenter)
         AND NOT (user)-[:BLOCKED]-(postAuthor)
+        AND NOT (user)-[:MUTED]->(commenter)
+        AND NOT (user)-[:MUTED]->(postAuthor)
       OPTIONAL MATCH (post)-[:IN]->(group:Group)
       OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(user)
       WITH comment, user, group WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
@@ -413,7 +418,9 @@ const notifyUsersOfComment = async (label, commentId, reason, context) => {
     const notificationTransactionResponse = await transaction.run(
       `
       MATCH (observingUser:User)-[:OBSERVES { active: true }]->(post:Post)<-[:COMMENTS]-(comment:Comment { id: $commentId })<-[:WROTE]-(commenter:User)
-      WHERE NOT (observingUser)-[:BLOCKED]-(commenter) AND NOT observingUser.id = $userId
+        WHERE NOT (observingUser)-[:BLOCKED]-(commenter)
+        AND NOT (observingUser)-[:MUTED]->(commenter)
+        AND NOT observingUser.id = $userId
       WITH observingUser, post, comment, commenter
       MATCH (postAuthor:User)-[:WROTE]->(post)
       MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(observingUser)
