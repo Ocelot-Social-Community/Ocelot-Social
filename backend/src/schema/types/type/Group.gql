@@ -42,9 +42,7 @@ type Group {
 
   posts: [Post] @relation(name: "IN", direction: "IN")
 
-  isMutedByMe: Boolean!
-  @cypher(
-    statement: "MATCH (this)<-[m:MUTED]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(m) >= 1")
+  isMutedByMe: Boolean! @cypher(statement: "MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )")
 }
 
 
