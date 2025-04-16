@@ -85,6 +85,27 @@ export const adminUserQuery = () => {
         contributionsCount
         commentedCount
         shoutedCount
+        badges {
+          id
+          type
+          icon
+        }
+      }
+    }
+  `
+}
+
+export const adminUserBadgesQuery = () => {
+  return gql`
+    query User($id: ID!) {
+      User(id: $id) {
+        id
+        badges {
+          id
+        }
+        verified {
+          id
+        }
       }
     }
   `

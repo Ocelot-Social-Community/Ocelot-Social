@@ -63,6 +63,16 @@
             <ds-text v-else>{{ scope.row.role }}</ds-text>
           </template>
         </template>
+        <template #badges="scope">
+          <nuxt-link
+            :to="{
+              name: 'admin-users-id',
+              params: { id: scope.row.id },
+            }"
+          >
+            <b>Badges</b>
+          </nuxt-link>
+        </template>
       </ds-table>
       <pagination-buttons :hasNext="hasNext" :hasPrevious="hasPrevious" @next="next" @back="back" />
     </base-card>
@@ -130,6 +140,10 @@ export default {
         },
         role: {
           label: this.$t('admin.users.table.columns.role'),
+          align: 'right',
+        },
+        badges: {
+          label: this.$t('admin.users.table.columns.badges'),
           align: 'right',
         },
       }
