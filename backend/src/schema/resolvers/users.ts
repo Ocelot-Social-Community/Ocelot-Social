@@ -389,7 +389,7 @@ export default {
       } = context
 
       if (slot >= PROFILE_BADGE_COUNT || slot < 0) {
-        throw new Error(`There is only ${PROFILE_BADGE_COUNT} badge slots to fill`)
+        throw new Error(`Invalid slot! There is only ${PROFILE_BADGE_COUNT} badge-slots to fill`)
       }
 
       const session = context.driver.session()
@@ -411,7 +411,7 @@ export default {
       try {
         const user = await query
         if (!user) {
-          throw new Error('You cat set badges must be rewarded to you.')
+          throw new Error('You cannot set badges not rewarded to you.')
         }
         return user
       } catch (error) {
