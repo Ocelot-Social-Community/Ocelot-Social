@@ -165,7 +165,7 @@ export const verification = async () => {
     // Red Role
     verificationModerator: await Factory.build('badge', {
       id: 'verification_moderator',
-      type: 'badge',
+      type: 'verification',
       description: 'You are a Moderator',
       icon: '/img/badges/verification_red_moderator.svg',
     }),
