@@ -4,7 +4,7 @@ Feature: Notifications for Groups
   To stay informed about the group's activity
 
   When absent or offline I get notified via e-mail
-  For users I have blocked or muted no notifications or emails are send
+  No notifications or emails are send regarding posts from users I have blocked or muted
 
   Background:
     Given the following "users" are in the database:
