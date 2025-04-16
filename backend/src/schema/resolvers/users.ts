@@ -1,6 +1,7 @@
 import { UserInputError, ForbiddenError } from 'apollo-server'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
+import { PROFILE_BADGE_COUNT } from '@constants/badges'
 import { getNeode } from '@db/neo4j'
 
 import log from './helpers/databaseLogger'
@@ -387,8 +388,8 @@ export default {
         user: { id: userId },
       } = context
 
-      if (slot >= 9 || slot < 0) {
-        throw new Error('There is only 9 badge slots to fill')
+      if (slot >= PROFILE_BADGE_COUNT || slot < 0) {
+        throw new Error(`There is only ${PROFILE_BADGE_COUNT} badge slots to fill`)
       }
 
       const session = context.driver.session()
@@ -520,7 +521,7 @@ export default {
       })
       try {
         const profileBadges = await query
-        const result = Array(9).fill(null)
+        const result = Array(PROFILE_BADGE_COUNT).fill(null)
         profileBadges.map((record) => {
           result[record.get('slot')] = record.get('badge')
           return true
