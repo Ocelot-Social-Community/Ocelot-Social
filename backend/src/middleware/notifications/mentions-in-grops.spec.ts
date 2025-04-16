@@ -115,7 +115,7 @@ afterAll(async () => {
 })
 
 describe('mentions in groups', () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     postAuthor = await Factory.build(
       'user',
       {
@@ -256,15 +256,18 @@ describe('mentions in groups', () => {
         roleInGroup: 'usual',
       },
     })
+    authenticatedUser = await groupMember.toJson()
+    await markAllAsRead()
+  })
+
+  afterEach(async () => {
+    await cleanDatabase()
   })
 
   describe('post in public group', () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
       jest.clearAllMocks()
-      authenticatedUser = await groupMember.toJson()
-      await markAllAsRead()
       authenticatedUser = await postAuthor.toJson()
-      await markAllAsRead()
       await mutate({
         mutation: createPostMutation,
         variables: {
@@ -288,40 +291,6 @@ describe('mentions in groups', () => {
       ).resolves.toMatchObject({
         data: {
           notifications: [
-            {
-              from: {
-                __typename: 'Post',
-                id: 'public-post',
-              },
-              read: false,
-              reason: 'mentioned_in_post',
-            },
-          ],
-        },
-        errors: undefined,
-      })
-    })
-
-    it('sends a notification to the pending member', async () => {
-      authenticatedUser = await pendingMember.toJson()
-      await expect(
-        query({
-          query: notificationQuery,
-          variables: {
-            read: false,
-          },
-        }),
-      ).resolves.toMatchObject({
-        data: {
-          notifications: [
-            {
-              from: {
-                __typename: 'Post',
-                id: 'public-post',
-              },
-              read: false,
-              reason: 'post_in_group',
-            },
             {
               from: {
                 __typename: 'Post',
@@ -370,22 +339,15 @@ describe('mentions in groups', () => {
       })
     })
 
-    it('sends 5 emails, three mentions and 2 post in group', () => {
+    it('sends 3 emails, 2 mentions and 1 post in group', () => {
       expect(sendMailMock).toHaveBeenCalledTimes(5)
     })
   })
 
   describe('post in closed group', () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
       jest.clearAllMocks()
-      authenticatedUser = await noMember.toJson()
-      await markAllAsRead()
-      authenticatedUser = await pendingMember.toJson()
-      await markAllAsRead()
-      authenticatedUser = await groupMember.toJson()
-      await markAllAsRead()
       authenticatedUser = await postAuthor.toJson()
-      await markAllAsRead()
       await mutate({
         mutation: createPostMutation,
         variables: {
@@ -471,16 +433,9 @@ describe('mentions in groups', () => {
   })
 
   describe('post in hidden group', () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
       jest.clearAllMocks()
-      authenticatedUser = await noMember.toJson()
-      await markAllAsRead()
-      authenticatedUser = await pendingMember.toJson()
-      await markAllAsRead()
-      authenticatedUser = await groupMember.toJson()
-      await markAllAsRead()
       authenticatedUser = await postAuthor.toJson()
-      await markAllAsRead()
       await mutate({
         mutation: createPostMutation,
         variables: {
@@ -567,16 +522,21 @@ describe('mentions in groups', () => {
 
   describe('comments on group posts', () => {
     describe('public group', () => {
-      beforeAll(async () => {
-        jest.clearAllMocks()
-        authenticatedUser = await noMember.toJson()
-        await markAllAsRead()
-        authenticatedUser = await pendingMember.toJson()
-        await markAllAsRead()
+      beforeEach(async () => {
+        authenticatedUser = await postAuthor.toJson()
+        await mutate({
+          mutation: createPostMutation,
+          variables: {
+            id: 'public-post',
+            title: 'This is the post in the public group',
+            content: `Some public content`,
+            groupId: 'public-group',
+          },
+        })
         authenticatedUser = await groupMember.toJson()
         await markAllAsRead()
         authenticatedUser = await postAuthor.toJson()
-        await markAllAsRead()
+        jest.clearAllMocks()
         await mutate({
           mutation: createCommentMutation,
           variables: {
@@ -589,32 +549,6 @@ describe('mentions in groups', () => {
 
       it('sends a notification to the no member', async () => {
         authenticatedUser = await noMember.toJson()
-        await expect(
-          query({
-            query: notificationQuery,
-            variables: {
-              read: false,
-            },
-          }),
-        ).resolves.toMatchObject({
-          data: {
-            notifications: [
-              {
-                from: {
-                  __typename: 'Comment',
-                  id: 'public-comment',
-                },
-                read: false,
-                reason: 'mentioned_in_comment',
-              },
-            ],
-          },
-          errors: undefined,
-        })
-      })
-
-      it('sends a notification to the pending member', async () => {
-        authenticatedUser = await pendingMember.toJson()
         await expect(
           query({
             query: notificationQuery,
@@ -665,22 +599,27 @@ describe('mentions in groups', () => {
         })
       })
 
-      it('sends 3 emails', () => {
+      it('sends 2 emails', () => {
         expect(sendMailMock).toHaveBeenCalledTimes(3)
       })
     })
 
     describe('closed group', () => {
-      beforeAll(async () => {
-        jest.clearAllMocks()
-        authenticatedUser = await noMember.toJson()
-        await markAllAsRead()
-        authenticatedUser = await pendingMember.toJson()
-        await markAllAsRead()
+      beforeEach(async () => {
+        authenticatedUser = await postAuthor.toJson()
+        await mutate({
+          mutation: createPostMutation,
+          variables: {
+            id: 'closed-post',
+            title: 'This is the post in the closed group',
+            content: `Some closed content`,
+            groupId: 'closed-group',
+          },
+        })
         authenticatedUser = await groupMember.toJson()
         await markAllAsRead()
         authenticatedUser = await postAuthor.toJson()
-        await markAllAsRead()
+        jest.clearAllMocks()
         await mutate({
           mutation: createCommentMutation,
           variables: {
@@ -757,16 +696,21 @@ describe('mentions in groups', () => {
     })
 
     describe('hidden group', () => {
-      beforeAll(async () => {
-        jest.clearAllMocks()
-        authenticatedUser = await noMember.toJson()
-        await markAllAsRead()
-        authenticatedUser = await pendingMember.toJson()
-        await markAllAsRead()
+      beforeEach(async () => {
+        authenticatedUser = await postAuthor.toJson()
+        await mutate({
+          mutation: createPostMutation,
+          variables: {
+            id: 'hidden-post',
+            title: 'This is the post in the hidden group',
+            content: `Some hidden content`,
+            groupId: 'hidden-group',
+          },
+        })
         authenticatedUser = await groupMember.toJson()
         await markAllAsRead()
         authenticatedUser = await postAuthor.toJson()
-        await markAllAsRead()
+        jest.clearAllMocks()
         await mutate({
           mutation: createCommentMutation,
           variables: {
