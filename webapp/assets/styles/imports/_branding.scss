@@ -4,23 +4,50 @@
     *
 */
 
+@font-face {
+  font-family: Inter;
+  src: url('~@/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf');
+}
+
+// /* Webfont: Inter-Bold */
 // @font-face {
-//   font-family: Overpass;
-//   src: url('~@/assets/fonts/Overpass-VariableFont_wght.ttf');
+//   font-family: 'Inter';
+//   src: url('~@@/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('ttf');
+//   font-style: normal;
+//   font-weight: 600;
+//   text-rendering: optimizeLegibility;
 // }
 
-// $font-family-heading: 'Overpass', Helvetica, Arial, Lucida, sans-serif;
-// $font-family-text: 'Overpass', Helvetica, Arial, Lucida, sans-serif;
+// /* Webfont: Inter-BoldItalic */
+// @font-face {
+//   font-family: 'Inter';
+//   src: url('~@@/assets/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('ttf');
+//   font-style: italic;
+//   font-weight: 600;
+//   text-rendering: optimizeLegibility;
+// }
 
-$color-primary: rgb(56, 57, 55);
-$color-primary-light: rgb(149, 153, 147);
-$color-primary-dark: rgb(25, 26, 24);
-$color-primary-active: rgb(135, 135, 135);
-$color-primary-inverse: rgb(226, 230, 218);
+// /* Webfont: Inter-Italic */
+// @font-face {
+//   font-family: 'Inter';
+//   src: url('~@@/assets/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('ttf');
+//   font-style: italic;
+//   font-weight: normal;
+//   text-rendering: optimizeLegibility;
+// }
 
-$color-secondary: rgb(239, 123, 0);
-$color-secondary-active: rgb(255, 172, 23);
-$color-secondary-inverse: rgb(255, 238, 212);
+// /* Webfont: Inter-Regular */
+// @font-face {
+//   font-family: 'Inter';
+//   src: url('~@@/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('ttf');
+//   font-style: normal;
+//   font-weight: normal;
+//   text-rendering: optimizeLegibility;
+// }
+
+$font-family-heading: 'Inter', Helvetica, Arial, Lucida, sans-serif;
+$font-family-text: 'Inter', Helvetica, Arial, Lucida, sans-serif;
+
 
 $color-tertiary: rgb(0, 168, 181);
 $color-tertiary-light: rgb(182, 228, 234);
@@ -44,6 +71,7 @@ $background-color-primary: $color-primary;
 $background-color-primary-active: $color-primary-active;
 $background-color-primary-inverse: $color-tertiary-light;
 
+$border-color-active: $color-primary;
 
 $color-header-background: $color-secondary;
 $color-footer-background: $color-secondary-active;
@@ -85,6 +113,10 @@ a:hover {
 .base-button.--circle.post-add-button-top {
   background-color: $color-secondary-active;
   border-color: $color-secondary-active;
+}
+a:hover > .base-button.--circle.post-add-button-top {
+  background-color: $color-secondary;
+  border-color: $color-secondary-dark;
 }
 
 /* ds-menu-item link colors */
@@ -130,7 +162,7 @@ a:hover.ds-menu-item-link {
   color: $color-primary;
 }
 .hc-hashtag a:hover {
-  color: $color-primary-active;
+  color: $color-primary-light;
 }
 
 #footer {
@@ -140,7 +172,7 @@ a:hover.ds-menu-item-link {
   color: $color-secondary-inverse;
 }
 #footer a:hover {
-  color: $color-primary-active;
+  color: color.adjust($color-primary-light, $lightness: -10%);
 }
 
 .avatar-menu .profile-avatar {
@@ -176,7 +208,7 @@ a:hover.ds-menu-item-link {
 }
 
 /* number count color */
-div.ds-number>p.ds-number-count {
+div.ds-number > p.ds-number-count {
   color: $text-color-base;
 }
 
@@ -196,3 +228,56 @@ div.tab-navigation li.Tabs__tab {
 span.category-tag.filterActive {
   background-color: $color-primary;
 }
+
+/* input */
+div.ds-input-wrap > input:focus-within.ds-input {
+  border-color: $color-primary;
+}
+// div .ds-form-item .ds-input-has-focus {
+//   border-color: $color-primary;
+// }
+// div.ds-input-has-focus {
+//   border-color: $color-primary;
+// }
+// div.ds-select:focus {
+//   border-color: $color-primary;
+// }
+
+/* checkbox */
+// [type="checkbox"] {
+//   position: relative;
+//   // left: 15px;
+//   // top: 5px;
+//   // z-index: 0;
+//   appearance: none;
+//   -webkit-appearance: none;
+// }
+// [type="checkbox"] + label {
+//   // position: absolute;
+//   position: relative;
+//   // left: 2px;
+//   top: -1px;
+// }
+// [type="checkbox"] + label::before {
+//   position: relative;
+//   width: 16px;
+//   height: 16px;
+//   border-radius: 4px;
+//   border: 2px solid $color-primary-light;
+//   background-color: white;
+//   display: block;
+//   content: "";
+//   float: left;
+//   // margin-right: 6px;
+//   // z-index: 5;
+// }
+// [type="checkbox"]:checked + label::before {
+//   // box-shadow: inset 0px 0px 0px 3px #fff;
+//   background-color: $color-primary-light;
+// }
+// [type="checkbox"] {
+//   accent-color: white;
+// }
+// [type="checkbox"]:checked + label::before {
+//   accent-color: $color-primary-light;
+// }
