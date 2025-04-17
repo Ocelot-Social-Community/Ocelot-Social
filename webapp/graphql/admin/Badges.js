@@ -6,18 +6,19 @@ export const queryBadges = () => gql`
       id
       type
       icon
+      description
     }
   }
 `
 
 export const setVerificationBadge = () => gql`
   mutation ($badgeId: ID!, $userId: ID!) {
-    verify(badgeId: $badgeId, userId: $userId) {
+    setVerificationBadge(badgeId: $badgeId, userId: $userId) {
       id
-      verified {
+      badgeVerification {
         id
       }
-      badges {
+      badgeTrophies {
         id
       }
     }
@@ -26,12 +27,12 @@ export const setVerificationBadge = () => gql`
 
 export const rewardTrophyBadge = () => gql`
   mutation ($badgeId: ID!, $userId: ID!) {
-    reward(badgeId: $badgeId, userId: $userId) {
+    rewardTrophyBadge(badgeId: $badgeId, userId: $userId) {
       id
-      verified {
+      badgeVerification {
         id
       }
-      badges {
+      badgeTrophies {
         id
       }
     }
@@ -40,12 +41,12 @@ export const rewardTrophyBadge = () => gql`
 
 export const revokeBadge = () => gql`
   mutation ($badgeId: ID!, $userId: ID!) {
-    unreward(badgeId: $badgeId, userId: $userId) {
+    revokeBadge(badgeId: $badgeId, userId: $userId) {
       id
-      verified {
+      badgeVerification {
         id
       }
-      badges {
+      badgeTrophies {
         id
       }
     }

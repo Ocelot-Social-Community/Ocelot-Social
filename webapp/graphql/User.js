@@ -85,11 +85,6 @@ export const adminUserQuery = () => {
         contributionsCount
         commentedCount
         shoutedCount
-        badges {
-          id
-          type
-          icon
-        }
       }
     }
   `
@@ -100,10 +95,10 @@ export const adminUserBadgesQuery = () => {
     query User($id: ID!) {
       User(id: $id) {
         id
-        badges {
+        badgeTrophies {
           id
         }
-        verified {
+        badgeVerification {
           id
         }
       }

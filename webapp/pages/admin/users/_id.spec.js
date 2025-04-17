@@ -32,10 +32,10 @@ const availableBadges = [
 
 const user = {
   id: 'user1',
-  verified: {
+  badgeVerification: {
     id: 'verification-badge-1',
   },
-  badges: [
+  badgeTrophies: [
     {
       id: 'trophy-badge-2',
     },
@@ -95,10 +95,10 @@ describe('.vue', () => {
           data: {
             setVerificationBadge: {
               id: 'user1',
-              verified: {
+              badgeVerification: {
                 id: availableBadges[1].id,
               },
-              badges: [],
+              badgeTrophies: [],
             },
           },
         })
@@ -153,8 +153,8 @@ describe('.vue', () => {
             data: {
               setTrophyBadge: {
                 id: 'user1',
-                verified: null,
-                badges: [
+                badgeVerification: null,
+                badgeTrophies: [
                   {
                     id: 'trophy-badge-2',
                   },
@@ -214,8 +214,8 @@ describe('.vue', () => {
             data: {
               setVerificationBadge: {
                 id: 'user1',
-                verified: null,
-                badges: [],
+                badgeVerification: null,
+                badgeTrophies: [],
               },
             },
           })
@@ -272,8 +272,8 @@ describe('.vue', () => {
           data: {
             setTrophyBadge: {
               id: 'user1',
-              verified: null,
-              badges: [],
+              badgeVerification: null,
+              badgeTrophies: [],
             },
           },
         })

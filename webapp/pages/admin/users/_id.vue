@@ -64,30 +64,30 @@ export default {
   },
   computed: {
     verificationBadges() {
-      if (!this.user?.badges) return []
+      if (!this.user) return []
 
       return this.badges
         .filter((badge) => badge.type === 'verification')
         .map((badge) => ({
           ...badge,
-          isActive: this.user.verified?.id === badge.id,
+          isActive: this.user.badgeVerification?.id === badge.id,
         }))
     },
     trophyBadges() {
-      if (!this.user?.badges) return []
+      if (!this.user?.badgeTrophies) return []
 
       return this.badges
         .filter((badge) => badge.type === 'trophy')
         .map((badge) => ({
           ...badge,
-          isActive: this.user.badges.some((userBadge) => userBadge.id === badge.id),
+          isActive: this.user.badgeTrophies.some((userBadge) => userBadge.id === badge.id),
         }))
     },
   },
   methods: {
     toggleBadge(badge) {
       if (badge.isActive) {
-        this.revokeBadge(badge.id)
+        this.revokeBadge(badge)
         return
       }
 
@@ -112,19 +112,27 @@ export default {
         this.$toast.error('admin.badges.rewardTrophy.error')
       }
     },
-    async revokeBadge(badgeId) {
+    async revokeBadge(badge) {
       try {
         await this.$apollo.mutate({
           mutation: revokeBadge(),
           variables: {
-            badgeId,
+            badgeId: badge.id,
             userId: this.user.id,
           },
         })
 
-        this.$toast.success('admin.badges.revoke.success')
+        this.$toast.success(
+          badge.type === 'verification'
+            ? 'admin.badges.revokeVerification.success'
+            : 'admin.badges.revokeTrophy.success',
+        )
       } catch (error) {
-        this.$toast.error('admin.badges.revoke.error')
+        this.$toast.error(
+          badge.type === 'verification'
+            ? 'admin.badges.revokeVerification.error'
+            : 'admin.badges.revokeTrophy.error',
+        )
       }
     },
     async setVerificationBadge(badgeId) {
