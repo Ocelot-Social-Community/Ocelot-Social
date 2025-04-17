@@ -403,10 +403,12 @@ $color-toast-green: $color-success;
  * @tokens Ribbon Color
  */
 
-$color-ribbon-event: $background-color-third;
-$color-ribbon-event-active: $background-color-third-active;
-$color-ribbon-article: $background-color-secondary;
-$color-ribbon-article-active: $background-color-secondary-active;
+$color-ribbon-announcement: $background-color-warning;
+$color-ribbon-announcement-shadow: color.adjust($color-ribbon-announcement, $lightness: -20%,);
+$color-ribbon-article: $background-color-secondary-active;
+$color-ribbon-article-shadow: color.adjust($color-ribbon-article, $lightness: -20%);
+$color-ribbon-event: $background-color-third-active;
+$color-ribbon-event-shadow: color.adjust($color-ribbon-event, $lightness: -20%);
 
 /**
  * @tokens Chat Color
@@ -415,10 +417,15 @@ $color-ribbon-article-active: $background-color-secondary-active;
 $chat-message-bg-me: $color-primary-light;
 $chat-message-color: $text-color-base;
 $chat-message-bg-others: $color-neutral-80;
-$chat-sidemenu-bg: $color-secondary-active;
+$chat-sidemenu-bg: white;
+$chat-sidemenu-background-over: '#f6f6f6';
+$chat-sidemenu-background-active: $color-primary-light;
 $chat-new-message-color: $color-secondary-active;
 $chat-message-timestamp: $text-color-soft;
 $chat-message-checkmark-seen: $text-color-secondary;
 $chat-message-checkmark: $text-color-soft;
 $chat-room-color-counter-badge: $text-color-inverse;
 $chat-room-background-counter-badge: $color-secondary;
+$chat-icon-add: $color-primary;
+$chat-icon-send: $color-primary;
+$chat-icon-emoji: $color-primary;
