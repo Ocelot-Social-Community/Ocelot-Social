@@ -70,32 +70,32 @@ const updateOnlineStatus = gql`
   }
 `
 
-const setBadgeSelected = gql`
+const setTrophyBadgeSelected = gql`
   mutation ($slot: Int!, $badgeId: ID!) {
-    setBadgeSelected(slot: $slot, badgeId: $badgeId) {
-      badgesSelected {
+    setTrophyBadgeSelected(slot: $slot, badgeId: $badgeId) {
+      badgeTrophiesCount
+      badgeTrophiesSelected {
         id
       }
-      badgesUnused {
+      badgeTrophiesUnused {
         id
       }
-      badgesCount
-      badgesUnusedCount
+      badgeTrophiesUnusedCount
     }
   }
 `
 
-const resetBadgesSelected = gql`
+const resetTrophyBadgesSelected = gql`
   mutation {
-    resetBadgesSelected {
-      badgesSelected {
+    resetTrophyBadgesSelected {
+      badgeTrophiesCount
+      badgeTrophiesSelected {
         id
       }
-      badgesUnused {
+      badgeTrophiesUnused {
         id
       }
-      badgesCount
-      badgesUnusedCount
+      badgeTrophiesUnusedCount
     }
   }
 `
@@ -1101,29 +1101,29 @@ describe('updateOnlineStatus', () => {
   })
 })
 
-describe('setBadgeSelected', () => {
+describe('setTrophyBadgeSelected', () => {
   beforeEach(async () => {
     user = await Factory.build('user', {
       id: 'user',
       role: 'user',
     })
     const badgeBear = await Factory.build('badge', {
-      id: 'badge_bear',
-      type: 'badge',
+      id: 'trophy_bear',
+      type: 'trophy',
       description: 'You earned a Bear',
-      icon: '/img/badges/badge_blue_bear.svg',
+      icon: '/img/badges/trophy_blue_bear.svg',
     })
     const badgePanda = await Factory.build('badge', {
-      id: 'badge_panda',
-      type: 'badge',
+      id: 'trophy_panda',
+      type: 'trophy',
       description: 'You earned a Panda',
-      icon: '/img/badges/badge_blue_panda.svg',
+      icon: '/img/badges/trophy_blue_panda.svg',
     })
     await Factory.build('badge', {
-      id: 'badge_rabbit',
-      type: 'badge',
+      id: 'trophy_rabbit',
+      type: 'trophy',
       description: 'You earned a Rabbit',
-      icon: '/img/badges/badge_blue_rabbit.svg',
+      icon: '/img/badges/trophy_blue_rabbit.svg',
     })
 
     await user.relateTo(badgeBear, 'rewarded')
@@ -1137,7 +1137,10 @@ describe('setBadgeSelected', () => {
 
     it('throws an error', async () => {
       await expect(
-        mutate({ mutation: setBadgeSelected, variables: { slot: 0, badgeId: 'badge_bear' } }),
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 0, badgeId: 'trophy_bear' },
+        }),
       ).resolves.toEqual(
         expect.objectContaining({
           errors: [
@@ -1157,7 +1160,10 @@ describe('setBadgeSelected', () => {
 
     it('throws Error when slot is out of bound', async () => {
       await expect(
-        mutate({ mutation: setBadgeSelected, variables: { slot: -1, badgeId: 'badge_bear' } }),
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: -1, badgeId: 'trophy_bear' },
+        }),
       ).resolves.toEqual(
         expect.objectContaining({
           errors: [
@@ -1168,7 +1174,10 @@ describe('setBadgeSelected', () => {
         }),
       )
       await expect(
-        mutate({ mutation: setBadgeSelected, variables: { slot: 9, badgeId: 'badge_bear' } }),
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 9, badgeId: 'trophy_bear' },
+        }),
       ).resolves.toEqual(
         expect.objectContaining({
           errors: [
@@ -1182,7 +1191,10 @@ describe('setBadgeSelected', () => {
 
     it('throws Error when badge was not rewarded to user', async () => {
       await expect(
-        mutate({ mutation: setBadgeSelected, variables: { slot: 0, badgeId: 'badge_rabbit' } }),
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 0, badgeId: 'trophy_rabbit' },
+        }),
       ).resolves.toEqual(
         expect.objectContaining({
           errors: [
@@ -1196,7 +1208,10 @@ describe('setBadgeSelected', () => {
 
     it('throws Error when badge is unknown', async () => {
       await expect(
-        mutate({ mutation: setBadgeSelected, variables: { slot: 0, badgeId: 'badge_unknown' } }),
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 0, badgeId: 'trophy_unknown' },
+        }),
       ).resolves.toEqual(
         expect.objectContaining({
           errors: [
@@ -1210,21 +1225,18 @@ describe('setBadgeSelected', () => {
 
     it('returns the user with badges set on slots', async () => {
       await expect(
-        mutate({ mutation: setBadgeSelected, variables: { slot: 0, badgeId: 'badge_bear' } }),
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 0, badgeId: 'trophy_bear' },
+        }),
       ).resolves.toEqual(
         expect.objectContaining({
           data: {
-            setBadgeSelected: {
-              badgesCount: 2,
-              badgesUnused: [
+            setTrophyBadgeSelected: {
+              badgeTrophiesCount: 2,
+              badgeTrophiesSelected: [
                 {
-                  id: 'badge_panda',
-                },
-              ],
-              badgesUnusedCount: 1,
-              badgesSelected: [
-                {
-                  id: 'badge_bear',
+                  id: 'trophy_bear',
                 },
                 null,
                 null,
@@ -1235,34 +1247,43 @@ describe('setBadgeSelected', () => {
                 null,
                 null,
               ],
+              badgeTrophiesUnused: [
+                {
+                  id: 'trophy_panda',
+                },
+              ],
+              badgeTrophiesUnusedCount: 1,
             },
           },
         }),
       )
       await expect(
-        mutate({ mutation: setBadgeSelected, variables: { slot: 5, badgeId: 'badge_panda' } }),
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 5, badgeId: 'trophy_panda' },
+        }),
       ).resolves.toEqual(
         expect.objectContaining({
           data: {
-            setBadgeSelected: {
-              badgesCount: 2,
-              badgesUnused: [],
-              badgesUnusedCount: 0,
-              badgesSelected: [
+            setTrophyBadgeSelected: {
+              badgeTrophiesCount: 2,
+              badgeTrophiesSelected: [
                 {
-                  id: 'badge_bear',
+                  id: 'trophy_bear',
                 },
                 null,
                 null,
                 null,
                 null,
                 {
-                  id: 'badge_panda',
+                  id: 'trophy_panda',
                 },
                 null,
                 null,
                 null,
               ],
+              badgeTrophiesUnused: [],
+              badgeTrophiesUnusedCount: 0,
             },
           },
         }),
@@ -1271,36 +1292,42 @@ describe('setBadgeSelected', () => {
   })
 })
 
-describe('resetBadgesSelected', () => {
+describe('resetTrophyBadgesSelected', () => {
   beforeEach(async () => {
     user = await Factory.build('user', {
       id: 'user',
       role: 'user',
     })
     const badgeBear = await Factory.build('badge', {
-      id: 'badge_bear',
-      type: 'badge',
+      id: 'trophy_bear',
+      type: 'trophy',
       description: 'You earned a Bear',
-      icon: '/img/badges/badge_blue_bear.svg',
+      icon: '/img/badges/trophy_blue_bear.svg',
     })
     const badgePanda = await Factory.build('badge', {
-      id: 'badge_panda',
-      type: 'badge',
+      id: 'trophy_panda',
+      type: 'trophy',
       description: 'You earned a Panda',
-      icon: '/img/badges/badge_blue_panda.svg',
+      icon: '/img/badges/trophy_blue_panda.svg',
     })
     await Factory.build('badge', {
-      id: 'badge_rabbit',
-      type: 'badge',
+      id: 'trophy_rabbit',
+      type: 'trophy',
       description: 'You earned a Rabbit',
-      icon: '/img/badges/badge_blue_rabbit.svg',
+      icon: '/img/badges/trophy_blue_rabbit.svg',
     })
 
     await user.relateTo(badgeBear, 'rewarded')
     await user.relateTo(badgePanda, 'rewarded')
 
-    await mutate({ mutation: setBadgeSelected, variables: { slot: 0, badgeId: 'badge_bear' } })
-    await mutate({ mutation: setBadgeSelected, variables: { slot: 5, badgeId: 'badge_panda' } })
+    await mutate({
+      mutation: setTrophyBadgeSelected,
+      variables: { slot: 0, badgeId: 'trophy_bear' },
+    })
+    await mutate({
+      mutation: setTrophyBadgeSelected,
+      variables: { slot: 5, badgeId: 'trophy_panda' },
+    })
   })
 
   describe('not authenticated', () => {
@@ -1309,7 +1336,7 @@ describe('resetBadgesSelected', () => {
     })
 
     it('throws an error', async () => {
-      await expect(mutate({ mutation: resetBadgesSelected })).resolves.toEqual(
+      await expect(mutate({ mutation: resetTrophyBadgesSelected })).resolves.toEqual(
         expect.objectContaining({
           errors: [
             expect.objectContaining({
@@ -1327,21 +1354,21 @@ describe('resetBadgesSelected', () => {
     })
 
     it('returns the user with no profile badges badges set', async () => {
-      await expect(mutate({ mutation: resetBadgesSelected })).resolves.toEqual(
+      await expect(mutate({ mutation: resetTrophyBadgesSelected })).resolves.toEqual(
         expect.objectContaining({
           data: {
-            resetBadgesSelected: {
-              badgesCount: 2,
-              badgesUnused: [
+            resetTrophyBadgesSelected: {
+              badgeTrophiesCount: 2,
+              badgeTrophiesSelected: [null, null, null, null, null, null, null, null, null],
+              badgeTrophiesUnused: [
                 {
-                  id: 'badge_panda',
+                  id: 'trophy_panda',
                 },
                 {
-                  id: 'badge_bear',
+                  id: 'trophy_bear',
                 },
               ],
-              badgesUnusedCount: 2,
-              badgesSelected: [null, null, null, null, null, null, null, null, null],
+              badgeTrophiesUnusedCount: 2,
             },
           },
         }),

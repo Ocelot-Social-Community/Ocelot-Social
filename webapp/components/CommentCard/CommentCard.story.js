@@ -32,8 +32,8 @@ const comment = {
     location: null,
     badges: [
       {
-        id: 'badge_bear',
-        icon: '/img/badges/badge_blue_bear.svg',
+        id: 'trophy_bear',
+        icon: '/img/badges/trophy_blue_bear.svg',
         __typename: 'Badge',
       },
     ],

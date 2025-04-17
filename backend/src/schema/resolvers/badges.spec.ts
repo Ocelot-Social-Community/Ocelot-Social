@@ -65,10 +65,10 @@ describe('Badges', () => {
       },
     )
     badge = await Factory.build('badge', {
-      id: 'badge_rhino',
-      type: 'badge',
+      id: 'trophy_rhino',
+      type: 'trophy',
       description: 'You earned a rhino',
-      icon: '/img/badges/badge_blue_rhino.svg',
+      icon: '/img/badges/trophy_blue_rhino.svg',
     })
 
     verification = await Factory.build('badge', {
@@ -97,7 +97,7 @@ describe('Badges', () => {
           badgeVerification {
             id
           }
-          badges {
+          badgeTrophies {
             id
           }
         }
@@ -181,7 +181,7 @@ describe('Badges', () => {
           await expect(
             mutate({
               mutation: setVerificationBadgeMutation,
-              variables: { userId: 'regular-user-id', badgeId: 'badge_rhino' },
+              variables: { userId: 'regular-user-id', badgeId: 'trophy_rhino' },
             }),
           ).resolves.toMatchObject({
             data: { setVerificationBadge: null },
@@ -201,7 +201,7 @@ describe('Badges', () => {
             setVerificationBadge: {
               id: 'regular-user-id',
               badgeVerification: { id: 'verification_moderator' },
-              badges: [],
+              badgeTrophies: [],
             },
           },
           errors: undefined,
@@ -223,7 +223,7 @@ describe('Badges', () => {
             setVerificationBadge: {
               id: 'regular-user-id',
               badgeVerification: { id: 'verification_admin' },
-              badges: [],
+              badgeTrophies: [],
             },
           },
           errors: undefined,
@@ -252,7 +252,7 @@ describe('Badges', () => {
             setVerificationBadge: {
               id: 'regular-user-2-id',
               badgeVerification: { id: 'verification_moderator' },
-              badges: [],
+              badgeTrophies: [],
             },
           },
           errors: undefined,
@@ -283,20 +283,20 @@ describe('Badges', () => {
     })
   })
 
-  describe('rewardBadge', () => {
+  describe('rewardTrophyBadge', () => {
     const variables = {
-      badgeId: 'badge_rhino',
+      badgeId: 'trophy_rhino',
       userId: 'regular-user-id',
     }
 
-    const rewardBadgeMutation = gql`
+    const rewardTrophyBadgeMutation = gql`
       mutation ($badgeId: ID!, $userId: ID!) {
-        rewardBadge(badgeId: $badgeId, userId: $userId) {
+        rewardTrophyBadge(badgeId: $badgeId, userId: $userId) {
           id
           badgeVerification {
             id
           }
-          badges {
+          badgeTrophies {
             id
           }
         }
@@ -306,8 +306,10 @@ describe('Badges', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
-        await expect(mutate({ mutation: rewardBadgeMutation, variables })).resolves.toMatchObject({
-          data: { rewardBadge: null },
+        await expect(
+          mutate({ mutation: rewardTrophyBadgeMutation, variables }),
+        ).resolves.toMatchObject({
+          data: { rewardTrophyBadge: null },
           errors: [{ message: 'Not Authorized!' }],
         })
       })
@@ -320,12 +322,12 @@ describe('Badges', () => {
 
       describe('rewards badge to user', () => {
         it('throws authorization error', async () => {
-          await expect(mutate({ mutation: rewardBadgeMutation, variables })).resolves.toMatchObject(
-            {
-              data: { rewardBadge: null },
-              errors: [{ message: 'Not Authorized!' }],
-            },
-          )
+          await expect(
+            mutate({ mutation: rewardTrophyBadgeMutation, variables }),
+          ).resolves.toMatchObject({
+            data: { rewardTrophyBadge: null },
+            errors: [{ message: 'Not Authorized!' }],
+          })
         })
       })
     })
@@ -339,11 +341,11 @@ describe('Badges', () => {
         it('rejects with an informative error message', async () => {
           await expect(
             mutate({
-              mutation: rewardBadgeMutation,
+              mutation: rewardTrophyBadgeMutation,
               variables: { userId: 'regular-user-id', badgeId: 'non-existent-badge-id' },
             }),
           ).resolves.toMatchObject({
-            data: { rewardBadge: null },
+            data: { rewardTrophyBadge: null },
             errors: [
               {
                 message:
@@ -358,11 +360,11 @@ describe('Badges', () => {
         it('rejects with a telling error message', async () => {
           await expect(
             mutate({
-              mutation: rewardBadgeMutation,
-              variables: { userId: 'non-existent-user-id', badgeId: 'badge_rhino' },
+              mutation: rewardTrophyBadgeMutation,
+              variables: { userId: 'non-existent-user-id', badgeId: 'trophy_rhino' },
             }),
           ).resolves.toMatchObject({
-            data: { rewardBadge: null },
+            data: { rewardTrophyBadge: null },
             errors: [
               {
                 message:
@@ -377,11 +379,11 @@ describe('Badges', () => {
         it('rejects with a telling error message', async () => {
           await expect(
             mutate({
-              mutation: rewardBadgeMutation,
+              mutation: rewardTrophyBadgeMutation,
               variables: { userId: 'regular-user-id', badgeId: 'verification_moderator' },
             }),
           ).resolves.toMatchObject({
-            data: { rewardBadge: null },
+            data: { rewardTrophyBadge: null },
             errors: [
               {
                 message:
@@ -395,49 +397,49 @@ describe('Badges', () => {
       it('rewards a badge to the user', async () => {
         const expected = {
           data: {
-            rewardBadge: {
+            rewardTrophyBadge: {
               id: 'regular-user-id',
               badgeVerification: null,
-              badges: [{ id: 'badge_rhino' }],
+              badgeTrophies: [{ id: 'trophy_rhino' }],
             },
           },
           errors: undefined,
         }
-        await expect(mutate({ mutation: rewardBadgeMutation, variables })).resolves.toMatchObject(
-          expected,
-        )
+        await expect(
+          mutate({ mutation: rewardTrophyBadgeMutation, variables }),
+        ).resolves.toMatchObject(expected)
       })
 
       it('rewards a second different badge to the same user', async () => {
         await Factory.build('badge', {
-          id: 'badge_racoon',
-          type: 'badge',
+          id: 'trophy_racoon',
+          type: 'trophy',
           description: 'You earned a racoon',
-          icon: '/img/badges/badge_blue_racoon.svg',
+          icon: '/img/badges/trophy_blue_racoon.svg',
         })
-        const badges = [{ id: 'badge_racoon' }, { id: 'badge_rhino' }]
+        const trophies = [{ id: 'trophy_racoon' }, { id: 'trophy_rhino' }]
         const expected = {
           data: {
-            rewardBadge: {
+            rewardTrophyBadge: {
               id: 'regular-user-id',
-              badges: expect.arrayContaining(badges),
+              badgeTrophies: expect.arrayContaining(trophies),
             },
           },
           errors: undefined,
         }
         await mutate({
-          mutation: rewardBadgeMutation,
+          mutation: rewardTrophyBadgeMutation,
           variables: {
             userId: 'regular-user-id',
-            badgeId: 'badge_rhino',
+            badgeId: 'trophy_rhino',
           },
         })
         await expect(
           mutate({
-            mutation: rewardBadgeMutation,
+            mutation: rewardTrophyBadgeMutation,
             variables: {
               userId: 'regular-user-id',
-              badgeId: 'badge_racoon',
+              badgeId: 'trophy_racoon',
             },
           }),
         ).resolves.toMatchObject(expected)
@@ -446,9 +448,9 @@ describe('Badges', () => {
       it('rewards the same badge as well to another user', async () => {
         const expected = {
           data: {
-            rewardBadge: {
+            rewardTrophyBadge: {
               id: 'regular-user-2-id',
-              badges: [{ id: 'badge_rhino' }],
+              badgeTrophies: [{ id: 'trophy_rhino' }],
             },
           },
           errors: undefined,
@@ -463,15 +465,15 @@ describe('Badges', () => {
           },
         )
         await mutate({
-          mutation: rewardBadgeMutation,
+          mutation: rewardTrophyBadgeMutation,
           variables,
         })
         await expect(
           mutate({
-            mutation: rewardBadgeMutation,
+            mutation: rewardTrophyBadgeMutation,
             variables: {
               userId: 'regular-user-2-id',
-              badgeId: 'badge_rhino',
+              badgeId: 'trophy_rhino',
             },
           }),
         ).resolves.toMatchObject(expected)
@@ -479,26 +481,26 @@ describe('Badges', () => {
 
       it('creates no duplicate reward relationships', async () => {
         await mutate({
-          mutation: rewardBadgeMutation,
+          mutation: rewardTrophyBadgeMutation,
           variables,
         })
         await mutate({
-          mutation: rewardBadgeMutation,
+          mutation: rewardTrophyBadgeMutation,
           variables,
         })
 
         const userQuery = gql`
           {
             User(id: "regular-user-id") {
-              badgesCount
-              badges {
+              badgeTrophiesCount
+              badgeTrophies {
                 id
               }
             }
           }
         `
         const expected = {
-          data: { User: [{ badgesCount: 1, badges: [{ id: 'badge_rhino' }] }] },
+          data: { User: [{ badgeTrophiesCount: 1, badgeTrophies: [{ id: 'trophy_rhino' }] }] },
           errors: undefined,
         }
 
@@ -509,7 +511,7 @@ describe('Badges', () => {
 
   describe('revokeBadge', () => {
     const variables = {
-      badgeId: 'badge_rhino',
+      badgeId: 'trophy_rhino',
       userId: 'regular-user-id',
     }
 
@@ -525,7 +527,7 @@ describe('Badges', () => {
           badgeVerification {
             id
           }
-          badges {
+          badgeTrophies {
             id
           }
         }
@@ -538,15 +540,15 @@ describe('Badges', () => {
         const userQuery = gql`
           {
             User(id: "regular-user-id") {
-              badgesCount
-              badges {
+              badgeTrophiesCount
+              badgeTrophies {
                 id
               }
             }
           }
         `
         const expected = {
-          data: { User: [{ badgesCount: 1, badges: [{ id: 'badge_rhino' }] }] },
+          data: { User: [{ badgeTrophiesCount: 1, badgeTrophies: [{ id: 'trophy_rhino' }] }] },
           errors: undefined,
         }
         await expect(query({ query: userQuery })).resolves.toMatchObject(expected)
@@ -591,7 +593,7 @@ describe('Badges', () => {
             revokeBadge: {
               id: 'regular-user-id',
               badgeVerification: { id: 'verification_moderator' },
-              badges: [],
+              badgeTrophies: [],
             },
           },
           errors: undefined,
@@ -605,7 +607,7 @@ describe('Badges', () => {
             revokeBadge: {
               id: 'regular-user-id',
               badgeVerification: { id: 'verification_moderator' },
-              badges: [],
+              badgeTrophies: [],
             },
           },
           errors: undefined,
@@ -626,7 +628,7 @@ describe('Badges', () => {
             revokeBadge: {
               id: 'regular-user-id',
               badgeVerification: null,
-              badges: [{ id: 'badge_rhino' }],
+              badgeTrophies: [{ id: 'trophy_rhino' }],
             },
           },
           errors: undefined,
@@ -654,7 +656,7 @@ describe('Badges', () => {
             revokeBadge: {
               id: 'regular-user-id',
               badgeVerification: null,
-              badges: [{ id: 'badge_rhino' }],
+              badgeTrophies: [{ id: 'trophy_rhino' }],
             },
           },
           errors: undefined,

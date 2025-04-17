@@ -1,161 +1,161 @@
 import Factory from '@db/factories'
 
-export const badges = async () => {
+export const trophies = async () => {
   return {
     // Blue Animals
-    badgeBear: await Factory.build('badge', {
-      id: 'badge_bear',
-      type: 'badge',
+    trophyBear: await Factory.build('badge', {
+      id: 'trophy_bear',
+      type: 'trophy',
       description: 'You earned a Bear',
-      icon: '/img/badges/badge_blue_bear.svg',
+      icon: '/img/badges/trophy_blue_bear.svg',
     }),
-    badgePanda: await Factory.build('badge', {
-      id: 'badge_panda',
-      type: 'badge',
+    trophyPanda: await Factory.build('badge', {
+      id: 'trophy_panda',
+      type: 'trophy',
       description: 'You earned a Panda',
-      icon: '/img/badges/badge_blue_panda.svg',
+      icon: '/img/badges/trophy_blue_panda.svg',
     }),
-    badgeRabbit: await Factory.build('badge', {
-      id: 'badge_rabbit',
-      type: 'badge',
+    trophyRabbit: await Factory.build('badge', {
+      id: 'trophy_rabbit',
+      type: 'trophy',
       description: 'You earned a Rabbit',
-      icon: '/img/badges/badge_blue_rabbit.svg',
+      icon: '/img/badges/trophy_blue_rabbit.svg',
     }),
-    badgeRacoon: await Factory.build('badge', {
-      id: 'badge_racoon',
-      type: 'badge',
+    trophyRacoon: await Factory.build('badge', {
+      id: 'trophy_racoon',
+      type: 'trophy',
       description: 'You earned a Racoon',
-      icon: '/img/badges/badge_blue_racoon.svg',
+      icon: '/img/badges/trophy_blue_racoon.svg',
     }),
-    badgeRhino: await Factory.build('badge', {
-      id: 'badge_rhino',
-      type: 'badge',
+    trophyRhino: await Factory.build('badge', {
+      id: 'trophy_rhino',
+      type: 'trophy',
       description: 'You earned a Rhino',
-      icon: '/img/badges/badge_blue_rhino.svg',
+      icon: '/img/badges/trophy_blue_rhino.svg',
     }),
-    badgeTiger: await Factory.build('badge', {
-      id: 'badge_tiger',
-      type: 'badge',
+    trophyTiger: await Factory.build('badge', {
+      id: 'trophy_tiger',
+      type: 'trophy',
       description: 'You earned a Tiger',
-      icon: '/img/badges/badge_blue_tiger.svg',
+      icon: '/img/badges/trophy_blue_tiger.svg',
     }),
-    badgeTurtle: await Factory.build('badge', {
-      id: 'badge_turtle',
-      type: 'badge',
+    trophyTurtle: await Factory.build('badge', {
+      id: 'trophy_turtle',
+      type: 'trophy',
       description: 'You earned a Turtle',
-      icon: '/img/badges/badge_blue_turtle.svg',
+      icon: '/img/badges/trophy_blue_turtle.svg',
     }),
-    badgeWhale: await Factory.build('badge', {
-      id: 'badge_whale',
-      type: 'badge',
+    trophyWhale: await Factory.build('badge', {
+      id: 'trophy_whale',
+      type: 'trophy',
       description: 'You earned a Whale',
-      icon: '/img/badges/badge_blue_whale.svg',
+      icon: '/img/badges/trophy_blue_whale.svg',
     }),
-    badgeWolf: await Factory.build('badge', {
-      id: 'badge_wolf',
-      type: 'badge',
+    trophyWolf: await Factory.build('badge', {
+      id: 'trophy_wolf',
+      type: 'trophy',
       description: 'You earned a Wolf',
-      icon: '/img/badges/badge_blue_wolf.svg',
+      icon: '/img/badges/trophy_blue_wolf.svg',
     }),
     // Green Transports
-    badgeAirship: await Factory.build('badge', {
-      id: 'badge_airship',
-      type: 'badge',
+    trophyAirship: await Factory.build('badge', {
+      id: 'trophy_airship',
+      type: 'trophy',
       description: 'You earned an Airship',
-      icon: '/img/badges/badge_green_airship.svg',
+      icon: '/img/badges/trophy_green_airship.svg',
     }),
-    badgeAlienship: await Factory.build('badge', {
-      id: 'badge_alienship',
-      type: 'badge',
+    trophyAlienship: await Factory.build('badge', {
+      id: 'trophy_alienship',
+      type: 'trophy',
       description: 'You earned an Alienship',
-      icon: '/img/badges/badge_green_alienship.svg',
+      icon: '/img/badges/trophy_green_alienship.svg',
     }),
-    badgeBalloon: await Factory.build('badge', {
-      id: 'badge_balloon',
-      type: 'badge',
+    trophyBalloon: await Factory.build('badge', {
+      id: 'trophy_balloon',
+      type: 'trophy',
       description: 'You earned a Balloon',
-      icon: '/img/badges/badge_green_balloon.svg',
+      icon: '/img/badges/trophy_green_balloon.svg',
     }),
-    badgeBigballoon: await Factory.build('badge', {
-      id: 'badge_bigballoon',
-      type: 'badge',
+    trophyBigballoon: await Factory.build('badge', {
+      id: 'trophy_bigballoon',
+      type: 'trophy',
       description: 'You earned a Big Balloon',
-      icon: '/img/badges/badge_green_bigballoon.svg',
+      icon: '/img/badges/trophy_green_bigballoon.svg',
     }),
-    badgeCrane: await Factory.build('badge', {
-      id: 'badge_crane',
-      type: 'badge',
+    trophyCrane: await Factory.build('badge', {
+      id: 'trophy_crane',
+      type: 'trophy',
       description: 'You earned a Crane',
-      icon: '/img/badges/badge_green_crane.svg',
+      icon: '/img/badges/trophy_green_crane.svg',
     }),
-    badgeGlider: await Factory.build('badge', {
-      id: 'badge_glider',
-      type: 'badge',
+    trophyGlider: await Factory.build('badge', {
+      id: 'trophy_glider',
+      type: 'trophy',
       description: 'You earned a Glider',
-      icon: '/img/badges/badge_green_glider.svg',
+      icon: '/img/badges/trophy_green_glider.svg',
     }),
-    badgeHelicopter: await Factory.build('badge', {
-      id: 'badge_helicopter',
-      type: 'badge',
+    trophyHelicopter: await Factory.build('badge', {
+      id: 'trophy_helicopter',
+      type: 'trophy',
       description: 'You earned a Helicopter',
-      icon: '/img/badges/badge_green_helicopter.svg',
+      icon: '/img/badges/trophy_green_helicopter.svg',
     }),
     // Green Animals
-    badgeBee: await Factory.build('badge', {
-      id: 'badge_bee',
-      type: 'badge',
+    trophyBee: await Factory.build('badge', {
+      id: 'trophy_bee',
+      type: 'trophy',
       description: 'You earned a Bee',
-      icon: '/img/badges/badge_green_bee.svg',
+      icon: '/img/badges/trophy_green_bee.svg',
     }),
-    badgeButterfly: await Factory.build('badge', {
-      id: 'badge_butterfly',
-      type: 'badge',
+    trophyButterfly: await Factory.build('badge', {
+      id: 'trophy_butterfly',
+      type: 'trophy',
       description: 'You earned a Butterfly',
-      icon: '/img/badges/badge_green_butterfly.svg',
+      icon: '/img/badges/trophy_green_butterfly.svg',
     }),
     // Green Plants
-    badgeFlower: await Factory.build('badge', {
-      id: 'badge_flower',
-      type: 'badge',
+    trophyFlower: await Factory.build('badge', {
+      id: 'trophy_flower',
+      type: 'trophy',
       description: 'You earned a Flower',
-      icon: '/img/badges/badge_green_flower.svg',
+      icon: '/img/badges/trophy_green_flower.svg',
     }),
-    badgeLifetree: await Factory.build('badge', {
-      id: 'badge_lifetree',
-      type: 'badge',
+    trophyLifetree: await Factory.build('badge', {
+      id: 'trophy_lifetree',
+      type: 'trophy',
       description: 'You earned the tree of life',
-      icon: '/img/badges/badge_green_lifetree.svg',
+      icon: '/img/badges/trophy_green_lifetree.svg',
     }),
     // Green Misc
-    badgeDoublerainbow: await Factory.build('badge', {
-      id: 'badge_doublerainbow',
-      type: 'badge',
+    trophyDoublerainbow: await Factory.build('badge', {
+      id: 'trophy_doublerainbow',
+      type: 'trophy',
       description: 'You earned the Double Rainbow',
-      icon: '/img/badges/badge_green_doublerainbow.svg',
+      icon: '/img/badges/trophy_green_doublerainbow.svg',
     }),
-    badgeEndrainbow: await Factory.build('badge', {
-      id: 'badge_endrainbow',
-      type: 'badge',
+    trophyEndrainbow: await Factory.build('badge', {
+      id: 'trophy_endrainbow',
+      type: 'trophy',
       description: 'You earned the End of the Rainbow',
-      icon: '/img/badges/badge_green_endrainbow.svg',
+      icon: '/img/badges/trophy_green_endrainbow.svg',
     }),
-    badgeMagicrainbow: await Factory.build('badge', {
-      id: 'badge_magicrainbow',
-      type: 'badge',
+    trophyMagicrainbow: await Factory.build('badge', {
+      id: 'trophy_magicrainbow',
+      type: 'trophy',
       description: 'You earned the Magic Rainbow',
-      icon: '/img/badges/badge_green_magicrainbow.svg',
+      icon: '/img/badges/trophy_green_magicrainbow.svg',
     }),
-    badgeStarter: await Factory.build('badge', {
-      id: 'badge_starter',
-      type: 'badge',
+    trophyStarter: await Factory.build('badge', {
+      id: 'trophy_starter',
+      type: 'trophy',
       description: 'You earned the Starter Badge',
-      icon: '/img/badges/badge_green_starter.svg',
+      icon: '/img/badges/trophy_green_starter.svg',
     }),
-    badgeSuperfounder: await Factory.build('badge', {
-      id: 'badge_superfounder',
-      type: 'badge',
+    trophySuperfounder: await Factory.build('badge', {
+      id: 'trophy_superfounder',
+      type: 'trophy',
       description: 'You earned the Super Founder Badge',
-      icon: '/img/badges/badge_green_superfounder.svg',
+      icon: '/img/badges/trophy_green_superfounder.svg',
     }),
   }
 }

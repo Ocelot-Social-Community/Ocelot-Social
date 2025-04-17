@@ -1,7 +1,7 @@
 import { UserInputError, ForbiddenError } from 'apollo-server'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
-import { PROFILE_BADGE_COUNT } from '@constants/badges'
+import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import { getNeode } from '@db/neo4j'
 
 import log from './helpers/databaseLogger'
@@ -382,14 +382,16 @@ export default {
 
       return true
     },
-    setBadgeSelected: async (_object, args, context, _resolveInfo) => {
+    setTrophyBadgeSelected: async (_object, args, context, _resolveInfo) => {
       const { slot, badgeId } = args
       const {
         user: { id: userId },
       } = context
 
-      if (slot >= PROFILE_BADGE_COUNT || slot < 0) {
-        throw new Error(`Invalid slot! There is only ${PROFILE_BADGE_COUNT} badge-slots to fill`)
+      if (slot >= TROPHY_BADGES_SELECTED_MAX || slot < 0) {
+        throw new Error(
+          `Invalid slot! There is only ${TROPHY_BADGES_SELECTED_MAX} badge-slots to fill`,
+        )
       }
 
       const session = context.driver.session()
@@ -420,7 +422,7 @@ export default {
         session.close()
       }
     },
-    resetBadgesSelected: async (_object, _args, context, _resolveInfo) => {
+    resetTrophyBadgesSelected: async (_object, _args, context, _resolveInfo) => {
       const {
         user: { id: userId },
       } = context
@@ -504,7 +506,7 @@ export default {
         },
       ]
     },
-    badgesSelected: async (parent, _params, context, _resolveInfo) => {
+    badgeTrophiesSelected: async (parent, _params, context, _resolveInfo) => {
       const session = context.driver.session()
 
       const query = session.readTransaction(async (transaction) => {
@@ -521,7 +523,7 @@ export default {
       })
       try {
         const badgesSelected = await query
-        const result = Array(PROFILE_BADGE_COUNT).fill(null)
+        const result = Array(TROPHY_BADGES_SELECTED_MAX).fill(null)
         badgesSelected.map((record) => {
           result[record.get('slot')] = record.get('badge')
           return true
@@ -533,7 +535,7 @@ export default {
         session.close()
       }
     },
-    badgesUnused: async (_parent, _params, context, _resolveInfo) => {
+    badgeTrophiesUnused: async (_parent, _params, context, _resolveInfo) => {
       const {
         user: { id: userId },
       } = context
@@ -559,7 +561,7 @@ export default {
         session.close()
       }
     },
-    badgesUnusedCount: async (_parent, _params, context, _resolveInfo) => {
+    badgeTrophiesUnusedCount: async (_parent, _params, context, _resolveInfo) => {
       const {
         user: { id: userId },
       } = context
@@ -618,7 +620,7 @@ export default {
           '-[:WROTE]->(c:Comment)-[:COMMENTS]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true',
         shoutedCount:
           '-[:SHOUTED]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true',
-        badgesCount: '<-[:REWARDED]-(related:Badge)',
+        badgeTrophiesCount: '<-[:REWARDED]-(related:Badge)',
       },
       hasOne: {
         avatar: '-[:AVATAR_IMAGE]->(related:Image)',
@@ -636,7 +638,7 @@ export default {
         comments: '-[:WROTE]->(related:Comment)',
         shouted: '-[:SHOUTED]->(related:Post)',
         categories: '-[:CATEGORIZED]->(related:Category)',
-        badges: '<-[:REWARDED]-(related:Badge)',
+        badgeTrophies: '<-[:REWARDED]-(related:Badge)',
         inviteCodes: '-[:GENERATED]->(related:InviteCode)',
       },
     }),

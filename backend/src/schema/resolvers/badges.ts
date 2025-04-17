@@ -49,7 +49,7 @@ export default {
       }
     },
 
-    rewardBadge: async (_object, args, context, _resolveInfo) => {
+    rewardTrophyBadge: async (_object, args, context, _resolveInfo) => {
       const {
         user: { id: currentUserId },
       } = context
@@ -59,7 +59,7 @@ export default {
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const response = await transaction.run(
           `
-            MATCH (badge:Badge {id: $badgeId, type: 'badge'}), (user:User {id: $userId})
+            MATCH (badge:Badge {id: $badgeId, type: 'trophy'}), (user:User {id: $userId})
             MERGE (badge)-[relation:REWARDED {by: $currentUserId}]->(user)
             RETURN relation, user {.*}
           `,

@@ -18,7 +18,7 @@ import createServer from '@src/server'
 
 import Factory from './factories'
 import { getNeode, getDriver } from './neo4j'
-import { badges, verification } from './seed/badges'
+import { trophies, verification } from './seed/badges'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
@@ -126,25 +126,25 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await Paris.relateTo(France, 'isIn')
 
     const {
-      badgeAirship,
-      badgeBee,
-      badgeStarter,
-      badgeFlower,
-      badgePanda,
-      badgeTiger,
-      badgeAlienship,
-      badgeBalloon,
-      badgeMagicrainbow,
-      badgeSuperfounder,
-      badgeBigballoon,
-      badgeLifetree,
-      badgeRacoon,
-      badgeRhino,
-      badgeWolf,
-      badgeTurtle,
-      badgeBear,
-      badgeRabbit,
-    } = await badges()
+      trophyAirship,
+      trophyBee,
+      trophyStarter,
+      trophyFlower,
+      trophyPanda,
+      trophyTiger,
+      trophyAlienship,
+      trophyBalloon,
+      trophyMagicrainbow,
+      trophySuperfounder,
+      trophyBigballoon,
+      trophyLifetree,
+      trophyRacoon,
+      trophyRhino,
+      trophyWolf,
+      trophyTurtle,
+      trophyBear,
+      trophyRabbit,
+    } = await trophies()
 
     const { verificationAdmin, verificationModerator, verificationDeveloper } = await verification()
     // users
@@ -241,47 +241,47 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await huey.relateTo(Paris, 'isIn')
 
     // badges
-    await peterLustig.relateTo(badgeRacoon, 'rewarded')
-    await peterLustig.relateTo(badgeRhino, 'rewarded')
-    await peterLustig.relateTo(badgeWolf, 'rewarded')
-    await peterLustig.relateTo(badgeAirship, 'rewarded')
+    await peterLustig.relateTo(trophyRacoon, 'rewarded')
+    await peterLustig.relateTo(trophyRhino, 'rewarded')
+    await peterLustig.relateTo(trophyWolf, 'rewarded')
+    await peterLustig.relateTo(trophyAirship, 'rewarded')
     await peterLustig.relateTo(verificationAdmin, 'verifies')
-    await peterLustig.relateTo(badgeRacoon, 'selected', { slot: 0 })
-    await peterLustig.relateTo(badgeRhino, 'selected', { slot: 1 })
-    await peterLustig.relateTo(badgeAirship, 'selected', { slot: 5 })
+    await peterLustig.relateTo(trophyRacoon, 'selected', { slot: 0 })
+    await peterLustig.relateTo(trophyRhino, 'selected', { slot: 1 })
+    await peterLustig.relateTo(trophyAirship, 'selected', { slot: 5 })
 
-    await bobDerBaumeister.relateTo(badgeRacoon, 'rewarded')
-    await bobDerBaumeister.relateTo(badgeTurtle, 'rewarded')
-    await bobDerBaumeister.relateTo(badgeBee, 'rewarded')
+    await bobDerBaumeister.relateTo(trophyRacoon, 'rewarded')
+    await bobDerBaumeister.relateTo(trophyTurtle, 'rewarded')
+    await bobDerBaumeister.relateTo(trophyBee, 'rewarded')
     await bobDerBaumeister.relateTo(verificationModerator, 'verifies')
-    await bobDerBaumeister.relateTo(badgeRacoon, 'selected', { slot: 1 })
-    await bobDerBaumeister.relateTo(badgeTurtle, 'selected', { slot: 2 })
+    await bobDerBaumeister.relateTo(trophyRacoon, 'selected', { slot: 1 })
+    await bobDerBaumeister.relateTo(trophyTurtle, 'selected', { slot: 2 })
 
-    await jennyRostock.relateTo(badgeBear, 'rewarded')
-    await jennyRostock.relateTo(badgeStarter, 'rewarded')
-    await jennyRostock.relateTo(badgeFlower, 'rewarded')
-    await jennyRostock.relateTo(badgeBear, 'selected', { slot: 0 })
-    await jennyRostock.relateTo(badgeStarter, 'selected', { slot: 1 })
-    await jennyRostock.relateTo(badgeFlower, 'selected', { slot: 2 })
+    await jennyRostock.relateTo(trophyBear, 'rewarded')
+    await jennyRostock.relateTo(trophyStarter, 'rewarded')
+    await jennyRostock.relateTo(trophyFlower, 'rewarded')
+    await jennyRostock.relateTo(trophyBear, 'selected', { slot: 0 })
+    await jennyRostock.relateTo(trophyStarter, 'selected', { slot: 1 })
+    await jennyRostock.relateTo(trophyFlower, 'selected', { slot: 2 })
 
-    await huey.relateTo(badgePanda, 'rewarded')
-    await huey.relateTo(badgeTiger, 'rewarded')
-    await huey.relateTo(badgeAlienship, 'rewarded')
-    await huey.relateTo(badgeBalloon, 'rewarded')
-    await huey.relateTo(badgeMagicrainbow, 'rewarded')
-    await huey.relateTo(badgeSuperfounder, 'rewarded')
+    await huey.relateTo(trophyPanda, 'rewarded')
+    await huey.relateTo(trophyTiger, 'rewarded')
+    await huey.relateTo(trophyAlienship, 'rewarded')
+    await huey.relateTo(trophyBalloon, 'rewarded')
+    await huey.relateTo(trophyMagicrainbow, 'rewarded')
+    await huey.relateTo(trophySuperfounder, 'rewarded')
     await huey.relateTo(verificationDeveloper, 'verifies')
-    await huey.relateTo(badgePanda, 'selected', { slot: 0 })
-    await huey.relateTo(badgeTiger, 'selected', { slot: 1 })
-    await huey.relateTo(badgeAlienship, 'selected', { slot: 2 })
+    await huey.relateTo(trophyPanda, 'selected', { slot: 0 })
+    await huey.relateTo(trophyTiger, 'selected', { slot: 1 })
+    await huey.relateTo(trophyAlienship, 'selected', { slot: 2 })
 
-    await dewey.relateTo(badgeBigballoon, 'rewarded')
-    await dewey.relateTo(badgeLifetree, 'rewarded')
-    await dewey.relateTo(badgeBigballoon, 'selected', { slot: 7 })
-    await dewey.relateTo(badgeLifetree, 'selected', { slot: 8 })
+    await dewey.relateTo(trophyBigballoon, 'rewarded')
+    await dewey.relateTo(trophyLifetree, 'rewarded')
+    await dewey.relateTo(trophyBigballoon, 'selected', { slot: 7 })
+    await dewey.relateTo(trophyLifetree, 'selected', { slot: 8 })
 
-    await louie.relateTo(badgeRabbit, 'rewarded')
-    await louie.relateTo(badgeRabbit, 'selected', { slot: 4 })
+    await louie.relateTo(trophyRabbit, 'rewarded')
+    await louie.relateTo(trophyRabbit, 'selected', { slot: 4 })
 
     // Friends
     await peterLustig.relateTo(bobDerBaumeister, 'friends')

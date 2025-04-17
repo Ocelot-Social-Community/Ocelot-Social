@@ -10,7 +10,7 @@ type Badge {
 
 enum BadgeType {
   verification
-  badge
+  trophy
 }
 
 type Query {
@@ -19,6 +19,6 @@ type Query {
 
 type Mutation {
   setVerificationBadge(badgeId: ID!, userId: ID!): User
-  rewardBadge(badgeId: ID!, userId: ID!): User
+  rewardTrophyBadge(badgeId: ID!, userId: ID!): User
   revokeBadge(badgeId: ID!, userId: ID!): User
 }
