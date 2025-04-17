@@ -10,6 +10,28 @@
     "saveCategories": null
   },
   "admin": {
+    "badges": {
+      "description": null,
+      "revokeTrophy": {
+        "error": null,
+        "success": null
+      },
+      "revokeVerification": {
+        "error": null,
+        "success": null
+      },
+      "rewardTrophy": {
+        "error": null,
+        "success": null
+      },
+      "setVerification": {
+        "error": null,
+        "success": null
+      },
+      "title": null,
+      "trophyBadges": null,
+      "verificationBadges": null
+    },
     "categories": {
       "categoryName": "Имя",
       "name": "Категории",
@@ -73,8 +95,10 @@
           "name": "Имя",
           "number": "№",
           "role": "Роль",
-          "slug": "Алиас"
-        }
+          "slug": "Алиас",
+          "badges": null
+        },
+        "edit": null
       }
     }
   },

@@ -125,8 +125,12 @@ type User {
 
   categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
-  badges: [Badge]! @relation(name: "REWARDED", direction: "IN")
-  badgesCount: Int! @cypher(statement: "MATCH (this)<-[:REWARDED]-(r:Badge) RETURN COUNT(r)")
+  badgeVerification: Badge @relation(name: "VERIFIES", direction: "IN")
+  badgeTrophies: [Badge]! @relation(name: "REWARDED", direction: "IN")
+  badgeTrophiesCount: Int! @cypher(statement: "MATCH (this)<-[:REWARDED]-(r:Badge) RETURN COUNT(r)")
+  badgeTrophiesSelected: [Badge]! @neo4j_ignore
+  badgeTrophiesUnused: [Badge]! @neo4j_ignore
+  badgeTrophiesUnusedCount: Int! @neo4j_ignore
 
   emotions: [EMOTED]
 
@@ -247,4 +251,7 @@ type Mutation {
 
   # Get a JWT Token for the given Email and password
   login(email: String!, password: String!): String!
+
+  setTrophyBadgeSelected(slot: Int!, badgeId: ID!): User
+  resetTrophyBadgesSelected: User
 }

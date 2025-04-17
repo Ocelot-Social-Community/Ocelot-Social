@@ -120,6 +120,20 @@ When using `CATEGORIES_ACTIVE=true` you also want to seed the categories with:
 yarn db:data:categories
 ```
 
+### Branding Data
+
+You might need to seed some branding specific data into the database.
+
+To do so, run:
+
+```sh
+# in backend with database running (In docker or local)
+yarn db:data:branding
+
+# for docker
+docker exec backend yarn db:data:branding
+```
+
 ### Seed Data
 
 For a predefined set of test data you can seed the database with:

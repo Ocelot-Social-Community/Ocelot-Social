@@ -42,8 +42,8 @@
               {{ $t('profile.memberSince') }} {{ user.createdAt | date('MMMM yyyy') }}
             </ds-text>
           </ds-space>
-          <ds-space v-if="user.badges && user.badges.length" margin="x-small">
-            <hc-badges :badges="user.badges" />
+          <ds-space v-if="user.badgeTrophies && user.badgeTrophies.length" margin="x-small">
+            <hc-badges :badges="user.badgeTrophies" />
           </ds-space>
           <ds-flex>
             <ds-flex-item>

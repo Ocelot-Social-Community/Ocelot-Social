@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Admin/BadgesSection renders 1`] = `
+<body>
+  <div>
+    <div
+      class="badge-section"
+    >
+      <h4>
+        
+      </h4>
+       
+      <div
+        class="badge-container"
+      >
+        <button
+          class="badge"
+        >
+          <img
+            alt="description1"
+            src="icon1"
+          />
+        </button>
+        <button
+          class="badge inactive"
+        >
+          <img
+            alt="description2"
+            src="icon2"
+          />
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+`;
