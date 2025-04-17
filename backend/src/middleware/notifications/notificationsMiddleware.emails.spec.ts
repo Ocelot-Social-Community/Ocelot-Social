@@ -487,6 +487,7 @@ describe('emails sent for notifications', () => {
               postId: 'post',
             },
           })
+          await markAllAsRead()
           jest.clearAllMocks()
           authenticatedUser = await postAuthor.toJson()
           await mutate({
@@ -536,7 +537,7 @@ describe('emails sent for notifications', () => {
                       'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my beloved follower.',
                   },
                   read: false,
-                  reason: 'commented_on_post',
+                  reason: 'mentioned_in_comment',
                   relatedUser: null,
                 },
               ]),

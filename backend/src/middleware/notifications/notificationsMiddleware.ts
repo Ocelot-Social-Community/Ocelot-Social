@@ -56,17 +56,16 @@ const publishNotifications = async (
     pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
     if (
       (notificationAdded.to[emailNotificationSetting] ?? true) &&
-      !isUserOnline(notificationAdded.to)
+      !isUserOnline(notificationAdded.to) &&
+      !emailsSent.includes(notificationsEmailAddresses[index].email)
     ) {
-      if (!emailsSent.includes(notificationsEmailAddresses[index].email)) {
-        sendMail(
-          notificationTemplate({
-            email: notificationsEmailAddresses[index].email,
-            variables: { notification: notificationAdded },
-          }),
-        )
-        emailsSent.push(notificationsEmailAddresses[index].email)
-      }
+      sendMail(
+        notificationTemplate({
+          email: notificationsEmailAddresses[index].email,
+          variables: { notification: notificationAdded },
+        }),
+      )
+      emailsSent.push(notificationsEmailAddresses[index].email)
     }
   })
   return emailsSent
@@ -142,13 +141,11 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
         sentEmails,
       ),
     )
-    sentEmails.concat(
-      await publishNotifications(
-        context,
-        [notifyGroupMembersOfNewPost(post.id, groupId, context)],
-        'emailNotificationsPostInGroup',
-        sentEmails,
-      ),
+    await publishNotifications(
+      context,
+      [notifyGroupMembersOfNewPost(post.id, groupId, context)],
+      'emailNotificationsPostInGroup',
+      sentEmails,
     )
   }
   return post
@@ -173,13 +170,11 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
     ],
     'emailNotificationsMention',
   )
-  sentEmails.concat(
-    await publishNotifications(
-      context,
-      [notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context)],
-      'emailNotificationsCommentOnObservedPost',
-      sentEmails,
-    ),
+  await publishNotifications(
+    context,
+    [notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context)],
+    'emailNotificationsCommentOnObservedPost',
+    sentEmails,
   )
   return comment
 }

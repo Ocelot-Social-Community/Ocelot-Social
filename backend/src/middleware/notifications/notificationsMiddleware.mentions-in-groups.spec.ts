@@ -124,7 +124,7 @@ describe('mentions in groups', () => {
         slug: 'post-author',
       },
       {
-        email: 'test@example.org',
+        email: 'post.author@example.org',
         password: '1234',
       },
     )
@@ -136,7 +136,7 @@ describe('mentions in groups', () => {
         slug: 'group-member',
       },
       {
-        email: 'test2@example.org',
+        email: 'group.member@example.org',
         password: '1234',
       },
     )
@@ -148,7 +148,7 @@ describe('mentions in groups', () => {
         slug: 'pending-member',
       },
       {
-        email: 'test3@example.org',
+        email: 'pending.member@example.org',
         password: '1234',
       },
     )
@@ -160,7 +160,7 @@ describe('mentions in groups', () => {
         slug: 'no-member',
       },
       {
-        email: 'test4@example.org',
+        email: 'no.member@example.org',
         password: '1234',
       },
     )
