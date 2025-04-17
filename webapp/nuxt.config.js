@@ -206,6 +206,15 @@ export default {
         'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
       },
     },
+    '/img': {
+      // make this configurable (nuxt-dotenv)
+      target: CONFIG.GRAPHQL_URI,
+      toProxy: true, // cloudflare needs that
+      headers: {
+        'X-UI-Request': true,
+        'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
+      },
+    },
   },
 
   // Give apollo module options
