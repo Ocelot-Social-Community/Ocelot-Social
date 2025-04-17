@@ -52,9 +52,9 @@ export default {
     target: 'Badge',
     direction: 'in',
   },
-  profilebadge: {
+  selected: {
     type: 'relationship',
-    relationship: 'PROFILEBADGE',
+    relationship: 'SELECTED',
     target: 'Badge',
     direction: 'out',
     properties: {
@@ -64,9 +64,9 @@ export default {
       },
     },
   },
-  verified: {
+  verifies: {
     type: 'relationship',
-    relationship: 'VERIFIED',
+    relationship: 'VERIFIES',
     target: 'Badge',
     direction: 'in',
   },

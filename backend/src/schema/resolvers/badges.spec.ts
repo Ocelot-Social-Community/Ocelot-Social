@@ -84,17 +84,17 @@ describe('Badges', () => {
     await cleanDatabase()
   })
 
-  describe('verify', () => {
+  describe('setVerificationBadge', () => {
     const variables = {
       badgeId: 'verification_moderator',
       userId: 'regular-user-id',
     }
 
-    const verifyMutation = gql`
+    const setVerificationBadgeMutation = gql`
       mutation ($badgeId: ID!, $userId: ID!) {
-        verify(badgeId: $badgeId, userId: $userId) {
+        setVerificationBadge(badgeId: $badgeId, userId: $userId) {
           id
-          verified {
+          badgeVerification {
             id
           }
           badges {
@@ -107,8 +107,10 @@ describe('Badges', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
-        await expect(mutate({ mutation: verifyMutation, variables })).resolves.toMatchObject({
-          data: { verify: null },
+        await expect(
+          mutate({ mutation: setVerificationBadgeMutation, variables }),
+        ).resolves.toMatchObject({
+          data: { setVerificationBadge: null },
           errors: [{ message: 'Not Authorized!' }],
         })
       })
@@ -121,8 +123,10 @@ describe('Badges', () => {
 
       describe('rewards badge to user', () => {
         it('throws authorization error', async () => {
-          await expect(mutate({ mutation: verifyMutation, variables })).resolves.toMatchObject({
-            data: { verify: null },
+          await expect(
+            mutate({ mutation: setVerificationBadgeMutation, variables }),
+          ).resolves.toMatchObject({
+            data: { setVerificationBadge: null },
             errors: [{ message: 'Not Authorized!' }],
           })
         })
@@ -138,11 +142,11 @@ describe('Badges', () => {
         it('rejects with an informative error message', async () => {
           await expect(
             mutate({
-              mutation: verifyMutation,
+              mutation: setVerificationBadgeMutation,
               variables: { userId: 'regular-user-id', badgeId: 'non-existent-badge-id' },
             }),
           ).resolves.toMatchObject({
-            data: { verify: null },
+            data: { setVerificationBadge: null },
             errors: [
               {
                 message:
@@ -157,11 +161,11 @@ describe('Badges', () => {
         it('rejects with a telling error message', async () => {
           await expect(
             mutate({
-              mutation: verifyMutation,
+              mutation: setVerificationBadgeMutation,
               variables: { userId: 'non-existent-user-id', badgeId: 'verification_moderator' },
             }),
           ).resolves.toMatchObject({
-            data: { verify: null },
+            data: { setVerificationBadge: null },
             errors: [
               {
                 message:
@@ -176,11 +180,11 @@ describe('Badges', () => {
         it('rejects with a telling error message', async () => {
           await expect(
             mutate({
-              mutation: verifyMutation,
+              mutation: setVerificationBadgeMutation,
               variables: { userId: 'regular-user-id', badgeId: 'badge_rhino' },
             }),
           ).resolves.toMatchObject({
-            data: { verify: null },
+            data: { setVerificationBadge: null },
             errors: [
               {
                 message:
@@ -194,17 +198,17 @@ describe('Badges', () => {
       it('rewards a verification badge to the user', async () => {
         const expected = {
           data: {
-            verify: {
+            setVerificationBadge: {
               id: 'regular-user-id',
-              verified: { id: 'verification_moderator' },
+              badgeVerification: { id: 'verification_moderator' },
               badges: [],
             },
           },
           errors: undefined,
         }
-        await expect(mutate({ mutation: verifyMutation, variables })).resolves.toMatchObject(
-          expected,
-        )
+        await expect(
+          mutate({ mutation: setVerificationBadgeMutation, variables }),
+        ).resolves.toMatchObject(expected)
       })
 
       it('overrides the existing verification if a second verification badge is rewarded to the same user', async () => {
@@ -216,16 +220,16 @@ describe('Badges', () => {
         })
         const expected = {
           data: {
-            verify: {
+            setVerificationBadge: {
               id: 'regular-user-id',
-              verified: { id: 'verification_admin' },
+              badgeVerification: { id: 'verification_admin' },
               badges: [],
             },
           },
           errors: undefined,
         }
         await mutate({
-          mutation: verifyMutation,
+          mutation: setVerificationBadgeMutation,
           variables: {
             userId: 'regular-user-id',
             badgeId: 'verification_moderator',
@@ -233,7 +237,7 @@ describe('Badges', () => {
         })
         await expect(
           mutate({
-            mutation: verifyMutation,
+            mutation: setVerificationBadgeMutation,
             variables: {
               userId: 'regular-user-id',
               badgeId: 'verification_admin',
@@ -245,9 +249,9 @@ describe('Badges', () => {
       it('rewards the same verification badge as well to another user', async () => {
         const expected = {
           data: {
-            verify: {
+            setVerificationBadge: {
               id: 'regular-user-2-id',
-              verified: { id: 'verification_moderator' },
+              badgeVerification: { id: 'verification_moderator' },
               badges: [],
             },
           },
@@ -263,12 +267,12 @@ describe('Badges', () => {
           },
         )
         await mutate({
-          mutation: verifyMutation,
+          mutation: setVerificationBadgeMutation,
           variables,
         })
         await expect(
           mutate({
-            mutation: verifyMutation,
+            mutation: setVerificationBadgeMutation,
             variables: {
               userId: 'regular-user-2-id',
               badgeId: 'verification_moderator',
@@ -279,17 +283,17 @@ describe('Badges', () => {
     })
   })
 
-  describe('reward', () => {
+  describe('rewardBadge', () => {
     const variables = {
       badgeId: 'badge_rhino',
       userId: 'regular-user-id',
     }
 
-    const rewardMutation = gql`
+    const rewardBadgeMutation = gql`
       mutation ($badgeId: ID!, $userId: ID!) {
-        reward(badgeId: $badgeId, userId: $userId) {
+        rewardBadge(badgeId: $badgeId, userId: $userId) {
           id
-          verified {
+          badgeVerification {
             id
           }
           badges {
@@ -302,8 +306,8 @@ describe('Badges', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
-        await expect(mutate({ mutation: rewardMutation, variables })).resolves.toMatchObject({
-          data: { reward: null },
+        await expect(mutate({ mutation: rewardBadgeMutation, variables })).resolves.toMatchObject({
+          data: { rewardBadge: null },
           errors: [{ message: 'Not Authorized!' }],
         })
       })
@@ -316,10 +320,12 @@ describe('Badges', () => {
 
       describe('rewards badge to user', () => {
         it('throws authorization error', async () => {
-          await expect(mutate({ mutation: rewardMutation, variables })).resolves.toMatchObject({
-            data: { reward: null },
-            errors: [{ message: 'Not Authorized!' }],
-          })
+          await expect(mutate({ mutation: rewardBadgeMutation, variables })).resolves.toMatchObject(
+            {
+              data: { rewardBadge: null },
+              errors: [{ message: 'Not Authorized!' }],
+            },
+          )
         })
       })
     })
@@ -333,11 +339,11 @@ describe('Badges', () => {
         it('rejects with an informative error message', async () => {
           await expect(
             mutate({
-              mutation: rewardMutation,
+              mutation: rewardBadgeMutation,
               variables: { userId: 'regular-user-id', badgeId: 'non-existent-badge-id' },
             }),
           ).resolves.toMatchObject({
-            data: { reward: null },
+            data: { rewardBadge: null },
             errors: [
               {
                 message:
@@ -352,11 +358,11 @@ describe('Badges', () => {
         it('rejects with a telling error message', async () => {
           await expect(
             mutate({
-              mutation: rewardMutation,
+              mutation: rewardBadgeMutation,
               variables: { userId: 'non-existent-user-id', badgeId: 'badge_rhino' },
             }),
           ).resolves.toMatchObject({
-            data: { reward: null },
+            data: { rewardBadge: null },
             errors: [
               {
                 message:
@@ -371,11 +377,11 @@ describe('Badges', () => {
         it('rejects with a telling error message', async () => {
           await expect(
             mutate({
-              mutation: rewardMutation,
+              mutation: rewardBadgeMutation,
               variables: { userId: 'regular-user-id', badgeId: 'verification_moderator' },
             }),
           ).resolves.toMatchObject({
-            data: { reward: null },
+            data: { rewardBadge: null },
             errors: [
               {
                 message:
@@ -389,15 +395,15 @@ describe('Badges', () => {
       it('rewards a badge to the user', async () => {
         const expected = {
           data: {
-            reward: {
+            rewardBadge: {
               id: 'regular-user-id',
-              verified: null,
+              badgeVerification: null,
               badges: [{ id: 'badge_rhino' }],
             },
           },
           errors: undefined,
         }
-        await expect(mutate({ mutation: rewardMutation, variables })).resolves.toMatchObject(
+        await expect(mutate({ mutation: rewardBadgeMutation, variables })).resolves.toMatchObject(
           expected,
         )
       })
@@ -412,7 +418,7 @@ describe('Badges', () => {
         const badges = [{ id: 'badge_racoon' }, { id: 'badge_rhino' }]
         const expected = {
           data: {
-            reward: {
+            rewardBadge: {
               id: 'regular-user-id',
               badges: expect.arrayContaining(badges),
             },
@@ -420,7 +426,7 @@ describe('Badges', () => {
           errors: undefined,
         }
         await mutate({
-          mutation: rewardMutation,
+          mutation: rewardBadgeMutation,
           variables: {
             userId: 'regular-user-id',
             badgeId: 'badge_rhino',
@@ -428,7 +434,7 @@ describe('Badges', () => {
         })
         await expect(
           mutate({
-            mutation: rewardMutation,
+            mutation: rewardBadgeMutation,
             variables: {
               userId: 'regular-user-id',
               badgeId: 'badge_racoon',
@@ -440,7 +446,7 @@ describe('Badges', () => {
       it('rewards the same badge as well to another user', async () => {
         const expected = {
           data: {
-            reward: {
+            rewardBadge: {
               id: 'regular-user-2-id',
               badges: [{ id: 'badge_rhino' }],
             },
@@ -457,12 +463,12 @@ describe('Badges', () => {
           },
         )
         await mutate({
-          mutation: rewardMutation,
+          mutation: rewardBadgeMutation,
           variables,
         })
         await expect(
           mutate({
-            mutation: rewardMutation,
+            mutation: rewardBadgeMutation,
             variables: {
               userId: 'regular-user-2-id',
               badgeId: 'badge_rhino',
@@ -473,11 +479,11 @@ describe('Badges', () => {
 
       it('creates no duplicate reward relationships', async () => {
         await mutate({
-          mutation: rewardMutation,
+          mutation: rewardBadgeMutation,
           variables,
         })
         await mutate({
-          mutation: rewardMutation,
+          mutation: rewardBadgeMutation,
           variables,
         })
 
@@ -501,7 +507,7 @@ describe('Badges', () => {
     })
   })
 
-  describe('unreward', () => {
+  describe('revokeBadge', () => {
     const variables = {
       badgeId: 'badge_rhino',
       userId: 'regular-user-id',
@@ -509,14 +515,14 @@ describe('Badges', () => {
 
     beforeEach(async () => {
       await regularUser.relateTo(badge, 'rewarded')
-      await regularUser.relateTo(verification, 'verified')
+      await regularUser.relateTo(verification, 'verifies')
     })
 
-    const unrewardMutation = gql`
+    const revokeBadgeMutation = gql`
       mutation ($badgeId: ID!, $userId: ID!) {
-        unreward(badgeId: $badgeId, userId: $userId) {
+        revokeBadge(badgeId: $badgeId, userId: $userId) {
           id
-          verified {
+          badgeVerification {
             id
           }
           badges {
@@ -550,8 +556,8 @@ describe('Badges', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
-        await expect(mutate({ mutation: unrewardMutation, variables })).resolves.toMatchObject({
-          data: { unreward: null },
+        await expect(mutate({ mutation: revokeBadgeMutation, variables })).resolves.toMatchObject({
+          data: { revokeBadge: null },
           errors: [{ message: 'Not Authorized!' }],
         })
       })
@@ -564,10 +570,12 @@ describe('Badges', () => {
 
       describe('removes badge from user', () => {
         it('throws authorization error', async () => {
-          await expect(mutate({ mutation: unrewardMutation, variables })).resolves.toMatchObject({
-            data: { unreward: null },
-            errors: [{ message: 'Not Authorized!' }],
-          })
+          await expect(mutate({ mutation: revokeBadgeMutation, variables })).resolves.toMatchObject(
+            {
+              data: { revokeBadge: null },
+              errors: [{ message: 'Not Authorized!' }],
+            },
+          )
         })
       })
     })
@@ -578,11 +586,11 @@ describe('Badges', () => {
       })
 
       it('removes a badge from user', async () => {
-        await expect(mutate({ mutation: unrewardMutation, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: revokeBadgeMutation, variables })).resolves.toMatchObject({
           data: {
-            unreward: {
+            revokeBadge: {
               id: 'regular-user-id',
-              verified: { id: 'verification_moderator' },
+              badgeVerification: { id: 'verification_moderator' },
               badges: [],
             },
           },
@@ -590,13 +598,13 @@ describe('Badges', () => {
         })
       })
 
-      it('does not crash when unrewarding multiple times', async () => {
-        await mutate({ mutation: unrewardMutation, variables })
-        await expect(mutate({ mutation: unrewardMutation, variables })).resolves.toMatchObject({
+      it('does not crash when revoking multiple times', async () => {
+        await mutate({ mutation: revokeBadgeMutation, variables })
+        await expect(mutate({ mutation: revokeBadgeMutation, variables })).resolves.toMatchObject({
           data: {
-            unreward: {
+            revokeBadge: {
               id: 'regular-user-id',
-              verified: { id: 'verification_moderator' },
+              badgeVerification: { id: 'verification_moderator' },
               badges: [],
             },
           },
@@ -607,7 +615,7 @@ describe('Badges', () => {
       it('removes a verification from user', async () => {
         await expect(
           mutate({
-            mutation: unrewardMutation,
+            mutation: revokeBadgeMutation,
             variables: {
               badgeId: 'verification_moderator',
               userId: 'regular-user-id',
@@ -615,7 +623,11 @@ describe('Badges', () => {
           }),
         ).resolves.toMatchObject({
           data: {
-            unreward: { id: 'regular-user-id', verified: null, badges: [{ id: 'badge_rhino' }] },
+            revokeBadge: {
+              id: 'regular-user-id',
+              badgeVerification: null,
+              badges: [{ id: 'badge_rhino' }],
+            },
           },
           errors: undefined,
         })
@@ -623,7 +635,7 @@ describe('Badges', () => {
 
       it('does not crash when removing verification multiple times', async () => {
         await mutate({
-          mutation: unrewardMutation,
+          mutation: revokeBadgeMutation,
           variables: {
             badgeId: 'verification_moderator',
             userId: 'regular-user-id',
@@ -631,7 +643,7 @@ describe('Badges', () => {
         })
         await expect(
           mutate({
-            mutation: unrewardMutation,
+            mutation: revokeBadgeMutation,
             variables: {
               badgeId: 'verification_moderator',
               userId: 'regular-user-id',
@@ -639,7 +651,11 @@ describe('Badges', () => {
           }),
         ).resolves.toMatchObject({
           data: {
-            unreward: { id: 'regular-user-id', verified: null, badges: [{ id: 'badge_rhino' }] },
+            revokeBadge: {
+              id: 'regular-user-id',
+              badgeVerification: null,
+              badges: [{ id: 'badge_rhino' }],
+            },
           },
           errors: undefined,
         })

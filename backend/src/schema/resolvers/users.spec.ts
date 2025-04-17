@@ -70,10 +70,10 @@ const updateOnlineStatus = gql`
   }
 `
 
-const setProfileBadge = gql`
+const setBadgeSelected = gql`
   mutation ($slot: Int!, $badgeId: ID!) {
-    setProfileBadge(slot: $slot, badgeId: $badgeId) {
-      profileBadges {
+    setBadgeSelected(slot: $slot, badgeId: $badgeId) {
+      badgesSelected {
         id
       }
       badgesUnused {
@@ -85,10 +85,10 @@ const setProfileBadge = gql`
   }
 `
 
-const resetProfileBadges = gql`
+const resetBadgesSelected = gql`
   mutation {
-    resetProfileBadges {
-      profileBadges {
+    resetBadgesSelected {
+      badgesSelected {
         id
       }
       badgesUnused {
@@ -1101,7 +1101,7 @@ describe('updateOnlineStatus', () => {
   })
 })
 
-describe('setProfileBadge', () => {
+describe('setBadgeSelected', () => {
   beforeEach(async () => {
     user = await Factory.build('user', {
       id: 'user',
@@ -1137,7 +1137,7 @@ describe('setProfileBadge', () => {
 
     it('throws an error', async () => {
       await expect(
-        mutate({ mutation: setProfileBadge, variables: { slot: 0, badgeId: 'badge_bear' } }),
+        mutate({ mutation: setBadgeSelected, variables: { slot: 0, badgeId: 'badge_bear' } }),
       ).resolves.toEqual(
         expect.objectContaining({
           errors: [
@@ -1157,7 +1157,7 @@ describe('setProfileBadge', () => {
 
     it('throws Error when slot is out of bound', async () => {
       await expect(
-        mutate({ mutation: setProfileBadge, variables: { slot: -1, badgeId: 'badge_bear' } }),
+        mutate({ mutation: setBadgeSelected, variables: { slot: -1, badgeId: 'badge_bear' } }),
       ).resolves.toEqual(
         expect.objectContaining({
           errors: [
@@ -1168,7 +1168,7 @@ describe('setProfileBadge', () => {
         }),
       )
       await expect(
-        mutate({ mutation: setProfileBadge, variables: { slot: 9, badgeId: 'badge_bear' } }),
+        mutate({ mutation: setBadgeSelected, variables: { slot: 9, badgeId: 'badge_bear' } }),
       ).resolves.toEqual(
         expect.objectContaining({
           errors: [
@@ -1182,7 +1182,7 @@ describe('setProfileBadge', () => {
 
     it('throws Error when badge was not rewarded to user', async () => {
       await expect(
-        mutate({ mutation: setProfileBadge, variables: { slot: 0, badgeId: 'badge_rabbit' } }),
+        mutate({ mutation: setBadgeSelected, variables: { slot: 0, badgeId: 'badge_rabbit' } }),
       ).resolves.toEqual(
         expect.objectContaining({
           errors: [
@@ -1196,7 +1196,7 @@ describe('setProfileBadge', () => {
 
     it('throws Error when badge is unknown', async () => {
       await expect(
-        mutate({ mutation: setProfileBadge, variables: { slot: 0, badgeId: 'badge_unknown' } }),
+        mutate({ mutation: setBadgeSelected, variables: { slot: 0, badgeId: 'badge_unknown' } }),
       ).resolves.toEqual(
         expect.objectContaining({
           errors: [
@@ -1210,11 +1210,11 @@ describe('setProfileBadge', () => {
 
     it('returns the user with badges set on slots', async () => {
       await expect(
-        mutate({ mutation: setProfileBadge, variables: { slot: 0, badgeId: 'badge_bear' } }),
+        mutate({ mutation: setBadgeSelected, variables: { slot: 0, badgeId: 'badge_bear' } }),
       ).resolves.toEqual(
         expect.objectContaining({
           data: {
-            setProfileBadge: {
+            setBadgeSelected: {
               badgesCount: 2,
               badgesUnused: [
                 {
@@ -1222,7 +1222,7 @@ describe('setProfileBadge', () => {
                 },
               ],
               badgesUnusedCount: 1,
-              profileBadges: [
+              badgesSelected: [
                 {
                   id: 'badge_bear',
                 },
@@ -1240,15 +1240,15 @@ describe('setProfileBadge', () => {
         }),
       )
       await expect(
-        mutate({ mutation: setProfileBadge, variables: { slot: 5, badgeId: 'badge_panda' } }),
+        mutate({ mutation: setBadgeSelected, variables: { slot: 5, badgeId: 'badge_panda' } }),
       ).resolves.toEqual(
         expect.objectContaining({
           data: {
-            setProfileBadge: {
+            setBadgeSelected: {
               badgesCount: 2,
               badgesUnused: [],
               badgesUnusedCount: 0,
-              profileBadges: [
+              badgesSelected: [
                 {
                   id: 'badge_bear',
                 },
@@ -1271,7 +1271,7 @@ describe('setProfileBadge', () => {
   })
 })
 
-describe('resetProfileBadges', () => {
+describe('resetBadgesSelected', () => {
   beforeEach(async () => {
     user = await Factory.build('user', {
       id: 'user',
@@ -1299,8 +1299,8 @@ describe('resetProfileBadges', () => {
     await user.relateTo(badgeBear, 'rewarded')
     await user.relateTo(badgePanda, 'rewarded')
 
-    await mutate({ mutation: setProfileBadge, variables: { slot: 0, badgeId: 'badge_bear' } })
-    await mutate({ mutation: setProfileBadge, variables: { slot: 5, badgeId: 'badge_panda' } })
+    await mutate({ mutation: setBadgeSelected, variables: { slot: 0, badgeId: 'badge_bear' } })
+    await mutate({ mutation: setBadgeSelected, variables: { slot: 5, badgeId: 'badge_panda' } })
   })
 
   describe('not authenticated', () => {
@@ -1309,7 +1309,7 @@ describe('resetProfileBadges', () => {
     })
 
     it('throws an error', async () => {
-      await expect(mutate({ mutation: resetProfileBadges })).resolves.toEqual(
+      await expect(mutate({ mutation: resetBadgesSelected })).resolves.toEqual(
         expect.objectContaining({
           errors: [
             expect.objectContaining({
@@ -1327,10 +1327,10 @@ describe('resetProfileBadges', () => {
     })
 
     it('returns the user with no profile badges badges set', async () => {
-      await expect(mutate({ mutation: resetProfileBadges })).resolves.toEqual(
+      await expect(mutate({ mutation: resetBadgesSelected })).resolves.toEqual(
         expect.objectContaining({
           data: {
-            resetProfileBadges: {
+            resetBadgesSelected: {
               badgesCount: 2,
               badgesUnused: [
                 {
@@ -1341,7 +1341,7 @@ describe('resetProfileBadges', () => {
                 },
               ],
               badgesUnusedCount: 2,
-              profileBadges: [null, null, null, null, null, null, null, null, null],
+              badgesSelected: [null, null, null, null, null, null, null, null, null],
             },
           },
         }),

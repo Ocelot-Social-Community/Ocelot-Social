@@ -7,7 +7,7 @@ export default {
   },
 
   Mutation: {
-    verify: async (_object, args, context, _resolveInfo) => {
+    setVerificationBadge: async (_object, args, context, _resolveInfo) => {
       const {
         user: { id: currentUserId },
       } = context
@@ -18,9 +18,9 @@ export default {
         const response = await transaction.run(
           `
             MATCH (badge:Badge {id: $badgeId, type: 'verification'}), (user:User {id: $userId})
-            OPTIONAL MATCH (:Badge {type: 'verification'})-[verify:VERIFIED]->(user)
+            OPTIONAL MATCH (:Badge {type: 'verification'})-[verify:VERIFIES]->(user)
             DELETE verify
-            MERGE (badge)-[relation:VERIFIED {by: $currentUserId}]->(user)
+            MERGE (badge)-[relation:VERIFIES {by: $currentUserId}]->(user)
             RETURN relation, user {.*}
           `,
           {
@@ -49,7 +49,7 @@ export default {
       }
     },
 
-    reward: async (_object, args, context, _resolveInfo) => {
+    rewardBadge: async (_object, args, context, _resolveInfo) => {
       const {
         user: { id: currentUserId },
       } = context
@@ -89,7 +89,7 @@ export default {
       }
     },
 
-    unreward: async (_object, args, context, _resolveInfo) => {
+    revokeBadge: async (_object, args, context, _resolveInfo) => {
       const { badgeId, userId } = args
       const session = context.driver.session()
 
@@ -97,7 +97,7 @@ export default {
         const response = await transaction.run(
           `
             MATCH (user:User {id: $userId})
-            OPTIONAL MATCH (badge:Badge {id: $badgeId})-[relation:REWARDED|VERIFIED]->(user)
+            OPTIONAL MATCH (badge:Badge {id: $badgeId})-[relation:REWARDED|VERIFIES]->(user)
             DELETE relation
             RETURN user {.*}
           `,

@@ -382,7 +382,7 @@ export default {
 
       return true
     },
-    setProfileBadge: async (_object, args, context, _resolveInfo) => {
+    setBadgeSelected: async (_object, args, context, _resolveInfo) => {
       const { slot, badgeId } = args
       const {
         user: { id: userId },
@@ -398,10 +398,10 @@ export default {
         const result = await transaction.run(
           `
             MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge {id: $badgeId})
-            OPTIONAL MATCH (user)-[badgeRelation:PROFILEBADGE]->(badge)
-            OPTIONAL MATCH (user)-[slotRelation:PROFILEBADGE{slot: $slot}]->(:Badge)
+            OPTIONAL MATCH (user)-[badgeRelation:SELECTED]->(badge)
+            OPTIONAL MATCH (user)-[slotRelation:SELECTED{slot: $slot}]->(:Badge)
             DELETE badgeRelation, slotRelation
-            MERGE (user)-[:PROFILEBADGE{slot: toInteger($slot)}]->(badge)
+            MERGE (user)-[:SELECTED{slot: toInteger($slot)}]->(badge)
             RETURN user {.*}
           `,
           { userId, badgeId, slot },
@@ -420,7 +420,7 @@ export default {
         session.close()
       }
     },
-    resetProfileBadges: async (_object, _args, context, _resolveInfo) => {
+    resetBadgesSelected: async (_object, _args, context, _resolveInfo) => {
       const {
         user: { id: userId },
       } = context
@@ -431,7 +431,7 @@ export default {
         const result = await transaction.run(
           `
             MATCH (user:User {id: $userId})
-            OPTIONAL MATCH (user)-[relation:PROFILEBADGE]->(:Badge)
+            OPTIONAL MATCH (user)-[relation:SELECTED]->(:Badge)
             DELETE relation
             RETURN user {.*}
           `,
@@ -504,13 +504,13 @@ export default {
         },
       ]
     },
-    profileBadges: async (parent, _params, context, _resolveInfo) => {
+    badgesSelected: async (parent, _params, context, _resolveInfo) => {
       const session = context.driver.session()
 
       const query = session.readTransaction(async (transaction) => {
         const result = await transaction.run(
           `
-            MATCH (user:User {id: $parent.id})-[relation:PROFILEBADGE]->(badge:Badge)
+            MATCH (user:User {id: $parent.id})-[relation:SELECTED]->(badge:Badge)
             WITH relation, badge
             ORDER BY relation.slot ASC
             RETURN relation.slot as slot, badge {.*}
@@ -520,9 +520,9 @@ export default {
         return result.records
       })
       try {
-        const profileBadges = await query
+        const badgesSelected = await query
         const result = Array(PROFILE_BADGE_COUNT).fill(null)
-        profileBadges.map((record) => {
+        badgesSelected.map((record) => {
           result[record.get('slot')] = record.get('badge')
           return true
         })
@@ -544,7 +544,7 @@ export default {
         const result = await transaction.run(
           `
             MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge)
-            WHERE NOT (user)-[:PROFILEBADGE]-(badge)
+            WHERE NOT (user)-[:SELECTED]-(badge)
             RETURN badge {.*}
           `,
           { userId },
@@ -570,7 +570,7 @@ export default {
         const result = await transaction.run(
           `
             MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge)
-            WHERE NOT (user)-[:PROFILEBADGE]-(badge)
+            WHERE NOT (user)-[:SELECTED]-(badge)
             RETURN toString(COUNT(badge)) as count
           `,
           { userId },
@@ -625,7 +625,7 @@ export default {
         invitedBy: '<-[:INVITED]-(related:User)',
         location: '-[:IS_IN]->(related:Location)',
         redeemedInviteCode: '-[:REDEEMED]->(related:InviteCode)',
-        verified: '<-[:VERIFIED]-(related:Badge)',
+        badgeVerification: '<-[:VERIFIES]-(related:Badge)',
       },
       hasMany: {
         followedBy: '<-[:FOLLOWS]-(related:User)',

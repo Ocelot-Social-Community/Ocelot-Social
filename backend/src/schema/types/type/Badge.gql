@@ -5,7 +5,7 @@ type Badge {
   createdAt: String
 
   rewarded: [User]! @relation(name: "REWARDED", direction: "OUT")
-  verified: [User]! @relation(name: "VERIFIED", direction: "OUT")
+  verifies: [User]! @relation(name: "VERIFIES", direction: "OUT")
 }
 
 enum BadgeType {
@@ -18,7 +18,7 @@ type Query {
 }
 
 type Mutation {
-  verify(badgeId: ID!, userId: ID!): User
-  reward(badgeId: ID!, userId: ID!): User
-  unreward(badgeId: ID!, userId: ID!): User
+  setVerificationBadge(badgeId: ID!, userId: ID!): User
+  rewardBadge(badgeId: ID!, userId: ID!): User
+  revokeBadge(badgeId: ID!, userId: ID!): User
 }
