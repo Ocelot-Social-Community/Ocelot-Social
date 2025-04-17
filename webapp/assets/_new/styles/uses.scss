@@ -1,0 +1,4 @@
+// we can not use the command '@use' in 'tokens.scss' because of the compiler error 'SassError: @use rules must be written before any other rules.'
+// therefore we integrate this file at first in 'nuxt.config.js'
+
+@use 'sass:color';

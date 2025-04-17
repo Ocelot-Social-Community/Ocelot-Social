@@ -403,10 +403,12 @@ $color-toast-green: $color-success;
  * @tokens Ribbon Color
  */
 
-$color-ribbon-event: $background-color-third;
-$color-ribbon-event-active: $background-color-third-active;
-$color-ribbon-article: $background-color-secondary;
-$color-ribbon-article-active: $background-color-secondary-active;
+$color-ribbon-announcement: $background-color-warning;
+$color-ribbon-announcement-shadow: color.adjust($color-ribbon-announcement, $lightness: -20%,);
+$color-ribbon-article: $background-color-secondary-active;
+$color-ribbon-article-shadow: color.adjust($color-ribbon-article, $lightness: -20%);
+$color-ribbon-event: $background-color-third-active;
+$color-ribbon-event-shadow: color.adjust($color-ribbon-event, $lightness: -20%);
 
 /**
  * @tokens Chat Color

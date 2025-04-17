@@ -64,7 +64,7 @@ export default {
   }
 
   &.--highlight {
-    border: $border-size-base solid $color-warning;
+    border: $border-size-base solid $color-ribbon-announcement;
   }
 
   &.--wide-content {

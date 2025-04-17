@@ -10,9 +10,9 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
   // },
 
   internalPage: {
-    // footerIdent: 'site.made', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.made', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.made', // localized string identifier, on null it's hidden, if undefined default is used
+    footerIdent: 'reformer-network.footer.about-us', // localized string identifier, if undefined default is used
+    headTitleIdent: 'reformer-network.footer.about-us', // localized string identifier, if undefined default is used
+    headlineIdent: 'reformer-network.footer.about-us', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
@@ -57,9 +57,9 @@ const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwri
   // externalLink: null, // if defined it's dominating
 
   internalPage: {
-    // footerIdent: 'site.termsAndConditions', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.termsAndConditions', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.termsAndConditions', // localized string identifier, on null it's hidden, if undefined default is used
+    footerIdent: 'reformer-network.footer.terms-and-conditions-short', // localized string identifier, if undefined default is used
+    headTitleIdent: 'reformer-network.footer.terms-and-conditions', // localized string identifier, if undefined default is used
+    headlineIdent: 'reformer-network.footer.terms-and-conditions', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
@@ -70,9 +70,9 @@ const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
   // externalLink: null, // if defined it's dominating
 
   internalPage: {
-    // footerIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.code-of-conduct', // localized string identifier, on null it's hidden, if undefined default is used
+    footerIdent: 'reformer-network.footer.code-of-conduct', // localized string identifier, if undefined default is used
+    headTitleIdent: 'reformer-network.footer.code-of-conduct', // localized string identifier, if undefined default is used
+    headlineIdent: 'reformer-network.footer.code-of-conduct', // localized string identifier, on null it's hidden, if undefined default is used
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
@@ -139,10 +139,9 @@ export default {
 
   FOOTER_LINK_LIST: [
     ORGANIZATION,
-    TERMS_AND_CONDITIONS,
     CODE_OF_CONDUCT,
     DATA_PRIVACY,
-    DONATE,
+    TERMS_AND_CONDITIONS,
     FAQ,
     SUPPORT,
     IMPRINT,

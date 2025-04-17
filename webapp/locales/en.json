@@ -1139,5 +1139,13 @@
     "newTermsAndConditions": "New Terms and Conditions",
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
+  },
+  "reformer-network": {
+    "footer": {
+      "about-us": "About Us",
+      "code-of-conduct": "Code of Conduct",
+      "terms-and-conditions": "Terms and Conditions",
+      "terms-and-conditions-short": "Terms and Conditions"
+    }
   }
 }
