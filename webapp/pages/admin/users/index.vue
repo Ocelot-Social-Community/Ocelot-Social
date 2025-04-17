@@ -70,7 +70,7 @@
               params: { id: scope.row.id },
             }"
           >
-            <b>Badges</b>
+            {{ $t('admin.users.table.edit') }}
           </nuxt-link>
         </template>
       </ds-table>

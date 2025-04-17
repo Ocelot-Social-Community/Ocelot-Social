@@ -11,8 +11,26 @@
   },
   "admin": {
     "badges": {
+      "description": "Configure the available badges for this user",
+      "revokeTrophy": {
+        "error": "Trophy could not be revoked!",
+        "success": "Trophy successfully revoked!"
+      },
+      "revokeVerification": {
+        "error": "Verification could not be revoked!",
+        "success": "Verification succesfully revoked"
+      },
+      "rewardTrophy": {
+        "error": "Trophy could not be rewarded!",
+        "success": "Trophy successfully rewarded!"
+      },
+      "setVerification": {
+        "error": "Verification could not be set!",
+        "success": "Verification successfully set!"
+      },
       "title": "Badges",
-      "description": "Configure the available badges for this user"
+      "trophyBadges": "Trophies",
+      "verificationBadges": "Verifications"
     },
     "categories": {
       "categoryName": "Name",
@@ -77,8 +95,10 @@
           "name": "Name",
           "number": "No.",
           "role": "Role",
-          "slug": "Slug"
-        }
+          "slug": "Slug",
+          "badges": "Badges"
+        },
+        "edit": "Edit"
       }
     }
   },

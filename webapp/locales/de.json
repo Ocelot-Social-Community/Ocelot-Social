@@ -10,6 +10,28 @@
     "saveCategories": "Themen speichern"
   },
   "admin": {
+    "badges": {
+      "description": "Stelle die verfügbaren Auszeichnungen für diesen Nutzer ein.",
+      "revokeTrophy": {
+        "error": "Trophäe konnte nicht widerrufen werden!",
+        "success": "Trophäe erfolgreich widerrufen"
+      },
+      "revokeVerification": {
+        "error": "Verifizierung konnte nicht gesetzt werden!",
+        "success": "Verifizierung erfolgreich widerrufen"
+      },
+      "rewardTrophy": {
+        "error": "Trophäe konnte nicht vergeben werden!",
+        "success": "Trophäe erfolgreich vergeben!"
+      },
+      "setVerification": {
+        "error": "Verifizierung konnte nicht gesetzt werden!",
+        "success": "Verifizierung erfolgreich gesetzt"
+      },
+      "title": "Auszeichnungen",
+      "trophyBadges": "Trophäen",
+      "verificationBadges": "Verifizierungen"
+    },
     "categories": {
       "categoryName": "Name",
       "name": "Themen",
@@ -73,7 +95,10 @@
           "name": "Name",
           "number": "Nr.",
           "role": "Rolle",
-          "slug": "Alias"
+          "slug": "Alias",
+          "badges": "Auszeichnungen"
+        },
+        "edit": "Bearbeiten"
         }
       }
     }

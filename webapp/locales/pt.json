@@ -10,6 +10,28 @@
     "saveCategories": null
   },
   "admin": {
+    "badges": {
+      "description": null,
+      "revokeTrophy": {
+        "error": null,
+        "success": null
+      },
+      "revokeVerification": {
+        "error": null,
+        "success": null
+      },
+      "rewardTrophy": {
+        "error": null,
+        "success": null
+      },
+      "setVerification": {
+        "error": null,
+        "success": null
+      },
+      "title": null,
+      "trophyBadges": null,
+      "verificationBadges": null
+    },
     "categories": {
       "categoryName": "Nome",
       "name": "Categorias",
@@ -73,8 +95,10 @@
           "name": "Nome",
           "number": "N.º",
           "role": "Função",
-          "slug": "Slug"
-        }
+          "slug": "Slug",
+          "badges": null
+        },
+        "edit": null
       }
     }
   },
