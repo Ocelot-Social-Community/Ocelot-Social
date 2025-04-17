@@ -34,21 +34,22 @@ export default {
 
 <style scoped>
 .badge-section h4 {
-  margin-bottom: 10px;
+  margin-bottom: 24px;
 }
 .badge-container {
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 36px;
   flex-flow: row wrap;
-  gap: 4px;
+  gap: 10px;
 }
 .badge:hover {
   cursor: pointer;
 }
 .badge img {
-  width: 30px;
+  width: 70px;
 }
 .badge.inactive {
-  opacity: 0.5;
+  opacity: 0.3;
+  filter: grayscale(0.4);
 }
 </style>
