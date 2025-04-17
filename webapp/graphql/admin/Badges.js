@@ -10,7 +10,7 @@ export const queryBadges = () => gql`
   }
 `
 
-export const verify = () => gql`
+export const setVerificationBadge = () => gql`
   mutation ($badgeId: ID!, $userId: ID!) {
     verify(badgeId: $badgeId, userId: $userId) {
       id
@@ -24,7 +24,7 @@ export const verify = () => gql`
   }
 `
 
-export const reward = () => gql`
+export const rewardTrophyBadge = () => gql`
   mutation ($badgeId: ID!, $userId: ID!) {
     reward(badgeId: $badgeId, userId: $userId) {
       id
@@ -38,7 +38,7 @@ export const reward = () => gql`
   }
 `
 
-export const unreward = () => gql`
+export const revokeBadge = () => gql`
   mutation ($badgeId: ID!, $userId: ID!) {
     unreward(badgeId: $badgeId, userId: $userId) {
       id

@@ -11,8 +11,8 @@
         @toggleBadge="toggleBadge"
       />
       <badges-section
-        :title="$t('admin.badges.standardBadges')"
-        :badges="standardBadges"
+        :title="$t('admin.badges.trophyBadges')"
+        :badges="trophyBadges"
         @toggleBadge="toggleBadge"
       />
     </base-card>
@@ -21,7 +21,12 @@
 
 <script>
 import BadgesSection from '~/components/_new/features/Admin/Badges/BadgesSection.vue'
-import { queryBadges, reward, unreward, verify } from '~/graphql/admin/Badges'
+import {
+  queryBadges,
+  rewardTrophyBadge,
+  revokeBadge,
+  setVerificationBadge,
+} from '~/graphql/admin/Badges'
 import { adminUserBadgesQuery } from '~/graphql/User'
 
 export default {
@@ -68,11 +73,11 @@ export default {
           isActive: this.user.verified?.id === badge.id,
         }))
     },
-    standardBadges() {
+    trophyBadges() {
       if (!this.user?.badges) return []
 
       return this.badges
-        .filter((badge) => badge.type === 'badge')
+        .filter((badge) => badge.type === 'trophy')
         .map((badge) => ({
           ...badge,
           isActive: this.user.badges.some((userBadge) => userBadge.id === badge.id),
@@ -92,10 +97,10 @@ export default {
         this.grantRewardBadge(badge.id)
       }
     },
-    async grantRewardBadge(badgeId) {
+    async rewardTrophyBadge(badgeId) {
       try {
-        const { data } = await this.$apollo.mutate({
-          mutation: reward(),
+        await this.$apollo.mutate({
+          mutation: rewardTrophyBadge(),
           variables: {
             badgeId,
             userId: this.user.id,
@@ -109,8 +114,8 @@ export default {
     },
     async revokeBadge(badgeId) {
       try {
-        const { data } = this.$apollo.mutate({
-          mutation: unreward(),
+        await this.$apollo.mutate({
+          mutation: revokeBadge(),
           variables: {
             badgeId,
             userId: this.user.id,
@@ -124,8 +129,8 @@ export default {
     },
     async setVerificationBadge(badgeId) {
       try {
-        const { data } = this.$apollo.mutate({
-          mutation: verify(),
+        await this.$apollo.mutate({
+          mutation: setVerificationBadge(),
           variables: {
             badgeId,
             userId: this.user.id,
