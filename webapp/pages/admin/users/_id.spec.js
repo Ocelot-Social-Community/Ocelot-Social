@@ -109,7 +109,7 @@ describe('.vue', () => {
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
           mutation: expect.anything(),
           variables: {
-            badgeId: availableBadges[0].id,
+            badgeId: availableBadges[1].id,
             userId: 'user1',
           },
         })
@@ -130,7 +130,7 @@ describe('.vue', () => {
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
           mutation: expect.anything(),
           variables: {
-            badgeId: availableBadges[0].id,
+            badgeId: availableBadges[1].id,
             userId: 'user1',
           },
         })
@@ -156,7 +156,7 @@ describe('.vue', () => {
                 badgeVerification: null,
                 badgeTrophies: [
                   {
-                    id: 'trophy-badge-2',
+                    id: availableBadges[2].id,
                   },
                 ],
               },
@@ -169,7 +169,7 @@ describe('.vue', () => {
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
             mutation: expect.anything(),
             variables: {
-              badgeId: availableBadges[3].id,
+              badgeId: availableBadges[2].id,
               userId: 'user1',
             },
           })
@@ -190,7 +190,7 @@ describe('.vue', () => {
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
             mutation: expect.anything(),
             variables: {
-              badgeId: availableBadges[3].id,
+              badgeId: availableBadges[2].id,
               userId: 'user1',
             },
           })
@@ -233,7 +233,9 @@ describe('.vue', () => {
         })
 
         it('shows success message', async () => {
-          expect(mocks.$toast.success).toHaveBeenCalledWith('admin.badges.revoke.success')
+          expect(mocks.$toast.success).toHaveBeenCalledWith(
+            'admin.badges.revokeVerification.success',
+          )
         })
       })
 
@@ -254,7 +256,7 @@ describe('.vue', () => {
         })
 
         it('shows error message', async () => {
-          expect(mocks.$toast.error).toHaveBeenCalledWith('admin.badges.revoke.error')
+          expect(mocks.$toast.error).toHaveBeenCalledWith('admin.badges.revokeVerification.error')
         })
       })
     })
@@ -273,7 +275,11 @@ describe('.vue', () => {
             setTrophyBadge: {
               id: 'user1',
               badgeVerification: null,
-              badgeTrophies: [],
+              badgeTrophies: [
+                {
+                  id: availableBadges[3].id,
+                },
+              ],
             },
           },
         })
@@ -291,7 +297,7 @@ describe('.vue', () => {
       })
 
       it('shows success message', async () => {
-        expect(mocks.$toast.success).toHaveBeenCalledWith('admin.badges.revoke.success')
+        expect(mocks.$toast.success).toHaveBeenCalledWith('admin.badges.revokeTrophy.success')
       })
     })
 
@@ -312,7 +318,7 @@ describe('.vue', () => {
       })
 
       it('shows error message', async () => {
-        expect(mocks.$toast.error).toHaveBeenCalledWith('admin.badges.revoke.error')
+        expect(mocks.$toast.error).toHaveBeenCalledWith('admin.badges.revokeTrophy.error')
       })
     })
   })

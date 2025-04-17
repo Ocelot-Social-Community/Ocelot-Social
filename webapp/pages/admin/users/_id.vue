@@ -107,9 +107,9 @@ export default {
           },
         })
 
-        this.$toast.success('admin.badges.rewardTrophy.success')
+        this.$toast.success(this.$t('admin.badges.rewardTrophy.success'))
       } catch (error) {
-        this.$toast.error('admin.badges.rewardTrophy.error')
+        this.$toast.error(this.$t('admin.badges.rewardTrophy.error'))
       }
     },
     async revokeBadge(badge) {
@@ -123,15 +123,19 @@ export default {
         })
 
         this.$toast.success(
-          badge.type === 'verification'
-            ? 'admin.badges.revokeVerification.success'
-            : 'admin.badges.revokeTrophy.success',
+          this.$t(
+            badge.type === 'verification'
+              ? 'admin.badges.revokeVerification.success'
+              : 'admin.badges.revokeTrophy.success',
+          ),
         )
       } catch (error) {
         this.$toast.error(
-          badge.type === 'verification'
-            ? 'admin.badges.revokeVerification.error'
-            : 'admin.badges.revokeTrophy.error',
+          this.$t(
+            badge.type === 'verification'
+              ? 'admin.badges.revokeVerification.error'
+              : 'admin.badges.revokeTrophy.error',
+          ),
         )
       }
     },
@@ -145,9 +149,9 @@ export default {
           },
         })
 
-        this.$toast.success('admin.badges.setVerification.success')
+        this.$toast.success(this.$t('admin.badges.setVerification.success'))
       } catch (error) {
-        this.$toast.error('admin.badges.setVerification.error')
+        this.$toast.error(this.$t('admin.badges.setVerification.error'))
       }
     },
   },
