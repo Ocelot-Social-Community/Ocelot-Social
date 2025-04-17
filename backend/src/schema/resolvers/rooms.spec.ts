@@ -387,6 +387,34 @@ describe('Room', () => {
             },
           })
         })
+
+        it('when chattingUser is blocked has 0 unread rooms', async () => {
+          authenticatedUser = await otherChattingUser.toJson()
+          await otherChattingUser.relateTo(chattingUser, 'blocked')
+          await expect(
+            query({
+              query: unreadRoomsQuery(),
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              UnreadRooms: 0,
+            },
+          })
+        })
+
+        it('when chattingUser is muted has 0 unread rooms', async () => {
+          authenticatedUser = await otherChattingUser.toJson()
+          await otherChattingUser.relateTo(chattingUser, 'muted')
+          await expect(
+            query({
+              query: unreadRoomsQuery(),
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              UnreadRooms: 0,
+            },
+          })
+        })
       })
 
       describe('as not chatting user', () => {
