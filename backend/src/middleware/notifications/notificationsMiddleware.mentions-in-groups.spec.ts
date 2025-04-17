@@ -124,7 +124,7 @@ describe('mentions in groups', () => {
         slug: 'post-author',
       },
       {
-        email: 'test@example.org',
+        email: 'post.author@example.org',
         password: '1234',
       },
     )
@@ -136,7 +136,7 @@ describe('mentions in groups', () => {
         slug: 'group-member',
       },
       {
-        email: 'test2@example.org',
+        email: 'group.member@example.org',
         password: '1234',
       },
     )
@@ -148,7 +148,7 @@ describe('mentions in groups', () => {
         slug: 'pending-member',
       },
       {
-        email: 'test3@example.org',
+        email: 'pending.member@example.org',
         password: '1234',
       },
     )
@@ -160,7 +160,7 @@ describe('mentions in groups', () => {
         slug: 'no-member',
       },
       {
-        email: 'test4@example.org',
+        email: 'no.member@example.org',
         password: '1234',
       },
     )
@@ -316,31 +316,39 @@ describe('mentions in groups', () => {
         }),
       ).resolves.toMatchObject({
         data: {
-          notifications: [
+          notifications: expect.arrayContaining([
             {
+              createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
                 id: 'public-post',
+                content:
+                  'Hey <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-meber</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br>! Please read this',
               },
               read: false,
               reason: 'post_in_group',
+              relatedUser: null,
             },
             {
+              createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
                 id: 'public-post',
+                content:
+                  'Hey <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-meber</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br>! Please read this',
               },
               read: false,
               reason: 'mentioned_in_post',
+              relatedUser: null,
             },
-          ],
+          ]),
         },
         errors: undefined,
       })
     })
 
-    it('sends 3 emails, 2 mentions and 1 post in group', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(5)
+    it('sends 3 emails, one for each user', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(3)
     })
   })
 
@@ -404,31 +412,39 @@ describe('mentions in groups', () => {
         }),
       ).resolves.toMatchObject({
         data: {
-          notifications: [
+          notifications: expect.arrayContaining([
             {
+              createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
                 id: 'closed-post',
+                content:
+                  'Hey members <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-meber</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br>! Please read this',
               },
               read: false,
               reason: 'post_in_group',
+              relatedUser: null,
             },
             {
+              createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
                 id: 'closed-post',
+                content:
+                  'Hey members <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-meber</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br>! Please read this',
               },
               read: false,
               reason: 'mentioned_in_post',
+              relatedUser: null,
             },
-          ],
+          ]),
         },
         errors: undefined,
       })
     })
 
-    it('sends 2 emails, one mention and one post in group', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(2)
+    it('sends only 1 email', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -492,31 +508,39 @@ describe('mentions in groups', () => {
         }),
       ).resolves.toMatchObject({
         data: {
-          notifications: [
+          notifications: expect.arrayContaining([
             {
+              createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
                 id: 'hidden-post',
+                content:
+                  'Hey hiders <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-meber</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br>! Please read this',
               },
               read: false,
               reason: 'post_in_group',
+              relatedUser: null,
             },
             {
+              createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
                 id: 'hidden-post',
+                content:
+                  'Hey hiders <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-meber</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br>! Please read this',
               },
               read: false,
               reason: 'mentioned_in_post',
+              relatedUser: null,
             },
-          ],
+          ]),
         },
         errors: undefined,
       })
     })
 
-    it('sends 2 emails, one mention and one post in group', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(2)
+    it('sends only 1 email', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(1)
     })
   })
 
