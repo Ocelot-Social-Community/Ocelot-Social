@@ -32,6 +32,7 @@ const availableBadges = [
 
 const user = {
   id: 'user1',
+  name: 'User1',
   badgeVerification: {
     id: 'verification-badge-1',
   },

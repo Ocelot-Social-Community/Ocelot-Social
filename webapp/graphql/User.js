@@ -95,6 +95,7 @@ export const adminUserBadgesQuery = () => {
     query User($id: ID!) {
       User(id: $id) {
         id
+        name
         badgeTrophies {
           id
         }

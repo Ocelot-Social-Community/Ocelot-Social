@@ -1,7 +1,11 @@
 <template>
   <ds-section>
     <ds-space>
-      <ds-heading size="h3">{{ $t('admin.badges.title') }}</ds-heading>
+      <ds-heading size="h3">
+        {{ user && user.name }}
+        -
+        {{ $t('admin.badges.title') }}
+      </ds-heading>
       <ds-text>{{ $t('admin.badges.description') }}</ds-text>
     </ds-space>
     <base-card>

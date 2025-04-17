@@ -19,7 +19,11 @@ exports[`.vue renders 1`] = `
             <h1
               class="ds-heading ds-heading-h3"
             >
-              admin.badges.title
+              
+      User1
+      -
+      admin.badges.title
+    
             </h1>
              
             <p
