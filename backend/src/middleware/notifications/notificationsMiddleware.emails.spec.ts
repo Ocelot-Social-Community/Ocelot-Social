@@ -171,7 +171,7 @@ describe('emails sent for notifications', () => {
   })
 
   describe('handleContentDataOfPost', () => {
-    describe('followed user posts into group of user and mentions the user', () => {
+    describe('post-author posts into group and mentions following group-member', () => {
       describe('all email notification settings are true', () => {
         beforeEach(async () => {
           jest.clearAllMocks()
