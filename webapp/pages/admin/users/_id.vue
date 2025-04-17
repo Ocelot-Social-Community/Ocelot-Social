@@ -5,35 +5,29 @@
       <ds-text>{{ $t('admin.badges.description') }}</ds-text>
     </ds-space>
     <base-card>
-      <div>
-        <h4>{{ $t('admin.badges.verificationBadges') }}</h4>
-
-        <div v-for="badge in verificationBadges" :key="badge.id">
-          <button @click="toggleBadge(badge)" :class="{ inactive: !badge.isActive }">
-            {{ badge.icon }} {{ badge.isActive ? 'Active' : 'Inactive' }}
-            <img :src="badge.icon" alt="Badge Icon" />
-          </button>
-        </div>
-      </div>
-      <div>
-        <h4>{{ $t('admin.badges.standardBadges') }}</h4>
-
-        <div v-for="badge in standardBadges" :key="badge.id">
-          <button @click="toggleBadge(badge)" :class="{ inactive: !badge.isActive }">
-            {{ badge.icon }} {{ badge.isActive ? 'Active' : 'Inactive' }}
-            <img :src="badge.icon" alt="Badge Icon" />
-          </button>
-        </div>
-      </div>
+      <badges-section
+        :title="$t('admin.badges.verificationBadges')"
+        :badges="verificationBadges"
+        @toggleBadge="toggleBadge"
+      />
+      <badges-section
+        :title="$t('admin.badges.standardBadges')"
+        :badges="standardBadges"
+        @toggleBadge="toggleBadge"
+      />
     </base-card>
   </ds-section>
 </template>
 
 <script>
+import BadgesSection from '~/components/_new/features/Admin/Badges/BadgesSection.vue'
 import { queryBadges, reward, unreward, verify } from '~/graphql/admin/Badges'
 import { adminUserBadgesQuery } from '~/graphql/User'
 
 export default {
+  components: {
+    BadgesSection,
+  },
   data() {
     return {
       user: null,
