@@ -124,7 +124,7 @@ describe('mentions in groups', () => {
         slug: 'post-author',
       },
       {
-        email: 'test@example.org',
+        email: 'post.author@example.org',
         password: '1234',
       },
     )
@@ -136,7 +136,7 @@ describe('mentions in groups', () => {
         slug: 'group-member',
       },
       {
-        email: 'test2@example.org',
+        email: 'group.member@example.org',
         password: '1234',
       },
     )
@@ -148,7 +148,7 @@ describe('mentions in groups', () => {
         slug: 'pending-member',
       },
       {
-        email: 'test3@example.org',
+        email: 'pending.member@example.org',
         password: '1234',
       },
     )
@@ -160,7 +160,7 @@ describe('mentions in groups', () => {
         slug: 'no-member',
       },
       {
-        email: 'test4@example.org',
+        email: 'no.member@example.org',
         password: '1234',
       },
     )
@@ -347,8 +347,8 @@ describe('mentions in groups', () => {
       })
     })
 
-    it('sends 3 emails, 2 mentions and 1 post in group', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(5)
+    it('sends 3 emails, one for each user', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(3)
     })
   })
 
@@ -443,8 +443,8 @@ describe('mentions in groups', () => {
       })
     })
 
-    it('sends 2 emails, one mention and one post in group', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(2)
+    it('sends only 1 email', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -539,8 +539,8 @@ describe('mentions in groups', () => {
       })
     })
 
-    it('sends 2 emails, one mention and one post in group', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(2)
+    it('sends only 1 email', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(1)
     })
   })
 
