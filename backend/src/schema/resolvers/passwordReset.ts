@@ -15,7 +15,7 @@ export default {
     resetPassword: async (_parent, { email, nonce, newPassword }, { driver }) => {
       const stillValid = new Date()
       stillValid.setDate(stillValid.getDate() - 1)
-      const encryptedNewPassword = await bcrypt.hashSync(newPassword, 10)
+      const encryptedNewPassword = await bcrypt.hash(newPassword, 10)
       const session = driver.session()
       try {
         const passwordResetTxPromise = session.writeTransaction(async (transaction) => {

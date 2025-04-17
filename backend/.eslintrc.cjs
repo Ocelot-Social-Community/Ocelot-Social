@@ -114,7 +114,7 @@ module.exports = {
     'n/no-callback-literal': 'error',
     // 'n/no-deprecated-api': 'error', // part of n/recommended
     // 'n/no-exports-assign': 'error', // part of n/recommended
-    'n/no-extraneous-import': 'off', // TODO // part of n/recommended
+    'n/no-extraneous-import': 'off', // duplicate of import/no-extraneous-dependencies // part of n/recommended
     // 'n/no-extraneous-require': 'error', // part of n/recommended
     'n/no-hide-core-modules': 'error',
     'n/no-missing-import': 'off', // not compatible with typescript // part of n/recommended
@@ -126,7 +126,7 @@ module.exports = {
     // 'n/no-process-exit': 'error', // part of n/recommended
     'n/no-restricted-import': 'error',
     'n/no-restricted-require': 'error',
-    // 'n/no-sync': 'error',
+    'n/no-sync': 'error',
     // 'n/no-unpublished-bin': 'error', // part of n/recommended
     'n/no-unpublished-import': [
       'error',
