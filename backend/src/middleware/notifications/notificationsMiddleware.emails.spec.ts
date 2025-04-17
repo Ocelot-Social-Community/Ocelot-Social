@@ -628,7 +628,7 @@ describe('emails sent for notifications', () => {
         })
       })
 
-      describe('all email notifications are false', () => {
+      describe('all relevant email notifications are false', () => {
         beforeEach(async () => {
           await groupMember.update({ emailNotificationsCommentOnObservedPost: false })
           await groupMember.update({ emailNotificationsMention: false })
