@@ -20,23 +20,9 @@ const badge2 = {
 
 describe('Admin/BadgesSection', () => {
   let wrapper
-  let mocks
 
-  beforeEach(() => {
-    mocks = {
-      $t: jest.fn((v) => v),
-      $apollo: {
-        mutate: jest.fn(),
-      },
-      $toast: {
-        success: jest.fn(),
-        error: jest.fn(),
-      },
-    }
-  })
   const Wrapper = () => {
     return render(BadgesSection, {
-      mocks,
       localVue,
       propsData: {
         badges: [badge1, badge2],
