@@ -94,7 +94,7 @@ export default {
       if (badge.type === 'verification') {
         this.setVerificationBadge(badge.id)
       } else {
-        this.grantRewardBadge(badge.id)
+        this.rewardTrophyBadge(badge.id)
       }
     },
     async rewardTrophyBadge(badgeId) {
@@ -107,9 +107,9 @@ export default {
           },
         })
 
-        this.$toast.success('Badge rewarded successfully')
+        this.$toast.success('admin.badges.rewardTrophy.success')
       } catch (error) {
-        this.$toast.error('Error rewarding badge')
+        this.$toast.error('admin.badges.rewardTrophy.error')
       }
     },
     async revokeBadge(badgeId) {
@@ -122,9 +122,9 @@ export default {
           },
         })
 
-        this.$toast.success('Badge revoked successfully')
+        this.$toast.success('admin.badges.revoke.success')
       } catch (error) {
-        this.$toast.error('Error revoking badge')
+        this.$toast.error('admin.badges.revoke.error')
       }
     },
     async setVerificationBadge(badgeId) {
@@ -137,9 +137,9 @@ export default {
           },
         })
 
-        this.$toast.success('Verification badge set successfully')
+        this.$toast.success('admin.badges.setVerification.success')
       } catch (error) {
-        this.$toast.error('Error setting verification badge')
+        this.$toast.error('admin.badges.setVerification.error')
       }
     },
   },

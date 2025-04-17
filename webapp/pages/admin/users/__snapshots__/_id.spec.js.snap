@@ -1,0 +1,100 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`.vue renders 1`] = `
+<body>
+  <div>
+    <section
+      class="ds-section"
+    >
+      <div
+        class="ds-section-content"
+      >
+        <div
+          class="ds-container ds-container-x-large"
+        >
+          <div
+            class="ds-space"
+            style="margin-bottom: 32px;"
+          >
+            <h1
+              class="ds-heading ds-heading-h3"
+            >
+              admin.badges.title
+            </h1>
+             
+            <p
+              class="ds-text"
+            >
+              admin.badges.description
+            </p>
+          </div>
+           
+          <article
+            class="base-card"
+          >
+            <div
+              class="badge-section"
+            >
+              <h4>
+                admin.badges.verificationBadges
+              </h4>
+               
+              <div
+                class="badge-container"
+              >
+                <button
+                  class="badge"
+                >
+                  <img
+                    alt="description-v-1"
+                    src="icon1"
+                  />
+                </button>
+                <button
+                  class="badge inactive"
+                >
+                  <img
+                    alt="description-v-2"
+                    src="icon2"
+                  />
+                </button>
+              </div>
+            </div>
+             
+            <div
+              class="badge-section"
+            >
+              <h4>
+                admin.badges.trophyBadges
+              </h4>
+               
+              <div
+                class="badge-container"
+              >
+                <button
+                  class="badge inactive"
+                >
+                  <img
+                    alt="description-t-1"
+                    src="icon3"
+                  />
+                </button>
+                <button
+                  class="badge"
+                >
+                  <img
+                    alt="description-t-2"
+                    src="icon4"
+                  />
+                </button>
+              </div>
+            </div>
+             
+            <!---->
+          </article>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+`;
