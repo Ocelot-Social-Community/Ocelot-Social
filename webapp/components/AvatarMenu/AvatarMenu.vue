@@ -168,10 +168,10 @@ export default {
     background-color: $color-neutral-90;
   }
   .logout-link {
-    color: $text-color-base;
+    color: $text-color-danger;
     padding-top: $space-xx-small;
     &:hover {
-      color: $text-color-link-active;
+      color: color.adjust($text-color-danger, $lightness: -10%);
     }
   }
 }
