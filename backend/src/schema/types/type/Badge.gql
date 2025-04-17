@@ -3,6 +3,7 @@ type Badge {
   type: BadgeType!
   icon: String!
   createdAt: String
+  description: String!
 
   rewarded: [User]! @relation(name: "REWARDED", direction: "OUT")
   verifies: [User]! @relation(name: "VERIFIES", direction: "OUT")
