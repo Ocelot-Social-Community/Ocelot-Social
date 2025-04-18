@@ -18,7 +18,7 @@ const neode = getNeode()
 const isAuthenticated = rule({
   cache: 'contextual',
 })(async (_parent, _args, ctx, _info) => {
-  return !!(ctx && ctx.user && ctx.user.id)
+  return !!ctx?.user?.id
 })
 
 const isModerator = rule()(async (_parent, _args, { user }, _info) => {
@@ -62,7 +62,7 @@ const isMySocialMedia = rule({
 const isAllowedToChangeGroupSettings = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const ownerId = user.id
   const { id: groupId } = args
   const session = driver.session()
@@ -92,7 +92,7 @@ const isAllowedToChangeGroupSettings = rule({
 const isAllowedSeeingGroupMembers = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { id: groupId } = args
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
@@ -128,7 +128,7 @@ const isAllowedSeeingGroupMembers = rule({
 const isAllowedToChangeGroupMemberRole = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const currentUserId = user.id
   const { groupId, userId, roleInGroup } = args
   if (currentUserId === userId) return false
@@ -175,7 +175,7 @@ const isAllowedToChangeGroupMemberRole = rule({
 const isAllowedToJoinGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { groupId, userId } = args
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
@@ -205,7 +205,7 @@ const isAllowedToJoinGroup = rule({
 const isAllowedToLeaveGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { groupId, userId } = args
   if (user.id !== userId) return false
   const session = driver.session()
@@ -235,7 +235,7 @@ const isAllowedToLeaveGroup = rule({
 const isMemberOfGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { groupId } = args
   if (!groupId) return true
   const userId = user.id
@@ -263,7 +263,7 @@ const isMemberOfGroup = rule({
 const canRemoveUserFromGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { groupId, userId } = args
   const currentUserId = user.id
   if (currentUserId === userId) return false
@@ -299,7 +299,7 @@ const canRemoveUserFromGroup = rule({
 const canCommentPost = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { postId } = args
   const userId = user.id
   const session = driver.session()

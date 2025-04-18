@@ -21,7 +21,7 @@ if (CONFIG.SENTRY_DSN_BACKEND) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     withScope: (scope, error, context: any) => {
       scope.setUser({
-        id: context.user && context.user.id,
+        id: context.user?.id,
       })
       scope.setExtra('body', context.req.body)
       scope.setExtra('origin', context.req.headers.origin)

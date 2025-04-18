@@ -49,7 +49,7 @@ export default {
         ) {
           delete currentUser.encryptedPassword
           return encode(currentUser)
-        } else if (currentUser && currentUser.disabled) {
+        } else if (currentUser?.disabled) {
           throw new AuthenticationError('Your account has been disabled.')
         } else {
           throw new AuthenticationError('Incorrect email address or password.')
