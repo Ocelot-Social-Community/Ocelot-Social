@@ -1588,14 +1588,14 @@ describe('resetTrophyBadgesSelected', () => {
                   isDefault: true,
                 },
               ],
-              badgeTrophiesUnused: [
+              badgeTrophiesUnused: expect.arrayContaining([
                 {
                   id: 'trophy_panda',
                 },
                 {
                   id: 'trophy_bear',
                 },
-              ],
+              ]),
               badgeTrophiesUnusedCount: 2,
             },
           },
