@@ -9,6 +9,7 @@ import gql from 'graphql-tag'
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import User from '@models/User'
 import createServer from '@src/server'
 
 const categoryIds = ['cat9']
@@ -1083,7 +1084,7 @@ describe('updateOnlineStatus', () => {
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
         const result = await neode.cypher(cypher, { id: authenticatedUser.id })
-        const dbUser = neode.hydrateFirst(result, 'u', neode.model('User'))
+        const dbUser = neode.hydrateFirst<typeof User>(result, 'u', neode.model('User'))
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince: expect.any(String),
