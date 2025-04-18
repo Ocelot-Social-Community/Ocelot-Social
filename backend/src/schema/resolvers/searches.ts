@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import log from './helpers/databaseLogger'
 import { queryString } from './searches/queryString'
 
@@ -250,6 +256,7 @@ export default {
         ]
 
       params.limit = 15
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const type: any = multiSearchMap.find((obj) => obj.symbol === searchType)
       return getSearchResults(context, type.setup, params)
     },

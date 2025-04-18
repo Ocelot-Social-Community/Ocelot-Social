@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { mergeWith, isArray } from 'lodash'
 
 const getInvisiblePosts = async (context) => {
@@ -5,7 +9,7 @@ const getInvisiblePosts = async (context) => {
   const readTxResultPromise = await session.readTransaction(async (transaction) => {
     let cypher = ''
     const { user } = context
-    if (user && user.id) {
+    if (user?.id) {
       cypher = `
         MATCH (post:Post)<-[:CANNOT_SEE]-(user:User { id: $userId })
         RETURN collect(post.id) AS invisiblePostIds`

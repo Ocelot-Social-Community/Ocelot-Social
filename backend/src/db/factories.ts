@@ -1,3 +1,11 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/unbound-method */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { faker } from '@faker-js/faker'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
@@ -40,14 +48,14 @@ Factory.define('category')
   .attr('id', uuid)
   .attr('icon', 'globe')
   .attr('name', 'Global Peace & Nonviolence')
-  .after((buildObject, options) => {
+  .after((buildObject, _options) => {
     return neode.create('Category', buildObject)
   })
 
 Factory.define('badge')
   .attr('type', 'crowdfunding')
   .attr('status', 'permanent')
-  .after((buildObject, options) => {
+  .after((buildObject, _options) => {
     return neode.create('Badge', buildObject)
   })
 
@@ -56,7 +64,7 @@ Factory.define('image')
   .attr('aspectRatio', 1.3333333333333333)
   .attr('alt', faker.lorem.sentence)
   .attr('type', 'image/jpeg')
-  .after((buildObject, options) => {
+  .after((buildObject, _options) => {
     const { url: imageUrl } = buildObject
     if (imageUrl) buildObject.url = uniqueImageUrl(imageUrl)
     return neode.create('Image', buildObject)
@@ -85,21 +93,21 @@ Factory.define('basicUser')
 Factory.define('userWithoutEmailAddress')
   .extend('basicUser')
   .option('about', faker.lorem.paragraph)
-  .after(async (buildObject, options) => {
+  .after(async (buildObject, _options) => {
     return neode.create('User', buildObject)
   })
 
 Factory.define('userWithAboutNull')
   .extend('basicUser')
   .option('about', null)
-  .after(async (buildObject, options) => {
+  .after(async (buildObject, _options) => {
     return neode.create('User', buildObject)
   })
 
 Factory.define('userWithAboutEmpty')
   .extend('basicUser')
   .option('about', '')
-  .after(async (buildObject, options) => {
+  .after(async (buildObject, _options) => {
     return neode.create('User', buildObject)
   })
 
@@ -224,7 +232,7 @@ Factory.define('donations')
   .attr('showDonations', true)
   .attr('goal', 15000)
   .attr('progress', 7000)
-  .after((buildObject, options) => {
+  .after((buildObject, _options) => {
     return neode.create('Donations', buildObject)
   })
 
@@ -235,13 +243,13 @@ const emailDefaults = {
 
 Factory.define('emailAddress')
   .attrs(emailDefaults)
-  .after((buildObject, options) => {
+  .after((buildObject, _options) => {
     return neode.create('EmailAddress', buildObject)
   })
 
 Factory.define('unverifiedEmailAddress')
   .attr(emailDefaults)
-  .after((buildObject, options) => {
+  .after((buildObject, _options) => {
     return neode.create('UnverifiedEmailAddress', buildObject)
   })
 
@@ -281,11 +289,11 @@ Factory.define('location')
     id: 'country.10743216036480410',
     type: 'country',
   })
-  .after((buildObject, options) => {
+  .after((buildObject, _options) => {
     return neode.create('Location', buildObject)
   })
 
-Factory.define('report').after((buildObject, options) => {
+Factory.define('report').after((buildObject, _options) => {
   return neode.create('Report', buildObject)
 })
 
@@ -293,7 +301,7 @@ Factory.define('tag')
   .attrs({
     name: '#human-connection',
   })
-  .after((buildObject, options) => {
+  .after((buildObject, _options) => {
     return neode.create('Tag', buildObject)
   })
 
@@ -301,7 +309,7 @@ Factory.define('socialMedia')
   .attrs({
     url: 'https://mastodon.social/@Gargron',
   })
-  .after((buildObject, options) => {
+  .after((buildObject, _options) => {
     return neode.create('SocialMedia', buildObject)
   })
 

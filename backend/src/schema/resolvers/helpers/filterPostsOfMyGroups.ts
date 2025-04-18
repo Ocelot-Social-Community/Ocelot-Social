@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { mergeWith, isArray } from 'lodash'
 
 const getMyGroupIds = async (context) => {
   const { user } = context
-  if (!(user && user.id)) return []
+  if (!user?.id) return []
   const session = context.driver.session()
 
   const readTxResultPromise = await session.readTransaction(async (transaction) => {
@@ -22,7 +26,7 @@ const getMyGroupIds = async (context) => {
 }
 
 export const filterPostsOfMyGroups = async (params, context) => {
-  if (!(params.filter && params.filter.postsInMyGroups)) return params
+  if (!params.filter?.postsInMyGroups) return params
   delete params.filter.postsInMyGroups
   const myGroupIds = await getMyGroupIds(context)
   params.filter = mergeWith(

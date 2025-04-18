@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 export const isUserOnline = (user) => {
   // Is Recipient considered online
   const lastActive = new Date(user.lastActiveAt).getTime()

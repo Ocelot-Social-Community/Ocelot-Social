@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { makeAugmentedSchema } from 'neo4j-graphql-js'
 
 import resolvers from './resolvers'

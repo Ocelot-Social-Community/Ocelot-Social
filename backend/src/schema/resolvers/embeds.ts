@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import scrape from './embeds/scraper'
 import { undefinedToNullResolver } from './helpers/Resolver'
 
 export default {
   Query: {
-    embed: async (object, { url }, context, resolveInfo) => {
+    embed: async (_object, { url }, _context, _resolveInfo) => {
       return scrape(url)
     },
   },
@@ -22,7 +25,7 @@ export default {
       'lang',
       'html',
     ]),
-    sources: async (parent, params, context, resolveInfo) => {
+    sources: async (parent, _params, _context, _resolveInfo) => {
       return typeof parent.sources === 'undefined' ? [] : parent.sources
     },
   },
