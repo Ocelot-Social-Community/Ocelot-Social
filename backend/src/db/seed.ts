@@ -1604,7 +1604,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     /* eslint-disable-next-line no-console */
     console.log('Seeded Data...')
     await driver.close()
-    await neode.close()
+    neode.close()
     process.exit(0)
     // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {

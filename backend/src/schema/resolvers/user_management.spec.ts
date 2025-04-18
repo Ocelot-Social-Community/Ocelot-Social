@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable promise/prefer-await-to-callbacks */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable jest/unbound-method */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 import jwt from 'jsonwebtoken'
@@ -56,7 +58,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(() => {
