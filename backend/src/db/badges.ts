@@ -12,6 +12,6 @@ import { trophies, verification } from './seed/badges'
     await trophies()
     await verification()
   } finally {
-    await neode.close()
+    neode.close()
   }
 })()
