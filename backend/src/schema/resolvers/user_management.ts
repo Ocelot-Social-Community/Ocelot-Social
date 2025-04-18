@@ -61,7 +61,7 @@ export default {
     changePassword: async (_, { oldPassword, newPassword }, { user }) => {
       const currentUser = await neode.find('User', user.id)
 
-      const encryptedPassword = currentUser.get('encryptedPassword')
+      const encryptedPassword = currentUser.get<string>('encryptedPassword')
       if (!(await bcrypt.compareSync(oldPassword, encryptedPassword))) {
         throw new AuthenticationError('Old password is not correct')
       }

@@ -41,12 +41,12 @@ export async function up(_next) {
   }
 }
 
-export function down(next) {
+export async function down(next) {
   const driver = getDriver()
   const session = driver.session()
   try {
     // Rollback your migration here.
-    next()
+    // next()
     // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     next(err)

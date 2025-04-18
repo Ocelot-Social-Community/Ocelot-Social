@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver, getNeode } from '@db/neo4j'
+import User from '@models/User'
 
 import decode from './decode'
 import encode from './encode'
@@ -86,26 +87,28 @@ describe('decode', () => {
       })
 
       it('sets `lastActiveAt`', async () => {
-        let user = await neode.first('User', { id: 'u3' })
+        let user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.not.toHaveProperty('lastActiveAt')
         await decode(driver, validAuthorizationHeader)
-        user = await neode.first('User', { id: 'u3' })
+        user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: expect.any(String),
         })
       })
 
       it('updates `lastActiveAt` for every authenticated request', async () => {
-        let user = await neode.first('User', { id: 'u3' })
+        let user = await neode.first('User', { id: 'u3' }, undefined)
         await user.update({
-          updatedAt: new Date().toISOString(),
-          lastActiveAt: '2019-10-03T23:33:08.598Z',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          updatedAt: new Date().toISOString() as any,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          lastActiveAt: '2019-10-03T23:33:08.598Z' as any,
         })
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: '2019-10-03T23:33:08.598Z',
         })
         await decode(driver, validAuthorizationHeader)
-        user = await neode.first('User', { id: 'u3' })
+        user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.toMatchObject({
           // should be a different time by now ;)
           lastActiveAt: expect.not.stringContaining('2019-10-03T23:33'),

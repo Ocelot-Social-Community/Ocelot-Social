@@ -11,7 +11,7 @@ import { getDriver, getNeode } from '@db/neo4j'
 class Store {
   async init(errFn) {
     const neode = getNeode()
-    const session = neode.driver.session()
+    const session = neode.session()
     const txFreshIndicesConstrains = session.writeTransaction(async (txc) => {
       // drop all indices and constraints
       await txc.run('CALL apoc.schema.assert({},{},true)')
@@ -46,8 +46,8 @@ class Store {
       console.log(error) // eslint-disable-line no-console
       errFn(error)
     } finally {
-      session.close()
-      neode.driver.close()
+      await session.close()
+      neode.close()
     }
   }
 

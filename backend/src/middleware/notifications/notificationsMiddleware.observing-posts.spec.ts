@@ -102,42 +102,21 @@ afterAll(async () => {
 
 describe('notifications for users that observe a post', () => {
   beforeAll(async () => {
-    postAuthor = await neode.create(
-      'User',
-      {
-        id: 'post-author',
-        name: 'Post Author',
-        slug: 'post-author',
-      },
-      {
-        email: 'test@example.org',
-        password: '1234',
-      },
-    )
-    firstCommenter = await neode.create(
-      'User',
-      {
-        id: 'first-commenter',
-        name: 'First Commenter',
-        slug: 'first-commenter',
-      },
-      {
-        email: 'test2@example.org',
-        password: '1234',
-      },
-    )
-    secondCommenter = await neode.create(
-      'User',
-      {
-        id: 'second-commenter',
-        name: 'Second Commenter',
-        slug: 'second-commenter',
-      },
-      {
-        email: 'test3@example.org',
-        password: '1234',
-      },
-    )
+    postAuthor = await neode.create('User', {
+      id: 'post-author',
+      name: 'Post Author',
+      slug: 'post-author',
+    })
+    firstCommenter = await neode.create('User', {
+      id: 'first-commenter',
+      name: 'First Commenter',
+      slug: 'first-commenter',
+    })
+    secondCommenter = await neode.create('User', {
+      id: 'second-commenter',
+      name: 'Second Commenter',
+      slug: 'second-commenter',
+    })
     authenticatedUser = await postAuthor.toJson()
     await mutate({
       mutation: createPostMutation,

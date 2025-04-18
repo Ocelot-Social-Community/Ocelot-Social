@@ -274,7 +274,11 @@ describe('login', () => {
       describe('normalization', () => {
         describe('email address is a gmail address ', () => {
           beforeEach(async () => {
-            const email = await neode.first('EmailAddress', { email: 'test@example.org' })
+            const email = await neode.first(
+              'EmailAddress',
+              { email: 'test@example.org' },
+              undefined,
+            )
             await email.update({ email: 'someuser@gmail.com' })
           })
 

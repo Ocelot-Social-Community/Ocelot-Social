@@ -198,9 +198,10 @@ describe('mergeImage', () => {
 
       it('connects resource with image via given image type', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
-        const result = await neode.cypher(`
-          MATCH(p:Post {id: "p99"})-[:HERO_IMAGE]->(i:Image) RETURN i,p
-        `)
+        const result = await neode.cypher(
+          `MATCH(p:Post {id: "p99"})-[:HERO_IMAGE]->(i:Image) RETURN i,p`,
+          {},
+        )
         post = neode.hydrateFirst(result, 'p', neode.model('Post'))
         const image = neode.hydrateFirst(result, 'i', neode.model('Image'))
         expect(post).toBeTruthy()
@@ -215,7 +216,7 @@ describe('mergeImage', () => {
 
       it('sets metadata', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
-        const image = await neode.first('Image', {})
+        const image = await neode.first<typeof Image>('Image', {}, undefined)
         await expect(image.toJson()).resolves.toMatchObject({
           alt: 'A description of the new image',
           createdAt: expect.any(String),
@@ -245,7 +246,11 @@ describe('mergeImage', () => {
           } finally {
             await session.close()
           }
-          const image = await neode.first('Image', { alt: 'This alt text gets overwritten' })
+          const image = await neode.first<typeof Image>(
+            'Image',
+            { alt: 'This alt text gets overwritten' },
+            undefined,
+          )
           await expect(image.toJson()).resolves.toMatchObject({
             alt: 'This alt text gets overwritten',
           })
@@ -296,7 +301,7 @@ describe('mergeImage', () => {
           await expect(neode.all('Image')).resolves.toHaveLength(1)
           await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
           await expect(neode.all('Image')).resolves.toHaveLength(1)
-          const image = await neode.first('Image', {})
+          const image = await neode.first<typeof Image>('Image', {}, undefined)
           await expect(image.toJson()).resolves.toMatchObject({
             alt: 'A description of the new image',
             createdAt: expect.any(String),
