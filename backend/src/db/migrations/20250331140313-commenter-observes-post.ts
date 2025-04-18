@@ -4,7 +4,7 @@ export const description = `
 All users commenting a post observe the post.
 `
 
-export async function up(next) {
+export async function up(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -33,7 +33,7 @@ export async function up(next) {
   }
 }
 
-export async function down(next) {
+export async function down(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()

@@ -4,7 +4,7 @@ import Resolver from './helpers/Resolver'
 
 export default {
   Mutation: {
-    CreateComment: async (object, params, context, resolveInfo) => {
+    CreateComment: async (_object, params, context, _resolveInfo) => {
       const { postId } = params
       const { user, driver } = context
       // Adding relationship from comment to post by passing in the postId,

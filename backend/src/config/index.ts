@@ -19,6 +19,7 @@ if (require.resolve) {
 }
 
 // Use Cypress env or process.env
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Cypress: any | undefined
 const env = typeof Cypress !== 'undefined' ? Cypress.env() : process.env // eslint-disable-line no-undef
 

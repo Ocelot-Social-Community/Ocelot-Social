@@ -4,7 +4,7 @@ export const description = `
 This migration adds the clickedCount property to all posts, setting it to 0.
 `
 
-export async function up(next) {
+export async function up(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -27,7 +27,7 @@ export async function up(next) {
   }
 }
 
-export async function down(next) {
+export async function down(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()

@@ -39,7 +39,7 @@ export default {
       }
       return neo4jgraphql(object, params, context, resolveInfo)
     },
-    UnreadRooms: async (object, params, context, resolveInfo) => {
+    UnreadRooms: async (_object, _params, context, _resolveInfo) => {
       const {
         user: { id: currentUserId },
       } = context
