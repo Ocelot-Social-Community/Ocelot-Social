@@ -38,7 +38,8 @@ class Store {
       // we need to have all constraints and indexes defined here. They can not be properly migrated
       await txFreshIndicesConstrains
 
-      getNeode().schema.install()
+      // eslint-disable-next-line @typescript-eslint/await-thenable
+      await getNeode().schema.install()
       // eslint-disable-next-line no-console
       console.log('Successfully created database indices and constraints!')
       // eslint-disable-next-line no-catch-all/no-catch-all
