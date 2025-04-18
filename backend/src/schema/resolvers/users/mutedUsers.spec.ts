@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
@@ -60,6 +64,7 @@ describe('mutedUsers', () => {
   it('throws permission error', async () => {
     const { query } = createTestClient(server)
     const result = await query({ query: mutedUserQuery })
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
   })
 

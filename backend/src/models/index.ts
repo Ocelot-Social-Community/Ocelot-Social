@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable n/no-missing-require */
 /* eslint-disable n/global-require */
 // NOTE: We cannot use `fs` here to clean up the code. Cypress breaks on any npm
 // module that is not browser-compatible. Node's `fs` module is server-side only
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Cypress: any | undefined
 export default {
   Image: typeof Cypress !== 'undefined' ? require('./Image') : require('./Image').default,
