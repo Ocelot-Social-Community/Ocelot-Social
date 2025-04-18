@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable security/detect-non-literal-regexp */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
