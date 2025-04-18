@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable security/detect-non-literal-fs-filename */
 import fs from 'node:fs'
 import path from 'node:path'

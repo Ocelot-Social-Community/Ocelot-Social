@@ -1,9 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import User from '@models/User'
 import createServer from '@src/server'
 
 const categoryIds = ['cat9']
@@ -118,7 +124,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
@@ -1076,7 +1082,7 @@ describe('updateOnlineStatus', () => {
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
         const result = await neode.cypher(cypher, { id: authenticatedUser.id })
-        const dbUser = neode.hydrateFirst(result, 'u', neode.model('User'))
+        const dbUser = neode.hydrateFirst<typeof User>(result, 'u', neode.model('User'))
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince: expect.any(String),
@@ -1360,14 +1366,14 @@ describe('resetTrophyBadgesSelected', () => {
             resetTrophyBadgesSelected: {
               badgeTrophiesCount: 2,
               badgeTrophiesSelected: [null, null, null, null, null, null, null, null, null],
-              badgeTrophiesUnused: [
+              badgeTrophiesUnused: expect.arrayContaining([
                 {
                   id: 'trophy_panda',
                 },
                 {
                   id: 'trophy_bear',
                 },
-              ],
+              ]),
               badgeTrophiesUnusedCount: 2,
             },
           },

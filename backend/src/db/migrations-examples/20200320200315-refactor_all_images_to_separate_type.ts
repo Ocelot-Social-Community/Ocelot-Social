@@ -1,3 +1,11 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable security/detect-non-literal-fs-filename */
 /* eslint-disable no-console */
 import { getDriver } from '@db/neo4j'
 
@@ -58,7 +66,7 @@ export async function up() {
     console.log('Created image nodes from all user avatars and post images.')
     printSummaries(stats)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -96,6 +104,6 @@ export async function down() {
     console.log('UNDO: Split images from users and posts.')
     printSummaries(stats)
   } finally {
-    session.close()
+    await session.close()
   }
 }

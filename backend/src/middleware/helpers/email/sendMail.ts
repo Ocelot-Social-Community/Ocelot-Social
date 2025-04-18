@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import nodemailer from 'nodemailer'
 import { htmlToText } from 'nodemailer-html-to-text'
 
@@ -28,6 +34,7 @@ const transporter = nodemailer.createTransport({
   },
 })
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function
 let sendMailCallback: any = async () => {}
 if (!hasEmailConfig) {
   if (!CONFIG.TEST) {
@@ -51,6 +58,7 @@ if (!hasEmailConfig) {
         cleanHtml(templateArgs.html, 'dummyKey', {
           allowedTags: ['a'],
           allowedAttributes: { a: ['href'] },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any).replace(/&amp;/g, '&'),
       )
     }

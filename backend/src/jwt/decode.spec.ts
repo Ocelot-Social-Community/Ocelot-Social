@@ -1,5 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver, getNeode } from '@db/neo4j'
+import User from '@models/User'
 
 import decode from './decode'
 import encode from './encode'
@@ -13,7 +17,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
@@ -83,26 +87,28 @@ describe('decode', () => {
       })
 
       it('sets `lastActiveAt`', async () => {
-        let user = await neode.first('User', { id: 'u3' })
+        let user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.not.toHaveProperty('lastActiveAt')
         await decode(driver, validAuthorizationHeader)
-        user = await neode.first('User', { id: 'u3' })
+        user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: expect.any(String),
         })
       })
 
       it('updates `lastActiveAt` for every authenticated request', async () => {
-        let user = await neode.first('User', { id: 'u3' })
+        let user = await neode.first('User', { id: 'u3' }, undefined)
         await user.update({
-          updatedAt: new Date().toISOString(),
-          lastActiveAt: '2019-10-03T23:33:08.598Z',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          updatedAt: new Date().toISOString() as any,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          lastActiveAt: '2019-10-03T23:33:08.598Z' as any,
         })
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: '2019-10-03T23:33:08.598Z',
         })
         await decode(driver, validAuthorizationHeader)
-        user = await neode.first('User', { id: 'u3' })
+        user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.toMatchObject({
           // should be a different time by now ;)
           lastActiveAt: expect.not.stringContaining('2019-10-03T23:33'),

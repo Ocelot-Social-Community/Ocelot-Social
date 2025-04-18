@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
@@ -35,7 +38,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 describe('Room', () => {
@@ -586,6 +589,7 @@ describe('Room', () => {
   })
 
   describe('query single room', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let result: any = null
 
     beforeAll(async () => {

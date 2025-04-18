@@ -1,3 +1,11 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable security/detect-non-literal-fs-filename */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable promise/prefer-await-to-callbacks */
 import { throwError, concat } from 'rxjs'
@@ -11,10 +19,12 @@ export const description = `
 `
 export function up(next) {
   const driver = getDriver()
-  const rxSession = driver.rxSession()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rxSession = driver.rxSession() as any
   rxSession
     .beginTransaction()
     .pipe(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       flatMap((transaction: any) =>
         concat(
           transaction
@@ -26,6 +36,7 @@ export function up(next) {
             )
             .records()
             .pipe(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               map((record: any) => {
                 const { id: locationId } = record.get('location')
                 return { locationId }
@@ -43,6 +54,7 @@ export function up(next) {
                   )
                   .records()
                   .pipe(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     map((record: any) => ({
                       location: record.get('location'),
                       updatedLocation: record.get('updatedLocation'),

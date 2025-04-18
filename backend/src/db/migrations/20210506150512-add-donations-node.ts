@@ -1,3 +1,11 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable security/detect-non-literal-fs-filename */
 import { v4 as uuid } from 'uuid'
 
 import { getDriver } from '@db/neo4j'
@@ -5,7 +13,7 @@ import { getDriver } from '@db/neo4j'
 export const description =
   'This migration adds a Donations node with default settings to the database.'
 
-export async function up(next) {
+export async function up(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -35,11 +43,11 @@ export async function up(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-export async function down(next) {
+export async function down(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -60,6 +68,6 @@ export async function down(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }

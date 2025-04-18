@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
@@ -18,6 +22,7 @@ let variables
 const getAllPasswordResets = async () => {
   const passwordResetQuery = await neode.cypher(
     'MATCH (passwordReset:PasswordReset) RETURN passwordReset',
+    {},
   )
   const resets = passwordResetQuery.records.map((record) => record.get('passwordReset'))
   return resets
@@ -40,7 +45,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(() => {
@@ -121,6 +126,7 @@ describe('passwordReset', () => {
 })
 
 describe('resetPassword', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setup = async (options: any = {}) => {
     const { email = 'user@example.org', issuedAt = new Date(), nonce = '12345' } = options
     await createPasswordReset({ driver, email, issuedAt, nonce })
