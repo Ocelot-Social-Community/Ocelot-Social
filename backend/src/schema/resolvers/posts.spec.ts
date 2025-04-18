@@ -10,6 +10,7 @@ import CONFIG from '@config/index'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
+import Image from '@models/Image'
 import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = true
@@ -974,9 +975,13 @@ describe('UpdatePost', () => {
           variables = { ...variables, image: { sensitive: true } }
         })
         it('updates the image', async () => {
-          await expect(neode.first('Image', { sensitive: true })).resolves.toBeFalsy()
+          await expect(
+            neode.first<typeof Image>('Image', { sensitive: true }, undefined),
+          ).resolves.toBeFalsy()
           await mutate({ mutation: updatePostMutation, variables })
-          await expect(neode.first('Image', { sensitive: true })).resolves.toBeTruthy()
+          await expect(
+            neode.first<typeof Image>('Image', { sensitive: true }, undefined),
+          ).resolves.toBeTruthy()
         })
       })
 
@@ -996,9 +1001,13 @@ describe('UpdatePost', () => {
           delete variables.image
         })
         it('keeps the image unchanged', async () => {
-          await expect(neode.first('Image', { sensitive: true })).resolves.toBeFalsy()
+          await expect(
+            neode.first<typeof Image>('Image', { sensitive: true }, undefined),
+          ).resolves.toBeFalsy()
           await mutate({ mutation: updatePostMutation, variables })
-          await expect(neode.first('Image', { sensitive: true })).resolves.toBeFalsy()
+          await expect(
+            neode.first<typeof Image>('Image', { sensitive: true }, undefined),
+          ).resolves.toBeFalsy()
         })
       })
     })
@@ -1244,11 +1253,11 @@ describe('pin posts', () => {
 
       it('removes previous `pinned` attribute', async () => {
         const cypher = 'MATCH (post:Post) WHERE post.pinned IS NOT NULL RETURN post'
-        pinnedPost = await neode.cypher(cypher)
+        pinnedPost = await neode.cypher(cypher, {})
         expect(pinnedPost.records).toHaveLength(1)
         variables = { ...variables, id: 'only-pinned-post' }
         await mutate({ mutation: pinPostMutation, variables })
-        pinnedPost = await neode.cypher(cypher)
+        pinnedPost = await neode.cypher(cypher, {})
         expect(pinnedPost.records).toHaveLength(1)
       })
 
@@ -1257,6 +1266,7 @@ describe('pin posts', () => {
         await mutate({ mutation: pinPostMutation, variables })
         pinnedPost = await neode.cypher(
           `MATCH (:User)-[pinned:PINNED]->(post:Post) RETURN post, pinned`,
+          {},
         )
         expect(pinnedPost.records).toHaveLength(1)
       })

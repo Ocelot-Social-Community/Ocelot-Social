@@ -22,6 +22,7 @@ let variables
 const getAllPasswordResets = async () => {
   const passwordResetQuery = await neode.cypher(
     'MATCH (passwordReset:PasswordReset) RETURN passwordReset',
+    {},
   )
   const resets = passwordResetQuery.records.map((record) => record.get('passwordReset'))
   return resets

@@ -9,6 +9,8 @@ import gql from 'graphql-tag'
 import CONFIG from '@config/index'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver, getNeode } from '@db/neo4j'
+import EmailAddress from '@models/EmailAddress'
+import User from '@models/User'
 import createServer from '@src/server'
 
 const neode = getNeode()
@@ -97,17 +99,27 @@ describe('Signup', () => {
       describe('creates a EmailAddress node', () => {
         it('with `createdAt` attribute', async () => {
           await mutate({ mutation, variables })
-          let emailAddress = await neode.first('EmailAddress', { email: 'someuser@example.org' })
-          emailAddress = await emailAddress.toJson()
-          expect(emailAddress.createdAt).toBeTruthy()
-          expect(Date.parse(emailAddress.createdAt)).toEqual(expect.any(Number))
+          const emailAddress = await neode.first<typeof EmailAddress>(
+            'EmailAddress',
+            { email: 'someuser@example.org' },
+            undefined,
+          )
+          const emailAddressJson = await emailAddress.toJson()
+          expect(emailAddressJson.createdAt).toBeTruthy()
+          expect(Date.parse(emailAddressJson.createdAt as unknown as string)).toEqual(
+            expect.any(Number),
+          )
         })
 
         it('with a cryptographic `nonce`', async () => {
           await mutate({ mutation, variables })
-          let emailAddress = await neode.first('EmailAddress', { email: 'someuser@example.org' })
-          emailAddress = await emailAddress.toJson()
-          expect(emailAddress.nonce).toEqual(expect.any(String))
+          const emailAddress = await neode.first<typeof EmailAddress>(
+            'EmailAddress',
+            { email: 'someuser@example.org' },
+            undefined,
+          )
+          const emailAddressJson = await emailAddress.toJson()
+          expect(emailAddressJson.nonce).toEqual(expect.any(String))
         })
 
         describe('if the email already exists', () => {
@@ -247,7 +259,11 @@ describe('SignupVerification', () => {
 
           it('sets `verifiedAt` attribute of EmailAddress', async () => {
             await mutate({ mutation, variables })
-            const email = await neode.first('EmailAddress', { email: 'john@example.org' })
+            const email = await neode.first(
+              'EmailAddress',
+              { email: 'john@example.org' },
+              undefined,
+            )
             await expect(email.toJson()).resolves.toEqual(
               expect.objectContaining({
                 verifiedAt: expect.any(String),
@@ -268,7 +284,7 @@ describe('SignupVerification', () => {
           it('sets `about` attribute of User', async () => {
             variables = { ...variables, about: 'Find this description in the user profile' }
             await mutate({ mutation, variables })
-            const user = await neode.first('User', { name: 'John Doe' })
+            const user = await neode.first<typeof User>('User', { name: 'John Doe' }, undefined)
             await expect(user.toJson()).resolves.toMatchObject({
               about: 'Find this description in the user profile',
             })
