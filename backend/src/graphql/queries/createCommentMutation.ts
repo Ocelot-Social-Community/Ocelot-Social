@@ -1,7 +1,5 @@
 import gql from 'graphql-tag'
 
-// ------ mutations
-
 export const createCommentMutation = gql`
   mutation ($id: ID, $postId: ID!, $content: String!) {
     CreateComment(id: $id, postId: $postId, content: $content) {
@@ -9,7 +7,3 @@ export const createCommentMutation = gql`
     }
   }
 `
-
-// ------ queries
-
-// fill queries in here

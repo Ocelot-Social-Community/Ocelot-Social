@@ -7,7 +7,7 @@ import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { loginMutation } from '@graphql/userManagement'
+import { loginMutation } from '@graphql/queries/loginMutation'
 import encode from '@jwt/encode'
 import createServer, { context } from '@src/server'
 

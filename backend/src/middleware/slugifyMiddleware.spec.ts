@@ -2,9 +2,10 @@ import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { signupVerificationMutation } from '@graphql/authentications'
-import { createGroupMutation, updateGroupMutation } from '@graphql/groups'
-import { createPostMutation } from '@graphql/posts'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { createPostMutation } from '@graphql/queries/createPostMutation'
+import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
+import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
 import createServer from '@src/server'
 
 let authenticatedUser
