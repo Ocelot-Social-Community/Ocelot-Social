@@ -82,7 +82,7 @@ export default {
     },
   },
   Mutation: {
-    markAsRead: async (parent, args, context, resolveInfo) => {
+    markAsRead: async (_parent, args, context, _resolveInfo) => {
       const { user: currentUser } = context
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -112,7 +112,7 @@ export default {
         session.close()
       }
     },
-    markAllAsRead: async (parent, args, context, resolveInfo) => {
+    markAllAsRead: async (parent, args, context, _resolveInfo) => {
       const { user: currentUser } = context
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {

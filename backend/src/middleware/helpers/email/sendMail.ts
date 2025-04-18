@@ -28,6 +28,7 @@ const transporter = nodemailer.createTransport({
   },
 })
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function
 let sendMailCallback: any = async () => {}
 if (!hasEmailConfig) {
   if (!CONFIG.TEST) {
@@ -51,6 +52,7 @@ if (!hasEmailConfig) {
         cleanHtml(templateArgs.html, 'dummyKey', {
           allowedTags: ['a'],
           allowedAttributes: { a: ['href'] },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any).replace(/&amp;/g, '&'),
       )
     }

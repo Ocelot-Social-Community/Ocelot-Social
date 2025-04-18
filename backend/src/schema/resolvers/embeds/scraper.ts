@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable n/no-extraneous-require */
 /* eslint-disable n/global-require */
 /* eslint-disable import/no-commonjs */

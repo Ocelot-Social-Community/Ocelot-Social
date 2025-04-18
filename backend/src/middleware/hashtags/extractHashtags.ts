@@ -19,6 +19,7 @@ export default function (content?) {
       return $(el).attr('data-hashtag-id')
     })
     .get()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const hashtags: any = []
   ids.forEach((id) => {
     const match = exec(id, regX)

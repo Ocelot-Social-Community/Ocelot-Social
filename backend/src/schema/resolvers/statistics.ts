@@ -5,6 +5,7 @@ export default {
   Query: {
     statistics: async (_parent, _args, { driver }) => {
       const session = driver.session()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const counts: any = {}
       try {
         const mapping = {

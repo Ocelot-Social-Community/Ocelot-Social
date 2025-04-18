@@ -15,23 +15,23 @@ const isAuthenticated = rule({
   return !!(ctx && ctx.user && ctx.user.id)
 })
 
-const isModerator = rule()(async (parent, args, { user }, info) => {
+const isModerator = rule()(async (_parent, _args, { user }, _info) => {
   return user && (user.role === 'moderator' || user.role === 'admin')
 })
 
-const isAdmin = rule()(async (parent, args, { user }, info) => {
+const isAdmin = rule()(async (_parent, _args, { user }, _info) => {
   return user && user.role === 'admin'
 })
 
 const onlyYourself = rule({
   cache: 'no_cache',
-})(async (parent, args, context, info) => {
+})(async (_parent, args, context, _info) => {
   return context.user.id === args.id
 })
 
 const isMyOwn = rule({
   cache: 'no_cache',
-})(async (parent, args, { user }, info) => {
+})(async (parent, _args, { user }, _info) => {
   return user && user.id === parent.id
 })
 
@@ -350,7 +350,7 @@ const isAuthor = rule({
 
 const isDeletingOwnAccount = rule({
   cache: 'no_cache',
-})(async (parent, args, context, _info) => {
+})(async (_parent, args, context, _info) => {
   return context.user.id === args.id
 })
 
@@ -362,7 +362,7 @@ const noEmailFilter = rule({
 
 const publicRegistration = rule()(() => CONFIG.PUBLIC_REGISTRATION)
 
-const inviteRegistration = rule()(async (_parent, args, { user, driver }) => {
+const inviteRegistration = rule()(async (_parent, args, { _user, driver }) => {
   if (!CONFIG.INVITE_REGISTRATION) return false
   const { inviteCode } = args
   const session = driver.session()

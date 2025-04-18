@@ -1,6 +1,6 @@
 export default {
   Query: {
-    userData: async (object, args, context, resolveInfo) => {
+    userData: async (_object, _args, context, _resolveInfo) => {
       const id = context.user.id
       const cypher = `
         MATCH (user:User { id: $id })

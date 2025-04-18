@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable import/no-named-as-default-member */
 import http from 'node:http'
 
@@ -68,7 +69,7 @@ const createServer = (options?) => {
     context,
     schema: middleware(schema),
     subscriptions: {
-      onConnect: (connectionParams, webSocket) => {
+      onConnect: (connectionParams, _webSocket) => {
         return getContext(connectionParams)
       },
     },

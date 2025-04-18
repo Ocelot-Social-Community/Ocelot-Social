@@ -2,7 +2,7 @@ import { sentry } from 'graphql-middleware-sentry'
 
 import CONFIG from '@config/index'
 
-// eslint-disable-next-line import/no-mutable-exports
+// eslint-disable-next-line import/no-mutable-exports, @typescript-eslint/no-explicit-any
 let sentryMiddleware: any = (resolve, root, args, context, resolveInfo) =>
   resolve(root, args, context, resolveInfo)
 
@@ -14,6 +14,7 @@ if (CONFIG.SENTRY_DSN_BACKEND) {
       release: CONFIG.COMMIT,
       environment: CONFIG.NODE_ENV,
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     withScope: (scope, error, context: any) => {
       scope.setUser({
         id: context.user && context.user.id,

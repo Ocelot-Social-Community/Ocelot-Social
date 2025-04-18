@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable promise/avoid-new */
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable import/no-named-as-default */

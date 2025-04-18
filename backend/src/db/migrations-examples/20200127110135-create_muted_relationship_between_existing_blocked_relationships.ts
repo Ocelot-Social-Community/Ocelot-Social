@@ -8,7 +8,7 @@ export const description = `
   A blocked user will still be able to see your contributions, but will not be able to interact with them and vice versa.
 `
 
-export async function up(next) {
+export async function up(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()

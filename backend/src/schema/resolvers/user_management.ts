@@ -16,7 +16,7 @@ export default {
       neo4jgraphql(object, { id: context.user.id }, context, resolveInfo),
   },
   Mutation: {
-    login: async (_, { email, password }, { driver, req, user }) => {
+    login: async (_, { email, password }, { driver }) => {
       // if (user && user.id) {
       //   throw new Error('Already logged in.')
       // }
@@ -51,7 +51,7 @@ export default {
         session.close()
       }
     },
-    changePassword: async (_, { oldPassword, newPassword }, { driver, user }) => {
+    changePassword: async (_, { oldPassword, newPassword }, { user }) => {
       const currentUser = await neode.find('User', user.id)
 
       const encryptedPassword = currentUser.get('encryptedPassword')

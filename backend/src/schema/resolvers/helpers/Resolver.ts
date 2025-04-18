@@ -11,6 +11,7 @@ export const undefinedToNullResolver = (list) => {
   return resolvers
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Resolver(type, options: any = {}) {
   const {
     idAttribute = 'id',
@@ -21,8 +22,8 @@ export default function Resolver(type, options: any = {}) {
     hasMany = {},
   } = options
 
-  const _hasResolver = (resolvers, { key, connection }, { returnType }) => {
-    return async (parent, params, { driver, cypherParams }, resolveInfo) => {
+  const _hasResolver = (_resolvers, { key, connection }, { returnType }) => {
+    return async (parent, _params, { driver, cypherParams }, _resolveInfo) => {
       if (typeof parent[key] !== 'undefined') return parent[key]
       const id = parent[idAttribute]
       const session = driver.session()
@@ -45,10 +46,11 @@ export default function Resolver(type, options: any = {}) {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const booleanResolver = (obj: any[]) => {
     const resolvers = {}
     for (const [key, condition] of Object.entries(obj)) {
-      resolvers[key] = async (parent, params, { cypherParams, driver }, resolveInfo) => {
+      resolvers[key] = async (parent, _params, { cypherParams, driver }, _resolveInfo) => {
         if (typeof parent[key] !== 'undefined') return parent[key]
         const id = parent[idAttribute]
         const session = driver.session()
@@ -73,7 +75,7 @@ export default function Resolver(type, options: any = {}) {
   const countResolver = (obj) => {
     const resolvers = {}
     for (const [key, connection] of Object.entries(obj)) {
-      resolvers[key] = async (parent, params, { driver, cypherParams }, resolveInfo) => {
+      resolvers[key] = async (parent, _params, { driver, cypherParams }, _resolveInfo) => {
         if (typeof parent[key] !== 'undefined') return parent[key]
         const session = driver.session()
         const readTxResultPromise = session.readTransaction(async (txc) => {

@@ -15,6 +15,7 @@ export function up(next) {
   rxSession
     .beginTransaction()
     .pipe(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       flatMap((transaction: any) =>
         concat(
           transaction
@@ -26,6 +27,7 @@ export function up(next) {
             )
             .records()
             .pipe(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               map((record: any) => {
                 const { id: locationId } = record.get('location')
                 return { locationId }
@@ -43,6 +45,7 @@ export function up(next) {
                   )
                   .records()
                   .pipe(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     map((record: any) => ({
                       location: record.get('location'),
                       updatedLocation: record.get('updatedLocation'),
