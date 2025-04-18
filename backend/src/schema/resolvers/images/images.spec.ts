@@ -25,7 +25,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(async () => {
@@ -83,7 +83,7 @@ describe('deleteImage', () => {
             return result
           })
         } finally {
-          session.close()
+          await session.close()
         }
         await expect(neode.all('Image')).resolves.toHaveLength(0)
         await expect(someString).toEqual('Hello')
@@ -106,7 +106,7 @@ describe('deleteImage', () => {
           await expect(neode.all('Image')).resolves.toHaveLength(1)
           // all good
         } finally {
-          session.close()
+          await session.close()
         }
       })
     })
@@ -243,7 +243,7 @@ describe('mergeImage', () => {
               )
             })
           } finally {
-            session.close()
+            await session.close()
           }
           const image = await neode.first('Image', { alt: 'This alt text gets overwritten' })
           await expect(image.toJson()).resolves.toMatchObject({
@@ -268,7 +268,7 @@ describe('mergeImage', () => {
             await expect(neode.all('Image')).resolves.toHaveLength(0)
             // all good
           } finally {
-            session.close()
+            await session.close()
           }
         })
       })
