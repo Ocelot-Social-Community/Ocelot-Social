@@ -37,7 +37,7 @@
     "cookie-universal-nuxt": "~2.2.2",
     "cropperjs": "^1.6.2",
     "cross-env": "~7.0.3",
-    "date-fns": "2.22.1",
+    "date-fns": "4.1.0",
     "express": "~5.1.0",
     "graphql": "~15.10.1",
     "intersection-observer": "^0.12.0",
