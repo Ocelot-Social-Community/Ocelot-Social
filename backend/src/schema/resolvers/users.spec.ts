@@ -76,7 +76,7 @@ const updateOnlineStatus = gql`
 `
 
 const setTrophyBadgeSelected = gql`
-  mutation ($slot: Int!, $badgeId: ID!) {
+  mutation ($slot: Int!, $badgeId: ID) {
     setTrophyBadgeSelected(slot: $slot, badgeId: $badgeId) {
       badgeTrophiesCount
       badgeTrophiesSelected {
@@ -1293,6 +1293,53 @@ describe('setTrophyBadgeSelected', () => {
           },
         }),
       )
+    })
+
+    describe('set badge to null', () => {
+      it('returns the user with no badge set on the selected slot', async () => {
+        await mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 0, badgeId: 'trophy_bear' },
+        })
+        await mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 5, badgeId: 'trophy_panda' },
+        })
+
+        await expect(
+          mutate({
+            mutation: setTrophyBadgeSelected,
+            variables: { slot: 5, badgeId: null },
+          }),
+        ).resolves.toEqual(
+          expect.objectContaining({
+            data: {
+              setTrophyBadgeSelected: {
+                badgeTrophiesCount: 2,
+                badgeTrophiesSelected: [
+                  {
+                    id: 'trophy_bear',
+                  },
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                ],
+                badgeTrophiesUnused: [
+                  {
+                    id: 'trophy_panda',
+                  },
+                ],
+                badgeTrophiesUnusedCount: 1,
+              },
+            },
+          }),
+        )
+      })
     })
   })
 })

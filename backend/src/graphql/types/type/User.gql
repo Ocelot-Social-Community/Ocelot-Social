@@ -252,6 +252,6 @@ type Mutation {
   # Get a JWT Token for the given Email and password
   login(email: String!, password: String!): String!
 
-  setTrophyBadgeSelected(slot: Int!, badgeId: ID!): User
+  setTrophyBadgeSelected(slot: Int!, badgeId: ID): User
   resetTrophyBadgesSelected: User
 }

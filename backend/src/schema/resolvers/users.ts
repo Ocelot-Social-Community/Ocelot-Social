@@ -404,17 +404,25 @@ export default {
       const session = context.driver.session()
 
       const query = session.writeTransaction(async (transaction) => {
-        const result = await transaction.run(
-          `
+        const queryBadge = `
             MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge {id: $badgeId})
             OPTIONAL MATCH (user)-[badgeRelation:SELECTED]->(badge)
             OPTIONAL MATCH (user)-[slotRelation:SELECTED{slot: $slot}]->(:Badge)
             DELETE badgeRelation, slotRelation
             MERGE (user)-[:SELECTED{slot: toInteger($slot)}]->(badge)
             RETURN user {.*}
-          `,
-          { userId, badgeId, slot },
-        )
+          `
+        const queryNull = `
+            MATCH (user:User {id: $userId})
+            OPTIONAL MATCH (user)-[slotRelation:SELECTED{slot: $slot}]->(:Badge)
+            DELETE slotRelation
+            RETURN user {.*}
+          `
+        const result = await transaction.run(badgeId ? queryBadge : queryNull, {
+          userId,
+          badgeId,
+          slot,
+        })
         return result.records.map((record) => record.get('user'))[0]
       })
       try {
