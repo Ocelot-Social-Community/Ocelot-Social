@@ -1,22 +1,22 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
 
 import CONFIG from '@config/index'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { signupVerificationMutation } from '@graphql/authentications'
-import { createCommentMutation } from '@graphql/comments'
-import {
-  createGroupMutation,
-  changeGroupMemberRoleMutation,
-  leaveGroupMutation,
-} from '@graphql/groups'
-import {
-  createPostMutation,
-  postQuery,
-  filterPosts,
-  profilePagePosts,
-  searchPosts,
-} from '@graphql/posts'
+import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
+import { createCommentMutation } from '@graphql/queries/createCommentMutation'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { createPostMutation } from '@graphql/queries/createPostMutation'
+import { filterPosts } from '@graphql/queries/filterPosts'
+import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
+import { postQuery } from '@graphql/queries/postQuery'
+import { profilePagePosts } from '@graphql/queries/profilePagePosts'
+import { searchPosts } from '@graphql/queries/searchPosts'
+import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
 import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false

@@ -16,6 +16,7 @@ module.exports = {
     'plugin:promise/recommended',
     'plugin:security/recommended-legacy',
     'plugin:@eslint-community/eslint-comments/recommended',
+    'prettier',
   ],
   settings: {
     'import/parsers': {
@@ -178,9 +179,10 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx'],
       extends: [
-        // 'plugin:@typescript-eslint/recommended',
-        // 'plugin:@typescript-eslint/recommended-requiring-type-checking',
-        // 'plugin:@typescript-eslint/strict',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:@typescript-eslint/recommended-requiring-type-checking',
+        'plugin:@typescript-eslint/strict',
+        'prettier',
       ],
       rules: {
         // allow explicitly defined dangling promises
@@ -192,6 +194,11 @@ module.exports = {
         'import/unambiguous': 'off',
         // this is not compatible with typeorm, due to joined tables can be null, but are not defined as nullable
         '@typescript-eslint/no-unnecessary-condition': 'off',
+        // respect underscore as acceptable unused variable
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        ],
       },
       parserOptions: {
         tsconfigRootDir: __dirname,

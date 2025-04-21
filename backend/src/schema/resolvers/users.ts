@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserInputError, ForbiddenError } from 'apollo-server'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
@@ -43,14 +50,14 @@ export const getBlockedUsers = async (context) => {
 
 export default {
   Query: {
-    mutedUsers: async (object, args, context, resolveInfo) => {
+    mutedUsers: async (_object, _args, context, _resolveInfo) => {
       try {
         return getMutedUsers(context)
       } catch (e) {
         throw new UserInputError(e.message)
       }
     },
-    blockedUsers: async (object, args, context, resolveInfo) => {
+    blockedUsers: async (_object, _args, context, _resolveInfo) => {
       try {
         return getBlockedUsers(context)
       } catch (e) {
@@ -111,7 +118,7 @@ export default {
       const unmutedUser = await neode.find('User', params.id)
       return unmutedUser.toJson()
     },
-    blockUser: async (object, args, context, resolveInfo) => {
+    blockUser: async (_object, args, context, _resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
 
@@ -138,7 +145,7 @@ export default {
         session.close()
       }
     },
-    unblockUser: async (object, args, context, resolveInfo) => {
+    unblockUser: async (_object, args, context, _resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
 
@@ -216,12 +223,12 @@ export default {
         session.close()
       }
     },
-    DeleteUser: async (object, params, context, resolveInfo) => {
+    DeleteUser: async (_object, params, context, _resolveInfo) => {
       const { resource, id: userId } = params
       const session = context.driver.session()
 
       const deleteUserTxResultPromise = session.writeTransaction(async (transaction) => {
-        if (resource && resource.length) {
+        if (resource?.length) {
           await Promise.all(
             resource.map(async (node) => {
               const txResult = await transaction.run(
@@ -283,7 +290,7 @@ export default {
         session.close()
       }
     },
-    switchUserRole: async (object, args, context, resolveInfo) => {
+    switchUserRole: async (_object, args, context, _resolveInfo) => {
       const { role, id } = args
 
       if (context.user.id === id) throw new Error('you-cannot-change-your-own-role')
@@ -308,7 +315,7 @@ export default {
         session.close()
       }
     },
-    saveCategorySettings: async (object, args, context, resolveInfo) => {
+    saveCategorySettings: async (_object, args, context, _resolveInfo) => {
       const { activeCategories } = args
       const {
         user: { id },
@@ -351,7 +358,7 @@ export default {
         session.close()
       }
     },
-    updateOnlineStatus: async (object, args, context, resolveInfo) => {
+    updateOnlineStatus: async (_object, args, context, _resolveInfo) => {
       const { status } = args
       const {
         user: { id },
@@ -451,7 +458,7 @@ export default {
     },
   },
   User: {
-    emailNotificationSettings: async (parent, params, context, resolveInfo) => {
+    emailNotificationSettings: async (parent, _params, _context, _resolveInfo) => {
       return [
         {
           type: 'post',

@@ -1,17 +1,21 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import {
-  createGroupMutation,
-  joinGroupMutation,
-  leaveGroupMutation,
-  changeGroupMemberRoleMutation,
-  removeUserFromGroupMutation,
-} from '@graphql/groups'
-import { createMessageMutation } from '@graphql/messages'
-import { createRoomMutation } from '@graphql/rooms'
+import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
+import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
+import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
 import createServer, { pubsub } from '@src/server'
 
 const sendMailMock = jest.fn()

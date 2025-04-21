@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { UserInputError } from 'apollo-server'
 
 export const validateEventParams = (params) => {
@@ -18,7 +22,7 @@ export const validateEventParams = (params) => {
       throw new UserInputError('Event venue must be present if event location is given!')
     }
     params.eventVenue = eventInput.eventVenue
-    params.eventLocationName = eventInput.eventLocationName && eventInput.eventLocationName.trim()
+    params.eventLocationName = eventInput.eventLocationName?.trim()
     if (params.eventLocationName) {
       locationName = params.eventLocationName
     } else {

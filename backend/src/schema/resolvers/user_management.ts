@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/await-thenable */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { AuthenticationError } from 'apollo-server'
 import bcrypt from 'bcryptjs'
 import { neo4jgraphql } from 'neo4j-graphql-js'
@@ -16,7 +23,7 @@ export default {
       neo4jgraphql(object, { id: context.user.id }, context, resolveInfo),
   },
   Mutation: {
-    login: async (_, { email, password }, { driver, req, user }) => {
+    login: async (_, { email, password }, { driver }) => {
       // if (user && user.id) {
       //   throw new Error('Already logged in.')
       // }
@@ -42,7 +49,7 @@ export default {
         ) {
           delete currentUser.encryptedPassword
           return encode(currentUser)
-        } else if (currentUser && currentUser.disabled) {
+        } else if (currentUser?.disabled) {
           throw new AuthenticationError('Your account has been disabled.')
         } else {
           throw new AuthenticationError('Incorrect email address or password.')
@@ -51,7 +58,7 @@ export default {
         session.close()
       }
     },
-    changePassword: async (_, { oldPassword, newPassword }, { driver, user }) => {
+    changePassword: async (_, { oldPassword, newPassword }, { user }) => {
       const currentUser = await neode.find('User', user.id)
 
       const encryptedPassword = currentUser.get('encryptedPassword')

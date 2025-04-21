@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable n/no-process-exit */
 import { faker } from '@faker-js/faker'
 import { createTestClient } from 'apollo-server-testing'
@@ -5,15 +9,13 @@ import sample from 'lodash/sample'
 
 import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
-import { createCommentMutation } from '@graphql/comments'
-import {
-  createGroupMutation,
-  joinGroupMutation,
-  changeGroupMemberRoleMutation,
-} from '@graphql/groups'
-import { createMessageMutation } from '@graphql/messages'
-import { createPostMutation } from '@graphql/posts'
-import { createRoomMutation } from '@graphql/rooms'
+import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
+import { createCommentMutation } from '@graphql/queries/createCommentMutation'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { createPostMutation } from '@graphql/queries/createPostMutation'
+import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import createServer from '@src/server'
 
 import Factory from './factories'
@@ -911,6 +913,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     authenticatedUser = null
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const comments: any[] = []
     comments.push(
       await Factory.build(
@@ -1085,6 +1088,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await huey.relateTo(p9, 'shouted')
     await louie.relateTo(p10, 'shouted')
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const reports: any[] = []
     reports.push(
       await Factory.build('report'),
@@ -1192,6 +1196,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       closed: true,
     })
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const additionalUsers: any[] = []
     for (let i = 0; i < 30; i++) {
       const user = await Factory.build('user')

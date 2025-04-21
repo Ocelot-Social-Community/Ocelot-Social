@@ -1,13 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import {
-  createGroupMutation,
-  joinGroupMutation,
-  changeGroupMemberRoleMutation,
-} from '@graphql/groups'
+import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import CONFIG from '@src/config'
 import createServer from '@src/server'
 
