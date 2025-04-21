@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable import/no-commonjs */
 // eslint-disable-next-line n/no-unpublished-require, @typescript-eslint/no-var-requires
 const tsNode = require('ts-node')
