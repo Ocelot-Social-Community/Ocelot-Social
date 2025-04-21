@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { createTestClient } from 'apollo-server-testing'
 
 import CONFIG from '@config/index'
@@ -2422,7 +2427,7 @@ describe('in mode', () => {
                   id: groupId,
                 },
               })
-              return result.data && result.data.GroupMembers
+              return result.data?.GroupMembers
                 ? !!result.data.GroupMembers.find((member) => member.id === userId)
                 : null
             }

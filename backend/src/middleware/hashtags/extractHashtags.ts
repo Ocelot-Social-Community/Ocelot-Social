@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { load } from 'cheerio'
 // eslint-disable-next-line import/extensions
 import { exec, build } from 'xregexp/xregexp-all.js'
@@ -19,6 +24,7 @@ export default function (content?) {
       return $(el).attr('data-hashtag-id')
     })
     .get()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const hashtags: any = []
   ids.forEach((id) => {
     const match = exec(id, regX)

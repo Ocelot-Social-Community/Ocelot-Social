@@ -1,10 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { v4 as uuid } from 'uuid'
 
 import Resolver from './helpers/Resolver'
 
 export default {
   Mutation: {
-    CreateComment: async (object, params, context, resolveInfo) => {
+    CreateComment: async (_object, params, context, _resolveInfo) => {
       const { postId } = params
       const { user, driver } = context
       // Adding relationship from comment to post by passing in the postId,

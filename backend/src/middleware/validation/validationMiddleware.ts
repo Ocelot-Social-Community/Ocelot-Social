@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserInputError } from 'apollo-server'
 
 const COMMENT_MIN_LENGTH = 1
@@ -80,7 +87,7 @@ const validateReview = async (resolve, root, args, context, info) => {
   try {
     const txResult = await reportReadTxPromise
     existingReportedResource = txResult
-    if (!existingReportedResource || !existingReportedResource.length)
+    if (!existingReportedResource?.length)
       throw new Error(`Resource not found or is not a Post|Comment|User!`)
     existingReportedResource = existingReportedResource[0]
     if (!existingReportedResource.filed)

@@ -89,7 +89,7 @@
     "neo4j-graphql-js": "^2.11.5",
     "neode": "^0.4.9",
     "node-fetch": "^2.7.0",
-    "nodemailer": "^6.10.0",
+    "nodemailer": "^6.10.1",
     "nodemailer-html-to-text": "^3.2.0",
     "request": "~2.88.2",
     "sanitize-html": "~2.15.0",
@@ -101,7 +101,7 @@
     "xregexp": "^5.1.2"
   },
   "devDependencies": {
-    "@eslint-community/eslint-plugin-eslint-comments": "^4.4.1",
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.5.0",
     "@faker-js/faker": "9.6.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.14.1",
