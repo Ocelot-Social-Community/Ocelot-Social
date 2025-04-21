@@ -12,7 +12,6 @@ import { Factory } from 'rosie'
 import slugify from 'slug'
 import { v4 as uuid } from 'uuid'
 
-import CONFIG from '@config/index'
 import generateInviteCode from '@schema/resolvers/helpers/generateInviteCode'
 
 import { getDriver, getNeode } from './neo4j'
@@ -20,7 +19,7 @@ import { getDriver, getNeode } from './neo4j'
 const neode = getNeode()
 
 const uniqueImageUrl = (imageUrl) => {
-  const newUrl = new URL(imageUrl, CONFIG.CLIENT_URI)
+  const newUrl = new URL(imageUrl)
   newUrl.search = `random=${uuid()}`
   return newUrl.toString()
 }
@@ -60,13 +59,22 @@ Factory.define('badge')
   })
 
 Factory.define('image')
-  .attr('url', faker.image.url)
-  .attr('aspectRatio', 1.3333333333333333)
+  .attr('width', 400)
+  .attr('height', 300)
+  .attr('blur', 0)
   .attr('alt', faker.lorem.sentence)
   .attr('type', 'image/jpeg')
+  .attr('url', null)
   .after((buildObject, _options) => {
-    const { url: imageUrl } = buildObject
-    if (imageUrl) buildObject.url = uniqueImageUrl(imageUrl)
+    if (!buildObject.url) {
+      buildObject.url = faker.image.urlPicsumPhotos({
+        width: buildObject.width,
+        height: buildObject.height,
+        blur: buildObject.blur,
+      })
+    }
+    buildObject.url = uniqueImageUrl(buildObject.url)
+    buildObject.aspectRatio = buildObject.width / buildObject.height
     return neode.create('Image', buildObject)
   })
 
