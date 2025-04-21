@@ -20,7 +20,7 @@ export default {
     }),
   },
   Query: {
-    queryLocations: async (object, args, context, resolveInfo) => {
+    queryLocations: async (_object, args, _context, _resolveInfo) => {
       try {
         return queryLocations(args)
       } catch (e) {

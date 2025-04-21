@@ -911,6 +911,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     authenticatedUser = null
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const comments: any[] = []
     comments.push(
       await Factory.build(
@@ -1085,6 +1086,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await huey.relateTo(p9, 'shouted')
     await louie.relateTo(p10, 'shouted')
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const reports: any[] = []
     reports.push(
       await Factory.build('report'),
@@ -1192,6 +1194,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       closed: true,
     })
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const additionalUsers: any[] = []
     for (let i = 0; i < 30; i++) {
       const user = await Factory.build('user')

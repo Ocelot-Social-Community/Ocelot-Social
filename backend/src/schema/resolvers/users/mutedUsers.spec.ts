@@ -60,6 +60,7 @@ describe('mutedUsers', () => {
   it('throws permission error', async () => {
     const { query } = createTestClient(server)
     const result = await query({ query: mutedUserQuery })
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
   })
 

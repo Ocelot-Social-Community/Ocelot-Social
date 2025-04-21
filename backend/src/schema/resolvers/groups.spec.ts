@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { createTestClient } from 'apollo-server-testing'
 
 import CONFIG from '@config/index'

@@ -250,6 +250,7 @@ export default {
         ]
 
       params.limit = 15
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const type: any = multiSearchMap.find((obj) => obj.symbol === searchType)
       return getSearchResults(context, type.setup, params)
     },
