@@ -7,8 +7,11 @@ import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { createMessageMutation, messageQuery, markMessagesAsSeen } from '@graphql/messages'
-import { createRoomMutation, roomQuery } from '@graphql/rooms'
+import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import { markMessagesAsSeen } from '@graphql/queries/markMessagesAsSeen'
+import { messageQuery } from '@graphql/queries/messageQuery'
+import { roomQuery } from '@graphql/queries/roomQuery'
 import createServer, { pubsub } from '@src/server'
 
 const driver = getDriver()

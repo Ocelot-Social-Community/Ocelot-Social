@@ -9,15 +9,13 @@ import sample from 'lodash/sample'
 
 import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
-import { createCommentMutation } from '@graphql/comments'
-import {
-  createGroupMutation,
-  joinGroupMutation,
-  changeGroupMemberRoleMutation,
-} from '@graphql/groups'
-import { createMessageMutation } from '@graphql/messages'
-import { createPostMutation } from '@graphql/posts'
-import { createRoomMutation } from '@graphql/rooms'
+import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
+import { createCommentMutation } from '@graphql/queries/createCommentMutation'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { createPostMutation } from '@graphql/queries/createPostMutation'
+import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import createServer from '@src/server'
 
 import Factory from './factories'

@@ -8,7 +8,7 @@ import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { createGroupMutation } from '@graphql/groups'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import CONFIG from '@src/config'
 import createServer from '@src/server'
 
