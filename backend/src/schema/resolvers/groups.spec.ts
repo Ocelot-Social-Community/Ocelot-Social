@@ -2429,7 +2429,7 @@ describe('in mode', () => {
                   id: groupId,
                 },
               })
-              return result.data && result.data.GroupMembers
+              return result.data?.GroupMembers
                 ? !!result.data.GroupMembers.find((member) => member.id === userId)
                 : null
             }

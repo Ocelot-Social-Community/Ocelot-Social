@@ -22,7 +22,7 @@ export const validateEventParams = (params) => {
       throw new UserInputError('Event venue must be present if event location is given!')
     }
     params.eventVenue = eventInput.eventVenue
-    params.eventLocationName = eventInput.eventLocationName && eventInput.eventLocationName.trim()
+    params.eventLocationName = eventInput.eventLocationName?.trim()
     if (params.eventLocationName) {
       locationName = params.eventLocationName
     } else {

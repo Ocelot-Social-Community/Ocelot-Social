@@ -19,7 +19,7 @@ import { pubsub, NOTIFICATION_ADDED, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } fr
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 
 const queryNotificationEmails = async (context, notificationUserIds) => {
-  if (!(notificationUserIds && notificationUserIds.length)) return []
+  if (!notificationUserIds?.length) return []
   const userEmailCypher = `
     MATCH (user: User)
     // blocked users are filtered out from notifications already
@@ -360,7 +360,7 @@ const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
 }
 
 const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
-  if (!(idsOfUsers && idsOfUsers.length)) return []
+  if (!idsOfUsers?.length) return []
   await validateNotifyUsers(label, reason)
   let mentionedCypher
   switch (reason) {

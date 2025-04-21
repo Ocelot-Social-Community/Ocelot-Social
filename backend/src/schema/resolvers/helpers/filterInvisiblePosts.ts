@@ -9,7 +9,7 @@ const getInvisiblePosts = async (context) => {
   const readTxResultPromise = await session.readTransaction(async (transaction) => {
     let cypher = ''
     const { user } = context
-    if (user && user.id) {
+    if (user?.id) {
       cypher = `
         MATCH (post:Post)<-[:CANNOT_SEE]-(user:User { id: $userId })
         RETURN collect(post.id) AS invisiblePostIds`

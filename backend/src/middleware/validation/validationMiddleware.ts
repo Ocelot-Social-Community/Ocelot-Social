@@ -87,7 +87,7 @@ const validateReview = async (resolve, root, args, context, info) => {
   try {
     const txResult = await reportReadTxPromise
     existingReportedResource = txResult
-    if (!existingReportedResource || !existingReportedResource.length)
+    if (!existingReportedResource?.length)
       throw new Error(`Resource not found or is not a Post|Comment|User!`)
     existingReportedResource = existingReportedResource[0]
     if (!existingReportedResource.filed)

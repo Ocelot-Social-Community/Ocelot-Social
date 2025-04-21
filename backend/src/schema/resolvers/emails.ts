@@ -48,7 +48,7 @@ export default {
 
       // check email does not belong to anybody
       const existingEmail = await existingEmailAddress({ args, context })
-      if (existingEmail && existingEmail.alreadyExistingEmail && existingEmail.user)
+      if (existingEmail?.alreadyExistingEmail && existingEmail.user)
         return existingEmail.alreadyExistingEmail
 
       const nonce = generateNonce()

@@ -228,7 +228,7 @@ export default {
       const session = context.driver.session()
 
       const deleteUserTxResultPromise = session.writeTransaction(async (transaction) => {
-        if (resource && resource.length) {
+        if (resource?.length) {
           await Promise.all(
             resource.map(async (node) => {
               const txResult = await transaction.run(
