@@ -16,12 +16,12 @@ CONFIG.CATEGORIES_ACTIVE = false
 
 const sendMailMock = jest.fn()
 jest.mock('../helpers/email/sendMail', () => ({
-  sendMail: () => sendMailMock(),
+  sendMail: (notification) => sendMailMock(notification),
 }))
 
 let server, query, mutate, authenticatedUser
 
-let postAuthor, firstFollower, secondFollower
+let postAuthor, firstFollower, secondFollower, thirdFollower
 
 const driver = getDriver()
 const neode = getNeode()
@@ -135,6 +135,18 @@ describe('following users notifications', () => {
         password: '1234',
       },
     )
+    thirdFollower = await Factory.build(
+      'user',
+      {
+        id: 'third-follower',
+        name: 'Third Follower',
+        slug: 'third-follower',
+      },
+      {
+        email: 'test4@example.org',
+        password: '1234',
+      },
+    )
     await secondFollower.update({ emailNotificationsFollowingUsers: false })
     authenticatedUser = await firstFollower.toJson()
     await mutate({
@@ -142,6 +154,11 @@ describe('following users notifications', () => {
       variables: { id: 'post-author' },
     })
     authenticatedUser = await secondFollower.toJson()
+    await mutate({
+      mutation: followUserMutation,
+      variables: { id: 'post-author' },
+    })
+    authenticatedUser = await thirdFollower.toJson()
     await mutate({
       mutation: followUserMutation,
       variables: { id: 'post-author' },
@@ -221,8 +238,20 @@ describe('following users notifications', () => {
       })
     })
 
-    it('sends only one email, as second follower has emails disabled', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(1)
+    it('sends only two emails, as second follower has emails disabled', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(2)
+      expect(sendMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          html: expect.stringContaining('Hello First Follower'),
+          to: 'test2@example.org',
+        }),
+      )
+      expect(sendMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          html: expect.stringContaining('Hello Third Follower'),
+          to: 'test4@example.org',
+        }),
+      )
     })
   })
 
