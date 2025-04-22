@@ -136,4 +136,7 @@ export default {
 .label {
   margin-left: $space-xx-small;
 }
+button + button {
+  margin-left: $space-x-small;
+}
 </style>
