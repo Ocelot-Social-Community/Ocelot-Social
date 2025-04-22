@@ -18,9 +18,9 @@ import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
 import createServer, { pubsub } from '@src/server'
 
-const sendMailMock = jest.fn()
-jest.mock('../helpers/email/sendMail', () => ({
-  sendMail: () => sendMailMock(),
+const sendMailMock: (notification) => void = jest.fn()
+jest.mock('@middleware/helpers/email/sendMail', () => ({
+  sendMail: (notification) => sendMailMock(notification),
 }))
 
 const chatMessageTemplateMock = jest.fn()

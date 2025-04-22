@@ -14,14 +14,14 @@ import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock = jest.fn()
-jest.mock('../helpers/email/sendMail', () => ({
+const sendMailMock: (notification) => void = jest.fn()
+jest.mock('@middleware/helpers/email/sendMail', () => ({
   sendMail: (notification) => sendMailMock(notification),
 }))
 
 let server, query, mutate, authenticatedUser
 
-let postAuthor, firstFollower, secondFollower, thirdFollower
+let postAuthor, firstFollower, secondFollower, thirdFollower, emaillessFollower
 
 const driver = getDriver()
 const neode = getNeode()
@@ -107,7 +107,7 @@ describe('following users notifications', () => {
         slug: 'post-author',
       },
       {
-        email: 'test@example.org',
+        email: 'post-author@example.org',
         password: '1234',
       },
     )
@@ -119,7 +119,7 @@ describe('following users notifications', () => {
         slug: 'first-follower',
       },
       {
-        email: 'test2@example.org',
+        email: 'first-follower@example.org',
         password: '1234',
       },
     )
@@ -131,7 +131,7 @@ describe('following users notifications', () => {
         slug: 'second-follower',
       },
       {
-        email: 'test3@example.org',
+        email: 'second-follower@example.org',
         password: '1234',
       },
     )
@@ -143,10 +143,15 @@ describe('following users notifications', () => {
         slug: 'third-follower',
       },
       {
-        email: 'test4@example.org',
+        email: 'third-follower@example.org',
         password: '1234',
       },
     )
+    emaillessFollower = await neode.create('User', {
+      id: 'email-less-follower',
+      name: 'Email-less Follower',
+      slug: 'email-less-follower',
+    })
     await secondFollower.update({ emailNotificationsFollowingUsers: false })
     authenticatedUser = await firstFollower.toJson()
     await mutate({
@@ -159,6 +164,11 @@ describe('following users notifications', () => {
       variables: { id: 'post-author' },
     })
     authenticatedUser = await thirdFollower.toJson()
+    await mutate({
+      mutation: followUserMutation,
+      variables: { id: 'post-author' },
+    })
+    authenticatedUser = await emaillessFollower.toJson()
     await mutate({
       mutation: followUserMutation,
       variables: { id: 'post-author' },
@@ -238,18 +248,41 @@ describe('following users notifications', () => {
       })
     })
 
-    it('sends only two emails, as second follower has emails disabled', () => {
+    it('sends notification to the email-less follower', async () => {
+      authenticatedUser = await emaillessFollower.toJson()
+      await expect(
+        query({
+          query: notificationQuery,
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: [
+            {
+              from: {
+                __typename: 'Post',
+                id: 'post',
+              },
+              read: false,
+              reason: 'followed_user_posted',
+            },
+          ],
+        },
+        errors: undefined,
+      })
+    })
+
+    it('sends only two emails, as second follower has emails disabled and email-less follower has no email', () => {
       expect(sendMailMock).toHaveBeenCalledTimes(2)
       expect(sendMailMock).toHaveBeenCalledWith(
         expect.objectContaining({
           html: expect.stringContaining('Hello First Follower'),
-          to: 'test2@example.org',
+          to: 'first-follower@example.org',
         }),
       )
       expect(sendMailMock).toHaveBeenCalledWith(
         expect.objectContaining({
           html: expect.stringContaining('Hello Third Follower'),
-          to: 'test4@example.org',
+          to: 'third-follower@example.org',
         }),
       )
     })
