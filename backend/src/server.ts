@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable import/no-named-as-default-member */
 import http from 'node:http'
 
 import { ApolloServer } from 'apollo-server-express'
@@ -15,6 +14,8 @@ import { PubSub } from 'graphql-subscriptions'
 import { graphqlUploadExpress } from 'graphql-upload'
 import helmet from 'helmet'
 import Redis from 'ioredis'
+import { Driver } from 'neo4j-driver'
+import Neode from 'neode'
 
 import CONFIG from './config'
 import { getNeode, getDriver } from './db/neo4j'
@@ -26,29 +27,41 @@ import schema from './schema'
 export const NOTIFICATION_ADDED = 'NOTIFICATION_ADDED'
 export const CHAT_MESSAGE_ADDED = 'CHAT_MESSAGE_ADDED'
 export const ROOM_COUNT_UPDATED = 'ROOM_COUNT_UPDATED'
-const { REDIS_DOMAIN, REDIS_PORT, REDIS_PASSWORD } = CONFIG
-let prodPubsub, devPubsub
-const options = {
-  host: REDIS_DOMAIN,
-  port: REDIS_PORT,
-  password: REDIS_PASSWORD,
-  retryStrategy: (times) => {
-    return Math.min(times * 50, 2000)
-  },
+
+const getPubSub = () => {
+  const { REDIS_DOMAIN, REDIS_PORT, REDIS_PASSWORD } = CONFIG
+
+  if (REDIS_DOMAIN && REDIS_PORT && REDIS_PASSWORD) {
+    const options = {
+      host: REDIS_DOMAIN,
+      port: REDIS_PORT,
+      password: REDIS_PASSWORD,
+      retryStrategy: (times) => {
+        return Math.min(times * 50, 2000)
+      },
+    }
+    return new RedisPubSub({
+      publisher: new Redis(options),
+      subscriber: new Redis(options),
+    })
+  } else {
+    return new PubSub()
+  }
 }
-if (options.host && options.port && options.password) {
-  prodPubsub = new RedisPubSub({
-    publisher: new Redis(options),
-    subscriber: new Redis(options),
-  })
-} else {
-  devPubsub = new PubSub()
-}
-export const pubsub = prodPubsub || devPubsub
+
+export const pubsub = getPubSub()
 const driver = getDriver()
 const neode = getNeode()
 
-const getContext = async (req) => {
+export interface Context {
+  driver: Driver
+  neode: Neode
+  user: any
+  req: any
+  cypherParams: any
+}
+
+const getContext = async (req): Promise<Context> => {
   const user = await decode(driver, req.headers.authorization)
   return {
     driver,
@@ -100,8 +113,11 @@ const createServer = (options?) => {
       (CONFIG.DEBUG && { contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }) || {},
     ) as any,
   )
+  // eslint-disable-next-line import/no-named-as-default-member
   app.use(express.static('public'))
+  // eslint-disable-next-line import/no-named-as-default-member
   app.use(bodyParser.json({ limit: '10mb' }) as any)
+  // eslint-disable-next-line import/no-named-as-default-member
   app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }) as any)
   app.use(graphqlUploadExpress())
   server.applyMiddleware({ app, path: '/' })

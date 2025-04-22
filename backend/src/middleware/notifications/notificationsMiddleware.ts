@@ -58,7 +58,7 @@ const publishNotifications = async (
     notifications.map((notification) => notification.to.id),
   )
   notifications.forEach((notificationAdded, index) => {
-    pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
+    void pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
     if (
       (notificationAdded.to[emailNotificationSetting] ?? true) &&
       !isUserOnline(notificationAdded.to) &&

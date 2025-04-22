@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import CONFIG from './config'
 import createServer from './server'
 
@@ -9,5 +7,7 @@ httpServer.listen({ port: url.port }, () => {
   /* eslint-disable-next-line no-console */
   console.log(`🚀 Server ready at http://localhost:${url.port}${server.graphqlPath}`)
   /* eslint-disable-next-line no-console */
-  console.log(`🚀 Subscriptions ready at ws://localhost:${url.port}${server.subscriptionsPath}`)
+  console.log(
+    `🚀 Subscriptions ready at ws://localhost:${url.port}${server.subscriptionsPath ?? ''}`,
+  )
 })

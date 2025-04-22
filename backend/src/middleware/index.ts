@@ -66,7 +66,7 @@ export default (schema) => {
 
   // add permisions middleware at the first position (unless we're seeding)
   if (CONFIG.DISABLED_MIDDLEWARES) {
-    const disabledMiddlewares = CONFIG.DISABLED_MIDDLEWARES.split(',')
+    const disabledMiddlewares = (CONFIG.DISABLED_MIDDLEWARES as string).split(',')
     order = order.filter((key) => {
       if (disabledMiddlewares.includes(key)) {
         /* eslint-disable-next-line no-console */

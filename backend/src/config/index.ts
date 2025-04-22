@@ -26,13 +26,22 @@ if (require.resolve) {
   }
 }
 
+const toNumber = (env: string | undefined): number | undefined => {
+  const number = Number(env)
+  return isNaN(number) ? undefined : number
+}
+
 // Use Cypress env or process.env
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare let Cypress: any | undefined
+declare let Cypress:
+  | {
+      env: () => Record<string, string>
+    }
+  | undefined
 const env = typeof Cypress !== 'undefined' ? Cypress.env() : process.env // eslint-disable-line no-undef
 
 const environment = {
-  NODE_ENV: env.NODE_ENV || process.env.NODE_ENV,
+  NODE_ENV: env.NODE_ENV ?? process.env.NODE_ENV,
   DEBUG: env.NODE_ENV !== 'production' && env.DEBUG,
   TEST: env.NODE_ENV === 'test',
   PRODUCTION: env.NODE_ENV === 'production',
@@ -48,9 +57,9 @@ const required = {
 }
 
 const server = {
-  CLIENT_URI: env.CLIENT_URI || 'http://localhost:3000',
-  GRAPHQL_URI: env.GRAPHQL_URI || 'http://localhost:4000',
-  JWT_EXPIRES: env.JWT_EXPIRES || '2y',
+  CLIENT_URI: env.CLIENT_URI ?? 'http://localhost:3000',
+  GRAPHQL_URI: env.GRAPHQL_URI ?? 'http://localhost:4000',
+  JWT_EXPIRES: env.JWT_EXPIRES ?? '2y',
 }
 
 const hasDKIMData = env.SMTP_DKIM_DOMAINNAME && env.SMTP_DKIM_KEYSELECTOR && env.SMTP_DKIM_PRIVATKEY
@@ -65,15 +74,15 @@ const smtp = {
   SMTP_DKIM_DOMAINNAME: hasDKIMData && env.SMTP_DKIM_DOMAINNAME,
   SMTP_DKIM_KEYSELECTOR: hasDKIMData && env.SMTP_DKIM_KEYSELECTOR,
   // PEM format: https://docs.progress.com/bundle/datadirect-hybrid-data-pipeline-installation-46/page/PEM-file-format.html
-  SMTP_DKIM_PRIVATKEY: hasDKIMData && env.SMTP_DKIM_PRIVATKEY.replace(/\\n/g, '\n'), // replace all "\n" in .env string by real line break
-  SMTP_MAX_CONNECTIONS: env.SMTP_MAX_CONNECTIONS || 5,
-  SMTP_MAX_MESSAGES: env.SMTP_MAX_MESSAGES || 100,
+  SMTP_DKIM_PRIVATKEY: hasDKIMData && env.SMTP_DKIM_PRIVATKEY, // .replace(/\\n/g, '\n'), // replace all "\n" in .env string by real line break
+  SMTP_MAX_CONNECTIONS: env.SMTP_MAX_CONNECTIONS ?? 5,
+  SMTP_MAX_MESSAGES: env.SMTP_MAX_MESSAGES ?? 100,
 }
 
 const neo4j = {
-  NEO4J_URI: env.NEO4J_URI || 'bolt://localhost:7687',
-  NEO4J_USERNAME: env.NEO4J_USERNAME || 'neo4j',
-  NEO4J_PASSWORD: env.NEO4J_PASSWORD || 'neo4j',
+  NEO4J_URI: env.NEO4J_URI ?? 'bolt://localhost:7687',
+  NEO4J_USERNAME: env.NEO4J_USERNAME ?? 'neo4j',
+  NEO4J_PASSWORD: env.NEO4J_PASSWORD ?? 'neo4j',
 }
 
 const sentry = {
@@ -83,7 +92,7 @@ const sentry = {
 
 const redis = {
   REDIS_DOMAIN: env.REDIS_DOMAIN,
-  REDIS_PORT: env.REDIS_PORT,
+  REDIS_PORT: toNumber(env.REDIS_PORT),
   REDIS_PASSWORD: env.REDIS_PASSWORD,
 }
 
@@ -92,7 +101,7 @@ const s3 = {
   AWS_SECRET_ACCESS_KEY: env.AWS_SECRET_ACCESS_KEY,
   AWS_ENDPOINT: env.AWS_ENDPOINT,
   AWS_REGION: env.AWS_REGION,
-  AWS_BUCKET: env.AWS_BUCKET,
+  AWS_BUCKET: env.AWS_BUCKET ?? 'default-bucket',
   S3_CONFIGURED:
     env.AWS_ACCESS_KEY_ID &&
     env.AWS_SECRET_ACCESS_KEY &&
