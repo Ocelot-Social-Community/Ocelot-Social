@@ -1,6 +1,6 @@
-/* 
+/*
     *
-    * Here, all SCSS variables and classes can be adapted to your custom design. 
+    * Here, all SCSS variables and classes can be adapted to your custom design.
     *
 */
 
@@ -47,7 +47,6 @@
 
 $font-family-heading: 'Inter', Helvetica, Arial, Lucida, sans-serif;
 $font-family-text: 'Inter', Helvetica, Arial, Lucida, sans-serif;
-
 
 $color-tertiary: rgb(0, 168, 181);
 $color-tertiary-light: rgb(182, 228, 234);
@@ -101,6 +100,10 @@ $chat-room-background-counter-badge: $color-primary;
 $chat-icon-add: $color-primary-light;
 $chat-icon-send: $color-primary-light;
 $chat-icon-emoji: $color-primary-light;
+
+body, .ds-list, .ds-chip {
+  font-family: $font-family-text !important;
+}
 
 /* "a" link colors */
 a {
