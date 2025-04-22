@@ -414,7 +414,7 @@ export default {
           `
         const queryNull = `
             MATCH (user:User {id: $userId})
-            OPTIONAL MATCH (user)-[slotRelation:SELECTED{slot: $slot}]->(:Badge)
+            OPTIONAL MATCH (user)-[slotRelation:SELECTED {slot: $slot}]->(:Badge)
             DELETE slotRelation
             RETURN user {.*}
           `
