@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable n/no-process-exit */
 import CONFIG from '@config/index'
 

@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
@@ -121,6 +125,7 @@ describe('passwordReset', () => {
 })
 
 describe('resetPassword', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setup = async (options: any = {}) => {
     const { email = 'user@example.org', issuedAt = new Date(), nonce = '12345' } = options
     await createPasswordReset({ driver, email, issuedAt, nonce })

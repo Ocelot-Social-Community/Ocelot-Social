@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable security/detect-object-injection */
 import { sendMail } from '@middleware/helpers/email/sendMail'
 import {
@@ -14,7 +19,7 @@ import { pubsub, NOTIFICATION_ADDED, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } fr
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 
 const queryNotificationEmails = async (context, notificationUserIds) => {
-  if (!(notificationUserIds && notificationUserIds.length)) return []
+  if (!notificationUserIds?.length) return []
   const userEmailCypher = `
     MATCH (user: User)
     // blocked users are filtered out from notifications already
@@ -40,7 +45,12 @@ const queryNotificationEmails = async (context, notificationUserIds) => {
   }
 }
 
-const publishNotifications = async (context, promises, emailNotificationSetting: string) => {
+const publishNotifications = async (
+  context,
+  promises,
+  emailNotificationSetting: string,
+  emailsSent: string[] = [],
+): Promise<string[]> => {
   let notifications = await Promise.all(promises)
   notifications = notifications.flat()
   const notificationsEmailAddresses = await queryNotificationEmails(
@@ -51,7 +61,8 @@ const publishNotifications = async (context, promises, emailNotificationSetting:
     pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
     if (
       (notificationAdded.to[emailNotificationSetting] ?? true) &&
-      !isUserOnline(notificationAdded.to)
+      !isUserOnline(notificationAdded.to) &&
+      !emailsSent.includes(notificationsEmailAddresses[index].email)
     ) {
       sendMail(
         notificationTemplate({
@@ -59,8 +70,10 @@ const publishNotifications = async (context, promises, emailNotificationSetting:
           variables: { notification: notificationAdded },
         }),
       )
+      emailsSent.push(notificationsEmailAddresses[index].email)
     }
   })
+  return emailsSent
 }
 
 const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
@@ -120,20 +133,24 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
   if (post) {
-    await publishNotifications(
+    const sentEmails: string[] = await publishNotifications(
       context,
       [notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context)],
       'emailNotificationsMention',
     )
-    await publishNotifications(
-      context,
-      [notifyFollowingUsers(post.id, groupId, context)],
-      'emailNotificationsFollowingUsers',
+    sentEmails.concat(
+      await publishNotifications(
+        context,
+        [notifyFollowingUsers(post.id, groupId, context)],
+        'emailNotificationsFollowingUsers',
+        sentEmails,
+      ),
     )
     await publishNotifications(
       context,
       [notifyGroupMembersOfNewPost(post.id, groupId, context)],
       'emailNotificationsPostInGroup',
+      sentEmails,
     )
   }
   return post
@@ -145,7 +162,7 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
   const comment = await resolve(root, args, context, resolveInfo)
   const [postAuthor] = await postAuthorOfComment(comment.id, { context })
   idsOfMentionedUsers = idsOfMentionedUsers.filter((id) => id !== postAuthor.id)
-  await publishNotifications(
+  const sentEmails: string[] = await publishNotifications(
     context,
     [
       notifyUsersOfMention(
@@ -158,13 +175,12 @@ const handleContentDataOfComment = async (resolve, root, args, context, resolveI
     ],
     'emailNotificationsMention',
   )
-
   await publishNotifications(
     context,
     [notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context)],
     'emailNotificationsCommentOnObservedPost',
+    sentEmails,
   )
-
   return comment
 }
 
@@ -234,6 +250,8 @@ const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
     MATCH (post)-[:IN]->(group:Group { id: $groupId })<-[membership:MEMBER_OF]-(user:User)
       WHERE NOT membership.role = 'pending'
       AND NOT (user)-[:MUTED]->(group)
+      AND NOT (user)-[:MUTED]->(author)
+      AND NOT (user)-[:BLOCKED]-(author)
       AND NOT user.id = $userId
     WITH post, author, user
     MERGE (post)-[notification:NOTIFIED {reason: $reason}]->(user)
@@ -342,14 +360,17 @@ const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
 }
 
 const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
-  if (!(idsOfUsers && idsOfUsers.length)) return []
+  if (!idsOfUsers?.length) return []
   await validateNotifyUsers(label, reason)
   let mentionedCypher
   switch (reason) {
     case 'mentioned_in_post': {
       mentionedCypher = `
         MATCH (post: Post { id: $id })<-[:WROTE]-(author: User)
-        MATCH (user: User) WHERE user.id in $idsOfUsers AND NOT (user)-[:BLOCKED]-(author)
+        MATCH (user: User)
+          WHERE user.id in $idsOfUsers
+          AND NOT (user)-[:BLOCKED]-(author)
+          AND NOT (user)-[:MUTED]->(author)
         OPTIONAL MATCH (post)-[:IN]->(group:Group)
         OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(user)
         WITH post, author, user, group WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
@@ -365,6 +386,8 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
         WHERE user.id in $idsOfUsers
         AND NOT (user)-[:BLOCKED]-(commenter)
         AND NOT (user)-[:BLOCKED]-(postAuthor)
+        AND NOT (user)-[:MUTED]->(commenter)
+        AND NOT (user)-[:MUTED]->(postAuthor)
       OPTIONAL MATCH (post)-[:IN]->(group:Group)
       OPTIONAL MATCH (group)<-[membership:MEMBER_OF]-(user)
       WITH comment, user, group WHERE group IS NULL OR group.groupType = 'public' OR membership.role IN ['usual', 'admin', 'owner']
@@ -411,7 +434,9 @@ const notifyUsersOfComment = async (label, commentId, reason, context) => {
     const notificationTransactionResponse = await transaction.run(
       `
       MATCH (observingUser:User)-[:OBSERVES { active: true }]->(post:Post)<-[:COMMENTS]-(comment:Comment { id: $commentId })<-[:WROTE]-(commenter:User)
-      WHERE NOT (observingUser)-[:BLOCKED]-(commenter) AND NOT observingUser.id = $userId
+        WHERE NOT (observingUser)-[:BLOCKED]-(commenter)
+        AND NOT (observingUser)-[:MUTED]->(commenter)
+        AND NOT observingUser.id = $userId
       WITH observingUser, post, comment, commenter
       MATCH (postAuthor:User)-[:WROTE]->(post)
       MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(observingUser)

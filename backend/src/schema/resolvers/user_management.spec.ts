@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable promise/prefer-await-to-callbacks */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
@@ -7,7 +12,7 @@ import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { loginMutation } from '@graphql/userManagement'
+import { loginMutation } from '@graphql/queries/loginMutation'
 import encode from '@jwt/encode'
 import createServer, { context } from '@src/server'
 

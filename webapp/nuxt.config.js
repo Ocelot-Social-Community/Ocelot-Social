@@ -102,6 +102,7 @@ export default {
    */
   styleResources: {
     scss: [
+      '~assets/_new/styles/uses.scss',
       styleguideStyles,
       '~assets/_new/styles/tokens.scss',
       '~assets/styles/imports/_branding.scss',
