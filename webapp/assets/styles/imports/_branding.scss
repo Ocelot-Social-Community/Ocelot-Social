@@ -4,46 +4,46 @@
     *
 */
 
+// @font-face {
+//   font-family: Inter;
+//   src: url('~@/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf');
+// }
+
+/* Webfont: Inter-Bold */
 @font-face {
-  font-family: Inter;
-  src: url('~@/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf');
+  font-family: 'Inter';
+  src: url('~@/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('ttf');
+  font-style: normal;
+  font-weight: 600;
+  text-rendering: optimizeLegibility;
 }
 
-// /* Webfont: Inter-Bold */
-// @font-face {
-//   font-family: 'Inter';
-//   src: url('~@@/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('ttf');
-//   font-style: normal;
-//   font-weight: 600;
-//   text-rendering: optimizeLegibility;
-// }
+/* Webfont: Inter-BoldItalic */
+@font-face {
+  font-family: 'Inter';
+  src: url('~@/assets/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('ttf');
+  font-style: italic;
+  font-weight: 600;
+  text-rendering: optimizeLegibility;
+}
 
-// /* Webfont: Inter-BoldItalic */
-// @font-face {
-//   font-family: 'Inter';
-//   src: url('~@@/assets/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('ttf');
-//   font-style: italic;
-//   font-weight: 600;
-//   text-rendering: optimizeLegibility;
-// }
+/* Webfont: Inter-Italic */
+@font-face {
+  font-family: 'Inter';
+  src: url('~@/assets/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('ttf');
+  font-style: italic;
+  font-weight: normal;
+  text-rendering: optimizeLegibility;
+}
 
-// /* Webfont: Inter-Italic */
-// @font-face {
-//   font-family: 'Inter';
-//   src: url('~@@/assets/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('ttf');
-//   font-style: italic;
-//   font-weight: normal;
-//   text-rendering: optimizeLegibility;
-// }
-
-// /* Webfont: Inter-Regular */
-// @font-face {
-//   font-family: 'Inter';
-//   src: url('~@@/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('ttf');
-//   font-style: normal;
-//   font-weight: normal;
-//   text-rendering: optimizeLegibility;
-// }
+/* Webfont: Inter-Regular */
+@font-face {
+  font-family: 'Inter';
+  src: url('~@/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('ttf');
+  font-style: normal;
+  font-weight: normal;
+  text-rendering: optimizeLegibility;
+}
 
 $font-family-heading: 'Inter', Helvetica, Arial, Lucida, sans-serif;
 $font-family-text: 'Inter', Helvetica, Arial, Lucida, sans-serif;
@@ -83,7 +83,7 @@ $color-donation-bar: $color-secondary;
 $color-toast-blue: rgb(0, 142, 230);
 $color-toast-green: $color-primary-light;
 
-$color-ribbon-announcement: $color-primary;
+$color-ribbon-announcement: rgb(84, 167, 252);
 $color-ribbon-announcement-shadow: color.adjust($color-ribbon-announcement, $lightness: -20%);
 $color-ribbon-article: $color-tertiary;
 $color-ribbon-article-shadow: color.adjust($color-ribbon-article, $lightness: -20%);
@@ -244,40 +244,6 @@ div.ds-input-wrap > input:focus-within.ds-input {
 // }
 
 /* checkbox */
-// [type="checkbox"] {
-//   position: relative;
-//   // left: 15px;
-//   // top: 5px;
-//   // z-index: 0;
-//   appearance: none;
-//   -webkit-appearance: none;
-// }
-// [type="checkbox"] + label {
-//   // position: absolute;
-//   position: relative;
-//   // left: 2px;
-//   top: -1px;
-// }
-// [type="checkbox"] + label::before {
-//   position: relative;
-//   width: 16px;
-//   height: 16px;
-//   border-radius: 4px;
-//   border: 2px solid $color-primary-light;
-//   background-color: white;
-//   display: block;
-//   content: "";
-//   float: left;
-//   // margin-right: 6px;
-//   // z-index: 5;
-// }
-// [type="checkbox"]:checked + label::before {
-//   // box-shadow: inset 0px 0px 0px 3px #fff;
-//   background-color: $color-primary-light;
-// }
-// [type="checkbox"] {
-//   accent-color: white;
-// }
-// [type="checkbox"]:checked + label::before {
-//   accent-color: $color-primary-light;
-// }
+[type="checkbox"] {
+  accent-color: $color-primary-light;
+}
