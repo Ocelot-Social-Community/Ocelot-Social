@@ -242,10 +242,10 @@
     }
   },
   "contribution": {
-    "amount-clicks": "{amount} clicks",
-    "amount-comments": "{amount} comments",
-    "amount-shouts": "{amount} recommendations",
-    "amount-views": "{amount} views",
+    "amount-clicks": "{amount} Clicks",
+    "amount-comments": "{amount} Comments",
+    "amount-shouts": "{amount} Recommendations",
+    "amount-views": "{amount} Views",
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} of {max} topics selected"
     },

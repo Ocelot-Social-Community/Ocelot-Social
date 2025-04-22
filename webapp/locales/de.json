@@ -242,10 +242,10 @@
     }
   },
   "contribution": {
-    "amount-clicks": "{amount} clicks",
-    "amount-comments": "{amount} comments",
-    "amount-shouts": "{amount} recommendations",
-    "amount-views": "{amount} views",
+    "amount-clicks": "{amount} Klicks",
+    "amount-comments": "{amount} Kommentare",
+    "amount-shouts": "{amount} Empfehlungen",
+    "amount-views": "{amount} Aurufe",
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} von {max} Themen ausgewählt"
     },
