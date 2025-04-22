@@ -12,7 +12,6 @@ import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import { getNeode } from '@db/neo4j'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
-import log from './helpers/databaseLogger'
 import Resolver from './helpers/Resolver'
 import { mergeImage, deleteImage } from './images/images'
 import { createOrUpdateLocations } from './users/location'
@@ -279,7 +278,6 @@ export default {
             `,
           { userId },
         )
-        log(deleteUserTransactionResponse)
         const [user] = deleteUserTransactionResponse.records.map((record) => record.get('user'))
         await deleteImage(user, 'AVATAR_IMAGE', { transaction })
         return user

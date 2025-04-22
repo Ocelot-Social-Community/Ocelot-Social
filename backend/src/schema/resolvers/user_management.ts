@@ -12,7 +12,6 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 import { getNeode } from '@db/neo4j'
 import encode from '@jwt/encode'
 
-import log from './helpers/databaseLogger'
 import normalizeEmail from './helpers/normalizeEmail'
 
 const neode = getNeode()
@@ -38,7 +37,6 @@ export default {
             `,
             { userEmail: email },
           )
-          log(loginTransactionResponse)
           return loginTransactionResponse.records.map((record) => record.get('user'))
         })
         const [currentUser] = await loginReadTxResultPromise
