@@ -20,14 +20,15 @@
     "eslint": "^9.24.0",
     "lodash": "^4.17.21",
     "nuxt": "^3.16.2",
+    "ocelot-styleguide": "^1.0.6",
     "pinia": "^3.0.2",
     "universal-cookie": "^8.0.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vue": "^3.5.13",
-    "vue-router": "^4.5.0",
-    "ocelot-styleguide": "^1.0.5"
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@nuxtjs/apollo": "^5.0.0-alpha.14"
+    "@nuxtjs/apollo": "^5.0.0-alpha.14",
+    "rollup-plugin-sourcemaps": "^0.6.3"
   }
 }
