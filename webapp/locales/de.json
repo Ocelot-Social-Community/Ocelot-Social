@@ -90,13 +90,13 @@
       "roleChanged": "Rolle erfolgreich geändert!",
       "table": {
         "columns": {
+          "badges": "Auszeichnungen",
           "createdAt": "Erstellt am",
           "email": "E-Mail",
           "name": "Name",
           "number": "Nr.",
           "role": "Rolle",
-          "slug": "Alias",
-          "badges": "Auszeichnungen"
+          "slug": "Alias"
         },
         "edit": "Bearbeiten"
       }

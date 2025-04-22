@@ -90,13 +90,13 @@
       "roleChanged": null,
       "table": {
         "columns": {
+          "badges": null,
           "createdAt": "Créé à",
           "email": "Mail",
           "name": "Nom",
           "number": "Num.",
           "role": "Rôle",
-          "slug": "Slug",
-          "badges": null
+          "slug": "Slug"
         },
         "edit": null
       }

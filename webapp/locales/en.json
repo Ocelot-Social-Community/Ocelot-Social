@@ -90,13 +90,13 @@
       "roleChanged": "Role changed successfully!",
       "table": {
         "columns": {
+          "badges": "Badges",
           "createdAt": "Created at",
           "email": "E-mail",
           "name": "Name",
           "number": "No.",
           "role": "Role",
-          "slug": "Slug",
-          "badges": "Badges"
+          "slug": "Slug"
         },
         "edit": "Edit"
       }
