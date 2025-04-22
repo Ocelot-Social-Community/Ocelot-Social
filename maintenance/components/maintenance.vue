@@ -50,10 +50,19 @@
 //  import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
   // import Logo from '~/components/Logo/Logo'
 
+  import { Container as DsContainer, Card as BaseCard, Space as DsSpace, Flex as DsFlex, FlexItem as DsFlexItem, Heading as DsHeading, Text as DsText } from 'ocelot-styleguide'
+
   export default {
     components: {
       // LocaleSwitch,
       // Logo,
+      DsContainer,
+      BaseCard,
+      DsSpace,
+      DsFlex,
+      DsFlexItem,
+      DsHeading,
+      DsText,
     },
     layout: 'blank',
     data() {
