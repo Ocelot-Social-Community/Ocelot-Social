@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable n/no-process-exit */
 import { faker } from '@faker-js/faker'
 import { createTestClient } from 'apollo-server-testing'
@@ -5,19 +9,18 @@ import sample from 'lodash/sample'
 
 import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
-import { createCommentMutation } from '@graphql/comments'
-import {
-  createGroupMutation,
-  joinGroupMutation,
-  changeGroupMemberRoleMutation,
-} from '@graphql/groups'
-import { createMessageMutation } from '@graphql/messages'
-import { createPostMutation } from '@graphql/posts'
-import { createRoomMutation } from '@graphql/rooms'
+import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
+import { createCommentMutation } from '@graphql/queries/createCommentMutation'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { createPostMutation } from '@graphql/queries/createPostMutation'
+import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import createServer from '@src/server'
 
 import Factory from './factories'
 import { getNeode, getDriver } from './neo4j'
+import { trophies, verification } from './seed/badges'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
@@ -124,32 +127,28 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await Hamburg.relateTo(Germany, 'isIn')
     await Paris.relateTo(France, 'isIn')
 
-    // badges
-    const racoon = await Factory.build('badge', {
-      id: 'indiegogo_en_racoon',
-      icon: '/img/badges/indiegogo_en_racoon.svg',
-    })
-    const rabbit = await Factory.build('badge', {
-      id: 'indiegogo_en_rabbit',
-      icon: '/img/badges/indiegogo_en_rabbit.svg',
-    })
-    const wolf = await Factory.build('badge', {
-      id: 'indiegogo_en_wolf',
-      icon: '/img/badges/indiegogo_en_wolf.svg',
-    })
-    const bear = await Factory.build('badge', {
-      id: 'indiegogo_en_bear',
-      icon: '/img/badges/indiegogo_en_bear.svg',
-    })
-    const turtle = await Factory.build('badge', {
-      id: 'indiegogo_en_turtle',
-      icon: '/img/badges/indiegogo_en_turtle.svg',
-    })
-    const rhino = await Factory.build('badge', {
-      id: 'indiegogo_en_rhino',
-      icon: '/img/badges/indiegogo_en_rhino.svg',
-    })
+    const {
+      trophyAirship,
+      trophyBee,
+      trophyStarter,
+      trophyFlower,
+      trophyPanda,
+      trophyTiger,
+      trophyAlienship,
+      trophyBalloon,
+      trophyMagicrainbow,
+      trophySuperfounder,
+      trophyBigballoon,
+      trophyLifetree,
+      trophyRacoon,
+      trophyRhino,
+      trophyWolf,
+      trophyTurtle,
+      trophyBear,
+      trophyRabbit,
+    } = await trophies()
 
+    const { verificationAdmin, verificationModerator, verificationDeveloper } = await verification()
     // users
     const peterLustig = await Factory.build(
       'user',
@@ -243,14 +242,50 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await jennyRostock.relateTo(Paris, 'isIn')
     await huey.relateTo(Paris, 'isIn')
 
-    await peterLustig.relateTo(racoon, 'rewarded')
-    await peterLustig.relateTo(rhino, 'rewarded')
-    await peterLustig.relateTo(wolf, 'rewarded')
-    await bobDerBaumeister.relateTo(racoon, 'rewarded')
-    await bobDerBaumeister.relateTo(turtle, 'rewarded')
-    await jennyRostock.relateTo(bear, 'rewarded')
-    await dagobert.relateTo(rabbit, 'rewarded')
+    // badges
+    await peterLustig.relateTo(trophyRacoon, 'rewarded')
+    await peterLustig.relateTo(trophyRhino, 'rewarded')
+    await peterLustig.relateTo(trophyWolf, 'rewarded')
+    await peterLustig.relateTo(trophyAirship, 'rewarded')
+    await peterLustig.relateTo(verificationAdmin, 'verifies')
+    await peterLustig.relateTo(trophyRacoon, 'selected', { slot: 0 })
+    await peterLustig.relateTo(trophyRhino, 'selected', { slot: 1 })
+    await peterLustig.relateTo(trophyAirship, 'selected', { slot: 5 })
 
+    await bobDerBaumeister.relateTo(trophyRacoon, 'rewarded')
+    await bobDerBaumeister.relateTo(trophyTurtle, 'rewarded')
+    await bobDerBaumeister.relateTo(trophyBee, 'rewarded')
+    await bobDerBaumeister.relateTo(verificationModerator, 'verifies')
+    await bobDerBaumeister.relateTo(trophyRacoon, 'selected', { slot: 1 })
+    await bobDerBaumeister.relateTo(trophyTurtle, 'selected', { slot: 2 })
+
+    await jennyRostock.relateTo(trophyBear, 'rewarded')
+    await jennyRostock.relateTo(trophyStarter, 'rewarded')
+    await jennyRostock.relateTo(trophyFlower, 'rewarded')
+    await jennyRostock.relateTo(trophyBear, 'selected', { slot: 0 })
+    await jennyRostock.relateTo(trophyStarter, 'selected', { slot: 1 })
+    await jennyRostock.relateTo(trophyFlower, 'selected', { slot: 2 })
+
+    await huey.relateTo(trophyPanda, 'rewarded')
+    await huey.relateTo(trophyTiger, 'rewarded')
+    await huey.relateTo(trophyAlienship, 'rewarded')
+    await huey.relateTo(trophyBalloon, 'rewarded')
+    await huey.relateTo(trophyMagicrainbow, 'rewarded')
+    await huey.relateTo(trophySuperfounder, 'rewarded')
+    await huey.relateTo(verificationDeveloper, 'verifies')
+    await huey.relateTo(trophyPanda, 'selected', { slot: 0 })
+    await huey.relateTo(trophyTiger, 'selected', { slot: 1 })
+    await huey.relateTo(trophyAlienship, 'selected', { slot: 2 })
+
+    await dewey.relateTo(trophyBigballoon, 'rewarded')
+    await dewey.relateTo(trophyLifetree, 'rewarded')
+    await dewey.relateTo(trophyBigballoon, 'selected', { slot: 7 })
+    await dewey.relateTo(trophyLifetree, 'selected', { slot: 8 })
+
+    await louie.relateTo(trophyRabbit, 'rewarded')
+    await louie.relateTo(trophyRabbit, 'selected', { slot: 4 })
+
+    // Friends
     await peterLustig.relateTo(bobDerBaumeister, 'friends')
     await peterLustig.relateTo(jennyRostock, 'friends')
     await bobDerBaumeister.relateTo(jennyRostock, 'friends')
@@ -635,9 +670,9 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         categoryIds: ['cat16'],
         author: peterLustig,
         image: Factory.build('image', {
-          url: faker.image.urlLoremFlickr({ category: 'food', width: 300, height: 169 }),
+          width: 300,
+          height: 169,
           sensitive: true,
-          aspectRatio: 300 / 169,
         }),
       },
     )
@@ -651,8 +686,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         categoryIds: ['cat1'],
         author: bobDerBaumeister,
         image: Factory.build('image', {
-          url: faker.image.urlLoremFlickr({ category: 'technics', width: 300, height: 1500 }),
-          aspectRatio: 300 / 1500,
+          width: 300,
+          height: 1500,
         }),
       },
     )
@@ -699,8 +734,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         categoryIds: ['cat6'],
         author: peterLustig,
         image: Factory.build('image', {
-          url: faker.image.urlLoremFlickr({ category: 'city', width: 300, height: 857 }),
-          aspectRatio: 300 / 857,
+          width: 300,
+          height: 857,
         }),
       },
     )
@@ -738,8 +773,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         categoryIds: ['cat11'],
         author: louie,
         image: Factory.build('image', {
-          url: faker.image.urlLoremFlickr({ category: 'people', width: 300, height: 901 }),
-          aspectRatio: 300 / 901,
+          width: 300,
+          height: 901,
         }),
       },
     )
@@ -764,8 +799,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         categoryIds: ['cat14'],
         author: jennyRostock,
         image: Factory.build('image', {
-          url: faker.image.urlLoremFlickr({ category: 'abstract', width: 300, height: 200 }),
-          aspectRatio: 300 / 450,
+          width: 300,
+          height: 200,
         }),
       },
     )
@@ -824,7 +859,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       mutation: createPostMutation(),
       variables: {
         id: 'p8',
-        image: faker.image.urlLoremFlickr({ category: 'nature' }),
         title: `Quantum Flow Theory explains Quantum Gravity`,
         content: hashtagAndMention1,
         categoryIds: ['cat8'],
@@ -878,6 +912,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     authenticatedUser = null
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const comments: any[] = []
     comments.push(
       await Factory.build(
@@ -1052,6 +1087,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await huey.relateTo(p9, 'shouted')
     await louie.relateTo(p10, 'shouted')
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const reports: any[] = []
     reports.push(
       await Factory.build('report'),
@@ -1159,6 +1195,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       closed: true,
     })
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const additionalUsers: any[] = []
     for (let i = 0; i < 30; i++) {
       const user = await Factory.build('user')
@@ -1180,9 +1217,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         {
           categoryIds: ['cat1'],
           author: jennyRostock,
-          image: Factory.build('image', {
-            url: faker.image.urlLoremFlickr({ category: 'abstract' }),
-          }),
         },
       )
     }
@@ -1231,9 +1265,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         {
           categoryIds: ['cat1'],
           author: peterLustig,
-          image: Factory.build('image', {
-            url: faker.image.urlLoremFlickr({ category: 'city' }),
-          }),
         },
       )
     }
@@ -1282,9 +1313,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         {
           categoryIds: ['cat1'],
           author: dewey,
-          image: Factory.build('image', {
-            url: faker.image.urlLoremFlickr({ category: 'food' }),
-          }),
         },
       )
     }
@@ -1333,9 +1361,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         {
           categoryIds: ['cat1'],
           author: louie,
-          image: Factory.build('image', {
-            url: faker.image.urlLoremFlickr({ category: 'technics' }),
-          }),
         },
       )
     }
@@ -1384,9 +1409,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         {
           categoryIds: ['cat1'],
           author: bobDerBaumeister,
-          image: Factory.build('image', {
-            url: faker.image.urlLoremFlickr({ category: 'people' }),
-          }),
         },
       )
     }
@@ -1435,9 +1457,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         {
           categoryIds: ['cat1'],
           author: huey,
-          image: Factory.build('image', {
-            url: faker.image.urlLoremFlickr({ category: 'nature' }),
-          }),
         },
       )
     }

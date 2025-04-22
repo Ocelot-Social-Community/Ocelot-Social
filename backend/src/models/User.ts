@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { v4 as uuid } from 'uuid'
 
 export default {
@@ -49,6 +50,24 @@ export default {
   rewarded: {
     type: 'relationship',
     relationship: 'REWARDED',
+    target: 'Badge',
+    direction: 'in',
+  },
+  selected: {
+    type: 'relationship',
+    relationship: 'SELECTED',
+    target: 'Badge',
+    direction: 'out',
+    properties: {
+      slot: {
+        type: 'int',
+        required: true,
+      },
+    },
+  },
+  verifies: {
+    type: 'relationship',
+    relationship: 'VERIFIES',
     target: 'Badge',
     direction: 'in',
   },

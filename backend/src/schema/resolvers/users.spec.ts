@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
@@ -67,6 +72,36 @@ const saveCategorySettings = gql`
 const updateOnlineStatus = gql`
   mutation ($status: OnlineStatus!) {
     updateOnlineStatus(status: $status)
+  }
+`
+
+const setTrophyBadgeSelected = gql`
+  mutation ($slot: Int!, $badgeId: ID!) {
+    setTrophyBadgeSelected(slot: $slot, badgeId: $badgeId) {
+      badgeTrophiesCount
+      badgeTrophiesSelected {
+        id
+      }
+      badgeTrophiesUnused {
+        id
+      }
+      badgeTrophiesUnusedCount
+    }
+  }
+`
+
+const resetTrophyBadgesSelected = gql`
+  mutation {
+    resetTrophyBadgesSelected {
+      badgeTrophiesCount
+      badgeTrophiesSelected {
+        id
+      }
+      badgeTrophiesUnused {
+        id
+      }
+      badgeTrophiesUnusedCount
+    }
   }
 `
 
@@ -1067,6 +1102,282 @@ describe('updateOnlineStatus', () => {
           awaySince,
         })
       })
+    })
+  })
+})
+
+describe('setTrophyBadgeSelected', () => {
+  beforeEach(async () => {
+    user = await Factory.build('user', {
+      id: 'user',
+      role: 'user',
+    })
+    const badgeBear = await Factory.build('badge', {
+      id: 'trophy_bear',
+      type: 'trophy',
+      description: 'You earned a Bear',
+      icon: '/img/badges/trophy_blue_bear.svg',
+    })
+    const badgePanda = await Factory.build('badge', {
+      id: 'trophy_panda',
+      type: 'trophy',
+      description: 'You earned a Panda',
+      icon: '/img/badges/trophy_blue_panda.svg',
+    })
+    await Factory.build('badge', {
+      id: 'trophy_rabbit',
+      type: 'trophy',
+      description: 'You earned a Rabbit',
+      icon: '/img/badges/trophy_blue_rabbit.svg',
+    })
+
+    await user.relateTo(badgeBear, 'rewarded')
+    await user.relateTo(badgePanda, 'rewarded')
+  })
+
+  describe('not authenticated', () => {
+    beforeEach(async () => {
+      authenticatedUser = undefined
+    })
+
+    it('throws an error', async () => {
+      await expect(
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 0, badgeId: 'trophy_bear' },
+        }),
+      ).resolves.toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'Not Authorized!',
+            }),
+          ],
+        }),
+      )
+    })
+  })
+
+  describe('authenticated', () => {
+    beforeEach(async () => {
+      authenticatedUser = await user.toJson()
+    })
+
+    it('throws Error when slot is out of bound', async () => {
+      await expect(
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: -1, badgeId: 'trophy_bear' },
+        }),
+      ).resolves.toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'Invalid slot! There is only 9 badge-slots to fill',
+            }),
+          ],
+        }),
+      )
+      await expect(
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 9, badgeId: 'trophy_bear' },
+        }),
+      ).resolves.toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'Invalid slot! There is only 9 badge-slots to fill',
+            }),
+          ],
+        }),
+      )
+    })
+
+    it('throws Error when badge was not rewarded to user', async () => {
+      await expect(
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 0, badgeId: 'trophy_rabbit' },
+        }),
+      ).resolves.toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'Error: You cannot set badges not rewarded to you.',
+            }),
+          ],
+        }),
+      )
+    })
+
+    it('throws Error when badge is unknown', async () => {
+      await expect(
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 0, badgeId: 'trophy_unknown' },
+        }),
+      ).resolves.toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'Error: You cannot set badges not rewarded to you.',
+            }),
+          ],
+        }),
+      )
+    })
+
+    it('returns the user with badges set on slots', async () => {
+      await expect(
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 0, badgeId: 'trophy_bear' },
+        }),
+      ).resolves.toEqual(
+        expect.objectContaining({
+          data: {
+            setTrophyBadgeSelected: {
+              badgeTrophiesCount: 2,
+              badgeTrophiesSelected: [
+                {
+                  id: 'trophy_bear',
+                },
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+              ],
+              badgeTrophiesUnused: [
+                {
+                  id: 'trophy_panda',
+                },
+              ],
+              badgeTrophiesUnusedCount: 1,
+            },
+          },
+        }),
+      )
+      await expect(
+        mutate({
+          mutation: setTrophyBadgeSelected,
+          variables: { slot: 5, badgeId: 'trophy_panda' },
+        }),
+      ).resolves.toEqual(
+        expect.objectContaining({
+          data: {
+            setTrophyBadgeSelected: {
+              badgeTrophiesCount: 2,
+              badgeTrophiesSelected: [
+                {
+                  id: 'trophy_bear',
+                },
+                null,
+                null,
+                null,
+                null,
+                {
+                  id: 'trophy_panda',
+                },
+                null,
+                null,
+                null,
+              ],
+              badgeTrophiesUnused: [],
+              badgeTrophiesUnusedCount: 0,
+            },
+          },
+        }),
+      )
+    })
+  })
+})
+
+describe('resetTrophyBadgesSelected', () => {
+  beforeEach(async () => {
+    user = await Factory.build('user', {
+      id: 'user',
+      role: 'user',
+    })
+    const badgeBear = await Factory.build('badge', {
+      id: 'trophy_bear',
+      type: 'trophy',
+      description: 'You earned a Bear',
+      icon: '/img/badges/trophy_blue_bear.svg',
+    })
+    const badgePanda = await Factory.build('badge', {
+      id: 'trophy_panda',
+      type: 'trophy',
+      description: 'You earned a Panda',
+      icon: '/img/badges/trophy_blue_panda.svg',
+    })
+    await Factory.build('badge', {
+      id: 'trophy_rabbit',
+      type: 'trophy',
+      description: 'You earned a Rabbit',
+      icon: '/img/badges/trophy_blue_rabbit.svg',
+    })
+
+    await user.relateTo(badgeBear, 'rewarded')
+    await user.relateTo(badgePanda, 'rewarded')
+
+    await mutate({
+      mutation: setTrophyBadgeSelected,
+      variables: { slot: 0, badgeId: 'trophy_bear' },
+    })
+    await mutate({
+      mutation: setTrophyBadgeSelected,
+      variables: { slot: 5, badgeId: 'trophy_panda' },
+    })
+  })
+
+  describe('not authenticated', () => {
+    beforeEach(async () => {
+      authenticatedUser = undefined
+    })
+
+    it('throws an error', async () => {
+      await expect(mutate({ mutation: resetTrophyBadgesSelected })).resolves.toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'Not Authorized!',
+            }),
+          ],
+        }),
+      )
+    })
+  })
+
+  describe('authenticated', () => {
+    beforeEach(async () => {
+      authenticatedUser = await user.toJson()
+    })
+
+    it('returns the user with no profile badges badges set', async () => {
+      await expect(mutate({ mutation: resetTrophyBadgesSelected })).resolves.toEqual(
+        expect.objectContaining({
+          data: {
+            resetTrophyBadgesSelected: {
+              badgeTrophiesCount: 2,
+              badgeTrophiesSelected: [null, null, null, null, null, null, null, null, null],
+              badgeTrophiesUnused: [
+                {
+                  id: 'trophy_panda',
+                },
+                {
+                  id: 'trophy_bear',
+                },
+              ],
+              badgeTrophiesUnusedCount: 2,
+            },
+          },
+        }),
+      )
     })
   })
 })

@@ -29,7 +29,7 @@ export default (i18n) => {
             commentedCount
             followedByCount
             followedByCurrentUser
-            badges {
+            badgeTrophies {
               id
               icon
             }

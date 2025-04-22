@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/await-thenable */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable promise/prefer-await-to-callbacks */
 import { UserInputError } from 'apollo-server'
 
@@ -40,7 +47,7 @@ describe('deleteImage', () => {
         {},
         {
           avatar: Factory.build('image', {
-            url: '/some/avatar/url/',
+            url: 'http://localhost/some/avatar/url/',
             alt: 'This is the avatar image of a user',
           }),
         },
@@ -329,7 +336,7 @@ describe('mergeImage', () => {
             ),
             image: Factory.build('image', {
               alt: 'This is the previous, not updated image',
-              url: '/some/original/url',
+              url: 'http://localhost/some/original/url',
             }),
           },
         )

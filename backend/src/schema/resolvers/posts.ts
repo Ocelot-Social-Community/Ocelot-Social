@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserInputError } from 'apollo-server'
 import { isEmpty } from 'lodash'
 import { neo4jgraphql } from 'neo4j-graphql-js'
@@ -48,7 +54,7 @@ export default {
       params = await filterForMutedUsers(params, context)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
-    PostsEmotionsCountByEmotion: async (object, params, context, resolveInfo) => {
+    PostsEmotionsCountByEmotion: async (_object, params, context, _resolveInfo) => {
       const { postId, data } = params
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (transaction) => {
@@ -70,7 +76,7 @@ export default {
         session.close()
       }
     },
-    PostsEmotionsByCurrentUser: async (object, params, context, resolveInfo) => {
+    PostsEmotionsByCurrentUser: async (_object, params, context, _resolveInfo) => {
       const { postId } = params
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (transaction) => {
@@ -242,7 +248,7 @@ export default {
       }
     },
 
-    DeletePost: async (object, args, context, resolveInfo) => {
+    DeletePost: async (_object, args, context, _resolveInfo) => {
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const deletePostTransactionResponse = await transaction.run(
@@ -269,7 +275,7 @@ export default {
         session.close()
       }
     },
-    AddPostEmotions: async (object, params, context, resolveInfo) => {
+    AddPostEmotions: async (_object, params, context, _resolveInfo) => {
       const { to, data } = params
       const { user } = context
       const session = context.driver.session()
@@ -296,7 +302,7 @@ export default {
         session.close()
       }
     },
-    RemovePostEmotions: async (object, params, context, resolveInfo) => {
+    RemovePostEmotions: async (_object, params, context, _resolveInfo) => {
       const { to, data } = params
       const { id: from } = context.user
       const session = context.driver.session()
@@ -499,7 +505,7 @@ export default {
           'MATCH (this)<-[obs:OBSERVES]-(related:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(related) >= 1',
       },
     }),
-    relatedContributions: async (parent, params, context, resolveInfo) => {
+    relatedContributions: async (parent, _params, context, _resolveInfo) => {
       if (typeof parent.relatedContributions !== 'undefined') return parent.relatedContributions
       const { id } = parent
       const session = context.driver.session()

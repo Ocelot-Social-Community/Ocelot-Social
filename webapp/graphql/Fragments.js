@@ -26,7 +26,7 @@ export const locationFragment = (lang) => gql`
 
 export const badgesFragment = gql`
   fragment badges on User {
-    badges {
+    badgeTrophies {
       id
       icon
     }
