@@ -8,7 +8,9 @@
 # TODO change this to last message date
 enum _RoomOrdering {
   lastMessageAt_desc
+  lastMessageAt_asc
   createdAt_desc
+  createdAt_asc
 }
 
 type Room {

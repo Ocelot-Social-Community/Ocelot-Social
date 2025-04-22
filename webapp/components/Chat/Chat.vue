@@ -160,16 +160,13 @@ export default {
           */
       ],
 
-      showDemoOptions: true,
       responsiveBreakpoint: 600,
       rooms: [],
       roomsLoaded: false,
-      roomPage: 0,
       roomPageSize: 10,
       selectedRoom: this.roomId,
       loadingRooms: true,
       messagesLoaded: false,
-      messagePage: 0,
       messagePageSize: 20,
       messages: [],
     }
@@ -237,160 +234,155 @@ export default {
       commitRoomIdFromSingleRoom: 'chat/UPDATE_ROOM_ID',
     }),
 
-    async fetchRooms({ room } = {}) {
+    fetchRooms({ room } = {}) {
       this.roomsLoaded = false
-      const offset = this.roomPage * this.roomPageSize
-      try {
-        const {
-          data: { Room },
-        } = await this.$apollo.query({
+      this.$apollo
+        .query({
           query: roomQuery(),
           variables: {
             id: room?.id,
             first: this.roomPageSize,
-            offset,
+            offset: this.rooms.length,
           },
           fetchPolicy: 'no-cache',
         })
+        .then(({ data: { Room } }) => {
+          const rms = []
+          const rmsIds = []
+          ;[...this.rooms, ...Room].forEach((r) => {
+            if (!rmsIds.find((v) => v === r.id)) {
+              rms.push(this.fixRoomObject(r))
+              rmsIds.push(r.id)
+            }
+          })
+          this.rooms = rms
+          if (Room.length < this.roomPageSize) {
+            this.roomsLoaded = true
+          }
 
-        const rms = []
-        const rmsIds = []
-        ;[...Room, ...this.rooms].forEach((r) => {
-          if (!rmsIds.find((v) => v === r.id)) {
-            rms.push(this.fixRoomObject(r))
-            rmsIds.push(r.id)
+          if (this.singleRoom && this.rooms.length > 0) {
+            this.commitRoomIdFromSingleRoom(this.rooms[0].roomId)
+          } else if (this.getStoreRoomId.roomId) {
+            // reset store room id
+            this.commitRoomIdFromSingleRoom(this.getStoreRoomId.roomId)
           }
         })
-        this.rooms = rms
-
-        if (Room.length < this.roomPageSize) {
-          this.roomsLoaded = true
-        }
-        this.roomPage += 1
-
-        if (this.singleRoom && this.rooms.length > 0) {
-          this.commitRoomIdFromSingleRoom(this.rooms[0].roomId)
-        } else if (this.getStoreRoomId.roomId) {
-          // reset store room id
-          this.commitRoomIdFromSingleRoom(null)
-        }
-      } catch (error) {
-        this.rooms = []
-        this.$toast.error(error.message)
-      }
-      // must be set false after initial rooms are loaded and never changed again
-      this.loadingRooms = false
+        .catch((error) => {
+          this.rooms = []
+          this.$toast.error(error.message)
+        })
+        .finally(() => {
+          // must be set false after initial rooms are loaded and never changed again
+          this.loadingRooms = false
+        })
     },
 
-    async fetchMessages({ room, options = {} }) {
+    fetchMessages({ room, options = {} }) {
       if (this.selectedRoom?.id !== room.id) {
         this.messages = []
-        this.messagePage = 0
         this.selectedRoom = room
       }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
-      const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
-      try {
-        const {
-          data: { Message },
-        } = await this.$apollo.query({
+
+      this.$apollo
+        .query({
           query: messageQuery(),
           variables: {
             roomId: room.id,
             first: this.messagePageSize,
-            offset,
+            offset: this.messages.length,
           },
           fetchPolicy: 'no-cache',
         })
+        .then(({ data: { Message } }) => {
+          const newMsgIds = Message.filter(
+            (m) => m.seen === false && m.senderId !== this.currentUser.id,
+          ).map((m) => m.id)
+          if (newMsgIds.length) {
+            const roomIndex = this.rooms.findIndex((r) => r.id === room.id) ?? Message.id
 
-        const newMsgIds = Message.filter(
-          (m) => m.seen === false && m.senderId !== this.currentUser.id,
-        ).map((m) => m.id)
-        if (newMsgIds.length) {
-          const roomIndex = this.rooms.findIndex((r) => r.id === room.id)
-          const changedRoom = { ...this.rooms[roomIndex] }
-          changedRoom.unreadCount = changedRoom.unreadCount - newMsgIds.length
-          this.rooms[roomIndex] = changedRoom
-          this.$apollo
-            .mutate({
-              mutation: markMessagesAsSeen(),
-              variables: {
-                messageIds: newMsgIds,
-              },
-            })
-            .then(() => {
-              this.$apollo
-                .query({
-                  query: unreadRoomsQuery(),
-                  fetchPolicy: 'network-only',
-                })
-                .then(({ data: { UnreadRooms } }) => {
-                  this.commitUnreadRoomCount(UnreadRooms)
-                })
-            })
-        }
+            if (roomIndex === -1) {
+              this.rooms = [room, ...this.rooms]
+            }
+            const changedRoom = { ...this.rooms[roomIndex] }
+            changedRoom.unreadCount = changedRoom.unreadCount - newMsgIds.length
+            this.rooms[roomIndex] = changedRoom
+            this.$apollo
+              .mutate({
+                mutation: markMessagesAsSeen(),
+                variables: {
+                  messageIds: newMsgIds,
+                },
+              })
+              .then(() => {
+                this.$apollo
+                  .query({
+                    query: unreadRoomsQuery(),
+                    fetchPolicy: 'network-only',
+                  })
+                  .then(({ data: { UnreadRooms } }) => {
+                    this.commitUnreadRoomCount(UnreadRooms)
+                  })
+              })
+          }
 
-        const msgs = []
-        ;[...this.messages, ...Message].forEach((m) => {
-          if (m.senderId !== this.currentUser.id) m.seen = true
-          m.date = new Date(m.date).toDateString()
-          m.avatar = this.$filters.proxyApiUrl(m.avatar)
-          msgs[m.indexId] = m
+          const msgs = []
+          ;[...this.messages, ...Message].forEach((m) => {
+            if (m.senderId !== this.currentUser.id) m.seen = true
+            m.date = new Date(m.date).toDateString()
+            m.avatar = this.$filters.proxyApiUrl(m.avatar)
+            msgs[m.indexId] = m
+          })
+          this.messages = msgs.filter(Boolean)
+
+          if (Message.length < this.messagePageSize) {
+            this.messagesLoaded = true
+          }
         })
-        this.messages = msgs.filter(Boolean)
-
-        if (Message.length < this.messagePageSize) {
-          this.messagesLoaded = true
-        }
-        this.messagePage += 1
-      } catch (error) {
-        this.messages = []
-        this.$toast.error(error.message)
-      }
+        .catch((error) => {
+          this.messages = []
+          this.$toast.error(error.message)
+        })
     },
 
-    async chatMessageAdded({ data }) {
+    addMessageToCurrentRoom(message) {
+      const messages = this.messages
+      message.date = new Date(message.date).toDateString()
+      messages.push(message)
+      this.messages = messages
+    },
+
+    chatMessageAdded({ data }) {
       const roomIndex = this.rooms.findIndex((r) => r.id === data.chatMessageAdded.room.id)
       const changedRoom = { ...this.rooms[roomIndex] }
+
       changedRoom.lastMessage = data.chatMessageAdded
       changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
       changedRoom.lastMessageAt = data.chatMessageAdded.date
-      changedRoom.unreadCount++
-      this.rooms[roomIndex] = changedRoom
       if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
-        this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
+        this.addMessageToCurrentRoom(data.chatMessageAdded)
       } else {
-        this.fetchRooms({ options: { refetch: true } })
+        changedRoom.unreadCount++
+        this.fetchRooms({ room: this.selectedRoom, options: { refetch: true } })
       }
+      this.rooms[roomIndex] = changedRoom
     },
 
-    async sendMessage(message) {
-      try {
-        const {
-          data: { CreateMessage: createdMessage },
-        } = await this.$apollo.mutate({
+    sendMessage(message) {
+      this.$apollo
+        .mutate({
           mutation: createMessageMutation(),
           variables: {
             roomId: message.roomId,
             content: message.content,
           },
         })
-        const roomIndex = this.rooms.findIndex((r) => r.id === message.roomId)
-        const changedRoom = { ...this.rooms[roomIndex] }
-        changedRoom.lastMessage = createdMessage
-        changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
-        // move current room to top (not 100% working)
-        // const rooms = [...this.rooms]
-        // rooms.splice(roomIndex,1)
-        // this.rooms = [changedRoom, ...rooms]
-        this.rooms[roomIndex] = changedRoom
-      } catch (error) {
-        this.$toast.error(error.message)
-      }
-      this.fetchMessages({
-        room: this.rooms.find((r) => r.roomId === message.roomId),
-        options: { refetch: true },
-      })
+        .then(({ data: { CreateMessage: createdMessage } }) => {
+          this.addMessageToCurrentRoom(createdMessage)
+        })
+        .catch((error) => {
+          this.$toast.error(error.message)
+        })
     },
 
     getInitialsName(fullname) {
@@ -441,13 +433,13 @@ export default {
             this.rooms = [room, ...this.rooms]
           }
           this.fetchMessages({ room, options: { refetch: true } })
-          this.$emit('show-chat', CreateRoom.id)
+          this.$emit('show-room', CreateRoom.id)
         })
         .catch((error) => {
           this.$toast.error(error.message)
         })
         .finally(() => {
-          // this.loading = false
+          this.loadingRooms = false
         })
     },
 

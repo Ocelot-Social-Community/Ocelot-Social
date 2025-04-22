@@ -43,7 +43,8 @@ export default {
       params.filter.users_some = {
         id: context.user.id,
       }
-      return neo4jgraphql(object, params, context, resolveInfo)
+      const resolved = await neo4jgraphql(object, params, context, resolveInfo)
+      return resolved.reverse()
     },
     UnreadRooms: async (_object, _params, context, _resolveInfo) => {
       const {
