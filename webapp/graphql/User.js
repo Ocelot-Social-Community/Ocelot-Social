@@ -405,7 +405,12 @@ export const currentUserQuery = gql`
   query {
     currentUser {
       ...user
-      badgeTrophies {
+      badgeTrophiesSelected {
+        id
+        icon
+        isDefault
+      }
+      badgeTrophiesUnused {
         id
         icon
       }
@@ -476,14 +481,17 @@ export const userDataQuery = (i18n) => {
 }
 
 export const setTrophyBadgeSelected = gql`
-  mutation ($slot: Int!, $badgeId: ID!) {
+  mutation ($slot: Int!, $badgeId: ID) {
     setTrophyBadgeSelected(slot: $slot, badgeId: $badgeId) {
       badgeTrophiesCount
       badgeTrophiesSelected {
         id
+        icon
+        isDefault
       }
       badgeTrophiesUnused {
         id
+        icon
       }
       badgeTrophiesUnusedCount
     }
@@ -496,9 +504,12 @@ export const resetTrophyBadgesSelected = gql`
       badgeTrophiesCount
       badgeTrophiesSelected {
         id
+        icon
+        isDefault
       }
       badgeTrophiesUnused {
         id
+        icon
       }
       badgeTrophiesUnusedCount
     }

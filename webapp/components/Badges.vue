@@ -4,16 +4,17 @@
     class="hc-badges"
     :style="{ transform: `scale(${scale})` }"
   >
-    <div
+    <component
+      :is="selectionMode ? 'button' : 'div'"
       class="hc-badge-container"
       v-for="(badge, index) in badges"
-      :key="badge.id"
+      :key="index"
       :title="badge.description"
       :class="{ selectable: selectionMode && index > 0, selected: selectedIndex === index }"
       @click="handleBadgeClick(index)"
     >
-      <img :title="badge.key" :src="badge.icon | proxyApiUrl" class="hc-badge" />
-    </div>
+      <img :title="badge.key" :src="badge.icon" class="hc-badge" />
+    </component>
   </div>
 </template>
 
@@ -51,6 +52,7 @@ export default {
       }
 
       this.selectedIndex = index
+      console.log('Selected badge:', this.badges[index])
       this.$emit('badge-selected', index)
     },
     resetSelection() {
