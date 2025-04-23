@@ -20,7 +20,7 @@
 
       <div v-if="selectedBadgeIndex !== null && isEmptySlot" class="selection-info">
         <badge-selection
-          :badges="availableBadgesFiltered"
+          :badges="currentUser.unusedBadges"
           @badge-selected="assignBadgeToSlot"
           ref="badgeSelection"
         />
@@ -53,7 +53,7 @@ export default {
     selectedBadges() {
       const emptyBadge = {
         key: 'empty',
-        icon: 'http://172.23.0.7:3000/img/badges/slot-empty.svg',
+        icon: '/img/badges/slot-empty.svg',
         description: '',
       }
 

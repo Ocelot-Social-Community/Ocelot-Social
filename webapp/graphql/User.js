@@ -405,6 +405,14 @@ export const currentUserQuery = gql`
   query {
     currentUser {
       ...user
+      badgeTrophies {
+        id
+        icon
+      }
+      badgeVerification {
+        id
+        icon
+      }
       email
       role
       about
@@ -466,3 +474,33 @@ export const userDataQuery = (i18n) => {
     }
   `
 }
+
+export const setTrophyBadgeSelected = gql`
+  mutation ($slot: Int!, $badgeId: ID!) {
+    setTrophyBadgeSelected(slot: $slot, badgeId: $badgeId) {
+      badgeTrophiesCount
+      badgeTrophiesSelected {
+        id
+      }
+      badgeTrophiesUnused {
+        id
+      }
+      badgeTrophiesUnusedCount
+    }
+  }
+`
+
+export const resetTrophyBadgesSelected = gql`
+  mutation {
+    resetTrophyBadgesSelected {
+      badgeTrophiesCount
+      badgeTrophiesSelected {
+        id
+      }
+      badgeTrophiesUnused {
+        id
+      }
+      badgeTrophiesUnusedCount
+    }
+  }
+`

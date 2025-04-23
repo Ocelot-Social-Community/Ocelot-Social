@@ -30,6 +30,10 @@ export const badgesFragment = gql`
       id
       icon
     }
+    badgeVerification {
+      id
+      icon
+    }
   }
 `
 
