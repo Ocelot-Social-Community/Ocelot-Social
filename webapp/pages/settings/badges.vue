@@ -7,15 +7,23 @@
           :badges="selectedBadges"
           :selection-mode="true"
           :scale="2"
-          @badge-selected="handleBadgeSelection"
+          @badge-selected="handleBadgeSlotSelection"
           ref="badgesComponent"
         />
       </div>
 
-      <div v-if="selectedBadgeIndex !== null" class="selection-info">
-        Ausgewählter Slot: {{ selectedBadgeIndex }}
+      <div v-if="selectedBadgeIndex !== null && !isEmptySlot" class="badge-actions">
+        <base-button @click="removeBadgeFromSlot" class="remove-button">
+          {{ $t('settings.badges.remove') }}
+        </base-button>
+      </div>
 
-        <badge-selection :badges="availableBadges" />
+      <div v-if="selectedBadgeIndex !== null && isEmptySlot" class="selection-info">
+        <badge-selection
+          :badges="availableBadgesFiltered"
+          @badge-selected="assignBadgeToSlot"
+          ref="badgeSelection"
+        />
       </div>
     </ds-space>
     <base-button filled @click="submit" :disabled="disabled">{{ $t('actions.save') }}</base-button>
@@ -35,6 +43,7 @@ export default {
   data() {
     return {
       selectedBadgeIndex: null,
+      userBadges: [],
     }
   },
   computed: {
@@ -48,10 +57,9 @@ export default {
         description: '',
       }
 
-      const badges = [
-        this.currentUser.badgeVerification || emptyBadge,
-        ...(this.currentUser.badgeTrophiesSelected || []),
-      ].map((item) => item || emptyBadge)
+      const badges = [this.currentUser.badgeVerification || emptyBadge, ...this.userBadges].map(
+        (item) => item || emptyBadge,
+      )
 
       while (badges.length < 10) {
         badges.push(emptyBadge)
@@ -96,47 +104,104 @@ export default {
         ]
       )
     },
+    availableBadgesFiltered() {
+      const selectedBadgeKeys = this.userBadges.filter((badge) => badge).map((badge) => badge.key)
+
+      return this.availableBadges.filter((badge) => !selectedBadgeKeys.includes(badge.key))
+    },
+    isEmptySlot() {
+      if (this.selectedBadgeIndex === null) return false
+      return this.selectedBadges[this.selectedBadgeIndex].key === 'empty'
+    },
     disabled() {
       return false
     },
   },
-  created() {},
+  created() {
+    this.userBadges = [...(this.currentUser.badgeTrophiesSelected || [])]
+  },
   methods: {
     ...mapMutations({
       setCurrentUser: 'auth/SET_USER',
     }),
-    handleBadgeSelection(index) {
-      console.log(this.currentUser.badgeTrophies)
+    handleBadgeSlotSelection(index) {
+      console.log('Slot ausgewählt:', index)
 
-      console.log('Badge ausgewählt:', index)
+      if (index === 0) {
+        this.$toast.info(
+          this.$t('settings.badges.verification') ||
+            'Dies ist deine Verifikations-Badge und kann nicht geändert werden.',
+        )
+        this.$refs.badgesComponent.resetSelection()
+        return
+      }
+
       this.selectedBadgeIndex = index
-
-      // Hier kannst du weitere Aktionen basierend auf der Auswahl durchführen
     },
-    resetSelection() {
+    assignBadgeToSlot(badge) {
+      console.log('Badge zum Zuweisen ausgewählt:', badge)
+
+      if (!badge || this.selectedBadgeIndex === null) {
+        return
+      }
+
+      const userBadgeIndex = this.selectedBadgeIndex - 1
+
+      while (this.userBadges.length <= userBadgeIndex) {
+        this.userBadges.push(null)
+      }
+
+      this.$set(this.userBadges, userBadgeIndex, badge)
+
+      if (this.$refs.badgeSelection && this.$refs.badgeSelection.resetSelection) {
+        this.$refs.badgeSelection.resetSelection()
+      }
       this.$refs.badgesComponent.resetSelection()
       this.selectedBadgeIndex = null
-      console.log('Auswahl zurückgesetzt')
+    },
+    removeBadgeFromSlot() {
+      if (this.selectedBadgeIndex === null || this.selectedBadgeIndex === 0) {
+        return
+      }
+
+      const userBadgeIndex = this.selectedBadgeIndex - 1
+
+      if (userBadgeIndex < this.userBadges.length) {
+        this.$set(this.userBadges, userBadgeIndex, null)
+
+        let lastIndex = this.userBadges.length - 1
+        while (lastIndex >= 0 && this.userBadges[lastIndex] === null) {
+          this.userBadges.pop()
+          lastIndex--
+        }
+      }
+
+      this.$refs.badgesComponent.resetSelection()
+      this.selectedBadgeIndex = null
     },
     async submit() {
       try {
+        const cleanedBadges = this.userBadges.filter((badge) => badge !== null)
+
         await this.$apollo.mutate({
           mutation: updateUserMutation(),
           variables: {
             id: this.currentUser.id,
-            showShoutsPublicly: this.shoutsAllowed,
+            badgeTrophiesSelected: cleanedBadges,
           },
           update: (_, { data: { UpdateUser } }) => {
-            const { showShoutsPublicly } = UpdateUser
+            const { badgeTrophiesSelected } = UpdateUser
             this.setCurrentUser({
               ...this.currentUser,
-              showShoutsPublicly,
+              badgeTrophiesSelected,
             })
-            this.$toast.success(this.$t('settings.privacy.success-update'))
+            this.$toast.success(
+              this.$t('settings.badges.success-update') ||
+                'Deine Badges wurden erfolgreich aktualisiert',
+            )
           },
         })
       } catch (error) {
-        this.shoutsAllowed = !this.shoutsAllowed
         this.$toast.error(error.message)
       }
     },
@@ -148,5 +213,20 @@ export default {
 .presenterContainer {
   padding-top: 50px;
   min-height: 250px;
+}
+
+.badge-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+
+  .remove-button {
+    margin-top: 8px;
+  }
+}
+
+.selection-info {
+  margin-top: 20px;
+  padding: 16px;
 }
 </style>

@@ -1,9 +1,9 @@
 <template>
-  <div class="badge-list">
+  <div class="badge-selection">
     <div
       v-for="(badge, index) in badges"
       :key="badge.key"
-      class="badge-list-item"
+      class="badge-selection-item"
       @click="handleBadgeClick(badge, index)"
     >
       <div class="badge-icon">
@@ -32,21 +32,16 @@ export default {
   },
   methods: {
     handleBadgeClick(badge, index) {
-      console.log('Badge clicked:', badge.key, index)
-
       if (this.selectedIndex === index) {
-        console.log('Deselecting badge')
         this.selectedIndex = null
         this.$emit('badge-selected', null)
         return
       }
 
       this.selectedIndex = index
-      console.log('Emitting badge-selected event with badge:', badge)
       this.$emit('badge-selected', badge)
     },
     resetSelection() {
-      console.log('Resetting badge selection')
       this.selectedIndex = null
     },
   },
@@ -54,12 +49,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.badge-list {
+.badge-selection {
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
 
-  .badge-list-item {
+  .badge-selection-item {
     display: flex;
     align-items: center;
     padding: 12px 16px;

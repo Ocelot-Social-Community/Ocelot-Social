@@ -958,7 +958,8 @@
   },
   "settings": {
     "badges": {
-      "name": "Badges"
+      "name": "Badges",
+      "remove": "Remove Badge"
     },
     "blocked-users": {
       "block": "Block user",
