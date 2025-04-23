@@ -11,6 +11,7 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import { getNeode } from '@db/neo4j'
 
+import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import log from './helpers/databaseLogger'
 import Resolver from './helpers/Resolver'
 import { mergeImage, deleteImage } from './images/images'
@@ -412,13 +413,15 @@ export default {
             MERGE (user)-[:SELECTED{slot: toInteger($slot)}]->(badge)
             RETURN user {.*}
           `
-        const queryNull = `
+        const queryEmpty = `
             MATCH (user:User {id: $userId})
             OPTIONAL MATCH (user)-[slotRelation:SELECTED {slot: $slot}]->(:Badge)
             DELETE slotRelation
             RETURN user {.*}
           `
-        const result = await transaction.run(badgeId ? queryBadge : queryNull, {
+        const isDefault = !badgeId || badgeId === defaultTrophyBadge.id
+
+        const result = await transaction.run(isDefault ? queryEmpty : queryBadge, {
           userId,
           badgeId,
           slot,
@@ -538,7 +541,7 @@ export default {
       })
       try {
         const badgesSelected = await query
-        const result = Array(TROPHY_BADGES_SELECTED_MAX).fill(null)
+        const result = Array(TROPHY_BADGES_SELECTED_MAX).fill(defaultTrophyBadge)
         badgesSelected.map((record) => {
           result[record.get('slot')] = record.get('badge')
           return true
@@ -550,21 +553,17 @@ export default {
         session.close()
       }
     },
-    badgeTrophiesUnused: async (_parent, _params, context, _resolveInfo) => {
-      const {
-        user: { id: userId },
-      } = context
-
+    badgeTrophiesUnused: async (parent, _params, context, _resolveInfo) => {
       const session = context.driver.session()
 
-      const query = session.writeTransaction(async (transaction) => {
+      const query = session.readTransaction(async (transaction) => {
         const result = await transaction.run(
           `
-            MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge)
+            MATCH (user:User {id: $parent.id})<-[:REWARDED]-(badge:Badge)
             WHERE NOT (user)-[:SELECTED]-(badge)
             RETURN badge {.*}
           `,
-          { userId },
+          { parent },
         )
         return result.records.map((record) => record.get('badge'))
       })
@@ -576,26 +575,44 @@ export default {
         session.close()
       }
     },
-    badgeTrophiesUnusedCount: async (_parent, _params, context, _resolveInfo) => {
-      const {
-        user: { id: userId },
-      } = context
-
+    badgeTrophiesUnusedCount: async (parent, _params, context, _resolveInfo) => {
       const session = context.driver.session()
 
-      const query = session.writeTransaction(async (transaction) => {
+      const query = session.readTransaction(async (transaction) => {
         const result = await transaction.run(
           `
-            MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge)
+            MATCH (user:User {id: $parent.id})<-[:REWARDED]-(badge:Badge)
             WHERE NOT (user)-[:SELECTED]-(badge)
             RETURN toString(COUNT(badge)) as count
           `,
-          { userId },
+          { parent },
         )
         return result.records.map((record) => record.get('count'))[0]
       })
       try {
         return await query
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    badgeVerification: async (parent, _params, context, _resolveInfo) => {
+      const session = context.driver.session()
+
+      const query = session.writeTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $parent.id})<-[:VERIFIES]-(verification:Badge)
+            RETURN verification {.*}
+          `,
+          { parent },
+        )
+        return result.records.map((record) => record.get('verification'))[0]
+      })
+      try {
+        const result = await query
+        return result ?? defaultVerificationBadge
       } catch (error) {
         throw new Error(error)
       } finally {
@@ -642,7 +659,6 @@ export default {
         invitedBy: '<-[:INVITED]-(related:User)',
         location: '-[:IS_IN]->(related:Location)',
         redeemedInviteCode: '-[:REDEEMED]->(related:InviteCode)',
-        badgeVerification: '<-[:VERIFIES]-(related:Badge)',
       },
       hasMany: {
         followedBy: '<-[:FOLLOWS]-(related:User)',
