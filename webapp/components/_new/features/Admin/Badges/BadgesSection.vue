@@ -8,7 +8,7 @@
         @click="toggleBadge(badge)"
         :class="{ badge, inactive: !badge.isActive }"
       >
-        <img :src="badge.icon" :alt="badge.description" />
+        <img :src="badge.icon | proxyApiUrl" :alt="badge.description" />
       </button>
     </div>
   </div>
