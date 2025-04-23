@@ -4,45 +4,9 @@
     *
 */
 
-// @font-face {
-//   font-family: Inter;
-//   src: url('~@/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf');
-// }
-
-/* Webfont: Inter-Bold */
 @font-face {
-  font-family: 'Inter';
-  src: url('~@/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('ttf');
-  font-style: normal;
-  font-weight: 600;
-  text-rendering: optimizeLegibility;
-}
-
-/* Webfont: Inter-BoldItalic */
-@font-face {
-  font-family: 'Inter';
-  src: url('~@/assets/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('ttf');
-  font-style: italic;
-  font-weight: 600;
-  text-rendering: optimizeLegibility;
-}
-
-/* Webfont: Inter-Italic */
-@font-face {
-  font-family: 'Inter';
-  src: url('~@/assets/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('ttf');
-  font-style: italic;
-  font-weight: normal;
-  text-rendering: optimizeLegibility;
-}
-
-/* Webfont: Inter-Regular */
-@font-face {
-  font-family: 'Inter';
-  src: url('~@/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('ttf');
-  font-style: normal;
-  font-weight: normal;
-  text-rendering: optimizeLegibility;
+  font-family: Inter;
+  src: url('~@/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf');
 }
 
 $font-family-heading: 'Inter', Helvetica, Arial, Lucida, sans-serif;
@@ -101,8 +65,11 @@ $chat-icon-add: $color-primary-light;
 $chat-icon-send: $color-primary-light;
 $chat-icon-emoji: $color-primary-light;
 
-body, .ds-list, .ds-chip {
+body, .ds-button, .ds-chip, .ds-copy-field, .ds-list, .ds-select-search, .ds-tag, .ds-text {
   font-family: $font-family-text !important;
+}
+.ds-heading {
+  font-family: $font-family-heading !important;
 }
 
 /* "a" link colors */
@@ -140,14 +107,7 @@ a:hover.ds-menu-item-link {
 
 .main-navigation a {
   color: white;
-  // text-transform: uppercase;
-  // font-size: 16px;
-  // font-weight: 500;
 }
-// .main-navigation a:hover {
-//   color: rgba(255, 255, 255, .8);
-// }
-
 .main-navigation .router-link-exact-active {
   color: $color-secondary !important;
 }
@@ -160,7 +120,6 @@ a:hover.ds-menu-item-link {
   color: white;
 }
 
-// #nav-search-box .hc-hashtag a {
 .hc-hashtag a {
   color: $color-primary;
 }
@@ -190,22 +149,7 @@ a:hover.ds-menu-item-link {
   color: $color-primary;
 }
 
-// .branding-menu .ds-text {
-//   font-family: 'Overpass', Helvetica, Arial, Lucida, sans-serif;
-//   font-weight: 500;
-//   text-transform: uppercase;
-//   font-size: 16px;
-// }
-
-/* avoid uppercase for user slug */
-// span.slug {
-//   text-transform: none;
-// }
-
 .ds-footer {
-  // font-family: 'Overpass', Helvetica, Arial, Lucida, sans-serif;
-  // text-transform: uppercase;
-  // font-size: 16px;
   font-weight: 600;
 }
 
@@ -224,8 +168,6 @@ div.tab-navigation li.Tabs__tab {
   border-bottom-color: $color-primary;
 }
 
-/* submit button color group form */
-// form.group-form button.ds-button-primary {
 /* ds-button with primary color */
 .ds-button-primary {
   background-color: $color-primary;
