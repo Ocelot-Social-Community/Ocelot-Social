@@ -270,6 +270,9 @@ export default {
         },
       }
 
+      config.resolve.alias['~@'] = path.resolve(__dirname, '/')
+      config.resolve.alias['@@'] = path.resolve(__dirname, '/')
+
       if (CONFIG.STYLEGUIDE_DEV) {
         config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/src/system`)
         config.module.rules.push({
