@@ -100,6 +100,7 @@ describe('Badges', () => {
           id
           badgeVerification {
             id
+            isDefault
           }
           badgeTrophies {
             id
@@ -204,7 +205,7 @@ describe('Badges', () => {
           data: {
             setVerificationBadge: {
               id: 'regular-user-id',
-              badgeVerification: { id: 'verification_moderator' },
+              badgeVerification: { id: 'verification_moderator', isDefault: false },
               badgeTrophies: [],
             },
           },
@@ -226,7 +227,7 @@ describe('Badges', () => {
           data: {
             setVerificationBadge: {
               id: 'regular-user-id',
-              badgeVerification: { id: 'verification_admin' },
+              badgeVerification: { id: 'verification_admin', isDefault: false },
               badgeTrophies: [],
             },
           },
@@ -255,7 +256,7 @@ describe('Badges', () => {
           data: {
             setVerificationBadge: {
               id: 'regular-user-2-id',
-              badgeVerification: { id: 'verification_moderator' },
+              badgeVerification: { id: 'verification_moderator', isDefault: false },
               badgeTrophies: [],
             },
           },
@@ -299,6 +300,7 @@ describe('Badges', () => {
           id
           badgeVerification {
             id
+            isDefault
           }
           badgeTrophies {
             id
@@ -403,7 +405,7 @@ describe('Badges', () => {
           data: {
             rewardTrophyBadge: {
               id: 'regular-user-id',
-              badgeVerification: null,
+              badgeVerification: { id: 'default_verification', isDefault: true },
               badgeTrophies: [{ id: 'trophy_rhino' }],
             },
           },
@@ -530,6 +532,7 @@ describe('Badges', () => {
           id
           badgeVerification {
             id
+            isDefault
           }
           badgeTrophies {
             id
@@ -596,7 +599,7 @@ describe('Badges', () => {
           data: {
             revokeBadge: {
               id: 'regular-user-id',
-              badgeVerification: { id: 'verification_moderator' },
+              badgeVerification: { id: 'verification_moderator', isDefault: false },
               badgeTrophies: [],
             },
           },
@@ -610,7 +613,7 @@ describe('Badges', () => {
           data: {
             revokeBadge: {
               id: 'regular-user-id',
-              badgeVerification: { id: 'verification_moderator' },
+              badgeVerification: { id: 'verification_moderator', isDefault: false },
               badgeTrophies: [],
             },
           },
@@ -631,7 +634,7 @@ describe('Badges', () => {
           data: {
             revokeBadge: {
               id: 'regular-user-id',
-              badgeVerification: null,
+              badgeVerification: { id: 'default_verification', isDefault: true },
               badgeTrophies: [{ id: 'trophy_rhino' }],
             },
           },
@@ -659,7 +662,7 @@ describe('Badges', () => {
           data: {
             revokeBadge: {
               id: 'regular-user-id',
-              badgeVerification: null,
+              badgeVerification: { id: 'default_verification', isDefault: true },
               badgeTrophies: [{ id: 'trophy_rhino' }],
             },
           },

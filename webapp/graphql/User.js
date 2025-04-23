@@ -90,6 +90,23 @@ export const adminUserQuery = () => {
   `
 }
 
+export const adminUserBadgesQuery = () => {
+  return gql`
+    query User($id: ID!) {
+      User(id: $id) {
+        id
+        name
+        badgeTrophies {
+          id
+        }
+        badgeVerification {
+          id
+        }
+      }
+    }
+  `
+}
+
 export const mapUserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
