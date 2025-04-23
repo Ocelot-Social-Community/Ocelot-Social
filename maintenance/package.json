@@ -20,7 +20,7 @@
     "eslint": "^9.24.0",
     "lodash": "^4.17.21",
     "nuxt": "^3.16.2",
-    "ocelot-styleguide": "^1.0.6",
+    "ocelot-styleguide": "^1.0.7",
     "pinia": "^3.0.2",
     "universal-cookie": "^8.0.1",
     "vite-tsconfig-paths": "^5.1.4",
