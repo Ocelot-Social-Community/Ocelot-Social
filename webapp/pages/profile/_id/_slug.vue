@@ -267,21 +267,7 @@ export default {
       return this.User ? this.User[0] : {}
     },
     userBadges() {
-      const emptyBadge = {
-        key: 'empty',
-        icon: 'http://172.23.0.7:3000/img/badges/slot-empty.svg',
-        description: '',
-      }
-
-      const badges = [this.user.badgeVerification, ...(this.user.badgeTrophiesSelected || [])].map(
-        (item) => item || emptyBadge,
-      )
-
-      while (badges.length < 10) {
-        badges.push(emptyBadge)
-      }
-
-      return badges
+      return [this.user.badgeVerification, ...(this.user.badgeTrophiesSelected || [])]
     },
     userName() {
       const { name } = this.user || {}
