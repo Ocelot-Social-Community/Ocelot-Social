@@ -52,7 +52,6 @@ export default {
       }
 
       this.selectedIndex = index
-      console.log('Selected badge:', this.badges[index])
       this.$emit('badge-selected', index)
     },
     resetSelection() {

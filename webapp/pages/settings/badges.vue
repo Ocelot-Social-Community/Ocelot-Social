@@ -55,8 +55,6 @@ export default {
       return this.currentUser.badgeTrophiesUnused
     },
     isEmptySlot() {
-      console.log('selectedBadgeIndex', this.selectedBadgeIndex)
-      console.log('selectedBadges', this.selectedBadges)
       return this.selectedBadges[this.selectedBadgeIndex]?.isDefault ?? true
     },
   },
