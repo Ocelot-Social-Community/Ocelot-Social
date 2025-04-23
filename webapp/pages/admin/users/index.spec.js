@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
-import Users from './users.vue'
+import Users from './index.vue'
 
 const localVue = global.localVue
 

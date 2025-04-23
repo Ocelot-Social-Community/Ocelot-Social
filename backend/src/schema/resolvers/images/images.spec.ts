@@ -47,7 +47,7 @@ describe('deleteImage', () => {
         {},
         {
           avatar: Factory.build('image', {
-            url: '/some/avatar/url/',
+            url: 'http://localhost/some/avatar/url/',
             alt: 'This is the avatar image of a user',
           }),
         },
@@ -336,7 +336,7 @@ describe('mergeImage', () => {
             ),
             image: Factory.build('image', {
               alt: 'This is the previous, not updated image',
-              url: '/some/original/url',
+              url: 'http://localhost/some/original/url',
             }),
           },
         )
