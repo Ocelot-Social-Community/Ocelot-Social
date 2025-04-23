@@ -42,8 +42,8 @@
               {{ $t('profile.memberSince') }} {{ user.createdAt | date('MMMM yyyy') }}
             </ds-text>
           </ds-space>
-          <ds-space v-if="user.badgeTrophies && user.badgeTrophies.length" margin="x-small">
-            <hc-badges :badges="user.badgeTrophies" />
+          <ds-space v-if="userBadges && userBadges.length" margin="x-small">
+            <hc-badges :badges="userBadges" />
           </ds-space>
           <ds-flex>
             <ds-flex-item>
@@ -265,6 +265,23 @@ export default {
     },
     user() {
       return this.User ? this.User[0] : {}
+    },
+    userBadges() {
+      const emptyBadge = {
+        key: 'empty',
+        icon: 'http://172.23.0.7:3000/img/badges/slot-empty.svg',
+        description: '',
+      }
+
+      const badges = [this.user.badgeVerification, ...(this.user.badgeTrophiesSelected || [])].map(
+        (item) => item || emptyBadge,
+      )
+
+      while (badges.length < 10) {
+        badges.push(emptyBadge)
+      }
+
+      return badges
     },
     userName() {
       const { name } = this.user || {}
