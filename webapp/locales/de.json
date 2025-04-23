@@ -957,6 +957,9 @@
     "title": "Suchergebnisse"
   },
   "settings": {
+    "badges": {
+      "name": "Badges"
+    },
     "blocked-users": {
       "block": "Nutzer blockieren",
       "columns": {

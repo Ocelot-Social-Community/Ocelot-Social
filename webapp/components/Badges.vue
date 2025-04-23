@@ -1,10 +1,16 @@
 <template>
-  <div :class="[badges.length === 2 && 'hc-badges-dual']" class="hc-badges">
+  <div
+    :class="[badges.length === 2 && 'hc-badges-dual']"
+    class="hc-badges"
+    :style="{ transform: `scale(${scale})` }"
+  >
     <div
       class="hc-badge-container"
-      v-for="badge in badges"
+      v-for="(badge, index) in badges"
       :key="badge.id"
       :title="badge.description"
+      :class="{ selectable: selectionMode && index > 0, selected: selectedIndex === index }"
+      @click="handleBadgeClick(index)"
     >
       <img :title="badge.key" :src="badge.icon | proxyApiUrl" class="hc-badge" />
     </div>
@@ -13,10 +19,42 @@
 
 <script>
 export default {
+  name: 'Badges',
   props: {
     badges: {
       type: Array,
       default: () => [],
+    },
+    scale: {
+      type: Number,
+      default: 1,
+    },
+    selectionMode: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      selectedIndex: null,
+    }
+  },
+  methods: {
+    handleBadgeClick(index) {
+      if (!this.selectionMode || index === 0) {
+        return
+      }
+      if (this.selectedIndex === index) {
+        this.selectedIndex = null
+        this.$emit('badge-selected', null)
+        return
+      }
+
+      this.selectedIndex = index
+      this.$emit('badge-selected', index)
+    },
+    resetSelection() {
+      this.selectedIndex = null
     },
   },
 }
@@ -44,6 +82,21 @@ export default {
     position: absolute;
     width: $badge-size-x;
     height: $badge-size-y;
+
+    &.selectable {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: scale(1.1);
+        filter: brightness(1.1);
+      }
+    }
+
+    &.selected {
+      transform: scale(1.1);
+      filter: brightness(1.2);
+    }
   }
 
   .hc-badge {

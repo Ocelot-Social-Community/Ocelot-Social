@@ -31,6 +31,10 @@ export default {
           path: `/settings/my-email-address`,
         },
         {
+          name: this.$t('settings.badges.name'),
+          path: `/settings/badges`,
+        },
+        {
           name: this.$t('settings.security.name'),
           path: `/settings/security`,
         },
