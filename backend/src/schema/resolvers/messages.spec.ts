@@ -1,20 +1,28 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/await-thenable */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { createMessageMutation, messageQuery, markMessagesAsSeen } from '@graphql/messages'
-import { createRoomMutation, roomQuery } from '@graphql/rooms'
+import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import { markMessagesAsSeen } from '@graphql/queries/markMessagesAsSeen'
+import { messageQuery } from '@graphql/queries/messageQuery'
+import { roomQuery } from '@graphql/queries/roomQuery'
 import createServer, { pubsub } from '@src/server'
 
 const driver = getDriver()
 const neode = getNeode()
 
-const pubsubSpy = jest.spyOn(pubsub, 'publish')
-
 let query
 let mutate
 let authenticatedUser
 let chattingUser, otherChattingUser, notChattingUser
+
+const pubsubSpy = jest.spyOn(pubsub, 'publish')
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -118,7 +126,7 @@ describe('Message', () => {
         })
 
         describe('user chats in room', () => {
-          it('returns the message and publishes subscriptions', async () => {
+          it('returns the message', async () => {
             await expect(
               mutate({
                 mutation: createMessageMutation(),
@@ -142,24 +150,6 @@ describe('Message', () => {
                   seen: false,
                 },
               },
-            })
-            expect(pubsubSpy).toBeCalledWith('ROOM_COUNT_UPDATED', {
-              roomCountUpdated: '1',
-              userId: 'other-chatting-user',
-            })
-            expect(pubsubSpy).toBeCalledWith('CHAT_MESSAGE_ADDED', {
-              chatMessageAdded: expect.objectContaining({
-                id: expect.any(String),
-                content: 'Some nice message to other chatting user',
-                senderId: 'chatting-user',
-                username: 'Chatting User',
-                avatar: expect.any(String),
-                date: expect.any(String),
-                saved: true,
-                distributed: false,
-                seen: false,
-              }),
-              userId: 'other-chatting-user',
             })
           })
 

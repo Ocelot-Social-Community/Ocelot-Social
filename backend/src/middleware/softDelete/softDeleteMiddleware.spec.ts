@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/await-thenable */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
@@ -42,7 +48,7 @@ beforeAll(async () => {
       },
       {
         avatar: Factory.build('image', {
-          url: '/some/offensive/avatar.jpg',
+          url: 'http://localhost/some/offensive/avatar.jpg',
         }),
       },
     ),
@@ -110,7 +116,7 @@ beforeAll(async () => {
       },
       {
         image: Factory.build('image', {
-          url: '/some/offensive/image.jpg',
+          url: 'http://localhost/some/offensive/image.jpg',
         }),
         author: troll,
         categoryIds,
@@ -272,7 +278,7 @@ describe('softDeleteMiddleware', () => {
           expect(subject.about).toEqual('This self description is very offensive'))
         it('displays avatar', () =>
           expect(subject.avatar).toEqual({
-            url: expect.stringContaining('/some/offensive/avatar.jpg'),
+            url: expect.stringMatching('http://localhost/some/offensive/avatar.jpg'),
           }))
       })
 
@@ -287,7 +293,7 @@ describe('softDeleteMiddleware', () => {
           expect(subject.contentExcerpt).toEqual('This is an offensive post content'))
         it('displays image', () =>
           expect(subject.image).toEqual({
-            url: expect.stringContaining('/some/offensive/image.jpg'),
+            url: expect.stringMatching('http://localhost/some/offensive/image.jpg'),
           }))
       })
 

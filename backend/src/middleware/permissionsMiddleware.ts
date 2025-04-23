@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 
 import CONFIG from '@config/index'
@@ -12,26 +18,26 @@ const neode = getNeode()
 const isAuthenticated = rule({
   cache: 'contextual',
 })(async (_parent, _args, ctx, _info) => {
-  return !!(ctx && ctx.user && ctx.user.id)
+  return !!ctx?.user?.id
 })
 
-const isModerator = rule()(async (parent, args, { user }, info) => {
+const isModerator = rule()(async (_parent, _args, { user }, _info) => {
   return user && (user.role === 'moderator' || user.role === 'admin')
 })
 
-const isAdmin = rule()(async (parent, args, { user }, info) => {
+const isAdmin = rule()(async (_parent, _args, { user }, _info) => {
   return user && user.role === 'admin'
 })
 
 const onlyYourself = rule({
   cache: 'no_cache',
-})(async (parent, args, context, info) => {
+})(async (_parent, args, context, _info) => {
   return context.user.id === args.id
 })
 
 const isMyOwn = rule({
   cache: 'no_cache',
-})(async (parent, args, { user }, info) => {
+})(async (parent, _args, { user }, _info) => {
   return user && user.id === parent.id
 })
 
@@ -56,7 +62,7 @@ const isMySocialMedia = rule({
 const isAllowedToChangeGroupSettings = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const ownerId = user.id
   const { id: groupId } = args
   const session = driver.session()
@@ -86,7 +92,7 @@ const isAllowedToChangeGroupSettings = rule({
 const isAllowedSeeingGroupMembers = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { id: groupId } = args
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
@@ -122,7 +128,7 @@ const isAllowedSeeingGroupMembers = rule({
 const isAllowedToChangeGroupMemberRole = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const currentUserId = user.id
   const { groupId, userId, roleInGroup } = args
   if (currentUserId === userId) return false
@@ -169,7 +175,7 @@ const isAllowedToChangeGroupMemberRole = rule({
 const isAllowedToJoinGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { groupId, userId } = args
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
@@ -199,7 +205,7 @@ const isAllowedToJoinGroup = rule({
 const isAllowedToLeaveGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { groupId, userId } = args
   if (user.id !== userId) return false
   const session = driver.session()
@@ -229,7 +235,7 @@ const isAllowedToLeaveGroup = rule({
 const isMemberOfGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { groupId } = args
   if (!groupId) return true
   const userId = user.id
@@ -257,7 +263,7 @@ const isMemberOfGroup = rule({
 const canRemoveUserFromGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { groupId, userId } = args
   const currentUserId = user.id
   if (currentUserId === userId) return false
@@ -293,7 +299,7 @@ const canRemoveUserFromGroup = rule({
 const canCommentPost = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { postId } = args
   const userId = user.id
   const session = driver.session()
@@ -350,7 +356,7 @@ const isAuthor = rule({
 
 const isDeletingOwnAccount = rule({
   cache: 'no_cache',
-})(async (parent, args, context, _info) => {
+})(async (_parent, args, context, _info) => {
   return context.user.id === args.id
 })
 
@@ -362,7 +368,7 @@ const noEmailFilter = rule({
 
 const publicRegistration = rule()(() => CONFIG.PUBLIC_REGISTRATION)
 
-const inviteRegistration = rule()(async (_parent, args, { user, driver }) => {
+const inviteRegistration = rule()(async (_parent, args, { _user, driver }) => {
   if (!CONFIG.INVITE_REGISTRATION) return false
   const { inviteCode } = args
   const session = driver.session()
@@ -429,10 +435,9 @@ export default shield(
       CreateSocialMedia: isAuthenticated,
       UpdateSocialMedia: isMySocialMedia,
       DeleteSocialMedia: isMySocialMedia,
-      // AddBadgeRewarded: isAdmin,
-      // RemoveBadgeRewarded: isAdmin,
-      reward: isAdmin,
-      unreward: isAdmin,
+      setVerificationBadge: isAdmin,
+      rewardTrophyBadge: isAdmin,
+      revokeBadge: isAdmin,
       followUser: isAuthenticated,
       unfollowUser: isAuthenticated,
       shout: isAuthenticated,
@@ -469,6 +474,8 @@ export default shield(
       toggleObservePost: isAuthenticated,
       muteGroup: and(isAuthenticated, isMemberOfGroup),
       unmuteGroup: and(isAuthenticated, isMemberOfGroup),
+      setTrophyBadgeSelected: isAuthenticated,
+      resetTrophyBadgesSelected: isAuthenticated,
     },
     User: {
       email: or(isMyOwn, isAdmin),

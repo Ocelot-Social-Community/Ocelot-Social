@@ -33,8 +33,8 @@ export const post = {
     badges: [
       {
         id: 'b4',
-        key: 'indiegogo_en_bear',
-        icon: '/img/badges/indiegogo_en_bear.svg',
+        key: 'trophy_bear',
+        icon: '/img/badges/trophy_blue_bear.svg',
         __typename: 'Badge',
       },
     ],

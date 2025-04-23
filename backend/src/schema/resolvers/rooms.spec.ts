@@ -1,9 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { createMessageMutation } from '@graphql/messages'
-import { createRoomMutation, roomQuery, unreadRoomsQuery } from '@graphql/rooms'
+import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import { roomQuery } from '@graphql/queries/roomQuery'
+import { unreadRoomsQuery } from '@graphql/queries/unreadRoomsQuery'
 import createServer from '@src/server'
 
 const driver = getDriver()
@@ -387,6 +392,34 @@ describe('Room', () => {
             },
           })
         })
+
+        it('when chattingUser is blocked has 0 unread rooms', async () => {
+          authenticatedUser = await otherChattingUser.toJson()
+          await otherChattingUser.relateTo(chattingUser, 'blocked')
+          await expect(
+            query({
+              query: unreadRoomsQuery(),
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              UnreadRooms: 0,
+            },
+          })
+        })
+
+        it('when chattingUser is muted has 0 unread rooms', async () => {
+          authenticatedUser = await otherChattingUser.toJson()
+          await otherChattingUser.relateTo(chattingUser, 'muted')
+          await expect(
+            query({
+              query: unreadRoomsQuery(),
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              UnreadRooms: 0,
+            },
+          })
+        })
       })
 
       describe('as not chatting user', () => {
@@ -558,6 +591,7 @@ describe('Room', () => {
   })
 
   describe('query single room', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let result: any = null
 
     beforeAll(async () => {

@@ -10,6 +10,28 @@
     "saveCategories": "Save topics"
   },
   "admin": {
+    "badges": {
+      "description": "Configure the available badges for this user",
+      "revokeTrophy": {
+        "error": "Trophy could not be revoked!",
+        "success": "Trophy successfully revoked!"
+      },
+      "revokeVerification": {
+        "error": "Verification could not be revoked!",
+        "success": "Verification succesfully revoked"
+      },
+      "rewardTrophy": {
+        "error": "Trophy could not be rewarded!",
+        "success": "Trophy successfully rewarded!"
+      },
+      "setVerification": {
+        "error": "Verification could not be set!",
+        "success": "Verification successfully set!"
+      },
+      "title": "Badges",
+      "trophyBadges": "Trophies",
+      "verificationBadges": "Verifications"
+    },
     "categories": {
       "categoryName": "Name",
       "name": "Topics",
@@ -68,13 +90,15 @@
       "roleChanged": "Role changed successfully!",
       "table": {
         "columns": {
+          "badges": "Badges",
           "createdAt": "Created at",
           "email": "E-mail",
           "name": "Name",
           "number": "No.",
           "role": "Role",
           "slug": "Slug"
-        }
+        },
+        "edit": "Edit"
       }
     }
   },

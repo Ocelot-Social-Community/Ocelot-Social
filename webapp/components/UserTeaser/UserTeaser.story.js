@@ -41,8 +41,8 @@ export const user = {
       commentedCount: 3,
       badges: [
         {
-          id: 'indiegogo_en_bear',
-          icon: '/img/badges/indiegogo_en_bear.svg',
+          id: 'trophy_bear',
+          icon: '/img/badges/trophy_blue_bear.svg',
         },
       ],
       location: {

@@ -1,3 +1,11 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable security/detect-non-literal-fs-filename */
 /* eslint-disable n/no-process-env */
 /* eslint-disable n/no-unpublished-require */
 /* eslint-disable n/no-missing-require */
@@ -19,6 +27,7 @@ if (require.resolve) {
 }
 
 // Use Cypress env or process.env
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Cypress: any | undefined
 const env = typeof Cypress !== 'undefined' ? Cypress.env() : process.env // eslint-disable-line no-undef
 

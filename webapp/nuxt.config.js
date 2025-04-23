@@ -102,6 +102,7 @@ export default {
    */
   styleResources: {
     scss: [
+      '~assets/_new/styles/uses.scss',
       styleguideStyles,
       '~assets/_new/styles/tokens.scss',
       '~assets/styles/imports/_branding.scss',
@@ -202,6 +203,15 @@ export default {
       toProxy: true, // cloudflare needs that
       headers: {
         Accept: 'application/json',
+        'X-UI-Request': true,
+        'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
+      },
+    },
+    '/img': {
+      // make this configurable (nuxt-dotenv)
+      target: CONFIG.GRAPHQL_URI,
+      toProxy: true, // cloudflare needs that
+      headers: {
         'X-UI-Request': true,
         'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
       },

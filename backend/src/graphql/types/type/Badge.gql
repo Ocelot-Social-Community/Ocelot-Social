@@ -1,0 +1,25 @@
+type Badge {
+  id: ID!
+  type: BadgeType!
+  icon: String!
+  createdAt: String
+  description: String!
+
+  rewarded: [User]! @relation(name: "REWARDED", direction: "OUT")
+  verifies: [User]! @relation(name: "VERIFIES", direction: "OUT")
+}
+
+enum BadgeType {
+  verification
+  trophy
+}
+
+type Query {
+  Badge: [Badge]
+}
+
+type Mutation {
+  setVerificationBadge(badgeId: ID!, userId: ID!): User
+  rewardTrophyBadge(badgeId: ID!, userId: ID!): User
+  revokeBadge(badgeId: ID!, userId: ID!): User
+}
