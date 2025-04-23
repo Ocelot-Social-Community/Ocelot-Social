@@ -92,7 +92,7 @@
     "nodemailer": "^6.10.1",
     "nodemailer-html-to-text": "^3.2.0",
     "request": "~2.88.2",
-    "sanitize-html": "~2.15.0",
+    "sanitize-html": "~2.16.0",
     "slug": "~9.1.0",
     "subscriptions-transport-ws": "^0.9.19",
     "trunc-html": "~1.1.2",
@@ -102,7 +102,7 @@
   },
   "devDependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "^4.5.0",
-    "@faker-js/faker": "9.6.0",
+    "@faker-js/faker": "9.7.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.14.1",
     "@typescript-eslint/eslint-plugin": "^5.62.0",

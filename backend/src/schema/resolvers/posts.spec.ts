@@ -1468,7 +1468,7 @@ describe('DeletePost', () => {
       },
       {
         image: Factory.build('image', {
-          url: 'path/to/some/image',
+          url: 'http://localhost/path/to/some/image',
         }),
         author,
         categoryIds,
