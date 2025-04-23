@@ -81,6 +81,7 @@ const setTrophyBadgeSelected = gql`
       badgeTrophiesCount
       badgeTrophiesSelected {
         id
+        isDefault
       }
       badgeTrophiesUnused {
         id
@@ -96,6 +97,7 @@ const resetTrophyBadgesSelected = gql`
       badgeTrophiesCount
       badgeTrophiesSelected {
         id
+        isDefault
       }
       badgeTrophiesUnused {
         id
@@ -1242,15 +1244,40 @@ describe('setTrophyBadgeSelected', () => {
               badgeTrophiesSelected: [
                 {
                   id: 'trophy_bear',
+                  isDefault: false,
                 },
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
               ],
               badgeTrophiesUnused: [
                 {
@@ -1275,17 +1302,40 @@ describe('setTrophyBadgeSelected', () => {
               badgeTrophiesSelected: [
                 {
                   id: 'trophy_bear',
+                  isDefault: false,
                 },
-                null,
-                null,
-                null,
-                null,
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
                 {
                   id: 'trophy_panda',
+                  isDefault: false,
                 },
-                null,
-                null,
-                null,
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
               ],
               badgeTrophiesUnused: [],
               badgeTrophiesUnusedCount: 0,
@@ -1295,8 +1345,8 @@ describe('setTrophyBadgeSelected', () => {
       )
     })
 
-    describe('set badge to null', () => {
-      it('returns the user with no badge set on the selected slot', async () => {
+    describe('set badge to null or default', () => {
+      beforeEach(async () => {
         await mutate({
           mutation: setTrophyBadgeSelected,
           variables: { slot: 0, badgeId: 'trophy_bear' },
@@ -1305,7 +1355,9 @@ describe('setTrophyBadgeSelected', () => {
           mutation: setTrophyBadgeSelected,
           variables: { slot: 5, badgeId: 'trophy_panda' },
         })
+      })
 
+      it('returns the user with no badge set on the selected slot when sending null', async () => {
         await expect(
           mutate({
             mutation: setTrophyBadgeSelected,
@@ -1319,15 +1371,101 @@ describe('setTrophyBadgeSelected', () => {
                 badgeTrophiesSelected: [
                   {
                     id: 'trophy_bear',
+                    isDefault: false,
                   },
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                ],
+                badgeTrophiesUnused: [
+                  {
+                    id: 'trophy_panda',
+                  },
+                ],
+                badgeTrophiesUnusedCount: 1,
+              },
+            },
+          }),
+        )
+      })
+
+      it('returns the user with no badge set on the selected slot when sending default_trophy', async () => {
+        await expect(
+          mutate({
+            mutation: setTrophyBadgeSelected,
+            variables: { slot: 5, badgeId: 'default_trophy' },
+          }),
+        ).resolves.toEqual(
+          expect.objectContaining({
+            data: {
+              setTrophyBadgeSelected: {
+                badgeTrophiesCount: 2,
+                badgeTrophiesSelected: [
+                  {
+                    id: 'trophy_bear',
+                    isDefault: false,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
                 ],
                 badgeTrophiesUnused: [
                   {
@@ -1411,7 +1549,44 @@ describe('resetTrophyBadgesSelected', () => {
           data: {
             resetTrophyBadgesSelected: {
               badgeTrophiesCount: 2,
-              badgeTrophiesSelected: [null, null, null, null, null, null, null, null, null],
+              badgeTrophiesSelected: [
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+              ],
               badgeTrophiesUnused: [
                 {
                   id: 'trophy_panda',

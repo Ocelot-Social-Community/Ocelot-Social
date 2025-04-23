@@ -6,6 +6,22 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
+export const defaultTrophyBadge = {
+  id: 'default_trophy',
+  type: 'trophy',
+  icon: '/img/badges/default_trophy.svg',
+  description: '',
+  createdAt: '',
+}
+
+export const defaultVerificationBadge = {
+  id: 'default_verification',
+  type: 'verification',
+  icon: '/img/badges/default_verification.svg',
+  description: '',
+  createdAt: '',
+}
+
 export default {
   Query: {
     Badge: async (object, args, context, resolveInfo) =>
@@ -122,5 +138,9 @@ export default {
         session.close()
       }
     },
+  },
+  Badge: {
+    isDefault: async (parent, _params, _context, _resolveInfo) =>
+      [defaultTrophyBadge.id, defaultVerificationBadge.id].includes(parent.id),
   },
 }
