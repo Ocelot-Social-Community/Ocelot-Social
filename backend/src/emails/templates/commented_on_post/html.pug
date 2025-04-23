@@ -1,0 +1,7 @@
+extend ../layout.pug
+
+block content
+  .content
+  - var commentUrl = commentUrl
+  p= t('commentedOnPost', { postTitle})
+  a.button(href=commentUrl)= t('buttons.viewComment')

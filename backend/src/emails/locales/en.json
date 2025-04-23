@@ -1,0 +1,27 @@
+{
+  "notification": "Notification",
+  "buttons": {
+    "viewChat": "Show Chat",
+    "viewComment": "View comment",
+    "viewGroup": "View group",
+    "viewPost": "View post"
+  },
+  "general": {
+    "greeting": "Hello",
+    "seeYou": "See you soon on ",
+    "yourTeam": "– The {team} Team",
+    "settingsHint": "PS: If you don't want to receive e-mails anymore, change your ",
+    "settingsName": "notification settings"
+  },
+  "changedGroupMemberRole": "your role in the group “{groupName}” has been changed. Click on this button to view this group:",
+  "chatMessageStart": "you have received a new chat message from ",
+  "chatMessageEnd": ".",
+  "commentedOnPost": "a user commented on a post that you are observing with the title “{postTitle}”. Click on this button to view this comment:",
+  "mentionedInComment": "you have been mentioned in a comment to the post with the title “{postTitle}”. Click on this button to view this comment:",
+  "followedUserPosted": "a user you are following wrote a new post with the title “{postTitle}”. Click on this button to view this post:",
+  "mentionedInPost": "you have been mentioned in a post with the title “{postTitle}”. Click on this button to view this post:",
+  "removedUserFromGroup": "you have been removed from the group “{groupName}”.",
+  "postInGroup": "someone wrote a new post with the title “{postTitle}” in one of your groups. Click on this button to view this post:",
+  "userJoinedGroup": "a user joined the group “{groupName}”. Click on this button to view this group:",
+  "userLeftGroup": "a user left the group “{groupName}”. Click on this button to view this group:"
+}

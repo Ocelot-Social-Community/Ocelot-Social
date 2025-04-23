@@ -1,0 +1,9 @@
+extend ../layout.pug
+
+block content
+  .content
+  - var chatUrl = chatUrl
+  p= t('chatMessageStart')
+    b= chattingUser
+    = t('chatMessageEnd')
+  a.button(href=chatUrl)= t('buttons.viewChat')
