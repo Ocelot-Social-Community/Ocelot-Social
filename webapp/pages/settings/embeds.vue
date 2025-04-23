@@ -17,7 +17,7 @@
       <ds-text>
         {{ $t('settings.embeds.status.change.question') }}
       </ds-text>
-      <ds-space margin="small">
+      <ds-space margin-top="small" margin-bottom="base">
         <base-button @click="submit" :filled="!disabled" :disabled="!disabled">
           {{ $t('settings.embeds.status.change.deny') }}
         </base-button>
