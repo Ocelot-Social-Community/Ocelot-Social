@@ -1,6 +1,7 @@
 <template>
   <base-card>
     <h2 class="title">{{ $t('settings.badges.name') }}</h2>
+    <p>{{ $t('settings.badges.description') }}</p>
     <ds-space margin-bottom="big">
       <div class="presenterContainer">
         <badges
@@ -18,7 +19,9 @@
         </base-button>
       </div>
 
-      <div v-if="selectedBadgeIndex !== null && isEmptySlot" class="selection-info">
+      <p v-if="!availableBadges.length && isEmptySlot">{{ $t('settings.badges.no-badges-available') }}</p>
+
+      <div v-if="availableBadges.length && selectedBadgeIndex !== null && isEmptySlot" class="selection-info">
         <badge-selection
           :badges="availableBadges"
           @badge-selected="assignBadgeToSlot"
@@ -67,10 +70,7 @@ export default {
     }),
     handleBadgeSlotSelection(index) {
       if (index === 0) {
-        this.$toast.info(
-          this.$t('settings.badges.verification') ||
-            'Dies ist deine Verifikations-Badge und kann nicht geändert werden.',
-        )
+        this.$toast.info(this.$t('settings.badges.verification'))
         this.$refs.badgesComponent.resetSelection()
         return
       }
@@ -100,7 +100,6 @@ export default {
       }
 
       await this.setSlot(badge, this.selectedBadgeIndex)
-
       this.$toast.success(this.$t('settings.badges.success-update'))
 
       if (this.$refs.badgeSelection && this.$refs.badgeSelection.resetSelection) {
@@ -113,6 +112,7 @@ export default {
       if (this.selectedBadgeIndex === null) return
 
       await this.setSlot(null, this.selectedBadgeIndex)
+      this.$toast.success(this.$t('settings.badges.success-update'))
 
       this.$refs.badgesComponent.resetSelection()
       this.selectedBadgeIndex = null
@@ -123,6 +123,7 @@ export default {
 
 <style lang="scss">
 .presenterContainer {
+  margin-top: 20px;
   padding-top: 50px;
   min-height: 250px;
 }

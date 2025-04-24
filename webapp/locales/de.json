@@ -958,8 +958,12 @@
   },
   "settings": {
     "badges": {
+      "description": "Hier hast du die Möglichkeit zu entscheiden, wie deine bereits erworbenen Badges in deinem Profil gezeigt werden sollen. Klicke einfach eine leere Fläche an, um ihr einen Badge hinzuzufügen.",
       "name": "Badges",
-      "remove": "Badge entfernen"
+      "no-badges-available": "Im Moment stehen dir keine Badges zur Verfügung, die du hinzufügen könntest.",
+      "remove": "Badge entfernen",
+      "success-update": "Deine Badges wurden erfolgreich gespeichert.",
+      "verification": "Dies ist deine Verifikations-Badge und kann nicht geändert werden."
     },
     "blocked-users": {
       "block": "Nutzer blockieren",

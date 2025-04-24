@@ -958,8 +958,12 @@
   },
   "settings": {
     "badges": {
+      "description": "Here you can choose how to display your earned badges on your profile. Simply click on an empty space to add a badge.",
       "name": "Badges",
-      "remove": "Remove Badge"
+      "no-badges-available": "You currently don't have any badges available to add.",
+      "remove": "Remove Badge",
+      "success-update": "Your badges have been updated successfully.",
+      "verification": "This is your verification badge and cannot be changed."
     },
     "blocked-users": {
       "block": "Block user",
