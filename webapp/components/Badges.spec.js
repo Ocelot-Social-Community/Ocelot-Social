@@ -4,18 +4,9 @@ import Badges from './Badges.vue'
 const localVue = global.localVue
 
 describe('Badges.vue', () => {
-  let mocks
-
-  beforeEach(() => {
-    mocks = {
-      $t: jest.fn((s) => s),
-    }
-  })
-
   const Wrapper = (propsData) => {
     return render(Badges, {
       propsData,
-      mocks,
       localVue,
     })
   }
