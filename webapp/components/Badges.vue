@@ -9,11 +9,10 @@
       class="hc-badge-container"
       v-for="(badge, index) in badges"
       :key="index"
-      :title="badge.description"
       :class="{ selectable: selectionMode && index > 0, selected: selectedIndex === index }"
       @click="handleBadgeClick(index)"
     >
-      <img :title="badge.key" :src="badge.icon | proxyApiUrl" class="hc-badge" />
+      <img :title="badge.description" :src="badge.icon | proxyApiUrl" class="hc-badge" />
     </component>
   </div>
 </template>

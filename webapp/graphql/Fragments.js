@@ -29,10 +29,12 @@ export const badgesFragment = gql`
     badgeTrophiesSelected {
       id
       icon
+      description
     }
     badgeVerification {
       id
       icon
+      description
     }
   }
 `
