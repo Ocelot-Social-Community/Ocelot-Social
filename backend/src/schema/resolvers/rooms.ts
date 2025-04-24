@@ -8,7 +8,7 @@ import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
 // eslint-disable-next-line import/no-cycle
-import { pubsub, ROOM_COUNT_UPDATED } from '@src/server'
+import { ROOM_COUNT_UPDATED } from '@constants/subscriptions'
 
 import Resolver from './helpers/Resolver'
 
@@ -30,7 +30,7 @@ export default {
   Subscription: {
     roomCountUpdated: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator(ROOM_COUNT_UPDATED),
+        (_, __, context) => context.pubsub.asyncIterator(ROOM_COUNT_UPDATED),
         (payload, variables, context) => {
           return payload.userId === context.user?.id
         },

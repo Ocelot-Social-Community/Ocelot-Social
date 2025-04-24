@@ -4,6 +4,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable security/detect-object-injection */
+import {
+  NOTIFICATION_ADDED,
+  ROOM_COUNT_UPDATED,
+  CHAT_MESSAGE_ADDED,
+} from '@constants/subscriptions'
 import { sendMail } from '@middleware/helpers/email/sendMail'
 import {
   chatMessageTemplate,
@@ -13,8 +18,6 @@ import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 // eslint-disable-next-line import/no-cycle
 import { getUnreadRoomsCount } from '@schema/resolvers/rooms'
-// eslint-disable-next-line import/no-cycle
-import { pubsub, NOTIFICATION_ADDED, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '@src/server'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 
@@ -58,7 +61,7 @@ const publishNotifications = async (
     notifications.map((notification) => notification.to.id),
   )
   notifications.forEach((notificationAdded, index) => {
-    pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
+    context.pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
     if (
       (notificationAdded.to[emailNotificationSetting] ?? true) &&
       !isUserOnline(notificationAdded.to) &&
@@ -509,11 +512,11 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
       // send subscriptions
       const roomCountUpdated = await getUnreadRoomsCount(recipientUser.id, session)
 
-      void pubsub.publish(ROOM_COUNT_UPDATED, {
+      void context.pubsub.publish(ROOM_COUNT_UPDATED, {
         roomCountUpdated,
         userId: recipientUser.id,
       })
-      void pubsub.publish(CHAT_MESSAGE_ADDED, {
+      void context.pubsub.publish(CHAT_MESSAGE_ADDED, {
         chatMessageAdded: message,
         userId: recipientUser.id,
       })
