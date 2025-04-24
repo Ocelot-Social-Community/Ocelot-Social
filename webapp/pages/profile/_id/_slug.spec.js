@@ -5,6 +5,11 @@ const localVue = global.localVue
 
 localVue.filter('date', (d) => d)
 
+// Mock Math.random, used in Dropdown
+Object.assign(Math, {
+  random: () => 0,
+})
+
 const stubs = {
   'client-only': true,
   'v-popover': true,
@@ -24,7 +29,7 @@ describe('ProfileSlug', () => {
         id: 'p23',
         name: 'It is a post',
       },
-      $t: jest.fn(),
+      $t: jest.fn((t) => t),
       // If you're mocking router, then don't use VueRouter with localVue: https://vue-test-utils.vuejs.org/guides/using-with-vue-router.html
       $route: {
         params: {

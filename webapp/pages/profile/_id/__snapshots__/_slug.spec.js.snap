@@ -43,7 +43,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
               handleresize="true"
               offset="5"
               openclass="open"
-              opengroup="0.7801068101395783"
+              opengroup="0"
               placement="bottom-end"
               popoverarrowclass="tooltip-arrow popover-arrow"
               popoverbaseclass="tooltip popover"
@@ -92,7 +92,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                             <!---->
                           </span>
                           
-            
+            report.user.title
           
                         </router-link-stub>
                         <!---->
@@ -111,7 +111,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                             <!---->
                           </span>
                           
-            
+            disable.user.title
           
                         </router-link-stub>
                         <!---->
@@ -130,7 +130,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                             <!---->
                           </span>
                           
-            
+            settings.muted-users.mute
           
                         </router-link-stub>
                         <!---->
@@ -149,7 +149,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                             <!---->
                           </span>
                           
-            
+            settings.blocked-users.block
           
                         </router-link-stub>
                         <!---->
@@ -187,7 +187,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
             >
               
-             
+            profile.memberSince 
           
             </p>
           </div>
@@ -264,7 +264,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                     class="ds-text ds-number-label ds-text-size-small ds-text-soft"
                   >
                     
-    
+    profile.followers
   
                   </p>
                 </div>
@@ -300,7 +300,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                     class="ds-text ds-number-label ds-text-size-small ds-text-soft"
                   >
                     
-    
+    profile.following
   
                   </p>
                 </div>
@@ -327,12 +327,13 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                
               <!---->
                
-  
+  followButton.follow
 
             </button>
              
             <button
-              class="base-button"
+              class="base-button has-tooltip"
+              data-original-title="null"
               type="button"
             >
               <span
@@ -343,7 +344,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                
               <!---->
                
-            
+            chat.userProfileButton.label
           
             </button>
           </div>
@@ -363,7 +364,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
           style="text-align: center; margin-bottom: 10px;"
         >
           
-        
+        profile.network.title
       
         </h3>
          
@@ -414,7 +415,9 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                       class="ds-space"
                       style="margin-top: 16px; margin-bottom: 16px;"
                     >
-                      <client-only-stub>
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
                         <div
                           class="ds-number ds-number-size-x-large"
                         >
@@ -439,7 +442,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                             class="ds-text ds-number-label ds-text-size-small ds-text-soft"
                           >
                             
-    
+    common.post
   
                           </p>
                         </div>
@@ -458,7 +461,9 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                       class="ds-space"
                       style="margin-top: 16px; margin-bottom: 16px;"
                     >
-                      <client-only-stub>
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
                         <div
                           class="ds-number ds-number-size-x-large"
                         >
@@ -483,7 +488,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                             class="ds-text ds-number-label ds-text-size-small ds-text-soft"
                           >
                             
-    
+    profile.commented
   
                           </p>
                         </div>
@@ -502,7 +507,9 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                       class="ds-space"
                       style="margin-top: 16px; margin-bottom: 16px;"
                     >
-                      <client-only-stub>
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
                         <div
                           class="ds-number ds-number-size-x-large"
                         >
@@ -527,7 +534,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
                             class="ds-text ds-number-label ds-text-size-small ds-text-soft"
                           >
                             
-    
+    profile.shouted
   
                           </p>
                         </div>
@@ -593,7 +600,7 @@ exports[`ProfileSlug given an authenticated user given another profile user rend
           <infinite-loading-stub
             direction="bottom"
             distance="100"
-            identifier="1745514261221"
+            identifier="1745514805869"
           />
         </client-only-stub>
       </div>
@@ -673,7 +680,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
               handleresize="true"
               offset="5"
               openclass="open"
-              opengroup="0.5255491841869031"
+              opengroup="0"
               placement="bottom-end"
               popoverarrowclass="tooltip-arrow popover-arrow"
               popoverbaseclass="tooltip popover"
@@ -721,7 +728,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                             <!---->
                           </span>
                           
-            
+            settings.name
           
                         </router-link-stub>
                         <!---->
@@ -759,7 +766,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
             >
               
-             
+            profile.memberSince 
           
             </p>
           </div>
@@ -841,7 +848,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                     class="ds-text ds-number-label ds-text-size-small ds-text-soft"
                   >
                     
-    
+    profile.followers
   
                   </p>
                 </div>
@@ -877,7 +884,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                     class="ds-text ds-number-label ds-text-size-small ds-text-soft"
                   >
                     
-    
+    profile.following
   
                   </p>
                 </div>
@@ -902,7 +909,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           style="text-align: center; margin-bottom: 10px;"
         >
           
-        
+        profile.network.title
       
         </h3>
          
@@ -953,7 +960,9 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                       class="ds-space"
                       style="margin-top: 16px; margin-bottom: 16px;"
                     >
-                      <client-only-stub>
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
                         <div
                           class="ds-number ds-number-size-x-large"
                         >
@@ -978,7 +987,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                             class="ds-text ds-number-label ds-text-size-small ds-text-soft"
                           >
                             
-    
+    common.post
   
                           </p>
                         </div>
@@ -997,7 +1006,9 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                       class="ds-space"
                       style="margin-top: 16px; margin-bottom: 16px;"
                     >
-                      <client-only-stub>
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
                         <div
                           class="ds-number ds-number-size-x-large"
                         >
@@ -1022,7 +1033,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                             class="ds-text ds-number-label ds-text-size-small ds-text-soft"
                           >
                             
-    
+    profile.commented
   
                           </p>
                         </div>
@@ -1041,7 +1052,9 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                       class="ds-space"
                       style="margin-top: 16px; margin-bottom: 16px;"
                     >
-                      <client-only-stub>
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
                         <div
                           class="ds-number ds-number-size-x-large"
                         >
@@ -1066,7 +1079,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                             class="ds-text ds-number-label ds-text-size-small ds-text-soft"
                           >
                             
-    
+    profile.shouted
   
                           </p>
                         </div>
@@ -1091,7 +1104,8 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 to="[object Object]"
               >
                 <button
-                  class="profile-post-add-button base-button --icon-only --circle --filled"
+                  class="profile-post-add-button base-button --icon-only --circle --filled has-tooltip"
+                  data-original-title="null"
                   path="[object Object]"
                   type="button"
                 >
@@ -1145,7 +1159,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           <infinite-loading-stub
             direction="bottom"
             distance="100"
-            identifier="1745514261221"
+            identifier="1745514805869"
           />
         </client-only-stub>
       </div>
