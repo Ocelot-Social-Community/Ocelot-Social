@@ -1,18 +1,18 @@
 <template>
   <div class="badge-selection">
-    <div
+    <button
       v-for="(badge, index) in badges"
-      :key="badge.key"
+      :key="badge.id"
       class="badge-selection-item"
       @click="handleBadgeClick(badge, index)"
     >
       <div class="badge-icon">
-        <img :src="badge.icon | proxyApiUrl" :alt="badge.key" />
+        <img :src="badge.icon | proxyApiUrl" :alt="badge.id" />
       </div>
       <div class="badge-info">
         <div class="badge-description">{{ badge.description }}</div>
       </div>
-    </div>
+    </button>
   </div>
 </template>
 
@@ -62,6 +62,8 @@ export default {
     border-radius: 8px;
     background-color: #f5f5f5;
     transition: all 0.2s ease;
+    width: 100%;
+    text-align: left;
     cursor: pointer;
 
     &:hover {
