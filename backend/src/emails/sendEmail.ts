@@ -64,12 +64,14 @@ export const sendMail = async (notification: any) => {
       from: `${CONFIG.APPLICATION_NAME} – ${i18n.__('notification')}`,
     },
     transport,
-    // preview: false,
+    preview: false,
+    /* This is very useful to see the emails sent by the unit tests
     preview: {
       open: {
         app: 'brave-browser',
       },
     },
+    */
   })
 
   try {
