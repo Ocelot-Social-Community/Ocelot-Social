@@ -32,7 +32,7 @@ const publishNotifications = async (
       !isUserOnline(notificationAdded.to) &&
       !emailsSent.includes(notificationAdded.email)
     ) {
-      await sendMailNew(notificationAdded)
+      void sendMailNew(notificationAdded)
       emailsSent.push(notificationAdded.email)
     }
   })
