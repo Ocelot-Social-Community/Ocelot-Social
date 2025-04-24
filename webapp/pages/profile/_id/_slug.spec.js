@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { render } from '@testing-library/vue'
 import ProfileSlug from './_slug.vue'
 
 const localVue = global.localVue
@@ -16,7 +16,6 @@ const stubs = {
 
 describe('ProfileSlug', () => {
   let wrapper
-  let Wrapper
   let mocks
 
   beforeEach(() => {
@@ -49,50 +48,109 @@ describe('ProfileSlug', () => {
     }
   })
 
-  describe('mount', () => {
-    Wrapper = () => {
-      return mount(ProfileSlug, {
-        mocks,
-        localVue,
-        stubs,
-      })
-    }
+  const Wrapper = (data) => {
+    return render(ProfileSlug, {
+      mocks,
+      localVue,
+      stubs,
+      data: () => data,
+    })
+  }
 
-    describe('given an authenticated user', () => {
-      beforeEach(() => {
-        mocks.$filters = {
-          removeLinks: (c) => c,
-          truncate: (a) => a,
-        }
-        mocks.$store = {
-          getters: {
-            'auth/isModerator': () => false,
-            'auth/user': {
-              id: 'u23',
-            },
+  describe('given an authenticated user', () => {
+    beforeEach(() => {
+      mocks.$filters = {
+        removeLinks: (c) => c,
+        truncate: (a) => a,
+      }
+      mocks.$store = {
+        getters: {
+          'auth/isModerator': () => false,
+          'auth/user': {
+            id: 'u23',
           },
-        }
+        },
+      }
+    })
+
+    describe('given another profile user', () => {
+      beforeEach(() => {
+        wrapper = Wrapper({
+          User: [
+            {
+              id: 'u3',
+              name: 'Bob the builder',
+              contributionsCount: 6,
+              shoutedCount: 7,
+              commentedCount: 8,
+              badgeVerification: {
+                id: 'bv1',
+                icon: '/path/to/icon-bv1',
+                description: 'verified',
+                isDefault: false,
+              },
+              badgeTrophiesSelected: [
+                {
+                  id: 'bt1',
+                  icon: '/path/to/icon-bt1',
+                  description: 'a trophy',
+                  isDefault: false,
+                },
+                {
+                  id: 'bt2',
+                  icon: '/path/to/icon-bt2',
+                  description: 'no trophy',
+                  isDefault: true,
+                },
+              ],
+            },
+          ],
+        })
       })
 
-      describe('given a user for the profile', () => {
-        beforeEach(() => {
-          wrapper = Wrapper()
-          wrapper.setData({
-            User: [
-              {
-                id: 'u3',
-                name: 'Bob the builder',
-                contributionsCount: 6,
-                shoutedCount: 7,
-                commentedCount: 8,
-              },
-            ],
-          })
-        })
+      it('renders', () => {
+        expect(wrapper.container).toMatchSnapshot()
+      })
+    })
 
-        it('displays name of the user', () => {
-          expect(wrapper.text()).toContain('Bob the builder')
+    describe('given the logged in user as profile user', () => {
+      beforeEach(() => {
+        mocks.$route.params.id = 'u23'
+        wrapper = Wrapper({
+          User: [
+            {
+              id: 'u23',
+              name: 'Bob the builder',
+              contributionsCount: 6,
+              shoutedCount: 7,
+              commentedCount: 8,
+              badgeVerification: {
+                id: 'bv1',
+                icon: '/path/to/icon-bv1',
+                description: 'verified',
+                isDefault: false,
+              },
+              badgeTrophiesSelected: [
+                {
+                  id: 'bt1',
+                  icon: '/path/to/icon-bt1',
+                  description: 'a trophy',
+                  isDefault: false,
+                },
+                {
+                  id: 'bt2',
+                  icon: '/path/to/icon-bt2',
+                  description: 'no trophy',
+                  isDefault: true,
+                },
+              ],
+            },
+          ],
         })
+      })
+
+      it('renders', () => {
+        expect(wrapper.container).toMatchSnapshot()
       })
     })
   })
