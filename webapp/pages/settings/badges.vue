@@ -19,9 +19,14 @@
         </base-button>
       </div>
 
-      <p v-if="!availableBadges.length && isEmptySlot">{{ $t('settings.badges.no-badges-available') }}</p>
+      <p v-if="!availableBadges.length && isEmptySlot">
+        {{ $t('settings.badges.no-badges-available') }}
+      </p>
 
-      <div v-if="availableBadges.length && selectedBadgeIndex !== null && isEmptySlot" class="selection-info">
+      <div
+        v-if="availableBadges.length && selectedBadgeIndex !== null && isEmptySlot"
+        class="selection-info"
+      >
         <badge-selection
           :badges="availableBadges"
           @badge-selected="assignBadgeToSlot"
