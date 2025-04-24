@@ -408,15 +408,18 @@ export const currentUserQuery = gql`
       badgeTrophiesSelected {
         id
         icon
+        description
         isDefault
       }
       badgeTrophiesUnused {
         id
         icon
+        description
       }
       badgeVerification {
         id
         icon
+        description
       }
       email
       role
@@ -487,11 +490,13 @@ export const setTrophyBadgeSelected = gql`
       badgeTrophiesSelected {
         id
         icon
+        description
         isDefault
       }
       badgeTrophiesUnused {
         id
         icon
+        description
       }
       badgeTrophiesUnusedCount
     }
@@ -505,11 +510,13 @@ export const resetTrophyBadgesSelected = gql`
       badgeTrophiesSelected {
         id
         icon
+        description
         isDefault
       }
       badgeTrophiesUnused {
         id
         icon
+        description
       }
       badgeTrophiesUnusedCount
     }
