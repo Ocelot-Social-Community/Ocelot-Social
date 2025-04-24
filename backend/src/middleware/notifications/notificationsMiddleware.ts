@@ -13,6 +13,7 @@ import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 // eslint-disable-next-line import/no-cycle
 import { getUnreadRoomsCount } from '@schema/resolvers/rooms'
+import { sendMail as sendMailNew } from '@src/emails/sendEmail'
 // eslint-disable-next-line import/no-cycle
 import { pubsub, NOTIFICATION_ADDED, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '@src/server'
 
@@ -26,6 +27,7 @@ const publishNotifications = async (
 ): Promise<string[]> => {
   const notifications = await notificationsPromise
   notifications.forEach((notificationAdded) => {
+    console.log(notificationAdded)
     pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
     if (
       notificationAdded.email && // no primary email was found
@@ -33,12 +35,7 @@ const publishNotifications = async (
       !isUserOnline(notificationAdded.to) &&
       !emailsSent.includes(notificationAdded.email)
     ) {
-      sendMail(
-        notificationTemplate({
-          email: notificationAdded.email,
-          variables: { notification: notificationAdded },
-        }),
-      )
+      sendMailNew(notificationAdded)
       emailsSent.push(notificationAdded.email)
     }
   })

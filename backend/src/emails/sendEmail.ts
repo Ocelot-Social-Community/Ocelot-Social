@@ -47,37 +47,97 @@ const transport = createTransport({
   },
 })
 
-export const sendMail = async () => {
-  i18n.setLocale('en')
+export const sendMail = async (notification: any) => {
+  const locale = notification?.to?.locale
+  const to = notification?.email
+  const name = notification?.to?.name
+  const template = notification?.reason
+
+  console.log('LOCALE', locale)
+  i18n.setLocale(locale)
+
+  console.log('getLocale', i18n.getLocale())
 
   const email = new Email({
     message: {
       from: `${CONFIG.APPLICATION_NAME} – ${i18n.__('notification')}`,
     },
     transport,
+    /*
     preview: {
       open: {
         app: 'brave-browser',
       },
     },
+    */
   })
 
   try {
     await email.send({
-      template: path.join(__dirname, 'templates', 'removed_user_from_group'),
+      template: path.join(__dirname, 'templates', template),
       message: {
-        to: 'test@example.org',
+        to,
       },
       locals: {
         ...defaultParams,
-        name: 'Elon',
-        postTitle: 'Mein genialer Beitrag',
-        postUrl: new URL('/post/id/slug', CONFIG.CLIENT_URI),
-        commentUrl: new URL('/post/id/slug#commentId-xxx', CONFIG.CLIENT_URI),
-        chattingUser: 'SR-71',
-        chatUrl: new URL('/chat', CONFIG.CLIENT_URI),
-        groupUrl: new URL('/group/id/slug', CONFIG.CLIENT_URI),
-        groupName: 'The Group',
+        locale,
+        name,
+        postTitle: notification?.from?.title,
+        postUrl: new URL(
+          notification?.from?.__typename === 'Comment'
+            ? `/post/${notification?.from?.post?.id}/${notification?.from?.post?.slug}`
+            : `/post/${notification?.from?.id}/${notification?.from?.slug}`,
+          CONFIG.CLIENT_URI,
+        ),
+        postAuthorName:
+          notification?.from?.__typename === 'Comment'
+            ? undefined
+            : notification?.from?.author?.name,
+        postAuthorUrl:
+          notification?.from?.__typename === 'Comment'
+            ? undefined
+            : new URL(
+                `user/${notification?.from?.author?.id}/${notification?.from?.author?.slug}`,
+                CONFIG.CLIENT_URI,
+              ),
+        commenterName:
+          notification?.from?.__typename === 'Comment'
+            ? notification?.from?.author?.name
+            : undefined,
+        commenterUrl:
+          notification?.from?.__typename === 'Comment'
+            ? new URL(
+                `/user/${notification?.from?.author?.id}/${notification?.from?.author?.slug}`,
+                CONFIG.CLIENT_URI,
+              )
+            : undefined,
+        commentUrl:
+          notification?.from?.__typename === 'Comment'
+            ? new URL(
+                `/post/${notification?.from?.post?.id}/${notification?.from?.post?.slug}#commentId-${notification?.from?.id}`,
+                CONFIG.CLIENT_URI,
+              )
+            : undefined,
+        // chattingUser: 'SR-71',
+        // chatUrl: new URL('/chat', CONFIG.CLIENT_URI),
+        groupUrl:
+          notification?.from?.__typename === 'Group'
+            ? new URL(
+                `/group/${notification?.from?.id}/${notification?.from?.slug}`,
+                CONFIG.CLIENT_URI,
+              )
+            : undefined,
+        groupName:
+          notification?.from?.__typename === 'Group' ? notification?.from?.name : undefined,
+        groupRelatedUserName:
+          notification?.from?.__typename === 'Group' ? notification?.relatedUser?.name : undefined,
+        groupRelatedUserUrl:
+          notification?.from?.__typename === 'Group'
+            ? new URL(
+                `/user/${notification?.relatedUser?.id}/${notification?.relatedUser?.slug}`,
+                CONFIG.CLIENT_URI,
+              )
+            : undefined,
       },
     })
   } catch (error) {

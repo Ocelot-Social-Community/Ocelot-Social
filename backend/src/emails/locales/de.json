@@ -17,7 +17,7 @@
   "chatMessageStart": "du hast eine neue Chat-Nachricht von ",
   "chatMessageEnd": " erhalten.",
   "commentedOnPost": "ein Nutzer hat einen Beitrag den Du beobachtest mit dem Titel „{postTitle}“ kommentiert. Klicke auf diesen Knopf, um diesen Kommentar zu sehen:",
-  "followedUserPosted": "ein Nutzer dem du folgst, hat einen neuen Beitrag mit dem Titel „{postTitle}“ geschrieben. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:",
+  "followedUserPosted": ", ein Nutzer dem du folgst, hat einen neuen Beitrag mit dem Titel „{postTitle}“ geschrieben. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:",
   "mentionedInComment": "du wurdest in einem Kommentar zu dem Beitrag mit dem Titel „{postTitle}“ erwähnt. Klicke auf diesen Knopf, um diesen Kommentar zu sehen:",
   "mentionedInPost": "du wurdest in einem Beitrag mit dem Titel „{postTitle}“ erwähnt. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:",
   "postInGroup": "jemand hat einen neuen Beitrag mit dem Titel „{postTitle}“ in einer Deiner Gruppen geschrieben. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:",

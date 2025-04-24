@@ -3,5 +3,8 @@ extend ../layout.pug
 block content
   .content
   - var postUrl = postUrl
-  p= t('followedUserPosted', { postTitle})
+  - var postAuthorUrl = postAuthorUrl
+  p
+    a.user(href=postAuthorUrl)= postAuthorName
+    = t('followedUserPosted', { postTitle })
   a.button(href=postUrl)= t('buttons.viewPost')
