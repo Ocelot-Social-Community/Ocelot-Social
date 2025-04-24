@@ -7,6 +7,7 @@ import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import { categories } from '@constants/categories'
+import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import User from '@models/User'
@@ -23,6 +24,7 @@ let variables
 
 const driver = getDriver()
 const neode = getNeode()
+const pubsub = pubsubContext()
 
 const deleteUserMutation = gql`
   mutation ($id: ID!, $resource: [Deletable]) {
@@ -117,6 +119,7 @@ beforeAll(async () => {
         driver,
         neode,
         user: authenticatedUser,
+        pubsub,
       }
     },
   })

@@ -4,11 +4,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
+import databaseContext from '@context/database'
+import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { createMessageMutation } from '@graphql/queries/createMessageMutation'
@@ -16,7 +18,7 @@ import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
-import createServer, { pubsub } from '@src/server'
+import createServer, { getContext } from '@src/server'
 
 const sendMailMock = jest.fn()
 jest.mock('../helpers/email/sendMail', () => ({
@@ -35,12 +37,12 @@ jest.mock('../helpers/isUserOnline', () => ({
   isUserOnline: () => isUserOnlineMock(),
 }))
 
+const database = databaseContext()
+const pubsub = pubsubContext()
 const pubsubSpy = jest.spyOn(pubsub, 'publish')
 
-let server, query, mutate, notifiedUser, authenticatedUser
+let query, mutate, notifiedUser, authenticatedUser
 
-const driver = getDriver()
-const neode = getNeode()
 const categoryIds = ['cat9']
 const createPostMutation = gql`
   mutation ($id: ID, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
@@ -68,19 +70,16 @@ const createCommentMutation = gql`
   }
 `
 
+let server: ApolloServer
+
 beforeAll(async () => {
   await cleanDatabase()
 
-  const createServerResult = createServer({
-    context: () => {
-      return {
-        user: authenticatedUser,
-        neode,
-        driver,
-      }
-    },
-  })
-  server = createServerResult.server
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database, pubsub })
+
+  server = createServer({ context }).server
+
   const createTestClientResult = createTestClient(server)
   query = createTestClientResult.query
   mutate = createTestClientResult.mutate
@@ -88,7 +87,9 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(async () => {
@@ -104,7 +105,7 @@ beforeEach(async () => {
       password: '1234',
     },
   )
-  await neode.create('Category', {
+  await database.neode.create('Category', {
     id: 'cat9',
     name: 'Democracy & Politics',
     icon: 'university',
@@ -195,7 +196,7 @@ describe('notifications', () => {
           beforeEach(async () => {
             jest.clearAllMocks()
             commentContent = 'Commenters comment.'
-            commentAuthor = await neode.create('User', {
+            commentAuthor = await database.neode.create('User', {
               id: 'commentAuthor',
               name: 'Mrs Comment',
               slug: 'mrs-comment',
@@ -338,7 +339,7 @@ describe('notifications', () => {
 
       beforeEach(async () => {
         jest.clearAllMocks()
-        postAuthor = await neode.create('User', {
+        postAuthor = await database.neode.create('User', {
           id: 'postAuthor',
           name: 'Mrs Post',
           slug: 'mrs-post',
@@ -644,7 +645,7 @@ describe('notifications', () => {
           beforeEach(async () => {
             commentContent =
               'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'
-            commentAuthor = await neode.create('User', {
+            commentAuthor = await database.neode.create('User', {
               id: 'commentAuthor',
               name: 'Mrs Comment',
               slug: 'mrs-comment',
@@ -652,7 +653,7 @@ describe('notifications', () => {
           })
 
           it('sends only one notification with reason mentioned_in_comment', async () => {
-            postAuthor = await neode.create('User', {
+            postAuthor = await database.neode.create('User', {
               id: 'MrPostAuthor',
               name: 'Mr Author',
               slug: 'mr-author',
@@ -728,7 +729,7 @@ describe('notifications', () => {
             await postAuthor.relateTo(notifiedUser, 'blocked')
             commentContent =
               'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'
-            commentAuthor = await neode.create('User', {
+            commentAuthor = await database.neode.create('User', {
               id: 'commentAuthor',
               name: 'Mrs Comment',
               slug: 'mrs-comment',
@@ -772,7 +773,7 @@ describe('notifications', () => {
             await postAuthor.relateTo(notifiedUser, 'muted')
             commentContent =
               'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'
-            commentAuthor = await neode.create('User', {
+            commentAuthor = await database.neode.create('User', {
               id: 'commentAuthor',
               name: 'Mrs Comment',
               slug: 'mrs-comment',
@@ -837,7 +838,7 @@ describe('notifications', () => {
     beforeEach(async () => {
       jest.clearAllMocks()
 
-      chatSender = await neode.create('User', {
+      chatSender = await database.neode.create('User', {
         id: 'chatSender',
         name: 'chatSender',
         slug: 'chatSender',
