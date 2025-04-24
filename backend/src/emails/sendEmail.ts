@@ -67,11 +67,13 @@ export const sendMail = async (notification: any) => {
       from: `${CONFIG.APPLICATION_NAME} – ${i18n.__('notification')}`,
     },
     transport,
+    /*
     preview: {
       open: {
         app: 'brave-browser',
       },
     },
+    */
   })
 
   try {
@@ -82,7 +84,6 @@ export const sendMail = async (notification: any) => {
       },
       locals: {
         ...defaultParams,
-        locale,
         name,
         postTitle: notification?.from?.title,
         postUrl: new URL(
