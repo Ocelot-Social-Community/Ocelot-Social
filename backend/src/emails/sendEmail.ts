@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import path from 'node:path'
 
 import Email from 'email-templates'
@@ -11,7 +15,6 @@ import metadata from '@config/metadata'
 
 import { i18n } from './i18n'
 
-const hasEmailConfig = CONFIG.SMTP_HOST && CONFIG.SMTP_PORT
 const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD
 const hasDKIMData =
   CONFIG.SMTP_DKIM_DOMAINNAME && CONFIG.SMTP_DKIM_KEYSELECTOR && CONFIG.SMTP_DKIM_PRIVATKEY
@@ -47,6 +50,7 @@ const transport = createTransport({
   },
 })
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sendMail = async (notification: any) => {
   const locale = notification?.to?.locale
   const to = notification?.email
@@ -63,13 +67,11 @@ export const sendMail = async (notification: any) => {
       from: `${CONFIG.APPLICATION_NAME} – ${i18n.__('notification')}`,
     },
     transport,
-    /*
     preview: {
       open: {
         app: 'brave-browser',
       },
     },
-    */
   })
 
   try {
@@ -142,5 +144,6 @@ export const sendMail = async (notification: any) => {
     })
   } catch (error) {
     console.log(error)
+    throw new Error(error)
   }
 }

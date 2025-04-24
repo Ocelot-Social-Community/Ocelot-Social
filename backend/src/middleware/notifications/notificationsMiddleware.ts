@@ -5,10 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable security/detect-object-injection */
 import { sendMail } from '@middleware/helpers/email/sendMail'
-import {
-  chatMessageTemplate,
-  notificationTemplate,
-} from '@middleware/helpers/email/templateBuilder'
+import { chatMessageTemplate } from '@middleware/helpers/email/templateBuilder'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 // eslint-disable-next-line import/no-cycle
@@ -35,7 +32,7 @@ const publishNotifications = async (
       !isUserOnline(notificationAdded.to) &&
       !emailsSent.includes(notificationAdded.email)
     ) {
-      sendMailNew(notificationAdded)
+      await sendMailNew(notificationAdded)
       emailsSent.push(notificationAdded.email)
     }
   })

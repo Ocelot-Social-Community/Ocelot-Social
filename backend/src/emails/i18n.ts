@@ -2,6 +2,8 @@ import path from 'node:path'
 
 import i18n from 'i18n'
 
+// when installing @types/i18n linter and unit tests are broken
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 i18n.configure({
   locales: ['en', 'de'],
   defaultLocale: 'en',
