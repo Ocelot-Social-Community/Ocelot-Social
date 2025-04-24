@@ -24,7 +24,7 @@ const publishNotifications = async (
 ): Promise<string[]> => {
   const notifications = await notificationsPromise
   notifications.forEach((notificationAdded) => {
-    console.log(notificationAdded)
+    // console.log(notificationAdded)
     pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
     if (
       notificationAdded.email && // no primary email was found

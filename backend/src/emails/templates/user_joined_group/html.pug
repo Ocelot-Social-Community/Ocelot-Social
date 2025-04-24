@@ -2,6 +2,7 @@ extend ../layout.pug
 
 block content
   .content
-  - var groupUrl = groupUrl
-  p= t('userJoinedGroup', { groupName })
+  p
+    a.user(href=groupRelatedUserUrl)= groupRelatedUserName  
+    = t('userJoinedGroup', { groupName })
   a.button(href=groupUrl)= t('buttons.viewGroup')

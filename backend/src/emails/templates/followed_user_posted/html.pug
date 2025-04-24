@@ -2,8 +2,6 @@ extend ../layout.pug
 
 block content
   .content
-  - var postUrl = postUrl
-  - var postAuthorUrl = postAuthorUrl
   p
     a.user(href=postAuthorUrl)= postAuthorName
     = t('followedUserPosted', { postTitle })

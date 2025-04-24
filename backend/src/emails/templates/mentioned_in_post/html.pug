@@ -2,6 +2,7 @@ extend ../layout.pug
 
 block content
   .content
-  - var postUrl = postUrl
-  p= t('mentionedInPost', { postTitle })
+  p
+    a.user(href=postAuthorUrl)= postAuthorName
+    = t('mentionedInPost', { postTitle })
   a.button(href=postUrl)= t('buttons.viewPost')

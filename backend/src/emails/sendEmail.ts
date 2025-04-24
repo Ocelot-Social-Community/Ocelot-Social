@@ -57,23 +57,19 @@ export const sendMail = async (notification: any) => {
   const name = notification?.to?.name
   const template = notification?.reason
 
-  console.log('LOCALE', locale)
-  i18n.setLocale(locale)
-
-  console.log('getLocale', i18n.getLocale())
+  i18n.setLocale(locale as string)
 
   const email = new Email({
     message: {
       from: `${CONFIG.APPLICATION_NAME} – ${i18n.__('notification')}`,
     },
     transport,
-    /*
+    // preview: false,
     preview: {
       open: {
         app: 'brave-browser',
       },
     },
-    */
   })
 
   try {
@@ -84,8 +80,12 @@ export const sendMail = async (notification: any) => {
       },
       locals: {
         ...defaultParams,
+        locale: i18n.getLocale(),
         name,
-        postTitle: notification?.from?.title,
+        postTitle:
+          notification?.from?.__typename === 'Comment'
+            ? notification?.from?.post?.title
+            : notification?.from?.title,
         postUrl: new URL(
           notification?.from?.__typename === 'Comment'
             ? `/post/${notification?.from?.post?.id}/${notification?.from?.post?.slug}`
@@ -144,7 +144,6 @@ export const sendMail = async (notification: any) => {
       },
     })
   } catch (error) {
-    console.log(error)
     throw new Error(error)
   }
 }

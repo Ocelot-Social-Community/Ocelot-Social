@@ -2,6 +2,7 @@ extend ../layout.pug
 
 block content
   .content
-  - var commentUrl = commentUrl
-  p= t('mentionedInComment', { postTitle})
+  p
+    a.user(href=commenterUrl)= commenterName
+    = t('mentionedInComment', { postTitle})
   a.button(href=commentUrl)= t('buttons.viewComment')
