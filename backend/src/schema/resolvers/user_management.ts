@@ -42,7 +42,7 @@ export default {
         const [currentUser] = await loginReadTxResultPromise
         if (
           currentUser &&
-          (await bcrypt.compareSync(password, currentUser.encryptedPassword)) &&
+          (await bcrypt.compare(password, currentUser.encryptedPassword)) &&
           !currentUser.disabled
         ) {
           delete currentUser.encryptedPassword
@@ -60,15 +60,15 @@ export default {
       const currentUser = await neode.find('User', user.id)
 
       const encryptedPassword = currentUser.get('encryptedPassword')
-      if (!(await bcrypt.compareSync(oldPassword, encryptedPassword))) {
+      if (!(await bcrypt.compare(oldPassword, encryptedPassword))) {
         throw new AuthenticationError('Old password is not correct')
       }
 
-      if (await bcrypt.compareSync(newPassword, encryptedPassword)) {
+      if (await bcrypt.compare(newPassword, encryptedPassword)) {
         throw new AuthenticationError('Old password and new password should be different')
       }
 
-      const newEncryptedPassword = await bcrypt.hashSync(newPassword, 10)
+      const newEncryptedPassword = await bcrypt.hash(newPassword, 10)
       await currentUser.update({
         encryptedPassword: newEncryptedPassword,
         updatedAt: new Date().toISOString(),
