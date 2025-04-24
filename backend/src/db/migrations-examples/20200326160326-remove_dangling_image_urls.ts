@@ -33,6 +33,7 @@ export async function up(next) {
     const urls = records.map((record) => record.get('url'))
     const danglingUrls = urls.filter((url) => {
       const fileLocation = `public${url}`
+      // eslint-disable-next-line n/no-sync
       return !existsSync(fileLocation)
     })
     await transaction.run(

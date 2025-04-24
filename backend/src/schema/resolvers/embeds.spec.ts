@@ -20,14 +20,17 @@ afterEach(() => {
 
 let variables = {}
 
+// eslint-disable-next-line n/no-sync
 const HumanConnectionOrg = fs.readFileSync(
   path.join(__dirname, '../../../snapshots/embeds/HumanConnectionOrg.html'),
   'utf8',
 )
+// eslint-disable-next-line n/no-sync
 const pr3934 = fs.readFileSync(
   path.join(__dirname, '../../../snapshots/embeds/pr3934.html'),
   'utf8',
 )
+// eslint-disable-next-line n/no-sync
 const babyLovesCat = fs.readFileSync(
   path.join(__dirname, '../../../snapshots/embeds/babyLovesCat.html'),
   'utf8',

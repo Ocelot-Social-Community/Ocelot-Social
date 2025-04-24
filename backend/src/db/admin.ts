@@ -11,6 +11,7 @@ import { getDriver } from './neo4j'
 
 const defaultAdmin = {
   email: 'admin@example.org',
+  // eslint-disable-next-line n/no-sync
   password: hashSync('1234', 10),
   name: 'admin',
   id: uuid(),

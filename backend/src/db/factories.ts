@@ -95,6 +95,7 @@ Factory.define('basicUser')
     return slug || slugify(name, { lower: true })
   })
   .attr('encryptedPassword', ['password'], (password) => {
+    // eslint-disable-next-line n/no-sync
     return hashSync(password, 10)
   })
 

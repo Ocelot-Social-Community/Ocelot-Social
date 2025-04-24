@@ -16,20 +16,21 @@ import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock = jest.fn()
-jest.mock('../helpers/email/sendMail', () => ({
-  sendMail: () => sendMailMock(),
+const sendMailMock: (notification) => void = jest.fn()
+jest.mock('@middleware/helpers/email/sendMail', () => ({
+  sendMail: (notification) => sendMailMock(notification),
 }))
 
-let server, query, mutate, authenticatedUser
+let server, query, mutate, authenticatedUser, emaillessMember
 
 let postAuthor, groupMember
 
 const driver = getDriver()
 const neode = getNeode()
 
-const mentionString =
-  '<a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member">@group-member</a>'
+const mentionString = `
+  <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member">@group-member</a>
+  <a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member">@email-less-member</a>`
 
 const createPostMutation = gql`
   mutation ($id: ID, $title: String!, $content: String!, $groupId: ID) {
@@ -148,6 +149,11 @@ describe('emails sent for notifications', () => {
         password: '1234',
       },
     )
+    emaillessMember = await neode.create('User', {
+      id: 'email-less-member',
+      name: 'Email-less Member',
+      slug: 'email-less-member',
+    })
     authenticatedUser = await postAuthor.toJson()
     await mutate({
       mutation: createGroupMutation(),
@@ -160,6 +166,18 @@ describe('emails sent for notifications', () => {
       },
     })
     authenticatedUser = await groupMember.toJson()
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'public-group',
+        userId: 'group-member',
+      },
+    })
+    await mutate({
+      mutation: followUserMutation,
+      variables: { id: 'post-author' },
+    })
+    authenticatedUser = await emaillessMember.toJson()
     await mutate({
       mutation: joinGroupMutation(),
       variables: {
@@ -188,7 +206,7 @@ describe('emails sent for notifications', () => {
             variables: {
               id: 'post',
               title: 'This is the post',
-              content: `Hello, ${mentionString}, my trusty follower.`,
+              content: `Hello, ${mentionString}, my trusty followers.`,
               groupId: 'public-group',
             },
           })
@@ -213,7 +231,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Post',
                     id: 'post',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my trusty follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'post_in_group',
@@ -225,7 +243,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Post',
                     id: 'post',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my trusty follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'followed_user_posted',
@@ -237,7 +255,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Post',
                     id: 'post',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my trusty follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'mentioned_in_post',
@@ -260,7 +278,7 @@ describe('emails sent for notifications', () => {
             variables: {
               id: 'post',
               title: 'This is the post',
-              content: `Hello, ${mentionString}, my trusty follower.`,
+              content: `Hello, ${mentionString}, my trusty followers.`,
               groupId: 'public-group',
             },
           })
@@ -285,7 +303,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Post',
                     id: 'post',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my trusty follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'post_in_group',
@@ -297,7 +315,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Post',
                     id: 'post',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my trusty follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'followed_user_posted',
@@ -309,7 +327,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Post',
                     id: 'post',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my trusty follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'mentioned_in_post',
@@ -333,7 +351,7 @@ describe('emails sent for notifications', () => {
             variables: {
               id: 'post',
               title: 'This is the post',
-              content: `Hello, ${mentionString}, my trusty follower.`,
+              content: `Hello, ${mentionString}, my trusty followers.`,
               groupId: 'public-group',
             },
           })
@@ -358,7 +376,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Post',
                     id: 'post',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my trusty follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'post_in_group',
@@ -370,7 +388,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Post',
                     id: 'post',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my trusty follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'followed_user_posted',
@@ -382,7 +400,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Post',
                     id: 'post',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my trusty follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'mentioned_in_post',
@@ -407,7 +425,7 @@ describe('emails sent for notifications', () => {
             variables: {
               id: 'post',
               title: 'This is the post',
-              content: `Hello, ${mentionString}, my trusty follower.`,
+              content: `Hello, ${mentionString}, my trusty followers.`,
               groupId: 'public-group',
             },
           })
@@ -432,7 +450,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Post',
                     id: 'post',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my trusty follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'post_in_group',
@@ -444,7 +462,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Post',
                     id: 'post',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my trusty follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'followed_user_posted',
@@ -456,7 +474,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Post',
                     id: 'post',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my trusty follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'mentioned_in_post',
@@ -481,7 +499,7 @@ describe('emails sent for notifications', () => {
             variables: {
               id: 'post',
               title: 'This is the post',
-              content: `Hello, ${mentionString}, my trusty follower.`,
+              content: `Hello, ${mentionString}, my trusty followers.`,
               groupId: 'public-group',
             },
           })
@@ -501,7 +519,7 @@ describe('emails sent for notifications', () => {
             mutation: createCommentMutation,
             variables: {
               id: 'comment-2',
-              content: `Hello, ${mentionString}, my beloved follower.`,
+              content: `Hello, ${mentionString}, my trusty followers.`,
               postId: 'post',
             },
           })
@@ -529,7 +547,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Comment',
                     id: 'comment-2',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my beloved follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'commented_on_post',
@@ -541,7 +559,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Comment',
                     id: 'comment-2',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my beloved follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'mentioned_in_comment',
@@ -563,7 +581,7 @@ describe('emails sent for notifications', () => {
             variables: {
               id: 'post',
               title: 'This is the post',
-              content: `Hello, ${mentionString}, my trusty follower.`,
+              content: `Hello, ${mentionString}, my trusty followers.`,
               groupId: 'public-group',
             },
           })
@@ -583,7 +601,7 @@ describe('emails sent for notifications', () => {
             mutation: createCommentMutation,
             variables: {
               id: 'comment-2',
-              content: `Hello, ${mentionString}, my beloved follower.`,
+              content: `Hello, ${mentionString}, my trusty followers.`,
               postId: 'post',
             },
           })
@@ -611,7 +629,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Comment',
                     id: 'comment-2',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my beloved follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'commented_on_post',
@@ -623,7 +641,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Comment',
                     id: 'comment-2',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my beloved follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'mentioned_in_comment',
@@ -646,7 +664,7 @@ describe('emails sent for notifications', () => {
             variables: {
               id: 'post',
               title: 'This is the post',
-              content: `Hello, ${mentionString}, my trusty follower.`,
+              content: `Hello, ${mentionString}, my trusty followers.`,
               groupId: 'public-group',
             },
           })
@@ -666,7 +684,7 @@ describe('emails sent for notifications', () => {
             mutation: createCommentMutation,
             variables: {
               id: 'comment-2',
-              content: `Hello, ${mentionString}, my beloved follower.`,
+              content: `Hello, ${mentionString}, my trusty followers.`,
               postId: 'post',
             },
           })
@@ -694,7 +712,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Comment',
                     id: 'comment-2',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my beloved follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'commented_on_post',
@@ -706,7 +724,7 @@ describe('emails sent for notifications', () => {
                     __typename: 'Comment',
                     id: 'comment-2',
                     content:
-                      'Hello, <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>, my beloved follower.',
+                      'Hello, <br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a><br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>, my trusty followers.',
                   },
                   read: false,
                   reason: 'mentioned_in_comment',

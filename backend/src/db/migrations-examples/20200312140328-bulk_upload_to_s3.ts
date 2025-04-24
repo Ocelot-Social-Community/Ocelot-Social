@@ -55,6 +55,7 @@ export async function up(next) {
             const { pathname } = new URL(url, 'http://example.org')
             const fileLocation = path.join(__dirname, `../../../public/${pathname}`)
             const s3Location = `original${pathname}`
+            // eslint-disable-next-line n/no-sync
             if (existsSync(fileLocation)) {
               const mimeType = mime.lookup(fileLocation)
               const params = {
