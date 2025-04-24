@@ -18,7 +18,7 @@ import createServer from '@src/server'
 CONFIG.CATEGORIES_ACTIVE = false
 
 const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
+jest.mock('@src/emails/sendEmail', () => ({
   sendMail: (notification) => sendMailMock(notification),
 }))
 
@@ -400,6 +400,24 @@ describe('mentions in groups', () => {
 
     it('sends only 3 emails, one for each user with an email', () => {
       expect(sendMailMock).toHaveBeenCalledTimes(3)
+      expect(sendMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'group.member@example.org',
+          reason: 'mentioned_in_post',
+        }),
+      )
+      expect(sendMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'no.member@example.org',
+          reason: 'mentioned_in_post',
+        }),
+      )
+      expect(sendMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'pending.member@example.org',
+          reason: 'mentioned_in_post',
+        }),
+      )
     })
   })
 
@@ -496,6 +514,12 @@ describe('mentions in groups', () => {
 
     it('sends only 1 email', () => {
       expect(sendMailMock).toHaveBeenCalledTimes(1)
+      expect(sendMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'group.member@example.org',
+          reason: 'mentioned_in_post',
+        }),
+      )
     })
   })
 
@@ -592,6 +616,12 @@ describe('mentions in groups', () => {
 
     it('sends only 1 email', () => {
       expect(sendMailMock).toHaveBeenCalledTimes(1)
+      expect(sendMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'group.member@example.org',
+          reason: 'mentioned_in_post',
+        }),
+      )
     })
   })
 
@@ -676,6 +706,18 @@ describe('mentions in groups', () => {
 
       it('sends 2 emails', () => {
         expect(sendMailMock).toHaveBeenCalledTimes(3)
+        expect(sendMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            email: 'group.member@example.org',
+            reason: 'mentioned_in_comment',
+          }),
+        )
+        expect(sendMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            email: 'no.member@example.org',
+            reason: 'mentioned_in_comment',
+          }),
+        )
       })
     })
 
@@ -767,6 +809,12 @@ describe('mentions in groups', () => {
 
       it('sends 1 email', () => {
         expect(sendMailMock).toHaveBeenCalledTimes(1)
+        expect(sendMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            email: 'group.member@example.org',
+            reason: 'mentioned_in_comment',
+          }),
+        )
       })
     })
 
@@ -858,6 +906,12 @@ describe('mentions in groups', () => {
 
       it('sends 1 email', () => {
         expect(sendMailMock).toHaveBeenCalledTimes(1)
+        expect(sendMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            email: 'group.member@example.org',
+            reason: 'mentioned_in_comment',
+          }),
+        )
       })
     })
   })

@@ -18,7 +18,7 @@ import createServer from '@src/server'
 CONFIG.CATEGORIES_ACTIVE = false
 
 const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
+jest.mock('@src/emails/sendEmail', () => ({
   sendMail: (notification) => sendMailMock(notification),
 }))
 
@@ -143,7 +143,7 @@ describe('notify group members of new posts in group', () => {
         slug: 'group-member',
       },
       {
-        email: 'test2@example.org',
+        email: 'group.member@example.org',
         password: '1234',
       },
     )
@@ -302,6 +302,12 @@ describe('notify group members of new posts in group', () => {
 
     it('sends one email', () => {
       expect(sendMailMock).toHaveBeenCalledTimes(1)
+      expect(sendMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          reason: 'post_in_group',
+          email: 'group.member@example.org',
+        }),
+      )
     })
 
     describe('group member mutes group', () => {

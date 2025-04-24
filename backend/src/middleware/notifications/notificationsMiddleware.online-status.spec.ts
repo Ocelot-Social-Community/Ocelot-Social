@@ -14,7 +14,7 @@ import createServer from '@src/server'
 CONFIG.CATEGORIES_ACTIVE = false
 
 const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
+jest.mock('@src/emails/sendEmail', () => ({
   sendMail: (notification) => sendMailMock(notification),
 }))
 

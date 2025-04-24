@@ -15,7 +15,7 @@ import createServer from '@src/server'
 CONFIG.CATEGORIES_ACTIVE = false
 
 const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
+jest.mock('@src/emails/sendEmail', () => ({
   sendMail: (notification) => sendMailMock(notification),
 }))
 
@@ -275,14 +275,14 @@ describe('following users notifications', () => {
       expect(sendMailMock).toHaveBeenCalledTimes(2)
       expect(sendMailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          html: expect.stringContaining('Hello First Follower'),
-          to: 'first-follower@example.org',
+          email: 'first-follower@example.org',
+          reason: 'followed_user_posted',
         }),
       )
       expect(sendMailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          html: expect.stringContaining('Hello Third Follower'),
-          to: 'third-follower@example.org',
+          email: 'third-follower@example.org',
+          reason: 'followed_user_posted',
         }),
       )
     })

@@ -13,7 +13,7 @@ import createServer from '@src/server'
 CONFIG.CATEGORIES_ACTIVE = false
 
 const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
+jest.mock('@src/emails/sendEmail', () => ({
   sendMail: (notification) => sendMailMock(notification),
 }))
 
@@ -220,7 +220,8 @@ describe('notifications for users that observe a post', () => {
       expect(sendMailMock).toHaveBeenCalledTimes(1)
       expect(sendMailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          to: 'post-author@example.org',
+          email: 'post-author@example.org',
+          reason: 'commented_on_post',
         }),
       )
     })
@@ -310,12 +311,14 @@ describe('notifications for users that observe a post', () => {
         expect(sendMailMock).toHaveBeenCalledTimes(2)
         expect(sendMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
-            to: 'post-author@example.org',
+            email: 'post-author@example.org',
+            reason: 'commented_on_post',
           }),
         )
         expect(sendMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
-            to: 'first-commenter@example.org',
+            email: 'first-commenter@example.org',
+            reason: 'commented_on_post',
           }),
         )
       })
@@ -424,7 +427,8 @@ describe('notifications for users that observe a post', () => {
         expect(sendMailMock).toHaveBeenCalledTimes(1)
         expect(sendMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
-            to: 'second-commenter@example.org',
+            email: 'second-commenter@example.org',
+            reason: 'commented_on_post',
           }),
         )
       })

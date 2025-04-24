@@ -23,6 +23,11 @@ jest.mock('@middleware/helpers/email/sendMail', () => ({
   sendMail: (notification) => sendMailMock(notification),
 }))
 
+const sendMailNewMock: (notification) => void = jest.fn()
+jest.mock('@src/emails/sendEmail', () => ({
+  sendMail: (notification) => sendMailNewMock(notification),
+}))
+
 const chatMessageTemplateMock = jest.fn()
 const notificationTemplateMock = jest.fn()
 jest.mock('../helpers/email/templateBuilder', () => ({
@@ -239,8 +244,13 @@ describe('notifications', () => {
             )
 
             // Mail
-            expect(sendMailMock).toHaveBeenCalledTimes(1)
-            expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+            expect(sendMailNewMock).toHaveBeenCalledTimes(1)
+            expect(sendMailNewMock).toHaveBeenCalledWith(
+              expect.objectContaining({
+                reason: 'commented_on_post',
+                email: 'test@example.org',
+              }),
+            )
           })
 
           describe('if I have disabled `emailNotificationsCommentOnObservedPost`', () => {
@@ -275,8 +285,7 @@ describe('notifications', () => {
               )
 
               // No Mail
-              expect(sendMailMock).not.toHaveBeenCalled()
-              expect(notificationTemplateMock).not.toHaveBeenCalled()
+              expect(sendMailNewMock).not.toHaveBeenCalled()
             })
           })
 
@@ -397,8 +406,13 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
-          expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+          expect(sendMailNewMock).toHaveBeenCalledTimes(1)
+          expect(sendMailNewMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              reason: 'mentioned_in_post',
+              email: 'test@example.org',
+            }),
+          )
         })
 
         describe('if I have disabled `emailNotificationsMention`', () => {
@@ -433,8 +447,7 @@ describe('notifications', () => {
             })
 
             // Mail
-            expect(sendMailMock).not.toHaveBeenCalled()
-            expect(notificationTemplateMock).not.toHaveBeenCalled()
+            expect(sendMailNewMock).not.toHaveBeenCalled()
           })
         })
 
@@ -940,7 +953,7 @@ describe('notifications', () => {
           userId: 'chatReceiver',
         })
 
-        expect(sendMailMock).not.toHaveBeenCalled()
+        expect(sendMailNewMock).not.toHaveBeenCalled()
         expect(chatMessageTemplateMock).not.toHaveBeenCalled()
       })
     })
@@ -1136,8 +1149,13 @@ describe('notifications', () => {
         })
 
         // Mail
-        expect(sendMailMock).toHaveBeenCalledTimes(1)
-        expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+        expect(sendMailNewMock).toHaveBeenCalledTimes(1)
+        expect(sendMailNewMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            reason: 'user_joined_group',
+            email: 'owner@example.org',
+          }),
+        )
       })
 
       describe('if the group owner has disabled `emailNotificationsGroupMemberJoined`', () => {
@@ -1169,8 +1187,7 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailMock).not.toHaveBeenCalled()
-          expect(notificationTemplateMock).not.toHaveBeenCalled()
+          expect(sendMailNewMock).not.toHaveBeenCalled()
         })
       })
     })
@@ -1239,8 +1256,19 @@ describe('notifications', () => {
         })
 
         // Mail
-        expect(sendMailMock).toHaveBeenCalledTimes(2)
-        expect(notificationTemplateMock).toHaveBeenCalledTimes(2)
+        expect(sendMailNewMock).toHaveBeenCalledTimes(2)
+        expect(sendMailNewMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            reason: 'user_joined_group',
+            email: 'owner@example.org',
+          }),
+        )
+        expect(sendMailNewMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            reason: 'user_left_group',
+            email: 'owner@example.org',
+          }),
+        )
       })
 
       describe('if the group owner has disabled `emailNotificationsGroupMemberLeft`', () => {
@@ -1284,8 +1312,7 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
-          expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+          expect(sendMailNewMock).toHaveBeenCalledTimes(1)
         })
       })
     })
@@ -1344,8 +1371,13 @@ describe('notifications', () => {
         })
 
         // Mail
-        expect(sendMailMock).toHaveBeenCalledTimes(1)
-        expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+        expect(sendMailNewMock).toHaveBeenCalledTimes(1)
+        expect(sendMailNewMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            reason: 'changed_group_member_role',
+            email: 'test@example.org',
+          }),
+        )
       })
 
       describe('if the group member has disabled `emailNotificationsGroupMemberRoleChanged`', () => {
@@ -1377,8 +1409,7 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailMock).not.toHaveBeenCalled()
-          expect(notificationTemplateMock).not.toHaveBeenCalled()
+          expect(sendMailNewMock).not.toHaveBeenCalled()
         })
       })
     })
@@ -1436,8 +1467,13 @@ describe('notifications', () => {
         })
 
         // Mail
-        expect(sendMailMock).toHaveBeenCalledTimes(1)
-        expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+        expect(sendMailNewMock).toHaveBeenCalledTimes(1)
+        expect(sendMailNewMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            reason: 'removed_user_from_group',
+            email: 'test@example.org',
+          }),
+        )
       })
 
       describe('if the previous group member has disabled `emailNotificationsGroupMemberRemoved`', () => {
@@ -1469,8 +1505,7 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailMock).not.toHaveBeenCalled()
-          expect(notificationTemplateMock).not.toHaveBeenCalled()
+          expect(sendMailNewMock).not.toHaveBeenCalled()
         })
       })
     })
