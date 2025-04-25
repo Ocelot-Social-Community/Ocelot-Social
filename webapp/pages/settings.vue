@@ -21,7 +21,7 @@
 export default {
   computed: {
     routes() {
-      return [
+      const routes = [
         {
           name: this.$t('settings.data.name'),
           path: `/settings`,
@@ -29,10 +29,6 @@ export default {
         {
           name: this.$t('settings.email.name'),
           path: `/settings/my-email-address`,
-        },
-        {
-          name: this.$t('settings.badges.name'),
-          path: `/settings/badges`,
         },
         {
           name: this.$t('settings.security.name'),
@@ -87,6 +83,15 @@ export default {
             },
             } */
       ]
+
+      if (this.$env.BADGES_ENABLED) {
+        routes.splice(2, 0, {
+          name: this.$t('settings.badges.name'),
+          path: `/settings/badges`,
+        })
+      }
+
+      return routes
     },
   },
 }
