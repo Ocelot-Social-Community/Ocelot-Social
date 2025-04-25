@@ -13,18 +13,18 @@
         />
       </div>
 
-      <div v-if="selectedBadgeIndex !== null && !isEmptySlot" class="badge-actions">
+      <div v-if="selectedBadgeIndex !== null && !isEmptySlotSelected" class="badge-actions">
         <base-button @click="removeBadgeFromSlot" class="remove-button">
           {{ $t('settings.badges.remove') }}
         </base-button>
       </div>
 
-      <p v-if="!availableBadges.length && isEmptySlot">
+      <p v-if="!availableBadges.length && isEmptySlotSelected">
         {{ $t('settings.badges.no-badges-available') }}
       </p>
 
       <div
-        v-if="availableBadges.length && selectedBadgeIndex !== null && isEmptySlot"
+        v-if="availableBadges.length && selectedBadgeIndex !== null && isEmptySlotSelected"
         class="selection-info"
       >
         <badge-selection
@@ -62,7 +62,7 @@ export default {
     availableBadges() {
       return this.currentUser.badgeTrophiesUnused
     },
-    isEmptySlot() {
+    isEmptySlotSelected() {
       return this.selectedBadges[this.selectedBadgeIndex]?.isDefault ?? true
     },
   },
