@@ -18,14 +18,14 @@ import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock = jest.fn()
-jest.mock('../helpers/email/sendMail', () => ({
-  sendMail: () => sendMailMock(),
+const sendMailMock: (notification) => void = jest.fn()
+jest.mock('@middleware/helpers/email/sendMail', () => ({
+  sendMail: (notification) => sendMailMock(notification),
 }))
 
 let query, mutate, authenticatedUser
 
-let postAuthor, groupMember, pendingMember
+let postAuthor, groupMember, pendingMember, emaillessMember
 
 const createPostMutation = gql`
   mutation ($id: ID, $title: String!, $content: String!, $groupId: ID) {
@@ -154,6 +154,12 @@ describe('notify group members of new posts in group', () => {
         password: '1234',
       },
     )
+    emaillessMember = await database.neode.create('User', {
+      id: 'email-less-member',
+      name: 'Email-less Member',
+      slug: 'email-less-member',
+    })
+
     authenticatedUser = await postAuthor.toJson()
     await mutate({
       mutation: createGroupMutation(),
@@ -181,12 +187,28 @@ describe('notify group members of new posts in group', () => {
         userId: 'pending-member',
       },
     })
+    authenticatedUser = await emaillessMember.toJson()
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'g-1',
+        userId: 'group-member',
+      },
+    })
     authenticatedUser = await postAuthor.toJson()
     await mutate({
       mutation: changeGroupMemberRoleMutation(),
       variables: {
         groupId: 'g-1',
         userId: 'group-member',
+        roleInGroup: 'usual',
+      },
+    })
+    await mutate({
+      mutation: changeGroupMemberRoleMutation(),
+      variables: {
+        groupId: 'g-1',
+        userId: 'email-less-member',
         roleInGroup: 'usual',
       },
     })

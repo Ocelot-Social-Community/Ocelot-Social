@@ -6,15 +6,20 @@ import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import CONFIG from '@config/index'
-import { cleanDatabase } from '@db/factories'
+import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
+const sendMailMock: (notification) => void = jest.fn()
+jest.mock('@middleware/helpers/email/sendMail', () => ({
+  sendMail: (notification) => sendMailMock(notification),
+}))
+
 let server, query, mutate, authenticatedUser
 
-let postAuthor, firstCommenter, secondCommenter
+let postAuthor, firstCommenter, secondCommenter, emaillessObserver
 
 const driver = getDriver()
 const neode = getNeode()
@@ -102,20 +107,46 @@ afterAll(async () => {
 
 describe('notifications for users that observe a post', () => {
   beforeAll(async () => {
-    postAuthor = await neode.create('User', {
-      id: 'post-author',
-      name: 'Post Author',
-      slug: 'post-author',
-    })
-    firstCommenter = await neode.create('User', {
-      id: 'first-commenter',
-      name: 'First Commenter',
-      slug: 'first-commenter',
-    })
-    secondCommenter = await neode.create('User', {
-      id: 'second-commenter',
-      name: 'Second Commenter',
-      slug: 'second-commenter',
+    postAuthor = await Factory.build(
+      'user',
+      {
+        id: 'post-author',
+        name: 'Post Author',
+        slug: 'post-author',
+      },
+      {
+        email: 'post-author@example.org',
+        password: '1234',
+      },
+    )
+    firstCommenter = await Factory.build(
+      'user',
+      {
+        id: 'first-commenter',
+        name: 'First Commenter',
+        slug: 'first-commenter',
+      },
+      {
+        email: 'first-commenter@example.org',
+        password: '1234',
+      },
+    )
+    secondCommenter = await Factory.build(
+      'user',
+      {
+        id: 'second-commenter',
+        name: 'Second Commenter',
+        slug: 'second-commenter',
+      },
+      {
+        email: 'second-commenter@example.org',
+        password: '1234',
+      },
+    )
+    emaillessObserver = await neode.create('User', {
+      id: 'email-less-observer',
+      name: 'Email-less Observer',
+      slug: 'email-less-observer',
     })
     authenticatedUser = await postAuthor.toJson()
     await mutate({
@@ -124,6 +155,14 @@ describe('notifications for users that observe a post', () => {
         id: 'post',
         title: 'This is the post',
         content: 'This is the content of the post',
+      },
+    })
+    authenticatedUser = await emaillessObserver.toJson()
+    await mutate({
+      mutation: toggleObservePostMutation,
+      variables: {
+        id: 'post',
+        value: true,
       },
     })
   })
@@ -177,8 +216,18 @@ describe('notifications for users that observe a post', () => {
       })
     })
 
+    it('sends one email', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(1)
+      expect(sendMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: 'post-author@example.org',
+        }),
+      )
+    })
+
     describe('second comment on post', () => {
       beforeAll(async () => {
+        jest.clearAllMocks()
         authenticatedUser = await secondCommenter.toJson()
         await mutate({
           mutation: createCommentMutation,
@@ -256,10 +305,25 @@ describe('notifications for users that observe a post', () => {
           errors: undefined,
         })
       })
+
+      it('sends two emails', () => {
+        expect(sendMailMock).toHaveBeenCalledTimes(2)
+        expect(sendMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            to: 'post-author@example.org',
+          }),
+        )
+        expect(sendMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            to: 'first-commenter@example.org',
+          }),
+        )
+      })
     })
 
     describe('first commenter unfollows the post and post author comments post', () => {
       beforeAll(async () => {
+        jest.clearAllMocks()
         authenticatedUser = await firstCommenter.toJson()
         await mutate({
           mutation: toggleObservePostMutation,
@@ -354,6 +418,15 @@ describe('notifications for users that observe a post', () => {
           },
           errors: undefined,
         })
+      })
+
+      it('sends one email', () => {
+        expect(sendMailMock).toHaveBeenCalledTimes(1)
+        expect(sendMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            to: 'second-commenter@example.org',
+          }),
+        )
       })
     })
   })

@@ -8,8 +8,6 @@ import { withFilter } from 'graphql-subscriptions'
 
 import { NOTIFICATION_ADDED } from '@constants/subscriptions'
 
-import log from './helpers/databaseLogger'
-
 export default {
   Subscription: {
     notificationAdded: {
@@ -76,7 +74,6 @@ export default {
           `,
           { id: currentUser.id },
         )
-        log(notificationsTransactionResponse)
         return notificationsTransactionResponse.records.map((record) => record.get('notification'))
       })
       try {
@@ -106,7 +103,6 @@ export default {
           `,
           { resourceId: args.id, id: currentUser.id },
         )
-        log(markNotificationAsReadTransactionResponse)
         return markNotificationAsReadTransactionResponse.records.map((record) =>
           record.get('notification'),
         )
@@ -136,7 +132,6 @@ export default {
           `,
           { id: currentUser.id },
         )
-        log(markAllNotificationAsReadTransactionResponse)
         return markAllNotificationAsReadTransactionResponse.records.map((record) =>
           record.get('notification'),
         )

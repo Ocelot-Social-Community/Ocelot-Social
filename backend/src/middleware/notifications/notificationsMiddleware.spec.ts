@@ -20,9 +20,9 @@ import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
 import createServer, { getContext } from '@src/server'
 
-const sendMailMock = jest.fn()
-jest.mock('../helpers/email/sendMail', () => ({
-  sendMail: () => sendMailMock(),
+const sendMailMock: (notification) => void = jest.fn()
+jest.mock('@middleware/helpers/email/sendMail', () => ({
+  sendMail: (notification) => sendMailMock(notification),
 }))
 
 const chatMessageTemplateMock = jest.fn()
@@ -196,11 +196,18 @@ describe('notifications', () => {
           beforeEach(async () => {
             jest.clearAllMocks()
             commentContent = 'Commenters comment.'
-            commentAuthor = await database.neode.create('User', {
-              id: 'commentAuthor',
-              name: 'Mrs Comment',
-              slug: 'mrs-comment',
-            })
+            commentAuthor = await Factory.build(
+              'user',
+              {
+                id: 'commentAuthor',
+                name: 'Mrs Comment',
+                slug: 'mrs-comment',
+              },
+              {
+                email: 'commentauthor@example.org',
+                password: '1234',
+              },
+            )
           })
 
           it('sends me a notification and email', async () => {
@@ -339,11 +346,18 @@ describe('notifications', () => {
 
       beforeEach(async () => {
         jest.clearAllMocks()
-        postAuthor = await database.neode.create('User', {
-          id: 'postAuthor',
-          name: 'Mrs Post',
-          slug: 'mrs-post',
-        })
+        postAuthor = await Factory.build(
+          'user',
+          {
+            id: 'postAuthor',
+            name: 'Mrs Post',
+            slug: 'mrs-post',
+          },
+          {
+            email: 'post-author@example.org',
+            password: '1234',
+          },
+        )
       })
 
       describe('mentions me in a post', () => {
@@ -645,19 +659,33 @@ describe('notifications', () => {
           beforeEach(async () => {
             commentContent =
               'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'
-            commentAuthor = await database.neode.create('User', {
-              id: 'commentAuthor',
-              name: 'Mrs Comment',
-              slug: 'mrs-comment',
-            })
+            commentAuthor = await Factory.build(
+              'user',
+              {
+                id: 'commentAuthor',
+                name: 'Mrs Comment',
+                slug: 'mrs-comment',
+              },
+              {
+                email: 'comment-author@example.org',
+                password: '1234',
+              },
+            )
           })
 
           it('sends only one notification with reason mentioned_in_comment', async () => {
-            postAuthor = await database.neode.create('User', {
-              id: 'MrPostAuthor',
-              name: 'Mr Author',
-              slug: 'mr-author',
-            })
+            postAuthor = await Factory.build(
+              'user',
+              {
+                id: 'MrPostAuthor',
+                name: 'Mr Author',
+                slug: 'mr-author',
+              },
+              {
+                email: 'post-author2@example.org',
+                password: '1234',
+              },
+            )
 
             await createCommentOnPostAction()
             const expected = expect.objectContaining({
@@ -729,11 +757,18 @@ describe('notifications', () => {
             await postAuthor.relateTo(notifiedUser, 'blocked')
             commentContent =
               'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'
-            commentAuthor = await database.neode.create('User', {
-              id: 'commentAuthor',
-              name: 'Mrs Comment',
-              slug: 'mrs-comment',
-            })
+            commentAuthor = await Factory.build(
+              'user',
+              {
+                id: 'commentAuthor',
+                name: 'Mrs Comment',
+                slug: 'mrs-comment',
+              },
+              {
+                email: 'comment-author@example.org',
+                password: '1234',
+              },
+            )
           })
 
           it('sends no notification', async () => {
@@ -773,11 +808,18 @@ describe('notifications', () => {
             await postAuthor.relateTo(notifiedUser, 'muted')
             commentContent =
               'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'
-            commentAuthor = await database.neode.create('User', {
-              id: 'commentAuthor',
-              name: 'Mrs Comment',
-              slug: 'mrs-comment',
-            })
+            commentAuthor = await Factory.build(
+              'user',
+              {
+                id: 'commentAuthor',
+                name: 'Mrs Comment',
+                slug: 'mrs-comment',
+              },
+              {
+                email: 'comment-author@example.org',
+                password: '1234',
+              },
+            )
           })
 
           it('sends me a notification', async () => {
@@ -838,11 +880,18 @@ describe('notifications', () => {
     beforeEach(async () => {
       jest.clearAllMocks()
 
-      chatSender = await database.neode.create('User', {
-        id: 'chatSender',
-        name: 'chatSender',
-        slug: 'chatSender',
-      })
+      chatSender = await Factory.build(
+        'user',
+        {
+          id: 'chatSender',
+          name: 'chatSender',
+          slug: 'chatSender',
+        },
+        {
+          email: 'chatSender@example.org',
+          password: '1234',
+        },
+      )
 
       chatReceiver = await Factory.build(
         'user',
@@ -883,7 +932,7 @@ describe('notifications', () => {
             content: 'Some nice message to chatReceiver',
             senderId: 'chatSender',
             username: 'chatSender',
-            avatar: null,
+            avatar: expect.any(String),
             date: expect.any(String),
             saved: true,
             distributed: false,
@@ -919,7 +968,7 @@ describe('notifications', () => {
             content: 'Some nice message to chatReceiver',
             senderId: 'chatSender',
             username: 'chatSender',
-            avatar: null,
+            avatar: expect.any(String),
             date: expect.any(String),
             saved: true,
             distributed: false,
@@ -998,7 +1047,7 @@ describe('notifications', () => {
             content: 'Some nice message to chatReceiver',
             senderId: 'chatSender',
             username: 'chatSender',
-            avatar: null,
+            avatar: expect.any(String),
             date: expect.any(String),
             saved: true,
             distributed: false,

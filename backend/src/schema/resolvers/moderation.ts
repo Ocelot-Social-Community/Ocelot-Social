@@ -2,8 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import log from './helpers/databaseLogger'
-
 export default {
   Mutation: {
     review: async (_object, params, context, _resolveInfo) => {
@@ -31,7 +29,6 @@ export default {
             moderatorId: moderator.id,
             dateTime: new Date().toISOString(),
           })
-          log(reviewTransactionResponse)
           return reviewTransactionResponse.records.map((record) => record.get('review'))
         })
         const [reviewed] = await reviewWriteTxResultPromise
