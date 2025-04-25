@@ -958,7 +958,9 @@
   },
   "settings": {
     "badges": {
-      "description": "Here you can choose how to display your earned badges on your profile. Simply click on an empty space to add a badge.",
+      "click-to-select": "Click on an empty space to add a badge.",
+      "click-to-use": "Click on a badge to use it in the selected slot.",
+      "description": "Here you can choose how to display your earned badges on your profile.",
       "name": "Badges",
       "no-badges-available": "You currently don't have any badges available to add.",
       "remove": "Remove Badge",

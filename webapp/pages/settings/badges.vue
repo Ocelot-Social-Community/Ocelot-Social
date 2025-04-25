@@ -2,7 +2,7 @@
   <base-card>
     <h2 class="title">{{ $t('settings.badges.name') }}</h2>
     <p>{{ $t('settings.badges.description') }}</p>
-    <ds-space margin-bottom="big">
+    <ds-space centered margin-bottom="small" margin-top="base">
       <div class="presenterContainer">
         <badges
           :badges="[currentUser.badgeVerification, ...selectedBadges]"
@@ -12,15 +12,27 @@
         />
       </div>
 
+      <p v-if="!availableBadges.length && isEmptySlotSelected">
+        {{ $t('settings.badges.no-badges-available') }}
+      </p>
+
+      <div v-if="availableBadges.length > 0">
+        <strong>
+          {{
+            selectedBadgeIndex === null
+              ? this.$t('settings.badges.click-to-select')
+              : isEmptySlotSelected
+                ? this.$t('settings.badges.click-to-use')
+                : ''
+          }}
+        </strong>
+      </div>
+
       <div v-if="selectedBadgeIndex !== null && !isEmptySlotSelected" class="badge-actions">
         <base-button @click="removeBadgeFromSlot" class="remove-button">
           {{ $t('settings.badges.remove') }}
         </base-button>
       </div>
-
-      <p v-if="!availableBadges.length && isEmptySlotSelected">
-        {{ $t('settings.badges.no-badges-available') }}
-      </p>
 
       <div
         v-if="availableBadges.length && selectedBadgeIndex !== null && isEmptySlotSelected"
@@ -62,7 +74,7 @@ export default {
       return this.currentUser.badgeTrophiesUnused
     },
     isEmptySlotSelected() {
-      return this.selectedBadges[this.selectedBadgeIndex]?.isDefault ?? true
+      return this.selectedBadges[this.selectedBadgeIndex]?.isDefault ?? false
     },
   },
   created() {
@@ -137,7 +149,7 @@ export default {
 .presenterContainer {
   margin-top: 20px;
   padding-top: 50px;
-  min-height: 250px;
+  min-height: 220px;
   --badges-scale: 2;
 }
 
