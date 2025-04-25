@@ -53,12 +53,17 @@ describe('ProfileSlug', () => {
     }
   })
 
-  const Wrapper = (data) => {
+  const Wrapper = (badgesEnabled, data) => {
     return render(ProfileSlug, {
-      mocks,
       localVue,
       stubs,
       data: () => data,
+      mocks: {
+        ...mocks,
+        $env: {
+          BADGES_ENABLED: badgesEnabled,
+        },
+      },
     })
   }
 
@@ -79,83 +84,114 @@ describe('ProfileSlug', () => {
     })
 
     describe('given another profile user', () => {
-      beforeEach(() => {
-        wrapper = Wrapper({
-          User: [
-            {
-              id: 'u3',
-              name: 'Bob the builder',
-              contributionsCount: 6,
-              shoutedCount: 7,
-              commentedCount: 8,
-              badgeVerification: {
-                id: 'bv1',
-                icon: '/path/to/icon-bv1',
-                description: 'verified',
+      const user = {
+        User: [
+          {
+            id: 'u3',
+            name: 'Bob the builder',
+            contributionsCount: 6,
+            shoutedCount: 7,
+            commentedCount: 8,
+            badgeVerification: {
+              id: 'bv1',
+              icon: '/path/to/icon-bv1',
+              description: 'verified',
+              isDefault: false,
+            },
+            badgeTrophiesSelected: [
+              {
+                id: 'bt1',
+                icon: '/path/to/icon-bt1',
+                description: 'a trophy',
                 isDefault: false,
               },
-              badgeTrophiesSelected: [
-                {
-                  id: 'bt1',
-                  icon: '/path/to/icon-bt1',
-                  description: 'a trophy',
-                  isDefault: false,
-                },
-                {
-                  id: 'bt2',
-                  icon: '/path/to/icon-bt2',
-                  description: 'no trophy',
-                  isDefault: true,
-                },
-              ],
-            },
-          ],
+              {
+                id: 'bt2',
+                icon: '/path/to/icon-bt2',
+                description: 'no trophy',
+                isDefault: true,
+              },
+            ],
+          },
+        ],
+      }
+
+      describe('and badges are enabled', () => {
+        beforeEach(() => {
+          wrapper = Wrapper(true, user)
+        })
+
+        it('renders', () => {
+          expect(wrapper.container).toMatchSnapshot()
         })
       })
 
-      it('renders', () => {
-        expect(wrapper.container).toMatchSnapshot()
+      describe('and badges are disabled', () => {
+        beforeEach(() => {
+          wrapper = Wrapper(false, user)
+        })
+
+        it('renders', () => {
+          expect(wrapper.container).toMatchSnapshot()
+        })
       })
     })
 
     describe('given the logged in user as profile user', () => {
       beforeEach(() => {
         mocks.$route.params.id = 'u23'
-        wrapper = Wrapper({
-          User: [
-            {
-              id: 'u23',
-              name: 'Bob the builder',
-              contributionsCount: 6,
-              shoutedCount: 7,
-              commentedCount: 8,
-              badgeVerification: {
-                id: 'bv1',
-                icon: '/path/to/icon-bv1',
-                description: 'verified',
+      })
+
+      const user = {
+        User: [
+          {
+            id: 'u23',
+            name: 'Bob the builder',
+            contributionsCount: 6,
+            shoutedCount: 7,
+            commentedCount: 8,
+            badgeVerification: {
+              id: 'bv1',
+              icon: '/path/to/icon-bv1',
+              description: 'verified',
+              isDefault: false,
+            },
+            badgeTrophiesSelected: [
+              {
+                id: 'bt1',
+                icon: '/path/to/icon-bt1',
+                description: 'a trophy',
                 isDefault: false,
               },
-              badgeTrophiesSelected: [
-                {
-                  id: 'bt1',
-                  icon: '/path/to/icon-bt1',
-                  description: 'a trophy',
-                  isDefault: false,
-                },
-                {
-                  id: 'bt2',
-                  icon: '/path/to/icon-bt2',
-                  description: 'no trophy',
-                  isDefault: true,
-                },
-              ],
-            },
-          ],
+              {
+                id: 'bt2',
+                icon: '/path/to/icon-bt2',
+                description: 'no trophy',
+                isDefault: true,
+              },
+            ],
+          },
+        ],
+      }
+
+      describe('and badges are enabled', () => {
+        beforeEach(() => {
+          wrapper = Wrapper(true, user)
+        })
+
+        it('renders', () => {
+          expect(wrapper.container).toMatchSnapshot()
         })
       })
 
-      it('renders', () => {
-        expect(wrapper.container).toMatchSnapshot()
+      describe('and badges are disabled', () => {
+        beforeEach(() => {
+          wrapper = Wrapper(false, user)
+        })
+
+        it('renders', () => {
+          expect(wrapper.container).toMatchSnapshot()
+        })
       })
     })
   })
