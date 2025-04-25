@@ -818,7 +818,6 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
              
             <div
               class="hc-badges"
-              style="transform: scale(1);"
             >
               <div
                 class="hc-badge-container"
@@ -2009,7 +2008,6 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
             >
               <div
                 class="hc-badges"
-                style="transform: scale(1);"
               >
                 <div
                   class="hc-badge-container"

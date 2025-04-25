@@ -4,7 +4,7 @@ exports[`Badges.vue with badges in presentation mode renders 1`] = `
 <div>
   <div
     class="hc-badges"
-    style="transform: scale(1.2);"
+    scale="1.2"
   >
     <div
       class="hc-badge-container"
@@ -41,7 +41,7 @@ exports[`Badges.vue with badges in selection mode clicking on second badge selec
 <div>
   <div
     class="hc-badges"
-    style="transform: scale(1.2);"
+    scale="1.2"
   >
     <button
       class="hc-badge-container"
@@ -78,7 +78,7 @@ exports[`Badges.vue with badges in selection mode clicking twice on second badge
 <div>
   <div
     class="hc-badges"
-    style="transform: scale(1.2);"
+    scale="1.2"
   >
     <button
       class="hc-badge-container"
@@ -115,7 +115,7 @@ exports[`Badges.vue with badges in selection mode renders 1`] = `
 <div>
   <div
     class="hc-badges"
-    style="transform: scale(1.2);"
+    scale="1.2"
   >
     <button
       class="hc-badge-container"
@@ -152,7 +152,6 @@ exports[`Badges.vue without badges renders in presentation mode 1`] = `
 <div>
   <div
     class="hc-badges"
-    style="transform: scale(1.2);"
   />
 </div>
 `;
@@ -161,7 +160,6 @@ exports[`Badges.vue without badges renders in selection mode 1`] = `
 <div>
   <div
     class="hc-badges"
-    style="transform: scale(1.2);"
   />
 </div>
 `;
