@@ -16,7 +16,6 @@ import {
 } from '@middleware/helpers/email/templateBuilder'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
-// eslint-disable-next-line import/no-cycle
 import { getUnreadRoomsCount } from '@schema/resolvers/rooms'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'

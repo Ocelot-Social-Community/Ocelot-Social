@@ -7,7 +7,6 @@
 import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
-// eslint-disable-next-line import/no-cycle
 import { ROOM_COUNT_UPDATED } from '@constants/subscriptions'
 
 import Resolver from './helpers/Resolver'

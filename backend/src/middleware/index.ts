@@ -15,7 +15,6 @@ import hashtags from './hashtags/hashtagsMiddleware'
 import includedFields from './includedFieldsMiddleware'
 import languages from './languages/languages'
 import login from './login/loginMiddleware'
-// eslint-disable-next-line import/no-cycle
 import notifications from './notifications/notificationsMiddleware'
 import orderBy from './orderByMiddleware'
 import permissions from './permissionsMiddleware'
