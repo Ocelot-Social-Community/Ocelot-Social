@@ -957,6 +957,14 @@
     "title": null
   },
   "settings": {
+    "badges": {
+      "description": null,
+      "name": null,
+      "no-badges-available": null,
+      "remove": null,
+      "success-update": null,
+      "verification": null
+    },
     "blocked-users": {
       "block": "Bloquer l'utilisateur",
       "columns": {
