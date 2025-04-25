@@ -104,8 +104,12 @@ export default {
         return
       }
 
-      await this.setSlot(badge, this.selectedBadgeIndex)
-      this.$toast.success(this.$t('settings.badges.success-update'))
+      try {
+        await this.setSlot(badge, this.selectedBadgeIndex)
+        this.$toast.success(this.$t('settings.badges.success-update'))
+      } catch (error) {
+        this.$toast.error(this.$t('settings.badges.error-update'))
+      }
 
       if (this.$refs.badgeSelection && this.$refs.badgeSelection.resetSelection) {
         this.$refs.badgeSelection.resetSelection()
@@ -116,8 +120,12 @@ export default {
     async removeBadgeFromSlot() {
       if (this.selectedBadgeIndex === null) return
 
-      await this.setSlot(null, this.selectedBadgeIndex)
-      this.$toast.success(this.$t('settings.badges.success-update'))
+      try {
+        await this.setSlot(null, this.selectedBadgeIndex)
+        this.$toast.success(this.$t('settings.badges.success-update'))
+      } catch (error) {
+        this.$toast.error(this.$t('settings.badges.error-update'))
+      }
 
       this.$refs.badgesComponent.resetSelection()
       this.selectedBadgeIndex = null
