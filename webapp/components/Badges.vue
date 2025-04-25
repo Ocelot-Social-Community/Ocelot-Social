@@ -77,19 +77,23 @@ export default {
     width: $badge-size-x;
     height: $badge-size-y;
 
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+
     &.selectable {
       cursor: pointer;
-      transition: transform 0.2s ease;
+
+      transition: transform 0.1s ease-in;
 
       &:hover {
         transform: scale(1.1);
-        filter: brightness(1.1);
       }
     }
 
     &.selected {
-      transform: scale(1.1);
       filter: drop-shadow(2px 4px 6px green);
+      img {
+        opacity: 0.6;
+      }
     }
   }
 
@@ -130,17 +134,17 @@ export default {
   }
 
   .hc-badge-container:nth-child(4) {
-    top: $offset-y + calc(-1 * $badge-size-y / 2) - (2 * $gap-y);
+    top: $offset-y + calc(-1 * $badge-size-y / 2) - (2 * $gap-y) - 0.5px;
     left: $main-badge-size-x + $gap-x + $slot-x;
   }
 
   .hc-badge-container:nth-child(5) {
-    top: $offset-y + calc($badge-size-y / 2);
+    top: $offset-y + calc($badge-size-y / 2) - 0.5px;
     left: $main-badge-size-x + $gap-x + $slot-x;
   }
 
   .hc-badge-container:nth-child(6) {
-    top: $offset-y + (1.5 * $badge-size-y) + (2 * $gap-y);
+    top: $offset-y + (1.5 * $badge-size-y) + (2 * $gap-y) - 0.5px;
     left: $main-badge-size-x + $gap-x + $slot-x;
   }
 
@@ -155,12 +159,12 @@ export default {
   }
 
   .hc-badge-container:nth-child(9) {
-    top: $offset-y + $slot-y - calc($badge-size-y / 2) - $gap-y;
+    top: $offset-y + $slot-y - calc($badge-size-y / 2) - $gap-y - 0.5px;
     left: $main-badge-size-x + $gap-x + (3 * $slot-x);
   }
 
   .hc-badge-container:nth-child(10) {
-    top: $offset-y + ($badge-size-y * 1.5) + (2 * $gap-y);
+    top: $offset-y + ($badge-size-y * 1.5) + (2 * $gap-y) - 0.5px;
     left: $main-badge-size-x + $gap-x + (3 * $slot-x);
   }
 }
