@@ -119,8 +119,10 @@ export default {
         const response = await transaction.run(
           `
             MATCH (user:User {id: $userId})
-            OPTIONAL MATCH (badge:Badge {id: $badgeId})-[relation:REWARDED|VERIFIES]->(user)
-            DELETE relation
+            OPTIONAL MATCH (badge:Badge {id: $badgeId})-[rewarded:REWARDED|VERIFIES]->(user)
+            OPTIONAL MATCH (user)-[selected:SELECTED]->(badge)
+            DELETE rewarded
+            DELETE selected
             RETURN user {.*}
           `,
           {
