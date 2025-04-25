@@ -960,7 +960,7 @@
     "badges": {
       "click-to-select": "Klicke auf einen freien Platz, um eine Badge hinzufügen.",
       "click-to-use": "Klicke auf eine Badge, um sie zu platzieren.",
-      "description": "Hier hast du die Möglichkeit zu entscheiden, wie deine bereits erworbenen Badges in deinem Profil gezeigt werden sollen. Klicke einfach eine leere Fläche an, um ihr einen Badge hinzuzufügen.",
+      "description": "Hier hast du die Möglichkeit zu entscheiden, wie deine bereits erworbenen Badges in deinem Profil gezeigt werden sollen.",
       "name": "Badges",
       "no-badges-available": "Im Moment stehen dir keine Badges zur Verfügung, die du hinzufügen könntest.",
       "remove": "Badge entfernen",
