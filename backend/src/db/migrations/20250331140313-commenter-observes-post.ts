@@ -33,7 +33,7 @@ export async function up(_next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -59,6 +59,6 @@ export async function down(_next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }

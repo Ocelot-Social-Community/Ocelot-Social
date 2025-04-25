@@ -17,7 +17,8 @@ export const description = `
 `
 export function up(next) {
   const driver = getDriver()
-  const rxSession = driver.rxSession()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rxSession = driver.rxSession() as any
   rxSession
     .beginTransaction()
     .pipe(

@@ -38,7 +38,7 @@ export const cleanDatabase = async ({ withMigrations } = { withMigrations: false
       return transaction.run(clean)
     })
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

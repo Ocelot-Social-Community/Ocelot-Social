@@ -26,7 +26,7 @@ export async function up(next) {
   `)
   try {
     // Implement your migration here.
-    const users = await updateDeletedUserAttributes.records.map((record) => record.get('user'))
+    const users = updateDeletedUserAttributes.records.map((record) => record.get('user'))
     // eslint-disable-next-line no-console
     console.log(users)
     await transaction.commit()
@@ -39,7 +39,7 @@ export async function up(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

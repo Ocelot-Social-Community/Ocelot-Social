@@ -94,7 +94,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(() => {
@@ -213,6 +213,7 @@ describe('userMiddleware', () => {
       await mutate({ mutation: updateUserMutation, variables })
       const locations = await neode.cypher(
         `MATCH (city:Location)-[:IS_IN]->(district:Location)-[:IS_IN]->(state:Location)-[:IS_IN]->(country:Location) return city {.*}, state {.*}, country {.*}`,
+        {},
       )
       expect(
         locations.records.map((record) => {

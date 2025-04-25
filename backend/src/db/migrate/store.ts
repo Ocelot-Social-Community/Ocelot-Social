@@ -7,7 +7,7 @@ import { getDriver, getNeode } from '@db/neo4j'
 class Store {
   async init(errFn) {
     const neode = getNeode()
-    const session = neode.driver.session()
+    const session = neode.session()
     const txFreshIndicesConstrains = session.writeTransaction(async (txc) => {
       // drop all indices and constraints
       await txc.run('CALL apoc.schema.assert({},{},true)')
@@ -34,6 +34,9 @@ class Store {
       // we need to have all constraints and indexes defined here. They can not be properly migrated
       await txFreshIndicesConstrains
 
+      // You have to wait for the schema to install, else the constraints will not be present.
+      // This is a type error of the library
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await getNeode().schema.install()
       // eslint-disable-next-line no-console
       console.log('Successfully created database indices and constraints!')
@@ -42,8 +45,8 @@ class Store {
       console.log(error) // eslint-disable-line no-console
       errFn(error)
     } finally {
-      session.close()
-      neode.driver.close()
+      await session.close()
+      neode.close()
     }
   }
 
@@ -72,7 +75,7 @@ class Store {
       console.log(error) // eslint-disable-line no-console
       next(error)
     } finally {
-      session.close()
+      await session.close()
     }
   }
 
@@ -108,7 +111,7 @@ class Store {
       console.log(error) // eslint-disable-line no-console
       next(error)
     } finally {
-      session.close()
+      await session.close()
     }
   }
 }

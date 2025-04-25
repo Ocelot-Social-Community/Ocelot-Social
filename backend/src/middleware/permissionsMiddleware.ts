@@ -8,6 +8,7 @@ import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 
 import CONFIG from '@config/index'
 import { getNeode } from '@db/neo4j'
+import SocialMedia from '@models/SocialMedia'
 import { validateInviteCode } from '@schema/resolvers/transactions/inviteCodes'
 
 const debug = !!CONFIG.DEBUG
@@ -48,15 +49,16 @@ const isMySocialMedia = rule({
   if (!user) {
     return false
   }
-  let socialMedia = await neode.find('SocialMedia', args.id)
+  const socialMedia = await neode.find<typeof SocialMedia>('SocialMedia', args.id)
   // Did we find a social media node?
   if (!socialMedia) {
     return false
   }
-  socialMedia = await socialMedia.toJson() // whats this for?
+  const socialMediaJson = await socialMedia.toJson() // whats this for?
 
   // Is it my social media entry?
-  return socialMedia.ownedBy.node.id === user.id
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (socialMediaJson.ownedBy as any).node.id === user.id
 })
 
 const isAllowedToChangeGroupSettings = rule({
