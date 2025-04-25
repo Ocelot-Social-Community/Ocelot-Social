@@ -12,6 +12,7 @@
   "admin": {
     "badges": {
       "description": null,
+      "noBadges": null,
       "revokeTrophy": {
         "error": null,
         "success": null

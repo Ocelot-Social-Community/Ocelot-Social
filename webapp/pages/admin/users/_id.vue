@@ -8,7 +8,7 @@
       </ds-heading>
       <ds-text>{{ $t('admin.badges.description') }}</ds-text>
     </ds-space>
-    <base-card>
+    <base-card v-if="!isLoadingBadges">
       <badges-section
         :title="$t('admin.badges.verificationBadges')"
         :badges="verificationBadges"
@@ -86,6 +86,9 @@ export default {
           ...badge,
           isActive: this.user.badgeTrophies.some((userBadge) => userBadge.id === badge.id),
         }))
+    },
+    isLoadingBadges() {
+      return this.$apollo.queries.User.loading || this.$apollo.queries.Badge.loading
     },
   },
   methods: {

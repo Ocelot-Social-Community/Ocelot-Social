@@ -12,6 +12,7 @@
   "admin": {
     "badges": {
       "description": "Stelle die verfügbaren Auszeichnungen für diesen Nutzer ein.",
+      "noBadges": "Keine Auszeichnungen vorhanden.",
       "revokeTrophy": {
         "error": "Trophäe konnte nicht widerrufen werden!",
         "success": "Trophäe erfolgreich widerrufen"

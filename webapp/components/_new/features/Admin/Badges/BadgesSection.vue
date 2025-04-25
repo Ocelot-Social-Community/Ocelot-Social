@@ -1,7 +1,7 @@
 <template>
   <div class="badge-section">
     <h4>{{ title }}</h4>
-    <div class="badge-container">
+    <div class="badge-container" v-if="badges.length > 0">
       <button
         v-for="badge in badges"
         :key="badge.id"
@@ -10,6 +10,9 @@
       >
         <img :src="badge.icon | proxyApiUrl" :alt="badge.description" />
       </button>
+    </div>
+    <div v-else>
+      {{ $t('admin.badges.noBadges') }}
     </div>
   </div>
 </template>
