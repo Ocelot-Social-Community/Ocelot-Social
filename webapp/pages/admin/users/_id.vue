@@ -88,7 +88,7 @@ export default {
         }))
     },
     isLoadingBadges() {
-      return this.$apollo.queries.User.loading || this.$apollo.queries.Badge.loading
+      return this.$apollo.queries.Badge.loading
     },
   },
   methods: {
