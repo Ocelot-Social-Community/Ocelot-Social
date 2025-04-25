@@ -37,20 +37,20 @@ export async function up(_next) {
     // eslint-disable-next-line no-console
     console.log('rolled back')
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-export function down(next) {
+export async function down(next) {
   const driver = getDriver()
   const session = driver.session()
   try {
     // Rollback your migration here.
-    next()
+    // next()
     // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     next(err)
   } finally {
-    session.close()
+    await session.close()
   }
 }

@@ -56,7 +56,7 @@ describe('shout and unshout posts', () => {
 
   afterAll(async () => {
     await cleanDatabase()
-    driver.close()
+    await driver.close()
   })
 
   beforeEach(async () => {

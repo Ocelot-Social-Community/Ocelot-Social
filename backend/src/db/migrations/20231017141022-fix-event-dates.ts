@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-base-to-string */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
@@ -26,11 +27,11 @@ export async function up(_next) {
     `)
     for (const event of events.records) {
       let [id, eventStart, eventEnd] = event
-      let date = new Date(eventStart)
+      let date = new Date(eventStart as string)
       date.setHours(date.getHours() - 1)
       eventStart = date.toISOString()
       if (eventEnd) {
-        date = new Date(eventEnd)
+        date = new Date(eventEnd as string)
         date.setHours(date.getHours() - 1)
         eventEnd = date.toISOString()
       }
@@ -50,7 +51,7 @@ export async function up(_next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -69,6 +70,6 @@ export async function down(_next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
