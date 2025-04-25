@@ -14,7 +14,6 @@ const stubs = {
   'client-only': true,
   'v-popover': true,
   'nuxt-link': true,
-  'infinite-loading': true,
   'follow-list': true,
   'router-link': true,
 }

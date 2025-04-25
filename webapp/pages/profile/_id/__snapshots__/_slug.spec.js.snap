@@ -559,11 +559,58 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         </div>
          
         <client-only-stub>
-          <infinite-loading-stub
-            direction="bottom"
-            distance="100"
-            identifier="1745572277858"
-          />
+          <div
+            class="infinite-loading-container"
+            data-v-644ea9c9=""
+          >
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              <i
+                class="loading-default"
+                data-v-46b20d22=""
+                data-v-644ea9c9=""
+              />
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No results :(
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No more data :)
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              
+        Opps, something went wrong :(
+        
+              <br
+                data-v-644ea9c9=""
+              />
+               
+              <button
+                class="btn-try-infinite"
+                data-v-644ea9c9=""
+              >
+                Retry
+              </button>
+            </div>
+          </div>
         </client-only-stub>
       </div>
     </div>
@@ -1168,11 +1215,58 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         </div>
          
         <client-only-stub>
-          <infinite-loading-stub
-            direction="bottom"
-            distance="100"
-            identifier="1745572277858"
-          />
+          <div
+            class="infinite-loading-container"
+            data-v-644ea9c9=""
+          >
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              <i
+                class="loading-default"
+                data-v-46b20d22=""
+                data-v-644ea9c9=""
+              />
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No results :(
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No more data :)
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              
+        Opps, something went wrong :(
+        
+              <br
+                data-v-644ea9c9=""
+              />
+               
+              <button
+                class="btn-try-infinite"
+                data-v-644ea9c9=""
+              >
+                Retry
+              </button>
+            </div>
+          </div>
         </client-only-stub>
       </div>
     </div>
@@ -1684,11 +1778,58 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         </div>
          
         <client-only-stub>
-          <infinite-loading-stub
-            direction="bottom"
-            distance="100"
-            identifier="1745572277858"
-          />
+          <div
+            class="infinite-loading-container"
+            data-v-644ea9c9=""
+          >
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              <i
+                class="loading-default"
+                data-v-46b20d22=""
+                data-v-644ea9c9=""
+              />
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No results :(
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No more data :)
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              
+        Opps, something went wrong :(
+        
+              <br
+                data-v-644ea9c9=""
+              />
+               
+              <button
+                class="btn-try-infinite"
+                data-v-644ea9c9=""
+              >
+                Retry
+              </button>
+            </div>
+          </div>
         </client-only-stub>
       </div>
     </div>
@@ -2243,11 +2384,58 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         </div>
          
         <client-only-stub>
-          <infinite-loading-stub
-            direction="bottom"
-            distance="100"
-            identifier="1745572277858"
-          />
+          <div
+            class="infinite-loading-container"
+            data-v-644ea9c9=""
+          >
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              <i
+                class="loading-default"
+                data-v-46b20d22=""
+                data-v-644ea9c9=""
+              />
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No results :(
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No more data :)
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              
+        Opps, something went wrong :(
+        
+              <br
+                data-v-644ea9c9=""
+              />
+               
+              <button
+                class="btn-try-infinite"
+                data-v-644ea9c9=""
+              >
+                Retry
+              </button>
+            </div>
+          </div>
         </client-only-stub>
       </div>
     </div>
