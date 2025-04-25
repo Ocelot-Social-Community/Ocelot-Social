@@ -958,6 +958,16 @@
     "title": null
   },
   "settings": {
+    "badges": {
+      "click-to-select": null,
+      "click-to-use": null,
+      "description": null,
+      "name": null,
+      "no-badges-available": null,
+      "remove": null,
+      "success-update": null,
+      "verification": null
+    },
     "blocked-users": {
       "block": "Bloquear usuario",
       "columns": {
