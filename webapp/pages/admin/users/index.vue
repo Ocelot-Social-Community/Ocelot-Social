@@ -120,7 +120,7 @@ export default {
       currentUser: 'auth/user',
     }),
     fields() {
-      return {
+      const fields = {
         index: this.$t('admin.users.table.columns.number'),
         name: this.$t('admin.users.table.columns.name'),
         email: this.$t('admin.users.table.columns.email'),
@@ -142,11 +142,16 @@ export default {
           label: this.$t('admin.users.table.columns.role'),
           align: 'right',
         },
-        badges: {
+      }
+
+      if (this.$env.BADGES_ENABLED) {
+        fields.badges = {
           label: this.$t('admin.users.table.columns.badges'),
           align: 'right',
-        },
+        }
       }
+
+      return fields
     },
   },
   apollo: {
