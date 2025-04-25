@@ -90,7 +90,7 @@ export default {
     }
 
     &.selected {
-      filter: drop-shadow(2px 4px 6px green);
+      filter: drop-shadow(0 0 0 $color-primary);
       img {
         opacity: 0.6;
       }
