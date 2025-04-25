@@ -1,9 +1,5 @@
 <template>
-  <div
-    :class="[badges.length === 2 && 'hc-badges-dual']"
-    class="hc-badges"
-    :style="{ transform: `scale(${scale})` }"
-  >
+  <div :class="[badges.length === 2 && 'hc-badges-dual']" class="hc-badges">
     <component
       :is="selectionMode ? 'button' : 'div'"
       class="hc-badge-container"
@@ -63,6 +59,8 @@ export default {
 <style lang="scss">
 .hc-badges {
   position: relative;
+
+  transform: scale(var(--badges-scale, 1));
 
   $badge-size-x: 30px;
   $badge-size-y: 26px;

@@ -7,7 +7,6 @@
         <badges
           :badges="[currentUser.badgeVerification, ...selectedBadges]"
           :selection-mode="true"
-          :scale="2"
           @badge-selected="handleBadgeSlotSelection"
           ref="badgesComponent"
         />
@@ -134,11 +133,18 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style scoped>
 .presenterContainer {
   margin-top: 20px;
   padding-top: 50px;
   min-height: 250px;
+  --badges-scale: 2;
+}
+
+@media screen and (max-width: 400px) {
+  .presenterContainer {
+    --badges-scale: 1.5;
+  }
 }
 
 .badge-actions {
