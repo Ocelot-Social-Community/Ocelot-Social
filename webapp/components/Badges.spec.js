@@ -13,12 +13,12 @@ describe('Badges.vue', () => {
 
   describe('without badges', () => {
     it('renders in presentation mode', () => {
-      const wrapper = Wrapper({ badges: [], scale: 1.2, selectionMode: false })
+      const wrapper = Wrapper({ badges: [], selectionMode: false })
       expect(wrapper.container).toMatchSnapshot()
     })
 
     it('renders in selection mode', () => {
-      const wrapper = Wrapper({ badges: [], scale: 1.2, selectionMode: true })
+      const wrapper = Wrapper({ badges: [], selectionMode: true })
       expect(wrapper.container).toMatchSnapshot()
     })
   })

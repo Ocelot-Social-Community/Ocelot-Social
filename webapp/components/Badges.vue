@@ -21,10 +21,6 @@ export default {
       type: Array,
       default: () => [],
     },
-    scale: {
-      type: Number,
-      default: 1,
-    },
     selectionMode: {
       type: Boolean,
       default: false,
@@ -93,7 +89,7 @@ export default {
 
     &.selected {
       transform: scale(1.1);
-      filter: brightness(1.2);
+      filter: drop-shadow(2px 4px 6px green);
     }
   }
 
