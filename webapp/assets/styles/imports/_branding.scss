@@ -130,6 +130,18 @@ a:hover.ds-menu-item-link {
 .user-teaser:hover .slug {
   color: $color-primary-light;
 }
+.profile-avatar.--no-image {
+  background-color: $color-secondary;
+}
+.profile-avatar.--no-image .initials {
+  font-weight: $font-weight-bold;
+}
+.profile-page-avatar.profile-avatar.--no-image {
+  background-color: $color-primary;
+}
+.profile-page-avatar.profile-avatar.--no-image .initials {
+  color: $color-primary-inverse;
+}
 
 #footer {
   background-color: $color-secondary-active;
