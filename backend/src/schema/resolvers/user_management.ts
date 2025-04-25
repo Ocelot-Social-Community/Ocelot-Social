@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/await-thenable */
+
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -12,7 +12,6 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 import { getNeode } from '@db/neo4j'
 import encode from '@jwt/encode'
 
-import log from './helpers/databaseLogger'
 import normalizeEmail from './helpers/normalizeEmail'
 
 const neode = getNeode()
@@ -38,7 +37,6 @@ export default {
             `,
             { userEmail: email },
           )
-          log(loginTransactionResponse)
           return loginTransactionResponse.records.map((record) => record.get('user'))
         })
         const [currentUser] = await loginReadTxResultPromise

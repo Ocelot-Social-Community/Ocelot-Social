@@ -28,7 +28,6 @@ if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
 
 const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
-/* eslint-disable no-multi-spaces */
 ;(async function () {
   let authenticatedUser = null
   const driver = getDriver()
@@ -1594,4 +1593,3 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     process.exit(1)
   }
 })()
-/* eslint-enable no-multi-spaces */

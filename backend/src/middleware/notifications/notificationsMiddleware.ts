@@ -13,7 +13,6 @@ import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 // eslint-disable-next-line import/no-cycle
 import { getUnreadRoomsCount } from '@schema/resolvers/rooms'
-// eslint-disable-next-line import/no-cycle
 import { pubsub, NOTIFICATION_ADDED, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '@src/server'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
