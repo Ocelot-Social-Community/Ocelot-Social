@@ -9,9 +9,8 @@ describe('badge settings', () => {
 
   const apolloMutateMock = jest.fn()
 
-  const Wrapper = (propsData) => {
+  const Wrapper = () => {
     return render(badges, {
-      propsData,
       localVue,
       mocks,
     })
@@ -202,7 +201,6 @@ describe('badge settings', () => {
     describe('no more badges available', () => {
       beforeEach(async () => {
         mocks.$store.getters['auth/user'].badgeTrophiesUnused = []
-        wrapper = Wrapper()
       })
 
       describe('selecting an empty slot', () => {
@@ -212,7 +210,7 @@ describe('badge settings', () => {
         })
 
         it('shows no more badges available message', () => {
-          expect(screen.container).toMatchSnapshot()
+          expect(wrapper.container).toMatchSnapshot()
         })
       })
     })
@@ -225,7 +223,7 @@ describe('badge settings', () => {
         })
 
         it('shows list with available badges', () => {
-          expect(screen.container).toMatchSnapshot()
+          expect(wrapper.container).toMatchSnapshot()
         })
 
         describe('clicking on an available badge', () => {
