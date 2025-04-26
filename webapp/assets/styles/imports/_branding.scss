@@ -209,33 +209,44 @@ div.ds-input-wrap > input:focus-within.ds-input {
   accent-color: $color-primary-light;
 }
 
-.login-page::after,
-.registration-page::after,
-.password-reset::after {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -1;
+body.page-name-login,
+body.page-name-registration,
+body.page-name-password-reset-request {
   background-image: url('~@/static/img/RefNet-Hero_16x9_desktop_1920x1080.jpg');
   background-size: cover;
   background-position: center;
 }
 
 @media only screen and (max-width: 900px) {
-  .login-page::after,
-  .registration-page::after,
-  .password-reset::after {
+  body.page-name-login,
+  body.page-name-registration,
+  body.page-name-password-reset-request {
     background-image: url('~@/static/img/RefNet-Hero_3x4_mobile_900x1200.jpg');
   }
 }
 
 @media only screen and (max-width: 800px) {
-  .login-page::after,
-  .registration-page::after,
-  .password-reset::after {
+  body.page-name-login,
+  body.page-name-registration,
+  body.page-name-password-reset-request {
     background-image: url('~@/static/img/RefNet-Hero_2x3_mobile_800x1200.jpg');
   }
 }
+
+
+
+
+//.login-page::after,
+//.registration-page::after,
+//.password-reset::after {
+//  content: "";
+//  position: fixed;
+//  top: 0;
+//  left: 0;
+//  width: 100vw;
+//  height: 100vh;
+//  z-index: -1;
+//  background-image: url('~@/static/img/RefNet-Hero_16x9_desktop_1920x1080.jpg');
+//  background-size: cover;
+//  background-position: center;
+//}
