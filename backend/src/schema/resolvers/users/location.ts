@@ -1,15 +1,18 @@
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable promise/avoid-new */
 /* eslint-disable promise/prefer-await-to-callbacks */
-/* eslint-disable import/no-named-as-default */
 import { UserInputError } from 'apollo-server'
-// eslint-disable-next-line import/no-extraneous-dependencies
-import Debug from 'debug'
 import request from 'request'
 
 import CONFIG from '@config/index'
 import asyncForEach from '@helpers/asyncForEach'
-
-const debug = Debug('human-connection:location')
 
 const fetch = (url) => {
   return new Promise((resolve, reject) => {
@@ -39,8 +42,8 @@ const createLocation = async (session, mapboxData) => {
     nameRU: mapboxData.text_ru,
     type: mapboxData.id.split('.')[0].toLowerCase(),
     address: mapboxData.address,
-    lng: mapboxData.center && mapboxData.center.length ? mapboxData.center[0] : null,
-    lat: mapboxData.center && mapboxData.center.length ? mapboxData.center[1] : null,
+    lng: mapboxData.center?.length ? mapboxData.center[0] : null,
+    lat: mapboxData.center?.length ? mapboxData.center[1] : null,
   }
 
   let mutation =
@@ -85,9 +88,7 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
       }&types=region,place,country,address&language=${locales.join(',')}`,
     )
 
-    debug(res)
-
-    if (!res || !res.features || !res.features[0]) {
+    if (!res?.features?.[0]) {
       throw new UserInputError('locationName is invalid')
     }
 
@@ -102,7 +103,7 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
       data = res.features[0]
     }
 
-    if (!data || !data.place_type || !data.place_type.length) {
+    if (!data?.place_type?.length) {
       throw new UserInputError('locationName is invalid')
     }
 
@@ -164,7 +165,7 @@ export const queryLocations = async ({ place, lang }) => {
     `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${CONFIG.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
   )
   // Return empty array if no location found or error occurred
-  if (!res || !res.features) {
+  if (!res?.features) {
     return []
   }
   return res.features

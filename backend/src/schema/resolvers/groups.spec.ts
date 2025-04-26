@@ -1,18 +1,21 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { createTestClient } from 'apollo-server-testing'
 
 import CONFIG from '@config/index'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import {
-  createGroupMutation,
-  updateGroupMutation,
-  joinGroupMutation,
-  leaveGroupMutation,
-  changeGroupMemberRoleMutation,
-  removeUserFromGroupMutation,
-  groupMembersQuery,
-  groupQuery,
-} from '@graphql/groups'
+import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { groupMembersQuery } from '@graphql/queries/groupMembersQuery'
+import { groupQuery } from '@graphql/queries/groupQuery'
+import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
+import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
+import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
+import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
 import createServer from '@src/server'
 
 const driver = getDriver()
@@ -238,7 +241,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 describe('in mode', () => {
@@ -2424,7 +2427,7 @@ describe('in mode', () => {
                   id: groupId,
                 },
               })
-              return result.data && result.data.GroupMembers
+              return result.data?.GroupMembers
                 ? !!result.data.GroupMembers.find((member) => member.id === userId)
                 : null
             }

@@ -1,6 +1,12 @@
+/* eslint-disable @typescript-eslint/no-dynamic-delete */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable security/detect-object-injection */
-import log from './databaseLogger'
-
 export const undefinedToNullResolver = (list) => {
   const resolvers = {}
   list.forEach((key) => {
@@ -11,6 +17,7 @@ export const undefinedToNullResolver = (list) => {
   return resolvers
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Resolver(type, options: any = {}) {
   const {
     idAttribute = 'id',
@@ -21,8 +28,8 @@ export default function Resolver(type, options: any = {}) {
     hasMany = {},
   } = options
 
-  const _hasResolver = (resolvers, { key, connection }, { returnType }) => {
-    return async (parent, params, { driver, cypherParams }, resolveInfo) => {
+  const _hasResolver = (_resolvers, { key, connection }, { returnType }) => {
+    return async (parent, _params, { driver, cypherParams }, _resolveInfo) => {
       if (typeof parent[key] !== 'undefined') return parent[key]
       const id = parent[idAttribute]
       const session = driver.session()
@@ -32,7 +39,6 @@ export default function Resolver(type, options: any = {}) {
         RETURN related {.*} as related
         `
         const result = await txc.run(cypher, { id, cypherParams })
-        log(result)
         return result.records.map((r) => r.get('related'))
       })
       try {
@@ -45,10 +51,11 @@ export default function Resolver(type, options: any = {}) {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const booleanResolver = (obj: any[]) => {
     const resolvers = {}
     for (const [key, condition] of Object.entries(obj)) {
-      resolvers[key] = async (parent, params, { cypherParams, driver }, resolveInfo) => {
+      resolvers[key] = async (parent, _params, { cypherParams, driver }, _resolveInfo) => {
         if (typeof parent[key] !== 'undefined') return parent[key]
         const id = parent[idAttribute]
         const session = driver.session()
@@ -56,7 +63,6 @@ export default function Resolver(type, options: any = {}) {
           const nodeCondition = condition.replace('this', 'this {id: $id}')
           const cypher = `${nodeCondition} as ${key}`
           const result = await txc.run(cypher, { id, cypherParams })
-          log(result)
           const [response] = result.records.map((r) => r.get(key))
           return response
         })
@@ -73,7 +79,7 @@ export default function Resolver(type, options: any = {}) {
   const countResolver = (obj) => {
     const resolvers = {}
     for (const [key, connection] of Object.entries(obj)) {
-      resolvers[key] = async (parent, params, { driver, cypherParams }, resolveInfo) => {
+      resolvers[key] = async (parent, _params, { driver, cypherParams }, _resolveInfo) => {
         if (typeof parent[key] !== 'undefined') return parent[key]
         const session = driver.session()
         const readTxResultPromise = session.readTransaction(async (txc) => {
@@ -83,7 +89,6 @@ export default function Resolver(type, options: any = {}) {
             RETURN COUNT(DISTINCT(related)) as count
           `
           const result = await txc.run(cypher, { id, cypherParams })
-          log(result)
           const [response] = result.records.map((r) => r.get('count').toNumber())
           return response
         })

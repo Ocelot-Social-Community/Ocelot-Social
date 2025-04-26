@@ -102,6 +102,7 @@ export default {
    */
   styleResources: {
     scss: [
+      '~assets/_new/styles/uses.scss',
       styleguideStyles,
       '~assets/_new/styles/tokens.scss',
       '~assets/styles/imports/_branding.scss',
@@ -206,6 +207,15 @@ export default {
         'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
       },
     },
+    '/img': {
+      // make this configurable (nuxt-dotenv)
+      target: CONFIG.GRAPHQL_URI,
+      toProxy: true, // cloudflare needs that
+      headers: {
+        'X-UI-Request': true,
+        'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
+      },
+    },
   },
 
   // Give apollo module options
@@ -259,6 +269,9 @@ export default {
           return tagName === 'vue-advanced-chat' || tagName === 'emoji-picker'
         },
       }
+
+      config.resolve.alias['~@'] = path.resolve(__dirname, '/')
+      config.resolve.alias['@@'] = path.resolve(__dirname, '/')
 
       if (CONFIG.STYLEGUIDE_DEV) {
         config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/src/system`)

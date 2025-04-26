@@ -90,6 +90,23 @@ export const adminUserQuery = () => {
   `
 }
 
+export const adminUserBadgesQuery = () => {
+  return gql`
+    query User($id: ID!) {
+      User(id: $id) {
+        id
+        name
+        badgeTrophies {
+          id
+        }
+        badgeVerification {
+          id
+        }
+      }
+    }
+  `
+}
+
 export const mapUserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
@@ -388,6 +405,22 @@ export const currentUserQuery = gql`
   query {
     currentUser {
       ...user
+      badgeTrophiesSelected {
+        id
+        icon
+        description
+        isDefault
+      }
+      badgeTrophiesUnused {
+        id
+        icon
+        description
+      }
+      badgeVerification {
+        id
+        icon
+        description
+      }
       email
       role
       about
@@ -449,3 +482,43 @@ export const userDataQuery = (i18n) => {
     }
   `
 }
+
+export const setTrophyBadgeSelected = gql`
+  mutation ($slot: Int!, $badgeId: ID) {
+    setTrophyBadgeSelected(slot: $slot, badgeId: $badgeId) {
+      badgeTrophiesCount
+      badgeTrophiesSelected {
+        id
+        icon
+        description
+        isDefault
+      }
+      badgeTrophiesUnused {
+        id
+        icon
+        description
+      }
+      badgeTrophiesUnusedCount
+    }
+  }
+`
+
+export const resetTrophyBadgesSelected = gql`
+  mutation {
+    resetTrophyBadgesSelected {
+      badgeTrophiesCount
+      badgeTrophiesSelected {
+        id
+        icon
+        description
+        isDefault
+      }
+      badgeTrophiesUnused {
+        id
+        icon
+        description
+      }
+      badgeTrophiesUnusedCount
+    }
+  }
+`

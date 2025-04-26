@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { render } from '@testing-library/vue'
 import settings from './settings.vue'
 
 const localVue = global.localVue
@@ -17,21 +17,37 @@ describe('settings.vue', () => {
     }
   })
 
-  describe('mount', () => {
-    const Wrapper = () => {
-      return mount(settings, {
-        mocks,
-        localVue,
-        stubs,
-      })
-    }
+  const Wrapper = () => {
+    return render(settings, {
+      mocks,
+      localVue,
+      stubs,
+    })
+  }
 
+  describe('given badges are enabled', () => {
     beforeEach(() => {
+      mocks.$env = {
+        BADGES_ENABLED: true,
+      }
       wrapper = Wrapper()
     })
 
     it('renders', () => {
-      expect(wrapper.element.tagName).toBe('DIV')
+      expect(wrapper.container).toMatchSnapshot()
+    })
+  })
+
+  describe('given badges are disabled', () => {
+    beforeEach(() => {
+      mocks.$env = {
+        BADGES_ENABLED: false,
+      }
+      wrapper = Wrapper()
+    })
+
+    it('renders', () => {
+      expect(wrapper.container).toMatchSnapshot()
     })
   })
 })

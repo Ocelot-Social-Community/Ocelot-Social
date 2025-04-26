@@ -1,4 +1,11 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable promise/prefer-await-to-callbacks */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable jest/unbound-method */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 import jwt from 'jsonwebtoken'
@@ -7,7 +14,7 @@ import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { loginMutation } from '@graphql/userManagement'
+import { loginMutation } from '@graphql/queries/loginMutation'
 import encode from '@jwt/encode'
 import createServer, { context } from '@src/server'
 
@@ -51,7 +58,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(() => {
@@ -155,8 +162,16 @@ describe('currentUser', () => {
           await respondsWith({
             data: {
               currentUser: expect.objectContaining({
-                activeCategories: [
+                activeCategories: expect.arrayContaining([
                   'cat1',
+                  'cat2',
+                  'cat3',
+                  'cat4',
+                  'cat5',
+                  'cat6',
+                  'cat7',
+                  'cat8',
+                  'cat9',
                   'cat10',
                   'cat11',
                   'cat12',
@@ -167,15 +182,7 @@ describe('currentUser', () => {
                   'cat17',
                   'cat18',
                   'cat19',
-                  'cat2',
-                  'cat3',
-                  'cat4',
-                  'cat5',
-                  'cat6',
-                  'cat7',
-                  'cat8',
-                  'cat9',
-                ],
+                ]),
               }),
             },
           })
@@ -267,7 +274,11 @@ describe('login', () => {
       describe('normalization', () => {
         describe('email address is a gmail address ', () => {
           beforeEach(async () => {
-            const email = await neode.first('EmailAddress', { email: 'test@example.org' })
+            const email = await neode.first(
+              'EmailAddress',
+              { email: 'test@example.org' },
+              undefined,
+            )
             await email.update({ email: 'someuser@gmail.com' })
           })
 

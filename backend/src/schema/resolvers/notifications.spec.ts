@@ -1,13 +1,16 @@
+/* eslint-disable @typescript-eslint/await-thenable */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
-import {
-  markAsReadMutation,
-  markAllAsReadMutation,
-  notificationQuery,
-} from '@graphql/notifications'
+import { markAllAsReadMutation } from '@graphql/queries/markAllAsReadMutation'
+import { markAsReadMutation } from '@graphql/queries/markAsReadMutation'
+import { notificationQuery } from '@graphql/queries/notificationQuery'
 import createServer from '@src/server'
 
 const driver = getDriver()
@@ -35,7 +38,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(async () => {

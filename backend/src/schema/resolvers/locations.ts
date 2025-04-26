@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { UserInputError } from 'apollo-server'
 
 import Resolver from './helpers/Resolver'
@@ -20,7 +22,7 @@ export default {
     }),
   },
   Query: {
-    queryLocations: async (object, args, context, resolveInfo) => {
+    queryLocations: async (_object, args, _context, _resolveInfo) => {
       try {
         return queryLocations(args)
       } catch (e) {

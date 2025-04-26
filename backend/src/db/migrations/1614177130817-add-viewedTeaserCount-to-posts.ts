@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 import { getDriver } from '@db/neo4j'
 
 export const description = `
 This migration adds the viewedTeaserCount property to all posts, setting it to 0.
 `
 
-export async function up(next) {
+export async function up(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -15,7 +17,6 @@ export async function up(next) {
         SET p.viewedTeaserCount = 0
     `)
     await transaction.commit()
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -24,11 +25,11 @@ export async function up(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-export async function down(next) {
+export async function down(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -39,7 +40,6 @@ export async function down(next) {
         REMOVE p.viewedTeaserCount
     `)
     await transaction.commit()
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -48,6 +48,6 @@ export async function down(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
