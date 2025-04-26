@@ -28,7 +28,6 @@ if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
 
 const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
-/* eslint-disable no-multi-spaces */
 ;(async function () {
   let authenticatedUser = null
   const driver = getDriver()
@@ -1585,7 +1584,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     /* eslint-disable-next-line no-console */
     console.log('Seeded Data...')
     await driver.close()
-    await neode.close()
+    neode.close()
     process.exit(0)
     // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
@@ -1594,4 +1593,3 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     process.exit(1)
   }
 })()
-/* eslint-enable no-multi-spaces */

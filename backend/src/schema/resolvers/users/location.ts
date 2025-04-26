@@ -8,16 +8,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable promise/avoid-new */
 /* eslint-disable promise/prefer-await-to-callbacks */
-/* eslint-disable import/no-named-as-default */
 import { UserInputError } from 'apollo-server'
-// eslint-disable-next-line import/no-extraneous-dependencies
-import Debug from 'debug'
 import request from 'request'
 
 import CONFIG from '@config/index'
 import asyncForEach from '@helpers/asyncForEach'
-
-const debug = Debug('human-connection:location')
 
 const fetch = (url) => {
   return new Promise((resolve, reject) => {
@@ -92,8 +87,6 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
         CONFIG.MAPBOX_TOKEN
       }&types=region,place,country,address&language=${locales.join(',')}`,
     )
-
-    debug(res)
 
     if (!res?.features?.[0]) {
       throw new UserInputError('locationName is invalid')

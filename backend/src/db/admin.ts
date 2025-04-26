@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 import { hashSync } from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 
@@ -11,6 +8,7 @@ import { getDriver } from './neo4j'
 
 const defaultAdmin = {
   email: 'admin@example.org',
+  // eslint-disable-next-line n/no-sync
   password: hashSync('1234', 10),
   name: 'admin',
   id: uuid(),

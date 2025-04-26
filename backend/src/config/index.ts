@@ -1,35 +1,19 @@
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable security/detect-non-literal-fs-filename */
 /* eslint-disable n/no-process-env */
-/* eslint-disable n/no-unpublished-require */
-/* eslint-disable n/no-missing-require */
 import { config } from 'dotenv'
 
 import emails from './emails'
 import metadata from './metadata'
 
 // Load env file
-if (require.resolve) {
-  try {
-    config({ path: require.resolve('../../.env') })
-  } catch (error) {
-    // This error is thrown when the .env is not found
-    if (error.code !== 'MODULE_NOT_FOUND') {
-      throw error
-    }
-  }
-}
+config()
 
 // Use Cypress env or process.env
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Cypress: any | undefined
-const env = typeof Cypress !== 'undefined' ? Cypress.env() : process.env // eslint-disable-line no-undef
+const env = typeof Cypress !== 'undefined' ? Cypress.env() : process.env
 
 const environment = {
   NODE_ENV: env.NODE_ENV || process.env.NODE_ENV,

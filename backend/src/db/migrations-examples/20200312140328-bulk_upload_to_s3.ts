@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -55,6 +53,7 @@ export async function up(next) {
             const { pathname } = new URL(url, 'http://example.org')
             const fileLocation = path.join(__dirname, `../../../public/${pathname}`)
             const s3Location = `original${pathname}`
+            // eslint-disable-next-line n/no-sync
             if (existsSync(fileLocation)) {
               const mimeType = mime.lookup(fileLocation)
               const params = {
@@ -91,7 +90,7 @@ export async function up(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -113,6 +112,6 @@ export async function down(next) {
     // eslint-disable-next-line no-console
     console.log('rolled back')
   } finally {
-    session.close()
+    await session.close()
   }
 }

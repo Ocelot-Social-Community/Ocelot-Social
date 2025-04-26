@@ -17,22 +17,23 @@ import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock = jest.fn()
-jest.mock('../helpers/email/sendMail', () => ({
-  sendMail: () => sendMailMock(),
+const sendMailMock: (notification) => void = jest.fn()
+jest.mock('@middleware/helpers/email/sendMail', () => ({
+  sendMail: (notification) => sendMailMock(notification),
 }))
 
 let server, query, mutate, authenticatedUser
 
-let postAuthor, groupMember, pendingMember, noMember
+let postAuthor, groupMember, pendingMember, noMember, emaillessMember
 
 const driver = getDriver()
 const neode = getNeode()
 
 const mentionString = `
-  <a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member">@no-meber</a>
+  <a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member">@no-member</a>
   <a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member">@pending-member</a>
   <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member">@group-member</a>.
+  <a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member">@email-less-member</a>.
 `
 
 const createPostMutation = gql`
@@ -115,7 +116,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 describe('mentions in groups', () => {
@@ -168,6 +169,12 @@ describe('mentions in groups', () => {
         password: '1234',
       },
     )
+    emaillessMember = await neode.create('User', {
+      id: 'email-less-member',
+      name: 'Email-less Member',
+      slug: 'email-less-member',
+    })
+
     authenticatedUser = await postAuthor.toJson()
     await mutate({
       mutation: createGroupMutation(),
@@ -243,6 +250,28 @@ describe('mentions in groups', () => {
         userId: 'pending-member',
       },
     })
+    authenticatedUser = await emaillessMember.toJson()
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'public-group',
+        userId: 'group-member',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'closed-group',
+        userId: 'group-member',
+      },
+    })
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'hidden-group',
+        userId: 'group-member',
+      },
+    })
     authenticatedUser = await postAuthor.toJson()
     await mutate({
       mutation: changeGroupMemberRoleMutation(),
@@ -260,7 +289,25 @@ describe('mentions in groups', () => {
         roleInGroup: 'usual',
       },
     })
+    await mutate({
+      mutation: changeGroupMemberRoleMutation(),
+      variables: {
+        groupId: 'closed-group',
+        userId: 'email-less-member',
+        roleInGroup: 'usual',
+      },
+    })
+    await mutate({
+      mutation: changeGroupMemberRoleMutation(),
+      variables: {
+        groupId: 'hidden-group',
+        userId: 'email-less-member',
+        roleInGroup: 'usual',
+      },
+    })
     authenticatedUser = await groupMember.toJson()
+    await markAllAsRead()
+    authenticatedUser = await emaillessMember.toJson()
     await markAllAsRead()
   })
 
@@ -327,7 +374,7 @@ describe('mentions in groups', () => {
                 __typename: 'Post',
                 id: 'public-post',
                 content:
-                  'Hey <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-meber</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br>! Please read this',
+                  'Hey <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-member</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>.<br>! Please read this',
               },
               read: false,
               reason: 'post_in_group',
@@ -339,7 +386,7 @@ describe('mentions in groups', () => {
                 __typename: 'Post',
                 id: 'public-post',
                 content:
-                  'Hey <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-meber</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br>! Please read this',
+                  'Hey <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-member</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>.<br>! Please read this',
               },
               read: false,
               reason: 'mentioned_in_post',
@@ -351,7 +398,7 @@ describe('mentions in groups', () => {
       })
     })
 
-    it('sends 3 emails, one for each user', () => {
+    it('sends only 3 emails, one for each user with an email', () => {
       expect(sendMailMock).toHaveBeenCalledTimes(3)
     })
   })
@@ -423,7 +470,7 @@ describe('mentions in groups', () => {
                 __typename: 'Post',
                 id: 'closed-post',
                 content:
-                  'Hey members <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-meber</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br>! Please read this',
+                  'Hey members <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-member</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>.<br>! Please read this',
               },
               read: false,
               reason: 'post_in_group',
@@ -435,7 +482,7 @@ describe('mentions in groups', () => {
                 __typename: 'Post',
                 id: 'closed-post',
                 content:
-                  'Hey members <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-meber</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br>! Please read this',
+                  'Hey members <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-member</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>.<br>! Please read this',
               },
               read: false,
               reason: 'mentioned_in_post',
@@ -519,7 +566,7 @@ describe('mentions in groups', () => {
                 __typename: 'Post',
                 id: 'hidden-post',
                 content:
-                  'Hey hiders <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-meber</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br>! Please read this',
+                  'Hey hiders <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-member</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>.<br>! Please read this',
               },
               read: false,
               reason: 'post_in_group',
@@ -531,7 +578,7 @@ describe('mentions in groups', () => {
                 __typename: 'Post',
                 id: 'hidden-post',
                 content:
-                  'Hey hiders <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-meber</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br>! Please read this',
+                  'Hey hiders <br><a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member" target="_blank">@no-member</a><br><a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member" target="_blank">@pending-member</a><br><a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member" target="_blank">@group-member</a>.<br><a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member" target="_blank">@email-less-member</a>.<br>! Please read this',
               },
               read: false,
               reason: 'mentioned_in_post',

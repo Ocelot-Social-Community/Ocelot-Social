@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/unbound-method */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { faker } from '@faker-js/faker'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
@@ -39,7 +37,7 @@ export const cleanDatabase = async ({ withMigrations } = { withMigrations: false
       return transaction.run(clean)
     })
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -95,6 +93,7 @@ Factory.define('basicUser')
     return slug || slugify(name, { lower: true })
   })
   .attr('encryptedPassword', ['password'], (password) => {
+    // eslint-disable-next-line n/no-sync
     return hashSync(password, 10)
   })
 

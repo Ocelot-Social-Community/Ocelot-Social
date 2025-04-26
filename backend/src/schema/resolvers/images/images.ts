@@ -91,7 +91,7 @@ const wrapTransaction = async (wrappedCallback, args, opts) => {
     })
     return result
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -152,6 +152,7 @@ const s3Upload = async ({ createReadStream, uniqueFilename, mimetype }) => {
 
 const localFileDelete = async (url) => {
   const location = `public${url}`
+  // eslint-disable-next-line n/no-sync
   if (existsSync(location)) unlinkSync(location)
 }
 

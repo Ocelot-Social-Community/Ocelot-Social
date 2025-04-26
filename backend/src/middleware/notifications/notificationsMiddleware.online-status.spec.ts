@@ -13,9 +13,9 @@ import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock = jest.fn()
-jest.mock('../helpers/email/sendMail', () => ({
-  sendMail: () => sendMailMock(),
+const sendMailMock: (notification) => void = jest.fn()
+jest.mock('@middleware/helpers/email/sendMail', () => ({
+  sendMail: (notification) => sendMailMock(notification),
 }))
 
 let isUserOnlineMock = jest.fn().mockReturnValue(false)
@@ -62,7 +62,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 afterEach(async () => {

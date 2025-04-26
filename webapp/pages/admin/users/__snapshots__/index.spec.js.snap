@@ -1,0 +1,847 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Users given badges are disabled renders 1`] = `
+<div
+  class="admin-users"
+>
+  <article
+    class="base-card"
+  >
+    <h2
+      class="title"
+    >
+      admin.users.name
+    </h2>
+     
+    <form
+      autocomplete="off"
+      class="ds-form"
+      novalidate="novalidate"
+    >
+      <div
+        class="ds-flex"
+        style="margin-left: -8px; margin-right: -8px;"
+      >
+        <div
+          class="ds-flex-item"
+          style="flex-basis: 90%; width: 90%; padding-left: 8px; padding-right: 8px; margin-bottom: 16px;"
+        >
+          <div
+            class="ds-form-item ds-input-size-base"
+          >
+            <label
+              class="ds-input-label"
+              style="display: none;"
+            >
+              
+  
+
+            </label>
+            <div
+              class="ds-input-wrap"
+            >
+              <div
+                class="ds-input-icon"
+              >
+                <span
+                  aria-label="icon"
+                  class="ds-icon"
+                >
+                  <svg
+                    class="ds-icon-svg"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M19 3c5.511 0 10 4.489 10 10s-4.489 10-10 10a9.923 9.923 0 01-6.313-2.25l-7.969 7.969-1.438-1.438 7.969-7.969a9.919 9.919 0 01-2.25-6.313c0-5.511 4.489-10 10-10zm0 2c-4.43 0-8 3.57-8 8s3.57 8 8 8 8-3.57 8-8-3.57-8-8-8z"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <input
+                class="ds-input ds-input-has-icon"
+                name="query"
+                placeholder="admin.users.form.placeholder"
+                tabindex="0"
+                type="text"
+              />
+              <!---->
+            </div>
+            <transition-stub
+              name="ds-input-error"
+            >
+              <div
+                class="ds-input-error"
+                style="display: none;"
+              >
+                
+    
+  
+              </div>
+            </transition-stub>
+          </div>
+        </div>
+         
+        <div
+          class="ds-flex-item"
+          style="flex-basis: 30px; width: 30px; padding-left: 8px; padding-right: 8px; margin-bottom: 16px;"
+        >
+          <button
+            class="base-button --icon-only --circle --filled"
+            type="submit"
+          >
+            <span
+              class="base-icon"
+            >
+              <!---->
+            </span>
+             
+            <!---->
+             
+          </button>
+        </div>
+      </div>
+    </form>
+     
+    <!---->
+  </article>
+   
+  <article
+    class="base-card"
+  >
+    <div
+      class="ds-table-wrap"
+    >
+      <table
+        cellpadding="0"
+        cellspacing="0"
+        class="ds-table ds-table-condensed ds-table-bordered"
+      >
+        <colgroup>
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+        </colgroup>
+        <thead>
+          <tr>
+            <th
+              class="ds-table-head-col"
+            >
+              
+          admin.users.table.columns.number
+        
+            </th>
+            <th
+              class="ds-table-head-col"
+            >
+              
+          admin.users.table.columns.name
+        
+            </th>
+            <th
+              class="ds-table-head-col"
+            >
+              
+          admin.users.table.columns.email
+        
+            </th>
+            <th
+              class="ds-table-head-col"
+            >
+              
+          admin.users.table.columns.slug
+        
+            </th>
+            <th
+              class="ds-table-head-col"
+            >
+              
+          admin.users.table.columns.createdAt
+        
+            </th>
+            <th
+              class="ds-table-head-col ds-table-head-col-right"
+            >
+              
+          🖉
+        
+            </th>
+            <th
+              class="ds-table-head-col ds-table-head-col-right"
+            >
+              
+          🗨
+        
+            </th>
+            <th
+              class="ds-table-head-col ds-table-head-col-right"
+            >
+              
+          ❤
+        
+            </th>
+            <th
+              class="ds-table-head-col ds-table-head-col-right"
+            >
+              
+          admin.users.table.columns.role
+        
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td
+              class="ds-table-col"
+            >
+              NaN.
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                <b>
+                  User
+                </b>
+              </nuxt-link-stub>
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              <a
+                href="mailto:user@example.org"
+              >
+                <b>
+                  user@example.org
+                </b>
+              </a>
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                <b>
+                  user
+                </b>
+              </nuxt-link-stub>
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              
+        
+      
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              
+            
+          
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              
+            
+          
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              
+            
+          
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              <select />
+            </td>
+          </tr>
+          <tr>
+            <td
+              class="ds-table-col"
+            >
+              NaN.
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                <b>
+                  User
+                </b>
+              </nuxt-link-stub>
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              <a
+                href="mailto:user2@example.org"
+              >
+                <b>
+                  user2@example.org
+                </b>
+              </a>
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                <b>
+                  user
+                </b>
+              </nuxt-link-stub>
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              
+        
+      
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              
+            
+          
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              
+            
+          
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              
+            
+          
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              <select />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+     
+    <div
+      class="pagination-buttons"
+    >
+      <button
+        class="previous-button base-button --icon-only --circle"
+        data-test="previous-button"
+        disabled="disabled"
+        type="button"
+      >
+        <span
+          class="base-icon"
+        >
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+       
+      <!---->
+       
+      <button
+        class="next-button base-button --icon-only --circle"
+        data-test="next-button"
+        disabled="disabled"
+        type="button"
+      >
+        <span
+          class="base-icon"
+        >
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+    </div>
+     
+    <!---->
+  </article>
+</div>
+`;
+
+exports[`Users given badges are enabled renders 1`] = `
+<div
+  class="admin-users"
+>
+  <article
+    class="base-card"
+  >
+    <h2
+      class="title"
+    >
+      admin.users.name
+    </h2>
+     
+    <form
+      autocomplete="off"
+      class="ds-form"
+      novalidate="novalidate"
+    >
+      <div
+        class="ds-flex"
+        style="margin-left: -8px; margin-right: -8px;"
+      >
+        <div
+          class="ds-flex-item"
+          style="flex-basis: 90%; width: 90%; padding-left: 8px; padding-right: 8px; margin-bottom: 16px;"
+        >
+          <div
+            class="ds-form-item ds-input-size-base"
+          >
+            <label
+              class="ds-input-label"
+              style="display: none;"
+            >
+              
+  
+
+            </label>
+            <div
+              class="ds-input-wrap"
+            >
+              <div
+                class="ds-input-icon"
+              >
+                <span
+                  aria-label="icon"
+                  class="ds-icon"
+                >
+                  <svg
+                    class="ds-icon-svg"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M19 3c5.511 0 10 4.489 10 10s-4.489 10-10 10a9.923 9.923 0 01-6.313-2.25l-7.969 7.969-1.438-1.438 7.969-7.969a9.919 9.919 0 01-2.25-6.313c0-5.511 4.489-10 10-10zm0 2c-4.43 0-8 3.57-8 8s3.57 8 8 8 8-3.57 8-8-3.57-8-8-8z"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <input
+                class="ds-input ds-input-has-icon"
+                name="query"
+                placeholder="admin.users.form.placeholder"
+                tabindex="0"
+                type="text"
+              />
+              <!---->
+            </div>
+            <transition-stub
+              name="ds-input-error"
+            >
+              <div
+                class="ds-input-error"
+                style="display: none;"
+              >
+                
+    
+  
+              </div>
+            </transition-stub>
+          </div>
+        </div>
+         
+        <div
+          class="ds-flex-item"
+          style="flex-basis: 30px; width: 30px; padding-left: 8px; padding-right: 8px; margin-bottom: 16px;"
+        >
+          <button
+            class="base-button --icon-only --circle --filled"
+            type="submit"
+          >
+            <span
+              class="base-icon"
+            >
+              <!---->
+            </span>
+             
+            <!---->
+             
+          </button>
+        </div>
+      </div>
+    </form>
+     
+    <!---->
+  </article>
+   
+  <article
+    class="base-card"
+  >
+    <div
+      class="ds-table-wrap"
+    >
+      <table
+        cellpadding="0"
+        cellspacing="0"
+        class="ds-table ds-table-condensed ds-table-bordered"
+      >
+        <colgroup>
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+          <col
+            width=""
+          />
+        </colgroup>
+        <thead>
+          <tr>
+            <th
+              class="ds-table-head-col"
+            >
+              
+          admin.users.table.columns.number
+        
+            </th>
+            <th
+              class="ds-table-head-col"
+            >
+              
+          admin.users.table.columns.name
+        
+            </th>
+            <th
+              class="ds-table-head-col"
+            >
+              
+          admin.users.table.columns.email
+        
+            </th>
+            <th
+              class="ds-table-head-col"
+            >
+              
+          admin.users.table.columns.slug
+        
+            </th>
+            <th
+              class="ds-table-head-col"
+            >
+              
+          admin.users.table.columns.createdAt
+        
+            </th>
+            <th
+              class="ds-table-head-col ds-table-head-col-right"
+            >
+              
+          🖉
+        
+            </th>
+            <th
+              class="ds-table-head-col ds-table-head-col-right"
+            >
+              
+          🗨
+        
+            </th>
+            <th
+              class="ds-table-head-col ds-table-head-col-right"
+            >
+              
+          ❤
+        
+            </th>
+            <th
+              class="ds-table-head-col ds-table-head-col-right"
+            >
+              
+          admin.users.table.columns.role
+        
+            </th>
+            <th
+              class="ds-table-head-col ds-table-head-col-right"
+            >
+              
+          admin.users.table.columns.badges
+        
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td
+              class="ds-table-col"
+            >
+              NaN.
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                <b>
+                  User
+                </b>
+              </nuxt-link-stub>
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              <a
+                href="mailto:user@example.org"
+              >
+                <b>
+                  user@example.org
+                </b>
+              </a>
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                <b>
+                  user
+                </b>
+              </nuxt-link-stub>
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              
+        
+      
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              
+            
+          
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              
+            
+          
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              
+            
+          
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              <select />
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                
+          admin.users.table.edit
+        
+              </nuxt-link-stub>
+            </td>
+          </tr>
+          <tr>
+            <td
+              class="ds-table-col"
+            >
+              NaN.
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                <b>
+                  User
+                </b>
+              </nuxt-link-stub>
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              <a
+                href="mailto:user2@example.org"
+              >
+                <b>
+                  user2@example.org
+                </b>
+              </a>
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                <b>
+                  user
+                </b>
+              </nuxt-link-stub>
+            </td>
+            <td
+              class="ds-table-col"
+            >
+              
+        
+      
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              
+            
+          
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              
+            
+          
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              
+            
+          
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              <select />
+            </td>
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                
+          admin.users.table.edit
+        
+              </nuxt-link-stub>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+     
+    <div
+      class="pagination-buttons"
+    >
+      <button
+        class="previous-button base-button --icon-only --circle"
+        data-test="previous-button"
+        disabled="disabled"
+        type="button"
+      >
+        <span
+          class="base-icon"
+        >
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+       
+      <!---->
+       
+      <button
+        class="next-button base-button --icon-only --circle"
+        data-test="next-button"
+        disabled="disabled"
+        type="button"
+      >
+        <span
+          class="base-icon"
+        >
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+    </div>
+     
+    <!---->
+  </article>
+</div>
+`;
