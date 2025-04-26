@@ -24,6 +24,7 @@ ONBUILD COPY ./branding/constants/ src/config/tmp
 ONBUILD RUN tools/replace-constants.sh
 ONBUILD COPY ./branding/email/ src/middleware/helpers/email/
 ONBUILD COPY ./branding/data/ src/db/data
+ONBUILD COPY ./branding/public/ public/
 ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
 ONBUILD RUN yarn run build
 ONBUILD RUN mkdir /build
