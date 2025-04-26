@@ -209,64 +209,33 @@ div.ds-input-wrap > input:focus-within.ds-input {
   accent-color: $color-primary-light;
 }
 
-.registration-page {
+.login-page::after,
+.registration-page::after,
+.password-reset::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
   background-image: url('~@/static/img/RefNet-Hero_16x9_desktop_1920x1080.jpg');
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-
-.login-page {
-  background-image: url('~@/static/img/RefNet-Hero_16x9_desktop_1920x1080.jpg');
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-
-.password-reset {
-  background-image: url('~@/static/img/RefNet-Hero_16x9_desktop_1920x1080.jpg');
-  background-repeat: no-repeat;
-  background-size: contain;
+  background-size: cover;
+  background-position: center;
 }
 
 @media only screen and (max-width: 900px) {
-
-  .registration-page {
+  .login-page::after,
+  .registration-page::after,
+  .password-reset::after {
     background-image: url('~@/static/img/RefNet-Hero_3x4_mobile_900x1200.jpg');
-    background-repeat: no-repeat;
-    background-size: contain;
   }
-
-  .login-page {
-    background-image: url('~@/static/img/RefNet-Hero_3x4_mobile_900x1200.jpg');
-    background-repeat: no-repeat;
-    background-size: contain;
-  }
-
-  .password-reset {
-    background-image: url('~@/static/img/RefNet-Hero_3x4_mobile_900x1200.jpg');
-    background-repeat: no-repeat;
-    background-size: contain;
-  }
-
 }
 
 @media only screen and (max-width: 800px) {
-
-  .registration-page {
+  .login-page::after,
+  .registration-page::after,
+  .password-reset::after {
     background-image: url('~@/static/img/RefNet-Hero_2x3_mobile_800x1200.jpg');
-    background-repeat: no-repeat;
-    background-size: contain;
   }
-
-  .login-page {
-    background-image: url('~@/static/img/RefNet-Hero_2x3_mobile_800x1200.jpg');
-    background-repeat: no-repeat;
-    background-size: contain;
-  }
-
-  .password-reset {
-    background-image: url('~@/static/img/RefNet-Hero_2x3_mobile_800x1200.jpg');
-    background-repeat: no-repeat;
-    background-size: contain;
-  }
-
 }
