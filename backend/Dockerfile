@@ -42,3 +42,4 @@ FROM build AS production_build
 
 FROM base AS production
 COPY --from=production_build /build .
+COPY --from=production_build /public .
