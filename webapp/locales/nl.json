@@ -1173,5 +1173,10 @@
     "newTermsAndConditions": null,
     "termsAndConditionsNewConfirm": null,
     "termsAndConditionsNewConfirmText": null
+  },
+  "user-teaser": {
+    "popover": {
+      "open-profile": null
+    }
   }
 }

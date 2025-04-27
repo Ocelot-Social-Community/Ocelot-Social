@@ -1173,5 +1173,10 @@
     "newTermsAndConditions": "Nouvelles conditions générales",
     "termsAndConditionsNewConfirm": "J'ai lu et accepté les nouvelles conditions générales.",
     "termsAndConditionsNewConfirmText": "Veuillez lire les nouvelles conditions d'utilisation dès maintenant !"
+  },
+  "user-teaser": {
+    "popover": {
+      "open-profile": null
+    }
   }
 }

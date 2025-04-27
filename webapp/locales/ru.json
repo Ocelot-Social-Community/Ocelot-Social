@@ -1173,5 +1173,10 @@
     "newTermsAndConditions": "Новые условия и положения",
     "termsAndConditionsNewConfirm": "Я прочитал(а) и согласен(на) с новыми условиями.",
     "termsAndConditionsNewConfirmText": "Пожалуйста, ознакомьтесь с новыми условиями использования!"
+  },
+  "user-teaser": {
+    "popover": {
+      "open-profile": null
+    }
   }
 }

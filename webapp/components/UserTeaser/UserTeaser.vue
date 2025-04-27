@@ -8,29 +8,30 @@
       <template #default="{ openMenu, closeMenu }">
         <component
           v-if="showAvatar"
-          :is="linkToProfile ? 'nuxt-link' : 'span'"
-          :to="userLink"
-          @mouseover.native="() => showPopover && openMenu(true)"
-          @mouseleave.native="closeMenu(true)"
+          :is="linkToProfile && !isTouchDevice ? 'nuxt-link' : 'span'"
+          :to="linkToProfile && !isTouchDevice && userLink"
         >
-          <profile-avatar :profile="user" size="small" />
+          <profile-avatar
+            :profile="user"
+            size="small"
+            @mouseover.native="() => showPopover && openMenu(true)"
+            @mouseleave.native="closeMenu(true)"
+            @click.native="() => showPopover && openMenu(true)"
+          />
         </component>
         <div class="info flex-direction-column">
           <div :class="wide ? 'flex-direction-row' : 'flex-direction-column'">
             <component
-              :is="linkToProfile ? 'nuxt-link' : 'span'"
-              :to="userLink"
-              @mouseover.native="() => showPopover && openMenu(true)"
-              @mouseleave.native="closeMenu(true)"
+              :is="linkToProfile && !isTouchDevice ? 'nuxt-link' : 'span'"
+              :to="linkToProfile && !isTouchDevice && userLink"
             >
-              <span class="text">
-                <span
-                  class="slug"
-                  @mouseover="() => showPopover && openMenu(true)"
-                  @mouseleave="closeMenu(true)"
-                >
-                  {{ userSlug }}
-                </span>
+              <span
+                class="text"
+                @mouseover="() => showPopover && openMenu(true)"
+                @mouseleave="closeMenu(true)"
+                @click="() => showPopover && openMenu(true)"
+              >
+                <span class="slug">{{ userSlug }}</span>
                 <span class="name">{{ userName }}</span>
               </span>
             </component>
@@ -52,15 +53,16 @@
             <date-time :date-time="dateTime" />
             <slot name="dateTime"></slot>
           </span>
-          <user-teaser-popover
-            :user="user"
-            v-if="user.badgeVerification"
-            @close="closeMenu(true)"
-          />
         </div>
       </template>
       <template #popover="{ isOpen }" v-if="showPopover">
-        <user-teaser-popover :user="user" @close="closeMenu(true)" v-if="isOpen" />
+        <user-teaser-popover
+          v-if="isOpen"
+          :user="user"
+          :link-to-profile="linkToProfile"
+          :user-link="userLink"
+          @close="closeMenu(true)"
+        />
       </template>
     </dropdown>
   </div>
@@ -73,6 +75,7 @@ import DateTime from '~/components/DateTime'
 import Dropdown from '~/components/Dropdown'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import UserTeaserPopover from './UserTeaserPopover'
+import { isTouchDevice } from '../utils/isTouchDevice'
 
 export default {
   name: 'UserTeaser',
@@ -95,6 +98,9 @@ export default {
     ...mapGetters({
       isModerator: 'auth/isModerator',
     }),
+    isTouchDevice() {
+      return isTouchDevice()
+    },
     itsMe() {
       return this.user.slug === this.$store.getters['auth/user'].slug
     },

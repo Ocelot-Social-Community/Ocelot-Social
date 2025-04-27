@@ -35,11 +35,15 @@
         </ds-space>
       </ds-flex-item>
     </ds-flex>
+    <nuxt-link v-if="isTouchDevice && linkToProfile" :to="userLink" class="link">
+      <ds-button primary>{{ $t('user-teaser.popover.open-profile') }}</ds-button>
+    </nuxt-link>
   </div>
 </template>
 
 <script>
 import Badges from '~/components/Badges.vue'
+import { isTouchDevice } from '~/components/utils/isTouchDevice'
 
 export default {
   name: 'UserTeaserPopover',
@@ -48,6 +52,13 @@ export default {
   },
   props: {
     user: { type: Object, default: null },
+    linkToProfile: { type: Boolean, default: true },
+    userLink: { type: Object, default: null },
+  },
+  computed: {
+    isTouchDevice() {
+      return isTouchDevice()
+    },
   },
 }
 </script>
@@ -56,6 +67,7 @@ export default {
 .user-teaser-popover {
   display: flex;
   flex-direction: column;
+  align-items: center;
   padding: 16px;
   min-width: 200px;
 }
@@ -65,5 +77,9 @@ export default {
   align-items: center;
   justify-content: center;
   margin-block: 16px;
+}
+
+.link {
+  margin-top: 16px;
 }
 </style>
