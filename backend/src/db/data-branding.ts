@@ -6,11 +6,14 @@
 import { readdir } from 'node:fs/promises'
 import path from 'node:path'
 
+import { getNeode } from './neo4j'
+
 const dataFolder = path.join(__dirname, 'data/')
+const neode = getNeode()
 
 ;(async function () {
   const files = await readdir(dataFolder)
-  files.forEach(async (file) => {
+  for await (const file of files) {
     if (file.slice(0, -3).endsWith('-branding')) {
       const importedModule = await import(path.join(dataFolder, file))
       if (!importedModule.default) {
@@ -18,5 +21,8 @@ const dataFolder = path.join(__dirname, 'data/')
       }
       await importedModule.default()
     }
-  })
+  }
+
+  // close database connection
+  neode.close()
 })()
