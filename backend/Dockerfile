@@ -29,7 +29,7 @@ ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
 ONBUILD RUN yarn run build
 ONBUILD RUN mkdir /build
 ONBUILD RUN cp -r ./build /build
-ONBUILD RUN cp -r ./public /build/build
+ONBUILD RUN cp -r ./public /public
 ONBUILD RUN cp -r ./package.json yarn.lock /build
 ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-interactive
 

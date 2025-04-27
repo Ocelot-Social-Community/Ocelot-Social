@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# public
-cp -r public/ build/public/
-
 # html files
 mkdir -p build/src/middleware/helpers/email/templates/
 cp -r src/middleware/helpers/email/templates/*.html build/src/middleware/helpers/email/templates/
