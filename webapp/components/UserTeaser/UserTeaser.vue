@@ -4,43 +4,65 @@
     <span class="info anonymous">{{ $t('profile.userAnonym') }}</span>
   </div>
   <div v-else :class="[{ 'disabled-content': user.disabled }]" placement="top-start">
-    <div :class="['user-teaser']">
-      <nuxt-link v-if="linkToProfile && showAvatar" :to="userLink" data-test="avatarUserLink">
-        <profile-avatar :profile="user" size="small" />
-      </nuxt-link>
-      <profile-avatar v-else-if="showAvatar" :profile="user" size="small" />
-      <div class="info flex-direction-column">
-        <div :class="wide ? 'flex-direction-row' : 'flex-direction-column'">
-          <nuxt-link v-if="linkToProfile" :to="userLink">
-            <span class="text">
-              <span class="slug">{{ userSlug }}</span>
-              <span class="name">{{ userName }}</span>
-            </span>
-          </nuxt-link>
-          <span v-else class="text">
-            <span class="slug">{{ userSlug }}</span>
-            <span class="name">{{ userName }}</span>
-          </span>
-          <span v-if="wide">&nbsp;</span>
-          <span v-if="group">
-            <span class="text">
-              {{ $t('group.in') }}
-            </span>
-            <nuxt-link :to="groupLink">
+    <dropdown class="user-teaser">
+      <template #default="{ openMenu, closeMenu }">
+        <component
+          v-if="showAvatar"
+          :is="linkToProfile ? 'nuxt-link' : 'span'"
+          :to="userLink"
+          @mouseover.native="() => showPopover && openMenu(true)"
+          @mouseleave.native="closeMenu(true)"
+        >
+          <profile-avatar :profile="user" size="small" />
+        </component>
+        <div class="info flex-direction-column">
+          <div :class="wide ? 'flex-direction-row' : 'flex-direction-column'">
+            <component
+              :is="linkToProfile ? 'nuxt-link' : 'span'"
+              :to="userLink"
+              @mouseover.native="() => showPopover && openMenu(true)"
+              @mouseleave.native="closeMenu(true)"
+            >
               <span class="text">
-                <span class="slug">{{ groupSlug }}</span>
-                <span v-if="!userOnly" class="name">{{ groupName }}</span>
+                <span
+                  class="slug"
+                  @mouseover="() => showPopover && openMenu(true)"
+                  @mouseleave="closeMenu(true)"
+                >
+                  {{ userSlug }}
+                </span>
+                <span class="name">{{ userName }}</span>
               </span>
-            </nuxt-link>
+            </component>
+            <span v-if="wide">&nbsp;</span>
+            <span v-if="group">
+              <span class="text">
+                {{ $t('group.in') }}
+              </span>
+              <nuxt-link :to="groupLink">
+                <span class="text">
+                  <span class="slug">{{ groupSlug }}</span>
+                  <span v-if="!userOnly" class="name">{{ groupName }}</span>
+                </span>
+              </nuxt-link>
+            </span>
+          </div>
+          <span v-if="!userOnly && dateTime" class="text">
+            <base-icon name="clock" />
+            <date-time :date-time="dateTime" />
+            <slot name="dateTime"></slot>
           </span>
+          <user-teaser-popover
+            :user="user"
+            v-if="user.badgeVerification"
+            @close="closeMenu(true)"
+          />
         </div>
-        <span v-if="!userOnly && dateTime" class="text">
-          <base-icon name="clock" />
-          <date-time :date-time="dateTime" />
-          <slot name="dateTime"></slot>
-        </span>
-      </div>
-    </div>
+      </template>
+      <template #popover="{ isOpen }" v-if="showPopover">
+        <user-teaser-popover :user="user" @close="closeMenu(true)" v-if="isOpen" />
+      </template>
+    </dropdown>
   </div>
 </template>
 
@@ -48,13 +70,17 @@
 import { mapGetters } from 'vuex'
 
 import DateTime from '~/components/DateTime'
+import Dropdown from '~/components/Dropdown'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import UserTeaserPopover from './UserTeaserPopover'
 
 export default {
   name: 'UserTeaser',
   components: {
+    Dropdown,
     DateTime,
     ProfileAvatar,
+    UserTeaserPopover,
   },
   props: {
     linkToProfile: { type: Boolean, default: true },
@@ -106,34 +132,24 @@ export default {
       return name || this.$t('profile.userAnonym')
     },
   },
-  methods: {
-    optimisticFollow({ followedByCurrentUser }) {
-      const inc = followedByCurrentUser ? 1 : -1
-      this.user.followedByCurrentUser = followedByCurrentUser
-      this.user.followedByCount += inc
-    },
-    updateFollow({ followedByCurrentUser, followedByCount }) {
-      this.user.followedByCount = followedByCount
-      this.user.followedByCurrentUser = followedByCurrentUser
-    },
-  },
 }
 </script>
 
 <style lang="scss">
 .trigger {
   max-width: 100%;
+  display: flex !important;
 }
 
 .user-teaser {
   display: flex;
   flex-wrap: nowrap;
 
-  > .profile-avatar {
+  .profile-avatar {
     flex-shrink: 0;
   }
 
-  > .info {
+  .info {
     padding-left: $space-xx-small;
     overflow: hidden;
     text-overflow: ellipsis;
