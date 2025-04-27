@@ -23,7 +23,8 @@
     "db:data:categories": "ts-node --require tsconfig-paths/register src/db/categories.ts",
     "db:migrate": "migrate --compiler 'ts:./src/db/compiler.ts' --migrations-dir ./src/db/migrations --store ./src/db/migrate/store.ts",
     "db:migrate:create": "migrate --compiler 'ts:./src/db/compiler.ts' --migrations-dir ./src/db/migrations --template-file ./src/db/migrate/template.ts --date-format 'yyyymmddHHmmss' create",
-    "prod:migrate": "migrate --migrations-dir ./build/src/db/migrations --store ./build/src/db/migrate/store.js"
+    "prod:migrate": "migrate --migrations-dir ./build/src/db/migrations --store ./build/src/db/migrate/store.js",
+    "prod:db:data:branding": "node build/src/db/data-branding.js"
   },
   "dependencies": {
     "@babel/cli": "~7.27.0",
