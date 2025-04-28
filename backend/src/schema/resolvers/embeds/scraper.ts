@@ -87,8 +87,9 @@ export default async function scrape(url) {
     throw new ApolloError('Not found', 'NOT_FOUND')
   }
 
-  return {
-    type: 'link',
-    ...output,
+  if (!output.type) {
+    output.type = 'link'
   }
+
+  return output
 }

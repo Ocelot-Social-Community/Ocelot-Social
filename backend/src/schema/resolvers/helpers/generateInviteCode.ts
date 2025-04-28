@@ -1,9 +1,9 @@
-import CONSTANTS_REGISTRATION from '@constants/registration'
+import registrationConstants from '@constants/registrationBranded'
 
 export default function generateInviteCode() {
   // 6 random numbers in [ 0, 35 ] are 36 possible numbers (10 [0-9] + 26 [A-Z])
   return Array.from(
-    { length: CONSTANTS_REGISTRATION.INVITE_CODE_LENGTH },
+    { length: registrationConstants.INVITE_CODE_LENGTH },
     (n: number = Math.floor(Math.random() * 36)) => {
       // n > 9: it is a letter (ASCII 65 is A) -> 10 + 55 = 65
       // else: it is a number (ASCII 48 is 0) -> 0 + 48 = 48
