@@ -22,7 +22,7 @@ const environment = {
   PRODUCTION: env.NODE_ENV === 'production',
   // used for staging enviroments if 'PRODUCTION=true' and 'PRODUCTION_DB_CLEAN_ALLOW=true'
   PRODUCTION_DB_CLEAN_ALLOW: env.PRODUCTION_DB_CLEAN_ALLOW === 'true' || false, // default = false
-  DISABLED_MIDDLEWARES: ['test', 'development'].includes(env.NODE_ENV)
+  DISABLED_MIDDLEWARES: ['test', 'development'].includes(env.NODE_ENV as string)
     ? (env.DISABLED_MIDDLEWARES?.split(',') ?? [])
     : [],
 }
