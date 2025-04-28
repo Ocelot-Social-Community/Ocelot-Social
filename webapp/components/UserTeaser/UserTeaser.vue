@@ -142,14 +142,16 @@ export default {
 </script>
 
 <style lang="scss">
-.trigger {
-  max-width: 100%;
-  display: flex !important;
-}
-
 .user-teaser {
   display: flex;
   flex-wrap: nowrap;
+
+  .trigger {
+    max-width: 100%;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+  }
 
   .profile-avatar {
     flex-shrink: 0;
@@ -167,12 +169,12 @@ export default {
 
     .slug {
       color: $color-primary;
-      font-size: $font-size-base;
+      font-size: calc(1.15 * $font-size-base);
     }
 
     .name {
       color: $text-color-soft;
-      font-size: $font-size-small;
+      font-size: $font-size-base;
     }
   }
 
@@ -180,12 +182,14 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: flex-start;
   }
 
   .flex-direction-row {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    padding-left: 2px;
   }
 
   .text {
