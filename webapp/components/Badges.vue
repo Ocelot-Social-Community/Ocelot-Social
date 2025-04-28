@@ -1,7 +1,7 @@
 <template>
   <div :class="[badges.length === 2 && 'hc-badges-dual']" class="hc-badges">
     <component
-      :is="selectionMode ? 'button' : 'div'"
+      :is="selectionMode && index > 0 ? 'button' : 'div'"
       class="hc-badge-container"
       v-for="(badge, index) in badges"
       :key="index"
