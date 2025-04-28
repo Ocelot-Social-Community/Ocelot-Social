@@ -70,7 +70,7 @@
               params: { id: scope.row.id },
             }"
           >
-            {{ $t('admin.users.table.edit') }}
+            <base-button icon="pencil" filled circle />
           </nuxt-link>
         </template>
       </ds-table>
@@ -223,5 +223,9 @@ export default {
 <style lang="scss">
 .admin-users > .base-card:first-child {
   margin-bottom: $space-small;
+}
+
+.ds-table-col {
+  vertical-align: middle;
 }
 </style>
