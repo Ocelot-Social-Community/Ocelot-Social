@@ -72,22 +72,34 @@
         <counter-icon
           icon="heart-o"
           :count="post.shoutedCount"
-          :title="$t('contribution.amount-shouts', { amount: post.shoutedCount })"
+          v-tooltip="{
+            content: $t('contribution.amount-shouts', { amount: post.shoutedCount }),
+            placement: 'bottom-start',
+          }"
         />
         <counter-icon
           icon="comments"
           :count="post.commentsCount"
-          :title="$t('contribution.amount-comments', { amount: post.commentsCount })"
+          v-tooltip="{
+            content: $t('contribution.amount-comments', { amount: post.commentsCount }),
+            placement: 'bottom-start',
+          }"
         />
         <counter-icon
           icon="hand-pointer"
           :count="post.clickedCount"
-          :title="$t('contribution.amount-clicks', { amount: post.clickedCount })"
+          v-tooltip="{
+            content: $t('contribution.amount-clicks', { amount: post.clickedCount }),
+            placement: 'bottom-start',
+          }"
         />
         <counter-icon
           icon="eye"
           :count="post.viewedTeaserCount"
-          :title="$t('contribution.amount-views', { amount: post.viewedTeaserCount })"
+          v-tooltip="{
+            content: $t('contribution.amount-views', { amount: post.viewedTeaserCount }),
+            placement: 'bottom-start',
+          }"
         />
         <client-only>
           <content-menu

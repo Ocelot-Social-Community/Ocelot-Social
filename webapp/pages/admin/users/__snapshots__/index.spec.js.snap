@@ -709,9 +709,19 @@ exports[`Users given badges are enabled renders 1`] = `
               <nuxt-link-stub
                 to="[object Object]"
               >
-                
-          admin.users.table.edit
-        
+                <button
+                  class="base-button --icon-only --circle --filled"
+                  type="button"
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                   
+                  <!---->
+                   
+                </button>
               </nuxt-link-stub>
             </td>
           </tr>
@@ -793,9 +803,19 @@ exports[`Users given badges are enabled renders 1`] = `
               <nuxt-link-stub
                 to="[object Object]"
               >
-                
-          admin.users.table.edit
-        
+                <button
+                  class="base-button --icon-only --circle --filled"
+                  type="button"
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                   
+                  <!---->
+                   
+                </button>
               </nuxt-link-stub>
             </td>
           </tr>

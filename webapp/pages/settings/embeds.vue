@@ -17,20 +17,29 @@
       <ds-text>
         {{ $t('settings.embeds.status.change.question') }}
       </ds-text>
-      <base-button @click="submit" :filled="!disabled" :disabled="!disabled">
-        {{ $t('settings.embeds.status.change.deny') }}
-      </base-button>
-      <base-button @click="submit" :filled="disabled" :disabled="disabled">
-        {{ $t('settings.embeds.status.change.allow') }}
-      </base-button>
-
-      <p>{{ $t('settings.embeds.info-description') }}</p>
-      <ul>
-        <li v-for="provider in providers" :key="provider.provider_name">
-          {{ provider.provider_name }},
-          <small>{{ provider.provider_url }}</small>
-        </li>
-      </ul>
+      <ds-space margin-top="small" margin-bottom="base">
+        <base-button @click="submit" :filled="!disabled" :disabled="!disabled">
+          {{ $t('settings.embeds.status.change.deny') }}
+        </base-button>
+        <base-button @click="submit" :filled="disabled" :disabled="disabled">
+          {{ $t('settings.embeds.status.change.allow') }}
+        </base-button>
+      </ds-space>
+      <h3>{{ $t('settings.embeds.info-description') }}</h3>
+      <ds-space margin="small">
+        <ul>
+          <li
+            v-for="provider in providers"
+            :key="provider.provider_name"
+            class="provider-list-item"
+          >
+            <ds-text>
+              {{ provider.provider_name }},
+              <small>{{ provider.provider_url }}</small>
+            </ds-text>
+          </li>
+        </ul>
+      </ds-space>
     </ds-section>
   </base-card>
 </template>
@@ -93,3 +102,13 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+button + button {
+  margin-left: $space-x-small;
+}
+.provider-list-item {
+  margin-top: $space-xx-small;
+  margin-bottom: $space-xx-small;
+}
+</style>
