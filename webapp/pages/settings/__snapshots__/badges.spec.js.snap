@@ -25,7 +25,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
         <div
           class="hc-badges"
         >
-          <button
+          <div
             class="hc-badge-container"
           >
             <img
@@ -33,7 +33,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
               src="/api/verification/icon"
               title="Verification description"
             />
-          </button>
+          </div>
           <button
             class="hc-badge-container selectable"
           >
@@ -160,7 +160,7 @@ exports[`badge settings with badges no more badges available selecting an empty 
         <div
           class="hc-badges"
         >
-          <button
+          <div
             class="hc-badge-container"
           >
             <img
@@ -168,7 +168,7 @@ exports[`badge settings with badges no more badges available selecting an empty 
               src="/api/verification/icon"
               title="Verification description"
             />
-          </button>
+          </div>
           <button
             class="hc-badge-container selectable"
           >
@@ -242,7 +242,7 @@ exports[`badge settings with badges renders 1`] = `
         <div
           class="hc-badges"
         >
-          <button
+          <div
             class="hc-badge-container"
           >
             <img
@@ -250,7 +250,7 @@ exports[`badge settings with badges renders 1`] = `
               src="/api/verification/icon"
               title="Verification description"
             />
-          </button>
+          </div>
           <button
             class="hc-badge-container selectable"
           >
@@ -402,7 +402,7 @@ exports[`badge settings without badges renders 1`] = `
         <div
           class="hc-badges"
         >
-          <button
+          <div
             class="hc-badge-container"
           >
             <img
@@ -410,7 +410,7 @@ exports[`badge settings without badges renders 1`] = `
               src="/api/verification/icon"
               title="Verification description"
             />
-          </button>
+          </div>
         </div>
       </div>
        
