@@ -1,7 +1,7 @@
 <template>
   <div :class="[badges.length === 2 && 'hc-badges-dual']" class="hc-badges">
     <component
-      :is="selectionMode ? 'button' : 'div'"
+      :is="selectionMode && index > 0 ? 'button' : 'div'"
       class="hc-badge-container"
       v-for="(badge, index) in badges"
       :key="index"
@@ -84,8 +84,10 @@ export default {
 
       transition: transform 0.1s ease-in;
 
-      &:hover {
+      &:hover,
+      &:focus-visible {
         transform: scale(1.1);
+        outline: none;
       }
     }
 
