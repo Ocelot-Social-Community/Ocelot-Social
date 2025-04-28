@@ -1,16 +1,19 @@
 <template>
-  <transition name="fade" appear>
-    <login-form @success="handleSuccess" />
-  </transition>
+  <div class="login-page">
+    <transition name="fade" appear>
+      <login-form @success="handleSuccess" />
+    </transition>
+  </div>
 </template>
 
 <script>
 import LoginForm from '~/components/LoginForm/LoginForm.vue'
+import loginConstants from '~/constants/loginBranded.js'
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { mapGetters } from 'vuex'
 
 export default {
-  layout: 'no-header',
+  layout: loginConstants.LAYOUT,
   components: {
     LoginForm,
   },

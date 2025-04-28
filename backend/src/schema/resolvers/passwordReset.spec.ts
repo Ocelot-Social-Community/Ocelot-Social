@@ -5,7 +5,7 @@
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import CONSTANTS_REGISTRATION from '@constants/registration'
+import registrationConstants from '@constants/registrationBranded'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import createServer from '@src/server'
@@ -118,7 +118,7 @@ describe('passwordReset', () => {
           const resets = await getAllPasswordResets()
           const [reset] = resets
           const { nonce } = reset.properties
-          expect(nonce).toHaveLength(CONSTANTS_REGISTRATION.NONCE_LENGTH)
+          expect(nonce).toHaveLength(registrationConstants.NONCE_LENGTH)
         })
       })
     })
