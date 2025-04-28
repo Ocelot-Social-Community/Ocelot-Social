@@ -313,7 +313,7 @@ describe('Registration', () => {
 
     it('renders', async () => {
       wrapper = await Wrapper()
-      expect(wrapper.classes('registration-slider')).toBe(true)
+      expect(wrapper.find('.registration-slider')).toBeTruthy()
     })
 
     // The asyncTests must go last
