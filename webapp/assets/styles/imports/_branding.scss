@@ -246,33 +246,39 @@ $text-box-shift-padding: 24px;
 $text-box-width: 350px;
 
 @media only screen and (min-width: 1201px) {
-  .login-form {
+  .login-form,
+  .registration-slider{
     width: unset;
     max-width: unset;
     padding-left: $text-box-shift-x;
   }
 }
 
-.login-form article {
+.login-form article,
+.registration-slider article {
   overflow: visible;
 }
 
 .login-page:before,
-.login-form article:before {
+.login-form article:before,
+.registration-page:before,
+.registration-slider article:before {
   color: #ffffff;
   padding: 24px;
   display: block;
   width: $text-box-width;
   background-color: rgba(0, 0, 0, 0.6);
 }
-.login-page:before {
+.login-page:before,
+.registration-page:before {
   content: 'Mitdenken.\A Mitreden.\A Mitwirken.';
   white-space: pre;
   font-size: 48px;
   position: relative;
   padding-bottom: calc($text-box-shift-padding / 2);
 }
-.login-form article:before {
+.login-form article:before,
+.registration-slider article:before {
   content: 'Reformer.network - gemeinsam verändern wir die Gesellschaft.';
   font-size: 24px;
   position: absolute;
@@ -283,24 +289,31 @@ $text-box-width: 350px;
 
 @media only screen and (max-width: 1200px) {
   .login-page:before,
-  .login-form article:before {
+  .login-form article:before,
+  .registration-page:before,
+  .registration-slider article:before {
     margin: 0 auto;
   }
-  .login-page:before {
+  .login-page:before,
+  .registration-page:before,
+  {
     font-size: 36px;
   }
-  .login-form article:before {
+  .login-form article:before,
+  .registration-slider article:before {
     font-size: 18px;
     top: calc(-1 * $text-box-shift-y);
     left: 0;
     right: 0;
   }
-  .login-form {
+  .login-form,
+  .registration-slider {
     padding-top: $text-box-shift-y;
   }
 }
 
-.login-page:before {
+.login-page:before,
+.registration-page:before {
   font-weight: bold;
 }
 // ^^^
