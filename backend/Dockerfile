@@ -24,11 +24,12 @@ ONBUILD COPY ./branding/constants/ src/config/tmp
 ONBUILD RUN tools/replace-constants.sh
 ONBUILD COPY ./branding/email/ src/middleware/helpers/email/
 ONBUILD COPY ./branding/data/ src/db/data
+ONBUILD COPY ./branding/public/ public/
 ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
 ONBUILD RUN yarn run build
 ONBUILD RUN mkdir /build
 ONBUILD RUN cp -r ./build /build
-ONBUILD RUN cp -r ./public /build/build
+ONBUILD RUN cp -r ./public /build
 ONBUILD RUN cp -r ./package.json yarn.lock /build
 ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-interactive
 
