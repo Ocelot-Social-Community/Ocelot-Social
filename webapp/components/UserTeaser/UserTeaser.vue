@@ -16,7 +16,7 @@
             size="small"
             @mouseover.native="() => showPopover && openMenu(true)"
             @mouseleave.native="closeMenu(true)"
-            @click.native="() => showPopover && openMenu(true)"
+            @click.native.stop="() => showPopover && openMenu(true)"
           />
         </component>
         <div class="info flex-direction-column">
@@ -29,7 +29,7 @@
                 class="text"
                 @mouseover="() => showPopover && openMenu(true)"
                 @mouseleave="closeMenu(true)"
-                @click="() => showPopover && openMenu(true)"
+                @click.stop="() => showPopover && openMenu(true)"
               >
                 <span class="slug">{{ userSlug }}</span>
                 <span class="name">{{ userName }}</span>
