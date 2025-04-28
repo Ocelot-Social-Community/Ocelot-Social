@@ -12,6 +12,7 @@
   "admin": {
     "badges": {
       "description": "Configure the available badges for this user",
+      "noBadges": "There are no badges available",
       "revokeTrophy": {
         "error": "Trophy could not be revoked!",
         "success": "Trophy successfully revoked!"
