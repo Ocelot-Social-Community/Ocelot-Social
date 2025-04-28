@@ -98,8 +98,7 @@
           "number": "No.",
           "role": "Role",
           "slug": "Slug"
-        },
-        "edit": "Edit"
+        }
       }
     }
   },
