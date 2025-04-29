@@ -1,0 +1,2442 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ProfileSlug given an authenticated user given another profile user and badges are disabled renders 1`] = `
+<div>
+  <div>
+    <div
+      class="ds-space"
+      style="margin-bottom: 32px;"
+    />
+     
+    <div
+      class="ds-flex"
+      style="margin-left: -12px; margin-right: -12px;"
+    >
+      <div
+        class="ds-flex-item"
+        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+      >
+        <article
+          class="base-card"
+          style="position: relative; height: auto; overflow: visible;"
+        >
+          <div
+            class="profile-page-avatar profile-avatar --large --no-image"
+          >
+            <span
+              class="initials"
+            >
+              BTB
+            </span>
+             
+            <!---->
+             
+            <!---->
+          </div>
+           
+          <client-only-stub>
+            <v-popover-stub
+              autohide="true"
+              class="content-menu user-content-menu"
+              container="body"
+              delay="0"
+              handleresize="true"
+              offset="5"
+              openclass="open"
+              opengroup="0"
+              placement="bottom-end"
+              popoverarrowclass="tooltip-arrow popover-arrow"
+              popoverbaseclass="tooltip popover"
+              popoverclass="vue-popover-theme"
+              popoverinnerclass="tooltip-inner popover-inner"
+              popoverwrapperclass="wrapper"
+              popperoptions="[object Object]"
+              trigger="manual"
+            >
+              <button
+                class="base-button --icon-only --circle --small"
+                data-test="content-menu-button"
+                type="button"
+              >
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                 
+                <!---->
+                 
+              </button>
+               
+              <div>
+                <div
+                  class="content-menu-popover"
+                >
+                  <nav
+                    class="ds-menu"
+                  >
+                    <ul
+                      class="ds-menu-list"
+                    >
+                      <li
+                        class="ds-menu-item ds-menu-item-level-0"
+                      >
+                        <router-link-stub
+                          class="ds-menu-item-link"
+                          exact="true"
+                          to="/"
+                        >
+                          <span
+                            class="base-icon"
+                          >
+                            <!---->
+                          </span>
+                          
+            report.user.title
+          
+                        </router-link-stub>
+                        <!---->
+                      </li>
+                      <li
+                        class="ds-menu-item ds-menu-item-level-0"
+                      >
+                        <router-link-stub
+                          class="ds-menu-item-link"
+                          exact="true"
+                          to="/"
+                        >
+                          <span
+                            class="base-icon"
+                          >
+                            <!---->
+                          </span>
+                          
+            disable.user.title
+          
+                        </router-link-stub>
+                        <!---->
+                      </li>
+                      <li
+                        class="ds-menu-item ds-menu-item-level-0"
+                      >
+                        <router-link-stub
+                          class="ds-menu-item-link"
+                          exact="true"
+                          to="/"
+                        >
+                          <span
+                            class="base-icon"
+                          >
+                            <!---->
+                          </span>
+                          
+            settings.muted-users.mute
+          
+                        </router-link-stub>
+                        <!---->
+                      </li>
+                      <li
+                        class="ds-menu-item ds-menu-item-level-0"
+                      >
+                        <router-link-stub
+                          class="ds-menu-item-link"
+                          exact="true"
+                          to="/"
+                        >
+                          <span
+                            class="base-icon"
+                          >
+                            <!---->
+                          </span>
+                          
+            settings.blocked-users.block
+          
+                        </router-link-stub>
+                        <!---->
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </v-popover-stub>
+          </client-only-stub>
+           
+          <div
+            class="ds-space"
+            style="margin-top: 16px; margin-bottom: 16px;"
+          >
+            <h3
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+            >
+              
+            Bob the builder
+          
+            </h3>
+             
+            <p
+              class="ds-text ds-text-soft ds-text-center"
+            >
+              
+            @undefined
+          
+            </p>
+             
+            <!---->
+             
+            <p
+              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            >
+              
+            profile.memberSince 
+          
+            </p>
+          </div>
+           
+          <!---->
+           
+          <div
+            class="ds-flex"
+          >
+            <div
+              class="ds-flex-item"
+              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
+            >
+              <client-only-stub>
+                <div
+                  class="ds-number ds-number-size-x-large"
+                >
+                  <p
+                    class="ds-text ds-number-count ds-text-size-x-large"
+                    style="margin-bottom: 0px;"
+                  >
+                    <span>
+                      <client-only-stub
+                        placeholder="0"
+                        tag="span"
+                      >
+                        <span>
+                          
+  0
+
+                        </span>
+                      </client-only-stub>
+                    </span>
+                  </p>
+                  <p
+                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                  >
+                    
+    profile.followers
+  
+                  </p>
+                </div>
+              </client-only-stub>
+            </div>
+             
+            <div
+              class="ds-flex-item"
+              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
+            >
+              <client-only-stub>
+                <div
+                  class="ds-number ds-number-size-x-large"
+                >
+                  <p
+                    class="ds-text ds-number-count ds-text-size-x-large"
+                    style="margin-bottom: 0px;"
+                  >
+                    <span>
+                      <client-only-stub
+                        placeholder="0"
+                        tag="span"
+                      >
+                        <span>
+                          
+  0
+
+                        </span>
+                      </client-only-stub>
+                    </span>
+                  </p>
+                  <p
+                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                  >
+                    
+    profile.following
+  
+                  </p>
+                </div>
+              </client-only-stub>
+            </div>
+          </div>
+           
+          <div
+            class="action-buttons"
+          >
+            <!---->
+             
+            <!---->
+             
+            <button
+              class="track-button base-button"
+              type="button"
+            >
+              <span
+                class="base-icon"
+              >
+                <!---->
+              </span>
+               
+              <!---->
+               
+  followButton.follow
+
+            </button>
+             
+            <button
+              class="base-button has-tooltip"
+              data-original-title="null"
+              type="button"
+            >
+              <span
+                class="base-icon"
+              >
+                <!---->
+              </span>
+               
+              <!---->
+               
+            chat.userProfileButton.label
+          
+            </button>
+          </div>
+           
+          <!---->
+           
+          <!---->
+        </article>
+         
+        <div
+          class="ds-space"
+          style="margin-bottom: 32px;"
+        />
+         
+        <h3
+          class="ds-heading ds-heading-h3 ds-heading-soft"
+          style="text-align: center; margin-bottom: 10px;"
+        >
+          
+        profile.network.title
+      
+        </h3>
+         
+        <follow-list-stub
+          type="followedBy"
+          user="[object Object]"
+        />
+         
+        <div
+          class="ds-space"
+          style="margin-bottom: 32px;"
+        />
+         
+        <follow-list-stub
+          type="following"
+          user="[object Object]"
+        />
+         
+        <!---->
+      </div>
+       
+      <div
+        class="ds-flex-item"
+        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+      >
+        <div
+          class="ds-grid"
+          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+        >
+          <div
+            class="tab-navigation"
+            style="grid-row-end: span 3; grid-column-start: 1; grid-column-end: -1;"
+          >
+            <article
+              class="ds-tab-nav base-card"
+            >
+              <ul
+                class="Tabs"
+              >
+                <li
+                  class="Tabs__tab pointer --active"
+                  data-test="post-tab"
+                >
+                  <a
+                    data-test="post-tab-click"
+                  >
+                    <div
+                      class="ds-space"
+                      style="margin-top: 16px; margin-bottom: 16px;"
+                    >
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
+                        <div
+                          class="ds-number ds-number-size-x-large"
+                        >
+                          <p
+                            class="ds-text ds-number-count ds-text-size-x-large"
+                            style="margin-bottom: 0px;"
+                          >
+                            <span>
+                              <client-only-stub
+                                placeholder="0"
+                                tag="span"
+                              >
+                                <span>
+                                  
+  0
+
+                                </span>
+                              </client-only-stub>
+                            </span>
+                          </p>
+                          <p
+                            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                          >
+                            
+    common.post
+  
+                          </p>
+                        </div>
+                      </client-only-stub>
+                    </div>
+                  </a>
+                </li>
+                <li
+                  class="Tabs__tab pointer"
+                  data-test="comment-tab"
+                >
+                  <a
+                    data-test="comment-tab-click"
+                  >
+                    <div
+                      class="ds-space"
+                      style="margin-top: 16px; margin-bottom: 16px;"
+                    >
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
+                        <div
+                          class="ds-number ds-number-size-x-large"
+                        >
+                          <p
+                            class="ds-text ds-number-count ds-text-size-x-large"
+                            style="margin-bottom: 0px;"
+                          >
+                            <span>
+                              <client-only-stub
+                                placeholder="0"
+                                tag="span"
+                              >
+                                <span>
+                                  
+  0
+
+                                </span>
+                              </client-only-stub>
+                            </span>
+                          </p>
+                          <p
+                            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                          >
+                            
+    profile.commented
+  
+                          </p>
+                        </div>
+                      </client-only-stub>
+                    </div>
+                  </a>
+                </li>
+                <li
+                  class="Tabs__tab pointer"
+                  data-test="shout-tab"
+                >
+                  <a
+                    data-test="shout-tab-click"
+                  >
+                    <div
+                      class="ds-space"
+                      style="margin-top: 16px; margin-bottom: 16px;"
+                    >
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
+                        <div
+                          class="ds-number ds-number-size-x-large"
+                        >
+                          <p
+                            class="ds-text ds-number-count ds-text-size-x-large"
+                            style="margin-bottom: 0px;"
+                          >
+                            <span>
+                              <client-only-stub
+                                placeholder="0"
+                                tag="span"
+                              >
+                                <span>
+                                  
+  0
+
+                                </span>
+                              </client-only-stub>
+                            </span>
+                          </p>
+                          <p
+                            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                          >
+                            
+    profile.shouted
+  
+                          </p>
+                        </div>
+                      </client-only-stub>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+               
+              <!---->
+            </article>
+          </div>
+           
+          <div
+            style="grid-row-end: span 2; grid-column-start: 1; grid-column-end: -1;"
+          >
+            <div
+              class="ds-space ds-space-centered"
+              style="margin-bottom: 32px;"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                <!---->
+              </nuxt-link-stub>
+            </div>
+          </div>
+           
+          <div
+            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+          >
+            <div
+              class="ds-space hc-empty ds-space-centered"
+              style="margin-top: 64px; margin-bottom: 64px;"
+            >
+              <p
+                class="ds-text"
+              >
+                <img
+                  alt="Empty"
+                  class="hc-empty-icon"
+                  src="/img/empty/file.svg"
+                  style="margin-bottom: 5px;"
+                  width="80"
+                />
+                 
+                <br />
+                 
+                <span
+                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                  style="display: none;"
+                >
+                  
+      
+    
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+         
+        <client-only-stub>
+          <div
+            class="infinite-loading-container"
+            data-v-644ea9c9=""
+          >
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              <i
+                class="loading-default"
+                data-v-46b20d22=""
+                data-v-644ea9c9=""
+              />
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No results :(
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No more data :)
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              
+        Opps, something went wrong :(
+        
+              <br
+                data-v-644ea9c9=""
+              />
+               
+              <button
+                class="btn-try-infinite"
+                data-v-644ea9c9=""
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        </client-only-stub>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ProfileSlug given an authenticated user given another profile user and badges are enabled renders 1`] = `
+<div>
+  <div>
+    <div
+      class="ds-space"
+      style="margin-bottom: 32px;"
+    />
+     
+    <div
+      class="ds-flex"
+      style="margin-left: -12px; margin-right: -12px;"
+    >
+      <div
+        class="ds-flex-item"
+        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+      >
+        <article
+          class="base-card"
+          style="position: relative; height: auto; overflow: visible;"
+        >
+          <div
+            class="profile-page-avatar profile-avatar --large --no-image"
+          >
+            <span
+              class="initials"
+            >
+              BTB
+            </span>
+             
+            <!---->
+             
+            <!---->
+          </div>
+           
+          <client-only-stub>
+            <v-popover-stub
+              autohide="true"
+              class="content-menu user-content-menu"
+              container="body"
+              delay="0"
+              handleresize="true"
+              offset="5"
+              openclass="open"
+              opengroup="0"
+              placement="bottom-end"
+              popoverarrowclass="tooltip-arrow popover-arrow"
+              popoverbaseclass="tooltip popover"
+              popoverclass="vue-popover-theme"
+              popoverinnerclass="tooltip-inner popover-inner"
+              popoverwrapperclass="wrapper"
+              popperoptions="[object Object]"
+              trigger="manual"
+            >
+              <button
+                class="base-button --icon-only --circle --small"
+                data-test="content-menu-button"
+                type="button"
+              >
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                 
+                <!---->
+                 
+              </button>
+               
+              <div>
+                <div
+                  class="content-menu-popover"
+                >
+                  <nav
+                    class="ds-menu"
+                  >
+                    <ul
+                      class="ds-menu-list"
+                    >
+                      <li
+                        class="ds-menu-item ds-menu-item-level-0"
+                      >
+                        <router-link-stub
+                          class="ds-menu-item-link"
+                          exact="true"
+                          to="/"
+                        >
+                          <span
+                            class="base-icon"
+                          >
+                            <!---->
+                          </span>
+                          
+            report.user.title
+          
+                        </router-link-stub>
+                        <!---->
+                      </li>
+                      <li
+                        class="ds-menu-item ds-menu-item-level-0"
+                      >
+                        <router-link-stub
+                          class="ds-menu-item-link"
+                          exact="true"
+                          to="/"
+                        >
+                          <span
+                            class="base-icon"
+                          >
+                            <!---->
+                          </span>
+                          
+            disable.user.title
+          
+                        </router-link-stub>
+                        <!---->
+                      </li>
+                      <li
+                        class="ds-menu-item ds-menu-item-level-0"
+                      >
+                        <router-link-stub
+                          class="ds-menu-item-link"
+                          exact="true"
+                          to="/"
+                        >
+                          <span
+                            class="base-icon"
+                          >
+                            <!---->
+                          </span>
+                          
+            settings.muted-users.mute
+          
+                        </router-link-stub>
+                        <!---->
+                      </li>
+                      <li
+                        class="ds-menu-item ds-menu-item-level-0"
+                      >
+                        <router-link-stub
+                          class="ds-menu-item-link"
+                          exact="true"
+                          to="/"
+                        >
+                          <span
+                            class="base-icon"
+                          >
+                            <!---->
+                          </span>
+                          
+            settings.blocked-users.block
+          
+                        </router-link-stub>
+                        <!---->
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </v-popover-stub>
+          </client-only-stub>
+           
+          <div
+            class="ds-space"
+            style="margin-top: 16px; margin-bottom: 16px;"
+          >
+            <h3
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+            >
+              
+            Bob the builder
+          
+            </h3>
+             
+            <p
+              class="ds-text ds-text-soft ds-text-center"
+            >
+              
+            @undefined
+          
+            </p>
+             
+            <!---->
+             
+            <p
+              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            >
+              
+            profile.memberSince 
+          
+            </p>
+          </div>
+           
+          <div
+            class="ds-space"
+            style="margin-top: 8px; margin-bottom: 8px;"
+          >
+            <!---->
+             
+            <div
+              class="hc-badges"
+            >
+              <div
+                class="hc-badge-container"
+              >
+                <img
+                  class="hc-badge"
+                  src="/api/path/to/icon-bv1"
+                  title="verified"
+                />
+              </div>
+              <div
+                class="hc-badge-container"
+              >
+                <img
+                  class="hc-badge"
+                  src="/api/path/to/icon-bt1"
+                  title="a trophy"
+                />
+              </div>
+              <div
+                class="hc-badge-container"
+              >
+                <img
+                  class="hc-badge"
+                  src="/api/path/to/icon-bt2"
+                  title="no trophy"
+                />
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="ds-flex"
+          >
+            <div
+              class="ds-flex-item"
+              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
+            >
+              <client-only-stub>
+                <div
+                  class="ds-number ds-number-size-x-large"
+                >
+                  <p
+                    class="ds-text ds-number-count ds-text-size-x-large"
+                    style="margin-bottom: 0px;"
+                  >
+                    <span>
+                      <client-only-stub
+                        placeholder="0"
+                        tag="span"
+                      >
+                        <span>
+                          
+  0
+
+                        </span>
+                      </client-only-stub>
+                    </span>
+                  </p>
+                  <p
+                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                  >
+                    
+    profile.followers
+  
+                  </p>
+                </div>
+              </client-only-stub>
+            </div>
+             
+            <div
+              class="ds-flex-item"
+              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
+            >
+              <client-only-stub>
+                <div
+                  class="ds-number ds-number-size-x-large"
+                >
+                  <p
+                    class="ds-text ds-number-count ds-text-size-x-large"
+                    style="margin-bottom: 0px;"
+                  >
+                    <span>
+                      <client-only-stub
+                        placeholder="0"
+                        tag="span"
+                      >
+                        <span>
+                          
+  0
+
+                        </span>
+                      </client-only-stub>
+                    </span>
+                  </p>
+                  <p
+                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                  >
+                    
+    profile.following
+  
+                  </p>
+                </div>
+              </client-only-stub>
+            </div>
+          </div>
+           
+          <div
+            class="action-buttons"
+          >
+            <!---->
+             
+            <!---->
+             
+            <button
+              class="track-button base-button"
+              type="button"
+            >
+              <span
+                class="base-icon"
+              >
+                <!---->
+              </span>
+               
+              <!---->
+               
+  followButton.follow
+
+            </button>
+             
+            <button
+              class="base-button has-tooltip"
+              data-original-title="null"
+              type="button"
+            >
+              <span
+                class="base-icon"
+              >
+                <!---->
+              </span>
+               
+              <!---->
+               
+            chat.userProfileButton.label
+          
+            </button>
+          </div>
+           
+          <!---->
+           
+          <!---->
+        </article>
+         
+        <div
+          class="ds-space"
+          style="margin-bottom: 32px;"
+        />
+         
+        <h3
+          class="ds-heading ds-heading-h3 ds-heading-soft"
+          style="text-align: center; margin-bottom: 10px;"
+        >
+          
+        profile.network.title
+      
+        </h3>
+         
+        <follow-list-stub
+          type="followedBy"
+          user="[object Object]"
+        />
+         
+        <div
+          class="ds-space"
+          style="margin-bottom: 32px;"
+        />
+         
+        <follow-list-stub
+          type="following"
+          user="[object Object]"
+        />
+         
+        <!---->
+      </div>
+       
+      <div
+        class="ds-flex-item"
+        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+      >
+        <div
+          class="ds-grid"
+          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+        >
+          <div
+            class="tab-navigation"
+            style="grid-row-end: span 3; grid-column-start: 1; grid-column-end: -1;"
+          >
+            <article
+              class="ds-tab-nav base-card"
+            >
+              <ul
+                class="Tabs"
+              >
+                <li
+                  class="Tabs__tab pointer --active"
+                  data-test="post-tab"
+                >
+                  <a
+                    data-test="post-tab-click"
+                  >
+                    <div
+                      class="ds-space"
+                      style="margin-top: 16px; margin-bottom: 16px;"
+                    >
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
+                        <div
+                          class="ds-number ds-number-size-x-large"
+                        >
+                          <p
+                            class="ds-text ds-number-count ds-text-size-x-large"
+                            style="margin-bottom: 0px;"
+                          >
+                            <span>
+                              <client-only-stub
+                                placeholder="0"
+                                tag="span"
+                              >
+                                <span>
+                                  
+  0
+
+                                </span>
+                              </client-only-stub>
+                            </span>
+                          </p>
+                          <p
+                            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                          >
+                            
+    common.post
+  
+                          </p>
+                        </div>
+                      </client-only-stub>
+                    </div>
+                  </a>
+                </li>
+                <li
+                  class="Tabs__tab pointer"
+                  data-test="comment-tab"
+                >
+                  <a
+                    data-test="comment-tab-click"
+                  >
+                    <div
+                      class="ds-space"
+                      style="margin-top: 16px; margin-bottom: 16px;"
+                    >
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
+                        <div
+                          class="ds-number ds-number-size-x-large"
+                        >
+                          <p
+                            class="ds-text ds-number-count ds-text-size-x-large"
+                            style="margin-bottom: 0px;"
+                          >
+                            <span>
+                              <client-only-stub
+                                placeholder="0"
+                                tag="span"
+                              >
+                                <span>
+                                  
+  0
+
+                                </span>
+                              </client-only-stub>
+                            </span>
+                          </p>
+                          <p
+                            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                          >
+                            
+    profile.commented
+  
+                          </p>
+                        </div>
+                      </client-only-stub>
+                    </div>
+                  </a>
+                </li>
+                <li
+                  class="Tabs__tab pointer"
+                  data-test="shout-tab"
+                >
+                  <a
+                    data-test="shout-tab-click"
+                  >
+                    <div
+                      class="ds-space"
+                      style="margin-top: 16px; margin-bottom: 16px;"
+                    >
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
+                        <div
+                          class="ds-number ds-number-size-x-large"
+                        >
+                          <p
+                            class="ds-text ds-number-count ds-text-size-x-large"
+                            style="margin-bottom: 0px;"
+                          >
+                            <span>
+                              <client-only-stub
+                                placeholder="0"
+                                tag="span"
+                              >
+                                <span>
+                                  
+  0
+
+                                </span>
+                              </client-only-stub>
+                            </span>
+                          </p>
+                          <p
+                            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                          >
+                            
+    profile.shouted
+  
+                          </p>
+                        </div>
+                      </client-only-stub>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+               
+              <!---->
+            </article>
+          </div>
+           
+          <div
+            style="grid-row-end: span 2; grid-column-start: 1; grid-column-end: -1;"
+          >
+            <div
+              class="ds-space ds-space-centered"
+              style="margin-bottom: 32px;"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                <!---->
+              </nuxt-link-stub>
+            </div>
+          </div>
+           
+          <div
+            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+          >
+            <div
+              class="ds-space hc-empty ds-space-centered"
+              style="margin-top: 64px; margin-bottom: 64px;"
+            >
+              <p
+                class="ds-text"
+              >
+                <img
+                  alt="Empty"
+                  class="hc-empty-icon"
+                  src="/img/empty/file.svg"
+                  style="margin-bottom: 5px;"
+                  width="80"
+                />
+                 
+                <br />
+                 
+                <span
+                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                  style="display: none;"
+                >
+                  
+      
+    
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+         
+        <client-only-stub>
+          <div
+            class="infinite-loading-container"
+            data-v-644ea9c9=""
+          >
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              <i
+                class="loading-default"
+                data-v-46b20d22=""
+                data-v-644ea9c9=""
+              />
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No results :(
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No more data :)
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              
+        Opps, something went wrong :(
+        
+              <br
+                data-v-644ea9c9=""
+              />
+               
+              <button
+                class="btn-try-infinite"
+                data-v-644ea9c9=""
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        </client-only-stub>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ProfileSlug given an authenticated user given the logged in user as profile user and badges are disabled renders 1`] = `
+<div>
+  <div>
+    <div
+      class="ds-space"
+      style="margin-bottom: 32px;"
+    />
+     
+    <div
+      class="ds-flex"
+      style="margin-left: -12px; margin-right: -12px;"
+    >
+      <div
+        class="ds-flex-item"
+        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+      >
+        <article
+          class="base-card"
+          style="position: relative; height: auto; overflow: visible;"
+        >
+          <div
+            class="avatar-uploader"
+          >
+            <div
+              class="vue-dropzone dropzone"
+              id="customdropzone"
+              options="[object Object]"
+            >
+              <div
+                class="dz-message"
+              >
+                <div
+                  class="dz-message"
+                >
+                  <div
+                    class="profile-page-avatar profile-avatar --large --no-image"
+                  >
+                    <span
+                      class="initials"
+                    >
+                      BTB
+                    </span>
+                     
+                    <!---->
+                     
+                    <!---->
+                  </div>
+                   
+                  <div
+                    class="avatar-attachments-upload-area"
+                  >
+                    <div
+                      class="avatar-drag-marker"
+                    >
+                      <!---->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+           
+          <client-only-stub>
+            <v-popover-stub
+              autohide="true"
+              class="content-menu user-content-menu"
+              container="body"
+              delay="0"
+              handleresize="true"
+              offset="5"
+              openclass="open"
+              opengroup="0"
+              placement="bottom-end"
+              popoverarrowclass="tooltip-arrow popover-arrow"
+              popoverbaseclass="tooltip popover"
+              popoverclass="vue-popover-theme"
+              popoverinnerclass="tooltip-inner popover-inner"
+              popoverwrapperclass="wrapper"
+              popperoptions="[object Object]"
+              trigger="manual"
+            >
+              <button
+                class="base-button --icon-only --circle --small"
+                data-test="content-menu-button"
+                type="button"
+              >
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                 
+                <!---->
+                 
+              </button>
+               
+              <div>
+                <div
+                  class="content-menu-popover"
+                >
+                  <nav
+                    class="ds-menu"
+                  >
+                    <ul
+                      class="ds-menu-list"
+                    >
+                      <li
+                        class="ds-menu-item ds-menu-item-level-0"
+                      >
+                        <router-link-stub
+                          class="ds-menu-item-link"
+                          to="/settings"
+                        >
+                          <span
+                            class="base-icon"
+                          >
+                            <!---->
+                          </span>
+                          
+            settings.name
+          
+                        </router-link-stub>
+                        <!---->
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </v-popover-stub>
+          </client-only-stub>
+           
+          <div
+            class="ds-space"
+            style="margin-top: 16px; margin-bottom: 16px;"
+          >
+            <h3
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+            >
+              
+            Bob the builder
+          
+            </h3>
+             
+            <p
+              class="ds-text ds-text-soft ds-text-center"
+            >
+              
+            @undefined
+          
+            </p>
+             
+            <!---->
+             
+            <p
+              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            >
+              
+            profile.memberSince 
+          
+            </p>
+          </div>
+           
+          <!---->
+           
+          <div
+            class="ds-flex"
+          >
+            <div
+              class="ds-flex-item"
+              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
+            >
+              <client-only-stub>
+                <div
+                  class="ds-number ds-number-size-x-large"
+                >
+                  <p
+                    class="ds-text ds-number-count ds-text-size-x-large"
+                    style="margin-bottom: 0px;"
+                  >
+                    <span>
+                      <client-only-stub
+                        placeholder="0"
+                        tag="span"
+                      >
+                        <span>
+                          
+  0
+
+                        </span>
+                      </client-only-stub>
+                    </span>
+                  </p>
+                  <p
+                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                  >
+                    
+    profile.followers
+  
+                  </p>
+                </div>
+              </client-only-stub>
+            </div>
+             
+            <div
+              class="ds-flex-item"
+              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
+            >
+              <client-only-stub>
+                <div
+                  class="ds-number ds-number-size-x-large"
+                >
+                  <p
+                    class="ds-text ds-number-count ds-text-size-x-large"
+                    style="margin-bottom: 0px;"
+                  >
+                    <span>
+                      <client-only-stub
+                        placeholder="0"
+                        tag="span"
+                      >
+                        <span>
+                          
+  0
+
+                        </span>
+                      </client-only-stub>
+                    </span>
+                  </p>
+                  <p
+                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                  >
+                    
+    profile.following
+  
+                  </p>
+                </div>
+              </client-only-stub>
+            </div>
+          </div>
+           
+          <!---->
+           
+          <!---->
+           
+          <!---->
+        </article>
+         
+        <div
+          class="ds-space"
+          style="margin-bottom: 32px;"
+        />
+         
+        <h3
+          class="ds-heading ds-heading-h3 ds-heading-soft"
+          style="text-align: center; margin-bottom: 10px;"
+        >
+          
+        profile.network.title
+      
+        </h3>
+         
+        <follow-list-stub
+          type="followedBy"
+          user="[object Object]"
+        />
+         
+        <div
+          class="ds-space"
+          style="margin-bottom: 32px;"
+        />
+         
+        <follow-list-stub
+          type="following"
+          user="[object Object]"
+        />
+         
+        <!---->
+      </div>
+       
+      <div
+        class="ds-flex-item"
+        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+      >
+        <div
+          class="ds-grid"
+          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+        >
+          <div
+            class="tab-navigation"
+            style="grid-row-end: span 3; grid-column-start: 1; grid-column-end: -1;"
+          >
+            <article
+              class="ds-tab-nav base-card"
+            >
+              <ul
+                class="Tabs"
+              >
+                <li
+                  class="Tabs__tab pointer --active"
+                  data-test="post-tab"
+                >
+                  <a
+                    data-test="post-tab-click"
+                  >
+                    <div
+                      class="ds-space"
+                      style="margin-top: 16px; margin-bottom: 16px;"
+                    >
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
+                        <div
+                          class="ds-number ds-number-size-x-large"
+                        >
+                          <p
+                            class="ds-text ds-number-count ds-text-size-x-large"
+                            style="margin-bottom: 0px;"
+                          >
+                            <span>
+                              <client-only-stub
+                                placeholder="0"
+                                tag="span"
+                              >
+                                <span>
+                                  
+  0
+
+                                </span>
+                              </client-only-stub>
+                            </span>
+                          </p>
+                          <p
+                            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                          >
+                            
+    common.post
+  
+                          </p>
+                        </div>
+                      </client-only-stub>
+                    </div>
+                  </a>
+                </li>
+                <li
+                  class="Tabs__tab pointer"
+                  data-test="comment-tab"
+                >
+                  <a
+                    data-test="comment-tab-click"
+                  >
+                    <div
+                      class="ds-space"
+                      style="margin-top: 16px; margin-bottom: 16px;"
+                    >
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
+                        <div
+                          class="ds-number ds-number-size-x-large"
+                        >
+                          <p
+                            class="ds-text ds-number-count ds-text-size-x-large"
+                            style="margin-bottom: 0px;"
+                          >
+                            <span>
+                              <client-only-stub
+                                placeholder="0"
+                                tag="span"
+                              >
+                                <span>
+                                  
+  0
+
+                                </span>
+                              </client-only-stub>
+                            </span>
+                          </p>
+                          <p
+                            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                          >
+                            
+    profile.commented
+  
+                          </p>
+                        </div>
+                      </client-only-stub>
+                    </div>
+                  </a>
+                </li>
+                <li
+                  class="Tabs__tab pointer"
+                  data-test="shout-tab"
+                >
+                  <a
+                    data-test="shout-tab-click"
+                  >
+                    <div
+                      class="ds-space"
+                      style="margin-top: 16px; margin-bottom: 16px;"
+                    >
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
+                        <div
+                          class="ds-number ds-number-size-x-large"
+                        >
+                          <p
+                            class="ds-text ds-number-count ds-text-size-x-large"
+                            style="margin-bottom: 0px;"
+                          >
+                            <span>
+                              <client-only-stub
+                                placeholder="0"
+                                tag="span"
+                              >
+                                <span>
+                                  
+  0
+
+                                </span>
+                              </client-only-stub>
+                            </span>
+                          </p>
+                          <p
+                            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                          >
+                            
+    profile.shouted
+  
+                          </p>
+                        </div>
+                      </client-only-stub>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+               
+              <!---->
+            </article>
+          </div>
+           
+          <div
+            style="grid-row-end: span 2; grid-column-start: 1; grid-column-end: -1;"
+          >
+            <div
+              class="ds-space ds-space-centered"
+              style="margin-bottom: 32px;"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                <button
+                  class="profile-post-add-button base-button --icon-only --circle --filled has-tooltip"
+                  data-original-title="null"
+                  path="[object Object]"
+                  type="button"
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                   
+                  <!---->
+                   
+                </button>
+              </nuxt-link-stub>
+            </div>
+          </div>
+           
+          <div
+            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+          >
+            <div
+              class="ds-space hc-empty ds-space-centered"
+              style="margin-top: 64px; margin-bottom: 64px;"
+            >
+              <p
+                class="ds-text"
+              >
+                <img
+                  alt="Empty"
+                  class="hc-empty-icon"
+                  src="/img/empty/file.svg"
+                  style="margin-bottom: 5px;"
+                  width="80"
+                />
+                 
+                <br />
+                 
+                <span
+                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                  style="display: none;"
+                >
+                  
+      
+    
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+         
+        <client-only-stub>
+          <div
+            class="infinite-loading-container"
+            data-v-644ea9c9=""
+          >
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              <i
+                class="loading-default"
+                data-v-46b20d22=""
+                data-v-644ea9c9=""
+              />
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No results :(
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No more data :)
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              
+        Opps, something went wrong :(
+        
+              <br
+                data-v-644ea9c9=""
+              />
+               
+              <button
+                class="btn-try-infinite"
+                data-v-644ea9c9=""
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        </client-only-stub>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ProfileSlug given an authenticated user given the logged in user as profile user and badges are enabled renders 1`] = `
+<div>
+  <div>
+    <div
+      class="ds-space"
+      style="margin-bottom: 32px;"
+    />
+     
+    <div
+      class="ds-flex"
+      style="margin-left: -12px; margin-right: -12px;"
+    >
+      <div
+        class="ds-flex-item"
+        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+      >
+        <article
+          class="base-card"
+          style="position: relative; height: auto; overflow: visible;"
+        >
+          <div
+            class="avatar-uploader"
+          >
+            <div
+              class="vue-dropzone dropzone"
+              id="customdropzone"
+              options="[object Object]"
+            >
+              <div
+                class="dz-message"
+              >
+                <div
+                  class="dz-message"
+                >
+                  <div
+                    class="profile-page-avatar profile-avatar --large --no-image"
+                  >
+                    <span
+                      class="initials"
+                    >
+                      BTB
+                    </span>
+                     
+                    <!---->
+                     
+                    <!---->
+                  </div>
+                   
+                  <div
+                    class="avatar-attachments-upload-area"
+                  >
+                    <div
+                      class="avatar-drag-marker"
+                    >
+                      <!---->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+           
+          <client-only-stub>
+            <v-popover-stub
+              autohide="true"
+              class="content-menu user-content-menu"
+              container="body"
+              delay="0"
+              handleresize="true"
+              offset="5"
+              openclass="open"
+              opengroup="0"
+              placement="bottom-end"
+              popoverarrowclass="tooltip-arrow popover-arrow"
+              popoverbaseclass="tooltip popover"
+              popoverclass="vue-popover-theme"
+              popoverinnerclass="tooltip-inner popover-inner"
+              popoverwrapperclass="wrapper"
+              popperoptions="[object Object]"
+              trigger="manual"
+            >
+              <button
+                class="base-button --icon-only --circle --small"
+                data-test="content-menu-button"
+                type="button"
+              >
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                 
+                <!---->
+                 
+              </button>
+               
+              <div>
+                <div
+                  class="content-menu-popover"
+                >
+                  <nav
+                    class="ds-menu"
+                  >
+                    <ul
+                      class="ds-menu-list"
+                    >
+                      <li
+                        class="ds-menu-item ds-menu-item-level-0"
+                      >
+                        <router-link-stub
+                          class="ds-menu-item-link"
+                          to="/settings"
+                        >
+                          <span
+                            class="base-icon"
+                          >
+                            <!---->
+                          </span>
+                          
+            settings.name
+          
+                        </router-link-stub>
+                        <!---->
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </v-popover-stub>
+          </client-only-stub>
+           
+          <div
+            class="ds-space"
+            style="margin-top: 16px; margin-bottom: 16px;"
+          >
+            <h3
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+            >
+              
+            Bob the builder
+          
+            </h3>
+             
+            <p
+              class="ds-text ds-text-soft ds-text-center"
+            >
+              
+            @undefined
+          
+            </p>
+             
+            <!---->
+             
+            <p
+              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            >
+              
+            profile.memberSince 
+          
+            </p>
+          </div>
+           
+          <div
+            class="ds-space"
+            style="margin-top: 8px; margin-bottom: 8px;"
+          >
+            <a
+              class="badge-edit-link"
+              href="/settings/badges"
+            >
+              <div
+                class="hc-badges"
+              >
+                <div
+                  class="hc-badge-container"
+                >
+                  <img
+                    class="hc-badge"
+                    src="/api/path/to/icon-bv1"
+                    title="verified"
+                  />
+                </div>
+                <div
+                  class="hc-badge-container"
+                >
+                  <img
+                    class="hc-badge"
+                    src="/api/path/to/icon-bt1"
+                    title="a trophy"
+                  />
+                </div>
+                <div
+                  class="hc-badge-container"
+                >
+                  <img
+                    class="hc-badge"
+                    src="/api/path/to/icon-bt2"
+                    title="no trophy"
+                  />
+                </div>
+              </div>
+            </a>
+             
+            <!---->
+          </div>
+           
+          <div
+            class="ds-flex"
+          >
+            <div
+              class="ds-flex-item"
+              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
+            >
+              <client-only-stub>
+                <div
+                  class="ds-number ds-number-size-x-large"
+                >
+                  <p
+                    class="ds-text ds-number-count ds-text-size-x-large"
+                    style="margin-bottom: 0px;"
+                  >
+                    <span>
+                      <client-only-stub
+                        placeholder="0"
+                        tag="span"
+                      >
+                        <span>
+                          
+  0
+
+                        </span>
+                      </client-only-stub>
+                    </span>
+                  </p>
+                  <p
+                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                  >
+                    
+    profile.followers
+  
+                  </p>
+                </div>
+              </client-only-stub>
+            </div>
+             
+            <div
+              class="ds-flex-item"
+              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
+            >
+              <client-only-stub>
+                <div
+                  class="ds-number ds-number-size-x-large"
+                >
+                  <p
+                    class="ds-text ds-number-count ds-text-size-x-large"
+                    style="margin-bottom: 0px;"
+                  >
+                    <span>
+                      <client-only-stub
+                        placeholder="0"
+                        tag="span"
+                      >
+                        <span>
+                          
+  0
+
+                        </span>
+                      </client-only-stub>
+                    </span>
+                  </p>
+                  <p
+                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                  >
+                    
+    profile.following
+  
+                  </p>
+                </div>
+              </client-only-stub>
+            </div>
+          </div>
+           
+          <!---->
+           
+          <!---->
+           
+          <!---->
+        </article>
+         
+        <div
+          class="ds-space"
+          style="margin-bottom: 32px;"
+        />
+         
+        <h3
+          class="ds-heading ds-heading-h3 ds-heading-soft"
+          style="text-align: center; margin-bottom: 10px;"
+        >
+          
+        profile.network.title
+      
+        </h3>
+         
+        <follow-list-stub
+          type="followedBy"
+          user="[object Object]"
+        />
+         
+        <div
+          class="ds-space"
+          style="margin-bottom: 32px;"
+        />
+         
+        <follow-list-stub
+          type="following"
+          user="[object Object]"
+        />
+         
+        <!---->
+      </div>
+       
+      <div
+        class="ds-flex-item"
+        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+      >
+        <div
+          class="ds-grid"
+          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+        >
+          <div
+            class="tab-navigation"
+            style="grid-row-end: span 3; grid-column-start: 1; grid-column-end: -1;"
+          >
+            <article
+              class="ds-tab-nav base-card"
+            >
+              <ul
+                class="Tabs"
+              >
+                <li
+                  class="Tabs__tab pointer --active"
+                  data-test="post-tab"
+                >
+                  <a
+                    data-test="post-tab-click"
+                  >
+                    <div
+                      class="ds-space"
+                      style="margin-top: 16px; margin-bottom: 16px;"
+                    >
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
+                        <div
+                          class="ds-number ds-number-size-x-large"
+                        >
+                          <p
+                            class="ds-text ds-number-count ds-text-size-x-large"
+                            style="margin-bottom: 0px;"
+                          >
+                            <span>
+                              <client-only-stub
+                                placeholder="0"
+                                tag="span"
+                              >
+                                <span>
+                                  
+  0
+
+                                </span>
+                              </client-only-stub>
+                            </span>
+                          </p>
+                          <p
+                            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                          >
+                            
+    common.post
+  
+                          </p>
+                        </div>
+                      </client-only-stub>
+                    </div>
+                  </a>
+                </li>
+                <li
+                  class="Tabs__tab pointer"
+                  data-test="comment-tab"
+                >
+                  <a
+                    data-test="comment-tab-click"
+                  >
+                    <div
+                      class="ds-space"
+                      style="margin-top: 16px; margin-bottom: 16px;"
+                    >
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
+                        <div
+                          class="ds-number ds-number-size-x-large"
+                        >
+                          <p
+                            class="ds-text ds-number-count ds-text-size-x-large"
+                            style="margin-bottom: 0px;"
+                          >
+                            <span>
+                              <client-only-stub
+                                placeholder="0"
+                                tag="span"
+                              >
+                                <span>
+                                  
+  0
+
+                                </span>
+                              </client-only-stub>
+                            </span>
+                          </p>
+                          <p
+                            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                          >
+                            
+    profile.commented
+  
+                          </p>
+                        </div>
+                      </client-only-stub>
+                    </div>
+                  </a>
+                </li>
+                <li
+                  class="Tabs__tab pointer"
+                  data-test="shout-tab"
+                >
+                  <a
+                    data-test="shout-tab-click"
+                  >
+                    <div
+                      class="ds-space"
+                      style="margin-top: 16px; margin-bottom: 16px;"
+                    >
+                      <client-only-stub
+                        placeholder="client-only.loading"
+                      >
+                        <div
+                          class="ds-number ds-number-size-x-large"
+                        >
+                          <p
+                            class="ds-text ds-number-count ds-text-size-x-large"
+                            style="margin-bottom: 0px;"
+                          >
+                            <span>
+                              <client-only-stub
+                                placeholder="0"
+                                tag="span"
+                              >
+                                <span>
+                                  
+  0
+
+                                </span>
+                              </client-only-stub>
+                            </span>
+                          </p>
+                          <p
+                            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+                          >
+                            
+    profile.shouted
+  
+                          </p>
+                        </div>
+                      </client-only-stub>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+               
+              <!---->
+            </article>
+          </div>
+           
+          <div
+            style="grid-row-end: span 2; grid-column-start: 1; grid-column-end: -1;"
+          >
+            <div
+              class="ds-space ds-space-centered"
+              style="margin-bottom: 32px;"
+            >
+              <nuxt-link-stub
+                to="[object Object]"
+              >
+                <button
+                  class="profile-post-add-button base-button --icon-only --circle --filled has-tooltip"
+                  data-original-title="null"
+                  path="[object Object]"
+                  type="button"
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                   
+                  <!---->
+                   
+                </button>
+              </nuxt-link-stub>
+            </div>
+          </div>
+           
+          <div
+            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+          >
+            <div
+              class="ds-space hc-empty ds-space-centered"
+              style="margin-top: 64px; margin-bottom: 64px;"
+            >
+              <p
+                class="ds-text"
+              >
+                <img
+                  alt="Empty"
+                  class="hc-empty-icon"
+                  src="/img/empty/file.svg"
+                  style="margin-bottom: 5px;"
+                  width="80"
+                />
+                 
+                <br />
+                 
+                <span
+                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                  style="display: none;"
+                >
+                  
+      
+    
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+         
+        <client-only-stub>
+          <div
+            class="infinite-loading-container"
+            data-v-644ea9c9=""
+          >
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              <i
+                class="loading-default"
+                data-v-46b20d22=""
+                data-v-644ea9c9=""
+              />
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No results :(
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              No more data :)
+            </div>
+             
+            <div
+              class="infinite-status-prompt"
+              data-v-644ea9c9=""
+              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+            >
+              
+        Opps, something went wrong :(
+        
+              <br
+                data-v-644ea9c9=""
+              />
+               
+              <button
+                class="btn-try-infinite"
+                data-v-644ea9c9=""
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        </client-only-stub>
+      </div>
+    </div>
+  </div>
+</div>
+`;

@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { AuthenticationError } from 'apollo-server'
 import bcrypt from 'bcryptjs'
 import { neo4jgraphql } from 'neo4j-graphql-js'
@@ -5,7 +12,6 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 import { getNeode } from '@db/neo4j'
 import encode from '@jwt/encode'
 
-import log from './helpers/databaseLogger'
 import normalizeEmail from './helpers/normalizeEmail'
 
 const neode = getNeode()
@@ -16,7 +22,7 @@ export default {
       neo4jgraphql(object, { id: context.user.id }, context, resolveInfo),
   },
   Mutation: {
-    login: async (_, { email, password }, { driver, req, user }) => {
+    login: async (_, { email, password }, { driver }) => {
       // if (user && user.id) {
       //   throw new Error('Already logged in.')
       // }
@@ -31,18 +37,17 @@ export default {
             `,
             { userEmail: email },
           )
-          log(loginTransactionResponse)
           return loginTransactionResponse.records.map((record) => record.get('user'))
         })
         const [currentUser] = await loginReadTxResultPromise
         if (
           currentUser &&
-          (await bcrypt.compareSync(password, currentUser.encryptedPassword)) &&
+          (await bcrypt.compare(password, currentUser.encryptedPassword)) &&
           !currentUser.disabled
         ) {
           delete currentUser.encryptedPassword
           return encode(currentUser)
-        } else if (currentUser && currentUser.disabled) {
+        } else if (currentUser?.disabled) {
           throw new AuthenticationError('Your account has been disabled.')
         } else {
           throw new AuthenticationError('Incorrect email address or password.')
@@ -51,19 +56,19 @@ export default {
         session.close()
       }
     },
-    changePassword: async (_, { oldPassword, newPassword }, { driver, user }) => {
+    changePassword: async (_, { oldPassword, newPassword }, { user }) => {
       const currentUser = await neode.find('User', user.id)
 
-      const encryptedPassword = currentUser.get('encryptedPassword')
-      if (!(await bcrypt.compareSync(oldPassword, encryptedPassword))) {
+      const encryptedPassword = currentUser.get<string>('encryptedPassword')
+      if (!(await bcrypt.compare(oldPassword, encryptedPassword))) {
         throw new AuthenticationError('Old password is not correct')
       }
 
-      if (await bcrypt.compareSync(newPassword, encryptedPassword)) {
+      if (await bcrypt.compare(newPassword, encryptedPassword)) {
         throw new AuthenticationError('Old password and new password should be different')
       }
 
-      const newEncryptedPassword = await bcrypt.hashSync(newPassword, 10)
+      const newEncryptedPassword = await bcrypt.hash(newPassword, 10)
       await currentUser.update({
         encryptedPassword: newEncryptedPassword,
         updatedAt: new Date().toISOString(),

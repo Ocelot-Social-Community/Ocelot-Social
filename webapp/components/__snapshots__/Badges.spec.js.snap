@@ -1,0 +1,165 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Badges.vue with badges in presentation mode renders 1`] = `
+<div>
+  <div
+    class="hc-badges"
+    scale="1.2"
+  >
+    <div
+      class="hc-badge-container"
+    >
+      <img
+        class="hc-badge"
+        src="/api/path/to/some/icon"
+        title="Some description"
+      />
+    </div>
+    <div
+      class="hc-badge-container"
+    >
+      <img
+        class="hc-badge"
+        src="/api/path/to/another/icon"
+        title="Another description"
+      />
+    </div>
+    <div
+      class="hc-badge-container"
+    >
+      <img
+        class="hc-badge"
+        src="/api/path/to/third/icon"
+        title="Third description"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Badges.vue with badges in selection mode clicking on second badge selects badge 1`] = `
+<div>
+  <div
+    class="hc-badges"
+    scale="1.2"
+  >
+    <div
+      class="hc-badge-container"
+    >
+      <img
+        class="hc-badge"
+        src="/api/path/to/some/icon"
+        title="Some description"
+      />
+    </div>
+    <button
+      class="hc-badge-container selectable selected"
+    >
+      <img
+        class="hc-badge"
+        src="/api/path/to/another/icon"
+        title="Another description"
+      />
+    </button>
+    <button
+      class="hc-badge-container selectable"
+    >
+      <img
+        class="hc-badge"
+        src="/api/path/to/third/icon"
+        title="Third description"
+      />
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Badges.vue with badges in selection mode clicking twice on second badge deselects badge 1`] = `
+<div>
+  <div
+    class="hc-badges"
+    scale="1.2"
+  >
+    <div
+      class="hc-badge-container"
+    >
+      <img
+        class="hc-badge"
+        src="/api/path/to/some/icon"
+        title="Some description"
+      />
+    </div>
+    <button
+      class="hc-badge-container selectable"
+    >
+      <img
+        class="hc-badge"
+        src="/api/path/to/another/icon"
+        title="Another description"
+      />
+    </button>
+    <button
+      class="hc-badge-container selectable"
+    >
+      <img
+        class="hc-badge"
+        src="/api/path/to/third/icon"
+        title="Third description"
+      />
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Badges.vue with badges in selection mode renders 1`] = `
+<div>
+  <div
+    class="hc-badges"
+    scale="1.2"
+  >
+    <div
+      class="hc-badge-container"
+    >
+      <img
+        class="hc-badge"
+        src="/api/path/to/some/icon"
+        title="Some description"
+      />
+    </div>
+    <button
+      class="hc-badge-container selectable"
+    >
+      <img
+        class="hc-badge"
+        src="/api/path/to/another/icon"
+        title="Another description"
+      />
+    </button>
+    <button
+      class="hc-badge-container selectable"
+    >
+      <img
+        class="hc-badge"
+        src="/api/path/to/third/icon"
+        title="Third description"
+      />
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Badges.vue without badges renders in presentation mode 1`] = `
+<div>
+  <div
+    class="hc-badges"
+  />
+</div>
+`;
+
+exports[`Badges.vue without badges renders in selection mode 1`] = `
+<div>
+  <div
+    class="hc-badges"
+  />
+</div>
+`;

@@ -1,9 +1,17 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserInputError, ForbiddenError } from 'apollo-server'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
+import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import { getNeode } from '@db/neo4j'
 
-import log from './helpers/databaseLogger'
+import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import Resolver from './helpers/Resolver'
 import { mergeImage, deleteImage } from './images/images'
 import { createOrUpdateLocations } from './users/location'
@@ -42,14 +50,14 @@ export const getBlockedUsers = async (context) => {
 
 export default {
   Query: {
-    mutedUsers: async (object, args, context, resolveInfo) => {
+    mutedUsers: async (_object, _args, context, _resolveInfo) => {
       try {
         return getMutedUsers(context)
       } catch (e) {
         throw new UserInputError(e.message)
       }
     },
-    blockedUsers: async (object, args, context, resolveInfo) => {
+    blockedUsers: async (_object, _args, context, _resolveInfo) => {
       try {
         return getBlockedUsers(context)
       } catch (e) {
@@ -110,7 +118,7 @@ export default {
       const unmutedUser = await neode.find('User', params.id)
       return unmutedUser.toJson()
     },
-    blockUser: async (object, args, context, resolveInfo) => {
+    blockUser: async (_object, args, context, _resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
 
@@ -137,7 +145,7 @@ export default {
         session.close()
       }
     },
-    unblockUser: async (object, args, context, resolveInfo) => {
+    unblockUser: async (_object, args, context, _resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
 
@@ -215,12 +223,12 @@ export default {
         session.close()
       }
     },
-    DeleteUser: async (object, params, context, resolveInfo) => {
+    DeleteUser: async (_object, params, context, _resolveInfo) => {
       const { resource, id: userId } = params
       const session = context.driver.session()
 
       const deleteUserTxResultPromise = session.writeTransaction(async (transaction) => {
-        if (resource && resource.length) {
+        if (resource?.length) {
           await Promise.all(
             resource.map(async (node) => {
               const txResult = await transaction.run(
@@ -270,7 +278,6 @@ export default {
             `,
           { userId },
         )
-        log(deleteUserTransactionResponse)
         const [user] = deleteUserTransactionResponse.records.map((record) => record.get('user'))
         await deleteImage(user, 'AVATAR_IMAGE', { transaction })
         return user
@@ -282,7 +289,7 @@ export default {
         session.close()
       }
     },
-    switchUserRole: async (object, args, context, resolveInfo) => {
+    switchUserRole: async (_object, args, context, _resolveInfo) => {
       const { role, id } = args
 
       if (context.user.id === id) throw new Error('you-cannot-change-your-own-role')
@@ -307,7 +314,7 @@ export default {
         session.close()
       }
     },
-    saveCategorySettings: async (object, args, context, resolveInfo) => {
+    saveCategorySettings: async (_object, args, context, _resolveInfo) => {
       const { activeCategories } = args
       const {
         user: { id },
@@ -350,7 +357,7 @@ export default {
         session.close()
       }
     },
-    updateOnlineStatus: async (object, args, context, resolveInfo) => {
+    updateOnlineStatus: async (_object, args, context, _resolveInfo) => {
       const { status } = args
       const {
         user: { id },
@@ -381,9 +388,86 @@ export default {
 
       return true
     },
+    setTrophyBadgeSelected: async (_object, args, context, _resolveInfo) => {
+      const { slot, badgeId } = args
+      const {
+        user: { id: userId },
+      } = context
+
+      if (slot >= TROPHY_BADGES_SELECTED_MAX || slot < 0) {
+        throw new Error(
+          `Invalid slot! There is only ${TROPHY_BADGES_SELECTED_MAX} badge-slots to fill`,
+        )
+      }
+
+      const session = context.driver.session()
+
+      const query = session.writeTransaction(async (transaction) => {
+        const queryBadge = `
+            MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge {id: $badgeId})
+            OPTIONAL MATCH (user)-[badgeRelation:SELECTED]->(badge)
+            OPTIONAL MATCH (user)-[slotRelation:SELECTED{slot: $slot}]->(:Badge)
+            DELETE badgeRelation, slotRelation
+            MERGE (user)-[:SELECTED{slot: toInteger($slot)}]->(badge)
+            RETURN user {.*}
+          `
+        const queryEmpty = `
+            MATCH (user:User {id: $userId})
+            OPTIONAL MATCH (user)-[slotRelation:SELECTED {slot: $slot}]->(:Badge)
+            DELETE slotRelation
+            RETURN user {.*}
+          `
+        const isDefault = !badgeId || badgeId === defaultTrophyBadge.id
+
+        const result = await transaction.run(isDefault ? queryEmpty : queryBadge, {
+          userId,
+          badgeId,
+          slot,
+        })
+        return result.records.map((record) => record.get('user'))[0]
+      })
+      try {
+        const user = await query
+        if (!user) {
+          throw new Error('You cannot set badges not rewarded to you.')
+        }
+        return user
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    resetTrophyBadgesSelected: async (_object, _args, context, _resolveInfo) => {
+      const {
+        user: { id: userId },
+      } = context
+
+      const session = context.driver.session()
+
+      const query = session.writeTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $userId})
+            OPTIONAL MATCH (user)-[relation:SELECTED]->(:Badge)
+            DELETE relation
+            RETURN user {.*}
+          `,
+          { userId },
+        )
+        return result.records.map((record) => record.get('user'))[0]
+      })
+      try {
+        return await query
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
   },
   User: {
-    emailNotificationSettings: async (parent, params, context, resolveInfo) => {
+    emailNotificationSettings: async (parent, _params, _context, _resolveInfo) => {
       return [
         {
           type: 'post',
@@ -438,6 +522,101 @@ export default {
         },
       ]
     },
+    badgeTrophiesSelected: async (parent, _params, context, _resolveInfo) => {
+      const session = context.driver.session()
+
+      const query = session.readTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $parent.id})-[relation:SELECTED]->(badge:Badge)
+            WITH relation, badge
+            ORDER BY relation.slot ASC
+            RETURN relation.slot as slot, badge {.*}
+          `,
+          { parent },
+        )
+        return result.records
+      })
+      try {
+        const badgesSelected = await query
+        const result = Array(TROPHY_BADGES_SELECTED_MAX).fill(defaultTrophyBadge)
+        badgesSelected.map((record) => {
+          result[record.get('slot')] = record.get('badge')
+          return true
+        })
+        return result
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    badgeTrophiesUnused: async (parent, _params, context, _resolveInfo) => {
+      const session = context.driver.session()
+
+      const query = session.readTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $parent.id})<-[:REWARDED]-(badge:Badge)
+            WHERE NOT (user)-[:SELECTED]-(badge)
+            RETURN badge {.*}
+          `,
+          { parent },
+        )
+        return result.records.map((record) => record.get('badge'))
+      })
+      try {
+        return await query
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    badgeTrophiesUnusedCount: async (parent, _params, context, _resolveInfo) => {
+      const session = context.driver.session()
+
+      const query = session.readTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $parent.id})<-[:REWARDED]-(badge:Badge)
+            WHERE NOT (user)-[:SELECTED]-(badge)
+            RETURN toString(COUNT(badge)) as count
+          `,
+          { parent },
+        )
+        return result.records.map((record) => record.get('count'))[0]
+      })
+      try {
+        return await query
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
+    badgeVerification: async (parent, _params, context, _resolveInfo) => {
+      const session = context.driver.session()
+
+      const query = session.writeTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $parent.id})<-[:VERIFIES]-(verification:Badge)
+            RETURN verification {.*}
+          `,
+          { parent },
+        )
+        return result.records.map((record) => record.get('verification'))[0]
+      })
+      try {
+        const result = await query
+        return result ?? defaultVerificationBadge
+      } catch (error) {
+        throw new Error(error)
+      } finally {
+        session.close()
+      }
+    },
     ...Resolver('User', {
       undefinedToNull: [
         'actorId',
@@ -471,7 +650,7 @@ export default {
           '-[:WROTE]->(c:Comment)-[:COMMENTS]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true',
         shoutedCount:
           '-[:SHOUTED]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true',
-        badgesCount: '<-[:REWARDED]-(related:Badge)',
+        badgeTrophiesCount: '<-[:REWARDED]-(related:Badge)',
       },
       hasOne: {
         avatar: '-[:AVATAR_IMAGE]->(related:Image)',
@@ -488,7 +667,7 @@ export default {
         comments: '-[:WROTE]->(related:Comment)',
         shouted: '-[:SHOUTED]->(related:Post)',
         categories: '-[:CATEGORIZED]->(related:Category)',
-        badges: '<-[:REWARDED]-(related:Badge)',
+        badgeTrophies: '<-[:REWARDED]-(related:Badge)',
         inviteCodes: '-[:GENERATED]->(related:InviteCode)',
       },
     }),

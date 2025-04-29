@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable promise/prefer-await-to-callbacks */
 import { throwError, concat } from 'rxjs'
@@ -17,16 +23,19 @@ export const description = `
 `
 export function up(next) {
   const driver = getDriver()
-  const rxSession = driver.rxSession()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rxSession = driver.rxSession() as any
   rxSession
     .beginTransaction()
     .pipe(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       flatMap((txc: any) =>
         concat(
           txc
             .run('MATCH (email:EmailAddress) RETURN email {.email}')
             .records()
             .pipe(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               map((record: any) => {
                 const { email } = record.get('email')
                 const normalizedEmail = normalizeEmail(email)
@@ -48,6 +57,7 @@ export function up(next) {
                   )
                   .records()
                   .pipe(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     map((r: any) => ({
                       oldEmail: email,
                       email: r.get('email'),
@@ -61,7 +71,7 @@ export function up(next) {
       ),
     )
     .subscribe({
-      next: ({ user, email, oldUser, oldEmail }) =>
+      next: ({ user, email, _oldUser, oldEmail }) =>
         // eslint-disable-next-line no-console
         console.log(`
           Merged:

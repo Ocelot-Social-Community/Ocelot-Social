@@ -16,6 +16,7 @@ module.exports = {
     'plugin:promise/recommended',
     'plugin:security/recommended-legacy',
     'plugin:@eslint-community/eslint-comments/recommended',
+    'prettier',
   ],
   settings: {
     'import/parsers': {
@@ -114,7 +115,7 @@ module.exports = {
     'n/no-callback-literal': 'error',
     // 'n/no-deprecated-api': 'error', // part of n/recommended
     // 'n/no-exports-assign': 'error', // part of n/recommended
-    'n/no-extraneous-import': 'off', // TODO // part of n/recommended
+    'n/no-extraneous-import': 'off', // duplicate of import/no-extraneous-dependencies // part of n/recommended
     // 'n/no-extraneous-require': 'error', // part of n/recommended
     'n/no-hide-core-modules': 'error',
     'n/no-missing-import': 'off', // not compatible with typescript // part of n/recommended
@@ -126,7 +127,7 @@ module.exports = {
     // 'n/no-process-exit': 'error', // part of n/recommended
     'n/no-restricted-import': 'error',
     'n/no-restricted-require': 'error',
-    // 'n/no-sync': 'error',
+    'n/no-sync': 'error',
     // 'n/no-unpublished-bin': 'error', // part of n/recommended
     'n/no-unpublished-import': [
       'error',
@@ -178,9 +179,10 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx'],
       extends: [
-        // 'plugin:@typescript-eslint/recommended',
-        // 'plugin:@typescript-eslint/recommended-requiring-type-checking',
-        // 'plugin:@typescript-eslint/strict',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:@typescript-eslint/recommended-requiring-type-checking',
+        'plugin:@typescript-eslint/strict',
+        'prettier',
       ],
       rules: {
         // allow explicitly defined dangling promises
@@ -192,6 +194,11 @@ module.exports = {
         'import/unambiguous': 'off',
         // this is not compatible with typeorm, due to joined tables can be null, but are not defined as nullable
         '@typescript-eslint/no-unnecessary-condition': 'off',
+        // respect underscore as acceptable unused variable
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        ],
       },
       parserOptions: {
         tsconfigRootDir: __dirname,

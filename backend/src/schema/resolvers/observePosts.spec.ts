@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import CONFIG from '@config/index'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { createPostMutation } from '@graphql/posts'
+import { createPostMutation } from '@graphql/queries/createPostMutation'
 import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
@@ -58,7 +61,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 describe('observing posts', () => {

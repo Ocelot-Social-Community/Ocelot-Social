@@ -1,22 +1,26 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import {
-  createGroupMutation,
-  joinGroupMutation,
-  leaveGroupMutation,
-  changeGroupMemberRoleMutation,
-  removeUserFromGroupMutation,
-} from '@graphql/groups'
-import { createMessageMutation } from '@graphql/messages'
-import { createRoomMutation } from '@graphql/rooms'
+import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
+import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
+import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
 import createServer, { pubsub } from '@src/server'
 
-const sendMailMock = jest.fn()
-jest.mock('../helpers/email/sendMail', () => ({
-  sendMail: () => sendMailMock(),
+const sendMailMock: (notification) => void = jest.fn()
+jest.mock('@middleware/helpers/email/sendMail', () => ({
+  sendMail: (notification) => sendMailMock(notification),
 }))
 
 const chatMessageTemplateMock = jest.fn()
@@ -84,7 +88,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(async () => {
@@ -191,8 +195,8 @@ describe('notifications', () => {
           beforeEach(async () => {
             jest.clearAllMocks()
             commentContent = 'Commenters comment.'
-            commentAuthor = await neode.create(
-              'User',
+            commentAuthor = await Factory.build(
+              'user',
               {
                 id: 'commentAuthor',
                 name: 'Mrs Comment',
@@ -294,6 +298,25 @@ describe('notifications', () => {
               ).resolves.toEqual(expected)
             })
           })
+
+          describe('if I have muted the comment author', () => {
+            it('sends me no notification', async () => {
+              await notifiedUser.relateTo(commentAuthor, 'muted')
+              await createCommentOnPostAction()
+              const expected = expect.objectContaining({
+                data: { notifications: [] },
+              })
+
+              await expect(
+                query({
+                  query: notificationQuery,
+                  variables: {
+                    read: false,
+                  },
+                }),
+              ).resolves.toEqual(expected)
+            })
+          })
         })
 
         describe('commenter is me', () => {
@@ -322,8 +345,8 @@ describe('notifications', () => {
 
       beforeEach(async () => {
         jest.clearAllMocks()
-        postAuthor = await neode.create(
-          'User',
+        postAuthor = await Factory.build(
+          'user',
           {
             id: 'postAuthor',
             name: 'Mrs Post',
@@ -581,6 +604,48 @@ describe('notifications', () => {
             expect(pubsubSpy).not.toHaveBeenCalled()
           })
         })
+
+        describe('but the author of the post muted me', () => {
+          beforeEach(async () => {
+            await postAuthor.relateTo(notifiedUser, 'muted')
+          })
+
+          it('sends me a notification', async () => {
+            await createPostAction()
+            const expected = expect.objectContaining({
+              data: {
+                notifications: [
+                  {
+                    createdAt: expect.any(String),
+                    from: {
+                      __typename: 'Post',
+                      content:
+                        'Hey <a class="mention" data-mention-id="you" href="/profile/you/al-capone" target="_blank">@al-capone</a> how do you do?',
+                      id: 'p47',
+                    },
+                    read: false,
+                    reason: 'mentioned_in_post',
+                    relatedUser: null,
+                  },
+                ],
+              },
+            })
+
+            await expect(
+              query({
+                query: notificationQuery,
+                variables: {
+                  read: false,
+                },
+              }),
+            ).resolves.toEqual(expected)
+          })
+
+          it('publishes `NOTIFICATION_ADDED`', async () => {
+            await createPostAction()
+            expect(pubsubSpy).toHaveBeenCalled()
+          })
+        })
       })
 
       describe('mentions me in a comment', () => {
@@ -593,8 +658,8 @@ describe('notifications', () => {
           beforeEach(async () => {
             commentContent =
               'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'
-            commentAuthor = await neode.create(
-              'User',
+            commentAuthor = await Factory.build(
+              'user',
               {
                 id: 'commentAuthor',
                 name: 'Mrs Comment',
@@ -608,15 +673,15 @@ describe('notifications', () => {
           })
 
           it('sends only one notification with reason mentioned_in_comment', async () => {
-            postAuthor = await neode.create(
-              'User',
+            postAuthor = await Factory.build(
+              'user',
               {
                 id: 'MrPostAuthor',
                 name: 'Mr Author',
                 slug: 'mr-author',
               },
               {
-                email: 'post-author@example.org',
+                email: 'post-author2@example.org',
                 password: '1234',
               },
             )
@@ -691,8 +756,8 @@ describe('notifications', () => {
             await postAuthor.relateTo(notifiedUser, 'blocked')
             commentContent =
               'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'
-            commentAuthor = await neode.create(
-              'User',
+            commentAuthor = await Factory.build(
+              'user',
               {
                 id: 'commentAuthor',
                 name: 'Mrs Comment',
@@ -736,6 +801,72 @@ describe('notifications', () => {
             expect(pubsubSpy).toHaveBeenCalledTimes(1)
           })
         })
+
+        describe('but the author of the post muted me', () => {
+          beforeEach(async () => {
+            await postAuthor.relateTo(notifiedUser, 'muted')
+            commentContent =
+              'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'
+            commentAuthor = await Factory.build(
+              'user',
+              {
+                id: 'commentAuthor',
+                name: 'Mrs Comment',
+                slug: 'mrs-comment',
+              },
+              {
+                email: 'comment-author@example.org',
+                password: '1234',
+              },
+            )
+          })
+
+          it('sends me a notification', async () => {
+            await createCommentOnPostAction()
+            await expect(
+              query({
+                query: notificationQuery,
+                variables: {
+                  read: false,
+                },
+              }),
+            ).resolves.toMatchObject({
+              data: {
+                notifications: [
+                  {
+                    createdAt: expect.any(String),
+                    from: {
+                      __typename: 'Comment',
+                      content:
+                        'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.',
+                      id: 'c47',
+                    },
+                    read: false,
+                    reason: 'mentioned_in_comment',
+                    relatedUser: null,
+                  },
+                ],
+              },
+              errors: undefined,
+            })
+          })
+
+          it('publishes `NOTIFICATION_ADDED` to authenticated user and me', async () => {
+            await createCommentOnPostAction()
+            expect(pubsubSpy).toHaveBeenCalledWith(
+              'NOTIFICATION_ADDED',
+              expect.objectContaining({
+                notificationAdded: expect.objectContaining({
+                  reason: 'commented_on_post',
+                  to: expect.objectContaining({
+                    id: 'postAuthor', // that's expected, it's not me but the post author
+                  }),
+                }),
+              }),
+            )
+            expect(pubsubSpy).toHaveBeenCalledTimes(2)
+          })
+        })
       })
     })
   })
@@ -748,8 +879,8 @@ describe('notifications', () => {
     beforeEach(async () => {
       jest.clearAllMocks()
 
-      chatSender = await neode.create(
-        'User',
+      chatSender = await Factory.build(
+        'user',
         {
           id: 'chatSender',
           name: 'chatSender',
@@ -800,7 +931,7 @@ describe('notifications', () => {
             content: 'Some nice message to chatReceiver',
             senderId: 'chatSender',
             username: 'chatSender',
-            avatar: null,
+            avatar: expect.any(String),
             date: expect.any(String),
             saved: true,
             distributed: false,
@@ -836,7 +967,7 @@ describe('notifications', () => {
             content: 'Some nice message to chatReceiver',
             senderId: 'chatSender',
             username: 'chatSender',
-            avatar: null,
+            avatar: expect.any(String),
             date: expect.any(String),
             saved: true,
             distributed: false,
@@ -915,7 +1046,7 @@ describe('notifications', () => {
             content: 'Some nice message to chatReceiver',
             senderId: 'chatSender',
             username: 'chatSender',
-            avatar: null,
+            avatar: expect.any(String),
             date: expect.any(String),
             saved: true,
             distributed: false,

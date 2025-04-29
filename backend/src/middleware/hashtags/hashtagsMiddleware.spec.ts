@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
@@ -51,22 +55,15 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(async () => {
-  hashtagingUser = await neode.create(
-    'User',
-    {
-      id: 'you',
-      name: 'Al Capone',
-      slug: 'al-capone',
-    },
-    {
-      password: '1234',
-      email: 'test@example.org',
-    },
-  )
+  hashtagingUser = await neode.create('User', {
+    id: 'you',
+    name: 'Al Capone',
+    slug: 'al-capone',
+  })
   await neode.create('Category', {
     id: 'cat9',
     name: 'Democracy & Politics',

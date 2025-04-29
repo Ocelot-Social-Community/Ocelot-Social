@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable promise/avoid-new */
 /* eslint-disable security/detect-non-literal-fs-filename */
 import { existsSync, unlinkSync, createWriteStream } from 'node:fs'
@@ -14,6 +21,7 @@ import { getDriver } from '@db/neo4j'
 // const widths = [34, 160, 320, 640, 1024]
 const { AWS_ENDPOINT: endpoint, AWS_REGION: region, AWS_BUCKET: Bucket, S3_CONFIGURED } = CONFIG
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function deleteImage(resource, relationshipType, opts: any = {}) {
   sanitizeRelationshipType(relationshipType)
   const { transaction, deleteCallback } = opts
@@ -36,6 +44,7 @@ export async function deleteImage(resource, relationshipType, opts: any = {}) {
   return image
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function mergeImage(resource, relationshipType, imageInput, opts: any = {}) {
   if (typeof imageInput === 'undefined') return
   if (imageInput === null) return deleteImage(resource, relationshipType, opts)
@@ -82,7 +91,7 @@ const wrapTransaction = async (wrappedCallback, args, opts) => {
     })
     return result
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -143,6 +152,7 @@ const s3Upload = async ({ createReadStream, uniqueFilename, mimetype }) => {
 
 const localFileDelete = async (url) => {
   const location = `public${url}`
+  // eslint-disable-next-line n/no-sync
   if (existsSync(location)) unlinkSync(location)
 }
 

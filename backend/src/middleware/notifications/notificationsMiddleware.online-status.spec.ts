@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
@@ -8,9 +13,9 @@ import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock = jest.fn()
-jest.mock('../helpers/email/sendMail', () => ({
-  sendMail: () => sendMailMock(),
+const sendMailMock: (notification) => void = jest.fn()
+jest.mock('@middleware/helpers/email/sendMail', () => ({
+  sendMail: (notification) => sendMailMock(notification),
 }))
 
 let isUserOnlineMock = jest.fn().mockReturnValue(false)
@@ -57,7 +62,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 afterEach(async () => {

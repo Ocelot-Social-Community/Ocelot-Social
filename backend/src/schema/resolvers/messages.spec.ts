@@ -1,9 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/await-thenable */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { createMessageMutation, messageQuery, markMessagesAsSeen } from '@graphql/messages'
-import { createRoomMutation, roomQuery } from '@graphql/rooms'
+import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import { markMessagesAsSeen } from '@graphql/queries/markMessagesAsSeen'
+import { messageQuery } from '@graphql/queries/messageQuery'
+import { roomQuery } from '@graphql/queries/roomQuery'
 import createServer, { pubsub } from '@src/server'
 
 const driver = getDriver()
@@ -37,7 +45,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 describe('Message', () => {

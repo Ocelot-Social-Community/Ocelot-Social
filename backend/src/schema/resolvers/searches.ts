@@ -1,4 +1,9 @@
-import log from './helpers/databaseLogger'
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { queryString } from './searches/queryString'
 
 // see http://lucene.apache.org/core/8_3_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package.description
@@ -127,7 +132,6 @@ const getSearchResults = async (context, setup, params, resultCallback = searchR
   const session = context.driver.session()
   try {
     const results = await searchResultPromise(session, setup, params)
-    log(results)
     return resultCallback(results)
   } finally {
     session.close()
@@ -250,6 +254,7 @@ export default {
         ]
 
       params.limit = 15
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const type: any = multiSearchMap.find((obj) => obj.symbol === searchType)
       return getSearchResults(context, type.setup, params)
     },

@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import CONSTANTS_REGISTRATION from '@constants/registration'
+import registrationConstants from '@constants/registrationBranded'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import createServer from '@src/server'
@@ -18,6 +22,7 @@ let variables
 const getAllPasswordResets = async () => {
   const passwordResetQuery = await neode.cypher(
     'MATCH (passwordReset:PasswordReset) RETURN passwordReset',
+    {},
   )
   const resets = passwordResetQuery.records.map((record) => record.get('passwordReset'))
   return resets
@@ -40,7 +45,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(() => {
@@ -113,7 +118,7 @@ describe('passwordReset', () => {
           const resets = await getAllPasswordResets()
           const [reset] = resets
           const { nonce } = reset.properties
-          expect(nonce).toHaveLength(CONSTANTS_REGISTRATION.NONCE_LENGTH)
+          expect(nonce).toHaveLength(registrationConstants.NONCE_LENGTH)
         })
       })
     })
@@ -121,6 +126,7 @@ describe('passwordReset', () => {
 })
 
 describe('resetPassword', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setup = async (options: any = {}) => {
     const { email = 'user@example.org', issuedAt = new Date(), nonce = '12345' } = options
     await createPasswordReset({ driver, email, issuedAt, nonce })

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 import { getDriver } from '@db/neo4j'
 
 export const description = `
@@ -5,7 +7,7 @@ export const description = `
   Additional we like to have fulltext indices the keys 'name', 'slug', 'about', and 'description'.
 `
 
-export async function up(next) {
+export async function up(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -34,11 +36,11 @@ export async function up(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-export async function down(next) {
+export async function down(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -66,6 +68,6 @@ export async function down(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
