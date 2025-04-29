@@ -44,9 +44,9 @@ const STYLE = {
     },
 
     sidemenu: {
-      background: '#fff',
-      backgroundHover: '#f6f6f6',
-      backgroundActive: styleData.colorPrimaryLight,
+      background: styleData.chatSidemenuBg,
+      backgroundHover: styleData.chatSidemenuBackgroundOver,
+      backgroundActive: styleData.chatSidemenuBackgroundActive,
       colorActive: '#1976d2',
       borderColorSearch: '#e1e5e8',
     },
@@ -114,12 +114,12 @@ const STYLE = {
     },
 
     emoji: {
-      background: '#fff',
+      background: 'white',
     },
 
     icons: {
       search: '#9ca6af',
-      add: styleData.colorPrimary,
+      add: styleData.chatIconAdd,
       toggle: styleData.colorNeutral30,
       menu: styleData.colorNeutral30,
       close: '#9ca6af',
@@ -128,9 +128,9 @@ const STYLE = {
       paperclip: styleData.colorPrimary,
       closeOutline: '#000',
       closePreview: '#fff',
-      send: styleData.colorPrimary,
+      send: styleData.chatIconSend,
       sendDisabled: '#9ca6af',
-      emoji: styleData.colorPrimary,
+      emoji: styleData.chatIconEmoji,
       emojiReaction: 'rgba(0, 0, 0, 0.3)',
       document: styleData.colorPrimary,
       pencil: '#9e9e9e',

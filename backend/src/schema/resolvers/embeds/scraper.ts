@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable n/no-extraneous-require */
 /* eslint-disable n/global-require */
 /* eslint-disable import/no-commonjs */
@@ -80,8 +87,9 @@ export default async function scrape(url) {
     throw new ApolloError('Not found', 'NOT_FOUND')
   }
 
-  return {
-    type: 'link',
-    ...output,
+  if (!output.type) {
+    output.type = 'link'
   }
+
+  return output
 }

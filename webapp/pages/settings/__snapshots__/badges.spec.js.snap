@@ -1,0 +1,429 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`badge settings with badges more badges available selecting an empty slot shows list with available badges 1`] = `
+<div>
+  <article
+    class="base-card"
+  >
+    <h2
+      class="title"
+    >
+      settings.badges.name
+    </h2>
+     
+    <p>
+      settings.badges.description
+    </p>
+     
+    <div
+      class="ds-space ds-space-centered"
+      style="margin-top: 24px; margin-bottom: 16px;"
+    >
+      <div
+        class="presenterContainer"
+      >
+        <div
+          class="hc-badges"
+        >
+          <div
+            class="hc-badge-container"
+          >
+            <img
+              class="hc-badge"
+              src="/api/verification/icon"
+              title="Verification description"
+            />
+          </div>
+          <button
+            class="hc-badge-container selectable"
+          >
+            <img
+              class="hc-badge"
+              src="/api/path/to/some/icon"
+              title="Some description"
+            />
+          </button>
+          <button
+            class="hc-badge-container selectable selected"
+          >
+            <img
+              class="hc-badge"
+              src="/api/path/to/empty/icon"
+              title="Empty"
+            />
+          </button>
+          <button
+            class="hc-badge-container selectable"
+          >
+            <img
+              class="hc-badge"
+              src="/api/path/to/third/icon"
+              title="Third description"
+            />
+          </button>
+        </div>
+      </div>
+       
+      <!---->
+       
+      <div>
+        <strong>
+          
+        settings.badges.click-to-use
+      
+        </strong>
+      </div>
+       
+      <!---->
+       
+      <div
+        class="selection-info"
+      >
+        <div
+          class="badge-selection"
+        >
+          <button
+            class="badge-selection-item"
+          >
+            <div
+              class="badge-icon"
+            >
+              <img
+                alt="4"
+                src="/api/path/to/fourth/icon"
+              />
+            </div>
+             
+            <div
+              class="badge-info"
+            >
+              <div
+                class="badge-description"
+              >
+                Fourth description
+              </div>
+            </div>
+          </button>
+          <button
+            class="badge-selection-item"
+          >
+            <div
+              class="badge-icon"
+            >
+              <img
+                alt="5"
+                src="/api/path/to/fifth/icon"
+              />
+            </div>
+             
+            <div
+              class="badge-info"
+            >
+              <div
+                class="badge-description"
+              >
+                Fifth description
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+     
+    <!---->
+  </article>
+</div>
+`;
+
+exports[`badge settings with badges no more badges available selecting an empty slot shows no more badges available message 1`] = `
+<div>
+  <article
+    class="base-card"
+  >
+    <h2
+      class="title"
+    >
+      settings.badges.name
+    </h2>
+     
+    <p>
+      settings.badges.description
+    </p>
+     
+    <div
+      class="ds-space ds-space-centered"
+      style="margin-top: 24px; margin-bottom: 16px;"
+    >
+      <div
+        class="presenterContainer"
+      >
+        <div
+          class="hc-badges"
+        >
+          <div
+            class="hc-badge-container"
+          >
+            <img
+              class="hc-badge"
+              src="/api/verification/icon"
+              title="Verification description"
+            />
+          </div>
+          <button
+            class="hc-badge-container selectable"
+          >
+            <img
+              class="hc-badge"
+              src="/api/path/to/some/icon"
+              title="Some description"
+            />
+          </button>
+          <button
+            class="hc-badge-container selectable selected"
+          >
+            <img
+              class="hc-badge"
+              src="/api/path/to/empty/icon"
+              title="Empty"
+            />
+          </button>
+          <button
+            class="hc-badge-container selectable"
+          >
+            <img
+              class="hc-badge"
+              src="/api/path/to/third/icon"
+              title="Third description"
+            />
+          </button>
+        </div>
+      </div>
+       
+      <p>
+        
+      settings.badges.no-badges-available
+    
+      </p>
+       
+      <!---->
+       
+      <!---->
+       
+      <!---->
+    </div>
+     
+    <!---->
+  </article>
+</div>
+`;
+
+exports[`badge settings with badges renders 1`] = `
+<div>
+  <article
+    class="base-card"
+  >
+    <h2
+      class="title"
+    >
+      settings.badges.name
+    </h2>
+     
+    <p>
+      settings.badges.description
+    </p>
+     
+    <div
+      class="ds-space ds-space-centered"
+      style="margin-top: 24px; margin-bottom: 16px;"
+    >
+      <div
+        class="presenterContainer"
+      >
+        <div
+          class="hc-badges"
+        >
+          <div
+            class="hc-badge-container"
+          >
+            <img
+              class="hc-badge"
+              src="/api/verification/icon"
+              title="Verification description"
+            />
+          </div>
+          <button
+            class="hc-badge-container selectable"
+          >
+            <img
+              class="hc-badge"
+              src="/api/path/to/some/icon"
+              title="Some description"
+            />
+          </button>
+          <button
+            class="hc-badge-container selectable"
+          >
+            <img
+              class="hc-badge"
+              src="/api/path/to/empty/icon"
+              title="Empty"
+            />
+          </button>
+          <button
+            class="hc-badge-container selectable"
+          >
+            <img
+              class="hc-badge"
+              src="/api/path/to/third/icon"
+              title="Third description"
+            />
+          </button>
+        </div>
+      </div>
+       
+      <!---->
+       
+      <div>
+        <strong>
+          
+        settings.badges.click-to-select
+      
+        </strong>
+      </div>
+       
+      <!---->
+       
+      <!---->
+    </div>
+     
+    <!---->
+  </article>
+</div>
+`;
+
+exports[`badge settings with badges selecting a used badge clicking remove badge button with successful server request removes the badge 1`] = `
+<div>
+  <article
+    class="base-card"
+  >
+    <h2
+      class="title"
+    >
+      settings.badges.name
+    </h2>
+     
+    <p>
+      settings.badges.description
+    </p>
+     
+    <div
+      class="ds-space"
+    >
+      <div
+        class="presenterContainer"
+      >
+        <div
+          class="hc-badges"
+          style="transform: scale(2);"
+        >
+          <button
+            class="hc-badge-container"
+          >
+            <img
+              class="hc-badge"
+              src="/api/verification/icon"
+              title="Verification description"
+            />
+          </button>
+          <button
+            class="hc-badge-container selectable"
+          >
+            <img
+              class="hc-badge"
+              src="/api/path/to/some/icon"
+              title="Some description"
+            />
+          </button>
+          <button
+            class="hc-badge-container selectable"
+          >
+            <img
+              class="hc-badge"
+              src="/api/path/to/empty/icon"
+              title="Empty"
+            />
+          </button>
+          <button
+            class="hc-badge-container selectable"
+          >
+            <img
+              class="hc-badge"
+              src="/api/path/to/third/icon"
+              title="Third description"
+            />
+          </button>
+        </div>
+      </div>
+       
+      <!---->
+       
+      <!---->
+       
+      <!---->
+    </div>
+     
+    <!---->
+  </article>
+</div>
+`;
+
+exports[`badge settings without badges renders 1`] = `
+<div>
+  <article
+    class="base-card"
+  >
+    <h2
+      class="title"
+    >
+      settings.badges.name
+    </h2>
+     
+    <p>
+      settings.badges.description
+    </p>
+     
+    <div
+      class="ds-space ds-space-centered"
+      style="margin-top: 24px; margin-bottom: 16px;"
+    >
+      <div
+        class="presenterContainer"
+      >
+        <div
+          class="hc-badges"
+        >
+          <div
+            class="hc-badge-container"
+          >
+            <img
+              class="hc-badge"
+              src="/api/verification/icon"
+              title="Verification description"
+            />
+          </div>
+        </div>
+      </div>
+       
+      <!---->
+       
+      <!---->
+       
+      <!---->
+       
+      <!---->
+    </div>
+     
+    <!---->
+  </article>
+</div>
+`;

@@ -17,6 +17,7 @@
 <script>
 import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
+import loginConstants from '~/constants/loginBranded.js'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
@@ -27,7 +28,7 @@ export default {
     Logo,
     PageParamsLink,
   },
-  layout: 'no-header',
+  layout: loginConstants.LAYOUT,
   data() {
     return {
       metadata,

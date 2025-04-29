@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/require-await */
+
 import { categories } from '@constants/categories'
 
 import { getDriver } from './neo4j'

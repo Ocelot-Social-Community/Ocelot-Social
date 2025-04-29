@@ -1,5 +1,7 @@
-import log from './helpers/databaseLogger'
-
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 export default {
   Mutation: {
     shout: async (_object, params, context, _resolveInfo) => {
@@ -21,7 +23,6 @@ export default {
               userId: context.user.id,
             },
           )
-          log(shoutTransactionResponse)
           return shoutTransactionResponse.records.map((record) => record.get('isShouted'))
         })
         const [isShouted] = await shoutWriteTxResultPromise
@@ -49,7 +50,6 @@ export default {
               userId: context.user.id,
             },
           )
-          log(unshoutTransactionResponse)
           return unshoutTransactionResponse.records.map((record) => record.get('isShouted'))
         })
         const [isShouted] = await unshoutWriteTxResultPromise

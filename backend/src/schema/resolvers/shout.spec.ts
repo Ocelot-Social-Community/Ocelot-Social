@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
@@ -52,7 +56,7 @@ describe('shout and unshout posts', () => {
 
   afterAll(async () => {
     await cleanDatabase()
-    driver.close()
+    await driver.close()
   })
 
   beforeEach(async () => {

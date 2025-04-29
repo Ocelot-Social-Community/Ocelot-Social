@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable security/detect-object-injection */
-import log from './helpers/databaseLogger'
-
 export default {
   Query: {
     statistics: async (_parent, _args, { driver }) => {
       const session = driver.session()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const counts: any = {}
       try {
         const mapping = {
@@ -23,7 +26,6 @@ export default {
               RETURN labels, relTypesCount
             `,
           )
-          log(statisticsTransactionResponse)
           return statisticsTransactionResponse.records.map((record) => {
             return {
               ...record.get('labels'),

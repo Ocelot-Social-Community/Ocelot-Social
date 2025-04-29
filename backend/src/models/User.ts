@@ -52,6 +52,24 @@ export default {
     target: 'Badge',
     direction: 'in',
   },
+  selected: {
+    type: 'relationship',
+    relationship: 'SELECTED',
+    target: 'Badge',
+    direction: 'out',
+    properties: {
+      slot: {
+        type: 'int',
+        required: true,
+      },
+    },
+  },
+  verifies: {
+    type: 'relationship',
+    relationship: 'VERIFIES',
+    target: 'Badge',
+    direction: 'in',
+  },
   invitedBy: { type: 'relationship', relationship: 'INVITED', target: 'User', direction: 'in' },
   lastActiveAt: { type: 'string', isoDate: true },
   lastOnlineStatus: { type: 'string' },

@@ -40,7 +40,7 @@ export default {
     background-color: $color-neutral-90;
   }
   .login-link {
-    color: $text-color-base;
+    color: $text-color-link;
     padding-top: $space-xx-small;
     &:hover {
       color: $text-color-link-active;

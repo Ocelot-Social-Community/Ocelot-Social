@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
@@ -71,7 +75,7 @@ describe('moderate resources', () => {
 
   afterAll(async () => {
     await cleanDatabase()
-    driver.close()
+    await driver.close()
   })
 
   beforeEach(async () => {
@@ -190,7 +194,7 @@ describe('moderate resources', () => {
         ])
         const cypher =
           'MATCH (:Report)<-[review:REVIEWED]-(moderator:User {id: "moderator-id"}) RETURN review'
-        const reviews = await neode.cypher(cypher)
+        const reviews = await neode.cypher(cypher, {})
         expect(reviews.records).toHaveLength(1)
       })
 

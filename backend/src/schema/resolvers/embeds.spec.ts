@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -17,14 +20,17 @@ afterEach(() => {
 
 let variables = {}
 
+// eslint-disable-next-line n/no-sync
 const HumanConnectionOrg = fs.readFileSync(
   path.join(__dirname, '../../../snapshots/embeds/HumanConnectionOrg.html'),
   'utf8',
 )
+// eslint-disable-next-line n/no-sync
 const pr3934 = fs.readFileSync(
   path.join(__dirname, '../../../snapshots/embeds/pr3934.html'),
   'utf8',
 )
+// eslint-disable-next-line n/no-sync
 const babyLovesCat = fs.readFileSync(
   path.join(__dirname, '../../../snapshots/embeds/babyLovesCat.html'),
   'utf8',
@@ -55,6 +61,7 @@ describe('Query', () => {
     beforeEach(() => {
       embedAction = async (variables) => {
         const { server } = createServer({
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
           context: () => {},
         })
         const { query } = createTestClient(server)

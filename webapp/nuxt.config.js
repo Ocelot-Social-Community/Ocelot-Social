@@ -102,6 +102,7 @@ export default {
    */
   styleResources: {
     scss: [
+      '~assets/_new/styles/uses.scss',
       styleguideStyles,
       '~assets/_new/styles/tokens.scss',
       '~assets/styles/imports/_branding.scss',
@@ -259,6 +260,9 @@ export default {
           return tagName === 'vue-advanced-chat' || tagName === 'emoji-picker'
         },
       }
+
+      config.resolve.alias['~@'] = path.resolve(__dirname, '/')
+      config.resolve.alias['@@'] = path.resolve(__dirname, '/')
 
       if (CONFIG.STYLEGUIDE_DEV) {
         config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/src/system`)

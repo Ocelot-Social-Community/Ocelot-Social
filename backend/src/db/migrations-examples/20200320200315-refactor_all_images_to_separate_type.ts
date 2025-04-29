@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable no-console */
 import { getDriver } from '@db/neo4j'
 
@@ -58,7 +61,7 @@ export async function up() {
     console.log('Created image nodes from all user avatars and post images.')
     printSummaries(stats)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -96,6 +99,6 @@ export async function down() {
     console.log('UNDO: Split images from users and posts.')
     printSummaries(stats)
   } finally {
-    session.close()
+    await session.close()
   }
 }

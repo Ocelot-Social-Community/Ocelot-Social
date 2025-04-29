@@ -1,10 +1,15 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { signupVerificationMutation } from '@graphql/authentications'
-import { createGroupMutation, updateGroupMutation } from '@graphql/groups'
-import { createPostMutation } from '@graphql/posts'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { createPostMutation } from '@graphql/queries/createPostMutation'
+import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
+import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
 import createServer from '@src/server'
 
 let authenticatedUser
@@ -37,7 +42,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(async () => {

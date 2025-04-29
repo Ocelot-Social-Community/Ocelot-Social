@@ -1,22 +1,26 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import {
-  createGroupMutation,
-  joinGroupMutation,
-  leaveGroupMutation,
-  changeGroupMemberRoleMutation,
-  removeUserFromGroupMutation,
-} from '@graphql/groups'
-import { createMessageMutation } from '@graphql/messages'
-import { createRoomMutation } from '@graphql/rooms'
+import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
+import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
+import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
 import createServer, { pubsub } from '@src/server'
 
-const sendMailMock = jest.fn()
-jest.mock('../helpers/email/sendMail', () => ({
-  sendMail: () => sendMailMock(),
+const sendMailMock: (notification) => void = jest.fn()
+jest.mock('@middleware/helpers/email/sendMail', () => ({
+  sendMail: (notification) => sendMailMock(notification),
 }))
 
 const chatMessageTemplateMock = jest.fn()
@@ -31,8 +35,10 @@ jest.mock('../helpers/isUserOnline', () => ({
   isUserOnline: () => isUserOnlineMock(),
 }))
 
+const pubsubSpy = jest.spyOn(pubsub, 'publish')
+
 let server, query, mutate, notifiedUser, authenticatedUser
-let publishSpy
+
 const driver = getDriver()
 const neode = getNeode()
 const categoryIds = ['cat9']
@@ -65,7 +71,6 @@ const createCommentMutation = gql`
 beforeAll(async () => {
   await cleanDatabase()
 
-  publishSpy = jest.spyOn(pubsub, 'publish')
   const createServerResult = createServer({
     context: () => {
       return {
@@ -83,11 +88,10 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(async () => {
-  publishSpy.mockClear()
   notifiedUser = await Factory.build(
     'user',
     {
@@ -191,8 +195,8 @@ describe('notifications', () => {
           beforeEach(async () => {
             jest.clearAllMocks()
             commentContent = 'Commenters comment.'
-            commentAuthor = await neode.create(
-              'User',
+            commentAuthor = await Factory.build(
+              'user',
               {
                 id: 'commentAuthor',
                 name: 'Mrs Comment',
@@ -294,6 +298,25 @@ describe('notifications', () => {
               ).resolves.toEqual(expected)
             })
           })
+
+          describe('if I have muted the comment author', () => {
+            it('sends me no notification', async () => {
+              await notifiedUser.relateTo(commentAuthor, 'muted')
+              await createCommentOnPostAction()
+              const expected = expect.objectContaining({
+                data: { notifications: [] },
+              })
+
+              await expect(
+                query({
+                  query: notificationQuery,
+                  variables: {
+                    read: false,
+                  },
+                }),
+              ).resolves.toEqual(expected)
+            })
+          })
         })
 
         describe('commenter is me', () => {
@@ -322,8 +345,8 @@ describe('notifications', () => {
 
       beforeEach(async () => {
         jest.clearAllMocks()
-        postAuthor = await neode.create(
-          'User',
+        postAuthor = await Factory.build(
+          'user',
           {
             id: 'postAuthor',
             name: 'Mrs Post',
@@ -417,7 +440,7 @@ describe('notifications', () => {
 
         it('publishes `NOTIFICATION_ADDED` to me', async () => {
           await createPostAction()
-          expect(publishSpy).toHaveBeenCalledWith(
+          expect(pubsubSpy).toHaveBeenCalledWith(
             'NOTIFICATION_ADDED',
             expect.objectContaining({
               notificationAdded: expect.objectContaining({
@@ -428,7 +451,7 @@ describe('notifications', () => {
               }),
             }),
           )
-          expect(publishSpy).toHaveBeenCalledTimes(1)
+          expect(pubsubSpy).toHaveBeenCalledTimes(1)
         })
 
         describe('updates the post and mentions me again', () => {
@@ -578,7 +601,49 @@ describe('notifications', () => {
 
           it('does not publish `NOTIFICATION_ADDED`', async () => {
             await createPostAction()
-            expect(publishSpy).not.toHaveBeenCalled()
+            expect(pubsubSpy).not.toHaveBeenCalled()
+          })
+        })
+
+        describe('but the author of the post muted me', () => {
+          beforeEach(async () => {
+            await postAuthor.relateTo(notifiedUser, 'muted')
+          })
+
+          it('sends me a notification', async () => {
+            await createPostAction()
+            const expected = expect.objectContaining({
+              data: {
+                notifications: [
+                  {
+                    createdAt: expect.any(String),
+                    from: {
+                      __typename: 'Post',
+                      content:
+                        'Hey <a class="mention" data-mention-id="you" href="/profile/you/al-capone" target="_blank">@al-capone</a> how do you do?',
+                      id: 'p47',
+                    },
+                    read: false,
+                    reason: 'mentioned_in_post',
+                    relatedUser: null,
+                  },
+                ],
+              },
+            })
+
+            await expect(
+              query({
+                query: notificationQuery,
+                variables: {
+                  read: false,
+                },
+              }),
+            ).resolves.toEqual(expected)
+          })
+
+          it('publishes `NOTIFICATION_ADDED`', async () => {
+            await createPostAction()
+            expect(pubsubSpy).toHaveBeenCalled()
           })
         })
       })
@@ -593,8 +658,8 @@ describe('notifications', () => {
           beforeEach(async () => {
             commentContent =
               'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'
-            commentAuthor = await neode.create(
-              'User',
+            commentAuthor = await Factory.build(
+              'user',
               {
                 id: 'commentAuthor',
                 name: 'Mrs Comment',
@@ -608,15 +673,15 @@ describe('notifications', () => {
           })
 
           it('sends only one notification with reason mentioned_in_comment', async () => {
-            postAuthor = await neode.create(
-              'User',
+            postAuthor = await Factory.build(
+              'user',
               {
                 id: 'MrPostAuthor',
                 name: 'Mr Author',
                 slug: 'mr-author',
               },
               {
-                email: 'post-author@example.org',
+                email: 'post-author2@example.org',
                 password: '1234',
               },
             )
@@ -691,8 +756,8 @@ describe('notifications', () => {
             await postAuthor.relateTo(notifiedUser, 'blocked')
             commentContent =
               'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'
-            commentAuthor = await neode.create(
-              'User',
+            commentAuthor = await Factory.build(
+              'user',
               {
                 id: 'commentAuthor',
                 name: 'Mrs Comment',
@@ -722,7 +787,7 @@ describe('notifications', () => {
 
           it('does not publish `NOTIFICATION_ADDED` to authenticated user', async () => {
             await createCommentOnPostAction()
-            expect(publishSpy).toHaveBeenCalledWith(
+            expect(pubsubSpy).toHaveBeenCalledWith(
               'NOTIFICATION_ADDED',
               expect.objectContaining({
                 notificationAdded: expect.objectContaining({
@@ -733,14 +798,80 @@ describe('notifications', () => {
                 }),
               }),
             )
-            expect(publishSpy).toHaveBeenCalledTimes(1)
+            expect(pubsubSpy).toHaveBeenCalledTimes(1)
+          })
+        })
+
+        describe('but the author of the post muted me', () => {
+          beforeEach(async () => {
+            await postAuthor.relateTo(notifiedUser, 'muted')
+            commentContent =
+              'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'
+            commentAuthor = await Factory.build(
+              'user',
+              {
+                id: 'commentAuthor',
+                name: 'Mrs Comment',
+                slug: 'mrs-comment',
+              },
+              {
+                email: 'comment-author@example.org',
+                password: '1234',
+              },
+            )
+          })
+
+          it('sends me a notification', async () => {
+            await createCommentOnPostAction()
+            await expect(
+              query({
+                query: notificationQuery,
+                variables: {
+                  read: false,
+                },
+              }),
+            ).resolves.toMatchObject({
+              data: {
+                notifications: [
+                  {
+                    createdAt: expect.any(String),
+                    from: {
+                      __typename: 'Comment',
+                      content:
+                        'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.',
+                      id: 'c47',
+                    },
+                    read: false,
+                    reason: 'mentioned_in_comment',
+                    relatedUser: null,
+                  },
+                ],
+              },
+              errors: undefined,
+            })
+          })
+
+          it('publishes `NOTIFICATION_ADDED` to authenticated user and me', async () => {
+            await createCommentOnPostAction()
+            expect(pubsubSpy).toHaveBeenCalledWith(
+              'NOTIFICATION_ADDED',
+              expect.objectContaining({
+                notificationAdded: expect.objectContaining({
+                  reason: 'commented_on_post',
+                  to: expect.objectContaining({
+                    id: 'postAuthor', // that's expected, it's not me but the post author
+                  }),
+                }),
+              }),
+            )
+            expect(pubsubSpy).toHaveBeenCalledTimes(2)
           })
         })
       })
     })
   })
 
-  describe('chat email notifications', () => {
+  describe('chat notifications', () => {
     let chatSender
     let chatReceiver
     let roomId
@@ -748,8 +879,8 @@ describe('notifications', () => {
     beforeEach(async () => {
       jest.clearAllMocks()
 
-      chatSender = await neode.create(
-        'User',
+      chatSender = await Factory.build(
+        'user',
         {
           id: 'chatSender',
           name: 'chatSender',
@@ -779,7 +910,7 @@ describe('notifications', () => {
     })
 
     describe('if the chatReceiver is online', () => {
-      it('sends no email', async () => {
+      it('publishes subscriptions but sends no email', async () => {
         isUserOnlineMock = jest.fn().mockReturnValue(true)
 
         await mutate({
@@ -790,13 +921,32 @@ describe('notifications', () => {
           },
         })
 
+        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_COUNT_UPDATED', {
+          roomCountUpdated: '1',
+          userId: 'chatReceiver',
+        })
+        expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
+          chatMessageAdded: expect.objectContaining({
+            id: expect.any(String),
+            content: 'Some nice message to chatReceiver',
+            senderId: 'chatSender',
+            username: 'chatSender',
+            avatar: expect.any(String),
+            date: expect.any(String),
+            saved: true,
+            distributed: false,
+            seen: false,
+          }),
+          userId: 'chatReceiver',
+        })
+
         expect(sendMailMock).not.toHaveBeenCalled()
         expect(chatMessageTemplateMock).not.toHaveBeenCalled()
       })
     })
 
     describe('if the chatReceiver is offline', () => {
-      it('sends an email', async () => {
+      it('publishes subscriptions and sends an email', async () => {
         isUserOnlineMock = jest.fn().mockReturnValue(false)
 
         await mutate({
@@ -807,13 +957,32 @@ describe('notifications', () => {
           },
         })
 
+        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_COUNT_UPDATED', {
+          roomCountUpdated: '1',
+          userId: 'chatReceiver',
+        })
+        expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
+          chatMessageAdded: expect.objectContaining({
+            id: expect.any(String),
+            content: 'Some nice message to chatReceiver',
+            senderId: 'chatSender',
+            username: 'chatSender',
+            avatar: expect.any(String),
+            date: expect.any(String),
+            saved: true,
+            distributed: false,
+            seen: false,
+          }),
+          userId: 'chatReceiver',
+        })
+
         expect(sendMailMock).toHaveBeenCalledTimes(1)
         expect(chatMessageTemplateMock).toHaveBeenCalledTimes(1)
       })
     })
 
     describe('if the chatReceiver has blocked chatSender', () => {
-      it('sends no email', async () => {
+      it('publishes no subscriptions and sends no email', async () => {
         isUserOnlineMock = jest.fn().mockReturnValue(false)
         await chatReceiver.relateTo(chatSender, 'blocked')
 
@@ -825,13 +994,37 @@ describe('notifications', () => {
           },
         })
 
+        expect(pubsubSpy).not.toHaveBeenCalled()
+        expect(pubsubSpy).not.toHaveBeenCalled()
+
+        expect(sendMailMock).not.toHaveBeenCalled()
+        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('if the chatReceiver has muted chatSender', () => {
+      it('publishes no subscriptions and sends no email', async () => {
+        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        await chatReceiver.relateTo(chatSender, 'muted')
+
+        await mutate({
+          mutation: createMessageMutation(),
+          variables: {
+            roomId,
+            content: 'Some nice message to chatReceiver',
+          },
+        })
+
+        expect(pubsubSpy).not.toHaveBeenCalled()
+        expect(pubsubSpy).not.toHaveBeenCalled()
+
         expect(sendMailMock).not.toHaveBeenCalled()
         expect(chatMessageTemplateMock).not.toHaveBeenCalled()
       })
     })
 
     describe('if the chatReceiver has disabled `emailNotificationsChatMessage`', () => {
-      it('sends no email', async () => {
+      it('publishes subscriptions but sends no email', async () => {
         isUserOnlineMock = jest.fn().mockReturnValue(false)
         await chatReceiver.update({ emailNotificationsChatMessage: false })
 
@@ -841,6 +1034,25 @@ describe('notifications', () => {
             roomId,
             content: 'Some nice message to chatReceiver',
           },
+        })
+
+        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_COUNT_UPDATED', {
+          roomCountUpdated: '1',
+          userId: 'chatReceiver',
+        })
+        expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
+          chatMessageAdded: expect.objectContaining({
+            id: expect.any(String),
+            content: 'Some nice message to chatReceiver',
+            senderId: 'chatSender',
+            username: 'chatSender',
+            avatar: expect.any(String),
+            date: expect.any(String),
+            saved: true,
+            distributed: false,
+            seen: false,
+          }),
+          userId: 'chatReceiver',
         })
 
         expect(sendMailMock).not.toHaveBeenCalled()

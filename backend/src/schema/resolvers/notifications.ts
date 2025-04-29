@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { withFilter } from 'graphql-subscriptions'
 
 import { pubsub, NOTIFICATION_ADDED } from '@src/server'
-
-import log from './helpers/databaseLogger'
 
 export default {
   Subscription: {
@@ -70,7 +74,6 @@ export default {
           `,
           { id: currentUser.id },
         )
-        log(notificationsTransactionResponse)
         return notificationsTransactionResponse.records.map((record) => record.get('notification'))
       })
       try {
@@ -82,7 +85,7 @@ export default {
     },
   },
   Mutation: {
-    markAsRead: async (parent, args, context, resolveInfo) => {
+    markAsRead: async (_parent, args, context, _resolveInfo) => {
       const { user: currentUser } = context
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -100,7 +103,6 @@ export default {
           `,
           { resourceId: args.id, id: currentUser.id },
         )
-        log(markNotificationAsReadTransactionResponse)
         return markNotificationAsReadTransactionResponse.records.map((record) =>
           record.get('notification'),
         )
@@ -112,7 +114,7 @@ export default {
         session.close()
       }
     },
-    markAllAsRead: async (parent, args, context, resolveInfo) => {
+    markAllAsRead: async (parent, args, context, _resolveInfo) => {
       const { user: currentUser } = context
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -130,7 +132,6 @@ export default {
           `,
           { id: currentUser.id },
         )
-        log(markAllNotificationAsReadTransactionResponse)
         return markAllNotificationAsReadTransactionResponse.records.map((record) =>
           record.get('notification'),
         )
