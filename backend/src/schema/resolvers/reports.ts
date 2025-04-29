@@ -3,8 +3,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import log from './helpers/databaseLogger'
-
 export default {
   Mutation: {
     fileReport: async (_parent, params, context, _resolveInfo) => {
@@ -33,7 +31,6 @@ export default {
             reasonDescription,
           },
         )
-        log(fileReportTransactionResponse)
         return fileReportTransactionResponse.records.map((record) => record.get('filedReport'))
       })
       try {
@@ -106,7 +103,6 @@ export default {
             ${offset} ${limit}
           `,
         )
-        log(reportsTransactionResponse)
         return reportsTransactionResponse.records.map((record) => record.get('report'))
       })
       try {
@@ -131,7 +127,6 @@ export default {
           `,
           { id },
         )
-        log(filedReportsTransactionResponse)
         return filedReportsTransactionResponse.records.map((record) => ({
           submitter: record.get('submitter').properties,
           filed: record.get('filed').properties,
@@ -166,7 +161,6 @@ export default {
           `,
           { id },
         )
-        log(reviewedReportsTransactionResponse)
         return reviewedReportsTransactionResponse.records.map((record) => ({
           review: record.get('review').properties,
           moderator: record.get('moderator').properties,

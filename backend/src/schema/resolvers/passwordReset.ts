@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/await-thenable */
+
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -21,7 +21,7 @@ export default {
     resetPassword: async (_parent, { email, nonce, newPassword }, { driver }) => {
       const stillValid = new Date()
       stillValid.setDate(stillValid.getDate() - 1)
-      const encryptedNewPassword = await bcrypt.hashSync(newPassword, 10)
+      const encryptedNewPassword = await bcrypt.hash(newPassword, 10)
       const session = driver.session()
       try {
         const passwordResetTxPromise = session.writeTransaction(async (transaction) => {

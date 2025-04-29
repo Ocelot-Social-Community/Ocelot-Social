@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/await-thenable */
+
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -12,7 +12,6 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 import { getNeode } from '@db/neo4j'
 import encode from '@jwt/encode'
 
-import log from './helpers/databaseLogger'
 import normalizeEmail from './helpers/normalizeEmail'
 
 const neode = getNeode()
@@ -38,13 +37,12 @@ export default {
             `,
             { userEmail: email },
           )
-          log(loginTransactionResponse)
           return loginTransactionResponse.records.map((record) => record.get('user'))
         })
         const [currentUser] = await loginReadTxResultPromise
         if (
           currentUser &&
-          (await bcrypt.compareSync(password, currentUser.encryptedPassword)) &&
+          (await bcrypt.compare(password, currentUser.encryptedPassword)) &&
           !currentUser.disabled
         ) {
           delete currentUser.encryptedPassword
@@ -61,16 +59,16 @@ export default {
     changePassword: async (_, { oldPassword, newPassword }, { user }) => {
       const currentUser = await neode.find('User', user.id)
 
-      const encryptedPassword = currentUser.get('encryptedPassword')
-      if (!(await bcrypt.compareSync(oldPassword, encryptedPassword))) {
+      const encryptedPassword = currentUser.get<string>('encryptedPassword')
+      if (!(await bcrypt.compare(oldPassword, encryptedPassword))) {
         throw new AuthenticationError('Old password is not correct')
       }
 
-      if (await bcrypt.compareSync(newPassword, encryptedPassword)) {
+      if (await bcrypt.compare(newPassword, encryptedPassword)) {
         throw new AuthenticationError('Old password and new password should be different')
       }
 
-      const newEncryptedPassword = await bcrypt.hashSync(newPassword, 10)
+      const newEncryptedPassword = await bcrypt.hash(newPassword, 10)
       await currentUser.update({
         encryptedPassword: newEncryptedPassword,
         updatedAt: new Date().toISOString(),

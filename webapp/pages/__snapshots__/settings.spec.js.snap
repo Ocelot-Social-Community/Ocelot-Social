@@ -1,0 +1,427 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`settings.vue given badges are disabled renders 1`] = `
+<div>
+  <div>
+    <div
+      class="ds-space"
+      style="margin-top: 16px; margin-bottom: 16px;"
+    >
+      <h1
+        class="ds-heading ds-heading-h1"
+      >
+        
+      </h1>
+    </div>
+     
+    <div
+      class="ds-space"
+      style="margin-top: 32px; margin-bottom: 32px;"
+    />
+     
+    <div
+      class="ds-flex"
+      style="margin-left: -8px; margin-right: -8px;"
+    >
+      <div
+        class="menu-container"
+      >
+        <nav
+          class="ds-menu"
+        >
+          <ul
+            class="ds-menu-list"
+          >
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/my-email-address"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/security"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/privacy"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/my-social-media"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/muted-users"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/blocked-users"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/embeds"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/notifications"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/data-download"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/delete-account"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+          </ul>
+        </nav>
+      </div>
+       
+      <div
+        class="settings-content"
+        id="settings-content"
+      >
+        <transition-stub
+          appear="true"
+          name="slide-up"
+        >
+          <nuxt-child-stub />
+        </transition-stub>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`settings.vue given badges are enabled renders 1`] = `
+<div>
+  <div>
+    <div
+      class="ds-space"
+      style="margin-top: 16px; margin-bottom: 16px;"
+    >
+      <h1
+        class="ds-heading ds-heading-h1"
+      >
+        
+      </h1>
+    </div>
+     
+    <div
+      class="ds-space"
+      style="margin-top: 32px; margin-bottom: 32px;"
+    />
+     
+    <div
+      class="ds-flex"
+      style="margin-left: -8px; margin-right: -8px;"
+    >
+      <div
+        class="menu-container"
+      >
+        <nav
+          class="ds-menu"
+        >
+          <ul
+            class="ds-menu-list"
+          >
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/my-email-address"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/badges"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/security"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/privacy"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/my-social-media"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/muted-users"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/blocked-users"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/embeds"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/notifications"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/data-download"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                exact="true"
+                href="/settings/delete-account"
+              >
+                
+      
+    
+              </a>
+              <!---->
+            </li>
+          </ul>
+        </nav>
+      </div>
+       
+      <div
+        class="settings-content"
+        id="settings-content"
+      >
+        <transition-stub
+          appear="true"
+          name="slide-up"
+        >
+          <nuxt-child-stub />
+        </transition-stub>
+      </div>
+    </div>
+  </div>
+</div>
+`;

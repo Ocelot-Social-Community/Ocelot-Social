@@ -36,7 +36,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(async () => {
@@ -110,11 +110,14 @@ describe('AddEmailAddress', () => {
 
       it('connects `UnverifiedEmailAddress` to the authenticated user', async () => {
         await mutate({ mutation, variables })
-        const result = await neode.cypher(`
+        const result = await neode.cypher(
+          `
         MATCH(u:User)-[:PRIMARY_EMAIL]->(:EmailAddress {email: "user@example.org"})
         MATCH(u:User)<-[:BELONGS_TO]-(e:UnverifiedEmailAddress {email: "new-email@example.org"})
         RETURN e
-      `)
+      `,
+          {},
+        )
         const email = neode.hydrateFirst(result, 'e', neode.model('UnverifiedEmailAddress'))
         await expect(email.toJson()).resolves.toMatchObject({
           email: 'new-email@example.org',
@@ -257,10 +260,13 @@ describe('VerifyEmailAddress', () => {
 
           it('connects the new `EmailAddress` as PRIMARY', async () => {
             await mutate({ mutation, variables })
-            const result = await neode.cypher(`
+            const result = await neode.cypher(
+              `
             MATCH(u:User {id: "567"})-[:PRIMARY_EMAIL]->(e:EmailAddress {email: "to-be-verified@example.org"})
             RETURN e
-          `)
+          `,
+              {},
+            )
             const email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
             await expect(email.toJson()).resolves.toMatchObject({
               email: 'to-be-verified@example.org',
@@ -272,13 +278,13 @@ describe('VerifyEmailAddress', () => {
             MATCH(u:User {id: "567"})-[:PRIMARY_EMAIL]->(e:EmailAddress {email: "user@example.org"})
             RETURN e
           `
-            let result = await neode.cypher(cypherStatement)
+            let result = await neode.cypher(cypherStatement, {})
             let email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
             await expect(email.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
             await mutate({ mutation, variables })
-            result = await neode.cypher(cypherStatement)
+            result = await neode.cypher(cypherStatement, {})
             email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
             await expect(email).toBe(false)
           })
@@ -288,13 +294,13 @@ describe('VerifyEmailAddress', () => {
             MATCH(u:User {id: "567"})<-[:BELONGS_TO]-(e:EmailAddress {email: "user@example.org"})
             RETURN e
           `
-            let result = await neode.cypher(cypherStatement)
+            let result = await neode.cypher(cypherStatement, {})
             let email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
             await expect(email.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
             await mutate({ mutation, variables })
-            result = await neode.cypher(cypherStatement)
+            result = await neode.cypher(cypherStatement, {})
             email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
             await expect(email).toBe(false)
           })
@@ -319,10 +325,13 @@ describe('VerifyEmailAddress', () => {
 
             it('connects the new `EmailAddress` as PRIMARY', async () => {
               await mutate({ mutation, variables })
-              const result = await neode.cypher(`
+              const result = await neode.cypher(
+                `
                 MATCH(u:User {id: "567"})-[:PRIMARY_EMAIL]->(e:EmailAddress {email: "to-be-verified@example.org"})
                 RETURN e
-              `)
+              `,
+                {},
+              )
               const email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
               await expect(email.toJson()).resolves.toMatchObject({
                 email: 'to-be-verified@example.org',
