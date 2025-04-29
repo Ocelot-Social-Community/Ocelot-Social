@@ -76,14 +76,15 @@ const email = new Email({
 })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const sendMail = async (notification: any) => {
+export const sendMail = async (notification: any): Promise<any> => {
   const locale = notification?.to?.locale
   const to = notification?.email
   const name = notification?.to?.name
   const template = notification?.reason
 
   try {
-    await email.send({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return await email.send({
       template: path.join(__dirname, 'templates', template),
       message: {
         to,
