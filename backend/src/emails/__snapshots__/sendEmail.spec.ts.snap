@@ -8,8 +8,8 @@ exports[`sendEmail English changed_group_member_role template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p>your role in the group “The Group” has been changed. Click on this button to view this group:</p><a class=\\"button\\" href=\\"http://localhost:3000/group/g1/the-group\\">View group</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nyour role in the group “The Group” has been changed. Click on this button to\\nview this group:\\n\\nView group [http://localhost:3000/group/g1/the-group]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<e76d35c1-21c6-8b93-0380-5e2fd861aa00@localhost>"}",
-  "messageId": "<e76d35c1-21c6-8b93-0380-5e2fd861aa00@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p>your role in the group “The Group” has been changed. Click on this button to view this group:</p><a class=\\"button\\" href=\\"http://localhost:3000/group/g1/the-group\\">View group</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nyour role in the group “The Group” has been changed. Click on this button to\\nview this group:\\n\\nView group [http://localhost:3000/group/g1/the-group]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<bc3a7ac4-f5bd-84ff-74f8-9cdbab0e3c75@localhost>"}",
+  "messageId": "<bc3a7ac4-f5bd-84ff-74f8-9cdbab0e3c75@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -62,9 +62,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -73,50 +74,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -183,8 +140,8 @@ exports[`sendEmail English commented_on_post template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> commented on a post that you are observing with the title “New Post”. Click on this button to view this comment:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post#commentId-c1\\">View comment</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] commented on a post\\nthat you are observing with the title “New Post”. Click on this button to view\\nthis comment:\\n\\nView comment [http://localhost:3000/post/p1/new-post#commentId-c1]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<7f033e2f-560e-0af1-2ad1-20b083b68585@localhost>"}",
-  "messageId": "<7f033e2f-560e-0af1-2ad1-20b083b68585@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> commented on a post that you are observing with the title “New Post”. Click on this button to view this comment:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post#commentId-c1\\">View comment</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] commented on a post\\nthat you are observing with the title “New Post”. Click on this button to view\\nthis comment:\\n\\nView comment [http://localhost:3000/post/p1/new-post#commentId-c1]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<350f38e2-1d10-fd82-16b1-f6c2043d5e95@localhost>"}",
+  "messageId": "<350f38e2-1d10-fd82-16b1-f6c2043d5e95@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -237,9 +194,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -248,50 +206,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -360,8 +274,8 @@ exports[`sendEmail English followed_user_posted template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a>, a user you are following, wrote a new post with the title “New Post”. Click on this button to view this post:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post\\">View post</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig], a user you are\\nfollowing, wrote a new post with the title “New Post”. Click on this button to\\nview this post:\\n\\nView post [http://localhost:3000/post/p1/new-post]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<9002010c-95e4-fbcb-3b88-59cad7093796@localhost>"}",
-  "messageId": "<9002010c-95e4-fbcb-3b88-59cad7093796@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a>, a user you are following, wrote a new post with the title “New Post”. Click on this button to view this post:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post\\">View post</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig], a user you are\\nfollowing, wrote a new post with the title “New Post”. Click on this button to\\nview this post:\\n\\nView post [http://localhost:3000/post/p1/new-post]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<7fcfb39a-2e59-ba20-2290-9eb46b351432@localhost>"}",
+  "messageId": "<7fcfb39a-2e59-ba20-2290-9eb46b351432@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -414,9 +328,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -425,50 +340,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -537,8 +408,8 @@ exports[`sendEmail English mentioned_in_comment template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> mentioned you in a comment to the post with the title “New Post”. Click on this button to view this comment:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post#commentId-c1\\">View comment</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] mentioned you in a\\ncomment to the post with the title “New Post”. Click on this button to view this\\ncomment:\\n\\nView comment [http://localhost:3000/post/p1/new-post#commentId-c1]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<476e2aa4-fd90-39f0-3265-ab5aca78c4f4@localhost>"}",
-  "messageId": "<476e2aa4-fd90-39f0-3265-ab5aca78c4f4@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> mentioned you in a comment to the post with the title “New Post”. Click on this button to view this comment:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post#commentId-c1\\">View comment</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] mentioned you in a\\ncomment to the post with the title “New Post”. Click on this button to view this\\ncomment:\\n\\nView comment [http://localhost:3000/post/p1/new-post#commentId-c1]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<d7429e56-4d93-9e96-f73a-9d5bef405305@localhost>"}",
+  "messageId": "<d7429e56-4d93-9e96-f73a-9d5bef405305@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -591,9 +462,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -602,50 +474,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -714,8 +542,8 @@ exports[`sendEmail English mentioned_in_post template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> mentioned you in a post with the title “New Post”. Click on this button to view this post:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post\\">View post</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] mentioned you in a\\npost with the title “New Post”. Click on this button to view this post:\\n\\nView post [http://localhost:3000/post/p1/new-post]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<ed23d24f-dec7-f0f2-7772-8db7171fca66@localhost>"}",
-  "messageId": "<ed23d24f-dec7-f0f2-7772-8db7171fca66@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> mentioned you in a post with the title “New Post”. Click on this button to view this post:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post\\">View post</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] mentioned you in a\\npost with the title “New Post”. Click on this button to view this post:\\n\\nView post [http://localhost:3000/post/p1/new-post]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<39833462-aee1-2809-923f-6b0558457258@localhost>"}",
+  "messageId": "<39833462-aee1-2809-923f-6b0558457258@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -768,9 +596,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -779,50 +608,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -890,8 +675,8 @@ exports[`sendEmail English removed_user_from_group template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p>you have been removed from the group “The Group”.</p>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nyou have been removed from the group “The Group”.\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<f2bc2800-d781-425e-5b03-2f7dfcd293a4@localhost>"}",
-  "messageId": "<f2bc2800-d781-425e-5b03-2f7dfcd293a4@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p>you have been removed from the group “The Group”.</p>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nyou have been removed from the group “The Group”.\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<ce44c836-5765-63bd-5ea8-7cedc94b0e58@localhost>"}",
+  "messageId": "<ce44c836-5765-63bd-5ea8-7cedc94b0e58@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -944,9 +729,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -955,50 +741,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -1062,8 +804,8 @@ exports[`sendEmail English user_joined_group template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> joined the group “The Group”. Click on this button to view this group:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/group/g1/the-group\\">View group</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] joined the group “The\\nGroup”. Click on this button to view this group:\\n\\nView group [http://localhost:3000/group/g1/the-group]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<bc5ea585-ed6b-c7bf-67f9-4f0a79545a6b@localhost>"}",
-  "messageId": "<bc5ea585-ed6b-c7bf-67f9-4f0a79545a6b@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> joined the group “The Group”. Click on this button to view this group:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/group/g1/the-group\\">View group</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] joined the group “The\\nGroup”. Click on this button to view this group:\\n\\nView group [http://localhost:3000/group/g1/the-group]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<ed4e5c7e-54e1-5d5b-7fcc-5db990d291f9@localhost>"}",
+  "messageId": "<ed4e5c7e-54e1-5d5b-7fcc-5db990d291f9@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -1116,9 +858,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -1127,50 +870,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -1238,8 +937,8 @@ exports[`sendEmail English user_left_group template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> left the group “The Group”. Click on this button to view this group:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/group/g1/the-group\\">View group</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] left the group “The\\nGroup”. Click on this button to view this group:\\n\\nView group [http://localhost:3000/group/g1/the-group]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<6826087d-3c16-0dbf-c521-cbc90ad7ab7d@localhost>"}",
-  "messageId": "<6826087d-3c16-0dbf-c521-cbc90ad7ab7d@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> left the group “The Group”. Click on this button to view this group:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/group/g1/the-group\\">View group</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] left the group “The\\nGroup”. Click on this button to view this group:\\n\\nView group [http://localhost:3000/group/g1/the-group]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<5f0c8056-51da-976e-596a-fbacd1333802@localhost>"}",
+  "messageId": "<5f0c8056-51da-976e-596a-fbacd1333802@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -1292,9 +991,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -1303,50 +1003,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -1414,8 +1070,8 @@ exports[`sendEmail German changed_group_member_role template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p>deine Rolle in der Gruppe  „The Group“ wurde geändert. Klicke auf diesen Knopf, um diese Gruppe zu sehen:</p><a class=\\"button\\" href=\\"http://localhost:3000/group/g1/the-group\\">Gruppe ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\ndeine Rolle in der Gruppe „The Group“ wurde geändert. Klicke auf diesen Knopf,\\num diese Gruppe zu sehen:\\n\\nGruppe ansehen [http://localhost:3000/group/g1/the-group]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<9925c354-f15d-39f4-5cb4-0def2fc82a6e@localhost>"}",
-  "messageId": "<9925c354-f15d-39f4-5cb4-0def2fc82a6e@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p>deine Rolle in der Gruppe  „The Group“ wurde geändert. Klicke auf diesen Knopf, um diese Gruppe zu sehen:</p><a class=\\"button\\" href=\\"http://localhost:3000/group/g1/the-group\\">Gruppe ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\ndeine Rolle in der Gruppe „The Group“ wurde geändert. Klicke auf diesen Knopf,\\num diese Gruppe zu sehen:\\n\\nGruppe ansehen [http://localhost:3000/group/g1/the-group]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<de465529-0734-87b8-eff2-5fb2317c9437@localhost>"}",
+  "messageId": "<de465529-0734-87b8-eff2-5fb2317c9437@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -1468,9 +1124,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -1479,50 +1136,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -1589,8 +1202,8 @@ exports[`sendEmail German commented_on_post template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> hat einen Beitrag den Du beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf diesen Knopf, um diesen Kommentar zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post#commentId-c1\\">Kommentar ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] hat einen Beitrag den\\nDu beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf diesen Knopf, um\\ndiesen Kommentar zu sehen:\\n\\nKommentar ansehen [http://localhost:3000/post/p1/new-post#commentId-c1]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<e287fd1d-edfa-8abf-f1bd-d2d4bc99bd40@localhost>"}",
-  "messageId": "<e287fd1d-edfa-8abf-f1bd-d2d4bc99bd40@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> hat einen Beitrag den Du beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf diesen Knopf, um diesen Kommentar zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post#commentId-c1\\">Kommentar ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] hat einen Beitrag den\\nDu beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf diesen Knopf, um\\ndiesen Kommentar zu sehen:\\n\\nKommentar ansehen [http://localhost:3000/post/p1/new-post#commentId-c1]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<e95c6e21-8d87-5aea-0efc-9c151622fde9@localhost>"}",
+  "messageId": "<e95c6e21-8d87-5aea-0efc-9c151622fde9@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -1643,9 +1256,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -1654,50 +1268,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -1766,8 +1336,8 @@ exports[`sendEmail German followed_user_posted template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a>, ein Nutzer dem du folgst, hat einen neuen Beitrag mit dem Titel „New Post“ geschrieben. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post\\">Beitrag ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig], ein Nutzer dem du\\nfolgst, hat einen neuen Beitrag mit dem Titel „New Post“ geschrieben. Klicke auf\\ndiesen Knopf, um diesen Beitrag zu sehen:\\n\\nBeitrag ansehen [http://localhost:3000/post/p1/new-post]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<3ce41f96-84f6-8810-5780-3f0ece6df29c@localhost>"}",
-  "messageId": "<3ce41f96-84f6-8810-5780-3f0ece6df29c@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a>, ein Nutzer dem du folgst, hat einen neuen Beitrag mit dem Titel „New Post“ geschrieben. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post\\">Beitrag ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig], ein Nutzer dem du\\nfolgst, hat einen neuen Beitrag mit dem Titel „New Post“ geschrieben. Klicke auf\\ndiesen Knopf, um diesen Beitrag zu sehen:\\n\\nBeitrag ansehen [http://localhost:3000/post/p1/new-post]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<45a5e7b1-a6de-65ad-15a8-a5a9c27c8806@localhost>"}",
+  "messageId": "<45a5e7b1-a6de-65ad-15a8-a5a9c27c8806@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -1820,9 +1390,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -1831,50 +1402,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -1943,8 +1470,8 @@ exports[`sendEmail German mentioned_in_comment template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> hat dich in einem Kommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf diesen Knopf, um diesen Kommentar zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post#commentId-c1\\">Kommentar ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] hat dich in einem\\nKommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf diesen\\nKnopf, um diesen Kommentar zu sehen:\\n\\nKommentar ansehen [http://localhost:3000/post/p1/new-post#commentId-c1]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<89238fa8-41e8-8748-7f70-c51ef433a016@localhost>"}",
-  "messageId": "<89238fa8-41e8-8748-7f70-c51ef433a016@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> hat dich in einem Kommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf diesen Knopf, um diesen Kommentar zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post#commentId-c1\\">Kommentar ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] hat dich in einem\\nKommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf diesen\\nKnopf, um diesen Kommentar zu sehen:\\n\\nKommentar ansehen [http://localhost:3000/post/p1/new-post#commentId-c1]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<0847d6ba-e37b-96b2-eaf8-adb85d83298a@localhost>"}",
+  "messageId": "<0847d6ba-e37b-96b2-eaf8-adb85d83298a@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -1997,9 +1524,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -2008,50 +1536,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -2120,8 +1604,8 @@ exports[`sendEmail German mentioned_in_post template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> hat Dich in einem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post\\">Beitrag ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] hat Dich in einem\\nBeitrag mit dem Titel „New Post“ erwähnt. Klicke auf diesen Knopf, um diesen\\nBeitrag zu sehen:\\n\\nBeitrag ansehen [http://localhost:3000/post/p1/new-post]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<dbf423d5-b407-9f11-6173-c878d578b090@localhost>"}",
-  "messageId": "<dbf423d5-b407-9f11-6173-c878d578b090@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> hat Dich in einem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/post/p1/new-post\\">Beitrag ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] hat Dich in einem\\nBeitrag mit dem Titel „New Post“ erwähnt. Klicke auf diesen Knopf, um diesen\\nBeitrag zu sehen:\\n\\nBeitrag ansehen [http://localhost:3000/post/p1/new-post]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<07b80566-aaef-377b-cde0-2cd9d8379f06@localhost>"}",
+  "messageId": "<07b80566-aaef-377b-cde0-2cd9d8379f06@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -2174,9 +1658,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -2185,50 +1670,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -2297,8 +1738,8 @@ exports[`sendEmail German removed_user_from_group template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p>du wurdest aus der Gruppe „The Group“ entfernt.</p>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\ndu wurdest aus der Gruppe „The Group“ entfernt.\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<f6701a59-d285-b5ec-8fba-c2db8c6adc29@localhost>"}",
-  "messageId": "<f6701a59-d285-b5ec-8fba-c2db8c6adc29@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p>du wurdest aus der Gruppe „The Group“ entfernt.</p>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\ndu wurdest aus der Gruppe „The Group“ entfernt.\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<af03cf6a-ae8a-6b57-efe7-191f8031bddd@localhost>"}",
+  "messageId": "<af03cf6a-ae8a-6b57-efe7-191f8031bddd@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -2351,9 +1792,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -2362,50 +1804,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -2469,8 +1867,8 @@ exports[`sendEmail German user_joined_group template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> ist der Gruppe „The Group“ beigetreten. Klicke auf diesen Knopf, um diese Gruppe zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/group/g1/the-group\\">Gruppe ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] ist der Gruppe „The\\nGroup“ beigetreten. Klicke auf diesen Knopf, um diese Gruppe zu sehen:\\n\\nGruppe ansehen [http://localhost:3000/group/g1/the-group]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<227eb3ac-49c3-249a-a66c-534fcd0cd223@localhost>"}",
-  "messageId": "<227eb3ac-49c3-249a-a66c-534fcd0cd223@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> ist der Gruppe „The Group“ beigetreten. Klicke auf diesen Knopf, um diese Gruppe zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/group/g1/the-group\\">Gruppe ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] ist der Gruppe „The\\nGroup“ beigetreten. Klicke auf diesen Knopf, um diese Gruppe zu sehen:\\n\\nGruppe ansehen [http://localhost:3000/group/g1/the-group]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<10ae228a-9658-4944-f078-c23a213632ac@localhost>"}",
+  "messageId": "<10ae228a-9658-4944-f078-c23a213632ac@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -2523,9 +1921,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -2534,50 +1933,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
@@ -2645,8 +2000,8 @@ exports[`sendEmail German user_left_group template 1`] = `
       "user@example.org",
     ],
   },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\n.content {\\n}\\n\\n.p_content{\\n  margin: 15px 0 15px 0;\\n  line-height: 26px;\\n  color: #9ca0a8;\\n}\\n\\n.clink {\\n  line-break: anywhere;\\n  margin-bottom: 40px;\\n}\\n\\n.button-3,\\n.button-4 {\\n  display: inline-block;\\n  padding: 9px 15px;\\n  color: white;\\n  border: 0;\\n  line-height: inherit;\\n  text-decoration: none;\\n  cursor: pointer;\\n  border-radius: 20px;\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);\\n  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);\\n  margin: 25px 0 25px 0;\\n  width: 50%;\\n}\\n\\n.button-4 {\\n  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);\\n}\\n\\n.socialmedia {\\n  display: flex;\\n  margin-top: 40px;\\n  max-width: 600px;\\n  \\n}\\n.slink{\\n  width: 150px;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> hat die Gruppe „The Group“ verlassen. Klicke auf diesen Knopf, um diese Gruppe zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/group/g1/the-group\\">Gruppe ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] hat die Gruppe „The\\nGroup“ verlassen. Klicke auf diesen Knopf, um diese Gruppe zu sehen:\\n\\nGruppe ansehen [http://localhost:3000/group/g1/the-group]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<01b62836-8590-7d65-0c3e-fedf3d61e534@localhost>"}",
-  "messageId": "<01b62836-8590-7d65-0c3e-fedf3d61e534@localhost>",
+  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://localhost:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://localhost:3000/user/u2/peter-lustig\\">Peter Lustig</a> hat die Gruppe „The Group“ verlassen. Klicke auf diesen Knopf, um diese Gruppe zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://localhost:3000/group/g1/the-group\\">Gruppe ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://localhost:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://localhost:3000/user/u2/peter-lustig] hat die Gruppe „The\\nGroup“ verlassen. Klicke auf diesen Knopf, um diese Gruppe zu sehen:\\n\\nGruppe ansehen [http://localhost:3000/group/g1/the-group]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<aae246b5-4e78-1600-c240-7676d580bd14@localhost>"}",
+  "messageId": "<aae246b5-4e78-1600-c240-7676d580bd14@localhost>",
   "originalMessage": {
     "attachments": [],
     "from": "ocelot.social",
@@ -2699,9 +2054,10 @@ a.button {
   font-size: 16px;
   line-height: 15px;
   text-decoration: none;
+  text-align:center;
   padding: 13px 17px;
   color: #ffffff;
-  display: block;
+  display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
@@ -2710,50 +2066,6 @@ a.button {
 .text-block {
   margin-top: 20px;
   color: #000000;
-}
-
-.content {
-}
-
-.p_content{
-  margin: 15px 0 15px 0;
-  line-height: 26px;
-  color: #9ca0a8;
-}
-
-.clink {
-  line-break: anywhere;
-  margin-bottom: 40px;
-}
-
-.button-3,
-.button-4 {
-  display: inline-block;
-  padding: 9px 15px;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 20px;
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #f9cd69, #c58d38);
-  box-shadow: 16px 13px 35px 0 rgba(56, 56, 56, 0.3);
-  margin: 25px 0 25px 0;
-  width: 50%;
-}
-
-.button-4 {
-  background-image: radial-gradient(circle farthest-corner at 0% 0%, #616161, #c2c2c2);
-}
-
-.socialmedia {
-  display: flex;
-  margin-top: 40px;
-  max-width: 600px;
-  
-}
-.slink{
-  width: 150px;
 }
 
 footer {
