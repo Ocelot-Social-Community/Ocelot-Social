@@ -4,6 +4,7 @@ type Badge {
   icon: String!
   createdAt: String
   description: String!
+  isDefault: Boolean!
 
   rewarded: [User]! @relation(name: "REWARDED", direction: "OUT")
   verifies: [User]! @relation(name: "VERIFIES", direction: "OUT")

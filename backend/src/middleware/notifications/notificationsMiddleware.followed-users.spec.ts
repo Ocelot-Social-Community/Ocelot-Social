@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
@@ -14,14 +14,14 @@ import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock = jest.fn()
-jest.mock('../helpers/email/sendMail', () => ({
-  sendMail: () => sendMailMock(),
+const sendMailMock: (notification) => void = jest.fn()
+jest.mock('@middleware/helpers/email/sendMail', () => ({
+  sendMail: (notification) => sendMailMock(notification),
 }))
 
 let server, query, mutate, authenticatedUser
 
-let postAuthor, firstFollower, secondFollower
+let postAuthor, firstFollower, secondFollower, thirdFollower, emaillessFollower
 
 const driver = getDriver()
 const neode = getNeode()
@@ -94,7 +94,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 describe('following users notifications', () => {
@@ -107,7 +107,7 @@ describe('following users notifications', () => {
         slug: 'post-author',
       },
       {
-        email: 'test@example.org',
+        email: 'post-author@example.org',
         password: '1234',
       },
     )
@@ -119,7 +119,7 @@ describe('following users notifications', () => {
         slug: 'first-follower',
       },
       {
-        email: 'test2@example.org',
+        email: 'first-follower@example.org',
         password: '1234',
       },
     )
@@ -131,10 +131,27 @@ describe('following users notifications', () => {
         slug: 'second-follower',
       },
       {
-        email: 'test3@example.org',
+        email: 'second-follower@example.org',
         password: '1234',
       },
     )
+    thirdFollower = await Factory.build(
+      'user',
+      {
+        id: 'third-follower',
+        name: 'Third Follower',
+        slug: 'third-follower',
+      },
+      {
+        email: 'third-follower@example.org',
+        password: '1234',
+      },
+    )
+    emaillessFollower = await neode.create('User', {
+      id: 'email-less-follower',
+      name: 'Email-less Follower',
+      slug: 'email-less-follower',
+    })
     await secondFollower.update({ emailNotificationsFollowingUsers: false })
     authenticatedUser = await firstFollower.toJson()
     await mutate({
@@ -142,6 +159,16 @@ describe('following users notifications', () => {
       variables: { id: 'post-author' },
     })
     authenticatedUser = await secondFollower.toJson()
+    await mutate({
+      mutation: followUserMutation,
+      variables: { id: 'post-author' },
+    })
+    authenticatedUser = await thirdFollower.toJson()
+    await mutate({
+      mutation: followUserMutation,
+      variables: { id: 'post-author' },
+    })
+    authenticatedUser = await emaillessFollower.toJson()
     await mutate({
       mutation: followUserMutation,
       variables: { id: 'post-author' },
@@ -221,8 +248,43 @@ describe('following users notifications', () => {
       })
     })
 
-    it('sends only one email, as second follower has emails disabled', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(1)
+    it('sends notification to the email-less follower', async () => {
+      authenticatedUser = await emaillessFollower.toJson()
+      await expect(
+        query({
+          query: notificationQuery,
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          notifications: [
+            {
+              from: {
+                __typename: 'Post',
+                id: 'post',
+              },
+              read: false,
+              reason: 'followed_user_posted',
+            },
+          ],
+        },
+        errors: undefined,
+      })
+    })
+
+    it('sends only two emails, as second follower has emails disabled and email-less follower has no email', () => {
+      expect(sendMailMock).toHaveBeenCalledTimes(2)
+      expect(sendMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          html: expect.stringContaining('Hello First Follower'),
+          to: 'first-follower@example.org',
+        }),
+      )
+      expect(sendMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          html: expect.stringContaining('Hello Third Follower'),
+          to: 'third-follower@example.org',
+        }),
+      )
     })
   })
 

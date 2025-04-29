@@ -42,8 +42,11 @@
               {{ $t('profile.memberSince') }} {{ user.createdAt | date('MMMM yyyy') }}
             </ds-text>
           </ds-space>
-          <ds-space v-if="user.badgeTrophies && user.badgeTrophies.length" margin="x-small">
-            <hc-badges :badges="user.badgeTrophies" />
+          <ds-space v-if="userBadges && userBadges.length" margin="x-small">
+            <a v-if="myProfile" href="/settings/badges" class="badge-edit-link">
+              <hc-badges :badges="userBadges" />
+            </a>
+            <hc-badges v-if="!myProfile" :badges="userBadges" />
           </ds-space>
           <ds-flex>
             <ds-flex-item>
@@ -266,6 +269,10 @@ export default {
     user() {
       return this.User ? this.User[0] : {}
     },
+    userBadges() {
+      if (!this.$env.BADGES_ENABLED) return null
+      return [this.user.badgeVerification, ...(this.user.badgeTrophiesSelected || [])]
+    },
     userName() {
       const { name } = this.user || {}
       return name || this.$t('profile.userAnonym')
@@ -455,6 +462,12 @@ export default {
 .profile-page-avatar.profile-avatar {
   margin: auto;
   margin-top: -60px;
+}
+.badge-edit-link {
+  transition: all 0.2s ease-out;
+  &:hover {
+    opacity: 0.7;
+  }
 }
 .page-name-profile-id-slug {
   .ds-flex-item:first-child .content-menu {

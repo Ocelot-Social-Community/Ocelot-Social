@@ -21,26 +21,41 @@ const badge2 = {
 describe('Admin/BadgesSection', () => {
   let wrapper
 
-  const Wrapper = () => {
+  const Wrapper = (withBadges = true) => {
     return render(BadgesSection, {
       localVue,
       propsData: {
-        badges: [badge1, badge2],
+        badges: withBadges ? [badge1, badge2] : [],
+      },
+      mocks: {
+        $t: jest.fn((t) => t),
       },
     })
   }
 
-  beforeEach(() => {
-    wrapper = Wrapper()
+  describe('without badges', () => {
+    beforeEach(() => {
+      wrapper = Wrapper(false)
+    })
+
+    it('renders', () => {
+      expect(wrapper.baseElement).toMatchSnapshot()
+    })
   })
 
-  it('renders', () => {
-    expect(wrapper.baseElement).toMatchSnapshot()
-  })
+  describe('with badges', () => {
+    beforeEach(() => {
+      wrapper = Wrapper(true)
+    })
 
-  it('emits toggleButton', async () => {
-    const button = screen.getByAltText(badge1.description)
-    await fireEvent.click(button)
-    expect(wrapper.emitted().toggleBadge[0][0]).toEqual(badge1)
+    it('renders', () => {
+      expect(wrapper.baseElement).toMatchSnapshot()
+    })
+
+    it('emits toggleButton', async () => {
+      const button = screen.getByAltText(badge1.description)
+      await fireEvent.click(button)
+      expect(wrapper.emitted().toggleBadge[0][0]).toEqual(badge1)
+    })
   })
 })
