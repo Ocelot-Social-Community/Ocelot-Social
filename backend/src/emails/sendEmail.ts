@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
@@ -48,39 +47,40 @@ export const transport = createTransport({
   },
 })
 
+const email = new Email({
+  message: {
+    from: `${CONFIG.APPLICATION_NAME}`,
+  },
+  transport,
+  i18n: {
+    locales: ['en', 'de'],
+    defaultLocale: 'en',
+    retryInDefaultLocale: false,
+    directory: path.join(__dirname, 'locales'),
+    updateFiles: false,
+    objectNotation: true,
+    mustacheConfig: {
+      tags: ['{', '}'],
+      disable: false,
+    },
+  },
+  preview: false,
+  // This is very useful to see the emails sent by the unit tests
+  /*
+  preview: {
+    open: {
+      app: 'brave-browser',
+    },
+  },
+  */
+})
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sendMail = async (notification: any) => {
   const locale = notification?.to?.locale
   const to = notification?.email
   const name = notification?.to?.name
   const template = notification?.reason
-
-  const email = new Email({
-    message: {
-      from: '${CONFIG.APPLICATION_NAME}',
-    },
-    transport,
-    i18n: {
-      locales: ['en', 'de'],
-      defaultLocale: 'en',
-      retryInDefaultLocale: false,
-      directory: path.join(__dirname, 'locales'),
-      updateFiles: false,
-      objectNotation: true,
-      mustacheConfig: {
-        tags: ['{', '}'],
-        disable: false,
-      },
-    },
-    preview: false,
-    /* This is very useful to see the emails sent by the unit tests
-    preview: {
-      open: {
-        app: 'brave-browser',
-      },
-    },
-    */
-  })
 
   try {
     await email.send({

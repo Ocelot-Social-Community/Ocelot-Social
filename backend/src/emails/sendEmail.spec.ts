@@ -1,8 +1,6 @@
-import { sendMail, transport } from './sendEmail'
+import { sendMail } from './sendEmail' // , transport
 
-
-
-const sendMailMock = jest.spyOn(transport, 'sendMail')
+// const sendMailMock = jest.spyOn(transport, 'sendMail')
 
 /*
       : (input) => void = jest.fn(() => console.log('HERE'))
