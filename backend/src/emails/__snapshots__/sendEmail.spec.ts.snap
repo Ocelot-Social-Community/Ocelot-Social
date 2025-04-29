@@ -2,18 +2,9 @@
 
 exports[`sendEmail English changed_group_member_role template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification: Role in group changed","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p>your role in the group “The Group” has been changed. Click on this button to view this group:</p><a class=\\"button\\" href=\\"http://webapp:3000/group/g1/the-group\\">View group</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nyour role in the group “The Group” has been changed. Click on this button to\\nview this group:\\n\\nView group [http://webapp:3000/group/g1/the-group]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<491c9e57-1986-3e7d-f0ef-e6d83afc74a3@localhost>"}",
-  "messageId": "<491c9e57-1986-3e7d-f0ef-e6d83afc74a3@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -109,8 +100,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Notification: Role in group changed",
-    "text": "HELLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Notification: Role in group changed",
+  "text": "HELLO JENNY ROSTOCK,
 
 your role in the group “The Group” has been changed. Click on this button to
 view this group:
@@ -127,25 +118,15 @@ settings [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail English commented_on_post template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification: New comment on post","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://webapp:3000/user/u2/peter-lustig\\">Peter Lustig</a> commented on a post that you are observing with the title “New Post”. Click on this button to view this comment:\\n        </p><a class=\\"button\\" href=\\"http://webapp:3000/post/p1/new-post#commentId-c1\\">View comment</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://webapp:3000/user/u2/peter-lustig] commented on a post that\\nyou are observing with the title “New Post”. Click on this button to view this\\ncomment:\\n\\nView comment [http://webapp:3000/post/p1/new-post#commentId-c1]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<50eb91ec-69a1-04d2-1019-ab1177e98604@localhost>"}",
-  "messageId": "<50eb91ec-69a1-04d2-1019-ab1177e98604@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -242,8 +223,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Notification: New comment on post",
-    "text": "HELLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Notification: New comment on post",
+  "text": "HELLO JENNY ROSTOCK,
 
 Peter Lustig [http://webapp:3000/user/u2/peter-lustig] commented on a post that
 you are observing with the title “New Post”. Click on this button to view this
@@ -261,25 +242,15 @@ settings [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail English followed_user_posted template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification: New post by followd user","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://webapp:3000/user/u2/peter-lustig\\">Peter Lustig</a>, a user you are following, wrote a new post with the title “New Post”. Click on this button to view this post:\\n        </p><a class=\\"button\\" href=\\"http://webapp:3000/post/p1/new-post\\">View post</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://webapp:3000/user/u2/peter-lustig], a user you are\\nfollowing, wrote a new post with the title “New Post”. Click on this button to\\nview this post:\\n\\nView post [http://webapp:3000/post/p1/new-post]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<ee64ea67-dd09-62ae-0a4a-ffa237edd247@localhost>"}",
-  "messageId": "<ee64ea67-dd09-62ae-0a4a-ffa237edd247@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -376,8 +347,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Notification: New post by followd user",
-    "text": "HELLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Notification: New post by followd user",
+  "text": "HELLO JENNY ROSTOCK,
 
 Peter Lustig [http://webapp:3000/user/u2/peter-lustig], a user you are
 following, wrote a new post with the title “New Post”. Click on this button to
@@ -395,25 +366,15 @@ settings [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail English mentioned_in_comment template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification: Mentioned in comment","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://webapp:3000/user/u2/peter-lustig\\">Peter Lustig</a> mentioned you in a comment to the post with the title “New Post”. Click on this button to view this comment:\\n        </p><a class=\\"button\\" href=\\"http://webapp:3000/post/p1/new-post#commentId-c1\\">View comment</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://webapp:3000/user/u2/peter-lustig] mentioned you in a\\ncomment to the post with the title “New Post”. Click on this button to view this\\ncomment:\\n\\nView comment [http://webapp:3000/post/p1/new-post#commentId-c1]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<d85609f0-1812-d5ef-2320-4f10d7e374a9@localhost>"}",
-  "messageId": "<d85609f0-1812-d5ef-2320-4f10d7e374a9@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -510,8 +471,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Notification: Mentioned in comment",
-    "text": "HELLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Notification: Mentioned in comment",
+  "text": "HELLO JENNY ROSTOCK,
 
 Peter Lustig [http://webapp:3000/user/u2/peter-lustig] mentioned you in a
 comment to the post with the title “New Post”. Click on this button to view this
@@ -529,25 +490,15 @@ settings [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail English mentioned_in_post template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification: Mentioned in post","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://webapp:3000/user/u2/peter-lustig\\">Peter Lustig</a> mentioned you in a post with the title “New Post”. Click on this button to view this post:\\n        </p><a class=\\"button\\" href=\\"http://webapp:3000/post/p1/new-post\\">View post</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://webapp:3000/user/u2/peter-lustig] mentioned you in a post\\nwith the title “New Post”. Click on this button to view this post:\\n\\nView post [http://webapp:3000/post/p1/new-post]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<1237a04d-22c9-0d9f-3845-4de1022fdb46@localhost>"}",
-  "messageId": "<1237a04d-22c9-0d9f-3845-4de1022fdb46@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -644,8 +595,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Notification: Mentioned in post",
-    "text": "HELLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Notification: Mentioned in post",
+  "text": "HELLO JENNY ROSTOCK,
 
 Peter Lustig [http://webapp:3000/user/u2/peter-lustig] mentioned you in a post
 with the title “New Post”. Click on this button to view this post:
@@ -662,25 +613,15 @@ settings [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail English removed_user_from_group template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification: Removed from group","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p>you have been removed from the group “The Group”.</p>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nyou have been removed from the group “The Group”.\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<3654288a-a266-e241-5e2d-66d8361ff41b@localhost>"}",
-  "messageId": "<3654288a-a266-e241-5e2d-66d8361ff41b@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -776,8 +717,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Notification: Removed from group",
-    "text": "HELLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Notification: Removed from group",
+  "text": "HELLO JENNY ROSTOCK,
 
 you have been removed from the group “The Group”.
 
@@ -791,25 +732,15 @@ settings [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail English user_joined_group template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification: User joined group","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://webapp:3000/user/u2/peter-lustig\\">Peter Lustig</a> joined the group “The Group”. Click on this button to view this group:\\n        </p><a class=\\"button\\" href=\\"http://webapp:3000/group/g1/the-group\\">View group</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://webapp:3000/user/u2/peter-lustig] joined the group “The\\nGroup”. Click on this button to view this group:\\n\\nView group [http://webapp:3000/group/g1/the-group]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<5a9b9a2a-45b5-6839-4024-87547ca25dd3@localhost>"}",
-  "messageId": "<5a9b9a2a-45b5-6839-4024-87547ca25dd3@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -906,8 +837,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Notification: User joined group",
-    "text": "HELLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Notification: User joined group",
+  "text": "HELLO JENNY ROSTOCK,
 
 Peter Lustig [http://webapp:3000/user/u2/peter-lustig] joined the group “The
 Group”. Click on this button to view this group:
@@ -924,25 +855,15 @@ settings [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail English user_left_group template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Notification: User left group","html":"<!DOCTYPE html>\\n<html lang=\\"en\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hello Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://webapp:3000/user/u2/peter-lustig\\">Peter Lustig</a> left the group “The Group”. Click on this button to view this group:\\n        </p><a class=\\"button\\" href=\\"http://webapp:3000/group/g1/the-group\\">View group</a>\\n        <div class=\\"text-block\\">\\n          <p>See you soon on <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– The ocelot.social Team</p><br>\\n          <p>PS: If you don't want to receive e-mails anymore, change your <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">notification settings</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HELLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://webapp:3000/user/u2/peter-lustig] left the group “The\\nGroup”. Click on this button to view this group:\\n\\nView group [http://webapp:3000/group/g1/the-group]\\n\\nSee you soon on ocelot.social [https://ocelot.social]!\\n\\n– The ocelot.social Team\\n\\n\\nPS: If you don't want to receive e-mails anymore, change your notification\\nsettings [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<ed28f8f8-7c05-06ee-4914-f1782319aad9@localhost>"}",
-  "messageId": "<ed28f8f8-7c05-06ee-4914-f1782319aad9@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -1039,8 +960,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Notification: User left group",
-    "text": "HELLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Notification: User left group",
+  "text": "HELLO JENNY ROSTOCK,
 
 Peter Lustig [http://webapp:3000/user/u2/peter-lustig] left the group “The
 Group”. Click on this button to view this group:
@@ -1057,25 +978,15 @@ settings [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail German changed_group_member_role template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung: Rolle in Gruppe geändert","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p>deine Rolle in der Gruppe  „The Group“ wurde geändert. Klicke auf diesen Knopf, um diese Gruppe zu sehen:</p><a class=\\"button\\" href=\\"http://webapp:3000/group/g1/the-group\\">Gruppe ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\ndeine Rolle in der Gruppe „The Group“ wurde geändert. Klicke auf diesen Knopf,\\num diese Gruppe zu sehen:\\n\\nGruppe ansehen [http://webapp:3000/group/g1/the-group]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<c788a436-27ab-e426-9230-f3c57dd99d5f@localhost>"}",
-  "messageId": "<c788a436-27ab-e426-9230-f3c57dd99d5f@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -1171,8 +1082,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Benachrichtigung: Rolle in Gruppe geändert",
-    "text": "HALLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Benachrichtigung: Rolle in Gruppe geändert",
+  "text": "HALLO JENNY ROSTOCK,
 
 deine Rolle in der Gruppe „The Group“ wurde geändert. Klicke auf diesen Knopf,
 um diese Gruppe zu sehen:
@@ -1189,25 +1100,15 @@ Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail German commented_on_post template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung: Neuer Kommentar zu Beitrag","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://webapp:3000/user/u2/peter-lustig\\">Peter Lustig</a> hat einen Beitrag den du beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf diesen Knopf, um diesen Kommentar zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://webapp:3000/post/p1/new-post#commentId-c1\\">Kommentar ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://webapp:3000/user/u2/peter-lustig] hat einen Beitrag den du\\nbeobachtest mit dem Titel „New Post“ kommentiert. Klicke auf diesen Knopf, um\\ndiesen Kommentar zu sehen:\\n\\nKommentar ansehen [http://webapp:3000/post/p1/new-post#commentId-c1]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<7d0f5846-1c24-cdcd-3527-6f98b050aa36@localhost>"}",
-  "messageId": "<7d0f5846-1c24-cdcd-3527-6f98b050aa36@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -1304,8 +1205,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Benachrichtigung: Neuer Kommentar zu Beitrag",
-    "text": "HALLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Benachrichtigung: Neuer Kommentar zu Beitrag",
+  "text": "HALLO JENNY ROSTOCK,
 
 Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat einen Beitrag den du
 beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf diesen Knopf, um
@@ -1323,25 +1224,15 @@ Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail German followed_user_posted template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung: Neuer Beitrag von gefolgtem Nutzer","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://webapp:3000/user/u2/peter-lustig\\">Peter Lustig</a>, ein Nutzer dem du folgst, hat einen neuen Beitrag mit dem Titel „New Post“ geschrieben. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://webapp:3000/post/p1/new-post\\">Beitrag ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://webapp:3000/user/u2/peter-lustig], ein Nutzer dem du\\nfolgst, hat einen neuen Beitrag mit dem Titel „New Post“ geschrieben. Klicke auf\\ndiesen Knopf, um diesen Beitrag zu sehen:\\n\\nBeitrag ansehen [http://webapp:3000/post/p1/new-post]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<c286248b-f68b-583f-2444-45874aac1a09@localhost>"}",
-  "messageId": "<c286248b-f68b-583f-2444-45874aac1a09@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -1438,8 +1329,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Benachrichtigung: Neuer Beitrag von gefolgtem Nutzer",
-    "text": "HALLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Benachrichtigung: Neuer Beitrag von gefolgtem Nutzer",
+  "text": "HALLO JENNY ROSTOCK,
 
 Peter Lustig [http://webapp:3000/user/u2/peter-lustig], ein Nutzer dem du
 folgst, hat einen neuen Beitrag mit dem Titel „New Post“ geschrieben. Klicke auf
@@ -1457,25 +1348,15 @@ Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail German mentioned_in_comment template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung: Erwähnung in Kommentar","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://webapp:3000/user/u2/peter-lustig\\">Peter Lustig</a> hat dich in einem Kommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf diesen Knopf, um diesen Kommentar zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://webapp:3000/post/p1/new-post#commentId-c1\\">Kommentar ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://webapp:3000/user/u2/peter-lustig] hat dich in einem\\nKommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf diesen\\nKnopf, um diesen Kommentar zu sehen:\\n\\nKommentar ansehen [http://webapp:3000/post/p1/new-post#commentId-c1]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<719139b3-675e-8e75-29ec-e362b0a4a992@localhost>"}",
-  "messageId": "<719139b3-675e-8e75-29ec-e362b0a4a992@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -1572,8 +1453,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Benachrichtigung: Erwähnung in Kommentar",
-    "text": "HALLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Benachrichtigung: Erwähnung in Kommentar",
+  "text": "HALLO JENNY ROSTOCK,
 
 Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat dich in einem
 Kommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf diesen
@@ -1591,25 +1472,15 @@ Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail German mentioned_in_post template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung: Erwähnung in Beitrag","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://webapp:3000/user/u2/peter-lustig\\">Peter Lustig</a> hat Dich in einem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://webapp:3000/post/p1/new-post\\">Beitrag ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://webapp:3000/user/u2/peter-lustig] hat Dich in einem Beitrag\\nmit dem Titel „New Post“ erwähnt. Klicke auf diesen Knopf, um diesen Beitrag zu\\nsehen:\\n\\nBeitrag ansehen [http://webapp:3000/post/p1/new-post]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<981e1cfd-5e7a-f13b-4363-6272076383df@localhost>"}",
-  "messageId": "<981e1cfd-5e7a-f13b-4363-6272076383df@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -1706,8 +1577,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Benachrichtigung: Erwähnung in Beitrag",
-    "text": "HALLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Benachrichtigung: Erwähnung in Beitrag",
+  "text": "HALLO JENNY ROSTOCK,
 
 Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat Dich in einem Beitrag
 mit dem Titel „New Post“ erwähnt. Klicke auf diesen Knopf, um diesen Beitrag zu
@@ -1725,25 +1596,15 @@ Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail German removed_user_from_group template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung: Aus Gruppe entfernt","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p>du wurdest aus der Gruppe „The Group“ entfernt.</p>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\ndu wurdest aus der Gruppe „The Group“ entfernt.\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<02c406fa-2fe1-4b41-ffaf-2d1918e68afd@localhost>"}",
-  "messageId": "<02c406fa-2fe1-4b41-ffaf-2d1918e68afd@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -1839,8 +1700,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Benachrichtigung: Aus Gruppe entfernt",
-    "text": "HALLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Benachrichtigung: Aus Gruppe entfernt",
+  "text": "HALLO JENNY ROSTOCK,
 
 du wurdest aus der Gruppe „The Group“ entfernt.
 
@@ -1854,25 +1715,15 @@ Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail German user_joined_group template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung: Nutzer tritt Gruppe bei","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://webapp:3000/user/u2/peter-lustig\\">Peter Lustig</a> ist der Gruppe „The Group“ beigetreten. Klicke auf diesen Knopf, um diese Gruppe zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://webapp:3000/group/g1/the-group\\">Gruppe ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://webapp:3000/user/u2/peter-lustig] ist der Gruppe „The\\nGroup“ beigetreten. Klicke auf diesen Knopf, um diese Gruppe zu sehen:\\n\\nGruppe ansehen [http://webapp:3000/group/g1/the-group]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<2d89978c-a325-5f03-645d-6182665cc7d5@localhost>"}",
-  "messageId": "<2d89978c-a325-5f03-645d-6182665cc7d5@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -1969,8 +1820,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Benachrichtigung: Nutzer tritt Gruppe bei",
-    "text": "HALLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Benachrichtigung: Nutzer tritt Gruppe bei",
+  "text": "HALLO JENNY ROSTOCK,
 
 Peter Lustig [http://webapp:3000/user/u2/peter-lustig] ist der Gruppe „The
 Group“ beigetreten. Klicke auf diesen Knopf, um diese Gruppe zu sehen:
@@ -1987,25 +1838,15 @@ Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;
 
 exports[`sendEmail German user_left_group template 1`] = `
 {
-  "envelope": {
-    "from": false,
-    "to": [
-      "user@example.org",
-    ],
-  },
-  "message": "{"to":[{"address":"user@example.org","name":""}],"from":{"address":"","name":"ocelot.social"},"attachments":[],"subject":"ocelot.social  – Benachrichtigung: Nutzer verlässt Gruppe","html":"<!DOCTYPE html>\\n<html lang=\\"de\\">\\n  <head>\\n    <meta content=\\"multipart/html; charset=UTF-8\\" http-equiv=\\"content-type\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\\n    <style>.wf-force-outline-none[tabindex=\\"-1\\"]:focus{outline:none;}</style>\\n    <style>body{\\n  display: block;\\n  font-family: Lato, sans-serif;\\n  font-size: 17px;\\n  text-align: left;\\n  text-align: -webkit-left;\\n  justify-content: center;\\n  padding: 15px;\\n  margin: 0px;\\n}\\n\\nh2 {\\n  margin-top: 25px;\\n  font-size: 25px;\\n  font-weight: normal;\\n  line-height: 22px;\\n  color: #333333;\\n}\\n\\n.container {\\n  max-width: 680px;\\n  margin: 0 auto;\\n  display: block;\\n}\\n\\n.head-logo {\\n  width: 60%;\\n  height: auto;\\n  display: block;\\n  margin-left: auto;\\n  margin-right: auto;\\n}\\n\\na {\\n  color: #17b53e;\\n}\\n\\na.button {\\n  background: #17b53e;\\n  font-family: Lato, sans-serif;\\n  font-size: 16px;\\n  line-height: 15px;\\n  text-decoration: none;\\n  text-align:center;\\n  padding: 13px 17px;\\n  color: #ffffff;\\n  display: table;\\n  margin-left: auto;\\n  margin-right: auto;\\n  border-radius: 4px;\\n}\\n\\n.text-block {\\n  margin-top: 20px;\\n  color: #000000;\\n}\\n\\nfooter {\\n  padding: 20px;\\n  font-family: Lato, sans-serif;\\n  font-size: 12px;\\n  line-height: 15px;\\n  text-align: center;\\n  color: #888888;\\n}\\n\\n    </style>\\n  </head>\\n  <body>\\n    <div class=\\"container\\">\\n      <header>\\n        <div class=\\"head\\"><img class=\\"head-logo\\" alt=\\"Welcome Image\\" loading=\\"lazy\\" src=\\"http://webapp:3000/img/custom/logo-squared.svg\\">\\n        </div>\\n      </header>\\n      <h2>Hallo Jenny Rostock,</h2>\\n      <div class=\\"wrapper\\">\\n        <div class=\\"content\\"></div>\\n        <p><a class=\\"user\\" href=\\"http://webapp:3000/user/u2/peter-lustig\\">Peter Lustig</a> hat die Gruppe „The Group“ verlassen. Klicke auf diesen Knopf, um diese Gruppe zu sehen:\\n        </p><a class=\\"button\\" href=\\"http://webapp:3000/group/g1/the-group\\">Gruppe ansehen</a>\\n        <div class=\\"text-block\\">\\n          <p>Bis bald bei <a class=\\"organization\\" href=\\"https://ocelot.social\\">ocelot.social</a>!</p>\\n          <p>– Dein ocelot.social Team</p><br>\\n          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class=\\"settings\\" href=\\"http://webapp:3000/settings/notifications\\">Benachrichtigungseinstellungen</a>!</p>\\n        </div>\\n      </div>\\n      <footer>\\n        <div class=\\"footer\\"></div><a href=\\"https://ocelot.social\\">ocelot.social Community</a>\\n      </footer>\\n    </div>\\n  </body>\\n</html>","text":"HALLO JENNY ROSTOCK,\\n\\nPeter Lustig [http://webapp:3000/user/u2/peter-lustig] hat die Gruppe „The\\nGroup“ verlassen. Klicke auf diesen Knopf, um diese Gruppe zu sehen:\\n\\nGruppe ansehen [http://webapp:3000/group/g1/the-group]\\n\\nBis bald bei ocelot.social [https://ocelot.social]!\\n\\n– Dein ocelot.social Team\\n\\n\\nPS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine\\nBenachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!\\n\\n\\nocelot.social Community [https://ocelot.social]","headers":{},"messageId":"<874f2629-6235-8e7f-dc91-ba52dca6e978@localhost>"}",
-  "messageId": "<874f2629-6235-8e7f-dc91-ba52dca6e978@localhost>",
-  "originalMessage": {
-    "attachments": [],
-    "from": "ocelot.social",
-    "html": "<!DOCTYPE html>
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
     <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
@@ -2102,8 +1943,8 @@ footer {
     </div>
   </body>
 </html>",
-    "subject": "ocelot.social  – Benachrichtigung: Nutzer verlässt Gruppe",
-    "text": "HALLO JENNY ROSTOCK,
+  "subject": "ocelot.social  – Benachrichtigung: Nutzer verlässt Gruppe",
+  "text": "HALLO JENNY ROSTOCK,
 
 Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat die Gruppe „The
 Group“ verlassen. Klicke auf diesen Knopf, um diese Gruppe zu sehen:
@@ -2120,7 +1961,6 @@ Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
-    "to": "user@example.org",
-  },
+  "to": "user@example.org",
 }
 `;

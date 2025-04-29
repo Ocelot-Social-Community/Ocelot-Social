@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import nodemailer from 'nodemailer'
+import { createTransport } from 'nodemailer'
 import { htmlToText } from 'nodemailer-html-to-text'
 
 import CONFIG from '@config/index'
@@ -15,7 +15,7 @@ const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD
 const hasDKIMData =
   CONFIG.SMTP_DKIM_DOMAINNAME && CONFIG.SMTP_DKIM_KEYSELECTOR && CONFIG.SMTP_DKIM_PRIVATKEY
 
-const transporter = nodemailer.createTransport({
+const transporter = createTransport({
   host: CONFIG.SMTP_HOST,
   port: CONFIG.SMTP_PORT,
   ignoreTLS: CONFIG.SMTP_IGNORE_TLS,

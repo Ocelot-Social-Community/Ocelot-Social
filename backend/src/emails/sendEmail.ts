@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
@@ -7,6 +7,7 @@ import path from 'node:path'
 
 import Email from 'email-templates'
 import { createTransport } from 'nodemailer'
+// import type Email as EmailType from '@types/email-templates'
 
 import CONFIG from '@config/index'
 import logosWebapp from '@config/logos'
@@ -75,16 +76,24 @@ const email = new Email({
   */
 })
 
+interface OriginalMessage {
+  to: string
+  from: string
+  attachments: string[]
+  subject: string
+  html: string
+  text: string
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const sendMail = async (notification: any): Promise<any> => {
+export const sendMail = async (notification: any): Promise<OriginalMessage> => {
   const locale = notification?.to?.locale
   const to = notification?.email
   const name = notification?.to?.name
   const template = notification?.reason
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return await email.send({
+    const { originalMessage } = await email.send({
       template: path.join(__dirname, 'templates', template),
       message: {
         to,
@@ -154,6 +163,7 @@ export const sendMail = async (notification: any): Promise<any> => {
             : undefined,
       },
     })
+    return originalMessage as OriginalMessage
   } catch (error) {
     throw new Error(error)
   }
