@@ -7,8 +7,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable security/detect-object-injection */
-import log from './databaseLogger'
-
 export const undefinedToNullResolver = (list) => {
   const resolvers = {}
   list.forEach((key) => {
@@ -41,7 +39,6 @@ export default function Resolver(type, options: any = {}) {
         RETURN related {.*} as related
         `
         const result = await txc.run(cypher, { id, cypherParams })
-        log(result)
         return result.records.map((r) => r.get('related'))
       })
       try {
@@ -66,7 +63,6 @@ export default function Resolver(type, options: any = {}) {
           const nodeCondition = condition.replace('this', 'this {id: $id}')
           const cypher = `${nodeCondition} as ${key}`
           const result = await txc.run(cypher, { id, cypherParams })
-          log(result)
           const [response] = result.records.map((r) => r.get(key))
           return response
         })
@@ -93,7 +89,6 @@ export default function Resolver(type, options: any = {}) {
             RETURN COUNT(DISTINCT(related)) as count
           `
           const result = await txc.run(cypher, { id, cypherParams })
-          log(result)
           const [response] = result.records.map((r) => r.get('count').toNumber())
           return response
         })

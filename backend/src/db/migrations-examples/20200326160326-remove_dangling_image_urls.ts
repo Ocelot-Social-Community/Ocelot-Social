@@ -3,8 +3,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 /* eslint-disable security/detect-non-literal-fs-filename */
 import { existsSync } from 'node:fs'
 
@@ -33,6 +32,7 @@ export async function up(next) {
     const urls = records.map((record) => record.get('url'))
     const danglingUrls = urls.filter((url) => {
       const fileLocation = `public${url}`
+      // eslint-disable-next-line n/no-sync
       return !existsSync(fileLocation)
     })
     await transaction.run(
@@ -61,7 +61,7 @@ export async function up(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

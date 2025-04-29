@@ -12,6 +12,7 @@
   "admin": {
     "badges": {
       "description": "Configure the available badges for this user",
+      "noBadges": "There are no badges available",
       "revokeTrophy": {
         "error": "Trophy could not be revoked!",
         "success": "Trophy successfully revoked!"
@@ -97,8 +98,7 @@
           "number": "No.",
           "role": "Role",
           "slug": "Slug"
-        },
-        "edit": "Edit"
+        }
       }
     }
   },
@@ -266,10 +266,10 @@
     }
   },
   "contribution": {
-    "amount-clicks": "{amount} clicks",
-    "amount-comments": "{amount} comments",
-    "amount-shouts": "{amount} recommendations",
-    "amount-views": "{amount} views",
+    "amount-clicks": "{amount} Clicks",
+    "amount-comments": "{amount} Comments",
+    "amount-shouts": "{amount} Recommendations",
+    "amount-views": "{amount} Views",
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} of {max} topics selected"
     },
@@ -957,6 +957,16 @@
     "title": "Search Results"
   },
   "settings": {
+    "badges": {
+      "click-to-select": "Click on an empty space to add a badge.",
+      "click-to-use": "Click on a badge to use it in the selected slot.",
+      "description": "Here you can choose how to display your earned badges on your profile.",
+      "name": "Badges",
+      "no-badges-available": "You currently don't have any badges available to add.",
+      "remove": "Remove Badge",
+      "success-update": "Your badges have been updated successfully.",
+      "verification": "This is your verification badge and cannot be changed."
+    },
     "blocked-users": {
       "block": "Block user",
       "columns": {
@@ -1071,20 +1081,20 @@
     "name": "Settings",
     "notifications": {
       "chat": "Chat",
-      "chatMessage": "Message received while absent",
+      "chatMessage": "Message received while absent.",
       "checkAll": "Check all",
-      "commentOnObservedPost": "Comments on observed posts",
-      "followingUsers": "User I follow published a new post",
+      "commentOnObservedPost": "Comments on observed posts.",
+      "followingUsers": "User I follow published a new post.",
       "group": "Groups",
-      "groupMemberJoined": "Member joined a group I own",
-      "groupMemberLeft": "Member left a group I own",
-      "groupMemberRemoved": "I was removed from a group",
-      "groupMemberRoleChanged": "My role in a group was changed",
-      "mention": "I was mentioned",
-      "name": "Email Notifications",
+      "groupMemberJoined": "Member joined a group I own.",
+      "groupMemberLeft": "Member left a group I own.",
+      "groupMemberRemoved": "I was removed from a group.",
+      "groupMemberRoleChanged": "Your role in a group changed or you were invited.",
+      "mention": "I was mentioned.",
+      "name": "E-Mail Notifications",
       "post": "Posts and comments",
-      "postByFollowedUser": "Posts by users I follow",
-      "postInGroup": "Post in a group I am a member of",
+      "postByFollowedUser": "Posts by users I follow.",
+      "postInGroup": "Post in a group I am a member of.",
       "send-email-notifications": "Send e-mail notifications",
       "success-update": "Notifications settings saved!",
       "uncheckAll": "Uncheck all"
@@ -1147,7 +1157,7 @@
     "bank": "bank account",
     "code-of-conduct": "Code of Conduct",
     "contact": "Contact",
-    "data-privacy": "Data privacy",
+    "data-privacy": "Data Privacy",
     "donate": "Donate",
     "error-occurred": "An error occurred.",
     "faq": "FAQ",
@@ -1156,7 +1166,7 @@
     "made": "Made with ❤️",
     "register": "Registry number",
     "support": "Support",
-    "termsAndConditions": "Terms and conditions",
+    "termsAndConditions": "Terms and Conditions",
     "thanks": "Thanks!"
   },
   "termsAndConditions": {

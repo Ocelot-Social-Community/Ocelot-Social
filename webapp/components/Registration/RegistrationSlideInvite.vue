@@ -23,7 +23,7 @@
 
 <script>
 import gql from 'graphql-tag'
-import CONSTANTS_REGISTRATION from './../../constants/registration'
+import registrationConstants from '~/constants/registration'
 
 export const isValidInviteCodeQuery = gql`
   query ($code: ID!) {
@@ -43,11 +43,11 @@ export default {
       formSchema: {
         inviteCode: {
           type: 'string',
-          min: CONSTANTS_REGISTRATION.INVITE_CODE_LENGTH,
-          max: CONSTANTS_REGISTRATION.INVITE_CODE_LENGTH,
+          min: registrationConstants.INVITE_CODE_LENGTH,
+          max: registrationConstants.INVITE_CODE_LENGTH,
           required: true,
           message: this.$t('components.registration.invite-code.form.validations.length', {
-            inviteCodeLength: CONSTANTS_REGISTRATION.INVITE_CODE_LENGTH,
+            inviteCodeLength: registrationConstants.INVITE_CODE_LENGTH,
           }),
         },
       },

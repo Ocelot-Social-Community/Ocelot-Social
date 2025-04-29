@@ -8,6 +8,7 @@ import path from 'node:path'
 
 import { minimatch } from 'minimatch'
 
+// eslint-disable-next-line n/no-sync
 let oEmbedProvidersFile = fs.readFileSync(
   path.join(__dirname, '../../../../public/providers.json'),
   'utf8',

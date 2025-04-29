@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable security/detect-non-literal-fs-filename */
+
 import { getDriver } from '@db/neo4j'
 
 export const description =
@@ -28,7 +25,7 @@ export async function up(next) {
   `)
   try {
     // Implement your migration here.
-    const users = await updateDeletedUserAttributes.records.map((record) => record.get('user'))
+    const users = updateDeletedUserAttributes.records.map((record) => record.get('user'))
     // eslint-disable-next-line no-console
     console.log(users)
     await transaction.commit()
@@ -41,7 +38,7 @@ export async function up(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

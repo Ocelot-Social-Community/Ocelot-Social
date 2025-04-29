@@ -21,7 +21,7 @@
 export default {
   computed: {
     routes() {
-      return [
+      const routes = [
         {
           name: this.$t('settings.data.name'),
           path: `/settings`,
@@ -83,6 +83,15 @@ export default {
             },
             } */
       ]
+
+      if (this.$env.BADGES_ENABLED) {
+        routes.splice(2, 0, {
+          name: this.$t('settings.badges.name'),
+          path: `/settings/badges`,
+        })
+      }
+
+      return routes
     },
   },
 }

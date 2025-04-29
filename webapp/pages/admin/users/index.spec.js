@@ -10,11 +10,9 @@ const stubs = {
 
 describe('Users', () => {
   let wrapper
-  let Wrapper
-  let getters
 
   const mocks = {
-    $t: jest.fn(),
+    $t: jest.fn((t) => t),
     $apollo: {
       loading: false,
       mutate: jest
@@ -38,116 +36,154 @@ describe('Users', () => {
     },
   }
 
-  describe('mount', () => {
-    getters = {
-      'auth/isAdmin': () => true,
-      'auth/user': () => {
-        return { id: 'admin' }
-      },
-    }
+  const getters = {
+    'auth/isAdmin': () => true,
+    'auth/user': () => {
+      return { id: 'admin' }
+    },
+  }
 
-    Wrapper = () => {
-      const store = new Vuex.Store({ getters })
-      return mount(Users, {
-        mocks,
-        localVue,
-        store,
-        stubs,
-      })
-    }
+  const Wrapper = () => {
+    const store = new Vuex.Store({ getters })
+    return mount(Users, {
+      mocks,
+      localVue,
+      store,
+      stubs,
+      data: () => ({
+        User: [
+          {
+            id: 'user',
+            email: 'user@example.org',
+            name: 'User',
+            role: 'moderator',
+            slug: 'user',
+          },
+          {
+            id: 'user2',
+            email: 'user2@example.org',
+            name: 'User',
+            role: 'moderator',
+            slug: 'user',
+          },
+        ],
+      }),
+    })
+  }
+
+  describe('given badges are enabled', () => {
+    beforeEach(() => {
+      mocks.$env = {
+        BADGES_ENABLED: true,
+      }
+      wrapper = Wrapper()
+    })
 
     it('renders', () => {
+      expect(wrapper.element).toMatchSnapshot()
+    })
+  })
+
+  describe('given badges are disabled', () => {
+    beforeEach(() => {
+      mocks.$env = {
+        BADGES_ENABLED: false,
+      }
       wrapper = Wrapper()
-      expect(wrapper.element.tagName).toBe('DIV')
     })
 
-    describe('search', () => {
-      let searchAction
-      beforeEach(() => {
-        searchAction = (wrapper, { query }) => {
-          wrapper.find('input').setValue(query)
-          wrapper.find('form').trigger('submit')
-          return wrapper
-        }
+    it('renders', () => {
+      expect(wrapper.element).toMatchSnapshot()
+    })
+  })
+
+  describe('search', () => {
+    let searchAction
+    beforeEach(() => {
+      wrapper = Wrapper()
+      searchAction = (wrapper, { query }) => {
+        wrapper.find('input').setValue(query)
+        wrapper.find('form').trigger('submit')
+        return wrapper
+      }
+    })
+
+    describe('query looks like an email address', () => {
+      it('searches users for exact email address', async () => {
+        const wrapper = await searchAction(Wrapper(), { query: 'email@example.org' })
+        expect(wrapper.vm.email).toEqual('email@example.org')
+        expect(wrapper.vm.filter).toBe(null)
       })
 
-      describe('query looks like an email address', () => {
-        it('searches users for exact email address', async () => {
-          const wrapper = await searchAction(Wrapper(), { query: 'email@example.org' })
-          expect(wrapper.vm.email).toEqual('email@example.org')
-          expect(wrapper.vm.filter).toBe(null)
-        })
-
-        it('email address is case-insensitive', async () => {
-          const wrapper = await searchAction(Wrapper(), { query: 'eMaiL@example.org' })
-          expect(wrapper.vm.email).toEqual('email@example.org')
-          expect(wrapper.vm.filter).toBe(null)
-        })
-      })
-
-      describe('query is just text', () => {
-        it('tries to find matching users by `name`, `slug` or `about`', async () => {
-          const wrapper = await searchAction(await Wrapper(), { query: 'Find me' })
-          const expected = {
-            OR: [
-              { name_contains: 'Find me' },
-              { slug_contains: 'Find me' },
-              { about_contains: 'Find me' },
-            ],
-          }
-          expect(wrapper.vm.email).toBe(null)
-          expect(wrapper.vm.filter).toEqual(expected)
-        })
+      it('email address is case-insensitive', async () => {
+        const wrapper = await searchAction(Wrapper(), { query: 'eMaiL@example.org' })
+        expect(wrapper.vm.email).toEqual('email@example.org')
+        expect(wrapper.vm.filter).toBe(null)
       })
     })
 
-    describe('change roles', () => {
-      beforeAll(() => {
-        wrapper = Wrapper()
-        wrapper.setData({
-          User: [
-            {
-              id: 'admin',
-              email: 'admin@example.org',
-              name: 'Admin',
-              role: 'admin',
-              slug: 'admin',
-            },
-            {
-              id: 'user',
-              email: 'user@example.org',
-              name: 'User',
-              role: 'user',
-              slug: 'user',
-            },
+    describe('query is just text', () => {
+      it('tries to find matching users by `name`, `slug` or `about`', async () => {
+        const wrapper = await searchAction(await Wrapper(), { query: 'Find me' })
+        const expected = {
+          OR: [
+            { name_contains: 'Find me' },
+            { slug_contains: 'Find me' },
+            { about_contains: 'Find me' },
           ],
-          userRoles: ['user', 'moderator', 'admin'],
-        })
+        }
+        expect(wrapper.vm.email).toBe(null)
+        expect(wrapper.vm.filter).toEqual(expected)
       })
+    })
+  })
 
-      it('cannot change own role', () => {
-        const adminRow = wrapper.findAll('tr').at(1)
-        expect(adminRow.find('select').exists()).toBe(false)
+  describe('change roles', () => {
+    beforeAll(() => {
+      wrapper = Wrapper()
+      wrapper.setData({
+        User: [
+          {
+            id: 'admin',
+            email: 'admin@example.org',
+            name: 'Admin',
+            role: 'admin',
+            slug: 'admin',
+          },
+          {
+            id: 'user',
+            email: 'user@example.org',
+            name: 'User',
+            role: 'user',
+            slug: 'user',
+          },
+        ],
+        userRoles: ['user', 'moderator', 'admin'],
       })
+    })
 
-      it('changes the role of another user', () => {
-        const userRow = wrapper.findAll('tr').at(2)
-        userRow.findAll('option').at(1).setSelected()
-        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
-          expect.objectContaining({
-            variables: {
-              id: 'user',
-              role: 'moderator',
-            },
-          }),
-        )
-      })
+    it('cannot change own role', () => {
+      const adminRow = wrapper.findAll('tr').at(1)
+      expect(adminRow.find('select').exists()).toBe(false)
+    })
 
-      it('toasts a success message after role has changed', () => {
-        const userRow = wrapper.findAll('tr').at(2)
-        userRow.findAll('option').at(1).setSelected()
-        expect(mocks.$toast.success).toHaveBeenCalled()
-      })
+    it('changes the role of another user', () => {
+      const userRow = wrapper.findAll('tr').at(2)
+      userRow.findAll('option').at(1).setSelected()
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: {
+            id: 'user',
+            role: 'moderator',
+          },
+        }),
+      )
+    })
+
+    it('toasts a success message after role has changed', () => {
+      const userRow = wrapper.findAll('tr').at(2)
+      userRow.findAll('option').at(1).setSelected()
+      expect(mocks.$toast.success).toHaveBeenCalled()
     })
   })
 })

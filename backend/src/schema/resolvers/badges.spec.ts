@@ -33,7 +33,7 @@ describe('Badges', () => {
 
   afterAll(async () => {
     await cleanDatabase()
-    driver.close()
+    await driver.close()
   })
 
   beforeEach(async () => {
@@ -524,25 +524,30 @@ describe('Badges', () => {
     beforeEach(async () => {
       await regularUser.relateTo(badge, 'rewarded')
       await regularUser.relateTo(verification, 'verifies')
+      await regularUser.relateTo(badge, 'selected', { slot: 6 })
     })
 
     const revokeBadgeMutation = gql`
       mutation ($badgeId: ID!, $userId: ID!) {
         revokeBadge(badgeId: $badgeId, userId: $userId) {
           id
+          badgeTrophies {
+            id
+          }
           badgeVerification {
             id
             isDefault
           }
-          badgeTrophies {
+          badgeTrophiesSelected {
             id
+            isDefault
           }
         }
       }
     `
 
     describe('check test setup', () => {
-      it('user has one badge', async () => {
+      it('user has one badge and has it selected', async () => {
         authenticatedUser = regularUser.toJson()
         const userQuery = gql`
           {
@@ -551,11 +556,68 @@ describe('Badges', () => {
               badgeTrophies {
                 id
               }
+              badgeVerification {
+                id
+                isDefault
+              }
+              badgeTrophiesSelected {
+                id
+                isDefault
+              }
             }
           }
         `
         const expected = {
-          data: { User: [{ badgeTrophiesCount: 1, badgeTrophies: [{ id: 'trophy_rhino' }] }] },
+          data: {
+            User: [
+              {
+                badgeTrophiesCount: 1,
+                badgeTrophies: [{ id: 'trophy_rhino' }],
+                badgeVerification: {
+                  id: 'verification_moderator',
+                  isDefault: false,
+                },
+                badgeTrophiesSelected: [
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'trophy_rhino',
+                    isDefault: false,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                  {
+                    id: 'default_trophy',
+                    isDefault: true,
+                  },
+                ],
+              },
+            ],
+          },
           errors: undefined,
         }
         await expect(query({ query: userQuery })).resolves.toMatchObject(expected)
@@ -601,6 +663,44 @@ describe('Badges', () => {
               id: 'regular-user-id',
               badgeVerification: { id: 'verification_moderator', isDefault: false },
               badgeTrophies: [],
+              badgeTrophiesSelected: [
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+              ],
             },
           },
           errors: undefined,
@@ -615,6 +715,44 @@ describe('Badges', () => {
               id: 'regular-user-id',
               badgeVerification: { id: 'verification_moderator', isDefault: false },
               badgeTrophies: [],
+              badgeTrophiesSelected: [
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+              ],
             },
           },
           errors: undefined,
@@ -636,6 +774,44 @@ describe('Badges', () => {
               id: 'regular-user-id',
               badgeVerification: { id: 'default_verification', isDefault: true },
               badgeTrophies: [{ id: 'trophy_rhino' }],
+              badgeTrophiesSelected: [
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'trophy_rhino',
+                  isDefault: false,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+              ],
             },
           },
           errors: undefined,
@@ -664,6 +840,44 @@ describe('Badges', () => {
               id: 'regular-user-id',
               badgeVerification: { id: 'default_verification', isDefault: true },
               badgeTrophies: [{ id: 'trophy_rhino' }],
+              badgeTrophiesSelected: [
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'trophy_rhino',
+                  isDefault: false,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+                {
+                  id: 'default_trophy',
+                  isDefault: true,
+                },
+              ],
             },
           },
           errors: undefined,

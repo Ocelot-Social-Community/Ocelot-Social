@@ -29,7 +29,7 @@
 <script>
 import gql from 'graphql-tag'
 import { isEmail } from 'validator'
-import CONSTANTS_REGISTRATION from './../../constants/registration'
+import registrationConstants from '~/constants/registration'
 
 import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 
@@ -54,11 +54,11 @@ export default {
       formSchema: {
         nonce: {
           type: 'string',
-          min: CONSTANTS_REGISTRATION.NONCE_LENGTH,
-          max: CONSTANTS_REGISTRATION.NONCE_LENGTH,
+          min: registrationConstants.NONCE_LENGTH,
+          max: registrationConstants.NONCE_LENGTH,
           required: true,
           message: this.$t('components.registration.email-nonce.form.validations.length', {
-            nonceLength: CONSTANTS_REGISTRATION.NONCE_LENGTH,
+            nonceLength: registrationConstants.NONCE_LENGTH,
           }),
         },
       },

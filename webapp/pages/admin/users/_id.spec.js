@@ -58,6 +58,11 @@ describe('.vue', () => {
           query: jest.fn(),
         },
         mutate: jest.fn(),
+        queries: {
+          Badge: {
+            loading: false,
+          },
+        },
       },
       $toast: {
         success: jest.fn(),
