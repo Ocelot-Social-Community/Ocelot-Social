@@ -208,3 +208,122 @@ div.ds-input-wrap > input:focus-within.ds-input {
 [type="checkbox"] {
   accent-color: $color-primary-light;
 }
+
+body.page-name-login,
+body.page-name-registration,
+body.page-name-password-reset-request {
+  background-image: url('~@/static/img/RefNet-Hero_16x9_desktop_1920x1080.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+@media only screen and (max-width: 900px) {
+  body.page-name-login,
+  body.page-name-registration,
+  body.page-name-password-reset-request {
+    background-image: url('~@/static/img/RefNet-Hero_3x4_mobile_900x1200.jpg');
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  body.page-name-login,
+  body.page-name-registration,
+  body.page-name-password-reset-request {
+    background-image: url('~@/static/img/RefNet-Hero_2x3_mobile_800x1200.jpg');
+  }
+}
+
+// CSS Hack for removing quote block
+.login-form blockquote {
+  display: none;
+}
+// ^^^
+
+// CSS Hack for adding text box
+$text-box-shift-x: 500px;
+$text-box-shift-y: 160px;
+$text-box-shift-padding: 24px;
+$text-box-width: 350px;
+
+@media only screen and (min-width: 1201px) {
+  .login-form
+  // .registration-slider{
+  {
+    width: unset;
+    max-width: unset;
+    padding-left: $text-box-shift-x;
+  }
+}
+
+.login-form article
+// .registration-slider article
+{
+  overflow: visible;
+}
+
+
+.login-page:before,
+.login-form article:before
+// .registration-page:before,
+// .registration-slider article:before
+{
+  color: #ffffff;
+  padding: 24px;
+  display: block;
+  width: $text-box-width;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+.login-page:before
+// .registration-page:before {
+{
+  content: 'Mitdenken.\A Mitreden.\A Mitwirken.';
+  white-space: pre;
+  font-size: 48px;
+  position: relative;
+  padding-bottom: calc($text-box-shift-padding / 2);
+}
+.login-form article:before
+// .registration-slider article:before {
+{
+  content: 'Reformer.network - gemeinsam verändern wir die Gesellschaft.';
+  font-size: 24px;
+  position: absolute;
+  top: 0;
+  left: calc(-1 * $text-box-shift-x);
+  padding-top: calc($text-box-shift-padding / 2);
+}
+
+@media only screen and (max-width: 1200px) {
+  .login-page:before,
+  .login-form article:before
+  // .registration-page:before,
+  // .registration-slider article:before
+  {
+    margin: 0 auto;
+  }
+  .login-page:before
+  // .registration-page:before,
+  {
+    font-size: 36px;
+  }
+  .login-form article:before
+  // .registration-slider article:before
+  {
+    font-size: 18px;
+    top: calc(-1 * $text-box-shift-y);
+    left: 0;
+    right: 0;
+  }
+  .login-form
+  // .registration-slider
+  {
+    padding-top: $text-box-shift-y;
+  }
+}
+
+.login-page:before
+// .registration-page:before
+{
+  font-weight: bold;
+}
+// ^^^

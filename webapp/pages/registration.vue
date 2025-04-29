@@ -1,16 +1,19 @@
 <template>
-  <registration-slider
-    :registrationType="registrationType.method"
-    :activePage="registrationType.activePage"
-    :overwriteSliderData="overwriteSliderData"
-  />
+  <div class="registration-page">
+    <registration-slider
+      :registrationType="registrationType.method"
+      :activePage="registrationType.activePage"
+      :overwriteSliderData="overwriteSliderData"
+    />
+  </div>
 </template>
 
 <script>
+import registrationConstants from '~/constants/registrationBranded.js'
 import RegistrationSlider from '~/components/Registration/RegistrationSlider'
 
 export default {
-  layout: 'no-header',
+  layout: registrationConstants.LAYOUT,
   name: 'Registration',
   components: {
     RegistrationSlider,

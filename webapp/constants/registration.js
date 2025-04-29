@@ -1,5 +1,4 @@
-// this file is duplicated in `backend/src/config/metadata.js` and `webapp/constants/metadata.js`
+// this file is duplicated in `backend/src/config/registration.ts` and `webapp/constants/registration.js`
 export default {
-  NONCE_LENGTH: 5,
-  INVITE_CODE_LENGTH: 6,
+  LAYOUT: 'blank',
 }
