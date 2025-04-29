@@ -1,5 +1,17 @@
 {
   "notification": "Notification",
+  "subjects": {
+    "changedGroupMemberRole": "Role in group changed",
+    "chatMessage": "New chat message",
+    "commentedOnPost": "New comment on post",
+    "followedUserPosted": "New post by followd user",
+    "mentionedInComment": "Mentioned in comment",
+    "mentionedInPost": "Mentioned in post",
+    "removedUserFromGroup": "Removed from group",
+    "postInGroup": "New post in group",
+    "userJoinedGroup": "User joined group",
+    "userLeftGroup": "User left group"
+  },
   "buttons": {
     "viewChat": "Show Chat",
     "viewComment": "View comment",

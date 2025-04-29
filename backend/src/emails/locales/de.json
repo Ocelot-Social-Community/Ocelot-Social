@@ -1,5 +1,17 @@
 {
   "notification": "Benachrichtigung",
+  "subjects": {
+    "changedGroupMemberRole": "Rolle in Gruppe geändert",
+    "chatMessage": "Neue Chat Nachricht",
+    "commentedOnPost": "Neuer Kommentar zu Beitrag",
+    "followedUserPosted": "Neuer Beitrag von gefolgtem Nutzer",
+    "mentionedInComment": "Erwähnung in Kommentar",
+    "mentionedInPost": "Erwähnung in Beitrag",
+    "removedUserFromGroup": "Aus Gruppe entfernt",
+    "postInGroup": "Neuer Beitrag in Gruppe",
+    "userJoinedGroup": "Nutzer tritt Gruppe bei",
+    "userLeftGroup": "Nutzer verlässt Gruppe"
+  },
   "buttons": {
     "viewChat": "Chat anzeigen",
     "viewComment": "Kommentar ansehen",
@@ -16,11 +28,11 @@
   "changedGroupMemberRole": "deine Rolle in der Gruppe  „{groupName}“ wurde geändert. Klicke auf diesen Knopf, um diese Gruppe zu sehen:",
   "chatMessageStart": "du hast eine neue Chat-Nachricht von ",
   "chatMessageEnd": " erhalten.",
-  "commentedOnPost": " hat einen Beitrag den Du beobachtest mit dem Titel „{postTitle}“ kommentiert. Klicke auf diesen Knopf, um diesen Kommentar zu sehen:",
+  "commentedOnPost": " hat einen Beitrag den du beobachtest mit dem Titel „{postTitle}“ kommentiert. Klicke auf diesen Knopf, um diesen Kommentar zu sehen:",
   "followedUserPosted": ", ein Nutzer dem du folgst, hat einen neuen Beitrag mit dem Titel „{postTitle}“ geschrieben. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:",
   "mentionedInComment": " hat dich in einem Kommentar zu dem Beitrag mit dem Titel „{postTitle}“ erwähnt. Klicke auf diesen Knopf, um diesen Kommentar zu sehen:",
   "mentionedInPost": " hat Dich in einem Beitrag mit dem Titel „{postTitle}“ erwähnt. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:",
-  "postInGroup": "jemand hat einen neuen Beitrag mit dem Titel „{postTitle}“ in einer Deiner Gruppen geschrieben. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:",
+  "postInGroup": "jemand hat einen neuen Beitrag mit dem Titel „{postTitle}“ in einer deiner Gruppen geschrieben. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:",
   "removedUserFromGroup": "du wurdest aus der Gruppe „{groupName}“ entfernt.",
   "userJoinedGroup": " ist der Gruppe „{groupName}“ beigetreten. Klicke auf diesen Knopf, um diese Gruppe zu sehen:",
   "userLeftGroup": " hat die Gruppe „{groupName}“ verlassen. Klicke auf diesen Knopf, um diese Gruppe zu sehen:"
