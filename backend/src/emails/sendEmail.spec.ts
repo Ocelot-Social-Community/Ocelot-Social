@@ -1,4 +1,25 @@
-import { sendMail } from './sendEmail'
+import { sendMail, transport } from './sendEmail'
+
+
+
+const sendMailMock = jest.spyOn(transport, 'sendMail')
+
+/*
+      : (input) => void = jest.fn(() => console.log('HERE'))
+jest.mock('./sendEmail', () => {
+  const originalModule = jest.requireActual('./sendEmail')
+  const { transport } = originalModule
+  console.log('-------', transport.sendMail)
+  return {
+    __esModule: true,
+    ...originalModule,
+    transport: {
+      ...transport,
+      sendMail: jest.fn(),
+    }
+  }
+})
+*/
 
 describe('sendEmail', () => {
   it('works with followed_user_posted template', async () => {
@@ -24,6 +45,7 @@ describe('sendEmail', () => {
         },
       }),
     ).resolves.not.toThrow()
+    // expect(sendMailMock).toHaveBeenCalledWith({})
   })
 
   it('works with mentioned_in_post template', async () => {

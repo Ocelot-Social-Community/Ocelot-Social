@@ -62,7 +62,6 @@
     "graphql-tag": "~2.10.3",
     "graphql-upload": "^13.0.0",
     "helmet": "~8.1.0",
-    "i18n": "^0.15.1",
     "ioredis": "^5.6.1",
     "jsonwebtoken": "~8.5.1",
     "languagedetect": "^2.0.0",

@@ -13,8 +13,6 @@ import CONFIG from '@config/index'
 import logosWebapp from '@config/logos'
 import metadata from '@config/metadata'
 
-import { i18n } from './i18n'
-
 const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD
 const hasDKIMData =
   CONFIG.SMTP_DKIM_DOMAINNAME && CONFIG.SMTP_DKIM_KEYSELECTOR && CONFIG.SMTP_DKIM_PRIVATKEY
@@ -31,7 +29,7 @@ const defaultParams = {
   settingsUrl,
 }
 
-const transport = createTransport({
+export const transport = createTransport({
   host: CONFIG.SMTP_HOST,
   port: CONFIG.SMTP_PORT,
   ignoreTLS: CONFIG.SMTP_IGNORE_TLS,
@@ -57,13 +55,23 @@ export const sendMail = async (notification: any) => {
   const name = notification?.to?.name
   const template = notification?.reason
 
-  i18n.setLocale(locale as string)
-
   const email = new Email({
     message: {
-      from: `${CONFIG.APPLICATION_NAME} – ${i18n.__('notification')}`,
+      from: '${CONFIG.APPLICATION_NAME}',
     },
     transport,
+    i18n: {
+      locales: ['en', 'de'],
+      defaultLocale: 'en',
+      retryInDefaultLocale: false,
+      directory: path.join(__dirname, 'locales'),
+      updateFiles: false,
+      objectNotation: true,
+      mustacheConfig: {
+        tags: ['{', '}'],
+        disable: false,
+      },
+    },
     preview: false,
     /* This is very useful to see the emails sent by the unit tests
     preview: {
@@ -82,7 +90,7 @@ export const sendMail = async (notification: any) => {
       },
       locals: {
         ...defaultParams,
-        locale: i18n.getLocale(),
+        locale,
         name,
         postTitle:
           notification?.from?.__typename === 'Comment'

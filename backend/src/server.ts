@@ -19,7 +19,6 @@ import Redis from 'ioredis'
 
 import CONFIG from './config'
 import { getNeode, getDriver } from './db/neo4j'
-import { i18n } from './emails/i18n'
 import decode from './jwt/decode'
 // eslint-disable-next-line import/no-cycle
 import middleware from './middleware'
@@ -106,7 +105,6 @@ const createServer = (options?) => {
   app.use(bodyParser.json({ limit: '10mb' }) as any)
   app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }) as any)
   app.use(graphqlUploadExpress())
-  app.use(i18n.init)
   server.applyMiddleware({ app, path: '/' })
   const httpServer = http.createServer(app)
   server.installSubscriptionHandlers(httpServer)
