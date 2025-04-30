@@ -759,11 +759,13 @@ describe('distanceToMe', () => {
           query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
         ).resolves.toEqual(
           expect.objectContaining({
-            data: {User: [
-              {
-                distanceToMe: null,
-              },
-            ]},
+            data: {
+              User: [
+                {
+                  distanceToMe: null,
+                },
+              ],
+            },
             errors: undefined,
           }),
         )
@@ -778,11 +780,13 @@ describe('distanceToMe', () => {
           query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
         ).resolves.toEqual(
           expect.objectContaining({
-            data: {User: [
-              {
-                distanceToMe: 0,
-              },
-            ]},
+            data: {
+              User: [
+                {
+                  distanceToMe: 0,
+                },
+              ],
+            },
             errors: undefined,
           }),
         )
@@ -797,11 +801,13 @@ describe('distanceToMe', () => {
           query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
         ).resolves.toEqual(
           expect.objectContaining({
-            data: {User: [
-              {
-                distanceToMe: 746,
-              },
-            ]},
+            data: {
+              User: [
+                {
+                  distanceToMe: 746,
+                },
+              ],
+            },
             errors: undefined,
           }),
         )
@@ -816,11 +822,13 @@ describe('distanceToMe', () => {
           query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
         ).resolves.toEqual(
           expect.objectContaining({
-            data: {User: [
-              {
-                distanceToMe: null,
-              },
-            ]},
+            data: {
+              User: [
+                {
+                  distanceToMe: null,
+                },
+              ],
+            },
             errors: undefined,
           }),
         )
@@ -835,11 +843,13 @@ describe('distanceToMe', () => {
           query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
         ).resolves.toEqual(
           expect.objectContaining({
-            data: {User: [
-              {
-                distanceToMe: null,
-              },
-            ]},
+            data: {
+              User: [
+                {
+                  distanceToMe: null,
+                },
+              ],
+            },
             errors: undefined,
           }),
         )
