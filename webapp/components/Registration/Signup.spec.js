@@ -25,6 +25,9 @@ describe('Signup', () => {
         loading: false,
         mutate: jest.fn().mockResolvedValue({ data: { Signup: { email: 'mail@example.org' } } }),
       },
+      $i18n: {
+        locale: () => 'de',
+      },
     }
     propsData = {}
   })
@@ -64,7 +67,7 @@ describe('Signup', () => {
         it('delivers email to backend', () => {
           const expected = expect.objectContaining({
             mutation: SignupMutation,
-            variables: { email: 'mAIL@exAMPLE.org', inviteCode: null },
+            variables: { email: 'mAIL@exAMPLE.org', locale: 'de', inviteCode: null },
           })
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
         })
