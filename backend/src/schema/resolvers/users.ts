@@ -493,6 +493,11 @@ export default {
 
       try {
         const result = await query
+        // No location set
+        if (!result.userLoc || !result.meLoc) {
+          return null
+        }
+
         const lat1 = result.userLoc.lat
         const lat2 = result.meLoc.lat
 
