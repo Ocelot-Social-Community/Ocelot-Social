@@ -20,6 +20,7 @@ export const locationFragment = (lang) => gql`
       name: name${lang}
       lng
       lat
+      distanceToMe
     }
   }
 `

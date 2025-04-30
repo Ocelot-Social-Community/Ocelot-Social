@@ -16,9 +16,9 @@ export default {
   },
   computed: {
     distance() {
-      return !this.location.distance
+      return !this.location.distanceToMe
         ? null
-        : this.$t('location.distance', { distance: this.location.distance })
+        : this.$t('location.distance', { distance: this.location.distanceToMe })
     },
   },
 }
