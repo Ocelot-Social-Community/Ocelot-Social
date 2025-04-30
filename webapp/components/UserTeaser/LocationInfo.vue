@@ -16,12 +16,9 @@ export default {
   },
   computed: {
     distance() {
-      if (this.location /* .distance, when backend is ready */) {
-        return this.$t('location.distance', {
-          distance: this.location.distance ?? 5000 /* todo remove when backend is ready */,
-        })
-      }
-      return null
+      return !this.location.distance
+        ? null
+        : this.$t('location.distance', { distance: this.location.distance })
     },
   },
 }
