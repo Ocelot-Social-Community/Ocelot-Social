@@ -636,6 +636,9 @@
   "localeSwitch": {
     "tooltip": null
   },
+  "location": {
+    "distance": null
+  },
   "login": {
     "email": "Uw E-mail",
     "failure": null,

@@ -636,6 +636,9 @@
   "localeSwitch": {
     "tooltip": null
   },
+  "location": {
+    "distance": null
+  },
   "login": {
     "email": "Su correo electrónico",
     "failure": "Dirección de correo electrónico o contraseña incorrecta.",

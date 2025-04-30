@@ -9,7 +9,7 @@
         <component
           v-if="showAvatar"
           :is="linkToProfile && !isTouchDevice ? 'nuxt-link' : 'span'"
-          :to="linkToProfile && !isTouchDevice && userLink"
+          :to="linkToProfile && !isTouchDevice ? userLink : undefined"
         >
           <profile-avatar
             :profile="user"
@@ -23,7 +23,7 @@
           <div :class="wide ? 'flex-direction-row' : 'flex-direction-column'">
             <component
               :is="linkToProfile && !isTouchDevice ? 'nuxt-link' : 'span'"
-              :to="linkToProfile && !isTouchDevice && userLink"
+              :to="linkToProfile && !isTouchDevice ? userLink : undefined"
             >
               <span
                 class="text"

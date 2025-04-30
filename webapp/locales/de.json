@@ -636,6 +636,9 @@
   "localeSwitch": {
     "tooltip": "Sprache wählen"
   },
+  "location": {
+    "distance": "{distance} km von mir entfernt"
+  },
   "login": {
     "email": "Deine E-Mail",
     "failure": "Fehlerhafte E-Mail-Adresse oder Passwort.",

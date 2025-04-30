@@ -4,9 +4,12 @@
       v-if="$env.BADGES_ENABLED"
       :badges="[user.badgeVerification, ...user.badgeTrophiesSelected]"
     />
-    <div class="location" v-if="user.location">
-      <base-icon name="map-marker" />
-      {{ user.location.name }}
+    <div class="location-info">
+      <div class="location" v-if="user.location">
+        <base-icon name="map-marker" />
+        {{ user.location.name }}
+      </div>
+      <div v-if="distanceToMe" class="distance">{{ distanceToMe }}</div>
     </div>
     <ul class="statistics">
       <li>
@@ -25,7 +28,7 @@
         />
       </li>
     </ul>
-    <nuxt-link v-if="isTouchDevice && linkToProfile" :to="userLink" class="link">
+    <nuxt-link v-if="isTouchDevice && userLink" :to="userLink" class="link">
       <ds-button primary>{{ $t('user-teaser.popover.open-profile') }}</ds-button>
     </nuxt-link>
   </div>
@@ -42,12 +45,19 @@ export default {
   },
   props: {
     user: { type: Object, default: null },
-    linkToProfile: { type: Boolean, default: true },
-    userLink: { type: Object, default: null },
+    userLink: { type: Object },
   },
   computed: {
     isTouchDevice() {
       return isTouchDevice()
+    },
+    distanceToMe() {
+      if (this.user.location /* && this.user.location.distanceToMe */) {
+        return this.$t('location.distance', {
+          distance: this.user.location.distanceToMe ?? 5000 /* todo remove when backend is ready */,
+        })
+      }
+      return null
     },
   },
 }
@@ -62,11 +72,22 @@ export default {
   min-width: 200px;
 }
 
-.location {
+.location-info {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-block: 16px;
+
+  .location {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .distance {
+    margin-top: 8px;
+  }
 }
 
 .link {
