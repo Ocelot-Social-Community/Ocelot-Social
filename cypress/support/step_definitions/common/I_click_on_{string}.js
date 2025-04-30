@@ -1,7 +1,6 @@
-import { When } from '@badeball/cypress-cucumber-preprocessor'
-import 'cypress-network-idle'
+import { When } from "@badeball/cypress-cucumber-preprocessor";
 
-When('I click on {string}', element => {
+When("I click on {string}", element => {
   const elementSelectors = {
     'submit button': 'button[name=submit]',
     'create post button': '.post-add-button',
@@ -16,6 +15,5 @@ When('I click on {string}', element => {
 
   cy.get(elementSelectors[element])
     .click()
-    .waitForNetworkIdle(2000)
-    .wait(750)
-})
+    .wait(750);
+});
