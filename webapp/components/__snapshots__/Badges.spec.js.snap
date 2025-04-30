@@ -43,7 +43,7 @@ exports[`Badges.vue with badges in selection mode clicking on second badge selec
     class="hc-badges"
     scale="1.2"
   >
-    <button
+    <div
       class="hc-badge-container"
     >
       <img
@@ -51,7 +51,7 @@ exports[`Badges.vue with badges in selection mode clicking on second badge selec
         src="/api/path/to/some/icon"
         title="Some description"
       />
-    </button>
+    </div>
     <button
       class="hc-badge-container selectable selected"
     >
@@ -80,7 +80,7 @@ exports[`Badges.vue with badges in selection mode clicking twice on second badge
     class="hc-badges"
     scale="1.2"
   >
-    <button
+    <div
       class="hc-badge-container"
     >
       <img
@@ -88,7 +88,7 @@ exports[`Badges.vue with badges in selection mode clicking twice on second badge
         src="/api/path/to/some/icon"
         title="Some description"
       />
-    </button>
+    </div>
     <button
       class="hc-badge-container selectable"
     >
@@ -117,7 +117,7 @@ exports[`Badges.vue with badges in selection mode renders 1`] = `
     class="hc-badges"
     scale="1.2"
   >
-    <button
+    <div
       class="hc-badge-container"
     >
       <img
@@ -125,7 +125,7 @@ exports[`Badges.vue with badges in selection mode renders 1`] = `
         src="/api/path/to/some/icon"
         title="Some description"
       />
-    </button>
+    </div>
     <button
       class="hc-badge-container selectable"
     >

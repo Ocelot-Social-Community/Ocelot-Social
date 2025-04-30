@@ -1,8 +1,13 @@
 <template>
   <base-card>
     <h2 class="title">{{ $t('settings.notifications.name') }}</h2>
-    <ds-space margin-top="base" v-for="topic in emailNotificationSettings" :key="topic.type">
-      <ds-space margin-bottom="small">
+    <ds-space
+      margin-top="small"
+      margin-bottom="small"
+      v-for="topic in emailNotificationSettings"
+      :key="topic.type"
+    >
+      <ds-space margin-bottom="x-small">
         <h4>{{ $t(`settings.notifications.${topic.type}`) }}</h4>
       </ds-space>
       <div class="notifcation-settings-section">
@@ -14,15 +19,17 @@
         </ds-space>
       </div>
     </ds-space>
-    <base-button @click="checkAll" :disabled="isCheckAllDisabled">
-      {{ $t('settings.notifications.checkAll') }}
-    </base-button>
-    <base-button @click="uncheckAll" :disabled="isUncheckAllDisabled">
-      {{ $t('settings.notifications.uncheckAll') }}
-    </base-button>
-    <base-button class="save-button" filled @click="submit" :disabled="isSubmitDisabled">
-      {{ $t('actions.save') }}
-    </base-button>
+    <ds-space margin-top="base" margin-bottom="x-small">
+      <base-button @click="checkAll" :disabled="isCheckAllDisabled">
+        {{ $t('settings.notifications.checkAll') }}
+      </base-button>
+      <base-button @click="uncheckAll" :disabled="isUncheckAllDisabled">
+        {{ $t('settings.notifications.uncheckAll') }}
+      </base-button>
+      <base-button class="save-button" filled @click="submit" :disabled="isSubmitDisabled">
+        {{ $t('actions.save') }}
+      </base-button>
+    </ds-space>
   </base-card>
 </template>
 
@@ -137,5 +144,8 @@ export default {
 }
 .label {
   margin-left: $space-xx-small;
+}
+button + button {
+  margin-left: $space-x-small;
 }
 </style>

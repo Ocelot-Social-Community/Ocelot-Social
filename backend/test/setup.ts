@@ -1,2 +1,2 @@
 // Metascraper takes longer nowadays, double time
-// jest.setTimeout(10000)
+jest.setTimeout(10000)

@@ -12,6 +12,7 @@
   "admin": {
     "badges": {
       "description": null,
+      "noBadges": null,
       "revokeTrophy": {
         "error": null,
         "success": null
@@ -97,8 +98,7 @@
           "number": "N.º",
           "role": "Função",
           "slug": "Slug"
-        },
-        "edit": null
+        }
       }
     }
   },
