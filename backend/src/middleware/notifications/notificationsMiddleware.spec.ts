@@ -1011,7 +1011,7 @@ describe('notifications', () => {
         expect(pubsubSpy).not.toHaveBeenCalled()
         expect(pubsubSpy).not.toHaveBeenCalled()
 
-        expect(sendChatMessageMailMock).not.toHaveBeenCalled()        
+        expect(sendChatMessageMailMock).not.toHaveBeenCalled()
       })
     })
 
@@ -1031,7 +1031,7 @@ describe('notifications', () => {
         expect(pubsubSpy).not.toHaveBeenCalled()
         expect(pubsubSpy).not.toHaveBeenCalled()
 
-        expect(sendChatMessageMailMock).not.toHaveBeenCalled()        
+        expect(sendChatMessageMailMock).not.toHaveBeenCalled()
       })
     })
 
@@ -1067,7 +1067,7 @@ describe('notifications', () => {
           userId: 'chatReceiver',
         })
 
-        expect(sendChatMessageMailMock).not.toHaveBeenCalled()        
+        expect(sendChatMessageMailMock).not.toHaveBeenCalled()
       })
     })
   })
