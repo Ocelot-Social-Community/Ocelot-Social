@@ -467,7 +467,7 @@ export default {
     },
   },
   User: {
-    distance: async (parent, _params, context, _resolveInfo) => {
+    distanceToMe: async (parent, _params, context, _resolveInfo) => {
       // is it myself?
       if (parent.id === context.user.id) {
         return null
@@ -483,7 +483,7 @@ export default {
             WITH
               point({latitude: userLoc.lat, longitude: userLoc.lng}) as userPoint,
               point({latitude: meLoc.lat, longitude: meLoc.lng}) as mePoint
-            RETURN point.distance(userPoint, mePoint) as distance
+            RETURN round(point.distance(userPoint, mePoint) / 1000) as distance
           `,
           { parent, user: context.user },
         )
@@ -492,8 +492,7 @@ export default {
       })
 
       try {
-        const distance = await query
-        return distance === undefined ? null : Math.round(distance / 1000)
+        return await query
       } finally {
         session.close()
       }
