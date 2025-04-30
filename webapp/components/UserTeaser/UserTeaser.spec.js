@@ -5,34 +5,18 @@ import Vuex from 'vuex'
 
 const localVue = global.localVue
 
-/*
-to test:
-  - user is deleted
-  - user is disabled
-  - user is anonymous
-  - user is a moderator
-  - user is a moderator and the user is deleted
-  - user is a moderator and the user is disabled
-  - linkToProfile on/off
-  - showAvatar on/off
-  - showPopover on/off
-  - hovering name on desktop
-  - clicking name on mobile
-  - hovering avatar on desktop
-  - clicking avatar on mobile
-  - hovering slug on desktop
-  - clicking slug on mobile
-*/
-
 // Mock Math.random, used in Dropdown
 Object.assign(Math, {
   random: () => 0,
 })
 
+const waitForPopover = async () => await new Promise((resolve) => setTimeout(resolve, 600))
+
 const userTilda = {
   name: 'Tilda Swinton',
   slug: 'tilda-swinton',
   id: 'user1',
+  avatar: '/avatars/tilda-swinton',
   badgeVerification: {
     id: 'bv1',
     icon: '/icons/verified',
@@ -66,6 +50,7 @@ describe('UserTeaser', () => {
     isModerator = false,
     withLinkToProfile = true,
     onTouchScreen = false,
+    withAvatar = true,
     user = userTilda,
   }) => {
     const mockIsTouchDevice = onTouchScreen
@@ -86,6 +71,7 @@ describe('UserTeaser', () => {
       propsData: {
         user,
         linkToProfile: withLinkToProfile,
+        showAvatar: withAvatar,
       },
       stubs: {
         NuxtLink: RouterLinkStub,
@@ -119,6 +105,19 @@ describe('UserTeaser', () => {
         beforeEach(async () => {
           const userName = screen.getByText('Tilda Swinton')
           await fireEvent.click(userName)
+          await waitForPopover()
+        })
+
+        it('renders the popover', () => {
+          expect(wrapper.container).toMatchSnapshot()
+        })
+      })
+
+      describe('when clicking the user avatar', () => {
+        beforeEach(async () => {
+          const userAvatar = screen.getByAltText('Tilda Swinton')
+          await fireEvent.click(userAvatar)
+          await waitForPopover()
         })
 
         it('renders the popover', () => {
@@ -163,7 +162,19 @@ describe('UserTeaser', () => {
         beforeEach(async () => {
           const userName = screen.getByText('Tilda Swinton')
           await fireEvent.mouseOver(userName)
-          await new Promise((resolve) => setTimeout(resolve, 2000))
+          await waitForPopover()
+        })
+
+        it('renders the popover', () => {
+          expect(wrapper.container).toMatchSnapshot()
+        })
+      })
+
+      describe('when hovering the user avatar', () => {
+        beforeEach(async () => {
+          const userAvatar = screen.getByAltText('Tilda Swinton')
+          await fireEvent.mouseOver(userAvatar)
+          await waitForPopover()
         })
 
         it('renders the popover', () => {
@@ -186,12 +197,19 @@ describe('UserTeaser', () => {
         beforeEach(async () => {
           const userName = screen.getByText('Tilda Swinton')
           await fireEvent.mouseOver(userName)
-          await new Promise((resolve) => setTimeout(resolve, 2000))
+          await waitForPopover()
         })
 
         it('renders the popover', () => {
           expect(wrapper.container).toMatchSnapshot()
         })
+      })
+    })
+
+    describe('avatar is disabled', () => {
+      it('does not render the avatar', () => {
+        const wrapper = Wrapper({ withAvatar: false })
+        expect(wrapper.container).toMatchSnapshot()
       })
     })
 

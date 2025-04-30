@@ -1,5 +1,69 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`UserTeaser given an user avatar is disabled does not render the avatar 1`] = `
+<div>
+  <div
+    class=""
+    placement="top-start"
+  >
+    <v-popover-stub
+      autohide="true"
+      class="user-teaser"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="16"
+      openclass="open"
+      opengroup="0"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
+    >
+      <!---->
+       
+      <div
+        class="info flex-direction-column"
+      >
+        <div
+          class="flex-direction-column"
+        >
+          <a>
+            <span
+              class="text"
+            >
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
+               
+              <span
+                class="name"
+              >
+                Tilda Swinton
+              </span>
+            </span>
+          </a>
+           
+          <!---->
+           
+          <!---->
+        </div>
+         
+        <!---->
+      </div>
+       
+      <div />
+    </v-popover-stub>
+  </div>
+</div>
+`;
+
 exports[`UserTeaser given an user user is deleted even if the current user is a moderator renders anonymous user 1`] = `
 <div>
   <div
@@ -90,7 +154,7 @@ exports[`UserTeaser given an user user is disabled current user is a moderator r
     >
       <a>
         <div
-          class="profile-avatar --small --no-image"
+          class="profile-avatar --small"
         >
           <span
             class="initials"
@@ -100,7 +164,12 @@ exports[`UserTeaser given an user user is disabled current user is a moderator r
            
           <!---->
            
-          <!---->
+          <img
+            alt="Tilda Swinton"
+            class="image"
+            src="/api/avatars/tilda-swinton"
+            title="Tilda Swinton"
+          />
         </div>
       </a>
        
@@ -200,7 +269,7 @@ exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
     >
       <a>
         <div
-          class="profile-avatar --small --no-image"
+          class="profile-avatar --small"
         >
           <span
             class="initials"
@@ -210,7 +279,12 @@ exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
            
           <!---->
            
-          <!---->
+          <img
+            alt="Tilda Swinton"
+            class="image"
+            src="/api/avatars/tilda-swinton"
+            title="Tilda Swinton"
+          />
         </div>
       </a>
        
@@ -279,7 +353,7 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
     >
       <a>
         <div
-          class="profile-avatar --small --no-image"
+          class="profile-avatar --small"
         >
           <span
             class="initials"
@@ -289,7 +363,12 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
            
           <!---->
            
-          <!---->
+          <img
+            alt="Tilda Swinton"
+            class="image"
+            src="/api/avatars/tilda-swinton"
+            title="Tilda Swinton"
+          />
         </div>
       </a>
        
@@ -363,7 +442,7 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`
     >
       <a>
         <div
-          class="profile-avatar --small --no-image"
+          class="profile-avatar --small"
         >
           <span
             class="initials"
@@ -373,7 +452,12 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`
            
           <!---->
            
-          <!---->
+          <img
+            alt="Tilda Swinton"
+            class="image"
+            src="/api/avatars/tilda-swinton"
+            title="Tilda Swinton"
+          />
         </div>
       </a>
        
@@ -441,7 +525,7 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
     >
       <a>
         <div
-          class="profile-avatar --small --no-image"
+          class="profile-avatar --small"
         >
           <span
             class="initials"
@@ -451,7 +535,12 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
            
           <!---->
            
-          <!---->
+          <img
+            alt="Tilda Swinton"
+            class="image"
+            src="/api/avatars/tilda-swinton"
+            title="Tilda Swinton"
+          />
         </div>
       </a>
        
@@ -519,7 +608,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
     >
       <span>
         <div
-          class="profile-avatar --small --no-image"
+          class="profile-avatar --small"
         >
           <span
             class="initials"
@@ -529,7 +618,12 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
            
           <!---->
            
-          <!---->
+          <img
+            alt="Tilda Swinton"
+            class="image"
+            src="/api/avatars/tilda-swinton"
+            title="Tilda Swinton"
+          />
         </div>
       </span>
        
@@ -571,6 +665,95 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
 </div>
 `;
 
+exports[`UserTeaser given an user without linkToProfile, on desktop when hovering the user avatar renders the popover 1`] = `
+<div>
+  <div
+    class=""
+    placement="top-start"
+  >
+    <v-popover-stub
+      autohide="true"
+      class="user-teaser"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="16"
+      open="true"
+      openclass="open"
+      opengroup="0"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
+    >
+      <span>
+        <div
+          class="profile-avatar --small"
+        >
+          <span
+            class="initials"
+          >
+            TS
+          </span>
+           
+          <!---->
+           
+          <img
+            alt="Tilda Swinton"
+            class="image"
+            src="/api/avatars/tilda-swinton"
+            title="Tilda Swinton"
+          />
+        </div>
+      </span>
+       
+      <div
+        class="info flex-direction-column"
+      >
+        <div
+          class="flex-direction-column"
+        >
+          <span>
+            <span
+              class="text"
+            >
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
+               
+              <span
+                class="name"
+              >
+                Tilda Swinton
+              </span>
+            </span>
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+         
+        <!---->
+      </div>
+       
+      <div>
+        <user-teaser-popover-stub
+          user="[object Object]"
+          userlink="[object Object]"
+        />
+      </div>
+    </v-popover-stub>
+  </div>
+</div>
+`;
+
 exports[`UserTeaser given an user without linkToProfile, on desktop when hovering the user name renders the popover 1`] = `
 <div>
   <div
@@ -598,7 +781,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
     >
       <span>
         <div
-          class="profile-avatar --small --no-image"
+          class="profile-avatar --small"
         >
           <span
             class="initials"
@@ -608,7 +791,12 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
            
           <!---->
            
-          <!---->
+          <img
+            alt="Tilda Swinton"
+            class="image"
+            src="/api/avatars/tilda-swinton"
+            title="Tilda Swinton"
+          />
         </div>
       </span>
        
@@ -681,7 +869,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
     >
       <span>
         <div
-          class="profile-avatar --small --no-image"
+          class="profile-avatar --small"
         >
           <span
             class="initials"
@@ -691,7 +879,12 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
            
           <!---->
            
-          <!---->
+          <img
+            alt="Tilda Swinton"
+            class="image"
+            src="/api/avatars/tilda-swinton"
+            title="Tilda Swinton"
+          />
         </div>
       </span>
        
@@ -733,7 +926,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
 </div>
 `;
 
-exports[`UserTeaser given an user without linkToProfile, on touch screen when clicking the user name renders the popover 1`] = `
+exports[`UserTeaser given an user without linkToProfile, on touch screen when clicking the user avatar renders the popover 1`] = `
 <div>
   <div
     class=""
@@ -746,6 +939,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
       delay="0"
       handleresize="true"
       offset="16"
+      open="true"
       openclass="open"
       opengroup="0"
       placement="bottom-end"
@@ -759,7 +953,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
     >
       <span>
         <div
-          class="profile-avatar --small --no-image"
+          class="profile-avatar --small"
         >
           <span
             class="initials"
@@ -769,7 +963,12 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
            
           <!---->
            
-          <!---->
+          <img
+            alt="Tilda Swinton"
+            class="image"
+            src="/api/avatars/tilda-swinton"
+            title="Tilda Swinton"
+          />
         </div>
       </span>
        
@@ -805,7 +1004,101 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
         <!---->
       </div>
        
-      <div />
+      <div>
+        <user-teaser-popover-stub
+          user="[object Object]"
+          userlink="[object Object]"
+        />
+      </div>
+    </v-popover-stub>
+  </div>
+</div>
+`;
+
+exports[`UserTeaser given an user without linkToProfile, on touch screen when clicking the user name renders the popover 1`] = `
+<div>
+  <div
+    class=""
+    placement="top-start"
+  >
+    <v-popover-stub
+      autohide="true"
+      class="user-teaser"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="16"
+      open="true"
+      openclass="open"
+      opengroup="0"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
+    >
+      <span>
+        <div
+          class="profile-avatar --small"
+        >
+          <span
+            class="initials"
+          >
+            TS
+          </span>
+           
+          <!---->
+           
+          <img
+            alt="Tilda Swinton"
+            class="image"
+            src="/api/avatars/tilda-swinton"
+            title="Tilda Swinton"
+          />
+        </div>
+      </span>
+       
+      <div
+        class="info flex-direction-column"
+      >
+        <div
+          class="flex-direction-column"
+        >
+          <span>
+            <span
+              class="text"
+            >
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
+               
+              <span
+                class="name"
+              >
+                Tilda Swinton
+              </span>
+            </span>
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+         
+        <!---->
+      </div>
+       
+      <div>
+        <user-teaser-popover-stub
+          user="[object Object]"
+          userlink="[object Object]"
+        />
+      </div>
     </v-popover-stub>
   </div>
 </div>
