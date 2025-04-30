@@ -8,33 +8,23 @@
       <base-icon name="map-marker" />
       {{ user.location.name }}
     </div>
-    <ds-flex>
-      <ds-flex-item class="ds-tab-nav-item">
-        <ds-space margin="small">
-          <ds-number
-            :count="user.followedByCount"
-            :label="$t('profile.followers')"
-            size="x-large"
-          />
-        </ds-space>
-      </ds-flex-item>
-      <ds-flex-item class="ds-tab-nav-item">
-        <ds-space margin="small">
-          <ds-number
-            :count="user.contributionsCount"
-            :label="$t('common.post', null, user.contributionsCount)"
-          />
-        </ds-space>
-      </ds-flex-item>
-      <ds-flex-item class="ds-tab-nav-item">
-        <ds-space margin="small">
-          <ds-number
-            :count="user.commentedCount"
-            :label="$t('common.comment', null, user.commentedCount)"
-          />
-        </ds-space>
-      </ds-flex-item>
-    </ds-flex>
+    <ul class="statistics">
+      <li>
+        <ds-number :count="user.followedByCount" :label="$t('profile.followers')" />
+      </li>
+      <li>
+        <ds-number
+          :count="user.contributionsCount"
+          :label="$t('common.post', null, user.contributionsCount)"
+        />
+      </li>
+      <li>
+        <ds-number
+          :count="user.commentedCount"
+          :label="$t('common.comment', null, user.commentedCount)"
+        />
+      </li>
+    </ul>
     <nuxt-link v-if="isTouchDevice && linkToProfile" :to="userLink" class="link">
       <ds-button primary>{{ $t('user-teaser.popover.open-profile') }}</ds-button>
     </nuxt-link>
@@ -81,5 +71,11 @@ export default {
 
 .link {
   margin-top: 16px;
+}
+
+.statistics {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
 </style>
