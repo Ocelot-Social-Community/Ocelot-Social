@@ -2,8 +2,7 @@ extend ../layout.pug
 
 block content
   .content
-  - var chatUrl = chatUrl
   p= t('chatMessageStart')
-    b= chattingUser
+    a.user(href=chattingUserUrl)= chattingUser
     = t('chatMessageEnd')
   a.button(href=chatUrl)= t('buttons.viewChat')

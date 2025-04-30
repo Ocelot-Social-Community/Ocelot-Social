@@ -4,13 +4,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable security/detect-object-injection */
-import { sendMail } from '@middleware/helpers/email/sendMail'
 import { chatMessageTemplate } from '@middleware/helpers/email/templateBuilder'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 // eslint-disable-next-line import/no-cycle
 import { getUnreadRoomsCount } from '@schema/resolvers/rooms'
-import { sendNotificationMail } from '@src/emails/sendEmail'
+import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail'
 import { pubsub, NOTIFICATION_ADDED, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '@src/server'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
@@ -487,7 +486,7 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
 
       // Send EMail if we found a user(not blocked) and he is not considered online
       if (recipientUser.emailNotificationsChatMessage !== false && !isUserOnline(recipientUser)) {
-        void sendMail(chatMessageTemplate({ email, variables: { senderUser, recipientUser } }))
+        void sendChatMessageMail({ email, senderUser, recipientUser })
       }
     }
 

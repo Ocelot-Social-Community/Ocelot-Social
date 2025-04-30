@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`sendEmail English changed_group_member_role template 1`] = `
+exports[`sendNotificationMail English changed_group_member_role template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -122,7 +122,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail English commented_on_post template 1`] = `
+exports[`sendNotificationMail English commented_on_post template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -246,7 +246,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail English followed_user_posted template 1`] = `
+exports[`sendNotificationMail English followed_user_posted template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -370,7 +370,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail English mentioned_in_comment template 1`] = `
+exports[`sendNotificationMail English mentioned_in_comment template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -494,7 +494,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail English mentioned_in_post template 1`] = `
+exports[`sendNotificationMail English mentioned_in_post template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -617,7 +617,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail English post_in_group template 1`] = `
+exports[`sendNotificationMail English post_in_group template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -739,7 +739,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail English removed_user_from_group template 1`] = `
+exports[`sendNotificationMail English removed_user_from_group template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -858,7 +858,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail English user_joined_group template 1`] = `
+exports[`sendNotificationMail English user_joined_group template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -981,7 +981,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail English user_left_group template 1`] = `
+exports[`sendNotificationMail English user_left_group template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -1104,7 +1104,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail German changed_group_member_role template 1`] = `
+exports[`sendNotificationMail German changed_group_member_role template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -1226,7 +1226,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail German commented_on_post template 1`] = `
+exports[`sendNotificationMail German commented_on_post template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -1350,7 +1350,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail German followed_user_posted template 1`] = `
+exports[`sendNotificationMail German followed_user_posted template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -1474,7 +1474,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail German mentioned_in_comment template 1`] = `
+exports[`sendNotificationMail German mentioned_in_comment template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -1598,7 +1598,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail German mentioned_in_post template 1`] = `
+exports[`sendNotificationMail German mentioned_in_post template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -1722,7 +1722,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail German post_in_group template 1`] = `
+exports[`sendNotificationMail German post_in_group template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -1844,7 +1844,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail German removed_user_from_group template 1`] = `
+exports[`sendNotificationMail German removed_user_from_group template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -1963,7 +1963,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail German user_joined_group template 1`] = `
+exports[`sendNotificationMail German user_joined_group template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -2086,7 +2086,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmail German user_left_group template 1`] = `
+exports[`sendNotificationMail German user_left_group template 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",

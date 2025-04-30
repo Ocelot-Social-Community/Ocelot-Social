@@ -18,21 +18,11 @@ import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
 import createServer, { pubsub } from '@src/server'
 
-const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
-  sendMail: (notification) => sendMailMock(notification),
-}))
-
+const sendChatMessageMailMock: (notification) => void = jest.fn()
 const sendNotificationMailMock: (notification) => void = jest.fn()
 jest.mock('@src/emails/sendEmail', () => ({
+  sendChatMessageMail: (notification) => sendChatMessageMailMock(notification),
   sendNotificationMail: (notification) => sendNotificationMailMock(notification),
-}))
-
-const chatMessageTemplateMock = jest.fn()
-const notificationTemplateMock = jest.fn()
-jest.mock('../helpers/email/templateBuilder', () => ({
-  chatMessageTemplate: () => chatMessageTemplateMock(),
-  notificationTemplate: () => notificationTemplateMock(),
 }))
 
 let isUserOnlineMock = jest.fn()
@@ -953,8 +943,7 @@ describe('notifications', () => {
           userId: 'chatReceiver',
         })
 
-        expect(sendNotificationMailMock).not.toHaveBeenCalled()
-        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+        expect(sendChatMessageMailMock).not.toHaveBeenCalled()
       })
     })
 
@@ -989,8 +978,20 @@ describe('notifications', () => {
           userId: 'chatReceiver',
         })
 
-        expect(sendMailMock).toHaveBeenCalledTimes(1)
-        expect(chatMessageTemplateMock).toHaveBeenCalledTimes(1)
+        expect(sendChatMessageMailMock).toHaveBeenCalledTimes(1)
+        expect(sendChatMessageMailMock).toHaveBeenCalledWith({
+          email: 'user@example.org',
+          senderUser: expect.objectContaining({
+            name: 'chatSender',
+            slug: 'chatsender',
+            id: 'chatSender',
+          }),
+          recipientUser: expect.objectContaining({
+            name: 'chatReceiver',
+            slug: 'chatreceiver',
+            id: 'chatReceiver',
+          }),
+        })
       })
     })
 
@@ -1010,8 +1011,7 @@ describe('notifications', () => {
         expect(pubsubSpy).not.toHaveBeenCalled()
         expect(pubsubSpy).not.toHaveBeenCalled()
 
-        expect(sendMailMock).not.toHaveBeenCalled()
-        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+        expect(sendChatMessageMailMock).not.toHaveBeenCalled()        
       })
     })
 
@@ -1031,8 +1031,7 @@ describe('notifications', () => {
         expect(pubsubSpy).not.toHaveBeenCalled()
         expect(pubsubSpy).not.toHaveBeenCalled()
 
-        expect(sendMailMock).not.toHaveBeenCalled()
-        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+        expect(sendChatMessageMailMock).not.toHaveBeenCalled()        
       })
     })
 
@@ -1068,8 +1067,7 @@ describe('notifications', () => {
           userId: 'chatReceiver',
         })
 
-        expect(sendMailMock).not.toHaveBeenCalled()
-        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+        expect(sendChatMessageMailMock).not.toHaveBeenCalled()        
       })
     })
   })

@@ -12,6 +12,7 @@ import { createTransport } from 'nodemailer'
 import CONFIG from '@config/index'
 import logosWebapp from '@config/logos'
 import metadata from '@config/metadata'
+import { UserDbProperties } from '@db/types/User'
 
 const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD
 const hasDKIMData =
@@ -161,6 +162,38 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
                 CONFIG.CLIENT_URI,
               )
             : undefined,
+      },
+    })
+    return originalMessage as OriginalMessage
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+export interface ChatMessageEmailInput {
+  senderUser: UserDbProperties
+  recipientUser: UserDbProperties
+  email: string
+}
+
+export const sendChatMessageMail = async (
+  data: ChatMessageEmailInput,
+): Promise<OriginalMessage> => {
+  const { senderUser, recipientUser } = data
+  const to = data.email
+  try {
+    const { originalMessage } = await email.send({
+      template: path.join(__dirname, 'templates', 'chat_message'),
+      message: {
+        to,
+      },
+      locals: {
+        ...defaultParams,
+        locale: recipientUser.locale,
+        name: recipientUser.name,
+        chattingUser: senderUser.name,
+        chattingUserUrl: new URL(`/user/${senderUser.id}/${senderUser.slug}`, CONFIG.CLIENT_URI),
+        chatUrl: new URL('/chat', CONFIG.CLIENT_URI),
       },
     })
     return originalMessage as OriginalMessage
