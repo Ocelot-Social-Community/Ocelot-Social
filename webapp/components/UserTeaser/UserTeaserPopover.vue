@@ -4,7 +4,11 @@
       v-if="$env.BADGES_ENABLED"
       :badges="[user.badgeVerification, ...user.badgeTrophiesSelected]"
     />
-    <location-info v-if="user.location" :location="user.location" class="location-info" />
+    <location-info
+      v-if="user.location"
+      :location="{ ...user.location, distanceToMe: user.distanceToMe }"
+      class="location-info"
+    />
     <ul class="statistics">
       <li>
         <ds-number :count="user.followedByCount" :label="$t('profile.followers')" />
