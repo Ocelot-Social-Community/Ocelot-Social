@@ -10,8 +10,9 @@
 import { existsSync, unlinkSync, createWriteStream } from 'node:fs'
 import path from 'node:path'
 
+import { S3Client, DeleteObjectCommand, ObjectCannedACL } from '@aws-sdk/client-s3'
+import { Upload } from '@aws-sdk/lib-storage'
 import { UserInputError } from 'apollo-server'
-import { S3 } from 'aws-sdk'
 import slug from 'slug'
 import { v4 as uuid } from 'uuid'
 
@@ -135,20 +136,24 @@ const localFileUpload = ({ createReadStream, uniqueFilename }) => {
 }
 
 const s3Upload = async ({ createReadStream, uniqueFilename, mimetype }) => {
-  const s3 = new S3({ region, endpoint })
   const s3Location = `original/${uniqueFilename}`
-
-  if (!Bucket) {
-    throw new Error('AWS_BUCKET is undefined')
-  }
   const params = {
     Bucket,
     Key: s3Location,
-    ACL: 'public-read',
+    ACL: ObjectCannedACL.public_read,
     ContentType: mimetype,
     Body: createReadStream(),
   }
-  const data = await s3.upload(params).promise()
+  const s3 = new S3Client({
+    credentials: {
+      accessKeyId: CONFIG.AWS_ACCESS_KEY_ID,
+      secretAccessKey: CONFIG.AWS_SECRET_ACCESS_KEY,
+    },
+    endpoint: CONFIG.AWS_ENDPOINT,
+    forcePathStyle: true,
+  })
+  const command = new Upload({ client: s3, params })
+  const data = await command.done()
   const { Location } = data
   return Location
 }
@@ -160,15 +165,23 @@ const localFileDelete = async (url) => {
 }
 
 const s3Delete = async (url) => {
-  const s3 = new S3({ region, endpoint })
   let { pathname } = new URL(url, 'http://example.org') // dummy domain to avoid invalid URL error
   pathname = pathname.substring(1) // remove first character '/'
-  if (!Bucket) {
-    throw new Error('AWS_BUCKET is undefined')
+  const prefix = `${Bucket}/`
+  if (pathname.startsWith(prefix)) {
+    pathname = pathname.slice(prefix.length)
   }
   const params = {
     Bucket,
     Key: pathname,
   }
-  await s3.deleteObject(params).promise()
+  const s3 = new S3Client({
+    credentials: {
+      accessKeyId: CONFIG.AWS_ACCESS_KEY_ID,
+      secretAccessKey: CONFIG.AWS_SECRET_ACCESS_KEY,
+    },
+    endpoint: CONFIG.AWS_ENDPOINT,
+    forcePathStyle: true,
+  })
+  await s3.send(new DeleteObjectCommand(params))
 }
