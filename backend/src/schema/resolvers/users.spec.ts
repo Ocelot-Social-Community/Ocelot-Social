@@ -660,8 +660,6 @@ const emailNotificationSettingsMutation = gql`
   }
 `
 
-// ---
-
 const distanceToMeQuery = gql`
   query ($id: ID!) {
     User(id: $id) {
@@ -857,8 +855,6 @@ describe('distanceToMe', () => {
     })
   })
 })
-
-// ---
 
 describe('emailNotificationSettings', () => {
   beforeEach(async () => {
