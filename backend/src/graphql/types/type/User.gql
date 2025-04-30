@@ -50,7 +50,6 @@ type User {
 
   locationName: String
   location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
-  distanceToMe: Int
   about: String
   socialMedia: [SocialMedia]! @relation(name: "OWNED_BY", direction: "IN")
 

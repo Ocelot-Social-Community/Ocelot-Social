@@ -467,36 +467,6 @@ export default {
     },
   },
   User: {
-    distanceToMe: async (parent, _params, context, _resolveInfo) => {
-      // is it myself?
-      if (parent.id === context.user.id) {
-        return null
-      }
-
-      const session = context.driver.session()
-
-      const query = session.readTransaction(async (transaction) => {
-        const result = await transaction.run(
-          `
-            MATCH (user:User {id: $parent.id})-[:IS_IN]->(userLoc:Location)
-            MATCH (me:User {id: $user.id})-[:IS_IN]->(meLoc:Location)
-            WITH
-              point({latitude: userLoc.lat, longitude: userLoc.lng}) as userPoint,
-              point({latitude: meLoc.lat, longitude: meLoc.lng}) as mePoint
-            RETURN round(point.distance(userPoint, mePoint) / 1000) as distance
-          `,
-          { parent, user: context.user },
-        )
-
-        return result.records.map((record) => record.get('distance'))[0]
-      })
-
-      try {
-        return await query
-      } finally {
-        session.close()
-      }
-    },
     emailNotificationSettings: async (parent, _params, _context, _resolveInfo) => {
       return [
         {
