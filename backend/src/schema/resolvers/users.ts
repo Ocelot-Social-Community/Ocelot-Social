@@ -467,6 +467,59 @@ export default {
     },
   },
   User: {
+    distance: async (parent, _params, context, _resolveInfo) => {
+      // is it myself?
+      if (parent.id === context.user.id) {
+        return null
+      }
+
+      const session = context.driver.session()
+
+      const query = session.readTransaction(async (transaction) => {
+        const result = await transaction.run(
+          `
+            MATCH (user:User {id: $parent.id})-[:IS_IN]->(userLoc:Location)
+            MATCH (me:User {id: $user.id})-[:IS_IN]->(meLoc:Location)
+            RETURN userLoc {.*}, meLoc {.*}
+          `,
+          { parent, user: context.user },
+        )
+
+        return {
+          userLoc: result.records.map((record) => record.get('userLoc'))[0],
+          meLoc: result.records.map((record) => record.get('meLoc'))[0],
+        }
+      })
+
+      try {
+        const result = await query
+        const lat1 = result.userLoc.lat
+        const lat2 = result.meLoc.lat
+
+        const lng1 = result.userLoc.lng
+        const lng2 = result.meLoc.lng
+
+        // calc distance
+        // https://www.movable-type.co.uk/scripts/latlong.html
+        const R = 6371e3 // metres
+        const φ1 = (lat1 * Math.PI) / 180 // φ, λ in radians
+        const φ2 = (lat2 * Math.PI) / 180
+        const Δφ = ((lat2 - lat1) * Math.PI) / 180
+        const Δλ = ((lng2 - lng1) * Math.PI) / 180
+
+        const a =
+          Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+          Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2)
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+
+        const d = R * c // in metres
+
+        // return in rounded kilometers
+        return Math.round(d / 1000)
+      } finally {
+        session.close()
+      }
+    },
     emailNotificationSettings: async (parent, _params, _context, _resolveInfo) => {
       return [
         {
