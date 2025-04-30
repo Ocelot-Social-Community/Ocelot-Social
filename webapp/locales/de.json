@@ -12,6 +12,7 @@
   "admin": {
     "badges": {
       "description": "Stelle die verfügbaren Auszeichnungen für diesen Nutzer ein.",
+      "noBadges": "Keine Auszeichnungen vorhanden.",
       "revokeTrophy": {
         "error": "Trophäe konnte nicht widerrufen werden!",
         "success": "Trophäe erfolgreich widerrufen"
@@ -97,8 +98,7 @@
           "number": "Nr.",
           "role": "Rolle",
           "slug": "Alias"
-        },
-        "edit": "Bearbeiten"
+        }
       }
     }
   },
@@ -266,10 +266,10 @@
     }
   },
   "contribution": {
-    "amount-clicks": "{amount} clicks",
-    "amount-comments": "{amount} comments",
-    "amount-shouts": "{amount} recommendations",
-    "amount-views": "{amount} views",
+    "amount-clicks": "{amount} Klicks",
+    "amount-comments": "{amount} Kommentare",
+    "amount-shouts": "{amount} Empfehlungen",
+    "amount-views": "{amount} Aurufe",
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} von {max} Themen ausgewählt"
     },
@@ -617,7 +617,7 @@
       "tooltip": "Landkarte"
     },
     "notifications": {
-      "tooltip": "Banachrichtigungen"
+      "tooltip": "Benachrichtigungen"
     }
   },
   "index": {
@@ -957,6 +957,16 @@
     "title": "Suchergebnisse"
   },
   "settings": {
+    "badges": {
+      "click-to-select": "Klicke auf einen freien Platz, um eine Badge hinzufügen.",
+      "click-to-use": "Klicke auf eine Badge, um sie zu platzieren.",
+      "description": "Hier hast du die Möglichkeit zu entscheiden, wie deine bereits erworbenen Badges in deinem Profil gezeigt werden sollen.",
+      "name": "Badges",
+      "no-badges-available": "Im Moment stehen dir keine Badges zur Verfügung, die du hinzufügen könntest.",
+      "remove": "Badge entfernen",
+      "success-update": "Deine Badges wurden erfolgreich gespeichert.",
+      "verification": "Dies ist deine Verifikations-Badge und kann nicht geändert werden."
+    },
     "blocked-users": {
       "block": "Nutzer blockieren",
       "columns": {
@@ -1071,20 +1081,20 @@
     "name": "Einstellungen",
     "notifications": {
       "chat": "Chat",
-      "chatMessage": "Nachricht erhalten während Abwesenheit",
+      "chatMessage": "Nachricht erhalten während Abwesenheit.",
       "checkAll": "Alle auswählen",
-      "commentOnObservedPost": "Kommentare zu beobachteten Beiträgen",
-      "followingUsers": "Ein Nutzer dem ich folge veröffentlichte einen neuen Beitrag",
+      "commentOnObservedPost": "Kommentare zu beobachteten Beiträgen.",
+      "followingUsers": "Ein Nutzer dem ich folge veröffentlichte einen neuen Beitrag.",
       "group": "Gruppen",
-      "groupMemberJoined": "Ein Mitglied ist deiner Gruppe beigetreten",
-      "groupMemberLeft": "Ein Mitglied hat deine Gruppe verlassen",
-      "groupMemberRemoved": "Du wurdest aus einer Gruppe entfernt",
-      "groupMemberRoleChanged": "Deine Rolle in einer Gruppe wurde geändert",
-      "mention": "Ich wurde erwähnt",
-      "name": "Benachrichtigungen per Email",
+      "groupMemberJoined": "Ein Mitglied ist deiner Gruppe beigetreten.",
+      "groupMemberLeft": "Ein Mitglied hat deine Gruppe verlassen.",
+      "groupMemberRemoved": "Du wurdest aus einer Gruppe entfernt.",
+      "groupMemberRoleChanged": "Deine Rolle in einer Gruppe wurde geändert oder du wurdest eingeladen.",
+      "mention": "Ich wurde erwähnt.",
+      "name": "Benachrichtigungen per E-Mail",
       "post": "Beiträge und Kommentare",
-      "postByFollowedUser": "Beitrag von einem Nutzer, dem ich folge",
-      "postInGroup": "Beitrag in einer Gruppe, die ich beobachte",
+      "postByFollowedUser": "Beitrag von einem Nutzer, dem ich folge.",
+      "postInGroup": "Beitrag in einer Gruppe, die ich beobachte.",
       "send-email-notifications": "Sende E-Mail-Benachrichtigungen",
       "success-update": "Benachrichtigungs-Einstellungen gespeichert!",
       "uncheckAll": "Alle abwählen"

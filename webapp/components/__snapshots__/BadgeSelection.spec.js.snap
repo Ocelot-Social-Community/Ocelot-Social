@@ -1,0 +1,84 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Badges.vue with badges renders 1`] = `
+<div>
+  <div
+    class="badge-selection"
+  >
+    <button
+      class="badge-selection-item"
+    >
+      <div
+        class="badge-icon"
+      >
+        <img
+          alt="1"
+          src="/api/path/to/some/icon"
+        />
+      </div>
+       
+      <div
+        class="badge-info"
+      >
+        <div
+          class="badge-description"
+        >
+          Some description
+        </div>
+      </div>
+    </button>
+    <button
+      class="badge-selection-item"
+    >
+      <div
+        class="badge-icon"
+      >
+        <img
+          alt="2"
+          src="/api/path/to/another/icon"
+        />
+      </div>
+       
+      <div
+        class="badge-info"
+      >
+        <div
+          class="badge-description"
+        >
+          Another description
+        </div>
+      </div>
+    </button>
+    <button
+      class="badge-selection-item"
+    >
+      <div
+        class="badge-icon"
+      >
+        <img
+          alt="3"
+          src="/api/path/to/third/icon"
+        />
+      </div>
+       
+      <div
+        class="badge-info"
+      >
+        <div
+          class="badge-description"
+        >
+          Third description
+        </div>
+      </div>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Badges.vue without badges renders 1`] = `
+<div>
+  <div
+    class="badge-selection"
+  />
+</div>
+`;

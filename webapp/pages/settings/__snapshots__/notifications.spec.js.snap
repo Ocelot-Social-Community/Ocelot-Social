@@ -12,11 +12,11 @@ exports[`notifications.vue mount renders 1`] = `
    
   <div
     class="ds-space"
-    style="margin-top: 24px; margin-bottom: 32px;"
+    style="margin-top: 16px; margin-bottom: 16px;"
   >
     <div
       class="ds-space"
-      style="margin-bottom: 16px;"
+      style="margin-bottom: 8px;"
     >
       <h4>
         settings.notifications.post
@@ -66,11 +66,11 @@ exports[`notifications.vue mount renders 1`] = `
   </div>
   <div
     class="ds-space"
-    style="margin-top: 24px; margin-bottom: 32px;"
+    style="margin-top: 16px; margin-bottom: 16px;"
   >
     <div
       class="ds-space"
-      style="margin-bottom: 16px;"
+      style="margin-bottom: 8px;"
     >
       <h4>
         settings.notifications.group
@@ -155,42 +155,47 @@ exports[`notifications.vue mount renders 1`] = `
     </div>
   </div>
    
-  <button
-    class="base-button"
-    type="button"
+  <div
+    class="ds-space"
+    style="margin-top: 24px; margin-bottom: 8px;"
   >
-    <!---->
+    <button
+      class="base-button"
+      type="button"
+    >
+      <!---->
+       
+      <!---->
+       
+      settings.notifications.checkAll
+    
+    </button>
      
-    <!---->
+    <button
+      class="base-button"
+      type="button"
+    >
+      <!---->
+       
+      <!---->
+       
+      settings.notifications.uncheckAll
+    
+    </button>
      
-    settings.notifications.checkAll
-  
-  </button>
-   
-  <button
-    class="base-button"
-    type="button"
-  >
-    <!---->
-     
-    <!---->
-     
-    settings.notifications.uncheckAll
-  
-  </button>
-   
-  <button
-    class="save-button base-button --filled"
-    disabled="disabled"
-    type="button"
-  >
-    <!---->
-     
-    <!---->
-     
-    actions.save
-  
-  </button>
+    <button
+      class="save-button base-button --filled"
+      disabled="disabled"
+      type="button"
+    >
+      <!---->
+       
+      <!---->
+       
+      actions.save
+    
+    </button>
+  </div>
    
   <!---->
 </article>
