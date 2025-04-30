@@ -23,9 +23,9 @@ jest.mock('@middleware/helpers/email/sendMail', () => ({
   sendMail: (notification) => sendMailMock(notification),
 }))
 
-const sendMailNewMock: (notification) => void = jest.fn()
+const sendNotificationMailMock: (notification) => void = jest.fn()
 jest.mock('@src/emails/sendEmail', () => ({
-  sendMail: (notification) => sendMailNewMock(notification),
+  sendNotificationMail: (notification) => sendNotificationMailMock(notification),
 }))
 
 const chatMessageTemplateMock = jest.fn()
@@ -244,8 +244,8 @@ describe('notifications', () => {
             )
 
             // Mail
-            expect(sendMailNewMock).toHaveBeenCalledTimes(1)
-            expect(sendMailNewMock).toHaveBeenCalledWith(
+            expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+            expect(sendNotificationMailMock).toHaveBeenCalledWith(
               expect.objectContaining({
                 reason: 'commented_on_post',
                 email: 'test@example.org',
@@ -285,7 +285,7 @@ describe('notifications', () => {
               )
 
               // No Mail
-              expect(sendMailNewMock).not.toHaveBeenCalled()
+              expect(sendNotificationMailMock).not.toHaveBeenCalled()
             })
           })
 
@@ -406,8 +406,8 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailNewMock).toHaveBeenCalledTimes(1)
-          expect(sendMailNewMock).toHaveBeenCalledWith(
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledWith(
             expect.objectContaining({
               reason: 'mentioned_in_post',
               email: 'test@example.org',
@@ -447,7 +447,7 @@ describe('notifications', () => {
             })
 
             // Mail
-            expect(sendMailNewMock).not.toHaveBeenCalled()
+            expect(sendNotificationMailMock).not.toHaveBeenCalled()
           })
         })
 
@@ -953,7 +953,7 @@ describe('notifications', () => {
           userId: 'chatReceiver',
         })
 
-        expect(sendMailNewMock).not.toHaveBeenCalled()
+        expect(sendNotificationMailMock).not.toHaveBeenCalled()
         expect(chatMessageTemplateMock).not.toHaveBeenCalled()
       })
     })
@@ -1149,8 +1149,8 @@ describe('notifications', () => {
         })
 
         // Mail
-        expect(sendMailNewMock).toHaveBeenCalledTimes(1)
-        expect(sendMailNewMock).toHaveBeenCalledWith(
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
             reason: 'user_joined_group',
             email: 'owner@example.org',
@@ -1187,7 +1187,7 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailNewMock).not.toHaveBeenCalled()
+          expect(sendNotificationMailMock).not.toHaveBeenCalled()
         })
       })
     })
@@ -1256,14 +1256,14 @@ describe('notifications', () => {
         })
 
         // Mail
-        expect(sendMailNewMock).toHaveBeenCalledTimes(2)
-        expect(sendMailNewMock).toHaveBeenCalledWith(
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(2)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
             reason: 'user_joined_group',
             email: 'owner@example.org',
           }),
         )
-        expect(sendMailNewMock).toHaveBeenCalledWith(
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
             reason: 'user_left_group',
             email: 'owner@example.org',
@@ -1312,7 +1312,7 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailNewMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
         })
       })
     })
@@ -1371,8 +1371,8 @@ describe('notifications', () => {
         })
 
         // Mail
-        expect(sendMailNewMock).toHaveBeenCalledTimes(1)
-        expect(sendMailNewMock).toHaveBeenCalledWith(
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
             reason: 'changed_group_member_role',
             email: 'test@example.org',
@@ -1409,7 +1409,7 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailNewMock).not.toHaveBeenCalled()
+          expect(sendNotificationMailMock).not.toHaveBeenCalled()
         })
       })
     })
@@ -1467,8 +1467,8 @@ describe('notifications', () => {
         })
 
         // Mail
-        expect(sendMailNewMock).toHaveBeenCalledTimes(1)
-        expect(sendMailNewMock).toHaveBeenCalledWith(
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
             reason: 'removed_user_from_group',
             email: 'test@example.org',
@@ -1505,7 +1505,7 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailNewMock).not.toHaveBeenCalled()
+          expect(sendNotificationMailMock).not.toHaveBeenCalled()
         })
       })
     })

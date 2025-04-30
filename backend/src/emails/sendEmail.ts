@@ -86,7 +86,7 @@ interface OriginalMessage {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const sendMail = async (notification: any): Promise<OriginalMessage> => {
+export const sendNotificationMail = async (notification: any): Promise<OriginalMessage> => {
   const locale = notification?.to?.locale
   const to = notification?.email
   const name = notification?.to?.name

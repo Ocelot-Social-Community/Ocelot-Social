@@ -16,9 +16,9 @@ import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock: (notification) => void = jest.fn()
+const sendNotificationMailMock: (notification) => void = jest.fn()
 jest.mock('@src/emails/sendEmail', () => ({
-  sendMail: (notification) => sendMailMock(notification),
+  sendNotificationMail: (notification) => sendNotificationMailMock(notification),
 }))
 
 let server, query, mutate, authenticatedUser, emaillessMember
@@ -213,8 +213,8 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends only one email', () => {
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
-          expect(sendMailMock).toHaveBeenCalledWith(
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledWith(
             expect.objectContaining({
               reason: 'mentioned_in_post',
               email: 'group.member@example.org',
@@ -291,8 +291,8 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends only one email', () => {
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
-          expect(sendMailMock).toHaveBeenCalledWith(
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledWith(
             expect.objectContaining({
               reason: 'followed_user_posted',
               email: 'group.member@example.org',
@@ -370,8 +370,8 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends only one email', () => {
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
-          expect(sendMailMock).toHaveBeenCalledWith(
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledWith(
             expect.objectContaining({
               reason: 'post_in_group',
               email: 'group.member@example.org',
@@ -450,7 +450,7 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends NO email', () => {
-          expect(sendMailMock).not.toHaveBeenCalled()
+          expect(sendNotificationMailMock).not.toHaveBeenCalled()
         })
 
         it('sends 3 notifications', async () => {
@@ -544,8 +544,8 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends only one email', () => {
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
-          expect(sendMailMock).toHaveBeenCalledWith(
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledWith(
             expect.objectContaining({
               reason: 'mentioned_in_comment',
               email: 'group.member@example.org',
@@ -632,8 +632,8 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends only one email', () => {
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
-          expect(sendMailMock).toHaveBeenCalledWith(
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledWith(
             expect.objectContaining({
               reason: 'mentioned_in_comment',
               email: 'group.member@example.org',
@@ -721,7 +721,7 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends NO email', () => {
-          expect(sendMailMock).not.toHaveBeenCalled()
+          expect(sendNotificationMailMock).not.toHaveBeenCalled()
         })
 
         it('sends 2 notifications', async () => {

@@ -1,6 +1,6 @@
-import { sendMail } from './sendEmail' // , transport
+import { sendNotificationMail } from './sendEmail'
 
-describe('sendEmail', () => {
+describe('sendNotificationMail', () => {
   let locale = 'en'
 
   describe('English', () => {
@@ -10,7 +10,7 @@ describe('sendEmail', () => {
 
     it('followed_user_posted template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'followed_user_posted',
           email: 'user@example.org',
           to: {
@@ -35,7 +35,7 @@ describe('sendEmail', () => {
 
     it('post_in_group template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'post_in_group',
           email: 'user@example.org',
           to: {
@@ -60,7 +60,7 @@ describe('sendEmail', () => {
 
     it('mentioned_in_post template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'mentioned_in_post',
           email: 'user@example.org',
           to: {
@@ -85,7 +85,7 @@ describe('sendEmail', () => {
 
     it('commented_on_post template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'commented_on_post',
           email: 'user@example.org',
           to: {
@@ -115,7 +115,7 @@ describe('sendEmail', () => {
 
     it('mentioned_in_comment template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'mentioned_in_comment',
           email: 'user@example.org',
           to: {
@@ -145,7 +145,7 @@ describe('sendEmail', () => {
 
     it('changed_group_member_role template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'changed_group_member_role',
           email: 'user@example.org',
           to: {
@@ -166,7 +166,7 @@ describe('sendEmail', () => {
 
     it('user_joined_group template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'user_joined_group',
           email: 'user@example.org',
           to: {
@@ -192,7 +192,7 @@ describe('sendEmail', () => {
 
     it('user_left_group template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'user_left_group',
           email: 'user@example.org',
           to: {
@@ -218,7 +218,7 @@ describe('sendEmail', () => {
 
     it('removed_user_from_group template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'removed_user_from_group',
           email: 'user@example.org',
           to: {
@@ -245,7 +245,7 @@ describe('sendEmail', () => {
 
     it('followed_user_posted template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'followed_user_posted',
           email: 'user@example.org',
           to: {
@@ -270,7 +270,7 @@ describe('sendEmail', () => {
 
     it('post_in_group template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'post_in_group',
           email: 'user@example.org',
           to: {
@@ -295,7 +295,7 @@ describe('sendEmail', () => {
 
     it('mentioned_in_post template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'mentioned_in_post',
           email: 'user@example.org',
           to: {
@@ -320,7 +320,7 @@ describe('sendEmail', () => {
 
     it('commented_on_post template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'commented_on_post',
           email: 'user@example.org',
           to: {
@@ -350,7 +350,7 @@ describe('sendEmail', () => {
 
     it('mentioned_in_comment template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'mentioned_in_comment',
           email: 'user@example.org',
           to: {
@@ -380,7 +380,7 @@ describe('sendEmail', () => {
 
     it('changed_group_member_role template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'changed_group_member_role',
           email: 'user@example.org',
           to: {
@@ -401,7 +401,7 @@ describe('sendEmail', () => {
 
     it('user_joined_group template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'user_joined_group',
           email: 'user@example.org',
           to: {
@@ -427,7 +427,7 @@ describe('sendEmail', () => {
 
     it('user_left_group template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'user_left_group',
           email: 'user@example.org',
           to: {
@@ -453,7 +453,7 @@ describe('sendEmail', () => {
 
     it('removed_user_from_group template', async () => {
       await expect(
-        sendMail({
+        sendNotificationMail({
           reason: 'removed_user_from_group',
           email: 'user@example.org',
           to: {

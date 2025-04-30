@@ -10,7 +10,7 @@ import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 // eslint-disable-next-line import/no-cycle
 import { getUnreadRoomsCount } from '@schema/resolvers/rooms'
-import { sendMail as sendMailNew } from '@src/emails/sendEmail'
+import { sendNotificationMail } from '@src/emails/sendEmail'
 import { pubsub, NOTIFICATION_ADDED, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '@src/server'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
@@ -31,7 +31,7 @@ const publishNotifications = async (
       !isUserOnline(notificationAdded.to) &&
       !emailsSent.includes(notificationAdded.email)
     ) {
-      void sendMailNew(notificationAdded)
+      void sendNotificationMail(notificationAdded)
       emailsSent.push(notificationAdded.email)
     }
   })
