@@ -10,7 +10,7 @@ describe('LocationInfo', () => {
       propsData: {
         location: {
           name: 'Paris',
-          distance: withDistance ? 100 : null,
+          distanceToMe: withDistance ? 100 : null,
         },
       },
       mocks: {
